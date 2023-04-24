@@ -61,15 +61,19 @@ async function responseInterceptor(response: HttpResponse<object>) {
   }
   // eslint-disable-next-line prefer-const
   let { data } = response;
-  const { success, code } = data;
+  const { success, code, message } = data;
   if (success || code === '0') {
     return Promise.resolve(response);
   }
   if (response.headers['content-disposition'] && response.headers['content-disposition'].indexOf('attachment') > -1) {
     return Promise.resolve(response);
   }
-  if (code === 'USER-0009') {
-    window.location.href = '/#/login';
+  if (code === 'USER-0009' && localStorage.getItem('enabledSSO') !== 'true') {
+    window.location.href = '/login';
+    return Promise.reject({});
+  }
+  if (code === 'SSO-0001') {
+    window.location.href = `${message}?back=${window.location.href}`;
     return Promise.reject({});
   }
   return Promise.reject(data);

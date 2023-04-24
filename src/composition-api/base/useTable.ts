@@ -8,13 +8,11 @@ import useRequest from '@/composition-api/base/useRequest';
 
 type Resp<T> = ApiResponse<T[] | TableResponse<T>>;
 
-type BuildParams<P extends Array<any>> = (page: number, pageSize: number) => P;
+type BuildParams<P extends Array<any>> = (page: number, size: number) => P;
 type ProcessResp<T> = (response: Resp<T>) => Resp<T>;
 type ListGetter<T> = (data: Ref<T[] | TableResponse<T>>) => T[];
 type ListSetter<T> = (data: T[]) => void;
 type FnName = 'buildParams' | 'processResp' | 'listGetter' | 'listSetter';
-
-const pageOffest = 0;
 
 interface Opt<P extends Array<any>, T> {
   initData: T[] | TableResponse<T>;
@@ -38,10 +36,7 @@ interface Opt<P extends Array<any>, T> {
   listSetter: ListSetter<T>;
 }
 
-export default function useTable<P extends Array<any>, T>(
-  getList: (...params: P) => HttpResponseP<T[] | TableResponse<T>>,
-  options?: Partial<Opt<P, T>>,
-) {
+export default function useTable<P extends Array<any>, T>(getList: (...params: P) => HttpResponseP<T[] | TableResponse<T>>, options?: Partial<Opt<P, T>>) {
   const {
     loading, data, error, requestFn,
   } = useRequest(getList, {
@@ -63,13 +58,13 @@ export default function useTable<P extends Array<any>, T>(
     }
   }
 
-  function buildParams(page: number, pageSize: number): P {
+  function buildParams(page: number, size: number): P {
     const defaultFn = getDefaultFn('buildParams') as BuildParams<P>;
     if (defaultFn) {
-      return defaultFn(page, pageSize);
+      return defaultFn(page, size);
     }
     if (paging) {
-      return [{ page, pageSize }] as any;
+      return [{ page, size }] as any;
     }
     return [] as any;
   }
@@ -81,14 +76,13 @@ export default function useTable<P extends Array<any>, T>(
     }
     if (paging) {
       const resp = response as ApiResponse<TableResponse<T>>;
-      if (hasOwn(resp.result, 'total')) {
-        pagination.total = resp.result.total as number;
-      } else if (resp.result.hasNext as boolean) {
+      if (hasOwn(resp.data, 'totalCount')) {
+        pagination.total = resp.data.totalCount as number;
+      } else if (resp.data.hasNext as boolean) {
         pagination.total = pagination.pageSize * pagination.currentPage + 1;
       } else {
-        pagination.total = pagination.pageSize * pagination.currentPage;
+        pagination.total = 0;
       }
-      pagination.currentPage = resp.result.current + pageOffest;
     }
     return response;
   }
@@ -100,7 +94,7 @@ export default function useTable<P extends Array<any>, T>(
     }
     if (data.value) {
       if (paging) {
-        return (data.value as TableResponse<T>).records;
+        return ((data.value as TableResponse<T>).content || (data.value as TableResponse<T>).dataList) as T[];
       }
       return data.value as T[];
     }
@@ -112,9 +106,10 @@ export default function useTable<P extends Array<any>, T>(
     if (defaultFn) {
       defaultFn(val);
     }
+
     if (data.value) {
       if (paging) {
-        (data.value as TableResponse<T>).records = val;
+        (data.value as TableResponse<T>).content = val;
       }
       (data.value as T[]) = val;
     }
@@ -136,10 +131,12 @@ export default function useTable<P extends Array<any>, T>(
     if (paging) {
       const p = (Validator.isNumber(page) ? page : pagination.currentPage) as number;
       pagination.currentPage = p;
-      params = [{
-        page: pagination.currentPage - pageOffest,
-        size: pagination.pageSize,
-      }];
+      params = [
+        {
+          page: pagination.currentPage - 1,
+          size: pagination.pageSize,
+        },
+      ];
     }
     params = buildParams(pagination.currentPage, pagination.pageSize);
     return requestFn(...params).then(processResp);
