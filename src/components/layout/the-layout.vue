@@ -37,6 +37,7 @@
 <script setup lang="ts">
 import cacheRouter from '@/router/cacheRouter';
 import useAppStore from '@/stores/app';
+import { useLoginStore } from '@/stores/login.store';
 import { storeToRefs } from 'pinia';
 import LayoutMenu from './layout-menu.vue';
 import LayoutHeader from './layout-header.vue';
@@ -44,6 +45,7 @@ import LayoutTabs from './layout-tabs.vue';
 import LayoutFooter from './layout-footer.vue';
 
 const appStore = useAppStore();
+const loginStore = useLoginStore();
 
 const {
   contentFullScreen,
@@ -51,6 +53,10 @@ const {
   routerViewLoading,
 } = storeToRefs(appStore);
 
+onMounted(() => {
+  loginStore.firstPageLoad = true;
+  loginStore.fetchIsLogin();
+});
 </script>
 
 <style scoped lang="scss">

@@ -60,7 +60,7 @@
 
       <div class="page-detail-buttons">
         <el-button @click="handleSearch" :disabled="getListLoading">刷新</el-button>
-        <el-button @click="handleExport" :disabled="getListLoading">数据导出</el-button>
+        <el-button @click="handleExport" :disabled="getListLoading"  v-show="searchDetailInfos.searchStatus === 'success' && totalCount > 0">数据导出</el-button>
       </div>
     </div>
     <div style="text-align: right;" class="p-r-10 p-y-10" v-show="searchDetailInfos.searchStatus === 'success' && pagination.totalColumnPage">
@@ -136,7 +136,7 @@ const searchFormData = reactive<Search.GetDataSearchListParams>({
 const shortcutsDate = [
   {
     text: '今天',
-    value: today(),
+    value: () => todayNow(),
   },
   {
     text: '昨天',
@@ -190,6 +190,7 @@ function getListData() {
   columns.value = [];
   tableData.value = [];
   tableErrorMsg.value = '';
+  totalCount.value = 0;
 
   const params = {
     pageSize: pagination.pageSize,
