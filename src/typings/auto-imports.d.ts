@@ -51,6 +51,7 @@ declare global {
   const useCssModule: typeof import('vue')['useCssModule']
   const useCssVars: typeof import('vue')['useCssVars']
   const useDark: typeof import('@vueuse/core')['useDark']
+  const useDataTypeIcon: typeof import('../composition-api/index')['useDataTypeIcon']
   const useRequest: typeof import('../composition-api/index')['useRequest']
   const useSlots: typeof import('vue')['useSlots']
   const useTable: typeof import('../composition-api/index')['useTable']

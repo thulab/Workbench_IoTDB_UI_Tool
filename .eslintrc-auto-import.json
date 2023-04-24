@@ -50,6 +50,7 @@
     "useCssModule": true,
     "useCssVars": true,
     "useDark": true,
+    "useDataTypeIcon": true,
     "useRequest": true,
     "useSlots": true,
     "useTable": true,

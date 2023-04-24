@@ -18,3 +18,21 @@
   width: 100%;
   height: 100%;
 }
+
+.page-container {
+  padding: 12px;
+}
+
+.operate-details {
+  display: flex;
+  justify-content: space-between;
+}
+
+.table-wrapper {
+  margin: 8px 0;
+}
+
+.paination-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
