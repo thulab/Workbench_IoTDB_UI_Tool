@@ -1,0 +1,30 @@
+common:
+  submit: Submit
+  cancel: Cancel
+  detail: Detail
+  delete: Delete
+  deleteConfirm: Are You Sure To Delete This?
+  edit: Edit
+  operation: Operation
+  save: Save
+  clear: Clear
+  noData: No Data
+  tip: Tips
+  deleteSuccess: Delete Success
+  add: Add
+  placeHolder: Please Input
+  selectPlaceholder: Please Select
+  refresh: Refresh
+  startTime: Start Time
+  endTime: End Time
+  all: All
+  success: Success
+  fail: Fail
+  query: Query
+  reset: Reset
+  submitSuccess: Success
+  closeAll: Close All
+  closeOther: Close Other
+  confirm: OK
+  more: More
+  closeCurrent: Close Other

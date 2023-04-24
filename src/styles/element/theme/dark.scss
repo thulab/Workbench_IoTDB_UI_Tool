@@ -1,0 +1,15 @@
+// only scss variables
+
+/* stylelint-disable-next-line scss/dollar-variable-pattern */
+$--colors: (
+  "primary": (
+    "base": #495ad4,
+  ),
+  "success": (
+    "base": #28d5cb,
+  ),
+);
+
+@forward "element-plus/theme-chalk/src/dark/var.scss" with (
+  $colors: $--colors
+);

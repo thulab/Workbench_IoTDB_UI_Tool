@@ -1,0 +1,42 @@
+/* stylelint-disable-next-line scss/dollar-variable-pattern */
+$--colors: (
+  "primary": (
+    "base": #495ad4,
+  ),
+  "success": (
+    "base": #28d5cb,
+  ),
+  "warning": (
+    "base": #e6a23c,
+  ),
+  "danger": (
+    "base": #f56c6c,
+  ),
+  "error": (
+    "base": #f56c6c,
+  ),
+  "info": (
+    "base": #909399,
+  ),
+);
+
+// we can add this to custom namespace, default is 'el'
+// @forward "element-plus/theme-chalk/src/mixins/config.scss" with (
+//   $namespace: "ep"
+// );
+
+// You should use them in scss, because we calculate it by sass.
+// comment next lines to use default color
+@forward "element-plus/theme-chalk/src/common/var.scss" with (
+  // do not use same name, it will override.
+  $colors: $--colors,
+);
+
+// if you want to import all
+// @use "element-plus/theme-chalk/src/index.scss" as *;
+
+// custom dark variables
+@use "./dark.scss";
+
+// You can comment it to hide debug info.
+// @debug $--colors;

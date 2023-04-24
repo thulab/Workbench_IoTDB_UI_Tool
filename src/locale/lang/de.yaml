@@ -1,0 +1,30 @@
+common:
+  submit: Absenden
+  cancel: Abbrechen
+  detail: Weitere Informationen
+  delete: Löschen
+  deleteConfirm: Soll dieses sicher gelöscht werden?
+  edit: Bearbeiten
+  operation: Oeration
+  save: Speichern
+  clear: Leer
+  noData: Keine Daten
+  tip: Tips
+  deleteSuccess: Löschen erfolgreich
+  add: Hinzufügen
+  placeHolder: Bitte geben Sie ein
+  selectPlaceholder: Wählen Sie
+  refresh: Auffrischen
+  startTime: Startzeit
+  endTime: Endzeit
+  all: Alle
+  success: Erfolgreich
+  fail: Fehlgeschlagen
+  query: Abfragen
+  reset: Umplanen
+  submitSuccess: Success
+  closeAll: Alle Schließen
+  confirm: OK
+  more: Mehr
+  closeCurrent: Schließen Andere
+  closeOther: Schließen Andere

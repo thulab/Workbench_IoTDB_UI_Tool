@@ -1,0 +1,20 @@
+// import dark theme
+@use "element-plus/theme-chalk/src/dark/css-vars.scss" as *;
+
+/** abstracts **/
+
+@import "abstracts/variables";
+
+/** base **/
+
+@import "base/base";
+@import "base/reset";
+
+/** el-fix **/
+
+@import "element/index";
+
+#app {
+  width: 100%;
+  height: 100%;
+}

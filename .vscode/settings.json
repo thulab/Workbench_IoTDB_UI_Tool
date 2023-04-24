@@ -1,0 +1,49 @@
+{
+  "i18n-ally.localesPaths": [
+    "src/locale/lang"
+  ],
+  "i18n-ally.keystyle": "nested",
+  "i18n-ally.displayLanguage": "zh-cn",
+  "i18n-ally.enabledParsers": [
+    "yaml"
+  ],
+  "i18n-ally.dirStructure": "file",
+  "i18n-ally.extract.keyMaxLength": 50,
+  "i18n-ally.review.enabled": false,
+  "i18n-ally.review.gutters": false,
+  "i18n-ally.sourceLanguage": "zh-cn",
+  "i18n-ally.annotationInPlace": false,
+  "i18n-ally.editor.preferEditor": true,
+  "i18n-ally.namespace": true,
+  "i18n-ally.translate.engines": [
+    "google-cn",
+    "google"
+  ],
+  "editor.formatOnSave": true,
+  "[vue]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "vue",
+    "typescript",
+    "typescriptreact"
+  ],
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "stylelint.validate": [
+    "css",
+    "less",
+    "scss",
+    "postcss",
+    "vue",
+  ],
+}
