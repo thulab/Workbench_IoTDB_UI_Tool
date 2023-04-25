@@ -20,4 +20,31 @@ declare namespace Search{
     valueList: string[][];
     measurementVOList: Item[];
   }
+
+  export interface SaveSqlParams {
+    connectionId: number;
+    id: string | null;
+    queryName: string | null;
+    sqls: string;
+  }
+
+  export interface GetSqlResponse {
+    queryName: string;
+    sqls: string;
+  }
+
+  export interface QuerySqlParams {
+    sqls: string[];
+    timestamp: string | number;
+    isShowAll: boolean;
+  }
+
+  export interface QuerySqlResponse {
+    columns: number;
+    line: number;
+    metaDataList: string [];
+    valueList: string [][];
+    queryTime: string;
+    rows: number;
+  }
 }
