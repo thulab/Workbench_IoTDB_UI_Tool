@@ -304,7 +304,6 @@ function handleTimeType(type: 'datetime' | 'datetimerange') {
 }
 
 onMounted(() => {
-  console.log(getStartAndEnd(0));
   handleReset();
 });
 

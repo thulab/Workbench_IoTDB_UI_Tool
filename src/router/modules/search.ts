@@ -6,7 +6,7 @@ const route = [
   {
     path: '/search',
     component: Layout,
-    redirect: 'data-search',
+    redirect: { name: 'DataSearch' },
     meta: {
       title: '查询',
       icon: Icon,
@@ -17,12 +17,14 @@ const route = [
         name: 'DataSearch',
         component: () => import('@/views/search/data-search.vue'),
         meta: { keepAlive: true, title: '数据查询', icon: Icon, },
+        props: (route) => ({ serverId: route.query.serverId }),
       },
       {
         path: 'sql-search',
         name: 'SqlSearch',
         component: () => import('@/views/search/sql-search.vue'),
         meta: { keepAlive: true, title: 'SQL查询', icon: Icon, },
+        props: (route) => ({ serverId: route.query.serverId, queryId: route.query.queryId }),
       },
     ],
   },
