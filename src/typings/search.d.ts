@@ -21,6 +21,11 @@ declare namespace Search{
     measurementVOList: Item[];
   }
 
+  export interface SqlList {
+    id: number | string;
+    queryName: string;
+  }
+
   export interface SaveSqlParams {
     connectionId: number;
     id: string | null;
@@ -36,7 +41,6 @@ declare namespace Search{
   export interface QuerySqlParams {
     sqls: string[];
     timestamp: string | number;
-    isShowAll: boolean;
   }
 
   export interface QuerySqlResponse {

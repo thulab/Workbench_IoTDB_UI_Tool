@@ -53,7 +53,9 @@ declare module '@vue/runtime-core' {
     IEpExpand: typeof import('~icons/ep/expand')['default']
     IEpFold: typeof import('~icons/ep/fold')['default']
     IEpFullScreen: typeof import('~icons/ep/full-screen')['default']
+    IEpInfoFilled: typeof import('~icons/ep/info-filled')['default']
     IEpMore: typeof import('~icons/ep/more')['default']
+    IEpPlus: typeof import('~icons/ep/plus')['default']
     IEpSearch: typeof import('~icons/ep/search')['default']
     IEpVideoPause: typeof import('~icons/ep/video-pause')['default']
     IEpVideoPlay: typeof import('~icons/ep/video-play')['default']
@@ -66,6 +68,7 @@ declare module '@vue/runtime-core' {
     LayoutTabsMoreOperation: typeof import('./../components/layout/components/layout-tabs-more-operation.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TextTooltip: typeof import('./../components/text-tooltip.vue')['default']
     TheLayout: typeof import('./../components/layout/the-layout.vue')['default']
   }
   export interface ComponentCustomProperties {
