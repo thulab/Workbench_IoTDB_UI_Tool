@@ -10,7 +10,12 @@
           <el-button size="small" circle class="add-tab-btn" @click="handleTabAdd"><i-ep-plus /></el-button>
         </div>
         <div class="sql-title-box">
-          <h4>SQL输入</h4>
+          <div class="sql-title-text">
+            <span>SQL输入</span>
+            <el-tooltip effect="light" content="操作说明" placement="top">
+              <a href="https://iotdb.apache.org/zh/UserGuide/V1.1.x/Query-Data/Overview.html" target="_blank"><i-ep-question-filled /></a>
+            </el-tooltip>
+          </div>
           <div class="sql-right-icon-box">
             <el-tooltip effect="light" content="保存" placement="top">
               <el-icon @click="handleSave"><i-ep-document /></el-icon>
@@ -47,24 +52,28 @@
             <el-tabs v-model="activeName" class="tabs_nav">
               <el-tab-pane v-for="(item, index) of columnList" :key="index" :name="`t${index}`">
                 <template #label>
-                  <span
-                  >运行结果{{ index + 1 }}
-                    <el-icon class="iconmore green"><i-ep-more /></el-icon>
-                  </span>
+                  <span>运行结果{{ index + 1 }}</span>
                 </template>
-                <div class="header_messge flex">
-                  <div>
-                    <span @click="exportSql(index)">
-                      <svg class="icon icon-1 icon-color" aria-hidden="true">
-                        <use xlink:href="#icon-se-icon-download" />
-                      </svg>
-                      <span class="downloadchart">下载</span>
-                    </span>
+                <div class="run-result-infos">
+                  <ul>
+                    <li class="run-result-item">查询状态：{{ formatSqlInfo('status', index) }}</li>
+                    <li class="run-result-item">开始时间：{{ formatSqlInfo('startQueryTime', index) }}</li>
+                    <li class="run-result-item">查询耗时：{{ formatSqlInfo('queryTime', index) }}</li>
+                    <li class="run-result-item">查询结果：{{ formatSqlInfo('result', index) }}</li>
+                    
                     <span class="frist_span">最多下载10万条数据</span>
-                  </div>
-                  <div>
-                    <span class="frist_span">查询时间：{{ timeList[index] }}</span>
-                    <span class="frist_span">查询行数：{{ lineList[index] }}</span>
+                  </ul>
+                  <div class="run-result-buttons">
+                    <el-button type="text" @click="handleCommandDown('refresh', index)"><i-ep-refresh />刷新</el-button>
+                    <el-dropdown class="more-icon" @command="val => handleCommandDown(val, index)">
+                      <i-ep-download />下载<el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-ep-question-filled /></el-tooltip>
+                      <template #dropdown>
+                        <el-dropdown-menu>
+                          <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
+                          <el-dropdown-item command="excel">以.excel格式导出</el-dropdown-item>
+                        </el-dropdown-menu>
+                      </template>
+                    </el-dropdown>
                   </div>
                 </div>
                 <div class="tab_table" v-if="item && display">
@@ -82,6 +91,7 @@
                 </div>
                 <div class="tab_table" v-else>
                   <span v-if="display">执行成功,该查询语句无数据返回</span>
+                  <span v-if="sqlResult[index].errMsg">{{ sqlResult[index].errMsg }}</span>
                 </div>
               </el-tab-pane>
             </el-tabs>
@@ -162,8 +172,8 @@ const nameDialogVisible = ref(false);
 const renameDialogVisible = ref(false);
 const divwerHeight = ref(430);
 const timeNumber = ref(0);
+const currentQueryTime = ref('');
 const display = ref(false);
-const tabelNum = ref(0);
 const standTable = ref(null);
 const key = ref('1');
 const activiteSql = ref<string>('_0');
@@ -171,10 +181,7 @@ const activeName = ref<string | number>(0);
 const sqlList = ref<Search.SqlList[]>([{ id: '', queryName: `查询${dayjs().format('YYYY-MM-DD HH:mm').replace(/\-|\:| /g, '')}` }]);
 const activeNameSide = ref('function');
 const runFlag = ref(true);
-const rows = ref(0);
-const columns = ref(0);
-const lineList = ref<number[]>([]);
-const timeList = ref<string[]>([]);
+const sqlResult = ref<Search.QuerySqlResponse[]>([]);
 
 const code = ref('');
 const sqlListRef = ref<InstanceType<typeof sideTemplate>>();
@@ -217,7 +224,6 @@ const pagination = reactive({
   pageSize: 10,
   pageNum: 1,
 });
-const totalTips = computed(() => `现一共有${rows.value}行, ${columns.value}列`);
 
 const { requestFn: queryStop } = useRequest(SearchApi.queryStop);
 const { requestFn: getSql } = useRequest(SearchApi.getSql);
@@ -290,20 +296,16 @@ function querySqlRun() {
     display.value = false;
     runFlag.value = false;
     timeNumber.value = Number(new Date());
+    currentQueryTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
     querySql(props.serverId, { sqls: code.value?.split('\n'), timestamp: timeNumber.value })
       .then((res) => {
         const { data } = res;
         activeName.value = 't0';
-        columnList.value = [];
-        tableData.list = [];
-        const lengthArry = [];
-        timeList.value = [];
-        lineList.value = [];
-        tabelNum.value = data.length;
+        columnList.value = []; // 列名
+        tableData.list = []; // 值
+        sqlResult.value = data || [];
         data.forEach((item) => {
           const length = <number[]>[];
-          timeList.value.push(item.queryTime);
-          lineList.value.push(item.line);
           if (item.metaDataList) {
             columnList.value.push(item.metaDataList.map((eleitem, index) => ({
               label: eleitem,
@@ -330,12 +332,9 @@ function querySqlRun() {
           } else {
             tableData.list.push(null);
           }
-          lengthArry.push(length);
         });
         display.value = true;
         runFlag.value = true;
-        rows.value = data[0].rows;
-        columns.value = data[0].columns;
       })
       .finally(() => {
         runFlag.value = true;
@@ -347,6 +346,20 @@ function querySqlRun() {
     ElMessage.error('查询正在运行中，请勿重复操作');
   }
 }
+// 查询结果
+const formatSqlInfo = computed(() => function(filed: string, index: number) {
+  let data: Search.QuerySqlResponse = sqlResult.value[index]
+  if (filed === 'status') {
+    return data.status === undefined ? '' : (data.status ? '查询成功' : '查询失败')
+  } else if (filed === 'startQueryTime') {
+    return data.startQueryTime ? data.startQueryTime : currentQueryTime.value
+  } else if (filed === 'queryTime') {
+    return data.status ? data.queryTime : ''
+  } else if (filed === 'result') {
+    return data.status ? `共${data.rows}行${data.line}列` : ''
+  }
+  return ''
+})
 // 添加tab
 function handleTabAdd() {
   const currentSqlLength = sqlList.value.length || 0;
@@ -458,26 +471,63 @@ function handleSave() {
 function stopquery() {
   queryStop(props.serverId, timeNumber.value).then(() => {});
 }
+// 下载
+function handleCommandDown(val: string, index: number) {
+  if (val === 'refresh') {
+    const codevalArr = code.value?.split('\n');
+    sqlResult.value[index].startQueryTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    columnList.value.splice(index, 1, []);
+    tableData.list.splice(index, 1, {});
+    querySql(props.serverId, { sqls: [codevalArr[index]], timestamp: dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).valueOf() })
+      .then((res) => {
+        const { data } = res;
+        data.forEach((item) => {
+          const length = <number[]>[];
+          if (item.metaDataList) {
+            columnList.value.splice(index, 1, item.metaDataList.map((eleitem, index) => ({
+              label: eleitem,
+              prop: `t${index}`,
+              width: 'auto',
+              fixed: index === 0 ? 'left' : false,
+            })));
+          } else {
+            columnList.value.splice(index, 1, null);
+          }
+          if (item.valueList) {
+            tableData.list.splice(index, 1, {
+              list: item.valueList.map((eleitem) => {
+                const obj = <Record<string, string>>({});
+                for (let i = 0; i < eleitem.length; i++) {
+                  if (eleitem[i].length > length[i] || !length[i]) {
+                    length[i] = eleitem[i].length;
+                  }
+                  obj[`t${i}`] = eleitem[i];
+                }
+                return obj;
+              }),
+            });
+          } else {
+            tableData.list.splice(index, 1, null);
+          }
+        });
+      })
+  } else if (val === 'csv') {
+    exportSql(index)
+  } else {
+    // TODO excel
+  }
+}
 function exportSql(i: number) {
   const codevalArr = code.value?.split('\n');
   exportDataSql(props.serverId, codevalArr[i]).then((res) => {
     if (res) {
-      ElMessage({
-        type: 'success',
-        message: '导出成功',
-      });
+      ElMessage.success('导出成功');
       handleExport(res, 'export.CSV');
     } else {
-      ElMessage({
-        type: 'info',
-        message: '导出未完成',
-      });
+      ElMessage.info('导出未完成');
     }
   }).catch((err) => {
-    ElMessage({
-      type: 'error',
-      message: err.message,
-    });
+    ElMessage.error(err.message);
   });
 }
 // 清空
@@ -490,6 +540,8 @@ function emptyQuery() {
     .then(() => {
       code.value = '';
       tableData.list = [];
+      columnList.value = [];
+      sqlResult.value = [];
     });
 }
 
@@ -561,6 +613,18 @@ watch(
   padding: 4px 8px;
 }
 
+.sql-title-text {
+  display: flex;
+  align-items: center;
+
+  a {
+    margin-left: 4px;
+    display: flex;
+    align-items: center;
+    color: #808080;
+  }
+}
+
 .sql-right-icon-box {
   display: flex;
 
@@ -585,5 +649,10 @@ watch(
       color: #ccc;
     }
   }
+}
+
+.run-result-infos {
+  display: flex;
+  justify-content: space-between;
 }
 </style>

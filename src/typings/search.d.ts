@@ -50,5 +50,8 @@ declare namespace Search{
     valueList: string [][];
     queryTime: string;
     rows: number;
+    status?: boolean;
+    errMsg: string;
+    startQueryTime?: string;
   }
 }

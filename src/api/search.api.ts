@@ -36,7 +36,7 @@ class SearchApi {
 
   // Import query
   static exportDataSql(serverId: string, sql: string): HttpResponseP {
-    return http.get('/file/exportData', { params: { sql, serverId } });
+    return http.get('/file/exportSqlData', { params: { sql, serverId } });
   }
 }
 export default SearchApi;
