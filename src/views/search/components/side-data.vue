@@ -1,128 +1,229 @@
 <template>
-  <div>
-    <div class="search_div">
-      <el-select v-model="groupName" :placeholder="$t('device.selectdataconnection')" class="elinput select-icon" @change="getdevicel">
-        <el-option
-          v-for="item in data.list"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        />
-      </el-select>
-      <el-select v-model="deviceName" :placeholder="$t('device.selectp')" class="elinput select-icon m-t-8" @change="getpylist">
-        <el-option v-for="item in deviceList" :key="item.value" :label="item.label" :value="item.value" />
-      </el-select>
-      <el-input v-model="filterText" :placeholder="$t('device.pleaseinput')" class="elinput input-icon m-t-8" @input="searchpylist">
-        <template #suffix><i-ep-search /></template>
-      </el-input>
+  <div class="search_div maxheight">
+    <div class="more-select-box">
+      <el-input placeholder="请选择存储组" v-model="storageName" readonly @focus="handleVisible('storage', true)" />
+      <div v-show="isShowStorage" class="select-box-down">
+        <el-input placeholder="输入关键字进行过滤" v-model="filterStorageText" size="small" @input="handleInput('storage')"></el-input>
+
+        <ul class="select-list-box">
+          <li v-for="item in storageList" :key="item" class="list-item-box" @click="handleSelect(item, 'storage')">
+            <text-tooltip :content="item" class-name="list-item-text" />
+          </li>
+          <li v-if="Math.ceil(storageTotal / 100) > storagePagination.pageNum && !storageLoading" @click="handleMore('storage')">加载更多</li>
+        </ul>
+      </div>
     </div>
-    <div class="search_div maxheight">
-      <span class="custom-tree-node chil" v-for="(item, index) in pyDataList" :key="'device_' + index" @dblclick="getFunction(item)" :style="{ color: index === 0 ? '#c7c6c6' : 'black' }">
-        <el-tooltip :content="item.label" placement="top">
-          <span>{{ item.label }}</span>
-        </el-tooltip>
-        <span>{{ item.decr || '——' }}</span>
-        <span>{{ item.type }}</span>
-      </span>
+    
+    <div class="more-select-box">
+      <el-input placeholder="请选择设备" v-model="deviceName" readonly :disabled="!storageName" @focus="handleVisible('device', true)" />
+      <div v-show="isShowDevice" class="select-box-down">
+        <el-input placeholder="输入关键字进行过滤" v-model="filterDeviceText" size="small" @input="handleInput('device')" ></el-input>
+
+        <ul class="select-list-box">
+          <li v-for="item in deviceList" :key="item" class="list-item-box" @click="handleSelect(item, 'device')">
+            <text-tooltip :content="item" class-name="list-item-text" />
+          </li>
+          <li v-if="Math.ceil(deviceTotal / 100) > devicePagination.pageNum && !deviceLoading" @click="handleMore('device')">加载更多</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="more-select-box">
+      <el-input placeholder="请选择物理量名称" v-model="measurementName" readonly :disabled="!deviceName" @focus="handleVisible('measurement', true)" />
+      <div v-show="isShowMeasurement" class="select-box-down">
+        <el-input placeholder="输入关键字进行过滤" v-model="filterMeasurementText" size="small" @input="handleInput('measurement')"></el-input>
+
+        <ul class="select-list-box">
+          <li v-for="item in measurementList" :key="item" class="list-item-box" @click="handleSelect(item, 'measurement')">
+            <text-tooltip :content="item" class-name="list-item-text" />
+          </li>
+          <li v-if="Math.ceil(measurementTotal / 100) > measurementPagination.pageNum && !measurementLoading" @click="handleMore('measurement')">加载更多</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="search-buttons">
+      <el-button type="primary" @click="handleAdd">添加</el-button>
+      <el-button @click="handleReset">重置</el-button>
     </div>
   </div>
+
 </template>
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
-import type { PropType } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { ClickOutside as vClickOutside } from 'element-plus/lib/directives'
 import { StorageApi } from '@/api';
-import { cloneDeep } from 'lodash-es';
 
-const props = defineProps({
-  placeholder: {
-    type: String,
-    default: '',
-  },
-  treeList: {
-    type: Object as PropType<{ list: Array<{ value: string, label: string }> }>,
-    required: true,
-    default: () => ({ list: [] }),
-  },
-  id: {
-    type: String,
-    default: '',
-  },
-});
+const props = defineProps<{
+  serverId: string;
+}>();
 
 const emit = defineEmits(['get-function']);
 
-const { requestFn: getCList } = useRequest(StorageApi.getMeasurementList);
+const { requestFn: getGroup } = useRequest(StorageApi.getStorageGroups);
 const { requestFn: getDevice } = useRequest(StorageApi.getDeviceByGroup);
+const { requestFn: getMeasurement } = useRequest(StorageApi.getMeasurementList);
 
-const { t } = useI18n();
-const data = reactive(props.treeList);
-const filterText = ref('');
-const groupName = ref('');
+const storageName = ref('');
+const isShowStorage = ref(false);
+const filterStorageText = ref('');
+const storageList = ref<string[]>([]);
+const storageTotal = ref(0);
+const storagePagination = reactive({
+  pageSize: 100,
+  pageNum: 1,
+});
+const storageLoading = ref(false);
+
 const deviceName = ref('');
-interface DeviceVo {
-  label: string,
-  value: string,
-  parentid: string
-}
-let deviceList = reactive < Array<DeviceVo>>([]);
+const isShowDevice = ref(false);
+const filterDeviceText = ref('');
+const deviceList = ref<string[]>([]);
+const deviceTotal = ref(0);
+const devicePagination = reactive({
+  pageSize: 100,
+  pageNum: 1,
+});
+const deviceLoading = ref(false);
 
-interface PhysicalQuantityVo {
-  parents?: string,
-  parent?: string,
-  label: string | undefined,
-  type: IotdbDataType | string | undefined,
-  decr: string | undefined
-}
-const pyCopyDataList = ref<Array<PhysicalQuantityVo>>([]);
-const pyDataList = ref<Array<PhysicalQuantityVo>>([]);
+const measurementName = ref('');
+const isShowMeasurement = ref(false);
+const filterMeasurementText = ref('');
+const measurementList = ref<string[]>([]);
+const measurementTotal = ref(0);
+const measurementPagination = reactive({
+  pageSize: 100,
+  pageNum: 1,
+});
+const measurementLoading = ref(false);
 
-function getFunction(val: PhysicalQuantityVo) {
-  emit('get-function', val.label);
-}
-function getdevicel() {
-  deviceName.value = '';
-  getDevice(props.id, groupName.value).then((res) => {
-    const datas = res.data.map((item: string) => ({
-      label: item,
-      value: item,
-      parentid: groupName.value,
-    }));
-    deviceList.length = 0;
-    deviceList = Object.assign(deviceList, datas);
-  });
-}
-function getpylist(deviceData: string) {
-  getCList({ pageSize: 99999, pageNum: 1, serverId: props.id }, { deviceName: deviceData }).then((res) => {
-    const result: Array<PhysicalQuantityVo> = res.data.measurementVOList.map((item) => ({
-      parents: deviceData,
-      parent: deviceData,
-      label: item.timeseries,
-      type: item.dataType,
-      decr: item.description,
-    }));
-    result.unshift({
-      label: t('device.measurement'),
-      type: t('sqlSearch.type'),
-      decr: t('sqlSearch.description'),
-    });
-    pyDataList.value = result;
-    pyCopyDataList.value = cloneDeep(result);
-  });
-}
-function searchpylist() {
-  if (!filterText.value) {
-    pyDataList.value = pyCopyDataList.value;
+// 关闭/显示下拉项
+function handleVisible(type: string, visible: boolean) {
+  if (type === 'storage') {
+    isShowStorage.value = visible
+  } else if (type === 'device') {
+    isShowDevice.value = visible
   } else {
-    pyDataList.value = pyCopyDataList.value.filter((item) => item.label?.indexOf(filterText.value) !== -1);
-    pyDataList.value.unshift({
-      label: t('device.measurement'),
-      type: t('sqlSearch.type'),
-      decr: t('sqlSearch.description'),
-    });
+    isShowMeasurement.value = visible
   }
 }
+// 加载更多
+function handleMore(type: string) {
+  if (type === 'storage') {
+    storagePagination.pageNum = storagePagination.pageNum+1
+    getStorageList();
+  } else if (type === 'device') {
+    devicePagination.pageNum = devicePagination.pageNum+1
+    getDeviceList();
+  } else {
+    measurementPagination.pageNum = measurementPagination.pageNum+1
+    getMeasurementList();
+  }
+}
+// 选择
+function handleSelect(val: string, type: string) {
+  if (type === 'storage') {
+    isShowStorage.value = false
+    if (val === storageName.value) return;
+    storageName.value = val;
+    deviceList.value = [];
+    devicePagination.pageNum = 1;
+    getDeviceList();
+  } else if (type === 'device') {
+    isShowDevice.value = false
+    if (val === deviceName.value) return;
+    deviceName.value = val;
+    measurementList.value = [];
+    measurementPagination.pageNum = 1;
+    getMeasurementList();
+  } else {
+    isShowMeasurement.value = false;
+  }
+}
+// 输入搜索条件
+function handleInput(type: string) {
+  if (type === 'storage') {
+    storagePagination.pageNum = 1
+    storageList.value = [];
+    getStorageList();
+  } else if (type === 'device') {
+    devicePagination.pageNum = 1
+    deviceList.value = [];
+    getDeviceList();
+  } else {
+    measurementPagination.pageNum = 1;
+    measurementList.value = [];
+    getMeasurementList();
+  }
+}
+// 获取存储组
+function getStorageList() {
+  storageLoading.value = true;
+  getGroup({
+    serverId: props.serverId, 
+    pageSize: storagePagination.pageSize,
+    pageNum: storagePagination.pageNum,
+    keyword: filterStorageText.value,
+  }).then((res) => {
+    let dataArr = res.data?.storageGroupNames.map((item) => item);
+    storageList.value = storageList.value.concat(dataArr);
+    storageTotal.value = res.data?.totalCount || 0;
+  }).finally(() => {
+    storageLoading.value = false;
+  })
+}
+// 获取设备
+function getDeviceList() {
+  deviceLoading.value = true;
+  getDevice({
+    serverId: props.serverId,
+    groupName: storageName.value,
+    pageSize: devicePagination.pageSize,
+    pageNum: devicePagination.pageNum,
+    keyword: filterDeviceText.value,
+  }).then((res) => {
+    let dataArr = res.data?.pathNames.map((item) => item);
+    deviceList.value = deviceList.value.concat(dataArr);
+    deviceTotal.value = res.data?.totalCount || 0;
+  }).finally(() => {
+    deviceLoading.value = false;
+  })
+}
+// 获取物理量
+function getMeasurementList() {
+  measurementLoading.value = true;
+  getMeasurement({
+    serverId: props.serverId,
+    deviceName: deviceName.value,
+    pageSize: measurementPagination.pageSize,
+    pageNum: measurementPagination.pageNum,
+    keyword: filterMeasurementText.value,
+  }).then((res) => {
+    let dataArr = res.data?.pathNames.map((item) => item);
+    measurementList.value = measurementList.value.concat(dataArr);
+    measurementTotal.value = res.data?.totalCount || 0;
+  }).finally(() => {
+    measurementLoading.value = false;
+  })
+}
+// 添加
+function handleAdd() {
+  let res = measurementName.value || deviceName.value || storageName.value
+  emit('get-function', res);
+}
+// 重置
+function handleReset() {
+  storageName.value = ''
+  deviceName.value = ''
+  measurementName.value = ''
+  storagePagination.pageNum = 1
+  getStorageList();
+}
+
+onMounted(() => {
+  getStorageList();
+});
 
 </script>
 
@@ -137,40 +238,39 @@ function searchpylist() {
   }
 }
 
-.elinput {
-  width: 100%;
-}
-</style>
-<style lang="scss">
-.select-icon {
-  .el-input__suffix {
-    top: 0;
-  }
+.more-select-box {
+  margin-bottom: 12px;
+  position: relative;
 }
 
-.input-icon {
-  .el-input__suffix {
-    top: 7px;
-  }
+.select-box-down {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  border: 1px solid #eee;
+  background: #fff;
+  border-radius: 4px;
 }
 
-.search_div .el-tree-node__content {
-  height: 35px !important;
+.select-list-box {
+  max-height: 400px;
+  overflow-y: auto;
 }
 
-.custom-tree-node.chil {
+.list-item-box {
+  padding: 0 8px;
+  position: relative;
   display: flex;
-  font-size: 12px;
+  align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #ebeef5;
-  padding: 10px 0;
+  height: 40px;
   cursor: pointer;
 
-  span {
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  &:hover {
+    background-color: #f7fafc;
   }
 }
+
 </style>

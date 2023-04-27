@@ -1,55 +1,74 @@
 <template>
   <div class="search_div maxheight">
-    <el-tree :data="data" :props="defaultProps" accordion ref="treeRef">
-      <template #default="{ node, data }">
-        <span class="custom-tree-node">
-          <el-tooltip class="item" effect="light" :content="data.label" placement="top">
-            <span @dblclick="getFunction(node)">{{ node.level === 1 ? node.label : data.value }}</span>
-          </el-tooltip>
-        </span>
-      </template>
-    </el-tree>
+    <ul class="sql-list" v-loading="loading">
+      <li v-for="item in sqlList" :key="item.id" class="sql-item-box">
+        <text-tooltip :content="item.queryName" class-name="sql-item-text" />
+        <el-dropdown class="more-icon" @command="val => handleSqlCommand(val, item)">
+          <i-ep-more-filled />
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="open">打开</el-dropdown-item>
+              <el-dropdown-item command="rename">重命名</el-dropdown-item>
+              <el-dropdown-item command="delete">删除</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </li>
+    </ul>
   </div>
 </template>
 
 <script lang="ts" setup>
-import type Node from 'element-plus/es/components/tree/src/model/node';
-import type { ElTree } from 'element-plus';
-import {
-  functionTreeData,
-} from '@/constants';
+import { SearchApi } from '@/api';
 
-const treeRef = ref<InstanceType<typeof ElTree> | null>(null);
-const emit = defineEmits(['get-function']);
+const props = defineProps<{
+  serverId: string;
+}>();
 
-const data = functionTreeData;
-const filterText = ref('');
-const tree = ref();
-interface Tree {
-  value: string
-  label: string
-  children?: Tree[]
-}
-const defaultProps = {
-  children: 'children',
-  label: 'label',
+const emit = defineEmits(['handleSqlOperate']);
+
+const loading = ref(false);
+const sqlList = ref<Search.SqlList[]>([]);
+const { requestFn: getQuery } = useRequest(SearchApi.getQuery);
+const { requestFn: deleteQueryS } = useRequest(SearchApi.deleteQueryS);
+
+// 获取列表数据
+const getQueryList = async () => {
+  loading.value = true;
+  const res = await getQuery(props.serverId);
+  loading.value = false;
+  if (res.code === '0') {
+    sqlList.value = res.data || [];
+  }
 };
-watch(filterText, (newValue) => {
-  tree.value.filter(newValue.toLocaleUpperCase());
-});
-function getFunction(node: Node) {
-  if (node.level !== 1) {
-    emit('get-function', node.data.value);
-  }
-}
-function filterNode(value: string, data: Tree, node: Node) {
-  if (!value) return true;
-  if (data.children?.length) {
-    return data.label.includes(value);
-  }
-  return data.value.includes(value);
-}
 
+const handleSqlCommand = (val: string, data: Search.SqlList) => {
+  if (val === 'delete') {
+    ElMessageBox.confirm('是否删除列表', '删除提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    })
+      .then(() => {
+        deleteQueryS(props.serverId, `${data.id}`).then(() => {
+          ElMessage({
+            type: 'success',
+            message: '删除成功!',
+          });
+        });
+      });
+    getQueryList();
+    emit('handleSqlOperate', val, data);
+  } else {
+    emit('handleSqlOperate', val, data);
+  }
+};
+
+onMounted(() => {
+  getQueryList();
+});
+
+defineExpose({ getQueryList });
 </script>
 
 <style lang="scss" scoped>
@@ -64,20 +83,35 @@ function filterNode(value: string, data: Tree, node: Node) {
   }
 }
 
-.elinputs {
-  height: 30px;
-  line-height: 30px;
-}
-</style>
-<style lang="scss">
-.elinputs {
-  .el-input__inner {
-    height: 30px;
-    line-height: 30px;
+.sql-list {
+  display: flex;
+  flex-direction: column;
+
+  .sql-item-box {
+    padding: 0 8px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 40px;
+
+    &:hover {
+      background-color: #f7fafc;
+    }
+
+    .more-icon {
+      cursor: pointer;
+      margin-left: 12px;
+      align-self: flex-end;
+
+      svg:focus {
+        outline: none;
+      }
+    }
   }
 
-  .el-input__icon {
-    line-height: 30px;
+  .sql-menu-list {
+    display: none;
   }
 }
 </style>

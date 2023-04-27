@@ -55,6 +55,7 @@ declare module '@vue/runtime-core' {
     IEpFullScreen: typeof import('~icons/ep/full-screen')['default']
     IEpInfoFilled: typeof import('~icons/ep/info-filled')['default']
     IEpMore: typeof import('~icons/ep/more')['default']
+    IEpMoreFilled: typeof import('~icons/ep/more-filled')['default']
     IEpPlus: typeof import('~icons/ep/plus')['default']
     IEpSearch: typeof import('~icons/ep/search')['default']
     IEpVideoPause: typeof import('~icons/ep/video-pause')['default']

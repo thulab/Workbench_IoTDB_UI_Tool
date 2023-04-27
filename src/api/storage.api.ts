@@ -2,21 +2,18 @@ import http from '@/utils/http';
 
 // 存储组
 class StorageApi {
-  static getStorageGroups(serverId: string, showAll?: boolean): HttpResponseP<Array<{ groupName: string }>> {
-    return http.get('/schema/getAllStorageGroups', { params: { serverId, showAll } });
+  static getStorageGroups(params: SearchPageQuery & {serverId: string}): HttpResponseP<Storage.GetStorageListResponse> {
+    return http.get('/schema/getAllStorageGroups', { params });
   }
 
   // get device list(list)
-  static getDeviceByGroup(serverId: string, groupName: string): HttpResponseP<Array<string>> {
-    return http.get('/schema/getDevicesByGroupName', { params: { serverId, groupName } });
+  static getDeviceByGroup(params: SearchPageQuery & {serverId: string, groupName: string}): HttpResponseP<Storage.GetPathListResponse> {
+    return http.get('/schema/getDevicesByGroupName', { params });
   }
 
   // Get the measurement  list under the entity
-  static getMeasurementList(
-    params: Record<string, string | number>,
-    data: Record<string, string | number>,
-  ): HttpResponseP<Storage.MeasurementResult> {
-    return http.post('/schema/getMeasurementsByDeviceName', data, { params });
+  static getMeasurementList(params: SearchPageQuery & {serverId: string, deviceName: string}):HttpResponseP<Storage.GetPathListResponse> {
+    return http.get('/schema/getMeasurementsByDeviceName', { params });
   }
 }
 export default StorageApi;

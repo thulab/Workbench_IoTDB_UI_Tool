@@ -4,7 +4,7 @@
       <div class="sql-search-wrapper">
         <div class="sql-tab-box">
           <el-tabs v-model="activiteSql" type="card" closable class="sql-tab-list" @tab-click="handleTabClick" @tab-remove="handleTabRemove">
-            <el-tab-pane v-for="(item, index) in sqlList" :key="item.id+'_'+index" :label="item.queryName" :name="item.id+'_'+index"></el-tab-pane>
+            <el-tab-pane v-for="(item, index) in sqlList" :key="item.id + '_' + index" :label="item.queryName" :name="item.id + '_' + index" />
           </el-tabs>
 
           <el-button size="small" circle class="add-tab-btn" @click="handleTabAdd"><i-ep-plus /></el-button>
@@ -13,16 +13,16 @@
           <h4>SQL输入</h4>
           <div class="sql-right-icon-box">
             <el-tooltip effect="light" content="保存" placement="top">
-              <el-icon @click="nameDialogVisible = true"><i-ep-document /></el-icon>
+              <el-icon @click="handleSave"><i-ep-document /></el-icon>
             </el-tooltip>
             <el-tooltip effect="light" content="运行" placement="top">
               <el-icon @click="querySqlRun"><i-ep-video-play /></el-icon>
             </el-tooltip>
-            <el-tooltip  effect="light" content="取消" placement="top">
+            <el-tooltip effect="light" content="取消" placement="top">
               <el-icon @click="stopquery"><i-ep-circle-close /></el-icon>
             </el-tooltip>
             <el-tooltip effect="light" content="清空" placement="top">
-              <el-icon @click="deleteQuery"><i-ep-delete /></el-icon>
+              <el-icon @click="emptyQuery"><i-ep-delete /></el-icon>
             </el-tooltip>
           </div>
         </div>
@@ -93,13 +93,13 @@
         <div v-if="codeMirrorReady">
           <el-tabs v-model="activeNameSide" class="tabs-nav-aside">
             <el-tab-pane label="测点" name="data">
-              <!-- <side-data @get-function="getFunction" :id="serverId" :tree-list="treeList" /> -->
+              <side-data :server-id="serverId" @get-function="getFunction" />
             </el-tab-pane>
             <el-tab-pane label="函数" name="function">
               <side-function @get-function="getFunction" />
             </el-tab-pane>
             <el-tab-pane label="模板" name="template">
-              <side-template @get-function="getFunction" />
+              <side-template ref="sqlListRef" :server-id="serverId" @handle-sql-operate="handleSqlOperate" />
             </el-tab-pane>
           </el-tabs>
         </div>
@@ -119,6 +119,23 @@
         </span>
       </template>
     </el-dialog>
+
+    <el-dialog title="重命名" v-model="renameDialogVisible" width="400px">
+      <el-form ref="resaveFormRef" :model="resaveForm" :rules="saveFormRules" label-position="left">
+        <el-form-item label="原名称：" prop="oldSqlName">
+          <el-input v-model="resaveForm.oldSqlName" disabled />
+        </el-form-item>
+        <el-form-item label="新名称：" prop="sqlName" :error="errorRenameTip">
+          <el-input v-model="resaveForm.sqlName" placeholder="请输入" maxlength="25" @blur="handleInputRename" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="renameDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="handleRenameConfirm">确定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </el-container>
 </template>
 
@@ -128,30 +145,30 @@ import dayjs from 'dayjs';
 import { useTableHeight } from '@/composition-api';
 import { handleExport } from '@/utils/export';
 import DynamicTable from '@/components/dynamic-table.vue';
-import { SearchApi, StorageApi } from '@/api';
+import { SearchApi } from '@/api';
 import sideFunction from './components/side-function.vue';
 import sideData from './components/side-data.vue';
 import sideTemplate from './components/side-template.vue';
 import CodeEditor from './components/code-editor.vue';
 
 const props = defineProps<{
-  serverId?: string;
+  serverId: string;
   queryId?: string;
 }>();
 
 const { maxTableHeight } = useTableHeight(300);
 const codeMirrorReady = ref(false);
 const nameDialogVisible = ref(false);
+const renameDialogVisible = ref(false);
 const divwerHeight = ref(430);
 const timeNumber = ref(0);
-const sqlName = ref('new');
 const display = ref(false);
 const tabelNum = ref(0);
 const standTable = ref(null);
 const key = ref('1');
 const activiteSql = ref<string>('_0');
 const activeName = ref<string | number>(0);
-const sqlList = ref<Search.SqlList[]>([{id: '', queryName: `查询${dayjs().format('YYYY-MM-DD HH:mm:ss.SSS').replace(/\-|\:| /g, '')}`}]);
+const sqlList = ref<Search.SqlList[]>([{ id: '', queryName: `查询${dayjs().format('YYYY-MM-DD HH:mm').replace(/\-|\:| /g, '')}` }]);
 const activeNameSide = ref('function');
 const runFlag = ref(true);
 const rows = ref(0);
@@ -160,18 +177,32 @@ const lineList = ref<number[]>([]);
 const timeList = ref<string[]>([]);
 
 const code = ref('');
+const sqlListRef = ref<InstanceType<typeof sideTemplate>>();
 const saveFormRef = ref<FormInstance>();
+const resaveFormRef = ref<FormInstance>();
 const saveFormRules = reactive({
   sqlName: [
-    { required: true, message: '请填写名称后保存', trigger: 'blur', },
+    { required: true, message: '请填写名称后保存', trigger: 'blur' },
   ],
 });
 const saveForm = reactive<{
   sqlName: string;
+  id?: string;
 }>({
   sqlName: '',
+  id: '',
+});
+const resaveForm = reactive<{
+  oldSqlName: string;
+  sqlName: string;
+  id: string;
+}>({
+  oldSqlName: '',
+  sqlName: '',
+  id: '',
 });
 const errorNameTip = ref('');
+const errorRenameTip = ref('');
 
 const pageNums = reactive<number[]>([]);
 
@@ -179,14 +210,6 @@ const columnList = ref <Array<Array<DynamicTableColumn> | null>>([]);
 
 const tableData = reactive<{ list: Array<Record<string, any> | null> }>({
   list: [] || null,
-});
-const treeList = reactive<{ list: Array<{
-  label: string,
-  value: string,
-  decr: string,
-  type: string,
-}> }>({
-  list: [],
 });
 
 const total = computed(() => tableData.list.map((item) => item?.list?.length));
@@ -196,9 +219,7 @@ const pagination = reactive({
 });
 const totalTips = computed(() => `现一共有${rows.value}行, ${columns.value}列`);
 
-const { requestFn: getGroup } = useRequest(StorageApi.getStorageGroups);
 const { requestFn: queryStop } = useRequest(SearchApi.queryStop);
-const { requestFn: deleteQueryS } = useRequest(SearchApi.deleteQueryS);
 const { requestFn: getSql } = useRequest(SearchApi.getSql);
 const { requestFn: querySql } = useRequest(SearchApi.querySql);
 const { requestFn: saveQuery } = useRequest(SearchApi.saveQuery);
@@ -221,28 +242,46 @@ const tableDataPagination = computed(() => tableData.list.map((item, index) => {
 
 // 获取code
 function getSqlCode() {
-  if (props.queryId) {
-    getSql(props.serverId, props.queryId).then((res) => {
-      const resData = res.data;
-      sqlName.value = resData.queryName;
-      code.value = resData.sqls;
-    });
-  }
-}
-// 获取存储组
-function getGroupList() {
-  getGroup(props.serverId).then((res) => {
-    treeList.list = res.data.map((item) => ({
-      label: item.groupName,
-      value: item.groupName,
-      decr: '',
-      type: '',
-    }));
+  const id = activiteSql.value.charAt(0) === '_' ? null : activiteSql.value.split('_')[0];
+  code.value = '';
+  tableData.list = [];
+  if (!id) return;
+  getSql(props.serverId, id).then((res) => {
+    const resData = res.data;
+    code.value = resData.sqls;
   });
 }
 
+// 追加code
 function getFunction(val: string) {
   code.value += val;
+}
+
+// 模板操作
+function handleSqlOperate(val: string, data: Search.SqlList) {
+  const index = sqlList.value.findIndex((f) => f.id === data.id);
+  const length = sqlList.value.length || 0;
+  if (val === 'open') {
+    if (index > -1) {
+      activiteSql.value = `${data.id}_${index}`;
+    } else {
+      sqlList.value.push(data);
+      activiteSql.value = `${data.id}_${length}`;
+    }
+  } else if (val === 'rename') {
+    resaveForm.oldSqlName = data.queryName;
+    resaveForm.sqlName = '';
+    resaveForm.id = `${data.id}`;
+    renameDialogVisible.value = true;
+  } else if (index > -1) {
+    const tabs = sqlList.value;
+    let current = activiteSql.value;
+    const ci = tabs[index + 1] ? index : index - 1;
+    const nextTab = tabs[index + 1] || tabs[index - 1];
+    current = `${nextTab.id}_${ci}`;
+    activiteSql.value = current;
+    sqlList.value.splice(index, 1);
+  }
 }
 
 // 执行sql
@@ -305,18 +344,18 @@ function querySqlRun() {
       runFlag.value = true;
     }, 5000);
   } else {
-    ElMessage.error(`查询正在运行中，请勿重复操作`);
+    ElMessage.error('查询正在运行中，请勿重复操作');
   }
 }
 // 添加tab
 function handleTabAdd() {
-  let currentSqlLength = sqlList.value.length || 0;
+  const currentSqlLength = sqlList.value.length || 0;
   const newTabName = `_${currentSqlLength}`;
   sqlList.value.push({
-    queryName: `查询${dayjs().format('YYYY-MM-DD HH:mm:ss.SSS').replace(/\-|\:| /g, '')}`,
+    queryName: `查询${dayjs().format('YYYY-MM-DD HH:mm').replace(/\-|\:| /g, '')}`,
     id: '',
-  })
-  activiteSql.value = newTabName
+  });
+  activiteSql.value = newTabName;
 }
 // 点击tab
 function handleTabClick(tab: TabsPaneContext) {
@@ -325,7 +364,6 @@ function handleTabClick(tab: TabsPaneContext) {
     code.value = '';
     tableData.list = [];
     activiteSql.value = `${data.id}_${tab.index}`;
-    getSqlCode();
   }
 }
 // 删除tab
@@ -334,13 +372,13 @@ function handleTabRemove(targetName: string) {
     ElMessage.info('只有一个页签不允许删除');
     return;
   }
-  const tabs = sqlList.value
-  let current = activiteSql.value
-  let index = targetName.split('_')[1] as unknown as number;
-  let ci = tabs[index + 1] ? index : index-1
-  const nextTab = tabs[index + 1] || tabs[index - 1]
-  current = `${nextTab.id}_${ci}`
-  activiteSql.value = current
+  const tabs = sqlList.value;
+  let current = activiteSql.value;
+  const index = targetName.split('_')[1] as unknown as number;
+  const ci = tabs[index + 1] ? index : index - 1;
+  const nextTab = tabs[index + 1] || tabs[index - 1];
+  current = `${nextTab.id}_${ci}`;
+  activiteSql.value = current;
   sqlList.value.splice(index, 1);
 }
 
@@ -348,12 +386,21 @@ function handleTabRemove(targetName: string) {
 function handleInputName() {
   errorNameTip.value = '';
 }
+
+// 新名称输入
+function handleInputRename() {
+  if (resaveForm.sqlName === resaveForm.oldSqlName) {
+    errorRenameTip.value = '与原名称相同，请重新输入';
+  } else {
+    errorRenameTip.value = '';
+  }
+}
 // 保存模板
 function handleNameConfirm() {
   errorNameTip.value = '';
   saveFormRef.value?.validate((valid) => {
     if (valid) {
-      const id = !props.queryId ? null : props.queryId;
+      const id = activiteSql.value.charAt(0) === '_' ? null : activiteSql.value.split('_')[0];
       const data = {
         connectionId: Number(props.serverId) * 1,
         id,
@@ -364,14 +411,50 @@ function handleNameConfirm() {
         if (res.code === '0') {
           ElMessage.success('保存成功');
           nameDialogVisible.value = false;
+          sqlListRef.value?.getQueryList();
         }
-      }).catch(err => {
+      }).catch((err) => {
         errorNameTip.value = err.message;
       });
     }
   });
 }
-
+// 重命名
+function handleRenameConfirm() {
+  errorRenameTip.value = '';
+  if (resaveForm.sqlName === resaveForm.oldSqlName) {
+    errorRenameTip.value = '与原名称相同，请重新输入';
+    return;
+  }
+  resaveFormRef.value?.validate((valid) => {
+    if (valid) {
+      const { id } = resaveForm;
+      const data = {
+        connectionId: Number(props.serverId) * 1,
+        id,
+        queryName: resaveForm.sqlName,
+        sqls: code.value,
+      };
+      saveQuery(props.serverId, data).then((res) => {
+        if (res.code === '0') {
+          ElMessage.success('保存成功');
+          renameDialogVisible.value = false;
+          sqlListRef.value?.getQueryList();
+        }
+      }).catch((err) => {
+        errorRenameTip.value = err.message;
+      });
+    }
+  });
+}
+// 保存
+function handleSave() {
+  let index = activiteSql.value.split('_')[1] as unknown as number;
+  let current = sqlList.value[index]
+  saveForm.sqlName = current.queryName
+  nameDialogVisible.value = true
+}
+// 停止
 function stopquery() {
   queryStop(props.serverId, timeNumber.value).then(() => {});
 }
@@ -381,13 +464,13 @@ function exportSql(i: number) {
     if (res) {
       ElMessage({
         type: 'success',
-        message: `导出成功`,
+        message: '导出成功',
       });
       handleExport(res, 'export.CSV');
     } else {
       ElMessage({
         type: 'info',
-        message: `导出未完成`,
+        message: '导出未完成',
       });
     }
   }).catch((err) => {
@@ -398,30 +481,30 @@ function exportSql(i: number) {
   });
 }
 // 清空
-function deleteQuery() {
-  ElMessageBox.confirm(`是否清空页面`, `清空提示`, {
+function emptyQuery() {
+  ElMessageBox.confirm('是否清空页面', '清空提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
   })
     .then(() => {
-      if (!props.queryId) {
-        code.value = '';
-        return;
-      }
-      deleteQueryS(props.serverId, props.queryId).then(() => {
-        ElMessage({
-          type: 'success',
-          message: `清空成功!`,
-        });
-      });
-    })
+      code.value = '';
+      tableData.list = [];
+    });
 }
 
 onMounted(() => {
-  // getSqlCode();
-  // getGroupList();
+
 });
+
+watch(
+  activiteSql,
+  (newVal, oldVal) => {
+    if (newVal !== oldVal) {
+      getSqlCode();
+    }
+  },
+);
 
 </script>
 
