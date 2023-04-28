@@ -59,14 +59,11 @@
                     <li class="run-result-item">查询状态：{{ formatSqlInfo('status', index) }}</li>
                     <li class="run-result-item">开始时间：{{ formatSqlInfo('startQueryTime', index) }}</li>
                     <li class="run-result-item">查询耗时：{{ formatSqlInfo('queryTime', index) }}</li>
-                    <li class="run-result-item">查询结果：{{ formatSqlInfo('result', index) }}</li>
-                    
-                    <span class="frist_span">最多下载10万条数据</span>
                   </ul>
                   <div class="run-result-buttons">
                     <el-button type="text" @click="handleCommandDown('refresh', index)"><i-ep-refresh />刷新</el-button>
-                    <el-dropdown class="more-icon" @command="val => handleCommandDown(val, index)">
-                      <i-ep-download />下载<el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-ep-question-filled /></el-tooltip>
+                    <el-dropdown class="more-icon m-l-12" @command="val => handleCommandDown(val, index)">
+                      <el-button type="text"><i-ep-download />下载</el-button><el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-ep-question-filled /></el-tooltip>
                       <template #dropdown>
                         <el-dropdown-menu>
                           <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
@@ -150,7 +147,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormInstance, TabPaneName, TabsPaneContext } from 'element-plus';
+import type { FormInstance, TabsPaneContext } from 'element-plus';
 import dayjs from 'dayjs';
 import { useTableHeight } from '@/composition-api';
 import { handleExport } from '@/utils/export';
@@ -178,6 +175,7 @@ const standTable = ref(null);
 const key = ref('1');
 const activiteSql = ref<string>('_0');
 const activeName = ref<string | number>(0);
+// eslint-disable-next-line no-useless-escape
 const sqlList = ref<Search.SqlList[]>([{ id: '', queryName: `查询${dayjs().format('YYYY-MM-DD HH:mm').replace(/\-|\:| /g, '')}` }]);
 const activeNameSide = ref('function');
 const runFlag = ref(true);
@@ -347,24 +345,24 @@ function querySqlRun() {
   }
 }
 // 查询结果
-const formatSqlInfo = computed(() => function(filed: string, index: number) {
-  let data: Search.QuerySqlResponse = sqlResult.value[index]
+const formatSqlInfo = computed(() => function (filed: string, index: number) {
+  const data: Search.QuerySqlResponse = sqlResult.value[index];
   if (filed === 'status') {
-    return data.status === undefined ? '' : (data.status ? '查询成功' : '查询失败')
-  } else if (filed === 'startQueryTime') {
-    return data.startQueryTime ? data.startQueryTime : currentQueryTime.value
-  } else if (filed === 'queryTime') {
-    return data.status ? data.queryTime : ''
-  } else if (filed === 'result') {
-    return data.status ? `共${data.rows}行${data.line}列` : ''
+    // eslint-disable-next-line no-nested-ternary
+    return data.status === undefined ? '' : (data.status ? '查询成功' : '查询失败');
+  } if (filed === 'startQueryTime') {
+    return data.startQueryTime ? data.startQueryTime : currentQueryTime.value;
+  } if (filed === 'queryTime') {
+    return data.status ? data.queryTime : '';
   }
-  return ''
-})
+  return '';
+});
 // 添加tab
 function handleTabAdd() {
   const currentSqlLength = sqlList.value.length || 0;
   const newTabName = `_${currentSqlLength}`;
   sqlList.value.push({
+    // eslint-disable-next-line no-useless-escape
     queryName: `查询${dayjs().format('YYYY-MM-DD HH:mm').replace(/\-|\:| /g, '')}`,
     id: '',
   });
@@ -424,6 +422,8 @@ function handleNameConfirm() {
         if (res.code === '0') {
           ElMessage.success('保存成功');
           nameDialogVisible.value = false;
+          const index = activiteSql.value.split('_')[1] as unknown as number;
+          sqlList.value.splice(index, 1, { id: `${data}`, queryName: saveForm.sqlName });
           sqlListRef.value?.getQueryList();
         }
       }).catch((err) => {
@@ -452,6 +452,8 @@ function handleRenameConfirm() {
         if (res.code === '0') {
           ElMessage.success('保存成功');
           renameDialogVisible.value = false;
+          const index = activiteSql.value.split('_')[1] as unknown as number;
+          sqlList.value.splice(index, 1, { id: `${data}`, queryName: resaveForm.sqlName });
           sqlListRef.value?.getQueryList();
         }
       }).catch((err) => {
@@ -462,14 +464,27 @@ function handleRenameConfirm() {
 }
 // 保存
 function handleSave() {
-  let index = activiteSql.value.split('_')[1] as unknown as number;
-  let current = sqlList.value[index]
-  saveForm.sqlName = current.queryName
-  nameDialogVisible.value = true
+  const index = activiteSql.value.split('_')[1] as unknown as number;
+  const current = sqlList.value[index];
+  saveForm.sqlName = current.queryName;
+  nameDialogVisible.value = true;
 }
 // 停止
 function stopquery() {
   queryStop(props.serverId, timeNumber.value).then(() => {});
+}
+function exportSql(i: number) {
+  const codevalArr = code.value?.split('\n');
+  exportDataSql(props.serverId, codevalArr[i]).then((res) => {
+    if (res) {
+      ElMessage.success('导出成功');
+      handleExport(res, 'export.CSV');
+    } else {
+      ElMessage.info('导出未完成');
+    }
+  }).catch((err) => {
+    ElMessage.error(err.message);
+  });
 }
 // 下载
 function handleCommandDown(val: string, index: number) {
@@ -484,11 +499,11 @@ function handleCommandDown(val: string, index: number) {
         data.forEach((item) => {
           const length = <number[]>[];
           if (item.metaDataList) {
-            columnList.value.splice(index, 1, item.metaDataList.map((eleitem, index) => ({
+            columnList.value.splice(index, 1, item.metaDataList.map((eleitem, i) => ({
               label: eleitem,
-              prop: `t${index}`,
+              prop: `t${i}`,
               width: 'auto',
-              fixed: index === 0 ? 'left' : false,
+              fixed: i === 0 ? 'left' : false,
             })));
           } else {
             columnList.value.splice(index, 1, null);
@@ -510,25 +525,12 @@ function handleCommandDown(val: string, index: number) {
             tableData.list.splice(index, 1, null);
           }
         });
-      })
+      });
   } else if (val === 'csv') {
-    exportSql(index)
+    exportSql(index);
   } else {
     // TODO excel
   }
-}
-function exportSql(i: number) {
-  const codevalArr = code.value?.split('\n');
-  exportDataSql(props.serverId, codevalArr[i]).then((res) => {
-    if (res) {
-      ElMessage.success('导出成功');
-      handleExport(res, 'export.CSV');
-    } else {
-      ElMessage.info('导出未完成');
-    }
-  }).catch((err) => {
-    ElMessage.error(err.message);
-  });
 }
 // 清空
 function emptyQuery() {

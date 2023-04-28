@@ -1,24 +1,28 @@
 declare namespace Search{
-  export interface GetDataSearchListParams {
-    device: string;
-    time?: number;
-    datetimerange?: number[];
+  export interface QueryDataParams {
+    measurementList: string[];
+    startTime?: number;
+    endTime?: number;
+    unitInterval?: string;
     timeInterval?: number;
-    unitInterval: string;
-    aggregation: string;
+    aggregation?: string;
+    spage?: number;
+    ssize?: number;
   }
 
   export interface QueryDataResult {
     totalCount: number;
     totalPage: number;
-    totalColumnCount;
-    totalColumnPage;
-    currentPage;
-    currentColumnPage;
+    totalColumnCount: number;
+    totalColumnPage: number;
+    currentPage: number;
+    currentColumnPage: number;
     metaDataList: string[];
     typeList: DataType[];
     valueList: string[][];
-    measurementVOList: Item[];
+    queryTime: string;
+    status?: boolean;
+    errMsg: string;
   }
 
   export interface SqlList {
@@ -44,14 +48,12 @@ declare namespace Search{
   }
 
   export interface QuerySqlResponse {
-    columns: number;
-    line: number;
     metaDataList: string [];
     valueList: string [][];
     queryTime: string;
-    rows: number;
     status?: boolean;
     errMsg: string;
     startQueryTime?: string;
+    columns?: number;
   }
 }

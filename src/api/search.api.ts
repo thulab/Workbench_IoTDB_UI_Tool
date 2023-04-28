@@ -2,8 +2,8 @@ import http from '@/utils/http';
 
 // 查询
 class SearchApi {
-  static getDataSearchList(params: Record<string, any>, data: Record<string, any>): HttpResponseP<Search.QueryDataResult> {
-    return http.post('/data/getDataByDevice', data, { params });
+  static getDataSearchList(serverId: string, data: Search.QueryDataParams): HttpResponseP<Search.QueryDataResult> {
+    return http.post('/data/getDataByMeasurements', data, { params: { serverId } });
   }
 
   static getQuery(serverId: string): HttpResponseP<Array<{ id: number, queryName: string }>> {
@@ -37,6 +37,11 @@ class SearchApi {
   // Import query
   static exportDataSql(serverId: string, sql: string): HttpResponseP {
     return http.get('/file/exportSqlData', { params: { sql, serverId } });
+  }
+
+  // Import query
+  static exportData(serverId: string, data: Search.QueryDataParams): HttpResponseP {
+    return http.get('/file/exportSqlData', { params: { serverId, ...data } });
   }
 }
 export default SearchApi;
