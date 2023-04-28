@@ -49,7 +49,7 @@
             <span class="run-result-tip"><i-ep-info-filled />默认显示100行1000列，如需查看更多数据请下载查看</span>
           </div>
           <div class="tabs">
-            <el-tabs v-model="activeName" class="tabs_nav">
+            <el-tabs v-model="activeName" class="tabs-nav-list">
               <el-tab-pane v-for="(item, index) of columnList" :key="index" :name="`t${index}`">
                 <template #label>
                   <span>运行结果{{ index + 1 }}</span>
@@ -61,9 +61,9 @@
                     <li class="run-result-item">查询耗时：{{ formatSqlInfo('queryTime', index) }}</li>
                   </ul>
                   <div class="run-result-buttons">
-                    <el-button type="text" @click="handleCommandDown('refresh', index)"><i-ep-refresh />刷新</el-button>
+                    <el-button link @click="handleCommandDown('refresh', index)"><i-ep-refresh />刷新</el-button>
                     <el-dropdown class="more-icon m-l-12" @command="val => handleCommandDown(val, index)">
-                      <el-button type="text"><i-ep-download />下载</el-button><el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-ep-question-filled /></el-tooltip>
+                      <el-button link><i-ep-download />下载</el-button><el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-ep-question-filled /></el-tooltip>
                       <template #dropdown>
                         <el-dropdown-menu>
                           <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
@@ -179,7 +179,7 @@ const activeName = ref<string | number>(0);
 const sqlList = ref<Search.SqlList[]>([{ id: '', queryName: `查询${dayjs().format('YYYY-MM-DD HH:mm').replace(/\-|\:| /g, '')}` }]);
 const activeNameSide = ref('function');
 const runFlag = ref(true);
-const sqlResult = ref<Search.QuerySqlResponse[]>([]);
+const sqlResult = ref<Partial<Search.QuerySqlResponse>[]>([]);
 
 const code = ref('');
 const sqlListRef = ref<InstanceType<typeof sideTemplate>>();
@@ -346,7 +346,7 @@ function querySqlRun() {
 }
 // 查询结果
 const formatSqlInfo = computed(() => function (filed: string, index: number) {
-  const data: Search.QuerySqlResponse = sqlResult.value[index];
+  const data: Partial<Search.QuerySqlResponse> = sqlResult.value[index];
   if (filed === 'status') {
     // eslint-disable-next-line no-nested-ternary
     return data.status === undefined ? '' : (data.status ? '查询成功' : '查询失败');
@@ -566,6 +566,10 @@ watch(
 .sql-wrapper {
   width: 100%;
   position: relative;
+
+  .el-button:focus-visible {
+    outline: none;
+  }
 }
 
 .sql-search-wrapper {
@@ -650,6 +654,12 @@ watch(
     svg {
       color: #ccc;
     }
+  }
+}
+
+.tabs-nav-list {
+  :deep(.el-tabs__content) {
+    padding: 10px 16px 10px 0;
   }
 }
 

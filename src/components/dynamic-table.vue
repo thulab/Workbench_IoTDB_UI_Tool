@@ -74,6 +74,7 @@ const emit = defineEmits<{
   (event: 'update:currentPage', payload: number): void;
   (event: 'update:pageSize', payload: number): void;
 }>();
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { t } = useI18n();
 
 const { getIconName } = useDataTypeIcon();
@@ -99,7 +100,8 @@ const getLabelName = (label: string) => {
   if (label.indexOf('root') !== -1 || label === 'Time' || !label) {
     return label;
   }
-  return t(label);
+  // return t(label);
+  return label;
 };
 </script>
 

@@ -355,6 +355,12 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+.page-container {
+  .el-button:focus-visible {
+    outline: none;
+  }
+}
+
 .search-time-wrapper {
   display: flex;
   align-items: center;

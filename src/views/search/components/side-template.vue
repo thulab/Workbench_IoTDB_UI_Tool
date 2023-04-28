@@ -102,7 +102,10 @@ defineExpose({ getQueryList });
     .more-icon {
       cursor: pointer;
       margin-left: 12px;
-      align-self: flex-end;
+
+      svg {
+        transform: rotate(90deg);
+      }
 
       svg:focus {
         outline: none;
