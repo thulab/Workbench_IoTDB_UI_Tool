@@ -1,4 +1,4 @@
-declare namespace Storage{
+declare namespace StorageDevice{
 
   export type EncodingType = 'RLE' | 'PLAIN' | 'TS_2DIFF' | 'GORILLA';
   export type CompressionType = 'UNCOMPRESSED' | 'SNAPPY' | 'LZ4' | 'GZIP';
@@ -31,5 +31,15 @@ declare namespace Storage{
     totalCount: number;
     totalPage: number;
     measurementVOList: Partial<MeasurementItem>[];
+  }
+
+  export interface GetStorageListResponse {
+    storageGroupNames: string[];
+    totalCount: number;
+  }
+
+  export interface GetPathListResponse {
+    pathNames: string[];
+    totalCount: number;
   }
 }

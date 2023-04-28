@@ -25,11 +25,7 @@ const emit = defineEmits(['get-function']);
 const data = functionTreeData;
 const filterText = ref('');
 const tree = ref();
-interface Tree {
-  value: string
-  label: string
-  children?: Tree[]
-}
+
 const defaultProps = {
   children: 'children',
   label: 'label',
@@ -41,13 +37,6 @@ function getFunction(node: Node) {
   if (node.level !== 1) {
     emit('get-function', node.data.value);
   }
-}
-function filterNode(value: string, data: Tree, node: Node) {
-  if (!value) return true;
-  if (data.children?.length) {
-    return data.label.includes(value);
-  }
-  return data.value.includes(value);
 }
 
 </script>

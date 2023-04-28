@@ -1,6 +1,6 @@
 <template>
   <div class="search_div maxheight">
-    <ul class="sql-list" v-loading="loading">
+    <ul class="sql-list" :loading="loading">
       <li v-for="item in sqlList" :key="item.id" class="sql-item-box">
         <text-tooltip :content="item.queryName" class-name="sql-item-text" />
         <el-dropdown class="more-icon" @command="val => handleSqlCommand(val, item)">

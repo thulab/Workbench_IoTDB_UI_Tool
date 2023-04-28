@@ -1,7 +1,7 @@
 <template>
   <div class="search_div maxheight">
     <div class="more-select-box">
-      <el-input placeholder="请选择存储组" v-model="storageName" readonly @focus="handleVisible('storage', true)" />
+      <!-- <el-input placeholder="请选择存储组" v-model="storageName" readonly @focus="handleVisible('storage', true)" />
       <div v-show="isShowStorage" class="select-box-down">
         <el-input placeholder="输入关键字进行过滤" v-model="filterStorageText" size="small" @input="handleInput('storage')"></el-input>
 
@@ -11,13 +11,16 @@
           </li>
           <li v-if="Math.ceil(storageTotal / 100) > storagePagination.pageNum && !storageLoading" @click="handleMore('storage')">加载更多</li>
         </ul>
-      </div>
+      </div> -->
+      <el-select v-model="storageName" placeholder="请选择存储组" @change="val => handleSelect(val, 'storage')">
+        <el-option v-for="item in storageList" :key="item" :value="item" :label="item" />
+      </el-select>
     </div>
-    
+
     <div class="more-select-box">
       <el-input placeholder="请选择设备" v-model="deviceName" readonly :disabled="!storageName" @focus="handleVisible('device', true)" />
       <div v-show="isShowDevice" class="select-box-down">
-        <el-input placeholder="输入关键字进行过滤" v-model="filterDeviceText" size="small" @input="handleInput('device')" ></el-input>
+        <el-input placeholder="输入关键字进行过滤" v-model="filterDeviceText" size="small" @input="handleInput('device')" />
 
         <ul class="select-list-box">
           <li v-for="item in deviceList" :key="item" class="list-item-box" @click="handleSelect(item, 'device')">
@@ -31,7 +34,7 @@
     <div class="more-select-box">
       <el-input placeholder="请选择物理量名称" v-model="measurementName" readonly :disabled="!deviceName" @focus="handleVisible('measurement', true)" />
       <div v-show="isShowMeasurement" class="select-box-down">
-        <el-input placeholder="输入关键字进行过滤" v-model="filterMeasurementText" size="small" @input="handleInput('measurement')"></el-input>
+        <el-input placeholder="输入关键字进行过滤" v-model="filterMeasurementText" size="small" @input="handleInput('measurement')" />
 
         <ul class="select-list-box">
           <li v-for="item in measurementList" :key="item" class="list-item-box" @click="handleSelect(item, 'measurement')">
@@ -52,7 +55,8 @@
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
-import { ClickOutside as vClickOutside } from 'element-plus/lib/directives'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { ClickOutside as vClickOutside } from 'element-plus/lib/directives';
 import { StorageApi } from '@/api';
 
 const props = defineProps<{
@@ -101,37 +105,87 @@ const measurementLoading = ref(false);
 // 关闭/显示下拉项
 function handleVisible(type: string, visible: boolean) {
   if (type === 'storage') {
-    isShowStorage.value = visible
+    isShowStorage.value = visible;
   } else if (type === 'device') {
-    isShowDevice.value = visible
+    isShowDevice.value = visible;
   } else {
-    isShowMeasurement.value = visible
+    isShowMeasurement.value = visible;
   }
+}
+// 获取存储组
+function getStorageList() {
+  storageLoading.value = true;
+  getGroup({
+    serverId: props.serverId,
+    pageSize: storagePagination.pageSize,
+    pageNum: storagePagination.pageNum,
+    keyword: filterStorageText.value,
+  }).then((res) => {
+    const dataArr = res.data?.storageGroupNames.map((item) => item);
+    storageList.value = storageList.value.concat(dataArr);
+    storageTotal.value = res.data?.totalCount || 0;
+  }).finally(() => {
+    storageLoading.value = false;
+  });
+}
+// 获取设备
+function getDeviceList() {
+  deviceLoading.value = true;
+  getDevice({
+    serverId: props.serverId,
+    groupName: storageName.value,
+    pageSize: devicePagination.pageSize,
+    pageNum: devicePagination.pageNum,
+    keyword: filterDeviceText.value,
+  }).then((res) => {
+    const dataArr = res.data?.pathNames.map((item) => item);
+    deviceList.value = deviceList.value.concat(dataArr);
+    deviceTotal.value = res.data?.totalCount || 0;
+  }).finally(() => {
+    deviceLoading.value = false;
+  });
+}
+// 获取物理量
+function getMeasurementList() {
+  measurementLoading.value = true;
+  getMeasurement({
+    serverId: props.serverId,
+    deviceName: deviceName.value,
+    pageSize: measurementPagination.pageSize,
+    pageNum: measurementPagination.pageNum,
+    keyword: filterMeasurementText.value,
+  }).then((res) => {
+    const dataArr = res.data?.pathNames.map((item) => item);
+    measurementList.value = measurementList.value.concat(dataArr);
+    measurementTotal.value = res.data?.totalCount || 0;
+  }).finally(() => {
+    measurementLoading.value = false;
+  });
 }
 // 加载更多
 function handleMore(type: string) {
   if (type === 'storage') {
-    storagePagination.pageNum = storagePagination.pageNum+1
+    storagePagination.pageNum += 1;
     getStorageList();
   } else if (type === 'device') {
-    devicePagination.pageNum = devicePagination.pageNum+1
+    devicePagination.pageNum += 1;
     getDeviceList();
   } else {
-    measurementPagination.pageNum = measurementPagination.pageNum+1
+    measurementPagination.pageNum += 1;
     getMeasurementList();
   }
 }
 // 选择
 function handleSelect(val: string, type: string) {
   if (type === 'storage') {
-    isShowStorage.value = false
+    isShowStorage.value = false;
     if (val === storageName.value) return;
     storageName.value = val;
     deviceList.value = [];
     devicePagination.pageNum = 1;
     getDeviceList();
   } else if (type === 'device') {
-    isShowDevice.value = false
+    isShowDevice.value = false;
     if (val === deviceName.value) return;
     deviceName.value = val;
     measurementList.value = [];
@@ -144,11 +198,11 @@ function handleSelect(val: string, type: string) {
 // 输入搜索条件
 function handleInput(type: string) {
   if (type === 'storage') {
-    storagePagination.pageNum = 1
+    storagePagination.pageNum = 1;
     storageList.value = [];
     getStorageList();
   } else if (type === 'device') {
-    devicePagination.pageNum = 1
+    devicePagination.pageNum = 1;
     deviceList.value = [];
     getDeviceList();
   } else {
@@ -157,67 +211,17 @@ function handleInput(type: string) {
     getMeasurementList();
   }
 }
-// 获取存储组
-function getStorageList() {
-  storageLoading.value = true;
-  getGroup({
-    serverId: props.serverId, 
-    pageSize: storagePagination.pageSize,
-    pageNum: storagePagination.pageNum,
-    keyword: filterStorageText.value,
-  }).then((res) => {
-    let dataArr = res.data?.storageGroupNames.map((item) => item);
-    storageList.value = storageList.value.concat(dataArr);
-    storageTotal.value = res.data?.totalCount || 0;
-  }).finally(() => {
-    storageLoading.value = false;
-  })
-}
-// 获取设备
-function getDeviceList() {
-  deviceLoading.value = true;
-  getDevice({
-    serverId: props.serverId,
-    groupName: storageName.value,
-    pageSize: devicePagination.pageSize,
-    pageNum: devicePagination.pageNum,
-    keyword: filterDeviceText.value,
-  }).then((res) => {
-    let dataArr = res.data?.pathNames.map((item) => item);
-    deviceList.value = deviceList.value.concat(dataArr);
-    deviceTotal.value = res.data?.totalCount || 0;
-  }).finally(() => {
-    deviceLoading.value = false;
-  })
-}
-// 获取物理量
-function getMeasurementList() {
-  measurementLoading.value = true;
-  getMeasurement({
-    serverId: props.serverId,
-    deviceName: deviceName.value,
-    pageSize: measurementPagination.pageSize,
-    pageNum: measurementPagination.pageNum,
-    keyword: filterMeasurementText.value,
-  }).then((res) => {
-    let dataArr = res.data?.pathNames.map((item) => item);
-    measurementList.value = measurementList.value.concat(dataArr);
-    measurementTotal.value = res.data?.totalCount || 0;
-  }).finally(() => {
-    measurementLoading.value = false;
-  })
-}
 // 添加
 function handleAdd() {
-  let res = measurementName.value || deviceName.value || storageName.value
+  const res = measurementName.value || deviceName.value || storageName.value;
   emit('get-function', res);
 }
 // 重置
 function handleReset() {
-  storageName.value = ''
-  deviceName.value = ''
-  measurementName.value = ''
-  storagePagination.pageNum = 1
+  storageName.value = '';
+  deviceName.value = '';
+  measurementName.value = '';
+  storagePagination.pageNum = 1;
   getStorageList();
 }
 

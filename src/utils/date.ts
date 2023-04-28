@@ -21,5 +21,3 @@ export const getOneDay = (day: number = 7) => dayjs(dayjs().format('YYYY-MM-DD 2
 
 // 某段时间间隔
 export const getOneInterval = (day: number = 7, format = 'YYYY-MM-DD HH:mm:ss') => [dayjs(dayjs(new Date()).format(format)).valueOf() - day * 24 * 60 * 60 * 1000, dayjs(dayjs(new Date()).format(format)).valueOf()];
-
-
