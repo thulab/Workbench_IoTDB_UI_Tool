@@ -56,7 +56,7 @@
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { ClickOutside as vClickOutside } from 'element-plus/lib/directives';
+// import { ClickOutside as vClickOutside } from 'element-plus/lib/directives';
 import { StorageApi } from '@/api';
 
 const props = defineProps<{

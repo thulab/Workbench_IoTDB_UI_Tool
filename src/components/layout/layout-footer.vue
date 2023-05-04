@@ -13,14 +13,17 @@ const { AppBuildCommit } = useAppStore();
 
 <style scoped lang="scss">
 .footer {
-  height: 30px;
+  height: 0;
+  overflow: hidden;
+  font-size: 12px;
   background: var(--el-bg-color);
-  border-top: 1px solid var(--el-border-color-light);
+  border-top: 0;
 
   .right {
     position: absolute;
     color: #ccc;
     right: 10px;
+    bottom: 0;
   }
 }
 </style>

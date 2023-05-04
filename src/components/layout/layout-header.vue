@@ -4,10 +4,10 @@
       <el-icon
         class="collapse-icon"
         @click="menuStore.setCollapse()">
-        <i-ep-expand v-if="isCollapse" />
-        <i-ep-fold v-else />
+        <i-custom-nav-open v-if="isCollapse" />
+        <i-custom-nav-close v-else />
       </el-icon>
-      <el-breadcrumb :separator-icon="IconEpArrowRight">
+      <el-breadcrumb :separator-icon="IconEpArrowRight" v-if="false">
         <transition-group
           name="breadcrumb"
           mode="out-in">
@@ -26,7 +26,7 @@
     </div>
     <div class="header-ri flex-center">
 
-      <el-dropdown @command="handleLangCommand">
+      <el-dropdown v-if="false" @command="handleLangCommand">
         <span class="lang-icon m-r-20">
           <i-custom-lang-switch />
         </span>
@@ -42,6 +42,7 @@
       </el-dropdown>
 
       <el-switch
+        v-if="false"
         v-model="isDark"
         class="switch-dark"
         inline-prompt

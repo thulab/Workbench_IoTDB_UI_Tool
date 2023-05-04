@@ -12,7 +12,6 @@
 </template>
 
 <script setup lang="ts">
-import { ElMessageBox } from 'element-plus';
 import { computed } from 'vue';
 import { useLoginStore } from '@/stores/login.store';
 
@@ -40,13 +39,17 @@ const handleLoginCommand = (val: string) => {
     default:
       break;
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
 .username {
   font-size: 15px;
   color: var(--el-text-color-primary);
+
+  &:focus-visible {
+    outline: none;
+  }
 }
 
 .avatar {

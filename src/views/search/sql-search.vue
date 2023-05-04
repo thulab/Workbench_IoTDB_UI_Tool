@@ -153,9 +153,9 @@ import { useTableHeight } from '@/composition-api';
 import { handleExport } from '@/utils/export';
 import DynamicTable from '@/components/dynamic-table.vue';
 import { SearchApi } from '@/api';
-import sideFunction from './components/side-function.vue';
-import sideData from './components/side-data.vue';
-import sideTemplate from './components/side-template.vue';
+import SideFunction from './components/side-function.vue';
+import SideData from './components/side-data.vue';
+import SideTemplate from './components/side-template.vue';
 import CodeEditor from './components/code-editor.vue';
 
 const props = defineProps<{
@@ -182,7 +182,7 @@ const runFlag = ref(true);
 const sqlResult = ref<Partial<Search.QuerySqlResponse>[]>([]);
 
 const code = ref('');
-const sqlListRef = ref<InstanceType<typeof sideTemplate>>();
+const sqlListRef = ref<InstanceType<typeof SideTemplate>>();
 const saveFormRef = ref<FormInstance>();
 const resaveFormRef = ref<FormInstance>();
 const saveFormRules = reactive({

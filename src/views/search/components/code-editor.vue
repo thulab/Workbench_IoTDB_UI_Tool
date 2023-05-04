@@ -108,4 +108,9 @@ onBeforeUnmount(() => {
   text-align: initial;
   display: contents;
 }
+
+/* stylelint-disable-next-line selector-class-pattern */
+.ͼ1.cm-focused {
+  outline: none;
+}
 </style>

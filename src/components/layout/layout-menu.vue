@@ -1,7 +1,7 @@
 <template>
   <div
     class="menu"
-    :style="{ width: isCollapse ? '65px' : '220px' }">
+    :style="{ width: isCollapse ? '40px' : '280px' }">
     <div class="logo flex-center">
       <img
         v-show="!isCollapse"
@@ -15,10 +15,7 @@
         :router="true"
         :collapse="isCollapse"
         :collapse-transition="false"
-        :unique-opened="true"
-        background-color="#20222a"
-        text-color="#bdbdc0"
-        active-text-color="#fff">
+        :unique-opened="true">
         <layout-menu-sub-item :menu-list="menuList" />
       </el-menu>
     </el-scrollbar>
@@ -107,17 +104,47 @@ listeningWindow();
 
 <style scoped lang="scss">
 .menu {
+  --el-menu-active-color: #131926;
+  --el-menu-text-color: #131926;
+  --el-menu-hover-text-color: #131926;
+  --el-menu-bg-color: #fff;
+  --el-menu-hover-bg-color: #f7f8fc;
+  --el-menu-item-height: 40px;
+  --el-menu-sub-item-height: var(--el-menu-item-height);
+  --el-menu-horizontal-sub-item-height: 36px;
+  --el-menu-item-font-size: var(--el-font-size-base);
+  --el-menu-item-hover-fill: var(--el-color-primary-light-9);
+  --el-menu-border-color: var(--el-border-color);
+  --el-menu-base-level-padding: 20px;
+  --el-menu-level-padding: 20px;
+  --el-menu-icon-width: 24px;
+
+  .el-menu--collapse {
+    --el-menu-base-level-padding: 8px;
+
+    &:deep(.el-menu-tooltip__trigger) {
+      width: 30px !important;
+      height: 30px !important;
+      padding: 0 3px !important;
+    }
+  }
+
   position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #20222a;
+  background: #fff;
   transition: all 0.3s ease;
+
+  :deep(.el-divider--horizontal) {
+    width: calc(100% - 16px);
+    margin: 0 8px;
+  }
 
   .logo {
     box-sizing: border-box;
     height: 55px;
-    border-bottom: 2px solid #1d1e26;
+    border-bottom: 0 solid #1d1e26;
     box-shadow: 2px 0 6px rgb(0 21 41 / 35%);
 
     span {

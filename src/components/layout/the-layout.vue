@@ -80,11 +80,11 @@ onMounted(() => {
 
   .el-main {
     box-sizing: border-box;
-    padding: 10px 13px;
+    padding: 16px;
 
     // 防止切换出现横向滚动条
     overflow-x: hidden;
-    background: var(--el-bg-color-page);
+    background: #F0F1FA; // var(--el-bg-color-page);
 
     .main-box {
       box-sizing: border-box;
