@@ -66,7 +66,7 @@
                       <template #dropdown>
                         <el-dropdown-menu>
                           <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
-                          <el-dropdown-item command="excel">以.excel格式导出</el-dropdown-item>
+                          <el-dropdown-item command="xlsx">以.xlsx格式导出</el-dropdown-item>
                         </el-dropdown-menu>
                       </template>
                     </el-dropdown>
@@ -343,7 +343,7 @@ function querySqlRun() {
   }
 }
 // 查询结果
-const formatSqlInfo = computed(() => function (filed: string, index: number) {
+const formatSqlInfo = computed(() => (filed: string, index: number) => {
   const data: Partial<Search.QuerySqlResponse> = sqlResult.value[index];
   if (filed === 'status') {
     // eslint-disable-next-line no-nested-ternary
@@ -476,7 +476,7 @@ function exportSql(i: number, exportType: string) {
   exportDataSql(serverId, codevalArr[i], exportType).then((res) => {
     if (res) {
       ElMessage.success('导出成功');
-      handleExport(res, `export.${exportType === 'csv' ? 'csv' : 'xlsx'}`);
+      handleExport(res, `export.${exportType}`);
     } else {
       ElMessage.info('导出未完成');
     }
@@ -524,7 +524,7 @@ function handleCommandDown(val: string, index: number) {
           }
         });
       });
-  } else if (val === 'csv' || val === 'excel') {
+  } else if (val === 'csv' || val === 'xlsx') {
     exportSql(index, val);
   }
 }
