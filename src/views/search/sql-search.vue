@@ -590,6 +590,19 @@ watch(
     top: 50%;
     transform: translateY(-50%);
   }
+
+  :deep(.el-tabs--card > .el-tabs__header .el-tabs__nav) {
+    border-radius: 6px 6px 0 0;
+  }
+
+  :deep(.el-tabs__item) {
+    border-radius: 6px 6px 0 0;
+  }
+
+  :deep(.el-tabs__item.is-active) {
+    background-color: var(--el-color-primary);
+    color: #fff;
+  }
 }
 
 .sql-search-aside {

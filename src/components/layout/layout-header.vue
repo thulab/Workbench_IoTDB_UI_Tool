@@ -85,7 +85,7 @@ const handleLangCommand = (command: string) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 55px;
+  height: 48px;
   padding: 0 15px;
   background-color: var(--el-bg-color);
   border-bottom: 1px solid var(--el-border-color-extra-light);

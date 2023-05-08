@@ -84,6 +84,7 @@ declare global {
     path: string;
     title: string;
     icon?: string;
+    activeIcon?: string;
     isLink?: string;
     close?: boolean;
     order?: number;

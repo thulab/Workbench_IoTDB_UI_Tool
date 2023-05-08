@@ -113,4 +113,8 @@ onBeforeUnmount(() => {
 .ͼ1.cm-focused {
   outline: none;
 }
+/* stylelint-disable-next-line selector-class-pattern */
+.ͼ4 .cm-line{
+  caret-color: black !important;
+}
 </style>

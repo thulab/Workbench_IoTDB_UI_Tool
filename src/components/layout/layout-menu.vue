@@ -2,11 +2,9 @@
   <div
     class="menu"
     :style="{ width: isCollapse ? '40px' : '280px' }">
-    <div class="logo flex-center">
-      <img
-        v-show="!isCollapse"
-        src="@/assets/logo.png"
-        alt="logo">
+    <div class="logo flex-align-center" :style="{ paddingLeft: isCollapse ? '6px' : '14px' }">
+      <el-icon alt="logo"><i-custom-logo /></el-icon>
+      <el-icon class="title" v-show="!isCollapse"><i-custom-title /></el-icon>
       <!-- <span v-show="!isCollapse">{{ systemTitle }}</span> -->
     </div>
     <el-scrollbar>
@@ -50,6 +48,7 @@ const routesToMenu = (routeItem: RouteRecordRaw, parentPath: string) => {
     path,
     title: routeItem.meta?.title,
     icon: routeItem.meta?.icon,
+    activeIcon: routeItem.meta?.activeIcon,
     isLink: routeItem.meta?.isLink,
     close: routeItem.meta?.close,
     alwayShow: routeItem.meta?.alwayShow,
@@ -116,7 +115,7 @@ listeningWindow();
   --el-menu-item-hover-fill: var(--el-color-primary-light-9);
   --el-menu-border-color: var(--el-border-color);
   --el-menu-base-level-padding: 20px;
-  --el-menu-level-padding: 20px;
+  --el-menu-level-padding: 4px;
   --el-menu-icon-width: 24px;
 
   .el-menu--collapse {
@@ -143,9 +142,21 @@ listeningWindow();
 
   .logo {
     box-sizing: border-box;
-    height: 55px;
+    height: 48px;
     border-bottom: 0 solid #1d1e26;
-    box-shadow: 2px 0 6px rgb(0 21 41 / 35%);
+    box-shadow: 0;
+    background-color: var(--el-color-primary);
+
+    .el-icon {
+      font-size: 28px;
+
+      &.title {
+        margin-left: 16px;
+        height: 20px;
+        width: 105px;
+        font-size: 105px;
+      }
+    }
 
     span {
       font-size: 22px;
