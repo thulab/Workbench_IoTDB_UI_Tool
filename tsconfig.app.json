@@ -18,7 +18,7 @@
     },
     "types": [
       "node",
-      "element-plus/global",
+      "element-plus/global.d.ts",
       "unplugin-icons/types/vue",
       "@intlify/unplugin-vue-i18n/messages"
     ]

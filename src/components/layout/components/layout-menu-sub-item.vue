@@ -4,7 +4,7 @@
     :key="subItem.path">
     <template v-if="subItem.children && subItem.children.length > 0">
       <el-divider />
-      <el-sub-menu
+      <el-menu-item
         v-if="!isCollapse"
         :index="subItem.path">
         <template #title>
@@ -13,7 +13,7 @@
           </el-icon>
           <span>{{ subItem.title }}</span>
         </template>
-      </el-sub-menu>
+      </el-menu-item>
       <layout-menu-sub-item :menu-list="subItem.children" />
     </template>
 

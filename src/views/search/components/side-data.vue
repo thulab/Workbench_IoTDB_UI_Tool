@@ -60,7 +60,7 @@ import { ref, reactive } from 'vue';
 import { StorageApi } from '@/api';
 
 const props = defineProps<{
-  serverId: string;
+  serverId: number;
 }>();
 
 const emit = defineEmits(['get-function']);
@@ -121,7 +121,7 @@ function getStorageList() {
     pageNum: storagePagination.pageNum,
     keyword: filterStorageText.value,
   }).then((res) => {
-    const dataArr = res.data?.storageGroupNames.map((item) => item);
+    const dataArr = res.data?.databases.map((item) => item);
     storageList.value = storageList.value.concat(dataArr);
     storageTotal.value = res.data?.totalCount || 0;
   }).finally(() => {

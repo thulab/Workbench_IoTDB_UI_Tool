@@ -3,10 +3,7 @@
     <div class="search-form-wrapper">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline :disabled="getListLoading">
         <el-form-item label="测点选择:" prop="device" :error="errorDeviceTip">
-          <div style="display: flex;">
-            <el-input v-model="searchFormData.device" readonly placeholder="请选择测点" />
-            <el-button type="primary" class="m-l-12">选择</el-button>
-          </div>
+          <timeseries-select v-model="searchFormData.device" />
         </el-form-item>
         <el-form-item label="查询时间:" prop="time">
           <div class="search-time-wrapper">
@@ -120,10 +117,10 @@ import {
 import { formatTimeseries } from '@/utils/format';
 import { handleExport } from '@/utils/export';
 import DynamicTable from '@/components/dynamic-table.vue';
+import { useServerStore } from '@/stores';
 
-const props = defineProps<{
-  serverId: string;
-}>();
+const serverStroe = useServerStore();
+const serverId = serverStroe.currentServerId;
 
 const { maxTableHeight } = useTableHeight(400);
 const searchFormRef = ref<FormInstance>();
@@ -232,7 +229,7 @@ function getListData() {
   searchDetailInfos.value.queryTime = '';
   currentQueryTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
   getListLoading.value = true;
-  getList(props.serverId, {
+  getList(serverId, {
     measurementList: searchFormData.device.split(','),
     startTime,
     endTime,
@@ -307,7 +304,7 @@ function handleExportData() {
     startTime = dayjs(searchFormData.datetimerange[0]).valueOf();
     endTime = dayjs(searchFormData.datetimerange[1]).valueOf();
   }
-  exportData(props.serverId, {
+  exportData(serverId, {
     measurementList: searchFormData.device.split(','),
     startTime,
     endTime,

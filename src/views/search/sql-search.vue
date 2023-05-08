@@ -32,23 +32,22 @@
           </div>
         </div>
 
-        <div :style="{ height: `calc(100vh - ${200 + divwerHeight}px)` }">
+        <div style="height:50%">
           <code-editor
             v-show="codeMirrorReady"
             v-model:model-value="code"
             @ready="()=>codeMirrorReady = true"
             :style="{
-              height: `calc(100vh - ${200 + divwerHeight}px)`,
+              height: '300px',
               backgroundColor: '#f9fbfc',
             }" />
         </div>
-
-        <div :style="{ height: divwerHeight + 'px' }">
+        <div>
           <div class="run-result-title-box">
             <h4>执行结果</h4>
             <span class="run-result-tip"><i-ep-info-filled />默认显示100行1000列，如需查看更多数据请下载查看</span>
           </div>
-          <div class="tabs">
+          <div class="tabs" v-if="tableData.list && tableData.list.length > 0">
             <el-tabs v-model="activeName" class="tabs-nav-list">
               <el-tab-pane v-for="(item, index) of columnList" :key="index" :name="`t${index}`">
                 <template #label>
@@ -78,7 +77,7 @@
                     ref="standTable"
                     :columns="item"
                     :table-data="tableDataPagination[index].list"
-                    :max-height="maxTableHeight"
+                    :max-height="300"
                     v-model:current-page="pageNums[index]"
                     v-model:page-size="pagination.pageSize"
                     :total="total[index]"
@@ -128,7 +127,7 @@
     </el-dialog>
 
     <el-dialog title="重命名" v-model="renameDialogVisible" width="400px">
-      <el-form ref="resaveFormRef" :model="resaveForm" :rules="saveFormRules" label-position="left">
+      <el-form ref="resaveFormRef" :model="resaveForm" :rules="saveFormRules" label-width="100px" label-position="right">
         <el-form-item label="原名称：" prop="oldSqlName">
           <el-input v-model="resaveForm.oldSqlName" disabled />
         </el-form-item>
@@ -153,15 +152,14 @@ import { useTableHeight } from '@/composition-api';
 import { handleExport } from '@/utils/export';
 import DynamicTable from '@/components/dynamic-table.vue';
 import { SearchApi } from '@/api';
+import { useServerStore } from '@/stores';
 import SideFunction from './components/side-function.vue';
 import SideData from './components/side-data.vue';
 import SideTemplate from './components/side-template.vue';
 import CodeEditor from './components/code-editor.vue';
 
-const props = defineProps<{
-  serverId: string;
-  queryId?: string;
-}>();
+const serverStroe = useServerStore();
+const serverId = serverStroe.currentServerId;
 
 const { maxTableHeight } = useTableHeight(300);
 const codeMirrorReady = ref(false);
@@ -250,7 +248,7 @@ function getSqlCode() {
   code.value = '';
   tableData.list = [];
   if (!id) return;
-  getSql(props.serverId, id).then((res) => {
+  getSql(serverId, id).then((res) => {
     const resData = res.data;
     code.value = resData.sqls;
   });
@@ -295,7 +293,7 @@ function querySqlRun() {
     runFlag.value = false;
     timeNumber.value = Number(new Date());
     currentQueryTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
-    querySql(props.serverId, { sqls: code.value?.split('\n'), timestamp: timeNumber.value })
+    querySql(serverId, { sqls: code.value?.split('\n'), timestamp: timeNumber.value })
       .then((res) => {
         const { data } = res;
         activeName.value = 't0';
@@ -413,13 +411,13 @@ function handleNameConfirm() {
     if (valid) {
       const id = activiteSql.value.charAt(0) === '_' ? null : activiteSql.value.split('_')[0];
       const data = {
-        connectionId: Number(props.serverId) * 1,
+        serverId,
         id,
         queryName: saveForm.sqlName,
         sqls: code.value,
       };
-      saveQuery(props.serverId, data).then((res) => {
-        if (res.code === '0') {
+      saveQuery(serverId, data).then((res) => {
+        if (res.code === 0) {
           ElMessage.success('保存成功');
           nameDialogVisible.value = false;
           const index = activiteSql.value.split('_')[1] as unknown as number;
@@ -443,13 +441,13 @@ function handleRenameConfirm() {
     if (valid) {
       const { id } = resaveForm;
       const data = {
-        connectionId: Number(props.serverId) * 1,
+        serverId: Number(serverId) * 1,
         id,
         queryName: resaveForm.sqlName,
         sqls: code.value,
       };
-      saveQuery(props.serverId, data).then((res) => {
-        if (res.code === '0') {
+      saveQuery(serverId, data).then((res) => {
+        if (res.code === 0) {
           ElMessage.success('保存成功');
           renameDialogVisible.value = false;
           const index = activiteSql.value.split('_')[1] as unknown as number;
@@ -471,14 +469,14 @@ function handleSave() {
 }
 // 停止
 function stopquery() {
-  queryStop(props.serverId, timeNumber.value).then(() => {});
+  queryStop(serverId, timeNumber.value).then(() => {});
 }
-function exportSql(i: number) {
+function exportSql(i: number, exportType: string) {
   const codevalArr = code.value?.split('\n');
-  exportDataSql(props.serverId, codevalArr[i]).then((res) => {
+  exportDataSql(serverId, codevalArr[i], exportType).then((res) => {
     if (res) {
       ElMessage.success('导出成功');
-      handleExport(res, 'export.CSV');
+      handleExport(res, `export.${exportType === 'csv' ? 'csv' : 'xlsx'}`);
     } else {
       ElMessage.info('导出未完成');
     }
@@ -493,7 +491,7 @@ function handleCommandDown(val: string, index: number) {
     sqlResult.value[index].startQueryTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
     columnList.value.splice(index, 1, []);
     tableData.list.splice(index, 1, {});
-    querySql(props.serverId, { sqls: [codevalArr[index]], timestamp: dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).valueOf() })
+    querySql(serverId, { sqls: [codevalArr[index]], timestamp: dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).valueOf() })
       .then((res) => {
         const { data } = res;
         data.forEach((item) => {
@@ -526,10 +524,8 @@ function handleCommandDown(val: string, index: number) {
           }
         });
       });
-  } else if (val === 'csv') {
-    exportSql(index);
-  } else {
-    // TODO excel
+  } else if (val === 'csv' || val === 'excel') {
+    exportSql(index, val);
   }
 }
 // 清空

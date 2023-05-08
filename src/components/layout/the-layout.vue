@@ -23,7 +23,7 @@
         </section>
       </el-main>
       <el-footer>
-        <layout-footer />
+        <layout-footer v-if="false" />
       </el-footer>
     </el-container>
   </el-container>

@@ -22,7 +22,7 @@
 import { SearchApi } from '@/api';
 
 const props = defineProps<{
-  serverId: string;
+  serverId: number;
 }>();
 
 const emit = defineEmits(['handleSqlOperate']);
@@ -37,7 +37,7 @@ const getQueryList = async () => {
   loading.value = true;
   const res = await getQuery(props.serverId);
   loading.value = false;
-  if (res.code === '0') {
+  if (res.code === 0) {
     sqlList.value = res.data || [];
   }
 };

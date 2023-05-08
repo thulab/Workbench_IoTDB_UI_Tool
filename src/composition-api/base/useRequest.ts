@@ -3,7 +3,7 @@
 
 import { ref, type Ref } from 'vue';
 
-const toastErrorCode = ['CONN-0002', 'CONN-0003', 'USER-0004', 'USER-0012', 'USER-0006', 'CSV-0002', 'IOTDB-0001', 'IOTDB-0002', 'IOTDB-0013', 'IOTDB-0016', 'IOTDB-0022', 'IOTDB-0023', 'IOTDB-0024', 'IOTDB-0025', 'IOTDB-0026', 'IOTDB-0027', 'IOTDB-0054', 'IOTDB-0055', 'IOTDB-0056', 'IOTDB-0066', 'IOTDB-0067', 'IOTDB-0069', 'IOTDB-0070', 'IOTDB-0072', 'IOTDB-0098', 'GROUP-0001', 'GROUP-0002', 'DEV-0001', 'DEV-0002', 'MEASU-0004', 'MEASU-0002', 'MEASU-0003', 'ROLE-0001', 'ROLE-0002', 'MEASU-0004'];
+const alertErrorCode = [1001];
 
 interface Opt<T> {
   initData?: T;
@@ -20,23 +20,23 @@ export default function useRequest<Requests extends Array<any>, Resp>(apiFn: (..
   const data = ref(options.initData as Resp) as Ref<Resp>;
   const error = ref(null) as Ref<any>;
 
-  const showError = (message: string, code?: string) => {
+  const showError = (message: string, code?: number) => {
     if (!message) return;
     // 有code 并且在toastErrorCode中 或者 code不包含-的
-    if (code && (toastErrorCode.includes(code) || !code.includes('-'))) {
-      ElMessage.error({ message, grouping: true });
-    } else if (!window.__errBoxShowing__) {
+    if (code && alertErrorCode.includes(code) && !window.__errBoxShowing__) {
       window.__errBoxShowing__ = true;
       ElMessageBox.alert(message, '提示', {
         confirmButtonText: '确定',
         type: 'error',
       }).then(() => {
         window.__errBoxShowing__ = false;
-        if (code && code === 'USER-0008') {
+        if (code && code === 1008) {
           localStorage.setItem('authorization', '');
           window.location.reload();
         }
       });
+    } else {
+      ElMessage.error({ message, grouping: true });
     }
   };
 

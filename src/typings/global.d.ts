@@ -20,7 +20,7 @@ declare global {
   type ApiResponse<T = any> = {
     success: boolean;
     data: T;
-    code: string;
+    code: number;
     message: string;
   };
 
@@ -28,7 +28,7 @@ declare global {
     errCode: number;
     errMessage: string;
     message: string;
-    code: string;
+    code: number;
     [key: string]: any;
   };
 
