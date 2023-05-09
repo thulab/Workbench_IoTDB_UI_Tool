@@ -18,18 +18,10 @@
               </el-tooltip>
             </div>
             <div class="sql-right-icon-box">
-              <el-tooltip effect="light" content="保存" placement="top">
-                <el-icon @click="handleSave"><i-ep-document /></el-icon>
-              </el-tooltip>
-              <el-tooltip effect="light" content="运行" placement="top">
-                <el-icon @click="querySqlRun"><i-ep-video-play /></el-icon>
-              </el-tooltip>
-              <el-tooltip effect="light" content="取消" placement="top">
-                <el-icon @click="stopquery"><i-ep-circle-close /></el-icon>
-              </el-tooltip>
-              <el-tooltip effect="light" content="清空" placement="top">
-                <el-icon @click="emptyQuery"><i-ep-delete /></el-icon>
-              </el-tooltip>
+              <el-button link @click="handleSave"><el-icon><i-ep-document /></el-icon>保存</el-button>
+              <el-button link :disabled="!runFlag" @click="querySqlRun"><el-icon><i-ep-video-play /></el-icon>运行</el-button>
+              <el-button link :disabled="runFlag" @click="stopquery"><el-icon><i-ep-circle-close /></el-icon>取消</el-button>
+              <el-button link @click="emptyQuery"><el-icon><i-ep-delete /></el-icon>清空</el-button>
             </div>
           </div>
 
@@ -47,7 +39,7 @@
         <div>
           <div class="run-result-title-box">
             <h4>执行结果</h4>
-            <span class="run-result-tip"><i-ep-info-filled />默认显示1000行100列，如需查看更多数据请下载查看</span>
+            <span class="run-result-tip"><i-ep-info-filled />默认最多查询1000行100列，如需查看更多数据请下载查看</span>
           </div>
           <div class="tabs" v-if="tableData.list && tableData.list.length > 0">
             <el-tabs v-model="activeName" class="tabs-nav-list">
@@ -478,6 +470,7 @@ function handleSave() {
 // 停止
 function stopquery() {
   controller.abort();
+  runFlag.value = true;
   queryStop(serverId, timeNumber.value).then(() => {});
 }
 function exportSql(i: number, exportType: string) {
@@ -678,8 +671,12 @@ watch(
 .sql-right-icon-box {
   display: flex;
 
+  .el-button + .el-button {
+    margin-left: 4px;
+  }
+
   .el-icon {
-    margin: 0 0 0 16px;
+    margin: 0 5px 0 0;
   }
 }
 
