@@ -1,7 +1,7 @@
 <template>
   <div class="stand-table">
     <div class="flex row">
-      <div class="border_table flex-1">
+      <div class="border_table flex-1" :style="{ maxWidth: totalColumnPage > 1 ? 'calc(100% - 70px)' : '100%' }">
         <el-table
           :data="tableData"
           style="width: 100%;"
@@ -34,7 +34,7 @@
           <slot name="append-column"></slot>
         </el-table>
       </div>
-      <div style="width:60px" class="m-l-4">
+      <div style="width:60px" class="m-l-4" v-if="totalColumnPage > 1">
         <el-button size="small" @click="columnPageNum--" :disabled="columnPageNum < 2" circle><i-ep-arrow-left-bold /></el-button>
         <el-button class="m-l-4" @click="columnPageNum++" :disabled="columnPageNum >= totalColumnPage" size="small" circle><i-ep-arrow-right-bold /></el-button>
       </div>
@@ -50,7 +50,7 @@
         v-model:page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper"
         :page-sizes="[10, 20, 50, 100]"
-        :total="total"
+        :total="total || 0"
         :hide-on-single-page="true"
       />
     </div>
@@ -92,6 +92,12 @@ const totalColumnPage = computed(() => Math.ceil((props.columns.length - 1) / 10
 const columnPageNum = ref(1);
 
 const columnsByPage = computed(() => {
+  if (props.columns && props.columns.length <= 11) {
+    return props.columns;
+  }
+  if (!props.columns) {
+    return [];
+  }
   const start = (columnPageNum.value - 1) * 10 + 1;
   const end = columnPageNum.value * 10 + 1;
   return [props.columns[0], ...props.columns.slice(start, end)];

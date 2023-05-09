@@ -78,7 +78,7 @@
                   <dynamic-table
                     ref="standTable"
                     :columns="item"
-                    :table-data="tableDataPagination[index].list"
+                    :table-data="tableDataPagination[index].list || []"
                     :max-height="300"
                     v-model:current-page="pageNums[index]"
                     v-model:page-size="pagination.pageSize"
@@ -505,11 +505,11 @@ function exportSql(i: number, exportType: string) {
 // 下载
 function handleCommandDown(val: string, index: number) {
   if (val === 'refresh') {
-    const codevalArr = code.value?.split('\n');
     sqlResult.value[index].startQueryTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
     columnList.value.splice(index, 1, []);
     tableData.list.splice(index, 1, {});
-    querySql(serverId, { sqls: [codevalArr[index]], timestamp: dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).valueOf() })
+    const { sql } = sqlResult.value[index];
+    querySql(serverId, { sqls: [sql!], timestamp: dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).valueOf() })
       .then((res) => {
         const { data } = res;
         data.forEach((item) => {

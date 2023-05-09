@@ -54,6 +54,7 @@ declare namespace Search{
     status?: boolean;
     errMsg: string;
     startQueryTime?: string;
+    sql: string;
     columns?: number;
   }
 }
