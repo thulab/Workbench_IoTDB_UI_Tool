@@ -26,8 +26,8 @@ class SearchApi {
   }
 
   // sql query
-  static querySql(serverId: number, data: Search.QuerySqlParams): HttpResponseP<Search.QuerySqlResponse[]> {
-    return http.post('/query/querySql', data, { params: { serverId } });
+  static querySql(serverId: number, data: Search.QuerySqlParams, controller?: AbortController): HttpResponseP<Search.QuerySqlResponse[]> {
+    return http.post('/query/querySql', data, { params: { serverId }, signal: controller?.signal });
   }
 
   static queryStop(serverId: number, timestamp: number): HttpResponseP {

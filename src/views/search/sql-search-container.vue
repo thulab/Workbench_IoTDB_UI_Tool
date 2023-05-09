@@ -288,6 +288,7 @@ function handleSqlOperate(val: string, data: Search.SqlList) {
     sqlList.value.splice(index, 1);
   }
 }
+let controller = new AbortController();
 
 // 执行sql
 function querySqlRun() {
@@ -296,7 +297,11 @@ function querySqlRun() {
     runFlag.value = false;
     timeNumber.value = Number(new Date());
     currentQueryTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
-    querySql(serverId, { sqls: code.value?.split('\n'), timestamp: timeNumber.value })
+    columnList.value = []; // 列名
+    tableData.list = []; // 值
+    sqlResult.value = [];
+    controller = new AbortController();
+    querySql(serverId, { sqls: code.value?.split('\n'), timestamp: timeNumber.value }, controller)
       .then((res) => {
         const { data } = res;
         activeName.value = 't0';
@@ -472,6 +477,7 @@ function handleSave() {
 }
 // 停止
 function stopquery() {
+  controller.abort();
   queryStop(serverId, timeNumber.value).then(() => {});
 }
 function exportSql(i: number, exportType: string) {

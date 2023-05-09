@@ -48,16 +48,15 @@ const handleSqlCommand = (val: string, data: Search.SqlList) => {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning',
-    })
-      .then(() => {
-        deleteQueryS(props.serverId, `${data.id}`).then(() => {
-          ElMessage({
-            type: 'success',
-            message: '删除成功!',
-          });
+    }).then(() => {
+      deleteQueryS(props.serverId, `${data.id}`).then(() => {
+        ElMessage({
+          type: 'success',
+          message: '删除成功!',
         });
+        getQueryList();
       });
-    getQueryList();
+    });
     emit('handleSqlOperate', val, data);
   } else {
     emit('handleSqlOperate', val, data);

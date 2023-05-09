@@ -1,37 +1,43 @@
 <template>
   <div class="stand-table">
-    <div class="border_table">
-      <el-table
-        :data="tableData"
-        style="width: 100%;"
-        :height="height"
-        :max-height="maxHeight"
-        tooltip-effect="light"
-        :header-cell-style="{
-          color: 'black',
-          overflow: 'hidden',
-          background: '#F9FAFC',
-        }"
-        @selection-change="handleSelectionChange"
-      >
-        <el-table-column fixed="left" v-if="showSelect" type="selection" width="50" align="center" />
-        <el-table-column :key="item.prop" v-for="item of columns" min-width="180px" :width="item.width + 'px'" :align="item.align" :fixed="item.fixed" show-overflow-tooltip>
-          <template #header>
-            <svg v-if="getIconName(item.icon)" class="icon m-r-5" :class="[{ 'icon-time': item.icon === 'TIME' }]" aria-hidden="true">
-              <use :xlink:href="`#icon-${getIconName(item.icon)}`" />
-            </svg>
-            <!-- 用$t函数包裹title导致页面警告过多卡死页面-->
-            <span
-              :title="item.label"
-            >{{ item.formatHeader ? item.formatHeader(item.label) : getLabelName(item.label) }}
-            </span>
-          </template>
-          <template #default="scope">
-            <span>{{ item.formatContent ? item.formatContent(scope.row[item.prop] || item.defaultValue) : scope.row[item.prop] || item.defaultValue }}</span>
-          </template>
-        </el-table-column>
-        <slot name="append-column"></slot>
-      </el-table>
+    <div class="flex row">
+      <div class="border_table flex-1">
+        <el-table
+          :data="tableData"
+          style="width: 100%;"
+          :height="height"
+          :max-height="maxHeight"
+          tooltip-effect="light"
+          :header-cell-style="{
+            color: 'black',
+            overflow: 'hidden',
+            background: '#F9FAFC',
+          }"
+          @selection-change="handleSelectionChange"
+        >
+          <el-table-column fixed="left" v-if="showSelect" type="selection" width="50" align="center" />
+          <el-table-column :key="item.prop" v-for="item of columnsByPage" min-width="180px" :width="item.width + 'px'" :align="item.align" :fixed="item.fixed" show-overflow-tooltip>
+            <template #header>
+              <svg v-if="getIconName(item.icon)" class="icon m-r-5" :class="[{ 'icon-time': item.icon === 'TIME' }]" aria-hidden="true">
+                <use :xlink:href="`#icon-${getIconName(item.icon)}`" />
+              </svg>
+              <!-- 用$t函数包裹title导致页面警告过多卡死页面-->
+              <span
+                :title="item.label"
+              >{{ item.formatHeader ? item.formatHeader(item.label) : getLabelName(item.label) }}
+              </span>
+            </template>
+            <template #default="scope">
+              <span>{{ item.formatContent ? item.formatContent(scope.row[item.prop] || item.defaultValue) : scope.row[item.prop] || item.defaultValue }}</span>
+            </template>
+          </el-table-column>
+          <slot name="append-column"></slot>
+        </el-table>
+      </div>
+      <div style="width:60px" class="m-l-4">
+        <el-button size="small" @click="columnPageNum--" :disabled="columnPageNum < 2" circle><i-ep-arrow-left-bold /></el-button>
+        <el-button class="m-l-4" @click="columnPageNum++" :disabled="columnPageNum >= totalColumnPage" size="small" circle><i-ep-arrow-right-bold /></el-button>
+      </div>
     </div>
     <div class="paination" v-if="(showPagination || showBatchDelete)">
       <el-button v-if="showBatchDelete" type="primary" @click="deleteArrys" :loading="batchDeleting">{{ $t('standTable.deleteArry') }}</el-button>
@@ -82,6 +88,19 @@ const { getIconName } = useDataTypeIcon();
 const currentPage = useVModel(props, 'currentPage');
 const pageSize = useVModel(props, 'pageSize');
 
+const totalColumnPage = computed(() => Math.ceil((props.columns.length - 1) / 10));
+const columnPageNum = ref(1);
+
+const columnsByPage = computed(() => {
+  const start = (columnPageNum.value - 1) * 10 + 1;
+  const end = columnPageNum.value * 10 + 1;
+  return [props.columns[0], ...props.columns.slice(start, end)];
+});
+
+watch(props.columns, () => {
+  columnPageNum.value = 1;
+});
+
 function handleSelectionChange(val: Record<string, any>[]) {
   emit('selectedChange', val);
 }
@@ -118,6 +137,7 @@ const getLabelName = (label: string) => {
 
 .border_table {
   border-radius: 4px;
+  max-width: calc(100% - 70px);
   border: 1px solid #eaecf0;
 }
 

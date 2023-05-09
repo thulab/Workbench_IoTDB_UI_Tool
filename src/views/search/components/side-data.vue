@@ -1,7 +1,6 @@
 <template>
   <div class="search_div maxheight">
-    <div class="more-select-box">
-      <!-- <el-input placeholder="请选择存储组" v-model="storageName" readonly @focus="handleVisible('storage', true)" />
+    <!-- <el-input placeholder="请选择存储组" v-model="storageName" readonly @focus="handleVisible('storage', true)" />
       <div v-show="isShowStorage" class="select-box-down">
         <el-input placeholder="输入关键字进行过滤" v-model="filterStorageText" size="small" @input="handleInput('storage')"></el-input>
 
@@ -12,27 +11,26 @@
           <li v-if="Math.ceil(storageTotal / 100) > storagePagination.pageNum && !storageLoading" @click="handleMore('storage')">加载更多</li>
         </ul>
       </div> -->
-      <el-select v-model="storageName" placeholder="请选择存储组" @change="handleSelectDatabase" :loading="storageLoading">
-        <el-option v-for="item in storageList" :key="item" :value="item" :label="item" />
-      </el-select>
+    <el-select v-model="storageName" style="width: 100%;" placeholder="请选择存储组" @change="handleSelectDatabase" :loading="storageLoading">
+      <el-option v-for="item in storageList" :key="item" :value="item" :label="item" />
+    </el-select>
 
-    </div>
-
-    <div class="more-select-box">
-      <el-select
-        :disabled="!storageName"
-        v-model="deviceName"
-        placeholder="请选择设备"
-        filterable
-        remote
-        remote-show-suffix
-        :remote-method="handleDeviceInput"
-        :loading="deviceLoading"
-        v-loading="deviceLoading && !deviceName"
-        @change="handleSelectDevice">
-        <el-option v-for="item in deviceList" :key="item" :label="item" :value="item" />
-      </el-select>
-      <!-- <el-input placeholder="请选择设备" v-model="deviceName" readonly :disabled="!storageName" @focus="handleVisible('device', true)" />
+    <el-select
+      class="m-t-10"
+      style="width: 100%;"
+      :disabled="!storageName"
+      v-model="deviceName"
+      placeholder="请选择设备"
+      filterable
+      remote
+      remote-show-suffix
+      :remote-method="handleDeviceInput"
+      :loading="deviceLoading"
+      v-loading="deviceLoading && !deviceName"
+      @change="handleSelectDevice">
+      <el-option v-for="item in deviceList" :key="item" :label="item" :value="item" />
+    </el-select>
+    <!-- <el-input placeholder="请选择设备" v-model="deviceName" readonly :disabled="!storageName" @focus="handleVisible('device', true)" />
       <div v-show="isShowDevice" class="select-box-down">
         <el-input placeholder="输入关键字进行过滤" v-model="filterDeviceText" size="small" @input="handleInput('device')" />
 
@@ -42,14 +40,11 @@
           </li>
         </ul>
       </div> -->
-    </div>
 
-    <div class="more-select-box">
-
-      <el-input :disabled="!deviceName" v-model="filterMeasurementText" placeholder="输入关键字进行过滤" @input="handleInput('measurement')">
-        <template #suffix><i-ep-search /></template>
-      </el-input>
-      <!-- <el-input placeholder="请选择物理量名称" v-model="measurementName" readonly :disabled="!deviceName" @focus="handleVisible('measurement', true)" />
+    <el-input class="m-y-10" :disabled="!deviceName" v-model="filterMeasurementText" placeholder="输入关键字进行过滤" @input="handleInput('measurement')">
+      <template #suffix><i-ep-search /></template>
+    </el-input>
+    <!-- <el-input placeholder="请选择物理量名称" v-model="measurementName" readonly :disabled="!deviceName" @focus="handleVisible('measurement', true)" />
       <div v-show="isShowMeasurement" class="select-box-down">
         <el-input placeholder="输入关键字进行过滤" v-model="filterMeasurementText" size="small" @input="handleInput('measurement')" />
 
@@ -59,7 +54,6 @@
           </li>
         </ul>
       </div> -->
-    </div>
 
     <div class="search-buttons">
       <el-button v-if="false" type="primary" @click="handleAdd(storageName)">当前存储组</el-button>
@@ -135,7 +129,7 @@ function getStorageList() {
     serverId: props.serverId,
     // pageSize: storagePagination.pageSize,
     // pageNum: storagePagination.pageNum,
-    keyword: filterStorageText.value,
+    // keyword: filterStorageText.value,
   }).then((res) => {
     const dataArr = res.data?.pathNames.map((item) => item);
     storageList.value = storageList.value.concat(dataArr);
@@ -216,6 +210,7 @@ function handleAdd(item: string) {
 function handleReset() {
   storageName.value = '';
   deviceName.value = '';
+  filterMeasurementText.value = '';
   measurementName.value = '';
   getStorageList();
 }
