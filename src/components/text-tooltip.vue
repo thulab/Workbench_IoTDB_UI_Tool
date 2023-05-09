@@ -2,7 +2,7 @@
   <el-tooltip
     :disabled="tooltipDisabled"
     :content="props.content"
-    placement="top"
+    :placement="placement"
     effect="light"
     popper-class="tooltip-max-width"
   >
@@ -12,22 +12,17 @@
   </el-tooltip>
 </template>
 <script setup lang="ts">
+import type { Placement } from 'element-plus';
 import { getCurrentInstance, ref } from 'vue';
 
 const { proxy }: any = getCurrentInstance();
-const props = defineProps({
-  content: {
-    required: true,
-    type: String,
-  },
-  className: {
-    type: String,
-    default: '',
-  },
-  spanClassName: {
-    type: String,
-    default: '',
-  },
+const props = withDefaults(defineProps<{
+  content: string;
+  className?: string;
+  spanClassName?: string;
+  placement?: Placement;
+}>(), {
+  placement: 'top',
 });
 const tooltipDisabled = ref(true);
 const onMouseOver = (str: string) => {

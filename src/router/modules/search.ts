@@ -26,7 +26,7 @@ const route = [
       {
         path: 'sql-search',
         name: 'SqlSearch',
-        component: () => import('@/views/search/sql-search.vue'),
+        component: () => import('@/views/search/sql-search-container.vue'),
         meta: { keepAlive: true, title: 'SQL查询', icon: ICustomQuerySQL },
         // props: (route) => ({ serverId: route.query.serverId, queryId: route.query.queryId }),
       },

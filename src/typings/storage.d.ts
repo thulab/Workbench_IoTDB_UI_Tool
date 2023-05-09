@@ -34,7 +34,7 @@ declare namespace StorageDevice{
   }
 
   export interface GetStorageListResponse {
-    databases: string[];
+    pathNames: string[];
     totalCount: number;
   }
 

@@ -14,7 +14,7 @@
             <div class="sql-title-text">
               <span>SQL输入</span>
               <el-tooltip effect="light" content="操作说明" placement="top">
-                <a href="https://iotdb.apache.org/zh/UserGuide/V1.1.x/Query-Data/Overview.html" target="_blank"><i-ep-question-filled /></a>
+                <a href="https://iotdb.apache.org/zh/UserGuide/V1.1.x/Query-Data/Overview.html" rel="noopener noreferrer" target="_blank"><i-ep-question-filled>1</i-ep-question-filled></a>
               </el-tooltip>
             </div>
             <div class="sql-right-icon-box">
@@ -47,7 +47,7 @@
         <div>
           <div class="run-result-title-box">
             <h4>执行结果</h4>
-            <span class="run-result-tip"><i-ep-info-filled />默认显示100行1000列，如需查看更多数据请下载查看</span>
+            <span class="run-result-tip"><i-ep-info-filled />默认显示1000行100列，如需查看更多数据请下载查看</span>
           </div>
           <div class="tabs" v-if="tableData.list && tableData.list.length > 0">
             <el-tabs v-model="activeName" class="tabs-nav-list">
@@ -63,7 +63,7 @@
                   </ul>
                   <div class="run-result-buttons">
                     <el-button link @click="handleCommandDown('refresh', index)"><i-ep-refresh />刷新</el-button>
-                    <el-dropdown class="more-icon m-l-12" @command="val => handleCommandDown(val, index)">
+                    <el-dropdown :disabled="!sqlResult[index].status" class="more-icon m-l-12" @command="val => handleCommandDown(val, index)">
                       <el-button link><i-ep-download />下载</el-button><el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-ep-question-filled /></el-tooltip>
                       <template #dropdown>
                         <el-dropdown-menu>
@@ -89,7 +89,7 @@
                 </div>
                 <div class="tab_table" v-else>
                   <span v-if="display && !sqlResult[index].errMsg">执行成功,该查询语句无数据返回</span>
-                  <span v-if="sqlResult[index].errMsg">{{ sqlResult[index].errMsg }}</span>
+                  <span v-if="sqlResult[index].errMsg">MSG: {{ sqlResult[index].errMsg }}</span>
                 </div>
               </el-tab-pane>
             </el-tabs>
@@ -354,7 +354,7 @@ const formatSqlInfo = computed(() => (filed: string, index: number) => {
   } if (filed === 'startQueryTime') {
     return data.startQueryTime ? data.startQueryTime : currentQueryTime.value;
   } if (filed === 'queryTime') {
-    return data.status ? data.queryTime : '';
+    return data.queryTime ? data.queryTime : '';
   }
   return '';
 });
@@ -704,5 +704,13 @@ watch(
 .run-result-infos {
   display: flex;
   justify-content: space-between;
+
+  ul {
+    display: flex;
+
+    .run-result-item + .run-result-item {
+      margin-left: 8px;
+    }
+  }
 }
 </style>

@@ -63,6 +63,7 @@ declare module '@vue/runtime-core' {
     IEpPlus: typeof import('~icons/ep/plus')['default']
     IEpQuestionFilled: typeof import('~icons/ep/question-filled')['default']
     IEpRefresh: typeof import('~icons/ep/refresh')['default']
+    IEpSearch: typeof import('~icons/ep/search')['default']
     IEpVideoPlay: typeof import('~icons/ep/video-play')['default']
     LayoutFooter: typeof import('./../components/layout/layout-footer.vue')['default']
     LayoutHeader: typeof import('./../components/layout/layout-header.vue')['default']
