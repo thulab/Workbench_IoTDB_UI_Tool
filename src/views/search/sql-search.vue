@@ -9,38 +9,40 @@
 
           <el-button size="small" circle class="add-tab-btn" @click="handleTabAdd"><i-ep-plus /></el-button>
         </div>
-        <div class="sql-title-box">
-          <div class="sql-title-text">
-            <span>SQL输入</span>
-            <el-tooltip effect="light" content="操作说明" placement="top">
-              <a href="https://iotdb.apache.org/zh/UserGuide/V1.1.x/Query-Data/Overview.html" target="_blank"><i-ep-question-filled /></a>
-            </el-tooltip>
+        <div class="sql-input-area">
+          <div class="sql-title-box">
+            <div class="sql-title-text">
+              <span>SQL输入</span>
+              <el-tooltip effect="light" content="操作说明" placement="top">
+                <a href="https://iotdb.apache.org/zh/UserGuide/V1.1.x/Query-Data/Overview.html" target="_blank"><i-ep-question-filled /></a>
+              </el-tooltip>
+            </div>
+            <div class="sql-right-icon-box">
+              <el-tooltip effect="light" content="保存" placement="top">
+                <el-icon @click="handleSave"><i-ep-document /></el-icon>
+              </el-tooltip>
+              <el-tooltip effect="light" content="运行" placement="top">
+                <el-icon @click="querySqlRun"><i-ep-video-play /></el-icon>
+              </el-tooltip>
+              <el-tooltip effect="light" content="取消" placement="top">
+                <el-icon @click="stopquery"><i-ep-circle-close /></el-icon>
+              </el-tooltip>
+              <el-tooltip effect="light" content="清空" placement="top">
+                <el-icon @click="emptyQuery"><i-ep-delete /></el-icon>
+              </el-tooltip>
+            </div>
           </div>
-          <div class="sql-right-icon-box">
-            <el-tooltip effect="light" content="保存" placement="top">
-              <el-icon @click="handleSave"><i-ep-document /></el-icon>
-            </el-tooltip>
-            <el-tooltip effect="light" content="运行" placement="top">
-              <el-icon @click="querySqlRun"><i-ep-video-play /></el-icon>
-            </el-tooltip>
-            <el-tooltip effect="light" content="取消" placement="top">
-              <el-icon @click="stopquery"><i-ep-circle-close /></el-icon>
-            </el-tooltip>
-            <el-tooltip effect="light" content="清空" placement="top">
-              <el-icon @click="emptyQuery"><i-ep-delete /></el-icon>
-            </el-tooltip>
-          </div>
-        </div>
 
-        <div style="height:50%">
-          <code-editor
-            v-show="codeMirrorReady"
-            v-model:model-value="code"
-            @ready="()=>codeMirrorReady = true"
-            :style="{
-              height: '300px',
-              backgroundColor: '#f9fbfc',
-            }" />
+          <div style="height:50%">
+            <code-editor
+              v-show="codeMirrorReady"
+              v-model:model-value="code"
+              @ready="()=>codeMirrorReady = true"
+              :style="{
+                height: '300px',
+                backgroundColor: '#f9fbfc',
+              }" />
+          </div>
         </div>
         <div>
           <div class="run-result-title-box">
@@ -86,7 +88,7 @@
                   />
                 </div>
                 <div class="tab_table" v-else>
-                  <span v-if="display">执行成功,该查询语句无数据返回</span>
+                  <span v-if="display && !sqlResult[index].errMsg">执行成功,该查询语句无数据返回</span>
                   <span v-if="sqlResult[index].errMsg">{{ sqlResult[index].errMsg }}</span>
                 </div>
               </el-tab-pane>
@@ -153,6 +155,7 @@ import { handleExport } from '@/utils/export';
 import DynamicTable from '@/components/dynamic-table.vue';
 import { SearchApi } from '@/api';
 import { useServerStore } from '@/stores';
+import { showErrorFn } from '@/composition-api/base/useRequest';
 import SideFunction from './components/side-function.vue';
 import SideData from './components/side-data.vue';
 import SideTemplate from './components/side-template.vue';
@@ -481,7 +484,16 @@ function exportSql(i: number, exportType: string) {
       ElMessage.info('导出未完成');
     }
   }).catch((err) => {
-    ElMessage.error(err.message);
+    if (err.message) {
+      ElMessage.error(err.message);
+    } else if (err.type === 'application/json') {
+      err.text().then((str: string) => {
+        const data = JSON.parse(str);
+        showErrorFn(data);
+      });
+    } else {
+      ElMessage.error('导出失败');
+    }
   });
 }
 // 下载
@@ -559,6 +571,11 @@ watch(
 </script>
 
 <style lang="scss" scoped>
+.sql-container{
+  // margin: -20px;
+  // background: #dfe1ed;
+}
+
 .sql-wrapper {
   width: 100%;
   position: relative;
@@ -622,15 +639,27 @@ watch(
   }
 }
 
+.sql-input-area {
+  padding: 0 16px 16px ;
+  margin-bottom: 16px;
+  border-radius: 0 0 6px 6px;
+  background-color: #fff;
+}
+
 .sql-title-box {
   display: flex;
   justify-content: space-between;
-  padding: 4px 8px;
+  padding: 12px 0  15px ;
 }
 
 .sql-title-text {
   display: flex;
   align-items: center;
+
+  span {
+    font-size: 14px;
+    color: var(--el-color-primary)
+  }
 
   a {
     margin-left: 4px;

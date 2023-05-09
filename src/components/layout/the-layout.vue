@@ -84,7 +84,7 @@ onMounted(() => {
 
     // 防止切换出现横向滚动条
     overflow-x: hidden;
-    background: #F0F1FA; // var(--el-bg-color-page);
+    background: #dfe1ed; // var(--el-bg-color-page);
 
     .main-box {
       box-sizing: border-box;
@@ -95,7 +95,8 @@ onMounted(() => {
       overflow-x: hidden !important;
       background-color: var(--el-bg-color);
       border-radius: 4px;
-      box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+
+      // box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
 
       &::-webkit-scrollbar {
         background-color: var(--el-bg-color);

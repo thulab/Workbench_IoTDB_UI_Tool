@@ -36,12 +36,18 @@ class SearchApi {
 
   // Import query
   static exportDataSql(serverId: number, sql: string, exportType: string = 'csv'): HttpResponseP {
-    return http.get('/file/exportSqlData', { params: { sql, serverId, exportType } });
+    if (exportType === 'csv') {
+      return http.get('/file/exportCSVSqlData', { params: { sql, serverId } });
+    }
+    return http.get('/file/exportExcelSqlData', { params: { sql, serverId }, responseType: 'blob' });
   }
 
   // Import query
-  static exportData(serverId: number, data: Search.QueryDataParams): HttpResponseP {
-    return http.get('/file/exportSqlData', { params: { serverId, ...data } });
+  static exportData(serverId: number, data: Search.QueryDataParams, exportType: string = 'csv'): HttpResponseP {
+    if (exportType === 'csv') {
+      return http.get('/file/exportCSVData', { params: { serverId, ...data } });
+    }
+    return http.get('/file/exportExcelData', { params: { serverId, ...data }, responseType: 'blob' });
   }
 }
 export default SearchApi;

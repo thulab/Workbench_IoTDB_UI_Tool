@@ -11,6 +11,38 @@ interface Opt<T> {
   errMessage?: boolean | string; // 失败默认toast提示
 }
 
+const showError = (message: string, code?: number) => {
+  if (!message) return;
+  // 有code 并且在toastErrorCode中 或者 code不包含-的
+  if (code && alertErrorCode.includes(code) && !window.__errBoxShowing__) {
+    window.__errBoxShowing__ = true;
+    ElMessageBox.alert(message, '提示', {
+      confirmButtonText: '确定',
+      type: 'error',
+    }).then(() => {
+      window.__errBoxShowing__ = false;
+      if (code && code === 1008) {
+        localStorage.setItem('authorization', '');
+        window.location.reload();
+      }
+    });
+  } else {
+    ElMessage.error({ message, grouping: true });
+  }
+};
+
+export const showErrorFn = (err: HttpError, defaultErrMessage?: string | boolean) => {
+  if (err.status && err.status !== 200) {
+    ElMessage.error({ message: '内部服务异常，请联系管理员', grouping: true });
+  } else if (typeof defaultErrMessage === 'string') {
+    showError(defaultErrMessage, err.code);
+  } else if (defaultErrMessage && err.message) {
+    showError(err.message, err.code);
+  } else if (err.error) {
+    showError(err.error, err.code);
+  }
+};
+
 export default function useRequest<Requests extends Array<any>, Resp>(apiFn: (...args: Requests) => HttpResponseP<Resp>, opt?: Opt<Resp>) {
   const options = {
     errMessage: true,
@@ -19,26 +51,6 @@ export default function useRequest<Requests extends Array<any>, Resp>(apiFn: (..
   const loading = ref(false);
   const data = ref(options.initData as Resp) as Ref<Resp>;
   const error = ref(null) as Ref<any>;
-
-  const showError = (message: string, code?: number) => {
-    if (!message) return;
-    // 有code 并且在toastErrorCode中 或者 code不包含-的
-    if (code && alertErrorCode.includes(code) && !window.__errBoxShowing__) {
-      window.__errBoxShowing__ = true;
-      ElMessageBox.alert(message, '提示', {
-        confirmButtonText: '确定',
-        type: 'error',
-      }).then(() => {
-        window.__errBoxShowing__ = false;
-        if (code && code === 1008) {
-          localStorage.setItem('authorization', '');
-          window.location.reload();
-        }
-      });
-    } else {
-      ElMessage.error({ message, grouping: true });
-    }
-  };
 
   function requestFn(...args: Requests): Promise<ApiResponse<Resp>> {
     loading.value = true;
@@ -55,15 +67,7 @@ export default function useRequest<Requests extends Array<any>, Resp>(apiFn: (..
       })
       .catch((err: HttpError) => {
         error.value = err;
-        if (err.status && err.status !== 200) {
-          ElMessage.error({ message: '内部服务异常，请联系管理员', grouping: true });
-        } else if (typeof options.errMessage === 'string') {
-          showError(options.errMessage, err.code);
-        } else if (options.errMessage && err.message) {
-          showError(err.message, err.code);
-        } else if (err.error) {
-          showError(err.error, err.code);
-        }
+        showErrorFn(err);
         return Promise.reject(err);
       })
       .finally(() => {
@@ -76,5 +80,6 @@ export default function useRequest<Requests extends Array<any>, Resp>(apiFn: (..
     data,
     error,
     requestFn,
+    showErrorFn,
   };
 }
