@@ -1,6 +1,6 @@
 declare namespace Search{
   export interface QueryDataParams {
-    measurementList: string[];
+    measurements: string[];
     startTime?: number;
     endTime?: number;
     unitInterval?: string;
@@ -8,6 +8,8 @@ declare namespace Search{
     aggregation?: string;
     spage?: number;
     ssize?: number;
+    size: number;
+    page: number;
   }
 
   export interface QueryDataResult {
@@ -23,6 +25,7 @@ declare namespace Search{
     queryTime: string;
     status?: boolean;
     errMsg: string;
+    hasNext: boolean;
   }
 
   export interface SqlList {

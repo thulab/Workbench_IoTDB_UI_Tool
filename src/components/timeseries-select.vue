@@ -40,7 +40,7 @@ const remoteMethod = (query: string) => {
   lastMeasurementQuery = query;
   getMeasurement({
     serverId: props.serverId,
-    deviceName: 'root.dacoo.deviceS12410',
+    deviceName: 'root.sg1.d1',
     keyword: lastMeasurementQuery,
   }).then((res) => {
     if (lastMeasurementQuery === query) {

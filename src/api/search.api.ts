@@ -45,9 +45,9 @@ class SearchApi {
   // Import query
   static exportData(serverId: number, data: Search.QueryDataParams, exportType: string = 'csv'): HttpResponseP {
     if (exportType === 'csv') {
-      return http.get('/file/exportCSVData', { params: { serverId, ...data } });
+      return http.post('/file/exportCSVData', data, { params: { serverId } });
     }
-    return http.get('/file/exportExcelData', { params: { serverId, ...data }, responseType: 'blob' });
+    return http.post('/file/exportExcelData', data, { params: { serverId }, responseType: 'blob' });
   }
 }
 export default SearchApi;

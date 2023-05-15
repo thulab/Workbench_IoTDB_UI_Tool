@@ -3,7 +3,7 @@ import { ref } from 'vue';
 
 export const useServerStore = defineStore('ServerStore', () => {
   const currentServer = ref<Server.ConnectionInfo>({
-    id: 10,
+    id: 20,
     alias: 'test',
     systemStatus: 'Running',
   });

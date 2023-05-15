@@ -72,7 +72,7 @@
         <div class="page-detail-buttons">
           <el-button @click="handleSearch" :disabled="getListLoading">刷新</el-button>
           <el-dropdown class="more-icon m-l-12" :disabled="getListLoading" v-show="searchDetailInfos.status && totalCount > 0" @command="val => handleCommandDown(val)">
-            <el-button><i-ep-download />数据导出</el-button><el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-custom-question /></el-tooltip>
+            <el-button>数据导出<el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-custom-question /></el-tooltip></el-button>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
@@ -83,7 +83,7 @@
         </div>
       </div>
 
-      <div style="text-align: right;" class="p-r-10 p-y-10" v-show="searchDetailInfos.status && pagination.totalColumnPage">
+      <!-- <div style="text-align: right;" class="p-r-10 p-y-10" v-show="searchDetailInfos.status && pagination.totalColumnPage">
         <el-button @click="queryData(pagination.columnNum - 1)" type="success" circle :disabled="pagination.columnNum < 2">
           <template #icon><i-ep-arrow-left-bold /></template>
         </el-button>
@@ -91,19 +91,30 @@
         <el-button @click="queryData(pagination.columnNum + 1)" type="success" circle :disabled="pagination.columnNum >= pagination.totalColumnPage">
           <template #icon><i-ep-arrow-right-bold /></template>
         </el-button>
-      </div>
+      </div> -->
       <div :loading="getListLoading">
-        <dynamic-table
-          v-if="searchDetailInfos.status && totalCount > 0"
-          :columns="columns"
-          :table-data="tableDataPagination"
-          :total="totalCount"
-          :max-height="maxTableHeight"
-          v-model:current-page="pagination.pageNum"
-          v-model:page-size="pagination.pageSize"
-          show-pagination
-        />
-        <div class="table-empty-wrapper" v-if="searchDetailInfos.status && totalCount === 0">
+        <div v-if="searchDetailInfos.status && tableData.length > 0">
+          <dynamic-table
+            :columns="columns"
+            :table-data="tableData"
+            :max-height="maxTableHeight"
+            :show-pagination="false"
+          />
+          <div class="pagination-container">
+            <el-button plain class="btn-page btn-first" @click="handleClickPage('first')">第一页</el-button>
+            <el-button type="primary" class="btn-page btn-prev" @click="handleClickPage('prev')" :disabled="pagination.pageNum === 1">上一页</el-button>
+            <el-button type="primary" class="btn-page btn-next" @click="handleClickPage('next')" :disabled="!hasNext">下一页</el-button>
+            <el-select v-model="pagination.pageSize" @change="handleChangePageSize" style="width: 100px;">
+              <el-option
+                v-for="item in paginationSizerOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </div>
+        </div>
+        <div class="table-empty-wrapper" v-if="searchDetailInfos.status && tableData.length === 0">
           <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
           无数据
         </div>
@@ -145,6 +156,12 @@ const aggregateFunctions = [
   { label: '平均值', value: 'avg' },
   { label: '最大值', value: 'max_value' },
   { label: '最小值', value: 'min_value' },
+];
+const paginationSizerOptions = [
+  { label: '10条/页', value: 10 },
+  { label: '20条/页', value: 20 },
+  { label: '50条/页', value: 50 },
+  { label: '100条/页', value: 100 },
 ];
 const currentQueryTime = ref('');
 const timeType = ref('datetime');
@@ -189,12 +206,13 @@ const disabledDate = (time: number) => time > today();
 
 const searchDetailInfos = ref<Partial<Search.QueryDataResult>>({});
 const totalCount = ref(0);
+const hasNext = ref(false);
 const columns = ref<DynamicTableColumn[]>([]);
 const tableData = ref<Record<string, any>[]>([]);
 const pagination = reactive({
   pageSize: 10,
   pageNum: 1,
-  columnSize: 100,
+  columnSize: 10000,
   columnNum: 1,
   totalColumnPage: 0,
   totalColumnCount: 0,
@@ -214,6 +232,7 @@ const formatSqlInfo = computed(() => function (filed: string) {
   return '';
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
 
 const { requestFn: getList } = useRequest(SearchApi.getDataSearchList);
@@ -239,7 +258,7 @@ function getListData() {
   currentQueryTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
   getListLoading.value = true;
   getList(serverId, {
-    measurementList: searchFormData.path,
+    measurements: searchFormData.path,
     startTime,
     endTime,
     aggregation: searchFormData.aggregation,
@@ -247,6 +266,8 @@ function getListData() {
     unitInterval: searchFormData.unitInterval,
     spage: pagination.columnNum,
     ssize: pagination.columnSize,
+    size: pagination.pageSize,
+    page: pagination.pageNum,
   }).then((res) => {
     // eslint-disable-next-line no-undef
     const list: DynamicTableColumn[] = [];
@@ -267,6 +288,7 @@ function getListData() {
       });
       return obj;
     });
+    hasNext.value = res.data.hasNext;
     totalCount.value = res.data.totalCount;
     pagination.totalColumnPage = res.data.totalColumnPage;
     pagination.totalColumnCount = res.data.totalColumnCount;
@@ -294,11 +316,29 @@ function handleSearch() {
 }
 
 // 列
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function queryData(columnNum?: number) {
   pagination.pageSize = 10;
   pagination.pageNum = 1;
   pagination.columnNum = columnNum || 1;
   pagination.columnSize = 100;
+  getListData();
+}
+
+function handleClickPage(type: string) {
+  if (type === 'first') {
+    pagination.pageNum = 1;
+  } else if (type === 'prev') {
+    pagination.pageNum--;
+  } else {
+    pagination.pageNum++;
+  }
+  getListData();
+}
+
+function handleChangePageSize(val: number) {
+  pagination.pageSize = val;
+  pagination.pageNum = 1;
   getListData();
 }
 
@@ -314,7 +354,7 @@ function handleExportData(exportType: string) {
     endTime = dayjs(searchFormData.datetimerange[1]).valueOf();
   }
   exportData(serverId, {
-    measurementList: searchFormData.path,
+    measurements: searchFormData.path,
     startTime,
     endTime,
     aggregation: searchFormData.aggregation,
@@ -322,6 +362,8 @@ function handleExportData(exportType: string) {
     unitInterval: searchFormData.unitInterval,
     spage: pagination.columnNum,
     ssize: pagination.columnSize,
+    size: pagination.pageSize,
+    page: pagination.pageNum,
   }, exportType).then((res) => {
     if (res) {
       ElMessage.success('导出成功');
@@ -411,6 +453,7 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 16px;
   }
 
   .run-result-list {
@@ -424,6 +467,20 @@ onMounted(() => {
       display: flex;
       align-items: center;
     }
+  }
+}
+
+.pagination-container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 24px;
+
+  .btn-prev, .btn-next, .btn-first{
+    margin: 0 8px 0 0;
+    padding: 6px 4px;
+    min-width: 56px;
   }
 }
 
