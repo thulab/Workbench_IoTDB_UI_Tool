@@ -3,6 +3,9 @@
     <div class="search-form-wrapper">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline :disabled="getListLoading">
         <el-form-item label="测点选择:" prop="path" :error="errorDeviceTip">
+          <template #label>
+            测点选择:<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
+          </template>
           <timeseries-select v-model="searchFormData.path" :server-id="serverId" />
         </el-form-item>
         <br>
@@ -57,19 +60,23 @@
       <h4 class="page-info-title">查询详情</h4>
       <div class="page-info-box">
         <ul class="run-result-list">
-          <li class="run-result-item">查询状态：{{ formatSqlInfo('status') }}</li>
-          <li class="run-result-item">开始时间：{{ formatSqlInfo('startQueryTime') }}</li>
-          <li class="run-result-item">查询耗时：{{ formatSqlInfo('queryTime') }}</li>
+          <li class="run-result-item">
+            <i-custom-query-success v-if="searchDetailInfos.status === true" />
+            <i-custom-query-error v-else-if="searchDetailInfos.status === false" />
+            <i-custom-query-status v-else />
+            查询状态：{{ formatSqlInfo('status') }}</li>
+          <li class="run-result-item"><i-custom-query-start-time />开始时间：{{ formatSqlInfo('startQueryTime') }}</li>
+          <li class="run-result-item"><i-custom-query-time />查询耗时：{{ formatSqlInfo('queryTime') }}</li>
         </ul>
 
         <div class="page-detail-buttons">
           <el-button @click="handleSearch" :disabled="getListLoading">刷新</el-button>
           <el-dropdown class="more-icon m-l-12" :disabled="getListLoading" v-show="searchDetailInfos.status && totalCount > 0" @command="val => handleCommandDown(val)">
-            <el-button><i-ep-download />数据导出</el-button><el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-ep-question-filled /></el-tooltip>
+            <el-button><i-ep-download />数据导出</el-button><el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-custom-question /></el-tooltip>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
-                <el-dropdown-item command="excel">以.excel格式导出</el-dropdown-item>
+                <el-dropdown-item command="xlsx">以.xlsx格式导出</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -97,7 +104,8 @@
           show-pagination
         />
         <div class="table-empty-wrapper" v-if="searchDetailInfos.status && totalCount === 0">
-          暂无数据
+          <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+          无数据
         </div>
         <div class="table-error-wrapper" v-if="searchDetailInfos.errMsg">
           {{ searchDetailInfos.errMsg }}
@@ -231,7 +239,7 @@ function getListData() {
   currentQueryTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
   getListLoading.value = true;
   getList(serverId, {
-    measurementList: searchFormData.device.split(','),
+    measurementList: searchFormData.path,
     startTime,
     endTime,
     aggregation: searchFormData.aggregation,
@@ -277,8 +285,8 @@ function handleReset() {
 
 // 查询
 function handleSearch() {
-  if (!searchFormData.device) {
-    errorDeviceTip.value = '请选择物理量后查询';
+  if (!searchFormData.path.length) {
+    errorDeviceTip.value = '请输入测点名称后进行搜索';
     return;
   }
   errorDeviceTip.value = '';
@@ -295,7 +303,7 @@ function queryData(columnNum?: number) {
 }
 
 // 导出
-function handleExportData() {
+function handleExportData(exportType: string) {
   let startTime = 0;
   let endTime = 0;
   if (timeType.value === 'datetime') {
@@ -306,7 +314,7 @@ function handleExportData() {
     endTime = dayjs(searchFormData.datetimerange[1]).valueOf();
   }
   exportData(serverId, {
-    measurementList: searchFormData.device.split(','),
+    measurementList: searchFormData.path,
     startTime,
     endTime,
     aggregation: searchFormData.aggregation,
@@ -314,10 +322,10 @@ function handleExportData() {
     unitInterval: searchFormData.unitInterval,
     spage: pagination.columnNum,
     ssize: pagination.columnSize,
-  }).then((res) => {
+  }, exportType).then((res) => {
     if (res) {
       ElMessage.success('导出成功');
-      handleExport(res, 'export.CSV');
+      handleExport(res, `export.${exportType}`);
     } else {
       ElMessage.info('导出未完成');
     }
@@ -335,15 +343,11 @@ function handleTimeType(type: 'datetime' | 'datetimerange') {
 }
 // 下载
 function handleCommandDown(val: string) {
-  if (!searchFormData.device) {
-    errorDeviceTip.value = '请选择物理量后查询';
+  if (!searchFormData.path.length) {
+    errorDeviceTip.value = '请输入测点名称后进行搜索';
     return;
   }
-  if (val === 'csv') {
-    handleExportData();
-  } else {
-    // TODO excel
-  }
+  handleExportData(val);
 }
 
 onMounted(() => {
@@ -387,6 +391,10 @@ onMounted(() => {
   }
 }
 
+:deep(.el-select-v2__selection){
+  flex-wrap: nowrap;
+}
+
 .page-table-details {
   padding: 8px 16px;
   border-radius: 2px;
@@ -413,14 +421,33 @@ onMounted(() => {
       line-height: 12px;
       color: #131926;
       margin-right: 30px;
+      display: flex;
+      align-items: center;
     }
   }
 }
 
-.table-empty-wrapper,
 .table-error-wrapper {
   min-height: 200px;
-  padding: 16px 12px;
+  padding: 16px 24px;
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 24px;
+  color: #424561;
+}
+
+.table-empty-wrapper{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  font-size: 14px;
+  color: #131926;
+
+  .data-empty-img{
+    width: 150px;
+    height: 150px;
+    margin-bottom: 16px;
+  }
 }
 
 </style>
