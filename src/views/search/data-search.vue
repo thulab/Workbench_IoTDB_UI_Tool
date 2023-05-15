@@ -64,7 +64,9 @@
             <i-custom-query-success v-if="searchDetailInfos.status === true" />
             <i-custom-query-error v-else-if="searchDetailInfos.status === false" />
             <i-custom-query-status v-else />
-            查询状态：{{ formatSqlInfo('status') }}</li>
+            查询状态：
+            <span :style="{ color: searchDetailInfos !== undefined ? searchDetailInfos.status ? '#44C795' : '#D43030' : '#656A85' }">{{ formatSqlInfo('status') }}</span>
+          </li>
           <li class="run-result-item"><i-custom-query-start-time />开始时间：{{ formatSqlInfo('startQueryTime') }}</li>
           <li class="run-result-item"><i-custom-query-time />查询耗时：{{ formatSqlInfo('queryTime') }}</li>
         </ul>
@@ -72,7 +74,7 @@
         <div class="page-detail-buttons">
           <el-button @click="handleSearch" :disabled="getListLoading">刷新</el-button>
           <el-dropdown class="more-icon m-l-12" :disabled="getListLoading" v-show="searchDetailInfos.status && totalCount > 0" @command="val => handleCommandDown(val)">
-            <el-button>数据导出<el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-custom-question /></el-tooltip></el-button>
+            <el-button class="export-btn">数据导出<el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-custom-question /></el-tooltip></el-button>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
@@ -466,6 +468,16 @@ onMounted(() => {
       margin-right: 30px;
       display: flex;
       align-items: center;
+    }
+  }
+
+  .export-btn{
+    position: relative;
+
+    svg{
+      position: absolute;
+      right: 4px;
+      top: 4px;
     }
   }
 }

@@ -13,15 +13,12 @@
           <div class="sql-title-box">
             <div class="sql-title-text">
               <span>SQL输入</span>
-              <el-tooltip effect="light" content="操作说明" placement="top">
-                <a href="https://iotdb.apache.org/zh/UserGuide/V1.1.x/Query-Data/Overview.html" rel="noopener noreferrer" target="_blank"><i-ep-question-filled>1</i-ep-question-filled></a>
-              </el-tooltip>
             </div>
             <div class="sql-right-icon-box">
-              <el-button link @click="handleSave"><el-icon><i-ep-document /></el-icon>保存</el-button>
-              <el-button link :disabled="!runFlag" @click="querySqlRun"><el-icon><i-ep-video-play /></el-icon>运行</el-button>
-              <el-button link :disabled="runFlag" @click="stopquery"><el-icon><i-ep-circle-close /></el-icon>取消</el-button>
-              <el-button link @click="emptyQuery"><el-icon><i-ep-delete /></el-icon>清空</el-button>
+              <el-button link @click="handleSave"><i-custom-sql-save />保存</el-button>
+              <el-button link :disabled="!runFlag" @click="querySqlRun"><i-custom-sql-run />运行</el-button>
+              <el-button link :disabled="runFlag" @click="stopquery"><i-custom-sql-abort />取消</el-button>
+              <el-button link @click="emptyQuery"><i-custom-sql-empty />清空</el-button>
             </div>
           </div>
 
@@ -39,24 +36,30 @@
         <div>
           <div class="run-result-title-box">
             <h4>执行结果</h4>
-            <span class="run-result-tip"><i-ep-info-filled />默认最多查询1000行100列，如需查看更多数据请下载查看</span>
+            <span class="run-result-tip"><i-custom-info-warning />默认最多查询1000行100列，如需查看更多数据请下载查看</span>
           </div>
           <div class="tabs" v-if="tableData.list && tableData.list.length > 0">
-            <el-tabs v-model="activeName" class="tabs-nav-list">
+            <el-tabs v-model="activeName" type="card" class="tabs-nav-list">
               <el-tab-pane v-for="(item, index) of columnList" :key="index" :name="`t${index}`">
                 <template #label>
                   <span>运行结果{{ index + 1 }}</span>
                 </template>
                 <div class="run-result-infos">
                   <ul>
-                    <li class="run-result-item">查询状态：{{ formatSqlInfo('status', index) }}</li>
-                    <li class="run-result-item">开始时间：{{ formatSqlInfo('startQueryTime', index) }}</li>
-                    <li class="run-result-item">查询耗时：{{ formatSqlInfo('queryTime', index) }}</li>
+                    <li class="run-result-item">
+                      <i-custom-query-success v-if="sqlResult[index].status === true" />
+                      <i-custom-query-error v-else-if="sqlResult[index].status === false" />
+                      <i-custom-query-status v-else />
+                      查询状态：
+                      <span :style="{ color: sqlResult[index].status !== undefined ? sqlResult[index].status ? '#44C795' : '#D43030' : '#656A85' }">{{ formatSqlInfo('status', index) }}</span>
+                    </li>
+                    <li class="run-result-item"><i-custom-query-start-time />开始时间：{{ formatSqlInfo('startQueryTime', index) }}</li>
+                    <li class="run-result-item"><i-custom-query-time />查询耗时：{{ formatSqlInfo('queryTime', index) }}</li>
                   </ul>
                   <div class="run-result-buttons">
-                    <el-button link @click="handleCommandDown('refresh', index)"><i-ep-refresh />刷新</el-button>
+                    <el-button link @click="handleCommandDown('refresh', index)"><i-custom-refresh />刷新</el-button>
                     <el-dropdown :disabled="!sqlResult[index].status" class="more-icon m-l-12" @command="val => handleCommandDown(val, index)">
-                      <el-button link><i-ep-download />下载</el-button><el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-ep-question-filled /></el-tooltip>
+                      <el-button link class="export-btn"><i-custom-download />下载<el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-custom-question class="export-tip" /></el-tooltip></el-button>
                       <template #dropdown>
                         <el-dropdown-menu>
                           <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
@@ -91,6 +94,7 @@
 
       <div class="sql-search-aside">
         <div v-if="codeMirrorReady">
+          <h4 style="font-size: 14px;font-weight: 700;color: #495AD4;margin: 0 0 10px 16px;">快捷操作</h4>
           <el-tabs v-model="activeNameSide" class="tabs-nav-aside">
             <el-tab-pane label="测点" name="data">
               <side-data :server-id="serverId" @get-function="getFunction" />
@@ -102,6 +106,7 @@
               <side-template ref="sqlListRef" :server-id="serverId" @handle-sql-operate="handleSqlOperate" />
             </el-tab-pane>
           </el-tabs>
+          <a href="https://iotdb.apache.org/zh/UserGuide/V1.1.x/Query-Data/Overview.html" rel="noopener noreferrer" target="_blank" class="operate-link"><i-custom-question />操作说明</a>
         </div>
       </div>
     </div>
@@ -628,6 +633,24 @@ watch(
   top: 0;
   right: 0;
   height: 100%;
+
+  .operate-link{
+    position: absolute;
+    left: 8px;
+    bottom: 0;
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 12px;
+    color: #656A85;
+    display: flex;
+    align-items: center;
+
+    svg{
+      width: 16px;
+      height: 16px;
+      margin-right: 4px;
+    }
+  }
 }
 
 .tabs-nav-aside {
@@ -675,14 +698,25 @@ watch(
     margin-left: 4px;
   }
 
-  .el-icon {
-    margin: 0 5px 0 0;
+  .el-button{
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 12px;
+    color: #656A85;
+
+    svg{
+      width: 16px;
+      height: 16px;
+      margin-right: 4px;
+    }
   }
 }
 
 .run-result-title-box {
   display: flex;
-  padding-top: 12px;
+  padding: 12px 0;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #DFE1ED;
 
   .run-result-tip {
     align-self: flex-end;
@@ -694,6 +728,7 @@ watch(
 
     svg {
       color: #ccc;
+      margin-right: 4px;
     }
   }
 }
@@ -701,6 +736,25 @@ watch(
 .tabs-nav-list {
   :deep(.el-tabs__content) {
     padding: 10px 16px 10px 0;
+  }
+
+  :deep(.el-tabs__header) {
+    height: 27px;
+  }
+
+  :deep(.el-tabs__nav) {
+    border-radius: 6px 6px 0 0 !important;
+  }
+
+  :deep(.el-tabs__item) {
+    border-radius: 6px 6px 0 0;
+    height: 27px;
+    font-size: 12px;
+  }
+
+  :deep(.el-tabs__item.is-active) {
+    background-color: var(--el-color-primary);
+    color: #fff;
   }
 }
 
@@ -710,9 +764,35 @@ watch(
 
   ul {
     display: flex;
+    margin-bottom: 12px;
 
-    .run-result-item + .run-result-item {
-      margin-left: 8px;
+    .run-result-item {
+      font-size: 12px;
+      line-height: 12px;
+      color: #131926;
+      margin-right: 30px;
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .run-result-buttons{
+    .el-button{
+      font-size: 12px;
+      font-weight: 300;
+      line-height: 12px;
+      color: #656A85;
+    }
+  }
+
+  .export-btn{
+    position: relative;
+    padding: 0 12px;
+
+    .export-tip{
+      position: absolute;
+      right: 2px;
+      top: -4px;
     }
   }
 }

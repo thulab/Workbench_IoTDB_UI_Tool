@@ -2,6 +2,7 @@
   <div class="search_div maxheight">
     <ul class="sql-list" :loading="loading">
       <li v-for="item in sqlList" :key="item.id" class="sql-item-box">
+        <i-custom-template />
         <text-tooltip :content="item.queryName" class-name="sql-item-text" />
         <el-dropdown class="more-icon" @command="val => handleSqlCommand(val, item)">
           <i-ep-more-filled />
@@ -93,6 +94,10 @@ defineExpose({ getQueryList });
     align-items: center;
     justify-content: space-between;
     height: 40px;
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 12px;
+    color: #656A85;
 
     &:hover {
       background-color: #f7fafc;
@@ -103,7 +108,7 @@ defineExpose({ getQueryList });
       margin-left: 12px;
 
       svg {
-        transform: rotate(90deg);
+        // transform: rotate(90deg);
       }
 
       svg:focus {

@@ -53,6 +53,15 @@ function getFunction(node: Node) {
   }
 }
 
+:deep(.el-tree-node__expand-icon){
+  color: #495AD4;
+}
+
+:deep(.el-tree-node__expand-icon.is-leaf){
+  color: transparent;
+  cursor: default;
+}
+
 .elinputs {
   height: 30px;
   line-height: 30px;
