@@ -87,8 +87,9 @@ const { getIconName } = useDataTypeIcon();
 
 const currentPage = useVModel(props, 'currentPage');
 const pageSize = useVModel(props, 'pageSize');
+const columnPageSize = 100;
 
-const totalColumnPage = computed(() => Math.ceil((props.columns.length - 1) / 10));
+const totalColumnPage = computed(() => Math.ceil((props.columns.length - 1) / columnPageSize));
 const columnPageNum = ref(1);
 
 const columnsByPage = computed(() => {
@@ -98,8 +99,8 @@ const columnsByPage = computed(() => {
   if (!props.columns) {
     return [];
   }
-  const start = (columnPageNum.value - 1) * 10 + 1;
-  const end = columnPageNum.value * 10 + 1;
+  const start = (columnPageNum.value - 1) * columnPageSize + 1;
+  const end = columnPageNum.value * columnPageSize + 1;
   return [props.columns[0], ...props.columns.slice(start, end)];
 });
 

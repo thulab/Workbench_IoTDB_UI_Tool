@@ -80,9 +80,6 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// import { ClickOutside as vClickOutside } from 'element-plus/lib/directives';
 import { StorageApi } from '@/api';
 
 const props = defineProps<{
@@ -98,7 +95,6 @@ const { requestFn: getDevice, loading: deviceLoading } = useRequest(StorageApi.g
 const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementList);
 
 const storageName = ref('');
-const filterStorageText = ref('');
 const storageList = ref<string[]>([]);
 const storageTotal = ref(0);
 // const storagePagination = reactive({

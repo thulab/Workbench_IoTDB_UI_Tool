@@ -2,9 +2,10 @@
   <div class="page-container">
     <div class="search-form-wrapper">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline :disabled="getListLoading">
-        <el-form-item label="测点选择:" prop="device" :error="errorDeviceTip">
-          <timeseries-select v-model="searchFormData.device" />
+        <el-form-item label="测点选择:" prop="path" :error="errorDeviceTip">
+          <timeseries-select v-model="searchFormData.path" :server-id="serverId" />
         </el-form-item>
+        <br>
         <el-form-item label="查询时间:" prop="time">
           <div class="search-time-wrapper">
             <ul class="search-time-list">
@@ -107,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance } from 'element-plus';
+import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import dayjs from 'dayjs';
 import { useTableHeight } from '@/composition-api';
 import { SearchApi } from '@/api';
@@ -141,9 +142,9 @@ const currentQueryTime = ref('');
 const timeType = ref('datetime');
 const errorDeviceTip = ref('');
 const searchFormData = reactive({
-  device: '',
+  path: [] as string[],
   time: todayNow(),
-  datetimerange: getStartAndEnd(0),
+  datetimerange: getStartAndEnd(0) as SingleOrRange<DateModelType>,
   timeInterval: undefined,
   unitInterval: 'h',
   aggregation: 'last_value',
