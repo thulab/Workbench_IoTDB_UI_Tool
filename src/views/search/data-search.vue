@@ -171,7 +171,7 @@ const searchFormData = reactive({
   datetimerange: getStartAndEnd(0) as SingleOrRange<DateModelType>,
   timeInterval: undefined,
   unitInterval: 'h',
-  aggregation: 'last_value',
+  aggregation: '',
 });
 const shortcutsDate = [
   {
@@ -210,7 +210,7 @@ const tableData = ref<Record<string, any>[]>([]);
 const pagination = reactive({
   pageSize: 10,
   pageNum: 1,
-  columnSize: 10000,
+  columnSize: 100,
   columnNum: 1,
   totalColumnPage: 0,
   totalColumnCount: 0,
@@ -246,7 +246,7 @@ function getListData() {
   let endTime = 0;
   if (timeType.value === 'datetime') {
     startTime = dayjs(searchFormData.time).valueOf();
-    endTime = dayjs(searchFormData.time).valueOf();
+    endTime = startTime + 1000;
   } else {
     startTime = dayjs(searchFormData.datetimerange[0]).valueOf();
     endTime = dayjs(searchFormData.datetimerange[1]).valueOf();
@@ -271,7 +271,7 @@ function getListData() {
   }, controller).then((res) => {
     // eslint-disable-next-line no-undef
     const list: DynamicTableColumn[] = [];
-    res.data.metaDataList.forEach((item: string, index: number) => {
+    res.data.metaDataList?.forEach((item: string, index: number) => {
       list.push({
         label: item,
         prop: `t${index}`,
@@ -281,7 +281,7 @@ function getListData() {
       });
     });
     columns.value = list;
-    tableData.value = res.data.valueList.map((item: any[]) => {
+    tableData.value = res.data.valueList?.map((item: any[]) => {
       const obj = {} as Record<string, string>;
       item.forEach((childItem, index) => {
         obj[`t${index}`] = childItem;

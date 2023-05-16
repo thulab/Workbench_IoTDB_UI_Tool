@@ -13,7 +13,7 @@
       collapse-tags
       collapse-tags-tooltip
       placeholder="请选择测点" />
-    <el-button type="primary" class="m-l-12" @click="()=>dialogVisible = true">查看测点</el-button>
+    <el-button type="primary" class="m-l-12" @click="()=>dialogVisible = true">已选测点</el-button>
     <el-dialog title="已选测点" v-model="dialogVisible" class="select-modal">
       <ul class="select-list">
         <li v-for="item in model" :key="item" class="select-item">{{ item }}</li>
