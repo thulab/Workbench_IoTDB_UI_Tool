@@ -20,4 +20,4 @@ export const todayNow = () => dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).value
 export const getOneDay = (day: number = 7) => dayjs(dayjs().format('YYYY-MM-DD 23:59:59')).valueOf() - day * 24 * 60 * 60 * 1000;
 
 // 某段时间间隔
-export const getOneInterval = (day: number = 7, format = 'YYYY-MM-DD HH:mm:ss') => [dayjs(dayjs(new Date()).format(format)).valueOf() - day * 24 * 60 * 60 * 1000, dayjs(dayjs(new Date()).format(format)).valueOf()];
+export const getOneInterval = (day: number = 7) => [dayjs(dayjs(new Date()).format('YYYY-MM-DD 00:00:00')).valueOf() - day * 24 * 60 * 60 * 1000, dayjs(dayjs(new Date()).format('YYYY-MM-DD 23:59:59')).valueOf() - 24 * 60 * 60 * 1000];

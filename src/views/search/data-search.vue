@@ -6,7 +6,7 @@
           <template #label>
             测点选择:<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
           </template>
-          <timeseries-select v-model="searchFormData.path" :server-id="serverId" />
+          <timeseries-select v-model="searchFormData.path" :server-id="serverId" :is-show-view-btn="true" />
         </el-form-item>
         <br>
         <el-form-item label="查询时间:" prop="time">
@@ -45,7 +45,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="采样策略:" prop="aggregation">
-          <el-select v-model="searchFormData.aggregation" style="width: 120px;" placeholder="">
+          <el-select v-model="searchFormData.aggregation" style="width: 120px;" clearable>
             <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" />
           </el-select>
         </el-form-item>
@@ -141,7 +141,7 @@ import { useServerStore } from '@/stores';
 const serverStroe = useServerStore();
 const serverId = serverStroe.currentServerId;
 
-const { maxTableHeight } = useTableHeight(400);
+const { maxTableHeight } = useTableHeight(460);
 const searchFormRef = ref<FormInstance>();
 const timeUnits = [
   { label: '毫秒', value: 'ms' },
@@ -168,7 +168,7 @@ const errorDeviceTip = ref('');
 const searchFormData = reactive({
   path: [] as string[],
   time: todayNow(),
-  datetimerange: getStartAndEnd(0) as SingleOrRange<DateModelType>,
+  datetimerange: getStartAndEnd(0) as SingleOrRange<DateModelType> as number[],
   timeInterval: undefined,
   unitInterval: 'h',
   aggregation: '',
@@ -194,7 +194,7 @@ const shortcutsDaterange = [
   },
   {
     text: '昨天',
-    value: () => getStartAndEnd(1),
+    value: () => getOneInterval(1),
   },
   {
     text: '最近7天',
@@ -239,6 +239,10 @@ const { requestFn: exportData } = useRequest(SearchApi.exportData);
 let controller = new AbortController();
 
 function getListData() {
+  if (searchFormData.timeInterval && !searchFormData.aggregation) {
+    ElMessage.error('采样周期填写的情况下请选择采样策略');
+    return;
+  }
   columns.value = [];
   tableData.value = [];
 
@@ -315,6 +319,7 @@ function handleSearch() {
     controller.abort();
     return;
   }
+  pagination.pageNum = 1;
   getListData();
 }
 
@@ -351,7 +356,7 @@ function handleExportData(exportType: string) {
   let endTime = 0;
   if (timeType.value === 'datetime') {
     startTime = dayjs(searchFormData.time).valueOf();
-    endTime = dayjs(searchFormData.time).valueOf();
+    endTime = startTime + 1000;
   } else {
     startTime = dayjs(searchFormData.datetimerange[0]).valueOf();
     endTime = dayjs(searchFormData.datetimerange[1]).valueOf();
