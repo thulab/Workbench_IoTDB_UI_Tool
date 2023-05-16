@@ -32,6 +32,12 @@
             </template>
           </el-table-column>
           <slot name="append-column"></slot>
+          <template #empty>
+            <div class="table-empty-wrapper">
+              <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+              <span class="data-empty-text">无数据</span>
+            </div>
+          </template>
         </el-table>
       </div>
       <div style="width:60px" class="m-l-4" v-if="totalColumnPage > 1">
@@ -211,6 +217,26 @@ const getLabelName = (label: string) => {
       width: 100px;
       padding: 0 16px;
     }
+  }
+}
+
+.table-empty-wrapper{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 16px 0;
+
+  .data-empty-img{
+    width: 150px;
+    height: 150px;
+    margin-bottom: 16px;
+  }
+
+  .data-empty-text{
+    font-size: 14px;
+    color: #131926;
+    line-height: 21px;
   }
 }
 </style>

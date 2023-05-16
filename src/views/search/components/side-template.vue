@@ -1,9 +1,17 @@
 <template>
   <div class="search_div maxheight">
+    <el-input placeholder="请输入模板名称" v-model="filterText" size="small" @input="getQueryList">
+      <template #suffix>
+        <i-custom-search-icon />
+      </template>
+    </el-input>
+
     <ul class="sql-list" :loading="loading">
       <li v-for="item in sqlList" :key="item.id" class="sql-item-box">
-        <i-custom-template />
-        <text-tooltip :content="item.queryName" class-name="sql-item-text" />
+        <div class="sql-item-text-box">
+          <i-custom-template />
+          <text-tooltip :content="item.queryName" class-name="sql-item-text" />
+        </div>
         <el-dropdown class="more-icon" @command="val => handleSqlCommand(val, item)">
           <i-ep-more-filled />
           <template #dropdown>
@@ -20,6 +28,7 @@
 </template>
 
 <script lang="ts" setup>
+import { debounce } from 'lodash-es';
 import { SearchApi } from '@/api';
 
 const props = defineProps<{
@@ -28,24 +37,25 @@ const props = defineProps<{
 
 const emit = defineEmits(['handleSqlOperate']);
 
+const filterText = ref('');
 const loading = ref(false);
 const sqlList = ref<Search.SqlList[]>([]);
 const { requestFn: getQuery } = useRequest(SearchApi.getQuery);
 const { requestFn: deleteQueryS } = useRequest(SearchApi.deleteQueryS);
 
 // 获取列表数据
-const getQueryList = async () => {
+const getQueryList = debounce(async () => {
   loading.value = true;
-  const res = await getQuery(props.serverId);
+  const res = await getQuery(props.serverId, filterText.value);
   loading.value = false;
   if (res.code === 0) {
     sqlList.value = res.data || [];
   }
-};
+}, 500);
 
 const handleSqlCommand = (val: string, data: Search.SqlList) => {
   if (val === 'delete') {
-    ElMessageBox.confirm('是否删除列表', '删除提示', {
+    ElMessageBox.confirm('是否删除模板', '注意', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning',
@@ -56,9 +66,9 @@ const handleSqlCommand = (val: string, data: Search.SqlList) => {
           message: '删除成功!',
         });
         getQueryList();
+        emit('handleSqlOperate', val, data);
       });
     });
-    emit('handleSqlOperate', val, data);
   } else {
     emit('handleSqlOperate', val, data);
   }
@@ -86,6 +96,7 @@ defineExpose({ getQueryList });
 .sql-list {
   display: flex;
   flex-direction: column;
+  margin-top: 12px;
 
   .sql-item-box {
     padding: 0 8px;
@@ -101,6 +112,16 @@ defineExpose({ getQueryList });
 
     &:hover {
       background-color: #f7fafc;
+    }
+
+    .sql-item-text-box{
+      display: flex;
+      align-items: center;
+      width: 160px;
+
+      svg {
+        margin-right: 4px;
+      }
     }
 
     .more-icon {

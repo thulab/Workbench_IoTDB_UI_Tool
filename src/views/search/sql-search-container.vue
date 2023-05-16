@@ -17,7 +17,7 @@
             <div class="sql-right-icon-box">
               <el-button link @click="handleSave"><i-custom-sql-save />保存</el-button>
               <el-button link :disabled="!runFlag" @click="querySqlRun"><i-custom-sql-run />运行</el-button>
-              <el-button link :disabled="runFlag" @click="stopquery"><i-custom-sql-abort />取消</el-button>
+              <el-button link @click="stopquery"><i-custom-sql-abort />取消</el-button>
               <el-button link @click="emptyQuery"><i-custom-sql-empty />清空</el-button>
             </div>
           </div>
@@ -58,8 +58,8 @@
                   </ul>
                   <div class="run-result-buttons">
                     <el-button link @click="handleCommandDown('refresh', index)"><i-custom-refresh />刷新</el-button>
-                    <el-dropdown :disabled="!sqlResult[index].status" class="more-icon m-l-12" @command="val => handleCommandDown(val, index)">
-                      <el-button link class="export-btn"><i-custom-download />下载<el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-custom-question class="export-tip" /></el-tooltip></el-button>
+                    <el-dropdown :disabled="!sqlResult[index].status" class="more-icon m-l-12" @command="val => handleCommandDown(val, index)" v-show="sqlResult[index].status && tableDataPagination[index].list.length > 0">
+                      <el-button link class="export-btn" :disabled="!sqlResult[index].status"><i-custom-download />下载<el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-custom-question class="export-tip" /></el-tooltip></el-button>
                       <template #dropdown>
                         <el-dropdown-menu>
                           <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
@@ -84,7 +84,7 @@
                 </div>
                 <div class="tab_table" v-else>
                   <span v-if="display && !sqlResult[index].errMsg">执行成功,该查询语句无数据返回</span>
-                  <span v-if="sqlResult[index].errMsg">MSG: {{ sqlResult[index].errMsg }}</span>
+                  <span v-if="sqlResult[index].errMsg">{{ sqlResult[index].errMsg }}</span>
                 </div>
               </el-tab-pane>
             </el-tabs>
@@ -113,7 +113,7 @@
 
     <el-dialog title="保存模板" v-model="nameDialogVisible" width="400px">
       <el-form ref="saveFormRef" :model="saveForm" :rules="saveFormRules" label-position="left">
-        <el-form-item label="查询名称：" prop="sqlName" :error="errorNameTip">
+        <el-form-item label="名称：" prop="sqlName" :error="errorNameTip">
           <el-input v-model="saveForm.sqlName" placeholder="请输入" maxlength="25" @blur="handleInputName" />
         </el-form-item>
       </el-form>
@@ -126,11 +126,11 @@
     </el-dialog>
 
     <el-dialog title="重命名" v-model="renameDialogVisible" width="400px">
-      <el-form ref="resaveFormRef" :model="resaveForm" :rules="saveFormRules" label-width="100px" label-position="right">
+      <el-form ref="resaveFormRef" :model="resaveForm" label-width="100px" label-position="right">
         <el-form-item label="原名称：" prop="oldSqlName">
           <el-input v-model="resaveForm.oldSqlName" disabled />
         </el-form-item>
-        <el-form-item label="新名称：" prop="sqlName" :error="errorRenameTip">
+        <el-form-item label="新名称：" prop="sqlName" :error="errorRenameTip" inline-message>
           <el-input v-model="resaveForm.sqlName" placeholder="请输入" maxlength="25" @blur="handleInputRename" />
         </el-form-item>
       </el-form>
@@ -147,7 +147,6 @@
 <script lang="ts" setup>
 import type { FormInstance, TabsPaneContext } from 'element-plus';
 import dayjs from 'dayjs';
-import { useTableHeight } from '@/composition-api';
 import { handleExport } from '@/utils/export';
 import DynamicTable from '@/components/dynamic-table.vue';
 import { SearchApi } from '@/api';
@@ -161,11 +160,9 @@ import CodeEditor from './components/code-editor.vue';
 const serverStroe = useServerStore();
 const serverId = serverStroe.currentServerId;
 
-const { maxTableHeight } = useTableHeight(300);
 const codeMirrorReady = ref(false);
 const nameDialogVisible = ref(false);
 const renameDialogVisible = ref(false);
-const divwerHeight = ref(430);
 const timeNumber = ref(0);
 const currentQueryTime = ref('');
 const display = ref(false);
@@ -261,7 +258,8 @@ function getFunction(val: string) {
 
 // 模板操作
 function handleSqlOperate(val: string, data: Search.SqlList) {
-  const index = sqlList.value.findIndex((f) => f.id === data.id);
+  // eslint-disable-next-line eqeqeq
+  const index = sqlList.value.findIndex((f) => f.id == data.id);
   const length = sqlList.value.length || 0;
   if (val === 'open') {
     if (index > -1) {
@@ -274,6 +272,7 @@ function handleSqlOperate(val: string, data: Search.SqlList) {
     resaveForm.oldSqlName = data.queryName;
     resaveForm.sqlName = '';
     resaveForm.id = `${data.id}`;
+    errorRenameTip.value = '';
     renameDialogVisible.value = true;
   } else if (index > -1) {
     const tabs = sqlList.value;
@@ -403,7 +402,9 @@ function handleInputName() {
 
 // 新名称输入
 function handleInputRename() {
-  if (resaveForm.sqlName === resaveForm.oldSqlName) {
+  if (!resaveForm.sqlName.trim()) {
+    errorRenameTip.value = '请填写名称后保存';
+  } else if (resaveForm.sqlName === resaveForm.oldSqlName) {
     errorRenameTip.value = '与原名称相同，请重新输入';
   } else {
     errorRenameTip.value = '';
@@ -426,7 +427,8 @@ function handleNameConfirm() {
           ElMessage.success('保存成功');
           nameDialogVisible.value = false;
           const index = activiteSql.value.split('_')[1] as unknown as number;
-          sqlList.value.splice(index, 1, { id: `${data}`, queryName: saveForm.sqlName });
+          sqlList.value.splice(index, 1, { id: `${res.data}`, queryName: saveForm.sqlName });
+          activiteSql.value = `${res.data}_${index}`;
           sqlListRef.value?.getQueryList();
         }
       }).catch((err) => {
@@ -438,7 +440,10 @@ function handleNameConfirm() {
 // 重命名
 function handleRenameConfirm() {
   errorRenameTip.value = '';
-  if (resaveForm.sqlName === resaveForm.oldSqlName) {
+  if (!resaveForm.sqlName.trim()) {
+    errorRenameTip.value = '请填写名称后保存';
+    return;
+  } if (resaveForm.sqlName === resaveForm.oldSqlName) {
     errorRenameTip.value = '与原名称相同，请重新输入';
     return;
   }
@@ -456,8 +461,9 @@ function handleRenameConfirm() {
           ElMessage.success('保存成功');
           renameDialogVisible.value = false;
           const index = activiteSql.value.split('_')[1] as unknown as number;
-          sqlList.value.splice(index, 1, { id: `${data}`, queryName: resaveForm.sqlName });
+          sqlList.value.splice(index, 1, { id: `${id}`, queryName: resaveForm.sqlName });
           sqlListRef.value?.getQueryList();
+          activiteSql.value = `${id}_${index}`;
         }
       }).catch((err) => {
         errorRenameTip.value = err.message;
@@ -470,6 +476,7 @@ function handleSave() {
   const index = activiteSql.value.split('_')[1] as unknown as number;
   const current = sqlList.value[index];
   saveForm.sqlName = current.queryName;
+  errorNameTip.value = '';
   nameDialogVisible.value = true;
 }
 // 停止
@@ -546,7 +553,7 @@ function handleCommandDown(val: string, index: number) {
 }
 // 清空
 function emptyQuery() {
-  ElMessageBox.confirm('是否清空页面', '清空提示', {
+  ElMessageBox.confirm('是否清空页面', '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',

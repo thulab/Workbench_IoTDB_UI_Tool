@@ -6,8 +6,8 @@ class SearchApi {
     return http.post('/data/getDataByMeasurements', data, { params: { serverId } });
   }
 
-  static getQuery(serverId: number): HttpResponseP<Array<{ id: number, queryName: string }>> {
-    return http.get('/query/query', { params: { serverId } });
+  static getQuery(serverId: number, keyword: string): HttpResponseP<Array<{ id: number, queryName: string }>> {
+    return http.get('/query/query', { params: { serverId, keyword } });
   }
 
   // save sql

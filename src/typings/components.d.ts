@@ -60,6 +60,7 @@ declare module '@vue/runtime-core' {
     ICustomQueryTime: typeof import('~icons/custom/query-time')['default']
     ICustomQuestion: typeof import('~icons/custom/question')['default']
     ICustomRefresh: typeof import('~icons/custom/refresh')['default']
+    ICustomSearchIcon: typeof import('~icons/custom/search-icon')['default']
     ICustomSqlAbort: typeof import('~icons/custom/sql-abort')['default']
     ICustomSqlEmpty: typeof import('~icons/custom/sql-empty')['default']
     ICustomSqlRun: typeof import('~icons/custom/sql-run')['default']

@@ -52,12 +52,6 @@ const remoteMethod = (query: string) => {
 
 <style scoped lang="scss">
 
-:deep(.el-dialog__header) {
-  margin-left: 16px;
-  border-bottom: 1px solid #DFE1ED;
-  padding-left: 0;
-}
-
 .select-list{
   max-height: 400px;
   overflow-y: auto;

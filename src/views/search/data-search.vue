@@ -73,7 +73,7 @@
 
         <div class="page-detail-buttons">
           <el-button @click="handleSearch" :disabled="getListLoading">刷新</el-button>
-          <el-dropdown class="more-icon m-l-12" :disabled="getListLoading" v-show="searchDetailInfos.status && totalCount > 0" @command="val => handleCommandDown(val)">
+          <el-dropdown class="more-icon m-l-12" :disabled="getListLoading" v-show="searchDetailInfos.status && tableData.length > 0" @command="val => handleCommandDown(val)">
             <el-button class="export-btn">数据导出<el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-custom-question /></el-tooltip></el-button>
             <template #dropdown>
               <el-dropdown-menu>
@@ -95,14 +95,14 @@
         </el-button>
       </div> -->
       <div :loading="getListLoading">
-        <div v-if="searchDetailInfos.status && tableData.length > 0">
+        <div v-if="searchDetailInfos.status">
           <dynamic-table
             :columns="columns"
             :table-data="tableData"
             :max-height="maxTableHeight"
             :show-pagination="false"
           />
-          <div class="pagination-container">
+          <div class="pagination-container" v-if="tableData.length > 0">
             <el-button plain class="btn-page btn-first" @click="handleClickPage('first')">第一页</el-button>
             <el-button type="primary" class="btn-page btn-prev" @click="handleClickPage('prev')" :disabled="pagination.pageNum === 1">上一页</el-button>
             <el-button type="primary" class="btn-page btn-next" @click="handleClickPage('next')" :disabled="!hasNext">下一页</el-button>
@@ -115,10 +115,6 @@
               />
             </el-select>
           </div>
-        </div>
-        <div class="table-empty-wrapper" v-if="searchDetailInfos.status && tableData.length === 0">
-          <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-          无数据
         </div>
         <div class="table-error-wrapper" v-if="searchDetailInfos.errMsg">
           {{ searchDetailInfos.errMsg }}
@@ -503,20 +499,6 @@ onMounted(() => {
   font-weight: 300;
   line-height: 24px;
   color: #424561;
-}
-
-.table-empty-wrapper{
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  font-size: 14px;
-  color: #131926;
-
-  .data-empty-img{
-    width: 150px;
-    height: 150px;
-    margin-bottom: 16px;
-  }
 }
 
 </style>
