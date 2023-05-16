@@ -17,6 +17,9 @@
       <template #prefix>
         <i-custom-search-icon class="remote-select-search-icon" />
       </template>
+      <template #default="{ item }">
+        <text-tooltip :content="item.label" class-name="remote-select-search-text" />
+      </template>
     </el-select-v2>
     <el-button v-if="isShowViewBtn" plain class="m-l-12" @click="()=>dialogVisible = true">已选测点</el-button>
     <el-dialog title="已选测点" v-model="dialogVisible" class="select-modal">
@@ -38,19 +41,15 @@ const props = defineProps<{
 const model = useVModel(props, 'modelValue');
 const dialogVisible = ref(false);
 
-const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementList);
+const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementAllList);
 
 const options = ref<Array<{ label: string; value: string }>>([]);
 let lastMeasurementQuery = '';
 const remoteMethod = (query: string) => {
   lastMeasurementQuery = query;
-  getMeasurement({
-    serverId: props.serverId,
-    deviceName: 'root.sg1.d1',
-    keyword: lastMeasurementQuery,
-  }).then((res) => {
+  getMeasurement(props.serverId, lastMeasurementQuery).then((res) => {
     if (lastMeasurementQuery === query) {
-      options.value = res.data?.pathNames.map((item) => ({ label: item, value: item })) || [];
+      options.value = res.data?.measurements.map((item) => ({ label: item, value: item })) || [];
     }
   });
 };
@@ -63,6 +62,10 @@ const remoteMethod = (query: string) => {
 
   :deep(.el-select-v2__wrapper) {
     padding-left: 20px;
+  }
+
+  :deep(.el-select-v2__tags-text) {
+    max-width: 120px !important;
   }
 
   .remote-select-search-icon {

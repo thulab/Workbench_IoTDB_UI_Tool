@@ -4,7 +4,11 @@
       <div class="sql-search-wrapper">
         <div class="sql-tab-box">
           <el-tabs v-model="activiteSql" type="card" closable class="sql-tab-list" @tab-click="handleTabClick" @tab-remove="handleTabRemove">
-            <el-tab-pane v-for="(item, index) in sqlList" :key="item.id + '_' + index" :label="item.queryName" :name="item.id + '_' + index" />
+            <el-tab-pane v-for="(item, index) in sqlList" :key="item.id + '_' + index" :label="item.queryName" :name="item.id + '_' + index">
+              <template #label>
+                <text-tooltip :content="item.queryName" />
+              </template>
+            </el-tab-pane>
           </el-tabs>
 
           <el-button size="small" circle class="add-tab-btn" @click="handleTabAdd"><i-ep-plus /></el-button>
@@ -58,7 +62,7 @@
                   </ul>
                   <div class="run-result-buttons">
                     <el-button link @click="handleCommandDown('refresh', index)"><i-custom-refresh />刷新</el-button>
-                    <el-dropdown :disabled="!sqlResult[index].status" class="more-icon m-l-12" @command="val => handleCommandDown(val, index)" v-show="sqlResult[index].status && tableDataPagination[index].list.length > 0">
+                    <el-dropdown :disabled="!sqlResult[index].status" class="more-icon m-l-12" @command="val => handleCommandDown(val, index)" v-show="sqlResult[index].status && tableDataPagination[index]?.list?.length > 0">
                       <el-button link class="export-btn" :disabled="!sqlResult[index].status"><i-custom-download />下载<el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-custom-question class="export-tip" /></el-tooltip></el-button>
                       <template #dropdown>
                         <el-dropdown-menu>
@@ -69,7 +73,7 @@
                     </el-dropdown>
                   </div>
                 </div>
-                <div class="tab_table" v-if="item && display">
+                <div class="tab_table" v-if="sqlResult[index].status">
                   <dynamic-table
                     ref="standTable"
                     :columns="item"
@@ -82,9 +86,8 @@
                     show-pagination
                   />
                 </div>
-                <div class="tab_table" v-else>
-                  <span v-if="display && !sqlResult[index].errMsg">执行成功,该查询语句无数据返回</span>
-                  <span v-if="sqlResult[index].errMsg">{{ sqlResult[index].errMsg }}</span>
+                <div class="tab_table" v-if="sqlResult[index].errMsg">
+                  Msg: {{ sqlResult[index].errMsg }}
                 </div>
               </el-tab-pane>
             </el-tabs>
@@ -288,6 +291,10 @@ let controller = new AbortController();
 
 // 执行sql
 function querySqlRun() {
+  if (!code.value.length) {
+    ElMessage.error('请先输入语句再运行');
+    return;
+  }
   if (runFlag.value) {
     display.value = false;
     runFlag.value = false;
@@ -387,10 +394,10 @@ function handleTabRemove(targetName: string) {
   }
   const tabs = sqlList.value;
   let current = activiteSql.value;
-  const index = targetName.split('_')[1] as unknown as number;
+  const index = Number(targetName.split('_')[1] as unknown as number);
   const ci = tabs[index + 1] ? index : index - 1;
   const nextTab = tabs[index + 1] || tabs[index - 1];
-  current = `${nextTab.id}_${ci}`;
+  current = `${nextTab?.id || ''}_${ci}`;
   activiteSql.value = current;
   sqlList.value.splice(index, 1);
 }
@@ -473,7 +480,7 @@ function handleRenameConfirm() {
 }
 // 保存
 function handleSave() {
-  const index = activiteSql.value.split('_')[1] as unknown as number;
+  const index = Number(activiteSql.value.split('_')[1] as unknown as number);
   const current = sqlList.value[index];
   saveForm.sqlName = current.queryName;
   errorNameTip.value = '';
@@ -513,8 +520,8 @@ function handleCommandDown(val: string, index: number) {
     sqlResult.value[index].startQueryTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
     columnList.value.splice(index, 1, []);
     tableData.list.splice(index, 1, {});
-    const { sql } = sqlResult.value[index];
-    querySql(serverId, { sqls: [sql!], timestamp: dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).valueOf() })
+    const { sql = '' } = sqlResult.value[index];
+    querySql(serverId, { sqls: [sql], timestamp: dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).valueOf() })
       .then((res) => {
         const { data } = res;
         data.forEach((item) => {
@@ -625,6 +632,7 @@ watch(
 
   :deep(.el-tabs__item) {
     border-radius: 6px 6px 0 0;
+    max-width: 200px;
   }
 
   :deep(.el-tabs__item.is-active) {

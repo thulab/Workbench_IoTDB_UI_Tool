@@ -118,7 +118,7 @@
           </div>
         </div>
         <div class="table-error-wrapper" v-if="searchDetailInfos.errMsg">
-          {{ searchDetailInfos.errMsg }}
+          Msg: {{ searchDetailInfos.errMsg }}
         </div>
       </div>
     </div>

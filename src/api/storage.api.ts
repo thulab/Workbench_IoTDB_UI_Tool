@@ -15,5 +15,11 @@ class StorageApi {
   static getMeasurementList(params: SearchPageQuery & { serverId: number, deviceName: string }):HttpResponseP<StorageDevice.GetPathListResponse> {
     return http.get('/schema/getMeasurementsByDeviceName', { params });
   }
+
+  // Get the measurement  list under the entity
+  static getMeasurementAllList(serverId: number, keyword: string):HttpResponseP<{ measurements
+  :string[] }> {
+    return http.post('/schema/getMeasurementsByFuzzy', { keyword }, { params: { serverId } });
+  }
 }
 export default StorageApi;
