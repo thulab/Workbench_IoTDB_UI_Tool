@@ -2,8 +2,8 @@ import http from '@/utils/http';
 
 // 查询
 class SearchApi {
-  static getDataSearchList(serverId: number, data: Search.QueryDataParams): HttpResponseP<Search.QueryDataResult> {
-    return http.post('/data/getDataByMeasurements', data, { params: { serverId } });
+  static getDataSearchList(serverId: number, data: Search.QueryDataParams, controller?: AbortController): HttpResponseP<Search.QueryDataResult> {
+    return http.post('/data/getDataByMeasurements', data, { params: { serverId }, signal: controller?.signal });
   }
 
   static getQuery(serverId: number, keyword: string): HttpResponseP<Array<{ id: number, queryName: string }>> {

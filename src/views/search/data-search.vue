@@ -49,11 +49,12 @@
             <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" />
           </el-select>
         </el-form-item>
-        <el-form-item>
-          <el-button @click="handleReset" :disabled="getListLoading">重 置</el-button>
-          <el-button type="primary" @click="handleSearch" :disabled="getListLoading">{{getListLoading ? '取消查询' : '查 询'}}</el-button>
-        </el-form-item>
       </el-form>
+      <div class="search-form-buttons">
+        <el-button @click="handleReset" :disabled="getListLoading">重 置</el-button>
+        <el-button type="primary" @click="handleSearch">{{getListLoading ? '取消查询' : '查 询'}}</el-button>
+      </div>
+
     </div>
 
     <div class="page-table-details">
@@ -203,7 +204,6 @@ const shortcutsDaterange = [
 const disabledDate = (time: number) => time > today();
 
 const searchDetailInfos = ref<Partial<Search.QueryDataResult>>({});
-const totalCount = ref(0);
 const hasNext = ref(false);
 const columns = ref<DynamicTableColumn[]>([]);
 const tableData = ref<Record<string, any>[]>([]);
@@ -236,10 +236,11 @@ const tableDataPagination = computed(() => tableData.value.slice(((pagination.pa
 const { requestFn: getList } = useRequest(SearchApi.getDataSearchList);
 const { requestFn: exportData } = useRequest(SearchApi.exportData);
 
+let controller = new AbortController();
+
 function getListData() {
   columns.value = [];
   tableData.value = [];
-  totalCount.value = 0;
 
   let startTime = 0;
   let endTime = 0;
@@ -255,6 +256,7 @@ function getListData() {
   searchDetailInfos.value.queryTime = '';
   currentQueryTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
   getListLoading.value = true;
+  controller = new AbortController();
   getList(serverId, {
     measurements: searchFormData.path,
     startTime,
@@ -266,7 +268,7 @@ function getListData() {
     ssize: pagination.columnSize,
     size: pagination.pageSize,
     page: pagination.pageNum,
-  }).then((res) => {
+  }, controller).then((res) => {
     // eslint-disable-next-line no-undef
     const list: DynamicTableColumn[] = [];
     res.data.metaDataList.forEach((item: string, index: number) => {
@@ -287,7 +289,6 @@ function getListData() {
       return obj;
     });
     hasNext.value = res.data.hasNext;
-    totalCount.value = res.data.totalCount;
     pagination.totalColumnPage = res.data.totalColumnPage;
     pagination.totalColumnCount = res.data.totalColumnCount;
     searchDetailInfos.value = res.data;
@@ -310,6 +311,10 @@ function handleSearch() {
     return;
   }
   errorDeviceTip.value = '';
+  if (getListLoading.value) {
+    controller.abort();
+    return;
+  }
   getListData();
 }
 
@@ -400,6 +405,17 @@ onMounted(() => {
 .page-container {
   .el-button:focus-visible {
     outline: none;
+  }
+}
+
+.search-form-wrapper{
+  display: flex;
+  justify-content: space-between;
+
+  .search-form-buttons{
+    align-self: flex-end;
+    margin-bottom: 18px;
+    flex: 0 0 180px;
   }
 }
 
