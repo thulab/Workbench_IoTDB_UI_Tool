@@ -28,7 +28,7 @@ export const useLoginStore = defineStore('login', () => {
 
   function getLoginInfo(back = '') {
     return SSOApi.getLoginInfo().then((res) => {
-      if (res.data.code === '0') {
+      if (res.data.code === 0) {
         if (res.headers.authorization) {
           localStorage.setItem('authorization', res.headers.authorization);
         }
@@ -65,7 +65,7 @@ export const useLoginStore = defineStore('login', () => {
       if (!res.data.data) {
         SSOApi.getSsoAuthUrl().then((res1) => {
           console.log(res1);
-          if (res1.data.code === '0') {
+          if (res1.data.code === 0) {
             window.location.href = res1.data.data;
           }
         });
