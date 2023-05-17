@@ -28,8 +28,11 @@
 </template>
 
 <script lang="ts" setup>
+import { markRaw } from 'vue';
 import { debounce } from 'lodash-es';
 import { SearchApi } from '@/api';
+// eslint-disable-next-line import/extensions
+import ICustomMessageWarning from '~icons/custom/message-warning';
 
 const props = defineProps<{
   serverId: number;
@@ -59,6 +62,7 @@ const handleSqlCommand = (val: string, data: Search.SqlList) => {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning',
+      icon: markRaw(ICustomMessageWarning),
     }).then(() => {
       deleteQueryS(props.serverId, `${data.id}`).then(() => {
         ElMessage({

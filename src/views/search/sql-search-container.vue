@@ -149,6 +149,7 @@
 
 <script lang="ts" setup>
 import type { FormInstance, TabsPaneContext } from 'element-plus';
+import { markRaw } from 'vue';
 import dayjs from 'dayjs';
 import { handleExport } from '@/utils/export';
 import DynamicTable from '@/components/dynamic-table.vue';
@@ -159,6 +160,8 @@ import SideFunction from './components/side-function.vue';
 import SideData from './components/side-data.vue';
 import SideTemplate from './components/side-template.vue';
 import CodeEditor from './components/code-editor.vue';
+// eslint-disable-next-line import/extensions
+import ICustomMessageWarning from '~icons/custom/message-warning';
 
 const serverStroe = useServerStore();
 const serverId = serverStroe.currentServerId;
@@ -564,6 +567,7 @@ function emptyQuery() {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
+    icon: markRaw(ICustomMessageWarning),
   })
     .then(() => {
       code.value = '';

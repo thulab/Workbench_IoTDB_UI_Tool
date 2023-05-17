@@ -51,6 +51,7 @@ declare module '@vue/runtime-core' {
     ICustomInfoWarning: typeof import('~icons/custom/info-warning')['default']
     ICustomLangSwitch: typeof import('~icons/custom/lang-switch')['default']
     ICustomLogo: typeof import('~icons/custom/logo')['default']
+    ICustomMessageWarning: typeof import('~icons/custom/message-warning')['default']
     ICustomNavClose: typeof import('~icons/custom/nav-close')['default']
     ICustomNavOpen: typeof import('~icons/custom/nav-open')['default']
     ICustomQueryError: typeof import('~icons/custom/query-error')['default']
