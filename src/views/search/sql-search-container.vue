@@ -3,7 +3,7 @@
     <div class="sql-wrapper">
       <div class="sql-search-wrapper">
         <div class="sql-tab-box">
-          <el-tabs v-model="activiteSql" editable type="card" closable class="sql-tab-list" @tab-click="handleTabClick" @tab-remove="handleTabRemove">
+          <el-tabs v-model="activiteSql" editable type="card" closable class="sql-tab-list" @tab-click="handleTabClick" @tab-remove="handleTabRemove" @tab-add="handleTabAdd">
             <el-tab-pane v-for="(item, index) in sqlList" :key="item.id + '_' + index" :label="item.queryName" :name="item.id + '_' + index">
               <template #label>
                 <text-tooltip :content="item.queryName" />
@@ -11,7 +11,7 @@
               <sql-search :server-id="serverId" :code="code" @save="handleSave" />
             </el-tab-pane>
           </el-tabs>
-          <el-button size="small" circle class="add-tab-btn" @click="handleTabAdd"><i-ep-plus /></el-button>
+          <!-- <el-button size="small" circle class="add-tab-btn" @click="handleTabAdd"><i-ep-plus /></el-button> -->
         </div>
       </div>
 
@@ -328,6 +328,11 @@ watch(
 
   :deep(.el-tabs__header) {
     margin: 0;
+  }
+
+  :deep(.el-tabs__nav-prev.is-disabled),
+  :deep(.el-tabs__nav-next.is-disabled) {
+    cursor: not-allowed;
   }
 
   .add-tab-btn {
