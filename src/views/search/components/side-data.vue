@@ -80,6 +80,7 @@
 </template>
 
 <script lang="ts" setup>
+import { debounce } from 'lodash-es';
 import { StorageApi } from '@/api';
 
 const props = defineProps<{
@@ -183,12 +184,12 @@ function handleSelectDevice(val: string) {
   getMeasurementList();
 }
 
-function handleDeviceInput(query: string) {
+const handleDeviceInput = debounce((query: string) => {
   deviceList.value = [];
   getDeviceList(query);
-}
+}, 500);
 // 输入搜索条件
-function handleInput(type: string) {
+const handleInput = debounce((type: string) => {
   if (type === 'storage') {
     storageList.value = [];
     getStorageList();
@@ -196,7 +197,7 @@ function handleInput(type: string) {
     measurementList.value = [];
     getMeasurementList();
   }
-}
+}, 500);
 // 添加
 function handleAdd(item: string) {
   const res = item || deviceName.value || storageName.value;

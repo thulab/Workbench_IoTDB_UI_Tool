@@ -18,7 +18,9 @@
         <i-custom-search-icon class="remote-select-search-icon" />
       </template>
       <template #default="{ item }">
-        <text-tooltip :content="item.label" class-name="remote-select-search-text" />
+        <div class="remote-select-search-text">
+          <text-tooltip :content="item.label" />
+        </div>
       </template>
     </el-select-v2>
     <el-button v-if="isShowViewBtn" plain class="m-l-12" @click="()=>dialogVisible = true">已选测点</el-button>
@@ -31,6 +33,7 @@
 </template>
 
 <script setup lang="ts">
+import { debounce } from 'lodash-es';
 import { StorageApi } from '@/api';
 
 const props = defineProps<{
@@ -45,14 +48,14 @@ const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(St
 
 const options = ref<Array<{ label: string; value: string }>>([]);
 let lastMeasurementQuery = '';
-const remoteMethod = (query: string) => {
+const remoteMethod = debounce((query: string) => {
   lastMeasurementQuery = query;
   getMeasurement(props.serverId, lastMeasurementQuery).then((res) => {
     if (lastMeasurementQuery === query) {
-      options.value = res.data?.measurements.map((item) => ({ label: item, value: item })) || [];
+      options.value = res.data?.measurements?.map((item) => ({ label: item, value: item })) || [];
     }
   });
-};
+}, 500);
 </script>
 
 <style scoped lang="scss">
@@ -85,5 +88,11 @@ const remoteMethod = (query: string) => {
     line-height: 24px;
     color: #656A85;
   }
+}
+</style>
+<style lang="scss">
+.remote-select-search-text{
+  display: inline-flex;
+  max-width: 200px;
 }
 </style>
