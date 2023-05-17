@@ -55,7 +55,7 @@ const {
 
 onMounted(() => {
   loginStore.firstPageLoad = true;
-  loginStore.fetchIsLogin();
+  // loginStore.fetchIsLogin();
 });
 </script>
 
