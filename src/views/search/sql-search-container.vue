@@ -29,7 +29,7 @@
               <side-template ref="sqlListRef" :server-id="serverId" @handle-sql-operate="handleSqlOperate" />
             </el-tab-pane>
           </el-tabs>
-          <a href="https://iotdb.apache.org/zh/UserGuide/V1.1.x/Query-Data/Overview.html" rel="noopener noreferrer" target="_blank" class="operate-link"><i-custom-question />操作说明</a>
+          <a href="https://www.timecho.com/docs/zh/UserGuide/V1.0.x/Reference/SQL-Reference.html" rel="noopener noreferrer" target="_blank" class="operate-link"><i-custom-question />操作说明</a>
         </div>
       </div>
     </div>
