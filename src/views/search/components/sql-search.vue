@@ -94,9 +94,7 @@ const props = defineProps<{
   serverId: number;
   code: string;
 }>();
-const emit = defineEmits<{
-  (e: 'save'): void;
-}>();
+const emit = defineEmits(['save', 'update:code']);
 
 const code = useVModel(props, 'code');
 const codeMirrorReady = ref(false);

@@ -8,7 +8,7 @@
               <template #label>
                 <text-tooltip :content="item.queryName" />
               </template>
-              <sql-search :server-id="serverId" :code="code" @save="handleSave" />
+              <sql-search :server-id="serverId" v-model:code="code[activiteSql]" @save="handleSave" />
             </el-tab-pane>
           </el-tabs>
           <!-- <el-button size="small" circle class="add-tab-btn" @click="handleTabAdd"><i-ep-plus /></el-button> -->
@@ -90,7 +90,7 @@ const activiteSql = ref<string>('_0');
 const sqlList = ref<Search.SqlList[]>([{ id: '', queryName: `查询${dayjs().format('YYYY-MM-DD HH:mm').replace(/\-|\:| /g, '')}` }]);
 const activeNameSide = ref('function');
 
-const code = ref('');
+const code = reactive<Record<string, string>>({ _0: '' });
 const sqlListRef = ref<InstanceType<typeof SideTemplate>>();
 const saveFormRef = ref<FormInstance>();
 const resaveFormRef = ref<FormInstance>();
@@ -123,19 +123,20 @@ const { requestFn: saveQuery } = useRequest(SearchApi.saveQuery);
 
 // 获取code
 function getSqlCode() {
+  if (code[activiteSql.value]) return;
   const id = activiteSql.value.charAt(0) === '_' ? null : activiteSql.value.split('_')[0];
-  code.value = '';
+  code[activiteSql.value] = '';
   // tableData.list = [];
   if (!id) return;
   getSql(serverId, id).then((res) => {
     const resData = res.data;
-    code.value = resData.sqls;
+    code[activiteSql.value] = resData.sqls;
   });
 }
 
 // 追加code
 function getFunction(val: string) {
-  code.value += val;
+  code[activiteSql.value] += val;
 }
 
 // 模板操作
@@ -177,6 +178,7 @@ function handleTabAdd() {
     id: '',
   });
   activiteSql.value = newTabName;
+  code[activiteSql.value] = '';
 }
 // 点击tab
 function handleTabClick(tab: TabsPaneContext) {
@@ -195,6 +197,7 @@ function handleTabRemove(targetName: TabPaneName) {
   }
   const tabs = sqlList.value;
   let current = activiteSql.value;
+  code[current] = '';
   const index = Number((targetName as string).split('_')[1] as unknown as number);
   const ci = tabs[index + 1] ? index : index - 1;
   const nextTab = tabs[index + 1] || tabs[index - 1];
@@ -228,7 +231,7 @@ function handleNameConfirm() {
         serverId,
         id,
         queryName: saveForm.sqlName,
-        sqls: code.value,
+        sqls: code[activiteSql.value],
       };
       saveQuery(serverId, data).then((res) => {
         if (res.code === 0) {
@@ -262,7 +265,7 @@ function handleRenameConfirm() {
         serverId: Number(serverId) * 1,
         id,
         queryName: resaveForm.sqlName,
-        sqls: code.value,
+        sqls: code[activiteSql.value],
       };
       saveQuery(serverId, data).then((res) => {
         if (res.code === 0) {
