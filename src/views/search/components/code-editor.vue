@@ -20,7 +20,7 @@ const props = defineProps<{
 const emit = defineEmits(events);
 
 const config = shallowRef(({
-  autofocus: false,
+  autofocus: true,
   disabled: false,
   indentWithTab: true,
   tabSize: 2,
@@ -37,6 +37,21 @@ const view = shallowRef<EditorView>();
 //   // coder.value.setValue(content);
 //   // coder.value?.replaceSelection(content);
 // }
+
+const insertContent = (content: string) => {
+  if (view.value!.state.selection && view.value!.state.selection.ranges && view.value!.state.selection.ranges.length > 0) {
+    const { from, to } = view.value!.state.selection.ranges[0];
+    view.value!.dispatch({
+      changes: { from, to, insert: content },
+      selection: { anchor: from + content.length },
+    });
+    codeContainerRef.value!.focus();
+  }
+};
+
+defineExpose({
+  insertContent,
+});
 
 onMounted(() => {
   state.value = createEditorState({
