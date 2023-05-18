@@ -220,7 +220,7 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .search_div {
-  padding: 10px 20px;
+  padding: 20px 0;
   background: #fff;
 
   &.maxheight {

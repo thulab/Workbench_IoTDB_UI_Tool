@@ -17,7 +17,7 @@
 
       <div class="sql-search-aside">
         <div v-if="codeMirrorReady">
-          <h4 style="font-size: 14px;font-weight: 700;color: #495AD4;margin: 0 0 10px 16px;">快捷操作</h4>
+          <h4 style="font-size: 14px;font-weight: 700;color: #495AD4;margin: 0 0 12px;">快捷操作</h4>
           <el-tabs v-model="activeNameSide" class="tabs-nav-aside">
             <el-tab-pane label="测点" name="data">
               <side-data :server-id="serverId" @get-function="getFunction" />
@@ -315,7 +315,10 @@ watch(
 }
 
 .sql-search-wrapper {
-  width: calc(100% - 241px);
+  width: calc(100% - 256px);
+  height: 100%;
+  background-color: #fff;
+  border-radius: 6px;
 }
 
 .sql-tab-box {
@@ -323,11 +326,16 @@ watch(
   position: relative;
 
   .sql-tab-list {
-    width: calc(100% - 40px);
+    // width: calc(100% - 40px);
   }
 
   :deep(.el-tabs__header) {
     margin: 0;
+    padding-right: 16px;
+  }
+
+  :deep(.el-tabs__content) {
+    width: 100%;
   }
 
   :deep(.el-tabs__nav-prev.is-disabled),
@@ -364,11 +372,15 @@ watch(
   top: 0;
   right: 0;
   height: 100%;
+  background-color: #fff;
+  border-radius: 6px;
+  padding: 10px 16px;
+  box-sizing: border-box;
 
   .operate-link{
     position: absolute;
     left: 8px;
-    bottom: 0;
+    bottom: 12px;
     font-size: 12px;
     font-weight: 300;
     line-height: 12px;
@@ -386,7 +398,6 @@ watch(
 
 .tabs-nav-aside {
   :deep(.el-tabs__header) {
-    padding: 0 20px;
     background: #fff;
     margin: 0;
   }

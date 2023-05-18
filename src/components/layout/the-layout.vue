@@ -90,11 +90,13 @@ onMounted(() => {
       box-sizing: border-box;
       width: 100%;
       height: 100%;
-      padding: 20px;
+
+      // padding: 20px;
       overflow: auto;
       overflow-x: hidden !important;
-      background-color: var(--el-bg-color);
-      border-radius: 4px;
+
+      // background-color: var(--el-bg-color);
+      border-radius: 0;
 
       // box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
 

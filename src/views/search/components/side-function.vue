@@ -44,7 +44,7 @@ function getFunction(node: Node) {
 <style lang="scss" scoped>
 .search_div {
   font-size: 14px;
-  padding: 20px 20px 0;
+  padding: 20px 0 0;
   background: #fff;
 
   &.maxheight {

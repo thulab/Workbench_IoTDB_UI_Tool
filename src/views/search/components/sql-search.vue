@@ -25,7 +25,7 @@
   </div>
   <div>
     <div class="run-result-title-box">
-      <h4>执行结果</h4>
+      <h4 style="font-size: 14px;font-weight: 700;line-height: 20px;color:#495AD4;">执行结果</h4>
       <span class="run-result-tip"><i-custom-info-warning />默认最多查询1000行100列，如需查看更多数据请下载查看</span>
     </div>
     <div class="tabs" v-if="tableData.list && tableData.list.length > 0">
@@ -337,7 +337,9 @@ function emptyQuery() {
 
   span {
     font-size: 14px;
-    color: var(--el-color-primary)
+    font-weight: 700;
+    line-height: 20px;
+    color:#495AD4;
   }
 
   a {
@@ -371,7 +373,7 @@ function emptyQuery() {
 
 .run-result-title-box {
   display: flex;
-  padding: 12px 0;
+  padding: 12px 0 12px 16px;
   margin-bottom: 12px;
   border-bottom: 1px solid #DFE1ED;
 
@@ -390,9 +392,14 @@ function emptyQuery() {
   }
 }
 
+.tabs{
+  padding: 8px 16px;
+}
+
 .tabs-nav-list {
   :deep(.el-tabs__content) {
-    padding: 10px 16px 10px 0;
+    padding: 16px;
+    background-color: #F7F8FC;
   }
 
   :deep(.el-tabs__header) {

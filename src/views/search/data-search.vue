@@ -408,6 +408,13 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .page-container {
+  background-color: #fff;
+  border-radius: 6px;
+  padding: 16px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+
   .el-button:focus-visible {
     outline: none;
   }
