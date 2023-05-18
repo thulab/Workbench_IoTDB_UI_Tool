@@ -400,6 +400,7 @@ function emptyQuery() {
   :deep(.el-tabs__content) {
     padding: 16px;
     background-color: #F7F8FC;
+    box-sizing: border-box;
   }
 
   :deep(.el-tabs__header) {
