@@ -259,6 +259,7 @@ function handleCommandDown(val: string, index: number) {
     sqlResult.value[index].startQueryTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
     columnList.value.splice(index, 1, []);
     tableData.list.splice(index, 1, {});
+    sqlResult.value[index].sql = code.value[index] || '';
     const { sql = '' } = sqlResult.value[index];
     querySql(props.serverId, { sqls: [sql], timestamp: dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).valueOf() })
       .then((res) => {
