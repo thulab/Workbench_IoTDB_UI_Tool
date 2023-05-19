@@ -158,7 +158,7 @@ function querySqlRun() {
     tableData.list = []; // 值
     sqlResult.value = [];
     controller = new AbortController();
-    querySql(props.serverId, { sqls: code.value?.split('\n'), timestamp: timeNumber.value }, controller)
+    querySql(props.serverId, { sqls: code.value?.split(';\n'), timestamp: timeNumber.value }, controller)
       .then((res) => {
         const { data } = res;
         activeName.value = 't0';
