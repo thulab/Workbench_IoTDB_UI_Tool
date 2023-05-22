@@ -87,7 +87,7 @@ const renameDialogVisible = ref(false);
 const activiteSql = ref<string>('_0');
 
 // eslint-disable-next-line no-useless-escape
-const sqlList = ref<Search.SqlList[]>([{ id: '', queryName: `查询${dayjs().format('YYYY-MM-DD HH:mm').replace(/\-|\:| /g, '')}` }]);
+const sqlList = ref<Search.SqlList[]>([{ id: '', queryName: `查询${dayjs().format('YYYY-MM-DD HH:mm:ss').replace(/\-|\:| /g, '')}` }]);
 const activeNameSide = ref('function');
 
 const code = reactive<Record<string, string>>({ _0: '' });
@@ -96,7 +96,7 @@ const saveFormRef = ref<FormInstance>();
 const resaveFormRef = ref<FormInstance>();
 const saveFormRules = reactive({
   sqlName: [
-    { required: true, message: '请填写名称后保存', trigger: 'blur' },
+    { required: true, message: '请填写名称后确定', trigger: 'blur' },
   ],
 });
 const saveForm = reactive<{
@@ -174,7 +174,7 @@ function handleTabAdd() {
   const newTabName = `_${currentSqlLength}`;
   sqlList.value.push({
     // eslint-disable-next-line no-useless-escape
-    queryName: `查询${dayjs().format('YYYY-MM-DD HH:mm').replace(/\-|\:| /g, '')}`,
+    queryName: `查询${dayjs().format('YYYY-MM-DD HH:mm:ss').replace(/\-|\:| /g, '')}`,
     id: '',
   });
   activiteSql.value = newTabName;
@@ -214,7 +214,7 @@ function handleInputName() {
 // 新名称输入
 function handleInputRename() {
   if (!resaveForm.sqlName.trim()) {
-    errorRenameTip.value = '请填写名称后保存';
+    errorRenameTip.value = '请填写名称后确定';
   } else if (resaveForm.sqlName === resaveForm.oldSqlName) {
     errorRenameTip.value = '与原名称相同，请重新输入';
   } else {
@@ -252,7 +252,7 @@ function handleNameConfirm() {
 function handleRenameConfirm() {
   errorRenameTip.value = '';
   if (!resaveForm.sqlName.trim()) {
-    errorRenameTip.value = '请填写名称后保存';
+    errorRenameTip.value = '新名称为空，请重新输入';
     return;
   } if (resaveForm.sqlName === resaveForm.oldSqlName) {
     errorRenameTip.value = '与原名称相同，请重新输入';

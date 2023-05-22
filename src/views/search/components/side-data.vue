@@ -1,6 +1,6 @@
 <template>
   <div class="search_div maxheight">
-    <!-- <el-input placeholder="请选择存储组" v-model="storageName" readonly @focus="handleVisible('storage', true)" />
+    <!-- <el-input placeholder="请选择数据库" v-model="storageName" readonly @focus="handleVisible('storage', true)" />
       <div v-show="isShowStorage" class="select-box-down">
         <el-input placeholder="输入关键字进行过滤" v-model="filterStorageText" size="small" @input="handleInput('storage')"></el-input>
 
@@ -11,7 +11,7 @@
           <li v-if="Math.ceil(storageTotal / 100) > storagePagination.pageNum && !storageLoading" @click="handleMore('storage')">加载更多</li>
         </ul>
       </div> -->
-    <el-select v-model="storageName" style="width: 100%;" placeholder="请选择存储组" @change="handleSelectDatabase" :loading="storageLoading">
+    <el-select v-model="storageName" style="width: 100%;" placeholder="请选择数据库" @change="handleSelectDatabase" :loading="storageLoading">
       <el-option v-for="item in storageList" :key="item" :value="item" :label="item" />
     </el-select>
 
@@ -56,7 +56,7 @@
       </div> -->
 
     <div class="search-buttons">
-      <el-button v-if="false" type="primary" @click="handleAdd(storageName)">当前存储组</el-button>
+      <el-button v-if="false" type="primary" @click="handleAdd(storageName)">当前数据库</el-button>
       <el-button v-if="false" type="primary" @click="handleAdd(deviceName)">当前设备</el-button>
       <el-button @click="handleReset">重置</el-button>
     </div>
@@ -120,7 +120,7 @@ const measurementTotal = ref(0);
 //   pageNum: 1,
 // });
 
-// 获取存储组
+// 获取数据库
 function getStorageList() {
   getGroup({
     serverId: props.serverId,

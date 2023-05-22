@@ -50,6 +50,7 @@ declare module '@vue/runtime-core' {
     ICustomDeleteActive: typeof import('~icons/custom/delete-active')['default']
     ICustomDeviceNum: typeof import('~icons/custom/device-num')['default']
     ICustomDownload: typeof import('~icons/custom/download')['default']
+    ICustomEdit: typeof import('~icons/custom/edit')['default']
     ICustomInfoWaring: typeof import('~icons/custom/info-waring')['default']
     ICustomInfoWarning: typeof import('~icons/custom/info-warning')['default']
     ICustomLangSwitch: typeof import('~icons/custom/lang-switch')['default']

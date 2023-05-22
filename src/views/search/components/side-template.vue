@@ -7,22 +7,25 @@
     </el-input>
 
     <ul class="sql-list" :loading="loading">
-      <li v-for="item in sqlList" :key="item.id" class="sql-item-box">
-        <div class="sql-item-text-box">
-          <i-custom-template />
-          <text-tooltip :content="item.queryName" class-name="sql-item-text" />
-        </div>
-        <el-dropdown class="more-icon" @command="val => handleSqlCommand(val, item)">
-          <i-ep-more-filled />
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item command="open">打开</el-dropdown-item>
-              <el-dropdown-item command="rename">重命名</el-dropdown-item>
-              <el-dropdown-item command="delete">删除</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-      </li>
+      <template v-if="sqlList.length">
+        <li v-for="item in sqlList" :key="item.id" class="sql-item-box">
+          <div class="sql-item-text-box">
+            <i-custom-template />
+            <text-tooltip :content="item.queryName" class-name="sql-item-text" />
+          </div>
+          <el-dropdown class="more-icon" @command="val => handleSqlCommand(val, item)">
+            <i-ep-more-filled />
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="open">打开</el-dropdown-item>
+                <el-dropdown-item command="rename">重命名</el-dropdown-item>
+                <el-dropdown-item command="delete">删除</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </li>
+      </template>
+      <li v-else class="sql-item-box-empty">暂无模板</li>
     </ul>
   </div>
 </template>
@@ -140,6 +143,19 @@ defineExpose({ getQueryList });
         outline: none;
       }
     }
+  }
+
+  .sql-item-box-empty{
+    padding: 0 8px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 40px;
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 12px;
+    color: #656A85;
   }
 
   .sql-menu-list {

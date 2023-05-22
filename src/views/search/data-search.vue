@@ -66,7 +66,8 @@
             <i-custom-query-error v-else-if="searchDetailInfos.status === false" />
             <i-custom-query-status v-else />
             查询状态：
-            <span :style="{ color: searchDetailInfos !== undefined ? searchDetailInfos.status ? '#44C795' : '#D43030' : '#656A85' }">{{ formatSqlInfo('status') }}</span>
+            <span v-if="getListLoading" :style="{ color: '#656A85' }">查询中</span>
+            <span v-else :style="{ color: searchDetailInfos !== undefined ? searchDetailInfos.status ? '#44C795' : '#D43030' : '#656A85' }">{{ formatSqlInfo('status') }}</span>
           </li>
           <li class="run-result-item"><i-custom-query-start-time />开始时间：{{ formatSqlInfo('startQueryTime') }}</li>
           <li class="run-result-item"><i-custom-query-time />查询耗时：{{ formatSqlInfo('queryTime') }}</li>
@@ -104,7 +105,7 @@
             :show-pagination="false"
           />
           <div class="pagination-container" v-if="tableData.length > 0">
-            <el-button plain class="btn-page btn-first" @click="handleClickPage('first')">第一页</el-button>
+            <el-button plain class="btn-page btn-first" @click="handleClickPage('first')" :disabled="pagination.pageNum === 1">第一页</el-button>
             <el-button type="primary" class="btn-page btn-prev" @click="handleClickPage('prev')" :disabled="pagination.pageNum === 1">上一页</el-button>
             <el-button type="primary" class="btn-page btn-next" @click="handleClickPage('next')" :disabled="!hasNext">下一页</el-button>
             <el-select v-model="pagination.pageSize" @change="handleChangePageSize" style="width: 100px;">
@@ -131,7 +132,7 @@ import dayjs from 'dayjs';
 import { useTableHeight } from '@/composition-api';
 import { SearchApi } from '@/api';
 import {
-  getStartAndEnd, today, getOneDay, getOneInterval, todayNow,
+  getStartAndEnd, today, getOneDay, getOneInterval, todayNow, getOneIntervalNow,
 } from '@/utils/date';
 import { formatTimeseries } from '@/utils/format';
 import { handleExport } from '@/utils/export';
@@ -170,7 +171,7 @@ const searchFormData = reactive({
   time: todayNow(),
   datetimerange: getStartAndEnd(0) as SingleOrRange<DateModelType> as number[],
   timeInterval: undefined,
-  unitInterval: 'h',
+  unitInterval: 's',
   aggregation: '',
 });
 const shortcutsDate = [
@@ -198,7 +199,7 @@ const shortcutsDaterange = [
   },
   {
     text: '最近7天',
-    value: () => getOneInterval(7),
+    value: () => getOneIntervalNow(7),
   },
 ];
 const disabledDate = (time: number) => time > today();

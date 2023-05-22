@@ -1,6 +1,6 @@
 import http from '@/utils/http';
 
-// 存储组
+// 数据库
 class StorageApi {
   static getStorageGroups(params: SearchPageQuery & { serverId: number }): HttpResponseP<StorageDevice.GetStorageListResponse> {
     return http.get('/schema/getDatabases', { params });
