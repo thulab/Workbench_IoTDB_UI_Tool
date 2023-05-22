@@ -88,7 +88,7 @@ import DynamicTable from '@/components/dynamic-table.vue';
 import { SearchApi } from '@/api';
 import { showErrorFn } from '@/composition-api/base/useRequest';
 import CodeEditor from './code-editor.vue';
-import ICustomMessageWarning from '~icons/custom/message-warning.svg?raw';
+import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
 const props = defineProps<{
   serverId: number;
