@@ -238,9 +238,8 @@ function stopquery() {
   runFlag.value = true;
   queryStop(props.serverId, timeNumber.value).then(() => {});
 }
-function exportSql(i: number, exportType: string) {
-  const codevalArr = code.value?.split('\n');
-  exportDataSql(props.serverId, codevalArr[i], exportType).then((res) => {
+function exportSql(val: string, exportType: string) {
+  exportDataSql(props.serverId, val, exportType).then((res) => {
     if (res) {
       ElMessage.success('导出成功');
       handleExport(res, `export.${exportType}`);
@@ -262,12 +261,11 @@ function exportSql(i: number, exportType: string) {
 }
 // 下载
 function handleCommandDown(val: string, index: number) {
+  const { sql = '' } = sqlResult.value[index];
   if (val === 'refresh') {
     sqlResult.value[index].startQueryTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
     columnList.value.splice(index, 1, []);
     tableData.list.splice(index, 1, {});
-    sqlResult.value[index].sql = code.value?.split(';\n')[index] || '';
-    const { sql = '' } = sqlResult.value[index];
     querySql(props.serverId, { sqls: [sql], timestamp: dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).valueOf() })
       .then((res) => {
         const { data } = res;
@@ -303,7 +301,7 @@ function handleCommandDown(val: string, index: number) {
         });
       });
   } else if (val === 'csv' || val === 'xlsx') {
-    exportSql(index, val);
+    exportSql(sql, val);
   }
 }
 
