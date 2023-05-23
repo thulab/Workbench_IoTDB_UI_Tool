@@ -398,7 +398,7 @@ watch(
 
   :deep(.el-tabs__item) {
     border-radius: 6px 6px 0 0;
-    max-width: 200px;
+    max-width: 240px;
   }
 
   :deep(.el-tabs__item.is-active) {

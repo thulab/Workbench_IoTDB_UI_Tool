@@ -67,7 +67,7 @@ export default function useRequest<Requests extends Array<any>, Resp>(apiFn: (..
       })
       .catch((err: HttpError) => {
         error.value = err;
-        showErrorFn(err);
+        showErrorFn(err, options.errMessage);
         return Promise.reject(err);
       })
       .finally(() => {
