@@ -95,6 +95,7 @@ onMounted(() => {
   editorTools.setTabSize(config.value.tabSize || 2);
   // editorTools.setPhrases(config.value.phrases || {});
   editorTools.setPlaceholder(config.value.placeholder || '');
+  editorTools.setTheme();
   // watch prop.style
   watch(
     () => props.style,
@@ -124,10 +125,6 @@ onBeforeUnmount(() => {
   display: contents;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
-.ͼ1.cm-focused {
-  outline: none;
-}
 /* stylelint-disable-next-line selector-class-pattern */
 .ͼ4 .cm-line{
   caret-color: black !important;

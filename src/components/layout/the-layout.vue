@@ -84,7 +84,7 @@ onMounted(() => {
 
     // 防止切换出现横向滚动条
     overflow-x: hidden;
-    background: #dfe1ed; // var(--el-bg-color-page);
+    background: #f0f1fa; // var(--el-bg-color-page);
 
     .main-box {
       box-sizing: border-box;

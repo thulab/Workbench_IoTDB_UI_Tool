@@ -281,7 +281,8 @@ onMounted(() => {
   }
 }
 
-.search-buttons{
+.search-buttons {
   text-align: right;
 }
+
 </style>

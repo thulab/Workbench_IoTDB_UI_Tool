@@ -7,18 +7,18 @@
       <div class="sql-right-icon-box">
         <el-button link @click="handleSave"><i-custom-sql-save />保存</el-button>
         <el-button link :disabled="!runFlag" @click="querySqlRun"><i-custom-sql-run />运行</el-button>
-        <el-button link @click="stopquery"><i-custom-sql-abort />取消</el-button>
+        <el-button link :disabled="runFlag" @click="stopquery"><i-custom-sql-abort />取消</el-button>
         <el-button link @click="emptyQuery"><i-custom-sql-empty />清空</el-button>
       </div>
     </div>
 
-    <div style="height:50%">
+    <div>
       <code-editor
         v-show="codeMirrorReady"
         v-model:model-value="code"
         @ready="()=>codeMirrorReady = true"
         :style="{
-          height: '300px',
+          height: `${codeEditorHeight}px`,
           backgroundColor: '#f9fbfc',
         }" />
     </div>
@@ -117,7 +117,12 @@ const display = ref(false);
 const key = ref('1');
 const runFlag = ref(true);
 
-const { maxTableHeight } = useTableHeight(720);
+const codeEditorHeight = computed(() => {
+  const height = document.documentElement.clientHeight / 4;
+  return height;
+});
+
+const { maxTableHeight } = useTableHeight(codeEditorHeight.value + 410, undefined, 200);
 
 const pagination = reactive({
   pageSize: 10,
@@ -321,8 +326,8 @@ function emptyQuery() {
 </script>
 <style lang="scss" scoped>
 .sql-input-area {
-  padding: 0 16px 16px ;
-  margin-bottom: 16px;
+  padding: 0 16px;
+  margin-bottom: 8px;
   border-radius: 0 0 6px 6px;
   background-color: #fff;
 }

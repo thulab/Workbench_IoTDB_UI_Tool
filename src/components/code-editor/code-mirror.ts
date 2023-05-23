@@ -123,6 +123,33 @@ export const getEditorTools = (view: EditorView) => {
     reStyle(EditorView.theme({ '&': { ...(style as any) } }));
   };
 
+  const { run: reTheme } = createEditorCompartment(view);
+  const setTheme = () => {
+    reTheme(EditorView.baseTheme({
+      '&': {
+        color: '#424561',
+        backgroundColor: '#f7f8fc !important',
+      },
+      '&.cm-focused': {
+        outline: 'none',
+      },
+      '.cm-content': {
+        color: '#424561',
+      },
+      // '&.cm-focused .cm-cursor': {
+      //   borderLeftColor: '#0e9',
+      // },
+      '&.cm-focused .cm-selectionBackground, ::selection': {
+        backgroundColor: '#074',
+      },
+      '.cm-gutters': {
+        backgroundColor: '#f0f1fa',
+        color: '#495ad4',
+        border: 'none',
+      },
+    }));
+  };
+
   return {
     focus,
     getDoc,
@@ -134,6 +161,7 @@ export const getEditorTools = (view: EditorView) => {
     setPhrases,
     setPlaceholder,
     setStyle,
+    setTheme,
   };
 };
 

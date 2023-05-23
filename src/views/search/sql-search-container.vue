@@ -443,6 +443,10 @@ watch(
     background: #fff;
     margin: 0;
   }
+
+  :deep(.el-tabs__item) {
+    padding: 0 20px !important;
+  }
 }
 
 </style>
