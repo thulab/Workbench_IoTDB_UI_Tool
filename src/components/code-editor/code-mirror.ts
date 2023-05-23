@@ -135,10 +135,11 @@ export const getEditorTools = (view: EditorView) => {
       },
       '.cm-content': {
         color: '#424561',
+        caretColor: 'transparent', // 隐藏光标，因为外面设置了 .ͼ4 .cm-line
       },
-      // '&.cm-focused .cm-cursor': {
-      //   borderLeftColor: '#0e9',
-      // },
+      '&.cm-focused .cm-cursor': {
+        borderLeftColor: 'transparent', // 隐藏光标，因为外面设置了 .ͼ4 .cm-line
+      },
       '&.cm-focused .cm-selectionBackground, ::selection': {
         backgroundColor: '#074',
       },

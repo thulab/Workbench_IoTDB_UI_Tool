@@ -122,7 +122,7 @@ onBeforeUnmount(() => {
 <style lang="scss">
 
 /* stylelint-disable-next-line selector-class-pattern */
-.ͼ4 .cm-line{
+.ͼ4 .cm-line {
   caret-color: black !important;
 }
 </style>
