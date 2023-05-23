@@ -101,7 +101,8 @@
           <dynamic-table
             :columns="columns"
             :table-data="tableData"
-            :max-height="maxTableHeight"
+            :height="tableHeight"
+            :max-height="tableHeight"
             :show-pagination="false"
           />
           <div class="pagination-container" v-if="tableData.length > 0">
@@ -142,7 +143,7 @@ import { useServerStore } from '@/stores';
 const serverStroe = useServerStore();
 const serverId = serverStroe.currentServerId;
 
-const { maxTableHeight } = useTableHeight(460);
+const { maxTableHeight } = useTableHeight(380);
 const searchFormRef = ref<FormInstance>();
 const timeUnits = [
   { label: '毫秒', value: 'ms' },
@@ -217,6 +218,9 @@ const pagination = reactive({
   totalColumnCount: 0,
 });
 const getListLoading = ref(false);
+
+const tableHeight = computed(() => (tableData.value.length > 0 ? maxTableHeight.value : maxTableHeight.value + 60));
+
 // 查询结果
 const formatSqlInfo = computed(() => function (filed: string) {
   const data: Partial<Search.QueryDataResult> = searchDetailInfos?.value;
