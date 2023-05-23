@@ -42,7 +42,7 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="nameDialogVisible = false">取消</el-button>
+          <el-button @click="handleNameCancel">取消</el-button>
           <el-button type="primary" @click="handleNameConfirm">确定</el-button>
         </span>
       </template>
@@ -117,6 +117,7 @@ const resaveForm = reactive<{
 });
 const errorNameTip = ref('');
 const errorRenameTip = ref('');
+const saveSource = ref('save');
 
 const { requestFn: getSql } = useRequest(SearchApi.getSql);
 const { requestFn: saveQuery } = useRequest(SearchApi.saveQuery);
@@ -195,15 +196,46 @@ function handleTabRemove(targetName: TabPaneName) {
     ElMessage.info('只有一个页签不允许删除');
     return;
   }
-  const tabs = sqlList.value;
-  let current = activiteSql.value;
-  code[current] = '';
+  // const tabs = sqlList.value;
+  // let current = activiteSql.value;
+  // code[current] = '';
+  // const index = Number((targetName as string).split('_')[1] as unknown as number);
+  // const ci = tabs[index + 1] ? index : index - 1;
+  // const nextTab = tabs[index + 1] || tabs[index - 1];
+  // current = `${nextTab?.id || ''}_${ci}`;
+  // activiteSql.value = current;
+  // sqlList.value.splice(index, 1);
   const index = Number((targetName as string).split('_')[1] as unknown as number);
-  const ci = tabs[index + 1] ? index : index - 1;
-  const nextTab = tabs[index + 1] || tabs[index - 1];
-  current = `${nextTab?.id || ''}_${ci}`;
-  activiteSql.value = current;
-  sqlList.value.splice(index, 1);
+  const current = sqlList.value[index];
+  const id = `${targetName}`.charAt(0) === '_' ? null : activiteSql.value.split('_')[0];
+  if (!id) {
+    activiteSql.value = targetName as string;
+    saveForm.sqlName = current.queryName;
+    saveSource.value = 'close';
+    errorNameTip.value = '';
+    nameDialogVisible.value = true;
+  } else {
+    saveQuery(serverId, {
+      serverId,
+      id,
+      queryName: current.queryName,
+      sqls: code[targetName],
+    }).then((res) => {
+      if (res.code === 0) {
+        ElMessage.success('保存成功');
+        const tabs = sqlList.value;
+        let newCurrent = targetName;
+        code[targetName] = '';
+        const oldindex = Number((targetName as string).split('_')[1] as unknown as number);
+        const ci = tabs[oldindex + 1] ? oldindex : oldindex - 1;
+        const nextTab = tabs[oldindex + 1] || tabs[oldindex - 1];
+        newCurrent = `${nextTab?.id || ''}_${ci}`;
+        activiteSql.value = newCurrent;
+        sqlList.value.splice(oldindex, 1);
+        sqlListRef.value?.getQueryList();
+      }
+    });
+  }
 }
 
 // 模板名称输入
@@ -237,16 +269,46 @@ function handleNameConfirm() {
         if (res.code === 0) {
           ElMessage.success('保存成功');
           nameDialogVisible.value = false;
-          const index = activiteSql.value.split('_')[1] as unknown as number;
-          sqlList.value.splice(index, 1, { id: `${res.data}`, queryName: saveForm.sqlName });
-          activiteSql.value = `${res.data}_${index}`;
-          sqlListRef.value?.getQueryList();
+          if (saveSource.value === 'save') {
+            const index = activiteSql.value.split('_')[1] as unknown as number;
+            sqlList.value.splice(index, 1, { id: `${res.data}`, queryName: saveForm.sqlName });
+            activiteSql.value = `${res.data}_${index}`;
+            sqlListRef.value?.getQueryList();
+          } else {
+            const tabs = sqlList.value;
+            let newCurrent = activiteSql.value;
+            code[newCurrent] = '';
+            const oldindex = Number((newCurrent as string).split('_')[1] as unknown as number);
+            const ci = tabs[oldindex + 1] ? oldindex : oldindex - 1;
+            const nextTab = tabs[oldindex + 1] || tabs[oldindex - 1];
+            newCurrent = `${nextTab?.id || ''}_${ci}`;
+            activiteSql.value = newCurrent;
+            sqlList.value.splice(oldindex, 1);
+            sqlListRef.value?.getQueryList();
+          }
         }
       }).catch((err) => {
         errorNameTip.value = err.message;
       });
     }
   });
+}
+// 取消保存模板
+function handleNameCancel() {
+  if (saveSource.value === 'save') {
+    nameDialogVisible.value = false;
+  } else {
+    nameDialogVisible.value = false;
+    const tabs = sqlList.value;
+    let newCurrent = activiteSql.value;
+    code[newCurrent] = '';
+    const oldindex = Number((newCurrent as string).split('_')[1] as unknown as number);
+    const ci = tabs[oldindex + 1] ? oldindex : oldindex - 1;
+    const nextTab = tabs[oldindex + 1] || tabs[oldindex - 1];
+    newCurrent = `${nextTab?.id || ''}_${ci}`;
+    activiteSql.value = newCurrent;
+    sqlList.value.splice(oldindex, 1);
+  }
 }
 // 重命名
 function handleRenameConfirm() {
@@ -287,6 +349,7 @@ function handleSave() {
   const index = Number(activiteSql.value.split('_')[1] as unknown as number);
   const current = sqlList.value[index];
   saveForm.sqlName = current.queryName;
+  saveSource.value = 'save';
   errorNameTip.value = '';
   nameDialogVisible.value = true;
 }
