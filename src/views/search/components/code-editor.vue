@@ -120,10 +120,6 @@ onBeforeUnmount(() => {
 
 </script>
 <style lang="scss">
-.font_fmiy {
-  text-align: initial;
-  display: contents;
-}
 
 /* stylelint-disable-next-line selector-class-pattern */
 .ͼ4 .cm-line{

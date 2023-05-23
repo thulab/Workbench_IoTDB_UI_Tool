@@ -6,10 +6,12 @@
   "exclude": [],
   "compilerOptions": {
     "composite": true,
+    "moduleResolution": "node",
     "lib": [],
     "types": [
       "node",
-      "jsdom"
+      "jsdom",
+      "element-plus/global"
     ]
   }
 }

@@ -15,7 +15,7 @@
     <div>
       <code-editor
         v-show="codeMirrorReady"
-        v-model:model-value="code"
+        v-model:model-value="codeVal"
         @ready="()=>codeMirrorReady = true"
         :style="{
           height: `${codeEditorHeight}px`,
@@ -49,7 +49,9 @@
             <div class="run-result-buttons">
               <el-button link @click="handleCommandDown('refresh', index)"><i-custom-refresh />刷新</el-button>
               <el-dropdown :disabled="!sqlResult[index].status" class="more-icon m-l-12" @command="val => handleCommandDown(val, index)" v-show="sqlResult[index].status && tableDataPagination[index]?.list?.length > 0">
-                <el-button link class="export-btn" :disabled="!sqlResult[index].status"><i-custom-download />下载<el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-custom-question class="export-tip" /></el-tooltip></el-button>
+                <el-button link class="export-btn" :disabled="!sqlResult[index].status">
+                  <i-custom-download />下载<el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-custom-question class="export-tip" /></el-tooltip>
+                </el-button>
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
@@ -96,7 +98,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits(['save', 'update:code']);
 
-const code = useVModel(props, 'code');
+const codeVal = useVModel(props, 'code');
 const codeMirrorReady = ref(false);
 
 const standTable = ref(null);
@@ -152,7 +154,7 @@ let controller = new AbortController();
 
 // 执行sql
 function querySqlRun() {
-  if (!code.value.length) {
+  if (!codeVal.value.length) {
     ElMessage.error('请先输入语句再运行');
     return;
   }
@@ -165,7 +167,7 @@ function querySqlRun() {
     tableData.list = []; // 值
     sqlResult.value = [];
     controller = new AbortController();
-    querySql(props.serverId, { sqls: code.value?.split(';\n'), timestamp: timeNumber.value }, controller)
+    querySql(props.serverId, { sqls: codeVal.value?.split(';\n'), timestamp: timeNumber.value }, controller)
       .then((res) => {
         const { data } = res;
         activeName.value = 't0';
@@ -314,7 +316,7 @@ function emptyQuery() {
     icon: ICustomMessageWarning,
   })
     .then(() => {
-      code.value = '';
+      codeVal.value = '';
       tableData.list = [];
       columnList.value = [];
       sqlResult.value = [];
@@ -362,6 +364,7 @@ function emptyQuery() {
     margin-left: 4px;
   }
 
+  /* stylelint-disable-next-line no-descending-specificity */
   .el-button{
     font-size: 12px;
     font-weight: 300;

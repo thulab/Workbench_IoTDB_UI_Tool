@@ -167,15 +167,15 @@ function handleSqlOperate(val: string, data: Search.SqlList) {
 
 // 添加tab
 const handleTabAdd = debounce(() => {
-  const currentSqlId = `_${dayjs().format('YYYY-MM-DD HH:mm:ss:sss')}`;
+  const currentSqlId = `_${dayjs().unix()}`;
   sqlList.value.push({
     // eslint-disable-next-line no-useless-escape
-    queryName: `查询${dayjs().format('YYYY-MM-DD HH:mm:ss').replace(/\-|\:| /g, '')}`,
+    queryName: `查询${dayjs().format('YYYYMMDDHHmmss')}`,
     id: currentSqlId,
   });
   activiteSql.value = currentSqlId;
   code[activiteSql.value] = '';
-}, 800);
+}, 300);
 // 点击tab
 function handleTabClick(tab: TabsPaneContext) {
   if (tab.index) {
