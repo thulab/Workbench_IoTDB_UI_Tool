@@ -129,7 +129,7 @@ function getStorageList() {
     // keyword: filterStorageText.value,
   }).then((res) => {
     const dataArr = res.data?.pathNames.map((item) => item);
-    storageList.value = storageList.value.concat(dataArr);
+    storageList.value = dataArr;
     storageTotal.value = res.data?.totalCount || 0;
   });
 }
@@ -209,6 +209,7 @@ function handleReset() {
   deviceName.value = '';
   filterMeasurementText.value = '';
   measurementName.value = '';
+  measurementList.value = [];
   getStorageList();
 }
 
