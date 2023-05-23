@@ -4,7 +4,7 @@
       <div class="sql-search-wrapper">
         <div class="sql-tab-box">
           <el-tabs v-model="activiteSql" editable type="card" closable class="sql-tab-list" @tab-click="handleTabClick" @tab-remove="handleTabRemove" @tab-add="handleTabAdd">
-            <el-tab-pane v-for="(item, index) in sqlList" :key="item.id + '_' + index" :label="item.queryName" :name="item.id + '_' + index">
+            <el-tab-pane v-for="item in sqlList" :key="item.id" :label="item.queryName" :name="item.id">
               <template #label>
                 <text-tooltip :content="item.queryName" />
               </template>
@@ -70,6 +70,7 @@
 <script lang="ts" setup>
 import type { FormInstance, TabsPaneContext, TabPaneName } from 'element-plus';
 import dayjs from 'dayjs';
+import { debounce } from 'lodash-es';
 import { SearchApi } from '@/api';
 import { useServerStore } from '@/stores';
 import SideFunction from './components/side-function.vue';
@@ -84,13 +85,14 @@ const codeMirrorReady = ref(true);
 const nameDialogVisible = ref(false);
 const renameDialogVisible = ref(false);
 
-const activiteSql = ref<string>('_0');
+const activiteSql = ref<string>(`_${dayjs().format('YYYY-MM-DD HH:mm:ss:SSS')}`);
 
 // eslint-disable-next-line no-useless-escape
-const sqlList = ref<Search.SqlList[]>([{ id: '', queryName: `查询${dayjs().format('YYYY-MM-DD HH:mm:ss').replace(/\-|\:| /g, '')}` }]);
+const sqlList = ref<Search.SqlList[]>([{ id: activiteSql.value, queryName: `查询${dayjs().format('YYYY-MM-DD HH:mm:ss').replace(/\-|\:| /g, '')}` }]);
 const activeNameSide = ref('function');
 
-const code = reactive<Record<string, string>>({ _0: '' });
+const code = reactive<Record<string, string>>({});
+code[activiteSql.value] = '';
 const sqlListRef = ref<InstanceType<typeof SideTemplate>>();
 const saveFormRef = ref<FormInstance>();
 const resaveFormRef = ref<FormInstance>();
@@ -125,7 +127,7 @@ const { requestFn: saveQuery } = useRequest(SearchApi.saveQuery);
 // 获取code
 function getSqlCode() {
   if (code[activiteSql.value]) return;
-  const id = activiteSql.value.charAt(0) === '_' ? null : activiteSql.value.split('_')[0];
+  const id = activiteSql.value.charAt(0) === '_' ? null : activiteSql.value;
   code[activiteSql.value] = '';
   // tableData.list = [];
   if (!id) return;
@@ -142,15 +144,13 @@ function getFunction(val: string) {
 
 // 模板操作
 function handleSqlOperate(val: string, data: Search.SqlList) {
-  // eslint-disable-next-line eqeqeq
-  const index = sqlList.value.findIndex((f) => f.id == data.id);
-  const length = sqlList.value.length || 0;
+  const index = sqlList.value.findIndex((f) => `${f.id}` === `${data.id}`);
   if (val === 'open') {
     if (index > -1) {
-      activiteSql.value = `${data.id}_${index}`;
+      activiteSql.value = `${data.id}`;
     } else {
-      sqlList.value.push(data);
-      activiteSql.value = `${data.id}_${length}`;
+      sqlList.value.push({ ...data, id: `${data.id}` });
+      activiteSql.value = `${data.id}`;
     }
   } else if (val === 'rename') {
     resaveForm.oldSqlName = data.queryName;
@@ -159,35 +159,30 @@ function handleSqlOperate(val: string, data: Search.SqlList) {
     errorRenameTip.value = '';
     renameDialogVisible.value = true;
   } else if (index > -1) {
-    const tabs = sqlList.value;
-    let current = activiteSql.value;
-    const ci = tabs[index + 1] ? index : index - 1;
-    const nextTab = tabs[index + 1] || tabs[index - 1];
-    current = `${nextTab.id}_${ci}`;
-    activiteSql.value = current;
+    const nextTab = sqlList.value[index + 1] || sqlList.value[index - 1];
+    activiteSql.value = `${nextTab.id}`;
     sqlList.value.splice(index, 1);
   }
 }
 
 // 添加tab
-function handleTabAdd() {
-  const currentSqlLength = sqlList.value.length || 0;
-  const newTabName = `_${currentSqlLength}`;
+const handleTabAdd = debounce(() => {
+  const currentSqlId = `_${dayjs().format('YYYY-MM-DD HH:mm:ss:sss')}`;
   sqlList.value.push({
     // eslint-disable-next-line no-useless-escape
     queryName: `查询${dayjs().format('YYYY-MM-DD HH:mm:ss').replace(/\-|\:| /g, '')}`,
-    id: '',
+    id: currentSqlId,
   });
-  activiteSql.value = newTabName;
+  activiteSql.value = currentSqlId;
   code[activiteSql.value] = '';
-}
+}, 800);
 // 点击tab
 function handleTabClick(tab: TabsPaneContext) {
   if (tab.index) {
     const data = sqlList.value[tab.index as unknown as number];
     // code.value = '';
     // tableData.list = [];
-    activiteSql.value = `${data.id}_${tab.index}`;
+    activiteSql.value = `${data.id}`;
   }
 }
 // 删除tab
@@ -196,18 +191,9 @@ function handleTabRemove(targetName: TabPaneName) {
     ElMessage.info('只有一个页签不允许删除');
     return;
   }
-  // const tabs = sqlList.value;
-  // let current = activiteSql.value;
-  // code[current] = '';
-  // const index = Number((targetName as string).split('_')[1] as unknown as number);
-  // const ci = tabs[index + 1] ? index : index - 1;
-  // const nextTab = tabs[index + 1] || tabs[index - 1];
-  // current = `${nextTab?.id || ''}_${ci}`;
-  // activiteSql.value = current;
-  // sqlList.value.splice(index, 1);
-  const index = Number((targetName as string).split('_')[1] as unknown as number);
+  const index = sqlList.value.findIndex((f) => `${f.id}` === `${targetName}`);
   const current = sqlList.value[index];
-  const id = `${targetName}`.charAt(0) === '_' ? null : activiteSql.value.split('_')[0];
+  const id = `${targetName}`.charAt(0) === '_' ? null : activiteSql.value;
   if (!id) {
     activiteSql.value = targetName as string;
     saveForm.sqlName = current.queryName;
@@ -223,15 +209,11 @@ function handleTabRemove(targetName: TabPaneName) {
     }).then((res) => {
       if (res.code === 0) {
         ElMessage.success('保存成功');
-        const tabs = sqlList.value;
-        let newCurrent = targetName;
-        code[targetName] = '';
-        const oldindex = Number((targetName as string).split('_')[1] as unknown as number);
-        const ci = tabs[oldindex + 1] ? oldindex : oldindex - 1;
-        const nextTab = tabs[oldindex + 1] || tabs[oldindex - 1];
-        newCurrent = `${nextTab?.id || ''}_${ci}`;
-        activiteSql.value = newCurrent;
-        sqlList.value.splice(oldindex, 1);
+        // code[targetName] = '';
+        delete code[targetName];
+        const nextTab = sqlList.value[index + 1] || sqlList.value[index - 1];
+        activiteSql.value = `${nextTab.id}`;
+        sqlList.value.splice(index, 1);
         sqlListRef.value?.getQueryList();
       }
     });
@@ -258,7 +240,7 @@ function handleNameConfirm() {
   errorNameTip.value = '';
   saveFormRef.value?.validate((valid) => {
     if (valid) {
-      const id = activiteSql.value.charAt(0) === '_' ? null : activiteSql.value.split('_')[0];
+      const id = activiteSql.value.charAt(0) === '_' ? null : activiteSql.value;
       const data = {
         serverId,
         id,
@@ -270,20 +252,17 @@ function handleNameConfirm() {
           ElMessage.success('保存成功');
           nameDialogVisible.value = false;
           if (saveSource.value === 'save') {
-            const index = activiteSql.value.split('_')[1] as unknown as number;
+            const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
             sqlList.value.splice(index, 1, { id: `${res.data}`, queryName: saveForm.sqlName });
-            activiteSql.value = `${res.data}_${index}`;
+            activiteSql.value = `${res.data}`;
             sqlListRef.value?.getQueryList();
           } else {
-            const tabs = sqlList.value;
-            let newCurrent = activiteSql.value;
-            code[newCurrent] = '';
-            const oldindex = Number((newCurrent as string).split('_')[1] as unknown as number);
-            const ci = tabs[oldindex + 1] ? oldindex : oldindex - 1;
-            const nextTab = tabs[oldindex + 1] || tabs[oldindex - 1];
-            newCurrent = `${nextTab?.id || ''}_${ci}`;
-            activiteSql.value = newCurrent;
-            sqlList.value.splice(oldindex, 1);
+            code[activiteSql.value] = '';
+            // delete code[activiteSql.value];
+            const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
+            const nextTab = sqlList.value[index + 1] || sqlList.value[index - 1];
+            activiteSql.value = `${nextTab?.id}`;
+            sqlList.value.splice(index, 1);
             sqlListRef.value?.getQueryList();
           }
         }
@@ -299,15 +278,12 @@ function handleNameCancel() {
     nameDialogVisible.value = false;
   } else {
     nameDialogVisible.value = false;
-    const tabs = sqlList.value;
-    let newCurrent = activiteSql.value;
-    code[newCurrent] = '';
-    const oldindex = Number((newCurrent as string).split('_')[1] as unknown as number);
-    const ci = tabs[oldindex + 1] ? oldindex : oldindex - 1;
-    const nextTab = tabs[oldindex + 1] || tabs[oldindex - 1];
-    newCurrent = `${nextTab?.id || ''}_${ci}`;
-    activiteSql.value = newCurrent;
-    sqlList.value.splice(oldindex, 1);
+    // delete code[activiteSql.value];
+    code[activiteSql.value] = '';
+    const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
+    const nextTab = sqlList.value[index + 1] || sqlList.value[index - 1];
+    activiteSql.value = `${nextTab?.id}`;
+    sqlList.value.splice(index, 1);
   }
 }
 // 重命名
@@ -333,10 +309,10 @@ function handleRenameConfirm() {
         if (res.code === 0) {
           ElMessage.success('保存成功');
           renameDialogVisible.value = false;
-          const index = activiteSql.value.split('_')[1] as unknown as number;
+          const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
           sqlList.value.splice(index, 1, { id: `${id}`, queryName: resaveForm.sqlName });
           sqlListRef.value?.getQueryList();
-          activiteSql.value = `${id}_${index}`;
+          activiteSql.value = `${id}`;
         }
       }).catch((err) => {
         errorRenameTip.value = err.message;
@@ -346,7 +322,7 @@ function handleRenameConfirm() {
 }
 // 保存
 function handleSave() {
-  const index = Number(activiteSql.value.split('_')[1] as unknown as number);
+  const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
   const current = sqlList.value[index];
   saveForm.sqlName = current.queryName;
   saveSource.value = 'save';
