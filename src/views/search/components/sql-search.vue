@@ -65,7 +65,7 @@
               ref="standTable"
               :columns="item"
               :table-data="tableDataPagination[index].list || []"
-              :max-height="300"
+              :max-height="maxTableHeight"
               v-model:current-page="pageNums[index]"
               v-model:page-size="pagination.pageSize"
               :total="total[index]"
@@ -116,6 +116,8 @@ const currentQueryTime = ref('');
 const display = ref(false);
 const key = ref('1');
 const runFlag = ref(true);
+
+const { maxTableHeight } = useTableHeight(720);
 
 const pagination = reactive({
   pageSize: 10,
