@@ -31,6 +31,7 @@ declare namespace Search{
   export interface SqlList {
     id: number | string;
     queryName: string;
+    focused?: boolean;
   }
 
   export interface SaveSqlParams {

@@ -1,19 +1,20 @@
 <template>
-  <div class="search_div maxheight">
+  <div class="search_div maxheight" v-loading="loading">
     <el-input placeholder="请输入模板名称" v-model="filterText" size="small" @input="getQueryList">
       <template #suffix>
         <i-custom-search-icon />
       </template>
     </el-input>
 
-    <ul class="sql-list" :loading="loading">
+    <ul class="sql-list">
       <template v-if="sqlList.length">
         <li v-for="item in sqlList" :key="item.id" class="sql-item-box">
           <div class="sql-item-text-box">
             <i-custom-template />
             <text-tooltip :content="item.queryName" class-name="sql-item-text" />
           </div>
-          <el-dropdown class="more-icon" @command="val => handleSqlCommand(val, item)">
+          <i-ep-more-filled @click="item.focused = true" v-if="!item.focused" class="more-icon" />
+          <el-dropdown v-else class="more-icon" @command="val => handleSqlCommand(val, item)">
             <i-ep-more-filled />
             <template #dropdown>
               <el-dropdown-menu>
@@ -44,19 +45,17 @@ const props = defineProps<{
 const emit = defineEmits(['handleSqlOperate']);
 
 const filterText = ref('');
-const loading = ref(false);
 const sqlList = ref<Search.SqlList[]>([]);
-const { requestFn: getQuery } = useRequest(SearchApi.getQuery);
+const { requestFn: getQuery, loading } = useRequest(SearchApi.getQuery);
 const { requestFn: deleteQueryS } = useRequest(SearchApi.deleteQueryS);
 
 // 获取列表数据
-const getQueryList = debounce(async () => {
-  loading.value = true;
-  const res = await getQuery(props.serverId, filterText.value);
-  loading.value = false;
-  if (res.code === 0) {
-    sqlList.value = res.data || [];
-  }
+const getQueryList = debounce(() => {
+  getQuery(props.serverId, filterText.value).then((res) => {
+    if (res.code === 0) {
+      sqlList.value = res.data || [];
+    }
+  });
 }, 500);
 
 const handleSqlCommand = (val: string, data: Search.SqlList) => {
@@ -95,7 +94,7 @@ defineExpose({ getQueryList });
   background: #fff;
 
   &.maxheight {
-    height: calc(100vh - 289px);
+    height: calc(100vh - 189px);
     overflow: auto;
   }
 }
@@ -104,6 +103,7 @@ defineExpose({ getQueryList });
   display: flex;
   flex-direction: column;
   margin-top: 12px;
+  min-height: 200px;
 
   .sql-item-box {
     padding: 0 8px;
@@ -137,6 +137,7 @@ defineExpose({ getQueryList });
     .more-icon {
       cursor: pointer;
       margin-left: 12px;
+      font-size: 14px;
 
       svg {
         // transform: rotate(90deg);
