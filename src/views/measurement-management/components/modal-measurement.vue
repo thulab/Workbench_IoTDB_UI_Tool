@@ -138,7 +138,7 @@ const deviceRules = ref([
   {
     required: true,
     message: '设备名称不能为空',
-    trigger: 'blur',
+    trigger: ['blur', 'change'],
   },
   {
     pattern: /^`.*`$|^(["'.a-zA-Z0-9_\u4e00-\u9fa5]*)$/,
