@@ -107,7 +107,7 @@ defineExpose({ getStorageList });
 
 .border-refresh-icon{
   border-radius: 4px;
-  border: 1px solid #DFE1ED;
+  border: 1px solid #DFE1ED !important;
 
   &:hover{
     border-color: #DFE1ED !important;
