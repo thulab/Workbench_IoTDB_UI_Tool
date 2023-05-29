@@ -65,10 +65,6 @@
     "watch": true,
     "watchEffect": true,
     "watchPostEffect": true,
-    "watchSyncEffect": true,
-    "toValue": true,
-    "IconEpArrowRight": true,
-    "IconEpMoon": true,
-    "IconEpSunny": true
+    "watchSyncEffect": true
   }
 }

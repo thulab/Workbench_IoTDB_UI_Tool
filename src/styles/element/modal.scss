@@ -4,6 +4,10 @@
   padding-left: 0;
 }
 
+.el-message-box__header{
+  border-bottom: 1px solid #DFE1ED;
+}
+
 .el-message-box__status svg{
   width: 18px !important;
   height: 18px !important;
