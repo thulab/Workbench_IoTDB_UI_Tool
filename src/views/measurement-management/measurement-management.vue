@@ -218,6 +218,7 @@ const getTtlTimeUnit = (val: string | undefined, options: Array<{ label: string,
 // 列表接口
 function getListData() {
   getMeasurementsInfosByFuzzy(serverId, {
+    dataBaseOrDevice: 'database',
     pathName: currentStorage.value,
     keyword: searchKeyword.value,
     ...pagination,

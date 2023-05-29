@@ -198,6 +198,7 @@ const remoteMethod = debounce((query: string) => {
 // 获取物理量
 function getMeasurementList(val: string) {
   getMeasurementsInfosByFuzzy(props.serverId, {
+    dataBaseOrDevice: 'device',
     pathName: val,
     keyword: '',
     pageNum: 1,
