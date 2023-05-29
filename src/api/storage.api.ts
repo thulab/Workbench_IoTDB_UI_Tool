@@ -87,7 +87,7 @@ class StorageApi {
     if (fileType === 'csv') {
       return http.post('/file/exportCSVMeasurementData', data, { params: { serverId } });
     }
-    return http.post('/file/exportExcelMeasurementData', data, { params: { serverId } });
+    return http.post('/file/exportExcelMeasurementData', data, { params: { serverId }, responseType: 'blob' });
   }
 }
 export default StorageApi;
