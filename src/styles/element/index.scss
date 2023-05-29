@@ -5,3 +5,14 @@
 .el-button:focus-visible {
   outline: none !important;
 }
+
+.el-input-group__prepend, .el-input-group__append{
+  background: #F7F8FC !important;
+  color: #131926 !important;
+  font-weight: 300;
+}
+
+.el-input__inner{
+  color: #656A85;
+  font-weight: 300;
+}

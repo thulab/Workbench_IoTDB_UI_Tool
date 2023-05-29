@@ -9,9 +9,9 @@
           :max-height="maxHeight"
           tooltip-effect="light"
           :header-cell-style="{
-            color: 'black',
+            color: '#424561',
             overflow: 'hidden',
-            background: '#F9FAFC',
+            background: '#F0F1FA',
           }"
           @selection-change="handleSelectionChange"
         >

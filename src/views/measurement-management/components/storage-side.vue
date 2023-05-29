@@ -2,7 +2,7 @@
   <div class="storage-list-title">
     <h4>数据库</h4>
     <div class="storage-operate-buttons">
-      <el-button link class="m-r-8" @click="getStorageList"><i-custom-refresh-border /></el-button>
+      <el-button link class="m-r-8 border-refresh-icon" @click="getStorageList"><i-custom-refresh /></el-button>
       <el-button link style="margin: 0;" @click="handleAddStorage"><i-custom-new-storage /></el-button>
     </div>
   </div>
@@ -103,6 +103,25 @@ defineExpose({ getStorageList });
     line-height: 20px;
     color: #495AD4;
   }
+}
+
+.border-refresh-icon{
+  border-radius: 4px;
+  border: 1px solid #DFE1ED;
+
+  &:hover{
+    border-color: #DFE1ED !important;
+  }
+
+  svg{
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.storage-list-box{
+  height: calc(100% - 70px);
+  overflow-y: auto;
 }
 
 .storage-item-box{

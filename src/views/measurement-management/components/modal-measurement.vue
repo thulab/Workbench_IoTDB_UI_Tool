@@ -33,7 +33,7 @@
           </div>
         </div>
       </el-form-item>
-      <h4 class="module-title">物理量</h4>
+      <h4 class="module-title">测点</h4>
       <el-collapse accordion class="measurement-list-box">
         <el-collapse-item v-for="(item, index) in formData.measurementList" :key="index" :name="'measurement_' + index">
           <template #title>
@@ -53,10 +53,10 @@
               </el-col>
             </el-row>
           </template>
-          <el-row>
+          <el-row style="margin-bottom: 8px;">
             <el-col :span="8">
-              <el-form-item label="物理量名称" :prop="'measurementList[' + index + '].timeseries'" :rules="requiredRules">
-                <el-input v-model="item.timeseries" placeholder="请输入物理量名称" :disabled="!item.isEditable || !formData.deviceName" />
+              <el-form-item label="测点名称" :prop="'measurementList[' + index + '].timeseries'" :rules="requiredRules">
+                <el-input v-model="item.timeseries" placeholder="请输入测点名称" :disabled="!item.isEditable || !formData.deviceName" />
               </el-form-item>
             </el-col>
           </el-row>
@@ -86,7 +86,7 @@
         </el-collapse-item>
       </el-collapse>
 
-      <el-button style="width: 100%" :disabled="addControl" @click="handleAddRow"><i-custom-add class="m-r-12" />添加物理量</el-button>
+      <el-button style="width: 100%;" :disabled="addControl" @click="handleAddRow"><i-custom-add class="m-r-12" />添加测点</el-button>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
@@ -240,7 +240,7 @@ function handleCopyRow(data: Partial<StorageDevice.MeasurementItem>) {
 
 // 删除
 function handleDelRow(i: number) {
-  ElMessageBox.confirm('是否删除时间序列？', '注意', {
+  ElMessageBox.confirm('是否删除测点？', '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
@@ -356,6 +356,7 @@ watch(
 .measurement-list-box{
   max-height: 400px;
   overflow-y: auto;
+  border-bottom: none;
 }
 
 .collapse-title-box{

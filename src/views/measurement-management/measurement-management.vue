@@ -62,7 +62,7 @@
             <el-button type="primary" @click="handleAddMeasure">新建</el-button>
             <el-button class="m-l-16" @click="handleImport">导入</el-button>
             <el-dropdown class="m-x-16" :disabled="!(totalCount > 0)" @command="val => handleCommandDown(val)">
-              <el-button class="export-btn" :disabled="!(totalCount > 0)">导出<el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-custom-question class="export-tip" /></el-tooltip></el-button>
+              <el-button class="export-btn" :disabled="!(totalCount > 0)">导 出<el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-custom-question class="export-tip" /></el-tooltip></el-button>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
@@ -88,11 +88,16 @@
             :max-height="maxTableHeight"
             tooltip-effect="light"
             ref="tableRef"
+            :header-cell-style="{
+              color: '#424561',
+              overflow: 'hidden',
+              background: '#F0F1FA',
+            }"
             @selection-change="handleSelectionChange"
           >
             <el-table-column type="selection" width="55" />
             <el-table-column label="设备名称" prop="deviceName" min-width="240" show-overflow-tooltip />
-            <el-table-column label="物理量名称" prop="timeseries" width="160" show-overflow-tooltip />
+            <el-table-column label="测点名称" prop="timeseries" width="160" show-overflow-tooltip />
             <el-table-column label="数据类型" prop="dataType" width="140" show-overflow-tooltip />
             <el-table-column label="编码方式" prop="encoding" min-width="140" show-overflow-tooltip />
             <el-table-column label="压缩方式" prop="compression" min-width="140" show-overflow-tooltip />
@@ -323,7 +328,7 @@ function handleImport() {
 
 // 删除行
 function handleDelRow(type: string, row: StorageDevice.MeasurementItem | null) {
-  ElMessageBox.confirm('是否删除时间序列？', '注意', {
+  ElMessageBox.confirm('是否删除测点？', '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',

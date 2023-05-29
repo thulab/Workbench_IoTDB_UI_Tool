@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="批量导入物理量"
+    title="批量导入测点"
     v-model="dialogVisible"
     width="748px"
     class="new-storage-container"
