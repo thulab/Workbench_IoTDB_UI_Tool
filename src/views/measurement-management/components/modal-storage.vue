@@ -123,6 +123,7 @@ watch(
   (newVal) => {
     if (newVal) {
       formRef.value?.resetFields();
+      formData.ttlUnit = 'day';
     }
   },
 );

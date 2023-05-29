@@ -54,28 +54,30 @@
             </el-row>
           </template>
           <el-row>
-            <el-col :span="12">
+            <el-col :span="8">
               <el-form-item label="物理量名称" :prop="'measurementList[' + index + '].timeseries'" :rules="requiredRules">
-                <el-input v-model="item.timeseries" placeholder="请输入物理量名称" :disabled="!item.isEditable" />
+                <el-input v-model="item.timeseries" placeholder="请输入物理量名称" :disabled="!item.isEditable || !formData.deviceName" />
               </el-form-item>
             </el-col>
-            <el-col :span="12">
+          </el-row>
+          <el-row>
+            <el-col :span="8">
               <el-form-item label="数据类型" :prop="'measurementList[' + index + '].dataType'" :rules="requiredRules">
-                <el-select v-model="item.dataType" placeholder="请选择数据类型" @change="val => handleChangeRowDataType(val, item, index)" :disabled="!item.isEditable">
+                <el-select v-model="item.dataType" placeholder="请选择数据类型" @change="val => handleChangeRowDataType(val, item, index)" :disabled="!item.isEditable || !formData.deviceName">
                   <el-option v-for="dtype in dataTypeOptions" :key="dtype" :label="dtype" :value="dtype" />
                 </el-select>
               </el-form-item>
             </el-col>
-            <el-col :span="12">
+            <el-col :span="8">
               <el-form-item label="编码方式" :prop="'measurementList[' + index + '].encoding'" :rules="requiredRules">
-                <el-select v-model="item.encoding" placeholder="请选择数据类型" :disabled="!item.isEditable || !item.dataType">
+                <el-select v-model="item.encoding" placeholder="请选择数据类型" :disabled="!item.isEditable || !item.dataType || !formData.deviceName">
                   <el-option v-for="enc in encodingOptions(item.dataType as string)" :key="enc" :label="enc" :value="enc" />
                 </el-select>
               </el-form-item>
             </el-col>
-            <el-col :span="12">
+            <el-col :span="8">
               <el-form-item label="压缩方式" :prop="'measurementList[' + index + '].compression'" :rules="requiredRules">
-                <el-select v-model="item.compression" placeholder="请选择数据类型" :disabled="!item.isEditable">
+                <el-select v-model="item.compression" placeholder="请选择数据类型" :disabled="!item.isEditable || !formData.deviceName">
                   <el-option v-for="com in compressionOptions" :key="com" :label="com" :value="com" />
                 </el-select>
               </el-form-item>
@@ -201,14 +203,25 @@ function getMeasurementList(val: string) {
     pageNum: 1,
     pageSize: 10,
   }).then((res) => {
-    formData.measurementList = res.data?.measurements?.map((item) => ({ ...item, isEditable: false }));
+    const data = res.data?.measurements?.map((item) => ({ ...item, isEditable: false }));
+    data.forEach((item) => {
+      formData.measurementList.unshift({ ...item });
+    });
   });
 }
 
 // 切换新建设备
-function handleChangeAdd() {
+function handleChangeAdd(val: boolean) {
   formData.deviceName = '';
   formData.measurementList = [];
+  formData.measurementList.push({
+    deviceName: !val ? '' : `${props.groupName}`,
+    timeseries: '',
+    dataType: 'BOOLEAN',
+    encoding: 'PLAIN',
+    compression: 'SNAPPY',
+    isEditable: true,
+  });
   isAligned.value = false;
 }
 
@@ -287,9 +300,10 @@ const handleConfirm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
       const deviceName = !addDevice.value ? formData.deviceName : `${props.groupName}.${formData.deviceName}`;
+      const measurementDTOList = formData.measurementList.filter((f) => f.isEditable).map((item) => ({ ...item, deviceName }));
       saveMeasurementList(props.serverId, {
         deviceName,
-        measurementDTOList: formData.measurementList.filter((f) => f.isEditable),
+        measurementDTOList,
         isAligned: isAligned.value,
       }).then((res) => {
         if (res.code === 0) {
@@ -313,6 +327,14 @@ watch(
       formData.measurementList = [];
       addDevice.value = false;
       isAligned.value = false;
+      formData.measurementList.push({
+        deviceName: formData.deviceName,
+        timeseries: '',
+        dataType: 'BOOLEAN',
+        encoding: 'PLAIN',
+        compression: 'SNAPPY',
+        isEditable: true,
+      });
       remoteMethod('');
     }
   },
