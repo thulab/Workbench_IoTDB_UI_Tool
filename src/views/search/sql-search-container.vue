@@ -409,7 +409,6 @@ watch(
 
 .sql-search-aside {
   width: 240px;
-  border-left: 1px solid #ebeef5;
   position: absolute;
   top: 0;
   right: 0;

@@ -1,36 +1,13 @@
 declare namespace StorageDevice{
-
-  export type EncodingType = 'RLE' | 'PLAIN' | 'TS_2DIFF' | 'GORILLA';
-  export type CompressionType = 'UNCOMPRESSED' | 'SNAPPY' | 'LZ4' | 'GZIP';
-
   export interface MeasurementItem {
-    alias: string;
-    attributes: string[][];
-    compression: CompressionType;
-    dataCount: number;
-    dataType: IotdbDataType;
-    description: string;
-    encoding: EncodingType;
-    newValue: string;
-    newValueTime?: string;
-    tags: string[][];
+    deviceName: string;
     timeseries: string;
-    display?: boolean;
-    border?: boolean;
-    namecopy?: boolean;
-    seBorder?: boolean;
-    changed?: boolean;
-    isAdd?: boolean;
-    deadband?: string;
-    compdev?: number;
-    compmintime?: number;
-    compmaxtime?: number;
-  }
-
-  export interface MeasurementResult {
-    totalCount: number;
-    totalPage: number;
-    measurementVOList: Partial<MeasurementItem>[];
+    dataType: IotdbDataType;
+    encoding: EncodingType;
+    compression: CompressionType;
+    isEditable?: boolean;
+    value?: string;
+    valueTime?: string;
   }
 
   export interface GetStorageListResponse {
@@ -41,5 +18,45 @@ declare namespace StorageDevice{
   export interface GetPathListResponse {
     pathNames: string[];
     totalCount: number;
+  }
+
+  export interface GetStorageGroupsInfoResponse {
+    groupName: string;
+    ttl?: string;
+    ttlUnit?: string;
+    deviceCount: number;
+    measurementCount: number;
+    dataCount: number;
+  }
+
+  export interface SaveStorageGroupsRequest {
+    groupName: string;
+    ttl?: number;
+    ttlUnit?: string;
+  }
+
+  export interface GetMeasurementsInfosByFuzzyRes {
+    measurements: MeasurementItem[];
+    totalCount: number;
+    totalPage: number;
+  }
+
+  export interface GetLastValueRes {
+    value: string;
+    valueTime: string;
+  }
+
+  export interface SaveMeasurementListRequest {
+    measurementDTOList: Partial<MeasurementItem>[];
+    deviceName: string;
+    isAligned: boolean;
+  }
+
+  export interface ImportMeasurementDataRes {
+    status: boolean;
+    errMsg: string;
+    successNum: number;
+    failNum: number;
+    filePath: string;
   }
 }

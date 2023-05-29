@@ -1,3 +1,7 @@
 @import "./pagination";
 @import "./date";
 @import "./modal";
+
+.el-button:focus-visible {
+  outline: none !important;
+}
