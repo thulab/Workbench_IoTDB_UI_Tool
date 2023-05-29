@@ -17,7 +17,7 @@
       </el-steps>
 
       <div class="select-file-box" v-if="activeStep === 0">
-        <div class="select-item-box">
+        <div class="select-item-box" style="align-items: center;">
           <span class="select-item-label">模板下载：</span>
           <el-button v-if="false" link class="template-button" @click="downloadTemplate">moban.csv</el-button>
           <a href="/api/file/exportMeasurementTemplate" class="template-button" target="_blank">moban.csv</a>
@@ -244,14 +244,43 @@ watch(
     line-height: 21px;
   }
 
+  :deep(.el-step.is-horizontal .el-step__line) {
+    height: 1px;
+  }
+
   :deep(.el-step__title.is-process) {
     color: #495AD4;
     font-weight: 700;
   }
 
+  :deep(.el-step__icon) {
+    border: 1px solid #DFE1ED;
+  }
+
+  :deep(.el-step__head.is-process .el-step__icon) {
+    background: #495AD4;
+    color: #fff;
+    border-color: transparent;
+  }
+
   :deep(.el-step__title.is-wait) {
     color: #424561;
     font-weight: 700;
+  }
+
+  :deep(.el-step__title.is-success) {
+    color: #424561;
+  }
+
+  :deep(.el-step__head.is-success) {
+    color: #495AD4;
+    border-color: #495AD4;
+
+    .el-step__icon{
+      background: #495AD4;
+      color: #fff;
+      border-color: transparent;
+    }
   }
 }
 
