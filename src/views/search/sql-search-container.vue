@@ -324,10 +324,23 @@ function handleRenameConfirm() {
 function handleSave() {
   const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
   const current = sqlList.value[index];
-  saveForm.sqlName = current.queryName;
-  saveSource.value = 'save';
-  errorNameTip.value = '';
-  nameDialogVisible.value = true;
+  if (!current.id) {
+    saveForm.sqlName = current.queryName;
+    saveSource.value = 'save';
+    errorNameTip.value = '';
+    nameDialogVisible.value = true;
+  } else {
+    saveQuery(serverId, {
+      serverId,
+      id: current.id as string,
+      queryName: current.queryName,
+      sqls: code[activiteSql.value],
+    }).then((res) => {
+      if (res.code === 0) {
+        ElMessage.success('保存成功');
+      }
+    });
+  }
 }
 
 watch(
