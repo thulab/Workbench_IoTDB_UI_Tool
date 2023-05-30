@@ -145,7 +145,7 @@ import { useServerStore } from '@/stores';
 const serverStroe = useServerStore();
 const serverId = serverStroe.currentServerId;
 
-const { maxTableHeight } = useTableHeight(380);
+const { maxTableHeight } = useTableHeight(420);
 const searchFormRef = ref<FormInstance>();
 const timeUnits = [
   { label: '毫秒', value: 'ms' },
