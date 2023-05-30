@@ -324,7 +324,8 @@ function handleRenameConfirm() {
 function handleSave() {
   const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
   const current = sqlList.value[index];
-  if (!current.id) {
+  const id = `${current.id}`.charAt(0) === '_' ? null : `${current.id}`;
+  if (!id) {
     saveForm.sqlName = current.queryName;
     saveSource.value = 'save';
     errorNameTip.value = '';
@@ -332,7 +333,7 @@ function handleSave() {
   } else {
     saveQuery(serverId, {
       serverId,
-      id: current.id as string,
+      id,
       queryName: current.queryName,
       sqls: code[activiteSql.value],
     }).then((res) => {
