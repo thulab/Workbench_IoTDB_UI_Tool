@@ -131,6 +131,7 @@
 <script setup lang="ts">
 import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import dayjs from 'dayjs';
+import { cloneDeep } from 'lodash-es';
 import { useTableHeight } from '@/composition-api';
 import { SearchApi } from '@/api';
 import {
@@ -176,6 +177,7 @@ const searchFormData = reactive({
   unitInterval: 's',
   aggregation: '',
 });
+let copySearchFormData = cloneDeep(searchFormData);
 const shortcutsDate = [
   {
     text: '今天',
@@ -245,7 +247,7 @@ const { requestFn: exportData } = useRequest(SearchApi.exportData);
 let controller = new AbortController();
 
 function getListData() {
-  if (searchFormData.timeInterval && !searchFormData.aggregation) {
+  if (copySearchFormData.timeInterval && !copySearchFormData.aggregation) {
     ElMessage.error('采样周期填写的情况下请选择采样策略');
     return;
   }
@@ -255,11 +257,11 @@ function getListData() {
   let startTime = 0;
   let endTime = 0;
   if (timeType.value === 'datetime') {
-    startTime = dayjs(searchFormData.time).valueOf();
+    startTime = dayjs(copySearchFormData.time).valueOf();
     endTime = startTime + 1000;
   } else {
-    startTime = dayjs(searchFormData.datetimerange[0] as string).valueOf();
-    endTime = dayjs(searchFormData.datetimerange[1]).valueOf();
+    startTime = dayjs(copySearchFormData.datetimerange[0]).valueOf();
+    endTime = dayjs(copySearchFormData.datetimerange[1]).valueOf();
   }
 
   searchDetailInfos.value.status = undefined;
@@ -268,12 +270,12 @@ function getListData() {
   getListLoading.value = true;
   controller = new AbortController();
   getList(serverId, {
-    measurements: searchFormData.path,
+    measurements: copySearchFormData.path,
     startTime,
     endTime,
-    aggregation: searchFormData.aggregation,
-    timeInterval: searchFormData.timeInterval || undefined,
-    unitInterval: searchFormData.unitInterval,
+    aggregation: copySearchFormData.aggregation,
+    timeInterval: copySearchFormData.timeInterval || undefined,
+    unitInterval: copySearchFormData.unitInterval,
     spage: pagination.columnNum,
     ssize: pagination.columnSize,
     size: pagination.pageSize,
@@ -326,6 +328,7 @@ function handleSearch() {
     return;
   }
   pagination.pageNum = 1;
+  copySearchFormData = cloneDeep(searchFormData);
   getListData();
 }
 
@@ -361,19 +364,19 @@ function handleExportData(exportType: string) {
   let startTime = 0;
   let endTime = 0;
   if (timeType.value === 'datetime') {
-    startTime = dayjs(searchFormData.time).valueOf();
+    startTime = dayjs(copySearchFormData.time).valueOf();
     endTime = startTime + 1000;
   } else {
-    startTime = dayjs(searchFormData.datetimerange[0]).valueOf();
-    endTime = dayjs(searchFormData.datetimerange[1]).valueOf();
+    startTime = dayjs(copySearchFormData.datetimerange[0]).valueOf();
+    endTime = dayjs(copySearchFormData.datetimerange[1]).valueOf();
   }
   exportData(serverId, {
-    measurements: searchFormData.path,
+    measurements: copySearchFormData.path,
     startTime,
     endTime,
-    aggregation: searchFormData.aggregation,
-    timeInterval: searchFormData.timeInterval || undefined,
-    unitInterval: searchFormData.unitInterval,
+    aggregation: copySearchFormData.aggregation,
+    timeInterval: copySearchFormData.timeInterval || undefined,
+    unitInterval: copySearchFormData.unitInterval,
     spage: pagination.columnNum,
     ssize: pagination.columnSize,
     size: pagination.pageSize,
@@ -399,7 +402,7 @@ function handleTimeType(type: 'datetime' | 'datetimerange') {
 }
 // 下载
 function handleCommandDown(val: string) {
-  if (!searchFormData.path.length) {
+  if (!copySearchFormData.path.length) {
     errorDeviceTip.value = '请输入测点名称后进行搜索';
     return;
   }
