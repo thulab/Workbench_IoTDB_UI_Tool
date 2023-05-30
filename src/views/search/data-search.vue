@@ -31,6 +31,7 @@
                 v-model="searchFormData.datetimerange"
                 type="datetimerange"
                 range-separator="-"
+                unlink-panels
                 :disabled-date="disabledDate"
                 :shortcuts="shortcutsDaterange"
                 :clearable="false"
@@ -170,7 +171,7 @@ const errorDeviceTip = ref('');
 const searchFormData = reactive({
   path: [] as string[],
   time: todayNow(),
-  datetimerange: getStartAndEnd(0) as SingleOrRange<DateModelType> as number[],
+  datetimerange: getStartAndEnd(0) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
   timeInterval: undefined,
   unitInterval: 's',
   aggregation: '',
@@ -203,7 +204,7 @@ const shortcutsDaterange = [
     value: () => getOneIntervalNow(7),
   },
 ];
-const disabledDate = (time: number) => time > today();
+const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 
 const searchDetailInfos = ref<Partial<Search.QueryDataResult>>({});
 const hasNext = ref(false);
@@ -257,7 +258,7 @@ function getListData() {
     startTime = dayjs(searchFormData.time).valueOf();
     endTime = startTime + 1000;
   } else {
-    startTime = dayjs(searchFormData.datetimerange[0]).valueOf();
+    startTime = dayjs(searchFormData.datetimerange[0] as string).valueOf();
     endTime = dayjs(searchFormData.datetimerange[1]).valueOf();
   }
 
@@ -310,7 +311,7 @@ function getListData() {
 function handleReset() {
   searchFormRef.value?.resetFields();
   searchFormData.time = todayNow();
-  searchFormData.datetimerange = getStartAndEnd(0);
+  searchFormData.datetimerange = getStartAndEnd(0) as [DateModelType, DateModelType];
 }
 
 // 查询
@@ -394,7 +395,7 @@ function handleTimeType(type: 'datetime' | 'datetimerange') {
   if (timeType.value === type || getListLoading.value) return;
   timeType.value = type;
   searchFormData.time = todayNow();
-  searchFormData.datetimerange = getStartAndEnd(0);
+  searchFormData.datetimerange = getStartAndEnd(0) as [DateModelType, DateModelType];
 }
 // 下载
 function handleCommandDown(val: string) {
