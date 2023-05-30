@@ -94,7 +94,7 @@ defineExpose({ getQueryList });
   background: #fff;
 
   &.maxheight {
-    height: calc(100vh - 189px);
+    height: calc(100vh - 240px);
     overflow: auto;
   }
 }
