@@ -175,7 +175,7 @@ const ttlUnitOptions = [
   { label: '天', value: 'day' },
 ];
 
-const { maxTableHeight } = useTableHeight(400);
+const { maxTableHeight } = useTableHeight(420);
 const storageSideRef = ref<InstanceType<typeof StorageSide>>();
 const currentStorage = ref('');
 const searchKeyword = ref('');
