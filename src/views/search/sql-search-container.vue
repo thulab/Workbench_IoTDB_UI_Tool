@@ -37,7 +37,7 @@
     <el-dialog title="保存模板" v-model="nameDialogVisible" width="400px">
       <el-form ref="saveFormRef" :model="saveForm" :rules="saveFormRules" label-position="left">
         <el-form-item label="名称：" prop="sqlName" :error="errorNameTip">
-          <el-input v-model="saveForm.sqlName" placeholder="请输入" maxlength="25" @blur="handleInputName" />
+          <el-input v-model="saveForm.sqlName" placeholder="请输入" maxlength="25" @blur="handleInputName" show-word-limit />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -54,7 +54,7 @@
           <el-input v-model="resaveForm.oldSqlName" disabled />
         </el-form-item>
         <el-form-item label="新名称：" prop="sqlName" :error="errorRenameTip" inline-message>
-          <el-input v-model="resaveForm.sqlName" placeholder="请输入" maxlength="25" @blur="handleInputRename" />
+          <el-input v-model="resaveForm.sqlName" placeholder="请输入" maxlength="25" @blur="handleInputRename" show-word-limit />
         </el-form-item>
       </el-form>
       <template #footer>

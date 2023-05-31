@@ -8,7 +8,7 @@
   >
     <el-form ref="formRef" :model="formData" :rules="rules" class="source-form" label-position="left" label-width="120px">
       <el-form-item label="数据库名称" prop="groupName">
-        <el-input v-model="formData.groupName" placeholder="请输入数据库名称" maxlength="59">
+        <el-input v-model="formData.groupName" placeholder="请输入数据库名称" maxlength="59" show-word-limit>
           <template #prepend>root.</template>
         </el-input>
       </el-form-item>
@@ -18,7 +18,7 @@
         </template>
         <el-input v-model="formData.ttl" min="0" max="9007199254740992" class="ttl-input">
           <template #append>
-            <el-select v-model="formData.ttlUnit" style="width: 80px;" clearable placeholder="">
+            <el-select v-model="formData.ttlUnit" style="width: 80px;" placeholder="">
               <el-option label="毫秒" value="millisecond" />
               <el-option label="秒" value="second" />
               <el-option label="分" value="minute" />
@@ -98,7 +98,7 @@ const handleConfirm = () => {
         ElMessage.error('存活时间不能超过9007199254740992');
         return;
       }
-      if ((formData.ttl && !formData.ttlUnit) || (!formData.ttl && formData.ttlUnit)) {
+      if (formData.ttl && !formData.ttlUnit) {
         ElMessage.error('存活时间和存活时间单位必须同时填写');
         return;
       }
