@@ -63,7 +63,7 @@ onMounted(() => {
 .el-container {
   display: flex;
   width: 100%;
-  min-width: 960px;
+  min-width: 1320px;
   min-height: 600px;
   height: 100%;
 
