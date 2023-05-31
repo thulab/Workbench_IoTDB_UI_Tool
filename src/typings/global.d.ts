@@ -120,4 +120,10 @@ declare global {
     required?: boolean;
     disabled?: boolean;
   }
+
+  interface SortMethod<T> {
+    column: TableColumnCtx<T>;
+    prop: string;
+    order: 'ascending' | 'descending' | null;
+  }
 }
