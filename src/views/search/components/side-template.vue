@@ -114,7 +114,7 @@ defineExpose({ getQueryList });
     height: 40px;
     font-size: 12px;
     font-weight: 300;
-    line-height: 12px;
+    line-height: 1.2;
     color: #656A85;
 
     &:hover {
