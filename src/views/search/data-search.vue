@@ -97,6 +97,10 @@
           <template #icon><i-ep-arrow-right-bold /></template>
         </el-button>
       </div> -->
+      <div class="table-empty-wrapper" v-if="firstLoad" style="background-color: #fff; height: 400px;">
+        <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+        <span class="data-empty-text">无数据</span>
+      </div>
       <div :loading="getListLoading">
         <div v-if="searchDetailInfos.status">
           <dynamic-table
@@ -147,6 +151,7 @@ const serverId = serverStroe.currentServerId;
 
 const { maxTableHeight } = useTableHeight(420);
 const searchFormRef = ref<FormInstance>();
+const firstLoad = ref(true);
 const timeUnits = [
   { label: '毫秒', value: 'ms' },
   { label: '秒', value: 's' },
@@ -251,6 +256,7 @@ function getListData() {
     ElMessage.error('采样周期填写的情况下请选择采样策略');
     return;
   }
+  firstLoad.value = false;
   columns.value = [];
   tableData.value = [];
 
@@ -410,6 +416,7 @@ function handleCommandDown(val: string) {
 }
 
 onMounted(() => {
+  firstLoad.value = true;
   handleReset();
 });
 
