@@ -41,7 +41,7 @@
         </ul>
       </div> -->
 
-    <el-input class="m-y-10" :disabled="!deviceName" v-model="filterMeasurementText" placeholder="输入关键字进行过滤" @input="handleInput('measurement')">
+    <el-input class="m-y-10" :disabled="!deviceName" v-model="filterMeasurementText" placeholder="请输入测点名称" @input="handleInput('measurement')">
       <template #suffix><i-ep-search /></template>
     </el-input>
     <!-- <el-input placeholder="请选择物理量名称" v-model="measurementName" readonly :disabled="!deviceName" @focus="handleVisible('measurement', true)" />

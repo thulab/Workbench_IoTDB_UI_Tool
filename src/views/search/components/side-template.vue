@@ -154,7 +154,7 @@ defineExpose({ getQueryList });
     position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     height: 40px;
     font-size: 12px;
     font-weight: 300;
