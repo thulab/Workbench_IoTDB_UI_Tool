@@ -460,7 +460,7 @@ function emptyQuery() {
 
   .export-btn{
     position: relative;
-    padding: 0 12px;
+    padding: 2px 12px;
 
     .export-tip{
       position: absolute;
