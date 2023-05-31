@@ -64,7 +64,7 @@ onMounted(() => {
   display: flex;
   width: 100%;
   min-width: 960px;
-  min-height: 800px;
+  min-height: 600px;
   height: 100%;
 
   .el-aside {
