@@ -439,7 +439,7 @@ watch(
     font-size: 12px;
     font-weight: 300;
     line-height: 12px;
-    color: #656A85;
+    color: #495AD4;
     display: flex;
     align-items: center;
 
