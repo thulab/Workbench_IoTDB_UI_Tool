@@ -85,10 +85,10 @@
 </template>
 <script lang="ts" setup>
 import dayjs from 'dayjs';
-import { handleExport } from '@/utils/export';
+// import { handleExport } from '@/utils/export';
 import DynamicTable from '@/components/dynamic-table.vue';
 import { SearchApi } from '@/api';
-import { showErrorFn } from '@/composition-api/base/useRequest';
+// import { showErrorFn } from '@/composition-api/base/useRequest';
 import CodeEditor from './code-editor.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
@@ -133,7 +133,7 @@ const pagination = reactive({
 
 const { requestFn: queryStop } = useRequest(SearchApi.queryStop);
 const { requestFn: querySql } = useRequest(SearchApi.querySql);
-const { requestFn: exportDataSql } = useRequest(SearchApi.exportDataSql);
+// const { requestFn: exportDataSql } = useRequest(SearchApi.exportDataSql);
 
 function getList(index: number) {
   return (value: any) => {
@@ -241,25 +241,30 @@ function stopquery() {
   queryStop(props.serverId, timeNumber.value).then(() => {});
 }
 function exportSql(val: string, exportType: string) {
-  exportDataSql(props.serverId, val, exportType).then((res) => {
-    if (res) {
-      ElMessage.success('导出成功');
-      handleExport(res, `export.${exportType}`);
-    } else {
-      ElMessage.info('导出未完成');
-    }
-  }).catch((err) => {
-    if (err.message) {
-      ElMessage.error(err.message);
-    } else if (err.type === 'application/json') {
-      err.text().then((str: string) => {
-        const data = JSON.parse(str);
-        showErrorFn(data);
-      });
-    } else {
-      ElMessage.error('导出失败');
-    }
-  });
+  // exportDataSql(props.serverId, val, exportType).then((res) => {
+  //   if (res) {
+  //     ElMessage.success('导出成功');
+  //     handleExport(res, `export.${exportType}`);
+  //   } else {
+  //     ElMessage.info('导出未完成');
+  //   }
+  // }).catch((err) => {
+  //   if (err.message) {
+  //     ElMessage.error(err.message);
+  //   } else if (err.type === 'application/json') {
+  //     err.text().then((str: string) => {
+  //       const data = JSON.parse(str);
+  //       showErrorFn(data);
+  //     });
+  //   } else {
+  //     ElMessage.error('导出失败');
+  //   }
+  // });
+  let url = `/api/file/exportExcelSqlData?serverId=${props.serverId}&sql=${val}`;
+  if (exportType === 'csv') {
+    url = `/api/file/exportCSVSqlData?serverId=${props.serverId}&sql=${val}`;
+  }
+  window.open(url);
 }
 // 下载
 function handleCommandDown(val: string, index: number) {
