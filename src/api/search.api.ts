@@ -37,17 +37,17 @@ class SearchApi {
   // Import query
   static exportDataSql(serverId: number, sql: string, exportType: string = 'csv'): HttpResponseP {
     if (exportType === 'csv') {
-      return http.get('/file/exportCSVSqlData', { params: { sql, serverId } });
+      return http.get('/file/exportCSVSqlData', { params: { sql, serverId }, timeout: 60 * 30 * 1000 });
     }
-    return http.get('/file/exportExcelSqlData', { params: { sql, serverId }, responseType: 'blob' });
+    return http.get('/file/exportExcelSqlData', { params: { sql, serverId }, timeout: 60 * 30 * 1000, responseType: 'blob' });
   }
 
   // Import query
   static exportData(serverId: number, data: Search.QueryDataParams, exportType: string = 'csv'): HttpResponseP {
     if (exportType === 'csv') {
-      return http.post('/file/exportCSVData', data, { params: { serverId } });
+      return http.post('/file/exportCSVData', data, { params: { serverId }, timeout: 60 * 30 * 1000 });
     }
-    return http.post('/file/exportExcelData', data, { params: { serverId }, responseType: 'blob' });
+    return http.post('/file/exportExcelData', data, { params: { serverId }, timeout: 60 * 30 * 1000, responseType: 'blob' });
   }
 }
 export default SearchApi;
