@@ -14,6 +14,7 @@ const route = [
       title: '告警管理',
       icon: ICustomQuery,
       activeIcon: ICustomQueryActive,
+      order: 30,
     },
     children: [
       {

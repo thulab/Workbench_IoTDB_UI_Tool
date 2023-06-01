@@ -14,6 +14,7 @@ const route = [
       title: '查询',
       icon: ICustomQuery,
       activeIcon: ICustomQueryActive,
+      order: 20,
     },
     children: [
       {

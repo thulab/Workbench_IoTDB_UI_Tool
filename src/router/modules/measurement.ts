@@ -12,6 +12,7 @@ const route = [
       title: '测点管理',
       icon: ICustomStorage,
       activeIcon: ICustomStorageActive,
+      order: 10,
     },
     children: [
       {
