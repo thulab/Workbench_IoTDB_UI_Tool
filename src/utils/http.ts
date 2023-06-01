@@ -1,5 +1,5 @@
 /* eslint-disable prefer-promise-reject-errors */
-import Axios, { type AxiosRequestConfig } from 'axios';
+import Axios, { type InternalAxiosRequestConfig } from 'axios';
 import NProgress from '@/config/nprogress-config';
 
 let requestCount = 0;
@@ -13,18 +13,18 @@ const http = Axios.create({
   },
 });
 
-function requestInterceptor(config: AxiosRequestConfig) {
+function requestInterceptor(config: InternalAxiosRequestConfig): InternalAxiosRequestConfig {
   if (!config.headers || !config.headers.background) {
     NProgress.start();
     requestCount += 1;
   }
-  if (config && config.headers) {
-    config.headers.Authorization = localStorage.getItem('authorization') || '';
-  } else {
-    config.headers = {
-      Authorization: localStorage.getItem('authorization') || '',
-    };
-  }
+  // if (config && config.headers) {
+  //   config.headers.Authorization = localStorage.getItem('authorization') || '';
+  // } else {
+  //   config.headers = {
+  //     Authorization: localStorage.getItem('authorization') || '',
+  //   };
+  // }
   return config;
 }
 
@@ -46,7 +46,11 @@ async function responseInterceptor(response: HttpResponse<object>) {
   if (success || code === 0) {
     return Promise.resolve(response);
   }
-  if (response.headers['content-disposition'] && response.headers['content-disposition'].indexOf('attachment') > -1) {
+  // 如果是下载文件，并且返回类型是正确的blob 直接返回
+  if (response.headers['content-disposition']
+      && response.headers['content-disposition'].indexOf('attachment') > -1
+      && data instanceof Blob
+      && data.type !== 'application/json') {
     return Promise.resolve(response);
   }
   if (code === 1009 && localStorage.getItem('enabledSSO') !== 'true') {

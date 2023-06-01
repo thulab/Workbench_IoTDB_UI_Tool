@@ -394,8 +394,6 @@ function handleExportData(exportType: string) {
     } else {
       ElMessage.info('导出未完成');
     }
-  }).catch((err) => {
-    ElMessage.error(err.message);
   });
 }
 
