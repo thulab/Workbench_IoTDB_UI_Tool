@@ -2,6 +2,11 @@ import http from '@/utils/http';
 
 // 告警
 class AlarmApi {
+  // 获取枚举
+  static getConfigEnum(): HttpResponseP {
+    return http.post('/enum/get');
+  }
+
   // 获取告警配置列表
   static getAlarmConfigList(data: Alarm.QueryConfigParams): HttpResponseP<Alarm.QueryConfigResultList> {
     return http.post('/alarm/getConf', data);

@@ -43,6 +43,12 @@ class StorageApi {
     return http.post('/schema/getMeasurementsByFuzzy', { keyword }, { params: { serverId } });
   }
 
+  // 模糊匹配物理量
+  static getMeasurementAllObjList(serverId: number, keyword: string):HttpResponseP<{ measurements
+  :StorageDevice.MeasurementDataItem[] }> {
+    return http.post('/schema/getMeasurementsByFuzzyV2', { keyword, size: 100 }, { params: { serverId } });
+  }
+
   // 根据路径和关键词查物理量
   static getMeasurementsInfosByFuzzy(serverId: number, data: Record<string, string | number | Date | null> & PageQuery):HttpResponseP<StorageDevice.GetMeasurementsInfosByFuzzyRes> {
     return http.post('/schema/getMeasurementsInfosByFuzzy', data, { params: { serverId } });

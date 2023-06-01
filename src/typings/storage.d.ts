@@ -59,4 +59,9 @@ declare namespace StorageDevice{
     failNum: number;
     filePath: string;
   }
+
+  export interface MeasurementDataItem {
+    timeseries: string;
+    dataType: IotdbDataType;
+  }
 }

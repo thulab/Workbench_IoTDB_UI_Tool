@@ -21,8 +21,9 @@
               remote-show-suffix
               :remote-method="remoteMethod"
               :loading="measurementLoading"
+              @change="handleChangePath"
             >
-              <el-option v-for="item in measurementList" :key="item" :label="item" :value="item" />
+              <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" />
             </el-select>
           </el-form-item>
         </el-col>
@@ -155,11 +156,11 @@ const formData = reactive<Alarm.ConfigData>({
   alarmDuration: '',
   alarmDurationType: '',
 });
-const measurementList = ref<string[]>([]);
+const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);
 const { requestFn: saveAlarmConfig } = useRequest(AlarmApi.saveAlarmConfig);
 const { requestFn: updateAlarmConfig } = useRequest(AlarmApi.updateAlarmConfig);
 const { requestFn: getAlarmConfigDetail } = useRequest(AlarmApi.getAlarmConfigDetail);
-const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementAllList);
+const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementAllObjList);
 
 let lastMeasurementQuery = '';
 const remoteMethod = debounce((query: string) => {
@@ -175,6 +176,11 @@ function getDetail() {
   getAlarmConfigDetail(props.alarmConfId).then((res) => {
     assign(formData, res.data);
   });
+}
+
+function handleChangePath(val: string) {
+  const current = measurementList.value.find((f) => f.timeseries === val);
+  formData.measurementType = current?.dataType;
 }
 
 /**
@@ -216,6 +222,8 @@ watch(
       if (props.editType === 'edit') {
         formData.alarmConfId = props.alarmConfId;
         getDetail();
+      } else {
+        remoteMethod('');
       }
     }
   },
