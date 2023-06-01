@@ -77,7 +77,7 @@
         <div class="page-detail-buttons">
           <el-button @click="handleSearch" :disabled="getListLoading">刷新</el-button>
           <el-dropdown class="more-icon m-l-12" :disabled="getListLoading" v-show="searchDetailInfos.status && tableData.length > 0" @command="val => handleCommandDown(val)">
-            <el-button class="export-btn">数据导出<el-tooltip effect="light" content="excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-custom-question /></el-tooltip></el-button>
+            <el-button class="export-btn">数据导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top"><i-custom-question /></el-tooltip></el-button>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
@@ -391,6 +391,7 @@ function handleExportData(exportType: string) {
     if (exportType === 'csv') {
       url = `/api/file/exportCSVData?serverId=${serverId}&exportId=${res.data}`;
     }
+    console.log(url, 'url');
     window.open(url);
   });
 }
