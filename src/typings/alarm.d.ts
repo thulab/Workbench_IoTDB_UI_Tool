@@ -1,32 +1,33 @@
 declare namespace Alarm{
   export interface QueryConfigParams {
-    alarmName: string;
-    measurements: string[];
-    alarmLevel?: string;
-    status?: string;
-    createStartTime?: DateModelType;
-    createEndTime?: DateModelType;
-    updateStartTime?: DateModelType;
-    updateEndTime?: DateModelType;
-    size: number;
-    page: number;
+    alarmName: string | null;
+    measurements: string[] | null;
+    alarmLevel?: string | null;
+    status?: string | number | null;
+    createStartTime?: DateModelType | null;
+    createEndTime?: DateModelType | null;
+    updateStartTime?: DateModelType | null;
+    updateEndTime?: DateModelType | null;
+    orderBy: string;
+    asc: string;
   }
 
   export interface QueryConfigResult {
     alarmConfId: number;
     alarmName: string;
-    measurements: string;
+    measurement: string;
     alarmLevel: string;
     alarmDesc: string;
     alarmRule: string;
-    status: string;
+    status: number;
     createTime: DateModelType;
     updateTime: DateModelType;
   }
 
   export interface QueryConfigResultList {
-    data: QueryConfigResult[];
+    list: QueryConfigResult[];
     totalCount: number;
+    totalPage: number;
   }
 
   export interface ConfigData {
@@ -66,7 +67,8 @@ declare namespace Alarm{
   }
 
   export interface QueryRecordResultList {
-    data: QueryRecordResult[];
+    list: QueryRecordResult[];
     totalCount: number;
+    totalPage: number;
   }
 }

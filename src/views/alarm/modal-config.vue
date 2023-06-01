@@ -125,7 +125,7 @@ const props = defineProps<{
   serverId: number;
   visible: boolean;
   editType: string;
-  alarmConfId: number;
+  alarmConfId?: number;
 }>();
 
 const emit = defineEmits<{

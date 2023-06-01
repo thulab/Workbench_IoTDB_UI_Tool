@@ -7,20 +7,20 @@
         </el-form-item>
         <el-form-item label="告警序列:" prop="measurements">
           <template #label>
-            告警序列:<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
+            告警序列:<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
           </template>
           <timeseries-select v-model="searchFormData.measurements" :server-id="serverId" :is-show-view-btn="true" />
         </el-form-item>
         <el-form-item label="告警级别:" prop="alarmLevel">
           <template #label>
-            告警级别:<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减" placement="top"><i-custom-question /></el-tooltip>
+            告警级别:<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减。" placement="top"><i-custom-question /></el-tooltip>
           </template>
           <el-select v-model="searchFormData.alarmLevel">
-            <el-option v-for="item in levelOptions" :key="item.value" :value="item.value" :label="item.label" />
+            <el-option v-for="item in levelOptions" :key="item.value" :value="item.value" :label="item.name" />
           </el-select>
         </el-form-item>
         <el-form-item label="状态:" prop="status">
-          <el-select v-model="searchFormData.status" style="width: 120px;" clearable>
+          <el-select v-model="searchFormData.status" style="width: 120px;">
             <el-option v-for="item in statusOptions" :key="item.value" :value="item.value" :label="item.label" />
           </el-select>
         </el-form-item>
@@ -59,7 +59,7 @@
       </div>
       <div class="page-table-box">
         <el-table
-          :data="tableData"
+          :data="tableData.list"
           v-loading="loading"
           style="width: 100%;"
           :max-height="maxTableHeight"
@@ -70,21 +70,30 @@
             overflow: 'hidden',
             background: '#F0F1FA',
           }"
+          :default-sort="{ prop: 'createTime', order: 'descending' }"
           @selection-change="handleSelectionChange"
           @sort-change="handleSortChange"
         >
           <el-table-column type="selection" width="55" />
           <el-table-column label="告警序列" prop="measurement" min-width="240" show-overflow-tooltip />
           <el-table-column label="告警名称" prop="alarmName" width="160" show-overflow-tooltip />
-          <el-table-column label="告警级别" prop="alarmLevel" sortable="custom" width="140" show-overflow-tooltip />
+          <el-table-column label="告警级别" prop="alarmLevel" sortable="custom" width="140" show-overflow-tooltip>
+            <template #default="{ row }">
+              {{ getOptionField(row.alarmLevel, enumStore.alarmLevelEnum) }}
+            </template>
+          </el-table-column>
           <el-table-column label="创建时间" prop="createTime" sortable="custom" min-width="140" show-overflow-tooltip />
           <el-table-column label="更新时间" prop="updateTime" sortable="custom" min-width="140" show-overflow-tooltip />
           <el-table-column label="告警描述" prop="alarmDesc" min-width="140" show-overflow-tooltip />
           <el-table-column label="告警规则" prop="alarmRule" min-width="240" show-overflow-tooltip />
-          <el-table-column label="状态" prop="status" min-width="240" show-overflow-tooltip />
+          <el-table-column label="状态" prop="status" min-width="90" show-overflow-tooltip>
+            <template #default="{ row }">
+              {{ getOptionField(row.status, statusOptions, 'value', 'label') }}
+            </template>
+          </el-table-column>
           <el-table-column label="操作" width="240" fixed="right">
             <template #default="{ row }">
-              <el-button type="primary" link size="small" @click="handleStatus(row)">{{ row.status ? '禁用' : '启用' }}</el-button>
+              <el-button v-if="row.status !== 3" type="primary" link size="small" @click="handleStatus(row)">{{ row.status === 1 ? '禁用' : '启用' }}</el-button>
               <el-button type="primary" link size="small" @click="handleEdit(row)">编辑</el-button>
               <el-button type="primary" link size="small" @click="handleDel('row', row)">删除</el-button>
             </template>
@@ -125,35 +134,32 @@
 import type {
   FormInstance, DateModelType,
 } from 'element-plus';
-// import dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import {
   getStartAndEnd, today, getOneInterval, getOneIntervalNow,
 } from '@/utils/date';
+import { getOptionField } from '@/utils/format';
 import { AlarmApi } from '@/api';
-import { useServerStore } from '@/stores';
+import { useServerStore, useEnumStore } from '@/stores';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import modalConfig from './modal-config.vue';
 
 const serverStroe = useServerStore();
 const serverId = serverStroe.currentServerId;
+const enumStore = useEnumStore();
 
 const { maxTableHeight } = useTableHeight(420);
 const searchFormRef = ref<FormInstance>();
-const levelOptions = [
-  { label: '全部', value: '' },
-  { label: '一级', value: '1' },
-  { label: '二级', value: '2' },
-  { label: '三级', value: '3' },
-  { label: '四级', value: '4' },
-  { label: '五级', value: '5' },
-];
+const levelOptions = [{ name: '全部', value: '' }].concat(enumStore.alarmLevelEnum);
 const statusOptions = [
   { label: '全部', value: '' },
-  { label: '启用', value: '0' },
-  { label: '禁用', value: '1' },
-  { label: '失效', value: '2' },
+  { label: '启用', value: 1 },
+  { label: '禁用', value: 2 },
+  { label: '失效', value: 3 },
 ];
 const searchFormData = reactive({
+  orderBy: '',
+  asc: '',
   alarmName: '',
   measurements: [] as string[],
   createtimerange: null as unknown as [DateModelType, DateModelType],
@@ -180,35 +186,37 @@ const shortcutsDaterange = [
   },
 ];
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
-const tableData = ref<Record<string, any>[]>([]);
 const pagination = reactive({
   pageSize: 10,
   pageNum: 1,
 });
 const totalCount = ref(0);
-const loading = ref(false);
 const multipleSelection = ref<Alarm.QueryConfigResult[]>([]);
 const editVisible = ref(false);
 const editType = ref('add');
 const alarmConfId = ref();
 
-// const { requestFn: getAlarmConfigList, data: tableData, loading } = useRequest(AlarmApi.getAlarmConfigList);
+const { requestFn: getAlarmConfigList, data: tableData, loading } = useRequest(AlarmApi.getAlarmConfigList, {
+  initData: {
+    totalCount: 0,
+    totalPage: 1,
+    list: [],
+  },
+});
 const { requestFn: deleteAlarmConfig } = useRequest(AlarmApi.deleteAlarmConfig);
+const { requestFn: updateAlarmConfigStatus } = useRequest(AlarmApi.updateAlarmConfigStatus);
 
 function getListData() {
-  // getAlarmConfigList({
-  //   ...searchFormData,
-  //   createStartTime: searchFormData.createtimerange ? dayjs(searchFormData.createtimerange[0]).valueOf() : null,
-  //   createEndTime: searchFormData.createtimerange ? dayjs(searchFormData.createtimerange[1]).valueOf() : null,
-  //   updateStartTime: searchFormData.updatetimerange ? dayjs(searchFormData.updatetimerange[0]).valueOf() : null,
-  //   updateEndTime: searchFormData.updatetimerange ? dayjs(searchFormData.updatetimerange[1]).valueOf() : null,
-  //   size: pagination.pageSize,
-  //   page: pagination.pageNum,
-  // }).then((res) => {
-  //   if (res.code === 0) {
-  //     totalCount.value = res.data.totalCount;
-  //   }
-  // });
+  getAlarmConfigList({
+    ...pagination,
+    ...searchFormData,
+    createStartTime: searchFormData.createtimerange ? dayjs(searchFormData.createtimerange[0]).valueOf() : null,
+    createEndTime: searchFormData.createtimerange ? dayjs(searchFormData.createtimerange[1]).valueOf() : null,
+    updateStartTime: searchFormData.updatetimerange ? dayjs(searchFormData.updatetimerange[0]).valueOf() : null,
+    updateEndTime: searchFormData.updatetimerange ? dayjs(searchFormData.updatetimerange[1]).valueOf() : null,
+  }).then((res) => {
+    totalCount.value = res.data.totalCount;
+  });
 }
 
 // 重置
@@ -237,16 +245,24 @@ function handleSelectionChange(vals: Alarm.QueryConfigResult[]) {
   multipleSelection.value = vals;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleSortChange({ column, prop, order }:SortMethod<Alarm.QueryConfigResult>) {
-  console.log(column, prop, order);
+  searchFormData.asc = order === 'ascending' ? 'asc' : 'desc';
+  searchFormData.orderBy = prop;
+  handleSearch();
 }
 
 function handleStatus(row: Alarm.QueryConfigResult) {
-  console.log(row, '状态');
+  const { status } = row;
+  updateAlarmConfigStatus(row.alarmConfId, status === 1 ? 2 : 1).then(() => {
+    ElMessage.success('状态更新成功');
+    row.status = status === 1 ? 2 : 1;
+  });
 }
 
 function handleAdd() {
   editType.value = 'add';
+  alarmConfId.value = undefined;
   editVisible.value = true;
 }
 
@@ -254,7 +270,6 @@ function handleEdit(row: Alarm.QueryConfigResult) {
   editType.value = 'edit';
   alarmConfId.value = row.alarmConfId;
   editVisible.value = true;
-  console.log(row, '编辑');
 }
 
 function handleDel(type: string, data: Alarm.QueryConfigResult | null) {

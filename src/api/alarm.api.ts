@@ -8,7 +8,7 @@ class AlarmApi {
   }
 
   // 获取告警配置列表
-  static getAlarmConfigList(data: Alarm.QueryConfigParams): HttpResponseP<Alarm.QueryConfigResultList> {
+  static getAlarmConfigList(data: Alarm.QueryConfigParams & PageQuery): HttpResponseP<Alarm.QueryConfigResultList> {
     return http.post('/alarm/getConf', data);
   }
 
@@ -30,6 +30,11 @@ class AlarmApi {
   // 获取告警配置详情
   static getAlarmConfigDetail(alarmConfId: number): HttpResponseP<Alarm.ConfigData> {
     return http.get('/alarm/getConfDetail', { params: { alarmConfId } });
+  }
+
+  // 更新告警配置状态
+  static updateAlarmConfigStatus(alarmConfId: number, status: number): HttpResponseP {
+    return http.get('/alarm/updateStatus', { params: { alarmConfId, status } });
   }
 
   // 获取告警记录列表

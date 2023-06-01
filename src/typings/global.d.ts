@@ -124,6 +124,6 @@ declare global {
   interface SortMethod<T> {
     column: TableColumnCtx<T>;
     prop: string;
-    order: 'ascending' | 'descending' | null;
+    order: 'ascending' | 'descending';
   }
 }
