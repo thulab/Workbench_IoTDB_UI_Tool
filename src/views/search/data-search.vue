@@ -142,7 +142,6 @@ import {
   getStartAndEnd, today, getOneDay, getOneInterval, todayNow, getOneIntervalNow,
 } from '@/utils/date';
 import { formatTimeseries } from '@/utils/format';
-import { handleExport } from '@/utils/export';
 import DynamicTable from '@/components/dynamic-table.vue';
 import { useServerStore } from '@/stores';
 
@@ -376,7 +375,7 @@ function handleExportData(exportType: string) {
     startTime = dayjs(copySearchFormData.datetimerange[0]).valueOf();
     endTime = dayjs(copySearchFormData.datetimerange[1]).valueOf();
   }
-  exportData(serverId, {
+  exportData({
     measurements: copySearchFormData.path,
     startTime,
     endTime,
@@ -387,13 +386,12 @@ function handleExportData(exportType: string) {
     ssize: pagination.columnSize,
     size: pagination.pageSize,
     page: pagination.pageNum,
-  }, exportType).then((res) => {
-    if (res) {
-      ElMessage.success('导出成功');
-      handleExport(res, `export.${exportType}`);
-    } else {
-      ElMessage.info('导出未完成');
+  }).then((res) => {
+    let url = `/api/file/exportExcelData?serverId=${serverId}&exportId=${res.data}`;
+    if (exportType === 'csv') {
+      url = `/api/file/exportCSVData?serverId=${serverId}&exportId=${res.data}`;
     }
+    window.open(url);
   });
 }
 

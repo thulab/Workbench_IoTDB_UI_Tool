@@ -64,16 +64,6 @@ class StorageApi {
     return http.post('/schema/deleteMeasurements', { measurementList }, { params: { serverId } });
   }
 
-  // 下载物理量导入模版
-  static downloadMeasurementTemplate() {
-    return http.get('/file/exportMeasurementTemplate', { timeout: 60 * 30 * 1000 });
-  }
-
-  // 下载导入物理量错误表
-  static downloadMeasurementErrorInfo(fileName: string) {
-    return http.get('/file/downloadMeasurementErrorInfo', { params: { fileName }, timeout: 60 * 30 * 1000 });
-  }
-
   // 导入物理量
   static importMeasurementData(serverId: number, data: FormData, fileType: string = 'csv'): HttpResponseP<StorageDevice.ImportMeasurementDataRes> {
     if (fileType === 'csv') {
@@ -83,11 +73,8 @@ class StorageApi {
   }
 
   // 导出物理量
-  static exportMeasurementData(serverId: number, data: Record<string, string | number | Date | null> & PageQuery, fileType: string = 'csv'): HttpResponseP {
-    if (fileType === 'csv') {
-      return http.post('/file/exportCSVMeasurementData', data, { params: { serverId }, timeout: 60 * 30 * 1000 });
-    }
-    return http.post('/file/exportExcelMeasurementData', data, { params: { serverId }, timeout: 60 * 30 * 1000, responseType: 'blob' });
+  static exportMeasurementData(data: Record<string, string | number | Date | null> & PageQuery): HttpResponseP {
+    return http.post('/file/measurementDataExportId', data);
   }
 }
 export default StorageApi;

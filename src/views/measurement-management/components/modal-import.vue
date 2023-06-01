@@ -93,7 +93,6 @@ import { genFileId } from 'element-plus';
 import type {
   UploadInstance, UploadProps, UploadRawFile,
 } from 'element-plus';
-// import { handleExport } from '@/utils/export';
 import { StorageApi } from '@/api';
 
 const props = defineProps<{
@@ -106,8 +105,6 @@ const emit = defineEmits<{
   (e: 'handle-close', reload: boolean): void;
 }>();
 
-// const { requestFn: downloadMeasurementTemplate } = useRequest(StorageApi.downloadMeasurementTemplate);
-// const { requestFn: downloadMeasurementErrorInfo } = useRequest(StorageApi.downloadMeasurementErrorInfo);
 const { requestFn: importMeasurementData } = useRequest(StorageApi.importMeasurementData);
 
 const dialogVisible = useVModel(props, 'visible', emit);
@@ -125,20 +122,10 @@ const uploadResult = reactive({
 
 // 下载模板
 function downloadTemplate() {
-  // downloadMeasurementTemplate().then((res) => {
-  //   if (res) {
-  //     handleExport(res, 'moban.csv');
-  //   }
-  // });
   window.open('/api/file/exportMeasurementTemplate');
 }
 
 function handleDownError() {
-  // downloadMeasurementErrorInfo(uploadResult.filePath).then((res) => {
-  //   if (res) {
-  //     handleExport(res, uploadResult.filePath);
-  //   }
-  // });
   window.open(`/api/file/downloadMeasurementErrorInfo?fileName=${uploadResult.filePath}`);
 }
 

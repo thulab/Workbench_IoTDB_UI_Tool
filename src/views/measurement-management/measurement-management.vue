@@ -156,7 +156,6 @@
 <script setup lang="ts">
 import { useTableHeight } from '@/composition-api';
 import { StorageApi } from '@/api';
-import { handleExport } from '@/utils/export';
 import { useServerStore } from '@/stores';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import StorageSide from './components/storage-side.vue';
@@ -295,19 +294,16 @@ function onChangePage(page: number) {
 
 // 导出
 function handleExportData(exportType: string) {
-  exportMeasurementData(serverId, {
+  exportMeasurementData({
     pathName: currentStorage.value,
     keyword: searchKeyword.value,
     ...pagination,
-  }, exportType).then((res) => {
-    if (res) {
-      ElMessage.success('导出成功');
-      handleExport(res, `export.${exportType}`);
-    } else {
-      ElMessage.info('导出未完成');
+  }).then((res) => {
+    let url = `/api/file/exportExcelMeasurementData?serverId=${serverId}&exportId=${res.data}`;
+    if (exportType === 'csv') {
+      url = `/api/file/exportCSVMeasurementData?serverId=${serverId}&exportId=${res.data}`;
     }
-  }).catch((err) => {
-    ElMessage.error(err.message);
+    window.open(url);
   });
 }
 
