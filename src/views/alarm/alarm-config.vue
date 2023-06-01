@@ -11,7 +11,7 @@
           </template>
           <timeseries-select v-model="searchFormData.measurements" :server-id="serverId" :is-show-view-btn="true" />
         </el-form-item>
-        <el-form-item label="告警级别:" prop="level">
+        <el-form-item label="告警级别:" prop="alarmLevel">
           <template #label>
             告警级别:<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减" placement="top"><i-custom-question /></el-tooltip>
           </template>
@@ -85,7 +85,7 @@
           <el-table-column label="操作" width="240" fixed="right">
             <template #default="{ row }">
               <el-button type="primary" link size="small" @click="handleStatus(row)">{{ row.status ? '禁用' : '启用' }}</el-button>
-              <el-button type="primary" link size="small" @click="handleEdit(row)">删除</el-button>
+              <el-button type="primary" link size="small" @click="handleEdit(row)">编辑</el-button>
               <el-button type="primary" link size="small" @click="handleDel('row', row)">删除</el-button>
             </template>
           </el-table-column>

@@ -26,5 +26,23 @@ class AlarmApi {
   static getAlarmConfigDetail(alarmConfId: number): HttpResponseP<Alarm.ConfigData> {
     return http.get('/alarm/getConfDetail', { params: { alarmConfId } });
   }
+
+  // 获取告警记录列表
+  static getAlarmRecordList(data: Alarm.QueryRecordParams): HttpResponseP<Alarm.QueryRecordResultList> {
+    return http.post('/alarm/getRecords', data);
+  }
+
+  // 删除告警记录
+  static deleteAlarmRecord(data: number[]): HttpResponseP {
+    return http.post('/alarm/deleteRecords', { alarmRecordIds: data });
+  }
+
+  // 导出告警记录
+  static exportAlarmRecord(data: Record<string, string | number | Date | string[] | null | any>, fileType: string = 'csv'): HttpResponseP {
+    if (fileType === 'csv') {
+      return http.post('/file/exportCSVAlarmRecordData', data, { timeout: 60 * 30 * 1000 });
+    }
+    return http.post('/file/exportExcelAlarmRecordData', data, { timeout: 60 * 30 * 1000 });
+  }
 }
 export default AlarmApi;
