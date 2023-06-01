@@ -13,9 +13,9 @@
       <h4 class="storage-info-title">数据库信息</h4>
       <div class="page-info-box">
         <ul class="storage-info-list">
-          <li class="storage-info-item"><i-custom-storage-num /><span class="storage-info-item-label">数据库名称：</span><text-tooltip :content="currentStorage" /></li>
+          <li class="storage-info-item"><el-icon size="24"><i-custom-storage-num /></el-icon><span class="storage-info-item-label">数据库名称：</span><text-tooltip :content="currentStorage" /></li>
           <li class="storage-info-item storage-info-item-ttl">
-            <i-custom-time />
+            <el-icon size="24"><i-custom-time /></el-icon>
             <span class="storage-info-item-label">数据保存时间：<el-tooltip effect="light" content="数据保存时间（TTL），到期后系统将自动删除数据，此处不填代表永久存储" placement="top"><i-custom-question class="ttl-tip" /></el-tooltip></span>
             <span v-if="!editTTL">{{ storageInfos?.ttl ? (storageInfos.ttl + getTtlTimeUnit(storageInfos.ttlUnit, ttlUnitOptions)) : '∞'}}</span>
             <div v-if="currentStorage && editTTL" class="edit-ttl-box">
@@ -36,9 +36,9 @@
             <el-button link v-if="currentStorage && !editTTL" class="m-l-12" @click="handleEditTTL"><i-custom-edit /></el-button>
           </li>
           <br>
-          <li class="storage-info-item"><i-custom-device-num /><span class="storage-info-item-label">设备数量：</span>{{ storageInfos?.deviceCount || 0 }}</li>
-          <li class="storage-info-item"><i-custom-measure-num /><span class="storage-info-item-label">测点数量：</span>{{ storageInfos?.measurementCount || 0 }}</li>
-          <li class="storage-info-item"><i-custom-total-num /><span class="storage-info-item-label">数据总量：</span>{{ storageInfos?.dataCount || 0 }}</li>
+          <li class="storage-info-item"><el-icon size="24"><i-custom-device-num /></el-icon><span class="storage-info-item-label">设备数量：</span>{{ storageInfos?.deviceCount || 0 }}</li>
+          <li class="storage-info-item"><el-icon size="24"><i-custom-measure-num /></el-icon><span class="storage-info-item-label">测点数量：</span>{{ storageInfos?.measurementCount || 0 }}</li>
+          <li class="storage-info-item"><el-icon size="24"><i-custom-total-num /></el-icon><span class="storage-info-item-label">数据总量：</span>{{ storageInfos?.dataCount || 0 }}</li>
         </ul>
 
         <div class="page-detail-buttons">
@@ -463,7 +463,7 @@ watch(
     margin: 0 50px 6px 0;
     display: inline-flex;
     align-items: center;
-    width: 180px;
+    width: 240px;
 
     .storage-info-item-label{
       color: #131926;
