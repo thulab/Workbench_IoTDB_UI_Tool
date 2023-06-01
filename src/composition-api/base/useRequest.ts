@@ -67,6 +67,13 @@ export default function useRequest<Requests extends Array<any>, Resp>(apiFn: (..
       })
       .catch((err: HttpError) => {
         error.value = err;
+        if (err.type === 'application/json') {
+          return err.text().then((str: string) => {
+            const formatErr = JSON.parse(str);
+            showErrorFn(formatErr, '文件下载失败');
+            return Promise.reject(data);
+          });
+        }
         showErrorFn(err, options.errMessage);
         return Promise.reject(err);
       })
