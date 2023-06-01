@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <el-container class="layout-wrapper">
     <el-aside v-show="!contentFullScreen">
       <layout-menu />
     </el-aside>
@@ -60,11 +60,15 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+
+.layout-wrapper{
+  min-width: 1320px;
+  min-height: 600px;
+}
+
 .el-container {
   display: flex;
   width: 100%;
-  min-width: 1320px;
-  min-height: 600px;
   height: 100%;
 
   .el-aside {

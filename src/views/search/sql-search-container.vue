@@ -1,5 +1,5 @@
 <template>
-  <el-container class="sql-container">
+  <div class="sql-container">
     <div class="sql-wrapper">
       <div class="sql-search-wrapper">
         <div class="sql-tab-box">
@@ -64,7 +64,7 @@
         </span>
       </template>
     </el-dialog>
-  </el-container>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -357,13 +357,15 @@ watch(
 
 <style lang="scss" scoped>
 .sql-container{
-  // margin: -20px;
-  // background: #dfe1ed;
+  width: 100%;
+  position: relative;
+  height: 100%;
 }
 
 .sql-wrapper {
   width: 100%;
   position: relative;
+  height: 100%;
 
   .el-button:focus-visible {
     outline: none;

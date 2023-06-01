@@ -3,7 +3,7 @@
 
 import { ref, type Ref } from 'vue';
 
-const alertErrorCode = [1001];
+const alertErrorCode = [1001, 9999];
 
 interface Opt<T> {
   initData?: T;
@@ -16,7 +16,7 @@ const showError = (message: string, code?: number) => {
   // 有code 并且在toastErrorCode中 或者 code不包含-的
   if (code && alertErrorCode.includes(code) && !window.__errBoxShowing__) {
     window.__errBoxShowing__ = true;
-    ElMessageBox.alert(message, '提示', {
+    ElMessageBox.alert(message, '错误', {
       confirmButtonText: '确定',
       type: 'error',
     }).then(() => {
