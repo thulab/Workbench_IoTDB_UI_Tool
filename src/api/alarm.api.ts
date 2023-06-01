@@ -38,13 +38,18 @@ class AlarmApi {
   }
 
   // 获取告警记录列表
-  static getAlarmRecordList(data: Alarm.QueryRecordParams): HttpResponseP<Alarm.QueryRecordResultList> {
+  static getAlarmRecordList(data: Alarm.QueryRecordParams & PageQuery): HttpResponseP<Alarm.QueryRecordResultList> {
     return http.post('/alarm/getRecords', data);
   }
 
   // 删除告警记录
   static deleteAlarmRecord(data: number[]): HttpResponseP {
     return http.post('/alarm/deleteRecords', { alarmRecordIds: data });
+  }
+
+  // 更新告警记录状态
+  static updateAlarmRecordStatus(traceId: number): HttpResponseP {
+    return http.get('/alarm/notConcerned', { params: { traceId } });
   }
 
   // 导出告警记录

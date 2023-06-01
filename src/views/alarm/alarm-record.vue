@@ -7,7 +7,7 @@
         </el-form-item>
         <el-form-item label="告警序列:" prop="measurements">
           <template #label>
-            告警序列:<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
+            告警序列:<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
           </template>
           <timeseries-select v-model="searchFormData.measurements" :server-id="serverId" :is-show-view-btn="true" />
         </el-form-item>
@@ -16,7 +16,7 @@
             告警级别:<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减" placement="top"><i-custom-question /></el-tooltip>
           </template>
           <el-select v-model="searchFormData.alarmLevel">
-            <el-option v-for="item in levelOptions" :key="item.value" :value="item.value" :label="item.label" />
+            <el-option v-for="item in levelOptions" :key="item.value" :value="item.value" :label="item.name" />
           </el-select>
         </el-form-item>
         <el-form-item label="告警时间:" prop="createtimerange">
@@ -55,7 +55,7 @@
       </div>
       <div class="page-table-box">
         <el-table
-          :data="tableData"
+          :data="tableData.list"
           v-loading="loading"
           style="width: 100%;"
           :max-height="maxTableHeight"
@@ -66,6 +66,7 @@
             overflow: 'hidden',
             background: '#F0F1FA',
           }"
+          :default-sort="{ prop: 'createTime', order: 'descending' }"
           @selection-change="handleSelectionChange"
           @sort-change="handleSortChange"
         >
@@ -78,7 +79,8 @@
           <el-table-column label="告警描述" prop="alarmDesc" min-width="140" show-overflow-tooltip />
           <el-table-column label="操作" width="180" fixed="right">
             <template #default="{ row }">
-              <el-button type="primary" link size="small" @click="handleEdit(row)">已阅</el-button>
+              <el-button v-if="!row.hasRead" type="primary" link size="small" @click="handleStatus(row)">已阅</el-button>
+              <el-icon v-else size="16"><i-custom-success-green /></el-icon>
               <el-button type="primary" link size="small" @click="handleDel('row', row)">删除</el-button>
             </template>
           </el-table-column>
@@ -117,24 +119,20 @@ import {
   getStartAndEnd, today, getOneInterval, getOneIntervalNow,
 } from '@/utils/date';
 import { AlarmApi } from '@/api';
-import { useServerStore } from '@/stores';
+import { useServerStore, useEnumStore } from '@/stores';
 import { handleExport } from '@/utils/export';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
 const serverStroe = useServerStore();
 const serverId = serverStroe.currentServerId;
+const enumStore = useEnumStore();
 
 const { maxTableHeight } = useTableHeight(420);
 const searchFormRef = ref<FormInstance>();
-const levelOptions = [
-  { label: '全部', value: '' },
-  { label: '一级', value: '1' },
-  { label: '二级', value: '2' },
-  { label: '三级', value: '3' },
-  { label: '四级', value: '4' },
-  { label: '五级', value: '5' },
-];
+const levelOptions = [{ name: '全部', value: '' }].concat(enumStore.alarmLevelEnum);
 const searchFormData = reactive({
+  orderBy: '',
+  asc: '',
   alarmName: '',
   measurements: [] as string[],
   createtimerange: null as unknown as [DateModelType, DateModelType],
@@ -159,31 +157,35 @@ const shortcutsDaterange = [
   },
 ];
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
-const tableData = ref<Record<string, any>[]>([]);
 const pagination = reactive({
   pageSize: 10,
   pageNum: 1,
 });
 const totalCount = ref(0);
-const loading = ref(false);
 const multipleSelection = ref<Alarm.QueryRecordResult[]>([]);
 
-// const { requestFn: getAlarmRecordList, data: tableData, loading } = useRequest(AlarmApi.getAlarmRecordList);
+const { requestFn: getAlarmRecordList, data: tableData, loading } = useRequest(AlarmApi.getAlarmRecordList, {
+  initData: {
+    totalCount: 0,
+    totalPage: 1,
+    list: [],
+  },
+});
 const { requestFn: deleteAlarmRecord } = useRequest(AlarmApi.deleteAlarmRecord);
 const { requestFn: exportAlarmRecord } = useRequest(AlarmApi.exportAlarmRecord);
+const { requestFn: updateAlarmRecordStatus } = useRequest(AlarmApi.updateAlarmRecordStatus);
 
 function getListData() {
-  // getAlarmRecordList({
-  //   ...copySearchFormData,
-  //   createStartTime: copySearchFormData.createtimerange ? dayjs(copySearchFormData.createtimerange[0]).valueOf() : null,
-  //   createEndTime: copySearchFormData.createtimerange ? dayjs(copySearchFormData.createtimerange[1]).valueOf() : null,
-  //   size: pagination.pageSize,
-  //   page: pagination.pageNum,
-  // }).then((res) => {
-  //   if (res.code === 0) {
-  //     totalCount.value = res.data.totalCount;
-  //   }
-  // });
+  getAlarmRecordList({
+    ...copySearchFormData,
+    ...pagination,
+    createStartTime: copySearchFormData.createtimerange ? dayjs(copySearchFormData.createtimerange[0]).valueOf() : null,
+    createEndTime: copySearchFormData.createtimerange ? dayjs(copySearchFormData.createtimerange[1]).valueOf() : null,
+  }).then((res) => {
+    if (res.code === 0) {
+      totalCount.value = res.data.totalCount;
+    }
+  });
 }
 
 // 重置
@@ -213,18 +215,21 @@ function handleSelectionChange(vals: Alarm.QueryRecordResult[]) {
   multipleSelection.value = vals;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleSortChange({ column, prop, order }:SortMethod<Alarm.QueryRecordResult>) {
-  console.log(column, prop, order);
+  searchFormData.asc = order === 'ascending' ? 'asc' : 'desc';
+  searchFormData.orderBy = prop;
+  copySearchFormData = cloneDeep(searchFormData);
+  handleSearch();
 }
 
 // 导出
 function handleCommandDown(val: string) {
   exportAlarmRecord({
     ...copySearchFormData,
+    ...pagination,
     createStartTime: copySearchFormData.createtimerange ? dayjs(copySearchFormData.createtimerange[0]).valueOf() : null,
     createEndTime: copySearchFormData.createtimerange ? dayjs(copySearchFormData.createtimerange[1]).valueOf() : null,
-    size: pagination.pageSize,
-    page: pagination.pageNum,
   }, val).then((res) => {
     if (res) {
       ElMessage.success('导出成功');
@@ -237,8 +242,11 @@ function handleCommandDown(val: string) {
   });
 }
 
-function handleEdit(row: Alarm.QueryRecordResult) {
-  console.log(row, '编辑');
+function handleStatus(row: Alarm.QueryRecordResult) {
+  updateAlarmRecordStatus(row.alarmTraceId).then(() => {
+    ElMessage.success('已阅');
+    handleSearch();
+  });
 }
 
 function handleDel(type: string, data: Alarm.QueryRecordResult | null) {

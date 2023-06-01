@@ -46,23 +46,25 @@ declare namespace Alarm{
   }
 
   export interface QueryRecordParams {
-    alarmName: string;
-    measurements: string[];
-    alarmLevel?: string;
-    status?: string;
-    createStartTime?: DateModelType;
-    createEndTime?: DateModelType;
-    size: number;
-    page: number;
+    alarmName: string | null;
+    measurements: string[] | null;
+    alarmLevel?: string | null;
+    status?: string | null;
+    createStartTime?: DateModelType | null;
+    createEndTime?: DateModelType | null;
+    orderBy: string;
+    asc: string;
   }
 
   export interface QueryRecordResult {
     alarmRecordId: number;
+    alarmTraceId: number;
     alarmName: string;
     measurement: string;
     alarmLevel: string;
     alarmDesc: string;
     alarmValue: DateModelType;
+    hasRead: boolean;
     createTime: DateModelType;
   }
 
