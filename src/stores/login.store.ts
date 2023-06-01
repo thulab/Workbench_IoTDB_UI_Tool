@@ -64,7 +64,6 @@ export const useLoginStore = defineStore('login', () => {
     await SSOApi.isLogin().then((res) => {
       if (!res.data.data) {
         SSOApi.getSsoAuthUrl().then((res1) => {
-          console.log(res1);
           if (res1.data.code === 0) {
             window.location.href = res1.data.data;
           }

@@ -23,7 +23,6 @@ export function handleRouter(routerList: MenuOptions[], newArr: string[] = []) {
 export function registerGuard(router: Router) {
   // * 路由拦截
   router.beforeEach((to, from, next) => {
-    console.log(`进入路由${to.fullPath},来自${from.fullPath}`);
     console.time('页面载入时间');
     NProgress.start();
     useAppStore().routerViewLoading = true;

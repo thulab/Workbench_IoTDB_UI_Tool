@@ -391,7 +391,6 @@ function handleExportData(exportType: string) {
     if (exportType === 'csv') {
       url = `/api/file/exportCSVData?serverId=${serverId}&exportId=${res.data}`;
     }
-    console.log(url, 'url');
     window.open(url);
   });
 }
