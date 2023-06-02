@@ -8,11 +8,6 @@
           :height="height"
           :max-height="maxHeight"
           tooltip-effect="light"
-          :header-cell-style="{
-            color: '#424561',
-            overflow: 'hidden',
-            background: '#F0F1FA',
-          }"
           @selection-change="handleSelectionChange"
         >
           <el-table-column fixed="left" v-if="showSelect" type="selection" width="50" align="center" />

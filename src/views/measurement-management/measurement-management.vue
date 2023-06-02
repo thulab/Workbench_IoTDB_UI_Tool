@@ -88,11 +88,6 @@
             :max-height="maxTableHeight"
             tooltip-effect="light"
             ref="tableRef"
-            :header-cell-style="{
-              color: '#424561',
-              overflow: 'hidden',
-              background: '#F0F1FA',
-            }"
             @selection-change="handleSelectionChange"
           >
             <el-table-column type="selection" width="55" />
@@ -103,9 +98,9 @@
             <el-table-column label="压缩方式" prop="compression" min-width="140" show-overflow-tooltip />
             <el-table-column label="最新值" prop="value" min-width="140" show-overflow-tooltip />
             <el-table-column label="最新值时间" prop="valueTime" min-width="240" show-overflow-tooltip />
-            <el-table-column label="操作" min-width="120">
+            <el-table-column label="操作" width="120" fixed="right">
               <template #default="{ row }">
-                <el-button type="primary" link size="small" class="el-button-delete" @click="handleDelRow('row', row)">删除</el-button>
+                <el-button type="primary" link size="small" @click="handleDelRow('row', row)">删除</el-button>
               </template>
             </el-table-column>
             <template #empty>

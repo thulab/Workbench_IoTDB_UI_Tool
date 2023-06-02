@@ -1,0 +1,12 @@
+.el-button {
+  &:focus-visible {
+    outline: none !important;
+  }
+
+  --el-button-font-weight: 400;
+  --el-font-size-base: 12px;
+
+  line-height: 18px !important;
+}
+
+
