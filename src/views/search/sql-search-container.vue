@@ -160,8 +160,19 @@ function handleSqlOperate(val: string, data: Search.SqlList) {
     renameDialogVisible.value = true;
   } else if (index > -1) {
     const nextTab = sqlList.value[index + 1] || sqlList.value[index - 1];
-    activiteSql.value = `${nextTab.id}`;
-    sqlList.value.splice(index, 1);
+    if (nextTab) {
+      activiteSql.value = `${nextTab.id}`;
+      sqlList.value.splice(index, 1);
+    } else {
+      const currentSqlId = `_${dayjs().unix()}`;
+      sqlList.value.splice(index, 1, {
+        // eslint-disable-next-line no-useless-escape
+        queryName: `查询${dayjs().format('YYYYMMDDHHmmss')}`,
+        id: currentSqlId,
+      });
+      activiteSql.value = currentSqlId;
+      code[activiteSql.value] = '';
+    }
   }
 }
 
