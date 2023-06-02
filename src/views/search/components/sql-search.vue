@@ -118,7 +118,7 @@ const key = ref('1');
 const runFlag = ref(true);
 
 const codeEditorHeight = computed(() => {
-  const height = document.documentElement.clientHeight / 4;
+  const height = document.documentElement.clientHeight / 3;
   return height;
 });
 
