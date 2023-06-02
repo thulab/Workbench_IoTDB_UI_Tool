@@ -62,11 +62,11 @@ const rules = reactive({
       message: '请输入数据库名称',
       trigger: 'blur',
     },
-    {
-      pattern: /^([`"'.a-zA-Z0-9_\u4e00-\u9fa5]*)$/,
-      message: '请输入正确格式，只能由字母、数字、下划线以及UNICODE 中文字符组成',
-      trigger: 'blur',
-    },
+    // {
+    //   pattern: /^([`"'.a-zA-Z0-9_\u4e00-\u9fa5]*)$/,
+    //   message: '请输入正确格式，只能由字母、数字、下划线以及UNICODE 中文字符组成',
+    //   trigger: 'blur',
+    // },
   ],
   ttl: [
     {
