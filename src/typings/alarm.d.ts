@@ -13,7 +13,7 @@ declare namespace Alarm{
   }
 
   export interface QueryConfigResult {
-    alarmConfId: number;
+    alarmConfigId: number;
     alarmName: string;
     measurement: string;
     alarmLevel: string;
@@ -31,7 +31,7 @@ declare namespace Alarm{
   }
 
   export interface ConfigData {
-    alarmConfId?: number;
+    alarmConfigId?: number;
     alarmName: string;
     measurement?: string;
     measurementType?: string;
@@ -39,7 +39,7 @@ declare namespace Alarm{
     alarmDesc: string;
     alarmRulesType?: string;
     alarmRulesTypeVal?: string;
-    alarmRules?: Array<Record<string, any>>;
+    alarmRules?: Array<{ operator?: string, value?: string }>;
     alarmFrequency: string;
     alarmDuration: string;
     alarmDurationType: string;

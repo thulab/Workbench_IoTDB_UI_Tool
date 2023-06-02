@@ -69,9 +69,9 @@
       <el-row>
         <el-col :span="12">
           <el-form-item label="持续时间:" prop="alarmDuration" :rules="requiredRules">
-            <el-input v-model="formData.alarmDuration" :disabled="formData.measurementType === 'BOOLEAN' && formData.alarmRulesType === 'ONE'">
+            <el-input v-model="formData.alarmDuration" :disabled="formData.measurementType === 'BOOLEAN' && formData.alarmRulesType === 'change'">
               <template #append>
-                <el-select v-model="formData.alarmDurationType" style="width: 100px;" :disabled="formData.measurementType === 'BOOLEAN' && formData.alarmRulesType === 'ONE'">
+                <el-select v-model="formData.alarmDurationType" style="width: 100px;" :disabled="formData.measurementType === 'BOOLEAN' && formData.alarmRulesType === 'change'">
                   <el-option label="ms" value="ms" />
                   <el-option label="s" value="s" />
                   <el-option label="min" value="min" />
@@ -140,7 +140,7 @@ const props = defineProps<{
   serverId: number;
   visible: boolean;
   editType: string;
-  alarmConfId?: number;
+  alarmConfigId?: number;
 }>();
 
 const emit = defineEmits<{
@@ -163,7 +163,7 @@ const requiredRules = ref([
   },
 ]);
 const formData = reactive<Alarm.ConfigData>({
-  alarmConfId: undefined,
+  alarmConfigId: undefined,
   alarmName: '',
   measurement: '',
   measurementType: '',
@@ -175,39 +175,30 @@ const formData = reactive<Alarm.ConfigData>({
   alarmDuration: '',
   alarmDurationType: '',
 });
-// const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);
-const measurementList = ref<StorageDevice.MeasurementItem[]>([]);
+const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);
 const { requestFn: saveAlarmConfig } = useRequest(AlarmApi.saveAlarmConfig);
 const { requestFn: updateAlarmConfig } = useRequest(AlarmApi.updateAlarmConfig);
 const { requestFn: getAlarmConfigDetail } = useRequest(AlarmApi.getAlarmConfigDetail);
-// const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementAllObjList);
-const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementsInfosByFuzzy);
+const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementAllObjList);
 
 let lastMeasurementQuery = '';
 const remoteMethod = debounce((query: string) => {
   lastMeasurementQuery = query;
-  // getMeasurement(props.serverId, lastMeasurementQuery).then((res) => {
-  //   if (lastMeasurementQuery === query) {
-  //     measurementList.value = res.data?.measurements?.map((item) => item) || [];
-  //   }
-  // });
-  getMeasurement(props.serverId, {
-    dataBaseOrDevice: 'database',
-    pathName: 'root.naigai',
-    keyword: lastMeasurementQuery,
-    pageNum: 1,
-    pageSize: 100,
-  }).then((res) => {
-    measurementList.value = res.data?.measurements;
+  getMeasurement(props.serverId, lastMeasurementQuery).then((res) => {
+    if (lastMeasurementQuery === query) {
+      measurementList.value = res.data?.measurements?.map((item) => item) || [];
+    }
   });
 }, 500);
 
 function getDetail() {
-  if (!props.alarmConfId) return;
-  getAlarmConfigDetail(props.alarmConfId).then((res) => {
+  if (!props.alarmConfigId) return;
+  getAlarmConfigDetail(props.alarmConfigId).then((res) => {
     assign(formData, res.data);
-    // formData.alarmRulesType = '';
-    // formData.alarmRulesTypeVal = '';
+    if (res.data.alarmRules?.length) {
+      formData.alarmRulesType = res.data.alarmRules[0].operator;
+      formData.alarmRulesTypeVal = res.data.alarmRules[0].value;
+    }
   });
 }
 
@@ -225,7 +216,7 @@ function handleChangePath(val: string) {
 }
 
 function handleChangeBooleanRule(val: string) {
-  if (val === 'ONE') {
+  if (val === 'change') {
     formData.alarmDuration = '0';
   }
 }
@@ -233,9 +224,28 @@ function handleChangeBooleanRule(val: string) {
 const handleConfirm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
+      if (formData.measurementType !== 'BOOLEAN' && !formData.alarmRulesTypeVal) {
+        ElMessage.error('请输入告警规则值');
+        return;
+      }
+      if (!formData.alarmDurationType) {
+        ElMessage.error('请选择持续时间单位');
+        return;
+      }
+      const params = {
+        alarmName: formData.alarmName,
+        alarmLevel: formData.alarmLevel,
+        alarmDesc: formData.alarmDesc,
+        alarmFrequency: formData.alarmFrequency,
+        alarmDuration: formData.alarmDuration,
+        alarmDurationType: formData.alarmDurationType,
+        alarmRules: [{ operator: formData.alarmRulesType, value: formData.alarmRulesTypeVal }],
+      };
       if (props.editType === 'add') {
         saveAlarmConfig({
-          ...formData,
+          ...params,
+          measurement: formData.measurement,
+          measurementType: formData.measurementType,
         }).then((res) => {
           if (res.code === 0) {
             ElMessage.success('新建告警成功');
@@ -245,7 +255,8 @@ const handleConfirm = () => {
         });
       } else {
         updateAlarmConfig({
-          ...formData,
+          ...params,
+          alarmConfigId: props.alarmConfigId,
         }).then((res) => {
           if (res.code === 0) {
             ElMessage.success('编辑告警成功');
@@ -268,10 +279,10 @@ watch(
       formData.alarmDuration = '';
       formData.alarmDurationType = '';
       if (props.editType === 'edit') {
-        formData.alarmConfId = props.alarmConfId;
+        formData.alarmConfigId = props.alarmConfigId;
         getDetail();
       } else {
-        formData.alarmConfId = undefined;
+        formData.alarmConfigId = undefined;
         remoteMethod('');
       }
     }

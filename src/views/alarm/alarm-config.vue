@@ -124,7 +124,7 @@
     <modal-config
       v-model:visible="editVisible"
       :server-id="serverId"
-      :alarmConfId="alarmConfId"
+      :alarmConfigId="alarmConfigId"
       :edit-type="editType"
       @handleSave="handleSaveConfig"
     />
@@ -195,7 +195,7 @@ const totalCount = ref(0);
 const multipleSelection = ref<Alarm.QueryConfigResult[]>([]);
 const editVisible = ref(false);
 const editType = ref('add');
-const alarmConfId = ref();
+const alarmConfigId = ref();
 
 const { requestFn: getAlarmConfigList, data: tableData, loading } = useRequest(AlarmApi.getAlarmConfigList, {
   initData: {
@@ -255,7 +255,7 @@ function handleSortChange({ column, prop, order }:SortMethod<Alarm.QueryConfigRe
 
 function handleStatus(row: Alarm.QueryConfigResult) {
   const { status } = row;
-  updateAlarmConfigStatus(row.alarmConfId, status === 1 ? 2 : 1).then(() => {
+  updateAlarmConfigStatus(row.alarmConfigId, status === 1 ? 2 : 1).then(() => {
     ElMessage.success('状态更新成功');
     row.status = status === 1 ? 2 : 1;
   });
@@ -263,13 +263,13 @@ function handleStatus(row: Alarm.QueryConfigResult) {
 
 function handleAdd() {
   editType.value = 'add';
-  alarmConfId.value = undefined;
+  alarmConfigId.value = undefined;
   editVisible.value = true;
 }
 
 function handleEdit(row: Alarm.QueryConfigResult) {
   editType.value = 'edit';
-  alarmConfId.value = row.alarmConfId;
+  alarmConfigId.value = row.alarmConfigId;
   editVisible.value = true;
 }
 
@@ -281,13 +281,13 @@ function handleDel(type: string, data: Alarm.QueryConfigResult | null) {
     icon: ICustomMessageWarning,
   })
     .then(() => {
-      let alarmConfIds = [];
+      let alarmConfigIds = [];
       if (type === 'batch') {
-        alarmConfIds = multipleSelection.value?.map((i) => i.alarmConfId);
+        alarmConfigIds = multipleSelection.value?.map((i) => i.alarmConfigId);
       } else {
-        alarmConfIds = data?.alarmConfId ? [data.alarmConfId] : [];
+        alarmConfigIds = data?.alarmConfigId ? [data.alarmConfigId] : [];
       }
-      deleteAlarmConfig(alarmConfIds).then((res) => {
+      deleteAlarmConfig(alarmConfigIds).then((res) => {
         if (res.code === 0) {
           ElMessage.success('删除成功');
           handleSearch();

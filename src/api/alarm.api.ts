@@ -9,32 +9,32 @@ class AlarmApi {
 
   // 获取告警配置列表
   static getAlarmConfigList(data: Alarm.QueryConfigParams & PageQuery): HttpResponseP<Alarm.QueryConfigResultList> {
-    return http.post('/alarm/getConf', data);
+    return http.post('/alarm/getConfig', data);
   }
 
   // 删除告警配置
   static deleteAlarmConfig(data: number[]): HttpResponseP {
-    return http.post('/alarm/deleteConf', { alarmConfIds: data });
+    return http.post('/alarm/deleteConfig', { alarmConfigIds: data });
   }
 
   // 保存告警配置
   static saveAlarmConfig(data: Alarm.ConfigData): HttpResponseP {
-    return http.post('/alarm/addConf', data);
+    return http.post('/alarm/addConfig', data);
   }
 
   // 更新告警配置
   static updateAlarmConfig(data: Alarm.ConfigData): HttpResponseP {
-    return http.post('/alarm/updateConf', data);
+    return http.post('/alarm/updateConfig', data);
   }
 
   // 获取告警配置详情
-  static getAlarmConfigDetail(alarmConfId: number): HttpResponseP<Alarm.ConfigData> {
-    return http.get('/alarm/getConfDetail', { params: { alarmConfId } });
+  static getAlarmConfigDetail(alarmConfigId: number): HttpResponseP<Alarm.ConfigData> {
+    return http.get('/alarm/getConfigDetail', { params: { alarmConfigId } });
   }
 
   // 更新告警配置状态
-  static updateAlarmConfigStatus(alarmConfId: number, status: number): HttpResponseP {
-    return http.get('/alarm/updateStatus', { params: { alarmConfId, status } });
+  static updateAlarmConfigStatus(alarmConfigId: number, status: number): HttpResponseP {
+    return http.get('/alarm/updateStatus', { params: { alarmConfigId, status } });
   }
 
   // 获取告警记录列表
