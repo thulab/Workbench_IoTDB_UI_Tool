@@ -2,8 +2,19 @@
 @import "./date";
 @import "./modal";
 
-.el-button:focus-visible {
-  outline: none !important;
+.el-button {
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 18px !important;
+  color: #656A85 !important;
+
+  &:focus-visible {
+    outline: none !important;
+  }
+}
+
+.el-button--primary{
+  color: #fff !important;
 }
 
 .el-input-group__prepend, .el-input-group__append{

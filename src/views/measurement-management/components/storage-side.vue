@@ -140,6 +140,7 @@ defineExpose({ getStorageList });
   .storage-item-text{
     width: 200px;
     display: inline-flex;
+    line-height: 1.2;
   }
 
   .storage-item-delete-box{
