@@ -126,6 +126,7 @@
       :server-id="serverId"
       :alarmConfId="alarmConfId"
       :edit-type="editType"
+      @handleSave="handleSaveConfig"
     />
   </div>
 </template>
@@ -293,6 +294,11 @@ function handleDel(type: string, data: Alarm.QueryConfigResult | null) {
         }
       });
     });
+}
+
+function handleSaveConfig() {
+  handleReset();
+  handleSearch();
 }
 
 onMounted(() => {

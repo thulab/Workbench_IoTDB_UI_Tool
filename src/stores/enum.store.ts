@@ -4,7 +4,7 @@ import { AlarmApi } from '@/api';
 const { requestFn: getConfigEnum } = useRequest(AlarmApi.getConfigEnum);
 
 export const useEnumStore = defineStore('EnumStore', () => {
-  const allEnum = ref<Record<string, any>>({});
+  const allEnum = ref<Record<string, ConfigEnumData[]>>({});
   // 布尔类型告警规则
   const alarmBooleanRuleEnum = computed(() => allEnum.value?.ALARM_BOOLEAN_RULE || []);
   // 数值类型告警规则

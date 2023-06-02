@@ -126,4 +126,13 @@ declare global {
     prop: string;
     order: 'ascending' | 'descending';
   }
+
+  interface ConfigEnumData {
+    value: string;
+    name: string;
+    paramMap?: {
+      color?: string;
+      icon?: string;
+    }
+  }
 }

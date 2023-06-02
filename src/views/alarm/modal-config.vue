@@ -21,9 +21,10 @@
               remote-show-suffix
               :remote-method="remoteMethod"
               :loading="measurementLoading"
+              :disabled="editType === 'edit'"
               @change="handleChangePath"
             >
-              <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" />
+              <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :disabled="item.dataType === 'TEXT'" />
             </el-select>
           </el-form-item>
         </el-col>
@@ -43,27 +44,38 @@
       <el-row>
         <el-col :span="12">
           <el-form-item label="告警规则:" prop="alarmRulesType" :rules="requiredRules">
-            <el-select v-model="formData.alarmRulesType">
-              <el-option label="毫秒" value="millisecond" />
-              <el-option label="秒" value="second" />
-              <el-option label="分" value="minute" />
-              <el-option label="小时" value="hour" />
-              <el-option label="天" value="day" />
+            <el-select v-if="formData.measurementType === 'BOOLEAN' || !formData.measurementType" v-model="formData.alarmRulesType" :disabled="!formData.measurementType" @change="handleChangeBooleanRule">
+              <el-option
+                v-for="item in booleanRuleEnum"
+                :key="item.value"
+                :label="item.name"
+                :value="item.value"
+              />
             </el-select>
+            <div v-else class="number-rule-box">
+              <el-select v-model="formData.alarmRulesType" :disabled="!formData.measurementType">
+                <el-option
+                  v-for="item in numberRuleEnum"
+                  :key="item.value"
+                  :label="item.name"
+                  :value="item.value"
+                />
+              </el-select>
+              <el-input v-model="formData.alarmRulesTypeVal" :disabled="!formData.measurementType" />
+            </div>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row>
         <el-col :span="12">
           <el-form-item label="持续时间:" prop="alarmDuration" :rules="requiredRules">
-            <el-input v-model="formData.alarmDuration">
+            <el-input v-model="formData.alarmDuration" :disabled="formData.measurementType === 'BOOLEAN' && formData.alarmRulesType === 'ONE'">
               <template #append>
-                <el-select v-model="formData.alarmDurationType" style="width: 100px;" clearable placeholder="">
-                  <el-option label="毫秒" value="millisecond" />
-                  <el-option label="秒" value="second" />
-                  <el-option label="分" value="minute" />
-                  <el-option label="小时" value="hour" />
-                  <el-option label="天" value="day" />
+                <el-select v-model="formData.alarmDurationType" style="width: 100px;" :disabled="formData.measurementType === 'BOOLEAN' && formData.alarmRulesType === 'ONE'">
+                  <el-option label="ms" value="ms" />
+                  <el-option label="s" value="s" />
+                  <el-option label="min" value="min" />
+                  <el-option label="h" value="h" />
                 </el-select>
               </template>
             </el-input>
@@ -77,11 +89,12 @@
               告警级别:<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减" placement="top"><i-custom-question /></el-tooltip>
             </template>
             <el-select v-model="formData.alarmLevel">
-              <el-option label="毫秒" value="millisecond" />
-              <el-option label="秒" value="second" />
-              <el-option label="分" value="minute" />
-              <el-option label="小时" value="hour" />
-              <el-option label="天" value="day" />
+              <el-option
+                v-for="item in levelEnum"
+                :key="item.value"
+                :label="item.name"
+                :value="item.value"
+              />
             </el-select>
           </el-form-item>
         </el-col>
@@ -90,11 +103,12 @@
         <el-col :span="12">
           <el-form-item label="告警频率:" prop="alarmFrequency" :rules="requiredRules">
             <el-select v-model="formData.alarmFrequency">
-              <el-option label="毫秒" value="millisecond" />
-              <el-option label="秒" value="second" />
-              <el-option label="分" value="minute" />
-              <el-option label="小时" value="hour" />
-              <el-option label="天" value="day" />
+              <el-option
+                v-for="item in frequencyEnum"
+                :key="item.value"
+                :label="item.name"
+                :value="item.value"
+              />
             </el-select>
           </el-form-item>
         </el-col>
@@ -120,6 +134,7 @@
 import { debounce, assign } from 'lodash-es';
 import type { FormInstance } from 'element-plus';
 import { AlarmApi, StorageApi } from '@/api';
+import { useEnumStore } from '@/stores';
 
 const props = defineProps<{
   serverId: number;
@@ -134,13 +149,17 @@ const emit = defineEmits<{
 }>();
 
 const dialogVisible = useVModel(props, 'visible', emit);
-
+const enumStore = useEnumStore();
+const booleanRuleEnum = enumStore.alarmBooleanRuleEnum;
+const numberRuleEnum = enumStore.alarmNumberRuleEnum;
+const levelEnum = enumStore.alarmLevelEnum;
+const frequencyEnum = enumStore.alarmFrequencyEnum;
 const formRef = ref<FormInstance>();
 const requiredRules = ref([
   {
     required: true,
     message: '请输入相应内容后进行操作',
-    trigger: 'change',
+    trigger: ['blur', 'change'],
   },
 ]);
 const formData = reactive<Alarm.ConfigData>({
@@ -156,36 +175,61 @@ const formData = reactive<Alarm.ConfigData>({
   alarmDuration: '',
   alarmDurationType: '',
 });
-const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);
+// const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);
+const measurementList = ref<StorageDevice.MeasurementItem[]>([]);
 const { requestFn: saveAlarmConfig } = useRequest(AlarmApi.saveAlarmConfig);
 const { requestFn: updateAlarmConfig } = useRequest(AlarmApi.updateAlarmConfig);
 const { requestFn: getAlarmConfigDetail } = useRequest(AlarmApi.getAlarmConfigDetail);
-const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementAllObjList);
+// const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementAllObjList);
+const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementsInfosByFuzzy);
 
 let lastMeasurementQuery = '';
 const remoteMethod = debounce((query: string) => {
   lastMeasurementQuery = query;
-  getMeasurement(props.serverId, lastMeasurementQuery).then((res) => {
-    if (lastMeasurementQuery === query) {
-      measurementList.value = res.data?.measurements?.map((item) => item) || [];
-    }
+  // getMeasurement(props.serverId, lastMeasurementQuery).then((res) => {
+  //   if (lastMeasurementQuery === query) {
+  //     measurementList.value = res.data?.measurements?.map((item) => item) || [];
+  //   }
+  // });
+  getMeasurement(props.serverId, {
+    dataBaseOrDevice: 'database',
+    pathName: 'root.naigai',
+    keyword: lastMeasurementQuery,
+    pageNum: 1,
+    pageSize: 100,
+  }).then((res) => {
+    measurementList.value = res.data?.measurements;
   });
 }, 500);
 
 function getDetail() {
+  if (!props.alarmConfId) return;
   getAlarmConfigDetail(props.alarmConfId).then((res) => {
     assign(formData, res.data);
+    // formData.alarmRulesType = '';
+    // formData.alarmRulesTypeVal = '';
   });
 }
 
 function handleChangePath(val: string) {
   const current = measurementList.value.find((f) => f.timeseries === val);
   formData.measurementType = current?.dataType;
+  formData.alarmName = '';
+  formData.alarmLevel = '';
+  formData.alarmDesc = '';
+  formData.alarmRulesType = '';
+  formData.alarmRulesTypeVal = '';
+  formData.alarmFrequency = '';
+  formData.alarmDuration = '';
+  formData.alarmDurationType = '';
 }
 
-/**
- * new/edit storage
- */
+function handleChangeBooleanRule(val: string) {
+  if (val === 'ONE') {
+    formData.alarmDuration = '0';
+  }
+}
+
 const handleConfirm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
@@ -219,10 +263,15 @@ watch(
   (newVal) => {
     if (newVal) {
       formRef.value?.resetFields();
+      formData.alarmRulesType = '';
+      formData.alarmRulesTypeVal = '';
+      formData.alarmDuration = '';
+      formData.alarmDurationType = '';
       if (props.editType === 'edit') {
         formData.alarmConfId = props.alarmConfId;
         getDetail();
       } else {
+        formData.alarmConfId = undefined;
         remoteMethod('');
       }
     }
@@ -235,5 +284,9 @@ watch(
 
 .new-storage-container{
   position: relative;
+}
+
+.number-rule-box{
+  display: flex;
 }
 </style>
