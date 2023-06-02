@@ -294,7 +294,7 @@ function getListData() {
         prop: `t${index}`,
         defaultValue: '——',
         fixed: index === 0 ? 'left' : undefined,
-        formatHeader: formatTimeseries,
+        // formatHeader: formatTimeseries,
       });
     });
     columns.value = list;
