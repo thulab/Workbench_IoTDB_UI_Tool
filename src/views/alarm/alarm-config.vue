@@ -3,20 +3,25 @@
     <div class="search-form-wrapper">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
         <el-form-item label="告警名称:" prop="alarmName">
-          <el-input v-model="searchFormData.alarmName" placeholder="请输入" />
+          <el-input v-model="searchFormData.alarmName" placeholder="请输入告警名称" />
         </el-form-item>
         <el-form-item label="告警序列:" prop="measurements">
           <template #label>
             告警序列:<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
           </template>
-          <timeseries-select v-model="searchFormData.measurements" :server-id="serverId" :is-show-view-btn="true" />
+          <timeseries-select v-model="searchFormData.measurements" :server-id="serverId" :is-show-view-btn="true" :placeholder="'请输入告警序列'" :viewText="'已选序列'" />
         </el-form-item>
         <el-form-item label="告警级别:" prop="alarmLevel">
           <template #label>
             告警级别:<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减。" placement="top"><i-custom-question /></el-tooltip>
           </template>
           <el-select v-model="searchFormData.alarmLevel">
-            <el-option v-for="item in levelOptions" :key="item.value" :value="item.value" :label="item.name" />
+            <el-option v-for="item in levelOptions" :key="item.value" :value="item.value" :label="item.name">
+              <span style="display: flex; align-items: center;">
+                <el-icon size="20" :style="{ color: item.paramMap?.color }"><i-custom-alarm-level /></el-icon>
+                <span :style="{ color: item.paramMap?.color }">{{ item.name }}</span>
+              </span>
+            </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="状态:" prop="status">
@@ -65,11 +70,6 @@
           :max-height="maxTableHeight"
           tooltip-effect="light"
           ref="tableRef"
-          :header-cell-style="{
-            color: '#424561',
-            overflow: 'hidden',
-            background: '#F0F1FA',
-          }"
           :default-sort="{ prop: 'createTime', order: 'descending' }"
           @selection-change="handleSelectionChange"
           @sort-change="handleSortChange"
@@ -79,7 +79,10 @@
           <el-table-column label="告警名称" prop="alarmName" width="160" show-overflow-tooltip />
           <el-table-column label="告警级别" prop="alarmLevel" sortable="custom" width="140" show-overflow-tooltip>
             <template #default="{ row }">
-              {{ getOptionField(row.alarmLevel, enumStore.alarmLevelEnum) }}
+              <span v-if="row.alarmLevel" style="display: flex; align-items: center;">
+                <el-icon size="20"><i-custom-alarm-level /></el-icon>
+                {{ getOptionField(row.alarmLevel, enumStore.alarmLevelEnum) }}
+              </span>
             </template>
           </el-table-column>
           <el-table-column label="创建时间" prop="createTime" sortable="custom" min-width="140" show-overflow-tooltip />
@@ -143,7 +146,7 @@ import { getOptionField } from '@/utils/format';
 import { AlarmApi } from '@/api';
 import { useServerStore, useEnumStore } from '@/stores';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
-import modalConfig from './modal-config.vue';
+import ModalConfig from './components/modal-config.vue';
 
 const serverStroe = useServerStore();
 const serverId = serverStroe.currentServerId;

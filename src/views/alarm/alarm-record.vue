@@ -3,13 +3,13 @@
     <div class="search-form-wrapper">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
         <el-form-item label="告警名称:" prop="alarmName">
-          <el-input v-model="searchFormData.alarmName" placeholder="请输入" />
+          <el-input v-model="searchFormData.alarmName" placeholder="请输入告警名称" />
         </el-form-item>
         <el-form-item label="告警序列:" prop="measurements">
           <template #label>
             告警序列:<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
           </template>
-          <timeseries-select v-model="searchFormData.measurements" :server-id="serverId" :is-show-view-btn="true" />
+          <timeseries-select v-model="searchFormData.measurements" :server-id="serverId" :is-show-view-btn="true" :placeholder="'请输入告警序列'" :viewText="'已选序列'" />
         </el-form-item>
         <el-form-item label="告警级别:" prop="alarmLevel">
           <template #label>
@@ -61,11 +61,6 @@
           :max-height="maxTableHeight"
           tooltip-effect="light"
           ref="tableRef"
-          :header-cell-style="{
-            color: '#424561',
-            overflow: 'hidden',
-            background: '#F0F1FA',
-          }"
           :default-sort="{ prop: 'createTime', order: 'descending' }"
           @selection-change="handleSelectionChange"
           @sort-change="handleSortChange"

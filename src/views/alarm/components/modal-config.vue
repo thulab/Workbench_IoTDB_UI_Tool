@@ -2,7 +2,7 @@
   <el-dialog
     :title="editType === 'add' ? '新建告警' : '编辑告警'"
     v-model="dialogVisible"
-    width="800px"
+    width="718px"
     class="new-storage-container"
     :close-on-click-modal="false"
   >
@@ -15,7 +15,7 @@
             </template>
             <el-select
               v-model="formData.measurement"
-              placeholder="请选择告警序列"
+              placeholder="请输入告警序列"
               filterable
               remote
               remote-show-suffix
@@ -23,28 +23,35 @@
               :loading="measurementLoading"
               :disabled="editType === 'edit'"
               @change="handleChangePath"
+              style="width: 220px;"
             >
               <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :disabled="item.dataType === 'TEXT'" />
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="数据类型:" prop="measurementType" :rules="requiredRules">
+          <el-form-item label="数据类型:" prop="measurementType">
             <el-input v-model="formData.measurementType" disabled />
           </el-form-item>
         </el-col>
       </el-row>
       <el-row>
-        <el-col :span="12">
+        <el-col :span="24">
           <el-form-item label="告警名称:" prop="alarmName" :rules="requiredRules">
-            <el-input v-model="formData.alarmName" show-word-limit maxlength="20" />
+            <el-input v-model="formData.alarmName" show-word-limit maxlength="20" placeholder="请输入告警名称" />
           </el-form-item>
         </el-col>
       </el-row>
       <el-row>
         <el-col :span="12">
           <el-form-item label="告警规则:" prop="alarmRulesType" :rules="requiredRules">
-            <el-select v-if="formData.measurementType === 'BOOLEAN' || !formData.measurementType" v-model="formData.alarmRulesType" :disabled="!formData.measurementType" @change="handleChangeBooleanRule">
+            <el-select
+              v-if="formData.measurementType === 'BOOLEAN' || !formData.measurementType"
+              v-model="formData.alarmRulesType"
+              :disabled="!formData.measurementType"
+              @change="handleChangeBooleanRule"
+              style="width: 220px;"
+            >
               <el-option
                 v-for="item in booleanRuleEnum"
                 :key="item.value"
@@ -61,17 +68,24 @@
                   :value="item.value"
                 />
               </el-select>
-              <el-input v-model="formData.alarmRulesTypeVal" :disabled="!formData.measurementType" />
+              <el-input v-model="formData.alarmRulesTypeVal" :disabled="!formData.measurementType" placeholder="请输入" />
             </div>
           </el-form-item>
         </el-col>
-      </el-row>
-      <el-row>
         <el-col :span="12">
           <el-form-item label="持续时间:" prop="alarmDuration" :rules="requiredRules">
-            <el-input v-model="formData.alarmDuration" :disabled="formData.measurementType === 'BOOLEAN' && formData.alarmRulesType === 'change'">
+            <el-input
+              v-model="formData.alarmDuration"
+              :disabled="formData.measurementType === 'BOOLEAN' && formData.alarmRulesType === 'change'"
+              placeholder="请输入持续时间"
+              style="width: 220px;"
+            >
               <template #append>
-                <el-select v-model="formData.alarmDurationType" style="width: 100px;" :disabled="formData.measurementType === 'BOOLEAN' && formData.alarmRulesType === 'change'">
+                <el-select
+                  v-model="formData.alarmDurationType"
+                  :disabled="formData.measurementType === 'BOOLEAN' && formData.alarmRulesType === 'change'"
+                  style="width: 90px;"
+                >
                   <el-option label="ms" value="ms" />
                   <el-option label="s" value="s" />
                   <el-option label="min" value="min" />
@@ -88,21 +102,24 @@
             <template #label>
               告警级别:<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减" placement="top"><i-custom-question /></el-tooltip>
             </template>
-            <el-select v-model="formData.alarmLevel">
+            <el-select v-model="formData.alarmLevel" style="width: 220px;">
               <el-option
                 v-for="item in levelEnum"
                 :key="item.value"
                 :label="item.name"
                 :value="item.value"
-              />
+              >
+                <span style="display: flex; align-items: center;">
+                  <el-icon size="20" :style="{ color: item.paramMap?.color }"><i-custom-alarm-level /></el-icon>
+                  <span :style="{ color: item.paramMap?.color }">{{ item.name }}</span>
+                </span>
+              </el-option>
             </el-select>
           </el-form-item>
         </el-col>
-      </el-row>
-      <el-row>
         <el-col :span="12">
           <el-form-item label="告警频率:" prop="alarmFrequency" :rules="requiredRules">
-            <el-select v-model="formData.alarmFrequency">
+            <el-select v-model="formData.alarmFrequency" style="width: 220px;">
               <el-option
                 v-for="item in frequencyEnum"
                 :key="item.value"
@@ -116,7 +133,7 @@
       <el-row>
         <el-col :span="24">
           <el-form-item label="告警说明:" prop="alarmDesc">
-            <el-input type="textarea" v-model="formData.alarmDesc" show-word-limit maxlength="100" />
+            <el-input type="textarea" v-model="formData.alarmDesc" show-word-limit maxlength="100" placeholder="请输入告警说明" :rows="4" />
           </el-form-item>
         </el-col>
       </el-row>

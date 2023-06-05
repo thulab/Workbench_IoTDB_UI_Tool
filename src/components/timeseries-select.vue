@@ -13,7 +13,7 @@
       multiple
       collapse-tags
       collapse-tags-tooltip
-      placeholder="请选择测点">
+      :placeholder="placeholder || '请选择测点'">
       <template #prefix>
         <i-custom-search-icon class="remote-select-search-icon" />
       </template>
@@ -23,8 +23,8 @@
         </div>
       </template>
     </el-select-v2>
-    <el-button v-if="isShowViewBtn" plain class="m-l-12" @click="()=>dialogVisible = true">已选测点</el-button>
-    <el-dialog title="已选测点" v-model="dialogVisible" class="select-modal">
+    <el-button v-if="isShowViewBtn" plain class="m-l-12" @click="()=>dialogVisible = true">{{viewText || '已选测点' }}</el-button>
+    <el-dialog :title="viewText || '已选测点'" v-model="dialogVisible" class="select-modal">
       <ul class="select-list">
         <li v-for="item in model" :key="item" class="select-item">{{ item }}</li>
       </ul>
@@ -40,6 +40,8 @@ const props = defineProps<{
   modelValue: Array<String> | String;
   serverId: number;
   isShowViewBtn?: boolean;
+  placeholder?: string;
+  viewText?: string;
 }>();
 const model = useVModel(props, 'modelValue');
 const dialogVisible = ref(false);
