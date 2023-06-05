@@ -40,7 +40,10 @@
           </div>
         </el-form-item>
         <el-form-item label="采样周期:" prop="timeInterval">
-          <el-input-number v-model="searchFormData.timeInterval" style="width: 65px;" :controls="false" placeholder="" :min="1" :step="1" />
+          <template #label>
+            采样周期:<el-tooltip effect="light" content="请输入正整数" placement="top"><i-custom-question /></el-tooltip>
+          </template>
+          <el-input-number v-model="searchFormData.timeInterval" style="width: 65px;" :controls="false" placeholder="" :min="1" @change="handleInputInterval" />
           <el-select v-model="searchFormData.unitInterval" style="width: 80px;" placeholder="">
             <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" />
           </el-select>
@@ -335,6 +338,14 @@ function handleSearch() {
   pagination.pageNum = 1;
   copySearchFormData = cloneDeep(searchFormData);
   getListData();
+}
+
+function handleInputInterval(val: number | null | undefined) {
+  if (val) {
+    if (/^0|\.|[^\d.]|^-/.test(`${val}`)) {
+      searchFormData.timeInterval = undefined;
+    }
+  }
 }
 
 // 列
