@@ -43,7 +43,7 @@
           <template #label>
             采样周期:<el-tooltip effect="light" content="请输入正整数" placement="top"><i-custom-question /></el-tooltip>
           </template>
-          <el-input-number v-model="searchFormData.timeInterval" style="width: 65px;" :controls="false" placeholder="" :min="1" @change="handleInputInterval" />
+          <el-input-number v-model="searchFormData.timeInterval" style="width: 65px;" :controls="false" placeholder="" @change="handleInputInterval" />
           <el-select v-model="searchFormData.unitInterval" style="width: 80px;" placeholder="">
             <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" />
           </el-select>
@@ -144,7 +144,6 @@ import { SearchApi } from '@/api';
 import {
   getStartAndEnd, today, getOneDay, getOneInterval, todayNow, getOneIntervalNow,
 } from '@/utils/date';
-import { formatTimeseries } from '@/utils/format';
 import DynamicTable from '@/components/dynamic-table.vue';
 import { useServerStore } from '@/stores';
 
@@ -345,6 +344,8 @@ function handleInputInterval(val: number | null | undefined) {
     if (/^0|\.|[^\d.]|^-/.test(`${val}`)) {
       searchFormData.timeInterval = undefined;
     }
+  } else {
+    searchFormData.timeInterval = undefined;
   }
 }
 
