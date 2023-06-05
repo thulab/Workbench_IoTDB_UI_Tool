@@ -43,7 +43,7 @@
           <template #label>
             采样周期:<el-tooltip effect="light" content="请输入正整数" placement="top"><i-custom-question /></el-tooltip>
           </template>
-          <el-input-number v-model="searchFormData.timeInterval" style="width: 65px;" :controls="false" placeholder="" @change="handleInputInterval" />
+          <el-input-number v-model="searchFormData.timeInterval" style="width: 180px;" :controls="false" placeholder="" :max="9007199254740992" @change="handleInputInterval" />
           <el-select v-model="searchFormData.unitInterval" style="width: 80px;" placeholder="">
             <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" />
           </el-select>
