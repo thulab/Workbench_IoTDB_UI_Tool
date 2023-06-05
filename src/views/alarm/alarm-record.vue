@@ -13,10 +13,19 @@
         </el-form-item>
         <el-form-item label="告警级别:" prop="alarmLevel">
           <template #label>
-            告警级别:<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减" placement="top"><i-custom-question /></el-tooltip>
+            告警级别:<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减。" placement="top"><i-custom-question /></el-tooltip>
           </template>
-          <el-select v-model="searchFormData.alarmLevel">
-            <el-option v-for="item in levelOptions" :key="item.value" :value="item.value" :label="item.name" />
+          <el-select v-model="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" class="level-select-box">
+            <template #prefix>
+              <el-icon v-if="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" size="20"><i-custom-alarm-level /></el-icon>
+            </template>
+            <el-option v-for="item in levelOptions" :key="item.value" :value="item.value" :label="item.name">
+              <span v-if="item.value" style="display: flex; align-items: center;">
+                <el-icon size="20" :style="{ color: item?.paramMap?.color }"><i-custom-alarm-level /></el-icon>
+                <span :style="{ color: item?.paramMap?.color }">{{ item.name }}</span>
+              </span>
+              <span v-else>{{ item.name }}</span>
+            </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="告警时间:" prop="createtimerange">
@@ -30,7 +39,11 @@
           />
         </el-form-item>
         <el-form-item label="仅查看最新状态:" prop="status">
-          <el-switch v-model="searchFormData.status" />
+          <el-switch
+            v-model="searchFormData.status"
+            style="
+
+--el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED" />
         </el-form-item>
       </el-form>
       <div class="search-form-buttons">
@@ -67,7 +80,14 @@
         >
           <el-table-column type="selection" width="55" />
           <el-table-column label="告警名称" prop="alarmName" width="160" show-overflow-tooltip />
-          <el-table-column label="告警级别" prop="alarmLevel" sortable="custom" width="140" show-overflow-tooltip />
+          <el-table-column label="告警级别" prop="alarmLevel" sortable="custom" width="140" show-overflow-tooltip>
+            <template #default="{ row }">
+              <span v-if="row.alarmLevel" style="display: flex; align-items: center;">
+                <el-icon size="20" :style="{ color: getLevelColor(row) }"><i-custom-alarm-level /></el-icon>
+                {{ getOptionField(row.alarmLevel, enumStore.alarmLevelEnum) }}
+              </span>
+            </template>
+          </el-table-column>
           <el-table-column label="告警序列" prop="measurement" min-width="240" show-overflow-tooltip />
           <el-table-column label="告警值" prop="alarmValue" min-width="140" show-overflow-tooltip />
           <el-table-column label="告警时间" prop="createTime" sortable="custom" min-width="140" show-overflow-tooltip />
@@ -113,6 +133,7 @@ import { cloneDeep } from 'lodash-es';
 import {
   getStartAndEnd, today, getOneInterval, getOneIntervalNow,
 } from '@/utils/date';
+import { getOptionField } from '@/utils/format';
 import { AlarmApi } from '@/api';
 import { useServerStore, useEnumStore } from '@/stores';
 import { handleExport } from '@/utils/export';
@@ -124,7 +145,7 @@ const enumStore = useEnumStore();
 
 const { maxTableHeight } = useTableHeight(420);
 const searchFormRef = ref<FormInstance>();
-const levelOptions = [{ name: '全部', value: '' }].concat(enumStore.alarmLevelEnum);
+const levelOptions = [{ name: '全部', value: '', paramMap: { color: '#656A85', icon: '' } }, ...enumStore.alarmLevelEnum];
 const searchFormData = reactive({
   orderBy: '',
   asc: '',
@@ -158,6 +179,18 @@ const pagination = reactive({
 });
 const totalCount = ref(0);
 const multipleSelection = ref<Alarm.QueryRecordResult[]>([]);
+
+const getLevelColor = computed(() => function (data?: Alarm.QueryRecordResult) {
+  if (!data) {
+    if (searchFormData.alarmLevel) {
+      const res = levelOptions.find((f) => f.value === searchFormData.alarmLevel);
+      return res?.paramMap?.color;
+    }
+    return '#656A85';
+  }
+  const res = levelOptions.find((f) => f.value === data.alarmLevel);
+  return res?.paramMap?.color;
+});
 
 const { requestFn: getAlarmRecordList, data: tableData, loading } = useRequest(AlarmApi.getAlarmRecordList, {
   initData: {
@@ -288,6 +321,12 @@ onMounted(() => {
 
 :deep(.el-select-v2__selection){
   flex-wrap: nowrap;
+}
+
+.level-select-box{
+  :deep(.el-input__inner) {
+    color: unset;
+  }
 }
 
 .operate-buttons{

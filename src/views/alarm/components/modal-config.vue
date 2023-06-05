@@ -98,11 +98,14 @@
       </el-row>
       <el-row>
         <el-col :span="12">
-          <el-form-item prop="alarmLevel" :rules="requiredRules">
+          <el-form-item prop="alarmLevel" :rules="requiredRules" :style="{ color: getLevelColor }">
             <template #label>
               告警级别:<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减" placement="top"><i-custom-question /></el-tooltip>
             </template>
-            <el-select v-model="formData.alarmLevel" style="width: 220px;">
+            <el-select v-model="formData.alarmLevel" style="width: 220px;" class="level-select-box">
+              <template #prefix>
+                <el-icon v-if="formData.alarmLevel" :style="{ color: getLevelColor }" size="20"><i-custom-alarm-level /></el-icon>
+              </template>
               <el-option
                 v-for="item in levelEnum"
                 :key="item.value"
@@ -193,6 +196,15 @@ const formData = reactive<Alarm.ConfigData>({
   alarmDurationType: '',
 });
 const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);
+
+const getLevelColor = computed(() => {
+  if (formData.alarmLevel) {
+    const res = levelEnum.find((f) => f.value === formData.alarmLevel);
+    return res?.paramMap?.color;
+  }
+  return '#656A85';
+});
+
 const { requestFn: saveAlarmConfig } = useRequest(AlarmApi.saveAlarmConfig);
 const { requestFn: updateAlarmConfig } = useRequest(AlarmApi.updateAlarmConfig);
 const { requestFn: getAlarmConfigDetail } = useRequest(AlarmApi.getAlarmConfigDetail);
@@ -316,5 +328,11 @@ watch(
 
 .number-rule-box{
   display: flex;
+}
+
+.level-select-box{
+  :deep(.el-input__inner) {
+    color: unset;
+  }
 }
 </style>
