@@ -98,8 +98,9 @@
             <el-table-column label="压缩方式" prop="compression" min-width="140" show-overflow-tooltip />
             <el-table-column label="最新值" prop="value" min-width="140" show-overflow-tooltip />
             <el-table-column label="最新值时间" prop="valueTime" min-width="240" show-overflow-tooltip />
-            <el-table-column label="操作" width="120" fixed="right">
+            <el-table-column label="操作" width="160" fixed="right">
               <template #default="{ row }">
+                <el-button type="primary" link size="small" @click="handleRowAlarm(row)">告警详情</el-button>
                 <el-button type="primary" link size="small" @click="handleDelRow('row', row)">删除</el-button>
               </template>
             </el-table-column>
@@ -149,6 +150,7 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
 import { useTableHeight } from '@/composition-api';
 import { StorageApi } from '@/api';
 import { useServerStore } from '@/stores';
@@ -158,6 +160,7 @@ import ModalStorage from './components/modal-storage.vue';
 import ModalMeasurement from './components/modal-measurement.vue';
 import ModalImport from './components/modal-import.vue';
 
+const router = useRouter();
 const serverStore = useServerStore();
 const serverId = serverStore.currentServerId;
 
@@ -340,6 +343,15 @@ function handleDelRow(type: string, row: StorageDevice.MeasurementItem | null) {
         }
       });
     });
+}
+
+function handleRowAlarm(row: StorageDevice.MeasurementItem) {
+  router.push({
+    name: 'AlarmConfig',
+    query: {
+      measurement: `${row.deviceName}.${row.timeseries}`,
+    },
+  });
 }
 
 function handleSelectionChange(vals: StorageDevice.MeasurementItem[]) {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-select-v2
+    <!-- <el-select-v2
       class="remote-select-box"
       v-model="model"
       style="width: 260px"
@@ -22,11 +22,41 @@
           <text-tooltip :content="item.label" />
         </div>
       </template>
-    </el-select-v2>
+    </el-select-v2> -->
+    <el-select
+      class="remote-select-box"
+      v-model="model"
+      :placeholder="placeholder || '请选择测点'"
+      filterable
+      remote
+      remote-show-suffix
+      clearable
+      multiple
+      collapse-tags
+      collapse-tags-tooltip
+      :remote-method="remoteMethod"
+      :loading="measurementLoading"
+      style="width: 270px;"
+    >
+      <template #prefix>
+        <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
+      </template>
+      <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+        <div class="remote-select-search-text">
+          <text-tooltip :content="item.label" />
+        </div>
+      </el-option>
+    </el-select>
     <el-button v-if="isShowViewBtn" plain class="m-l-12" @click="()=>dialogVisible = true">{{viewText || '已选测点' }}</el-button>
     <el-dialog :title="viewText || '已选测点'" v-model="dialogVisible" class="select-modal">
       <ul class="select-list">
-        <li v-for="item in model" :key="item" class="select-item">{{ item }}</li>
+        <li v-for="(item, index) in model" :key="item" class="select-item">
+          <span class="select-item-text"><text-tooltip :content="item" /></span>
+          <div class="select-item-delete-box" @click="handleDelete(index)">
+            <i-custom-delete class="select-item-delete" />
+            <i-custom-delete-active class="select-item-delete-active" />
+          </div>
+        </li>
       </ul>
     </el-dialog>
   </div>
@@ -37,7 +67,7 @@ import { debounce } from 'lodash-es';
 import { StorageApi } from '@/api';
 
 const props = defineProps<{
-  modelValue: Array<String> | String;
+  modelValue: Array<string>;
   serverId: number;
   isShowViewBtn?: boolean;
   placeholder?: string;
@@ -58,6 +88,10 @@ const remoteMethod = debounce((query: string) => {
     }
   });
 }, 500);
+
+function handleDelete(index: number) {
+  model.value?.splice(index, 1);
+}
 </script>
 
 <style scoped lang="scss">
@@ -65,7 +99,7 @@ const remoteMethod = debounce((query: string) => {
 .remote-select-box{
   position: relative;
 
-  :deep(.el-select-v2__wrapper) {
+  :deep(.el-select-v2__wrapper){
     padding-left: 20px;
   }
 
@@ -73,10 +107,14 @@ const remoteMethod = debounce((query: string) => {
     max-width: 120px !important;
   }
 
-  .remote-select-search-icon {
-    position: absolute;
-    top: 3px;
-    left: 4px;
+  :deep(.el-select__tags) {
+    flex-wrap: nowrap;
+  }
+
+  :deep(.el-select-tags-wrapper.has-prefix) {
+    padding-left: 24px;
+    display: flex;
+    flex-wrap: nowrap;
   }
 }
 
@@ -89,12 +127,50 @@ const remoteMethod = debounce((query: string) => {
     font-weight: 300;
     line-height: 24px;
     color: #656A85;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+
+    .select-item-text{
+      display: inline-flex;
+      width: 200px;
+    }
+
+    .select-item-delete-box{
+      position: absolute;
+      top: 3px;
+      right: 4px;
+      display: none;
+
+      svg{
+        width: 16px;
+        height: 16px;
+      }
+
+      .select-item-delete-active{
+        display: none;
+      }
+
+      &:hover {
+        .select-item-delete{
+          display: none;
+        }
+
+        .select-item-delete-active{
+          display: block;
+        }
+      }
+    }
+
+    &:hover{
+      background-color: #F7F8FC;
+      color: #495AD4;
+
+      .select-item-delete-box{
+        display: block;
+      }
+    }
   }
-}
-</style>
-<style lang="scss">
-.remote-select-search-text{
-  display: inline-flex;
-  max-width: 200px;
 }
 </style>

@@ -138,6 +138,7 @@
 import type {
   FormInstance, DateModelType,
 } from 'element-plus';
+import { useRoute } from 'vue-router';
 import dayjs from 'dayjs';
 import {
   getStartAndEnd, today, getOneInterval, getOneIntervalNow,
@@ -151,6 +152,7 @@ import ModalConfig from './components/modal-config.vue';
 const serverStroe = useServerStore();
 const serverId = serverStroe.currentServerId;
 const enumStore = useEnumStore();
+const route = useRoute();
 
 const { maxTableHeight } = useTableHeight(420);
 const searchFormRef = ref<FormInstance>();
@@ -165,7 +167,7 @@ const searchFormData = reactive({
   orderBy: '',
   asc: '',
   alarmName: '',
-  measurements: [] as string[],
+  measurements: (route.query.measurement ? [route.query.measurement] : []) as string[],
   createtimerange: null as unknown as [DateModelType, DateModelType],
   updatetimerange: null as unknown as [DateModelType, DateModelType],
   alarmLevel: '',
