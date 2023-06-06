@@ -41,6 +41,8 @@
         <el-form-item label="仅查看最新状态:" prop="status">
           <el-switch
             v-model="searchFormData.status"
+            :active-value="1"
+            :inactive-value="0"
             style="
 
 --el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED" />
@@ -136,7 +138,6 @@ import {
 import { getOptionField } from '@/utils/format';
 import { AlarmApi } from '@/api';
 import { useServerStore, useEnumStore } from '@/stores';
-import { handleExport } from '@/utils/export';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
 const serverStroe = useServerStore();
@@ -153,7 +154,7 @@ const searchFormData = reactive({
   measurements: [] as string[],
   createtimerange: null as unknown as [DateModelType, DateModelType],
   alarmLevel: '',
-  status: '',
+  status: 0,
   createStartTime: null as unknown as DateModelType,
   createEndTime: null as unknown as DateModelType,
 });
@@ -219,6 +220,7 @@ function getListData() {
 // 重置
 function handleReset() {
   searchFormRef.value?.resetFields();
+  searchFormData.status = 0;
 }
 
 // 查询
@@ -258,15 +260,14 @@ function handleCommandDown(val: string) {
     ...pagination,
     createStartTime: copySearchFormData.createtimerange ? dayjs(copySearchFormData.createtimerange[0]).valueOf() : null,
     createEndTime: copySearchFormData.createtimerange ? dayjs(copySearchFormData.createtimerange[1]).valueOf() : null,
-  }, val).then((res) => {
+  }).then((res) => {
     if (res) {
-      ElMessage.success('导出成功');
-      handleExport(res, `export.${val}`);
-    } else {
-      ElMessage.info('导出未完成');
+      let url = `/api/file/exportExcelAlarmRecordData?exportId=${res.data}`;
+      if (val === 'csv') {
+        url = `/api/file/exportCSVAlarmRecordData?exportId=${res.data}`;
+      }
+      window.open(url);
     }
-  }).catch((err) => {
-    ElMessage.error(err.message);
   });
 }
 
@@ -302,6 +303,8 @@ function handleDel(type: string, data: Alarm.QueryRecordResult | null) {
 
 onMounted(() => {
   handleReset();
+  searchFormData.asc = 'desc';
+  searchFormData.orderBy = 'createTime';
   handleSearch();
 });
 

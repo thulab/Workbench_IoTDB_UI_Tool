@@ -53,11 +53,8 @@ class AlarmApi {
   }
 
   // 导出告警记录
-  static exportAlarmRecord(data: Record<string, string | number | Date | string[] | null | any>, fileType: string = 'csv'): HttpResponseP {
-    if (fileType === 'csv') {
-      return http.post('/file/exportCSVAlarmRecordData', data, { timeout: 60 * 30 * 1000 });
-    }
-    return http.post('/file/exportExcelAlarmRecordData', data, { timeout: 60 * 30 * 1000 });
+  static exportAlarmRecord(data: Alarm.QueryRecordParams & PageQuery): HttpResponseP {
+    return http.post('/file/excelAlarmRecordExportId', data);
   }
 }
 export default AlarmApi;

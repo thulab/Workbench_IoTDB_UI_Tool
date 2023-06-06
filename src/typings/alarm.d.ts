@@ -49,7 +49,7 @@ declare namespace Alarm{
     alarmName: string | null;
     measurements: string[] | null;
     alarmLevel?: string | null;
-    status?: string | null;
+    status?: number;
     createStartTime?: DateModelType | null;
     createEndTime?: DateModelType | null;
     orderBy: string;
