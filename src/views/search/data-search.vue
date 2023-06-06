@@ -43,7 +43,7 @@
           <template #label>
             采样周期:<el-tooltip effect="light" content="请输入正整数" placement="top"><i-custom-question /></el-tooltip>
           </template>
-          <el-input-number v-model="searchFormData.timeInterval" style="width: 180px;" :controls="false" placeholder="" :max="9007199254740992" @change="handleInputInterval" />
+          <el-input v-model.number="searchFormData.timeInterval" style="width: 180px;" placeholder="" @input="handleInputInterval" />
           <el-select v-model="searchFormData.unitInterval" style="width: 80px;" placeholder="">
             <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" />
           </el-select>
@@ -339,9 +339,11 @@ function handleSearch() {
   getListData();
 }
 
-function handleInputInterval(val: number | null | undefined) {
+function handleInputInterval(val: string) {
   if (val) {
-    if (/^0|\.|[^\d.]|^-/.test(`${val}`)) {
+    if (!/^\+?[1-9][0-9]*$/.test(`${val}`)) {
+      searchFormData.timeInterval = undefined;
+    } else if (+val > Number.MAX_SAFE_INTEGER) {
       searchFormData.timeInterval = undefined;
     }
   } else {
