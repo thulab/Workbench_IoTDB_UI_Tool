@@ -44,7 +44,7 @@
       </el-row>
       <el-row>
         <el-col :span="12">
-          <el-form-item label="告警规则:" prop="alarmRulesType" :rules="requiredRules">
+          <el-form-item label="告警规则:" prop="alarmRulesType" :rules="requiredRulesRules">
             <el-select
               v-if="formData.measurementType === 'BOOLEAN' || !formData.measurementType"
               v-model="formData.alarmRulesType"
@@ -68,14 +68,14 @@
                   :value="item.value"
                 />
               </el-select>
-              <el-input v-model="formData.alarmRulesTypeVal" :disabled="!formData.measurementType" placeholder="请输入" />
+              <el-input v-model.number="formData.alarmRulesTypeVal" :disabled="!formData.measurementType" placeholder="请输入" />
             </div>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="持续时间:" prop="alarmDuration" :rules="requiredRules">
+          <el-form-item label="持续时间:" prop="alarmDuration" :rules="requiredDurationRules">
             <el-input
-              v-model="formData.alarmDuration"
+              v-model.number="formData.alarmDuration"
               :disabled="formData.measurementType === 'BOOLEAN' && formData.alarmRulesType === 'change'"
               placeholder="请输入持续时间"
               style="width: 220px;"
@@ -172,9 +172,10 @@ const dialogVisible = useVModel(props, 'visible', emit);
 const enumStore = useEnumStore();
 const booleanRuleEnum = enumStore.alarmBooleanRuleEnum;
 const numberRuleEnum = enumStore.alarmNumberRuleEnum;
-const levelEnum = enumStore.alarmLevelEnum;
+const levelEnum = computed(() => enumStore.alarmLevelEnum || []);
 const frequencyEnum = enumStore.alarmFrequencyEnum;
 const formRef = ref<FormInstance>();
+
 const requiredRules = ref([
   {
     required: true,
@@ -182,6 +183,7 @@ const requiredRules = ref([
     trigger: ['blur', 'change'],
   },
 ]);
+
 const formData = reactive<Alarm.ConfigData>({
   alarmConfigId: undefined,
   alarmName: '',
@@ -190,16 +192,75 @@ const formData = reactive<Alarm.ConfigData>({
   alarmLevel: '',
   alarmDesc: '',
   alarmRulesType: '',
-  alarmRulesTypeVal: '',
+  alarmRulesTypeVal: undefined,
   alarmFrequency: '',
-  alarmDuration: '',
+  alarmDuration: undefined,
   alarmDurationType: '',
 });
 const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);
 
+const checkRules = (rule: any, value: any, callback: any) => {
+  if (!value && value !== 0) {
+    return callback(new Error('请输入相应内容后进行操作'));
+  }
+  if (formData.measurementType !== 'BOOLEAN') {
+    if (!formData.alarmRulesTypeVal) {
+      return callback(new Error('请输入告警规则值'));
+    }
+    if (!/^\d+$/.test(`${formData.alarmRulesTypeVal}`)) {
+      return callback(new Error('只能输入正整数或0'));
+    }
+    if (typeof formData.alarmRulesTypeVal === 'number' && formData.alarmRulesTypeVal > Number.MAX_SAFE_INTEGER) {
+      return callback(new Error(`最大值为${Number.MAX_SAFE_INTEGER}`));
+    }
+    return callback();
+  }
+  return callback();
+};
+
+const requiredRulesRules = ref([
+  {
+    required: true,
+    message: '请输入相应内容后进行操作',
+    trigger: ['blur', 'change'],
+  },
+  {
+    validator: checkRules,
+    trigger: ['blur', 'change'],
+  },
+]);
+
+const checkDuration = (rule: any, value: any, callback: any) => {
+  if (!value && value !== 0) {
+    return callback(new Error('请输入相应内容后进行操作'));
+  }
+  if (!/^\d+$/.test(`${value}`)) {
+    return callback(new Error('只能输入正整数或0'));
+  }
+  if (typeof value === 'number' && value > Number.MAX_SAFE_INTEGER) {
+    return callback(new Error(`最大值为${Number.MAX_SAFE_INTEGER}`));
+  }
+  if (!(formData.measurementType === 'BOOLEAN' && formData.alarmRulesType === 'change') && !formData.alarmDurationType) {
+    return callback(new Error('请选择持续时间单位'));
+  }
+  return callback();
+};
+
+const requiredDurationRules = ref([
+  {
+    required: true,
+    message: '请输入相应内容后进行操作',
+    trigger: ['blur', 'change'],
+  },
+  {
+    validator: checkDuration,
+    trigger: ['blur', 'change'],
+  },
+]);
+
 const getLevelColor = computed(() => {
   if (formData.alarmLevel) {
-    const res = levelEnum.find((f) => f.value === formData.alarmLevel);
+    const res = levelEnum.value.find((f: ConfigEnumData) => f.value === formData.alarmLevel);
     return res?.paramMap?.color;
   }
   return '#656A85';
@@ -238,29 +299,21 @@ function handleChangePath(val: string) {
   formData.alarmLevel = '';
   formData.alarmDesc = '';
   formData.alarmRulesType = '';
-  formData.alarmRulesTypeVal = '';
+  formData.alarmRulesTypeVal = undefined;
   formData.alarmFrequency = '';
-  formData.alarmDuration = '';
+  formData.alarmDuration = undefined;
   formData.alarmDurationType = '';
 }
 
 function handleChangeBooleanRule(val: string) {
   if (val === 'change') {
-    formData.alarmDuration = '0';
+    formData.alarmDuration = 0;
   }
 }
 
 const handleConfirm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
-      if (formData.measurementType !== 'BOOLEAN' && !formData.alarmRulesTypeVal) {
-        ElMessage.error('请输入告警规则值');
-        return;
-      }
-      if (!formData.alarmDurationType) {
-        ElMessage.error('请选择持续时间单位');
-        return;
-      }
       const params = {
         alarmName: formData.alarmName,
         alarmLevel: formData.alarmLevel,
@@ -304,8 +357,8 @@ watch(
     if (newVal) {
       formRef.value?.resetFields();
       formData.alarmRulesType = '';
-      formData.alarmRulesTypeVal = '';
-      formData.alarmDuration = '';
+      formData.alarmRulesTypeVal = undefined;
+      formData.alarmDuration = undefined;
       formData.alarmDurationType = '';
       if (props.editType === 'edit') {
         formData.alarmConfigId = props.alarmConfigId;

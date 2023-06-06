@@ -98,7 +98,7 @@
               {{ getOptionField(row.status, statusOptions, 'value', 'label') }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="240" fixed="right">
+          <el-table-column label="操作" width="180" fixed="right">
             <template #default="{ row }">
               <el-button v-if="row.status !== 3" type="primary" link size="small" @click="handleStatus(row)">{{ row.status === 1 ? '禁用' : '启用' }}</el-button>
               <el-button type="primary" link size="small" @click="handleEdit(row)">编辑</el-button>
@@ -131,7 +131,7 @@
     <modal-config
       v-model:visible="editVisible"
       :server-id="serverId"
-      :alarmConfigId="alarmConfigId"
+      :alarm-config-id="alarmConfigId"
       :edit-type="editType"
       @handleSave="handleSaveConfig"
     />
@@ -324,6 +324,8 @@ function handleSaveConfig() {
 
 onMounted(() => {
   handleReset();
+  searchFormData.asc = 'desc';
+  searchFormData.orderBy = 'createTime';
   handleSearch();
 });
 

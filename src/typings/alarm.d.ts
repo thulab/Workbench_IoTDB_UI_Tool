@@ -38,10 +38,10 @@ declare namespace Alarm{
     alarmLevel: string;
     alarmDesc: string;
     alarmRulesType?: string;
-    alarmRulesTypeVal?: string;
-    alarmRules?: Array<{ operator?: string, value?: string }>;
+    alarmRulesTypeVal?: number;
+    alarmRules?: Array<{ operator?: string, value?: number }>;
     alarmFrequency: string;
-    alarmDuration: string;
+    alarmDuration?: number;
     alarmDurationType: string;
   }
 
