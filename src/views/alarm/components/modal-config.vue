@@ -153,6 +153,7 @@
 <script lang="ts" setup>
 import { debounce, assign } from 'lodash-es';
 import type { FormInstance } from 'element-plus';
+import { storeToRefs } from 'pinia';
 import { AlarmApi, StorageApi } from '@/api';
 import { useEnumStore } from '@/stores';
 
@@ -170,10 +171,12 @@ const emit = defineEmits<{
 
 const dialogVisible = useVModel(props, 'visible', emit);
 const enumStore = useEnumStore();
-const booleanRuleEnum = enumStore.alarmBooleanRuleEnum;
-const numberRuleEnum = enumStore.alarmNumberRuleEnum;
-const levelEnum = computed(() => enumStore.alarmLevelEnum || []);
-const frequencyEnum = enumStore.alarmFrequencyEnum;
+const {
+  alarmBooleanRuleEnum: booleanRuleEnum,
+  alarmNumberRuleEnum: numberRuleEnum,
+  alarmLevelEnum: levelEnum,
+  alarmFrequencyEnum: frequencyEnum,
+} = storeToRefs(enumStore);
 const formRef = ref<FormInstance>();
 
 const requiredRules = ref([
