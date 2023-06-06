@@ -17,6 +17,11 @@ class StorageApi {
     return http.post('/schema/saveDatabase', data, { params: { serverId } });
   }
 
+  // 更新存储组TTL
+  static upsertDatabaseTTL(serverId: number, data: StorageDevice.SaveStorageGroupsRequest): HttpResponseP {
+    return http.post('/schema/upsertDatabaseTTL', data, { params: { serverId } });
+  }
+
   //  存储组信息
   static getStorageGroupsInfo(serverId: number, groupName: string): HttpResponseP<StorageDevice.GetStorageGroupsInfoResponse> {
     return http.get('/schema/getDatabaseInfo', { params: { serverId, groupName } });

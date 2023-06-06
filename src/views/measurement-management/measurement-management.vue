@@ -196,7 +196,7 @@ const importVisible = ref(false);
 
 const { requestFn: deleteStorageGroups } = useRequest(StorageApi.deleteStorageGroups);
 const { requestFn: getStorageGroupsInfo } = useRequest(StorageApi.getStorageGroupsInfo);
-const { requestFn: saveStorageGroups } = useRequest(StorageApi.saveStorageGroups);
+const { requestFn: upsertDatabaseTTL } = useRequest(StorageApi.upsertDatabaseTTL);
 const { requestFn: getMeasurementsInfosByFuzzy, data: tableData, loading } = useRequest(StorageApi.getMeasurementsInfosByFuzzy, {
   initData: {
     totalCount: 0,
@@ -383,7 +383,7 @@ function handleConfirmEditTTL() {
     ttl: !editTTLModel.value ? undefined : +editTTLModel.value,
     ttlUnit: editTTLUnitModel.value || undefined,
   };
-  saveStorageGroups(serverId, { ...reqObj }).then((res) => {
+  upsertDatabaseTTL(serverId, { ...reqObj }).then((res) => {
     if (res.code === 0) {
       ElMessage.success('更新成功！');
       editTTL.value = false;

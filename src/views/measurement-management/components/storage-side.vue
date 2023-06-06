@@ -40,7 +40,7 @@ const { requestFn: deleteStorageGroups } = useRequest(StorageApi.deleteStorageGr
 // 获取数据库
 function getStorageList() {
   getGroup({ serverId: props.serverId }).then((res) => {
-    storageList.value = res.data?.pathNames || [];
+    storageList.value = res.data?.pathNames.filter((item) => item !== 'root.__system') || [];
     currentStorage.value = storageList.value[0] || '';
   });
 }
