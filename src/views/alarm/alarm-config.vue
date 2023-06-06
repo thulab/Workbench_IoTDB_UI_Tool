@@ -158,7 +158,7 @@ const serverId = serverStroe.currentServerId;
 const enumStore = useEnumStore();
 const route = useRoute();
 
-const { maxTableHeight } = useTableHeight(420);
+const { maxTableHeight } = useTableHeight(430);
 const searchFormRef = ref<FormInstance>();
 const levelOptions = [{ name: '全部', value: '', paramMap: { color: '#656A85', icon: '' } }, ...enumStore.alarmLevelEnum];
 const statusOptions = [

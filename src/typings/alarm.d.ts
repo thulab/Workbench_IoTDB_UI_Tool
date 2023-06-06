@@ -38,8 +38,8 @@ declare namespace Alarm{
     alarmLevel: string;
     alarmDesc: string;
     alarmRulesType?: string;
-    alarmRulesTypeVal?: number;
-    alarmRules?: Array<{ operator?: string, value?: number }>;
+    alarmRulesTypeVal?: string;
+    alarmRules?: Array<{ operator?: string, value?: string }>;
     alarmFrequency: string;
     alarmDuration?: number;
     alarmDurationType: string;
@@ -58,7 +58,7 @@ declare namespace Alarm{
 
   export interface QueryRecordResult {
     alarmRecordId: number;
-    alarmTraceId: number;
+    alarmTraceId: string;
     alarmName: string;
     measurement: string;
     alarmLevel: string;

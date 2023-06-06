@@ -48,7 +48,7 @@ class AlarmApi {
   }
 
   // 更新告警记录状态
-  static updateAlarmRecordStatus(traceId: number): HttpResponseP {
+  static updateAlarmRecordStatus(traceId: string): HttpResponseP {
     return http.get('/alarm/notConcerned', { params: { traceId } });
   }
 

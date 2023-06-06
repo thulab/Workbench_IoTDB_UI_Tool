@@ -96,9 +96,11 @@
           <el-table-column label="告警描述" prop="alarmDesc" min-width="140" show-overflow-tooltip />
           <el-table-column label="操作" width="180" fixed="right">
             <template #default="{ row }">
-              <el-button v-if="!row.hasRead" type="primary" link size="small" @click="handleStatus(row)">已阅</el-button>
-              <el-icon v-else size="16"><i-custom-success-green /></el-icon>
-              <el-button type="primary" link size="small" @click="handleDel('row', row)">删除</el-button>
+              <div style="display: flex; align-items: center;">
+                <el-button v-if="!row.hasRead" type="primary" link size="small" @click="handleStatus(row)">已阅</el-button>
+                <el-icon v-else size="16" class="m-r-8"><i-custom-success-green /></el-icon>
+                <el-button type="primary" link size="small" @click="handleDel('row', row)">删除</el-button>
+              </div>
             </template>
           </el-table-column>
           <template #empty>
@@ -144,7 +146,7 @@ const serverStroe = useServerStore();
 const serverId = serverStroe.currentServerId;
 const enumStore = useEnumStore();
 
-const { maxTableHeight } = useTableHeight(420);
+const { maxTableHeight } = useTableHeight(430);
 const searchFormRef = ref<FormInstance>();
 const levelOptions = [{ name: '全部', value: '', paramMap: { color: '#656A85', icon: '' } }, ...enumStore.alarmLevelEnum];
 const searchFormData = reactive({

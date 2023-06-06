@@ -68,7 +68,7 @@
                   :value="item.value"
                 />
               </el-select>
-              <el-input v-model.number="formData.alarmRulesTypeVal" :disabled="!formData.measurementType" placeholder="请输入" />
+              <el-input v-model="formData.alarmRulesTypeVal" :disabled="!formData.measurementType" placeholder="请输入" />
             </div>
           </el-form-item>
         </el-col>
@@ -192,7 +192,7 @@ const formData = reactive<Alarm.ConfigData>({
   alarmLevel: '',
   alarmDesc: '',
   alarmRulesType: '',
-  alarmRulesTypeVal: undefined,
+  alarmRulesTypeVal: '',
   alarmFrequency: '',
   alarmDuration: undefined,
   alarmDurationType: '',
@@ -200,18 +200,12 @@ const formData = reactive<Alarm.ConfigData>({
 const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);
 
 const checkRules = (rule: any, value: any, callback: any) => {
-  if (!value && value !== 0) {
-    return callback(new Error('请输入相应内容后进行操作'));
+  if (!value) {
+    return callback(new Error('请选择告警规则条件'));
   }
   if (formData.measurementType !== 'BOOLEAN') {
     if (!formData.alarmRulesTypeVal) {
       return callback(new Error('请输入告警规则值'));
-    }
-    if (!/^\d+$/.test(`${formData.alarmRulesTypeVal}`)) {
-      return callback(new Error('只能输入正整数或0'));
-    }
-    if (typeof formData.alarmRulesTypeVal === 'number' && formData.alarmRulesTypeVal > Number.MAX_SAFE_INTEGER) {
-      return callback(new Error(`最大值为${Number.MAX_SAFE_INTEGER}`));
     }
     return callback();
   }
@@ -221,7 +215,7 @@ const checkRules = (rule: any, value: any, callback: any) => {
 const requiredRulesRules = ref([
   {
     required: true,
-    message: '请输入相应内容后进行操作',
+    message: '请选择告警规则条件',
     trigger: ['blur', 'change'],
   },
   {
@@ -299,7 +293,7 @@ function handleChangePath(val: string) {
   formData.alarmLevel = '';
   formData.alarmDesc = '';
   formData.alarmRulesType = '';
-  formData.alarmRulesTypeVal = undefined;
+  formData.alarmRulesTypeVal = '';
   formData.alarmFrequency = '';
   formData.alarmDuration = undefined;
   formData.alarmDurationType = '';
@@ -357,7 +351,7 @@ watch(
     if (newVal) {
       formRef.value?.resetFields();
       formData.alarmRulesType = '';
-      formData.alarmRulesTypeVal = undefined;
+      formData.alarmRulesTypeVal = '';
       formData.alarmDuration = undefined;
       formData.alarmDurationType = '';
       if (props.editType === 'edit') {
