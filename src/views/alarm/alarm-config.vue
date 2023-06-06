@@ -140,7 +140,7 @@
 
 <script setup lang="ts">
 import type {
-  FormInstance, DateModelType,
+  FormInstance, DateModelType, ElTable,
 } from 'element-plus';
 import { useRoute } from 'vue-router';
 import dayjs from 'dayjs';
@@ -160,6 +160,7 @@ const route = useRoute();
 
 const { maxTableHeight } = useTableHeight(430);
 const searchFormRef = ref<FormInstance>();
+const tableRef = ref<InstanceType<typeof ElTable>>();
 const levelOptions = [{ name: '全部', value: '', paramMap: { color: '#656A85', icon: '' } }, ...enumStore.alarmLevelEnum];
 const statusOptions = [
   { label: '全部', value: '' },
@@ -244,6 +245,7 @@ function getListData() {
 // 重置
 function handleReset() {
   searchFormRef.value?.resetFields();
+  searchFormData.measurements = [];
 }
 
 // 查询
@@ -271,6 +273,10 @@ function handleSelectionChange(vals: Alarm.QueryConfigResult[]) {
 function handleSortChange({ column, prop, order }:SortMethod<Alarm.QueryConfigResult>) {
   searchFormData.asc = order === 'ascending' ? 'asc' : 'desc';
   searchFormData.orderBy = prop;
+  if (!order) {
+    tableRef.value?.sort('createTime', 'descending');
+    return;
+  }
   handleSearch();
 }
 

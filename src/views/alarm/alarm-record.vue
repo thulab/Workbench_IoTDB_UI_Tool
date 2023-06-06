@@ -130,7 +130,7 @@
 
 <script setup lang="ts">
 import type {
-  FormInstance, DateModelType,
+  FormInstance, DateModelType, ElTable,
 } from 'element-plus';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash-es';
@@ -148,6 +148,7 @@ const enumStore = useEnumStore();
 
 const { maxTableHeight } = useTableHeight(430);
 const searchFormRef = ref<FormInstance>();
+const tableRef = ref<InstanceType<typeof ElTable>>();
 const levelOptions = [{ name: '全部', value: '', paramMap: { color: '#656A85', icon: '' } }, ...enumStore.alarmLevelEnum];
 const searchFormData = reactive({
   orderBy: '',
@@ -223,6 +224,7 @@ function getListData() {
 function handleReset() {
   searchFormRef.value?.resetFields();
   searchFormData.status = 0;
+  searchFormData.measurements = [];
 }
 
 // 查询
@@ -252,6 +254,10 @@ function handleSortChange({ column, prop, order }:SortMethod<Alarm.QueryRecordRe
   searchFormData.asc = order === 'ascending' ? 'asc' : 'desc';
   searchFormData.orderBy = prop;
   copySearchFormData = cloneDeep(searchFormData);
+  if (!order) {
+    tableRef.value?.sort('createTime', 'descending');
+    return;
+  }
   handleSearch();
 }
 

@@ -7,6 +7,11 @@
   --el-font-size-base: 12px;
 
   line-height: 18px !important;
+
+  --el-button-hover-link-text-color: #495AD4;
 }
 
+.el-button.is-link:not(.is-disabled):hover{
+  text-decoration: underline;
+}
 
