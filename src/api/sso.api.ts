@@ -4,6 +4,7 @@ class SSOApi {
   static getLoginInfo(): HttpResponseP<{ name: string; id: string; urls: Record<string, string> }> {
     return http.get('/user/get');
   }
+
   static enabledSSO(): HttpResponseP<boolean> {
     return http.get('/sso/enabledSSO');
   }

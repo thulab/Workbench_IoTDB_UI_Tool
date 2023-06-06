@@ -32,7 +32,7 @@ const showError = (message: string, code?: number) => {
 };
 
 export const showErrorFn = (err: HttpError, defaultErrMessage?: string | boolean) => {
-  if (err.status && err.status !== 200) {
+  if ((err.status && err.status !== 200)) {
     ElMessage.error({ message: '内部服务异常，请联系管理员', grouping: true });
   } else if (typeof defaultErrMessage === 'string') {
     showError(defaultErrMessage, err.code);
@@ -40,6 +40,8 @@ export const showErrorFn = (err: HttpError, defaultErrMessage?: string | boolean
     showError(err.message, err.code);
   } else if (err.error) {
     showError(err.error, err.code);
+  } else if (!err) {
+    ElMessage.error({ message: '内部服务异常，请联系管理员', grouping: true });
   }
 };
 
