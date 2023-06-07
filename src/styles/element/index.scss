@@ -14,3 +14,11 @@
   --el-border-radius-base: 2px;
   --el-border-color: #DFE1ED;
 }
+
+::-webkit-scrollbar-thumb {
+  background: #F0F1FA;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #DFE1ED;
+}
