@@ -66,9 +66,9 @@
     </div>
 
     <div class="page-table-details">
-      <h4 class="page-info-title">查询详情</h4>
+
       <div class="page-info-box">
-        <ul class="run-result-list">
+        <!-- <ul class="run-result-list">
           <li class="run-result-item">
             <i-custom-query-success v-if="searchDetailInfos.status === true" />
             <i-custom-query-error v-else-if="searchDetailInfos.status === false" />
@@ -79,8 +79,10 @@
           </li>
           <li class="run-result-item"><i-custom-query-start-time />开始时间：{{ formatSqlInfo('startQueryTime') }}</li>
           <li class="run-result-item"><i-custom-query-time />查询耗时：{{ formatSqlInfo('queryTime') }}</li>
-        </ul>
-
+        </ul> -->
+        <h4 class="page-info-title">查询详情
+          <span class="run-result-tip"><i-custom-info-warning />默认最多展示1000行100列，如需查看更多数据请下载查看</span>
+        </h4>
         <div class="page-detail-buttons">
           <el-button @click="handleSearch" :disabled="getListLoading">刷新</el-button>
           <el-dropdown class="more-icon m-l-12" :disabled="getListLoading" v-show="searchDetailInfos.status && tableData.length > 0" @command="val => handleCommandDown(val)">
@@ -506,10 +508,26 @@ onMounted(() => {
   flex-direction: column;
 
   .page-info-title {
+    display: flex;
     font-size: 14px;
     line-height: 20px;
     color: #495ad4;
     margin-bottom: 18px;
+
+    .run-result-tip {
+      align-self: flex-end;
+      margin: 0 0 0 12px;
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      color: #808080;
+      font-weight: 400;
+
+      svg {
+        color: #ccc;
+        margin-right: 4px;
+      }
+    }
   }
 
   .page-info-box {

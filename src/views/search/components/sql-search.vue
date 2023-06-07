@@ -35,7 +35,7 @@
             <span>运行结果{{ index + 1 }}</span>
           </template>
           <div class="run-result-infos">
-            <ul>
+            <!-- <ul>
               <li class="run-result-item">
                 <i-custom-query-success v-if="sqlResult[index].status === true" />
                 <i-custom-query-error v-else-if="sqlResult[index].status === false" />
@@ -45,7 +45,8 @@
               </li>
               <li class="run-result-item"><i-custom-query-start-time />开始时间：{{ formatSqlInfo('startQueryTime', index) }}</li>
               <li class="run-result-item"><i-custom-query-time />查询耗时：{{ formatSqlInfo('queryTime', index) }}</li>
-            </ul>
+            </ul> -->
+            <div></div>
             <div class="run-result-buttons">
               <el-button link @click="handleCommandDown('refresh', index)"><i-custom-refresh />刷新</el-button>
               <el-dropdown :disabled="!sqlResult[index].status" class="more-icon m-l-12" @command="val => handleCommandDown(val, index)" v-show="sqlResult[index].status && tableDataPagination[index]?.list?.length > 0">
