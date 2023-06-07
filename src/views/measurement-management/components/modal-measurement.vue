@@ -356,6 +356,11 @@ watch(
   border-bottom: 1px solid #F0F1FA;
 }
 
+.device-box{
+  display: flex;
+  align-items: center;
+}
+
 .measurement-list-box{
   min-height: 300px;
   max-height: 500px;
@@ -405,5 +410,10 @@ watch(
 
 .operate-box{
   text-align: right;
+
+  .el-button{
+    min-width: 28px !important;
+    padding: 0 !important;
+  }
 }
 </style>

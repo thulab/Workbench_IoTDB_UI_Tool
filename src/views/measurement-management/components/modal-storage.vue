@@ -17,7 +17,7 @@
         </template>
         <el-input v-model="formData.ttl" min="0" max="9007199254740992" class="ttl-input">
           <template #append>
-            <el-select v-model="formData.ttlUnit" style="width: 80px;" placeholder="">
+            <el-select v-model="formData.ttlUnit" style="width: 56px;" placeholder="">
               <el-option label="毫秒" value="millisecond" />
               <el-option label="秒" value="second" />
               <el-option label="分" value="minute" />

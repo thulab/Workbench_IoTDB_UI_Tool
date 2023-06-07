@@ -366,12 +366,13 @@ function emptyQuery() {
 
 .run-result-title-box {
   display: flex;
+  align-items: center;
   padding: 12px 0 12px 16px;
   margin-bottom: 12px;
   border-bottom: 1px solid #DFE1ED;
 
   .run-result-tip {
-    align-self: flex-end;
+    // align-self: flex-end;
     margin: 0 0 0 12px;
     display: flex;
     align-items: center;

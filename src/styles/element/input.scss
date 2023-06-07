@@ -4,24 +4,14 @@
   font-weight: 300;
 }
 
-.el-input-group__append {
-  border-left: 0 !important;
-
-  .el-select {
-    .el-input {
-      .el-input__wrapper{
-        padding-left: 2px;
-      }
-    }
-  }
-}
-
 .el-input__inner, .el-range-input {
   color: #656A85;
   font-weight: 300;
 }
 
 .el-select {
+  line-height: 28px !important;
+
   .el-input__wrapper{
     padding-right: 1px !important;
   }
@@ -38,24 +28,21 @@
       }
     }
   }
+}
 
+.el-checkbox{
+  height: 28px !important;
+}
 
-  .el-select__icon{
-    position: relative;
+.el-input-group__append {
+  border-left: 0 !important;
+  background: #F0F1FA !important;
 
-    &::after{
-      position: absolute;
-      display: block;
-      content: "";
-      width: 0;
-      height: 0;
-      border-top: 3px solid #495AD4;
-      border-right: 3px solid transparent;
-      border-left: 3px solid transparent;
-    }
-
-    svg{
-      display: none;
+  .el-select {
+    .el-input {
+      .el-input__wrapper{
+        padding-left: 2px;
+      }
     }
   }
 }
