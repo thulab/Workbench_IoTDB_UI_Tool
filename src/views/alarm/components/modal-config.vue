@@ -234,8 +234,8 @@ const checkDuration = (rule: any, value: any, callback: any) => {
   if (!/^\d+$/.test(`${value}`)) {
     return callback(new Error('只能输入正整数或0'));
   }
-  if (typeof value === 'number' && value > Number.MAX_SAFE_INTEGER) {
-    return callback(new Error(`最大值为${Number.MAX_SAFE_INTEGER}`));
+  if (typeof value === 'number' && value > 100000000) {
+    return callback(new Error(`最大值为${100000000}`));
   }
   if (!(formData.measurementType === 'BOOLEAN' && formData.alarmRulesType === 'change') && !formData.alarmDurationType) {
     return callback(new Error('请选择持续时间单位'));
