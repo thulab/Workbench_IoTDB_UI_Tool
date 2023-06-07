@@ -114,16 +114,19 @@
         <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
         <span class="data-empty-text">无数据</span>
       </div>
-      <div :loading="getListLoading">
+      <div v-loading="getListLoading">
         <div v-if="searchDetailInfos.status">
           <dynamic-table
             :columns="columns"
-            :table-data="tableData"
+            :table-data="tableDataPagination"
             :height="tableHeight"
             :max-height="tableHeight"
-            :show-pagination="false"
+            v-model:current-page="pagination.pageNum"
+            v-model:page-size="pagination.pageSize"
+            :total="tableData.length"
+            :show-pagination="true"
           />
-          <div class="pagination-container" v-if="tableData.length > 0">
+          <!-- <div class="pagination-container" v-if="tableData.length > 0">
             <el-button plain class="btn-page btn-first" @click="handleClickPage('first')" :disabled="pagination.pageNum === 1">第一页</el-button>
             <el-button type="primary" class="btn-page btn-prev" @click="handleClickPage('prev')" :disabled="pagination.pageNum === 1">上一页</el-button>
             <el-button type="primary" class="btn-page btn-next" @click="handleClickPage('next')" :disabled="!hasNext">下一页</el-button>
@@ -135,7 +138,7 @@
                 :value="item.value"
               />
             </el-select>
-          </div>
+          </div> -->
         </div>
         <div class="table-error-wrapper" v-if="searchDetailInfos.errMsg">
           Msg: {{ searchDetailInfos.errMsg }}
@@ -161,7 +164,7 @@ import ICustomCalender from '~icons/custom/calender.svg';
 const serverStroe = useServerStore();
 const serverId = serverStroe.currentServerId;
 
-const { maxTableHeight } = useTableHeight(420);
+const { maxTableHeight } = useTableHeight(350);
 const searchFormRef = ref<FormInstance>();
 const firstLoad = ref(true);
 const timeUnits = [
@@ -177,12 +180,7 @@ const aggregateFunctions = [
   { label: '最大值', value: 'max_value' },
   { label: '最小值', value: 'min_value' },
 ];
-const paginationSizerOptions = [
-  { label: '10条/页', value: 10 },
-  { label: '20条/页', value: 20 },
-  { label: '50条/页', value: 50 },
-  { label: '100条/页', value: 100 },
-];
+
 const currentQueryTime = ref('');
 const timeType = ref('datetime');
 const errorDeviceTip = ref('');
@@ -241,19 +239,19 @@ const getListLoading = ref(false);
 
 const tableHeight = computed(() => (tableData.value.length > 0 ? maxTableHeight.value : maxTableHeight.value + 60));
 
-// 查询结果
-const formatSqlInfo = computed(() => function (filed: string) {
-  const data: Partial<Search.QueryDataResult> = searchDetailInfos?.value;
-  if (filed === 'status') {
-    // eslint-disable-next-line no-nested-ternary
-    return data.status === undefined ? '' : (data.status ? '查询成功' : '查询失败');
-  } if (filed === 'startQueryTime') {
-    return currentQueryTime.value;
-  } if (filed === 'queryTime') {
-    return data.status ? data.queryTime : '';
-  }
-  return '';
-});
+// // 查询结果
+// const formatSqlInfo = computed(() => function (filed: string) {
+//   const data: Partial<Search.QueryDataResult> = searchDetailInfos?.value;
+//   if (filed === 'status') {
+//     // eslint-disable-next-line no-nested-ternary
+//     return data.status === undefined ? '' : (data.status ? '查询成功' : '查询失败');
+//   } if (filed === 'startQueryTime') {
+//     return currentQueryTime.value;
+//   } if (filed === 'queryTime') {
+//     return data.status ? data.queryTime : '';
+//   }
+//   return '';
+// });
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
@@ -296,7 +294,7 @@ function getListData() {
     unitInterval: copySearchFormData.unitInterval,
     spage: pagination.columnNum,
     ssize: pagination.columnSize,
-    size: pagination.pageSize,
+    size: 1000,
     page: pagination.pageNum,
   }, controller).then((res) => {
     // eslint-disable-next-line no-undef
@@ -372,22 +370,22 @@ function queryData(columnNum?: number) {
   getListData();
 }
 
-function handleClickPage(type: string) {
-  if (type === 'first') {
-    pagination.pageNum = 1;
-  } else if (type === 'prev') {
-    pagination.pageNum--;
-  } else {
-    pagination.pageNum++;
-  }
-  getListData();
-}
+// function handleClickPage(type: string) {
+//   if (type === 'first') {
+//     pagination.pageNum = 1;
+//   } else if (type === 'prev') {
+//     pagination.pageNum--;
+//   } else {
+//     pagination.pageNum++;
+//   }
+//   getListData();
+// }
 
-function handleChangePageSize(val: number) {
-  pagination.pageSize = val;
-  pagination.pageNum = 1;
-  getListData();
-}
+// function handleChangePageSize(val: number) {
+//   pagination.pageSize = val;
+//   pagination.pageNum = 1;
+//   getListData();
+// }
 
 // 导出
 function handleExportData(exportType: string) {

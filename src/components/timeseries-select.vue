@@ -92,6 +92,9 @@ const remoteMethod = debounce((query: string) => {
 function handleDelete(index: number) {
   model.value?.splice(index, 1);
 }
+onMounted(() => {
+  remoteMethod('');
+});
 </script>
 
 <style scoped lang="scss">

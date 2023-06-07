@@ -215,19 +215,19 @@ function querySqlRun() {
     ElMessage.error('查询正在运行中，请勿重复操作');
   }
 }
-// 查询结果
-const formatSqlInfo = computed(() => (filed: string, index: number) => {
-  const data: Partial<Search.QuerySqlResponse> = sqlResult.value[index];
-  if (filed === 'status') {
-    // eslint-disable-next-line no-nested-ternary
-    return data.status === undefined ? '' : (data.status ? '查询成功' : '查询失败');
-  } if (filed === 'startQueryTime') {
-    return data.startQueryTime ? data.startQueryTime : currentQueryTime.value;
-  } if (filed === 'queryTime') {
-    return data.queryTime ? data.queryTime : '';
-  }
-  return '';
-});
+// // 查询结果
+// const formatSqlInfo = computed(() => (filed: string, index: number) => {
+//   const data: Partial<Search.QuerySqlResponse> = sqlResult.value[index];
+//   if (filed === 'status') {
+//     // eslint-disable-next-line no-nested-ternary
+//     return data.status === undefined ? '' : (data.status ? '查询成功' : '查询失败');
+//   } if (filed === 'startQueryTime') {
+//     return data.startQueryTime ? data.startQueryTime : currentQueryTime.value;
+//   } if (filed === 'queryTime') {
+//     return data.queryTime ? data.queryTime : '';
+//   }
+//   return '';
+// });
 
 function handleSave() {
   emit('save');
@@ -391,6 +391,8 @@ function emptyQuery() {
 }
 
 .tabs-nav-list {
+  margin-bottom: 8px;
+
   :deep(.el-tabs__content) {
     padding: 16px;
     background-color: #F7F8FC;

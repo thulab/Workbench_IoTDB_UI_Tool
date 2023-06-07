@@ -44,6 +44,7 @@
       <div></div>
       <el-pagination
         v-if="showPagination"
+        background
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         v-model:current-page="currentPageVM"

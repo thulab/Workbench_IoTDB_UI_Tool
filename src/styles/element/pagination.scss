@@ -1,5 +1,14 @@
 .el-pagination {
   justify-content: center;
+
+}
+
+.el-pagination .el-select .el-input {
+  width: 90px !important;
+
+  .el-input__wrapper{
+    padding-left: 1px;
+  }
 }
 
 .el-pagination.is-background .btn-prev,
