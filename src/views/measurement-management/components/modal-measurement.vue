@@ -33,7 +33,7 @@
           </div>
         </div>
       </el-form-item>
-      <h4 class="module-title">测点</h4>
+      <h4 class="module-title" style="border: none;">测点</h4>
       <el-collapse accordion class="measurement-list-box">
         <el-collapse-item v-for="(item, index) in formData.measurementList" :key="index" :name="'measurement_' + index">
           <template #title>
@@ -76,7 +76,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item label="压缩方式" :prop="'measurementList[' + index + '].compression'" :rules="requiredRules">
+              <el-form-item label="压缩方式" :prop="'measurementList[' + index + '].compression'" :rules="requiredRules" style="margin-right: 0;">
                 <el-select v-model="item.compression" placeholder="请选择数据类型" :disabled="!item.isEditable || !formData.deviceName">
                   <el-option v-for="com in compressionOptions" :key="com" :label="com" :value="com" />
                 </el-select>
@@ -357,10 +357,14 @@ watch(
 }
 
 .measurement-list-box{
-  height: 200px;
-  max-height: 400px;
+  min-height: 300px;
+  max-height: 500px;
   overflow-y: auto;
   border-bottom: none;
+
+  :deep(.el-form-item--default) {
+    margin-right: 16px;
+  }
 }
 
 .collapse-title-box{

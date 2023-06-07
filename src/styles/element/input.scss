@@ -8,3 +8,42 @@
   color: #656A85;
   font-weight: 300;
 }
+
+.el-select {
+  .el-input__wrapper{
+    padding-right: 1px !important;
+  }
+
+  .el-input__suffix{
+    width: 16px;
+    background: #F0F1FA;
+
+    .el-input__suffix-inner{
+      width: 100%;
+
+      &> :first-child{
+        margin-left: 0;
+      }
+    }
+  }
+
+
+  .el-select__icon{
+    position: relative;
+
+    &::after{
+      position: absolute;
+      display: block;
+      content: "";
+      width: 0;
+      height: 0;
+      border-top: 3px solid #495AD4;
+      border-right: 3px solid transparent;
+      border-left: 3px solid transparent;
+    }
+
+    svg{
+      display: none;
+    }
+  }
+}
