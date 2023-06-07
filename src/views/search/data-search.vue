@@ -45,13 +45,17 @@
               <template #label>
                 采样周期:<el-tooltip effect="light" content="请输入正整数" placement="top"><i-custom-question /></el-tooltip>
               </template>
-              <el-input v-model.number="searchFormData.timeInterval" style="width: 180px;" placeholder="" @input="handleInputInterval" />
-              <el-select v-model="searchFormData.unitInterval" style="width: 80px;" placeholder="">
-                <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" />
-              </el-select>
+              <el-input v-model.number="searchFormData.timeInterval" style="width: 100px;" placeholder="" @input="handleInputInterval">
+                <template #append>
+                  <el-select v-model="searchFormData.unitInterval" style="width: 50px;" placeholder="">
+                    <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" />
+                  </el-select>
+                </template>
+              </el-input>
+
             </el-form-item>
             <el-form-item label="采样策略:" prop="aggregation">
-              <el-select v-model="searchFormData.aggregation" style="width: 120px;" clearable>
+              <el-select v-model="searchFormData.aggregation" style="width: 80px;" clearable>
                 <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" />
               </el-select>
             </el-form-item>
