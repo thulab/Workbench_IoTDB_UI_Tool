@@ -1,7 +1,7 @@
 import { Layout } from '@/router/constant-routes';
 // 采用raw加载svg文件，v-html渲染
-import ICustomStorage from '@/assets/icons/storage.svg?raw';
-import ICustomStorageActive from '@/assets/icons/storage-active.svg?raw';
+import ICustomMeasurement from '@/assets/icons/measurement.svg?raw';
+import ICustomMeasurementActive from '@/assets/icons/measurement-active.svg?raw';
 
 const route = [
   {
@@ -10,8 +10,8 @@ const route = [
     redirect: { name: 'MeasurementManagement' },
     meta: {
       title: '测点管理',
-      icon: ICustomStorage,
-      activeIcon: ICustomStorageActive,
+      icon: ICustomMeasurement,
+      activeIcon: ICustomMeasurementActive,
     },
     children: [
       {

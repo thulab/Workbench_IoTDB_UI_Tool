@@ -85,7 +85,8 @@
             :data="tableData.measurements"
             v-loading="loading"
             style="width: 100%;"
-            :max-height="maxTableHeight"
+            :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 52"
+            :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 52"
             tooltip-effect="light"
             ref="tableRef"
             @selection-change="handleSelectionChange"
@@ -169,7 +170,7 @@ const ttlUnitOptions = [
   { label: '天', value: 'day' },
 ];
 
-const { maxTableHeight } = useTableHeight(420);
+const { maxTableHeight } = useTableHeight(400);
 const storageSideRef = ref<InstanceType<typeof StorageSide>>();
 const currentStorage = ref('');
 const searchKeyword = ref('');

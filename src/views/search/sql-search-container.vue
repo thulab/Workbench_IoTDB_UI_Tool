@@ -6,9 +6,11 @@
           <el-tabs v-model="activiteSql" editable type="card" closable class="sql-tab-list" @tab-click="handleTabClick" @tab-remove="handleTabRemove" @tab-add="handleTabAdd">
             <el-tab-pane v-for="item in sqlList" :key="item.id" :label="item.queryName" :name="item.id">
               <template #label>
-                <span style="font-size: 12px; line-height: 1.2;"><text-tooltip :content="item.queryName" /></span>
+                <span style="font-size: 12px; line-height: 1.2;display: flex; width: 118px;"><text-tooltip :content="item.queryName" /></span>
               </template>
-              <sql-search :server-id="serverId" v-model:code="code[activiteSql]" @save="handleSave" />
+              <el-scrollbar :height="tabHeight">
+                <sql-search :server-id="serverId" v-model:code="code[activiteSql]" @save="handleSave" />
+              </el-scrollbar>
             </el-tab-pane>
           </el-tabs>
           <!-- <el-button size="small" circle class="add-tab-btn" @click="handleTabAdd"><i-ep-plus /></el-button> -->
@@ -84,6 +86,8 @@ const serverId = serverStroe.currentServerId;
 const codeMirrorReady = ref(true);
 const nameDialogVisible = ref(false);
 const renameDialogVisible = ref(false);
+
+const { maxTableHeight: tabHeight } = useTableHeight(125);
 
 const activiteSql = ref<string>(`_${dayjs().format('YYYY-MM-DD HH:mm:ss:SSS')}`);
 

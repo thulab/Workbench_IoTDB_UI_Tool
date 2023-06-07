@@ -1,7 +1,7 @@
 <template>
   <div
     class="menu"
-    :style="{ width: isCollapse ? '40px' : '280px' }">
+    :style="{ width: isCollapse ? '40px' : '216px' }">
     <div class="logo flex-align-center" :style="{ paddingLeft: isCollapse ? '6px' : '14px' }">
       <el-icon alt="logo"><i-custom-logo /></el-icon>
       <el-icon class="title" v-show="!isCollapse"><i-custom-title /></el-icon>

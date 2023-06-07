@@ -68,6 +68,7 @@
               :columns="item"
               :table-data="tableDataPagination[index].list || []"
               :max-height="maxTableHeight"
+              :height="maxTableHeight"
               v-model:current-page="pageNums[index]"
               v-model:page-size="pagination.pageSize"
               :total="total[index]"
@@ -383,7 +384,7 @@ function emptyQuery() {
   }
 }
 
-.tabs{
+.tabs {
   padding: 8px 16px;
 }
 

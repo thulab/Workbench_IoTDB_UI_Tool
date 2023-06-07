@@ -283,6 +283,7 @@ onMounted(() => {
 
 .search-buttons {
   text-align: right;
+  margin-bottom: 16px;
 }
 
 </style>

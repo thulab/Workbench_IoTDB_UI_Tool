@@ -58,7 +58,6 @@
         <el-button @click="handleReset" :disabled="getListLoading">重 置</el-button>
         <el-button type="primary" @click="handleSearch">{{getListLoading ? '取消查询' : '查 询'}}</el-button>
       </div>
-
     </div>
 
     <div class="page-table-details">
@@ -100,7 +99,7 @@
           <template #icon><i-ep-arrow-right-bold /></template>
         </el-button>
       </div> -->
-      <div class="table-empty-wrapper" v-if="firstLoad" style="background-color: #fff; height: 400px;">
+      <div class="table-empty-wrapper" v-if="firstLoad" style="background-color: #fff; height: 100%;">
         <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
         <span class="data-empty-text">无数据</span>
       </div>
@@ -439,6 +438,8 @@ onMounted(() => {
   padding: 16px;
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
   box-sizing: border-box;
 
   .el-button:focus-visible {
@@ -493,6 +494,8 @@ onMounted(() => {
   padding: 8px 16px;
   border-radius: 2px;
   background: #f7f8fc;
+  display: flex;
+  flex-direction: column;
 
   .page-info-title {
     font-size: 14px;
