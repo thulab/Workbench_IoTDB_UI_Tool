@@ -179,7 +179,7 @@ const searchFormData = reactive({
   path: [] as string[],
   time: todayNow(),
   datetimerange: getStartAndEnd(0) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
-  timeInterval: undefined,
+  timeInterval: undefined as number | undefined,
   unitInterval: 's',
   aggregation: '',
 });
@@ -343,8 +343,8 @@ function handleInputInterval(val: string) {
   if (val) {
     if (!/^\+?[1-9][0-9]*$/.test(`${val}`)) {
       searchFormData.timeInterval = undefined;
-    } else if (+val > Number.MAX_SAFE_INTEGER) {
-      searchFormData.timeInterval = undefined;
+    } else if (+val > 100000000) {
+      searchFormData.timeInterval = 100000000;
     }
   } else {
     searchFormData.timeInterval = undefined;
