@@ -2,7 +2,7 @@
   <el-dialog
     title="新建数据库"
     v-model="dialogVisible"
-    width="600px"
+    width="480px"
     class="new-storage-container"
     :close-on-click-modal="false"
   >

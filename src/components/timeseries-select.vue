@@ -24,7 +24,7 @@
       </template>
     </el-select-v2>
     <el-button v-if="isShowViewBtn" plain class="m-l-12" @click="()=>dialogVisible = true">已选测点</el-button>
-    <el-dialog title="已选测点" v-model="dialogVisible" class="select-modal">
+    <el-dialog title="已选测点" v-model="dialogVisible" class="select-modal" width="480px">
       <ul class="select-list">
         <li v-for="item in model" :key="item" class="select-item">{{ item }}</li>
       </ul>

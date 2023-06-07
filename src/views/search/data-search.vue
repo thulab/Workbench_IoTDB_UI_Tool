@@ -24,6 +24,7 @@
                 :disabled-date="disabledDate"
                 :shortcuts="shortcutsDate"
                 :clearable="false"
+                :prefix-icon="ICustomCalender"
               />
 
               <el-date-picker
@@ -35,6 +36,7 @@
                 :disabled-date="disabledDate"
                 :shortcuts="shortcutsDaterange"
                 :clearable="false"
+                :prefix-icon="ICustomCalender"
               />
             </div>
           </div>
@@ -145,6 +147,7 @@ import {
 } from '@/utils/date';
 import DynamicTable from '@/components/dynamic-table.vue';
 import { useServerStore } from '@/stores';
+import ICustomCalender from '~icons/custom/calender.svg';
 
 const serverStroe = useServerStore();
 const serverId = serverStroe.currentServerId;
@@ -253,7 +256,7 @@ let controller = new AbortController();
 
 function getListData() {
   if (copySearchFormData.timeInterval && !copySearchFormData.aggregation) {
-    ElMessage.error('采样周期填写的情况下请选择采样策略');
+    ElMessage.error('请选择采样策略');
     return;
   }
   firstLoad.value = false;

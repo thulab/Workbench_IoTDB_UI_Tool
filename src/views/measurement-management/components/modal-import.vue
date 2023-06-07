@@ -19,7 +19,7 @@
       <div class="select-file-box" v-if="activeStep === 0">
         <div class="select-item-box" style="align-items: center;">
           <span class="select-item-label">模板下载：</span>
-          <el-button v-if="false" link class="template-button" @click="downloadTemplate">moban.csv</el-button>
+          <el-button v-if="false" link class="template-button" @click="downloadTemplate">timeseries_template.csv</el-button>
           <a href="/api/file/exportMeasurementTemplate" class="template-button" target="_blank">moban.csv</a>
         </div>
         <div class="select-item-box">

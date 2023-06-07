@@ -2,7 +2,7 @@
   <el-dialog
     title="新建测点"
     v-model="dialogVisible"
-    width="800px"
+    width="748px"
     :close-on-click-modal="false"
   >
     <el-form ref="formRef" :model="formData" label-position="left">
@@ -131,7 +131,7 @@ const encoding: { [key: string]: string[] } = {
   DOUBLE: ['GORILLA', 'PLAIN', 'RLE', 'TS_2DIFF', 'FREQ', 'CHIMP', 'SPRINTZ', 'RLBE'],
   TEXT: ['PLAIN', 'DICTIONARY'],
 };
-const compressionOptions = ['SNAPPY', 'UNCOMPRESSED', 'LZ4', 'GZIP', 'ZSTD', 'LZMA2'];
+const compressionOptions = ['UNCOMPRESSED', 'SNAPPY', 'LZ4', 'GZIP', 'ZSTD', 'LZMA2'];
 
 const encodingOptions = computed(() => (val: string) => encoding[val]);
 
