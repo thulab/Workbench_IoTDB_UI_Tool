@@ -91,7 +91,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleConfirm">确定</el-button>
+        <el-button type="primary" :loading="saveloading" @click="handleConfirm">确定</el-button>
       </span>
     </template>
   </el-dialog>
@@ -119,7 +119,7 @@ const dialogVisible = useVModel(props, 'visible', emit);
 const { requestFn: getDevice, loading: deviceLoading } = useRequest(StorageApi.getDeviceByGroup);
 const { requestFn: getMeasurementsInfosByFuzzy } = useRequest(StorageApi.getMeasurementsInfosByFuzzy);
 const { requestFn: getIsAlignedDevice } = useRequest(StorageApi.getIsAlignedDevice);
-const { requestFn: saveMeasurementList } = useRequest(StorageApi.saveMeasurementList);
+const { requestFn: saveMeasurementList, loading: saveloading } = useRequest(StorageApi.saveMeasurementList);
 const { requestFn: deleteMeasurements } = useRequest(StorageApi.deleteMeasurements);
 
 const dataTypeOptions = ['BOOLEAN', 'INT32', 'INT64', 'FLOAT', 'DOUBLE', 'TEXT'];

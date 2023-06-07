@@ -32,7 +32,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleConfirm">确定</el-button>
+        <el-button type="primary" :loading="saveloading" @click="handleConfirm">确定</el-button>
       </span>
     </template>
   </el-dialog>
@@ -86,7 +86,7 @@ const formData = reactive<{
   ttl: '',
   ttlUnit: 'day',
 });
-const { requestFn: saveStorageGroups } = useRequest(StorageApi.saveStorageGroups);
+const { requestFn: saveStorageGroups, loading: saveloading } = useRequest(StorageApi.saveStorageGroups);
 
 /**
  * new/edit storage

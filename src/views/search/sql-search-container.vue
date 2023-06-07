@@ -43,7 +43,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="handleNameCancel">取消</el-button>
-          <el-button type="primary" @click="handleNameConfirm">确定</el-button>
+          <el-button type="primary" :loading="saveLoading" @click="handleNameConfirm">确定</el-button>
         </span>
       </template>
     </el-dialog>
@@ -60,7 +60,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="renameDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleRenameConfirm">确定</el-button>
+          <el-button type="primary" :loading="saveLoading" @click="handleRenameConfirm">确定</el-button>
         </span>
       </template>
     </el-dialog>
@@ -122,7 +122,7 @@ const errorRenameTip = ref('');
 const saveSource = ref('save');
 
 const { requestFn: getSql } = useRequest(SearchApi.getSql);
-const { requestFn: saveQuery } = useRequest(SearchApi.saveQuery);
+const { requestFn: saveQuery, loading: saveLoading } = useRequest(SearchApi.saveQuery);
 
 // 获取code
 function getSqlCode() {

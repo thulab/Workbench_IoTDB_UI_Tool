@@ -55,6 +55,7 @@ declare module '@vue/runtime-core' {
     ElUpload: typeof import('element-plus/es')['ElUpload']
     HelloWorld: typeof import('./../components/hello-world.vue')['default']
     ICustomAdd: typeof import('~icons/custom/add')['default']
+    ICustomAlarmLevel: typeof import('~icons/custom/alarm-level')['default']
     ICustomCopy: typeof import('~icons/custom/copy')['default']
     ICustomDelete: typeof import('~icons/custom/delete')['default']
     ICustomDeleteActive: typeof import('~icons/custom/delete-active')['default']
