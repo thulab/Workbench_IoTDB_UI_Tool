@@ -64,7 +64,7 @@
     <div class="page-table-details">
       <div class="operate-buttons">
         <el-button type="primary" @click="handleAdd">新建告警</el-button>
-        <el-button :disabled="!multipleSelection.length" :type="!multipleSelection.length ? '' : 'primary'" @click="handleDel('batch', null)">批量删除</el-button>
+        <el-button :disabled="!multipleSelection.length" type="primary" @click="handleDel('batch', null)">批量删除</el-button>
       </div>
       <div class="page-table-box">
         <el-table
