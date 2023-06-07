@@ -19,9 +19,9 @@
             <span class="storage-info-item-label">数据保存时间：<el-tooltip effect="light" content="数据保存时间（TTL），到期后系统将自动删除数据，此处不填代表永久存储" placement="top"><i-custom-question class="ttl-tip" /></el-tooltip></span>
             <span v-if="!editTTL">{{ storageInfos?.ttl ? (storageInfos.ttl + getTtlTimeUnit(storageInfos.ttlUnit, ttlUnitOptions)) : '∞'}}</span>
             <div v-if="currentStorage && editTTL" class="edit-ttl-box">
-              <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" size="small" style="width:220px;">
+              <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" style="width:220px;">
                 <template #append>
-                  <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder="" size="small" style="width:80px;">
+                  <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder="" style="width:80px;">
                     <el-option label="毫秒" value="millisecond" />
                     <el-option label="秒" value="second" />
                     <el-option label="分" value="minute" />
@@ -30,8 +30,8 @@
                   </el-select>
                 </template>
               </el-input>
-              <el-button plain size="small" @click="editTTL = false">取消</el-button>
-              <el-button type="primary" size="small" @click="handleConfirmEditTTL">确定</el-button>
+              <el-button class="m-l-12" plain @click="editTTL = false">取消</el-button>
+              <el-button type="primary" @click="handleConfirmEditTTL">确定</el-button>
             </div>
             <el-button link v-if="currentStorage && !editTTL" class="m-l-12" @click="handleEditTTL"><i-custom-edit /></el-button>
           </li>
