@@ -44,7 +44,7 @@
             </div>
             <template #tip>
               <div class="el-upload__tip">
-                目前仅支持上传 csv 和 xlsx 文件
+                仅支持上传 csv 和 xlsx 文件
               </div>
             </template>
           </el-upload>

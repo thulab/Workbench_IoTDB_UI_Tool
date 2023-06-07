@@ -4,6 +4,18 @@
   font-weight: 300;
 }
 
+.el-input-group__append {
+  border-left: 0 !important;
+
+  .el-select {
+    .el-input {
+      .el-input__wrapper{
+        padding-left: 2px;
+      }
+    }
+  }
+}
+
 .el-input__inner, .el-range-input {
   color: #656A85;
   font-weight: 300;

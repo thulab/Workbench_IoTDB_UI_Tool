@@ -26,7 +26,7 @@
   <div>
     <div class="run-result-title-box">
       <h4 style="font-size: 14px;font-weight: 700;line-height: 20px;color:#495AD4;">执行结果</h4>
-      <span class="run-result-tip"><i-custom-info-warning />默认最多查询1000行100列，如需查看更多数据请下载查看</span>
+      <span class="run-result-tip"><i-custom-info-warning />默认最多展示1000行100列，如需查看更多数据请下载查看</span>
     </div>
     <div class="tabs" v-if="tableData.list && tableData.list.length > 0">
       <el-tabs v-model="activeName" type="card" class="tabs-nav-list">

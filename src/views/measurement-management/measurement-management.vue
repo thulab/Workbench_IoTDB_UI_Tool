@@ -92,13 +92,13 @@
             @selection-change="handleSelectionChange"
           >
             <el-table-column type="selection" width="55" />
-            <el-table-column label="设备名称" prop="deviceName" min-width="240" show-overflow-tooltip />
-            <el-table-column label="测点名称" prop="timeseries" width="160" show-overflow-tooltip />
-            <el-table-column label="数据类型" prop="dataType" width="140" show-overflow-tooltip />
-            <el-table-column label="编码方式" prop="encoding" min-width="140" show-overflow-tooltip />
-            <el-table-column label="压缩方式" prop="compression" min-width="140" show-overflow-tooltip />
-            <el-table-column label="最新值" prop="value" min-width="140" show-overflow-tooltip />
-            <el-table-column label="最新值时间" prop="valueTime" min-width="240" show-overflow-tooltip />
+            <el-table-column label="设备名称" prop="deviceName" min-width="200" align="center" show-overflow-tooltip />
+            <el-table-column label="测点名称" prop="timeseries" width="160" align="center" show-overflow-tooltip />
+            <el-table-column label="数据类型" prop="dataType" width="140" align="center" show-overflow-tooltip />
+            <el-table-column label="编码方式" prop="encoding" min-width="140" align="center" show-overflow-tooltip />
+            <el-table-column label="压缩方式" prop="compression" min-width="140" align="center" show-overflow-tooltip />
+            <el-table-column label="最新值" prop="value" min-width="140" align="center" show-overflow-tooltip />
+            <el-table-column label="最新值时间" prop="valueTime" min-width="200" align="center" show-overflow-tooltip />
             <el-table-column label="操作" width="120" fixed="right">
               <template #default="{ row }">
                 <el-button type="primary" link size="small" @click="handleDelRow('row', row)">删除</el-button>
@@ -408,7 +408,7 @@ watch(
         };
       } else {
         getStorageInfo(val);
-        getListData();
+        handleRefresh();
       }
     }
   },

@@ -13,7 +13,7 @@
         :router="true"
         :collapse="isCollapse"
         :collapse-transition="false"
-        :unique-opened="true">
+        :unique-opened="false">
         <layout-menu-sub-item :menu-list="menuList" />
       </el-menu>
     </el-scrollbar>

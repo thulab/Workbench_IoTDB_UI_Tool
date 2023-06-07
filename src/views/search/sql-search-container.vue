@@ -475,7 +475,12 @@ watch(
   }
 
   :deep(.el-tabs__item) {
-    padding: 0 20px !important;
+    padding: 0 !important;
+    width: 68px;
+  }
+
+  :deep(.el-tabs__active-bar) {
+    border-radius: 2px 2px 0 0;
   }
 }
 

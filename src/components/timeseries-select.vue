@@ -56,6 +56,9 @@ const remoteMethod = debounce((query: string) => {
     }
   });
 }, 500);
+onMounted(() => {
+  remoteMethod('');
+});
 </script>
 
 <style scoped lang="scss">

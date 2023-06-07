@@ -1,21 +1,20 @@
 <template>
   <div class="page-container">
     <div class="search-form-wrapper">
-      <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline :disabled="getListLoading">
-        <el-form-item label="测点选择:" prop="path" :error="errorDeviceTip">
-          <template #label>
-            测点选择:<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
-          </template>
-          <timeseries-select v-model="searchFormData.path" :server-id="serverId" :is-show-view-btn="true" />
-        </el-form-item>
-        <br>
-        <el-form-item label="查询时间:" prop="time">
-          <div class="search-time-wrapper">
-            <ul class="search-time-list">
-              <li :class="['search-time-type', { 'search-time-active': timeType === 'datetime' }]" @click="handleTimeType('datetime')">时间点</li>
-              <li :class="['search-time-type', { 'search-time-active': timeType === 'datetimerange' }]" @click="handleTimeType('datetimerange')">时间段</li>
-            </ul>
-            <div class="search-time-box">
+      <el-form :model="searchFormData" style="flex: 1" ref="searchFormRef" label-position="left" size="default" inline :disabled="getListLoading">
+        <el-row>
+          <el-form-item label="测点选择:" prop="path" :error="errorDeviceTip">
+            <template #label>
+              测点选择:<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
+            </template>
+            <timeseries-select v-model="searchFormData.path" :server-id="serverId" :is-show-view-btn="true" />
+          </el-form-item>
+          <el-form-item label="查询时间:" prop="time" style="margin-right: 0;">
+            <div class="search-time-wrapper">
+              <ul class="search-time-list">
+                <li :class="['search-time-type', { 'search-time-active': timeType === 'datetime' }]" @click="handleTimeType('datetime')">时间点</li>
+                <li :class="['search-time-type', { 'search-time-active': timeType === 'datetimerange' }]" @click="handleTimeType('datetimerange')">时间段</li>
+              </ul>
               <el-date-picker
                 v-if="timeType === 'datetime'"
                 v-model="searchFormData.time"
@@ -26,7 +25,6 @@
                 :clearable="false"
                 :prefix-icon="ICustomCalender"
               />
-
               <el-date-picker
                 v-else
                 v-model="searchFormData.datetimerange"
@@ -39,27 +37,32 @@
                 :prefix-icon="ICustomCalender"
               />
             </div>
+          </el-form-item>
+        </el-row>
+        <el-row class="flex-justify-between">
+          <div>
+            <el-form-item label="采样周期:" prop="timeInterval">
+              <template #label>
+                采样周期:<el-tooltip effect="light" content="请输入正整数" placement="top"><i-custom-question /></el-tooltip>
+              </template>
+              <el-input v-model.number="searchFormData.timeInterval" style="width: 180px;" placeholder="" @input="handleInputInterval" />
+              <el-select v-model="searchFormData.unitInterval" style="width: 80px;" placeholder="">
+                <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="采样策略:" prop="aggregation">
+              <el-select v-model="searchFormData.aggregation" style="width: 120px;" clearable>
+                <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" />
+              </el-select>
+            </el-form-item>
           </div>
-        </el-form-item>
-        <el-form-item label="采样周期:" prop="timeInterval">
-          <template #label>
-            采样周期:<el-tooltip effect="light" content="请输入正整数" placement="top"><i-custom-question /></el-tooltip>
-          </template>
-          <el-input v-model.number="searchFormData.timeInterval" style="width: 180px;" placeholder="" @input="handleInputInterval" />
-          <el-select v-model="searchFormData.unitInterval" style="width: 80px;" placeholder="">
-            <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="采样策略:" prop="aggregation">
-          <el-select v-model="searchFormData.aggregation" style="width: 120px;" clearable>
-            <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" />
-          </el-select>
-        </el-form-item>
+          <el-form-item class="search-form-buttons">
+            <el-button @click="handleReset" :disabled="getListLoading">重 置</el-button>
+            <el-button type="primary" @click="handleSearch">{{getListLoading ? '取消查询' : '查 询'}}</el-button>
+          </el-form-item>
+        </el-row>
       </el-form>
-      <div class="search-form-buttons">
-        <el-button @click="handleReset" :disabled="getListLoading">重 置</el-button>
-        <el-button type="primary" @click="handleSearch">{{getListLoading ? '取消查询' : '查 询'}}</el-button>
-      </div>
+
     </div>
 
     <div class="page-table-details">
@@ -450,14 +453,15 @@ onMounted(() => {
   }
 }
 
-.search-form-wrapper{
+.search-form-wrapper {
   display: flex;
-  justify-content: space-between;
+  width: 100%;
 
-  .search-form-buttons{
+  .search-form-buttons {
     align-self: flex-end;
-    margin-bottom: 18px;
-    flex: 0 0 180px;
+    display: flex;
+    flex-wrap: nowrap;
+    margin-right: 0;
   }
 }
 
