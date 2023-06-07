@@ -119,6 +119,10 @@ onMounted(() => {
     display: flex;
     flex-wrap: nowrap;
   }
+
+  :deep(.el-tag) {
+    height: 16px !important;
+  }
 }
 
 .select-list{

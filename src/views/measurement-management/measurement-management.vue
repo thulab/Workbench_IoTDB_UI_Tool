@@ -21,7 +21,7 @@
             <div v-if="currentStorage && editTTL" class="edit-ttl-box">
               <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" style="width:120px;">
                 <template #append>
-                  <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder=" " style="width:60px;">
+                  <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder=" " style="width:50px;">
                     <el-option label="毫秒" value="millisecond" />
                     <el-option label="秒" value="second" />
                     <el-option label="分" value="minute" />

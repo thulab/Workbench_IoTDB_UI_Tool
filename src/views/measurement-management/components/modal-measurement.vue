@@ -34,7 +34,7 @@
         </div>
       </el-form-item>
       <h4 class="module-title" style="border: none;">测点</h4>
-      <el-collapse accordion class="measurement-list-box">
+      <el-collapse accordion class="measurement-list-box" v-model="activeName">
         <el-collapse-item v-for="(item, index) in formData.measurementList" :key="index" :name="'measurement_' + index">
           <template #title>
             <el-row class="collapse-title-box">
@@ -115,6 +115,7 @@ const emit = defineEmits<{
 }>();
 
 const dialogVisible = useVModel(props, 'visible', emit);
+const activeName = ref('measurement_0');
 
 const { requestFn: getDevice, loading: deviceLoading } = useRequest(StorageApi.getDeviceByGroup);
 const { requestFn: getMeasurementsInfosByFuzzy } = useRequest(StorageApi.getMeasurementsInfosByFuzzy);
@@ -206,6 +207,7 @@ function getMeasurementList(val: string) {
     data.forEach((item) => {
       formData.measurementList.unshift({ ...item });
     });
+    activeName.value = `measurement_${formData.measurementList.length - 1}`;
   });
 }
 
@@ -222,6 +224,7 @@ function handleChangeAdd(val: boolean) {
     isEditable: true,
   });
   isAligned.value = false;
+  activeName.value = 'measurement_0';
 }
 
 // 复制
@@ -237,6 +240,7 @@ function handleCopyRow(data: Partial<StorageDevice.MeasurementItem>, e: MouseEve
     compression: data.compression,
     isEditable: true,
   });
+  activeName.value = `measurement_${formData.measurementList.length - 1}`;
 }
 
 // 删除
@@ -368,7 +372,7 @@ watch(
   border-bottom: none;
 
   :deep(.el-form-item--default) {
-    margin-right: 16px;
+    margin-right: 15px;
   }
 }
 
