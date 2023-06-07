@@ -45,3 +45,8 @@
   // --el-button-hover-bg-color: #495AD4 !important;
   // --el-button-hover-border-color: #495AD4 !important;
 }
+
+.el-button.is-link:not(.is-disabled):hover, .el-button.is-link:not(.is-disabled):focus {
+  border-color: transparent !important;
+  background-color: transparent  !important;
+}

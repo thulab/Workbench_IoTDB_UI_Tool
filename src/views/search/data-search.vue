@@ -498,6 +498,7 @@ onMounted(() => {
   border-radius: 2px;
   background: #f7f8fc;
   display: flex;
+  flex: 1;
   flex-direction: column;
 
   .page-info-title {

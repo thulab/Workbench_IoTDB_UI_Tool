@@ -9,7 +9,7 @@
       />
     </div>
 
-    <div class="storage-details-wrapper">
+    <el-scrollbar class="storage-details-wrapper">
       <h4 class="storage-info-title">数据库信息</h4>
       <div class="page-info-box">
         <ul class="storage-info-list">
@@ -19,9 +19,9 @@
             <span class="storage-info-item-label">数据保存时间：<el-tooltip effect="light" content="数据保存时间（TTL），到期后系统将自动删除数据，此处不填代表永久存储" placement="top"><i-custom-question class="ttl-tip" /></el-tooltip></span>
             <span v-if="!editTTL">{{ storageInfos?.ttl ? (storageInfos.ttl + getTtlTimeUnit(storageInfos.ttlUnit, ttlUnitOptions)) : '∞'}}</span>
             <div v-if="currentStorage && editTTL" class="edit-ttl-box">
-              <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" style="width:220px;">
+              <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" style="width:120px;">
                 <template #append>
-                  <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder="" style="width:80px;">
+                  <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder=" " style="width:60px;">
                     <el-option label="毫秒" value="millisecond" />
                     <el-option label="秒" value="second" />
                     <el-option label="分" value="minute" />
@@ -126,7 +126,7 @@
           />
         </div>
       </template>
-    </div>
+    </el-scrollbar>
 
     <modal-storage
       v-model:visible="storageVisible"
@@ -170,7 +170,7 @@ const ttlUnitOptions = [
   { label: '天', value: 'day' },
 ];
 
-const { maxTableHeight } = useTableHeight(400);
+const { maxTableHeight } = useTableHeight(410);
 const storageSideRef = ref<InstanceType<typeof StorageSide>>();
 const currentStorage = ref('');
 const searchKeyword = ref('');
@@ -190,7 +190,7 @@ const totalCount = ref(0);
 const multipleSelection = ref<StorageDevice.MeasurementItem[]>([]);
 const editTTL = ref(false);
 const editTTLModel = ref();
-const editTTLUnitModel = ref();
+const editTTLUnitModel = ref('day');
 const storageVisible = ref(false);
 const measurementVisible = ref(false);
 const importVisible = ref(false);
@@ -363,7 +363,7 @@ function handleImportClose(reload: boolean) {
 function handleEditTTL() {
   editTTL.value = true;
   editTTLModel.value = storageInfos.value?.ttl;
-  editTTLUnitModel.value = storageInfos.value?.ttlUnit;
+  editTTLUnitModel.value = storageInfos.value?.ttlUnit || 'day';
 }
 
 function handleConfirmEditTTL() {
@@ -425,6 +425,8 @@ watch(
   width: 100%;
   height: 100%;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 .storage-list-wrapper{
@@ -452,14 +454,18 @@ watch(
     padding: 8px 16px;
   }
 
+  .storage-info-list {
+    flex: 1;
+  }
+
   .storage-info-item {
     font-size: 12px;
     line-height: 12px;
     color: #656A85;
-    margin: 0 50px 6px 0;
+    margin: 0 20px 6px 0;
     display: inline-flex;
     align-items: center;
-    width: 240px;
+    width: 160px;
 
     .storage-info-item-label{
       color: #131926;
@@ -476,7 +482,7 @@ watch(
   }
 
   .storage-info-item-ttl{
-    width: 500px;
+    width: 380px;
   }
 }
 

@@ -115,7 +115,7 @@ listeningWindow();
   --el-menu-item-hover-fill: var(--el-color-primary-light-9);
   --el-menu-border-color: var(--el-border-color);
   --el-menu-base-level-padding: 20px;
-  --el-menu-level-padding: 4px;
+  --el-menu-level-padding: 27px;
   --el-menu-icon-width: 24px;
 
   .el-menu--collapse {

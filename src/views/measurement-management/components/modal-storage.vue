@@ -7,14 +7,13 @@
     :close-on-click-modal="false"
   >
     <el-form ref="formRef" :model="formData" :rules="rules" class="source-form" label-position="left" label-width="120px">
-      <el-form-item label="数据库名称" prop="groupName">
+      <el-form-item label="数据库名称:" prop="groupName">
         <el-input v-model="formData.groupName" placeholder="请输入数据库名称" maxlength="59" show-word-limit>
           <template #prepend>root.</template>
         </el-input>
       </el-form-item>
       <el-form-item prop="ttl">
-        <template #label>
-          数据保存时间:<el-tooltip effect="light" content="数据保存时间（TTL），到期后系统将自动删除数据，此处不填代表永久存储" placement="top"><i-custom-question /></el-tooltip>
+        <template #label><span style="margin-left: 9px;">数据保存时间:</span><el-tooltip effect="light" content="数据保存时间（TTL），到期后系统将自动删除数据，此处不填代表永久存储" placement="top"><i-custom-question /></el-tooltip>
         </template>
         <el-input v-model="formData.ttl" min="0" max="9007199254740992" class="ttl-input">
           <template #append>

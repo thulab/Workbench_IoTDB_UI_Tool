@@ -47,8 +47,8 @@
               </el-col>
               <el-col :span="4">
                 <div class="operate-box">
-                  <el-button link :disabled="copyControl(item)" @click="handleCopyRow(item)"><i-custom-copy /></el-button>
-                  <el-button link class="m-x-12" @click="handleDelRow(index)"><i-custom-delete /></el-button>
+                  <el-button link @click="(e)=>handleCopyRow(item, e)"><i-custom-copy /></el-button>
+                  <el-button link class="m-x-12" @click="(e)=>handleDelRow(index, e)"><i-custom-delete /></el-button>
                 </div>
               </el-col>
             </el-row>
@@ -177,9 +177,7 @@ const addControl = computed(() => {
   return flag;
 });
 
-const copyControl = computed(() => function (data: Partial<StorageDevice.MeasurementItem>) {
-  return !data.timeseries || !data.dataType || !data.encoding || !data.compression;
-});
+const copyControl = (data: Partial<StorageDevice.MeasurementItem>) => !data.timeseries || !data.dataType || !data.encoding || !data.compression;
 let lastQuery = '';
 
 const remoteMethod = debounce((query: string) => {
@@ -227,7 +225,10 @@ function handleChangeAdd(val: boolean) {
 }
 
 // 复制
-function handleCopyRow(data: Partial<StorageDevice.MeasurementItem>) {
+function handleCopyRow(data: Partial<StorageDevice.MeasurementItem>, e: MouseEvent) {
+  e.preventDefault();
+  e.stopPropagation();
+  if (copyControl(data)) return;
   formData.measurementList.push({
     deviceName: data.deviceName,
     timeseries: `${data.timeseries}_copy`,
@@ -239,7 +240,9 @@ function handleCopyRow(data: Partial<StorageDevice.MeasurementItem>) {
 }
 
 // 删除
-function handleDelRow(i: number) {
+function handleDelRow(i: number, e: MouseEvent) {
+  e.preventDefault();
+  e.stopPropagation();
   ElMessageBox.confirm('是否删除测点？', '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
@@ -354,6 +357,7 @@ watch(
 }
 
 .measurement-list-box{
+  height: 200px;
   max-height: 400px;
   overflow-y: auto;
   border-bottom: none;
