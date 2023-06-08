@@ -6,14 +6,14 @@
     class="new-storage-container"
     :close-on-click-modal="false"
   >
-    <el-form ref="formRef" :model="formData" :rules="rules" class="source-form" label-position="left" label-width="120px">
+    <el-form ref="formRef" :model="formData" :rules="rules" class="source-form m-t-8" label-position="left" label-width="120px">
       <el-form-item label="数据库名称:" prop="groupName">
         <el-input type="hidden" />
         <el-input v-model="formData.groupName" placeholder="请输入数据库名称" maxlength="59" show-word-limit>
           <template #prepend>root.</template>
         </el-input>
       </el-form-item>
-      <el-form-item prop="ttl">
+      <el-form-item prop="ttl" class="m-b-6">
         <template #label><span style="margin-left: 9px;">数据保存时间:</span><el-tooltip effect="light" content="数据保存时间（TTL），到期后系统将自动删除数据，此处不填代表永久存储" placement="top"><i-custom-question /></el-tooltip>
         </template>
         <el-input type="hidden" />

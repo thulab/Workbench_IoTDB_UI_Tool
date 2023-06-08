@@ -40,7 +40,7 @@
         <el-button class="m-l-4" @click="columnPageNum++" :disabled="columnPageNum >= totalColumnPage" size="small" circle><i-ep-arrow-right-bold /></el-button>
       </div>
     </div>
-    <div class="paination" v-if="(showPagination)">
+    <div class="paination" v-if="(showPagination && total && total > 0)">
       <div></div>
       <el-pagination
         v-if="showPagination"
@@ -92,14 +92,14 @@ const columnPageSize = 100;
 const tableHeight = computed(() => {
   const total = props.total || 0;
   if (total >= 0 && props.pageSize && props.height && total <= props.pageSize) {
-    return props.height + 40;
+    return props.height + 46;
   }
   return props.height;
 });
 const tableMaxHeight = computed(() => {
   const total = props.total || 0;
   if (total >= 0 && props.pageSize && props.height && total <= props.pageSize) {
-    return props.maxHeight + 40;
+    return props.maxHeight + 46;
   }
   return props.maxHeight;
 });

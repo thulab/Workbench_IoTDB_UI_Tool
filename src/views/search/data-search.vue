@@ -113,7 +113,7 @@
           <template #icon><i-ep-arrow-right-bold /></template>
         </el-button>
       </div> -->
-      <div class="table-empty-wrapper" v-if="firstLoad" style="background-color: #fff; height: 100%;">
+      <div class="table-empty-wrapper" v-if="firstLoad" style="background-color: #fff;">
         <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
         <span class="data-empty-text">无数据</span>
       </div>
@@ -122,8 +122,8 @@
           <dynamic-table
             :columns="columns"
             :table-data="tableDataPagination"
-            :height="tableHeight"
-            :max-height="tableHeight"
+            :height="maxTableHeight"
+            :max-height="maxTableHeight"
             v-model:current-page="pagination.pageNum"
             v-model:page-size="pagination.pageSize"
             :total="tableData.length"
@@ -167,7 +167,8 @@ import ICustomCalender from '~icons/custom/calender.svg';
 const serverStroe = useServerStore();
 const serverId = serverStroe.currentServerId;
 
-const { maxTableHeight } = useTableHeight(350);
+const { maxTableHeight } = useTableHeight(330);
+
 const searchFormRef = ref<FormInstance>();
 const firstLoad = ref(true);
 const timeUnits = [
@@ -238,9 +239,9 @@ const pagination = reactive({
   totalColumnPage: 0,
   totalColumnCount: 0,
 });
-const getListLoading = ref(false);
+// const tableHeight = computed(() => (tableData.value.length > 0 ? maxTableHeight.value : maxTableHeight.value ));
 
-const tableHeight = computed(() => (tableData.value.length > 0 ? maxTableHeight.value : maxTableHeight.value + 60));
+const getListLoading = ref(false);
 
 // // 查询结果
 // const formatSqlInfo = computed(() => function (filed: string) {
@@ -498,6 +499,10 @@ onMounted(() => {
       color: #fff;
     }
   }
+}
+
+.table-empty-wrapper {
+  flex: 1;
 }
 
 :deep(.el-select-v2__selection){
