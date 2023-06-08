@@ -33,10 +33,13 @@
       color: #495AD4 !important;
     }
 
+    &:not(.is-disabled):hover{
+      text-decoration: underline;
+    }
+
     &:not(.is-disabled):hover, &:not(.is-disabled):focus{
       border-color: transparent !important;
       background-color: transparent !important;
-      text-decoration: underline;
     }
 
     .el-button__text--expand{

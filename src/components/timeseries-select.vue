@@ -125,6 +125,10 @@ onMounted(() => {
   :deep(.el-tag) {
     height: 16px !important;
   }
+
+  :deep(.el-select__tags-text) {
+    max-width: 120px !important;
+  }
 }
 
 .select-list{
