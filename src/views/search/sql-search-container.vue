@@ -473,6 +473,8 @@ watch(
 }
 
 .tabs-nav-aside {
+  width: 207px;
+
   :deep(.el-tabs__header) {
     background: #fff;
     margin: 0;
@@ -480,7 +482,7 @@ watch(
 
   :deep(.el-tabs__item) {
     padding: 0 !important;
-    width: 68px;
+    width: 69px;
   }
 
   :deep(.el-tabs__active-bar) {
