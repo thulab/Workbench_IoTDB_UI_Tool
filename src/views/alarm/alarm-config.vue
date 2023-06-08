@@ -85,7 +85,7 @@
           <el-table-column type="selection" width="55" />
           <el-table-column label="告警序列" prop="measurement" min-width="200" align="center" show-overflow-tooltip />
           <el-table-column label="告警名称" prop="alarmName" min-width="160" align="center" show-overflow-tooltip />
-          <el-table-column label="告警级别" prop="alarmLevel" sortable="custom" width="120" align="center" show-overflow-tooltip>
+          <el-table-column label="告警级别" prop="alarmLevel" sortable="custom" width="120" align="center">
             <template #default="{ row }">
               <span v-if="row.alarmLevel" style="display: flex; align-items: center; justify-content: center; margin-left: -20px;">
                 <el-icon size="20" :style="{ color: getLevelColor(row) }"><i-custom-alarm-level /></el-icon>
