@@ -91,7 +91,7 @@
         </el-collapse-item>
       </el-collapse>
 
-      <el-button style="width: 100%;" class="m-t-16" :disabled="addControl" @click="handleAddRow"><i-custom-add class="m-r-12" />添加测点</el-button>
+      <el-button style="width: 100%;" class="m-t-16" :disabled="addControl" @click="handleAddRow"><i-custom-add class="m-r-4" />添加测点</el-button>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
@@ -306,6 +306,7 @@ function handleAddRow() {
     compression: 'SNAPPY',
     isEditable: true,
   });
+  activeName.value = `measurement_${formData.measurementList.length - 1}`;
 }
 
 // 保存
