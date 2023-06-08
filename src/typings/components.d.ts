@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    BaseFormItem: typeof import('./../components/base-form-item.vue')['default']
     DynamicTable: typeof import('./../components/dynamic-table.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']
@@ -51,6 +52,7 @@ declare module 'vue' {
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElTree: typeof import('element-plus/es')['ElTree']
     ElUpload: typeof import('element-plus/es')['ElUpload']
+    FormItem: typeof import('./../components/form-item.vue')['default']
     HelloWorld: typeof import('./../components/hello-world.vue')['default']
     ICustomAdd: typeof import('~icons/custom/add')['default']
     ICustomAlarmLevel: typeof import('~icons/custom/alarm-level')['default']
@@ -108,6 +110,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TextTooltip: typeof import('./../components/text-tooltip.vue')['default']
+    TFormItem: typeof import('./../components/t-form-item.vue')['default']
     TheLayout: typeof import('./../components/layout/the-layout.vue')['default']
     TimeseriesSelect: typeof import('./../components/timeseries-select.vue')['default']
   }
