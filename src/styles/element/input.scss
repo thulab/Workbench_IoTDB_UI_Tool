@@ -34,6 +34,10 @@
       }
     }
   }
+
+  .el-input__prefix-inner > :last-child{
+    margin-right: 0;
+  }
 }
 
 .el-checkbox{

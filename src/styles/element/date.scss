@@ -1,10 +1,10 @@
 .el-date-editor {
-  --el-date-editor-datetimerange-width: 330px !important;
+  --el-date-editor-datetimerange-width: 294px !important;
 
   display: inline-flex;
 
   .el-range-input {
-    width: 42% !important;
+    // width: 42% !important;
   }
 
   .el-input__icon, .el-range__icon{
