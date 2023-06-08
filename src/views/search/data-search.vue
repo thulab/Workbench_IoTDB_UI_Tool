@@ -88,7 +88,7 @@
           <li class="run-result-item"><i-custom-query-time />查询耗时：{{ formatSqlInfo('queryTime') }}</li>
         </ul> -->
         <h4 class="page-info-title">查询详情
-          <span class="run-result-tip"><i-custom-info-warning />默认最多展示1000行100列，如需查看更多数据请下载查看</span>
+          <span class="run-result-tip"><i-custom-info-warning />默认最多展示1000行100列，如需更多请下载查看</span>
         </h4>
         <div class="page-detail-buttons">
           <el-button @click="handleSearch" :disabled="getListLoading">刷新</el-button>
