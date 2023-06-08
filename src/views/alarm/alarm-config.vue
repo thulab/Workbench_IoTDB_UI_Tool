@@ -2,18 +2,18 @@
   <div class="page-container">
     <div class="search-form-wrapper">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-        <base-form-item label="告警名称:" prop="alarmName">
+        <base-form-item label="告警名称：" prop="alarmName">
           <el-input v-model="searchFormData.alarmName" placeholder="请输入告警名称" style="width: 172px;" />
         </base-form-item>
-        <base-form-item label="告警序列:" prop="measurements">
+        <base-form-item label="告警序列：" prop="measurements">
           <template #label>
-            告警序列:<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
+            告警序列：<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
           </template>
           <timeseries-select v-model="searchFormData.measurements" :server-id="serverId" :is-show-view-btn="true" :placeholder="'请输入告警序列'" :viewText="'已选序列'" />
         </base-form-item>
-        <base-form-item label="告警级别:" prop="alarmLevel">
+        <base-form-item label="告警级别：" prop="alarmLevel">
           <template #label>
-            告警级别:<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减。" placement="top"><i-custom-question /></el-tooltip>
+            告警级别：<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减。" placement="top"><i-custom-question /></el-tooltip>
           </template>
           <el-select v-model="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" class="level-select-box" style="width: 80px;">
             <template #prefix>
@@ -28,13 +28,13 @@
             </el-option>
           </el-select>
         </base-form-item>
-        <base-form-item label="状态:" prop="status" class="m-r-0">
+        <base-form-item label="状态：" prop="status" class="m-r-0">
           <el-select v-model="searchFormData.status" style="width: 80px;">
             <el-option v-for="item in statusOptions" :key="item.value" :value="item.value" :label="item.label" />
           </el-select>
         </base-form-item>
         <el-row>
-          <base-form-item label="创建时间:" prop="createtimerange">
+          <base-form-item label="创建时间：" prop="createtimerange">
             <el-date-picker
               v-model="searchFormData.createtimerange"
               type="datetimerange"
@@ -45,7 +45,7 @@
               :prefix-icon="ICustomCalender"
             />
           </base-form-item>
-          <base-form-item label="更新时间:" prop="updatetimerange">
+          <base-form-item label="更新时间：" prop="updatetimerange">
             <el-date-picker
               v-model="searchFormData.updatetimerange"
               type="datetimerange"
@@ -105,7 +105,7 @@
           <el-table-column label="操作" width="140" fixed="right">
             <template #default="{ row }">
               <el-button v-if="row.status !== 3" type="primary" link size="small" @click="handleStatus(row)">{{ row.status === 1 ? '禁用' : '启用' }}</el-button>
-              <el-button type="primary" link size="small" @click="handleEdit(row)">编辑</el-button>
+              <el-button v-if="row.status !== 3" type="primary" link size="small" @click="handleEdit(row)">编辑</el-button>
               <el-button type="primary" link size="small" @click="handleDel('row', row)">删除</el-button>
             </template>
           </el-table-column>
@@ -358,7 +358,7 @@ onMounted(() => {
   }
 
   :deep(.el-form-item) {
-    margin-right: 24px;
+    margin-right: 22px;
   }
 }
 

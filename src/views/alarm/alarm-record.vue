@@ -2,18 +2,18 @@
   <div class="page-container">
     <div class="search-form-wrapper">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-        <base-form-item label="告警名称:" prop="alarmName">
+        <base-form-item label="告警名称：" prop="alarmName">
           <el-input v-model="searchFormData.alarmName" placeholder="请输入告警名称" style="width: 172px;" />
         </base-form-item>
-        <base-form-item label="告警序列:" prop="measurements">
+        <base-form-item label="告警序列：" prop="measurements">
           <template #label>
-            告警序列:<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
+            告警序列：<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
           </template>
           <timeseries-select v-model="searchFormData.measurements" :server-id="serverId" :is-show-view-btn="true" :placeholder="'请输入告警序列'" :viewText="'已选序列'" />
         </base-form-item>
-        <base-form-item label="告警级别:" prop="alarmLevel" class="m-r-0">
+        <base-form-item label="告警级别：" prop="alarmLevel" class="m-r-0">
           <template #label>
-            告警级别:<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减。" placement="top"><i-custom-question /></el-tooltip>
+            告警级别：<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减。" placement="top"><i-custom-question /></el-tooltip>
           </template>
           <el-select v-model="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" class="level-select-box" style="width: 80px;">
             <template #prefix>
@@ -29,7 +29,7 @@
           </el-select>
         </base-form-item>
         <el-row>
-          <base-form-item label="告警时间:" prop="createtimerange">
+          <base-form-item label="告警时间：" prop="createtimerange">
             <el-date-picker
               v-model="searchFormData.createtimerange"
               type="datetimerange"
@@ -40,7 +40,7 @@
               :prefix-icon="ICustomCalender"
             />
           </base-form-item>
-          <base-form-item label="仅查看最新状态:" prop="status">
+          <base-form-item label="仅查看最新状态：" prop="status">
             <el-switch
               v-model="searchFormData.status"
               :active-value="1"
@@ -61,7 +61,7 @@
     <div class="page-table-details">
       <div class="operate-buttons">
         <el-dropdown class="m-r-12" :disabled="!totalCount" @command="val => handleCommandDown(val)">
-          <el-button type="primary" class="export-btn" :disabled="!totalCount">导出<el-tooltip effect="light" content="此导出操作为搜索结果导出。excel格式导出时若数据量过大容易出现错误，推荐使用csv格式导出" placement="top"><i-custom-question-white /></el-tooltip></el-button>
+          <el-button type="primary" class="export-btn" :disabled="!totalCount">导出<el-tooltip effect="light" content="此导出操作为搜索结果导出。excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top"><i-custom-question-white /></el-tooltip></el-button>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
@@ -341,6 +341,25 @@ onMounted(() => {
 
   :deep(.el-form-item) {
     margin-right: 36px;
+  }
+
+  :deep(.el-switch) {
+    height: 28px;
+  }
+
+  :deep(.el-switch__core){
+    width: 64px;
+    height: 28px;
+    border-radius: 14px;
+  }
+
+  :deep(.el-switch__action) {
+    width: 24px;
+    height: 24px;
+  }
+
+  :deep(.el-switch.is-checked .el-switch__core .el-switch__action) {
+    left: calc(100% - 24px);
   }
 }
 
