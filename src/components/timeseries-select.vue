@@ -36,7 +36,7 @@
       collapse-tags-tooltip
       :remote-method="remoteMethod"
       :loading="measurementLoading"
-      style="width: 270px;"
+      style="width: 256px;"
     >
       <template #prefix>
         <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
@@ -49,15 +49,17 @@
     </el-select>
     <el-button v-if="isShowViewBtn" type="primary" :disabled="!model.length" class="m-l-12" @click="()=>dialogVisible = true">{{viewText || '已选测点' }}</el-button>
     <el-dialog :title="viewText || '已选测点'" v-model="dialogVisible" class="select-modal">
-      <ul class="select-list">
-        <li v-for="(item, index) in model" :key="item" class="select-item">
-          <span class="select-item-text"><text-tooltip :content="item" /></span>
-          <div class="select-item-delete-box" @click="handleDelete(index)">
-            <i-custom-delete class="select-item-delete" />
-            <i-custom-delete-active class="select-item-delete-active" />
-          </div>
-        </li>
-      </ul>
+      <el-scrollbar :max-height="400">
+        <ul class="select-list">
+          <li v-for="(item, index) in model" :key="item" class="select-item">
+            <span class="select-item-text"><text-tooltip :content="item" /></span>
+            <div class="select-item-delete-box" @click="handleDelete(index)">
+              <i-custom-delete class="select-item-delete" />
+              <i-custom-delete-active class="select-item-delete-active" />
+            </div>
+          </li>
+        </ul>
+      </el-scrollbar>
     </el-dialog>
   </div>
 </template>
@@ -126,9 +128,6 @@ onMounted(() => {
 }
 
 .select-list{
-  max-height: 400px;
-  overflow-y: auto;
-
   .select-item{
     font-size: 12px;
     font-weight: 300;
@@ -141,7 +140,7 @@ onMounted(() => {
 
     .select-item-text{
       display: inline-flex;
-      width: 200px;
+      width: 460px;
     }
 
     .select-item-delete-box{
@@ -179,5 +178,10 @@ onMounted(() => {
       }
     }
   }
+}
+
+.remote-select-search-text{
+  display: flex;
+  width: 200px;
 }
 </style>

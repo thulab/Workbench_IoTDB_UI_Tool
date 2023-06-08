@@ -105,17 +105,11 @@ defineExpose({ getStorageList });
   }
 }
 
-.storage-operate-buttons{
-  .el-button{
-    min-width: 28px !important;
-    padding: 0 !important;
-  }
-}
-
 .el-button.border-refresh-icon{
   border-radius: 4px;
   border: 1px solid #DFE1ED !important;
-  height: 25px !important;
+  width: 24px;
+  height: 24px !important;
 
   &:hover, &:focus{
     border-color: #DFE1ED !important;

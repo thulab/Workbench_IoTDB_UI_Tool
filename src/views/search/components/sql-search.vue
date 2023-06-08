@@ -456,5 +456,9 @@ function emptyQuery() {
       top: -4px;
     }
   }
+
+  .export-btn.el-button:focus{
+    color: #656A85 !important;
+  }
 }
 </style>
