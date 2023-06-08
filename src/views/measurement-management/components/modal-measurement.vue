@@ -306,6 +306,7 @@ function handleAddRow() {
     compression: 'SNAPPY',
     isEditable: true,
   });
+  activeName.value = `measurement_${formData.measurementList.length - 1}`;
 }
 
 // 保存

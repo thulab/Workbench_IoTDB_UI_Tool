@@ -6,7 +6,7 @@
     class="new-storage-container"
     :close-on-click-modal="false"
   >
-    <el-form ref="formRef" :model="formData" :rules="rules" class="source-form m-t-8" label-position="left" label-width="120px">
+    <el-form ref="formRef" :model="formData" :rules="rules" class="source-form m-t-8" label-position="left" label-width="112px">
       <el-form-item label="数据库名称:" prop="groupName">
         <el-input type="hidden" />
         <el-input v-model="formData.groupName" placeholder="请输入数据库名称" maxlength="59" show-word-limit>
