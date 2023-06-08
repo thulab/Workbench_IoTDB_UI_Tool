@@ -7,6 +7,7 @@
             <template #label>
               测点选择:<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
             </template>
+            <el-input type="hidden" />
             <timeseries-select v-model="searchFormData.path" :server-id="serverId" :is-show-view-btn="true" />
           </el-form-item>
           <el-form-item label="查询时间:" prop="time" style="margin-right: 0;">
@@ -15,6 +16,7 @@
                 <li :class="['search-time-type', { 'search-time-active': timeType === 'datetime' }]" @click="handleTimeType('datetime')">时间点</li>
                 <li :class="['search-time-type', { 'search-time-active': timeType === 'datetimerange' }]" @click="handleTimeType('datetimerange')">时间段</li>
               </ul>
+              <el-input type="hidden" />
               <el-date-picker
                 v-if="timeType === 'datetime'"
                 v-model="searchFormData.time"
@@ -45,6 +47,7 @@
               <template #label>
                 采样周期:<el-tooltip effect="light" content="请输入正整数" placement="top"><i-custom-question /></el-tooltip>
               </template>
+              <el-input type="hidden" />
               <el-input v-model.number="searchFormData.timeInterval" style="width: 100px;" placeholder="" @input="handleInputInterval">
                 <template #append>
                   <el-select v-model="searchFormData.unitInterval" style="width: 50px;" placeholder="">
@@ -55,6 +58,7 @@
 
             </el-form-item>
             <el-form-item label="采样策略:" prop="aggregation">
+              <el-input type="hidden" />
               <el-select v-model="searchFormData.aggregation" style="width: 80px;" clearable>
                 <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" />
               </el-select>
