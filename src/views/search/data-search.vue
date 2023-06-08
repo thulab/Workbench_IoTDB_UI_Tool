@@ -3,13 +3,12 @@
     <div class="search-form-wrapper">
       <el-form :model="searchFormData" style="flex: 1" ref="searchFormRef" label-position="left" size="default" inline :disabled="getListLoading">
         <el-row>
-          <el-form-item label="测点选择:" prop="path" :error="errorDeviceTip">
+          <base-form-item label="测点选择:" prop="path" :error="errorDeviceTip">
             <template #label>
               测点选择:<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
             </template>
-            <el-input type="hidden" />
             <timeseries-select v-model="searchFormData.path" :server-id="serverId" :is-show-view-btn="true" />
-          </el-form-item>
+          </base-form-item>
           <el-form-item label="查询时间:" prop="time" style="margin-right: 0;">
             <div class="search-time-wrapper">
               <ul class="search-time-list">
