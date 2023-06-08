@@ -78,6 +78,7 @@ declare module 'vue' {
     ICustomQuerySuccess: typeof import('~icons/custom/query-success')['default']
     ICustomQueryTime: typeof import('~icons/custom/query-time')['default']
     ICustomQuestion: typeof import('~icons/custom/question')['default']
+    ICustomQuestionWhite: typeof import('~icons/custom/question-white')['default']
     ICustomRefresh: typeof import('~icons/custom/refresh')['default']
     ICustomRefreshBorder: typeof import('~icons/custom/refresh-border')['default']
     ICustomSearchIcon: typeof import('~icons/custom/search-icon')['default']
