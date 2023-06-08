@@ -6,9 +6,11 @@
           <el-tabs v-model="activiteSql" editable type="card" closable class="sql-tab-list" @tab-click="handleTabClick" @tab-remove="handleTabRemove" @tab-add="handleTabAdd">
             <el-tab-pane v-for="item in sqlList" :key="item.id" :label="item.queryName" :name="item.id">
               <template #label>
-                <span style="font-size: 12px; line-height: 1.2;"><text-tooltip :content="item.queryName" /></span>
+                <span style="font-size: 12px; line-height: 1.2;display: flex; width: 118px;"><text-tooltip :content="item.queryName" /></span>
               </template>
-              <sql-search :server-id="serverId" v-model:code="code[activiteSql]" @save="handleSave" />
+              <el-scrollbar :height="tabHeight">
+                <sql-search :server-id="serverId" v-model:code="code[activiteSql]" @save="handleSave" />
+              </el-scrollbar>
             </el-tab-pane>
           </el-tabs>
           <!-- <el-button size="small" circle class="add-tab-btn" @click="handleTabAdd"><i-ep-plus /></el-button> -->
@@ -43,7 +45,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="handleNameCancel">取消</el-button>
-          <el-button type="primary" @click="handleNameConfirm">确定</el-button>
+          <el-button type="primary" :loading="saveLoading" @click="handleNameConfirm">确定</el-button>
         </span>
       </template>
     </el-dialog>
@@ -60,7 +62,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="renameDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleRenameConfirm">确定</el-button>
+          <el-button type="primary" :loading="saveLoading" @click="handleRenameConfirm">确定</el-button>
         </span>
       </template>
     </el-dialog>
@@ -84,6 +86,8 @@ const serverId = serverStroe.currentServerId;
 const codeMirrorReady = ref(true);
 const nameDialogVisible = ref(false);
 const renameDialogVisible = ref(false);
+
+const { maxTableHeight: tabHeight } = useTableHeight(125);
 
 const activiteSql = ref<string>(`_${dayjs().format('YYYY-MM-DD HH:mm:ss:SSS')}`);
 
@@ -122,7 +126,7 @@ const errorRenameTip = ref('');
 const saveSource = ref('save');
 
 const { requestFn: getSql } = useRequest(SearchApi.getSql);
-const { requestFn: saveQuery } = useRequest(SearchApi.saveQuery);
+const { requestFn: saveQuery, loading: saveLoading } = useRequest(SearchApi.saveQuery);
 
 // 获取code
 function getSqlCode() {
@@ -371,6 +375,7 @@ watch(
   width: 100%;
   position: relative;
   height: 100%;
+  overflow: hidden;
 }
 
 .sql-wrapper {
@@ -471,7 +476,12 @@ watch(
   }
 
   :deep(.el-tabs__item) {
-    padding: 0 20px !important;
+    padding: 0 !important;
+    width: 68px;
+  }
+
+  :deep(.el-tabs__active-bar) {
+    border-radius: 2px 2px 0 0;
   }
 }
 

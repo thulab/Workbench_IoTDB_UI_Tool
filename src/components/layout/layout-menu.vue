@@ -1,7 +1,7 @@
 <template>
   <div
     class="menu"
-    :style="{ width: isCollapse ? '40px' : '280px' }">
+    :style="{ width: isCollapse ? '40px' : '216px' }">
     <div class="logo flex-align-center" :style="{ paddingLeft: isCollapse ? '6px' : '14px' }">
       <el-icon alt="logo"><i-custom-logo /></el-icon>
       <el-icon class="title" v-show="!isCollapse"><i-custom-title /></el-icon>
@@ -13,7 +13,7 @@
         :router="true"
         :collapse="isCollapse"
         :collapse-transition="false"
-        :unique-opened="true">
+        :unique-opened="false">
         <layout-menu-sub-item :menu-list="menuList" />
       </el-menu>
     </el-scrollbar>
@@ -115,7 +115,7 @@ listeningWindow();
   --el-menu-item-hover-fill: var(--el-color-primary-light-9);
   --el-menu-border-color: var(--el-border-color);
   --el-menu-base-level-padding: 20px;
-  --el-menu-level-padding: 4px;
+  --el-menu-level-padding: 27px;
   --el-menu-icon-width: 24px;
 
   .el-menu--collapse {

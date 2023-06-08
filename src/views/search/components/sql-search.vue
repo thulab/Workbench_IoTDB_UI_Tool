@@ -26,7 +26,7 @@
   <div>
     <div class="run-result-title-box">
       <h4 style="font-size: 14px;font-weight: 700;line-height: 20px;color:#495AD4;">执行结果</h4>
-      <span class="run-result-tip"><i-custom-info-warning />默认最多查询1000行100列，如需查看更多数据请下载查看</span>
+      <span class="run-result-tip"><i-custom-info-warning />默认最多展示1000行100列，如需查看更多数据请下载查看</span>
     </div>
     <div class="tabs" v-if="tableData.list && tableData.list.length > 0">
       <el-tabs v-model="activeName" type="card" class="tabs-nav-list">
@@ -35,7 +35,7 @@
             <span>运行结果{{ index + 1 }}</span>
           </template>
           <div class="run-result-infos">
-            <ul>
+            <!-- <ul>
               <li class="run-result-item">
                 <i-custom-query-success v-if="sqlResult[index].status === true" />
                 <i-custom-query-error v-else-if="sqlResult[index].status === false" />
@@ -45,7 +45,8 @@
               </li>
               <li class="run-result-item"><i-custom-query-start-time />开始时间：{{ formatSqlInfo('startQueryTime', index) }}</li>
               <li class="run-result-item"><i-custom-query-time />查询耗时：{{ formatSqlInfo('queryTime', index) }}</li>
-            </ul>
+            </ul> -->
+            <div></div>
             <div class="run-result-buttons">
               <el-button link @click="handleCommandDown('refresh', index)"><i-custom-refresh />刷新</el-button>
               <el-dropdown :disabled="!sqlResult[index].status" class="more-icon m-l-12" @command="val => handleCommandDown(val, index)" v-show="sqlResult[index].status && tableDataPagination[index]?.list?.length > 0">
@@ -68,6 +69,7 @@
               :columns="item"
               :table-data="tableDataPagination[index].list || []"
               :max-height="maxTableHeight"
+              :height="maxTableHeight"
               v-model:current-page="pageNums[index]"
               v-model:page-size="pagination.pageSize"
               :total="total[index]"
@@ -213,19 +215,19 @@ function querySqlRun() {
     ElMessage.error('查询正在运行中，请勿重复操作');
   }
 }
-// 查询结果
-const formatSqlInfo = computed(() => (filed: string, index: number) => {
-  const data: Partial<Search.QuerySqlResponse> = sqlResult.value[index];
-  if (filed === 'status') {
-    // eslint-disable-next-line no-nested-ternary
-    return data.status === undefined ? '' : (data.status ? '查询成功' : '查询失败');
-  } if (filed === 'startQueryTime') {
-    return data.startQueryTime ? data.startQueryTime : currentQueryTime.value;
-  } if (filed === 'queryTime') {
-    return data.queryTime ? data.queryTime : '';
-  }
-  return '';
-});
+// // 查询结果
+// const formatSqlInfo = computed(() => (filed: string, index: number) => {
+//   const data: Partial<Search.QuerySqlResponse> = sqlResult.value[index];
+//   if (filed === 'status') {
+//     // eslint-disable-next-line no-nested-ternary
+//     return data.status === undefined ? '' : (data.status ? '查询成功' : '查询失败');
+//   } if (filed === 'startQueryTime') {
+//     return data.startQueryTime ? data.startQueryTime : currentQueryTime.value;
+//   } if (filed === 'queryTime') {
+//     return data.queryTime ? data.queryTime : '';
+//   }
+//   return '';
+// });
 
 function handleSave() {
   emit('save');
@@ -364,12 +366,13 @@ function emptyQuery() {
 
 .run-result-title-box {
   display: flex;
+  align-items: center;
   padding: 12px 0 12px 16px;
   margin-bottom: 12px;
   border-bottom: 1px solid #DFE1ED;
 
   .run-result-tip {
-    align-self: flex-end;
+    // align-self: flex-end;
     margin: 0 0 0 12px;
     display: flex;
     align-items: center;
@@ -383,11 +386,13 @@ function emptyQuery() {
   }
 }
 
-.tabs{
+.tabs {
   padding: 8px 16px;
 }
 
 .tabs-nav-list {
+  margin-bottom: 8px;
+
   :deep(.el-tabs__content) {
     padding: 16px;
     background-color: #F7F8FC;

@@ -1,21 +1,20 @@
 <template>
   <div class="page-container">
     <div class="search-form-wrapper">
-      <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline :disabled="getListLoading">
-        <el-form-item label="测点选择:" prop="path" :error="errorDeviceTip">
-          <template #label>
-            测点选择:<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
-          </template>
-          <timeseries-select v-model="searchFormData.path" :server-id="serverId" :is-show-view-btn="true" />
-        </el-form-item>
-        <br>
-        <el-form-item label="查询时间:" prop="time">
-          <div class="search-time-wrapper">
-            <ul class="search-time-list">
-              <li :class="['search-time-type', { 'search-time-active': timeType === 'datetime' }]" @click="handleTimeType('datetime')">时间点</li>
-              <li :class="['search-time-type', { 'search-time-active': timeType === 'datetimerange' }]" @click="handleTimeType('datetimerange')">时间段</li>
-            </ul>
-            <div class="search-time-box">
+      <el-form :model="searchFormData" style="flex: 1" ref="searchFormRef" label-position="left" size="default" inline :disabled="getListLoading">
+        <el-row>
+          <el-form-item label="测点选择:" prop="path" :error="errorDeviceTip">
+            <template #label>
+              测点选择:<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
+            </template>
+            <timeseries-select v-model="searchFormData.path" :server-id="serverId" :is-show-view-btn="true" />
+          </el-form-item>
+          <el-form-item label="查询时间:" prop="time" style="margin-right: 0;">
+            <div class="search-time-wrapper">
+              <ul class="search-time-list">
+                <li :class="['search-time-type', { 'search-time-active': timeType === 'datetime' }]" @click="handleTimeType('datetime')">时间点</li>
+                <li :class="['search-time-type', { 'search-time-active': timeType === 'datetimerange' }]" @click="handleTimeType('datetimerange')">时间段</li>
+              </ul>
               <el-date-picker
                 v-if="timeType === 'datetime'"
                 v-model="searchFormData.time"
@@ -24,8 +23,8 @@
                 :disabled-date="disabledDate"
                 :shortcuts="shortcutsDate"
                 :clearable="false"
+                :prefix-icon="ICustomCalender"
               />
-
               <el-date-picker
                 v-else
                 v-model="searchFormData.datetimerange"
@@ -35,36 +34,45 @@
                 :disabled-date="disabledDate"
                 :shortcuts="shortcutsDaterange"
                 :clearable="false"
+                :prefix-icon="ICustomCalender"
               />
             </div>
+          </el-form-item>
+        </el-row>
+        <el-row class="flex-justify-between">
+          <div>
+            <el-form-item label="采样周期:" prop="timeInterval">
+              <template #label>
+                采样周期:<el-tooltip effect="light" content="请输入正整数" placement="top"><i-custom-question /></el-tooltip>
+              </template>
+              <el-input v-model.number="searchFormData.timeInterval" style="width: 100px;" placeholder="" @input="handleInputInterval">
+                <template #append>
+                  <el-select v-model="searchFormData.unitInterval" style="width: 50px;" placeholder="">
+                    <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" />
+                  </el-select>
+                </template>
+              </el-input>
+
+            </el-form-item>
+            <el-form-item label="采样策略:" prop="aggregation">
+              <el-select v-model="searchFormData.aggregation" style="width: 80px;" clearable>
+                <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" />
+              </el-select>
+            </el-form-item>
           </div>
-        </el-form-item>
-        <el-form-item label="采样周期:" prop="timeInterval">
-          <template #label>
-            采样周期:<el-tooltip effect="light" content="请输入正整数" placement="top"><i-custom-question /></el-tooltip>
-          </template>
-          <el-input v-model.number="searchFormData.timeInterval" style="width: 180px;" placeholder="" @input="handleInputInterval" />
-          <el-select v-model="searchFormData.unitInterval" style="width: 80px;" placeholder="">
-            <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="采样策略:" prop="aggregation">
-          <el-select v-model="searchFormData.aggregation" style="width: 120px;" clearable>
-            <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" />
-          </el-select>
-        </el-form-item>
+          <el-form-item class="search-form-buttons">
+            <el-button @click="handleReset" :disabled="getListLoading">重 置</el-button>
+            <el-button type="primary" @click="handleSearch">{{getListLoading ? '取消查询' : '查 询'}}</el-button>
+          </el-form-item>
+        </el-row>
       </el-form>
-      <div class="search-form-buttons">
-        <el-button @click="handleReset" :disabled="getListLoading">重 置</el-button>
-        <el-button type="primary" @click="handleSearch">{{getListLoading ? '取消查询' : '查 询'}}</el-button>
-      </div>
 
     </div>
 
     <div class="page-table-details">
-      <h4 class="page-info-title">查询详情</h4>
+
       <div class="page-info-box">
-        <ul class="run-result-list">
+        <!-- <ul class="run-result-list">
           <li class="run-result-item">
             <i-custom-query-success v-if="searchDetailInfos.status === true" />
             <i-custom-query-error v-else-if="searchDetailInfos.status === false" />
@@ -75,8 +83,10 @@
           </li>
           <li class="run-result-item"><i-custom-query-start-time />开始时间：{{ formatSqlInfo('startQueryTime') }}</li>
           <li class="run-result-item"><i-custom-query-time />查询耗时：{{ formatSqlInfo('queryTime') }}</li>
-        </ul>
-
+        </ul> -->
+        <h4 class="page-info-title">查询详情
+          <span class="run-result-tip"><i-custom-info-warning />默认最多展示1000行100列，如需查看更多数据请下载查看</span>
+        </h4>
         <div class="page-detail-buttons">
           <el-button @click="handleSearch" :disabled="getListLoading">刷新</el-button>
           <el-dropdown class="more-icon m-l-12" :disabled="getListLoading" v-show="searchDetailInfos.status && tableData.length > 0" @command="val => handleCommandDown(val)">
@@ -100,20 +110,23 @@
           <template #icon><i-ep-arrow-right-bold /></template>
         </el-button>
       </div> -->
-      <div class="table-empty-wrapper" v-if="firstLoad" style="background-color: #fff; height: 400px;">
+      <div class="table-empty-wrapper" v-if="firstLoad" style="background-color: #fff; height: 100%;">
         <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
         <span class="data-empty-text">无数据</span>
       </div>
-      <div :loading="getListLoading">
+      <div v-loading="getListLoading">
         <div v-if="searchDetailInfos.status">
           <dynamic-table
             :columns="columns"
-            :table-data="tableData"
+            :table-data="tableDataPagination"
             :height="tableHeight"
             :max-height="tableHeight"
-            :show-pagination="false"
+            v-model:current-page="pagination.pageNum"
+            v-model:page-size="pagination.pageSize"
+            :total="tableData.length"
+            :show-pagination="true"
           />
-          <div class="pagination-container" v-if="tableData.length > 0">
+          <!-- <div class="pagination-container" v-if="tableData.length > 0">
             <el-button plain class="btn-page btn-first" @click="handleClickPage('first')" :disabled="pagination.pageNum === 1">第一页</el-button>
             <el-button type="primary" class="btn-page btn-prev" @click="handleClickPage('prev')" :disabled="pagination.pageNum === 1">上一页</el-button>
             <el-button type="primary" class="btn-page btn-next" @click="handleClickPage('next')" :disabled="!hasNext">下一页</el-button>
@@ -125,7 +138,7 @@
                 :value="item.value"
               />
             </el-select>
-          </div>
+          </div> -->
         </div>
         <div class="table-error-wrapper" v-if="searchDetailInfos.errMsg">
           Msg: {{ searchDetailInfos.errMsg }}
@@ -146,11 +159,12 @@ import {
 } from '@/utils/date';
 import DynamicTable from '@/components/dynamic-table.vue';
 import { useServerStore } from '@/stores';
+import ICustomCalender from '~icons/custom/calender.svg';
 
 const serverStroe = useServerStore();
 const serverId = serverStroe.currentServerId;
 
-const { maxTableHeight } = useTableHeight(420);
+const { maxTableHeight } = useTableHeight(350);
 const searchFormRef = ref<FormInstance>();
 const firstLoad = ref(true);
 const timeUnits = [
@@ -166,12 +180,7 @@ const aggregateFunctions = [
   { label: '最大值', value: 'max_value' },
   { label: '最小值', value: 'min_value' },
 ];
-const paginationSizerOptions = [
-  { label: '10条/页', value: 10 },
-  { label: '20条/页', value: 20 },
-  { label: '50条/页', value: 50 },
-  { label: '100条/页', value: 100 },
-];
+
 const currentQueryTime = ref('');
 const timeType = ref('datetime');
 const errorDeviceTip = ref('');
@@ -230,19 +239,19 @@ const getListLoading = ref(false);
 
 const tableHeight = computed(() => (tableData.value.length > 0 ? maxTableHeight.value : maxTableHeight.value + 60));
 
-// 查询结果
-const formatSqlInfo = computed(() => function (filed: string) {
-  const data: Partial<Search.QueryDataResult> = searchDetailInfos?.value;
-  if (filed === 'status') {
-    // eslint-disable-next-line no-nested-ternary
-    return data.status === undefined ? '' : (data.status ? '查询成功' : '查询失败');
-  } if (filed === 'startQueryTime') {
-    return currentQueryTime.value;
-  } if (filed === 'queryTime') {
-    return data.status ? data.queryTime : '';
-  }
-  return '';
-});
+// // 查询结果
+// const formatSqlInfo = computed(() => function (filed: string) {
+//   const data: Partial<Search.QueryDataResult> = searchDetailInfos?.value;
+//   if (filed === 'status') {
+//     // eslint-disable-next-line no-nested-ternary
+//     return data.status === undefined ? '' : (data.status ? '查询成功' : '查询失败');
+//   } if (filed === 'startQueryTime') {
+//     return currentQueryTime.value;
+//   } if (filed === 'queryTime') {
+//     return data.status ? data.queryTime : '';
+//   }
+//   return '';
+// });
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
@@ -254,7 +263,7 @@ let controller = new AbortController();
 
 function getListData() {
   if (copySearchFormData.timeInterval && !copySearchFormData.aggregation) {
-    ElMessage.error('采样周期填写的情况下请选择采样策略');
+    ElMessage.error('请选择采样策略');
     return;
   }
   firstLoad.value = false;
@@ -285,7 +294,7 @@ function getListData() {
     unitInterval: copySearchFormData.unitInterval,
     spage: pagination.columnNum,
     ssize: pagination.columnSize,
-    size: pagination.pageSize,
+    size: 1000,
     page: pagination.pageNum,
   }, controller).then((res) => {
     // eslint-disable-next-line no-undef
@@ -361,22 +370,22 @@ function queryData(columnNum?: number) {
   getListData();
 }
 
-function handleClickPage(type: string) {
-  if (type === 'first') {
-    pagination.pageNum = 1;
-  } else if (type === 'prev') {
-    pagination.pageNum--;
-  } else {
-    pagination.pageNum++;
-  }
-  getListData();
-}
+// function handleClickPage(type: string) {
+//   if (type === 'first') {
+//     pagination.pageNum = 1;
+//   } else if (type === 'prev') {
+//     pagination.pageNum--;
+//   } else {
+//     pagination.pageNum++;
+//   }
+//   getListData();
+// }
 
-function handleChangePageSize(val: number) {
-  pagination.pageSize = val;
-  pagination.pageNum = 1;
-  getListData();
-}
+// function handleChangePageSize(val: number) {
+//   pagination.pageSize = val;
+//   pagination.pageNum = 1;
+//   getListData();
+// }
 
 // 导出
 function handleExportData(exportType: string) {
@@ -439,6 +448,8 @@ onMounted(() => {
   padding: 16px;
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
   box-sizing: border-box;
 
   .el-button:focus-visible {
@@ -446,14 +457,15 @@ onMounted(() => {
   }
 }
 
-.search-form-wrapper{
+.search-form-wrapper {
   display: flex;
-  justify-content: space-between;
+  width: 100%;
 
-  .search-form-buttons{
+  .search-form-buttons {
     align-self: flex-end;
-    margin-bottom: 18px;
-    flex: 0 0 180px;
+    display: flex;
+    flex-wrap: nowrap;
+    margin-right: 0;
   }
 }
 
@@ -493,12 +505,31 @@ onMounted(() => {
   padding: 8px 16px;
   border-radius: 2px;
   background: #f7f8fc;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
 
   .page-info-title {
+    display: flex;
     font-size: 14px;
     line-height: 20px;
     color: #495ad4;
     margin-bottom: 18px;
+
+    .run-result-tip {
+      align-self: flex-end;
+      margin: 0 0 0 12px;
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      color: #808080;
+      font-weight: 400;
+
+      svg {
+        color: #ccc;
+        margin-right: 4px;
+      }
+    }
   }
 
   .page-info-box {

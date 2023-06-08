@@ -2,7 +2,7 @@
   <el-dialog
     title="新建测点"
     v-model="dialogVisible"
-    width="800px"
+    width="748px"
     :close-on-click-modal="false"
   >
     <el-form ref="formRef" :model="formData" label-position="left">
@@ -33,8 +33,8 @@
           </div>
         </div>
       </el-form-item>
-      <h4 class="module-title">测点</h4>
-      <el-collapse accordion class="measurement-list-box">
+      <h4 class="module-title" style="border: none;">测点</h4>
+      <el-collapse accordion class="measurement-list-box" v-model="activeName">
         <el-collapse-item v-for="(item, index) in formData.measurementList" :key="index" :name="'measurement_' + index">
           <template #title>
             <el-row class="collapse-title-box">
@@ -47,8 +47,8 @@
               </el-col>
               <el-col :span="4">
                 <div class="operate-box">
-                  <el-button link :disabled="copyControl(item)" @click="handleCopyRow(item)"><i-custom-copy /></el-button>
-                  <el-button link class="m-x-12" @click="handleDelRow(index)"><i-custom-delete /></el-button>
+                  <el-button link @click="(e)=>handleCopyRow(item, e)"><i-custom-copy /></el-button>
+                  <el-button link class="m-x-12" @click="(e)=>handleDelRow(index, e)"><i-custom-delete /></el-button>
                 </div>
               </el-col>
             </el-row>
@@ -76,7 +76,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item label="压缩方式" :prop="'measurementList[' + index + '].compression'" :rules="requiredRules">
+              <el-form-item label="压缩方式" :prop="'measurementList[' + index + '].compression'" :rules="requiredRules" style="margin-right: 0;">
                 <el-select v-model="item.compression" placeholder="请选择数据类型" :disabled="!item.isEditable || !formData.deviceName">
                   <el-option v-for="com in compressionOptions" :key="com" :label="com" :value="com" />
                 </el-select>
@@ -91,7 +91,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleConfirm">确定</el-button>
+        <el-button type="primary" :loading="saveloading" @click="handleConfirm">确定</el-button>
       </span>
     </template>
   </el-dialog>
@@ -115,11 +115,12 @@ const emit = defineEmits<{
 }>();
 
 const dialogVisible = useVModel(props, 'visible', emit);
+const activeName = ref('measurement_0');
 
 const { requestFn: getDevice, loading: deviceLoading } = useRequest(StorageApi.getDeviceByGroup);
 const { requestFn: getMeasurementsInfosByFuzzy } = useRequest(StorageApi.getMeasurementsInfosByFuzzy);
 const { requestFn: getIsAlignedDevice } = useRequest(StorageApi.getIsAlignedDevice);
-const { requestFn: saveMeasurementList } = useRequest(StorageApi.saveMeasurementList);
+const { requestFn: saveMeasurementList, loading: saveloading } = useRequest(StorageApi.saveMeasurementList);
 const { requestFn: deleteMeasurements } = useRequest(StorageApi.deleteMeasurements);
 
 const dataTypeOptions = ['BOOLEAN', 'INT32', 'INT64', 'FLOAT', 'DOUBLE', 'TEXT'];
@@ -131,7 +132,7 @@ const encoding: { [key: string]: string[] } = {
   DOUBLE: ['GORILLA', 'PLAIN', 'RLE', 'TS_2DIFF', 'FREQ', 'CHIMP', 'SPRINTZ', 'RLBE'],
   TEXT: ['PLAIN', 'DICTIONARY'],
 };
-const compressionOptions = ['SNAPPY', 'UNCOMPRESSED', 'LZ4', 'GZIP', 'ZSTD', 'LZMA2'];
+const compressionOptions = ['UNCOMPRESSED', 'SNAPPY', 'LZ4', 'GZIP', 'ZSTD', 'LZMA2'];
 
 const encodingOptions = computed(() => (val: string) => encoding[val]);
 
@@ -177,9 +178,7 @@ const addControl = computed(() => {
   return flag;
 });
 
-const copyControl = computed(() => function (data: Partial<StorageDevice.MeasurementItem>) {
-  return !data.timeseries || !data.dataType || !data.encoding || !data.compression;
-});
+const copyControl = (data: Partial<StorageDevice.MeasurementItem>) => !data.timeseries || !data.dataType || !data.encoding || !data.compression;
 let lastQuery = '';
 
 const remoteMethod = debounce((query: string) => {
@@ -208,6 +207,7 @@ function getMeasurementList(val: string) {
     data.forEach((item) => {
       formData.measurementList.unshift({ ...item });
     });
+    activeName.value = `measurement_${formData.measurementList.length - 1}`;
   });
 }
 
@@ -224,10 +224,14 @@ function handleChangeAdd(val: boolean) {
     isEditable: true,
   });
   isAligned.value = false;
+  activeName.value = 'measurement_0';
 }
 
 // 复制
-function handleCopyRow(data: Partial<StorageDevice.MeasurementItem>) {
+function handleCopyRow(data: Partial<StorageDevice.MeasurementItem>, e: MouseEvent) {
+  e.preventDefault();
+  e.stopPropagation();
+  if (copyControl(data)) return;
   formData.measurementList.push({
     deviceName: data.deviceName,
     timeseries: `${data.timeseries}_copy`,
@@ -236,10 +240,13 @@ function handleCopyRow(data: Partial<StorageDevice.MeasurementItem>) {
     compression: data.compression,
     isEditable: true,
   });
+  activeName.value = `measurement_${formData.measurementList.length - 1}`;
 }
 
 // 删除
-function handleDelRow(i: number) {
+function handleDelRow(i: number, e: MouseEvent) {
+  e.preventDefault();
+  e.stopPropagation();
   ElMessageBox.confirm('是否删除测点？', '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
@@ -353,10 +360,20 @@ watch(
   border-bottom: 1px solid #F0F1FA;
 }
 
+.device-box{
+  display: flex;
+  align-items: center;
+}
+
 .measurement-list-box{
-  max-height: 400px;
+  min-height: 300px;
+  max-height: 500px;
   overflow-y: auto;
   border-bottom: none;
+
+  :deep(.el-form-item--default) {
+    margin-right: 15px;
+  }
 }
 
 .collapse-title-box{
@@ -397,5 +414,10 @@ watch(
 
 .operate-box{
   text-align: right;
+
+  .el-button{
+    min-width: 28px !important;
+    padding: 0 !important;
+  }
 }
 </style>

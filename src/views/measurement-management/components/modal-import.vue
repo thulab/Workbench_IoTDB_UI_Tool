@@ -19,8 +19,8 @@
       <div class="select-file-box" v-if="activeStep === 0">
         <div class="select-item-box" style="align-items: center;">
           <span class="select-item-label">模板下载：</span>
-          <el-button v-if="false" link class="template-button" @click="downloadTemplate">moban.csv</el-button>
-          <a href="/api/file/exportMeasurementTemplate" class="template-button" target="_blank">moban.csv</a>
+          <el-button v-if="false" link class="template-button" @click="downloadTemplate">timeseries_template.csv</el-button>
+          <a href="/api/file/exportMeasurementTemplate" class="template-button" target="_blank">timeseries_template.csv</a>
         </div>
         <div class="select-item-box">
           <span class="select-item-label">导入文件：</span>
@@ -33,18 +33,21 @@
             accept=".csv, .xlsx"
             :auto-upload="false"
             :before-upload="beforeUpload"
+            :show-file-list="false"
             :on-exceed="handleExceed"
             :on-change="handleChange"
             :on-remove="handleRemove"
             :http-request="customUpload"
           >
-            <el-icon size="80"><i-custom-upload /></el-icon>
+            <el-icon size="80" v-if="!uploadFileInfo"><i-custom-upload /></el-icon>
+            <el-icon size="80" v-else><i-custom-file-info /></el-icon>
+            <div class="file-info-box" v-if="uploadFileInfo">{{ uploadFileInfo.name }}</div>
             <div class="el-upload__text">
-              将文件拖到此处，或<em>点击上传</em>
+              将文件拖到此处，或<em>{{!uploadFileInfo ? '点击上传' : '点击重新上传' }}</em>
             </div>
             <template #tip>
               <div class="el-upload__tip">
-                目前仅支持上传 csv 和 xlsx 文件
+                仅支持上传 csv 和 xlsx 文件
               </div>
             </template>
           </el-upload>
@@ -78,11 +81,13 @@
       </div>
     </div>
 
-    <div class="m-t-10" style="text-align: right;" v-if="activeStep === 0">
+    <div class="m-t-12" style="text-align: right;" v-if="activeStep === 0">
       <el-button plain :disabled="!uploadFileInfo" @click="handleNext">下一步</el-button>
     </div>
 
-    <div class="m-t-10" style="text-align: center;" v-if="activeStep === 2">
+    <div class="m-t-12" style="height: 28px;" v-if="activeStep === 1"></div>
+
+    <div class="m-t-12" style="text-align: center;" v-if="activeStep === 2">
       <el-button type="primary" @click="handleClose">完成</el-button>
     </div>
   </el-dialog>
@@ -224,58 +229,27 @@ watch(
   .import-box{
     background-color: #F7F8FC;
     padding: 24px 16px;
-  }
-}
+    height: 332px;
+    box-sizing: border-box;
 
-.import-step-box{
-  :deep(.el-step__title) {
-    font-size: 14px;
-    line-height: 21px;
-  }
-
-  :deep(.el-step.is-horizontal .el-step__line) {
-    height: 1px;
-  }
-
-  :deep(.el-step__title.is-process) {
-    color: #495AD4;
-    font-weight: 700;
-  }
-
-  :deep(.el-step__icon) {
-    border: 1px solid #DFE1ED;
-  }
-
-  :deep(.el-step__head.is-process .el-step__icon) {
-    background: #495AD4;
-    color: #fff;
-    border-color: transparent;
-  }
-
-  :deep(.el-step__title.is-wait) {
-    color: #424561;
-    font-weight: 700;
-  }
-
-  :deep(.el-step__title.is-success) {
-    color: #424561;
-  }
-
-  :deep(.el-step__head.is-success) {
-    color: #495AD4;
-    border-color: #495AD4;
-
-    .el-step__icon{
-      background: #495AD4;
-      color: #fff;
-      border-color: transparent;
+    .file-info-box{
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 18px;
+      color: #495AD4;
+      margin-bottom: 20px;
+      text-align: center;
     }
   }
 }
 
+.import-step-box{
+  margin: 0 50px 18px;
+}
+
 .select-item-box{
   display: flex;
-  margin: 10px 0;
+  margin: 20px 0;
 
   .select-item-label{
     font-size: 14px;
@@ -291,12 +265,32 @@ watch(
 
   .import-upload{
     flex: 1;
+
+    :deep(.el-upload-dragger) {
+      height: 180px;
+      padding-top: 32px;
+
+      .el-upload__text{
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 18px;
+        color: #656A85;
+      }
+    }
+
+    :deep(.el-upload__tip) {
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 18px;
+      color: #656A85;
+      margin-top: 4px;
+    }
   }
 }
 
 .select-result-box{
   width: 536px;
-  height: 200px;
+  height: 180px;
   border-radius: 2px;
   background: #FFF;
   border: 1px dashed #DFE1ED;

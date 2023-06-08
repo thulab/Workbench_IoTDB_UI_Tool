@@ -4,7 +4,7 @@
       <template #default="{ node, data }">
         <span class="custom-tree-node">
           <el-tooltip class="item" effect="light" :content="data.label" placement="top">
-            <span @dblclick="getFunction(node)">{{ node.level === 1 ? node.label : data.value }}</span>
+            <span style="color: #131926;font-weight: 300;" @dblclick="getFunction(node)">{{ node.level === 1 ? node.label : data.value }}</span>
           </el-tooltip>
         </span>
       </template>

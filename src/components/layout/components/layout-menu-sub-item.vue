@@ -20,8 +20,9 @@
     <el-menu-item
       v-else
       :index="subItem.path">
-      <el-icon>
-        <i v-html="subItem.icon"></i>
+      <el-icon v-if="subItem.icon">
+        <i class="active" v-if="isCollapse && subItem.activeIcon" v-html="subItem.activeIcon"></i>
+        <i class="normal" v-html="subItem.icon"></i>
       </el-icon>
       <template
         v-if="!subItem.isLink"
@@ -145,6 +146,14 @@ const menus = computed<MenuOptions[]>(() => {
 
     &.is-active {
       background-color: var(--el-color-primary) !important;
+
+      .active{
+        display: block;
+      }
+
+      .normal{
+        display: none;
+      }
 
       &::before{
         display: none

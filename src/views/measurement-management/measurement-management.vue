@@ -9,7 +9,7 @@
       />
     </div>
 
-    <div class="storage-details-wrapper">
+    <el-scrollbar class="storage-details-wrapper">
       <h4 class="storage-info-title">数据库信息</h4>
       <div class="page-info-box">
         <ul class="storage-info-list">
@@ -19,9 +19,9 @@
             <span class="storage-info-item-label">数据保存时间：<el-tooltip effect="light" content="数据保存时间（TTL），到期后系统将自动删除数据，此处不填代表永久存储" placement="top"><i-custom-question class="ttl-tip" /></el-tooltip></span>
             <span v-if="!editTTL">{{ storageInfos?.ttl ? (storageInfos.ttl + getTtlTimeUnit(storageInfos.ttlUnit, ttlUnitOptions)) : '∞'}}</span>
             <div v-if="currentStorage && editTTL" class="edit-ttl-box">
-              <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" size="small" style="width:220px;">
+              <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" style="width:120px;">
                 <template #append>
-                  <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder="" size="small" style="width:80px;">
+                  <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder=" " style="width:50px;">
                     <el-option label="毫秒" value="millisecond" />
                     <el-option label="秒" value="second" />
                     <el-option label="分" value="minute" />
@@ -30,8 +30,8 @@
                   </el-select>
                 </template>
               </el-input>
-              <el-button plain size="small" @click="editTTL = false">取消</el-button>
-              <el-button type="primary" size="small" @click="handleConfirmEditTTL">确定</el-button>
+              <el-button class="m-l-12" plain @click="editTTL = false">取消</el-button>
+              <el-button type="primary" @click="handleConfirmEditTTL">确定</el-button>
             </div>
             <el-button link v-if="currentStorage && !editTTL" class="m-l-12" @click="handleEditTTL"><i-custom-edit /></el-button>
           </li>
@@ -85,23 +85,24 @@
             :data="tableData.measurements"
             v-loading="loading"
             style="width: 100%;"
-            :max-height="maxTableHeight"
+            :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 52"
+            :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 52"
             tooltip-effect="light"
             ref="tableRef"
             @selection-change="handleSelectionChange"
           >
             <el-table-column type="selection" width="55" />
-            <el-table-column label="设备名称" prop="deviceName" min-width="240" show-overflow-tooltip />
-            <el-table-column label="测点名称" prop="timeseries" width="160" show-overflow-tooltip />
-            <el-table-column label="数据类型" prop="dataType" width="140" show-overflow-tooltip />
-            <el-table-column label="编码方式" prop="encoding" min-width="140" show-overflow-tooltip />
-            <el-table-column label="压缩方式" prop="compression" min-width="140" show-overflow-tooltip />
-            <el-table-column label="最新值" prop="value" min-width="140" show-overflow-tooltip />
-            <el-table-column label="最新值时间" prop="valueTime" min-width="240" show-overflow-tooltip />
-            <el-table-column label="操作" width="160" fixed="right">
+            <el-table-column label="设备名称" prop="deviceName" min-width="200" align="center" show-overflow-tooltip />
+            <el-table-column label="测点名称" prop="timeseries" width="160" align="center" show-overflow-tooltip />
+            <el-table-column label="数据类型" prop="dataType" width="140" align="center" show-overflow-tooltip />
+            <el-table-column label="编码方式" prop="encoding" min-width="140" align="center" show-overflow-tooltip />
+            <el-table-column label="压缩方式" prop="compression" min-width="140" align="center" show-overflow-tooltip />
+            <el-table-column label="最新值" prop="value" min-width="140" align="center" show-overflow-tooltip />
+            <el-table-column label="最新值时间" prop="valueTime" min-width="200" align="center" show-overflow-tooltip />
+            <el-table-column label="操作" width="120" fixed="right">
               <template #default="{ row }">
-                <el-button type="primary" link size="small" @click="handleRowAlarm(row)">告警详情</el-button>
                 <el-button type="primary" link size="small" @click="handleDelRow('row', row)">删除</el-button>
+                <el-button type="primary" link size="small" @click="handleRowAlarm(row)">告警详情</el-button>
               </template>
             </el-table-column>
             <template #empty>
@@ -126,7 +127,7 @@
           />
         </div>
       </template>
-    </div>
+    </el-scrollbar>
 
     <modal-storage
       v-model:visible="storageVisible"
@@ -172,7 +173,7 @@ const ttlUnitOptions = [
   { label: '天', value: 'day' },
 ];
 
-const { maxTableHeight } = useTableHeight(420);
+const { maxTableHeight } = useTableHeight(410);
 const storageSideRef = ref<InstanceType<typeof StorageSide>>();
 const currentStorage = ref('');
 const searchKeyword = ref('');
@@ -192,7 +193,7 @@ const totalCount = ref(0);
 const multipleSelection = ref<StorageDevice.MeasurementItem[]>([]);
 const editTTL = ref(false);
 const editTTLModel = ref();
-const editTTLUnitModel = ref();
+const editTTLUnitModel = ref('day');
 const storageVisible = ref(false);
 const measurementVisible = ref(false);
 const importVisible = ref(false);
@@ -374,7 +375,7 @@ function handleImportClose(reload: boolean) {
 function handleEditTTL() {
   editTTL.value = true;
   editTTLModel.value = storageInfos.value?.ttl;
-  editTTLUnitModel.value = storageInfos.value?.ttlUnit;
+  editTTLUnitModel.value = storageInfos.value?.ttlUnit || 'day';
 }
 
 function handleConfirmEditTTL() {
@@ -419,7 +420,7 @@ watch(
         };
       } else {
         getStorageInfo(val);
-        getListData();
+        handleRefresh();
       }
     }
   },
@@ -436,6 +437,8 @@ watch(
   width: 100%;
   height: 100%;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 .storage-list-wrapper{
@@ -463,14 +466,18 @@ watch(
     padding: 8px 16px;
   }
 
+  .storage-info-list {
+    flex: 1;
+  }
+
   .storage-info-item {
     font-size: 12px;
     line-height: 12px;
     color: #656A85;
-    margin: 0 50px 6px 0;
+    margin: 0 20px 6px 0;
     display: inline-flex;
     align-items: center;
-    width: 240px;
+    width: 160px;
 
     .storage-info-item-label{
       color: #131926;
@@ -487,7 +494,7 @@ watch(
   }
 
   .storage-info-item-ttl{
-    width: 500px;
+    width: 380px;
   }
 }
 

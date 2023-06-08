@@ -4,7 +4,22 @@
 @import "./button";
 @import "./input";
 @import "./table";
+@import "./collapse";
+@import "./step";
 
 :root {
   --el-text-color-regular: #656A85;
+  --el-font-weight-primary: 400;
+  --el-text-color-primary: #424561;
+  --el-component-size: 28px;
+  --el-border-radius-base: 2px;
+  --el-border-color: #DFE1ED;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #F0F1FA;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #DFE1ED;
 }

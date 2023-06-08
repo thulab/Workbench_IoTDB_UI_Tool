@@ -60,7 +60,14 @@
       <el-button v-if="false" type="primary" @click="handleAdd(deviceName)">当前设备</el-button>
       <el-button @click="handleReset">重置</el-button>
     </div>
-    <el-table :data="measurementList" :max-height="maxTableHeight" v-loading="measurementLoading" tooltip-effect="light" :tooltip-options="{ placement: 'left' }" @row-dblclick="(row, column, event)=>handleAdd(row)">
+    <el-table
+      v-if="measurementList && measurementList.length > 0"
+      :data="measurementList"
+      :max-height="maxTableHeight"
+      v-loading="measurementLoading"
+      tooltip-effect="light"
+      :tooltip-options="{ placement: 'left' }"
+      @row-dblclick="(row, column, event)=>handleAdd(row)">
       <el-table-column align="center" label="测点" v-slot="{ row }" show-overflow-tooltip>
         {{ row }}
       </el-table-column>
@@ -283,6 +290,7 @@ onMounted(() => {
 
 .search-buttons {
   text-align: right;
+  margin-bottom: 16px;
 }
 
 </style>

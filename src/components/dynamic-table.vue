@@ -5,8 +5,8 @@
         <el-table
           :data="tableData"
           style="width: 100%;"
-          :height="height"
-          :max-height="maxHeight"
+          :height="tableHeight"
+          :max-height="tableMaxHeight"
           tooltip-effect="light"
           @selection-change="handleSelectionChange"
         >
@@ -40,15 +40,15 @@
         <el-button class="m-l-4" @click="columnPageNum++" :disabled="columnPageNum >= totalColumnPage" size="small" circle><i-ep-arrow-right-bold /></el-button>
       </div>
     </div>
-    <div class="paination" v-if="(showPagination || showBatchDelete)">
-      <el-button v-if="showBatchDelete" type="primary" @click="deleteArrys" :loading="batchDeleting">{{ $t('standTable.deleteArry') }}</el-button>
+    <div class="paination" v-if="(showPagination)">
       <div></div>
       <el-pagination
         v-if="showPagination"
+        background
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        v-model:current-page="currentPage"
-        v-model:page-size="pageSize"
+        v-model:current-page="currentPageVM"
+        v-model:page-size="pageSizeVM"
         layout="total, sizes, prev, pager, next, jumper"
         :page-sizes="[10, 20, 50, 100]"
         :total="total || 0"
@@ -71,7 +71,6 @@ const props = defineProps<{
   pageSize?: number,
   total?: number,
   batchDeleting?: boolean,
-  showBatchDelete?: boolean,
   showSelect?: boolean,
 }>();
 const emit = defineEmits<{
@@ -86,9 +85,24 @@ const { t } = useI18n();
 
 const { getIconName } = useDataTypeIcon();
 
-const currentPage = useVModel(props, 'currentPage');
-const pageSize = useVModel(props, 'pageSize');
+const currentPageVM = useVModel(props, 'currentPage');
+const pageSizeVM = useVModel(props, 'pageSize');
 const columnPageSize = 100;
+
+const tableHeight = computed(() => {
+  const total = props.total || 0;
+  if (total >= 0 && props.pageSize && props.height && total <= props.pageSize) {
+    return props.height + 40;
+  }
+  return props.height;
+});
+const tableMaxHeight = computed(() => {
+  const total = props.total || 0;
+  if (total >= 0 && props.pageSize && props.height && total <= props.pageSize) {
+    return props.maxHeight + 40;
+  }
+  return props.maxHeight;
+});
 
 const totalColumnPage = computed(() => Math.ceil((props.columns.length - 1) / columnPageSize));
 const columnPageNum = ref(1);
@@ -111,9 +125,6 @@ watch(props.columns, () => {
 
 function handleSelectionChange(val: Record<string, any>[]) {
   emit('selectedChange', val);
-}
-function deleteArrys() {
-  emit('batchDelete');
 }
 
 function handleCurrentChange() {

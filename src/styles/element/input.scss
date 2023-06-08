@@ -7,4 +7,66 @@
 .el-input__inner, .el-range-input {
   color: #656A85;
   font-weight: 300;
+  font-size: 12px !important;
+  line-height: 18px !important;
+}
+
+.el-input__inner{
+  height: 26px !important;
+}
+
+.el-select {
+  line-height: 28px !important;
+
+  .el-input__wrapper{
+    padding-right: 1px !important;
+  }
+
+  .el-input__suffix{
+    width: 16px;
+    background: #F0F1FA;
+
+    .el-input__suffix-inner{
+      width: 100%;
+
+      &> :first-child{
+        margin-left: 0;
+      }
+    }
+  }
+}
+
+.el-checkbox{
+  height: 28px !important;
+}
+
+.el-input-group__append {
+  border-left: 0 !important;
+  background: #F0F1FA !important;
+
+  .el-select {
+    .el-input {
+      .el-input__wrapper{
+        padding-left: 2px;
+      }
+
+      .el-input__inner{
+        color: #131926;
+        text-align: center;
+      }
+    }
+  }
+}
+
+.el-form-item--default .el-form-item__label{
+  height: 28px !important;
+  color: #424561 !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 21px !important;
+  align-items: center !important;
+
+  svg{
+    align-self: flex-start;
+  }
 }
