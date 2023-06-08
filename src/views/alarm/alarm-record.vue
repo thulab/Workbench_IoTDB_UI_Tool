@@ -256,11 +256,13 @@ function handleSelectionChange(vals: Alarm.QueryRecordResult[]) {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleSortChange({ column, prop, order }:SortMethod<Alarm.QueryRecordResult>) {
+  const lastOrderBy = searchFormData.orderBy;
+  const lastAsc = searchFormData.asc;
   searchFormData.asc = order === 'ascending' ? 'asc' : 'desc';
   searchFormData.orderBy = prop;
   copySearchFormData = cloneDeep(searchFormData);
   if (!order) {
-    tableRef.value?.sort('createTime', 'descending');
+    tableRef.value?.sort(lastOrderBy, lastAsc === 'asc' ? 'descending' : 'ascending');
     return;
   }
   handleSearch();
