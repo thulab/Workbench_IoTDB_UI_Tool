@@ -25,6 +25,10 @@
   // --el-button-active-bg-color: #fff !important;
 
   &.is-link{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    min-width: auto;
+
     &:focus {
       color: #495AD4 !important;
     }
@@ -33,6 +37,11 @@
       border-color: transparent !important;
       background-color: transparent !important;
       text-decoration: underline;
+    }
+
+    .el-button__text--expand{
+      letter-spacing: 0 !important;
+      margin-right: 0 !important;
     }
   }
 }
@@ -54,14 +63,15 @@
     outline: none;
   }
 
+  &.is-link{
+    min-width: auto !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
   --el-button-hover-link-text-color: #495AD4 !important;
 
   // --el-button-hover-text-color: #fff !important;
   // --el-button-hover-bg-color: #495AD4 !important;
   // --el-button-hover-border-color: #495AD4 !important;
-}
-
-.el-button__text--expand{
-  letter-spacing: 0 !important;
-  margin-right: 0 !important;
 }

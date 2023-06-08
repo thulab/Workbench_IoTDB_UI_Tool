@@ -62,7 +62,7 @@
             <el-button type="primary" @click="handleAddMeasure">新建</el-button>
             <el-button class="m-l-16" @click="handleImport">导入</el-button>
             <el-dropdown class="m-x-16" :disabled="!(totalCount > 0)" @command="val => handleCommandDown(val)">
-              <el-button class="export-btn" :disabled="!(totalCount > 0)">导 出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top"><i-custom-question class="export-tip" /></el-tooltip></el-button>
+              <el-button class="export-btn" :disabled="!(totalCount > 0)">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top"><i-custom-question class="export-tip" /></el-tooltip></el-button>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>

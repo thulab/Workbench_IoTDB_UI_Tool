@@ -64,8 +64,8 @@
             </el-form-item>
           </div>
           <el-form-item class="search-form-buttons">
-            <el-button @click="handleReset" :disabled="getListLoading">重 置</el-button>
-            <el-button type="primary" @click="handleSearch">{{getListLoading ? '取消查询' : '查 询'}}</el-button>
+            <el-button @click="handleReset" :disabled="getListLoading">重置</el-button>
+            <el-button type="primary" @click="handleSearch">{{getListLoading ? '取消查询' : '查询'}}</el-button>
           </el-form-item>
         </el-row>
       </el-form>
