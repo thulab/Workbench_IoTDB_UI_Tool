@@ -39,6 +39,7 @@
     <el-dialog title="保存模板" v-model="nameDialogVisible" width="400px">
       <el-form ref="saveFormRef" :model="saveForm" :rules="saveFormRules" label-position="left">
         <el-form-item label="名称：" prop="sqlName" :error="errorNameTip">
+          <el-input type="hidden" />
           <el-input v-model="saveForm.sqlName" placeholder="请输入" maxlength="25" @blur="handleInputName" show-word-limit />
         </el-form-item>
       </el-form>
@@ -53,9 +54,11 @@
     <el-dialog title="重命名" v-model="renameDialogVisible" width="400px">
       <el-form ref="resaveFormRef" :model="resaveForm" label-width="100px" label-position="right">
         <el-form-item label="原名称：" prop="oldSqlName">
+          <el-input type="hidden" />
           <el-input v-model="resaveForm.oldSqlName" disabled />
         </el-form-item>
         <el-form-item label="新名称：" prop="sqlName" :error="errorRenameTip" inline-message>
+          <el-input type="hidden" />
           <el-input v-model="resaveForm.sqlName" placeholder="请输入" maxlength="25" @blur="handleInputRename" show-word-limit />
         </el-form-item>
       </el-form>

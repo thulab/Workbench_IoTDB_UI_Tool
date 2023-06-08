@@ -43,11 +43,10 @@
             <el-icon size="80" v-else><i-custom-file-info /></el-icon>
             <div class="file-info-box" v-if="uploadFileInfo">{{ uploadFileInfo.name }}</div>
             <div class="el-upload__text">
-              将文件拖到此处，或<em>{{!uploadFileInfo ? '点击上传' : '点击重新上传' }}</em>
+              仅支持上传 csv 和 xlsx 文件，将文件拖到此处，或<em>{{!uploadFileInfo ? '点击上传' : '点击重新上传' }}</em>
             </div>
             <template #tip>
               <div class="el-upload__tip">
-                仅支持上传 csv 和 xlsx 文件
               </div>
             </template>
           </el-upload>

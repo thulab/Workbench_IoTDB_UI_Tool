@@ -8,6 +8,7 @@
     <el-form ref="formRef" :model="formData" label-position="left">
       <h4 class="module-title">设备</h4>
       <el-form-item label="设备名称" prop="deviceName" class="p-t-8" :rules="deviceRules">
+        <el-input type="hidden" />
         <div class="device-box">
           <el-select
             v-if="!addDevice"
@@ -38,7 +39,7 @@
         <el-collapse-item v-for="(item, index) in formData.measurementList" :key="index" :name="'measurement_' + index">
           <template #title>
             <el-row class="collapse-title-box">
-              <el-col :span="12"><span class="all-path-name">{{!addDevice ? `${formData.deviceName}.${item.timeseries}` : `${groupName}.${formData.deviceName}.${item.timeseries}`}}</span></el-col>
+              <el-col :span="12"><span v-if="formData.deviceName" class="all-path-name">{{!addDevice ? `${formData.deviceName}.${item.timeseries}` : `${groupName}.${formData.deviceName}.${item.timeseries}`}}</span></el-col>
               <el-col :span="8">
                 <div class="collapse-data-type-box">
                   <span class="data-type-label">数据类型</span>
@@ -53,9 +54,10 @@
               </el-col>
             </el-row>
           </template>
-          <el-row style="margin-bottom: 8px;">
+          <el-row>
             <el-col :span="8">
               <el-form-item label="测点名称" :prop="'measurementList[' + index + '].timeseries'" :rules="requiredRules">
+                <el-input type="hidden" />
                 <el-input v-model="item.timeseries" placeholder="请输入测点名称" :disabled="!item.isEditable || !formData.deviceName" />
               </el-form-item>
             </el-col>
@@ -63,6 +65,7 @@
           <el-row>
             <el-col :span="8">
               <el-form-item label="数据类型" :prop="'measurementList[' + index + '].dataType'" :rules="requiredRules">
+                <el-input type="hidden" />
                 <el-select v-model="item.dataType" placeholder="请选择数据类型" @change="val => handleChangeRowDataType(val, item, index)" :disabled="!item.isEditable || !formData.deviceName">
                   <el-option v-for="dtype in dataTypeOptions" :key="dtype" :label="dtype" :value="dtype" />
                 </el-select>
@@ -70,6 +73,7 @@
             </el-col>
             <el-col :span="8">
               <el-form-item label="编码方式" :prop="'measurementList[' + index + '].encoding'" :rules="requiredRules">
+                <el-input type="hidden" />
                 <el-select v-model="item.encoding" placeholder="请选择数据类型" :disabled="!item.isEditable || !item.dataType || !formData.deviceName">
                   <el-option v-for="enc in encodingOptions(item.dataType as string)" :key="enc" :label="enc" :value="enc" />
                 </el-select>
@@ -77,6 +81,7 @@
             </el-col>
             <el-col :span="8">
               <el-form-item label="压缩方式" :prop="'measurementList[' + index + '].compression'" :rules="requiredRules" style="margin-right: 0;">
+                <el-input type="hidden" />
                 <el-select v-model="item.compression" placeholder="请选择数据类型" :disabled="!item.isEditable || !formData.deviceName">
                   <el-option v-for="com in compressionOptions" :key="com" :label="com" :value="com" />
                 </el-select>
@@ -86,7 +91,7 @@
         </el-collapse-item>
       </el-collapse>
 
-      <el-button style="width: 100%;" :disabled="addControl" @click="handleAddRow"><i-custom-add class="m-r-12" />添加测点</el-button>
+      <el-button style="width: 100%;" class="m-t-16" :disabled="addControl" @click="handleAddRow"><i-custom-add class="m-r-12" />添加测点</el-button>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
@@ -366,7 +371,7 @@ watch(
 }
 
 .measurement-list-box{
-  min-height: 300px;
+  min-height: 152px;
   max-height: 500px;
   overflow-y: auto;
   border-bottom: none;
