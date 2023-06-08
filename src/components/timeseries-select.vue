@@ -36,7 +36,7 @@
       collapse-tags-tooltip
       :remote-method="remoteMethod"
       :loading="measurementLoading"
-      style="width: 270px;"
+      style="width: 256px;"
     >
       <template #prefix>
         <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>

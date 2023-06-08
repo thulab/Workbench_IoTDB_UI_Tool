@@ -1,9 +1,9 @@
 <template>
   <div class="page-container">
     <div class="search-form-wrapper">
-      <el-form :model="searchFormData" style="flex: 1" ref="searchFormRef" label-position="left" size="default" inline :disabled="getListLoading">
+      <el-form :model="searchFormData" style="flex: 1" ref="searchFormRef" label-position="left" label-width="80px" size="default" inline :disabled="getListLoading">
         <el-row>
-          <base-form-item label="测点选择:" prop="path" :error="errorDeviceTip">
+          <base-form-item label="测点选择:" prop="path" :error="errorDeviceTip" class="m-r-20">
             <template #label>
               测点选择:<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
             </template>
@@ -42,7 +42,7 @@
         </el-row>
         <el-row class="flex-justify-between">
           <div>
-            <el-form-item label="采样周期:" prop="timeInterval">
+            <el-form-item label="采样周期:" prop="timeInterval" class="m-r-20">
               <template #label>
                 采样周期:<el-tooltip effect="light" content="请输入正整数" placement="top"><i-custom-question /></el-tooltip>
               </template>
