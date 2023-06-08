@@ -449,11 +449,11 @@ function emptyQuery() {
   .export-btn{
     position: relative;
     padding: 2px 12px;
+    display: flex !important;
+    align-items: center !important;
 
     .export-tip{
-      position: absolute;
-      right: 2px;
-      top: -4px;
+      align-self: flex-start;
     }
   }
 

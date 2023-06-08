@@ -3,13 +3,13 @@
     <div class="search-form-wrapper">
       <el-form :model="searchFormData" style="flex: 1" ref="searchFormRef" label-position="left" label-width="80px" size="default" inline :disabled="getListLoading">
         <el-row>
-          <base-form-item label="测点选择:" prop="path" :error="errorDeviceTip" class="m-r-20">
+          <base-form-item label="测点选择：" prop="path" :error="errorDeviceTip" class="m-r-20">
             <template #label>
-              测点选择:<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
+              测点选择：<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
             </template>
             <timeseries-select v-model="searchFormData.path" :server-id="serverId" :is-show-view-btn="true" />
           </base-form-item>
-          <el-form-item label="查询时间:" prop="time" style="margin-right: 0;">
+          <el-form-item label="查询时间：" prop="time" style="margin-right: 0;">
             <div class="search-time-wrapper">
               <ul class="search-time-list">
                 <li :class="['search-time-type', { 'search-time-active': timeType === 'datetime' }]" @click="handleTimeType('datetime')">时间点</li>
@@ -42,9 +42,9 @@
         </el-row>
         <el-row class="flex-justify-between">
           <div>
-            <el-form-item label="采样周期:" prop="timeInterval" class="m-r-20">
+            <el-form-item label="采样周期：" prop="timeInterval" class="m-r-20">
               <template #label>
-                采样周期:<el-tooltip effect="light" content="请输入正整数" placement="top"><i-custom-question /></el-tooltip>
+                采样周期：<el-tooltip effect="light" content="请输入正整数" placement="top"><i-custom-question /></el-tooltip>
               </template>
               <el-input type="hidden" />
               <el-input v-model.number="searchFormData.timeInterval" style="width: 100px;" placeholder="" @input="handleInputInterval">
@@ -56,7 +56,7 @@
               </el-input>
 
             </el-form-item>
-            <el-form-item label="采样策略:" prop="aggregation">
+            <el-form-item label="采样策略：" prop="aggregation">
               <el-input type="hidden" />
               <el-select v-model="searchFormData.aggregation" style="width: 80px;" clearable>
                 <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" />
@@ -560,8 +560,8 @@ onMounted(() => {
 
     svg{
       position: absolute;
-      right: 4px;
-      top: 4px;
+      right: 2px;
+      top: 2px;
     }
   }
 }

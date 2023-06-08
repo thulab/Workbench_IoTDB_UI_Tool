@@ -50,7 +50,7 @@
       <template v-if="currentStorage">
         <div class="search-form-wrapper">
           <div class="search-form-box">
-            <span class="search-from-label">测点选择:</span>
+            <span class="search-from-label">测点选择：</span>
             <el-input v-model="searchKeyword" placeholder="请输入测点名称" @keyup.enter="handleRefresh">
               <template #prefix>
                 <i-custom-search-icon class="remote-select-search-icon" @click="handleRefresh" />
