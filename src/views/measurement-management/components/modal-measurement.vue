@@ -39,7 +39,7 @@
         <el-collapse-item v-for="(item, index) in formData.measurementList" :key="index" :name="'measurement_' + index">
           <template #title>
             <el-row class="collapse-title-box">
-              <el-col :span="12"><span class="all-path-name">{{!addDevice ? `${formData.deviceName}.${item.timeseries}` : `${groupName}.${formData.deviceName}.${item.timeseries}`}}</span></el-col>
+              <el-col :span="12"><span v-if="formData.deviceName" class="all-path-name">{{!addDevice ? `${formData.deviceName}.${item.timeseries}` : `${groupName}.${formData.deviceName}.${item.timeseries}`}}</span></el-col>
               <el-col :span="8">
                 <div class="collapse-data-type-box">
                   <span class="data-type-label">数据类型</span>
@@ -54,7 +54,7 @@
               </el-col>
             </el-row>
           </template>
-          <el-row style="margin-bottom: 8px;">
+          <el-row>
             <el-col :span="8">
               <el-form-item label="测点名称" :prop="'measurementList[' + index + '].timeseries'" :rules="requiredRules">
                 <el-input type="hidden" />
@@ -91,7 +91,7 @@
         </el-collapse-item>
       </el-collapse>
 
-      <el-button style="width: 100%;" :disabled="addControl" @click="handleAddRow"><i-custom-add class="m-r-12" />添加测点</el-button>
+      <el-button style="width: 100%;" class="m-t-16" :disabled="addControl" @click="handleAddRow"><i-custom-add class="m-r-12" />添加测点</el-button>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
@@ -371,7 +371,7 @@ watch(
 }
 
 .measurement-list-box{
-  min-height: 190px;
+  min-height: 152px;
   max-height: 500px;
   overflow-y: auto;
   border-bottom: none;
