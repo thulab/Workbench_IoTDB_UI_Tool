@@ -62,6 +62,10 @@
   }
 }
 
+svg:focus{
+  outline: none !important;
+}
+
 .el-form-item--default .el-form-item__label{
   height: 28px !important;
   color: #424561 !important;
