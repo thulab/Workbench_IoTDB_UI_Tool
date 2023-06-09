@@ -30,7 +30,7 @@
           </base-form-item>
         </el-col>
         <el-col :span="12">
-          <base-form-item label="数据类型：" prop="measurementType" class="m-l-45">
+          <base-form-item label="数据类型：" prop="measurementType" class="m-l-45 type-input-disabled">
             <el-input v-model="formData.measurementType" disabled style="width: 80px;" />
           </base-form-item>
         </el-col>
@@ -142,7 +142,7 @@
       <el-row class="m-b-12">
         <el-col :span="24">
           <base-form-item label="告警说明：" prop="alarmDesc">
-            <el-input type="textarea" v-model="formData.alarmDesc" show-word-limit maxlength="100" placeholder="请输入告警说明" :rows="4" />
+            <el-input type="textarea" v-model="formData.alarmDesc" show-word-limit maxlength="100" placeholder="请输入告警说明" :resize="'none'" class="alarm-desc-textarea" />
           </base-form-item>
         </el-col>
       </el-row>
@@ -221,8 +221,8 @@ const checkRules = (rule: any, value: any, callback: any) => {
     if (!/^(-?\d+)(\.\d+)?$/.test(formData.alarmRulesTypeVal)) {
       return callback(new Error('告警规则值只能为数字'));
     }
-    if (+formData.alarmRulesTypeVal > Number.MAX_SAFE_INTEGER) {
-      formData.alarmRulesTypeVal = `${Number.MAX_SAFE_INTEGER}`;
+    if (+formData.alarmRulesTypeVal > Number.MAX_SAFE_INTEGER || +formData.alarmRulesTypeVal < Number.MIN_SAFE_INTEGER) {
+      return callback(new Error('告警规则值超过最大值范围，请修改'));
     }
 
     return callback();
@@ -403,6 +403,23 @@ watch(
 .level-select-box{
   :deep(.el-input__inner) {
     color: unset;
+  }
+}
+
+.type-input-disabled{
+  :deep(.el-input__inner){
+    color: #131926;
+    -webkit-text-fill-color: #131926;
+  }
+
+  :deep(.el-input__wrapper){
+    box-shadow: none;
+  }
+}
+
+.alarm-desc-textarea{
+  :deep(.el-textarea__inner) {
+    height: 72px;
   }
 }
 </style>

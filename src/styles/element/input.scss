@@ -94,6 +94,7 @@
   font-weight: 300 !important;
   font-size: 12px !important;
   line-height: 18px !important;
+  padding: 5px 8px !important;
 }
 
 .el-input__count{
@@ -106,5 +107,5 @@
 
 .el-textarea .el-input__count{
   bottom: 2px !important;
-  right: 6px !important;
+  right: 0 !important;
 }
