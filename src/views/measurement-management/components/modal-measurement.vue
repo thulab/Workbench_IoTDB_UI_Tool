@@ -39,7 +39,7 @@
         <el-collapse-item v-for="(item, index) in formData.measurementList" :key="index" :name="'measurement_' + index">
           <template #title>
             <el-row class="collapse-title-box">
-              <el-col :span="12"><span v-if="formData.deviceName" class="all-path-name">{{!addDevice ? `${formData.deviceName}.${item.timeseries}` : `${groupName}.${formData.deviceName}.${item.timeseries}`}}</span></el-col>
+              <el-col :span="12"><div v-if="formData.deviceName" class="all-path-name">{{!addDevice ? `${formData.deviceName}.${item.timeseries}` : `${groupName}.${formData.deviceName}.${item.timeseries}`}}</div></el-col>
               <el-col :span="8">
                 <div class="collapse-data-type-box">
                   <span class="data-type-label">数据类型</span>
@@ -393,8 +393,12 @@ watch(
   .all-path-name{
     font-size: 14px;
     font-weight: 400;
-    line-height: 21px;
     color: #424561;
+    max-width: 320px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 100%;
   }
 }
 
