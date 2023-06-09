@@ -98,11 +98,11 @@
           <el-table-column label="告警值" prop="alarmValue" min-width="160" align="center" show-overflow-tooltip />
           <el-table-column label="告警时间" prop="createTime" sortable="custom" min-width="180" align="center" show-overflow-tooltip />
           <el-table-column label="告警描述" prop="alarmDesc" min-width="140" align="center" show-overflow-tooltip />
-          <el-table-column label="操作" width="100" fixed="right">
+          <el-table-column label="操作" width="100" align="center" fixed="right">
             <template #default="{ row }">
               <div style="display: flex; align-items: center;">
                 <el-button v-if="!row.hasRead" type="primary" link size="small" @click="handleStatus(row)">已阅</el-button>
-                <el-icon v-else size="16" class="m-r-8"><i-custom-success-green /></el-icon>
+                <el-icon v-else size="16" class="p-x-5 m-r-12"><i-custom-success-green /></el-icon>
                 <el-button type="primary" link size="small" @click="handleDel('row', row)">删除</el-button>
               </div>
             </template>

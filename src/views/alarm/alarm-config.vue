@@ -102,11 +102,13 @@
               {{ getOptionField(row.status, statusOptions, 'value', 'label') }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="140" fixed="right">
+          <el-table-column label="操作" width="140" align="center" fixed="right">
             <template #default="{ row }">
-              <el-button v-if="row.status !== 3" type="primary" link size="small" @click="handleStatus(row)">{{ row.status === 1 ? '禁用' : '启用' }}</el-button>
-              <el-button v-if="row.status !== 3" type="primary" link size="small" @click="handleEdit(row)">编辑</el-button>
-              <el-button type="primary" link size="small" @click="handleDel('row', row)">删除</el-button>
+              <div>
+                <el-button v-if="row.status !== 3" type="primary" link size="small" @click="handleStatus(row)">{{ row.status === 1 ? '禁用' : '启用' }}</el-button>
+                <el-button :disabled="row.status === 3" type="primary" :style="{ 'margin-left': row.status !== 3 ? '12px' : '40px' }" link size="small" @click="handleEdit(row)">编辑</el-button>
+                <el-button type="primary" link size="small" @click="handleDel('row', row)">删除</el-button>
+              </div>
             </template>
           </el-table-column>
           <template #empty>
