@@ -29,7 +29,6 @@
       :placeholder="placeholder || '请选择测点'"
       filterable
       remote
-      remote-show-suffix
       clearable
       multiple
       collapse-tags
@@ -128,6 +127,10 @@ onMounted(() => {
 
   :deep(.el-select__tags-text) {
     max-width: 120px !important;
+  }
+
+  :deep(.el-input__suffix){
+    background: transparent;
   }
 }
 
