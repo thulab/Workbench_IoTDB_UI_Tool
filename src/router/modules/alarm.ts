@@ -11,7 +11,7 @@ const route = [
     component: Layout,
     redirect: { name: 'AlarmConfig' },
     meta: {
-      title: '告警管理',
+      title: '告警',
       icon: ICustomAlarm,
       activeIcon: ICustomAlarmActive,
       order: 30,
