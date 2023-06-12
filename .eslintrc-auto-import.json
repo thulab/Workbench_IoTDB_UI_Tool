@@ -1,8 +1,15 @@
 {
   "globals": {
+    "Component": true,
+    "ComponentPublicInstance": true,
+    "ComputedRef": true,
     "EffectScope": true,
     "ElMessage": true,
     "ElMessageBox": true,
+    "InjectionKey": true,
+    "PropType": true,
+    "Ref": true,
+    "VNode": true,
     "computed": true,
     "createApp": true,
     "customRef": true,
@@ -37,7 +44,6 @@
     "readonly": true,
     "ref": true,
     "resolveComponent": true,
-    "resolveDirective": true,
     "shallowReactive": true,
     "shallowReadonly": true,
     "shallowRef": true,
@@ -50,11 +56,16 @@
     "useCssModule": true,
     "useCssVars": true,
     "useDark": true,
+    "useDataTypeIcon": true,
+    "useRequest": true,
     "useSlots": true,
+    "useTable": true,
+    "useTableHeight": true,
     "useVModel": true,
     "watch": true,
     "watchEffect": true,
     "watchPostEffect": true,
-    "watchSyncEffect": true
+    "watchSyncEffect": true,
+    "toValue": true
   }
 }

@@ -78,13 +78,18 @@ summary,
 time,
 mark,
 audio,
+input,
 video {
   padding: 0;
   margin: 0;
-  font: inherit;
-  font-size: 100%;
+
+  // font: inherit;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+
+  // font-size: 100%;
   vertical-align: baseline;
   border: 0;
+  text-decoration: none;
 }
 
 /* HTML5 display-role reset for older browsers */
@@ -105,6 +110,7 @@ section {
 body {
   padding: 0;
   margin: 0;
+  line-height: 1;
 }
 
 ol,

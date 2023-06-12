@@ -1,24 +1,5 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 /* eslint-disable prefer-promise-reject-errors */
-import Axios, { type AxiosRequestConfig } from 'axios';
+import Axios, { type InternalAxiosRequestConfig } from 'axios';
 import NProgress from '@/config/nprogress-config';
 
 let requestCount = 0;
@@ -32,18 +13,18 @@ const http = Axios.create({
   },
 });
 
-function requestInterceptor(config: AxiosRequestConfig) {
+function requestInterceptor(config: InternalAxiosRequestConfig): InternalAxiosRequestConfig {
   if (!config.headers || !config.headers.background) {
     NProgress.start();
     requestCount += 1;
   }
-  if (config && config.headers) {
-    config.headers.Authorization = localStorage.getItem('authorization') || '';
-  } else {
-    config.headers = {
-      Authorization: localStorage.getItem('authorization') || '',
-    };
-  }
+  // if (config && config.headers) {
+  //   config.headers.Authorization = localStorage.getItem('authorization') || '';
+  // } else {
+  //   config.headers = {
+  //     Authorization: localStorage.getItem('authorization') || '',
+  //   };
+  // }
   return config;
 }
 
@@ -61,15 +42,23 @@ async function responseInterceptor(response: HttpResponse<object>) {
   }
   // eslint-disable-next-line prefer-const
   let { data } = response;
-  const { success, code } = data;
-  if (success || code === '0') {
+  const { success, code, message } = data;
+  if (success || code === 0) {
     return Promise.resolve(response);
   }
-  if (response.headers['content-disposition'] && response.headers['content-disposition'].indexOf('attachment') > -1) {
+  // 如果是下载文件，并且返回类型是正确的blob 直接返回
+  if (response.headers['content-disposition']
+      && response.headers['content-disposition'].indexOf('attachment') > -1
+      && data instanceof Blob
+      && data.type !== 'application/json') {
     return Promise.resolve(response);
   }
-  if (code === 'USER-0009') {
-    window.location.href = '/#/login';
+  if (code === 1009 && localStorage.getItem('enabledSSO') !== 'true') {
+    window.location.href = '/login';
+    return Promise.reject({});
+  }
+  if (code === 1001) {
+    window.location.href = `${message}?back=${window.location.href}`;
     return Promise.reject({});
   }
   return Promise.reject(data);

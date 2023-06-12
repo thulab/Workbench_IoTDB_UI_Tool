@@ -1,5 +1,5 @@
 // import dark theme
-@use "element-plus/theme-chalk/src/dark/css-vars.scss" as *;
+// @use "element-plus/theme-chalk/src/dark/css-vars.scss" as *;
 
 /** abstracts **/
 
@@ -17,4 +17,54 @@
 #app {
   width: 100%;
   height: 100%;
+}
+
+.page-container {
+  background-color: #fff;
+  border-radius: 6px;
+  padding: 16px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.page-table-details {
+  padding: 8px 16px;
+  border-radius: 2px;
+  background: #f7f8fc;
+}
+
+.operate-details {
+  display: flex;
+  justify-content: space-between;
+}
+
+.table-wrapper {
+  margin: 8px 0;
+}
+
+.paination-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.table-empty-wrapper{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 16px 0;
+
+  .data-empty-img{
+    width: 150px;
+    height: 150px;
+    margin-bottom: 16px;
+  }
+
+  .data-empty-text{
+    font-size: 14px;
+    color: #131926;
+    line-height: 21px;
+  }
 }

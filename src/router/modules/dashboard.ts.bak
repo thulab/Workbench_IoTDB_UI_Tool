@@ -4,7 +4,7 @@ import IconEpHomeFilled from '~icons/ep/home-filled.svg?raw';
 
 const route = [
   {
-    path: '/',
+    path: '/dashboard',
     component: Layout,
     redirect: '/dashboard',
     meta: { title: 'dashboard', icon: IconEpHomeFilled, order: 0 },

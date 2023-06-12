@@ -1,9 +1,9 @@
 <template>
-  <el-dropdown trigger="click">
+  <el-dropdown @command="handleLoginCommand">
     <span class="username">{{ userName }}</span>
     <template #dropdown>
       <el-dropdown-menu>
-        <el-dropdown-item @click="logout">
+        <el-dropdown-item command="logout">
           退出登录
         </el-dropdown-item>
       </el-dropdown-menu>
@@ -12,10 +12,11 @@
 </template>
 
 <script setup lang="ts">
-import { ElMessageBox } from 'element-plus';
 import { computed } from 'vue';
+import { useLoginStore } from '@/stores/login.store';
 
-const userName = computed(() => 'root');
+const loginStore = useLoginStore();
+const userName = computed(() => loginStore.userInfo.name || 'root');
 
 const logout = () => {
   ElMessageBox.confirm('您是否确认退出登录?', '温馨提示', {
@@ -23,8 +24,21 @@ const logout = () => {
     cancelButtonText: '取消',
     type: 'warning',
   }).then(() => {
-    // TODO: logout;
+    loginStore.isLogin = false;
+    localStorage.setItem('authorization', '');
+    loginStore.logoutSSO();
   });
+};
+
+const handleLoginCommand = (val: string) => {
+  switch (val) {
+    case 'logout': {
+      logout();
+      break;
+    }
+    default:
+      break;
+  }
 };
 </script>
 
@@ -32,6 +46,10 @@ const logout = () => {
 .username {
   font-size: 15px;
   color: var(--el-text-color-primary);
+
+  &:focus-visible {
+    outline: none;
+  }
 }
 
 .avatar {

@@ -1,0 +1,53 @@
+.el-step__title {
+  font-size: 14px !important;
+  line-height: 21px !important;
+  font-weight: 700;
+}
+
+.el-step.is-horizontal .el-step__line {
+  height: 1px !important;
+  background-color: #DFE1ED !important;
+
+  // margin: 0 10px !important;
+}
+
+.el-step__title.is-process {
+  color: #495AD4 !important;
+}
+
+.el-step__icon.is-text {
+  border: 1px solid #DFE1ED !important;
+}
+
+.el-step__head.is-process .el-step__icon {
+  background: #495AD4;
+  color: #fff;
+  border-color: transparent !important;
+}
+
+.el-step__title.is-wait {
+  color: #424561 !important;
+}
+
+.el-step__title.is-success {
+  color: #424561 !important;
+}
+
+.el-step__head.is-success {
+  color: #495AD4 !important;
+  border-color: #495AD4 !important;
+
+  .el-step__icon{
+    background: #495AD4;
+    color: #fff;
+    border-color: #495AD4 !important;
+  }
+
+  .el-step__line{
+    background-color: #495AD4 !important;
+  }
+
+  .el-step__line-inner{
+    display: none !important;
+  }
+}

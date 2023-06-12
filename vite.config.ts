@@ -26,7 +26,6 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'CONFIG');
   const proxyTarget = env.CONFIG_API_PROXY || 'http://localhost:9090';
   const srcPath = fileURLToPath(new URL('./src', import.meta.url));
-  const typingsPath = resolve(srcPath, 'typings');
   return {
     define: {
       __APP_VERSION__: `'${process.env.npm_package_version}'`,
@@ -71,7 +70,7 @@ export default defineConfig(({ mode }) => {
             prefix: 'Icon',
           }),
         ],
-        dts: resolve(typingsPath, 'auto-imports.d.ts'),
+        dts: './src/typings/auto-imports.d.ts',
         // Generate corresponding .eslintrc-auto-import.json file.
         // eslint globals Docs - https://eslint.org/docs/user-guide/configuring/language-options#specifying-globals
         eslintrc: {
@@ -92,7 +91,7 @@ export default defineConfig(({ mode }) => {
             importStyle: 'sass',
           }),
         ],
-        dts: resolve(typingsPath, 'components.d.ts'),
+        dts: './src/typings/components.d.ts',
       }),
       Icons({
         autoInstall: true,
