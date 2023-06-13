@@ -76,7 +76,9 @@ export default function useRequest<Requests extends Array<any>, Resp>(apiFn: (..
             return Promise.reject(data);
           });
         }
-        showErrorFn(err, options.errMessage);
+        if (err.code !== 401) {
+          showErrorFn(err, options.errMessage);
+        }
         return Promise.reject(err);
       })
       .finally(() => {

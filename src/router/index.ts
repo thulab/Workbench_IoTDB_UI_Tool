@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
 import { HOME_URL } from '@/config/app-config';
+import Login from '@/views/the-login.vue';
 import { registerGuard as registerAuthGuard } from './guard/auth-guard';
 
 const metaRouters = import.meta.glob('./modules/*.ts', { eager: true, import: 'default' }) as Record<string, Array<RouteRecordRaw>>;
@@ -17,6 +18,11 @@ const routes: Array<RouteRecordRaw> = [
     // 找不到路由重定向到404页面
     path: '/:pathMatch(.*)',
     redirect: { name: '404' },
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login,
   },
 ];
 
