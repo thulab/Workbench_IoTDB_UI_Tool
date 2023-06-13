@@ -5,11 +5,11 @@
         <base-form-item label="告警名称：" prop="alarmName">
           <el-input v-model="searchFormData.alarmName" placeholder="请输入告警名称" style="width: 172px;" />
         </base-form-item>
-        <base-form-item label="告警序列：" prop="measurements">
+        <base-form-item label="告警测点：" prop="measurements">
           <template #label>
-            告警序列：<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
+            告警测点：<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
           </template>
-          <timeseries-select v-model="searchFormData.measurements" :is-show-view-btn="true" :placeholder="'请输入告警序列'" :viewText="'已选序列'" />
+          <timeseries-select v-model="searchFormData.measurements" :is-show-view-btn="true" :placeholder="'请输入告警测点'" :viewText="'已选测点'" />
         </base-form-item>
         <base-form-item label="告警级别：" prop="alarmLevel">
           <template #label>
@@ -83,7 +83,7 @@
           @sort-change="handleSortChange"
         >
           <el-table-column type="selection" width="55" />
-          <el-table-column label="告警序列" prop="measurement" min-width="200" align="center" show-overflow-tooltip />
+          <el-table-column label="告警测点" prop="measurement" min-width="200" align="center" show-overflow-tooltip />
           <el-table-column label="告警名称" prop="alarmName" min-width="160" align="center" show-overflow-tooltip />
           <el-table-column label="告警级别" prop="alarmLevel" sortable="custom" width="120" align="center">
             <template #default="{ row }">

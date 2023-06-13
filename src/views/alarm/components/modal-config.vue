@@ -9,13 +9,13 @@
     <el-form ref="formRef" :model="formData" class="source-form" label-position="right" label-width="90px">
       <el-row>
         <el-col :span="12">
-          <base-form-item label="告警序列：" prop="measurement" :rules="editType === 'add' ? requiredRules : []">
+          <base-form-item label="告警测点：" prop="measurement" :rules="editType === 'add' ? requiredRules : []">
             <template #label>
-              告警序列：<el-tooltip v-if="editType === 'add'" effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
+              告警测点：<el-tooltip v-if="editType === 'add'" effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
             </template>
             <el-select
               v-model="formData.measurement"
-              placeholder="请输入告警序列"
+              placeholder="请输入告警测点"
               filterable
               remote
               remote-show-suffix
