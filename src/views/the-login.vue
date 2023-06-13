@@ -34,9 +34,12 @@
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
 import type { FormInstance, FormRules } from 'element-plus';
+import { useUserStore } from '@/stores';
 import { UserApi } from '@/api';
 
 const router = useRouter();
+const userStore = useUserStore();
+
 const formRef = ref<FormInstance>();
 const loginForm = reactive({
   user: '',
@@ -86,6 +89,8 @@ const submitForm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
       login(loginForm.user, loginForm.password).then(() => {
+        userStore.setUser(loginForm.user);
+        userStore.loadPrivileges();
         router.push({ path: '/' });
       });
     }

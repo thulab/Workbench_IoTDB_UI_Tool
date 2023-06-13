@@ -11,5 +11,10 @@ class UserApi {
   static logout(): HttpResponseP {
     return http.get('/logout');
   }
+
+  // 当前登录用户权限
+  static getUserPrivileges(userName?: string): HttpResponseP {
+    return http.get('/privileges/getPrivilegesByUserName', { params: userName ? { userName } : {} });
+  }
 }
 export default UserApi;
