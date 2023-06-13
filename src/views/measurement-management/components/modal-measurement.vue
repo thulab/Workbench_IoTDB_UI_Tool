@@ -109,7 +109,6 @@ import { StorageApi } from '@/api';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
 const props = defineProps<{
-  serverId: number;
   visible: boolean;
   groupName: string;
 }>();
@@ -189,7 +188,6 @@ let lastQuery = '';
 const remoteMethod = debounce((query: string) => {
   lastQuery = query;
   getDevice({
-    serverId: props.serverId,
     groupName: props.groupName,
     keyword: lastQuery,
   }).then((res) => {
@@ -201,7 +199,7 @@ const remoteMethod = debounce((query: string) => {
 
 // 获取物理量
 function getMeasurementList(val: string) {
-  getMeasurementsInfosByFuzzy(props.serverId, {
+  getMeasurementsInfosByFuzzy({
     dataBaseOrDevice: 'device',
     pathName: val,
     keyword: '',
@@ -263,7 +261,7 @@ function handleDelRow(i: number, e: MouseEvent) {
         formData.measurementList.splice(i, 1);
       } else {
         const deviceName = !addDevice.value ? formData.deviceName : `${props.groupName}.${formData.deviceName}`;
-        deleteMeasurements(props.serverId, [`${deviceName}.${formData.measurementList[i].timeseries}`]).then((res) => {
+        deleteMeasurements([`${deviceName}.${formData.measurementList[i].timeseries}`]).then((res) => {
           if (res.code === 0) {
             ElMessage.success('删除成功');
             formData.measurementList.splice(i, 1);
@@ -276,7 +274,6 @@ function handleDelRow(i: number, e: MouseEvent) {
 // 设备是否对齐
 function getDeviceAlign(val: string) {
   getIsAlignedDevice({
-    serverId: props.serverId,
     deviceName: val,
   }).then((res) => {
     if (res.code === 0) {
@@ -315,7 +312,7 @@ const handleConfirm = () => {
     if (valid) {
       const deviceName = !addDevice.value ? formData.deviceName : `${props.groupName}.${formData.deviceName}`;
       const measurementDTOList = formData.measurementList.filter((f) => f.isEditable).map((item) => ({ ...item, deviceName }));
-      saveMeasurementList(props.serverId, {
+      saveMeasurementList({
         deviceName,
         measurementDTOList,
         isAligned: isAligned.value,

@@ -38,10 +38,6 @@ import { SearchApi } from '@/api';
 // eslint-disable-next-line import/extensions
 import ICustomMessageWarning from '~icons/custom/message-warning';
 
-const props = defineProps<{
-  serverId: number;
-}>();
-
 const emit = defineEmits(['handleSqlOperate']);
 
 const filterText = ref('');
@@ -51,7 +47,7 @@ const { requestFn: deleteQueryS } = useRequest(SearchApi.deleteQueryS);
 
 // 获取列表数据
 const getQueryList = debounce(() => {
-  getQuery(props.serverId, filterText.value).then((res) => {
+  getQuery(filterText.value).then((res) => {
     if (res.code === 0) {
       sqlList.value = res.data || [];
     }
@@ -66,7 +62,7 @@ const handleSqlCommand = (val: string, data: Search.SqlList) => {
       type: 'warning',
       icon: markRaw(ICustomMessageWarning),
     }).then(() => {
-      deleteQueryS(props.serverId, `${data.id}`).then(() => {
+      deleteQueryS(`${data.id}`).then(() => {
         ElMessage({
           type: 'success',
           message: '删除成功!',

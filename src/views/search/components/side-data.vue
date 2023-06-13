@@ -90,10 +90,6 @@
 import { debounce } from 'lodash-es';
 import { StorageApi } from '@/api';
 
-const props = defineProps<{
-  serverId: number;
-}>();
-
 const { maxTableHeight } = useTableHeight(500);
 
 const emit = defineEmits(['get-function']);
@@ -130,7 +126,6 @@ const measurementTotal = ref(0);
 // 获取数据库
 function getStorageList() {
   getGroup({
-    serverId: props.serverId,
     // pageSize: storagePagination.pageSize,
     // pageNum: storagePagination.pageNum,
     // keyword: filterStorageText.value,
@@ -148,7 +143,6 @@ let lastMeasurementQuery = '';
 function getDeviceList(query: string) {
   lastDeviceQuery = query;
   getDevice({
-    serverId: props.serverId,
     groupName: storageName.value,
     // pageSize: devicePagination.pageSize,
     // pageNum: devicePagination.pageNum,
@@ -165,7 +159,6 @@ function getDeviceList(query: string) {
 function getMeasurementList() {
   lastMeasurementQuery = filterMeasurementText.value;
   getMeasurement({
-    serverId: props.serverId,
     deviceName: deviceName.value,
     keyword: lastMeasurementQuery,
   }).then((res) => {

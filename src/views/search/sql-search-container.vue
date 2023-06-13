@@ -9,7 +9,7 @@
                 <span style="font-size: 12px; line-height: 1.2;display: flex; width: 118px;"><text-tooltip :content="item.queryName" /></span>
               </template>
               <el-scrollbar :height="tabHeight">
-                <sql-search :server-id="serverId" v-model:code="code[activiteSql]" @save="handleSave" />
+                <sql-search v-model:code="code[activiteSql]" @save="handleSave" />
               </el-scrollbar>
             </el-tab-pane>
           </el-tabs>
@@ -22,13 +22,13 @@
           <h4 style="font-size: 14px;font-weight: 700;color: #495AD4;margin: 0 0 12px;">快捷操作</h4>
           <el-tabs v-model="activeNameSide" class="tabs-nav-aside">
             <el-tab-pane label="测点" name="data">
-              <side-data :server-id="serverId" @get-function="getFunction" />
+              <side-data @get-function="getFunction" />
             </el-tab-pane>
             <el-tab-pane label="函数" name="function">
               <side-function @get-function="getFunction" />
             </el-tab-pane>
             <el-tab-pane label="模板" name="template">
-              <side-template ref="sqlListRef" :server-id="serverId" @handle-sql-operate="handleSqlOperate" />
+              <side-template ref="sqlListRef" @handle-sql-operate="handleSqlOperate" />
             </el-tab-pane>
           </el-tabs>
           <a href="https://www.timecho.com/docs/zh/UserGuide/V1.0.x/Reference/SQL-Reference.html" rel="noopener noreferrer" target="_blank" class="operate-link"><i-custom-question />操作说明</a>
@@ -77,14 +77,10 @@ import type { FormInstance, TabsPaneContext, TabPaneName } from 'element-plus';
 import dayjs from 'dayjs';
 import { debounce } from 'lodash-es';
 import { SearchApi } from '@/api';
-import { useServerStore } from '@/stores';
 import SideFunction from './components/side-function.vue';
 import SideData from './components/side-data.vue';
 import SideTemplate from './components/side-template.vue';
 import SqlSearch from './components/sql-search.vue';
-
-const serverStroe = useServerStore();
-const serverId = serverStroe.currentServerId;
 
 const codeMirrorReady = ref(true);
 const nameDialogVisible = ref(false);
@@ -138,7 +134,7 @@ function getSqlCode() {
   code[activiteSql.value] = '';
   // tableData.list = [];
   if (!id) return;
-  getSql(serverId, id).then((res) => {
+  getSql(id).then((res) => {
     const resData = res.data;
     code[activiteSql.value] = resData.sqls;
   });
@@ -219,8 +215,7 @@ function handleTabRemove(targetName: TabPaneName) {
     errorNameTip.value = '';
     nameDialogVisible.value = true;
   } else {
-    saveQuery(serverId, {
-      serverId,
+    saveQuery({
       id,
       queryName: current.queryName,
       sqls: code[targetName],
@@ -260,12 +255,11 @@ function handleNameConfirm() {
     if (valid) {
       const id = activiteSql.value.charAt(0) === '_' ? null : activiteSql.value;
       const data = {
-        serverId,
         id,
         queryName: saveForm.sqlName,
         sqls: code[activiteSql.value],
       };
-      saveQuery(serverId, data).then((res) => {
+      saveQuery(data).then((res) => {
         if (res.code === 0) {
           ElMessage.success('保存成功');
           nameDialogVisible.value = false;
@@ -318,12 +312,11 @@ function handleRenameConfirm() {
     if (valid) {
       const { id } = resaveForm;
       const data = {
-        serverId: Number(serverId) * 1,
         id,
         queryName: resaveForm.sqlName,
         sqls: code[activiteSql.value],
       };
-      saveQuery(serverId, data).then((res) => {
+      saveQuery(data).then((res) => {
         if (res.code === 0) {
           ElMessage.success('保存成功');
           renameDialogVisible.value = false;
@@ -349,8 +342,7 @@ function handleSave() {
     errorNameTip.value = '';
     nameDialogVisible.value = true;
   } else {
-    saveQuery(serverId, {
-      serverId,
+    saveQuery({
       id,
       queryName: current.queryName,
       sqls: code[activiteSql.value],

@@ -35,7 +35,6 @@ declare namespace Search{
   }
 
   export interface SaveSqlParams {
-    serverId: number;
     id: string | null;
     queryName: string | null;
     sqls: string;

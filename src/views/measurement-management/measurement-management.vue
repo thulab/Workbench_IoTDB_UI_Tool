@@ -3,7 +3,6 @@
     <div class="storage-list-wrapper">
       <storage-side
         ref="storageSideRef"
-        :server-id="serverId"
         @handleAddStorage="storageVisible = true"
         @handleSelectStorage="val => currentStorage = val"
       />
@@ -131,20 +130,17 @@
 
     <modal-storage
       v-model:visible="storageVisible"
-      :server-id="serverId"
       @handleSave="handleSaveStorage"
     />
 
     <modal-measurement
       v-model:visible="measurementVisible"
-      :server-id="serverId"
       :group-name="currentStorage"
       @handleSave="handleSaveMeasurement"
     />
 
     <modal-import
       v-model:visible="importVisible"
-      :server-id="serverId"
       @handle-close="handleImportClose"
     />
   </div>
@@ -154,7 +150,6 @@
 import { useRouter } from 'vue-router';
 import { useTableHeight } from '@/composition-api';
 import { StorageApi } from '@/api';
-import { useServerStore } from '@/stores';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import StorageSide from './components/storage-side.vue';
 import ModalStorage from './components/modal-storage.vue';
@@ -162,8 +157,6 @@ import ModalMeasurement from './components/modal-measurement.vue';
 import ModalImport from './components/modal-import.vue';
 
 const router = useRouter();
-const serverStore = useServerStore();
-const serverId = serverStore.currentServerId;
 
 const ttlUnitOptions = [
   { label: '毫秒', value: 'millisecond' },
@@ -220,7 +213,7 @@ const getTtlTimeUnit = (val: string | undefined, options: Array<{ label: string,
 
 // 列表接口
 function getListData() {
-  getMeasurementsInfosByFuzzy(serverId, {
+  getMeasurementsInfosByFuzzy({
     dataBaseOrDevice: 'database',
     pathName: currentStorage.value,
     keyword: searchKeyword.value,
@@ -230,7 +223,7 @@ function getListData() {
     if (tableData.value.measurements?.length) {
       tableData.value.measurements.forEach((item) => {
         if (item && item.timeseries) {
-          getLastValue(serverId, item.deviceName, item.timeseries).then((newRes) => {
+          getLastValue(item.deviceName, item.timeseries).then((newRes) => {
             if (newRes.code === 0) {
               item.value = newRes.data.value;
               item.valueTime = newRes.data.valueTime;
@@ -244,7 +237,7 @@ function getListData() {
 
 // 存储组详细信息
 function getStorageInfo(data: string) {
-  getStorageGroupsInfo(serverId, data).then((res) => {
+  getStorageGroupsInfo(data).then((res) => {
     if (res?.code === 0) {
       storageInfos.value = res.data;
     }
@@ -260,7 +253,7 @@ function handleDelStorage() {
     icon: ICustomMessageWarning,
   })
     .then(() => {
-      deleteStorageGroups(serverId, currentStorage.value).then((res) => {
+      deleteStorageGroups(currentStorage.value).then((res) => {
         if (res.code === 0) {
           ElMessage.success('删除存储组成功');
           storageSideRef.value?.getStorageList();
@@ -298,9 +291,9 @@ function handleExportData(exportType: string) {
     keyword: searchKeyword.value,
     ...pagination,
   }).then((res) => {
-    let url = `/api/file/exportExcelMeasurementData?serverId=${serverId}&exportId=${res.data}`;
+    let url = `/api/file/exportExcelMeasurementData?exportId=${res.data}`;
     if (exportType === 'csv') {
-      url = `/api/file/exportCSVMeasurementData?serverId=${serverId}&exportId=${res.data}`;
+      url = `/api/file/exportCSVMeasurementData?exportId=${res.data}`;
     }
     window.open(url);
   });
@@ -336,7 +329,7 @@ function handleDelRow(type: string, row: StorageDevice.MeasurementItem | null) {
       } else {
         measurementList = row?.timeseries ? [`${row.deviceName}.${row.timeseries}`] : [];
       }
-      deleteMeasurements(serverId, measurementList).then((res) => {
+      deleteMeasurements(measurementList).then((res) => {
         if (res.code === 0) {
           ElMessage.success('删除成功');
           getStorageInfo(currentStorage.value);
@@ -396,7 +389,7 @@ function handleConfirmEditTTL() {
     ttl: !editTTLModel.value ? undefined : +editTTLModel.value,
     ttlUnit: editTTLUnitModel.value || undefined,
   };
-  upsertDatabaseTTL(serverId, { ...reqObj }).then((res) => {
+  upsertDatabaseTTL({ ...reqObj }).then((res) => {
     if (res.code === 0) {
       ElMessage.success('更新成功！');
       editTTL.value = false;

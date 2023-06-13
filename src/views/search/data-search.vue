@@ -7,7 +7,7 @@
             <template #label>
               测点选择：<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
             </template>
-            <timeseries-select v-model="searchFormData.path" :server-id="serverId" :is-show-view-btn="true" />
+            <timeseries-select v-model="searchFormData.path" :is-show-view-btn="true" />
           </base-form-item>
           <el-form-item label="查询时间：" prop="time" style="margin-right: 0;">
             <div class="search-time-wrapper">
@@ -161,11 +161,7 @@ import {
   getStartAndEnd, today, getOneDay, getOneInterval, todayNow, getOneIntervalNow,
 } from '@/utils/date';
 import DynamicTable from '@/components/dynamic-table.vue';
-import { useServerStore } from '@/stores';
 import ICustomCalender from '~icons/custom/calender.svg';
-
-const serverStroe = useServerStore();
-const serverId = serverStroe.currentServerId;
 
 const { maxTableHeight } = useTableHeight(330);
 
@@ -289,7 +285,7 @@ function getListData() {
   currentQueryTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
   getListLoading.value = true;
   controller = new AbortController();
-  getList(serverId, {
+  getList({
     measurements: copySearchFormData.path,
     startTime,
     endTime,
@@ -414,9 +410,9 @@ function handleExportData(exportType: string) {
     size: pagination.pageSize,
     page: pagination.pageNum,
   }).then((res) => {
-    let url = `/api/file/exportExcelData?serverId=${serverId}&exportId=${res.data}`;
+    let url = `/api/file/exportExcelData?exportId=${res.data}`;
     if (exportType === 'csv') {
-      url = `/api/file/exportCSVData?serverId=${serverId}&exportId=${res.data}`;
+      url = `/api/file/exportCSVData?exportId=${res.data}`;
     }
     window.open(url);
   });

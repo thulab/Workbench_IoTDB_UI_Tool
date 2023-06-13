@@ -93,7 +93,6 @@ import CodeEditor from './code-editor.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
 const props = defineProps<{
-  serverId: number;
   code: string;
 }>();
 const emit = defineEmits(['save', 'update:code']);
@@ -166,7 +165,7 @@ function querySqlRun() {
     tableData.list = []; // 值
     sqlResult.value = [];
     controller = new AbortController();
-    querySql(props.serverId, { sqls: codeVal.value?.split(';\n'), timestamp: timeNumber.value }, controller)
+    querySql({ sqls: codeVal.value?.split(';\n'), timestamp: timeNumber.value }, controller)
       .then((res) => {
         const { data } = res;
         activeName.value = 't0';
@@ -237,12 +236,12 @@ function handleSave() {
 function stopquery() {
   controller.abort();
   runFlag.value = true;
-  queryStop(props.serverId, timeNumber.value).then(() => {});
+  queryStop(timeNumber.value).then(() => {});
 }
 function exportSql(val: string, exportType: string) {
-  let url = `/api/file/exportExcelSqlData?serverId=${props.serverId}&sql=${val}`;
+  let url = `/api/file/exportExcelSqlData?sql=${val}`;
   if (exportType === 'csv') {
-    url = `/api/file/exportCSVSqlData?serverId=${props.serverId}&sql=${val}`;
+    url = `/api/file/exportCSVSqlData?sql=${val}`;
   }
   window.open(url);
 }
@@ -253,7 +252,7 @@ function handleCommandDown(val: string, index: number) {
     sqlResult.value[index].startQueryTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
     columnList.value.splice(index, 1, []);
     tableData.list.splice(index, 1, {});
-    querySql(props.serverId, { sqls: [sql], timestamp: dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).valueOf() })
+    querySql({ sqls: [sql], timestamp: dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).valueOf() })
       .then((res) => {
         const { data } = res;
         sqlResult.value[index] = Object.assign(sqlResult.value[index], data[0]);

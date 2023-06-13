@@ -22,10 +22,6 @@
 import { StorageApi } from '@/api';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
-const props = defineProps<{
-  serverId: number;
-}>();
-
 const emit = defineEmits<{
   (event: 'handleAddStorage'): void;
   (event: 'handleSelectStorage', payload: string): void;
@@ -39,7 +35,7 @@ const { requestFn: deleteStorageGroups } = useRequest(StorageApi.deleteStorageGr
 
 // 获取数据库
 function getStorageList() {
-  getGroup({ serverId: props.serverId }).then((res) => {
+  getGroup({}).then((res) => {
     storageList.value = res.data?.pathNames.filter((item) => item !== 'root.__system') || [];
     currentStorage.value = storageList.value[0] || '';
   });
@@ -59,7 +55,7 @@ function handleDeleteStorage(item: string) {
     icon: ICustomMessageWarning,
   })
     .then(() => {
-      deleteStorageGroups(props.serverId, item).then((res) => {
+      deleteStorageGroups(item).then((res) => {
         if (res.code === 0) {
           ElMessage.success('删除存储组成功');
           getStorageList();

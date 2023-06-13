@@ -4,7 +4,6 @@ declare namespace Server {
     alias: string;
     username?: string;
     id: number;
-    serverId?: string | number;
     rawid?: string | number;
     // 数据权限tree，展开树时获取
     dataPrivilege?: DbAuth.PreviewDataPrivilege;

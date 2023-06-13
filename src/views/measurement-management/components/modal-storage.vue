@@ -44,7 +44,6 @@ import type { FormInstance } from 'element-plus';
 import { StorageApi } from '@/api';
 
 const props = defineProps<{
-  serverId: number;
   visible: boolean;
 }>();
 
@@ -108,7 +107,7 @@ const handleConfirm = () => {
         ttl: !formData.ttl ? undefined : +formData.ttl,
         ttlUnit: formData.ttlUnit || undefined,
       };
-      saveStorageGroups(props.serverId, { ...reqObj }).then((res) => {
+      saveStorageGroups({ ...reqObj }).then((res) => {
         if (res.code === 0) {
           ElMessage.success('创建成功！');
           dialogVisible.value = false;

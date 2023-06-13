@@ -164,7 +164,6 @@ import { AlarmApi, StorageApi } from '@/api';
 import { useEnumStore } from '@/stores';
 
 const props = defineProps<{
-  serverId: number;
   visible: boolean;
   editType: string;
   alarmConfigId?: number;
@@ -287,7 +286,7 @@ const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(St
 let lastMeasurementQuery = '';
 const remoteMethod = debounce((query: string) => {
   lastMeasurementQuery = query;
-  getMeasurement(props.serverId, lastMeasurementQuery).then((res) => {
+  getMeasurement(lastMeasurementQuery).then((res) => {
     if (lastMeasurementQuery === query) {
       measurementList.value = res.data?.measurements?.map((item) => item) || [];
     }

@@ -69,7 +69,6 @@ import { StorageApi } from '@/api';
 
 const props = defineProps<{
   modelValue: Array<string>;
-  serverId: number;
   isShowViewBtn?: boolean;
   placeholder?: string;
   viewText?: string;
@@ -83,7 +82,7 @@ const options = ref<Array<{ label: string; value: string }>>([]);
 let lastMeasurementQuery = '';
 const remoteMethod = debounce((query: string) => {
   lastMeasurementQuery = query;
-  getMeasurement(props.serverId, lastMeasurementQuery).then((res) => {
+  getMeasurement(lastMeasurementQuery).then((res) => {
     if (lastMeasurementQuery === query) {
       options.value = res.data?.measurements?.map((item) => ({ label: item, value: item })) || [];
     }

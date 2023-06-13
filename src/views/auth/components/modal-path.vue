@@ -82,7 +82,7 @@ const { requestFn: getMeasurement } = useRequest(StorageApi.getMeasurementAllLis
 let lastQuery = '';
 // 获取数据库
 const getStorageList = (query: string) => {
-  getGroup({ serverId: 20 }).then((res) => {
+  getGroup({}).then((res) => {
     if (lastQuery === query) {
       const data = res.data?.pathNames.filter((item) => item !== 'root.__system') || [];
       options.value = data.filter((item) => item.includes(query));
@@ -93,7 +93,6 @@ const getStorageList = (query: string) => {
 // 查询设备
 const getDeviceList = (query: string) => {
   getDevice({
-    serverId: 20,
     groupName: 'root',
     keyword: query,
     pageNum: 1,

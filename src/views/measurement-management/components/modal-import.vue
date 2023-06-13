@@ -100,7 +100,6 @@ import type {
 import { StorageApi } from '@/api';
 
 const props = defineProps<{
-  serverId: number;
   visible: boolean;
 }>();
 
@@ -170,7 +169,7 @@ const handleRemove: UploadProps['onRemove'] = () => {
 const customUpload: UploadProps['httpRequest'] = (options) => {
   const formData = new FormData();
   formData.append('file', options.file);
-  return importMeasurementData(props.serverId, formData, isCSV.value ? 'csv' : 'xlsx').then(((res) => {
+  return importMeasurementData(formData, isCSV.value ? 'csv' : 'xlsx').then(((res) => {
     if (res.code === 0) {
       uploadResult.successNum = res.data.successNum;
       uploadResult.failNum = res.data.failNum;

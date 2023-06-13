@@ -9,7 +9,7 @@
           <template #label>
             告警序列：<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
           </template>
-          <timeseries-select v-model="searchFormData.measurements" :server-id="serverId" :is-show-view-btn="true" :placeholder="'请输入告警序列'" :viewText="'已选序列'" />
+          <timeseries-select v-model="searchFormData.measurements" :is-show-view-btn="true" :placeholder="'请输入告警序列'" :viewText="'已选序列'" />
         </base-form-item>
         <base-form-item label="告警级别：" prop="alarmLevel">
           <template #label>
@@ -136,7 +136,6 @@
 
     <modal-config
       v-model:visible="editVisible"
-      :server-id="serverId"
       :alarm-config-id="alarmConfigId"
       :edit-type="editType"
       @handleSave="handleSaveConfig"
@@ -155,13 +154,11 @@ import {
 } from '@/utils/date';
 import { getOptionField } from '@/utils/format';
 import { AlarmApi } from '@/api';
-import { useServerStore, useEnumStore } from '@/stores';
+import { useEnumStore } from '@/stores';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalConfig from './components/modal-config.vue';
 
-const serverStroe = useServerStore();
-const serverId = serverStroe.currentServerId;
 const enumStore = useEnumStore();
 const route = useRoute();
 
