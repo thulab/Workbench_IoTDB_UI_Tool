@@ -53,7 +53,7 @@ async function responseInterceptor(response: HttpResponse<object>) {
       && data.type !== 'application/json') {
     return Promise.resolve(response);
   }
-  if (code === 1009 && localStorage.getItem('enabledSSO') !== 'true') {
+  if (code === 1009) {
     window.location.href = '/login';
     return Promise.reject({});
   }

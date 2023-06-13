@@ -14,26 +14,29 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useLoginStore } from '@/stores/login.store';
+import { UserApi } from '@/api';
 
 const loginStore = useLoginStore();
 const userName = computed(() => loginStore.userInfo.name || 'root');
 
-const logout = () => {
+const { requestFn: logout } = useRequest(UserApi.logout);
+
+const handleLogout = () => {
   ElMessageBox.confirm('您是否确认退出登录?', '温馨提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
   }).then(() => {
-    loginStore.isLogin = false;
-    localStorage.setItem('authorization', '');
-    loginStore.logoutSSO();
+    logout().then(() => {
+      window.location.href = '/login';
+    });
   });
 };
 
 const handleLoginCommand = (val: string) => {
   switch (val) {
     case 'logout': {
-      logout();
+      handleLogout();
       break;
     }
     default:

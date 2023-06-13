@@ -2,7 +2,7 @@ import {
   AES, mode, pad, enc,
 } from 'crypto-js';
 
-export const encodeAES = (data?: string, key = 's1A]Gm6509.2Q3y=pUk;?rTWLoSb4_Mt') => {
+export const encodeAES = (data?: string, key = 'a=cd;fg.ijklmnop8rstu5wx*z12==56') => {
   if (!data) return '';
   const encrypted = AES.encrypt(data, enc.Utf8.parse(key), {
     mode: mode.ECB,

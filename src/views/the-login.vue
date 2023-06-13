@@ -1,6 +1,7 @@
 <template>
   <div class="login-wrapper">
     <el-form :hide-required-asterisk="true" :model="loginForm" :rules="rules" ref="formRef">
+      <label><input type="password" autocomplete="new-password" hidden></label>
       <el-form-item prop="user">
         <el-input
           v-model="loginForm.user"
