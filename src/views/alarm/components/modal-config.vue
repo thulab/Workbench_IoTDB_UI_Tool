@@ -11,7 +11,7 @@
         <el-col :span="12">
           <base-form-item label="告警序列：" prop="measurement" :rules="editType === 'add' ? requiredRules : []">
             <template #label>
-              告警序列：<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
+              告警序列：<el-tooltip v-if="editType === 'add'" effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
             </template>
             <el-select
               v-model="formData.measurement"
@@ -306,16 +306,12 @@ function getDetail() {
 }
 
 function handleChangePath(val: string) {
-  const current = measurementList.value.find((f) => f.timeseries === val);
-  formData.measurementType = current?.dataType;
-  formData.alarmName = '';
-  formData.alarmLevel = '';
-  formData.alarmDesc = '';
-  formData.alarmRulesType = '';
+  formRef.value?.resetFields();
   formData.alarmRulesTypeVal = undefined;
-  formData.alarmFrequency = '';
-  formData.alarmDuration = undefined;
   formData.alarmDurationType = '';
+  const current = measurementList.value.find((f) => f.timeseries === val);
+  formData.measurement = val;
+  formData.measurementType = current?.dataType;
 }
 
 function handleChangeBooleanRule(val: string) {
@@ -323,6 +319,8 @@ function handleChangeBooleanRule(val: string) {
     formData.alarmDuration = 0;
     formData.alarmDurationType = '';
     formData.alarmFrequency = '';
+    formRef.value?.clearValidate('alarmDuration');
+    formRef.value?.clearValidate('alarmFrequency');
   }
 }
 
