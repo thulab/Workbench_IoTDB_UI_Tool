@@ -204,7 +204,7 @@ const formData = reactive<Alarm.ConfigData>({
   alarmRulesTypeVal: undefined,
   alarmFrequency: '',
   alarmDuration: undefined,
-  alarmDurationType: '',
+  alarmDurationType: 'ms',
 });
 const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);
 
@@ -308,7 +308,7 @@ function getDetail() {
 function handleChangePath(val: string) {
   formRef.value?.resetFields();
   formData.alarmRulesTypeVal = undefined;
-  formData.alarmDurationType = '';
+  formData.alarmDurationType = 'ms';
   const current = measurementList.value.find((f) => f.timeseries === val);
   formData.measurement = val;
   formData.measurementType = current?.dataType;
@@ -317,7 +317,7 @@ function handleChangePath(val: string) {
 function handleChangeBooleanRule(val: string) {
   if (val === 'change') {
     formData.alarmDuration = 0;
-    formData.alarmDurationType = '';
+    formData.alarmDurationType = 'ms';
     formData.alarmFrequency = '';
     formRef.value?.clearValidate('alarmDuration');
     formRef.value?.clearValidate('alarmFrequency');
@@ -374,7 +374,7 @@ watch(
       formData.alarmRulesType = '';
       formData.alarmRulesTypeVal = undefined;
       formData.alarmDuration = undefined;
-      formData.alarmDurationType = '';
+      formData.alarmDurationType = 'ms';
       if (props.editType === 'edit') {
         formData.alarmConfigId = props.alarmConfigId;
         getDetail();
