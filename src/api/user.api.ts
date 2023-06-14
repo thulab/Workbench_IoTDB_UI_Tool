@@ -13,8 +13,13 @@ class UserApi {
   }
 
   // 当前登录用户权限
-  static getUserPrivileges(userName?: string): HttpResponseP {
-    return http.get('/privileges/getPrivilegesByUserName', { params: userName ? { userName } : {} });
+  static getLoginUserPrivileges(): HttpResponseP<Auth.LoginUserPrivileges> {
+    return http.get('/privileges/getLoginUserPrivileges');
+  }
+
+  // 权限配置项
+  static getPrivilegesEnum(): HttpResponseP<Auth.PrivilegesEnum> {
+    return http.get('/privileges/getPrivilegeConfig');
   }
 }
 export default UserApi;

@@ -69,7 +69,7 @@ const dialogVisible = useVModel(props, 'visible', emit);
 
 const pathOptions = ['database', 'device', 'timeseries'];
 
-const pathType = ref('input');
+const pathType = ref('select');
 const inputPath = ref('');
 const selectPath = ref('');
 const searchType = ref('database');
@@ -106,7 +106,7 @@ const getDeviceList = (query: string) => {
 
 // 查询测点
 const getMeasurementList = (query: string) => {
-  getMeasurement(20, query).then((res) => {
+  getMeasurement(query).then((res) => {
     if (lastQuery === query) {
       options.value = res.data?.measurements || [];
     }
@@ -156,7 +156,7 @@ watch(
   () => props.visible,
   (newVal) => {
     if (newVal) {
-      pathType.value = 'input';
+      pathType.value = 'select';
       searchType.value = 'database';
       inputPath.value = '';
       selectPath.value = '';

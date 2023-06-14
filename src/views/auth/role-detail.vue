@@ -9,27 +9,10 @@
     <el-container class="role-details-wrapper">
       <el-main class="p-0">
         <h4>权限详情</h4>
-        <el-table :data="tableData" style="width: 100%">
+        <el-table :data="tableData" style="width: 100%" stripe border>
           <el-table-column label="全选" align="center" width="60" />
-          <el-table-column label="数据库管理" align="center">
-            <el-table-column label="CREATE_DATABASE" align="center" width="180" />
-          </el-table-column>
-          <el-table-column label="时间序列管理" align="center">
-            <el-table-column label="READ" align="center" width="70" />
-            <el-table-column label="WRITE_SCHEMA" align="center" width="140" />
-            <el-table-column label="WRITE_DATA" align="center" width="140" />
-          </el-table-column>
-          <el-table-column label="权限管理" align="center">
-            <el-table-column label="MANAGE_USER" align="center" width="140" />
-            <el-table-column label="MANAGE_ROLE" align="center" width="140" />
-            <el-table-column label="ALTER_PASSWORD" align="center" width="160" />
-          </el-table-column>
-          <el-table-column label="高级功能" align="center">
-            <el-table-column label="TRIGGER" align="center" width="140" />
-            <el-table-column label="CQ" align="center" width="80" />
-          </el-table-column>
-          <el-table-column label="运维命令" align="center">
-            <el-table-column label="MAINTAIN" align="center" width="140" />
+          <el-table-column v-for="(column, index) in entityPrivilegesLabel" :label="column" :key="column + '_' + index + '_column'" align="center">
+            <el-table-column v-for="(col, ci) in entityColPrivilegesLabel(column)" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" align="center" :width="col.width || 180" />
           </el-table-column>
           <template #empty>
             <div class="table-empty-wrapper">
@@ -43,10 +26,8 @@
         <el-table :data="tableData" style="width: 100%" tooltip-effect="light">
           <el-table-column label="路径名称" align="center" width="150" show-overflow-tooltip />
           <el-table-column label="全选" align="center" width="60" />
-          <el-table-column label="时间序列管理" align="center">
-            <el-table-column label="READ" align="center" min-width="70" />
-            <el-table-column label="WRITE_SCHEMA" align="center" min-width="140" />
-            <el-table-column label="WRITE_DATA" align="center" min-width="140" />
+          <el-table-column v-for="(column, index) in pathPrivilegesLabel" :label="column" :key="column + '_' + index + '_column'" align="center">
+            <el-table-column v-for="(col, ci) in pathColPrivilegesLabel(column)" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" align="center" :width="col.width || 180" />
           </el-table-column>
           <el-table-column label="操作" align="center">
             <template #default="{ row }">
@@ -80,6 +61,8 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { useUserStore } from '@/stores';
 import RoleList from './components/role-list.vue';
 import ModalPath from './components/modal-path.vue';
 
@@ -87,6 +70,22 @@ const roleListRef = ref<InstanceType<typeof RoleList>>();
 const currentRole = ref('');
 const tableData = ref([]);
 const pathVisible = ref(false);
+
+const userStore = useUserStore();
+const {
+  entityPrivilegesConfig,
+  entityPrivilegesKeys: entityPrivilegesLabel,
+  pathPrivilegesConfig,
+  pathPrivilegesKeys: pathPrivilegesLabel,
+} = storeToRefs(userStore);
+
+const entityColPrivilegesLabel = computed(() => function (data: string) {
+  return (entityPrivilegesConfig.value && entityPrivilegesConfig.value[data]) || [];
+});
+
+const pathColPrivilegesLabel = computed(() => function (data: string) {
+  return (pathPrivilegesConfig.value && pathPrivilegesConfig.value[data]) || [];
+});
 
 function handleAddRow() {}
 

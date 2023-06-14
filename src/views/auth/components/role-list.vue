@@ -19,6 +19,7 @@
         cancel-button-text="取消"
         title="删除角色后相关联的用户权限将立即消失，是否删除该角色？"
         :icon="ICustomError"
+        @confirm="handleDelete(item)"
       >
         <template #reference>
           <el-button>删除</el-button>
@@ -26,10 +27,17 @@
       </el-popconfirm>
     </li>
   </ul>
+
+  <modal-role
+    v-model:visible="dialogVisible"
+    @handle-save="getList"
+  />
 </template>
 
 <script setup lang="ts">
+import { AuthApi } from '@/api';
 import ICustomError from '~icons/custom/error.svg';
+import modalRole from './modal-role.vue';
 
 const emit = defineEmits<{
   (event: 'handleSelect', payload: string): void;
@@ -37,28 +45,31 @@ const emit = defineEmits<{
 
 const list = ref<string[]>([]);
 const current = ref('');
-const loading = ref(false);
+const dialogVisible = ref(false);
+
+const { requestFn: getRoleList, loading } = useRequest(AuthApi.getRoleList);
+const { requestFn: deleteRole } = useRequest(AuthApi.deleteRole);
 
 // 获取角色
 function getList() {
+  getRoleList().then((res) => {
+    list.value = res.data || [];
+    current.value = list.value[0] || '';
+  });
 }
 
 // 新增角色
 function handleAdd() {
+  dialogVisible.value = true;
 }
 
 // 删除角色
-// function handleDelete(item: string) {
-//   ElMessageBox.confirm('删除角色后相关联的用户权限将立即消失，是否删除该角色？', '注意', {
-//     confirmButtonText: '确定',
-//     cancelButtonText: '取消',
-//     type: 'warning',
-//     icon: ICustomError,
-//   })
-//     .then(() => {
-//       console.log(item);
-//     });
-// }
+function handleDelete(item: string) {
+  deleteRole(item).then(() => {
+    ElMessage.success('删除成功');
+    getList();
+  });
+}
 
 // 选择
 function handleSelect(item: string) {
