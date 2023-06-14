@@ -27,7 +27,7 @@ class AuthApi {
   }
 
   // 根据角色更新权限
-  static updateAuthByRole(data: Record<string, string | string[]>): HttpResponseP {
+  static updateAuthByRole(data: Auth.UpdateAuthByRole): HttpResponseP {
     return http.post('/privileges/upsertPrivilegesByRoleName', data);
   }
 }

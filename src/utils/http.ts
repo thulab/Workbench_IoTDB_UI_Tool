@@ -61,17 +61,21 @@ async function responseInterceptor(response: HttpResponse<object>) {
     window.location.href = `${message}?back=${window.location.href}`;
     return Promise.reject({});
   }
-  if (response.status === 401) {
-    ElMessageBox.alert('登录失效，请重新登录', '提示', {
+  if (response.status === 403) {
+    return ElMessageBox.alert('登录失效，请重新登录', '提示', {
       confirmButtonText: '确定',
       type: 'error',
       showClose: false,
-    }).then(() => {
+    }).finally(() => {
       window.location.href = '/login';
       return Promise.reject(response);
     });
   }
-  return Promise.reject(response.status === 401 ? { code: 401 } : data);
+  if (response.status === 401) {
+    window.location.href = '/login';
+    return Promise.reject(response);
+  }
+  return Promise.reject(data);
 }
 
 function responseErrorInterceptor(error: { isAxiosError?: boolean; message?: string }) {

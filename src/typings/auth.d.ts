@@ -19,4 +19,12 @@ declare namespace Auth{
     entityPrivileges: Record<string, Auth.PrivilegeEnum[]>;
     pathPrivileges: Record<string, Auth.PrivilegeEnum[]>;
   }
+
+  export interface UpdateAuthByRole {
+    roleName: string;
+    cancelEntityPrivileges: string[];
+    addEntityPrivileges: string[];
+    cancelPathPrivileges: Record<string, string[]>;
+    addPathPrivileges: Record<string, string[]>;
+  }
 }

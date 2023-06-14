@@ -16,7 +16,9 @@
             <el-input
               v-model="loginForm.user"
               autocomplete="off"
-              placeholder="请输入账号">
+              placeholder="请输入账号"
+              @keyup.enter="submitForm"
+            >
               <template #prefix>
                 <el-icon size="30"><i-custom-user-name /></el-icon>
               </template>
@@ -28,6 +30,7 @@
               v-model="loginForm.password"
               autocomplete="off"
               placeholder="请输入密码"
+              @keyup.enter="submitForm"
             >
               <template #prefix>
                 <el-icon size="30"><i-custom-password /></el-icon>

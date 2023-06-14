@@ -9,10 +9,10 @@
     <el-container class="role-details-wrapper">
       <el-main class="p-0">
         <h4>权限详情</h4>
-        <el-table :data="tableData" style="width: 100%" stripe border>
+        <el-table :data="tableData" style="width: 100%" border>
           <el-table-column label="全选" align="center" width="60" />
           <el-table-column v-for="(column, index) in entityPrivilegesLabel" :label="column" :key="column + '_' + index + '_column'" align="center">
-            <el-table-column v-for="(col, ci) in entityColPrivilegesLabel(column)" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" align="center" :width="col.width || 180" />
+            <el-table-column v-for="(col, ci) in entityColPrivilegesLabel(column)" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" align="center" :min-width="col.width || 180" />
           </el-table-column>
           <template #empty>
             <div class="table-empty-wrapper">
@@ -23,11 +23,11 @@
         </el-table>
 
         <h4>路径</h4>
-        <el-table :data="tableData" style="width: 100%" tooltip-effect="light">
-          <el-table-column label="路径名称" align="center" width="150" show-overflow-tooltip />
+        <el-table :data="tableData" style="width: 100%" tooltip-effect="light" border>
+          <el-table-column label="路径名称" align="center" width="160" show-overflow-tooltip />
           <el-table-column label="全选" align="center" width="60" />
           <el-table-column v-for="(column, index) in pathPrivilegesLabel" :label="column" :key="column + '_' + index + '_column'" align="center">
-            <el-table-column v-for="(col, ci) in pathColPrivilegesLabel(column)" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" align="center" :width="col.width || 180" />
+            <el-table-column v-for="(col, ci) in pathColPrivilegesLabel(column)" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" align="center" :min-width="col.width || 180" />
           </el-table-column>
           <el-table-column label="操作" align="center">
             <template #default="{ row }">
