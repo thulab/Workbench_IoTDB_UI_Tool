@@ -45,6 +45,7 @@
           </el-form-item>
         </el-form>
       </div>
+      <p class="right-text">copyrightⒸ Timecho</p>
     </div>
   </div>
 </template>
@@ -134,6 +135,8 @@ const submitForm = () => {
   position: relative;
   display: flex;
   align-items: center;
+  min-width: 1300px;
+  min-height: 640px;
 }
 
 .login-side-img {
@@ -148,8 +151,11 @@ const submitForm = () => {
 
 .login-form-wrapper{
   flex: 1;
+  height: 100%;
   display: flex;
   justify-content: flex-start;
+  align-items: center;
+  position: relative;
 }
 
 .login-form-container{
@@ -220,5 +226,15 @@ const submitForm = () => {
   border-radius: 4px;
   height: 36px !important;
   font-size: 14px !important;
+}
+
+.right-text{
+  position: absolute;
+  bottom: 32px;
+  left: 183px;
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 18px;
+  color: #fff;
 }
 </style>
