@@ -38,7 +38,7 @@
             <el-date-picker
               v-model="searchFormData.createtimerange"
               type="datetimerange"
-              range-separator="-"
+              range-separator="～"
               unlink-panels
               :disabled-date="disabledDate"
               :shortcuts="shortcutsDaterange"
@@ -49,7 +49,7 @@
             <el-date-picker
               v-model="searchFormData.updatetimerange"
               type="datetimerange"
-              range-separator="-"
+              range-separator="～"
               unlink-panels
               :disabled-date="disabledDate"
               :shortcuts="shortcutsDaterange"
