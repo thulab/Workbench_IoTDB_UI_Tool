@@ -17,6 +17,7 @@
               v-model="loginForm.user"
               autocomplete="off"
               placeholder="请输入账号"
+              maxlength="32"
               @keyup.enter="submitForm"
             >
               <template #prefix>

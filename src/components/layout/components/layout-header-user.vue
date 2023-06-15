@@ -12,7 +12,7 @@
       </el-dropdown-menu>
     </template>
   </el-dropdown>
-  <modal-reset-password :user-name="userName" v-model:visible="modalVisible" />
+  <modal-reset-password title="重置密码" :user-name="userName" v-model:visible="modalVisible" />
 </template>
 
 <script setup lang="ts">

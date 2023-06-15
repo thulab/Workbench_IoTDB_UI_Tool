@@ -2,15 +2,22 @@
   <el-container>
     <el-aside width="240px" class="list-wrapper">
       <list
-        ref="roleListRef"
+        ref="listRef"
         @handleSelect="val => currentUser = val"
       />
     </el-aside>
     <el-container class="details-wrapper">
-      <el-main class="p-0">
+      <el-main class="p-0" v-loading="loading">
         <el-scrollbar>
           <h4>关联角色</h4>
+          <el-row><el-tag>角色 1</el-tag></el-row>
           <h4>权限详情</h4>
+          <el-table :data="tableData" style="width: 100%;">
+            <el-table-column label="全选" align="center" width="60" />
+            <el-table-column :label="group.group" v-for="group in entityPrivilegesEnumGroup" :key="group.group" align="center">
+              <el-table-column :label="child.privileges" v-for="child in group.children" :key="child.privileges" align="center" :width="child.width" />
+            </el-table-column>
+          </el-table>
           <el-table :data="tableData" style="width: 100%">
             <el-table-column label="全选" align="center" width="60" />
             <el-table-column label="数据库管理" align="center">
@@ -76,20 +83,53 @@
 
     <modal-path
       v-model:visible="pathVisible"
+      :path-list="[]"
     />
   </el-container>
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { useUserStore } from '@/stores';
+import { AuthApi } from '@/api';
 import List from './components/user-list.vue';
 import ModalPath from './components/modal-path.vue';
+
+const userStore = useUserStore();
+const {
+  entityPrivilegesEnumGroup,
+  pathPrivilegesEnumGroup,
+} = storeToRefs(userStore);
+
+const getWidth = (width) => width;
+const width = computed(() => entityPrivilegesEnumGroup.value[0].children[0].width + 100);
 
 const listRef = ref<InstanceType<typeof List>>();
 const currentUser = ref('');
 const tableData = ref([]);
 const pathVisible = ref(false);
 
+const { requestFn: getUserAuth, data: authData, loading } = useRequest(AuthApi.getUserAuth, {
+  initData: {
+    userName: '',
+    entityPrivileges: [],
+    pathPrivileges: {},
+    rolesToPrivileges: [],
+  },
+});
+
 function handleAddRow() {}
+
+function getDetail() {
+  getUserAuth(currentUser.value).then(() => {
+    if (authData.value.entityPrivileges.length === 0) {
+      authData.value.entityPrivileges.push('INSERT_TIMESERIES');
+    }
+    // entityTableRef.value?.doLayout();
+    // intitalEntityVals.value = authData.value.entityPrivileges;
+    // intitalPathVals.value = authData.value.pathPrivileges;
+  });
+}
 
 watch(
   () => currentUser.value,
@@ -98,7 +138,7 @@ watch(
       if (!val) {
         console.log('空页面');
       } else {
-        console.log('获取数据');
+        getDetail();
       }
     }
   },

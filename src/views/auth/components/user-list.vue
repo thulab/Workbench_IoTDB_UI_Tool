@@ -8,57 +8,69 @@
   </div>
 
   <ul class="list-box" v-loading="loading">
-    <li v-for="item in list" :key="item" :class="['item-box', current === item && 'item-box-active']" @click="handleSelect(item)">
-      <span class="item-text"><text-tooltip :content="item" /></span>
-      <!-- <div class="item-delete-box" @click="handleDelete(item)">
-        <i-custom-delete class="item-delete" />
-        <i-custom-delete-active class="item-delete-active" />
-      </div> -->
+    <li v-for="item in list" :key="item.name" :class="['item-box', current === item.name && 'item-box-active']" @click="handleSelect(item.name)">
+      <span class="item-text"><text-tooltip :content="item.name" /></span>
+      <div class="item-edit-box" @click="handleEdit(item.name)">
+        <i-custom-edit class="item-edit" />
+        <i-custom-edit class="item-edit-active" />
+      </div>
       <el-popconfirm
+        v-if="item.isManager === 0"
         confirm-button-text="确定"
         cancel-button-text="取消"
-        title="删除角色后相关联的用户权限将立即消失，是否删除该角色？"
+        width="160px"
+        title="是否删除该用户？"
         :icon="ICustomError"
+        @confirm="handleDelete(item.name)"
       >
         <template #reference>
-          <el-button>删除</el-button>
+          <div class="item-delete-box">
+            <i-custom-delete class="item-delete" />
+            <i-custom-delete-active class="item-delete-active" />
+          </div>
         </template>
       </el-popconfirm>
     </li>
   </ul>
+  <modal-reset-password title="编辑用户" :user-name="editUser" v-model:visible="modalVisible" />
+  <modal-user v-model:visible="modalUserVisible" v-if="list" :user-list="list" @handle-save="getList" />
 </template>
 
 <script setup lang="ts">
+import { AuthApi } from '@/api';
+import ModalResetPassword from '@/components/modal-reset-password.vue';
+import ModalUser from './modal-user.vue';
 import ICustomError from '~icons/custom/error.svg';
 
 const emit = defineEmits<{
   (event: 'handleSelect', payload: string): void;
 }>();
 
-const list = ref<string[]>([]);
 const current = ref('');
-const loading = ref(false);
+const editUser = ref('');
+const modalVisible = ref(false);
+const modalUserVisible = ref(false);
 
-// 获取角色
-function getList() {
-}
+const { requestFn: getList, data: list, loading } = useRequest(AuthApi.getUserList);
+const { requestFn: deleteUser } = useRequest(AuthApi.deleteUser);
 
 // 新增角色
 function handleAdd() {
+  modalUserVisible.value = true;
 }
 
 // 删除角色
-// function handleDelete(item: string) {
-//   ElMessageBox.confirm('删除角色后相关联的用户权限将立即消失，是否删除该角色？', '注意', {
-//     confirmButtonText: '确定',
-//     cancelButtonText: '取消',
-//     type: 'warning',
-//     icon: ICustomError,
-//   })
-//     .then(() => {
-//       console.log(item);
-//     });
-// }
+function handleDelete(item: string) {
+  deleteUser(item).then(() => {
+    ElMessage.success('删除成功');
+    getList();
+  });
+}
+
+function handleEdit(item: string) {
+  editUser.value = item;
+  modalVisible.value = true;
+}
 
 // 选择
 function handleSelect(item: string) {
@@ -66,7 +78,9 @@ function handleSelect(item: string) {
 }
 
 onMounted(() => {
-  getList();
+  getList().then(() => {
+    current.value = list.value[0]?.name;
+  });
 });
 
 watch(
@@ -76,6 +90,18 @@ watch(
   },
   {
     immediate: true,
+  },
+);
+
+watch(
+  () => list.value,
+  (val) => {
+    if (val.length === 0) {
+      current.value = '';
+    }
+    if (!val.some((item) => item.name === current.value)) {
+      current.value = val[0]?.name;
+    }
   },
 );
 
@@ -132,7 +158,7 @@ defineExpose({ getList });
   position: relative;
 
   .item-text{
-    width: 200px;
+    width: 180px;
     display: inline-flex;
     line-height: 1.2;
   }
@@ -163,6 +189,36 @@ defineExpose({ getList });
     }
   }
 
+  .item-edit-box{
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    display: none;
+
+    svg{
+      width: 16px;
+      height: 16px;
+    }
+
+    .item-edit-active{
+      display: none;
+
+      :deep(path) {
+        fill: #495AD4 !important;
+      }
+    }
+
+    &:hover {
+      .item-edit{
+        display: none;
+      }
+
+      .item-edit-active{
+        display: block;
+      }
+    }
+  }
+
   &:hover{
     background-color: #F7F8FC;
     color: #495AD4;
@@ -170,7 +226,12 @@ defineExpose({ getList });
     .item-delete-box{
       display: block;
     }
+
+    .item-edit-box{
+      display: block;
+    }
   }
+
 }
 
 .item-box-active{

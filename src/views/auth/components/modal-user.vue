@@ -1,13 +1,13 @@
 <template>
   <el-dialog
     v-model="dialogVisible"
-    :title="title"
+    title="新建用户"
     width="480px"
     :close-on-click-modal="false">
     <el-form label-width="100px" ref="formRef" :rules="rules" :model="formData">
       <label><input type="password" autocomplete="new-password" hidden></label>
-      <base-form-item label="用户名">
-        <el-text>{{ userName }}</el-text>
+      <base-form-item label="用户名" prop="userName">
+        <el-input v-model="formData.userName" maxlength="32" show-word-limit />
       </base-form-item>
       <base-form-item label="密码" prop="password" required>
         <el-input v-model="formData.password" maxlength="32" autocomplete="off" placeholder="请输入密码" show-password />
@@ -26,16 +26,14 @@
 </template>
 <script setup lang="ts">
 import type { FormInstance, FormRules } from 'element-plus';
-import { AuthApi, UserApi } from '@/api';
-import { useUserStore } from '@/stores';
+import { AuthApi } from '@/api';
 
 defineOptions({ name: 'ModalResetPassword' });
 const formRef = ref<FormInstance>();
 
 const props = defineProps<{
   visible: boolean,
-  userName: string,
-  title: string,
+  userList: Auth.DBUser[],
 }>();
 
 const emit = defineEmits<{
@@ -44,18 +42,46 @@ const emit = defineEmits<{
 }>();
 
 const dialogVisible = useVModel(props, 'visible', emit);
-const userStore = useUserStore();
 
 const formData = reactive({
+  userName: '',
   password: '',
   confirmPassword: '',
 });
 
 const rules = reactive<FormRules>({
+  userName: [
+    {
+      required: true,
+      message: '请输入相应内容后进行操作',
+      trigger: 'blur',
+    },
+    {
+      min: 4,
+      max: 32,
+      message: '字符长度不小于4，请重新输入',
+      trigger: 'blur',
+    },
+    {
+      pattern: /^[A-Za-z][A-Za-z0-9_]+$/,
+      message: '请以字母开头，只能包含字母、数字和下划线',
+      trigger: 'blur',
+    },
+    {
+      validator: (rule: any, value: any, callback: any) => {
+        if (value && props.userList.some((item) => item.name === value)) {
+          callback(new Error('该用户已存在，请重新输入'));
+        } else {
+          callback();
+        }
+      },
+      trigger: 'blur',
+    },
+  ],
   password: [
     {
       required: true,
-      message: '请输入密码',
+      message: '请输入相应内容后进行操作',
       trigger: 'blur',
     },
     {
@@ -85,24 +111,14 @@ const rules = reactive<FormRules>({
     },
   ],
 });
-const { requestFn: updateUser, loading } = useRequest(AuthApi.updateUser);
+const { requestFn: addUser, loading } = useRequest(AuthApi.addUser);
 
 const handleConfirm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
-      updateUser(props.userName, formData.password).then(() => {
-        ElMessage.success(`${props.title}成功`);
+      addUser(formData.userName, formData.password).then(() => {
+        ElMessage.success('新建用户成功');
         dialogVisible.value = false;
-        if (userStore.userInfo.name === props.userName) {
-          ElMessageBox.confirm('密码已修改，请重新登录', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning',
-          }).then(() => {
-            UserApi.logout();
-            window.location.href = '/login';
-          });
-        }
         emit('handleSave');
       });
     } else {

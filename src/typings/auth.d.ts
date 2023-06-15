@@ -1,18 +1,24 @@
 declare namespace Auth{
+
+  export interface DBUser {
+    name: string;
+    password: string;
+    isManager: 0 | 1;
+  }
   export interface PrivilegeEnum {
     privileges: string;
     width: number;
   }
 
-  export interface LoginUserPrivileges {
+  export interface UserPrivileges {
     userName: string;
     entityPrivileges: string[];
-    pathPrivileges: string[];
-    rolesToPrivileges: {
+    pathPrivileges: Record<string, string[]>;
+    rolesToPrivileges: Array<{
       roleName: string;
       entityPrivileges: string[];
-      pathPrivileges: string[];
-    }
+      pathPrivileges: Record<string, string[]>;
+    }>
   }
 
   export interface PrivilegesEnum {
@@ -32,5 +38,11 @@ declare namespace Auth{
     roleName: string;
     entityPrivileges: string[];
     pathPrivileges: Record<string, string[]>;
+  }
+  export interface UserAuthInfo extends UpdateAuthByRole {
+    roleName?: string;
+    userName: string;
+    cancelRoles: string[];
+    addRoles: string[];
   }
 }

@@ -12,7 +12,7 @@ export const useUserStore = defineStore('UserStore', () => {
     name: string;
   });
 
-  const allPrivileges = ref<Auth.LoginUserPrivileges>();
+  const allPrivileges = ref<Auth.UserPrivileges>();
   const privilegesEnum = ref<Auth.PrivilegesEnum>();
 
   // 权限配置

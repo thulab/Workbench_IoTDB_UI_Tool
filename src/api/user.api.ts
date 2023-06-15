@@ -13,7 +13,7 @@ class UserApi {
   }
 
   // 当前登录用户权限
-  static getLoginUserPrivileges(): HttpResponseP<Auth.LoginUserPrivileges> {
+  static getLoginUserPrivileges(): HttpResponseP<Auth.UserPrivileges> {
     return http.get('/privileges/getLoginUserPrivileges');
   }
 
