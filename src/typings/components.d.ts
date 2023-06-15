@@ -62,6 +62,7 @@ declare module 'vue' {
     ICustomAdd: typeof import('~icons/custom/add')['default']
     ICustomAlarmLevel: typeof import('~icons/custom/alarm-level')['default']
     ICustomCopy: typeof import('~icons/custom/copy')['default']
+    ICustomCorrect: typeof import('~icons/custom/correct')['default']
     ICustomDelete: typeof import('~icons/custom/delete')['default']
     ICustomDeleteActive: typeof import('~icons/custom/delete-active')['default']
     ICustomDeviceNum: typeof import('~icons/custom/device-num')['default']

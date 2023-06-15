@@ -43,7 +43,7 @@ import ModalUser from './modal-user.vue';
 import ICustomError from '~icons/custom/error.svg';
 
 const emit = defineEmits<{
-  (event: 'handleSelect', payload: string): void;
+  (event: 'handleSelect', payload?: Auth.DBUser): void;
 }>();
 
 const current = ref('');
@@ -86,7 +86,7 @@ onMounted(() => {
 watch(
   () => current.value,
   (val) => {
-    emit('handleSelect', val);
+    emit('handleSelect', list.value?.find((item) => item.name === val));
   },
   {
     immediate: true,
