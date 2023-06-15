@@ -16,8 +16,8 @@ declare namespace Auth{
   }
 
   export interface PrivilegesEnum {
-    entityPrivileges: Record<string, Auth.PrivilegeEnum[]>;
-    pathPrivileges: Record<string, Auth.PrivilegeEnum[]>;
+    entityPrivileges: Array<{ group: string, children: Auth.PrivilegeEnum[] }>;
+    pathPrivileges: Array<{ group: string, children: Auth.PrivilegeEnum[] }>;
   }
 
   export interface UpdateAuthByRole {

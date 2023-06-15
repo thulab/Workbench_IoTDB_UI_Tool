@@ -1,63 +1,70 @@
 <template>
   <el-container>
     <el-aside width="240px" class="role-list-wrapper">
-      <el-checkbox v-if="authData.entityPrivileges?.includes('CREATE_DATABASE')" :checked="authData.entityPrivileges?.includes('CREATE_DATABASE') === true" />
       <role-list
         ref="roleListRef"
         @handleSelect="val => currentRole = val"
       />
     </el-aside>
-    <el-container class="role-details-wrapper">
-      <el-main class="p-0">
-        <h4>权限详情</h4>
-        <el-table :data="authData.entityPrivileges.length ? [authData.entityPrivileges] : []" :loading="loading" style="width: 100%;" border ref="entityTableRef">
-          <el-table-column label="全选" align="center" :width="60" :min-width="60" fixed="left">
-            <template #default>
-              <el-checkbox :checked="entityCheckAll" @change="val => handleCheckedEntity(val, 'all')" />
-            </template>
-          </el-table-column>
-          <el-table-column v-for="(column, index) in entityPrivilegesEnumGroup" :label="column.group" :key="column.group + '_' + index + '_column'" align="center">
-            <el-table-column v-for="(col, ci) in column.children" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :width="col.width || 180">
-              <template #default="{ row, $index }">
-                <el-checkbox :checked="row.includes(col.privileges)" @change="val => handleCheckedEntity(val, 'row', $index)" />
+    <el-container class="role-details-wrapper p-0">
+      <el-header class="detail-title-box">
+        <h4 class="detail-title-text">权限详情</h4>
+        <el-button type="primary">编辑</el-button>
+      </el-header>
+      <el-main class="p-x-16 p-t-0" style="overflow-x: hidden;">
+        <div class="table-list-box">
+          <h4 class="table-box-title">全局</h4>
+          <el-table :data="authData.entityPrivileges.length ? [authData.entityPrivileges] : []" :loading="loading" style="width: 100%;" border ref="entityTableRef">
+            <el-table-column label="全选" align="center" :width="60" :min-width="60" fixed="left">
+              <template #default>
+                <el-checkbox :checked="entityCheckAll" @change="val => handleCheckedEntity(val, 'all')" />
               </template>
             </el-table-column>
-          </el-table-column>
-          <template #empty>
-            <div class="table-empty-wrapper">
-              <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-              <span class="data-empty-text">无数据</span>
-            </div>
-          </template>
-        </el-table>
+            <el-table-column v-for="(column, index) in entityPrivilegesEnumGroup" :label="column.group" :key="column.group + '_' + index + '_column'" align="center">
+              <el-table-column v-for="(col, ci) in column.children" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :width="col.width || 180">
+                <template #default="{ row, $index }">
+                  <el-checkbox :checked="row.includes(col.privileges)" @change="val => handleCheckedEntity(val, 'row', $index)" />
+                </template>
+              </el-table-column>
+            </el-table-column>
+            <template #empty>
+              <div class="table-empty-wrapper">
+                <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+                <span class="data-empty-text">无数据</span>
+              </div>
+            </template>
+          </el-table>
+        </div>
 
-        <h4>路径</h4>
-        <el-table :data="pathData" :loading="loading" style="width: 100%" tooltip-effect="light" border ref="pathTableRef">
-          <el-table-column label="路径名称" align="center" width="160" show-overflow-tooltip />
-          <el-table-column label="全选" align="center" width="60">
-            <template #default>
-              <el-checkbox :checked="pathCheckAll" />
-            </template>
-          </el-table-column>
-          <el-table-column v-for="(column, index) in pathPrivilegesEnumGroup" :label="column.group" :key="column.group + '_' + index + '_column'" align="center">
-            <el-table-column v-for="(col, ci) in column.children" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :min-width="col.width || 180">
-              <template #default="{ row }">
-                <el-checkbox :checked="row[col.privileges]" />
+        <div class="table-list-box">
+          <h4 class="table-box-title">路径</h4>
+          <el-table :data="pathData" :loading="loading" style="width: 100%" tooltip-effect="light" border ref="pathTableRef">
+            <el-table-column label="路径名称" align="center" width="160" show-overflow-tooltip />
+            <el-table-column label="全选" align="center" width="60">
+              <template #default>
+                <el-checkbox :checked="pathCheckAll" />
               </template>
             </el-table-column>
-          </el-table-column>
-          <el-table-column label="操作" align="center">
-            <template #default="{ row }">
-              <el-button>删除{{ row }}</el-button>
+            <el-table-column v-for="(column, index) in pathPrivilegesEnumGroup" :label="column.group" :key="column.group + '_' + index + '_column'" align="center">
+              <el-table-column v-for="(col, ci) in column.children" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :min-width="col.width || 180">
+                <template #default="{ row }">
+                  <el-checkbox :checked="row[col.privileges]" />
+                </template>
+              </el-table-column>
+            </el-table-column>
+            <el-table-column label="操作" align="center">
+              <template #default="{ row }">
+                <el-button>删除{{ row }}</el-button>
+              </template>
+            </el-table-column>
+            <template #empty>
+              <div class="table-empty-wrapper">
+                <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+                <span class="data-empty-text">无数据</span>
+              </div>
             </template>
-          </el-table-column>
-          <template #empty>
-            <div class="table-empty-wrapper">
-              <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-              <span class="data-empty-text">无数据</span>
-            </div>
-          </template>
-        </el-table>
+          </el-table>
+        </div>
 
         <el-button style="width: 100%;" class="m-t-16" @click="handleAddRow"><i-custom-add class="m-r-4" />添加路径</el-button>
       </el-main>
@@ -113,9 +120,12 @@ const { requestFn: getAuthByRole, data: authData, loading } = useRequest(AuthApi
 function getDetail() {
   getAuthByRole(currentRole.value).then(() => {
     if (authData.value.entityPrivileges.length === 0) {
-      authData.value.entityPrivileges.push('INSERT_TIMESERIES');
+      authData.value.entityPrivileges.push('CREATE_DATABASE');
     }
-    entityTableRef.value?.doLayout();
+    nextTick(() => {
+      entityTableRef.value?.doLayout();
+    });
+
     intitalEntityVals.value = authData.value.entityPrivileges;
     intitalPathVals.value = authData.value.pathPrivileges;
   });
@@ -164,8 +174,46 @@ watch(
   margin-left: 16px;
   background-color: #fff;
   border-radius: 6px;
-  padding: 8px 16px;
+}
+
+.detail-title-box{
+  height: 48px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #DFE1ED;
+  padding: 0 16px;
   box-sizing: border-box;
+
+  .detail-title-text{
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 21px;
+    color: #495AD4;
+  }
+}
+
+.table-list-box{
+  margin-top: 32px;
+  background-color: #F7F8FC;
+  padding: 8px 16px 16px;
+
+  .table-box-title{
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 21px;
+    color: #495AD4;
+    margin-bottom: 8px;
+  }
+
+  :deep(.el-table th.el-table__cell) {
+    background-color: #fff !important;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    color: #424561;
+  }
 }
 
 .operate-buttons{

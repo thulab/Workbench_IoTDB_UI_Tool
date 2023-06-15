@@ -10,19 +10,19 @@
   <ul class="list-box" v-loading="loading">
     <li v-for="item in list" :key="item" :class="['item-box', current === item && 'item-box-active']" @click="handleSelect(item)">
       <span class="item-text"><text-tooltip :content="item" /></span>
-      <!-- <div class="item-delete-box" @click="handleDelete(item)">
-        <i-custom-delete class="item-delete" />
-        <i-custom-delete-active class="item-delete-active" />
-      </div> -->
       <el-popconfirm
         confirm-button-text="确定"
         cancel-button-text="取消"
         title="删除角色后相关联的用户权限将立即消失，是否删除该角色？"
         :icon="ICustomError"
+        width="300"
         @confirm="handleDelete(item)"
       >
         <template #reference>
-          <el-button>删除</el-button>
+          <div class="item-delete-box">
+            <i-custom-delete class="item-delete" />
+            <i-custom-delete-active class="item-delete-active" />
+          </div>
         </template>
       </el-popconfirm>
     </li>

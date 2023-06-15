@@ -17,22 +17,12 @@ export const useUserStore = defineStore('UserStore', () => {
 
   // 权限配置
   // 全局
-  const entityPrivilegesEnumGroup = computed(() => {
-    if (privilegesEnum.value?.entityPrivileges) {
-      return Object.entries(privilegesEnum.value?.entityPrivileges).map((item) => ({ group: item[0], children: item[1] }));
-    }
-    return [];
-  });
+  const entityPrivilegesEnumGroup = computed(() => privilegesEnum.value?.entityPrivileges || []);
   const entityPrivilegesEnumList = computed(() => entityPrivilegesEnumGroup.value.flatMap((item) => item.children));
   const entityPrivilegesEnumKeys = computed(() => entityPrivilegesEnumList.value.map((item) => item.privileges));
 
   // 路径
-  const pathPrivilegesEnumGroup = computed(() => {
-    if (privilegesEnum.value?.pathPrivileges) {
-      return Object.entries(privilegesEnum.value?.pathPrivileges).map((item) => ({ group: item[0], children: item[1] }));
-    }
-    return [];
-  });
+  const pathPrivilegesEnumGroup = computed(() => privilegesEnum.value?.pathPrivileges || []);
   const pathPrivilegesEnumList = computed(() => pathPrivilegesEnumGroup.value.flatMap((item) => item.children));
   const pathPrivilegesEnumKeys = computed(() => pathPrivilegesEnumList.value.map((item) => item.privileges));
 

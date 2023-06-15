@@ -28,3 +28,8 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #DFE1ED;
 }
+
+.el-scrollbar{
+  --el-scrollbar-bg-color: #F0F1FA !important;
+  --el-scrollbar-hover-bg-color: #DFE1ED !important;
+}
