@@ -16,10 +16,25 @@ export const useUserStore = defineStore('UserStore', () => {
   const privilegesEnum = ref<Auth.PrivilegesEnum>();
 
   // 权限配置
-  const entityPrivilegesConfig = computed(() => privilegesEnum.value?.entityPrivileges);
-  const entityPrivilegesKeys = computed(() => Object.keys(entityPrivilegesConfig.value || {}) || []);
-  const pathPrivilegesConfig = computed(() => privilegesEnum.value?.pathPrivileges);
-  const pathPrivilegesKeys = computed(() => Object.keys(pathPrivilegesConfig.value || {}) || []);
+  // 全局
+  const entityPrivilegesEnumGroup = computed(() => {
+    if (privilegesEnum.value?.entityPrivileges) {
+      return Object.entries(privilegesEnum.value?.entityPrivileges).map((item) => ({ group: item[0], children: item[1] }));
+    }
+    return [];
+  });
+  const entityPrivilegesEnumList = computed(() => entityPrivilegesEnumGroup.value.flatMap((item) => item.children));
+  const entityPrivilegesEnumKeys = computed(() => entityPrivilegesEnumList.value.map((item) => item.privileges));
+
+  // 路径
+  const pathPrivilegesEnumGroup = computed(() => {
+    if (privilegesEnum.value?.pathPrivileges) {
+      return Object.entries(privilegesEnum.value?.pathPrivileges).map((item) => ({ group: item[0], children: item[1] }));
+    }
+    return [];
+  });
+  const pathPrivilegesEnumList = computed(() => pathPrivilegesEnumGroup.value.flatMap((item) => item.children));
+  const pathPrivilegesEnumKeys = computed(() => pathPrivilegesEnumList.value.map((item) => item.privileges));
 
   // 当前登录用户权限
   // 全局
@@ -40,7 +55,7 @@ export const useUserStore = defineStore('UserStore', () => {
   }
 
   function loadPrivilegesEnum(forceReload?: boolean) {
-    if (forceReload || !entityPrivilegesConfig.value) {
+    if (forceReload || !entityPrivilegesEnumGroup.value.length) {
       getPrivilegesEnum().then((res) => {
         privilegesEnum.value = res.data;
       });
@@ -54,10 +69,12 @@ export const useUserStore = defineStore('UserStore', () => {
     loadPrivileges,
     loadPrivilegesEnum,
     privilegesEnum,
-    entityPrivilegesConfig,
-    entityPrivilegesKeys,
-    pathPrivilegesConfig,
-    pathPrivilegesKeys,
+    entityPrivilegesEnumGroup,
+    entityPrivilegesEnumList,
+    entityPrivilegesEnumKeys,
+    pathPrivilegesEnumGroup,
+    pathPrivilegesEnumList,
+    pathPrivilegesEnumKeys,
     entityPrivilegesVals,
     pathPrivilegesVals,
     rolesToPrivilegesVals,

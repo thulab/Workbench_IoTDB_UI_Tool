@@ -27,4 +27,10 @@ declare namespace Auth{
     cancelPathPrivileges: Record<string, string[]>;
     addPathPrivileges: Record<string, string[]>;
   }
+
+  export interface AuthByRoleRes {
+    roleName: string;
+    entityPrivileges: string[];
+    pathPrivileges: Record<string, string[]>;
+  }
 }

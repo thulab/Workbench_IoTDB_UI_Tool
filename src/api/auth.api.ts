@@ -22,7 +22,7 @@ class AuthApi {
   }
 
   // 根据角色查询权限
-  static getAuthByRole(roleName: string): HttpResponseP {
+  static getAuthByRole(roleName: string): HttpResponseP<Auth.AuthByRoleRes> {
     return http.get('/privileges/getPrivilegesByRoleName', { params: { roleName } });
   }
 
