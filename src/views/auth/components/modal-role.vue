@@ -5,16 +5,16 @@
     width="480px"
     :close-on-click-modal="false"
   >
-    <el-form ref="formRef" :model="formData" label-position="right" label-width="90px">
+    <el-form ref="formRef" :model="formData">
       <base-form-item label="角色名：" prop="name" :rules="requiredRules">
         <el-input v-model="formData.name" placeholder="请输入角色名" maxlength="20" show-word-limit />
       </base-form-item>
     </el-form>
     <template #footer>
-      <span class="dialog-footer">
+      <div class="dialog-footer m-t-34">
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" :loading="loading" @click="handleConfirm">确定</el-button>
-      </span>
+      </div>
     </template>
   </el-dialog>
 </template>

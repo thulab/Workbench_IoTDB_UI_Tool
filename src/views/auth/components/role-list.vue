@@ -3,29 +3,32 @@
     <h4>角色列表</h4>
     <div class="operate-buttons">
       <el-button link class="m-r-8 border-refresh-icon" @click="getList"><i-custom-refresh /></el-button>
-      <el-button link style="margin: 0;" @click="handleAdd"><i-custom-new-storage /></el-button>
+      <el-button link style="margin: 0;" @click="handleAdd"><i-custom-new-role /></el-button>
     </div>
   </div>
 
   <ul class="list-box" v-loading="loading">
-    <li v-for="item in list" :key="item" :class="['item-box', current === item && 'item-box-active']" @click="handleSelect(item)">
-      <span class="item-text"><text-tooltip :content="item" /></span>
-      <el-popconfirm
-        confirm-button-text="确定"
-        cancel-button-text="取消"
-        title="删除角色后相关联的用户权限将立即消失，是否删除该角色？"
-        :icon="ICustomError"
-        width="300"
-        @confirm="handleDelete(item)"
-      >
-        <template #reference>
-          <div class="item-delete-box">
-            <i-custom-delete class="item-delete" />
-            <i-custom-delete-active class="item-delete-active" />
-          </div>
-        </template>
-      </el-popconfirm>
-    </li>
+    <template v-if="list.length">
+      <li v-for="item in list" :key="item" :class="['item-box', current === item && 'item-box-active']" @click="handleSelect(item)">
+        <span class="item-text"><text-tooltip :content="item" /></span>
+        <el-popconfirm
+          confirm-button-text="确定"
+          cancel-button-text="取消"
+          title="删除角色后相关联的用户权限将立即消失，是否删除该角色？"
+          :icon="ICustomError"
+          width="300"
+          @confirm="handleDelete(item)"
+        >
+          <template #reference>
+            <div class="item-delete-box">
+              <i-custom-delete class="item-delete" />
+              <i-custom-delete-active class="item-delete-active" />
+            </div>
+          </template>
+        </el-popconfirm>
+      </li>
+    </template>
+    <li v-else class="item-box-empty">暂无角色</li>
   </ul>
 
   <modal-role
@@ -182,6 +185,20 @@ defineExpose({ getList });
       display: block;
     }
   }
+}
+
+.item-box-empty{
+  padding: 0 8px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 12px;
+  color: #656A85;
+  margin-top: 174px;
 }
 
 .item-box-active{

@@ -9,7 +9,7 @@
     <el-radio-group v-model="pathType" @change="handleChangePath">
       <el-radio label="input">
         <span class="radio-label">路径模式：</span>
-        <el-input v-model="inputPath" placeholder="请输入完整路径" :disabled="pathType !== 'input'" />
+        <el-input v-model="inputPath" placeholder="请输入完整路径" :disabled="pathType !== 'input'" @change="handleInputPath" />
       </el-radio>
       <el-radio label="select">
         <span class="radio-label">已有路径：<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip></span>
@@ -139,16 +139,30 @@ function handleChangeType() {
   remoteMethod('');
 }
 
+function handleInputPath(val: string) {
+  const res = val.replace(/(\s*$)/g, '');
+  const reg = /[.|*]$/;
+  if (reg.test(res)) {
+    inputPath.value = '';
+  }
+}
+
 const handleConfirm = () => {
-  let res = inputPath.value;
-  if (pathType.value === 'select') {
-    res = selectPath.value;
+  let res = selectPath.value;
+  if (pathType.value === 'input') {
+    handleInputPath(inputPath.value);
+    res = inputPath.value;
+  }
+  if (!res) {
+    ElMessage.error('路径不能为空');
+    return;
   }
   const flag = props.pathList.some((item) => item === res);
   if (flag) {
     ElMessage.error('该路径已存在，请勿重复添加');
     return;
   }
+  dialogVisible.value = false;
   emit('handleSave', res);
 };
 
@@ -160,6 +174,8 @@ watch(
       searchType.value = 'database';
       inputPath.value = '';
       selectPath.value = '';
+      options.value = [];
+      remoteMethod('');
     }
   },
 );
