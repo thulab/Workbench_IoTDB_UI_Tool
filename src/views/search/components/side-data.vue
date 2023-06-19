@@ -28,7 +28,11 @@
       :loading="deviceLoading"
       v-loading="deviceLoading && !deviceName"
       @change="handleSelectDevice">
-      <el-option v-for="item in deviceList" :key="item" :label="item" :value="item" />
+      <el-option v-for="item in deviceList" :key="item" :label="item" :value="item">
+        <div style="display: flex; width: 160px;">
+          <text-tooltip :content="item" />
+        </div>
+      </el-option>
     </el-select>
     <!-- <el-input placeholder="请选择设备" v-model="deviceName" readonly :disabled="!storageName" @focus="handleVisible('device', true)" />
       <div v-show="isShowDevice" class="select-box-down">
