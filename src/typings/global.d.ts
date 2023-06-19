@@ -88,6 +88,7 @@ declare global {
     isLink?: string;
     close?: boolean;
     order?: number;
+    hideLine?: true;
     children?: MenuOptions[];
   }
 

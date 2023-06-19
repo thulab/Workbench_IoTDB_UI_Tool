@@ -1,9 +1,10 @@
 import { Layout } from '@/router/constant-routes';
 // 采用raw加载svg文件，v-html渲染
-import ICustomAlarmConfig from '@/assets/icons/alarm-config.svg?raw';
-import ICustomAlarmRecord from '@/assets/icons/alarm-record.svg?raw';
-import ICustomAlarm from '@/assets/icons/alarm.svg?raw';
-import ICustomAlarmActive from '~icons/custom/alarm-active.svg?raw';
+import ICustomSystemConfig from '@/assets/icons/system-config.svg?raw';
+import ICustomSystemConfigActive from '@/assets/icons/system-config-active.svg?raw';
+import ICustomAuth from '@/assets/icons/auth.svg?raw';
+import ICustomAuthUser from '@/assets/icons/auth-user.svg?raw';
+import ICustomAuthRole from '~icons/custom/auth-role.svg?raw';
 
 const route = [
   {
@@ -12,22 +13,33 @@ const route = [
     redirect: { name: 'UserManagement' },
     meta: {
       title: '系统管理',
-      icon: ICustomAlarm,
-      activeIcon: ICustomAlarmActive,
+      icon: ICustomSystemConfig,
+      activeIcon: ICustomSystemConfigActive,
       order: 40,
     },
     children: [
       {
-        path: 'user',
-        name: 'UserManagement',
-        component: () => import('@/views/auth/user-detail.vue'),
-        meta: { keepAlive: true, title: '用户管理', icon: ICustomAlarmConfig },
-      },
-      {
-        path: 'role',
-        name: 'RoleManagement',
-        component: () => import('@/views/auth/role-detail.vue'),
-        meta: { keepAlive: true, title: '角色管理', icon: ICustomAlarmRecord },
+        path: 'auth',
+        redirect: { name: 'UserManagement' },
+        meta: {
+          title: '权限管理',
+          hideLine: true,
+          icon: ICustomAuth,
+        },
+        children: [
+          {
+            path: 'user',
+            name: 'UserManagement',
+            component: () => import('@/views/auth/user-detail.vue'),
+            meta: { keepAlive: true, title: '用户管理', icon: ICustomAuthUser },
+          },
+          {
+            path: 'role',
+            name: 'RoleManagement',
+            component: () => import('@/views/auth/role-detail.vue'),
+            meta: { keepAlive: true, title: '角色管理', icon: ICustomAuthRole },
+          },
+        ],
       },
     ],
   },

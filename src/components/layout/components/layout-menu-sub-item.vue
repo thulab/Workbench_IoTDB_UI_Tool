@@ -3,7 +3,7 @@
     v-for="subItem in menus"
     :key="subItem.path">
     <template v-if="subItem.children && subItem.children.length > 0">
-      <el-divider />
+      <el-divider v-if="!subItem.hideLine" />
       <el-sub-menu
         :index="subItem.path">
         <template #title>

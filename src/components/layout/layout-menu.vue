@@ -53,9 +53,10 @@ const routesToMenu = (routeItem: RouteRecordRaw, parentPath: string) => {
     close: routeItem.meta?.close,
     alwayShow: routeItem.meta?.alwayShow,
     order: routeItem.meta?.order,
+    hideLine: routeItem.meta?.hideLine,
   } as MenuOptions;
   if (routeItem.children && routeItem.children.length > 0) {
-    if (routeItem.children.length === 1 && !routeItem.meta?.alwayShow) {
+    if (routeItem.children.length === 1 && !routeItem.meta?.alwayShow && (!routeItem.children[0].children?.length || routeItem.children[0].children?.length <= 1)) {
       menu.path = getRoutePath(routeItem.children[0], path);
     } else {
       const routesHasTitle = routeItem.children.filter((item) => item?.meta?.title && !item.meta?.hiddenMenu);
