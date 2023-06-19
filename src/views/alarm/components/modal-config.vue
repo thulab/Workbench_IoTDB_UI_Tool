@@ -19,13 +19,18 @@
               filterable
               remote
               remote-show-suffix
+              fit-input-width
               :remote-method="remoteMethod"
               :loading="measurementLoading"
               :disabled="editType === 'edit'"
               @change="handleChangePath"
               style="width: 235px;"
             >
-              <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :disabled="item.dataType === 'TEXT'" />
+              <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :disabled="item.dataType === 'TEXT'">
+                <div style="display: flex; width: 200px;">
+                  <text-tooltip :content="item.timeseries" />
+                </div>
+              </el-option>
             </el-select>
           </base-form-item>
         </el-col>

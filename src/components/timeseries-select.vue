@@ -32,7 +32,7 @@
       clearable
       multiple
       collapse-tags
-      collapse-tags-tooltip
+      :collapse-tags-tooltip="false"
       :remote-method="remoteMethod"
       :loading="measurementLoading"
       style="width: 256px;"

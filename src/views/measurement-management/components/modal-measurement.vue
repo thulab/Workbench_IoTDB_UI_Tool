@@ -22,7 +22,11 @@
             style="width: 400px;"
             @change="handleChangeDevice"
           >
-            <el-option v-for="item in deviceList" :key="item" :label="item" :value="item" />
+            <el-option v-for="item in deviceList" :key="item" :label="item" :value="item">
+              <div style="display: flex; width: 360px;">
+                <text-tooltip :content="item" />
+              </div>
+            </el-option>
           </el-select>
           <el-input v-else v-model="formData.deviceName" placeholder="请输入设备名称" style="width: 400px;">
             <template #prepend>{{ groupName }}.</template>
