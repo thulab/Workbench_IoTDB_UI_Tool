@@ -50,7 +50,7 @@
 
         <div class="table-list-box">
           <h4 class="table-box-title">路径</h4>
-          <el-table :data="authData.pathPrivileges" style="width: 100%" tooltip-effect="light" border :max-height="maxTableHeight">
+          <el-table :data="authData.pathPrivileges" style="width: 100%" tooltip-effect="light" border>
             <el-table-column label="路径名称" prop="path" align="center" width="193" show-overflow-tooltip />
             <el-table-column label="全选" align="center" width="193">
               <template #default="{ row, $index }">
@@ -118,7 +118,6 @@ import { cloneDeep, difference } from 'lodash-es';
 import type { CheckboxValueType } from 'element-plus';
 import { useUserStore } from '@/stores';
 import { AuthApi } from '@/api';
-import { useTableHeight } from '@/composition-api';
 import RoleList from './components/role-list.vue';
 import ModalPath from './components/modal-path.vue';
 
@@ -128,7 +127,6 @@ const editPathList = ref<string[]>([]);
 const intitalEntityVals = ref<string[]>([]);
 const intitalPathVals = ref<Array<{ path: string, privileges: string[] }>>([]);
 const pageType = ref('view');
-const { maxTableHeight } = useTableHeight(450);
 
 const userStore = useUserStore();
 const {

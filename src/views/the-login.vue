@@ -29,6 +29,7 @@
             <el-input
               :type="pwdType"
               v-model="loginForm.password"
+              show-password
               autocomplete="off"
               placeholder="请输入密码"
               @keyup.enter="submitForm"
@@ -36,12 +37,12 @@
               <template #prefix>
                 <el-icon size="30"><i-custom-password /></el-icon>
               </template>
-              <template #suffix>
+              <!-- <template #suffix>
                 <el-icon size="30" @click="handleChangePwdType">
                   <i-custom-password-hide v-if="pwdType === 'password'" />
                   <i-custom-password-show v-else />
                 </el-icon>
-              </template>
+              </template> -->
             </el-input>
           </el-form-item>
           <el-form-item class="m-b-0">
@@ -107,6 +108,7 @@ const rules = reactive<FormRules>({
   ],
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleChangePwdType() {
   if (pwdType.value === 'password') {
     pwdType.value = 'text';
