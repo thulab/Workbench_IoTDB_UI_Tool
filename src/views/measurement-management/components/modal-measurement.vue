@@ -39,68 +39,70 @@
         </div>
       </el-form-item>
       <h4 class="module-title" style="border: none;">测点</h4>
-      <el-collapse accordion class="measurement-list-box" v-model="activeName">
-        <el-collapse-item v-for="(item, index) in formData.measurementList" :key="index" :name="'measurement_' + index">
-          <template #title>
-            <el-row class="collapse-title-box">
-              <el-col :span="12"><div v-if="formData.deviceName" class="all-path-name">{{!addDevice ? `${formData.deviceName}.${item.timeseries}` : `${groupName}.${formData.deviceName}.${item.timeseries}`}}</div></el-col>
+      <div v-loading="measurementLoading" class="measurement-list-box">
+        <el-collapse accordion v-model="activeName">
+          <el-collapse-item v-for="(item, index) in formData.measurementList" :key="index" :name="'measurement_' + index">
+            <template #title>
+              <el-row class="collapse-title-box">
+                <el-col :span="12"><div v-if="formData.deviceName" class="all-path-name">{{!addDevice ? `${formData.deviceName}.${item.timeseries}` : `${groupName}.${formData.deviceName}.${item.timeseries}`}}</div></el-col>
+                <el-col :span="8">
+                  <div class="collapse-data-type-box">
+                    <span class="data-type-label">数据类型</span>
+                    <span>{{ item.dataType }}</span>
+                  </div>
+                </el-col>
+                <el-col :span="4">
+                  <div class="operate-box">
+                    <el-button link @click="(e)=>handleCopyRow(item, e)"><i-custom-copy /></el-button>
+                    <el-button link class="m-x-12" @click="(e)=>handleDelRow(index, e)"><i-custom-delete /></el-button>
+                  </div>
+                </el-col>
+              </el-row>
+            </template>
+            <el-row>
               <el-col :span="8">
-                <div class="collapse-data-type-box">
-                  <span class="data-type-label">数据类型</span>
-                  <span>{{ item.dataType }}</span>
-                </div>
-              </el-col>
-              <el-col :span="4">
-                <div class="operate-box">
-                  <el-button link @click="(e)=>handleCopyRow(item, e)"><i-custom-copy /></el-button>
-                  <el-button link class="m-x-12" @click="(e)=>handleDelRow(index, e)"><i-custom-delete /></el-button>
-                </div>
+                <el-form-item label="测点名称：" :prop="'measurementList[' + index + '].timeseries'" :rules="requiredRules">
+                  <el-input type="hidden" />
+                  <el-input v-model="item.timeseries" placeholder="请输入测点名称" :disabled="!item.isEditable || !formData.deviceName" />
+                </el-form-item>
               </el-col>
             </el-row>
-          </template>
-          <el-row>
-            <el-col :span="8">
-              <el-form-item label="测点名称：" :prop="'measurementList[' + index + '].timeseries'" :rules="requiredRules">
-                <el-input type="hidden" />
-                <el-input v-model="item.timeseries" placeholder="请输入测点名称" :disabled="!item.isEditable || !formData.deviceName" />
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-row>
-            <el-col :span="8">
-              <el-form-item label="数据类型：" :prop="'measurementList[' + index + '].dataType'" :rules="requiredRules">
-                <el-input type="hidden" />
-                <el-select v-model="item.dataType" placeholder="请选择数据类型" @change="val => handleChangeRowDataType(val, item, index)" :disabled="!item.isEditable || !formData.deviceName">
-                  <el-option v-for="dtype in dataTypeOptions" :key="dtype" :label="dtype" :value="dtype" />
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="编码方式：" :prop="'measurementList[' + index + '].encoding'" :rules="requiredRules">
-                <el-input type="hidden" />
-                <el-select v-model="item.encoding" placeholder="请选择数据类型" :disabled="!item.isEditable || !item.dataType || !formData.deviceName">
-                  <el-option v-for="enc in encodingOptions(item.dataType as string)" :key="enc" :label="enc" :value="enc" />
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="压缩方式：" :prop="'measurementList[' + index + '].compression'" :rules="requiredRules" style="margin-right: 0;">
-                <el-input type="hidden" />
-                <el-select v-model="item.compression" placeholder="请选择数据类型" :disabled="!item.isEditable || !formData.deviceName">
-                  <el-option v-for="com in compressionOptions" :key="com" :label="com" :value="com" />
-                </el-select>
-              </el-form-item>
-            </el-col>
-          </el-row>
-        </el-collapse-item>
-      </el-collapse>
+            <el-row>
+              <el-col :span="8">
+                <el-form-item label="数据类型：" :prop="'measurementList[' + index + '].dataType'" :rules="requiredRules">
+                  <el-input type="hidden" />
+                  <el-select v-model="item.dataType" placeholder="请选择数据类型" @change="val => handleChangeRowDataType(val, item, index)" :disabled="!item.isEditable || !formData.deviceName">
+                    <el-option v-for="dtype in dataTypeOptions" :key="dtype" :label="dtype" :value="dtype" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item label="编码方式：" :prop="'measurementList[' + index + '].encoding'" :rules="requiredRules">
+                  <el-input type="hidden" />
+                  <el-select v-model="item.encoding" placeholder="请选择数据类型" :disabled="!item.isEditable || !item.dataType || !formData.deviceName">
+                    <el-option v-for="enc in encodingOptions(item.dataType as string)" :key="enc" :label="enc" :value="enc" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item label="压缩方式：" :prop="'measurementList[' + index + '].compression'" :rules="requiredRules" style="margin-right: 0;">
+                  <el-input type="hidden" />
+                  <el-select v-model="item.compression" placeholder="请选择数据类型" :disabled="!item.isEditable || !formData.deviceName">
+                    <el-option v-for="com in compressionOptions" :key="com" :label="com" :value="com" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-collapse-item>
+        </el-collapse>
+      </div>
 
       <el-button style="width: 100%;" class="m-t-16" :disabled="addControl" @click="handleAddRow"><i-custom-add class="m-r-4" />添加测点</el-button>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="saveloading" @click="handleConfirm">确定</el-button>
+        <el-button type="primary" :loading="saveLoading" @click="handleConfirm">确定</el-button>
       </span>
     </template>
   </el-dialog>
@@ -126,9 +128,9 @@ const dialogVisible = useVModel(props, 'visible', emit);
 const activeName = ref('measurement_0');
 
 const { requestFn: getDevice, loading: deviceLoading } = useRequest(StorageApi.getDeviceByGroup);
-const { requestFn: getMeasurementsInfosByFuzzy } = useRequest(StorageApi.getMeasurementsInfosByFuzzy);
+const { requestFn: getMeasurementsInfosByFuzzy, loading: measurementLoading } = useRequest(StorageApi.getMeasurementsInfosByFuzzy);
 const { requestFn: getIsAlignedDevice } = useRequest(StorageApi.getIsAlignedDevice);
-const { requestFn: saveMeasurementList, loading: saveloading } = useRequest(StorageApi.saveMeasurementList);
+const { requestFn: saveMeasurementList, loading: saveLoading } = useRequest(StorageApi.saveMeasurementList);
 const { requestFn: deleteMeasurements } = useRequest(StorageApi.deleteMeasurements);
 
 const dataTypeOptions = ['BOOLEAN', 'INT32', 'INT64', 'FLOAT', 'DOUBLE', 'TEXT'];
@@ -288,6 +290,7 @@ function getDeviceAlign(val: string) {
 
 // 切换设备名
 function handleChangeDevice(val: string) {
+  formData.measurementList = [];
   getDeviceAlign(val);
   getMeasurementList(val);
 }
@@ -379,7 +382,7 @@ watch(
   border-bottom: none;
 
   :deep(.el-form-item--default) {
-    margin-right: 15px;
+    margin-right: 9px;
   }
 
   :deep(.el-form-item__label) {
