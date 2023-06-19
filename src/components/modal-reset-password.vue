@@ -4,15 +4,15 @@
     :title="title"
     width="480px"
     :close-on-click-modal="false">
-    <el-form label-width="100px" ref="formRef" :rules="rules" :model="formData">
+    <el-form label-width="100px" ref="formRef" :rules="rules" :model="formData" label-position="left">
       <label><input type="password" autocomplete="new-password" hidden></label>
-      <base-form-item label="用户名">
+      <base-form-item label="用户名：">
         <el-text>{{ userName }}</el-text>
       </base-form-item>
-      <base-form-item label="密码" prop="password" required>
+      <base-form-item label="输入密码：" prop="password" required>
         <el-input v-model="formData.password" maxlength="32" autocomplete="off" placeholder="请输入密码" show-password />
       </base-form-item>
-      <base-form-item label="确认密码" prop="confirmPassword" required>
+      <base-form-item label="确认密码：" prop="confirmPassword" required>
         <el-input v-model="formData.confirmPassword" maxlength="32" autocomplete="off" placeholder="请再次输入密码" show-password />
       </base-form-item>
     </el-form>
@@ -55,7 +55,7 @@ const rules = reactive<FormRules>({
   password: [
     {
       required: true,
-      message: '请输入密码',
+      message: '请输入相应内容后进行操作',
       trigger: 'blur',
     },
     {
@@ -74,7 +74,7 @@ const rules = reactive<FormRules>({
     {
       validator: (rule: any, value: any, callback: any) => {
         if (value === '') {
-          callback(new Error('请输入确认密码'));
+          callback(new Error('请输入相应内容后进行操作'));
         } else if (value !== formData.password) {
           callback(new Error('密码不一致，请重新输入'));
         } else {

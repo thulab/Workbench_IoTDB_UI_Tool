@@ -8,8 +8,14 @@
   </div>
 
   <ul class="list-box" v-loading="loading">
-    <li v-for="item in list" :key="item.name" :class="['item-box', current === item.name && 'item-box-active']" @click="handleSelect(item.name)">
-      <span class="item-text"><text-tooltip :content="item.name" /></span>
+    <li v-for="item in list" :key="item.name" :class="['item-box', current === item.name && 'item-box-active']" @click="e=>handleSelect(item.name, e)">
+      <span class="item-text">
+        <el-icon size="30">
+          <i-custom-user-manager v-if="item.isManager" />
+          <i-custom-user-normal v-else />
+        </el-icon>
+        <text-tooltip :content="item.name" />
+      </span>
       <div class="item-edit-box" @click="handleEdit(item.name)">
         <i-custom-edit class="item-edit" />
         <i-custom-edit class="item-edit-active" />
@@ -72,8 +78,25 @@ function handleEdit(item: string) {
   modalVisible.value = true;
 }
 
+const canStopPropagation = (e: HTMLElement):boolean => {
+  const { classList } = e;
+
+  if (classList.contains('item-edit-box')
+      || classList.contains('item-delete-box')
+      || classList.contains('item-edit')
+      || classList.contains('item-delete')
+      || classList.contains('item-edit-active')
+      || classList.contains('item-delete-active')) {
+    return true;
+  }
+  if ((e.tagName === 'path' || e.tagName === 'g') && e.parentElement) {
+    return canStopPropagation(e.parentElement);
+  }
+  return false;
+};
 // 选择
-function handleSelect(item: string) {
+function handleSelect(item: string, e: MouseEvent) {
+  if (canStopPropagation(e.target as HTMLElement)) return;
   current.value = item;
 }
 
@@ -161,6 +184,8 @@ defineExpose({ getList });
     width: 180px;
     display: inline-flex;
     line-height: 1.2;
+    text-align: center;
+    align-items: center;
   }
 
   .item-delete-box{
