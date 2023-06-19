@@ -20,7 +20,6 @@
             remote
             clearable
             collapse-tags
-            collapse-tags-tooltip
             :remote-show-suffix="false"
             :remote-method="remoteMethod"
             style="width: 258px;"
@@ -30,7 +29,7 @@
               <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
             </template>
             <el-option v-for="item in options" :key="item" :label="item" :value="item">
-              <div class="remote-select-search-text">
+              <div style="display: flex; width: 200px;">
                 <text-tooltip :content="item" />
               </div>
             </el-option>

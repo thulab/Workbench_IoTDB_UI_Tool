@@ -30,14 +30,14 @@ declare namespace Auth{
     roleName: string;
     cancelEntityPrivileges: string[];
     addEntityPrivileges: string[];
-    cancelPathPrivileges: Record<string, string[]>;
-    addPathPrivileges: Record<string, string[]>;
+    cancelPathPrivileges: Array<{ path: string, privileges: string[] }>;
+    addPathPrivileges: Array<{ path: string, privileges: string[] }>;
   }
 
   export interface AuthByRoleRes {
     roleName: string;
     entityPrivileges: string[];
-    pathPrivileges: Record<string, string[]>;
+    pathPrivileges: Array<{ path: string, privileges: string[] }>;
   }
   export interface UserAuthInfo extends UpdateAuthByRole {
     roleName?: string;

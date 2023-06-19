@@ -9,7 +9,7 @@
 
   <ul class="list-box" v-loading="loading">
     <template v-if="list.length">
-      <li v-for="item in list" :key="item" :class="['item-box', current === item && 'item-box-active']" @click="handleSelect(item)">
+      <li v-for="item in list" :key="item" :class="['item-box', current === item && 'item-box-active']" @click="e=>handleSelect(item, e)">
         <span class="item-text"><text-tooltip :content="item" /></span>
         <el-popconfirm
           confirm-button-text="确定"
@@ -74,8 +74,23 @@ function handleDelete(item: string) {
   });
 }
 
+const canStopPropagation = (e: HTMLElement):boolean => {
+  const { classList } = e;
+
+  if (classList.contains('item-delete-box')
+      || classList.contains('item-delete')
+      || classList.contains('item-delete-active')) {
+    return true;
+  }
+  if ((e.tagName === 'path' || e.tagName === 'g') && e.parentElement) {
+    return canStopPropagation(e.parentElement);
+  }
+  return false;
+};
+
 // 选择
-function handleSelect(item: string) {
+function handleSelect(item: string, e: MouseEvent) {
+  if (canStopPropagation(e.target as HTMLElement)) return;
   current.value = item;
 }
 
