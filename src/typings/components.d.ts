@@ -106,6 +106,7 @@ declare module 'vue' {
     ICustomTitle: typeof import('~icons/custom/title')['default']
     ICustomTotalNum: typeof import('~icons/custom/total-num')['default']
     ICustomUpload: typeof import('~icons/custom/upload')['default']
+    ICustomUserAdd: typeof import('~icons/custom/user-add')['default']
     ICustomUserName: typeof import('~icons/custom/user-name')['default']
     ICustomWaiting: typeof import('~icons/custom/waiting')['default']
     ICustomWarningBlue: typeof import('~icons/custom/warning-blue')['default']

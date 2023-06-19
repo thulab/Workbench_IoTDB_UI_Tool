@@ -3,7 +3,7 @@
     <h4>用户列表</h4>
     <div class="operate-buttons">
       <el-button link class="m-r-8 border-refresh-icon" @click="getList"><i-custom-refresh /></el-button>
-      <el-button link style="margin: 0;" @click="handleAdd"><i-custom-new-storage /></el-button>
+      <el-button link style="margin: 0;" @click="handleAdd"><i-custom-user-add /></el-button>
     </div>
   </div>
 
