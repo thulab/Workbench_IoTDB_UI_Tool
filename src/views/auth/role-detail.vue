@@ -91,7 +91,7 @@
             </template>
           </el-table>
 
-          <el-button v-if="pageType === 'edit'" style="width: 100%;" class="m-t-24" @click="handleAddRow"><i-custom-add class="m-r-4" />添加路径</el-button>
+          <el-button v-if="pageType === 'edit'" style="width: 100%;" class="m-t-24" :disabled="pathAddUnabled" @click="handleAddRow"><i-custom-add class="m-r-4" />添加路径</el-button>
         </div>
       </el-main>
 
@@ -148,6 +148,8 @@ const { requestFn: getAuthByRole, data: authData, loading } = useRequest(AuthApi
   },
 });
 const { requestFn: updateAuthByRole, loading: saveLoading } = useRequest(AuthApi.updateAuthByRole);
+
+const pathAddUnabled = computed(() => pathData.value.some((data) => data.list.length === 0));
 
 function getDetail() {
   getAuthByRole(currentRole.value).then(() => {
@@ -217,20 +219,29 @@ function handleReset() {
 
 // 更新权限
 function handleSave() {
+  const flag = pathData.value.some((data) => !data.list.length);
+  if (flag) {
+    ElMessage.error('存在权限为空的序列');
+    return;
+  }
   const cancelPathPrivileges: Record<string, string[]> = {};
   const addPathPrivileges: Record<string, string[]> = {};
   const initialPathKeys = intitalPathVals.value ? Object.keys(intitalPathVals.value) : [];
   const pathVals = pathData.value.map((data) => data.path);
   const delArr = difference(initialPathKeys, pathVals);
   delArr.forEach((path) => {
-    cancelPathPrivileges[path] = pathData.value.find((data) => data.path === path)?.list || [];
+    cancelPathPrivileges[path] = intitalPathVals.value[path] || [];
   });
   pathData.value.forEach((item) => {
     const sourcePrivileges = intitalPathVals.value[item.path] || [];
     const addVals = difference(item.list, sourcePrivileges);
     const cancelVals = difference(sourcePrivileges, item.list);
-    addPathPrivileges[item.path] = addVals;
-    cancelPathPrivileges[item.path] = cancelVals;
+    if (addVals.length > 0 || !initialPathKeys.includes(item.path)) {
+      addPathPrivileges[item.path] = addVals;
+    }
+    if (cancelVals.length > 0) {
+      cancelPathPrivileges[item.path] = cancelVals;
+    }
   });
 
   const addEntityPrivileges = difference(authData.value.entityPrivileges, intitalEntityVals.value);
@@ -246,6 +257,9 @@ function handleSave() {
   updateAuthByRole(data).then(() => {
     ElMessage.success('保存成功');
     pageType.value = 'view';
+    getDetail();
+  }).catch(() => {
+    pageType.value = 'edit';
     getDetail();
   });
 }

@@ -20,6 +20,7 @@ import { computed } from 'vue';
 import { useUserStore } from '@/stores';
 import { UserApi } from '@/api';
 import ModalResetPassword from '@/components/modal-reset-password.vue';
+import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
 const userStore = useUserStore();
 const userName = computed(() => userStore.userInfo.name || 'root');
@@ -32,6 +33,7 @@ const handleLogout = () => {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
+    icon: ICustomMessageWarning,
   }).then(() => {
     logout().then(() => {
       window.location.href = '/login';
