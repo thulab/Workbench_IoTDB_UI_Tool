@@ -7,7 +7,7 @@
   >
     <el-form ref="formRef" :model="formData" label-position="left">
       <h4 class="module-title">设备</h4>
-      <el-form-item label="设备名称：" prop="deviceName" class="p-t-8" :rules="deviceRules">
+      <el-form-item label="设备名称：" prop="deviceName" class="p-t-8" :rules="!addDevice ? requiredRules : deviceRules">
         <el-input type="hidden" />
         <div class="device-box">
           <el-select
@@ -109,7 +109,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormInstance } from 'element-plus';
+import type { FormInstance, CheckboxValueType } from 'element-plus';
 import { debounce } from 'lodash-es';
 import { StorageApi } from '@/api';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
@@ -163,7 +163,7 @@ const requiredRules = ref([
   {
     required: true,
     message: '请输入相应内容后进行操作',
-    trigger: 'change',
+    trigger: ['blur', 'change'],
   },
 ]);
 const formData = reactive<{
@@ -221,7 +221,7 @@ function getMeasurementList(val: string) {
 }
 
 // 切换新建设备
-function handleChangeAdd(val: boolean) {
+function handleChangeAdd(val: CheckboxValueType) {
   formData.deviceName = '';
   formData.measurementList = [];
   formData.measurementList.push({
