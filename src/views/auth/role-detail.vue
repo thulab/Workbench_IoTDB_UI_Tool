@@ -8,8 +8,8 @@
     <el-container class="role-details-wrapper p-0">
       <el-header class="detail-title-box">
         <h4 class="detail-title-text">权限详情</h4>
-        <el-button type="primary" v-if="pageType === 'view'" :disabled="!currentRole" @click="pageType = 'edit'">编辑</el-button>
-        <el-button type="primary" v-else @click="handleReset">退出编辑</el-button>
+        <el-button type="primary" v-if="isView" :disabled="!currentRole" @click="pageType = 'edit'">编辑</el-button>
+        <el-button type="primary" v-else @click="handleReset('view')">退出编辑</el-button>
       </el-header>
       <el-main class="p-x-16 p-t-0 p-b-16" v-loading="loading">
         <div class="table-list-box">
@@ -17,8 +17,8 @@
           <el-table :data="[authData.entityPrivileges]" style="width: 100%;" border>
             <el-table-column label="全选" align="center" width="58" fixed="left">
               <template #default="{ row }">
-                <el-icon v-if="pageType === 'view'" size="24">
-                  <i-custom-correct v-if="row.length >= entityPrivilegesEnumKeys.length" />
+                <el-icon v-if="isView" size="21">
+                  <i-custom-correct style="transform: translateY(3px);" v-if="row.length >= entityPrivilegesEnumKeys.length" />
                 </el-icon>
                 <template v-else>
                   <el-checkbox :checked="row.length >= entityPrivilegesEnumKeys.length" v-if="row.length >= entityPrivilegesEnumKeys.length" @change="val => handleCheckedEntity(val)" />
@@ -29,8 +29,8 @@
             <el-table-column v-for="(column, index) in entityPrivilegesEnumGroup" :label="column.group" :key="column.group + '_' + index + '_column'" align="center">
               <el-table-column v-for="(col, ci) in column.children" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :width="col.width || 180">
                 <template #default="{ row }">
-                  <el-icon v-if="pageType === 'view'" size="24">
-                    <i-custom-correct v-if="row.includes(col.privileges)" />
+                  <el-icon v-if="isView" size="21">
+                    <i-custom-correct style="transform: translateY(3px);" v-if="row.includes(col.privileges)" />
                   </el-icon>
                   <template v-else>
                     <el-checkbox :checked="row.includes(col.privileges)" v-if="row.includes(col.privileges)" @change="val => handleCheckedEntity(val, col.privileges)" />
@@ -54,8 +54,8 @@
             <el-table-column label="路径名称" prop="path" align="center" width="193" show-overflow-tooltip />
             <el-table-column label="全选" align="center" width="193">
               <template #default="{ row, $index }">
-                <el-icon v-if="pageType === 'view'" size="24">
-                  <i-custom-correct v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" />
+                <el-icon v-if="isView" size="21">
+                  <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" />
                 </el-icon>
                 <template v-else>
                   <!-- eslint-disable-next-line vue/max-len -->
@@ -67,8 +67,8 @@
             <el-table-column v-for="(column, index) in pathPrivilegesEnumGroup" :label="column.group" :key="column.group + '_' + index + '_column'" align="center">
               <el-table-column v-for="(col, ci) in column.children" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :min-width="col.width || 180">
                 <template #default="{ row, $index }">
-                  <el-icon v-if="pageType === 'view'" size="24">
-                    <i-custom-correct v-if="row.privileges.includes(col.privileges)" />
+                  <el-icon v-if="isView" size="21">
+                    <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.includes(col.privileges)" />
                   </el-icon>
                   <template v-else>
                     <el-checkbox :checked="row.privileges.includes(col.privileges)" v-if="row.privileges.includes(col.privileges)" @change="val => handleCheckedPath(val, $index, col.privileges)" />
@@ -79,8 +79,8 @@
             </el-table-column>
             <el-table-column label="操作" align="center" width="194" fixed="right">
               <template #default="{ $index }">
-                <el-button v-if="currentRole" link @click="handleDelRow($index)" :disabled="pageType === 'view'">
-                  <el-icon size="24"><i-custom-close /></el-icon>
+                <el-button v-if="currentRole" link @click="handleDelRow($index)" :disabled="isView">
+                  <el-icon size="21"><i-custom-close /></el-icon>
                 </el-button>
               </template>
             </el-table-column>
@@ -92,13 +92,13 @@
             </template>
           </el-table>
 
-          <el-button v-if="pageType === 'edit'" style="width: 100%;" class="m-t-24" :disabled="pathAddUnabled" @click="handleAddRow"><i-custom-add class="m-r-4" />添加路径</el-button>
+          <el-button v-if="!isView" style="width: 100%;" class="m-t-24" :disabled="pathAddUnabled" @click="handleAddRow"><i-custom-add class="m-r-4" />添加路径</el-button>
         </div>
       </el-main>
 
-      <el-footer v-if="pageType === 'edit'">
+      <el-footer v-if="!isView">
         <div class="operate-buttons">
-          <el-button @click="handleReset">重置</el-button>
+          <el-button @click="handleReset('edit')">重置</el-button>
           <el-button type="primary" @click="handleSave" :loading="saveLoading">应用</el-button>
         </div>
       </el-footer>
@@ -116,7 +116,7 @@
 import { storeToRefs } from 'pinia';
 import { cloneDeep, difference } from 'lodash-es';
 import type { CheckboxValueType } from 'element-plus';
-import { useUserStore } from '@/stores';
+import { useUserStore } from '@/stores/user.store';
 import { AuthApi } from '@/api';
 import RoleList from './components/role-list.vue';
 import ModalPath from './components/modal-path.vue';
@@ -126,7 +126,9 @@ const pathVisible = ref(false);
 const editPathList = ref<string[]>([]);
 const intitalEntityVals = ref<string[]>([]);
 const intitalPathVals = ref<Array<{ path: string, privileges: string[] }>>([]);
-const pageType = ref('view');
+const pageType = ref<'edit' | 'view'>('view');
+
+const isView = computed(() => pageType.value === 'view');
 
 const userStore = useUserStore();
 const {
@@ -203,8 +205,8 @@ function handleCheckedPath(val: CheckboxValueType, index: number, auth?:string) 
 }
 
 // 重置
-function handleReset() {
-  pageType.value = 'edit';
+function handleReset(type: 'edit' | 'view') {
+  pageType.value = type;
   getDetail();
 }
 
