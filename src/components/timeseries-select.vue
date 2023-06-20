@@ -73,6 +73,7 @@ const props = defineProps<{
   isShowViewBtn?: boolean;
   placeholder?: string;
   viewText?: string;
+  filterSystem?: boolean;
 }>();
 const model = useVModel(props, 'modelValue');
 const dialogVisible = ref(false);
@@ -85,7 +86,11 @@ const remoteMethod = debounce((query: string) => {
   lastMeasurementQuery = query;
   getMeasurement(props.serverId, lastMeasurementQuery).then((res) => {
     if (lastMeasurementQuery === query) {
-      options.value = res.data?.measurements?.map((item) => ({ label: item, value: item })) || [];
+      let measurements = res.data?.measurements || [];
+      if (props.filterSystem) {
+        measurements = measurements.filter((item) => !item.startsWith('root.__system'));
+      }
+      options.value = measurements.map((item) => ({ label: item, value: item })) || [];
     }
   });
 }, 500);

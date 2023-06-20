@@ -9,7 +9,7 @@
           <template #label>
             告警测点：<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
           </template>
-          <timeseries-select v-model="searchFormData.measurements" :server-id="serverId" :is-show-view-btn="true" :placeholder="'请输入告警测点'" :viewText="'已选测点'" />
+          <timeseries-select v-model="searchFormData.measurements" filter-system :server-id="serverId" :is-show-view-btn="true" :placeholder="'请输入告警测点'" :viewText="'已选测点'" />
         </base-form-item>
         <base-form-item label="告警级别：" prop="alarmLevel" class="m-r-0">
           <template #label>
