@@ -27,7 +27,7 @@
               </template>
             </el-table-column>
             <el-table-column v-for="(column, index) in entityPrivilegesEnumGroup" :label="column.group" :key="column.group + '_' + index + '_column'" align="center">
-              <el-table-column v-for="(col, ci) in column.children" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :width="col.width || 180">
+              <el-table-column v-for="(col, ci) in column.children" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :width="calcColumnWidth(col)">
                 <template #default="{ row }">
                   <el-icon v-if="isView" size="21">
                     <i-custom-correct style="transform: translateY(3px);" v-if="row.includes(col.privileges)" />
@@ -213,6 +213,13 @@ function handleCheckedPath(val: CheckboxValueType, index: number, auth?:string) 
 function handleReset(type: 'edit' | 'view') {
   pageType.value = type;
   getDetail();
+}
+
+function calcColumnWidth(child: Auth.PrivilegeEnum) {
+  if (child.privileges.length > 0) {
+    return child.privileges.length * 8 + 32;
+  }
+  return child.width;
 }
 
 // 更新权限

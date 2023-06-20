@@ -13,6 +13,7 @@
         :router="true"
         :collapse="isCollapse"
         :collapse-transition="false"
+        :default-openeds="['/system/auth']"
         :unique-opened="false">
         <layout-menu-sub-item :menu-list="menuList" />
       </el-menu>

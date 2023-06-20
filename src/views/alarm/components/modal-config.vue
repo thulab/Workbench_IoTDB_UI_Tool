@@ -293,7 +293,7 @@ const remoteMethod = debounce((query: string) => {
   lastMeasurementQuery = query;
   getMeasurement(lastMeasurementQuery).then((res) => {
     if (lastMeasurementQuery === query) {
-      measurementList.value = res.data?.measurements?.map((item) => item) || [];
+      measurementList.value = (res.data?.measurements || []).filter((f) => !f.timeseries.startsWith('root.__system'));
     }
   });
 }, 500);
