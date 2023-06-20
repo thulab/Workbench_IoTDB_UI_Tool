@@ -10,9 +10,13 @@
       <el-radio label="select">
         <span class="radio-label">已有路径：<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip></span>
         <div class="search-path-box">
-          <el-select v-model="searchType" class="path-type-select" style="width: 88px;" placeholder="" @change="handleChangeType">
-            <el-option v-for="item in pathOptions" :key="item" :label="item" :value="item" />
-          </el-select>
+          <el-select-v2 v-model="searchType" class="path-type-select" style="width: 88px;" placeholder="" :options="pathOptions" @change="handleChangeType">
+            <template #default="{ item }">
+              <div style="display: flex; width: 56px;">
+                <text-tooltip :content="item.label" />
+              </div>
+            </template>
+          </el-select-v2>
           <el-select
             v-model="selectPath"
             placeholder="请输入完整路径"
@@ -68,7 +72,11 @@ const emit = defineEmits<{
 
 const dialogVisible = useVModel(props, 'visible', emit);
 
-const pathOptions = ['database', 'device', 'timeseries'];
+const pathOptions = [
+  { label: 'database', value: 'database' },
+  { label: 'device', value: 'device' },
+  { label: 'timeseries', value: 'timeseries' },
+];
 
 const pathType = ref('select');
 const inputPath = ref('');
@@ -223,6 +231,14 @@ watch(
 
   :deep(.el-input__inner) {
     color: #131926;
+  }
+
+  :deep(.el-select-v2__wrapper) {
+    background-color: #F0F1FA;
+  }
+
+  :deep(.el-select-v2__placeholder) {
+    color: #131926 !important;
   }
 }
 

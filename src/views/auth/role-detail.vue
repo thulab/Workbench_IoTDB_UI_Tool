@@ -21,8 +21,8 @@
                   <i-custom-correct style="transform: translateY(3px);" v-if="row.length >= entityPrivilegesEnumKeys.length" />
                 </el-icon>
                 <template v-else>
-                  <el-checkbox :checked="row.length >= entityPrivilegesEnumKeys.length" v-if="row.length >= entityPrivilegesEnumKeys.length" @change="val => handleCheckedEntity(val)" />
-                  <el-checkbox :checked="row.length >= entityPrivilegesEnumKeys.length" v-else @change="val => handleCheckedEntity(val)" />
+                  <el-checkbox :checked="true" v-if="row.length >= entityPrivilegesEnumKeys.length" @change="val => handleCheckedEntity(val)" />
+                  <el-checkbox :checked="false" v-else @change="val => handleCheckedEntity(val)" />
                 </template>
               </template>
             </el-table-column>
@@ -33,8 +33,8 @@
                     <i-custom-correct style="transform: translateY(3px);" v-if="row.includes(col.privileges)" />
                   </el-icon>
                   <template v-else>
-                    <el-checkbox :checked="row.includes(col.privileges)" v-if="row.includes(col.privileges)" @change="val => handleCheckedEntity(val, col.privileges)" />
-                    <el-checkbox :checked="row.includes(col.privileges)" v-else @change="val => handleCheckedEntity(val, col.privileges)" />
+                    <el-checkbox :checked="true" v-if="row.includes(col.privileges)" @change="val => handleCheckedEntity(val, col.privileges)" />
+                    <el-checkbox :checked="false" v-else @change="val => handleCheckedEntity(val, col.privileges)" />
                   </template>
                 </template>
               </el-table-column>
@@ -59,8 +59,8 @@
                 </el-icon>
                 <template v-else>
                   <!-- eslint-disable-next-line vue/max-len -->
-                  <el-checkbox :checked="row.privileges.length >= pathPrivilegesEnumKeys.length" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" @change="val => handleCheckedPath(val, $index)" />
-                  <el-checkbox :checked="row.privileges.length >= pathPrivilegesEnumKeys.length" v-else @change="val => handleCheckedPath(val, $index)" />
+                  <el-checkbox :checked="true" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" @change="val => handleCheckedPath(val, $index)" />
+                  <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index)" />
                 </template>
               </template>
             </el-table-column>
@@ -71,15 +71,15 @@
                     <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.includes(col.privileges)" />
                   </el-icon>
                   <template v-else>
-                    <el-checkbox :checked="row.privileges.includes(col.privileges)" v-if="row.privileges.includes(col.privileges)" @change="val => handleCheckedPath(val, $index, col.privileges)" />
-                    <el-checkbox :checked="row.privileges.includes(col.privileges)" v-else @change="val => handleCheckedPath(val, $index, col.privileges)" />
+                    <el-checkbox :checked="true" v-if="row.privileges.includes(col.privileges)" @change="val => handleCheckedPath(val, $index, col.privileges)" />
+                    <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index, col.privileges)" />
                   </template>
                 </template>
               </el-table-column>
             </el-table-column>
             <el-table-column label="操作" align="center" width="194" fixed="right">
-              <template #default="{ $index }">
-                <el-button v-if="currentRole" link @click="handleDelRow($index)" :disabled="isView">
+              <template #default="{ row, $index }">
+                <el-button v-if="row.path || (!row.path && !isView)" link @click="handleDelRow($index)" :disabled="isView">
                   <el-icon size="21"><i-custom-close /></el-icon>
                 </el-button>
               </template>
@@ -92,7 +92,7 @@
             </template>
           </el-table>
 
-          <el-button v-if="!isView" style="width: 100%;" class="m-t-24" :disabled="pathAddUnabled" @click="handleAddRow"><i-custom-add class="m-r-4" />添加路径</el-button>
+          <el-button v-if="!isView" style="width: 100%;" class="m-t-24" @click="handleAddRow"><i-custom-add class="m-r-4" />添加路径</el-button>
         </div>
       </el-main>
 
@@ -147,12 +147,13 @@ const { requestFn: getAuthByRole, data: authData, loading } = useRequest(AuthApi
 });
 const { requestFn: updateAuthByRole, loading: saveLoading } = useRequest(AuthApi.updateAuthByRole);
 
-const pathAddUnabled = computed(() => authData.value.pathPrivileges.some((data) => data.privileges.length === 0));
-
 function getDetail() {
   getAuthByRole(currentRole.value).then(() => {
     intitalEntityVals.value = cloneDeep(authData.value.entityPrivileges);
     intitalPathVals.value = cloneDeep(authData.value.pathPrivileges);
+    if (authData.value.pathPrivileges.length === 0) {
+      authData.value.pathPrivileges.push({ path: '', privileges: [] });
+    }
   });
 }
 
@@ -164,7 +165,11 @@ function handleAddRow() {
 
 // 保存路径
 function handleSavePath(path: string) {
-  authData.value.pathPrivileges.push({ path, privileges: [] });
+  if (authData.value.pathPrivileges.length === 1 && !authData.value.pathPrivileges[0].path) {
+    authData.value.pathPrivileges.splice(0, 1, { path, privileges: [] });
+  } else {
+    authData.value.pathPrivileges.push({ path, privileges: [] });
+  }
 }
 
 // 删除行
@@ -212,7 +217,7 @@ function handleReset(type: 'edit' | 'view') {
 
 // 更新权限
 function handleSave() {
-  const flag = authData.value.pathPrivileges.some((data) => !data.privileges.length);
+  const flag = authData.value.pathPrivileges.some((data) => !data.privileges.length || !data.path);
   if (flag) {
     ElMessage.error('存在权限为空的序列');
     return;
@@ -270,7 +275,7 @@ watch(
     if (val !== old) {
       pageType.value = 'view';
       authData.value.entityPrivileges = [];
-      authData.value.pathPrivileges = [];
+      authData.value.pathPrivileges = [{ path: '', privileges: [] }];
       pathVisible.value = false;
       if (val) {
         getDetail();

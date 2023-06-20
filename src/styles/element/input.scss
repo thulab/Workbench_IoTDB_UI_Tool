@@ -40,6 +40,40 @@
   }
 }
 
+.el-select-v2__wrapper{
+  padding-right: 16px !important;
+  font-weight: 300;
+  font-size: 12px !important;
+  line-height: 18px !important;
+  color: #656A85 !important;
+
+  .el-select-v2__placeholder{
+    width: calc(100% - 28px);
+    color: #656A85 !important;
+  }
+
+  .el-select-v2__suffix{
+    height: 26px;
+    width: 16px;
+    right: 0;
+    background: #F0F1FA;
+  }
+}
+
+.el-select-v2__wrapper, .el-select-v2__wrapper .el-select-v2__input-wrapper{
+  line-height: 28px !important;
+}
+
+.el-vl__window{
+  .el-select-dropdown__option-item{
+    padding: 0 16px !important;
+
+    &.is-selected::after{
+      display: none !important;
+    }
+  }
+}
+
 .el-checkbox{
   height: 28px !important;
 }
