@@ -123,6 +123,7 @@ const submitForm = () => {
     if (valid) {
       login(loginForm.user, loginForm.password).then(() => {
         router.push({ path: '/' });
+        sessionStorage.setItem('nologin', '0');
       });
     }
   });

@@ -10,17 +10,6 @@ declare namespace Auth{
     width: number;
   }
 
-  export interface UserPrivileges {
-    userName: string;
-    entityPrivileges: string[];
-    pathPrivileges: Record<string, string[]>;
-    rolesToPrivileges: Array<{
-      roleName: string;
-      entityPrivileges: string[];
-      pathPrivileges: Record<string, string[]>;
-    }>
-  }
-
   export interface PrivilegesEnum {
     entityPrivileges: Array<{ group: string, children: Auth.PrivilegeEnum[] }>;
     pathPrivileges: Array<{ group: string, children: Auth.PrivilegeEnum[] }>;
@@ -39,10 +28,28 @@ declare namespace Auth{
     entityPrivileges: string[];
     pathPrivileges: Array<{ path: string, privileges: string[] }>;
   }
+
+  export interface UserPrivileges {
+    userName: string;
+    entityPrivileges: string[];
+    pathPrivileges: Array<{ path: string, privileges: string[] }>;
+    rolesToPrivileges: Array<AuthByRoleRes>
+  }
   export interface UserAuthInfo extends UpdateAuthByRole {
     roleName?: string;
     userName: string;
     cancelRoles: string[];
     addRoles: string[];
+  }
+  export interface UserEditAuthInfo {
+    userPrivileges: string[];
+    rolePrivileges: string[];
+    allChecked: boolean;
+    privileges: string[];
+  }
+  export interface UserEditPathAuthInfo extends UserEditAuthInfo {
+    userPrivileges?: string[];
+    userSourceData: { path: string, privileges: string[] },
+    path: string;
   }
 }

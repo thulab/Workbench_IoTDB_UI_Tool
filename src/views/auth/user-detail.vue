@@ -7,28 +7,47 @@
       />
     </el-aside>
     <el-container class="details-wrapper">
-      <el-header class="detail-title-box">
-        <h4 class="detail-title-text">权限详情</h4>
-        <el-button type="primary" v-if="canEdit">编辑</el-button>
-      </el-header>
-      <el-main class="p-x-16 p-t-0" v-loading="loading">
+      <el-main class="p-0" v-loading="loading">
         <el-scrollbar>
-          <div class="table-list-box" v-if="canEdit">
-            <h4 class="table-box-title" style="display: inline-block;">关联角色：</h4>
-            <el-tag>角色 1</el-tag>
+          <div class="detail-title-box" v-if="!isManager">
+            <h4 class="detail-title-text">角色详情</h4>
+            <el-button type="primary" v-if="canEdit && !isEdit" @click="pageType = 'edit'">编辑</el-button>
+            <el-button type="primary" v-else-if="isEdit" @click="handleReset('view')">退出编辑</el-button>
           </div>
-          <div class="table-list-box">
+          <div class="detail-role-list" v-if="!isManager">
+            拥有角色：<el-tag closable type="info" v-for="(item, index,) in authData.rolesToPrivileges" :key="item.roleName" @close="handleDeleteRole(index)" @click="showRoleDetail(item)">{{ item.roleName }}</el-tag>
+            <el-button link @click="addRole()" v-if="isEdit"><el-icon size="24px" class="m-l-16">
+              <i-custom-user-role-add />
+            </el-icon>
+            </el-button>
+          </div>
+          <div class="detail-title-box">
+            <h4 class="detail-title-text">权限详情</h4>
+          </div>
+          <div class="table-list-box m-x-16">
             <h4 class="table-box-title">全局</h4>
-            <el-table :data="[authData.entityPrivileges]" style="width: 100%">
+            <el-table :data="entityTableData" style="width: 100%">
               <el-table-column label="全选" align="center" width="60">
                 <template #default="{ row }">
-                  <i-custom-correct v-if="row.length >= entityPrivilegesEnumKeys.length" />
+                  <el-icon v-if="!isEdit" class="moveDown3" size="21">
+                    <i-custom-correct v-if="row.allChecked" />
+                  </el-icon>
+                  <template v-else>
+                    <el-checkbox :checked="true" v-if="row.privileges.length >= entityPrivilegesEnumKeys.length" @change="e=>handleAllCheckedEntity(row, false)" />
+                    <el-checkbox :checked="false" v-else @change="e=>handleAllCheckedEntity(row, true)" />
+                  </template>
                 </template>
               </el-table-column>
               <el-table-column :label="group.group" v-for="group in entityPrivilegesEnumGroup" :key="group.group" align="center">
-                <el-table-column :label="child.privileges" v-for="child in group.children" :key="child.privileges" align="center" :width="child.width">
+                <el-table-column :label="child.privileges" v-for="child in group.children" :key="child.privileges" align="center" :width="calcColumnWidth(child)">
                   <template #default="{ row }">
-                    <i-custom-correct v-if="row.includes(child.privileges)" />
+                    <el-icon v-if="!isEdit" class="move-down3" size="21">
+                      <i-custom-correct v-if="row.privileges.includes(child.privileges)" />
+                    </el-icon>
+                    <template v-else>
+                      <el-checkbox :checked="true" :disabled="row.rolePrivileges.includes(child.privileges)" v-if="row.privileges.includes(child.privileges)" @change="handleCheckedEntity(row, child.privileges, false)" />
+                      <el-checkbox :checked="false" v-else @change="handleCheckedEntity(row, child.privileges, true)" />
+                    </template>
                   </template>
                 </el-table-column>
               </el-table-column>
@@ -40,19 +59,43 @@
               </template>
             </el-table>
           </div>
-          <div class="table-list-box" v-if="canEdit">
+          <div class="table-list-box  m-x-16 m-b-16" v-if="canEdit">
             <h4 class="table-box-title">路径</h4>
             <el-table :data="tableData" style="width: 100%" tooltip-effect="light">
-              <el-table-column label="路径名称" align="center" width="150" show-overflow-tooltip />
-              <el-table-column label="全选" align="center" width="60" />
-              <el-table-column label="时间序列管理" align="center">
-                <el-table-column label="READ" align="center" min-width="70" />
-                <el-table-column label="WRITE_SCHEMA" align="center" min-width="140" />
-                <el-table-column label="WRITE_DATA" align="center" min-width="140" />
+              <el-table-column label="路径名称" align="center" width="193" prop="path" show-overflow-tooltip />
+              <el-table-column label="全选" align="center" width="193">
+                <template #default="{ row }">
+                  <el-icon v-if="!isEdit || !row.path" class="moveDown3" size="21">
+                    <i-custom-correct v-if="row.allChecked" />
+                  </el-icon>
+                  <template v-else>
+                    <el-checkbox :checked="true" v-if="row.privileges.length >= entityPrivilegesEnumKeys.length" @change="e=>handleAllCheckedPath(row, false)" />
+                    <el-checkbox :checked="false" v-else @change="e=>handleAllCheckedPath(row, true)" />
+                  </template>
+                </template>
+              </el-table-column>
+              <el-table-column v-for="(group, index) in pathPrivilegesEnumGroup" :label="group.group" :key="group.group + '_' + index + '_column'" align="center">
+                <el-table-column v-for="(child, childIndex) in group.children" :label="child.privileges" :key="child.privileges + '_' + childIndex + '_col'" :prop="child.privileges" align="center" :min-width="child.width || 180">
+                  <template #default="{ row }">
+                    <el-icon v-if="!isEdit || !row.path" class="move-down3" size="21">
+                      <i-custom-correct v-if="row.privileges.includes(child.privileges)" />
+                    </el-icon>
+                    <template v-else>
+                      <el-checkbox
+                        :checked="true"
+                        :disabled="row.rolePrivileges.includes(child.privileges)"
+                        v-if="row.privileges.includes(child.privileges)"
+                        @change="handleCheckedPath(row, child.privileges, false)" />
+                      <el-checkbox :checked="false" v-else @change="handleCheckedPath(row, child.privileges, true)" />
+                    </template>
+                  </template>
+                </el-table-column>
               </el-table-column>
               <el-table-column label="操作" align="center">
                 <template #default="{ row }">
-                  <el-button>删除{{ row }}</el-button>
+                  <el-button link @click="handleDelRow(row)" v-if="row.path" :disabled="pageType === 'view' || row.rolePrivileges.length > 0">
+                    <el-icon size="24"><i-custom-close /></el-icon>
+                  </el-button>
                 </template>
               </el-table-column>
               <template #empty>
@@ -62,13 +105,13 @@
                 </div>
               </template>
             </el-table>
+            <el-button style="width: 100%;" class="m-t-24" @click="handleAddRow" v-if="canEdit && isEdit"><i-custom-add class="m-r-4" />添加路径</el-button>
           </div>
-          <el-button style="width: 100%;" class="m-t-16" @click="handleAddRow" v-if="canEdit"><i-custom-add class="m-r-4" />添加路径</el-button>
         </el-scrollbar>
       </el-main>
-      <el-footer>
-        <div class="operate-buttons" v-if="canEdit">
-          <el-button>重置</el-button>
+      <el-footer v-if="canEdit && isEdit">
+        <div class="operate-buttons">
+          <el-button @click="handleReset('edit')">重置</el-button>
           <el-button type="primary">应用</el-button>
         </div>
       </el-footer>
@@ -76,8 +119,10 @@
 
     <modal-path
       v-model:visible="pathVisible"
-      :path-list="[]"
+      :path-list="editPathList"
+      @handle-save="handleSavePath"
     />
+    <modal-add-role v-model:visible="addRoleVisible" :selected="[]" @add-role="handleAddRole" />
   </el-container>
 </template>
 
@@ -85,8 +130,10 @@
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/stores';
 import { AuthApi } from '@/api';
+import { cloneDeep, union, difference } from 'lodash-es';
 import List from './components/user-list.vue';
 import ModalPath from './components/modal-path.vue';
+import ModalAddRole from './components/modal-add-role.vue';
 
 const userStore = useUserStore();
 const {
@@ -98,27 +145,230 @@ const {
 
 const listRef = ref<InstanceType<typeof List>>();
 const currentUser = ref<Auth.DBUser>();
-const tableData = ref([]);
 const pathVisible = ref(false);
+const addRoleVisible = ref(false);
+// const { maxTableHeight } = useTableHeight(540);
+// const minHeight = computed(() => {
+//   if (maxTableHeight.value < 300) {
+//     return 300;
+//   }
+//   return maxTableHeight.value;
+// });
+const isManager = computed(() => currentUser.value?.isManager === 1);
 const canEdit = computed(() => currentUser.value?.isManager === 0);
+const pageType = ref<'view' | 'edit'>('view');
+const isEdit = computed(() => pageType.value === 'edit');
 const { requestFn: getUserAuth, data: authData, loading } = useRequest(AuthApi.getUserAuth, {
   initData: {
     userName: '',
     entityPrivileges: [],
-    pathPrivileges: {},
+    pathPrivileges: [],
     rolesToPrivileges: [],
   },
 });
 
-function handleAddRow() {}
+const { requestFn: getRoleAuth } = useRequest(AuthApi.getAuthByRole);
+
+const sourceData: {
+  role: string[];
+  entityPrivileges: string[];
+  pathPrivileges: Array<{ path: string, privileges: string[] }>
+} = {
+  role: [],
+  entityPrivileges: [],
+  pathPrivileges: [],
+};
+
+const entityUserPrivileges = ref<string[]>([]);
+const pathUserPrivileges = ref<{ path: string, privileges: string[] }[]>([]);
+
+/**
+ * 全局权限表格数据，包含用户和用户所有角色的权限
+ */
+const entityTableData = computed(() => {
+  const result: Auth.UserEditAuthInfo = {
+    userPrivileges: entityUserPrivileges.value,
+    rolePrivileges: (authData.value.rolesToPrivileges || []).flatMap((item) => item.entityPrivileges),
+    allChecked: false,
+    privileges: [],
+  };
+  result.privileges = union(result.userPrivileges, result.rolePrivileges);
+  if (result.privileges.length >= entityPrivilegesEnumKeys.value.length) {
+    result.allChecked = true;
+  }
+  return [result];
+});
+
+/**
+ * 将角色的路径权限合并到一起
+ * @param data 合并完的结果
+ * @param role 要合并的角色
+ */
+function mergeRolePathPrivileges(data: Array<{ path: string, privileges: string[] }>, role: Auth.AuthByRoleRes) {
+  role.pathPrivileges.forEach((item) => {
+    const path = data.find((pathItem) => pathItem.path === item.path);
+    if (!path) {
+      data.push({
+        path: item.path,
+        privileges: item.privileges,
+      });
+    } else {
+      path.privileges = union(path.privileges, item.privileges);
+    }
+  });
+}
+
+/**
+ * 角色路径权限，合并到一起。独立计算属性（计算属性有缓存，角色不变，这里就不变）
+ */
+const rolePathPrivileges = computed(() => {
+  const result: Array<{ path: string, privileges: string[] }> = [];
+  authData.value.rolesToPrivileges?.forEach((role) => {
+    mergeRolePathPrivileges(result, role);
+  });
+  return result;
+});
+function joinRolePathPrivileges(data: Auth.UserEditPathAuthInfo[], rolePathAuth: { path: string, privileges: string[] }) {
+  const path = data.find((pathItem) => pathItem.path === rolePathAuth.path);
+  if (!path) {
+    data.push({
+      path: rolePathAuth.path,
+      userSourceData: {
+        path: rolePathAuth.path,
+        privileges: [],
+      },
+      allChecked: rolePathAuth.privileges.length >= pathPrivilegesEnumKeys.value.length,
+      rolePrivileges: rolePathAuth.privileges,
+      privileges: rolePathAuth.privileges,
+    });
+  } else {
+    path.rolePrivileges = union(path.rolePrivileges, rolePathAuth.privileges);
+    path.privileges = union(path.userSourceData?.privileges || [], path.rolePrivileges);
+    if (path.privileges.length >= pathPrivilegesEnumKeys.value.length) {
+      path.allChecked = true;
+    }
+  }
+}
+/**
+ * 路径权限表格数据，没有数据时，添加一行空数据
+ */
+const tableData = computed<Auth.UserEditPathAuthInfo[]>(() => {
+  const result = pathUserPrivileges.value.map((item) => ({
+    path: item.path,
+    userSourceData: item,
+    rolePrivileges: [],
+    allChecked: item.privileges.length >= pathPrivilegesEnumKeys.value.length,
+    privileges: union(item.privileges, []),
+  } as Auth.UserEditPathAuthInfo));
+  rolePathPrivileges.value?.forEach((item) => {
+    joinRolePathPrivileges(result, item);
+  });
+  if (result.length === 0) {
+    result.push({
+      path: '',
+      userSourceData: {
+        path: '',
+        privileges: [],
+      },
+      rolePrivileges: [],
+      allChecked: false,
+      privileges: [],
+    });
+  }
+  return result;
+});
+
+const editPathList = computed(() => tableData.value.map((item) => item.path!).filter((item) => item));
+function handleAllCheckedEntity(row: Auth.UserEditAuthInfo, value: boolean) {
+  if (value) {
+    // 赋予其 除角色权限外的所有权限
+    entityUserPrivileges.value = difference(entityPrivilegesEnumKeys.value, row.rolePrivileges);
+  } else {
+    entityUserPrivileges.value = [];
+  }
+}
+function handleCheckedEntity(row: Auth.UserEditAuthInfo, privilege: string, checked: boolean) {
+  if (checked) {
+    row.userPrivileges.push(privilege);
+  } else {
+    row.userPrivileges.splice(row.userPrivileges.indexOf(privilege), 1);
+  }
+}
+
+function handleAllCheckedPath(row: Auth.UserEditPathAuthInfo, value: boolean) {
+  if (value) {
+    // 赋予其 除角色权限外的所有权限
+    row.userSourceData.privileges = difference(entityPrivilegesEnumKeys.value, row.rolePrivileges);
+  } else {
+    row.userSourceData.privileges = [];
+  }
+}
+function handleCheckedPath(row: Auth.UserEditPathAuthInfo, privilege: string, checked: boolean) {
+  if (checked) {
+    row.userSourceData.privileges.push(privilege);
+  } else {
+    row.userSourceData.privileges.splice(row.userSourceData.privileges.indexOf(privilege), 1);
+  }
+}
+function handleAddRow() {
+  pathVisible.value = true;
+}
+// 保存路径
+function handleSavePath(path: string) {
+  authData.value.pathPrivileges.push({ path, privileges: [] });
+}
+function handleDelRow(row: Auth.UserEditAuthInfo) {
+  const index = pathUserPrivileges.value.findIndex((item) => (item.path === row.path));
+  pathUserPrivileges.value.splice(index, 1);
+}
 
 function getDetail() {
   if (currentUser.value) {
     getUserAuth(currentUser.value.name).then(() => {
-    // intitalEntityVals.value = authData.value.entityPrivileges;
-    // intitalPathVals.value = authData.value.pathPrivileges;
+      sourceData.role = authData.value.rolesToPrivileges?.map((item) => item.roleName) || [];
+      sourceData.entityPrivileges = cloneDeep(authData.value.entityPrivileges || []);
+      sourceData.pathPrivileges = cloneDeep(authData.value.pathPrivileges || []);
+      entityUserPrivileges.value = authData.value.entityPrivileges || [];
+      const rolePaths = rolePathPrivileges.value.map((item) => item.path);
+      const userPrivileges = authData.value.pathPrivileges || [];
+      difference(rolePaths, userPrivileges.map((item) => item.path)).forEach((path) => {
+        userPrivileges.push({ path, privileges: [] });
+      });
+      pathUserPrivileges.value = userPrivileges;
     });
   }
+}
+function addRole() {
+  addRoleVisible.value = true;
+}
+function handleAddRole(roleName: string) {
+  addRoleVisible.value = false;
+  getRoleAuth(roleName).then((res) => {
+    const rolePaths = res.data.pathPrivileges.map((item) => item.path);
+    difference(rolePaths, pathUserPrivileges.value.map((item) => item.path)).forEach((path) => {
+      pathUserPrivileges.value.push({ path, privileges: [] });
+    });
+    authData.value.rolesToPrivileges.push(res.data);
+  });
+}
+function handleDeleteRole(index: number) {
+  authData.value.rolesToPrivileges.splice(index, 1);
+}
+function showRoleDetail(role: Auth.AuthByRoleRes) {
+  console.log(role);
+}
+
+// 重置
+function handleReset(type:'view' | 'edit') {
+  pageType.value = type;
+  getDetail();
+}
+
+function calcColumnWidth(child: Auth.PrivilegeEnum) {
+  if (child.privileges.length > 0) {
+    return child.privileges.length * 8 + 32;
+  }
+  return child.width;
 }
 
 watch(
@@ -128,6 +378,7 @@ watch(
       if (!val) {
         console.log('空页面');
       } else {
+        pageType.value = 'view';
         getDetail();
       }
     }
@@ -163,6 +414,31 @@ watch(
   }
 }
 
+.detail-role-list{
+  margin: 12px 16px;
+  height: 28px;
+  display: inline-flex;
+  font-size: 14px;
+  align-items: center;
+
+  .el-tag{
+    cursor: pointer;
+  }
+
+  .el-tag--info {
+    background-color: #F7F8FC;
+    color:#656A85;
+    border: 0;
+    border-radius: 2px;
+    font-size: 12px;
+    font-weight: 300;
+  }
+
+  .el-tag + .el-tag {
+    margin: 0 0 0 8px;
+  }
+}
+
 .details-wrapper{
   margin-left: 16px;
   background-color: #fff;
@@ -189,6 +465,10 @@ watch(
     color: #495AD4;
     margin-bottom: 8px;
   }
+}
+
+.move-down3{
+  transform: translateY(3px);
 }
 
 .operate-buttons{

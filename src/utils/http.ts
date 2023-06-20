@@ -42,7 +42,7 @@ async function responseInterceptor(response: HttpResponse<object>) {
   }
   // eslint-disable-next-line prefer-const
   let { data } = response;
-  const { success, code, message } = data;
+  const { success, code } = data;
   if (success || code === 0) {
     return Promise.resolve(response);
   }
@@ -53,26 +53,21 @@ async function responseInterceptor(response: HttpResponse<object>) {
       && data.type !== 'application/json') {
     return Promise.resolve(response);
   }
-  if (code === 1009) {
-    window.location.href = '/login';
-    return Promise.reject({});
-  }
-  if (code === 1001) {
-    window.location.href = `${message}?back=${window.location.href}`;
-    return Promise.reject({});
-  }
-  if (response.status === 403) {
-    return ElMessageBox.alert('登录失效，请重新登录', '提示', {
+  const logined = sessionStorage.getItem('nologin') === '0';
+  if (response.status === 403 || (response.status === 401 && logined)) {
+    return ElMessageBox.alert('登录已失效，请重新登录', '提示', {
       confirmButtonText: '确定',
       type: 'error',
       showClose: false,
     }).finally(() => {
       window.location.href = '/login';
+      sessionStorage.setItem('nologin', '1');
       return Promise.reject(response);
     });
   }
   if (response.status === 401) {
     window.location.href = '/login';
+    sessionStorage.setItem('nologin', '1');
     return Promise.reject(response);
   }
   return Promise.reject(data);

@@ -9,6 +9,7 @@ class UserApi {
 
   // 退出登录
   static logout(): HttpResponseP {
+    sessionStorage.setItem('nologin', '1');
     return http.get('/logout');
   }
 
