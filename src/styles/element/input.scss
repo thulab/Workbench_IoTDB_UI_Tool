@@ -152,3 +152,7 @@ svg:focus{
 .el-radio__input.is-checked + .el-radio__label{
   color: #424561 !important;
 }
+
+.el-color-dropdown__link-btn{
+  display: none !important;
+}
