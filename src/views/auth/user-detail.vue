@@ -7,7 +7,7 @@
       />
     </el-aside>
     <el-container class="details-wrapper">
-      <el-main class="p-0" v-loading="loading">
+      <el-main class="p-0" v-loading="loading || roleLoading">
         <el-scrollbar>
           <div class="detail-title-box" v-if="!isManager">
             <h4 class="detail-title-text">角色详情</h4>
@@ -45,7 +45,11 @@
                       <i-custom-correct v-if="row.privileges.includes(child.privileges)" />
                     </el-icon>
                     <template v-else>
-                      <el-checkbox :checked="true" :disabled="row.rolePrivileges.includes(child.privileges)" v-if="row.privileges.includes(child.privileges)" @change="handleCheckedEntity(row, child.privileges, false)" />
+                      <el-checkbox
+                        :checked="true"
+                        :disabled="row.rolePrivileges.includes(child.privileges)"
+                        v-if="row.privileges.includes(child.privileges)"
+                        @change="handleCheckedEntity(row, child.privileges, false)" />
                       <el-checkbox :checked="false" v-else @change="handleCheckedEntity(row, child.privileges, true)" />
                     </template>
                   </template>
@@ -123,6 +127,12 @@
       @handle-save="handleSavePath"
     />
     <modal-add-role v-model:visible="addRoleVisible" :selected="[]" @add-role="handleAddRole" />
+    <modal-preview-role
+      v-if="currentRole"
+      v-model:visible="previewRoleVisible"
+      :name="currentRole.roleName"
+      :entity-privileges="currentRole.entityPrivileges || []"
+      :path-privileges="currentRole.pathPrivileges || []" />
   </el-container>
 </template>
 
@@ -134,6 +144,7 @@ import { cloneDeep, union, difference } from 'lodash-es';
 import List from './components/user-list.vue';
 import ModalPath from './components/modal-path.vue';
 import ModalAddRole from './components/modal-add-role.vue';
+import ModalPreviewRole from './components/modal-preview-role.vue';
 
 const userStore = useUserStore();
 const {
@@ -147,6 +158,7 @@ const listRef = ref<InstanceType<typeof List>>();
 const currentUser = ref<Auth.DBUser>();
 const pathVisible = ref(false);
 const addRoleVisible = ref(false);
+const previewRoleVisible = ref(false);
 // const { maxTableHeight } = useTableHeight(540);
 // const minHeight = computed(() => {
 //   if (maxTableHeight.value < 300) {
@@ -167,7 +179,9 @@ const { requestFn: getUserAuth, data: authData, loading } = useRequest(AuthApi.g
   },
 });
 
-const { requestFn: getRoleAuth } = useRequest(AuthApi.getAuthByRole);
+const currentRole = ref<Auth.AuthByRoleRes | undefined>(undefined);
+
+const { requestFn: getRoleAuth, loading: roleLoading } = useRequest(AuthApi.getAuthByRole);
 
 const sourceData: {
   role: string[];
@@ -317,7 +331,7 @@ function handleAddRow() {
 function handleSavePath(path: string) {
   authData.value.pathPrivileges.push({ path, privileges: [] });
 }
-function handleDelRow(row: Auth.UserEditAuthInfo) {
+function handleDelRow(row: Auth.UserEditPathAuthInfo) {
   const index = pathUserPrivileges.value.findIndex((item) => (item.path === row.path));
   pathUserPrivileges.value.splice(index, 1);
 }
@@ -341,21 +355,24 @@ function getDetail() {
 function addRole() {
   addRoleVisible.value = true;
 }
-function handleAddRole(roleName: string) {
+function handleAddRole(roleNames: string[]) {
   addRoleVisible.value = false;
-  getRoleAuth(roleName).then((res) => {
-    const rolePaths = res.data.pathPrivileges.map((item) => item.path);
-    difference(rolePaths, pathUserPrivileges.value.map((item) => item.path)).forEach((path) => {
-      pathUserPrivileges.value.push({ path, privileges: [] });
+  roleNames.forEach((roleName) => {
+    getRoleAuth(roleName).then((res) => {
+      const rolePaths = res.data.pathPrivileges.map((item) => item.path);
+      difference(rolePaths, pathUserPrivileges.value.map((item) => item.path)).forEach((path) => {
+        pathUserPrivileges.value.push({ path, privileges: [] });
+      });
+      authData.value.rolesToPrivileges.push(res.data);
     });
-    authData.value.rolesToPrivileges.push(res.data);
   });
 }
 function handleDeleteRole(index: number) {
   authData.value.rolesToPrivileges.splice(index, 1);
 }
 function showRoleDetail(role: Auth.AuthByRoleRes) {
-  console.log(role);
+  currentRole.value = role;
+  previewRoleVisible.value = true;
 }
 
 // 重置

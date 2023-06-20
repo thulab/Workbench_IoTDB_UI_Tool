@@ -8,7 +8,7 @@
   >
     <el-form ref="formRef" :model="formData">
       <base-form-item label="关联角色：" prop="name" :rules="requiredRules" class="m-t-12 m-b-0">
-        <el-select v-model="formData.name" style="width:100%" placeholder="请输入角色名称" filterable :loading="getRoleListLoading">
+        <el-select v-model="formData.name" style="width:100%" placeholder="请输入角色名称" collapse-tags multiple filterable :loading="getRoleListLoading">
           <template #prefix>
             <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
           </template>
@@ -40,7 +40,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
-  (event: 'add-role', name: string): void;
+  (event: 'add-role', name: string[]): void;
 }>();
 
 const { requestFn: getRoleList, data: roleList, loading: getRoleListLoading } = useRequest(AuthApi.getRoleList, {
@@ -60,7 +60,7 @@ const requiredRules = ref([
 ]);
 
 const formData = reactive({
-  name: '',
+  name: [],
 });
 
 const handleConfirm = () => {
