@@ -43,6 +43,25 @@ const route = [
       },
     ],
   },
+  {
+    path: '/trend',
+    component: Layout,
+    redirect: { name: 'TrendDetail' },
+    meta: {
+      title: '趋势',
+      icon: ICustomSystemConfig,
+      activeIcon: ICustomSystemConfigActive,
+      order: 50,
+    },
+    children: [
+      {
+        path: 'detail',
+        name: 'TrendDetail',
+        component: () => import('@/views/data-trend/trend-detail.vue'),
+        meta: { keepAlive: true },
+      },
+    ],
+  },
 ];
 
 export default route;
