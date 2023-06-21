@@ -4,6 +4,8 @@ import ICustomSystemConfig from '@/assets/icons/system-config.svg?raw';
 import ICustomSystemConfigActive from '@/assets/icons/system-config-active.svg?raw';
 import ICustomAuth from '@/assets/icons/auth.svg?raw';
 import ICustomAuthUser from '@/assets/icons/auth-user.svg?raw';
+import ICustomTrend from '@/assets/icons/trend.svg?raw';
+import ICustomTrendActive from '@/assets/icons/trend-active.svg?raw';
 import ICustomAuthRole from '~icons/custom/auth-role.svg?raw';
 
 const route = [
@@ -49,8 +51,8 @@ const route = [
     redirect: { name: 'TrendDetail' },
     meta: {
       title: '趋势',
-      icon: ICustomSystemConfig,
-      activeIcon: ICustomSystemConfigActive,
+      icon: ICustomTrend,
+      activeIcon: ICustomTrendActive,
       order: 50,
     },
     children: [

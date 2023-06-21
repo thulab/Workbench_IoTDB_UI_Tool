@@ -28,15 +28,17 @@
           </el-option>
         </el-select>
       </base-form-item>
-      <base-form-item label="颜色：" prop="color" :rules="requiredRules">
-        <el-color-picker v-model="formData.color" color-format="hex" :predefine="predefineColors" />
-      </base-form-item>
-      <base-form-item label="线宽：" prop="width" :rules="requiredNumberRules">
-        <el-input v-model.number="formData.width" />
-      </base-form-item>
+      <div class="chart-detail-box">
+        <base-form-item label="颜色：" prop="color" :rules="requiredRules">
+          <el-color-picker v-model="formData.color" color-format="hex" :predefine="predefineColors" />
+        </base-form-item>
+        <base-form-item class="chart-width-box" label="线宽：" prop="width" :rules="requiredNumberRules">
+          <el-input-number v-model.number="formData.width" :min="1" :max="10" step-strictly controls-position="right" style="width: 40px;" />
+        </base-form-item>
+      </div>
     </el-form>
     <template #footer>
-      <div class="dialog-footer m-t-6">
+      <div class="dialog-footer m-t-10">
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" @click="handleConfirm">确定</el-button>
       </div>
@@ -52,6 +54,8 @@ import { StorageApi } from '@/api';
 const props = defineProps<{
   visible: boolean;
   pathList: string[];
+  predefineColors: string[];
+  defaultColor: string;
 }>();
 
 const emit = defineEmits<{
@@ -98,7 +102,6 @@ const requiredNumberRules = ref([
   },
 ]);
 const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);
-const predefineColors = ['#4992ff', '#7cffb2', '#fddd60', '#ff6e76', '#58d9f9', '#05c091', '#ff8a45', '#8d48e3', '#dd79ff', '#8AC211'];
 
 const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementAllObjList);
 
@@ -115,6 +118,7 @@ const remoteMethod = debounce((query: string) => {
 const handleConfirm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
+      dialogVisible.value = false;
       emit('handleSave', formData);
     }
   });
@@ -125,9 +129,22 @@ watch(
   (newVal) => {
     if (newVal) {
       formRef.value?.resetFields();
+      formData.width = 2;
+      formData.color = props.defaultColor;
       remoteMethod('');
     }
   },
 );
 
 </script>
+
+<style lang="scss" scoped>
+  .chart-detail-box{
+    display: flex;
+    margin-top: 24px;
+
+    .chart-width-box{
+      margin-left: 36px;
+    }
+  }
+</style>

@@ -1,19 +1,12 @@
 <template>
-  <el-container>
-    <el-header>
+  <el-container class="data-trend-wrapper">
+    <el-header class="p-0" style="height: auto;">
       <div class="search-form-wrapper">
-        <el-form :model="searchFormData" ref="searchFormRef" label-position="left" label-width="88px" size="default" inline>
-          <base-form-item label="">
-            <el-switch
-              v-model="searchFormData.tab"
-              :active-value="1"
-              :inactive-value="0"
-              active-text="实时趋势"
-              inactive-text="历史趋势"
-              style="
-
---el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;" />
-          </base-form-item>
+        <el-form :model="searchFormData" ref="searchFormRef" label-position="left" label-width="88px" size="default" inline class="m-b-22">
+          <ul class="search-data-list">
+            <li :class="['search-data-type', { 'search-data-active': dataTab === 'running' }]" @click="handleTrendTab('running')">实时趋势</li>
+            <li :class="['search-data-type', { 'search-data-active': dataTab === 'history' }]" @click="handleTrendTab('history')">历史趋势</li>
+          </ul>
           <base-form-item label="时间范围：" prop="datetimerange" :rules="requiredRules">
             <el-date-picker
               v-model="searchFormData.datetimerange"
@@ -24,56 +17,52 @@
               :shortcuts="shortcutsDaterange"
               :clearable="false"
               :prefix-icon="ICustomCalender"
+              :disabled="isRunningTab"
             />
           </base-form-item>
           <base-form-item label="采样周期：" prop="unitInterval" :rules="requiredRules">
-            <el-select v-model="searchFormData.unitInterval">
+            <el-select v-model="searchFormData.unitInterval" :disabled="isRunningTab" style="width: 80px;">
               <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" />
             </el-select>
           </base-form-item>
           <base-form-item label="采样策略：" prop="aggregation" :rules="requiredRules">
-            <el-select v-model="searchFormData.aggregation">
+            <el-select v-model="searchFormData.aggregation" :disabled="isRunningTab" style="width: 80px;">
               <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" />
             </el-select>
           </base-form-item>
-          <base-form-item class="search-form-buttons">
-            <el-button @click="handleReset">重置</el-button>
-            <el-tooltip
-              placement="top-start"
-              effect="light"
-              trigger="hover"
-              content="请先添加测点并选中"
-              :disabled="!!pathList.length"
-            >
-              <el-button :class="[!pathList.length && 'hover-btn-disabled']" type="primary" @click="handleSearch">应用</el-button>
-            </el-tooltip>
-          </base-form-item>
+          <div class="play-pause-buttons">
+            <el-icon size="30" v-if="!isRunningTab"><i-custom-play-disabled /></el-icon>
+            <template v-else>
+              <el-icon size="30" v-if="!loading"><i-custom-play-active /></el-icon>
+              <el-icon size="30" v-else><i-custom-pause /></el-icon>
+            </template>
+          </div>
         </el-form>
-      </div>
-    </el-header>
-    <el-main>
-      <el-container>
-        <el-main>趋势图</el-main>
-        <el-aside>
-          <h4>已选测点</h4>
+        <div class="search-form-buttons" v-if="!isRunningTab">
+          <el-button @click="handleReset">重置</el-button>
           <el-tooltip
             placement="top-start"
             effect="light"
             trigger="hover"
-            content="最多同时展示10条测点趋势"
-            :disabled="pathList.length !== 10"
+            content="请先添加测点并选中"
+            :disabled="!!pathList.length"
           >
-            <el-button :class="[pathList.length === 10 && 'hover-btn-disabled']" @click="handleAdd"><i-custom-add class="m-r-4" /></el-button>
+            <el-button :class="[!pathList.length && 'hover-btn-disabled']" type="primary" @click="handleSearch">应用</el-button>
           </el-tooltip>
+        </div>
+      </div>
+    </el-header>
+    <el-main class="p-0">
+      <el-container class="chart-detail-wrapper">
+        <el-main>趋势图</el-main>
+        <el-aside width="240px" class="path-list-wrapper">
+          <trend-list
+            v-model="pathList"
+          />
         </el-aside>
       </el-container>
     </el-main>
 
-    <modal-path
-      v-model:visible="pathVisible"
-      :path-list="editPathList"
-      @handleSave="handleSavePath"
-    />
   </el-container>
 </template>
 
@@ -84,7 +73,7 @@ import {
   getStartAndEnd, today, getOneInterval, getOneIntervalNow,
 } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
-import ModalPath from './components/modal-path.vue';
+import TrendList from './components/trend-list.vue';
 
 const searchFormRef = ref<FormInstance>();
 
@@ -136,9 +125,10 @@ const requiredRules = ref([
   },
 ]);
 
+const dataTab = ref<'running' | 'history'>('running');
 const pathList = ref<Trend.LineObj[]>([]);
-const pathVisible = ref(false);
-const editPathList = ref<string[]>([]);
+const loading = ref(false);
+const isRunningTab = computed(() => dataTab.value === 'running');
 
 // 重置
 function handleReset() {
@@ -160,24 +150,92 @@ function handleSearch() {
   console.log('handleSearch');
 }
 
-function handleAdd() {
-  if (pathList.value.length === 10) return;
-  editPathList.value = pathList.value.map((item) => item.path);
-  pathVisible.value = true;
+// 切换数据类型
+function handleTrendTab(type: 'running' | 'history') {
+  dataTab.value = type;
 }
-
-function handleSavePath(data: Trend.LineObj) {
-  console.log(data, 'data');
-  pathList.value.push(data);
-}
-
 </script>
 
 <style lang="scss" scoped>
+
+.data-trend-wrapper{
+  border-radius: 6px;
+  background: #FFF;
+  box-sizing: border-box;
+  padding: 26px 16px 16px 30px;
+}
+
+.search-form-wrapper{
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+
+  :deep(.el-form) {
+    display: flex;
+    align-items: center;
+    height: 30px;
+  }
+
+  :deep(.el-form-item--default) {
+    margin: 0 24px 0 0;
+  }
+}
+
+.search-data-list {
+  display: inline-flex;
+  margin-right: 24px;
+  border-radius: 12px;
+  background-color: #f0f1fa;
+  padding: 4px;
+
+  .search-data-type {
+    padding: 3px 12px 3px 8px;
+    cursor: pointer;
+    border-radius: 12px;
+    background-color: transparent;
+    font-size: 12px;
+    line-height: 12px;
+    font-weight: 300;
+    color: #656a85;
+    white-space: nowrap;
+  }
+
+  .search-data-active {
+    background-color: #495ad4;
+    color: #fff;
+    padding: 3px 12px;
+  }
+}
+
+.play-pause-buttons{
+  height: 30px;
+}
+
+.search-form-buttons{
+  display: inline-flex;
+  flex-wrap: nowrap;
+  flex: 1;
+  justify-content: end;
+}
+
 .hover-btn-disabled, .hover-btn-disabled:focus{
   color: var(--el-button-disabled-text-color) !important;
   cursor: not-allowed !important;
   background-color: var(--el-button-disabled-bg-color) !important;
   border-color: var(--el-button-disabled-border-color) !important;
 }
+
+.chart-detail-wrapper{
+  width: 100%;
+  height: 100%;
+}
+
+.path-list-wrapper{
+  margin-left: 16px;
+  background-color: #F7F8FC;
+  border-radius: 2px;
+  box-sizing: border-box;
+  padding: 12px 16px 25px;
+}
+
 </style>

@@ -5,6 +5,7 @@
 
   .el-range-input {
     // width: 42% !important;
+    height: 26px !important;
   }
 
   .el-input__icon, .el-range__icon{
@@ -22,7 +23,7 @@
 } 
 
 .el-range-editor.el-input__wrapper {
-  padding: 0 11px !important;
+  padding: 0 5px !important;
 }
 
 .el-date-editor--datetimerange {

@@ -15,6 +15,10 @@
   height: 26px !important;
 }
 
+.el-input-number__increase, .el-input-number__decrease{
+  width: 14px !important;
+}
+
 .el-select {
   line-height: 28px !important;
 
@@ -71,6 +75,17 @@
     &.is-selected::after{
       display: none !important;
     }
+  }
+}
+
+.el-input-number.is-controls-right{
+  .el-input-number__increase, .el-input-number__decrease{
+    --el-input-number-controls-height: 13px !important;
+  }
+
+  .el-input__wrapper{
+    padding-left: 0 !important;
+    padding-right: 14px !important;
   }
 }
 
@@ -155,4 +170,15 @@ svg:focus{
 
 .el-color-dropdown__link-btn{
   display: none !important;
+}
+
+.el-color-picker__trigger{
+  width: 22px !important;
+  height: 22px !important;
+  padding: 0 !important;
+  border-color: #DFE1ED !important;
+}
+
+.el-color-picker__color{
+  border: none !important;
 }
