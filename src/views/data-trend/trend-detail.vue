@@ -45,9 +45,9 @@
             effect="light"
             trigger="hover"
             content="请先添加测点并选中"
-            :disabled="!!pathList.length"
+            :disabled="searchAbled"
           >
-            <el-button :class="[!pathList.length && 'hover-btn-disabled']" type="primary" @click="handleSearch">应用</el-button>
+            <el-button :class="[!searchAbled && 'hover-btn-disabled']" type="primary" @click="handleSearch">应用</el-button>
           </el-tooltip>
         </div>
       </div>
@@ -55,9 +55,10 @@
     <el-main class="p-0">
       <el-container class="chart-detail-wrapper">
         <el-main>趋势图</el-main>
-        <el-aside width="240px" class="path-list-wrapper">
+        <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand && 'p-0']">
           <trend-list
             v-model="pathList"
+            v-model:is-expand="isExpand"
           />
         </el-aside>
       </el-container>
@@ -75,8 +76,8 @@ import {
 import ICustomCalender from '~icons/custom/calender.svg';
 import TrendList from './components/trend-list.vue';
 
+const isExpand = ref(true);
 const searchFormRef = ref<FormInstance>();
-
 const searchFormData = reactive({
   tab: '',
   datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
@@ -129,6 +130,7 @@ const dataTab = ref<'running' | 'history'>('running');
 const pathList = ref<Trend.LineObj[]>([]);
 const loading = ref(false);
 const isRunningTab = computed(() => dataTab.value === 'running');
+const searchAbled = computed(() => pathList.value.length > 0 && pathList.value.filter((item) => item.checked).length > 0);
 
 // 重置
 function handleReset() {
@@ -216,6 +218,7 @@ function handleTrendTab(type: 'running' | 'history') {
   flex-wrap: nowrap;
   flex: 1;
   justify-content: end;
+  margin-bottom: 16px;
 }
 
 .hover-btn-disabled, .hover-btn-disabled:focus{
@@ -236,6 +239,8 @@ function handleTrendTab(type: 'running' | 'history') {
   border-radius: 2px;
   box-sizing: border-box;
   padding: 12px 16px 25px;
+  position: relative;
+  transition: all 0.3s ease;
 }
 
 </style>

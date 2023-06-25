@@ -1,5 +1,5 @@
 <template>
-  <div class="path-title-box">
+  <div class="path-title-box" v-if="isExpand">
     <h4 class="path-list-title">已选测点</h4>
     <el-tooltip
       placement="top-start"
@@ -12,12 +12,37 @@
     </el-tooltip>
   </div>
 
-  <div class="path-list-box">
+  <h4 v-if="!isExpand" class="collapse-title">已选测点</h4>
+
+  <div class="path-list-box" v-if="isExpand">
     <div class="list-empty-wrapper" v-if="!pathList.length">
       <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
       <span class="data-empty-text">暂无测点</span>
     </div>
+    <ul class="list-box" v-else>
+      <li v-for="(item, index) in pathList" :key="item.path" :class="['path-item-box']">
+        <div class="path-text-box">
+          <el-checkbox :checked="item.checked" @change="val => handleChecked(val, item, index)" class="m-r-8" />
+          <div class="path-text"><text-tooltip :content="item.path" /></div>
+        </div>
+        <div class="path-detail-box">
+          <div class="path-detail-item">
+            <span class="detail-label">颜色：</span>
+            <el-color-picker v-model="item.color" color-format="hex" :predefine="predefineColors" />
+          </div>
+          <div class="path-detail-item">
+            <span class="detail-label">线宽：</span>
+            <el-input-number v-model.number="item.width" :min="1" :max="10" step-strictly controls-position="right" style="width: 40px;" @change="val => handleChangeWidth(val, item, index)" />
+          </div>
+        </div>
+        <el-icon size="14" class="delete-icon" @click="handleDel(index)"><i-custom-close-circle /></el-icon>
+      </li>
+    </ul>
   </div>
+
+  <el-icon :class="['expand-icon', !isExpand && 'collapse-icon']" size="24" @click="handleExpand">
+    <i-custom-arrow-right-expand />
+  </el-icon>
 
   <modal-path
     v-model:visible="pathVisible"
@@ -30,16 +55,21 @@
 
 <script setup lang="ts">
 import { difference } from 'lodash-es';
+import type { CheckboxValueType } from 'element-plus';
 import ModalPath from './modal-path.vue';
 
 const props = defineProps<{
   modelValue: Trend.LineObj[];
+  isExpand: boolean;
 }>();
-const pathList = useVModel(props, 'modelValue');
 
 const emit = defineEmits<{
+  (event: 'update:isExpand', isExpand: boolean): void;
   (event: 'handleSelect', payload: string): void;
 }>();
+
+const pathList = useVModel(props, 'modelValue');
+const isExpand = useVModel(props, 'isExpand', emit);
 
 const predefineColors = ['#4992ff', '#7cffb2', '#fddd60', '#ff6e76', '#58d9f9', '#05c091', '#ff8a45', '#8d48e3', '#dd79ff', '#8AC211'];
 
@@ -58,7 +88,23 @@ function handleAdd() {
 }
 
 function handleSavePath(data: Trend.LineObj) {
-  pathList.value.push(data);
+  pathList.value.push({ ...data, checked: true });
+}
+
+function handleChecked(val: CheckboxValueType, data: Trend.LineObj, index: number) {
+  pathList.value.splice(index, 1, { ...data, checked: val as boolean });
+}
+
+function handleChangeWidth(val: number | undefined, data: Trend.LineObj, index: number) {
+  pathList.value.splice(index, 1, { ...data, width: val as number });
+}
+
+function handleDel(index: number) {
+  pathList.value.splice(index, 1);
+}
+
+function handleExpand() {
+  isExpand.value = !isExpand.value;
 }
 
 watch(
@@ -88,11 +134,25 @@ watch(
   }
 }
 
+.collapse-title{
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 17px;
+  color: #495AD4;
+  margin: 14px 5px 0;
+}
+
+.hover-btn-disabled, .hover-btn-disabled:focus{
+  color: var(--el-button-disabled-text-color) !important;
+  cursor: not-allowed !important;
+  background-color: var(--el-button-disabled-bg-color) !important;
+  border-color: var(--el-button-disabled-border-color) !important;
+}
+
 .path-list-box{
   border-radius: 2px;
   background: #FFF;
-  border: 1px solid #DFE1ED;
-  height: calc(100% - 52px);
+  height: calc(100% - 54px);
   overflow-y: auto;
 
   .list-empty-wrapper{
@@ -117,4 +177,91 @@ watch(
   }
 }
 
+.path-item-box{
+  border-radius: 2px;
+  background: #FFF;
+  border: 1px solid #DFE1ED;
+  margin-top: -1px;
+  padding-top: 10px;
+  height: 84px;
+  box-sizing: border-box;
+  position: relative;
+  cursor: pointer;
+
+  &:first-child{
+    margin-top: 0;
+  }
+
+  .delete-icon{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 4px;
+    display: none;
+  }
+
+  &:hover .delete-icon{
+    display: block;
+  }
+}
+
+.path-text-box{
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+  margin-bottom: 8px;
+
+  .path-text{
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    color: #424561;
+    width: 145px;
+    display: inline-flex;
+  }
+}
+
+.path-detail-box{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 32px;
+
+  .path-detail-item{
+    display: flex;
+    align-items: center;
+
+    .detail-label{
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 12px;
+      color: #131926;
+    }
+
+    :deep(.el-input__inner) {
+      height: 22px !important;
+    }
+
+    :deep(.el-input-number.is-controls-right .el-input-number__increase, .el-input-number.is-controls-right .el-input-number__decrease){
+      --el-input-number-controls-height: 11px !important;
+    }
+  }
+}
+
+.expand-icon{
+  position: absolute;
+  bottom: 0;
+  left: 16px;
+  cursor: pointer;
+  color: #A0A3B8;
+
+  &:hover{
+    color: #495AD4;
+  }
+
+  &.collapse-icon{
+    left: 0;
+    transform: rotate(-180deg);
+  }
+}
 </style>
