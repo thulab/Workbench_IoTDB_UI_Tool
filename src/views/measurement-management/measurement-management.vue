@@ -98,9 +98,10 @@
             <el-table-column label="压缩方式" prop="compression" min-width="140" align="center" show-overflow-tooltip />
             <el-table-column label="最新值" prop="value" min-width="140" align="center" show-overflow-tooltip />
             <el-table-column label="最新值时间" prop="valueTime" min-width="200" align="center" show-overflow-tooltip />
-            <el-table-column label="操作" width="120" align="center" fixed="right">
+            <el-table-column label="操作" width="160" align="center" fixed="right">
               <template #default="{ row }">
                 <el-button type="primary" link size="small" @click="handleRowAlarm(row)">告警详情</el-button>
+                <el-button type="primary" link size="small" @click="handleRowTrend(row)">趋势</el-button>
                 <el-button type="primary" link size="small" @click="handleDelRow('row', row)">删除</el-button>
               </template>
             </el-table-column>
@@ -342,6 +343,15 @@ function handleDelRow(type: string, row: StorageDevice.MeasurementItem | null) {
 function handleRowAlarm(row: StorageDevice.MeasurementItem) {
   router.push({
     name: 'AlarmConfig',
+    query: {
+      measurement: `${row.deviceName}.${row.timeseries}`,
+    },
+  });
+}
+
+function handleRowTrend(row: StorageDevice.MeasurementItem) {
+  router.push({
+    name: 'TrendDetail',
     query: {
       measurement: `${row.deviceName}.${row.timeseries}`,
     },

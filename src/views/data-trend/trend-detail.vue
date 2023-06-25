@@ -54,7 +54,9 @@
     </el-header>
     <el-main class="p-0">
       <el-container class="chart-detail-wrapper">
-        <el-main>趋势图</el-main>
+        <el-main class="p-0">
+          <div ref="chartContainer" class="chart-container" v-element-size="onResize"></div>
+        </el-main>
         <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand && 'p-0']">
           <trend-list
             v-model="pathList"
@@ -68,14 +70,21 @@
 </template>
 
 <script setup lang="ts">
+import { useRoute } from 'vue-router';
 import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import dayjs from 'dayjs';
+import { debounce } from 'lodash-es';
+import { vElementSize } from '@vueuse/components';
+import { echarts, type ECOption } from '@/plugins/echarts-plugin';
 import {
   getStartAndEnd, today, getOneInterval, getOneIntervalNow,
 } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
 import TrendList from './components/trend-list.vue';
 
+const route = useRoute();
+const chartContainer = ref<HTMLElement | null>(null);
+let chartInstance: echarts.ECharts;
 const isExpand = ref(true);
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({
@@ -132,6 +141,42 @@ const loading = ref(false);
 const isRunningTab = computed(() => dataTab.value === 'running');
 const searchAbled = computed(() => pathList.value.length > 0 && pathList.value.filter((item) => item.checked).length > 0);
 
+const chartOptions = computed<ECOption>(() => ({
+  tooltip: {
+    trigger: 'item',
+    triggerOn: 'mousemove',
+    formatter: (params: Object) => {
+      console.log(params);
+      return '';
+    },
+  },
+  useUTC: true,
+  xAxis: {
+    type: 'category',
+    boundaryGap: false,
+    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+  },
+  yAxis: {
+    type: 'value',
+  },
+  series: [
+    {
+      type: 'line',
+      colorBy: 'data',
+      label: {
+        formatter: (params: Object) => {
+          console.log(params);
+          return `${params?.data?.name}`;
+        },
+      },
+      data: [120, 132, 101, 134, 90, 230, 210],
+      emphasis: {
+        focus: 'series',
+      },
+    },
+  ],
+}));
+
 // 重置
 function handleReset() {
   searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
@@ -156,6 +201,49 @@ function handleSearch() {
 function handleTrendTab(type: 'running' | 'history') {
   dataTab.value = type;
 }
+
+const setOption = (option:ECOption) => {
+  if (chartInstance) {
+    // 实例存在直接设置
+    chartInstance.setOption(option);
+  } else if (chartContainer.value && chartContainer.value.clientHeight) {
+    // 实例不存在，容器存在，容器高度存在
+    chartInstance = echarts.init(chartContainer.value, 'dark');
+    // 初次加载，设置notMerge为true
+    chartInstance.setOption(option, true);
+  } else {
+    // 容器高度有问题时，延迟加载
+    nextTick(() => {
+      setOption(option);
+    });
+  }
+};
+
+const onResize = debounce(() => {
+  if (chartContainer.value) {
+    chartInstance.resize();
+  }
+}, 50);
+
+onMounted(() => {
+  if (route.query.measurement) {
+    pathList.value.push({
+      path: route.query.measurement as string,
+      color: '#4992ff',
+      width: 2,
+      checked: true,
+    });
+  }
+  setOption(chartOptions.value);
+});
+
+onUnmounted(() => {
+  if (chartInstance) {
+    chartInstance.clear();
+    chartInstance.dispose();
+  }
+});
+
 </script>
 
 <style lang="scss" scoped>
@@ -231,6 +319,13 @@ function handleTrendTab(type: 'running' | 'history') {
 .chart-detail-wrapper{
   width: 100%;
   height: 100%;
+}
+
+.chart-container {
+  width: 100%;
+  min-height: 300px;
+  height: 100%;
+  overflow: hidden;
 }
 
 .path-list-wrapper{
