@@ -33,7 +33,7 @@
                     <i-custom-correct v-if="row.allChecked" />
                   </el-icon>
                   <template v-else>
-                    <el-checkbox :checked="true" v-if="row.privileges.length >= entityPrivilegesEnumKeys.length" @change="e=>handleAllCheckedEntity(row, false)" />
+                    <el-checkbox :checked="true" :disabled="row.rolePrivileges.length >= entityPrivilegesEnumKeys.length" v-if="row.privileges.length >= entityPrivilegesEnumKeys.length" @change="e=>handleAllCheckedEntity(row, false)" />
                     <el-checkbox :checked="false" v-else @change="e=>handleAllCheckedEntity(row, true)" />
                   </template>
                 </template>
@@ -55,12 +55,6 @@
                   </template>
                 </el-table-column>
               </el-table-column>
-              <template #empty>
-                <div class="table-empty-wrapper">
-                  <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-                  <span class="data-empty-text">无数据</span>
-                </div>
-              </template>
             </el-table>
           </div>
           <div class="table-list-box  m-x-16 m-b-16" v-if="canEdit">
@@ -73,7 +67,7 @@
                     <i-custom-correct v-if="row.allChecked" />
                   </el-icon>
                   <template v-else>
-                    <el-checkbox :checked="true" v-if="row.privileges.length >= entityPrivilegesEnumKeys.length" @change="e=>handleAllCheckedPath(row, false)" />
+                    <el-checkbox :checked="true" :disabled="row.rolePrivileges.length >= pathPrivilegesEnumKeys.length" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" @change="e=>handleAllCheckedPath(row, false)" />
                     <el-checkbox :checked="false" v-else @change="e=>handleAllCheckedPath(row, true)" />
                   </template>
                 </template>
@@ -102,12 +96,6 @@
                   </el-button>
                 </template>
               </el-table-column>
-              <template #empty>
-                <div class="table-empty-wrapper">
-                  <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-                  <span class="data-empty-text">无数据</span>
-                </div>
-              </template>
             </el-table>
             <el-button style="width: 100%;" class="m-t-24" @click="handleAddRow" v-if="canEdit && isEdit"><i-custom-add class="m-r-4" />添加路径</el-button>
           </div>
@@ -116,7 +104,7 @@
       <el-footer v-if="canEdit && isEdit">
         <div class="operate-buttons">
           <el-button @click="handleReset('edit')">重置</el-button>
-          <el-button type="primary">应用</el-button>
+          <el-button type="primary" @click="handleSave" :loading="saveLoading">应用</el-button>
         </div>
       </el-footer>
     </el-container>
@@ -179,10 +167,15 @@ const { requestFn: getUserAuth, data: authData, loading } = useRequest(AuthApi.g
   },
 });
 
+const { requestFn: updateUserAuth, loading: saveLoading } = useRequest(AuthApi.updateUserAuth);
+
 const currentRole = ref<Auth.AuthByRoleRes | undefined>(undefined);
 
 const { requestFn: getRoleAuth, loading: roleLoading } = useRequest(AuthApi.getAuthByRole);
 
+/**
+ * 原数据，编辑前的数据
+ */
 const sourceData: {
   role: string[];
   entityPrivileges: string[];
@@ -244,18 +237,18 @@ const rolePathPrivileges = computed(() => {
 });
 function joinRolePathPrivileges(data: Auth.UserEditPathAuthInfo[], rolePathAuth: { path: string, privileges: string[] }) {
   const path = data.find((pathItem) => pathItem.path === rolePathAuth.path);
-  if (!path) {
-    data.push({
-      path: rolePathAuth.path,
-      userSourceData: {
-        path: rolePathAuth.path,
-        privileges: [],
-      },
-      allChecked: rolePathAuth.privileges.length >= pathPrivilegesEnumKeys.value.length,
-      rolePrivileges: rolePathAuth.privileges,
-      privileges: rolePathAuth.privileges,
-    });
-  } else {
+  if (path) {
+  //   data.push({
+  //     path: rolePathAuth.path,
+  //     userSourceData: {
+  //       path: rolePathAuth.path,
+  //       privileges: [],
+  //     },
+  //     allChecked: rolePathAuth.privileges.length >= pathPrivilegesEnumKeys.value.length,
+  //     rolePrivileges: rolePathAuth.privileges,
+  //     privileges: rolePathAuth.privileges,
+  //   });
+  // } else {
     path.rolePrivileges = union(path.rolePrivileges, rolePathAuth.privileges);
     path.privileges = union(path.userSourceData?.privileges || [], path.rolePrivileges);
     if (path.privileges.length >= pathPrivilegesEnumKeys.value.length) {
@@ -312,7 +305,8 @@ function handleCheckedEntity(row: Auth.UserEditAuthInfo, privilege: string, chec
 function handleAllCheckedPath(row: Auth.UserEditPathAuthInfo, value: boolean) {
   if (value) {
     // 赋予其 除角色权限外的所有权限
-    row.userSourceData.privileges = difference(entityPrivilegesEnumKeys.value, row.rolePrivileges);
+    console.log(difference(pathPrivilegesEnumKeys.value, row.rolePrivileges));
+    row.userSourceData.privileges = difference(pathPrivilegesEnumKeys.value, row.rolePrivileges);
   } else {
     row.userSourceData.privileges = [];
   }
@@ -386,6 +380,68 @@ function calcColumnWidth(child: Auth.PrivilegeEnum) {
     return child.privileges.length * 8 + 32;
   }
   return child.width;
+}
+
+// 更新权限
+function handleSave() {
+  const flag = tableData.value.filter((item) => item.path).some((data) => (!data.privileges.length));
+  if (flag) {
+    ElMessage.error('路径权限不允许为空，请选择权限后重新操作');
+    return;
+  }
+  const currentRoleNames = authData.value.rolesToPrivileges.map((item) => item.roleName);
+  const addRoles = difference(currentRoleNames, sourceData.role);
+  const cancelRoles = difference(sourceData.role, currentRoleNames);
+
+  const cancelPathPrivileges: Array<{ path: string, privileges: string[] }> = [];
+  const addPathPrivileges: Array<{ path: string, privileges: string[] }> = [];
+
+  const sourcePaths = sourceData.pathPrivileges.map((data) => data.path) || [];
+  const currentPaths = pathUserPrivileges.value.map((data) => data.path) || [];
+  const delArr = difference(sourcePaths, currentPaths);
+  delArr.forEach((path) => {
+    const findData = sourceData.pathPrivileges.find((data) => data.path === path);
+    if (findData) {
+      cancelPathPrivileges.push({ ...findData });
+    }
+  });
+
+  pathUserPrivileges.value.forEach((item) => {
+    const sourcePrivileges = sourceData.pathPrivileges.find((data) => data.path === item.path);
+    if (sourcePrivileges) {
+      const addVals = difference(item.privileges, sourcePrivileges.privileges);
+      const cancelVals = difference(sourcePrivileges.privileges, item.privileges);
+      if (addVals.length > 0) {
+        addPathPrivileges.push({ path: item.path, privileges: addVals });
+      }
+      if (cancelVals.length > 0) {
+        cancelPathPrivileges.push({ path: item.path, privileges: cancelVals });
+      }
+    } else {
+      addPathPrivileges.push({ ...item });
+    }
+  });
+
+  const addEntityPrivileges = difference(entityUserPrivileges.value, sourceData.entityPrivileges);
+  const cancelEntityPrivileges = difference(sourceData.entityPrivileges, entityUserPrivileges.value);
+
+  const data = {
+    userName: currentUser.value!.name,
+    addRoles,
+    cancelRoles,
+    cancelEntityPrivileges,
+    addEntityPrivileges,
+    cancelPathPrivileges: cancelPathPrivileges.filter((item) => item.privileges.length > 0),
+    addPathPrivileges: addPathPrivileges.filter((item) => item.privileges.length > 0),
+  };
+  updateUserAuth(data).then(() => {
+    ElMessage.success('保存成功');
+    pageType.value = 'view';
+    getDetail();
+  }).catch(() => {
+    pageType.value = 'edit';
+    getDetail();
+  });
 }
 
 watch(

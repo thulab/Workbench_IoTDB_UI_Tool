@@ -54,10 +54,10 @@
             <el-table-column label="路径名称" prop="path" align="center" width="193" show-overflow-tooltip />
             <el-table-column label="全选" align="center" width="193">
               <template #default="{ row, $index }">
-                <el-icon v-if="isView" size="21">
+                <el-icon v-if="isView || !row.path" size="21">
                   <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" />
                 </el-icon>
-                <template v-else>
+                <template v-else-if="row.path">
                   <!-- eslint-disable-next-line vue/max-len -->
                   <el-checkbox :checked="true" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" @change="val => handleCheckedPath(val, $index)" />
                   <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index)" />
@@ -70,7 +70,7 @@
                   <el-icon v-if="isView" size="21">
                     <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.includes(col.privileges)" />
                   </el-icon>
-                  <template v-else>
+                  <template v-else-if="row.path">
                     <el-checkbox :checked="true" v-if="row.privileges.includes(col.privileges)" @change="val => handleCheckedPath(val, $index, col.privileges)" />
                     <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index, col.privileges)" />
                   </template>
@@ -79,7 +79,7 @@
             </el-table-column>
             <el-table-column label="操作" align="center" width="194" fixed="right">
               <template #default="{ row, $index }">
-                <el-button v-if="row.path || (!row.path && !isView)" link @click="handleDelRow($index)" :disabled="isView">
+                <el-button v-if="row.path" link @click="handleDelRow($index)" :disabled="isView">
                   <el-icon size="21"><i-custom-close /></el-icon>
                 </el-button>
               </template>
@@ -224,15 +224,16 @@ function calcColumnWidth(child: Auth.PrivilegeEnum) {
 
 // 更新权限
 function handleSave() {
-  const flag = authData.value.pathPrivileges.some((data) => !data.privileges.length || !data.path);
+  const pathPrivileges = authData.value.pathPrivileges.filter((item) => item.path);
+  const flag = pathPrivileges.some((data) => !data.privileges.length);
   if (flag) {
-    ElMessage.error('存在权限为空的序列');
+    ElMessage.error('路径权限不允许为空，请选择权限后重新操作');
     return;
   }
   const cancelPathPrivileges: Array<{ path: string, privileges: string[] }> = [];
   const addPathPrivileges: Array<{ path: string, privileges: string[] }> = [];
   const initialPathKeys = intitalPathVals.value.map((data) => data.path) || [];
-  const pathVals = authData.value.pathPrivileges.map((data) => data.path) || [];
+  const pathVals = pathPrivileges.map((data) => data.path) || [];
   const delArr = difference(initialPathKeys, pathVals);
   delArr.forEach((path) => {
     const findData = intitalPathVals.value.find((data) => data.path === path);
@@ -240,7 +241,7 @@ function handleSave() {
       cancelPathPrivileges.push({ ...findData });
     }
   });
-  authData.value.pathPrivileges.forEach((item) => {
+  pathPrivileges.forEach((item) => {
     const sourcePrivileges = intitalPathVals.value.find((data) => data.path === item.path);
     if (sourcePrivileges) {
       const addVals = difference(item.privileges, sourcePrivileges.privileges);
@@ -263,8 +264,8 @@ function handleSave() {
     roleName: currentRole.value,
     cancelEntityPrivileges,
     addEntityPrivileges,
-    cancelPathPrivileges,
-    addPathPrivileges,
+    cancelPathPrivileges: cancelPathPrivileges.filter((item) => item.privileges.length > 0),
+    addPathPrivileges: addPathPrivileges.filter((item) => item.privileges.length > 0),
   };
   updateAuthByRole(data).then(() => {
     ElMessage.success('保存成功');
