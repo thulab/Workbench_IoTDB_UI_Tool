@@ -38,5 +38,10 @@ class SearchApi {
   static exportData(data: Search.QueryDataParams): HttpResponseP {
     return http.post('/file/dataGetExportId', data);
   }
+
+  // 历史趋势查询
+  static getHistoryTrend(data: Search.QueryHistoryTrend): HttpResponseP {
+    return http.post('/trend/history', data);
+  }
 }
 export default SearchApi;

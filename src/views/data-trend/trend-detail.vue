@@ -31,10 +31,10 @@
             </el-select>
           </base-form-item>
           <div class="play-pause-buttons">
-            <el-icon size="30" v-if="!isRunningTab"><i-custom-play-disabled /></el-icon>
+            <el-icon size="30" v-if="!isRunningTab" style="cursor: not-allowed;"><i-custom-play-disabled /></el-icon>
             <template v-else>
-              <el-icon size="30" v-if="!loading"><i-custom-play-active /></el-icon>
-              <el-icon size="30" v-else><i-custom-pause /></el-icon>
+              <el-icon size="30" v-if="!loading" @click="handlePlay(true)"><i-custom-play-active /></el-icon>
+              <el-icon size="30" v-else @click="handlePlay(false)"><i-custom-pause /></el-icon>
             </template>
           </div>
         </el-form>
@@ -61,6 +61,7 @@
           <trend-list
             v-model="pathList"
             v-model:is-expand="isExpand"
+            @handleOperate="handleOperatePath"
           />
         </el-aside>
       </el-container>
@@ -73,12 +74,14 @@
 import { useRoute } from 'vue-router';
 import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import dayjs from 'dayjs';
-import { debounce } from 'lodash-es';
+import { debounce, cloneDeep, difference } from 'lodash-es';
 import { vElementSize } from '@vueuse/components';
+import { SearchApi } from '@/api';
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
 import {
   getStartAndEnd, today, getOneInterval, getOneIntervalNow,
 } from '@/utils/date';
+import { useWebsocket } from '@/composition-api';
 import ICustomCalender from '~icons/custom/calender.svg';
 import TrendList from './components/trend-list.vue';
 
@@ -88,12 +91,10 @@ let chartInstance: echarts.ECharts;
 const isExpand = ref(true);
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({
-  tab: '',
   datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
-  unitInterval: '10min',
+  unitInterval: '10m',
   aggregation: 'avg',
 });
-
 const shortcutsDaterange = [
   {
     text: '今天',
@@ -110,15 +111,15 @@ const shortcutsDaterange = [
 ];
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 const timeUnits = [
-  { label: '1min', value: '1min', timestamp: 60000 },
-  { label: '5min', value: '5min', timestamp: 300000 },
-  { label: '10min', value: '10min', timestamp: 600000 },
-  { label: '30min', value: '30min', timestamp: 1800000 },
+  { label: '1min', value: '1m', timestamp: 60000 },
+  { label: '5min', value: '5m', timestamp: 300000 },
+  { label: '10min', value: '10m', timestamp: 600000 },
+  { label: '30min', value: '30m', timestamp: 1800000 },
   { label: '1h', value: '1h', timestamp: 3600000 },
   { label: '8h', value: '8h', timestamp: 28800000 },
   { label: '1d', value: '1d', timestamp: 86400000 },
   { label: '1w', value: '1w', timestamp: 604800000 },
-  { label: '1m', value: '1m', timestamp: 2592000000 },
+  { label: '1m', value: '1mo', timestamp: 2592000000 },
 ];
 const aggregateFunctions = [
   { label: '平均值', value: 'avg' },
@@ -126,7 +127,6 @@ const aggregateFunctions = [
   { label: '最小值', value: 'min_value' },
   { label: '最新值', value: 'last_value' },
 ];
-
 const requiredRules = ref([
   {
     required: true,
@@ -134,73 +134,41 @@ const requiredRules = ref([
     trigger: ['change'],
   },
 ]);
-
 const dataTab = ref<'running' | 'history'>('running');
 const pathList = ref<Trend.LineObj[]>([]);
 const loading = ref(false);
 const isRunningTab = computed(() => dataTab.value === 'running');
 const searchAbled = computed(() => pathList.value.length > 0 && pathList.value.filter((item) => item.checked).length > 0);
+const checkedData = computed(() => pathList.value.filter((item) => item.checked));
+const chartData = ref<Search.TrendData[]>([]);
+const copyCheckData = ref<Trend.LineObj[]>([]);
 
 const chartOptions = computed<ECOption>(() => ({
-  tooltip: {
-    trigger: 'item',
-    triggerOn: 'mousemove',
-    formatter: (params: Object) => {
-      console.log(params);
-      return '';
-    },
-  },
+  color: checkedData.value.map((item) => item.color),
   useUTC: true,
   xAxis: {
     type: 'category',
     boundaryGap: false,
-    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    data: chartData.value.map((item) => (item.timeseries)),
   },
   yAxis: {
     type: 'value',
   },
-  series: [
-    {
-      type: 'line',
-      colorBy: 'data',
-      label: {
-        formatter: (params: Object) => {
-          console.log(params);
-          return `${params?.data?.name}`;
-        },
-      },
-      data: [120, 132, 101, 134, 90, 230, 210],
-      emphasis: {
-        focus: 'series',
-      },
+  series: chartData.value.filter((data) => checkedData.value.some((s) => s.path === data.path && s.checked)).map((item) => ({
+    type: 'line',
+    name: item.path,
+    data: item.values,
+    emphasis: {
+      focus: 'series',
     },
-  ],
+    // encode: {
+    //   x: 'timeseries',
+    //   y: 'values',
+    // },
+  })),
 }));
 
-// 重置
-function handleReset() {
-  searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
-  searchFormData.unitInterval = '10min';
-  searchFormData.aggregation = 'avg';
-}
-
-// 查询
-function handleSearch() {
-  if (!pathList.value.length) return;
-  const timerange = dayjs(searchFormData.datetimerange[1]).valueOf() - dayjs(searchFormData.datetimerange[0]).valueOf();
-  const timeinterval = timeUnits.find((time) => time.value === searchFormData.unitInterval)?.timestamp;
-  const point = timeinterval ? Math.ceil(timerange / timeinterval) : 0;
-  if (point > 2000) {
-    ElMessage.warning('当前数据点较多，无法绘制，请缩短时间范围或调整采样周期重试');
-    return;
-  }
-  console.log('handleSearch');
-}
-
-// 切换数据类型
-function handleTrendTab(type: 'running' | 'history') {
-  dataTab.value = type;
-}
+const { requestFn: getHistoryTrend } = useRequest(SearchApi.getHistoryTrend);
 
 const setOption = (option:ECOption) => {
   if (chartInstance) {
@@ -221,9 +189,99 @@ const setOption = (option:ECOption) => {
 
 const onResize = debounce(() => {
   if (chartContainer.value) {
-    chartInstance.resize();
+    chartInstance?.resize();
   }
 }, 50);
+
+// 重置
+function handleReset() {
+  searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
+  searchFormData.unitInterval = '10m';
+  searchFormData.aggregation = 'avg';
+}
+
+// 查询
+function handleSearch() {
+  if (!checkedData.value.length) return;
+  const timerange = dayjs(searchFormData.datetimerange[1]).valueOf() - dayjs(searchFormData.datetimerange[0]).valueOf();
+  const timeinterval = timeUnits.find((time) => time.value === searchFormData.unitInterval)?.timestamp;
+  const point = timeinterval ? Math.ceil(timerange / timeinterval) : 0;
+  if (point > 2000) {
+    ElMessage.warning('当前数据点较多，无法绘制，请缩短时间范围或调整采样周期重试');
+    return;
+  }
+  getHistoryTrend({
+    paths: checkedData.value.map((item) => item.path),
+    startTime: dayjs(searchFormData.datetimerange[0]).valueOf(),
+    endTime: dayjs(searchFormData.datetimerange[1]).valueOf(),
+    groupBy: searchFormData.unitInterval,
+    aggregateFun: searchFormData.aggregation,
+  }).then((res) => {
+    chartData.value = res.data || [];
+  });
+}
+
+function handlePlay(val: boolean) {
+  loading.value = val;
+}
+
+function handleData(data: any) {
+  const jsonData: {
+    data: Search.TrendData[],
+    operate: string,
+  } = JSON.parse(data) || [];
+  if (loading.value && jsonData.operate === 'get') {
+    jsonData.data.forEach((item) => {
+      const index = chartData.value.findIndex((f) => f.path === item.path);
+      if (index !== -1) {
+        const originData = chartData.value[index];
+        originData.timeseries.push(...item.timeseries);
+        originData.values.push(...item.values);
+        chartData.value.splice(index, 1, { ...originData });
+      }
+    });
+    setOption(chartOptions.value);
+  }
+}
+
+const { socketInstance } = useWebsocket('/api/trendData', handleData);
+
+// 切换数据类型
+function handleTrendTab(type: 'running' | 'history') {
+  if (dataTab.value === type) return;
+  dataTab.value = type;
+  chartData.value = [];
+  if (type === 'history') {
+    copyCheckData.value = cloneDeep(checkedData.value);
+    loading.value = false;
+    handleReset();
+    handleSearch();
+  } else {
+    const currentChecked = checkedData.value.map((item) => item.path);
+    const cloneChecked = copyCheckData.value.map((item) => item.path);
+    const add = difference(currentChecked, cloneChecked);
+    const del = difference(cloneChecked, currentChecked);
+    if (add.length > 0) {
+      socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [...add] }));
+    }
+    if (del.length > 0) {
+      socketInstance.value?.send(JSON.stringify({ operate: 'del', paths: [...del] }));
+    }
+    loading.value = true;
+  }
+}
+
+function handleOperatePath(type: 'add' | 'del', path: string) {
+  if (dataTab.value === 'running') {
+    if (type === 'add') {
+      socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [path] }));
+    } else {
+      socketInstance.value?.send(JSON.stringify({ operate: 'del', paths: [path] }));
+    }
+  } else {
+    handleSearch();
+  }
+}
 
 onMounted(() => {
   if (route.query.measurement) {
@@ -233,21 +291,35 @@ onMounted(() => {
       width: 2,
       checked: true,
     });
+    socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [route.query.measurement as string] }));
   }
   setOption(chartOptions.value);
+
+  window.addEventListener('beforeunload', () => {
+    chartContainer.value = null;
+    if (chartInstance) {
+      chartInstance.clear();
+      chartInstance.dispose();
+    }
+    if (socketInstance.value) {
+      socketInstance.value.close();
+    }
+  });
 });
 
 onUnmounted(() => {
+  chartContainer.value = null;
   if (chartInstance) {
     chartInstance.clear();
     chartInstance.dispose();
   }
+  if (socketInstance.value) {
+    socketInstance.value.close();
+  }
 });
-
 </script>
 
 <style lang="scss" scoped>
-
 .data-trend-wrapper{
   border-radius: 6px;
   background: #FFF;

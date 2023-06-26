@@ -117,6 +117,10 @@ export default defineConfig(({ mode }) => {
         '/api': {
           target: proxyTarget,
         },
+        '/api/trendData': {
+          target: proxyTarget,
+          ws: true,
+        },
       },
     },
   };

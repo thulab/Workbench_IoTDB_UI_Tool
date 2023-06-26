@@ -60,4 +60,18 @@ declare namespace Search{
     sql: string;
     columns?: number;
   }
+
+  export interface QueryHistoryTrend {
+    paths: string[];
+    startTime: number;
+    endTime: number;
+    groupBy: string;
+    aggregateFun: string;
+  }
+
+  export interface TrendData {
+    path: string;
+    timeseries: number[];
+    values: string[];
+  }
 }

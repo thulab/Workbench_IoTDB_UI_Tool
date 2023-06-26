@@ -35,7 +35,7 @@
             <el-input-number v-model.number="item.width" :min="1" :max="10" step-strictly controls-position="right" style="width: 40px;" @change="val => handleChangeWidth(val, item, index)" />
           </div>
         </div>
-        <el-icon size="14" class="delete-icon" @click="handleDel(index)"><i-custom-close-circle /></el-icon>
+        <el-icon size="14" class="delete-icon" @click="handleDel(item, index)"><i-custom-close-circle /></el-icon>
       </li>
     </ul>
   </div>
@@ -66,6 +66,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: 'update:isExpand', isExpand: boolean): void;
   (event: 'handleSelect', payload: string): void;
+  (evnet: 'handleOperate', payload: 'add' | 'del', data: string): void;
 }>();
 
 const pathList = useVModel(props, 'modelValue');
@@ -89,18 +90,21 @@ function handleAdd() {
 
 function handleSavePath(data: Trend.LineObj) {
   pathList.value.push({ ...data, checked: true });
+  emit('handleOperate', 'add', data.path);
 }
 
 function handleChecked(val: CheckboxValueType, data: Trend.LineObj, index: number) {
   pathList.value.splice(index, 1, { ...data, checked: val as boolean });
+  // emit('handleOperate', val ? 'add' : 'del', data.path);
 }
 
 function handleChangeWidth(val: number | undefined, data: Trend.LineObj, index: number) {
   pathList.value.splice(index, 1, { ...data, width: val as number });
 }
 
-function handleDel(index: number) {
+function handleDel(data: Trend.LineObj, index: number) {
   pathList.value.splice(index, 1);
+  emit('handleOperate', 'del', data.path);
 }
 
 function handleExpand() {

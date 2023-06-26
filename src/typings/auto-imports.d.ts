@@ -60,6 +60,7 @@ declare global {
   const useTable: typeof import('../composition-api/index')['useTable']
   const useTableHeight: typeof import('../composition-api/index')['useTableHeight']
   const useVModel: typeof import('@vueuse/core')['useVModel']
+  const useWebsocket: typeof import('../composition-api/index')['useWebsocket']
   const watch: typeof import('vue')['watch']
   const watchEffect: typeof import('vue')['watchEffect']
   const watchPostEffect: typeof import('vue')['watchPostEffect']

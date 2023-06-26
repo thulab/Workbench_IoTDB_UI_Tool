@@ -66,6 +66,7 @@
     "watchEffect": true,
     "watchPostEffect": true,
     "watchSyncEffect": true,
-    "toValue": true
+    "toValue": true,
+    "useWebsocket": true
   }
 }
