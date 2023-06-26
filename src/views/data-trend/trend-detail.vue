@@ -142,29 +142,54 @@ const searchAbled = computed(() => pathList.value.length > 0 && pathList.value.f
 const checkedData = computed(() => pathList.value.filter((item) => item.checked));
 const chartData = ref<Search.TrendData[]>([]);
 const copyCheckData = ref<Trend.LineObj[]>([]);
+const showData = computed(() => chartData.value.filter((data) => checkedData.value.some((s) => s.path === data.path && s.checked)));
 
 const chartOptions = computed<ECOption>(() => ({
   color: checkedData.value.map((item) => item.color),
   useUTC: true,
   xAxis: {
-    type: 'category',
-    boundaryGap: false,
-    data: chartData.value.map((item) => (item.timeseries)),
+    type: 'time',
   },
   yAxis: {
     type: 'value',
   },
-  series: chartData.value.filter((data) => checkedData.value.some((s) => s.path === data.path && s.checked)).map((item) => ({
+  series: showData.value.map((item) => ({
     type: 'line',
     name: item.path,
-    data: item.values,
+    data: item.values.map((dataItem, index) => [item.timeseries[index], dataItem]),
     emphasis: {
       focus: 'series',
     },
-    // encode: {
-    //   x: 'timeseries',
-    //   y: 'values',
-    // },
+  })),
+}));
+
+const chartHistoryOptions = computed<ECOption>(() => ({
+  color: checkedData.value.map((item) => item.color),
+  useUTC: true,
+  tooltip: {
+    trigger: 'axis',
+  },
+  xAxis: {
+    type: 'time',
+    boundaryGap: false,
+    min: dayjs(searchFormData.datetimerange[0]).valueOf(),
+    max: dayjs(searchFormData.datetimerange[1]).valueOf(),
+  },
+  yAxis: {
+    type: 'value',
+  },
+  // yAxis: showData.value.map(() => ({
+  //   type: 'value',
+  // })),
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  series: showData.value.map((item, index) => ({
+    type: 'line',
+    name: item.path,
+    data: item.values.map((dataItem, dataIndex) => [item.timeseries[dataIndex], dataItem]),
+    emphasis: {
+      focus: 'series',
+    },
+    // yAxisIndex: index,
   })),
 }));
 
@@ -218,6 +243,7 @@ function handleSearch() {
     aggregateFun: searchFormData.aggregation,
   }).then((res) => {
     chartData.value = res.data || [];
+    setOption(chartHistoryOptions.value);
   });
 }
 
@@ -231,6 +257,7 @@ function handleData(data: any) {
     operate: string,
   } = JSON.parse(data) || [];
   if (loading.value && jsonData.operate === 'get') {
+    // TODO 返回值待处理
     jsonData.data.forEach((item) => {
       const index = chartData.value.findIndex((f) => f.path === item.path);
       if (index !== -1) {
