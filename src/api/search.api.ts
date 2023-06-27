@@ -40,7 +40,7 @@ class SearchApi {
   }
 
   // 历史趋势查询
-  static getHistoryTrend(data: Search.QueryHistoryTrend): HttpResponseP {
+  static getHistoryTrend(data: Search.QueryHistoryTrend): HttpResponseP<Search.QueryHistoryTrendResponse> {
     return http.post('/trend/history', data);
   }
 }

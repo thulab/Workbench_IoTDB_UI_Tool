@@ -73,5 +73,11 @@ declare namespace Search{
     path: string;
     timestamps: number[];
     values: string[];
+    disabled?: boolean;
+  }
+
+  export interface QueryHistoryTrendResponse {
+    normal: TrendData[];
+    abnormal: string[];
   }
 }

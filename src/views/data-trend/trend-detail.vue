@@ -61,6 +61,7 @@
           <trend-list
             v-model="pathList"
             v-model:is-expand="isExpand"
+            :data-tab="dataTab"
             @handleOperate="handleOperatePath"
           />
         </el-aside>
@@ -95,7 +96,7 @@ const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({
   datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
   unitInterval: '10m',
-  aggregation: '',
+  aggregation: 'avg',
 });
 const shortcutsDaterange = [
   {
@@ -195,6 +196,7 @@ const chartOptions = computed<ECOption>(() => ({
   yAxis: {
     type: 'value',
   },
+  animation: !isRunningTab.value,
   series: seriesData.value.series,
 }));
 
@@ -233,23 +235,12 @@ const onResize = debounce(() => {
 function handleReset() {
   searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
   searchFormData.unitInterval = '10m';
-  searchFormData.aggregation = '';
-  nextTick(() => {
-    searchFormRef.value?.clearValidate('aggregation');
-  });
+  searchFormData.aggregation = 'avg';
 }
 
 // 查询
 function handleSearch() {
   if (!checkedData.value.length) return;
-  if (!searchFormData.aggregation) {
-    ElMessage.error('请输入相应内容后进行操作');
-    nextTick(() => {
-      searchFormRef.value?.clearValidate('aggregation');
-    });
-    return;
-  }
-
   const timerange = dayjs(searchFormData.datetimerange[1]).valueOf() - dayjs(searchFormData.datetimerange[0]).valueOf();
   const timeinterval = timeUnits.find((time) => time.value === searchFormData.unitInterval)?.timestamp;
   const point = timeinterval ? Math.ceil(timerange / timeinterval) : 0;
@@ -259,12 +250,6 @@ function handleSearch() {
   }
   const start = dayjs(searchFormData.datetimerange[0]).valueOf();
   const end = dayjs(searchFormData.datetimerange[1]).valueOf();
-  setOption({
-    xAxis: {
-      min: start,
-      max: end,
-    },
-  });
   getHistoryTrend({
     paths: checkedData.value.map((item) => item.path),
     startTime: start,
@@ -272,8 +257,23 @@ function handleSearch() {
     groupBy: searchFormData.unitInterval,
     aggregateFun: searchFormData.aggregation,
   }).then((res) => {
-    chartHistoryData.value = res.data || [];
-    setOption(chartOptions.value);
+    chartHistoryData.value = res.data?.normal || [];
+    if (res.data?.abnormal?.length) {
+      ElMessage.warning('boolean类型仅支持最新值计算，请修改采样策略后查看趋势');
+      pathList.value.forEach((item) => {
+        if (res.data.abnormal.includes(item.path)) {
+          item.disabled = true;
+          item.checked = false;
+        }
+      });
+    }
+    setOption(chartOptions.value, true);
+    setOption({
+      xAxis: {
+        min: start,
+        max: end,
+      },
+    });
   });
 }
 
@@ -328,9 +328,8 @@ function handleTrendTab(type: 'running' | 'history') {
         item.timestamps = [];
         item.values = [];
       });
-      chartInstance.clear();
       chartHistoryData.value.length = 0;
-      setOption(chartOptions.value);
+      setOption(chartOptions.value, true);
       handleReset();
       handleSearch();
     } else {
@@ -345,8 +344,7 @@ function handleTrendTab(type: 'running' | 'history') {
       if (del.length > 0) {
         socketInstance.value?.send(JSON.stringify({ operate: 'del', paths: [...del] }));
       }
-      chartInstance.clear();
-      setOption(chartOptions.value);
+      setOption(chartOptions.value, true);
     }
   });
 }

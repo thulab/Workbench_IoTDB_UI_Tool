@@ -5,5 +5,6 @@ declare namespace Trend{
     color: string;
     width: number;
     checked?: boolean;
+    disabled?: boolean;
   }
 }

@@ -22,17 +22,18 @@
     <ul class="list-box" v-else>
       <li v-for="(item, index) in pathList" :key="item.path" :class="['path-item-box']">
         <div class="path-text-box">
-          <el-checkbox :checked="item.checked" @change="val => handleChecked(val, item, index)" class="m-r-8" />
+          <el-checkbox v-if="historyDisabled(item)" :checked="false" :disabled="true" class="m-r-8" />
+          <el-checkbox v-else :checked="item.checked" @change="val => handleChecked(val, item, index)" class="m-r-8" />
           <div class="path-text"><text-tooltip :content="item.path" /></div>
         </div>
         <div class="path-detail-box">
           <div class="path-detail-item">
             <span class="detail-label">颜色：</span>
-            <el-color-picker v-model="item.color" color-format="hex" :predefine="predefineColors" @change="val => handleChangeColor(val, item, index)" />
+            <el-color-picker v-model="item.color" :disabled="historyDisabled(item)" color-format="hex" :predefine="predefineColors" @change="val => handleChangeColor(val, item, index)" />
           </div>
           <div class="path-detail-item">
             <span class="detail-label">线宽：</span>
-            <el-input-number v-model.number="item.width" :min="1" :max="10" step-strictly controls-position="right" style="width: 40px;" @change="val => handleChangeWidth(val, item, index)" />
+            <el-input-number v-model.number="item.width" :disabled="historyDisabled(item)" :min="1" :max="10" step-strictly controls-position="right" style="width: 40px;" @change="val => handleChangeWidth(val, item, index)" />
           </div>
         </div>
         <el-icon size="14" class="delete-icon" @click="handleDel(item, index)"><i-custom-close-circle /></el-icon>
@@ -61,6 +62,7 @@ import ModalPath from './modal-path.vue';
 const props = defineProps<{
   modelValue: Trend.LineObj[];
   isExpand: boolean;
+  dataTab: 'running' | 'history';
 }>();
 
 const emit = defineEmits<{
@@ -78,6 +80,10 @@ const current = ref('');
 const pathVisible = ref(false);
 const editPathList = ref<string[]>([]);
 const defaultColor = ref('');
+
+const historyDisabled = computed(() => function (item: Trend.LineObj) {
+  return props.dataTab === 'history' && item.disabled;
+})
 
 function handleAdd() {
   if (pathList.value.length === 10) return;
