@@ -71,7 +71,7 @@ declare namespace Search{
 
   export interface TrendData {
     path: string;
-    timeseries: number[];
+    timestamps: number[];
     values: string[];
   }
 }

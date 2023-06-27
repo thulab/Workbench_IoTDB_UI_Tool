@@ -16,29 +16,31 @@
         <layout-menu-sub-item :menu-list="subItem.children" />
       </el-sub-menu>
     </template>
+    <template v-else>
+      <el-divider v-if="subItem.showTopLine" />
+      <el-menu-item
 
-    <el-menu-item
-      v-else
-      :index="subItem.path">
-      <el-icon v-if="subItem.icon">
-        <i class="active" v-if="isCollapse && subItem.activeIcon" v-html="subItem.activeIcon"></i>
-        <i class="normal" v-html="subItem.icon"></i>
-      </el-icon>
-      <template
-        v-if="!subItem.isLink"
-        #title>
-        <span>{{ subItem.title }}</span>
-      </template>
-      <template
-        v-else
-        #title>
-        <a
-          class="href"
-          :href="subItem.isLink"
-          rel="noopener noreferrer"
-          target="_blank">{{ subItem.title }}</a>
-      </template>
-    </el-menu-item>
+        :index="subItem.path">
+        <el-icon v-if="subItem.icon">
+          <i class="active" v-if="isCollapse && subItem.activeIcon" v-html="subItem.activeIcon"></i>
+          <i class="normal" v-html="subItem.icon"></i>
+        </el-icon>
+        <template
+          v-if="!subItem.isLink"
+          #title>
+          <span>{{ subItem.title }}</span>
+        </template>
+        <template
+          v-else
+          #title>
+          <a
+            class="href"
+            :href="subItem.isLink"
+            rel="noopener noreferrer"
+            target="_blank">{{ subItem.title }}</a>
+        </template>
+      </el-menu-item>
+    </template>
   </template>
 </template>
 

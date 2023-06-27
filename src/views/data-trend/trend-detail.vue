@@ -74,7 +74,9 @@
 import { useRoute } from 'vue-router';
 import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import dayjs from 'dayjs';
-import { debounce, cloneDeep, difference } from 'lodash-es';
+import {
+  debounce, throttle, cloneDeep, difference,
+} from 'lodash-es';
 import { vElementSize } from '@vueuse/components';
 import { SearchApi } from '@/api';
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
@@ -136,36 +138,61 @@ const requiredRules = ref([
 ]);
 const dataTab = ref<'running' | 'history'>('running');
 const pathList = ref<Trend.LineObj[]>([]);
-const loading = ref(false);
+const loading = ref(true);
 const isRunningTab = computed(() => dataTab.value === 'running');
 const searchAbled = computed(() => pathList.value.length > 0 && pathList.value.filter((item) => item.checked).length > 0);
 const checkedData = computed(() => pathList.value.filter((item) => item.checked));
+// 实时数据
 const chartData = ref<Search.TrendData[]>([]);
+// 历史数据
+const chartHistoryData = ref<Search.TrendData[]>([]);
 const copyCheckData = ref<Trend.LineObj[]>([]);
-const showData = computed(() => chartData.value.filter((data) => checkedData.value.some((s) => s.path === data.path && s.checked)));
+// 当前数据
+const currentData = computed(() => (isRunningTab.value ? chartData.value : chartHistoryData.value));
+// 当前展示数据
+const showData = computed(() => currentData.value.filter((data) => checkedData.value.some((s) => s.path === data.path && s.checked)));
 
-const chartOptions = computed<ECOption>(() => ({
-  color: checkedData.value.map((item) => item.color),
-  useUTC: true,
-  xAxis: {
-    type: 'time',
-  },
-  yAxis: {
-    type: 'value',
-  },
-  series: showData.value.map((item) => ({
+const legendSelected = computed(() => ({
+  show: false,
+  selected: pathList.value.reduce((pre, cur) => {
+    pre[cur.path] = cur.checked || false;
+    return pre;
+  }, {} as Record<string, boolean>),
+}));
+
+const seriesData = computed<ECOption>(() => ({
+  series: currentData.value.map((item) => ({
     type: 'line',
+    symbol: 'none',
     name: item.path,
-    data: item.values.map((dataItem, index) => [item.timeseries[index], dataItem]),
+    data: item.values.map((dataItem, index) => [item.timestamps[index], dataItem]),
     emphasis: {
       focus: 'series',
     },
   })),
 }));
 
+const chartOptions = computed<ECOption>(() => ({
+  color: pathList.value.map((item) => item.color),
+  legend: legendSelected.value,
+  useUTC: false,
+  tooltip: {
+    trigger: 'axis',
+  },
+  xAxis: {
+    type: 'time',
+    min: dayjs().subtract(10, 'minute').valueOf(),
+  },
+  yAxis: {
+    type: 'value',
+  },
+  series: seriesData.value.series,
+}));
+
 const chartHistoryOptions = computed<ECOption>(() => ({
-  color: checkedData.value.map((item) => item.color),
-  useUTC: true,
+  color: pathList.value.map((item) => item.color),
+  legend: legendSelected.value,
+  useUTC: false,
   tooltip: {
     trigger: 'axis',
   },
@@ -181,16 +208,17 @@ const chartHistoryOptions = computed<ECOption>(() => ({
   // yAxis: showData.value.map(() => ({
   //   type: 'value',
   // })),
+  series: seriesData.value.series,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  series: showData.value.map((item, index) => ({
-    type: 'line',
-    name: item.path,
-    data: item.values.map((dataItem, dataIndex) => [item.timeseries[dataIndex], dataItem]),
-    emphasis: {
-      focus: 'series',
-    },
-    // yAxisIndex: index,
-  })),
+  // series: showData.value.map((item, index) => ({
+  //   type: 'line',
+  //   name: item.path,
+  //   data: item.values.map((dataItem, dataIndex) => [item.timestamps[dataIndex], dataItem]),
+  //   emphasis: {
+  //     focus: 'series',
+  //   },
+  //   // yAxisIndex: index,
+  // })),
 }));
 
 const { requestFn: getHistoryTrend } = useRequest(SearchApi.getHistoryTrend);
@@ -242,8 +270,8 @@ function handleSearch() {
     groupBy: searchFormData.unitInterval,
     aggregateFun: searchFormData.aggregation,
   }).then((res) => {
-    chartData.value = res.data || [];
-    setOption(chartHistoryOptions.value);
+    chartHistoryData.value = res.data || [];
+    setOption({ ...chartHistoryOptions.value });
   });
 }
 
@@ -262,12 +290,19 @@ function handleData(data: any) {
       const index = chartData.value.findIndex((f) => f.path === item.path);
       if (index !== -1) {
         const originData = chartData.value[index];
-        originData.timeseries.push(...item.timeseries);
+        originData.timestamps.push(...item.timestamps);
         originData.values.push(...item.values);
         chartData.value.splice(index, 1, { ...originData });
+      } else {
+        const dataItem = {
+          path: item.path,
+          timestamps: item.timestamps,
+          values: item.values,
+        };
+        chartData.value.push(dataItem);
       }
     });
-    setOption(chartOptions.value);
+    setOption({ legend: legendSelected.value, series: seriesData.value.series });
   }
 }
 
@@ -277,25 +312,30 @@ const { socketInstance } = useWebsocket('/api/trendData', handleData);
 function handleTrendTab(type: 'running' | 'history') {
   if (dataTab.value === type) return;
   dataTab.value = type;
-  chartData.value = [];
-  if (type === 'history') {
-    copyCheckData.value = cloneDeep(checkedData.value);
-    loading.value = false;
-    handleReset();
-    handleSearch();
-  } else {
-    const currentChecked = checkedData.value.map((item) => item.path);
-    const cloneChecked = copyCheckData.value.map((item) => item.path);
-    const add = difference(currentChecked, cloneChecked);
-    const del = difference(cloneChecked, currentChecked);
-    if (add.length > 0) {
-      socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [...add] }));
+  // chartData.value = [];
+  nextTick(() => {
+    if (type === 'history') {
+      copyCheckData.value = cloneDeep(checkedData.value);
+      loading.value = false;
+      chartInstance.clear();
+      handleReset();
+      handleSearch();
+    } else {
+      const currentChecked = currentData.value.map((item) => item.path);
+      const cloneChecked = copyCheckData.value.map((item) => item.path);
+      const add = difference(currentChecked, cloneChecked);
+      const del = difference(cloneChecked, currentChecked);
+      if (add.length > 0) {
+        socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [...add] }));
+      }
+      if (del.length > 0) {
+        socketInstance.value?.send(JSON.stringify({ operate: 'del', paths: [...del] }));
+      }
+      loading.value = true;
+      chartInstance.clear();
+      setOption({ ...chartOptions.value });
     }
-    if (del.length > 0) {
-      socketInstance.value?.send(JSON.stringify({ operate: 'del', paths: [...del] }));
-    }
-    loading.value = true;
-  }
+  });
 }
 
 function handleOperatePath(type: 'add' | 'del', path: string) {
@@ -309,6 +349,10 @@ function handleOperatePath(type: 'add' | 'del', path: string) {
     handleSearch();
   }
 }
+
+watch(() => pathList.value, () => {
+  setOption({ legend: legendSelected.value });
+});
 
 onMounted(() => {
   if (route.query.measurement) {

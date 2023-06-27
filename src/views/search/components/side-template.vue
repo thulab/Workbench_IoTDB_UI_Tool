@@ -35,8 +35,7 @@
 import { markRaw } from 'vue';
 import { debounce } from 'lodash-es';
 import { SearchApi } from '@/api';
-// eslint-disable-next-line import/extensions
-import ICustomMessageWarning from '~icons/custom/message-warning';
+import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
 const emit = defineEmits(['handleSqlOperate']);
 
@@ -60,7 +59,7 @@ const handleSqlCommand = (val: string, data: Search.SqlList) => {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning',
-      icon: markRaw(ICustomMessageWarning),
+      icon: ICustomMessageWarning,
     }).then(() => {
       deleteQueryS(`${data.id}`).then(() => {
         ElMessage({

@@ -89,6 +89,7 @@ declare global {
     close?: boolean;
     order?: number;
     hideLine?: true;
+    showTopLine?: boolean;
     children?: MenuOptions[];
   }
 

@@ -53,7 +53,8 @@ const route = [
       title: '趋势',
       icon: ICustomTrend,
       activeIcon: ICustomTrendActive,
-      order: 50,
+      showTopLine: true,
+      order: 25,
     },
     children: [
       {

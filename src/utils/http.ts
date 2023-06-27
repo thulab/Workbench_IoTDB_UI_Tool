@@ -35,7 +35,7 @@ function requestErrorInterceptor(error: any) {
   return Promise.reject(error);
 }
 
-async function responseInterceptor(response: HttpResponse<object>) {
+async function responseInterceptor(response: HttpResponse<object>): Promise<HttpResponse<object>> {
   requestCount -= 1;
   if (requestCount < 1) {
     NProgress.done();
@@ -63,7 +63,7 @@ async function responseInterceptor(response: HttpResponse<object>) {
       window.location.href = '/login';
       sessionStorage.setItem('nologin', '1');
       return Promise.reject(response);
-    });
+    }) as unknown as Promise<HttpResponse<object>>;
   }
   if (response.status === 401) {
     window.location.href = '/login';

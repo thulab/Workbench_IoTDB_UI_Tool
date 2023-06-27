@@ -67,6 +67,9 @@
     "watchPostEffect": true,
     "watchSyncEffect": true,
     "toValue": true,
-    "useWebsocket": true
+    "useWebsocket": true,
+    "IconEpArrowRight": true,
+    "IconEpMoon": true,
+    "IconEpSunny": true
   }
 }

@@ -11,7 +11,7 @@ export default function useUpload(fileType: string[], fileSize: number) {
     formData.append('file', file);
     return CommonApi.uploadImage(formData).then((res) => {
       ElMessage.success('上传成功');
-      return res.data.result;
+      return res.data;
     }).catch(() => {
       ElMessage.error('上传失败');
       return Promise.reject();

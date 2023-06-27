@@ -75,7 +75,7 @@
 <script lang="ts" setup>
 import type { FormInstance, TabsPaneContext, TabPaneName } from 'element-plus';
 import dayjs from 'dayjs';
-import { debounce } from 'lodash-es';
+import { throttle } from 'lodash-es';
 import { SearchApi } from '@/api';
 import SideFunction from './components/side-function.vue';
 import SideData from './components/side-data.vue';
@@ -180,7 +180,7 @@ function handleSqlOperate(val: string, data: Search.SqlList) {
 }
 
 // 添加tab
-const handleTabAdd = debounce(() => {
+const handleTabAdd = throttle(() => {
   const currentSqlId = `_${dayjs().unix()}`;
   sqlList.value.push({
     // eslint-disable-next-line no-useless-escape
@@ -189,7 +189,7 @@ const handleTabAdd = debounce(() => {
   });
   activiteSql.value = currentSqlId;
   code[activiteSql.value] = '';
-}, 300);
+}, 999);
 // 点击tab
 function handleTabClick(tab: TabsPaneContext) {
   if (tab.index) {
