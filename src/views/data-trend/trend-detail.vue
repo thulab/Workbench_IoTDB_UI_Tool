@@ -84,6 +84,7 @@ import {
   getStartAndEnd, today, getOneInterval, getOneIntervalNow,
 } from '@/utils/date';
 import { useWebsocket } from '@/composition-api';
+import { timeStamp } from 'console';
 import ICustomCalender from '~icons/custom/calender.svg';
 import TrendList from './components/trend-list.vue';
 
@@ -185,10 +186,6 @@ const chartOptions = computed<ECOption>(() => ({
     type: 'time',
     boundaryGap: false,
     show: inited ? pathList.value.length > 0 : true,
-    // axisLine: {
-    //   show: pathList.value.length > 0,
-    // },
-    min: dayjs().subtract(10, 'minute').valueOf(),
   },
   yAxis: {
     type: 'value',
@@ -205,8 +202,6 @@ const chartHistoryOptions = computed<ECOption>(() => ({
   xAxis: {
     type: 'time',
     boundaryGap: false,
-    min: dayjs(searchFormData.datetimerange[0]).valueOf(),
-    max: dayjs(searchFormData.datetimerange[1]).valueOf(),
   },
   yAxis: {
     type: 'value',
@@ -265,6 +260,7 @@ function handleSearch() {
     });
     return;
   }
+
   const timerange = dayjs(searchFormData.datetimerange[1]).valueOf() - dayjs(searchFormData.datetimerange[0]).valueOf();
   const timeinterval = timeUnits.find((time) => time.value === searchFormData.unitInterval)?.timestamp;
   const point = timeinterval ? Math.ceil(timerange / timeinterval) : 0;
@@ -272,10 +268,18 @@ function handleSearch() {
     ElMessage.warning('当前数据点较多，无法绘制，请缩短时间范围或调整采样周期重试');
     return;
   }
+  const start = dayjs(searchFormData.datetimerange[0]).valueOf();
+  const end = dayjs(searchFormData.datetimerange[1]).valueOf();
+  setOption({
+    xAxis: {
+      min: start,
+      max: end,
+    },
+  });
   getHistoryTrend({
     paths: checkedData.value.map((item) => item.path),
-    startTime: dayjs(searchFormData.datetimerange[0]).valueOf(),
-    endTime: dayjs(searchFormData.datetimerange[1]).valueOf(),
+    startTime: start,
+    endTime: end,
     groupBy: searchFormData.unitInterval,
     aggregateFun: searchFormData.aggregation,
   }).then((res) => {
@@ -294,12 +298,19 @@ function handleData(data: any) {
     operate: string,
   } = JSON.parse(data) || [];
   if (loading.value && jsonData.operate === 'get') {
+    const minTime = dayjs().subtract(10, 'minute').valueOf();
     jsonData.data.forEach((item) => {
       const index = chartData.value.findIndex((f) => f.path === item.path);
       if (index !== -1) {
         const originData = chartData.value[index];
         originData.timestamps.push(...item.timestamps);
         originData.values.push(...item.values);
+        // 有效的数据索引（10 分钟内的）
+        const effectiveIndex = originData.timestamps.findIndex((time) => time >= minTime);
+        if (effectiveIndex > 0) {
+          originData.timestamps.splice(0, effectiveIndex);
+          originData.values.splice(0, effectiveIndex);
+        }
         chartData.value.splice(index, 1, { ...originData });
       } else {
         const dataItem = {
@@ -310,7 +321,7 @@ function handleData(data: any) {
         chartData.value.push(dataItem);
       }
     });
-    setOption({ legend: legendSelected.value, series: seriesData.value.series, xAxis: { min: dayjs().subtract(10, 'minute').valueOf(), show: true } });
+    setOption({ legend: legendSelected.value, series: seriesData.value.series, xAxis: { min: minTime, show: true } });
   }
 }
 
@@ -324,6 +335,10 @@ function handleTrendTab(type: 'running' | 'history') {
     if (type === 'history') {
       copyCheckData.value = cloneDeep(checkedData.value);
       loading.value = false;
+      chartData.value.forEach((item) => {
+        item.timestamps = [];
+        item.values = [];
+      });
       chartInstance.clear();
       handleReset();
       handleSearch();
