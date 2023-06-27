@@ -84,7 +84,6 @@ import {
   getStartAndEnd, today, getOneInterval, getOneIntervalNow,
 } from '@/utils/date';
 import { useWebsocket } from '@/composition-api';
-import { timeStamp } from 'console';
 import ICustomCalender from '~icons/custom/calender.svg';
 import TrendList from './components/trend-list.vue';
 
@@ -182,6 +181,12 @@ const chartOptions = computed<ECOption>(() => ({
   tooltip: {
     trigger: 'axis',
   },
+  grid: {
+    left: 20,
+    right: 20,
+    bottom: 20,
+    containLabel: true,
+  },
   xAxis: {
     type: 'time',
     boundaryGap: false,
@@ -193,28 +198,12 @@ const chartOptions = computed<ECOption>(() => ({
   series: seriesData.value.series,
 }));
 
-const chartHistoryOptions = computed<ECOption>(() => ({
-  legend: legendSelected.value,
-  useUTC: false,
-  tooltip: {
-    trigger: 'axis',
-  },
-  xAxis: {
-    type: 'time',
-    boundaryGap: false,
-  },
-  yAxis: {
-    type: 'value',
-  },
-  series: seriesData.value.series,
-}));
-
 const { requestFn: getHistoryTrend } = useRequest(SearchApi.getHistoryTrend);
 
-const setOption = (option:ECOption) => {
+const setOption = (option:ECOption, noMerge: boolean = false) => {
   if (chartInstance) {
     // 实例存在直接设置
-    chartInstance.setOption(option);
+    chartInstance.setOption(option, noMerge);
   } else if (chartContainer.value && chartContainer.value.clientHeight) {
     inited = true;
     // 实例不存在，容器存在，容器高度存在
@@ -284,7 +273,7 @@ function handleSearch() {
     aggregateFun: searchFormData.aggregation,
   }).then((res) => {
     chartHistoryData.value = res.data || [];
-    setOption({ ...chartHistoryOptions.value });
+    setOption(chartOptions.value);
   });
 }
 
@@ -340,6 +329,8 @@ function handleTrendTab(type: 'running' | 'history') {
         item.values = [];
       });
       chartInstance.clear();
+      chartHistoryData.value.length = 0;
+      setOption(chartOptions.value);
       handleReset();
       handleSearch();
     } else {
@@ -355,7 +346,7 @@ function handleTrendTab(type: 'running' | 'history') {
         socketInstance.value?.send(JSON.stringify({ operate: 'del', paths: [...del] }));
       }
       chartInstance.clear();
-      setOption({ ...chartOptions.value });
+      setOption(chartOptions.value);
     }
   });
 }
@@ -370,6 +361,15 @@ function handleOperatePath(type: 'add' | 'del' | 'detail', path: string) {
       socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [path] }));
     } else if (type === 'del') {
       socketInstance.value?.send(JSON.stringify({ operate: 'del', paths: [path] }));
+      const index = chartData.value.findIndex((data) => data.path === path);
+      const historyIndex = chartHistoryData.value.findIndex((data) => data.path === path);
+      if (index !== -1) {
+        chartData.value.splice(index, 1);
+        setOption(chartOptions.value, true);
+      }
+      if (historyIndex !== -1) {
+        chartHistoryData.value.splice(historyIndex, 1);
+      }
     }
   } else {
     handleSearch();
