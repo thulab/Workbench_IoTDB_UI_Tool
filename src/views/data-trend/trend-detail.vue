@@ -188,6 +188,7 @@ const chartOptions = computed<ECOption>(() => ({
     bottom: 20,
     containLabel: true,
   },
+  connectNulls: false,
   xAxis: {
     type: 'time',
     boundaryGap: false,
@@ -280,6 +281,14 @@ function handleSearch() {
 }
 
 function handlePlay(val: boolean) {
+  if (val) {
+    chartData.value.forEach((data) => {
+      if (data.timestamps.length > 0) {
+        data.values.push('');
+        data.timestamps.push(data.timestamps[data.timestamps.length - 1] + 1);
+      }
+    });
+  }
   loading.value = val;
 }
 
