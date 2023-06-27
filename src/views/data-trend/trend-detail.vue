@@ -75,7 +75,7 @@ import { useRoute } from 'vue-router';
 import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import dayjs from 'dayjs';
 import {
-  debounce, throttle, cloneDeep, difference,
+  debounce, cloneDeep, difference,
 } from 'lodash-es';
 import { vElementSize } from '@vueuse/components';
 import { SearchApi } from '@/api';
@@ -95,7 +95,7 @@ const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({
   datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
   unitInterval: '10m',
-  aggregation: 'avg',
+  aggregation: '',
 });
 const shortcutsDaterange = [
   {
@@ -149,8 +149,6 @@ const chartHistoryData = ref<Search.TrendData[]>([]);
 const copyCheckData = ref<Trend.LineObj[]>([]);
 // 当前数据
 const currentData = computed(() => (isRunningTab.value ? chartData.value : chartHistoryData.value));
-// 当前展示数据
-const showData = computed(() => currentData.value.filter((data) => checkedData.value.some((s) => s.path === data.path && s.checked)));
 
 const legendSelected = computed(() => ({
   show: false,
@@ -169,11 +167,14 @@ const seriesData = computed<ECOption>(() => ({
     emphasis: {
       focus: 'series',
     },
+    lineStyle: {
+      width: pathList.value.find((data) => data.path === item.path)?.width || 2,
+      color: pathList.value.find((data) => data.path === item.path)?.color,
+    },
   })),
 }));
 
 const chartOptions = computed<ECOption>(() => ({
-  color: pathList.value.map((item) => item.color),
   legend: legendSelected.value,
   useUTC: false,
   tooltip: {
@@ -190,7 +191,6 @@ const chartOptions = computed<ECOption>(() => ({
 }));
 
 const chartHistoryOptions = computed<ECOption>(() => ({
-  color: pathList.value.map((item) => item.color),
   legend: legendSelected.value,
   useUTC: false,
   tooltip: {
@@ -205,20 +205,7 @@ const chartHistoryOptions = computed<ECOption>(() => ({
   yAxis: {
     type: 'value',
   },
-  // yAxis: showData.value.map(() => ({
-  //   type: 'value',
-  // })),
   series: seriesData.value.series,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // series: showData.value.map((item, index) => ({
-  //   type: 'line',
-  //   name: item.path,
-  //   data: item.values.map((dataItem, dataIndex) => [item.timestamps[dataIndex], dataItem]),
-  //   emphasis: {
-  //     focus: 'series',
-  //   },
-  //   // yAxisIndex: index,
-  // })),
 }));
 
 const { requestFn: getHistoryTrend } = useRequest(SearchApi.getHistoryTrend);
@@ -250,12 +237,22 @@ const onResize = debounce(() => {
 function handleReset() {
   searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
   searchFormData.unitInterval = '10m';
-  searchFormData.aggregation = 'avg';
+  searchFormData.aggregation = '';
+  nextTick(() => {
+    searchFormRef.value?.clearValidate('aggregation');
+  });
 }
 
 // 查询
 function handleSearch() {
   if (!checkedData.value.length) return;
+  if (!searchFormData.aggregation) {
+    ElMessage.error('请输入相应内容后进行操作');
+    nextTick(() => {
+      searchFormRef.value?.clearValidate('aggregation');
+    });
+    return;
+  }
   const timerange = dayjs(searchFormData.datetimerange[1]).valueOf() - dayjs(searchFormData.datetimerange[0]).valueOf();
   const timeinterval = timeUnits.find((time) => time.value === searchFormData.unitInterval)?.timestamp;
   const point = timeinterval ? Math.ceil(timerange / timeinterval) : 0;
@@ -285,7 +282,6 @@ function handleData(data: any) {
     operate: string,
   } = JSON.parse(data) || [];
   if (loading.value && jsonData.operate === 'get') {
-    // TODO 返回值待处理
     jsonData.data.forEach((item) => {
       const index = chartData.value.findIndex((f) => f.path === item.path);
       if (index !== -1) {
@@ -312,7 +308,6 @@ const { socketInstance } = useWebsocket('/api/trendData', handleData);
 function handleTrendTab(type: 'running' | 'history') {
   if (dataTab.value === type) return;
   dataTab.value = type;
-  // chartData.value = [];
   nextTick(() => {
     if (type === 'history') {
       copyCheckData.value = cloneDeep(checkedData.value);
@@ -325,34 +320,34 @@ function handleTrendTab(type: 'running' | 'history') {
       const cloneChecked = copyCheckData.value.map((item) => item.path);
       const add = difference(currentChecked, cloneChecked);
       const del = difference(cloneChecked, currentChecked);
+      loading.value = true;
       if (add.length > 0) {
         socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [...add] }));
       }
       if (del.length > 0) {
         socketInstance.value?.send(JSON.stringify({ operate: 'del', paths: [...del] }));
       }
-      loading.value = true;
       chartInstance.clear();
       setOption({ ...chartOptions.value });
     }
   });
 }
 
-function handleOperatePath(type: 'add' | 'del', path: string) {
+function handleOperatePath(type: 'add' | 'del' | 'detail', path: string) {
+  if (type === 'detail') {
+    setOption({ legend: legendSelected.value, series: seriesData.value.series });
+    return;
+  }
   if (dataTab.value === 'running') {
     if (type === 'add') {
       socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [path] }));
-    } else {
+    } else if (type === 'del') {
       socketInstance.value?.send(JSON.stringify({ operate: 'del', paths: [path] }));
     }
   } else {
     handleSearch();
   }
 }
-
-watch(() => pathList.value, () => {
-  setOption({ legend: legendSelected.value });
-});
 
 onMounted(() => {
   if (route.query.measurement) {

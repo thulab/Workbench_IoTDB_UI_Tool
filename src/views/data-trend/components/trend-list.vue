@@ -28,7 +28,7 @@
         <div class="path-detail-box">
           <div class="path-detail-item">
             <span class="detail-label">颜色：</span>
-            <el-color-picker v-model="item.color" color-format="hex" :predefine="predefineColors" />
+            <el-color-picker v-model="item.color" color-format="hex" :predefine="predefineColors" @change="val => handleChangeColor(val, item, index)" />
           </div>
           <div class="path-detail-item">
             <span class="detail-label">线宽：</span>
@@ -66,7 +66,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: 'update:isExpand', isExpand: boolean): void;
   (event: 'handleSelect', payload: string): void;
-  (evnet: 'handleOperate', payload: 'add' | 'del', data: string): void;
+  (evnet: 'handleOperate', payload: 'add' | 'del' | 'detail', data: string): void;
 }>();
 
 const pathList = useVModel(props, 'modelValue');
@@ -95,11 +95,16 @@ function handleSavePath(data: Trend.LineObj) {
 
 function handleChecked(val: CheckboxValueType, data: Trend.LineObj, index: number) {
   pathList.value.splice(index, 1, { ...data, checked: val as boolean });
-  // emit('handleOperate', val ? 'add' : 'del', data.path);
+  emit('handleOperate', 'detail', data.path);
+}
+function handleChangeColor(val: string | null, data: Trend.LineObj, index: number) {
+  pathList.value.splice(index, 1, { ...data, color: val as string });
+  emit('handleOperate', 'detail', data.path);
 }
 
 function handleChangeWidth(val: number | undefined, data: Trend.LineObj, index: number) {
   pathList.value.splice(index, 1, { ...data, width: val as number });
+  emit('handleOperate', 'detail', data.path);
 }
 
 function handleDel(data: Trend.LineObj, index: number) {
