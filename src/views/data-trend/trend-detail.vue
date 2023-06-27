@@ -260,13 +260,15 @@ function handleSearch() {
     chartHistoryData.value = res.data?.normal || [];
     if (res.data?.abnormal?.length) {
       ElMessage.warning('boolean类型仅支持最新值计算，请修改采样策略后查看趋势');
-      pathList.value.forEach((item) => {
-        if (res.data.abnormal.includes(item.path)) {
-          item.disabled = true;
-          item.checked = false;
-        }
-      });
     }
+    pathList.value.forEach((item) => {
+      if (res.data.abnormal.includes(item.path)) {
+        item.disabled = true;
+        item.checked = false;
+      } else {
+        item.disabled = false;
+      }
+    });
     setOption(chartOptions.value, true);
     setOption({
       xAxis: {
