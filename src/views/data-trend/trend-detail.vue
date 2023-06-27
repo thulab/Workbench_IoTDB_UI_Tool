@@ -368,11 +368,7 @@ function handleTrendTab(type: 'running' | 'history') {
 
 function handleOperatePath(type: 'add' | 'del' | 'detail', path: string) {
   if (type === 'detail') {
-    if (isRunningTab.value) {
-      setOption({ legend: legendSelected.value, series: seriesData.value.series });
-    } else {
-      setOption(chartOptions.value, true);
-    }
+    setOption({ legend: legendSelected.value, series: seriesData.value.series });
     return;
   }
   if (dataTab.value === 'running') {

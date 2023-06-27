@@ -33,7 +33,17 @@
           </div>
           <div class="path-detail-item">
             <span class="detail-label">线宽：</span>
-            <el-input-number v-model.number="item.width" :disabled="historyDisabled(item)" :min="1" :max="10" step-strictly controls-position="right" style="width: 40px;" @blur="ev => handleChangeWidth(ev, item, index)" />
+            <el-input-number
+              v-model.number="item.width"
+              :disabled="historyDisabled(item)"
+              :min="1"
+              :max="10"
+              step-strictly
+              controls-position="right"
+              style="width: 40px;"
+              @change="val => handleChangeWidth(val, item, index)"
+              @blur="ev => handleBlurWidth(ev, item, index)"
+            />
           </div>
         </div>
         <el-icon size="14" class="delete-icon" @click="handleDel(item, index)"><i-custom-close-circle /></el-icon>
@@ -108,13 +118,17 @@ function handleChangeColor(val: string | null, data: Trend.LineObj, index: numbe
   emit('handleOperate', 'detail', data.path);
 }
 
-function handleChangeWidth(ev: FocusEvent, data: Trend.LineObj, index: number) {
+function handleBlurWidth(ev: FocusEvent, data: Trend.LineObj, index: number) {
   const val = (ev?.target as unknown as { value: string | null | undefined })?.value || '';
   let width = 2;
   if (val) {
     width = +val;
   }
   pathList.value.splice(index, 1, { ...data, width: width as number });
+}
+
+function handleChangeWidth(val: number | undefined, data: Trend.LineObj, index: number) {
+  pathList.value.splice(index, 1, { ...data, width: val as number });
   emit('handleOperate', 'detail', data.path);
 }
 
