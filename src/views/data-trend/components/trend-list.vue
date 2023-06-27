@@ -83,7 +83,7 @@ const defaultColor = ref('');
 
 const historyDisabled = computed(() => function (item: Trend.LineObj) {
   return props.dataTab === 'history' && item.disabled;
-})
+});
 
 function handleAdd() {
   if (pathList.value.length === 10) return;

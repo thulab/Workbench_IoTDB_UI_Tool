@@ -344,16 +344,22 @@ function handleTrendTab(type: 'running' | 'history') {
       handleReset();
       handleSearch();
     } else {
-      const currentChecked = currentData.value.map((item) => item.path);
-      const cloneChecked = copyCheckData.value.map((item) => item.path);
-      const add = difference(currentChecked, cloneChecked);
-      const del = difference(cloneChecked, currentChecked);
+      const currentChecked = chartData.value.map((item) => item.path);
+      const cloneChecked = pathList.value.map((item) => item.path);
+      const del = difference(currentChecked, cloneChecked);
+      const add = difference(cloneChecked, currentChecked);
       loading.value = true;
       if (add.length > 0) {
         socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [...add] }));
       }
       if (del.length > 0) {
         socketInstance.value?.send(JSON.stringify({ operate: 'del', paths: [...del] }));
+        del.forEach((deleteItem) => {
+          const index = chartData.value.findIndex((data) => data.path === deleteItem);
+          if (index !== -1) {
+            chartData.value.splice(index, 1);
+          }
+        });
       }
       setOption(chartOptions.value, true);
     }
@@ -362,7 +368,11 @@ function handleTrendTab(type: 'running' | 'history') {
 
 function handleOperatePath(type: 'add' | 'del' | 'detail', path: string) {
   if (type === 'detail') {
-    setOption({ legend: legendSelected.value, series: seriesData.value.series });
+    if (isRunningTab.value) {
+      setOption({ legend: legendSelected.value, series: seriesData.value.series });
+    } else {
+      setOption(chartOptions.value, true);
+    }
     return;
   }
   if (dataTab.value === 'running') {
