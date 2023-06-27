@@ -59,8 +59,8 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  'update:visible': [visible: boolean],
-  'handleSave':[obj: Trend.LineObj],
+  (event: 'update:visible', visible: boolean): void;
+  (event: 'handleSave', payload: Trend.LineObj): void;
 }>();
 
 const dialogVisible = useVModel(props, 'visible', emit);
