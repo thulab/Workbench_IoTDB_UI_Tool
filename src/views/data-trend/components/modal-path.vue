@@ -79,7 +79,8 @@ const requiredRules = ref([
 ]);
 const checkNumber = (rule: any, value: any, callback: any) => {
   if (!value && value !== 0) {
-    return callback(new Error('请输入相应内容后进行操作'));
+    formData.width = 2;
+    return callback();
   }
   if (!/^[1-9]\d*$/.test(`${value}`)) {
     return callback(new Error('只支持输入1-10范围内的正整数'));
@@ -90,11 +91,6 @@ const checkNumber = (rule: any, value: any, callback: any) => {
   return callback();
 };
 const requiredNumberRules = ref([
-  {
-    required: true,
-    message: '请输入相应内容后进行操作',
-    trigger: ['blur'],
-  },
   {
     required: true,
     validator: checkNumber,
