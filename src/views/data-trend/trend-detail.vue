@@ -136,6 +136,7 @@ const requiredRules = ref([
     trigger: ['change'],
   },
 ]);
+let inited = false;
 const dataTab = ref<'running' | 'history'>('running');
 const pathList = ref<Trend.LineObj[]>([]);
 const loading = ref(true);
@@ -182,6 +183,11 @@ const chartOptions = computed<ECOption>(() => ({
   },
   xAxis: {
     type: 'time',
+    boundaryGap: false,
+    show: inited ? pathList.value.length > 0 : true,
+    // axisLine: {
+    //   show: pathList.value.length > 0,
+    // },
     min: dayjs().subtract(10, 'minute').valueOf(),
   },
   yAxis: {
@@ -215,10 +221,16 @@ const setOption = (option:ECOption) => {
     // 实例存在直接设置
     chartInstance.setOption(option);
   } else if (chartContainer.value && chartContainer.value.clientHeight) {
+    inited = true;
     // 实例不存在，容器存在，容器高度存在
     chartInstance = echarts.init(chartContainer.value, 'dark');
     // 初次加载，设置notMerge为true
     chartInstance.setOption(option, true);
+    chartInstance.setOption({
+      xAxis: {
+        show: false,
+      },
+    });
   } else {
     // 容器高度有问题时，延迟加载
     nextTick(() => {
@@ -298,7 +310,7 @@ function handleData(data: any) {
         chartData.value.push(dataItem);
       }
     });
-    setOption({ legend: legendSelected.value, series: seriesData.value.series });
+    setOption({ legend: legendSelected.value, series: seriesData.value.series, xAxis: { min: dayjs().subtract(10, 'minute').valueOf(), show: true } });
   }
 }
 
