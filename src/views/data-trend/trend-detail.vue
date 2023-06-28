@@ -399,7 +399,13 @@ onMounted(() => {
       width: 2,
       checked: true,
     });
-    socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [route.query.measurement as string] }));
+    if (socketInstance.value && socketInstance.value.readyState === 1) {
+      socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [route.query.measurement as string] }));
+    } else {
+      socketInstance.value?.addEventListener('open', () => {
+        socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [route.query.measurement as string] }));
+      });
+    }
   }
   setOption(chartOptions.value);
 

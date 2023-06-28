@@ -3,6 +3,14 @@ import { ref } from 'vue';
 export default function useWebsocket(url: string, receiveData: Function) {
   const socketInstance = ref<WebSocket | null>();
 
+  /**
+   * readyState
+   * 0 正在连接
+   * 1 连接成功
+   * 2 连接正在关闭
+   * 3 连接已经关闭/打开连接失败
+   */
+
   function initWebsocket() {
     if (!('WebSocket' in window)) {
       ElMessage.warning('您的浏览器不支持webSocket,请使用更高版本浏览器！');
