@@ -62,6 +62,7 @@
             v-model="pathList"
             v-model:is-expand="isExpand"
             :data-tab="dataTab"
+            :aggregation="searchFormData.aggregation"
             @handleOperate="handleOperatePath"
           />
         </el-aside>
@@ -184,14 +185,15 @@ const chartOptions = computed<ECOption>(() => ({
     // appendToBody: true,
     formatter: (params) => {
       let res = '';
+      const paramsData = params as unknown as Array<Record<string, any>>;
       const circle = '<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:';
       checkedData.value.forEach((item) => {
-        const data = params.find((f) => f.seriesName === item.path);
+        const data = paramsData.find((f) => f.seriesName === item.path);
         if (data) {
           res += `<div style="margin: 10px 0 0;">${circle}${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;margin-left:2px">${data.seriesName}</span><span style="float:right;margin-left:20px;font-size:14px;color:#666;font-weight:900">${data.data[1]}</span></div>`;
         }
       });
-      return `<div style="font-size:14px;color:#666;font-weight:400;line-height:1;">${params[0].axisValueLabel}</div>${res}`;
+      return `<div style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0].axisValueLabel}</div>${res}`;
     },
   },
   grid: {

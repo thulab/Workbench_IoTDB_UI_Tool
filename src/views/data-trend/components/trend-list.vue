@@ -73,6 +73,7 @@ const props = defineProps<{
   modelValue: Trend.LineObj[];
   isExpand: boolean;
   dataTab: 'running' | 'history';
+  aggregation: 'avg' | 'max_value' | 'min_value' | 'last_value' | string;
 }>();
 
 const emit = defineEmits<{
@@ -92,7 +93,7 @@ const editPathList = ref<string[]>([]);
 const defaultColor = ref('');
 
 const historyDisabled = computed(() => function (item: Trend.LineObj) {
-  return props.dataTab === 'history' && item.disabled;
+  return props.dataTab === 'history' && item.disabled && props.aggregation !== 'last_value';
 });
 
 function handleAdd() {
