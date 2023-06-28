@@ -12,17 +12,18 @@
         </template>
         <el-select
           v-model="formData.path"
-          placeholder="请输入告警测点"
+          placeholder="请输入测点名称"
           filterable
           remote
-          remote-show-suffix
+          :remote-show-suffix="false"
           fit-input-width
           :remote-method="remoteMethod"
           :loading="measurementLoading"
-          style="width: 235px;"
+          style="width: 363px;"
+          class="path-select"
         >
           <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :disabled="item.dataType === 'TEXT' || pathList.includes(item.timeseries)">
-            <div style="display: flex; width: 200px;">
+            <div style="display: flex; width: 320px;">
               <text-tooltip :content="item.timeseries" />
             </div>
           </el-option>
@@ -141,6 +142,12 @@ watch(
 
     .chart-width-box{
       margin-left: 36px;
+    }
+  }
+
+  .path-select{
+    :deep(.el-input__suffix) {
+      background-color: transparent;
     }
   }
 </style>
