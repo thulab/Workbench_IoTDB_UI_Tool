@@ -68,8 +68,9 @@ const loginForm = reactive({
   password: '',
 });
 const pwdType = ref('password');
+const loading = ref(false);
 
-const { requestFn: login, loading } = useRequest(UserApi.login);
+const { requestFn: login } = useRequest(UserApi.login);
 
 const validateuser = (rule: any, value: any, callback: any) => {
   if (value === '') {
@@ -121,13 +122,20 @@ function handleChangePwdType() {
 const submitForm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
+      loading.value = true;
       login(loginForm.user, loginForm.password).then(() => {
         router.push({ path: '/' });
         sessionStorage.setItem('nologin', '0');
+      }).catch(() => {
+        loading.value = false;
       });
     }
   });
 };
+
+onUnmounted(() => {
+  loading.value = false;
+});
 
 </script>
 
