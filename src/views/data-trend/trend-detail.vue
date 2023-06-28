@@ -294,18 +294,6 @@ function handleSearch() {
   });
 }
 
-function handlePlay(val: boolean) {
-  if (val) {
-    chartData.value.forEach((data) => {
-      if (data.timestamps.length > 0) {
-        data.values.push('');
-        data.timestamps.push(data.timestamps[data.timestamps.length - 1] + 1);
-      }
-    });
-  }
-  loading.value = val;
-}
-
 function handleData(data: any) {
   const jsonData: {
     data: Search.TrendData[],
@@ -339,7 +327,25 @@ function handleData(data: any) {
   }
 }
 
-const { socketInstance } = useWebsocket('/api/trendData', handleData);
+const { socketInstance, initWebsocket } = useWebsocket('/api/trendData', handleData);
+
+function handlePlay(val: boolean) {
+  if (val) {
+    if (!socketInstance.value || socketInstance.value.readyState > 1) {
+      initWebsocket(() => {
+        const paths = chartData.value.map((data) => data.path);
+        socketInstance.value?.send(JSON.stringify({ operate: 'add', paths }));
+      });
+    }
+    chartData.value.forEach((data) => {
+      if (data.timestamps.length > 0) {
+        data.values.push('');
+        data.timestamps.push(data.timestamps[data.timestamps.length - 1] + 1);
+      }
+    });
+  }
+  loading.value = val;
+}
 
 // 切换数据类型
 function handleTrendTab(type: 'running' | 'history') {
