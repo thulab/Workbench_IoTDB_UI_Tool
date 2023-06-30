@@ -7,6 +7,7 @@ import ICustomAuthUser from '@/assets/icons/auth-user.svg?raw';
 import ICustomTrend from '@/assets/icons/trend.svg?raw';
 import ICustomTrendActive from '@/assets/icons/trend-active.svg?raw';
 import ICustomAuthRole from '~icons/custom/auth-role.svg?raw';
+import ICustomWhiteList from '~icons/custom/white-list.svg?raw';
 
 const route = [
   {
@@ -42,6 +43,16 @@ const route = [
             meta: { keepAlive: true, title: '角色管理', icon: ICustomAuthRole },
           },
         ],
+      },
+      {
+        path: 'white-list',
+        name: 'WhiteList',
+        component: () => import('@/views/white-list/detail.vue'),
+        meta: {
+          keepAlive: true,
+          title: '白名单管理',
+          icon: ICustomWhiteList,
+        },
       },
     ],
   },

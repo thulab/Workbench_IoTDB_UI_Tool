@@ -84,6 +84,7 @@ declare module 'vue' {
     ICustomNewRole: typeof import('~icons/custom/new-role')['default']
     ICustomNewStorage: typeof import('~icons/custom/new-storage')['default']
     ICustomNewTrend: typeof import('~icons/custom/new-trend')['default']
+    ICustomNewWhiteList: typeof import('~icons/custom/new-white-list')['default']
     ICustomPassword: typeof import('~icons/custom/password')['default']
     ICustomPause: typeof import('~icons/custom/pause')['default']
     ICustomPlayActive: typeof import('~icons/custom/play-active')['default']
