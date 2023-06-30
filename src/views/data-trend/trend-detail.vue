@@ -164,7 +164,10 @@ const legendSelected = computed(() => ({
 const seriesData = computed<ECOption>(() => ({
   series: currentData.value.map((item) => ({
     type: 'line',
-    symbol: 'none',
+    // symbol: 'none',
+    showAllSymbol: 'auto',
+    connectNulls: false,
+    symbolSize: pathList.value.find((data) => data.path === item.path)?.width || 2,
     name: item.path,
     data: item.values.map((dataItem, index) => [item.timestamps[index], dataItem]),
     emphasis: {
@@ -172,6 +175,9 @@ const seriesData = computed<ECOption>(() => ({
     },
     lineStyle: {
       width: pathList.value.find((data) => data.path === item.path)?.width || 2,
+      color: pathList.value.find((data) => data.path === item.path)?.color,
+    },
+    itemStyle: {
       color: pathList.value.find((data) => data.path === item.path)?.color,
     },
   })),
@@ -196,10 +202,32 @@ const chartOptions = computed<ECOption>(() => ({
       return `<div style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0].axisValueLabel}</div>${res}`;
     },
   },
+  dataZoom: [
+    {
+      type: 'slider',
+      show: pathList.value.length > 0,
+      xAxisIndex: 0,
+      height: 20,
+      handleSize: 8,
+      filterMode: 'empty',
+      showDetail: false,
+      right: 20,
+    },
+    {
+      type: 'slider',
+      show: pathList.value.length > 0,
+      yAxisIndex: 0,
+      width: 20,
+      handleSize: 8,
+      filterMode: 'empty',
+      showDetail: false,
+      right: 28,
+    },
+  ],
   grid: {
     left: 20,
-    right: 20,
-    bottom: 20,
+    right: 60,
+    bottom: 48,
     containLabel: true,
   },
   connectNulls: false,

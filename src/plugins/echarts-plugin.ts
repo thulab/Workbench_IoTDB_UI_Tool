@@ -26,6 +26,8 @@ import {
   // 数据集组件
   DatasetComponent,
   type DatasetComponentOption,
+  DataZoomComponent,
+  type DataZoomComponentOption,
   // 内置数据转换器组件 (filter, sort)
   TransformComponent,
 } from 'echarts/components';
@@ -45,6 +47,7 @@ type ECOption = echarts.ComposeOption<
 | LegendComponentOption
 | ToolboxComponentOption
 | TreeSeriesOption
+| DataZoomComponentOption
 >;
 
 // 注册必须的组件
@@ -56,6 +59,7 @@ echarts.use([
   DatasetComponent,
   TransformComponent,
   ToolboxComponent,
+  DataZoomComponent,
   GaugeChart,
   LineChart,
   BarChart,
