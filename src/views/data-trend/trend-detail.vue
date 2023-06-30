@@ -401,12 +401,23 @@ function handleOperatePath(type: 'add' | 'del' | 'detail', path: string) {
       if (index !== -1) {
         chartData.value.splice(index, 1);
         setOption(chartOptions.value, true);
+        const minTime = dayjs().subtract(10, 'minute').valueOf();
+        setOption({ xAxis: { min: minTime } });
       }
       if (historyIndex !== -1) {
         chartHistoryData.value.splice(historyIndex, 1);
       }
     }
   } else {
+    if (type === 'del') {
+      const historyIndex = chartHistoryData.value.findIndex((data) => data.path === path);
+      if (historyIndex !== -1) {
+        chartHistoryData.value.splice(historyIndex, 1);
+        if (checkedData.value.length === 0) {
+          setOption(chartOptions.value, true);
+        }
+      }
+    }
     handleSearch();
   }
 }
