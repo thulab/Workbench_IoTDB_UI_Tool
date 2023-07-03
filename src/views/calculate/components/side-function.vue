@@ -3,8 +3,18 @@
     <el-tree :data="data" :props="defaultProps" accordion ref="treeRef">
       <template #default="{ node, data }">
         <span class="custom-tree-node">
-          <el-tooltip class="item" effect="light" :content="data.label" placement="top">
+          <el-tooltip class="item" effect="light" :disabled="node.level === 1" :content="data.label" placement="top" trigger="hover" :show-after="300">
             <span style="color: #131926;font-weight: 300;" @dblclick="getFunction(node)">{{ node.level === 1 ? node.label : data.value }}</span>
+            <template #content>
+              <div style="width: 200px;">
+                <p style="color: #131926;font-weight: 300;">
+                  {{ data.value }}
+                </p>
+                <p style="color: #131926;font-weight: 300;">
+                  {{ data.label }}
+                </p>
+              </div>
+            </template>
           </el-tooltip>
         </span>
       </template>
@@ -22,7 +32,7 @@ import {
 const treeRef = ref<InstanceType<typeof ElTree> | null>(null);
 const emit = defineEmits(['get-function']);
 
-const data = functionTreeData;
+const data = functionTreeData.filter((item) => item.value !== 'sqlSearch.Aggregate');
 const filterText = ref('');
 const tree = ref();
 
@@ -59,5 +69,10 @@ function getFunction(node: Node) {
 :deep(.el-tree-node__expand-icon.is-leaf){
   color: transparent;
   cursor: default;
+}
+
+.custom-tree-node{
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
