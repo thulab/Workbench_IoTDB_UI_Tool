@@ -1,0 +1,226 @@
+<template>
+  <el-dialog
+    :title="editType === 'add' ? '创建计算' : '编辑计算'"
+    v-model="dialogVisible"
+    width="780px"
+    :close-on-click-modal="false"
+  >
+    <el-form ref="formRef" :model="formData" class="source-form" label-position="right">
+      <base-form-item label="计算名称：" prop="name" :rules="requiredRules" class="form-label-width">
+        <el-input v-model="formData.name" show-word-limit maxlength="20" placeholder="请输入计算名称" />
+      </base-form-item>
+      <base-form-item label="计算描述：" prop="desc" class="form-label-width">
+        <el-input type="textarea" v-model="formData.desc" show-word-limit maxlength="100" placeholder="请输入计算描述" :resize="'none'" class="desc-textarea" />
+      </base-form-item>
+      <base-form-item label="结果测点：" prop="measurement" :rules="requiredRules" class="form-label-width">
+        <template #label>
+          结果测点：<el-tooltip effect="light" content="数据类型根据表达式计算逻辑推断生成，编码方式及压缩方式为null" placement="top"><i-custom-question /></el-tooltip>
+        </template>
+        <el-input v-model="formData.measurement" placeholder="请输入结果测点名称" v-if="editType === 'add'">
+          <template #prepend>root.</template>
+        </el-input>
+        <el-input v-model="formData.measurement" v-else disabled class="input-disabled" />
+      </base-form-item>
+      <base-form-item label="计算表达式：" prop="expression" :rules="requiredRules" class="form-expression-box">
+        <div class="calculate-expression-box">
+          <div class="code-box">
+            <code-editor
+              v-show="codeMirrorReady"
+              v-model:model-value="formData.expression"
+              @ready="()=>codeMirrorReady = true"
+              :style="{
+                height: `206px`,
+                backgroundColor: '#F7F8FC',
+              }" />
+          </div>
+          <div class="quick-box">
+            <el-tabs v-model="activeNameSide" class="tabs-nav-aside">
+              <el-tab-pane label="测点" name="data">
+                <side-data @get-function="getFunction" />
+              </el-tab-pane>
+              <el-tab-pane label="函数" name="function">
+                <side-function @get-function="getFunction" />
+              </el-tab-pane>
+            </el-tabs>
+          </div>
+        </div>
+      </base-form-item>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleConfirm">确定</el-button>
+      </div>
+    </template>
+  </el-dialog>
+</template>
+
+<script lang="ts" setup>
+import type { FormInstance } from 'element-plus';
+import { CalculateApi } from '@/api';
+import SideData from './side-data.vue';
+import SideFunction from './side-function.vue';
+
+const props = defineProps<{
+  visible: boolean;
+  editType: string;
+  editData?: Calculate.CalculateItem;
+}>();
+
+const emit = defineEmits<{
+  (event: 'update:visible', visible: boolean): void;
+  (event: 'handleSave',): void;
+}>();
+
+const dialogVisible = useVModel(props, 'visible', emit);
+const formRef = ref<FormInstance>();
+const codeMirrorReady = ref(false);
+const activeNameSide = ref('data');
+
+const requiredRules = ref([
+  {
+    required: true,
+    message: '请输入相应内容后进行操作',
+    trigger: ['blur', 'change'],
+  },
+]);
+
+const formData = reactive({
+  name: '',
+  desc: '',
+  measurement: '',
+  expression: '',
+});
+
+const { requestFn: saveCalculate } = useRequest(CalculateApi.saveCalculate);
+const { requestFn: updateCalculate } = useRequest(CalculateApi.updateCalculate);
+
+// 追加code
+function getFunction(val: string) {
+  formData.expression += val;
+}
+
+const handleConfirm = () => {
+  formRef.value?.validate((valid) => {
+    if (valid) {
+      if (props.editType === 'add') {
+        saveCalculate({
+          ...formData,
+          measurement: `root.${formData.measurement}`,
+        }).then(() => {
+          ElMessage.success('创建成功');
+          dialogVisible.value = false;
+          emit('handleSave');
+        });
+      } else {
+        updateCalculate({
+          ...formData,
+          measurement: `${formData.measurement}`,
+        }).then(() => {
+          ElMessage.success('编辑成功');
+          dialogVisible.value = false;
+          emit('handleSave');
+        });
+      }
+    }
+  });
+};
+
+watch(
+  () => props.visible,
+  (newVal) => {
+    if (newVal) {
+      formRef.value?.resetFields();
+      activeNameSide.value = 'data';
+      if (props.editType === 'edit' && props.editData) {
+        formData.name = props.editData.name;
+        formData.desc = props.editData.desc;
+        formData.measurement = props.editData.measurement;
+        formData.expression = props.editData.expression || '';
+      }
+    }
+  },
+);
+
+</script>
+
+<style lang="scss" scoped>
+
+.form-label-width{
+  :deep(.el-form-item__label) {
+    width: 90px;
+  }
+}
+
+.desc-textarea{
+  :deep(.el-textarea__inner) {
+    // height: 44px;
+  }
+}
+
+.input-disabled{
+  :deep(.el-input__inner){
+    color: #131926;
+    -webkit-text-fill-color: #131926;
+  }
+
+  :deep(.el-input__wrapper){
+    box-shadow: none;
+  }
+}
+
+.form-expression-box{
+  flex-direction: column;
+
+  :deep(.el-form-item__label) {
+    justify-content: flex-start;
+  }
+}
+
+.calculate-expression-box{
+  width: 100%;
+  display: flex;
+  padding: 5px 4px;
+  background-color: #F7F8FC;
+  height: 216px;
+  box-sizing: border-box;
+
+  .code-box{
+    flex: 1;
+  }
+
+  .quick-box{
+    flex: 0 0 226px;
+    margin-left: 8px;
+    padding: 0 8px;
+    background: #fff;
+
+    :deep(.el-tabs__header) {
+      margin: 0 0 12px;
+    }
+
+    :deep(.el-tabs__item) {
+      width: 113px;
+      padding: 0;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 21px;
+      height: 27px;
+      color: #131926;
+    }
+
+    :deep(.el-tabs__item.is-active){
+      color: #495ad4;
+    }
+
+    :deep(.el-tabs__nav-wrap::after){
+      height: 1px;
+      background-color: #DFE1ED;
+    }
+  }
+}
+
+.dialog-footer{
+  margin-top: -24px;
+}
+</style>

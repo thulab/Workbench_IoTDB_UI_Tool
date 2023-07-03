@@ -6,6 +6,8 @@ import ICustomAuth from '@/assets/icons/auth.svg?raw';
 import ICustomAuthUser from '@/assets/icons/auth-user.svg?raw';
 import ICustomTrend from '@/assets/icons/trend.svg?raw';
 import ICustomTrendActive from '@/assets/icons/trend-active.svg?raw';
+import ICustomCalculate from '@/assets/icons/calculate.svg?raw';
+import ICustomCalculateActive from '@/assets/icons/calculate-active.svg?raw';
 import ICustomAuthRole from '~icons/custom/auth-role.svg?raw';
 import ICustomWhiteList from '~icons/custom/white-list.svg?raw';
 
@@ -76,7 +78,26 @@ const route = [
       },
     ],
   },
-
+  {
+    path: '/calculate',
+    component: Layout,
+    redirect: { name: 'CalculateDetail' },
+    meta: {
+      title: '计算',
+      icon: ICustomCalculate,
+      activeIcon: ICustomCalculateActive,
+      showTopLine: true,
+      order: 26,
+    },
+    children: [
+      {
+        path: 'detail',
+        name: 'CalculateDetail',
+        component: () => import('@/views/calculate/detail.vue'),
+        meta: { keepAlive: true },
+      },
+    ],
+  },
 ];
 
 export default route;
