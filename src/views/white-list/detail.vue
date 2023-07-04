@@ -42,8 +42,8 @@
             :data="tableData"
             v-loading="loading"
             style="width: 100%;"
-            :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 52"
-            :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 52"
+            :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+            :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
             tooltip-effect="light"
             ref="tableRef"
           >
@@ -89,7 +89,7 @@ import { useTableHeight } from '@/composition-api';
 import ModalIp from './components/modal-ip.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
-const { maxTableHeight } = useTableHeight(394);
+const { maxTableHeight } = useTableHeight(390);
 const configStatus = ref(1);
 const searchKeyword = ref('');
 const pagination = reactive({

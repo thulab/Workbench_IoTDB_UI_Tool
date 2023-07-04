@@ -13,14 +13,7 @@
           <el-table-column fixed="left" v-if="showSelect" type="selection" width="50" align="center" />
           <el-table-column :key="item.prop" v-for="item of columnsByPage" min-width="180px" :width="item.width + 'px'" :align="item.align" :fixed="item.fixed" show-overflow-tooltip>
             <template #header>
-              <svg v-if="getIconName(item.icon)" class="icon m-r-5" :class="[{ 'icon-time': item.icon === 'TIME' }]" aria-hidden="true">
-                <use :xlink:href="`#icon-${getIconName(item.icon)}`" />
-              </svg>
-              <!-- 用$t函数包裹title导致页面警告过多卡死页面-->
-              <span
-                :title="item.label"
-              >{{ item.formatHeader ? item.formatHeader(item.label) : getLabelName(item.label) }}
-              </span>
+              <span style="display: flex; max-width: 100%;"><text-tooltip :content="item.label" /></span>
             </template>
             <template #default="scope">
               <span>{{ item.formatContent ? item.formatContent(scope.row[item.prop] || item.defaultValue) : scope.row[item.prop] || item.defaultValue }}</span>

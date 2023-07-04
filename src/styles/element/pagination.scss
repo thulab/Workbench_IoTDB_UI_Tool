@@ -1,6 +1,9 @@
 .el-pagination {
   justify-content: center;
 
+  --el-pagination-button-width: 28px !important;
+  --el-pagination-button-height: 28px !important;
+
 }
 
 .el-pagination .el-select .el-input {

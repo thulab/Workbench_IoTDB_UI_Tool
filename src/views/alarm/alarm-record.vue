@@ -76,8 +76,8 @@
           :data="tableData.list"
           v-loading="loading"
           style="width: 100%;"
-          :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 52"
-          :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 52"
+          :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+          :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
           tooltip-effect="light"
           ref="tableRef"
           :default-sort="{ prop: 'createTime', order: 'descending' }"
@@ -149,7 +149,7 @@ import ICustomCalender from '~icons/custom/calender.svg';
 
 const enumStore = useEnumStore();
 
-const { maxTableHeight } = useTableHeight(340);
+const { maxTableHeight } = useTableHeight(320);
 const searchFormRef = ref<FormInstance>();
 const tableRef = ref<InstanceType<typeof ElTable>>();
 const levelOptions = [{ name: '全部', value: '', paramMap: { color: '#656A85', icon: '' } }, ...enumStore.alarmLevelEnum];
