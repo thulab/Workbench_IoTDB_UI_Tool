@@ -7,6 +7,7 @@
       trigger="hover"
       content="最多同时展示10条测点趋势"
       :disabled="pathList.length !== 10"
+      popper-class="tooltip-box-width"
     >
       <el-button link :class="[pathList.length === 10 && 'hover-btn-disabled', 'p-0']" @click="handleAdd"><i-custom-new-trend /></el-button>
     </el-tooltip>

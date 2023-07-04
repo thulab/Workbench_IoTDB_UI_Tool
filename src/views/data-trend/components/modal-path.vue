@@ -8,7 +8,7 @@
     <el-form ref="formRef" :model="formData">
       <base-form-item label="测点名称：" prop="path" :rules="requiredRules">
         <template #label>
-          测点名称：<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
+          测点名称：<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
         </template>
         <el-select
           v-model="formData.path"

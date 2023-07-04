@@ -46,6 +46,7 @@
             trigger="hover"
             content="请先添加测点并选中"
             :disabled="searchAbled"
+            popper-class="tooltip-box-width"
           >
             <el-button :class="[!searchAbled && 'hover-btn-disabled']" type="primary" @click="handleSearch">应用</el-button>
           </el-tooltip>

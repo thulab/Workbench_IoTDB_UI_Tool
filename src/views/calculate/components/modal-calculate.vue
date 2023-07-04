@@ -14,7 +14,7 @@
       </base-form-item>
       <base-form-item label="结果测点：" prop="measurement" :rules="requiredRules" class="form-label-width">
         <template #label>
-          结果测点：<el-tooltip effect="light" content="数据类型根据表达式计算逻辑推断生成，编码方式及压缩方式为null" placement="top"><i-custom-question /></el-tooltip>
+          结果测点：<el-tooltip effect="light" content="数据类型根据表达式计算逻辑推断生成，编码方式及压缩方式为null" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
         </template>
         <el-input v-model="formData.measurement" placeholder="请输入结果测点名称" v-if="editType === 'add'">
           <template #prepend>root.</template>

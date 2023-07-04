@@ -7,13 +7,13 @@
         </base-form-item>
         <base-form-item label="告警测点：" prop="measurements">
           <template #label>
-            告警测点：<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
+            告警测点：<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
           <timeseries-select v-model="searchFormData.measurements" filter-system :is-show-view-btn="true" :placeholder="'请输入告警测点'" :viewText="'已选测点'" />
         </base-form-item>
         <base-form-item label="告警级别：" prop="alarmLevel" class="m-r-0">
           <template #label>
-            告警级别：<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减。" placement="top"><i-custom-question /></el-tooltip>
+            告警级别：<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减。" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
           <el-select v-model="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" class="level-select-box" style="width: 80px;">
             <template #prefix>
@@ -61,7 +61,7 @@
     <div class="page-table-details">
       <div class="operate-buttons">
         <el-dropdown class="m-r-12" :disabled="!totalCount" @command="val => handleCommandDown(val)">
-          <el-button type="primary" class="export-btn" :disabled="!totalCount">导出<el-tooltip effect="light" content="此导出操作为搜索结果导出。excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top"><i-custom-question-white /></el-tooltip></el-button>
+          <el-button type="primary" class="export-btn" :disabled="!totalCount">导出<el-tooltip effect="light" content="此导出操作为搜索结果导出。excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question-white /></el-tooltip></el-button>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>

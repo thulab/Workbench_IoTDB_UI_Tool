@@ -14,7 +14,7 @@
         </el-input>
       </el-form-item>
       <el-form-item prop="ttl" class="m-b-6">
-        <template #label><span style="margin-left: 9px;">数据保存时间:</span><el-tooltip effect="light" content="数据保存时间（TTL），到期后系统将自动删除数据，此处不填代表永久存储" placement="top"><i-custom-question /></el-tooltip>
+        <template #label><span style="margin-left: 9px;">数据保存时间:</span><el-tooltip effect="light" content="数据保存时间（TTL），到期后系统将自动删除数据，此处不填代表永久存储" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
         </template>
         <el-input type="hidden" />
         <el-input v-model="formData.ttl" min="0" max="9007199254740992" class="ttl-input">

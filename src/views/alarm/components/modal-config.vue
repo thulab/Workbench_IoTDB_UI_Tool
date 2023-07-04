@@ -11,7 +11,7 @@
         <el-col :span="12">
           <base-form-item label="告警测点：" prop="measurement" :rules="editType === 'add' ? requiredRules : []">
             <template #label>
-              告警测点：<el-tooltip v-if="editType === 'add'" effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip>
+              告警测点：<el-tooltip v-if="editType === 'add'" effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
             <el-select
               v-model="formData.measurement"
@@ -107,7 +107,7 @@
         <el-col :span="12">
           <base-form-item prop="alarmLevel" :rules="requiredRules" :style="{ color: getLevelColor }">
             <template #label>
-              告警级别：<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减" placement="top"><i-custom-question /></el-tooltip>
+              告警级别：<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
             <el-select v-model="formData.alarmLevel" style="width: 235px;" class="level-select-box">
               <template #prefix>

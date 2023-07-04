@@ -8,7 +8,7 @@
 
     <el-radio-group v-model="pathType" @change="handleChangePath" class="path-radio-group">
       <el-radio label="select">
-        <span class="radio-label">已有路径：<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top"><i-custom-question /></el-tooltip></span>
+        <span class="radio-label">已有路径：<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
         <div class="search-path-box">
           <el-select-v2 v-model="searchType" class="path-type-select" style="width: 88px;" placeholder="" :options="pathOptions" @change="handleChangeType">
             <template #default="{ item }">
