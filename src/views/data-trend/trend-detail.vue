@@ -183,6 +183,7 @@ const seriesData = computed<ECOption>(() => ({
     },
   })),
 }));
+const isShowZoom = computed(() => pathList.value.length > 0);
 
 const chartOptions = computed<ECOption>(() => ({
   legend: legendSelected.value,
@@ -206,7 +207,7 @@ const chartOptions = computed<ECOption>(() => ({
   dataZoom: [
     {
       type: 'slider',
-      show: pathList.value.length > 0,
+      show: isShowZoom.value,
       xAxisIndex: 0,
       height: 20,
       handleSize: 8,
@@ -216,7 +217,7 @@ const chartOptions = computed<ECOption>(() => ({
     },
     {
       type: 'slider',
-      show: pathList.value.length > 0,
+      show: isShowZoom.value,
       yAxisIndex: 0,
       width: 20,
       handleSize: 8,
@@ -295,14 +296,17 @@ function handleSearch() {
   const start = dayjs(searchFormData.datetimerange[0]).valueOf();
   const end = dayjs(searchFormData.datetimerange[1]).valueOf();
   getHistoryTrend({
-    paths: checkedData.value.map((item) => item.path),
+    paths: pathList.value.map((item) => item.path),
     startTime: start,
     endTime: end,
     groupBy: searchFormData.unitInterval,
     aggregateFun: searchFormData.aggregation,
   }).then((res) => {
     chartHistoryData.value = res.data?.normal || [];
-    if (res.data?.abnormal?.length) {
+    const abnormals = res.data?.abnormal || [];
+    const currentAll = pathList.value.filter((f) => f.disabled).map((item) => item.path);
+    const differents = difference(abnormals, currentAll);
+    if (differents.length) {
       ElMessage.warning('boolean类型仅支持最新值计算，请修改采样策略后查看趋势');
     }
     pathList.value.forEach((item) => {
@@ -352,7 +356,33 @@ function handleData(data: any) {
         chartData.value.push(dataItem);
       }
     });
-    setOption({ legend: legendSelected.value, series: seriesData.value.series, xAxis: { min: minTime, show: true } });
+    setOption({
+      legend: legendSelected.value,
+      series: seriesData.value.series,
+      xAxis: { min: minTime, show: true },
+      dataZoom: [
+        {
+          type: 'slider',
+          show: isShowZoom.value,
+          xAxisIndex: 0,
+          height: 20,
+          handleSize: 8,
+          filterMode: 'empty',
+          showDetail: false,
+          right: 20,
+        },
+        {
+          type: 'slider',
+          show: isShowZoom.value,
+          yAxisIndex: 0,
+          width: 20,
+          handleSize: 8,
+          filterMode: 'empty',
+          showDetail: false,
+          right: 28,
+        },
+      ],
+    });
   }
 }
 
