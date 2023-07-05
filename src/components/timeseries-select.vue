@@ -1,32 +1,9 @@
 <template>
   <div>
-    <!-- <el-select-v2
-      class="remote-select-box"
-      v-model="model"
-      style="width: 260px"
-      filterable
-      remote
-      :remote-method="remoteMethod"
-      :loading="measurementLoading"
-      :options="options"
-      clearable
-      multiple
-      collapse-tags
-      collapse-tags-tooltip
-      :placeholder="placeholder || '请选择测点'">
-      <template #prefix>
-        <i-custom-search-icon class="remote-select-search-icon" />
-      </template>
-      <template #default="{ item }">
-        <div class="remote-select-search-text">
-          <text-tooltip :content="item.label" />
-        </div>
-      </template>
-    </el-select-v2> -->
     <el-select
       class="remote-select-box"
       v-model="model"
-      :placeholder="placeholder || '请选择测点'"
+      :placeholder="'请选择测点'"
       filterable
       remote
       clearable
