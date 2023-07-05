@@ -2,7 +2,7 @@
   <div class="storage-list-title">
     <h4>数据库</h4>
     <div class="storage-operate-buttons">
-      <el-button link class="m-r-8 border-refresh-icon" @click="getStorageList"><i-custom-refresh /></el-button>
+      <el-button link class="m-r-8 border-refresh-icon" @click="() => getStorageList"><i-custom-refresh /></el-button>
       <el-button link style="margin: 0;" @click="handleAddStorage"><i-custom-new-storage /></el-button>
     </div>
   </div>
@@ -19,6 +19,7 @@
 </template>
 
 <script setup lang="ts">
+import { useRoute } from 'vue-router';
 import { StorageApi } from '@/api';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
@@ -27,17 +28,22 @@ const emit = defineEmits<{
   (event: 'handleSelectStorage', payload: string): void;
 }>();
 
+const route = useRoute();
 const storageList = ref<string[]>([]);
-const currentStorage = ref('');
+const currentStorage = ref(route.query.databse as string || '');
 
 const { requestFn: getGroup, loading: storageLoading } = useRequest(StorageApi.getStorageGroups);
 const { requestFn: deleteStorageGroups } = useRequest(StorageApi.deleteStorageGroups);
 
 // 获取数据库
-function getStorageList() {
+function getStorageList(isInitial?: boolean) {
   getGroup({}).then((res) => {
     storageList.value = res.data?.pathNames.filter((item) => item !== 'root.__system') || [];
-    currentStorage.value = storageList.value[0] || '';
+    if (route.query.databse && isInitial) {
+      currentStorage.value = route.query.databse as string;
+    } else {
+      currentStorage.value = storageList.value[0] || '';
+    }
   });
 }
 
@@ -70,7 +76,7 @@ function handleSelectStorage(item: string) {
 }
 
 onMounted(() => {
-  getStorageList();
+  getStorageList(true);
 });
 
 watch(

@@ -154,6 +154,7 @@
 <script setup lang="ts">
 import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import dayjs from 'dayjs';
+import { useRoute } from 'vue-router';
 import { cloneDeep } from 'lodash-es';
 import { useTableHeight } from '@/composition-api';
 import { SearchApi } from '@/api';
@@ -163,6 +164,7 @@ import {
 import DynamicTable from '@/components/dynamic-table.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
 
+const route = useRoute();
 const { maxTableHeight } = useTableHeight(330);
 
 const searchFormRef = ref<FormInstance>();
@@ -437,6 +439,7 @@ function handleCommandDown(val: string) {
 onMounted(() => {
   firstLoad.value = true;
   handleReset();
+  searchFormData.path = (route.query.measurement ? [route.query.measurement] : []) as string[];
 });
 
 </script>

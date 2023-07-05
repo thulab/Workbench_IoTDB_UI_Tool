@@ -5,6 +5,7 @@ declare namespace StorageDevice{
     dataType: IotdbDataType;
     encoding: EncodingType;
     compression: CompressionType;
+    viewType?: string;
     isEditable?: boolean;
     value?: string;
     valueTime?: string;

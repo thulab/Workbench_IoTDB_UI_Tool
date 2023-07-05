@@ -39,8 +39,8 @@
             :data="tableData.list"
             v-loading="loading"
             style="width: 100%;"
-            :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 44"
-            :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 44"
+            :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+            :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
             tooltip-effect="light"
             ref="tableRef"
             @selection-change="handleSelectionChange"
@@ -116,7 +116,7 @@ import ModalCalculate from './components/modal-calculate.vue';
 import ModalExpression from './components/modal-expression.vue';
 
 const router = useRouter();
-const { maxTableHeight } = useTableHeight(300);
+const { maxTableHeight } = useTableHeight(290);
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({
   name: '',
@@ -154,11 +154,12 @@ function getListData() {
     totalCount.value = res.data.totalCount;
     if (tableData.value.list?.length) {
       tableData.value.list.forEach((item) => {
+        item.desc = item.desc || '-';
         if (item && item.measurement) {
           getLastValue(item.measurement).then((newRes) => {
             if (newRes.code === 0) {
-              item.value = newRes.data.value;
-              item.valueTime = newRes.data.time;
+              item.value = newRes.data.value || '-';
+              item.valueTime = newRes.data.time || '-';
             }
           });
         }
@@ -253,6 +254,11 @@ function handleDel(type: string, data: Calculate.CalculateItem | null) {
       });
     });
 }
+
+onMounted(() => {
+  handleReset();
+  handleSearch();
+});
 </script>
 
 <style lang="scss" scoped>

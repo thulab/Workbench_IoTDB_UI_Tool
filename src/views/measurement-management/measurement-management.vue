@@ -94,6 +94,7 @@
             <el-table-column label="设备名称" prop="deviceName" min-width="200" align="center" show-overflow-tooltip />
             <el-table-column label="测点名称" prop="timeseries" width="160" align="center" show-overflow-tooltip />
             <el-table-column label="数据类型" prop="dataType" width="140" align="center" show-overflow-tooltip />
+            <el-table-column label="测点类型" prop="viewType" width="140" align="center" show-overflow-tooltip />
             <el-table-column label="编码方式" prop="encoding" min-width="140" align="center" show-overflow-tooltip />
             <el-table-column label="压缩方式" prop="compression" min-width="140" align="center" show-overflow-tooltip />
             <el-table-column label="最新值" prop="value" min-width="140" align="center" show-overflow-tooltip />
@@ -148,7 +149,7 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useTableHeight } from '@/composition-api';
 import { StorageApi } from '@/api';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
@@ -158,6 +159,7 @@ import ModalMeasurement from './components/modal-measurement.vue';
 import ModalImport from './components/modal-import.vue';
 
 const router = useRouter();
+const route = useRoute();
 
 const ttlUnitOptions = [
   { label: '毫秒', value: 'millisecond' },
@@ -170,7 +172,7 @@ const ttlUnitOptions = [
 const { maxTableHeight } = useTableHeight(400);
 const storageSideRef = ref<InstanceType<typeof StorageSide>>();
 const currentStorage = ref('');
-const searchKeyword = ref('');
+const searchKeyword = ref(route.query.measurement as string || '');
 const storageInfos = ref<StorageDevice.GetStorageGroupsInfoResponse>({
   groupName: '',
   ttl: undefined,
@@ -408,6 +410,10 @@ function handleConfirmEditTTL() {
   });
 }
 
+onMounted(() => {
+  searchKeyword.value = (route.query.measurement || '') as string;
+});
+
 watch(
   () => currentStorage.value,
   (val, old) => {
@@ -422,6 +428,11 @@ watch(
           dataCount: 0,
         };
       } else {
+        if (!old) {
+          searchKeyword.value = (route.query.measurement || '') as string;
+        } else {
+          searchKeyword.value = '';
+        }
         getStorageInfo(val);
         handleRefresh();
       }

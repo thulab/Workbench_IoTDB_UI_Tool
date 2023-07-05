@@ -31,7 +31,9 @@
               :style="{
                 height: `206px`,
                 backgroundColor: '#F7F8FC',
-              }" />
+              }"
+              ref="codeEditorRef"
+            />
           </div>
           <div class="quick-box">
             <el-tabs v-model="activeNameSide" class="tabs-nav-aside">
@@ -58,6 +60,7 @@
 <script lang="ts" setup>
 import type { FormInstance } from 'element-plus';
 import { CalculateApi } from '@/api';
+import CodeEditor from '@/views/search/components/code-editor.vue';
 import SideData from './side-data.vue';
 import SideFunction from './side-function.vue';
 
@@ -74,6 +77,7 @@ const emit = defineEmits<{
 
 const dialogVisible = useVModel(props, 'visible', emit);
 const formRef = ref<FormInstance>();
+const codeEditorRef = ref<InstanceType<typeof CodeEditor>>();
 const codeMirrorReady = ref(false);
 const activeNameSide = ref('data');
 
@@ -97,7 +101,7 @@ const { requestFn: updateCalculate } = useRequest(CalculateApi.updateCalculate);
 
 // 追加code
 function getFunction(val: string) {
-  formData.expression += val;
+  codeEditorRef.value?.insertContent(val);
 }
 
 const handleConfirm = () => {
