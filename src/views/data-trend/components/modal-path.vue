@@ -12,7 +12,7 @@
         </template>
         <el-select
           v-model="formData.path"
-          placeholder="请输入测点名称"
+          placeholder="请选择测点"
           filterable
           remote
           :remote-show-suffix="false"

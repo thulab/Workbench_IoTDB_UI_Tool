@@ -15,7 +15,7 @@
             </template>
             <el-select
               v-model="formData.measurement"
-              placeholder="请输入告警测点"
+              placeholder="请选择测点"
               filterable
               remote
               remote-show-suffix
@@ -49,14 +49,14 @@
       </el-row>
       <el-row>
         <el-col :span="12">
-          <base-form-item label="告警规则：" prop="alarmRulesType" :rules="requiredRulesRules">
+          <base-form-item label="告警规则：" prop="alarmRulesType" :rules="!formData.measurementType ? [] : requiredRulesRules">
             <el-select
               v-if="formData.measurementType === 'BOOLEAN' || !formData.measurementType"
               v-model="formData.alarmRulesType"
               :disabled="!formData.measurementType"
               @change="handleChangeBooleanRule"
               style="width: 235px;"
-              placeholder="未选择"
+              placeholder="请选择"
             >
               <el-option
                 v-for="item in booleanRuleEnum"
@@ -128,7 +128,7 @@
           </base-form-item>
         </el-col>
         <el-col :span="12">
-          <base-form-item label="告警频率：" prop="alarmFrequency" :rules="changeBoolean ? [] : requiredRules" class="m-l-45">
+          <base-form-item label="告警频率：" prop="alarmFrequency" :rules="requiredRules" class="m-l-45">
             <el-select
               v-model="formData.alarmFrequency"
               :disabled="changeBoolean"
@@ -206,8 +206,8 @@ const formData = reactive<Alarm.ConfigData>({
   alarmDesc: '',
   alarmRulesType: '',
   alarmRulesTypeVal: undefined,
-  alarmFrequency: '',
-  alarmDuration: undefined,
+  alarmFrequency: 'ONCE',
+  alarmDuration: 0,
   alarmDurationType: 'ms',
 });
 const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);
@@ -216,7 +216,7 @@ const changeBoolean = computed(() => formData.measurementType === 'BOOLEAN' && f
 
 const checkRules = (rule: any, value: any, callback: any) => {
   if (!value) {
-    return callback(new Error('请选择告警规则条件'));
+    return callback(new Error('请输入相应内容后进行操作'));
   }
   if (formData.measurementType !== 'BOOLEAN') {
     if (!formData.alarmRulesTypeVal) {
@@ -237,7 +237,7 @@ const checkRules = (rule: any, value: any, callback: any) => {
 const requiredRulesRules = ref([
   {
     required: true,
-    message: '请选择告警规则条件',
+    message: '请输入相应内容后进行操作',
     trigger: ['blur', 'change'],
   },
   {
@@ -322,7 +322,7 @@ function handleChangeBooleanRule(val: string) {
   if (val === 'change') {
     formData.alarmDuration = 0;
     formData.alarmDurationType = 'ms';
-    formData.alarmFrequency = '';
+    formData.alarmFrequency = 'ONCE';
     formRef.value?.clearValidate('alarmDuration');
     formRef.value?.clearValidate('alarmFrequency');
   }
@@ -377,8 +377,9 @@ watch(
       formRef.value?.resetFields();
       formData.alarmRulesType = '';
       formData.alarmRulesTypeVal = undefined;
-      formData.alarmDuration = undefined;
+      formData.alarmDuration = 0;
       formData.alarmDurationType = 'ms';
+      formData.alarmFrequency = 'ONCE';
       if (props.editType === 'edit') {
         formData.alarmConfigId = props.alarmConfigId;
         getDetail();
@@ -416,6 +417,12 @@ watch(
 
   :deep(.el-input__wrapper){
     box-shadow: none;
+  }
+
+  :deep(.el-form-item__label::before){
+    content: "*";
+    color: var(--el-color-danger);
+    margin-right: 4px;
   }
 }
 
