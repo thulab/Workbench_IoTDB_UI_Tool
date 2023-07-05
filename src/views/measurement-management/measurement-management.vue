@@ -94,7 +94,11 @@
             <el-table-column label="设备名称" prop="deviceName" min-width="200" align="center" show-overflow-tooltip />
             <el-table-column label="测点名称" prop="timeseries" width="160" align="center" show-overflow-tooltip />
             <el-table-column label="数据类型" prop="dataType" width="140" align="center" show-overflow-tooltip />
-            <el-table-column label="测点类型" prop="viewType" width="140" align="center" show-overflow-tooltip />
+            <el-table-column label="测点类型" prop="viewType" width="140" align="center" show-overflow-tooltip>
+              <template #default="{ row }">
+                {{ row.viewType === 'VIEW' ? '计算序列' : '普通序列' }}
+              </template>
+            </el-table-column>
             <el-table-column label="编码方式" prop="encoding" min-width="140" align="center" show-overflow-tooltip />
             <el-table-column label="压缩方式" prop="compression" min-width="140" align="center" show-overflow-tooltip />
             <el-table-column label="最新值" prop="value" min-width="140" align="center" show-overflow-tooltip />

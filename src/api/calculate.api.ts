@@ -7,7 +7,7 @@ class CalculateApi {
   }
 
   static getLastValue(measurement: string):HttpResponseP<Calculate.GetLastValueRes> {
-    return http.get('/data/getLastValue', { params: { measurement } });
+    return http.get('/calculate/getLastValue', { params: { measurement } });
   }
 
   static saveCalculate(data: Calculate.CalculateItem): HttpResponseP {

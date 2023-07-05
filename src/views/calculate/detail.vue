@@ -36,7 +36,7 @@
         </div>
         <div class="page-table-box">
           <el-table
-            :data="tableData.list"
+            :data="tableDataPagination"
             v-loading="loading"
             style="width: 100%;"
             :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
@@ -46,11 +46,15 @@
             @selection-change="handleSelectionChange"
           >
             <el-table-column type="selection" width="55" />
-            <el-table-column label="计算名称" prop="name" min-width="120" align="center" show-overflow-tooltip />
-            <el-table-column label="计算描述" prop="desc" min-width="160" align="center" show-overflow-tooltip />
-            <el-table-column label="结果测点" prop="measurement" align="center">
+            <el-table-column label="计算名称" prop="name" min-width="120" align="center" show-overflow-tooltip>
+              <template #default="{ row }">{{ row.name || '-' }}</template>
+            </el-table-column>
+            <el-table-column label="计算描述" prop="desc" min-width="160" align="center" show-overflow-tooltip>
+              <template #default="{ row }">{{ row.desc || '-' }}</template>
+            </el-table-column>
+            <el-table-column label="结果测点" prop="measurement" width="150" align="center" show-overflow-tooltip>
               <template #default="{ row }">
-                <el-button type="primary" link size="small" @click="handleView(row)">{{ row.measurement }}</el-button>
+                <el-button type="primary" class="measurement-text-button" link size="small" @click="handleView(row)">{{ row.measurement }}</el-button>
               </template>
             </el-table-column>
             <el-table-column label="表达式" prop="expression" min-width="80" align="center" show-overflow-tooltip>
@@ -60,7 +64,7 @@
             </el-table-column>
             <el-table-column label="最新结果" prop="value" min-width="140" align="center" show-overflow-tooltip />
             <el-table-column label="最新结果时间" prop="valueTime" min-width="200" align="center" show-overflow-tooltip />
-            <el-table-column label="操作" width="140" align="center" fixed="right">
+            <el-table-column label="操作" width="180" align="center" fixed="right">
               <template #default="{ row }">
                 <div>
                   <el-button type="primary" link size="small" @click="handleQuery(row)">查看数据</el-button>
@@ -144,6 +148,8 @@ const { requestFn: getCalculateList, data: tableData, loading } = useRequest(Cal
 const { requestFn: getLastValue } = useRequest(CalculateApi.getLastValue);
 const { requestFn: deleteCalculate } = useRequest(CalculateApi.deleteCalculate);
 
+const tableDataPagination = computed(() => tableData.value.list.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
+
 function getListData() {
   getCalculateList({
     ...pagination,
@@ -154,7 +160,6 @@ function getListData() {
     totalCount.value = res.data.totalCount;
     if (tableData.value.list?.length) {
       tableData.value.list.forEach((item) => {
-        item.desc = item.desc || '-';
         if (item && item.measurement) {
           getLastValue(item.measurement).then((newRes) => {
             if (newRes.code === 0) {
@@ -294,4 +299,13 @@ onMounted(() => {
   }
 }
 
+.measurement-text-button{
+  width: 100%;
+
+  span{
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
 </style>

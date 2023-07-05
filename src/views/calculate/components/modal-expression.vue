@@ -5,7 +5,9 @@
     width="480px"
     :close-on-click-modal="false"
   >
-    <div class="expression-text">{{ content }}</div>
+    <el-scrollbar :max-height="300">
+      <div class="expression-text">{{ content }}</div>
+    </el-scrollbar>
   </el-dialog>
 </template>
 

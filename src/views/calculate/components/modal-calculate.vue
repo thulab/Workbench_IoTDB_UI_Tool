@@ -29,21 +29,23 @@
               v-model:model-value="formData.expression"
               @ready="()=>codeMirrorReady = true"
               :style="{
-                height: `206px`,
+                height: `216px`,
                 backgroundColor: '#F7F8FC',
               }"
               ref="codeEditorRef"
             />
-          </div>
-          <div class="quick-box">
-            <el-tabs v-model="activeNameSide" class="tabs-nav-aside">
-              <el-tab-pane label="测点" name="data">
-                <side-data @get-function="getFunction" />
-              </el-tab-pane>
-              <el-tab-pane label="函数" name="function">
-                <side-function @get-function="getFunction" />
-              </el-tab-pane>
-            </el-tabs>
+            <div class="quick-box-container">
+              <div class="quick-box">
+                <el-tabs v-model="activeNameSide" class="tabs-nav-aside">
+                  <el-tab-pane label="测点" name="data">
+                    <side-data @get-function="getFunction" />
+                  </el-tab-pane>
+                  <el-tab-pane label="函数" name="function">
+                    <side-function @get-function="getFunction" />
+                  </el-tab-pane>
+                </el-tabs>
+              </div>
+            </div>
           </div>
         </div>
       </base-form-item>
@@ -131,6 +133,18 @@ const handleConfirm = () => {
 };
 
 watch(
+  () => formData.expression,
+  (newVal) => {
+    if (newVal) {
+      formRef.value?.clearValidate('expression');
+    }
+  },
+  {
+    immediate: true,
+  },
+);
+
+watch(
   () => props.visible,
   (newVal) => {
     if (newVal) {
@@ -183,28 +197,45 @@ watch(
 
 .calculate-expression-box{
   width: 100%;
-  display: flex;
-  padding: 5px 4px;
-  background-color: #F7F8FC;
   height: 216px;
   box-sizing: border-box;
+  position: relative;
 
   .code-box{
-    flex: 1;
+    width: calc(100% - 238px);
+
+    :deep(.cm-scroller::-webkit-scrollbar-track){
+      background-color: #F7F8FC !important;
+    }
+
+    :deep(.cm-scroller::-webkit-scrollbar-corner){
+      background-color: #F7F8FC !important;
+    }
+  }
+
+  .quick-box-container{
+    width: 238px;
+    background-color: #F7F8FC;
+    padding: 5px 4px 5px 8px;
+    height: 100%;
+    box-sizing: border-box;
+    position: absolute;
+    top: 0;
+    right: 0;
   }
 
   .quick-box{
-    flex: 0 0 226px;
-    margin-left: 8px;
     padding: 0 8px;
     background: #fff;
+    box-sizing: border-box;
+    height: 100%;
 
     :deep(.el-tabs__header) {
       margin: 0 0 12px;
     }
 
     :deep(.el-tabs__item) {
-      width: 113px;
+      width: 105px;
       padding: 0;
       font-size: 14px;
       font-weight: 400;
