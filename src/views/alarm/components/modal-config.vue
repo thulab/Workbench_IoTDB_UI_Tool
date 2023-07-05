@@ -49,7 +49,7 @@
       </el-row>
       <el-row>
         <el-col :span="12">
-          <base-form-item label="告警规则：" prop="alarmRulesType" :rules="!formData.measurementType ? [] : requiredRulesRules">
+          <base-form-item label="告警规则：" prop="alarmRulesType" :rules="requiredRulesRules" class="alarm-rule-error">
             <el-select
               v-if="formData.measurementType === 'BOOLEAN' || !formData.measurementType"
               v-model="formData.alarmRulesType"
@@ -429,6 +429,12 @@ watch(
 .alarm-desc-textarea{
   :deep(.el-textarea__inner) {
     height: 72px;
+  }
+}
+
+.alarm-rule-error.is-error{
+  :deep(.el-input__wrapper){
+    box-shadow: 0 0 0 1px var(--el-color-danger) inset !important;
   }
 }
 </style>
