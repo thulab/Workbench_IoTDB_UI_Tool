@@ -4,6 +4,7 @@ declare namespace Calculate{
     desc: string;
     measurement: string;
     expression?: string;
+    display?: string;
     database?: string;
     value?: string;
     valueTime?: string;

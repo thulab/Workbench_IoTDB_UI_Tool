@@ -120,7 +120,7 @@ import ModalCalculate from './components/modal-calculate.vue';
 import ModalExpression from './components/modal-expression.vue';
 
 const router = useRouter();
-const { maxTableHeight } = useTableHeight(290);
+const { maxTableHeight } = useTableHeight(300);
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({
   name: '',
@@ -223,7 +223,7 @@ function handleQuery(row: Calculate.CalculateItem) {
 
 // 表达式
 function handleExpression(row: Calculate.CalculateItem) {
-  editExpression.value = row.expression || '';
+  editExpression.value = row.display || '';
   expressionVisible.value = true;
 }
 

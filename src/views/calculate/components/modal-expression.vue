@@ -6,7 +6,7 @@
     :close-on-click-modal="false"
   >
     <el-scrollbar :max-height="300">
-      <div class="expression-text">{{ content }}</div>
+      <pre class="expression-text">{{ content }}</pre>
     </el-scrollbar>
   </el-dialog>
 </template>
@@ -23,3 +23,13 @@ const emit = defineEmits<{
 
 const dialogVisible = useVModel(props, 'visible', emit);
 </script>
+
+<style lang="scss" scoped>
+.expression-text{
+  // white-space: pre-line;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 300;
+  color: #131926;
+}
+</style>
