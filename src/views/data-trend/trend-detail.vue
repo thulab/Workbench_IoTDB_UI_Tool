@@ -165,9 +165,9 @@ const legendSelected = computed(() => ({
 const seriesData = computed<ECOption>(() => ({
   series: currentData.value.map((item) => ({
     type: 'line',
-    symbol: 'emptyCircle',
+    symbol: 'circle',
     showSymbol: false,
-    showAllSymbol: false,
+    showAllSymbol: 'auto',
     connectNulls: false,
     symbolSize: (pathList.value.find((data) => data.path === item.path)?.width || 2) + 2,
     name: item.path,
