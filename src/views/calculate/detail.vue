@@ -242,7 +242,7 @@ function handleQuery(row: Calculate.CalculateItem) {
 
 // 表达式
 function handleExpression(row: Calculate.CalculateItem) {
-  editExpression.value = row.display || '';
+  editExpression.value = row.expression || '';
   expressionVisible.value = true;
 }
 

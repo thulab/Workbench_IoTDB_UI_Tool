@@ -3,7 +3,7 @@
 
 import { ref, type Ref } from 'vue';
 
-const alertErrorCode = [1001, 9999];
+const alertErrorCode = [1001, 9999, 1300, 1330];
 
 interface Opt<T> {
   initData?: T;
@@ -16,15 +16,17 @@ const showError = (message: string, code?: number) => {
   // 有code 并且在toastErrorCode中 或者 code不包含-的
   if (code && alertErrorCode.includes(code) && !window.__errBoxShowing__) {
     window.__errBoxShowing__ = true;
-    ElMessageBox.alert(message, '错误', {
+    ElMessageBox.confirm(message, '错误', {
       confirmButtonText: '确定',
+      cancelButtonText: '取消',
       type: 'error',
     }).then(() => {
-      window.__errBoxShowing__ = false;
       if (code && code === 1008) {
         localStorage.setItem('authorization', '');
         window.location.reload();
       }
+    }).finally(() => {
+      window.__errBoxShowing__ = false;
     });
   } else {
     ElMessage.error({ message, grouping: true });

@@ -31,5 +31,6 @@ const dialogVisible = useVModel(props, 'visible', emit);
   line-height: 21px;
   font-weight: 300;
   color: #131926;
+  padding: 12px 0;
 }
 </style>
