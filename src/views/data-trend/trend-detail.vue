@@ -171,9 +171,9 @@ const seriesData = computed<ECOption>(() => ({
     symbolSize: pathList.value.find((data) => data.path === item.path)?.width || 2,
     name: item.path,
     data: item.values.map((dataItem, index) => [item.timestamps[index], dataItem]),
-    emphasis: {
-      focus: 'series',
-    },
+    // emphasis: {
+    //   focus: 'series',
+    // },
     lineStyle: {
       width: pathList.value.find((data) => data.path === item.path)?.width || 2,
       color: pathList.value.find((data) => data.path === item.path)?.color,
