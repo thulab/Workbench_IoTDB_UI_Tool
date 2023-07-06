@@ -47,11 +47,15 @@ function handleAdd(item: StorageDevice.MeasurementDataItem) {
   emit('get-function', res);
 }
 
-onMounted(() => {
+function init() {
   filterMeasurementText.value = '';
   measurementList.value = [];
-});
+}
 
+onMounted(() => {
+  init();
+});
+defineExpose({ init });
 </script>
 
 <style lang="scss" scoped>

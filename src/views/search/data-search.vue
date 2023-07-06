@@ -439,7 +439,10 @@ function handleCommandDown(val: string) {
 onMounted(() => {
   firstLoad.value = true;
   handleReset();
-  searchFormData.path = (route.query.measurement ? [route.query.measurement] : []) as string[];
+  if (route.query.measurement) {
+    searchFormData.path = [route.query.measurement] as string[];
+    handleSearch();
+  }
 });
 
 </script>

@@ -42,6 +42,7 @@
             :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
             :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
             tooltip-effect="light"
+            :tooltip-options="{ popperClass: 'calculate-table-tooltip' }"
             ref="tableRef"
             @selection-change="handleSelectionChange"
           >
@@ -52,7 +53,7 @@
             <el-table-column label="计算描述" prop="desc" min-width="160" align="center" show-overflow-tooltip>
               <template #default="{ row }">{{ row.desc || '-' }}</template>
             </el-table-column>
-            <el-table-column label="结果测点" prop="measurement" width="150" align="center" show-overflow-tooltip>
+            <el-table-column label="结果测点" prop="measurement" width="160" align="center" show-overflow-tooltip>
               <template #default="{ row }">
                 <el-button type="primary" class="measurement-text-button" link size="small" @click="handleView(row)">{{ row.measurement }}</el-button>
               </template>
@@ -301,11 +302,16 @@ onMounted(() => {
 
 .measurement-text-button{
   width: 100%;
+}
+</style>
+<style lang="scss">
+.measurement-text-button.el-button > span{
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  span{
-    display: inline-block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+.calculate-table-tooltip{
+  max-width: 500px;
 }
 </style>

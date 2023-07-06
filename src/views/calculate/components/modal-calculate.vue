@@ -38,7 +38,7 @@
               <div class="quick-box">
                 <el-tabs v-model="activeNameSide" class="tabs-nav-aside">
                   <el-tab-pane label="测点" name="data">
-                    <side-data @get-function="getFunction" />
+                    <side-data @get-function="getFunction" ref="sideDataRef" />
                   </el-tab-pane>
                   <el-tab-pane label="函数" name="function">
                     <side-function @get-function="getFunction" />
@@ -80,6 +80,7 @@ const emit = defineEmits<{
 const dialogVisible = useVModel(props, 'visible', emit);
 const formRef = ref<FormInstance>();
 const codeEditorRef = ref<InstanceType<typeof CodeEditor>>();
+const sideDataRef = ref<InstanceType<typeof SideData>>();
 const codeMirrorReady = ref(false);
 const activeNameSide = ref('data');
 
@@ -150,6 +151,7 @@ watch(
     if (newVal) {
       formRef.value?.resetFields();
       activeNameSide.value = 'data';
+      sideDataRef.value?.init();
       if (props.editType === 'edit' && props.editData) {
         formData.name = props.editData.name;
         formData.desc = props.editData.desc;
