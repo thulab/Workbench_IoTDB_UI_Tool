@@ -100,7 +100,7 @@ const handleConfirm = () => {
             type: 'warning',
           }).then(() => {
             UserApi.logout();
-            window.location.href = '/login';
+            window.location.href = `/login?timestamp=${new Date().getTime()}`;
           });
         }
         emit('handleSave');

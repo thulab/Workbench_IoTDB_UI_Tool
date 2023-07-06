@@ -36,7 +36,7 @@ const handleLogout = () => {
     icon: ICustomMessageWarning,
   }).then(() => {
     logout().then(() => {
-      window.location.href = '/login';
+      window.location.href = `/login?timestamp=${new Date().getTime()}`;
     });
   });
 };
