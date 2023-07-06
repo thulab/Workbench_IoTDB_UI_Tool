@@ -31,7 +31,7 @@
           <div class="operate-buttons">
             <el-button type="primary" @click="handleAdd">创建计算</el-button>
             <el-button :disabled="!multipleSelection.length" type="primary" @click="handleDel('batch', null)">批量删除</el-button>
-            <el-button link @click="getListData"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+            <el-button link @click="getNewVal"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
           </div>
         </div>
         <div class="page-table-box">
@@ -151,6 +151,21 @@ const { requestFn: deleteCalculate } = useRequest(CalculateApi.deleteCalculate);
 
 const tableDataPagination = computed(() => tableData.value.list.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
 
+function getNewVal() {
+  if (tableDataPagination.value.length) {
+    tableDataPagination.value.forEach((item) => {
+      if (item && item.measurement) {
+        getLastValue(item.measurement).then((newRes) => {
+          if (newRes.code === 0) {
+            item.value = newRes.data.value || '-';
+            item.valueTime = newRes.data.time || '-';
+          }
+        });
+      }
+    });
+  }
+}
+
 function getListData() {
   getCalculateList({
     ...pagination,
@@ -159,18 +174,19 @@ function getListData() {
     desc: searchFormData.type === 'desc' ? searchFormData.name : '',
   }).then((res) => {
     totalCount.value = res.data.totalCount;
-    if (tableData.value.list?.length) {
-      tableData.value.list.forEach((item) => {
-        if (item && item.measurement) {
-          getLastValue(item.measurement).then((newRes) => {
-            if (newRes.code === 0) {
-              item.value = newRes.data.value || '-';
-              item.valueTime = newRes.data.time || '-';
-            }
-          });
-        }
-      });
-    }
+    // if (tableData.value.list?.length) {
+    //   tableData.value.list.forEach((item) => {
+    //     if (item && item.measurement) {
+    //       getLastValue(item.measurement).then((newRes) => {
+    //         if (newRes.code === 0) {
+    //           item.value = newRes.data.value || '-';
+    //           item.valueTime = newRes.data.time || '-';
+    //         }
+    //       });
+    //     }
+    //   });
+    // }
+    getNewVal();
   });
 }
 
@@ -189,12 +205,14 @@ function handleSearch() {
 function onChangePageSize(val: number) {
   pagination.pageSize = val;
   pagination.pageNum = 1;
-  getListData();
+  // getListData();
+  getNewVal();
 }
 
 function onChangePage(page: number) {
   pagination.pageNum = page;
-  getListData();
+  // getListData();
+  getNewVal();
 }
 
 function handleSelectionChange(vals: Calculate.CalculateItem[]) {
