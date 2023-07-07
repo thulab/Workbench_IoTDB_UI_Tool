@@ -22,6 +22,20 @@
         <el-input v-model="formData.measurement" v-else disabled class="input-disabled" />
       </base-form-item>
       <base-form-item label="计算表达式：" prop="expression" :rules="requiredRules" class="form-expression-box">
+        <template #label>
+          计算表达式：<el-tooltip effect="light" placement="top">
+            <i-custom-question />
+            <template #content>
+              <p style="color: #131926;font-weight: 300;width: 230px;">支持使用运算符及函数(除聚合函数), 如: root.sgcc.wf03.wt01.temperature + 1，详细规则见
+                <a
+                  href="https://www.timecho.com/docs/zh/UserGuide/V1.1.x/Operators-Functions/Overview.html#%E8%BF%90%E7%AE%97%E7%AC%A6%E5%92%8C%E5%87%BD%E6%95%B0"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style="color: #495ad4;"
+                >文档</a></p>
+            </template>
+          </el-tooltip>
+        </template>
         <div class="calculate-expression-box">
           <div class="code-box">
             <code-editor
@@ -199,6 +213,7 @@ watch(
 
   :deep(.el-form-item__label) {
     justify-content: flex-start;
+    width: fit-content;
   }
 }
 
