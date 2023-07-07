@@ -8,7 +8,6 @@ declare namespace Calculate{
     database?: string;
     value?: string;
     valueTime?: string;
-    tooltipDisabled?: boolean;
   }
 
   export interface GetLastValueRes {

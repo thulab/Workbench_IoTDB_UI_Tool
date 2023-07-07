@@ -67,7 +67,7 @@
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleConfirm">确定</el-button>
+        <el-button type="primary" :loading="saveLoading" @click="handleConfirm">确定</el-button>
       </div>
     </template>
   </el-dialog>
@@ -112,6 +112,7 @@ const formData = reactive({
   measurement: '',
   expression: '',
 });
+const saveLoading = ref(false);
 
 const { requestFn: saveCalculate } = useRequest(CalculateApi.saveCalculate);
 const { requestFn: updateCalculate } = useRequest(CalculateApi.updateCalculate);
@@ -124,6 +125,7 @@ function getFunction(val: string) {
 const handleConfirm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
+      saveLoading.value = true;
       if (props.editType === 'add') {
         saveCalculate({
           ...formData,
@@ -132,6 +134,8 @@ const handleConfirm = () => {
           ElMessage.success('创建成功');
           dialogVisible.value = false;
           emit('handleSave');
+        }).finally(() => {
+          saveLoading.value = false;
         });
       } else {
         updateCalculate({
@@ -141,6 +145,8 @@ const handleConfirm = () => {
           ElMessage.success('编辑成功');
           dialogVisible.value = false;
           emit('handleSave');
+        }).finally(() => {
+          saveLoading.value = false;
         });
       }
     }
@@ -166,6 +172,7 @@ watch(
       formRef.value?.resetFields();
       activeNameSide.value = 'data';
       sideDataRef.value?.init();
+      saveLoading.value = false;
       if (props.editType === 'edit' && props.editData) {
         formData.name = props.editData.name;
         formData.desc = props.editData.desc;
