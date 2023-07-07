@@ -157,6 +157,11 @@ watch(
         formData.desc = props.editData.desc;
         formData.measurement = props.editData.measurement;
         formData.expression = props.editData.expression || '';
+      } else {
+        formData.name = '';
+        formData.desc = '';
+        formData.measurement = '';
+        formData.expression = '';
       }
     }
   },
