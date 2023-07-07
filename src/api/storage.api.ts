@@ -60,8 +60,8 @@ class StorageApi {
   }
 
   // 查询物理量的最新值和时间
-  static getLastValue(deviceName: string, measurementName: string):HttpResponseP<StorageDevice.GetLastValueRes> {
-    return http.get('/data/getLastValue', { params: { deviceName, measurementName } });
+  static getLastValue(deviceName: string, measurementName: string, viewType: string):HttpResponseP<StorageDevice.GetLastValueRes> {
+    return http.get('/data/getLastValue', { params: { deviceName, measurementName, viewType } });
   }
 
   // 保存物理量

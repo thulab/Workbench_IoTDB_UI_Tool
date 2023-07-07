@@ -230,7 +230,7 @@ function getListData() {
     if (tableData.value.measurements?.length) {
       tableData.value.measurements.forEach((item) => {
         if (item && item.timeseries) {
-          getLastValue(item.deviceName, item.timeseries).then((newRes) => {
+          getLastValue(item.deviceName, item.timeseries, item.viewType || 'BASE').then((newRes) => {
             if (newRes.code === 0) {
               item.value = newRes.data.value;
               item.valueTime = newRes.data.valueTime;
