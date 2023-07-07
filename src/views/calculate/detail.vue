@@ -53,9 +53,14 @@
             <el-table-column label="计算描述" prop="desc" min-width="160" align="center" show-overflow-tooltip>
               <template #default="{ row }">{{ row.desc || '-' }}</template>
             </el-table-column>
-            <el-table-column label="结果测点" prop="measurement" width="160" align="center" show-overflow-tooltip>
+            <el-table-column label="结果测点" prop="measurement" width="160" align="center">
               <template #default="{ row }">
-                <el-button type="primary" class="measurement-text-button" link size="small" @click="handleView(row)">{{ row.measurement }}</el-button>
+                <el-tooltip effect="light" placement="top" :disabled="row.tooltipDisabled">
+                  <el-button type="primary" class="measurement-text-button" link size="small" @click="handleView(row)" @mouseover="onMouseOver(`contentRef${row.measurement}`, row)" @focus="onMouseOver(`contentRef${row.measurement}`, row)"><span :ref="'contentRef' + row.measurement">{{ row.measurement }}</span></el-button>
+                  <template #content>
+                    {{ row.measurement }}
+                  </template>
+                </el-tooltip>
               </template>
             </el-table-column>
             <el-table-column label="表达式" prop="expression" min-width="80" align="center" show-overflow-tooltip>
@@ -120,6 +125,7 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalCalculate from './components/modal-calculate.vue';
 import ModalExpression from './components/modal-expression.vue';
 
+const { proxy }: any = getCurrentInstance();
 const router = useRouter();
 const { maxTableHeight } = useTableHeight(300);
 const searchFormRef = ref<FormInstance>();
@@ -189,6 +195,16 @@ function getListData() {
     getNewVal();
   });
 }
+
+const onMouseOver = (str: string, row: Calculate.CalculateItem) => {
+  const parentWidth: number = proxy.$refs[str].parentNode.offsetWidth;
+  const contentWidth: number = proxy.$refs[str].offsetWidth;
+  if (contentWidth > parentWidth) {
+    row.tooltipDisabled = false;
+  } else {
+    row.tooltipDisabled = true;
+  }
+};
 
 // 重置
 function handleReset() {
