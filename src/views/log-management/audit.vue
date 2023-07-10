@@ -60,8 +60,14 @@
             <el-table-column label="IP来源" prop="address" width="160" align="center" show-overflow-tooltip />
             <el-table-column label="操作用户" prop="username" width="140" align="center" show-overflow-tooltip />
             <el-table-column label="操作详情" prop="log" min-width="280" align="left">
-              <template #default="{ row }">
-                <span class="detail-text-button" :ref="`${row.time}_log`" @click="handleView(row)">{{ row.log }}</span>
+              <template #default="{ row, $index }">
+                <overflow-click
+                  class="detail-text-button"
+                  :content="row.log"
+                  :key="row.time + $index + '_' + row.log"
+                  :offset="24"
+                  @handleClick="() => handleView(row)"
+                />
               </template>
             </el-table-column>
             <template #empty>
@@ -102,8 +108,8 @@ import {
   getStartAndEnd, today, formatDate,
 } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
+import OverflowClick from './components/overflow-click.vue';
 
-const { proxy }: any = getCurrentInstance();
 const { maxTableHeight } = useTableHeight(340);
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({
@@ -169,12 +175,8 @@ function onChangePage(page: number) {
 }
 
 function handleView(row: Log.AuditData) {
-  const parentWidth: number = proxy.$refs[`${row.time}_log`].parentNode.offsetWidth;
-  const contentWidth: number = proxy.$refs[`${row.time}_log`].offsetWidth;
-  if (contentWidth > parentWidth) {
-    editDetail.value = row.log;
-    dialogVisible.value = true;
-  }
+  editDetail.value = row.log;
+  dialogVisible.value = true;
 }
 
 onMounted(() => {
@@ -211,9 +213,9 @@ onMounted(() => {
 }
 
 .detail-text-button{
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  // overflow: hidden;
+  // text-overflow: ellipsis;
+  // white-space: nowrap;
   width: 100%;
 }
 

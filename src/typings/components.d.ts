@@ -125,6 +125,7 @@ declare module 'vue' {
     LayoutTabs: typeof import('./../components/layout/layout-tabs.vue')['default']
     LayoutTabsMoreOperation: typeof import('./../components/layout/components/layout-tabs-more-operation.vue')['default']
     ModalResetPassword: typeof import('./../components/modal-reset-password.vue')['default']
+    OverflowClick: typeof import('./../components/overflow-click.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TextTooltip: typeof import('./../components/text-tooltip.vue')['default']
