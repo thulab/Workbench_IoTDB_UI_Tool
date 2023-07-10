@@ -3,8 +3,8 @@
     <el-header class="p-x-0" style="height: auto;">
       <div class="search-form-wrapper">
         <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-          <base-form-item label="操作用户：" prop="user">
-            <el-input v-model="searchFormData.user" placeholder="请输入用户名称" style="width: 172px;">
+          <base-form-item label="操作用户：" prop="username">
+            <el-input v-model="searchFormData.username" placeholder="请输入用户名称" style="width: 172px;">
               <template #prefix>
                 <i-custom-search-icon class="remote-select-search-icon" />
               </template>
@@ -58,7 +58,7 @@
           >
             <el-table-column label="操作时间" prop="time" width="160" align="center" show-overflow-tooltip />
             <el-table-column label="IP来源" prop="address" width="160" align="center" show-overflow-tooltip />
-            <el-table-column label="操作用户" prop="user" width="140" align="center" show-overflow-tooltip />
+            <el-table-column label="操作用户" prop="username" width="140" align="center" show-overflow-tooltip />
             <el-table-column label="操作详情" prop="log" min-width="280" align="left">
               <template #default="{ row }">
                 <span class="detail-text-button" @click="handleView(row)">{{ row.log }}</span>
@@ -108,7 +108,7 @@ import ICustomCalender from '~icons/custom/calender.svg';
 const { maxTableHeight } = useTableHeight(330);
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({
-  user: '',
+  username: '',
   address: '',
   log: '',
   time: getStartAndEnd(0),

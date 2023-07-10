@@ -1,6 +1,6 @@
 declare namespace Log{
   export interface QueryAuditList {
-    user: string;
+    username: string;
     address: string;
     log: string;
     startTime: DateModelType;
@@ -10,7 +10,7 @@ declare namespace Log{
 
   export interface AuditData {
     time: DateModelType;
-    user: string;
+    username: string;
     address: string;
     log: string;
   }
