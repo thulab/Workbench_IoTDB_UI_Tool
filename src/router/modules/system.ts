@@ -55,6 +55,7 @@ const route = [
           title: '日志管理',
           hideLine: true,
           icon: ICustomLogManagement,
+          alwayShow: true,
         },
         children: [
           {
