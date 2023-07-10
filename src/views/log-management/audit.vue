@@ -104,7 +104,7 @@ import {
 import ICustomCalender from '~icons/custom/calender.svg';
 
 const { proxy }: any = getCurrentInstance();
-const { maxTableHeight } = useTableHeight(330);
+const { maxTableHeight } = useTableHeight(340);
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({
   username: '',
