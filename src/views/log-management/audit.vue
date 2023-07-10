@@ -98,6 +98,7 @@
 
 <script setup lang="ts">
 import type { FormInstance } from 'element-plus';
+import { cloneDeep } from 'lodash-es';
 import { LogApi } from '@/api';
 import {
   getStartAndEnd, today, formatDate,
@@ -112,6 +113,7 @@ const searchFormData = reactive({
   log: '',
   time: getStartAndEnd(0),
 });
+let copySearchFormData = cloneDeep(searchFormData);
 const timestamp = ref(0);
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 const pagination = reactive({
@@ -133,11 +135,9 @@ const { requestFn: getAuditLogList, data: tableData, loading } = useRequest(LogA
 function getListData() {
   getAuditLogList({
     ...pagination,
-    user: searchFormData.user,
-    address: searchFormData.address,
-    log: searchFormData.log,
-    startTime: formatDate(searchFormData.time[0], 'YYYY-MM-DD HH:mm:ss.SSSZ'),
-    endTime: formatDate(searchFormData.time[1], 'YYYY-MM-DD HH:mm:ss.SSSZ'),
+    ...copySearchFormData,
+    startTime: formatDate(copySearchFormData.time[0], 'YYYY-MM-DD HH:mm:ss.SSSZ'),
+    endTime: formatDate(copySearchFormData.time[1], 'YYYY-MM-DD HH:mm:ss.SSSZ'),
     timestamp: timestamp.value,
   }).then((res) => {
     totalCount.value = res.data.totalCount;
@@ -153,6 +153,7 @@ function handleReset() {
 // 查询
 function handleSearch() {
   pagination.pageNum = 1;
+  copySearchFormData = cloneDeep(searchFormData);
   timestamp.value = Number(new Date());
   getListData();
 }
