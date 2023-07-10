@@ -56,12 +56,12 @@
             tooltip-effect="light"
             ref="tableRef"
           >
-            <el-table-column label="操作时间" prop="time" width="160" align="center" show-overflow-tooltip />
+            <el-table-column label="操作时间" prop="time" width="180" align="center" show-overflow-tooltip />
             <el-table-column label="IP来源" prop="address" width="160" align="center" show-overflow-tooltip />
             <el-table-column label="操作用户" prop="username" width="140" align="center" show-overflow-tooltip />
             <el-table-column label="操作详情" prop="log" min-width="280" align="left">
               <template #default="{ row }">
-                <span class="detail-text-button" @click="handleView(row)">{{ row.log }}</span>
+                <span class="detail-text-button" :ref="`${row.time}_log`" @click="handleView(row)">{{ row.log }}</span>
               </template>
             </el-table-column>
             <template #empty>
@@ -89,9 +89,7 @@
     </el-main>
 
     <el-dialog title="操作详情" v-model="dialogVisible" width="480px" :close-on-click-modal="false">
-      <el-scrollbar :max-height="300">
-        <pre class="detail-text">{{ editDetail }}</pre>
-      </el-scrollbar>
+      <div class="detail-text">{{ editDetail }}</div>
     </el-dialog>
   </el-container>
 </template>
@@ -105,6 +103,7 @@ import {
 } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
 
+const { proxy }: any = getCurrentInstance();
 const { maxTableHeight } = useTableHeight(330);
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({
@@ -170,8 +169,12 @@ function onChangePage(page: number) {
 }
 
 function handleView(row: Log.AuditData) {
-  editDetail.value = row.log;
-  dialogVisible.value = true;
+  const parentWidth: number = proxy.$refs[`${row.time}_log`].parentNode.offsetWidth;
+  const contentWidth: number = proxy.$refs[`${row.time}_log`].offsetWidth;
+  if (contentWidth > parentWidth) {
+    editDetail.value = row.log;
+    dialogVisible.value = true;
+  }
 }
 
 onMounted(() => {
@@ -207,11 +210,20 @@ onMounted(() => {
   }
 }
 
+.detail-text-button{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
 .detail-text{
   font-size: 14px;
   line-height: 21px;
   font-weight: 300;
   color: #131926;
   padding: 12px 0;
+  max-height: 300px;
+  overflow-y: auto;
 }
 </style>
