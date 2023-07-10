@@ -9,6 +9,8 @@ import ICustomTrendActive from '@/assets/icons/trend-active.svg?raw';
 import ICustomCalculate from '@/assets/icons/calculate.svg?raw';
 import ICustomCalculateActive from '@/assets/icons/calculate-active.svg?raw';
 import ICustomAuthRole from '~icons/custom/auth-role.svg?raw';
+import ICustomLogManagement from '~icons/custom/log-management.svg?raw';
+import ICustomAuditLog from '~icons/custom/audit-log.svg?raw';
 import ICustomWhiteList from '~icons/custom/white-list.svg?raw';
 
 const route = [
@@ -43,6 +45,23 @@ const route = [
             name: 'RoleManagement',
             component: () => import('@/views/auth/role-detail.vue'),
             meta: { keepAlive: true, title: '角色管理', icon: ICustomAuthRole },
+          },
+        ],
+      },
+      {
+        path: 'log',
+        redirect: { name: 'AuditLog' },
+        meta: {
+          title: '日志管理',
+          hideLine: true,
+          icon: ICustomLogManagement,
+        },
+        children: [
+          {
+            path: 'audit',
+            name: 'AuditLog',
+            component: () => import('@/views/log-management/audit.vue'),
+            meta: { keepAlive: true, title: '审计日志', icon: ICustomAuditLog },
           },
         ],
       },

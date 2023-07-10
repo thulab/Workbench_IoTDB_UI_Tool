@@ -4,6 +4,7 @@ import AlarmApi from './alarm.api';
 import UserApi from './user.api';
 import AuthApi from './auth.api';
 import CalculateApi from './calculate.api';
+import LogApi from './log.api';
 
 export {
   SearchApi,
@@ -12,4 +13,5 @@ export {
   UserApi,
   AuthApi,
   CalculateApi,
+  LogApi,
 };
