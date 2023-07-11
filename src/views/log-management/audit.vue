@@ -31,6 +31,7 @@
                 type="datetimerange"
                 range-separator="～"
                 unlink-panels
+                :clearable="false"
                 :disabled-date="disabledDate"
                 :prefix-icon="ICustomCalender"
               />
