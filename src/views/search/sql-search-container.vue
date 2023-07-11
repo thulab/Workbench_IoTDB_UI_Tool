@@ -52,7 +52,7 @@
     </el-dialog>
 
     <el-dialog title="重命名" v-model="renameDialogVisible" width="400px">
-      <el-form ref="resaveFormRef" :model="resaveForm" label-width="100px" label-position="right">
+      <el-form ref="resaveFormRef" :model="resaveForm" :rules="saveFormRules" label-width="100px" label-position="right">
         <el-form-item label="原名称：" prop="oldSqlName">
           <el-input type="hidden" />
           <el-input v-model="resaveForm.oldSqlName" disabled />

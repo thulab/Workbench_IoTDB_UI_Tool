@@ -232,8 +232,8 @@ function getListData() {
         if (item && item.timeseries) {
           getLastValue(item.deviceName, item.timeseries, item.viewType || 'BASE').then((newRes) => {
             if (newRes.code === 0) {
-              item.value = newRes.data.value;
-              item.valueTime = newRes.data.valueTime;
+              item.value = newRes.data.value || '-';
+              item.valueTime = newRes.data.valueTime || '-';
             }
           });
         }
