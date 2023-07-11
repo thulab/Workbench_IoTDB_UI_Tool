@@ -52,7 +52,7 @@
     </el-dialog>
 
     <el-dialog title="重命名" v-model="renameDialogVisible" width="400px">
-      <el-form ref="resaveFormRef" :model="resaveForm" :rules="saveFormRules" label-width="100px" label-position="right">
+      <el-form ref="resaveFormRef" :model="resaveForm" :rules="resaveFormRules" label-width="100px" label-position="right">
         <el-form-item label="原名称：" prop="oldSqlName">
           <el-input type="hidden" />
           <el-input v-model="resaveForm.oldSqlName" disabled />
@@ -102,6 +102,11 @@ const resaveFormRef = ref<FormInstance>();
 const saveFormRules = reactive({
   sqlName: [
     { required: true, message: '请填写名称后确定', trigger: 'blur' },
+  ],
+});
+const resaveFormRules = reactive({
+  sqlName: [
+    { required: true, message: '新名称为空，请重新输入', trigger: 'blur' },
   ],
 });
 const saveForm = reactive<{
@@ -241,7 +246,7 @@ function handleInputName() {
 // 新名称输入
 function handleInputRename() {
   if (!resaveForm.sqlName.trim()) {
-    errorRenameTip.value = '请填写名称后确定';
+    errorRenameTip.value = '新名称为空，请重新输入';
   } else if (resaveForm.sqlName === resaveForm.oldSqlName) {
     errorRenameTip.value = '与原名称相同，请重新输入';
   } else {
