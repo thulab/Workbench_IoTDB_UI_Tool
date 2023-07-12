@@ -9,6 +9,7 @@ import { LOCALE } from './constants';
 
 const appStore = useAppStore();
 const { locale: language } = useI18n();
+zhCn.el.pagination.goto = '跳至';
 const locale = computed(() => {
   switch (language.value) {
     case LOCALE.ZH_CN:
