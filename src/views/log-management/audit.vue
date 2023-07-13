@@ -32,6 +32,7 @@
                 range-separator="～"
                 unlink-panels
                 :clearable="false"
+                :shortcuts="shortcutsDaterange"
                 :disabled-date="disabledDate"
                 :prefix-icon="ICustomCalender"
               />
@@ -106,7 +107,7 @@ import type { FormInstance } from 'element-plus';
 import { cloneDeep } from 'lodash-es';
 import { LogApi } from '@/api';
 import {
-  getStartAndEnd, today, formatDate,
+  getStartAndEnd, today, formatDate, getOneInterval, getOneIntervalNow,
 } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
 import OverflowClick from './components/overflow-click.vue';
@@ -122,6 +123,20 @@ const searchFormData = reactive({
 let copySearchFormData = cloneDeep(searchFormData);
 const timestamp = ref(0);
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
+const shortcutsDaterange = [
+  {
+    text: '今天',
+    value: () => getStartAndEnd(0),
+  },
+  {
+    text: '昨天',
+    value: () => getOneInterval(1),
+  },
+  {
+    text: '最近7天',
+    value: () => getOneIntervalNow(7),
+  },
+];
 const pagination = reactive({
   pageSize: 10,
   pageNum: 1,
