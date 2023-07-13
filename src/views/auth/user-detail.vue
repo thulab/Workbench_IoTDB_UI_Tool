@@ -15,7 +15,7 @@
             <el-button type="primary" v-else-if="isEdit" @click="handleReset('view')">退出编辑</el-button>
           </div>
           <div class="detail-role-list" v-if="!isManager">
-            拥有角色：<el-tag closable type="info" v-for="(item, index,) in authData.rolesToPrivileges" :key="item.roleName" @close="handleDeleteRole(index)" @click="showRoleDetail(item)">{{ item.roleName }}</el-tag>
+            拥有角色：<el-tag :closable="isEdit" type="info" v-for="(item, index,) in authData.rolesToPrivileges" :key="item.roleName" @close="handleDeleteRole(index)" @click="showRoleDetail(item)">{{ item.roleName }}</el-tag>
             <el-button link @click="addRole()" v-if="isEdit"><el-icon size="24px" class="m-l-16">
               <i-custom-user-role-add />
             </el-icon>
