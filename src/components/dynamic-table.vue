@@ -52,8 +52,6 @@
 </template>
 
 <script lang="ts" setup>
-import { useI18n } from 'vue-i18n';
-
 const props = defineProps<{
   columns: Array<DynamicTableColumn>,
   tableData: Array<Record<string, any>>,
@@ -73,10 +71,6 @@ const emit = defineEmits<{
   (event: 'update:currentPage', payload: number): void;
   (event: 'update:pageSize', payload: number): void;
 }>();
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { t } = useI18n();
-
-const { getIconName } = useDataTypeIcon();
 
 const currentPageVM = useVModel(props, 'currentPage');
 const pageSizeVM = useVModel(props, 'pageSize');
@@ -126,14 +120,6 @@ function handleCurrentChange() {
 function handleSizeChange() {
   emit('loadData');
 }
-
-const getLabelName = (label: string) => {
-  if (label.indexOf('root') !== -1 || label === 'Time' || !label) {
-    return label;
-  }
-  // return t(label);
-  return label;
-};
 </script>
 
 <style lang="scss" scoped>

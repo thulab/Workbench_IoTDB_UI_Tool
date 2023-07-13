@@ -65,7 +65,7 @@
               </template>
             </el-table-column>
             <el-table-column v-for="(column, index) in pathPrivilegesEnumGroup" :label="column.group" :key="column.group + '_' + index + '_column'" align="center">
-              <el-table-column v-for="(col, ci) in column.children" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :min-width="col.width || 180">
+              <el-table-column v-for="(col, ci) in column.children" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :width="calcColumnWidth(col)">
                 <template #default="{ row, $index }">
                   <el-icon v-if="isView" size="21">
                     <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.includes(col.privileges)" />
