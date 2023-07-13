@@ -9,6 +9,14 @@
   line-height: 18px !important;
 }
 
+.el-input__prefix-inner{
+  margin-left: -5px !important;
+
+  & > :last-child{
+    margin-right: 4px !important;
+  }
+}
+
 .el-input__inner{
   height: 26px !important;
 }
