@@ -42,7 +42,7 @@
         @current-change="handleCurrentChange"
         v-model:current-page="currentPageVM"
         v-model:page-size="pageSizeVM"
-        layout="total, sizes, prev, pager, next, jumper"
+        layout="prev, pager, next, sizes, jumper"
         :page-sizes="[10, 20, 50, 100]"
         :total="total || 0"
         :hide-on-single-page="true"
@@ -191,7 +191,7 @@ const getLabelName = (label: string) => {
 
 .paination {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   margin-top: 10px;
 
   // padding: 10px 0px;
