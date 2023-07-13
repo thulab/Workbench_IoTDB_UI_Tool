@@ -23,7 +23,7 @@ import ModalResetPassword from '@/components/modal-reset-password.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
 const userStore = useUserStore();
-const userName = computed(() => userStore.userInfo.name || 'root');
+const userName = computed(() => userStore.userInfo.name);
 const modalVisible = ref(false);
 
 const { requestFn: logout } = useRequest(UserApi.logout);
@@ -36,6 +36,7 @@ const handleLogout = () => {
     icon: ICustomMessageWarning,
   }).then(() => {
     logout().then(() => {
+      userStore.setUser('');
       window.location.href = `/login?timestamp=${new Date().getTime()}`;
     });
   });
@@ -55,11 +56,15 @@ const handleLoginCommand = (val: string) => {
       break;
   }
 };
+onMounted(() => {
+  userStore.loadPrivileges(true);
+});
 </script>
 
 <style lang="scss" scoped>
 .username {
   font-size: 15px;
+  line-height: 1.2;
   color: var(--el-text-color-primary);
   max-width: 54px;
   overflow: hidden;

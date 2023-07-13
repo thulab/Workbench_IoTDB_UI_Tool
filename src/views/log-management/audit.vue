@@ -4,11 +4,9 @@
       <div class="search-form-wrapper">
         <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
           <base-form-item label="操作用户：" prop="username">
-            <el-input v-model="searchFormData.username" placeholder="请输入用户名称" style="width: 172px;">
-              <template #prefix>
-                <i-custom-search-icon class="remote-select-search-icon" />
-              </template>
-            </el-input>
+            <el-select v-model="searchFormData.username">
+              <el-option v-for="item in userList" :key="item.name" :label="item.name" :value="item.name" />
+            </el-select>
           </base-form-item>
           <base-form-item label="IP来源：" prop="address">
             <el-input v-model="searchFormData.address" placeholder="请输入 IP 来源" style="width: 172px;">
@@ -105,13 +103,16 @@
 <script setup lang="ts">
 import type { FormInstance } from 'element-plus';
 import { cloneDeep } from 'lodash-es';
-import { LogApi } from '@/api';
+import { useUserStore } from '@/stores';
+import { LogApi, AuthApi } from '@/api';
 import {
   getStartAndEnd, today, formatDate, getOneInterval, getOneIntervalNow,
 } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
 import OverflowClick from './components/overflow-click.vue';
 
+const userStore = useUserStore();
+const userName = computed(() => userStore.userInfo.name || 'root');
 const { maxTableHeight } = useTableHeight(340);
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({
@@ -145,6 +146,7 @@ const totalCount = ref(0);
 const dialogVisible = ref(false);
 const editDetail = ref('');
 
+const { requestFn: getUserList, data: userList } = useRequest(AuthApi.getUserList);
 const { requestFn: getAuditLogList, data: tableData, loading } = useRequest(LogApi.getAuditLogList, {
   initData: {
     totalCount: 0,
@@ -152,6 +154,10 @@ const { requestFn: getAuditLogList, data: tableData, loading } = useRequest(LogA
     list: [],
   },
 });
+
+function getUsers() {
+  getUserList();
+}
 
 function getListData() {
   getAuditLogList({
@@ -169,6 +175,7 @@ function getListData() {
 function handleReset() {
   searchFormRef.value?.resetFields();
   searchFormData.time = getStartAndEnd(0);
+  searchFormData.username = userName.value;
 }
 
 // 查询
@@ -196,7 +203,9 @@ function handleView(row: Log.AuditData) {
 }
 
 onMounted(() => {
+  getUsers();
   handleReset();
+  searchFormData.username = userName.value;
   handleSearch();
 });
 </script>

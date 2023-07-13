@@ -59,8 +59,10 @@
 import { useRouter } from 'vue-router';
 import type { FormInstance, FormRules } from 'element-plus';
 import { UserApi } from '@/api';
+import { useUserStore } from '@/stores';
 
 const router = useRouter();
+const userStore = useUserStore();
 
 const formRef = ref<FormInstance>();
 const loginForm = reactive({
@@ -124,6 +126,7 @@ const submitForm = () => {
     if (valid) {
       loading.value = true;
       login(loginForm.user, loginForm.password).then(() => {
+        userStore.setUser(loginForm.user);
         router.push({ path: '/' });
         sessionStorage.setItem('nologin', '0');
       }).catch(() => {
@@ -132,6 +135,10 @@ const submitForm = () => {
     }
   });
 };
+
+onMounted(() => {
+  userStore.setUser('');
+});
 
 onUnmounted(() => {
   loading.value = false;

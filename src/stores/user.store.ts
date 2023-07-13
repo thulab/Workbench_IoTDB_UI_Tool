@@ -36,7 +36,8 @@ export const useUserStore = defineStore('UserStore', () => {
 
   // 加载用户权限
   function loadPrivileges(forceReload?: boolean) {
-    if (forceReload || !userInfo.value.name) {
+    if (!forceReload && !userInfo.value.name) return;
+    if (forceReload) {
       getLoginUserPrivileges().then((res) => {
         userInfo.value.name = res.data.userName;
         allPrivileges.value = res.data;
@@ -45,6 +46,8 @@ export const useUserStore = defineStore('UserStore', () => {
   }
 
   function loadPrivilegesEnum(forceReload?: boolean) {
+    if (!userInfo.value.name) return;
+    console.log(userInfo.value.name);
     if (forceReload || !entityPrivilegesEnumGroup.value.length) {
       getPrivilegesEnum().then((res) => {
         privilegesEnum.value = res.data;
@@ -52,7 +55,15 @@ export const useUserStore = defineStore('UserStore', () => {
     }
   }
 
-  loadPrivileges();
+  loadPrivileges(false);
+
+  function setUser(name: string) {
+    userInfo.value.name = name;
+    if (name) {
+      loadPrivileges(true);
+      loadPrivilegesEnum(true);
+    }
+  }
 
   return {
     userInfo,
@@ -68,6 +79,7 @@ export const useUserStore = defineStore('UserStore', () => {
     entityPrivilegesVals,
     pathPrivilegesVals,
     rolesToPrivilegesVals,
+    setUser,
   };
 }, {
   persist: {
