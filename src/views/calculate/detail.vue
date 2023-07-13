@@ -47,12 +47,8 @@
             @selection-change="handleSelectionChange"
           >
             <el-table-column type="selection" width="55" />
-            <el-table-column label="计算名称" prop="name" min-width="120" align="center" show-overflow-tooltip>
-              <template #default="{ row }">{{ row.name || '-' }}</template>
-            </el-table-column>
-            <el-table-column label="计算描述" prop="desc" min-width="160" align="center" show-overflow-tooltip>
-              <template #default="{ row }">{{ row.desc || '-' }}</template>
-            </el-table-column>
+            <el-table-column label="计算名称" prop="name" min-width="120" align="center" show-overflow-tooltip />
+            <el-table-column label="计算描述" prop="desc" min-width="160" align="center" show-overflow-tooltip />
             <el-table-column label="结果测点" prop="measurement" width="160" align="center" show-overflow-tooltip>
               <template #default="{ row }">
                 <span class="measurement-text-button" @click="handleView(row)">{{ row.measurement }}</span>
