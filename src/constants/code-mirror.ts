@@ -191,6 +191,7 @@ const keywords = [
   'WITH',
   'WITHOUT',
   'WRITABLE',
+  'VIEW',
 ];
 
 const sqlExamples: { [key: string]: string [] } = {
