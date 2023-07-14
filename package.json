@@ -36,7 +36,7 @@
     "crypto-js": "^4.1.1",
     "dayjs": "^1.11.8",
     "echarts": "^5.4.2",
-    "element-plus": "^2.3.7",
+    "element-plus": "^2.3.8",
     "lodash-es": "^4.17.21",
     "nprogress": "^0.2.0",
     "pinia": "^2.1.4",
