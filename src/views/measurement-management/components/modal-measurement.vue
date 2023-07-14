@@ -223,10 +223,7 @@ function getMeasurementList(val: string) {
 
 // 切换新建设备
 function handleChangeAdd(val: CheckboxValueType) {
-  formData.deviceName = '';
-  nextTick(() => {
-    formRef.value?.clearValidate('deviceName');
-  });
+  formRef.value?.resetFields();
   formData.measurementList = [];
   formData.measurementList.push({
     deviceName: !val ? '' : `${props.groupName}`,
