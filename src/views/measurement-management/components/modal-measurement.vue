@@ -28,9 +28,10 @@
               </div>
             </el-option>
           </el-select>
-          <el-input v-else v-model="formData.deviceName" placeholder="请输入设备名称" style="width: 400px;">
-            <template #prepend>{{ groupName }}.</template>
-          </el-input>
+          <div v-else class="device-input-group">
+            <el-input :value="groupName + '.'" disabled class="device-input-prepend" style="width: 144px;" />
+            <el-input v-model="formData.deviceName" placeholder="请输入设备名称" class="device-input-box" style="width: 256px;" />
+          </div>
 
           <div class="device-operate m-l-12">
             <el-checkbox v-model="addDevice" label="新建设备" @change="handleChangeAdd" />
@@ -223,6 +224,9 @@ function getMeasurementList(val: string) {
 // 切换新建设备
 function handleChangeAdd(val: CheckboxValueType) {
   formData.deviceName = '';
+  nextTick(() => {
+    formRef.value?.clearValidate('deviceName');
+  });
   formData.measurementList = [];
   formData.measurementList.push({
     deviceName: !val ? '' : `${props.groupName}`,
@@ -373,6 +377,32 @@ watch(
 .device-box{
   display: flex;
   align-items: center;
+
+  .device-input-group{
+    display: inline-flex;
+
+    .device-input-prepend{
+      cursor: default;
+
+      :deep(.el-input__wrapper){
+        border-radius: 2px 0 0 2px;
+        margin-right: -1px;
+      }
+
+      :deep(.el-input__inner) {
+        cursor: default;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    .device-input-box{
+      :deep(.el-input__wrapper){
+        border-radius: 0 2px 2px 0;
+      }
+    }
+  }
 }
 
 .measurement-list-box{
