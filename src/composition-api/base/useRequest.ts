@@ -28,7 +28,7 @@ const showError = (message: string, code?: number) => {
     }).finally(() => {
       window.__errBoxShowing__ = false;
     });
-  } else {
+  } else if (code && !alertErrorCode.includes(code)) {
     ElMessage.error({ message, grouping: true });
   }
 };
