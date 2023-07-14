@@ -306,6 +306,9 @@ function getDetail() {
       formData.alarmRulesType = res.data.alarmRules[0].operator;
       formData.alarmRulesTypeVal = res.data.alarmRules[0].value;
     }
+    if (!res.data.alarmFrequency) {
+      formData.alarmFrequency = 'ONCE';
+    }
   });
 }
 
