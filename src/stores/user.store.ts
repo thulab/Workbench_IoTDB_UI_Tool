@@ -47,7 +47,6 @@ export const useUserStore = defineStore('UserStore', () => {
 
   function loadPrivilegesEnum(forceReload?: boolean) {
     if (!userInfo.value.name) return;
-    console.log(userInfo.value.name);
     if (forceReload || !entityPrivilegesEnumGroup.value.length) {
       getPrivilegesEnum().then((res) => {
         privilegesEnum.value = res.data;
@@ -65,6 +64,12 @@ export const useUserStore = defineStore('UserStore', () => {
     }
   }
 
+  function clearUserStore() {
+    userInfo.value.name = '';
+    allPrivileges.value = undefined;
+    privilegesEnum.value = undefined;
+  }
+
   return {
     userInfo,
     loadPrivileges,
@@ -80,11 +85,12 @@ export const useUserStore = defineStore('UserStore', () => {
     pathPrivilegesVals,
     rolesToPrivilegesVals,
     setUser,
+    clearUserStore,
   };
 }, {
   persist: {
     storage: sessionStorage,
-    paths: ['privilegesEnum'],
+    paths: ['privilegesEnum', 'userInfo'],
     afterRestore: (context) => {
       context.store.loadPrivilegesEnum();
     },

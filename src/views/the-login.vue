@@ -137,7 +137,9 @@ const submitForm = () => {
 };
 
 onMounted(() => {
-  userStore.setUser('');
+  userStore.clearUserStore();
+  sessionStorage.setItem('UserStore', '');
+  sessionStorage.setItem('nologin', '1');
 });
 
 onUnmounted(() => {
