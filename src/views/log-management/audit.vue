@@ -54,6 +54,7 @@
             :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
             :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
             tooltip-effect="light"
+            :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
             ref="tableRef"
           >
             <el-table-column label="操作时间" prop="time" width="180" align="center" show-overflow-tooltip />

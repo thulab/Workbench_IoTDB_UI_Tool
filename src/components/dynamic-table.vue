@@ -8,6 +8,7 @@
           :height="tableHeight"
           :max-height="tableMaxHeight"
           tooltip-effect="light"
+          :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
           @selection-change="handleSelectionChange"
         >
           <el-table-column fixed="left" v-if="showSelect" type="selection" width="50" align="center" />

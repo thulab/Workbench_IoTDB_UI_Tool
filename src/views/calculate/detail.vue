@@ -42,7 +42,7 @@
             :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
             :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
             tooltip-effect="light"
-            :tooltip-options="{ popperClass: 'calculate-table-tooltip' }"
+            :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
             ref="tableRef"
             @selection-change="handleSelectionChange"
           >
@@ -321,11 +321,5 @@ onMounted(() => {
   &:hover{
     text-decoration: underline;
   }
-}
-</style>
-<style lang="scss">
-
-.calculate-table-tooltip{
-  max-width: 500px;
 }
 </style>

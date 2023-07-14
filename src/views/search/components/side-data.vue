@@ -1,18 +1,11 @@
 <template>
   <div class="search_div maxheight">
-    <!-- <el-input placeholder="请选择数据库" v-model="storageName" readonly @focus="handleVisible('storage', true)" />
-      <div v-show="isShowStorage" class="select-box-down">
-        <el-input placeholder="输入关键字进行过滤" v-model="filterStorageText" size="small" @input="handleInput('storage')"></el-input>
-
-        <ul class="select-list-box">
-          <li v-for="item in storageList" :key="item" class="list-item-box" @click="handleSelect(item, 'storage')">
-            <text-tooltip :content="item" class-name="list-item-text" />
-          </li>
-          <li v-if="Math.ceil(storageTotal / 100) > storagePagination.pageNum && !storageLoading" @click="handleMore('storage')">加载更多</li>
-        </ul>
-      </div> -->
-    <el-select v-model="storageName" style="width: 100%;" placeholder="请选择数据库" @change="handleSelectDatabase" :loading="storageLoading">
-      <el-option v-for="item in storageList" :key="item" :value="item" :label="item" />
+    <el-select v-model="storageName" style="width: 100%;" placeholder="请选择数据库" @change="handleSelectDatabase" :loading="storageLoading" :placement="'bottom-start'" fit-input-width>
+      <el-option v-for="item in storageList" :key="item" :value="item" :label="item">
+        <div style="display: flex; width: 160px;">
+          <text-tooltip :content="item" />
+        </div>
+      </el-option>
     </el-select>
 
     <el-select
@@ -27,6 +20,8 @@
       :remote-method="handleDeviceInput"
       :loading="deviceLoading"
       v-loading="deviceLoading && !deviceName"
+      :placement="'bottom-start'"
+      fit-input-width
       @change="handleSelectDevice">
       <el-option v-for="item in deviceList" :key="item" :label="item" :value="item">
         <div style="display: flex; width: 160px;">
@@ -34,30 +29,10 @@
         </div>
       </el-option>
     </el-select>
-    <!-- <el-input placeholder="请选择设备" v-model="deviceName" readonly :disabled="!storageName" @focus="handleVisible('device', true)" />
-      <div v-show="isShowDevice" class="select-box-down">
-        <el-input placeholder="输入关键字进行过滤" v-model="filterDeviceText" size="small" @input="handleInput('device')" />
-
-        <ul class="select-list-box">
-          <li v-for="item in deviceList" :key="item" class="list-item-box" @click="handleSelect(item, 'device')">
-            <text-tooltip :content="item" class-name="list-item-text" />
-          </li>
-        </ul>
-      </div> -->
 
     <el-input class="m-y-10" :disabled="!deviceName" v-model="filterMeasurementText" placeholder="请输入测点名称" @input="handleInput('measurement')">
       <template #suffix><i-ep-search /></template>
     </el-input>
-    <!-- <el-input placeholder="请选择物理量名称" v-model="measurementName" readonly :disabled="!deviceName" @focus="handleVisible('measurement', true)" />
-      <div v-show="isShowMeasurement" class="select-box-down">
-        <el-input placeholder="输入关键字进行过滤" v-model="filterMeasurementText" size="small" @input="handleInput('measurement')" />
-
-        <ul class="select-list-box">
-          <li v-for="item in measurementList" :key="item" class="list-item-box" @click="handleSelect(item, 'measurement')">
-            <text-tooltip :content="item" class-name="list-item-text" />
-          </li>
-        </ul>
-      </div> -->
 
     <div class="search-buttons">
       <el-button v-if="false" type="primary" @click="handleAdd(storageName)">当前数据库</el-button>
@@ -70,22 +45,12 @@
       :max-height="maxTableHeight"
       v-loading="measurementLoading"
       tooltip-effect="light"
-      :tooltip-options="{ placement: 'left' }"
+      :tooltip-options="{ placement: 'left', popperClass: 'table-tooltip-max-width' }"
       @row-dblclick="(row, column, event)=>handleAdd(row)">
       <el-table-column align="center" label="测点" v-slot="{ row }" show-overflow-tooltip>
         {{ row }}
       </el-table-column>
     </el-table>
-    <!-- <ul class="select-list-box">
-      <li v-for="item in measurementList" :key="item" class="list-item-box" @dblclick="handleAdd(item)">
-        <text-tooltip placement="left" :content="item" class-name="list-item-text" />
-      </li>
-    </ul> -->
-    <!-- <div class="search_div maxheight">
-      <span class="custom-tree-node chil" v-for="(item, index) in measurementList" :key="'device_' + index" @dblclick="handleAdd(item)" :style="{ color: index === 0 ? '#c7c6c6' : 'black' }">
-        {{ item }}
-      </span>
-    </div> -->
   </div>
 
 </template>
@@ -104,39 +69,18 @@ const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(St
 
 const storageName = ref('');
 const storageList = ref<string[]>([]);
-const storageTotal = ref(0);
-// const storagePagination = reactive({
-//   pageSize: 100,
-//   pageNum: 1,
-// });
-
 const deviceName = ref('');
 const deviceList = ref<string[]>([]);
-const deviceTotal = ref(0);
-// const devicePagination = reactive({
-//   pageSize: 100,
-//   pageNum: 1,
-// });
-
 const measurementName = ref('');
 const filterMeasurementText = ref('');
 const measurementList = ref<string[]>([]);
-const measurementTotal = ref(0);
-// const measurementPagination = reactive({
-//   pageSize: 100,
-//   pageNum: 1,
-// });
 
 // 获取数据库
 function getStorageList() {
   getGroup({
-    // pageSize: storagePagination.pageSize,
-    // pageNum: storagePagination.pageNum,
-    // keyword: filterStorageText.value,
   }).then((res) => {
     const dataArr = res.data?.pathNames.map((item) => item);
     storageList.value = dataArr;
-    storageTotal.value = res.data?.totalCount || 0;
   });
 }
 let lastSelectedDatabase = '';
@@ -148,14 +92,11 @@ function getDeviceList(query: string) {
   lastDeviceQuery = query;
   getDevice({
     groupName: storageName.value,
-    // pageSize: devicePagination.pageSize,
-    // pageNum: devicePagination.pageNum,
     keyword: query,
   }).then((res) => {
     if (query === lastDeviceQuery && lastSelectedDatabase === storageName.value) {
       const dataArr = res.data?.pathNames;
       deviceList.value = deviceList.value.concat(dataArr);
-      deviceTotal.value = res.data?.totalCount || 0;
     }
   });
 }
@@ -168,7 +109,6 @@ function getMeasurementList() {
   }).then((res) => {
     if (lastMeasurementQuery === filterMeasurementText.value && lastSelectedDevice === deviceName.value) {
       measurementList.value = res.data?.pathNames;
-      measurementTotal.value = res.data?.totalCount || 0;
     }
   });
 }
@@ -230,7 +170,8 @@ onMounted(() => {
 
   &.maxheight {
     height: 65vh;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 }
 

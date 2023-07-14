@@ -78,6 +78,7 @@
           :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
           tooltip-effect="light"
           ref="tableRef"
+          :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
           :default-sort="{ prop: 'createTime', order: 'descending' }"
           @selection-change="handleSelectionChange"
           @sort-change="handleSortChange"

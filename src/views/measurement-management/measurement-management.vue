@@ -88,6 +88,7 @@
             :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
             tooltip-effect="light"
             ref="tableRef"
+            :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
             @selection-change="handleSelectionChange"
           >
             <el-table-column type="selection" width="55" />

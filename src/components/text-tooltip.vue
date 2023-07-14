@@ -46,5 +46,8 @@ const onMouseOver = (str: string) => {
   text-overflow: ellipsis;
   display: inline;
 }
-
 </style>
+<style lang="scss">
+.tooltip-max-width{
+  max-width: 500px;
+}</style>

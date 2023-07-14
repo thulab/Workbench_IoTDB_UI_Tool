@@ -10,7 +10,7 @@
       :max-height="130"
       v-loading="measurementLoading"
       tooltip-effect="light"
-      :tooltip-options="{ placement: 'left' }"
+      :tooltip-options="{ placement: 'left', popperClass: 'table-tooltip-max-width' }"
       @row-dblclick="(row, column, event)=>handleAdd(row)">
       <el-table-column align="center" label="测点" v-slot="{ row }" show-overflow-tooltip>
         {{ row.timeseries }}
