@@ -141,6 +141,7 @@ const {
   pathPrivilegesEnumGroup,
   pathPrivilegesEnumKeys,
 } = storeToRefs(userStore);
+const userName = computed(() => userStore.userInfo.name);
 
 const listRef = ref<InstanceType<typeof List>>();
 const currentUser = ref<Auth.DBUser>();
@@ -437,6 +438,9 @@ function handleSave() {
   updateUserAuth(data).then(() => {
     ElMessage.success('保存成功');
     pageType.value = 'view';
+    if (userName.value === currentUser.value?.name) {
+      userStore.loadPrivileges(true);
+    }
     getDetail();
   }).catch(() => {
     pageType.value = 'edit';
@@ -448,9 +452,7 @@ watch(
   () => currentUser.value,
   (val, old) => {
     if (val !== old) {
-      if (!val) {
-        console.log('空页面');
-      } else {
+      if (val) {
         pageType.value = 'view';
         getDetail();
       }
