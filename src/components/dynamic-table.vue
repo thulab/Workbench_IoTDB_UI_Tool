@@ -46,7 +46,7 @@
         layout="prev, pager, next, sizes, jumper"
         :page-sizes="[10, 20, 50, 100]"
         :total="total || 0"
-        :hide-on-single-page="true"
+        :hide-on-single-page="total < 10"
       />
     </div>
   </div>
@@ -79,15 +79,15 @@ const columnPageSize = 100;
 
 const tableHeight = computed(() => {
   const total = props.total || 0;
-  if (total >= 0 && props.pageSize && props.height && total <= props.pageSize) {
-    return props.height + 46;
+  if (total < 10 && props.pageSize && props.height) {
+    return props.height + 41;
   }
   return props.height;
 });
 const tableMaxHeight = computed(() => {
   const total = props.total || 0;
-  if (total >= 0 && props.pageSize && props.height && total <= props.pageSize) {
-    return props.maxHeight + 46;
+  if (total < 10 && props.pageSize && props.height) {
+    return props.maxHeight + 41;
   }
   return props.maxHeight;
 });
