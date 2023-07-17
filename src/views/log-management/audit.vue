@@ -243,6 +243,7 @@ onMounted(() => {
   // text-overflow: ellipsis;
   // white-space: nowrap;
   width: 100%;
+  white-space: pre;
 }
 
 .detail-text{
@@ -253,5 +254,6 @@ onMounted(() => {
   padding: 12px 0;
   max-height: 300px;
   overflow-y: auto;
+  white-space: pre-wrap;
 }
 </style>
