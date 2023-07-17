@@ -2,7 +2,7 @@
   <div
     class="menu"
     :style="{ width: isCollapse ? '40px' : '216px' }">
-    <div class="logo flex-align-center" :style="{ paddingLeft: isCollapse ? '6px' : '14px' }">
+    <div class="logo flex-align-center" :style="{ paddingLeft: isCollapse ? '6px' : '14px' }" @click="handleDashboard">
       <el-icon alt="logo"><i-custom-logo /></el-icon>
       <el-icon class="title" v-show="!isCollapse"><i-custom-title /></el-icon>
       <!-- <span v-show="!isCollapse">{{ systemTitle }}</span> -->
@@ -82,6 +82,10 @@ const getMenuList = () => {
   return menuList;
 };
 
+function handleDashboard() {
+  router.push({ name: 'Dashboard' });
+}
+
 onMounted(async () => {
   menuStore.setMenuList(getMenuList());
 });
@@ -149,6 +153,7 @@ listeningWindow();
     border-bottom: 0 solid #1d1e26;
     box-shadow: 0;
     background-color: var(--el-color-primary);
+    cursor: pointer;
 
     .el-icon {
       font-size: 28px;
