@@ -157,6 +157,11 @@ function querySqlRun() {
     return;
   }
   if (runFlag.value) {
+    const sqlsArr = codeVal.value?.split(';\n');
+    if (sqlsArr?.length > 50) {
+      ElMessage.warning('模版语句数量已达到上限，如有需要请新建模版进行操作');
+      return;
+    }
     display.value = false;
     runFlag.value = false;
     timeNumber.value = Number(new Date());
