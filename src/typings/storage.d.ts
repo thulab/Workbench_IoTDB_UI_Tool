@@ -64,5 +64,6 @@ declare namespace StorageDevice{
   export interface MeasurementDataItem {
     timeseries: string;
     dataType: IotdbDataType;
+    viewType: string;
   }
 }
