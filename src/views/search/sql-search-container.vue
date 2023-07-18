@@ -212,7 +212,7 @@ function handleTabRemove(targetName: TabPaneName) {
   }
   const index = sqlList.value.findIndex((f) => `${f.id}` === `${targetName}`);
   const current = sqlList.value[index];
-  const id = `${targetName}`.charAt(0) === '_' ? null : activiteSql.value;
+  const id = `${targetName}`.charAt(0) === '_' ? null : (targetName as unknown as string);
   if (!id) {
     activiteSql.value = targetName as string;
     saveForm.sqlName = current.queryName;
