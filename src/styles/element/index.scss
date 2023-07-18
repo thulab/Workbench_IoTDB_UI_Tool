@@ -35,3 +35,7 @@
   --el-scrollbar-opacity: 1 !important;
   --el-scrollbar-hover-opacity: 1 !important;
 }
+
+.el-tabs__nav-next, .el-tabs__nav-prev{
+  line-height: 28px !important;
+}
