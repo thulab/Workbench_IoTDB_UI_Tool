@@ -405,6 +405,7 @@ function emptyQuery() {
 
   :deep(.el-tabs__header) {
     height: 27px;
+    padding-right: 0 !important;
   }
 
   :deep(.el-tabs__nav) {
