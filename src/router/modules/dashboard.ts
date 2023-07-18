@@ -18,7 +18,7 @@ const route = [
       {
         path: 'dashboard',
         name: 'Dashboard',
-        component: () => import('@/views/the-dashboard.vue'),
+        component: () => import('@/views/dashboard/the-dashboard.vue'),
         meta: { keepAlive: true, title: 'dashboard', icon: ICustomAlarmConfig },
       },
     ],

@@ -50,7 +50,7 @@
 
         <div class="table-list-box">
           <h4 class="table-box-title">路径</h4>
-          <el-table :data="authData.pathPrivileges" style="width: 100%" tooltip-effect="light" border>
+          <el-table :data="authData.pathPrivileges" style="width: 100%" tooltip-effect="light" border :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
             <el-table-column label="路径名称" prop="path" align="center" width="193" show-overflow-tooltip />
             <el-table-column label="全选" align="center" width="193">
               <template #default="{ row, $index }">
