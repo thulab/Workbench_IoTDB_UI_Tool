@@ -5,6 +5,7 @@ import UserApi from './user.api';
 import AuthApi from './auth.api';
 import CalculateApi from './calculate.api';
 import LogApi from './log.api';
+import DashboardApi from './dashboard.api';
 
 export {
   SearchApi,
@@ -14,4 +15,5 @@ export {
   AuthApi,
   CalculateApi,
   LogApi,
+  DashboardApi,
 };
