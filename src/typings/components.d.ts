@@ -58,6 +58,7 @@ declare module 'vue' {
     ElTree: typeof import('element-plus/es')['ElTree']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     HelloWorld: typeof import('./../components/hello-world.vue')['default']
+    ICustomActiveStatus: typeof import('~icons/custom/active-status')['default']
     ICustomAdd: typeof import('~icons/custom/add')['default']
     ICustomAlarmLevel: typeof import('~icons/custom/alarm-level')['default']
     ICustomArrowRightExpand: typeof import('~icons/custom/arrow-right-expand')['default']
@@ -99,6 +100,7 @@ declare module 'vue' {
     ICustomSqlSave: typeof import('~icons/custom/sql-save')['default']
     ICustomStorageNum: typeof import('~icons/custom/storage-num')['default']
     ICustomSuccessGreen: typeof import('~icons/custom/success-green')['default']
+    ICustomSystemStatus: typeof import('~icons/custom/system-status')['default']
     ICustomTemplate: typeof import('~icons/custom/template')['default']
     ICustomTime: typeof import('~icons/custom/time')['default']
     ICustomTitle: typeof import('~icons/custom/title')['default']
@@ -129,6 +131,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TextTooltip: typeof import('./../components/text-tooltip.vue')['default']
+    TheChart: typeof import('./../components/the-chart.vue')['default']
     TheLayout: typeof import('./../components/layout/the-layout.vue')['default']
     TimeseriesSelect: typeof import('./../components/timeseries-select.vue')['default']
   }

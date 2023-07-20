@@ -13,17 +13,17 @@
           </div>
           <ul class="system-info-list">
             <li class="system-info-item">
-              <el-icon size="24"><i-custom-storage-num /></el-icon>
+              <el-icon size="24"><i-custom-system-status /></el-icon>
               <span class="module-label-text">服务器状态(Running)：</span>
               <span class="module-content-text"></span>
             </li>
             <li class="system-info-item">
-              <el-icon size="24"><i-custom-storage-num /></el-icon>
+              <el-icon size="24"><i-custom-active-status /></el-icon>
               <span class="module-label-text">是否激活：</span>
               <span class="module-content-text"></span>
             </li>
             <li class="system-info-item">
-              <el-icon size="24"><i-custom-storage-num /></el-icon>
+              <el-icon size="24"><i-custom-time /></el-icon>
               <span class="module-label-text">到期时间：</span>
               <span class="module-content-text"></span>
             </li>
@@ -86,11 +86,9 @@
             </el-select>
           </div>
 
-          <div class="monitor-info-wrapper">
-            <el-scrollbar>
-              <monitor-all />
-            </el-scrollbar>
-          </div>
+          <monitor-all />
+          <monitor-datanode />
+          <monitor-confignode />
         </div>
       </el-scrollbar>
     </el-main>
@@ -99,6 +97,8 @@
 
 <script lang="ts" setup>
 import MonitorAll from './components/monitor-all.vue';
+import MonitorDatanode from './components/monitor-datanode.vue';
+import MonitorConfignode from './components/monitor-confignode.vue';
 
 const tableData = ref([]);
 const loading = ref(false);
@@ -171,7 +171,11 @@ onUnmounted(() => {
   .system-info-item{
     display: flex;
     align-items: center;
-    margin: 8px 0;
+    margin: 8px 24px 8px 0;
+
+    &:last-child{
+      margin: 8px 0;
+    }
   }
 }
 
@@ -196,6 +200,6 @@ onUnmounted(() => {
 }
 
 .monitor-info-wrapper{
-  height: calc(100% - 516px);
+  min-height: calc(100% - 516px);
 }
 </style>
