@@ -48,13 +48,15 @@
     <div class="monitor-chart-box-3">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">每秒写入点数</h4>
-        <p class="monitor-info-module-text">100000</p>
+        <data-container :is-empty="false">
+          <p class="monitor-info-module-text">{{toThousands(100000)}}</p>
+        </data-container>
       </div>
     </div>
     <div class="monitor-chart-box-3">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">文件总数</h4>
-        <p class="monitor-info-module-text">6243892</p>
+        <p class="monitor-info-module-text">{{toThousands(6243892)}}</p>
       </div>
     </div>
   </div>
@@ -62,6 +64,8 @@
 
 <script setup lang="ts">
 import { type ECOption } from '@/plugins/echarts-plugin';
+import { toThousands } from '@/utils/format';
+import DataContainer from './data-container.vue';
 
 const diskIOChartOptions = computed<ECOption>(() => ({
   tooltip: {
@@ -383,7 +387,7 @@ const systemMemoryChartOptions = computed<ECOption>(() => ({
 .monitor-chart-box-4{
   width: calc((100% - 48px) / 4);
   margin: 12px 16px 0 0;
-  height: 258px;
+  height: 242px;
   border-radius: 2px;
   border: 1px solid #DFE1ED;
   box-sizing: border-box;
@@ -396,7 +400,7 @@ const systemMemoryChartOptions = computed<ECOption>(() => ({
 .monitor-chart-box-3{
   width: calc((100% - 32px) / 3);
   margin: 12px 16px 0 0;
-  height: 258px;
+  height: 242px;
   border-radius: 2px;
   border: 1px solid #DFE1ED;
   box-sizing: border-box;
@@ -447,9 +451,9 @@ const systemMemoryChartOptions = computed<ECOption>(() => ({
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 80px;
+  font-size: 64px;
   font-weight: 700;
-  line-height: 145px;
+  line-height: 96px;
   color: #495AD4;
 }
 

@@ -138,7 +138,7 @@ const gaugeChartOptions = computed(() => function (color1: string, color2: strin
 .monitor-chart-box-4{
   width: calc((100% - 48px) / 4);
   margin: 12px 16px 0 0;
-  height: 258px;
+  height: 242px;
   border-radius: 2px;
   border: 1px solid #DFE1ED;
   box-sizing: border-box;
@@ -151,7 +151,7 @@ const gaugeChartOptions = computed(() => function (color1: string, color2: strin
 .monitor-chart-box-3{
   width: calc((100% - 32px) / 3);
   margin: 12px 16px 0 0;
-  height: 258px;
+  height: 242px;
   border-radius: 2px;
   border: 1px solid #DFE1ED;
   box-sizing: border-box;
@@ -202,15 +202,15 @@ const gaugeChartOptions = computed(() => function (color1: string, color2: strin
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 80px;
+  font-size: 64px;
   font-weight: 700;
-  line-height: 145px;
+  line-height: 96px;
   color: #495AD4;
 
   .monitor-info-module-unit{
-    font-size: 24px;
+    font-size: 16px;
     align-self: end;
-    margin-bottom: 12px;
+    transform: translateY(-30%);
   }
 }
 

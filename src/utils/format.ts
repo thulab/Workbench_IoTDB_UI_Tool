@@ -14,3 +14,10 @@ export const getOptionField = (val: string | number | boolean | undefined | null
   const data = options.find((f) => f[valueFiled] === val);
   return data ? data[labelField] : '';
 };
+
+export function toThousands(num: number) {
+  if (num === 0) return num;
+  const resNum = `${num}`;
+  if (resNum.length < 6) return resNum;
+  return resNum.replace(/(\d)(?=(?:\d{3})+$)/g, '$1,');
+}
