@@ -1,6 +1,6 @@
 <template>
   <div class="monitor-chart-wrapper">
-    <div class="monitor-chart-box-4">
+    <div class="monitor-chart-box-media">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">CPU 核数</h4>
         <data-container :is-empty="false">
@@ -10,7 +10,7 @@
         </data-container>
       </div>
     </div>
-    <div class="monitor-chart-box-4">
+    <div class="monitor-chart-box-media">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">磁盘空间</h4>
         <data-container :is-empty="false">
@@ -20,7 +20,7 @@
         </data-container>
       </div>
     </div>
-    <div class="monitor-chart-box-4">
+    <div class="monitor-chart-box-media">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">系统内存</h4>
         <data-container :is-empty="false">
@@ -30,7 +30,7 @@
         </data-container>
       </div>
     </div>
-    <div class="monitor-chart-box-4">
+    <div class="monitor-chart-box-media">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">文件总数</h4>
         <data-container :is-empty="false">
@@ -40,9 +40,7 @@
         </data-container>
       </div>
     </div>
-    <!-- </div>
-  <div class="monitor-chart-wrapper"> -->
-    <div class="monitor-chart-box-4">
+    <div class="monitor-chart-box-media">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">CPU 负载</h4>
         <div class="chart-container-box">
@@ -50,7 +48,7 @@
         </div>
       </div>
     </div>
-    <div class="monitor-chart-box-4">
+    <div class="monitor-chart-box-media">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">磁盘使用情况</h4>
         <div class="chart-container-box">
@@ -58,7 +56,7 @@
         </div>
       </div>
     </div>
-    <div class="monitor-chart-box-4">
+    <div class="monitor-chart-box-media">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">内存使用情况</h4>
         <div class="chart-container-box">
@@ -66,7 +64,7 @@
         </div>
       </div>
     </div>
-    <div class="monitor-chart-box-4">
+    <div class="monitor-chart-box-media">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">磁盘 I/O 繁忙速率</h4>
         <div class="chart-container-box">
@@ -286,6 +284,38 @@ const diskIODataOptions = computed(() => diskIOChartOptions(diskIOCategory.value
   &:nth-of-type(2n) {
     margin-right: 0;
   }
+}
+
+.monitor-chart-box-media{
+  width: calc((100% - 48px) / 4);
+  margin: 12px 16px 0 0;
+  height: 258px;
+  border-radius: 2px;
+  border: 1px solid #DFE1ED;
+  box-sizing: border-box;
+
+  &:nth-of-type(4n) {
+    margin-right: 0;
+  }
+}
+
+@media (width <=1400px) {
+.monitor-chart-box-media{
+  width: calc((100% - 32px) / 3);
+  margin: 12px 16px 0 0;
+  height: 258px;
+  border-radius: 2px;
+  border: 1px solid #DFE1ED;
+  box-sizing: border-box;
+
+  &:nth-of-type(3n) {
+    margin-right: 0;
+  }
+
+  &:nth-of-type(4n) {
+    margin-right: 16px;
+  }
+}
 }
 
 .monitor-chart-container{
