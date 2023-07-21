@@ -3,50 +3,74 @@
     <div class="monitor-chart-box-4">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">CPU 核数</h4>
-        <p class="monitor-info-module-text">48</p>
+        <data-container :is-empty="false">
+          <div class="monitor-info-module-box">
+            <p class="monitor-info-module-text">48</p>
+          </div>
+        </data-container>
       </div>
     </div>
     <div class="monitor-chart-box-4">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">磁盘空间</h4>
-        <p class="monitor-info-module-text">48<span class="monitor-info-module-unit">TiB</span></p>
+        <data-container :is-empty="false">
+          <div class="monitor-info-module-box">
+            <p class="monitor-info-module-text">48<span class="monitor-info-module-unit">TiB</span></p>
+          </div>
+        </data-container>
       </div>
     </div>
     <div class="monitor-chart-box-4">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">系统内存</h4>
-        <p class="monitor-info-module-text">31.3<span class="monitor-info-module-unit">GiB</span></p>
+        <data-container :is-empty="false">
+          <div class="monitor-info-module-box">
+            <p class="monitor-info-module-text">31.3<span class="monitor-info-module-unit">GiB</span></p>
+          </div>
+        </data-container>
       </div>
     </div>
     <div class="monitor-chart-box-4">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">文件总数</h4>
-        <p class="monitor-info-module-text">{{toThousands(62432)}}</p>
+        <data-container :is-empty="false">
+          <div class="monitor-info-module-box">
+            <p class="monitor-info-module-text">{{toThousands(624312)}}</p>
+          </div>
+        </data-container>
       </div>
     </div>
-  </div>
-  <div class="monitor-chart-wrapper">
-    <div class="monitor-chart-box-3">
+    <!-- </div>
+  <div class="monitor-chart-wrapper"> -->
+    <div class="monitor-chart-box-4">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">CPU 负载</h4>
         <div class="chart-container-box">
-          <the-chart :option="gaugeChartOptions('#495AD4', '#929CE5', '19.15')" />
+          <the-chart :option="cpuDataOptions" />
         </div>
       </div>
     </div>
-    <div class="monitor-chart-box-3">
+    <div class="monitor-chart-box-4">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">磁盘使用情况</h4>
         <div class="chart-container-box">
-          <the-chart :option="gaugeChartOptions('#009DEA', '#66C4F2', '33.9')" />
+          <the-chart :option="diskDataOptions" />
         </div>
       </div>
     </div>
-    <div class="monitor-chart-box-3">
+    <div class="monitor-chart-box-4">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">内存使用情况</h4>
         <div class="chart-container-box">
-          <the-chart :option="gaugeChartOptions('#6738BD', '#A488D7', '22.23')" />
+          <the-chart :option="momoryDataOptions" />
+        </div>
+      </div>
+    </div>
+    <div class="monitor-chart-box-4">
+      <div class="monitor-chart-container">
+        <h4 class="monitor-info-module-title">磁盘 I/O 繁忙速率</h4>
+        <div class="chart-container-box">
+          <the-chart :option="diskIODataOptions" />
         </div>
       </div>
     </div>
@@ -56,97 +80,164 @@
 <script setup lang="ts">
 import { type ECOption } from '@/plugins/echarts-plugin';
 import { toThousands } from '@/utils/format';
+import DataContainer from './data-container.vue';
 
-const gaugeChartOptions = computed(() => function (color1: string, color2: string, value: string) {
-  return ({
-    series: [
-      {
-        type: 'gauge',
-        center: ['50%', '60%'],
-        startAngle: 200,
-        endAngle: -20,
-        itemStyle: {
-          color: color1,
-        },
-        progress: {
-          show: true,
+interface GaugeChartData {
+  themeColor: string;
+  opacityColor: string;
+  dataVal: string;
+}
+
+const cpuData = reactive<GaugeChartData>({
+  themeColor: '#495AD4',
+  opacityColor: '#929CE5',
+  dataVal: '19.15',
+});
+
+const diskData = reactive<GaugeChartData>({
+  themeColor: '#009DEA',
+  opacityColor: '#66C4F2',
+  dataVal: '33.9',
+});
+
+const momoryData = reactive<GaugeChartData>({
+  themeColor: '#6738BD',
+  opacityColor: '#A488D7',
+  dataVal: '22.23',
+});
+
+const diskIOCategory = ref<string[]>(['vda', 'vdb', 'vdc']);
+const diskIOData = ref<string[]>(['12', '25', '98']);
+
+const gaugeChartOptions = (optionData: GaugeChartData) => ({
+  series: [
+    {
+      type: 'gauge',
+      center: ['50%', '60%'],
+      startAngle: 200,
+      endAngle: -20,
+      itemStyle: {
+        color: optionData.themeColor,
+      },
+      progress: {
+        show: true,
+        width: 16,
+      },
+      pointer: {
+        show: false,
+      },
+      axisLine: {
+        lineStyle: {
           width: 16,
         },
-        pointer: {
-          show: false,
-        },
-        axisLine: {
-          lineStyle: {
-            width: 16,
-          },
-        },
-        axisTick: {
-          show: false,
-        },
-        splitLine: {
-          show: false,
-        },
-        axisLabel: {
-          show: false,
-        },
-        anchor: {
-          show: false,
-        },
-        title: {
-          show: false,
-        },
-        detail: {
-          offsetCenter: [0, '-8%'],
-          fontSize: 18,
-          fontWeight: 'bolder',
-          formatter: '{value} %',
-          color: 'inherit',
-        },
-        data: [
-          {
-            value,
-          },
-        ],
       },
-      {
-        type: 'gauge',
-        center: ['50%', '60%'],
-        startAngle: 200,
-        endAngle: -20,
-        itemStyle: {
-          color: color2,
-        },
-        progress: {
-          show: true,
-          width: 4,
-        },
-        pointer: {
-          show: false,
-        },
-        axisLine: {
-          show: false,
-        },
-        axisTick: {
-          show: false,
-        },
-        splitLine: {
-          show: false,
-        },
-        axisLabel: {
-          show: false,
-        },
-        detail: {
-          show: false,
-        },
-        data: [
-          {
-            value,
-          },
-        ],
+      axisTick: {
+        show: false,
       },
-    ],
-  }) as ECOption;
-});
+      splitLine: {
+        show: false,
+      },
+      axisLabel: {
+        show: false,
+      },
+      anchor: {
+        show: false,
+      },
+      title: {
+        show: false,
+      },
+      detail: {
+        offsetCenter: [0, '-8%'],
+        fontSize: 18,
+        fontWeight: 'bolder',
+        formatter: '{value} %',
+        color: 'inherit',
+      },
+      data: [
+        {
+          value: optionData.dataVal,
+        },
+      ],
+    },
+    {
+      type: 'gauge',
+      center: ['50%', '60%'],
+      startAngle: 200,
+      endAngle: -20,
+      itemStyle: {
+        color: optionData.opacityColor,
+      },
+      progress: {
+        show: true,
+        width: 4,
+      },
+      pointer: {
+        show: false,
+      },
+      axisLine: {
+        show: false,
+      },
+      axisTick: {
+        show: false,
+      },
+      splitLine: {
+        show: false,
+      },
+      axisLabel: {
+        show: false,
+      },
+      detail: {
+        show: false,
+      },
+      data: [
+        {
+          value: optionData.dataVal,
+        },
+      ],
+    },
+  ],
+} as ECOption);
+
+const diskIOChartOptions = (categoryList: string[], valueList: string[]) => ({
+  tooltip: {
+    show: false,
+  },
+  legend: {
+    show: false,
+  },
+  grid: {
+    left: 20,
+    right: 40,
+    bottom: 20,
+    containLabel: true,
+  },
+  xAxis: {
+    type: 'category',
+    data: categoryList,
+  },
+  yAxis: {
+    type: 'value',
+  },
+  series: [
+    {
+      type: 'bar',
+      data: valueList,
+      itemStyle: {
+        color: '#495AD4',
+      },
+      label: {
+        show: true,
+        position: 'top',
+        formatter: '{c}%',
+      },
+    },
+  ],
+} as ECOption);
+
+const cpuDataOptions = computed(() => gaugeChartOptions(cpuData));
+const diskDataOptions = computed(() => gaugeChartOptions(diskData));
+const momoryDataOptions = computed(() => gaugeChartOptions(momoryData));
+const diskIODataOptions = computed(() => diskIOChartOptions(diskIOCategory.value, diskIOData.value));
 
 </script>
 
@@ -161,7 +252,7 @@ const gaugeChartOptions = computed(() => function (color1: string, color2: strin
 .monitor-chart-box-4{
   width: calc((100% - 48px) / 4);
   margin: 12px 16px 0 0;
-  height: 242px;
+  height: 258px;
   border-radius: 2px;
   border: 1px solid #DFE1ED;
   box-sizing: border-box;
@@ -174,12 +265,25 @@ const gaugeChartOptions = computed(() => function (color1: string, color2: strin
 .monitor-chart-box-3{
   width: calc((100% - 32px) / 3);
   margin: 12px 16px 0 0;
-  height: 242px;
+  height: 258px;
   border-radius: 2px;
   border: 1px solid #DFE1ED;
   box-sizing: border-box;
 
   &:nth-of-type(3n) {
+    margin-right: 0;
+  }
+}
+
+.monitor-chart-box-2{
+  width: calc((100% - 16px) / 2);
+  margin: 12px 16px 0 0;
+  height: 258px;
+  border-radius: 2px;
+  border: 1px solid #DFE1ED;
+  box-sizing: border-box;
+
+  &:nth-of-type(2n) {
     margin-right: 0;
   }
 }
@@ -220,20 +324,22 @@ const gaugeChartOptions = computed(() => function (color1: string, color2: strin
   justify-content: center;
 }
 
-.monitor-info-module-text{
+.monitor-info-module-box{
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 64px;
-  font-weight: 700;
-  line-height: 96px;
-  color: #495AD4;
+
+  .monitor-info-module-text{
+    font-size: 72px;
+    font-weight: 700;
+    line-height: 105px;
+    color: #495AD4;
+  }
 
   .monitor-info-module-unit{
-    font-size: 16px;
-    align-self: end;
-    transform: translateY(-30%);
+    font-size: 24px;
+    padding-left: 4px;
   }
 }
 

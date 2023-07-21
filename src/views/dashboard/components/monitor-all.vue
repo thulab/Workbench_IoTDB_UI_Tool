@@ -8,8 +8,12 @@
           <h6 class="monitor-info-title">ConfigNode</h6>
         </div>
         <div class="monitor-info-list">
-          <p class="monitor-info-module-text">48</p>
-          <p class="monitor-info-module-text" style="color: #009DEA;">6</p>
+          <div class="monitor-info-module-box">
+            <p class="monitor-info-module-text">48</p>
+          </div>
+          <div class="monitor-info-module-box">
+            <p class="monitor-info-module-text" style="color: #009DEA;">6</p>
+          </div>
         </div>
       </div>
     </div>
@@ -21,7 +25,7 @@
           <h6 class="monitor-info-title">ConfigNode</h6>
         </div>
         <div class="chart-container-box">
-          <the-chart :option="diskMemoryChartOptions" />
+          <the-chart :option="diskDataOptions" />
         </div>
       </div>
     </div>
@@ -33,30 +37,30 @@
           <h6 class="monitor-info-title">ConfigNode</h6>
         </div>
         <div class="chart-container-box">
-          <the-chart :option="systemMemoryChartOptions" />
+          <the-chart :option="systemDataOptions" />
         </div>
       </div>
     </div>
-    <div class="monitor-chart-box-3">
-      <div class="monitor-chart-container">
-        <h4 class="monitor-info-module-title">磁盘 I/O 繁忙速率</h4>
-        <div class="chart-container-box">
-          <the-chart :option="diskIOChartOptions" />
-        </div>
-      </div>
-    </div>
-    <div class="monitor-chart-box-3">
+  </div>
+  <div class="monitor-chart-wrapper">
+    <div class="monitor-chart-box-2">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">每秒写入点数</h4>
         <data-container :is-empty="false">
-          <p class="monitor-info-module-text">{{toThousands(100000)}}</p>
+          <div class="monitor-info-module-box">
+            <p class="monitor-info-module-text">{{toThousands(100000)}}</p>
+          </div>
         </data-container>
       </div>
     </div>
-    <div class="monitor-chart-box-3">
+    <div class="monitor-chart-box-2">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">文件总数</h4>
-        <p class="monitor-info-module-text">{{toThousands(6243892)}}</p>
+        <data-container :is-empty="false">
+          <div class="monitor-info-module-box">
+            <p class="monitor-info-module-text">{{toThousands(6243892)}}</p>
+          </div>
+        </data-container>
       </div>
     </div>
   </div>
@@ -67,58 +71,42 @@ import { type ECOption } from '@/plugins/echarts-plugin';
 import { toThousands } from '@/utils/format';
 import DataContainer from './data-container.vue';
 
-const diskIOChartOptions = computed<ECOption>(() => ({
-  tooltip: {
-    show: false,
-  },
-  legend: {
-    show: true,
-  },
-  grid: {
-    left: 20,
-    right: 40,
-    bottom: 20,
-    containLabel: true,
-  },
-  xAxis: {
-    type: 'value',
-    boundaryGap: false,
-  },
-  yAxis: {
-    type: 'category',
-    data: ['vda', 'vdb', 'vdc'],
-  },
-  series: [
-    {
-      name: 'DataNode',
-      type: 'bar',
-      data: [18203, 23489, 29034],
-      itemStyle: {
-        color: '#495AD4',
-      },
-      label: {
-        show: true,
-        position: 'right',
-        formatter: '{c}%',
-      },
-    },
-    {
-      name: 'ConfigNode',
-      type: 'bar',
-      data: [19325, 23438, 31000],
-      itemStyle: {
-        color: '#009DEA',
-      },
-      label: {
-        show: true,
-        position: 'right',
-        formatter: '{c}%',
-      },
-    },
-  ],
-}));
+interface PieChartData {
+  themeColor: string;
+  valueUnit: string;
+  dataVal: string;
+  totalVal: string;
+}
 
-const diskMemoryChartOptions = computed<ECOption>(() => ({
+const dataNodeMemoryData = reactive<PieChartData>({
+  themeColor: '#495AD4',
+  valueUnit: 'TiB',
+  dataVal: '2',
+  totalVal: '8',
+});
+
+const configNodeMemoryData = reactive<PieChartData>({
+  themeColor: '#009DEA',
+  valueUnit: 'TiB',
+  dataVal: '0.5',
+  totalVal: '2',
+});
+
+const dataNodeSystemData = reactive<PieChartData>({
+  themeColor: '#495AD4',
+  valueUnit: 'GiB',
+  dataVal: '30234',
+  totalVal: '10045345',
+});
+
+const configNodeSystemData = reactive<PieChartData>({
+  themeColor: '#009DEA',
+  valueUnit: 'GiB',
+  dataVal: '12.5',
+  totalVal: '50',
+});
+
+const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData): ECOption => ({
   tooltip: {
     show: false,
   },
@@ -141,8 +129,8 @@ const diskMemoryChartOptions = computed<ECOption>(() => ({
       right: '50%',
       data: [
         {
-          value: 100,
-          name: 'Search Engine',
+          value: dataNode.totalVal,
+          name: '磁盘空间',
           itemStyle: {
             color: '#DFE1ED',
           },
@@ -168,15 +156,15 @@ const diskMemoryChartOptions = computed<ECOption>(() => ({
       right: '50%',
       data: [
         {
-          value: 33,
-          name: 'Baidu',
+          value: dataNode.dataVal,
+          name: 'DataNode',
           itemStyle: {
-            color: '#495AD4',
+            color: dataNode.themeColor,
           },
         },
         {
-          value: 100,
-          name: 'Direct',
+          value: Number(dataNode.totalVal) - Number(dataNode.dataVal),
+          name: '磁盘空间',
           itemStyle: {
             opacity: 0,
           },
@@ -184,132 +172,93 @@ const diskMemoryChartOptions = computed<ECOption>(() => ({
       ],
     },
     {
-      type: 'pie',
-      radius: ['55%', '70%'],
-      label: {
+      type: 'gauge',
+      z: 3,
+      pointer: {
         show: false,
       },
-      labelLine: {
+      progress: {
         show: false,
       },
-      emphasis: {
-        disabled: true,
-      },
-      top: 0,
-      bottom: 0,
-      left: '50%',
-      right: 0,
-      data: [
-        {
-          value: 100,
-          name: 'Search Engine',
-          itemStyle: {
-            color: '#DFE1ED',
-          },
-        },
-      ],
-    },
-    {
-      type: 'pie',
-      radius: ['50%', '75%'],
-      label: {
+      axisLine: {
         show: false,
       },
-      labelLine: {
+      splitLine: {
+        show: false,
+      },
+      axisTick: {
+        show: false,
+      },
+      axisLabel: {
         show: false,
       },
       emphasis: {
         disabled: true,
       },
-      clockwise: true,
-      top: 0,
-      bottom: 0,
-      left: '50%',
-      right: 0,
-      data: [
-        {
-          value: 33,
-          name: 'Baidu',
-          itemStyle: {
-            color: '#009DEA',
-          },
+      radius: '100%',
+      center: ['25%', '50%'],
+      data: [{
+        value: 0,
+        title: {
+          show: false,
         },
-        {
-          value: 100,
-          name: 'Direct',
-          itemStyle: {
-            opacity: 0,
-          },
-        },
-      ],
-    },
-  ],
-}));
+        detail: {
+          offsetCenter: ['0', '8'],
+          formatter: `{dataValue|${dataNode.dataVal}}{dataUnit|${dataNode.valueUnit}}\n{line|}\n{totalValue|${dataNode.totalVal}}{totalUnit|${dataNode.valueUnit}}`,
+          rich: {
+            dataValue: {
+              fontSize: 30,
+              fontWeight: 700,
+              height: 30,
+              color: dataNode.themeColor,
+              textBorderWidth: 1,
+              textBorderColor: '#fff',
+              textBorderType: 'solid',
+            },
+            dataUnit: {
+              fontSize: 12,
+              fontWeight: 700,
+              height: 18,
+              padding: [0, 0, 0, 2],
+              color: dataNode.themeColor,
+              verticalAlign: 'bottom',
+              textBorderWidth: 1,
+              textBorderColor: '#fff',
+              textBorderType: 'solid',
 
-const systemMemoryChartOptions = computed<ECOption>(() => ({
-  tooltip: {
-    show: false,
-  },
-  series: [
-    {
-      type: 'pie',
-      radius: ['55%', '70%'],
-      label: {
-        show: false,
-      },
-      labelLine: {
-        show: false,
-      },
-      emphasis: {
-        disabled: true,
-      },
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: '50%',
-      data: [
-        {
-          value: 100,
-          name: 'Search Engine',
-          itemStyle: {
-            color: '#DFE1ED',
+            },
+            line: {
+              width: 60,
+              lineHeight: 4,
+              height: 0,
+              borderWidth: 0.5,
+              borderColor: '#DFE1ED',
+              verticalAlign: 'bottom',
+            },
+            totalValue: {
+              fontSize: 12,
+              fontWeight: 700,
+              height: 18,
+              verticalAlign: 'top',
+              color: '#424561',
+              textBorderWidth: 1,
+              textBorderColor: '#fff',
+              textBorderType: 'solid',
+            },
+            totalUnit: {
+              fontSize: 12,
+              fontWeight: 300,
+              height: 18,
+              padding: [0, 0, 0, 2],
+              verticalAlign: 'top',
+              color: '#424561',
+              textBorderWidth: 1,
+              textBorderColor: '#fff',
+              textBorderType: 'solid',
+            },
           },
         },
-      ],
-    },
-    {
-      type: 'pie',
-      radius: ['50%', '75%'],
-      label: {
-        show: false,
-      },
-      labelLine: {
-        show: false,
-      },
-      emphasis: {
-        disabled: true,
-      },
-      clockwise: false,
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: '50%',
-      data: [
-        {
-          value: 33,
-          name: 'Baidu',
-          itemStyle: {
-            color: '#495AD4',
-          },
-        },
-        {
-          value: 100,
-          name: 'Direct',
-          itemStyle: {
-            opacity: 0,
-          },
-        },
-      ],
+      }],
     },
     {
       type: 'pie',
@@ -329,8 +278,8 @@ const systemMemoryChartOptions = computed<ECOption>(() => ({
       right: 0,
       data: [
         {
-          value: 100,
-          name: 'Search Engine',
+          value: configNode.totalVal,
+          name: '磁盘空间',
           itemStyle: {
             color: '#DFE1ED',
           },
@@ -356,23 +305,115 @@ const systemMemoryChartOptions = computed<ECOption>(() => ({
       right: 0,
       data: [
         {
-          value: 33,
-          name: 'Baidu',
+          value: configNode.dataVal,
+          name: 'ConfigNode',
           itemStyle: {
-            color: '#009DEA',
+            color: configNode.themeColor,
           },
         },
         {
-          value: 100,
-          name: 'Direct',
+          value: Number(configNode.totalVal) - Number(configNode.dataVal),
+          name: '磁盘空间',
           itemStyle: {
             opacity: 0,
           },
         },
       ],
     },
+    {
+      type: 'gauge',
+      z: 3,
+      pointer: {
+        show: false,
+      },
+      progress: {
+        show: false,
+      },
+      axisLine: {
+        show: false,
+      },
+      splitLine: {
+        show: false,
+      },
+      axisTick: {
+        show: false,
+      },
+      axisLabel: {
+        show: false,
+      },
+      emphasis: {
+        disabled: true,
+      },
+      radius: '100%',
+      center: ['75%', '50%'],
+      data: [{
+        value: 0,
+        title: {
+          show: false,
+        },
+        detail: {
+          offsetCenter: ['0', '8'],
+          formatter: `{dataValue|${configNode.dataVal}}{dataUnit|${configNode.valueUnit}}\n{line|}\n{totalValue|${configNode.totalVal}}{totalUnit|${configNode.valueUnit}}`,
+          rich: {
+            dataValue: {
+              fontSize: 30,
+              fontWeight: 700,
+              height: 30,
+              color: configNode.themeColor,
+              textBorderWidth: 1,
+              textBorderColor: '#fff',
+              textBorderType: 'solid',
+            },
+            dataUnit: {
+              fontSize: 12,
+              fontWeight: 700,
+              height: 18,
+              padding: [0, 0, 0, 2],
+              color: configNode.themeColor,
+              verticalAlign: 'bottom',
+              textBorderWidth: 1,
+              textBorderColor: '#fff',
+              textBorderType: 'solid',
+
+            },
+            line: {
+              width: 60,
+              lineHeight: 4,
+              height: 0,
+              borderWidth: 0.5,
+              borderColor: '#DFE1ED',
+              verticalAlign: 'bottom',
+            },
+            totalValue: {
+              fontSize: 12,
+              fontWeight: 700,
+              height: 18,
+              verticalAlign: 'top',
+              color: '#424561',
+              textBorderWidth: 1,
+              textBorderColor: '#fff',
+              textBorderType: 'solid',
+            },
+            totalUnit: {
+              fontSize: 12,
+              fontWeight: 300,
+              height: 18,
+              padding: [0, 0, 0, 2],
+              verticalAlign: 'top',
+              color: '#424561',
+              textBorderWidth: 1,
+              textBorderColor: '#fff',
+              textBorderType: 'solid',
+            },
+          },
+        },
+      }],
+    },
   ],
-}));
+} as ECOption);
+
+const diskDataOptions = computed(() => memoryChartOptions(dataNodeMemoryData, configNodeMemoryData));
+const systemDataOptions = computed(() => memoryChartOptions(dataNodeSystemData, configNodeSystemData));
 
 </script>
 
@@ -387,7 +428,7 @@ const systemMemoryChartOptions = computed<ECOption>(() => ({
 .monitor-chart-box-4{
   width: calc((100% - 48px) / 4);
   margin: 12px 16px 0 0;
-  height: 242px;
+  height: 258px;
   border-radius: 2px;
   border: 1px solid #DFE1ED;
   box-sizing: border-box;
@@ -400,12 +441,25 @@ const systemMemoryChartOptions = computed<ECOption>(() => ({
 .monitor-chart-box-3{
   width: calc((100% - 32px) / 3);
   margin: 12px 16px 0 0;
-  height: 242px;
+  height: 258px;
   border-radius: 2px;
   border: 1px solid #DFE1ED;
   box-sizing: border-box;
 
   &:nth-of-type(3n) {
+    margin-right: 0;
+  }
+}
+
+.monitor-chart-box-2{
+  width: calc((100% - 16px) / 2);
+  margin: 12px 16px 0 0;
+  height: 258px;
+  border-radius: 2px;
+  border: 1px solid #DFE1ED;
+  box-sizing: border-box;
+
+  &:nth-of-type(2n) {
     margin-right: 0;
   }
 }
@@ -446,15 +500,23 @@ const systemMemoryChartOptions = computed<ECOption>(() => ({
   justify-content: center;
 }
 
-.monitor-info-module-text{
+.monitor-info-module-box{
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 64px;
-  font-weight: 700;
-  line-height: 96px;
-  color: #495AD4;
+
+  .monitor-info-module-text{
+    font-size: 72px;
+    font-weight: 700;
+    line-height: 105px;
+    color: #495AD4;
+  }
+
+  .monitor-info-module-unit{
+    font-size: 24px;
+    padding-left: 4px;
+  }
 }
 
 .chart-container-box{
