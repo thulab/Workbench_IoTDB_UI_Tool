@@ -1,6 +1,6 @@
 <template>
   <div class="monitor-chart-wrapper">
-    <div class="monitor-chart-box-3">
+    <div class="monitor-chart-box-3" v-loading="cpuLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">CPU 核数</h4>
         <div class="monitor-module-title-box">
@@ -69,6 +69,7 @@
 <script setup lang="ts">
 import { type ECOption } from '@/plugins/echarts-plugin';
 import { toThousands } from '@/utils/format';
+import { DashboardApi } from '@/api';
 import DataContainer from './data-container.vue';
 
 interface PieChartData {
@@ -77,6 +78,14 @@ interface PieChartData {
   dataVal: string;
   totalVal: string;
 }
+
+const cpuData = reactive<{
+  dataCpu: number | null,
+  configCpu: number | null,
+}>({
+  dataCpu: null,
+  configCpu: null,
+});
 
 const dataNodeMemoryData = reactive<PieChartData>({
   themeColor: '#495AD4',
@@ -415,113 +424,23 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData): E
 const diskDataOptions = computed(() => memoryChartOptions(dataNodeMemoryData, configNodeMemoryData));
 const systemDataOptions = computed(() => memoryChartOptions(dataNodeSystemData, configNodeSystemData));
 
+const { requestFn: getMetricAllCPU, loading: cpuLoading } = useRequest(DashboardApi.getMetricAllCPU);
+
+function getCpu() {
+  getMetricAllCPU().then((res) => {
+    if (res.data) {
+      //
+    }
+  });
+}
+
+function getInitial() {
+  getCpu();
+}
+
+onMounted(() => {
+  getInitial();
+});
+
+defineExpose({ getInitial });
 </script>
-
-<style lang="scss" scoped>
-.monitor-chart-wrapper{
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  box-sizing: border-box;
-}
-
-.monitor-chart-box-4{
-  width: calc((100% - 48px) / 4);
-  margin: 12px 16px 0 0;
-  height: 258px;
-  border-radius: 2px;
-  border: 1px solid #DFE1ED;
-  box-sizing: border-box;
-
-  &:nth-of-type(4n) {
-    margin-right: 0;
-  }
-}
-
-.monitor-chart-box-3{
-  width: calc((100% - 32px) / 3);
-  margin: 12px 16px 0 0;
-  height: 258px;
-  border-radius: 2px;
-  border: 1px solid #DFE1ED;
-  box-sizing: border-box;
-
-  &:nth-of-type(3n) {
-    margin-right: 0;
-  }
-}
-
-.monitor-chart-box-2{
-  width: calc((100% - 16px) / 2);
-  margin: 12px 16px 0 0;
-  height: 258px;
-  border-radius: 2px;
-  border: 1px solid #DFE1ED;
-  box-sizing: border-box;
-
-  &:nth-of-type(2n) {
-    margin-right: 0;
-  }
-}
-
-.monitor-chart-container{
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.monitor-info-module-title{
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 27px;
-  color: #131926;
-  text-align: center;
-  margin: 14px 0 4px;
-}
-
-.monitor-module-title-box{
-  display: flex;
-
-  .monitor-info-title{
-    flex: 1;
-    text-align: center;
-    font-size: 12px;
-    font-weight: 300;
-    line-height: 18px;
-    color: #424561;
-  }
-}
-
-.monitor-info-list{
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.monitor-info-module-box{
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .monitor-info-module-text{
-    font-size: 72px;
-    font-weight: 700;
-    line-height: 105px;
-    color: #495AD4;
-  }
-
-  .monitor-info-module-unit{
-    font-size: 24px;
-    padding-left: 4px;
-  }
-}
-
-.chart-container-box{
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-</style>

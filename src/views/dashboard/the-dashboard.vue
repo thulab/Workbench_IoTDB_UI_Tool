@@ -1,6 +1,6 @@
 <template>
   <el-container class="details-wrapper">
-    <el-main class="p-0">
+    <el-main class="p-0" v-loading="loading">
       <el-scrollbar>
         <div class="module-box-wrapper m-b-16">
           <div class="module-title-wrapper">
@@ -15,32 +15,32 @@
             <li class="system-info-item">
               <el-icon size="24"><i-custom-system-status /></el-icon>
               <span class="module-label-text">服务器状态(Running)：</span>
-              <span class="module-content-text"></span>
+              <span class="module-content-text">Datanode {{systemData.dataNodeRatio}}个 Confignode {{ systemData.configNodeRatio}}个</span>
             </li>
             <li class="system-info-item">
               <el-icon size="24"><i-custom-active-status /></el-icon>
               <span class="module-label-text">是否激活：</span>
-              <span class="module-content-text"></span>
+              <span class="module-content-text" :style="{ color: systemData.active ? '#44C795' : '#D43030' }">{{ systemData.active ? '是' : '否' }}</span>
             </li>
             <li class="system-info-item">
               <el-icon size="24"><i-custom-time /></el-icon>
               <span class="module-label-text">到期时间：</span>
-              <span class="module-content-text"></span>
+              <span class="module-content-text">{{ systemData.expirationTime }}</span>
             </li>
             <li class="system-info-item">
               <el-icon size="24"><i-custom-storage-num /></el-icon>
               <span class="module-label-text">数据库数量：</span>
-              <span class="module-content-text"></span>
+              <span class="module-content-text">{{ toThousands(systemData.databaseNum) }}</span>
             </li>
             <li class="system-info-item">
               <el-icon size="24"><i-custom-device-num /></el-icon>
               <span class="module-label-text">设备数量：</span>
-              <span class="module-content-text"></span>
+              <span class="module-content-text">{{ toThousands(systemData.deviceNum) }}</span>
             </li>
             <li class="system-info-item">
               <el-icon size="24"><i-custom-measure-num /></el-icon>
               <span class="module-label-text">测点数量：</span>
-              <span class="module-content-text"></span>
+              <span class="module-content-text">{{ toThousands(systemData.measurementNum) }}</span>
             </li>
           </ul>
 
@@ -49,16 +49,15 @@
               :data="tableData"
               v-loading="loading"
               style="width: 100%;"
-              :height="260"
               :max-height="260"
               tooltip-effect="light"
               :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
             >
-              <el-table-column label="节点" prop="ip" min-width="200" align="center" show-overflow-tooltip />
-              <el-table-column label="类型" prop="nodeType" min-width="120" align="center" show-overflow-tooltip />
+              <el-table-column label="节点" prop="address" min-width="200" align="center" show-overflow-tooltip />
+              <el-table-column label="类型" prop="type" min-width="120" align="center" show-overflow-tooltip />
               <el-table-column label="状态" prop="status" min-width="120" align="center" show-overflow-tooltip />
               <el-table-column label="版本" prop="version" min-width="90" align="center" show-overflow-tooltip />
-              <el-table-column label="物理机" prop="ip" min-width="160" align="center" show-overflow-tooltip />
+              <el-table-column label="物理机" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
               <template #empty>
                 <div class="table-empty-wrapper">
                   <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
@@ -81,14 +80,14 @@
 
           <div class="search-form-box">
             <span class="search-from-label">节点：</span>
-            <el-select v-model="monitorNode" placeholder="全部" style="width: 256px;">
-              <el-option v-for="item in nodeList" :key="item" :value="item" :label="item" />
+            <el-select v-model="monitorNode" placeholder="全部" style="width: 256px;" @change="handleChangeNode">
+              <el-option v-for="item in nodeList" :key="`${item.address}(${item.type})`" :value="item.address" :label="item.address ? `${item.address}(${item.type})` : '全部'" />
             </el-select>
           </div>
 
-          <monitor-all />
-          <monitor-datanode />
-          <monitor-confignode />
+          <monitor-datanode v-if="currentNodeType === 'datanode'" />
+          <monitor-confignode v-else-if="currentNodeType === 'confignode'" />
+          <monitor-all v-else />
         </div>
       </el-scrollbar>
     </el-main>
@@ -96,16 +95,60 @@
 </template>
 
 <script lang="ts" setup>
+import { assign } from 'lodash-es';
+import { DashboardApi } from '@/api';
+import { toThousands } from '@/utils/format';
 import MonitorAll from './components/monitor-all.vue';
 import MonitorDatanode from './components/monitor-datanode.vue';
 import MonitorConfignode from './components/monitor-confignode.vue';
 
-const tableData = ref([]);
-const loading = ref(false);
+const systemData = reactive<Dashboard.SystemData>({
+  dataNodeRatio: '-',
+  configNodeRatio: '-',
+  active: false,
+  expirationTime: '-',
+  databaseNum: 0,
+  deviceNum: 0,
+  measurementNum: 0,
+});
+const tableData = ref<Dashboard.NodeItem[]>([]);
 const systemInterval = ref();
 const monitorInterval = ref();
 const monitorNode = ref('');
-const nodeList = ref([]);
+const nodeList = ref<Dashboard.NodeItem[]>([]);
+const currentNodeType = ref('');
+
+const { requestFn: getSystemInfo, loading } = useRequest(DashboardApi.getSystemInfo);
+
+function getSystemData() {
+  getSystemInfo().then((res) => {
+    assign(systemData, res.data);
+    systemData.expirationTime = res.data.expirationTime || '-';
+    tableData.value = res.data.nodes || [];
+    nodeList.value = [{
+      address: '',
+      type: '',
+      status: '',
+      version: '',
+      physicalMachine: '',
+    }, ...tableData.value];
+  });
+}
+
+function getInitialData() {
+  getSystemData();
+}
+
+function handleChangeNode(val: string) {
+  if (!val) {
+    currentNodeType.value = '';
+  } else {
+    const current = nodeList.value.find((f) => f.address === val);
+    if (current) {
+      currentNodeType.value = current.type;
+    }
+  }
+}
 
 // 刷新系统
 function handleRefreshSystem() {
@@ -122,6 +165,10 @@ function handleRefreshMonitor() {
     console.log('handleRefreshMonitor');
   }, 30 * 1000);
 }
+
+onMounted(() => {
+  getInitialData();
+});
 
 onUnmounted(() => {
   clearInterval(systemInterval.value);
@@ -202,4 +249,7 @@ onUnmounted(() => {
 .monitor-info-wrapper{
   min-height: calc(100% - 516px);
 }
+</style>
+<style lang="scss">
+@import './components/monitor-module';
 </style>

@@ -8,14 +8,18 @@ declare namespace Dashboard{
     physicalMachine: string;
   }
 
-  export interface SystemInfoRes {
+  export interface SystemData {
     dataNodeRatio: string;
     configNodeRatio: string;
     active: boolean;
     expirationTime: string;
     databaseNum: number;
     deviceNum: number;
-    measurementNum: NodeItem[];
+    measurementNum: number;
+  }
+
+  export interface SystemInfoRes extends SystemData {
+    nodes: NodeItem[];
   }
 
   export interface DiskIOUsedRateRes {
@@ -25,8 +29,8 @@ declare namespace Dashboard{
   }
 
   export interface MetricCPURes {
-    cpuDataNode: number;
-    cpuConfigNode: number;
+    cpu: number;
+    nodeType: string;
   }
 
   export interface MetricCPULoadRes {

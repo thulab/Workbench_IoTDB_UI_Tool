@@ -33,8 +33,13 @@ class DashboardApi {
   }
 
   // CPU
-  static getMetricCPU(): HttpResponseP<Dashboard.MetricCPURes> {
-    return http.get('/home/getMetricCPU');
+  static getMetricCPU(node: string, nodeType: string): HttpResponseP<Dashboard.MetricCPURes> {
+    return http.get('/home/getMetricCPU', { params: { node, nodeType } });
+  }
+
+  // CPU-all
+  static getMetricAllCPU(): HttpResponseP<Dashboard.MetricCPURes[]> {
+    return http.get('/home/getMetricAllCPU');
   }
 
   // CPU负载
