@@ -1,47 +1,49 @@
 <template>
   <div class="monitor-chart-wrapper">
-    <div class="monitor-chart-box-4">
+    <div class="monitor-chart-box-4" v-loading="cpuLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">CPU 核数</h4>
-        <data-container :is-empty="false">
+        <data-container :is-empty="cpuCount === null">
           <div class="monitor-info-module-box">
-            <p class="monitor-info-module-text">48</p>
+            <p class="monitor-info-module-text">{{ cpuCount }}</p>
           </div>
         </data-container>
       </div>
     </div>
-    <div class="monitor-chart-box-4">
+    <div class="monitor-chart-box-4" v-loading="cpuLoadLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">CPU 负载</h4>
         <div class="chart-container-box">
-          <the-chart :option="cpuDataOptions" />
+          <the-chart :option="cpuDataOptions" key="cpuLoad" />
         </div>
       </div>
     </div>
-    <div class="monitor-chart-box-4">
+    <div class="monitor-chart-box-4" v-loading="memoryLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">系统内存</h4>
-        <data-container :is-empty="false">
+        <data-container :is-empty="memoryData.dataCount === null">
           <div class="monitor-info-module-box">
-            <p class="monitor-info-module-text">31.3<span class="monitor-info-module-unit">GiB</span></p>
+            <p class="monitor-info-module-text">{{ memoryData.dataCount }}<span class="monitor-info-module-unit">{{ memoryData.valueUnit }}</span></p>
           </div>
         </data-container>
       </div>
     </div>
-    <div class="monitor-chart-box-4">
+    <div class="monitor-chart-box-4" v-loading="memoryLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">内存使用情况</h4>
         <div class="chart-container-box">
-          <the-chart :option="momoryDataOptions" />
+          <the-chart :option="memoryDataOptions" key="memoryData" />
         </div>
       </div>
     </div>
-    <div class="monitor-chart-box-4">
+    <div class="monitor-chart-box-4" v-loading="ioLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">磁盘 I/O 繁忙速率</h4>
-        <div class="chart-container-box">
-          <the-chart :option="diskIODataOptions" />
-        </div>
+        <data-container :is-empty="diskIOCategory.length === 0">
+          <div class="chart-container-box">
+            <the-chart :option="diskIODataOptions" key="diskIOData" />
+          </div>
+        </data-container>
       </div>
     </div>
   </div>
@@ -49,28 +51,40 @@
 
 <script setup lang="ts">
 import { type ECOption } from '@/plugins/echarts-plugin';
+import { DashboardApi } from '@/api';
 import DataContainer from './data-container.vue';
+
+const props = defineProps<{
+  node: string;
+  nodeType: string;
+}>();
 
 interface GaugeChartData {
   themeColor: string;
   opacityColor: string;
-  dataVal: string;
+  dataVal: number | null;
+  dataCount: number | null;
+  valueUnit?: string;
 }
 
+const cpuCount = ref();
 const cpuData = reactive<GaugeChartData>({
   themeColor: '#495AD4',
   opacityColor: '#929CE5',
-  dataVal: '19.15',
+  dataVal: 0,
+  dataCount: null,
 });
 
-const momoryData = reactive<GaugeChartData>({
+const memoryData = reactive<GaugeChartData>({
   themeColor: '#6738BD',
   opacityColor: '#A488D7',
-  dataVal: '22.23',
+  dataVal: 0,
+  dataCount: null,
+  valueUnit: 'GiB',
 });
 
-const diskIOCategory = ref<string[]>(['vda', 'vdb', 'vdc']);
-const diskIOData = ref<string[]>(['12', '25', '98']);
+const diskIOCategory = ref<string[]>([]);
+const diskIOData = ref<number[]>([]);
 
 const gaugeChartOptions = (optionData: GaugeChartData) => ({
   series: [
@@ -161,7 +175,7 @@ const gaugeChartOptions = (optionData: GaugeChartData) => ({
   ],
 } as ECOption);
 
-const diskIOChartOptions = (categoryList: string[], valueList: string[]) => ({
+const diskIOChartOptions = (categoryList: string[], valueList: number[]) => ({
   tooltip: {
     show: false,
   },
@@ -177,6 +191,7 @@ const diskIOChartOptions = (categoryList: string[], valueList: string[]) => ({
   xAxis: {
     type: 'category',
     data: categoryList,
+    show: categoryList.length > 0,
   },
   yAxis: {
     type: 'value',
@@ -198,7 +213,51 @@ const diskIOChartOptions = (categoryList: string[], valueList: string[]) => ({
 } as ECOption);
 
 const cpuDataOptions = computed(() => gaugeChartOptions(cpuData));
-const momoryDataOptions = computed(() => gaugeChartOptions(momoryData));
+const memoryDataOptions = computed(() => gaugeChartOptions(memoryData));
 const diskIODataOptions = computed(() => diskIOChartOptions(diskIOCategory.value, diskIOData.value));
 
+const { requestFn: getMetricCPU, loading: cpuLoading } = useRequest(DashboardApi.getMetricCPU);
+const { requestFn: getMetricCPULoad, loading: cpuLoadLoading } = useRequest(DashboardApi.getMetricCPULoad);
+const { requestFn: getMetricMemory, loading: memoryLoading } = useRequest(DashboardApi.getMetricMemory);
+const { requestFn: getMetricDiskIOUsedRate, loading: ioLoading } = useRequest(DashboardApi.getMetricDiskIOUsedRate);
+
+function getCpu() {
+  getMetricCPU(props.node, props.nodeType).then((res) => {
+    cpuCount.value = res.data.cpu;
+  });
+}
+
+function getCpuLoad() {
+  getMetricCPULoad(props.node, props.nodeType).then((res) => {
+    cpuData.dataVal = res.data.cpuLoad;
+  });
+}
+
+function getMemory() {
+  getMetricMemory(props.node, props.nodeType).then((res) => {
+    memoryData.dataCount = res.data.memoryUse;
+    memoryData.valueUnit = res.data.unit;
+    memoryData.dataVal = res.data.memoryRatio;
+  });
+}
+
+function getIo() {
+  getMetricDiskIOUsedRate(props.node).then((res) => {
+    diskIOCategory.value = res.data.map((item) => item.diskName);
+    diskIOData.value = res.data.map((item) => item.nodeRate);
+  });
+}
+
+function getInitial() {
+  getCpu();
+  getCpuLoad();
+  getMemory();
+  getIo();
+}
+
+onMounted(() => {
+  getInitial();
+});
+
+defineExpose({ getInitial });
 </script>

@@ -9,15 +9,15 @@
         </div>
         <div class="monitor-info-list">
           <div class="monitor-info-module-box">
-            <p class="monitor-info-module-text">48</p>
+            <p class="monitor-info-module-text">{{ cpuData.dataCpu }}</p>
           </div>
           <div class="monitor-info-module-box">
-            <p class="monitor-info-module-text" style="color: #009DEA;">6</p>
+            <p class="monitor-info-module-text" style="color: #009DEA;">{{ cpuData.configCpu }}</p>
           </div>
         </div>
       </div>
     </div>
-    <div class="monitor-chart-box-3">
+    <div class="monitor-chart-box-3" v-loading="diskLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">磁盘空间</h4>
         <div class="monitor-module-title-box">
@@ -25,11 +25,11 @@
           <h6 class="monitor-info-title">ConfigNode</h6>
         </div>
         <div class="chart-container-box">
-          <the-chart :option="diskDataOptions" />
+          <the-chart :option="diskDataOptions" key="diskChart" />
         </div>
       </div>
     </div>
-    <div class="monitor-chart-box-3">
+    <div class="monitor-chart-box-3" v-loading="systemLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">系统内存</h4>
         <div class="monitor-module-title-box">
@@ -37,28 +37,28 @@
           <h6 class="monitor-info-title">ConfigNode</h6>
         </div>
         <div class="chart-container-box">
-          <the-chart :option="systemDataOptions" />
+          <the-chart :option="systemDataOptions" key="memoryChart" />
         </div>
       </div>
     </div>
   </div>
   <div class="monitor-chart-wrapper">
-    <div class="monitor-chart-box-2">
+    <div class="monitor-chart-box-2" v-loading="speedLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">每秒写入点数</h4>
-        <data-container :is-empty="false">
+        <data-container :is-empty="writeSpeed === null">
           <div class="monitor-info-module-box">
-            <p class="monitor-info-module-text">{{toThousands(100000)}}</p>
+            <p class="monitor-info-module-text">{{toThousands(writeSpeed)}}</p>
           </div>
         </data-container>
       </div>
     </div>
-    <div class="monitor-chart-box-2">
+    <div class="monitor-chart-box-2" v-loading="fileLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">文件总数</h4>
-        <data-container :is-empty="false">
+        <data-container :is-empty="fileTotal === null">
           <div class="monitor-info-module-box">
-            <p class="monitor-info-module-text">{{toThousands(6243892)}}</p>
+            <p class="monitor-info-module-text">{{toThousands(fileTotal)}}</p>
           </div>
         </data-container>
       </div>
@@ -75,45 +75,48 @@ import DataContainer from './data-container.vue';
 interface PieChartData {
   themeColor: string;
   valueUnit: string;
-  dataVal: string;
-  totalVal: string;
+  dataVal: number;
+  totalVal: number;
 }
 
 const cpuData = reactive<{
-  dataCpu: number | null,
-  configCpu: number | null,
+  dataCpu: number | string,
+  configCpu: number | string,
 }>({
-  dataCpu: null,
-  configCpu: null,
+  dataCpu: '',
+  configCpu: '',
 });
 
 const dataNodeMemoryData = reactive<PieChartData>({
   themeColor: '#495AD4',
   valueUnit: 'TiB',
-  dataVal: '2',
-  totalVal: '8',
+  dataVal: 0,
+  totalVal: 0,
 });
 
 const configNodeMemoryData = reactive<PieChartData>({
   themeColor: '#009DEA',
   valueUnit: 'TiB',
-  dataVal: '0.5',
-  totalVal: '2',
+  dataVal: 0,
+  totalVal: 0,
 });
 
 const dataNodeSystemData = reactive<PieChartData>({
   themeColor: '#495AD4',
   valueUnit: 'GiB',
-  dataVal: '30234',
-  totalVal: '10045345',
+  dataVal: 0,
+  totalVal: 0,
 });
 
 const configNodeSystemData = reactive<PieChartData>({
   themeColor: '#009DEA',
   valueUnit: 'GiB',
-  dataVal: '12.5',
-  totalVal: '50',
+  dataVal: 0,
+  totalVal: 0,
 });
+
+const writeSpeed = ref();
+const fileTotal = ref();
 
 const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData): ECOption => ({
   tooltip: {
@@ -425,17 +428,82 @@ const diskDataOptions = computed(() => memoryChartOptions(dataNodeMemoryData, co
 const systemDataOptions = computed(() => memoryChartOptions(dataNodeSystemData, configNodeSystemData));
 
 const { requestFn: getMetricAllCPU, loading: cpuLoading } = useRequest(DashboardApi.getMetricAllCPU);
+const { requestFn: getMetricAllDisk, loading: diskLoading } = useRequest(DashboardApi.getMetricAllDisk);
+const { requestFn: getMetricAllMemory, loading: systemLoading } = useRequest(DashboardApi.getMetricAllMemory);
+const { requestFn: getMetricInsertNumPerSecond, loading: speedLoading } = useRequest(DashboardApi.getMetricInsertNumPerSecond);
+const { requestFn: getMetricAllFileCount, loading: fileLoading } = useRequest(DashboardApi.getMetricAllFileCount);
 
 function getCpu() {
   getMetricAllCPU().then((res) => {
     if (res.data) {
-      //
+      res.data.forEach((item) => {
+        if (item.nodeType === 'datanode') {
+          cpuData.dataCpu = (item.cpu || item.cpu === 0) ? item.cpu : '-';
+        } else if (item.nodeType === 'confignode') {
+          cpuData.configCpu = (item.cpu || item.cpu === 0) ? item.cpu : '-';
+        }
+      });
+    } else {
+      cpuData.dataCpu = '-';
+      cpuData.configCpu = '-';
     }
+  });
+}
+
+function getDisk() {
+  getMetricAllDisk().then((res) => {
+    if (res.data) {
+      res.data.forEach((item) => {
+        if (item.nodeType === 'datanode') {
+          dataNodeMemoryData.dataVal = item.diskUse;
+          dataNodeMemoryData.totalVal = item.diskTotal;
+          dataNodeMemoryData.valueUnit = item.unit;
+        } else if (item.nodeType === 'confignode') {
+          configNodeMemoryData.dataVal = item.diskUse;
+          configNodeMemoryData.totalVal = item.diskTotal;
+          configNodeMemoryData.valueUnit = item.unit;
+        }
+      });
+    }
+  });
+}
+
+function getSystem() {
+  getMetricAllMemory().then((res) => {
+    if (res.data) {
+      res.data.forEach((item) => {
+        if (item.nodeType === 'datanode') {
+          dataNodeSystemData.dataVal = item.memoryUse;
+          dataNodeSystemData.totalVal = item.memoryTotal;
+          dataNodeSystemData.valueUnit = item.unit;
+        } else if (item.nodeType === 'confignode') {
+          configNodeSystemData.dataVal = item.memoryUse;
+          configNodeSystemData.totalVal = item.memoryTotal;
+          configNodeSystemData.valueUnit = item.unit;
+        }
+      });
+    }
+  });
+}
+
+function getSpeed() {
+  getMetricInsertNumPerSecond().then((res) => {
+    writeSpeed.value = res.data;
+  });
+}
+
+function getFile() {
+  getMetricAllFileCount().then((res) => {
+    fileTotal.value = res.data;
   });
 }
 
 function getInitial() {
   getCpu();
+  getDisk();
+  getSystem();
+  getSpeed();
+  getFile();
 }
 
 onMounted(() => {

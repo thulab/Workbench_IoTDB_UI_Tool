@@ -1,75 +1,77 @@
 <template>
   <div class="monitor-chart-wrapper">
-    <div class="monitor-chart-box-media">
+    <div class="monitor-chart-box-media" v-loading="cpuLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">CPU 核数</h4>
-        <data-container :is-empty="false">
+        <data-container :is-empty="cpuCount === null">
           <div class="monitor-info-module-box">
-            <p class="monitor-info-module-text">48</p>
+            <p class="monitor-info-module-text">{{ cpuCount }}</p>
           </div>
         </data-container>
       </div>
     </div>
-    <div class="monitor-chart-box-media">
+    <div class="monitor-chart-box-media" v-loading="diskLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">磁盘空间</h4>
-        <data-container :is-empty="false">
+        <data-container :is-empty="diskData.dataCount === null">
           <div class="monitor-info-module-box">
-            <p class="monitor-info-module-text">48<span class="monitor-info-module-unit">TiB</span></p>
+            <p class="monitor-info-module-text">{{ diskData.dataCount }}<span class="monitor-info-module-unit">{{ diskData.valueUnit }}</span></p>
           </div>
         </data-container>
       </div>
     </div>
-    <div class="monitor-chart-box-media">
+    <div class="monitor-chart-box-media" v-loading="memoryLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">系统内存</h4>
-        <data-container :is-empty="false">
+        <data-container :is-empty="memoryData.dataCount === null">
           <div class="monitor-info-module-box">
-            <p class="monitor-info-module-text">31.3<span class="monitor-info-module-unit">GiB</span></p>
+            <p class="monitor-info-module-text">{{ memoryData.dataCount }}<span class="monitor-info-module-unit">{{ memoryData.valueUnit }}</span></p>
           </div>
         </data-container>
       </div>
     </div>
-    <div class="monitor-chart-box-media">
+    <div class="monitor-chart-box-media" v-loading="fileLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">文件总数</h4>
-        <data-container :is-empty="false">
+        <data-container :is-empty="fileTotal === null">
           <div class="monitor-info-module-box">
-            <p class="monitor-info-module-text">{{toThousands(624312)}}</p>
+            <p class="monitor-info-module-text">{{toThousands(fileTotal)}}</p>
           </div>
         </data-container>
       </div>
     </div>
-    <div class="monitor-chart-box-media">
+    <div class="monitor-chart-box-media" v-loading="cpuLoadLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">CPU 负载</h4>
         <div class="chart-container-box">
-          <the-chart :option="cpuDataOptions" />
+          <the-chart :option="cpuDataOptions" key="cpuData" />
         </div>
       </div>
     </div>
-    <div class="monitor-chart-box-media">
+    <div class="monitor-chart-box-media" v-loading="diskLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">磁盘使用情况</h4>
         <div class="chart-container-box">
-          <the-chart :option="diskDataOptions" />
+          <the-chart :option="diskDataOptions" key="diskData" />
         </div>
       </div>
     </div>
-    <div class="monitor-chart-box-media">
+    <div class="monitor-chart-box-media" v-loading="memoryLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">内存使用情况</h4>
         <div class="chart-container-box">
-          <the-chart :option="momoryDataOptions" />
+          <the-chart :option="memoryDataOptions" key="memoryData" />
         </div>
       </div>
     </div>
-    <div class="monitor-chart-box-media">
+    <div class="monitor-chart-box-media" v-loading="ioLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">磁盘 I/O 繁忙速率</h4>
-        <div class="chart-container-box">
-          <the-chart :option="diskIODataOptions" />
-        </div>
+        <data-container :is-empty="diskIOCategory.length === 0">
+          <div class="chart-container-box">
+            <the-chart :option="diskIODataOptions" key="diskIOData" />
+          </div>
+        </data-container>
       </div>
     </div>
   </div>
@@ -78,34 +80,49 @@
 <script setup lang="ts">
 import { type ECOption } from '@/plugins/echarts-plugin';
 import { toThousands } from '@/utils/format';
+import { DashboardApi } from '@/api';
 import DataContainer from './data-container.vue';
+
+const props = defineProps<{
+  node: string;
+  nodeType: string;
+}>();
 
 interface GaugeChartData {
   themeColor: string;
   opacityColor: string;
-  dataVal: string;
+  dataVal: number | null;
+  dataCount: number | null;
+  valueUnit?: string;
 }
 
+const cpuCount = ref();
 const cpuData = reactive<GaugeChartData>({
   themeColor: '#495AD4',
   opacityColor: '#929CE5',
-  dataVal: '19.15',
+  dataVal: 0,
+  dataCount: null,
 });
 
 const diskData = reactive<GaugeChartData>({
   themeColor: '#009DEA',
   opacityColor: '#66C4F2',
-  dataVal: '33.9',
+  dataVal: 0,
+  dataCount: null,
+  valueUnit: 'TiB',
 });
 
-const momoryData = reactive<GaugeChartData>({
+const memoryData = reactive<GaugeChartData>({
   themeColor: '#6738BD',
   opacityColor: '#A488D7',
-  dataVal: '22.23',
+  dataVal: 0,
+  dataCount: null,
+  valueUnit: 'GiB',
 });
 
-const diskIOCategory = ref<string[]>(['vda', 'vdb', 'vdc']);
-const diskIOData = ref<string[]>(['12', '25', '98']);
+const fileTotal = ref();
+const diskIOCategory = ref<string[]>([]);
+const diskIOData = ref<number[]>([]);
 
 const gaugeChartOptions = (optionData: GaugeChartData) => ({
   series: [
@@ -196,7 +213,7 @@ const gaugeChartOptions = (optionData: GaugeChartData) => ({
   ],
 } as ECOption);
 
-const diskIOChartOptions = (categoryList: string[], valueList: string[]) => ({
+const diskIOChartOptions = (categoryList: string[], valueList: number[]) => ({
   tooltip: {
     show: false,
   },
@@ -212,6 +229,7 @@ const diskIOChartOptions = (categoryList: string[], valueList: string[]) => ({
   xAxis: {
     type: 'category',
     data: categoryList,
+    show: categoryList.length > 0,
   },
   yAxis: {
     type: 'value',
@@ -234,7 +252,69 @@ const diskIOChartOptions = (categoryList: string[], valueList: string[]) => ({
 
 const cpuDataOptions = computed(() => gaugeChartOptions(cpuData));
 const diskDataOptions = computed(() => gaugeChartOptions(diskData));
-const momoryDataOptions = computed(() => gaugeChartOptions(momoryData));
+const memoryDataOptions = computed(() => gaugeChartOptions(memoryData));
 const diskIODataOptions = computed(() => diskIOChartOptions(diskIOCategory.value, diskIOData.value));
 
+const { requestFn: getMetricCPU, loading: cpuLoading } = useRequest(DashboardApi.getMetricCPU);
+const { requestFn: getMetricDisk, loading: diskLoading } = useRequest(DashboardApi.getMetricDisk);
+const { requestFn: getMetricCPULoad, loading: cpuLoadLoading } = useRequest(DashboardApi.getMetricCPULoad);
+const { requestFn: getMetricMemory, loading: memoryLoading } = useRequest(DashboardApi.getMetricMemory);
+const { requestFn: getMetricFileCount, loading: fileLoading } = useRequest(DashboardApi.getMetricFileCount);
+const { requestFn: getMetricDiskIOUsedRate, loading: ioLoading } = useRequest(DashboardApi.getMetricDiskIOUsedRate);
+
+function getCpu() {
+  getMetricCPU(props.node, props.nodeType).then((res) => {
+    cpuCount.value = res.data.cpu;
+  });
+}
+
+function getCpuLoad() {
+  getMetricCPULoad(props.node, props.nodeType).then((res) => {
+    cpuData.dataVal = res.data.cpuLoad;
+  });
+}
+
+function getDisk() {
+  getMetricDisk(props.node, props.nodeType).then((res) => {
+    diskData.dataCount = res.data.diskUse;
+    diskData.valueUnit = res.data.unit;
+    diskData.dataVal = res.data.diskRatio;
+  });
+}
+
+function getMemory() {
+  getMetricMemory(props.node, props.nodeType).then((res) => {
+    memoryData.dataCount = res.data.memoryUse;
+    memoryData.valueUnit = res.data.unit;
+    memoryData.dataVal = res.data.memoryRatio;
+  });
+}
+
+function getFile() {
+  getMetricFileCount(props.node, props.nodeType).then((res) => {
+    fileTotal.value = res.data;
+  });
+}
+
+function getIo() {
+  getMetricDiskIOUsedRate(props.node).then((res) => {
+    diskIOCategory.value = res.data.map((item) => item.diskName);
+    diskIOData.value = res.data.map((item) => item.nodeRate);
+  });
+}
+
+function getInitial() {
+  getCpu();
+  getCpuLoad();
+  getDisk();
+  getMemory();
+  getFile();
+  getIo();
+}
+
+onMounted(() => {
+  getInitial();
+});
+
+defineExpose({ getInitial });
 </script>

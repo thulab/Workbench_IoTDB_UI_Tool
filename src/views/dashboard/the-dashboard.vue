@@ -85,8 +85,16 @@
             </el-select>
           </div>
 
-          <monitor-datanode v-if="currentNodeType === 'datanode'" />
-          <monitor-confignode v-else-if="currentNodeType === 'confignode'" />
+          <monitor-datanode
+            v-if="currentNodeType === 'datanode'"
+            :node="monitorNode"
+            :node-type="currentNodeType"
+          />
+          <monitor-confignode
+            v-else-if="currentNodeType === 'confignode'"
+            :node="monitorNode"
+            :node-type="currentNodeType"
+          />
           <monitor-all v-else />
         </div>
       </el-scrollbar>

@@ -24,8 +24,7 @@ declare namespace Dashboard{
 
   export interface DiskIOUsedRateRes {
     diskName: string;
-    dateNodeRate: number;
-    configNodeRate: number;
+    nodeRate: number;
   }
 
   export interface MetricCPURes {
@@ -34,7 +33,22 @@ declare namespace Dashboard{
   }
 
   export interface MetricCPULoadRes {
-    total: number;
-    usedCPUNum: numer;
+    cpuLoad: number;
+  }
+
+  export interface MetricDiskRes {
+    nodeType: string;
+    diskTotal: number;
+    diskUse: number;
+    diskRatio: number;
+    unit: string;
+  }
+
+  export interface MetricMemoryRes {
+    nodeType: string;
+    memoryTotal: number;
+    memoryUse: number;
+    memoryRatio: number;
+    unit: string;
   }
 }

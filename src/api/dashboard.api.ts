@@ -8,8 +8,13 @@ class DashboardApi {
   }
 
   // 内存
-  static getMetricMemory(): HttpResponseP {
-    return http.get('/home/getMetricMemory');
+  static getMetricMemory(node: string, nodeType: string): HttpResponseP<Dashboard.MetricMemoryRes> {
+    return http.get('/home/getMetricMemory', { params: { node, nodeType } });
+  }
+
+  // 内存-all
+  static getMetricAllMemory(): HttpResponseP<Dashboard.MetricMemoryRes[]> {
+    return http.get('/home/getAllMetricMemory');
   }
 
   // 获取每秒写入点数信息
@@ -18,18 +23,28 @@ class DashboardApi {
   }
 
   // 文件数
-  static getMetricFileCount(): HttpResponseP<number> {
-    return http.get('/home/getMetricFileCount');
+  static getMetricFileCount(node: string, nodeType: string): HttpResponseP<number> {
+    return http.get('/home/getMetricFileCount', { params: { node, nodeType } });
+  }
+
+  // 文件数-all
+  static getMetricAllFileCount(): HttpResponseP<number> {
+    return http.get('/home/getMetricAllFileCount');
   }
 
   // disk
-  static getMetricDisk(): HttpResponseP {
-    return http.get('/home/getMetricDisk');
+  static getMetricDisk(node: string, nodeType: string): HttpResponseP<Dashboard.MetricDiskRes> {
+    return http.get('/home/getMetricDisk', { params: { node, nodeType } });
+  }
+
+  // disk-all
+  static getMetricAllDisk(): HttpResponseP<Dashboard.MetricDiskRes[]> {
+    return http.get('/home/getMetricAllDisk');
   }
 
   // 获取磁盘I/O繁忙速率信息
-  static getMetricDiskIOUsedRate(): HttpResponseP<Dashboard.DiskIOUsedRateRes[]> {
-    return http.get('/home/getMetricDiskIOUsedRate');
+  static getMetricDiskIOUsedRate(node: string): HttpResponseP<Dashboard.DiskIOUsedRateRes[]> {
+    return http.get('/home/getMetricDiskIOUsedRate', { params: { node } });
   }
 
   // CPU
@@ -43,8 +58,8 @@ class DashboardApi {
   }
 
   // CPU负载
-  static getMetricCPULoad(): HttpResponseP<Dashboard.MetricCPULoadRes> {
-    return http.get('/home/getMetricCPULoad');
+  static getMetricCPULoad(node: string, nodeType: string): HttpResponseP<Dashboard.MetricCPULoadRes> {
+    return http.get('/home/getMetricCPULoad', { params: { node, nodeType } });
   }
 }
 export default DashboardApi;
