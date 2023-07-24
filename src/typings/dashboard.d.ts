@@ -1,6 +1,7 @@
 declare namespace Dashboard{
 
   export interface NodeItem {
+    nodeID: string;
     address: string;
     type: string;
     status: string;
@@ -11,8 +12,8 @@ declare namespace Dashboard{
   export interface SystemData {
     dataNodeRatio: string;
     configNodeRatio: string;
-    active: boolean;
-    expirationTime: string;
+    active: boolean | null;
+    expirationTime: string | null;
     databaseNum: number;
     deviceNum: number;
     measurementNum: number;

@@ -49,7 +49,7 @@
               :data="tableData"
               v-loading="loading"
               style="width: 100%;"
-              :max-height="260"
+              :max-height="240"
               tooltip-effect="light"
               :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
             >
@@ -81,21 +81,23 @@
           <div class="search-form-box">
             <span class="search-from-label">节点：</span>
             <el-select v-model="monitorNode" placeholder="全部" style="width: 256px;" @change="handleChangeNode">
-              <el-option v-for="item in nodeList" :key="`${item.address}(${item.type})`" :value="item.address" :label="item.address ? `${item.address}(${item.type})` : '全部'" />
+              <el-option v-for="(item, index) in nodeList" :key="`${item.address}(${item.type})_${index}`" :value="item.nodeID" :label="item.address ? `${item.address}(${item.type})` : '全部'" />
             </el-select>
           </div>
 
           <monitor-datanode
             v-if="currentNodeType === 'datanode'"
+            ref="monitorDatanodeRef"
             :node="monitorNode"
             :node-type="currentNodeType"
           />
           <monitor-confignode
             v-else-if="currentNodeType === 'confignode'"
+            ref="monitorConfignodeRef"
             :node="monitorNode"
             :node-type="currentNodeType"
           />
-          <monitor-all v-else />
+          <monitor-all v-else ref="monitorAllRef" />
         </div>
       </el-scrollbar>
     </el-main>
@@ -103,7 +105,7 @@
 </template>
 
 <script lang="ts" setup>
-import { assign } from 'lodash-es';
+import { assign, concat } from 'lodash-es';
 import { DashboardApi } from '@/api';
 import { toThousands } from '@/utils/format';
 import MonitorAll from './components/monitor-all.vue';
@@ -125,6 +127,9 @@ const monitorInterval = ref();
 const monitorNode = ref('');
 const nodeList = ref<Dashboard.NodeItem[]>([]);
 const currentNodeType = ref('');
+const monitorAllRef = ref<InstanceType<typeof MonitorAll>>();
+const monitorDatanodeRef = ref<InstanceType<typeof MonitorDatanode>>();
+const monitorConfignodeRef = ref<InstanceType<typeof MonitorConfignode>>();
 
 const { requestFn: getSystemInfo, loading } = useRequest(DashboardApi.getSystemInfo);
 
@@ -133,13 +138,14 @@ function getSystemData() {
     assign(systemData, res.data);
     systemData.expirationTime = res.data.expirationTime || '-';
     tableData.value = res.data.nodes || [];
-    nodeList.value = [{
+    nodeList.value = concat([{
+      nodeID: '',
       address: '',
       type: '',
       status: '',
       version: '',
       physicalMachine: '',
-    }, ...tableData.value];
+    }], res.data.nodes ? [...res.data.nodes] : []);
   });
 }
 
@@ -151,7 +157,7 @@ function handleChangeNode(val: string) {
   if (!val) {
     currentNodeType.value = '';
   } else {
-    const current = nodeList.value.find((f) => f.address === val);
+    const current = nodeList.value.find((f) => f.nodeID === val);
     if (current) {
       currentNodeType.value = current.type;
     }

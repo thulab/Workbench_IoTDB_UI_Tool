@@ -8,8 +8,8 @@ class DashboardApi {
   }
 
   // 内存
-  static getMetricMemory(node: string, nodeType: string): HttpResponseP<Dashboard.MetricMemoryRes> {
-    return http.get('/home/getMetricMemory', { params: { node, nodeType } });
+  static getMetricMemory(nodeID: string, nodeType: string): HttpResponseP<Dashboard.MetricMemoryRes> {
+    return http.get('/home/getMetricMemory', { params: { nodeID, nodeType } });
   }
 
   // 内存-all
@@ -23,8 +23,8 @@ class DashboardApi {
   }
 
   // 文件数
-  static getMetricFileCount(node: string, nodeType: string): HttpResponseP<number> {
-    return http.get('/home/getMetricFileCount', { params: { node, nodeType } });
+  static getMetricFileCount(nodeID: string, nodeType: string): HttpResponseP<number> {
+    return http.get('/home/getMetricFileCount', { params: { nodeID, nodeType } });
   }
 
   // 文件数-all
@@ -33,8 +33,8 @@ class DashboardApi {
   }
 
   // disk
-  static getMetricDisk(node: string, nodeType: string): HttpResponseP<Dashboard.MetricDiskRes> {
-    return http.get('/home/getMetricDisk', { params: { node, nodeType } });
+  static getMetricDisk(nodeID: string, nodeType: string): HttpResponseP<Dashboard.MetricDiskRes> {
+    return http.get('/home/getMetricDisk', { params: { nodeID, nodeType } });
   }
 
   // disk-all
@@ -43,13 +43,13 @@ class DashboardApi {
   }
 
   // 获取磁盘I/O繁忙速率信息
-  static getMetricDiskIOUsedRate(node: string): HttpResponseP<Dashboard.DiskIOUsedRateRes[]> {
-    return http.get('/home/getMetricDiskIOUsedRate', { params: { node } });
+  static getMetricDiskIOUsedRate(nodeID: string): HttpResponseP<Dashboard.DiskIOUsedRateRes[]> {
+    return http.get('/home/getMetricDiskIOUsedRate', { params: { nodeID } });
   }
 
   // CPU
-  static getMetricCPU(node: string, nodeType: string): HttpResponseP<Dashboard.MetricCPURes> {
-    return http.get('/home/getMetricCPU', { params: { node, nodeType } });
+  static getMetricCPU(nodeID: string, nodeType: string): HttpResponseP<Dashboard.MetricCPURes> {
+    return http.get('/home/getMetricCPU', { params: { nodeID, nodeType } });
   }
 
   // CPU-all
@@ -58,8 +58,8 @@ class DashboardApi {
   }
 
   // CPU负载
-  static getMetricCPULoad(node: string, nodeType: string): HttpResponseP<Dashboard.MetricCPULoadRes> {
-    return http.get('/home/getMetricCPULoad', { params: { node, nodeType } });
+  static getMetricCPULoad(nodeID: string, nodeType: string): HttpResponseP<Dashboard.MetricCPULoadRes> {
+    return http.get('/home/getMetricCPULoad', { params: { nodeID, nodeType } });
   }
 }
 export default DashboardApi;

@@ -51,6 +51,7 @@
 
 <script setup lang="ts">
 import { type ECOption } from '@/plugins/echarts-plugin';
+import { transformDecimal } from '@/utils/format';
 import { DashboardApi } from '@/api';
 import DataContainer from './data-container.vue';
 
@@ -223,28 +224,30 @@ const { requestFn: getMetricDiskIOUsedRate, loading: ioLoading } = useRequest(Da
 
 function getCpu() {
   getMetricCPU(props.node, props.nodeType).then((res) => {
-    cpuCount.value = res.data.cpu;
+    cpuCount.value = res.data?.cpu || null;
   });
 }
 
 function getCpuLoad() {
   getMetricCPULoad(props.node, props.nodeType).then((res) => {
-    cpuData.dataVal = res.data.cpuLoad;
+    cpuData.dataVal = res.data?.cpuLoad || 0;
   });
 }
 
 function getMemory() {
   getMetricMemory(props.node, props.nodeType).then((res) => {
-    memoryData.dataCount = res.data.memoryUse;
-    memoryData.valueUnit = res.data.unit;
-    memoryData.dataVal = res.data.memoryRatio;
+    if (res.data) {
+      memoryData.dataCount = res.data.memoryUse;
+      memoryData.valueUnit = res.data.unit;
+      memoryData.dataVal = res.data.memoryRatio;
+    }
   });
 }
 
 function getIo() {
   getMetricDiskIOUsedRate(props.node).then((res) => {
     diskIOCategory.value = res.data.map((item) => item.diskName);
-    diskIOData.value = res.data.map((item) => item.nodeRate);
+    diskIOData.value = res.data.map((item) => transformDecimal(item.nodeRate, 6));
   });
 }
 
@@ -255,9 +258,15 @@ function getInitial() {
   getIo();
 }
 
-onMounted(() => {
-  getInitial();
-});
+watch(
+  () => props.node,
+  () => {
+    getInitial();
+  },
+  {
+    immediate: true,
+  },
+);
 
 defineExpose({ getInitial });
 </script>

@@ -77,6 +77,7 @@ interface PieChartData {
   valueUnit: string;
   dataVal: number;
   totalVal: number;
+  percent: number;
 }
 
 const cpuData = reactive<{
@@ -92,6 +93,7 @@ const dataNodeMemoryData = reactive<PieChartData>({
   valueUnit: 'TiB',
   dataVal: 0,
   totalVal: 0,
+  percent: 0,
 });
 
 const configNodeMemoryData = reactive<PieChartData>({
@@ -99,6 +101,7 @@ const configNodeMemoryData = reactive<PieChartData>({
   valueUnit: 'TiB',
   dataVal: 0,
   totalVal: 0,
+  percent: 0,
 });
 
 const dataNodeSystemData = reactive<PieChartData>({
@@ -106,6 +109,7 @@ const dataNodeSystemData = reactive<PieChartData>({
   valueUnit: 'GiB',
   dataVal: 0,
   totalVal: 0,
+  percent: 0,
 });
 
 const configNodeSystemData = reactive<PieChartData>({
@@ -113,6 +117,7 @@ const configNodeSystemData = reactive<PieChartData>({
   valueUnit: 'GiB',
   dataVal: 0,
   totalVal: 0,
+  percent: 0,
 });
 
 const writeSpeed = ref();
@@ -141,7 +146,7 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData): E
       right: '50%',
       data: [
         {
-          value: dataNode.totalVal,
+          value: 0,
           name: '磁盘空间',
           itemStyle: {
             color: '#DFE1ED',
@@ -168,14 +173,14 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData): E
       right: '50%',
       data: [
         {
-          value: dataNode.dataVal,
+          value: dataNode.percent,
           name: 'DataNode',
           itemStyle: {
             color: dataNode.themeColor,
           },
         },
         {
-          value: Number(dataNode.totalVal) - Number(dataNode.dataVal),
+          value: 1 - Number(dataNode.percent),
           name: '磁盘空间',
           itemStyle: {
             opacity: 0,
@@ -215,6 +220,7 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData): E
           show: false,
         },
         detail: {
+          show: !!dataNode.totalVal,
           offsetCenter: ['0', '8'],
           formatter: `{dataValue|${dataNode.dataVal}}{dataUnit|${dataNode.valueUnit}}\n{line|}\n{totalValue|${dataNode.totalVal}}{totalUnit|${dataNode.valueUnit}}`,
           rich: {
@@ -290,7 +296,7 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData): E
       right: 0,
       data: [
         {
-          value: configNode.totalVal,
+          value: 0,
           name: '磁盘空间',
           itemStyle: {
             color: '#DFE1ED',
@@ -317,14 +323,14 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData): E
       right: 0,
       data: [
         {
-          value: configNode.dataVal,
+          value: configNode.percent,
           name: 'ConfigNode',
           itemStyle: {
             color: configNode.themeColor,
           },
         },
         {
-          value: Number(configNode.totalVal) - Number(configNode.dataVal),
+          value: 1 - Number(configNode.percent),
           name: '磁盘空间',
           itemStyle: {
             opacity: 0,
@@ -364,6 +370,7 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData): E
           show: false,
         },
         detail: {
+          show: !!configNode.totalVal,
           offsetCenter: ['0', '8'],
           formatter: `{dataValue|${configNode.dataVal}}{dataUnit|${configNode.valueUnit}}\n{line|}\n{totalValue|${configNode.totalVal}}{totalUnit|${configNode.valueUnit}}`,
           rich: {
@@ -457,10 +464,12 @@ function getDisk() {
         if (item.nodeType === 'datanode') {
           dataNodeMemoryData.dataVal = item.diskUse;
           dataNodeMemoryData.totalVal = item.diskTotal;
+          dataNodeMemoryData.percent = item.diskRatio;
           dataNodeMemoryData.valueUnit = item.unit;
         } else if (item.nodeType === 'confignode') {
           configNodeMemoryData.dataVal = item.diskUse;
           configNodeMemoryData.totalVal = item.diskTotal;
+          configNodeMemoryData.percent = item.diskRatio;
           configNodeMemoryData.valueUnit = item.unit;
         }
       });
@@ -475,10 +484,12 @@ function getSystem() {
         if (item.nodeType === 'datanode') {
           dataNodeSystemData.dataVal = item.memoryUse;
           dataNodeSystemData.totalVal = item.memoryTotal;
+          dataNodeSystemData.percent = item.memoryRatio;
           dataNodeSystemData.valueUnit = item.unit;
         } else if (item.nodeType === 'confignode') {
           configNodeSystemData.dataVal = item.memoryUse;
           configNodeSystemData.totalVal = item.memoryTotal;
+          configNodeSystemData.percent = item.memoryRatio;
           configNodeSystemData.valueUnit = item.unit;
         }
       });
