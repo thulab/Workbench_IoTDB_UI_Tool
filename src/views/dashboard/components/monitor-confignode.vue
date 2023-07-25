@@ -60,6 +60,10 @@ const props = defineProps<{
   nodeType: string;
 }>();
 
+const emit = defineEmits<{
+  (event: 'handleFetch',): void;
+}>();
+
 interface GaugeChartData {
   themeColor: string;
   opacityColor: string;
@@ -223,21 +227,21 @@ const { requestFn: getMetricMemory, loading: memoryLoading } = useRequest(Dashbo
 const { requestFn: getMetricDiskIOUsedRate, loading: ioLoading } = useRequest(DashboardApi.getMetricDiskIOUsedRate);
 
 function getCpu() {
-  getMetricCPU(props.node, props.nodeType).then((res) => {
+  return getMetricCPU(props.node, props.nodeType).then((res) => {
     cpuCount.value = res.data?.cpu || null;
   });
 }
 
 function getCpuLoad() {
-  getMetricCPULoad(props.node, props.nodeType).then((res) => {
+  return getMetricCPULoad(props.node, props.nodeType).then((res) => {
     cpuData.dataVal = res.data.cpuLoad ? (res.data.cpuLoad * 100) : 0;
   });
 }
 
 function getMemory() {
-  getMetricMemory(props.node, props.nodeType).then((res) => {
+  return getMetricMemory(props.node, props.nodeType).then((res) => {
     if (res.data) {
-      memoryData.dataCount = res.data.memoryUse;
+      memoryData.dataCount = res.data.memoryTotal;
       memoryData.valueUnit = res.data.unit;
       memoryData.dataVal = res.data.memoryRatio * 100;
     }
@@ -245,17 +249,21 @@ function getMemory() {
 }
 
 function getIo() {
-  getMetricDiskIOUsedRate(props.node).then((res) => {
+  return getMetricDiskIOUsedRate(props.node).then((res) => {
     diskIOCategory.value = res.data.map((item) => item.diskName);
     diskIOData.value = res.data.map((item) => transformDecimal(item.nodeRate, 6));
   });
 }
 
 function getInitial() {
-  getCpu();
-  getCpuLoad();
-  getMemory();
-  getIo();
+  Promise.allSettled([
+    getCpu(),
+    getCpuLoad(),
+    getMemory(),
+    getIo(),
+  ]).then(() => {
+    emit('handleFetch');
+  });
 }
 
 defineExpose({ getInitial });

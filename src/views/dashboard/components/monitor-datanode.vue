@@ -88,6 +88,10 @@ const props = defineProps<{
   nodeType: string;
 }>();
 
+const emit = defineEmits<{
+  (event: 'handleFetch',): void;
+}>();
+
 interface GaugeChartData {
   themeColor: string;
   opacityColor: string;
@@ -263,21 +267,21 @@ const { requestFn: getMetricFileCount, loading: fileLoading } = useRequest(Dashb
 const { requestFn: getMetricDiskIOUsedRate, loading: ioLoading } = useRequest(DashboardApi.getMetricDiskIOUsedRate);
 
 function getCpu() {
-  getMetricCPU(props.node, props.nodeType).then((res) => {
+  return getMetricCPU(props.node, props.nodeType).then((res) => {
     cpuCount.value = res.data?.cpu || null;
   });
 }
 
 function getCpuLoad() {
-  getMetricCPULoad(props.node, props.nodeType).then((res) => {
+  return getMetricCPULoad(props.node, props.nodeType).then((res) => {
     cpuData.dataVal = res.data.cpuLoad ? (res.data.cpuLoad * 100) : 0;
   });
 }
 
 function getDisk() {
-  getMetricDisk(props.node, props.nodeType).then((res) => {
+  return getMetricDisk(props.node, props.nodeType).then((res) => {
     if (res.data) {
-      diskData.dataCount = res.data.diskUse;
+      diskData.dataCount = res.data.diskTotal;
       diskData.valueUnit = res.data.unit;
       diskData.dataVal = res.data.diskRatio * 100;
     }
@@ -285,9 +289,9 @@ function getDisk() {
 }
 
 function getMemory() {
-  getMetricMemory(props.node, props.nodeType).then((res) => {
+  return getMetricMemory(props.node, props.nodeType).then((res) => {
     if (res.data) {
-      memoryData.dataCount = res.data.memoryUse;
+      memoryData.dataCount = res.data.memoryTotal;
       memoryData.valueUnit = res.data.unit;
       memoryData.dataVal = res.data.memoryRatio * 100;
     }
@@ -295,25 +299,29 @@ function getMemory() {
 }
 
 function getFile() {
-  getMetricFileCount(props.node, props.nodeType).then((res) => {
+  return getMetricFileCount(props.node, props.nodeType).then((res) => {
     fileTotal.value = res.data;
   });
 }
 
 function getIo() {
-  getMetricDiskIOUsedRate(props.node).then((res) => {
+  return getMetricDiskIOUsedRate(props.node).then((res) => {
     diskIOCategory.value = res.data.map((item) => item.diskName);
     diskIOData.value = res.data.map((item) => transformDecimal(item.nodeRate, 6));
   });
 }
 
 function getInitial() {
-  getCpu();
-  getCpuLoad();
-  getDisk();
-  getMemory();
-  getFile();
-  getIo();
+  Promise.allSettled([
+    getCpu(),
+    getCpuLoad(),
+    getDisk(),
+    getMemory(),
+    getFile(),
+    getIo(),
+  ]).then(() => {
+    emit('handleFetch');
+  });
 }
 
 defineExpose({ getInitial });

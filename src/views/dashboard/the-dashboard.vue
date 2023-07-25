@@ -90,16 +90,19 @@
             ref="monitorDatanodeRef"
             :node="monitorNode"
             :node-type="currentNodeType"
+            @handleFetch="handleFetch"
           />
           <monitor-confignode
             v-else-if="currentNodeType === 'confignode'"
             ref="monitorConfignodeRef"
             :node="monitorNode"
             :node-type="currentNodeType"
+            @handleFetch="handleFetch"
           />
           <monitor-all
             v-else
             ref="monitorAllRef"
+            @handleFetch="handleFetch"
           />
         </div>
       </el-scrollbar>
@@ -157,7 +160,7 @@ function getMonitorData() {
 
 function getSystemData() {
   systemTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
-  getSystemInfo().then((res) => {
+  return getSystemInfo().then((res) => {
     assign(systemData, res.data);
     systemData.expirationTime = res.data.expirationTime || '-';
     tableData.value = res.data.nodes || [];
@@ -173,34 +176,32 @@ function getSystemData() {
     if (!flag) {
       monitorNode.value = '';
       currentNodeType.value = '';
-      clearInterval(refreshInterval.value);
+      clearTimeout(refreshInterval.value);
       getMonitorData();
-      refreshInterval.value = setInterval(() => {
-        getSystemData();
-        getMonitorData();
-      }, 30 * 1000);
     }
   });
 }
 
-// 刷新系统
-function handleRefreshSystem() {
-  clearInterval(refreshInterval.value);
-  getSystemData();
-  refreshInterval.value = setInterval(() => {
+function handleFetch() {
+  clearTimeout(refreshInterval.value);
+  refreshInterval.value = setTimeout(() => {
     getSystemData();
     getMonitorData();
   }, 30 * 1000);
 }
 
+// 刷新系统
+function handleRefreshSystem() {
+  clearTimeout(refreshInterval.value);
+  getSystemData().then(() => {
+    handleFetch();
+  });
+}
+
 // 刷新监控
 function handleRefreshMonitor() {
-  clearInterval(refreshInterval.value);
+  clearTimeout(refreshInterval.value);
   getMonitorData();
-  refreshInterval.value = setInterval(() => {
-    getSystemData();
-    getMonitorData();
-  }, 30 * 1000);
 }
 
 function handleChangeNode(val: string) {
@@ -220,15 +221,11 @@ function handleChangeNode(val: string) {
 
 onMounted(async () => {
   await getSystemData();
-  await getMonitorData();
-  refreshInterval.value = setInterval(() => {
-    getSystemData();
-    getMonitorData();
-  }, 30 * 1000);
+  getMonitorData();
 });
 
 onUnmounted(() => {
-  clearInterval(refreshInterval.value);
+  clearTimeout(refreshInterval.value);
 });
 </script>
 

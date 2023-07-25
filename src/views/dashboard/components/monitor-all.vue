@@ -72,6 +72,10 @@ import { toThousands } from '@/utils/format';
 import { DashboardApi } from '@/api';
 import DataContainer from './data-container.vue';
 
+const emit = defineEmits<{
+  (event: 'handleFetch',): void;
+}>();
+
 interface PieChartData {
   themeColor: string;
   valueUnit: string;
@@ -221,13 +225,14 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData, to
         },
         detail: {
           show: !!dataNode.totalVal,
-          offsetCenter: ['0', '8'],
+          offsetCenter: ['0', '10'],
           formatter: `{dataValue|${dataNode.dataVal}}{dataUnit|${dataNode.valueUnit}}\n{line|}\n{totalValue|${dataNode.totalVal}}{totalUnit|${totalNumUnit}}`,
           rich: {
             dataValue: {
               fontSize: 30,
               fontWeight: 700,
               height: 30,
+              padding: [0, 0, 0, 0],
               color: dataNode.themeColor,
               textBorderWidth: 1,
               textBorderColor: '#fff',
@@ -247,9 +252,9 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData, to
             },
             line: {
               width: 60,
-              lineHeight: 4,
+              lineHeight: 8,
               height: 0,
-              borderWidth: 0.5,
+              borderWidth: 1,
               borderColor: '#DFE1ED',
               verticalAlign: 'bottom',
             },
@@ -257,6 +262,7 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData, to
               fontSize: 12,
               fontWeight: 700,
               height: 18,
+              padding: [2, 0, 0, 0],
               verticalAlign: 'top',
               color: '#424561',
               textBorderWidth: 1,
@@ -267,7 +273,7 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData, to
               fontSize: 12,
               fontWeight: 300,
               height: 18,
-              padding: [0, 0, 0, 2],
+              padding: [2, 0, 0, 2],
               verticalAlign: 'top',
               color: '#424561',
               textBorderWidth: 1,
@@ -441,7 +447,7 @@ const { requestFn: getMetricInsertNumPerSecond, loading: speedLoading } = useReq
 const { requestFn: getMetricAllFileCount, loading: fileLoading } = useRequest(DashboardApi.getMetricAllFileCount);
 
 function getCpu() {
-  getMetricAllCPU().then((res) => {
+  return getMetricAllCPU().then((res) => {
     if (res.data) {
       res.data.forEach((item) => {
         if (item.nodeType === 'datanode') {
@@ -458,7 +464,7 @@ function getCpu() {
 }
 
 function getDisk() {
-  getMetricAllDisk().then((res) => {
+  return getMetricAllDisk().then((res) => {
     if (res.data) {
       res.data.forEach((item) => {
         if (item.nodeType === 'datanode') {
@@ -478,7 +484,7 @@ function getDisk() {
 }
 
 function getSystem() {
-  getMetricAllMemory().then((res) => {
+  return getMetricAllMemory().then((res) => {
     if (res.data) {
       res.data.forEach((item) => {
         if (item.nodeType === 'datanode') {
@@ -498,23 +504,27 @@ function getSystem() {
 }
 
 function getSpeed() {
-  getMetricInsertNumPerSecond().then((res) => {
+  return getMetricInsertNumPerSecond().then((res) => {
     writeSpeed.value = res.data;
   });
 }
 
 function getFile() {
-  getMetricAllFileCount().then((res) => {
+  return getMetricAllFileCount().then((res) => {
     fileTotal.value = res.data;
   });
 }
 
 function getInitial() {
-  getCpu();
-  getDisk();
-  getSystem();
-  getSpeed();
-  getFile();
+  Promise.allSettled([
+    getCpu(),
+    getDisk(),
+    getSystem(),
+    getSpeed(),
+    getFile(),
+  ]).then(() => {
+    emit('handleFetch');
+  });
 }
 
 defineExpose({ getInitial });
