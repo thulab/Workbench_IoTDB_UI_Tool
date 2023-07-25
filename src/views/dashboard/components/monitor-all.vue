@@ -123,7 +123,7 @@ const configNodeSystemData = reactive<PieChartData>({
 const writeSpeed = ref();
 const fileTotal = ref();
 
-const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData): ECOption => ({
+const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData, totalNumUnit: string): ECOption => ({
   tooltip: {
     show: false,
   },
@@ -222,7 +222,7 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData): E
         detail: {
           show: !!dataNode.totalVal,
           offsetCenter: ['0', '8'],
-          formatter: `{dataValue|${dataNode.dataVal}}{dataUnit|${dataNode.valueUnit}}\n{line|}\n{totalValue|${dataNode.totalVal}}{totalUnit|${dataNode.valueUnit}}`,
+          formatter: `{dataValue|${dataNode.dataVal}}{dataUnit|${dataNode.valueUnit}}\n{line|}\n{totalValue|${dataNode.totalVal}}{totalUnit|${totalNumUnit}}`,
           rich: {
             dataValue: {
               fontSize: 30,
@@ -372,7 +372,7 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData): E
         detail: {
           show: !!configNode.totalVal,
           offsetCenter: ['0', '8'],
-          formatter: `{dataValue|${configNode.dataVal}}{dataUnit|${configNode.valueUnit}}\n{line|}\n{totalValue|${configNode.totalVal}}{totalUnit|${configNode.valueUnit}}`,
+          formatter: `{dataValue|${configNode.dataVal}}{dataUnit|${configNode.valueUnit}}\n{line|}\n{totalValue|${configNode.totalVal}}{totalUnit|${totalNumUnit}}`,
           rich: {
             dataValue: {
               fontSize: 30,
@@ -431,8 +431,8 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData): E
   ],
 } as ECOption);
 
-const diskDataOptions = computed(() => memoryChartOptions(dataNodeMemoryData, configNodeMemoryData));
-const systemDataOptions = computed(() => memoryChartOptions(dataNodeSystemData, configNodeSystemData));
+const diskDataOptions = computed(() => memoryChartOptions(dataNodeMemoryData, configNodeMemoryData, 'TiB'));
+const systemDataOptions = computed(() => memoryChartOptions(dataNodeSystemData, configNodeSystemData, 'GiB'));
 
 const { requestFn: getMetricAllCPU, loading: cpuLoading } = useRequest(DashboardApi.getMetricAllCPU);
 const { requestFn: getMetricAllDisk, loading: diskLoading } = useRequest(DashboardApi.getMetricAllDisk);
@@ -516,10 +516,6 @@ function getInitial() {
   getSpeed();
   getFile();
 }
-
-onMounted(() => {
-  getInitial();
-});
 
 defineExpose({ getInitial });
 </script>

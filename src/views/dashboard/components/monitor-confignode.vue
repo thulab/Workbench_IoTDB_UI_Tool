@@ -230,7 +230,7 @@ function getCpu() {
 
 function getCpuLoad() {
   getMetricCPULoad(props.node, props.nodeType).then((res) => {
-    cpuData.dataVal = res.data?.cpuLoad || 0;
+    cpuData.dataVal = res.data.cpuLoad ? (res.data.cpuLoad * 100) : 0;
   });
 }
 
@@ -239,7 +239,7 @@ function getMemory() {
     if (res.data) {
       memoryData.dataCount = res.data.memoryUse;
       memoryData.valueUnit = res.data.unit;
-      memoryData.dataVal = res.data.memoryRatio;
+      memoryData.dataVal = res.data.memoryRatio * 100;
     }
   });
 }
@@ -257,16 +257,6 @@ function getInitial() {
   getMemory();
   getIo();
 }
-
-watch(
-  () => props.node,
-  () => {
-    getInitial();
-  },
-  {
-    immediate: true,
-  },
-);
 
 defineExpose({ getInitial });
 </script>

@@ -7,8 +7,8 @@
             <h4 class="module-title">系统信息</h4>
             <p class="module-details">
               <span class="module-label-text">数据截止：</span>
-              <span class="module-content-text"></span>
-              <el-button link @click="handleRefreshSystem"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+              <span class="module-content-text m-r-16">{{ systemTime }}</span>
+              <el-button link @click="() => handleRefreshSystem()"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
             </p>
           </div>
           <ul class="system-info-list">
@@ -73,7 +73,7 @@
             <h4 class="module-title">监控信息</h4>
             <p class="module-details">
               <span class="module-label-text">数据截止：</span>
-              <span class="module-content-text"></span>
+              <span class="module-content-text m-r-16">{{ monitorTime }}</span>
               <el-button link @click="handleRefreshMonitor"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
             </p>
           </div>
@@ -97,7 +97,10 @@
             :node="monitorNode"
             :node-type="currentNodeType"
           />
-          <monitor-all v-else ref="monitorAllRef" />
+          <monitor-all
+            v-else
+            ref="monitorAllRef"
+          />
         </div>
       </el-scrollbar>
     </el-main>
@@ -106,6 +109,7 @@
 
 <script lang="ts" setup>
 import { assign, concat } from 'lodash-es';
+import dayjs from 'dayjs';
 import { DashboardApi } from '@/api';
 import { toThousands } from '@/utils/format';
 import MonitorAll from './components/monitor-all.vue';
@@ -124,6 +128,8 @@ const systemData = reactive<Dashboard.SystemData>({
 const tableData = ref<Dashboard.NodeItem[]>([]);
 const systemInterval = ref();
 const monitorInterval = ref();
+const systemTime = ref();
+const monitorTime = ref();
 const monitorNode = ref('');
 const nodeList = ref<Dashboard.NodeItem[]>([]);
 const currentNodeType = ref('');
@@ -133,7 +139,34 @@ const monitorConfignodeRef = ref<InstanceType<typeof MonitorConfignode>>();
 
 const { requestFn: getSystemInfo, loading } = useRequest(DashboardApi.getSystemInfo);
 
+function getMonitorData() {
+  monitorTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
+  if (currentNodeType.value === 'datanode') {
+    nextTick(() => {
+      monitorDatanodeRef.value?.getInitial();
+    });
+  } else if (currentNodeType.value === 'confignode') {
+    nextTick(() => {
+      monitorConfignodeRef.value?.getInitial();
+    });
+  } else {
+    nextTick(() => {
+      monitorAllRef.value?.getInitial();
+    });
+  }
+}
+
+// 刷新监控
+function handleRefreshMonitor() {
+  clearInterval(monitorInterval.value);
+  getMonitorData();
+  monitorInterval.value = setInterval(() => {
+    getMonitorData();
+  }, 30 * 1000);
+}
+
 function getSystemData() {
+  systemTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
   getSystemInfo().then((res) => {
     assign(systemData, res.data);
     systemData.expirationTime = res.data.expirationTime || '-';
@@ -146,11 +179,24 @@ function getSystemData() {
       version: '',
       physicalMachine: '',
     }], res.data.nodes ? [...res.data.nodes] : []);
+    const flag = nodeList.value.some((s) => s.nodeID === monitorNode.value);
+    if (!flag) {
+      monitorNode.value = '';
+      currentNodeType.value = '';
+      handleRefreshMonitor();
+    }
   });
 }
 
-function getInitialData() {
-  getSystemData();
+// 刷新系统
+function handleRefreshSystem(noUpdate?: boolean) {
+  clearInterval(systemInterval.value);
+  if (!noUpdate) {
+    getSystemData();
+  }
+  systemInterval.value = setInterval(() => {
+    getSystemData();
+  }, 30 * 1000);
 }
 
 function handleChangeNode(val: string) {
@@ -160,28 +206,18 @@ function handleChangeNode(val: string) {
     const current = nodeList.value.find((f) => f.nodeID === val);
     if (current) {
       currentNodeType.value = current.type;
+    } else {
+      monitorNode.value = '';
+      currentNodeType.value = '';
     }
   }
-}
-
-// 刷新系统
-function handleRefreshSystem() {
-  clearInterval(systemInterval.value);
-  systemInterval.value = setInterval(() => {
-    console.log('handleRefreshSystem');
-  }, 30 * 1000);
-}
-
-// 刷新监控
-function handleRefreshMonitor() {
-  clearInterval(monitorInterval.value);
-  monitorInterval.value = setInterval(() => {
-    console.log('handleRefreshMonitor');
-  }, 30 * 1000);
+  handleRefreshSystem(true);
+  handleRefreshMonitor();
 }
 
 onMounted(() => {
-  getInitialData();
+  handleRefreshSystem();
+  handleRefreshMonitor();
 });
 
 onUnmounted(() => {
