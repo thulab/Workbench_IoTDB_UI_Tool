@@ -218,9 +218,9 @@ function handleChangeNode(val: string) {
   handleRefreshMonitor();
 }
 
-onMounted(() => {
-  getSystemData();
-  getMonitorData();
+onMounted(async () => {
+  await getSystemData();
+  await getMonitorData();
   refreshInterval.value = setInterval(() => {
     getSystemData();
     getMonitorData();

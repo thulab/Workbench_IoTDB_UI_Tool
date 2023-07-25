@@ -38,9 +38,9 @@
 
     <el-dialog title="保存模板" v-model="nameDialogVisible" width="400px">
       <el-form ref="saveFormRef" :model="saveForm" :rules="saveFormRules" label-position="left">
-        <el-form-item label="名称：" prop="sqlName" :error="errorNameTip">
+        <el-form-item label="名称：" prop="sqlName">
           <el-input type="hidden" />
-          <el-input v-model="saveForm.sqlName" placeholder="请输入" maxlength="25" @blur="handleInputName" show-word-limit />
+          <el-input v-model="saveForm.sqlName" placeholder="请输入" maxlength="25" show-word-limit />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -52,14 +52,14 @@
     </el-dialog>
 
     <el-dialog title="重命名" v-model="renameDialogVisible" width="400px">
-      <el-form ref="resaveFormRef" :model="resaveForm" :rules="resaveFormRules" label-width="100px" label-position="right">
+      <el-form ref="resaveFormRef" :model="resaveForm" :rules="resaveFormRules" label-width="73px" label-position="right">
         <el-form-item label="原名称：" prop="oldSqlName">
           <el-input type="hidden" />
           <el-input v-model="resaveForm.oldSqlName" disabled />
         </el-form-item>
-        <el-form-item label="新名称：" prop="sqlName" :error="errorRenameTip" inline-message>
+        <el-form-item label="新名称：" prop="sqlName">
           <el-input type="hidden" />
-          <el-input v-model="resaveForm.sqlName" placeholder="请输入" maxlength="25" @blur="handleInputRename" show-word-limit />
+          <el-input v-model="resaveForm.sqlName" placeholder="请输入" maxlength="25" show-word-limit />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -104,11 +104,6 @@ const saveFormRules = reactive({
     { required: true, message: '请填写名称后确定', trigger: 'blur' },
   ],
 });
-const resaveFormRules = reactive({
-  sqlName: [
-    { required: true, message: '新名称为空，请重新输入', trigger: 'blur' },
-  ],
-});
 const saveForm = reactive<{
   sqlName: string;
   id?: string;
@@ -125,8 +120,22 @@ const resaveForm = reactive<{
   sqlName: '',
   id: '',
 });
-const errorNameTip = ref('');
-const errorRenameTip = ref('');
+const resaveFormRules = reactive({
+  sqlName: [
+    {
+      required: true,
+      validator: (rule: any, value: any, callback: any) => {
+        if (!value || !value.trim()) {
+          return callback(new Error('新名称为空，请重新输入'));
+        } if (value === resaveForm.oldSqlName) {
+          return callback(new Error('与原名称相同，请重新输入'));
+        }
+        return callback();
+      },
+      trigger: 'blur',
+    },
+  ],
+});
 const saveSource = ref('save');
 
 const { requestFn: getSql } = useRequest(SearchApi.getSql);
@@ -164,8 +173,10 @@ function handleSqlOperate(val: string, data: Search.SqlList) {
     resaveForm.oldSqlName = data.queryName;
     resaveForm.sqlName = '';
     resaveForm.id = `${data.id}`;
-    errorRenameTip.value = '';
     renameDialogVisible.value = true;
+    nextTick(() => {
+      resaveFormRef.value?.clearValidate();
+    });
   } else if (index > -1) {
     const nextTab = sqlList.value[index + 1] || sqlList.value[index - 1];
     if (nextTab) {
@@ -217,8 +228,10 @@ function handleTabRemove(targetName: TabPaneName) {
     activiteSql.value = targetName as string;
     saveForm.sqlName = current.queryName;
     saveSource.value = 'close';
-    errorNameTip.value = '';
     nameDialogVisible.value = true;
+    nextTick(() => {
+      saveFormRef.value?.clearValidate();
+    });
   } else {
     saveQuery({
       id,
@@ -238,24 +251,8 @@ function handleTabRemove(targetName: TabPaneName) {
   }
 }
 
-// 模板名称输入
-function handleInputName() {
-  errorNameTip.value = '';
-}
-
-// 新名称输入
-function handleInputRename() {
-  if (!resaveForm.sqlName.trim()) {
-    errorRenameTip.value = '新名称为空，请重新输入';
-  } else if (resaveForm.sqlName === resaveForm.oldSqlName) {
-    errorRenameTip.value = '与原名称相同，请重新输入';
-  } else {
-    errorRenameTip.value = '';
-  }
-}
 // 保存模板
 function handleNameConfirm() {
-  errorNameTip.value = '';
   saveFormRef.value?.validate((valid) => {
     if (valid) {
       const id = activiteSql.value.charAt(0) === '_' ? null : activiteSql.value;
@@ -283,8 +280,6 @@ function handleNameConfirm() {
             sqlListRef.value?.getQueryList();
           }
         }
-      }).catch((err) => {
-        errorNameTip.value = err.message;
       });
     }
   });
@@ -305,14 +300,6 @@ function handleNameCancel() {
 }
 // 重命名
 function handleRenameConfirm() {
-  errorRenameTip.value = '';
-  if (!resaveForm.sqlName.trim()) {
-    errorRenameTip.value = '新名称为空，请重新输入';
-    return;
-  } if (resaveForm.sqlName === resaveForm.oldSqlName) {
-    errorRenameTip.value = '与原名称相同，请重新输入';
-    return;
-  }
   resaveFormRef.value?.validate((valid) => {
     if (valid) {
       const { id } = resaveForm;
@@ -330,8 +317,6 @@ function handleRenameConfirm() {
           sqlListRef.value?.getQueryList();
           activiteSql.value = `${id}`;
         }
-      }).catch((err) => {
-        errorRenameTip.value = err.message;
       });
     }
   });
@@ -344,8 +329,10 @@ function handleSave() {
   if (!id) {
     saveForm.sqlName = current.queryName;
     saveSource.value = 'save';
-    errorNameTip.value = '';
     nameDialogVisible.value = true;
+    nextTick(() => {
+      saveFormRef.value?.clearValidate();
+    });
   } else {
     saveQuery({
       id,
