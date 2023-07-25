@@ -126,8 +126,7 @@ const systemData = reactive<Dashboard.SystemData>({
   measurementNum: 0,
 });
 const tableData = ref<Dashboard.NodeItem[]>([]);
-const systemInterval = ref();
-const monitorInterval = ref();
+const refreshInterval = ref();
 const systemTime = ref();
 const monitorTime = ref();
 const monitorNode = ref('');
@@ -156,15 +155,6 @@ function getMonitorData() {
   }
 }
 
-// 刷新监控
-function handleRefreshMonitor() {
-  clearInterval(monitorInterval.value);
-  getMonitorData();
-  monitorInterval.value = setInterval(() => {
-    getMonitorData();
-  }, 30 * 1000);
-}
-
 function getSystemData() {
   systemTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
   getSystemInfo().then((res) => {
@@ -183,19 +173,33 @@ function getSystemData() {
     if (!flag) {
       monitorNode.value = '';
       currentNodeType.value = '';
-      handleRefreshMonitor();
+      clearInterval(refreshInterval.value);
+      getMonitorData();
+      refreshInterval.value = setInterval(() => {
+        getSystemData();
+        getMonitorData();
+      }, 30 * 1000);
     }
   });
 }
 
 // 刷新系统
-function handleRefreshSystem(noUpdate?: boolean) {
-  clearInterval(systemInterval.value);
-  if (!noUpdate) {
+function handleRefreshSystem() {
+  clearInterval(refreshInterval.value);
+  getSystemData();
+  refreshInterval.value = setInterval(() => {
     getSystemData();
-  }
-  systemInterval.value = setInterval(() => {
+    getMonitorData();
+  }, 30 * 1000);
+}
+
+// 刷新监控
+function handleRefreshMonitor() {
+  clearInterval(refreshInterval.value);
+  getMonitorData();
+  refreshInterval.value = setInterval(() => {
     getSystemData();
+    getMonitorData();
   }, 30 * 1000);
 }
 
@@ -211,18 +215,20 @@ function handleChangeNode(val: string) {
       currentNodeType.value = '';
     }
   }
-  handleRefreshSystem(true);
   handleRefreshMonitor();
 }
 
 onMounted(() => {
-  handleRefreshSystem();
-  handleRefreshMonitor();
+  getSystemData();
+  getMonitorData();
+  refreshInterval.value = setInterval(() => {
+    getSystemData();
+    getMonitorData();
+  }, 30 * 1000);
 });
 
 onUnmounted(() => {
-  clearInterval(systemInterval.value);
-  clearInterval(monitorInterval.value);
+  clearInterval(refreshInterval.value);
 });
 </script>
 
@@ -268,7 +274,7 @@ onUnmounted(() => {
   .system-info-item{
     display: flex;
     align-items: center;
-    margin: 8px 24px 8px 0;
+    margin: 12px 24px 12px 0;
 
     &:last-child{
       margin: 8px 0;
