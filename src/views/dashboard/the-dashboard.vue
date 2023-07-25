@@ -24,7 +24,7 @@
             </li>
             <li class="system-info-item">
               <el-icon size="24"><i-custom-time /></el-icon>
-              <span class="module-label-text">到期时间：</span>
+              <span class="module-label-text">激活到期：</span>
               <span class="module-content-text">{{ systemData.expirationTime }}</span>
             </li>
             <li class="system-info-item">
