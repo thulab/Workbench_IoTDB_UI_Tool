@@ -5,11 +5,11 @@
     width="780px"
     :close-on-click-modal="false"
   >
-    <el-form ref="formRef" :model="formData" class="source-form" label-position="right">
+    <el-form ref="formRef" :model="formData" class="source-form" label-position="left">
       <base-form-item label="计算名称：" prop="name" :rules="requiredRules" class="form-label-width">
         <el-input v-model="formData.name" show-word-limit maxlength="20" placeholder="请输入计算名称" />
       </base-form-item>
-      <base-form-item label="计算描述：" prop="desc" class="form-label-width">
+      <base-form-item label="计算描述：" prop="desc" class="form-label-width form-label-normal">
         <el-input type="textarea" v-model="formData.desc" show-word-limit maxlength="100" placeholder="请输入计算描述" :resize="'none'" class="desc-textarea" />
       </base-form-item>
       <base-form-item label="结果测点：" prop="measurement" :rules="requiredRules" class="form-label-width">
@@ -21,7 +21,7 @@
         </el-input>
         <el-input v-model="formData.measurement" v-else disabled class="input-disabled" />
       </base-form-item>
-      <base-form-item label="计算表达式：" prop="expression" :rules="requiredRules" class="form-expression-box">
+      <base-form-item label="计算表达式：" prop="expression" :rules="requiredExpressionRules" class="form-expression-box">
         <template #label>
           计算表达式：<el-tooltip effect="light" placement="top">
             <i-custom-question />
@@ -106,6 +106,19 @@ const requiredRules = ref([
   },
 ]);
 
+const requiredExpressionRules = ref([
+  {
+    required: true,
+    validator: (rule: any, value: any, callback: any) => {
+      if (!value || !value.trim()) {
+        return callback(new Error('请输入相应内容后进行操作'));
+      }
+      return callback();
+    },
+    trigger: ['blur', 'change'],
+  },
+]);
+
 const formData = reactive({
   name: '',
   desc: '',
@@ -157,7 +170,10 @@ watch(
   () => formData.expression,
   (newVal) => {
     if (newVal) {
-      formRef.value?.clearValidate('expression');
+      const real = formData.expression.trim();
+      if (real) {
+        formRef.value?.clearValidate('expression');
+      }
     }
   },
   {
@@ -195,6 +211,16 @@ watch(
 .form-label-width{
   :deep(.el-form-item__label) {
     width: 90px;
+
+    svg{
+      right: 10px;
+    }
+  }
+}
+
+.form-label-normal{
+  :deep(.el-form-item__label) {
+    padding-left: 9px;
   }
 }
 
@@ -221,6 +247,10 @@ watch(
   :deep(.el-form-item__label) {
     justify-content: flex-start;
     width: fit-content;
+
+    svg{
+      right: 10px;
+    }
   }
 }
 
