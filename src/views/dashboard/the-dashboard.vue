@@ -1,8 +1,8 @@
 <template>
   <el-container class="details-wrapper">
-    <el-main class="p-0" v-loading="loading">
+    <el-main class="p-0">
       <el-scrollbar>
-        <div class="module-box-wrapper m-b-16">
+        <div class="module-box-wrapper m-b-16" v-loading="loading">
           <div class="module-title-wrapper">
             <h4 class="module-title">系统信息</h4>
             <p class="module-details">
