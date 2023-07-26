@@ -1,8 +1,9 @@
 <template>
   <el-dialog
-    :title="editType === 'add' ? '创建计算' : '编辑计算'"
+    :title="editType === 'add' ? '新建计算' : '编辑计算'"
     v-model="dialogVisible"
     width="780px"
+    align-center
     :close-on-click-modal="false"
   >
     <el-form ref="formRef" :model="formData" class="source-form" label-position="left">

@@ -65,9 +65,12 @@
     </div>
 
     <div class="page-table-details">
-      <div class="operate-buttons">
-        <el-button type="primary" @click="handleAdd">新建告警</el-button>
-        <el-button :disabled="!multipleSelection.length" type="primary" @click="handleDel('batch', null)">批量删除</el-button>
+      <div class="page-table-title-box">
+        <h4 class="page-table-title">告警配置</h4>
+        <div class="operate-buttons">
+          <el-button type="primary" @click="handleAdd">新建告警</el-button>
+          <el-button :disabled="!multipleSelection.length" type="primary" @click="handleDel('batch', null)">批量删除</el-button>
+        </div>
       </div>
       <div class="page-table-box">
         <el-table
@@ -115,7 +118,7 @@
           <template #empty>
             <div class="table-empty-wrapper">
               <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-              <span class="data-empty-text">无数据</span>
+              <span class="data-empty-text">暂无数据</span>
             </div>
           </template>
         </el-table>
@@ -372,8 +375,17 @@ onMounted(() => {
   }
 }
 
-.operate-buttons{
-  text-align: right;
+.page-table-title-box{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin: 12px 0;
+
+  .page-table-title{
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 21px;
+    color: #495AD4;
+  }
 }
 </style>

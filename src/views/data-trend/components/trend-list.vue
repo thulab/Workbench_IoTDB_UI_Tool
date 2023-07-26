@@ -18,7 +18,7 @@
   <div class="path-list-box" v-if="isExpand">
     <div class="list-empty-wrapper" v-if="!pathList.length">
       <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-      <span class="data-empty-text">暂无测点</span>
+      <span class="data-empty-text">暂无数据</span>
     </div>
     <ul class="list-box" v-else>
       <li v-for="(item, index) in pathList" :key="item.path" :class="['path-item-box']">

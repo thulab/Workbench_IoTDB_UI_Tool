@@ -59,17 +59,20 @@
     </div>
 
     <div class="page-table-details">
-      <div class="operate-buttons">
-        <el-dropdown class="m-r-12" :disabled="!totalCount" @command="val => handleCommandDown(val)">
-          <el-button type="primary" class="export-btn" :disabled="!totalCount">导出<el-tooltip effect="light" content="此导出操作为搜索结果导出。excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question-white /></el-tooltip></el-button>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
-              <el-dropdown-item command="xlsx">以.xlsx格式导出</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-        <el-button :disabled="!multipleSelection.length" type="primary" @click="handleDel('batch', null)">批量删除</el-button>
+      <div class="page-table-title-box">
+        <h4 class="page-table-title">告警记录</h4>
+        <div class="operate-buttons">
+          <el-dropdown class="m-r-12" :disabled="!totalCount" @command="val => handleCommandDown(val)">
+            <el-button type="primary" class="export-btn" :disabled="!totalCount">导出<el-tooltip effect="light" content="此导出操作为搜索结果导出。excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question-white /></el-tooltip></el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
+                <el-dropdown-item command="xlsx">以.xlsx格式导出</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+          <el-button :disabled="!multipleSelection.length" type="primary" @click="handleDel('batch', null)">批量删除</el-button>
+        </div>
       </div>
       <div class="page-table-box">
         <el-table
@@ -111,7 +114,7 @@
           <template #empty>
             <div class="table-empty-wrapper">
               <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-              <span class="data-empty-text">无数据</span>
+              <span class="data-empty-text">暂无数据</span>
             </div>
           </template>
         </el-table>
@@ -372,9 +375,18 @@ onMounted(() => {
   }
 }
 
-.operate-buttons{
-  text-align: right;
+.page-table-title-box{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin: 12px 0;
+
+  .page-table-title{
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 21px;
+    color: #495AD4;
+  }
 }
 
 .export-btn svg{

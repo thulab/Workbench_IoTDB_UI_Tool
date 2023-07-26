@@ -4,6 +4,7 @@
     v-model="dialogVisible"
     width="718px"
     class="new-storage-container"
+    align-center
     :close-on-click-modal="false"
   >
     <el-form ref="formRef" :model="formData" class="source-form" label-position="right" label-width="90px">

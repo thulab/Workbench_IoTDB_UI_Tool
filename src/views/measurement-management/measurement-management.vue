@@ -114,7 +114,7 @@
             <template #empty>
               <div class="table-empty-wrapper">
                 <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-                <span class="data-empty-text">无数据</span>
+                <span class="data-empty-text">暂无数据</span>
               </div>
             </template>
           </el-table>
@@ -263,7 +263,7 @@ function handleDelStorage() {
     .then(() => {
       deleteStorageGroups(currentStorage.value).then((res) => {
         if (res.code === 0) {
-          ElMessage.success('删除存储组成功');
+          ElMessage.success('删除成功');
           storageSideRef.value?.getStorageList();
         }
       });

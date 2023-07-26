@@ -4,6 +4,7 @@
     v-model="dialogVisible"
     width="480px"
     class="add-role-modal"
+    align-center
     :close-on-click-modal="false"
   >
     <el-form ref="formRef" :model="formData">

@@ -3,6 +3,7 @@
     title="添加路径"
     v-model="dialogVisible"
     width="480px"
+    align-center
     :close-on-click-modal="false"
   >
 

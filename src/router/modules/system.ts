@@ -48,23 +48,33 @@ const route = [
           },
         ],
       },
+      // {
+      //   path: 'log',
+      //   redirect: { name: 'AuditLog' },
+      //   meta: {
+      //     title: '日志管理',
+      //     hideLine: true,
+      //     icon: ICustomLogManagement,
+      //     alwayShow: true,
+      //   },
+      //   children: [
+      //     {
+      //       path: 'audit',
+      //       name: 'AuditLog',
+      //       component: () => import('@/views/log-management/audit.vue'),
+      //       meta: { keepAlive: true, title: '审计日志', icon: ICustomAuditLog },
+      //     },
+      //   ],
+      // },
       {
-        path: 'log',
-        redirect: { name: 'AuditLog' },
+        path: 'audit',
+        name: 'AuditLog',
+        component: () => import('@/views/log-management/audit.vue'),
         meta: {
-          title: '日志管理',
-          hideLine: true,
-          icon: ICustomLogManagement,
-          alwayShow: true,
+          keepAlive: true,
+          title: '审计日志',
+          icon: ICustomAuditLog,
         },
-        children: [
-          {
-            path: 'audit',
-            name: 'AuditLog',
-            component: () => import('@/views/log-management/audit.vue'),
-            meta: { keepAlive: true, title: '审计日志', icon: ICustomAuditLog },
-          },
-        ],
       },
       {
         path: 'white-list',

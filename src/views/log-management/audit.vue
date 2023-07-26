@@ -76,7 +76,7 @@
             <template #empty>
               <div class="table-empty-wrapper">
                 <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-                <span class="data-empty-text">暂无内容</span>
+                <span class="data-empty-text">暂无数据</span>
               </div>
             </template>
           </el-table>
@@ -97,7 +97,7 @@
       </div>
     </el-main>
 
-    <el-dialog title="操作详情" v-model="dialogVisible" width="480px" :close-on-click-modal="false">
+    <el-dialog title="操作详情" v-model="dialogVisible" width="480px" :close-on-click-modal="false" align-center>
       <div class="detail-text">{{ editDetail }}</div>
     </el-dialog>
   </el-container>

@@ -63,7 +63,7 @@ function handleDeleteStorage(item: string) {
     .then(() => {
       deleteStorageGroups(item).then((res) => {
         if (res.code === 0) {
-          ElMessage.success('删除存储组成功');
+          ElMessage.success('删除成功');
           getStorageList();
         }
       });

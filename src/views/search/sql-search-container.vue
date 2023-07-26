@@ -9,7 +9,7 @@
                 <span style="font-size: 12px; line-height: 1.2;display: flex; width: 118px;"><text-tooltip :content="item.queryName" /></span>
               </template>
               <el-scrollbar :height="tabHeight">
-                <sql-search v-model:code="code[activiteSql]" @save="handleSave" />
+                <sql-search v-model:code="code[activiteSql]" @save="handleSave" ref="sqlSearchRef" />
               </el-scrollbar>
             </el-tab-pane>
           </el-tabs>
@@ -36,7 +36,7 @@
       </div>
     </div>
 
-    <el-dialog title="保存模板" v-model="nameDialogVisible" width="400px">
+    <el-dialog title="保存模板" v-model="nameDialogVisible" width="400px" align-center>
       <el-form ref="saveFormRef" :model="saveForm" :rules="saveFormRules" label-position="left">
         <el-form-item label="名称：" prop="sqlName">
           <el-input type="hidden" />
@@ -51,7 +51,7 @@
       </template>
     </el-dialog>
 
-    <el-dialog title="重命名" v-model="renameDialogVisible" width="400px">
+    <el-dialog title="重命名" v-model="renameDialogVisible" width="400px" align-center>
       <el-form ref="resaveFormRef" :model="resaveForm" :rules="resaveFormRules" label-width="73px" label-position="right">
         <el-form-item label="原名称：" prop="oldSqlName">
           <el-input type="hidden" />
@@ -82,6 +82,7 @@ import SideData from './components/side-data.vue';
 import SideTemplate from './components/side-template.vue';
 import SqlSearch from './components/sql-search.vue';
 
+const sqlSearchRef = ref<Array<InstanceType<typeof SqlSearch>>>([]);
 const codeMirrorReady = ref(true);
 const nameDialogVisible = ref(false);
 const renameDialogVisible = ref(false);
@@ -156,7 +157,11 @@ function getSqlCode() {
 
 // 追加code
 function getFunction(val: string) {
-  code[activiteSql.value] += val;
+  // code[activiteSql.value] += val;
+  const index = sqlList.value.findIndex((f) => `${f.id}` === `${activiteSql.value}`);
+  if (index !== -1) {
+    sqlSearchRef.value[index].insertContent(val);
+  }
 }
 
 // 模板操作

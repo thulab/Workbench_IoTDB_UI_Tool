@@ -4,6 +4,7 @@
     v-model="dialogVisible"
     width="748px"
     class="new-storage-container"
+    align-center
     :close-on-click-modal="false"
     @close="handleClose"
   >

@@ -3,6 +3,7 @@
     v-model="dialogVisible"
     :title="title"
     width="480px"
+    align-center
     :close-on-click-modal="false">
     <el-form label-width="100px" ref="formRef" :rules="rules" :model="formData" label-position="left">
       <label><input type="password" autocomplete="new-password" hidden></label>

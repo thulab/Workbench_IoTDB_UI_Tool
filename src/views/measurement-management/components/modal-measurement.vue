@@ -3,6 +3,7 @@
     title="新建测点"
     v-model="dialogVisible"
     width="748px"
+    align-center
     :close-on-click-modal="false"
   >
     <el-form ref="formRef" :model="formData" label-position="left">

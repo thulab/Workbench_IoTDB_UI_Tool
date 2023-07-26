@@ -24,7 +24,7 @@
       </el-option>
     </el-select>
     <el-button v-if="isShowViewBtn" type="primary" :disabled="!model.length" class="m-l-12" @click="()=>dialogVisible = true">{{viewText || '已选测点' }}</el-button>
-    <el-dialog :title="viewText || '已选测点'" v-model="dialogVisible" class="select-modal">
+    <el-dialog :title="viewText || '已选测点'" v-model="dialogVisible" class="select-modal" align-center>
       <el-scrollbar :max-height="400">
         <ul class="select-list">
           <li v-for="(item, index) in model" :key="item" class="select-item">

@@ -20,13 +20,15 @@
         :style="{
           height: `${codeEditorHeight}px`,
           backgroundColor: '#f9fbfc',
-        }" />
+        }"
+        ref="codeEditorRef"
+      />
     </div>
   </div>
   <div>
     <div class="run-result-title-box">
       <h4 style="font-size: 14px;font-weight: 700;line-height: 20px;color:#495AD4;">执行结果</h4>
-      <span class="run-result-tip"><i-custom-info-warning />默认最多展示1000行100列，如需更多请下载查看</span>
+      <span class="run-result-tip"><i-custom-info-warning />默认最多展示1000行100列，如需更多请导出查看</span>
     </div>
     <div class="tabs" v-if="tableData.list && tableData.list.length > 0">
       <el-tabs v-model="activeName" type="card" class="tabs-nav-list">
@@ -51,7 +53,7 @@
               <el-button link @click="handleCommandDown('refresh', index)"><i-custom-refresh />刷新</el-button>
               <el-dropdown :disabled="!sqlResult[index].status" class="more-icon m-l-12" @command="val => handleCommandDown(val, index)" v-show="sqlResult[index].status && tableDataPagination[index]?.list?.length > 0">
                 <el-button link class="export-btn" :disabled="!sqlResult[index].status">
-                  <i-custom-download />下载<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
+                  <i-custom-download />导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
                 </el-button>
                 <template #dropdown>
                   <el-dropdown-menu>
@@ -97,6 +99,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits(['save', 'update:code']);
 
+const codeEditorRef = ref<InstanceType<typeof CodeEditor>>();
 const codeVal = useVModel(props, 'code');
 const codeMirrorReady = ref(false);
 
@@ -312,6 +315,11 @@ function emptyQuery() {
     });
 }
 
+function insertContent(val: string) {
+  codeEditorRef.value?.insertContent(val);
+}
+
+defineExpose({ insertContent });
 </script>
 <style lang="scss" scoped>
 .sql-input-area {

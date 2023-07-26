@@ -29,7 +29,7 @@
         <div class="page-table-title-box">
           <h4 class="page-table-title">计算列表</h4>
           <div class="operate-buttons">
-            <el-button type="primary" @click="handleAdd">创建计算</el-button>
+            <el-button type="primary" @click="handleAdd">新建计算</el-button>
             <el-button :disabled="!multipleSelection.length" type="primary" @click="handleDel('batch', null)">批量删除</el-button>
             <el-button link @click="getNewVal"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
           </div>
@@ -73,7 +73,7 @@
             <template #empty>
               <div class="table-empty-wrapper">
                 <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-                <span class="data-empty-text">暂无内容</span>
+                <span class="data-empty-text">暂无数据</span>
               </div>
             </template>
           </el-table>

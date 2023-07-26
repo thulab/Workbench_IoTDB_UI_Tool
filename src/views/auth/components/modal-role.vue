@@ -3,6 +3,7 @@
     title="新建角色"
     v-model="dialogVisible"
     width="480px"
+    align-center
     :close-on-click-modal="false"
   >
     <el-form ref="formRef" :model="formData">
