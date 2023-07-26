@@ -274,7 +274,7 @@ function getCpu() {
 
 function getCpuLoad() {
   return getMetricCPULoad(props.node, props.nodeType).then((res) => {
-    cpuData.dataVal = res.data.cpuLoad ? (res.data.cpuLoad * 100) : 0;
+    cpuData.dataVal = res.data.cpuLoad ? transformDecimal(res.data.cpuLoad * 100, 1) : 0;
   });
 }
 
@@ -283,7 +283,7 @@ function getDisk() {
     if (res.data) {
       diskData.dataCount = res.data.diskTotal;
       diskData.valueUnit = res.data.unit;
-      diskData.dataVal = res.data.diskRatio * 100;
+      diskData.dataVal = transformDecimal(res.data.diskRatio * 100, 1);
     }
   });
 }
@@ -293,7 +293,7 @@ function getMemory() {
     if (res.data) {
       memoryData.dataCount = res.data.memoryTotal;
       memoryData.valueUnit = res.data.unit;
-      memoryData.dataVal = res.data.memoryRatio * 100;
+      memoryData.dataVal = transformDecimal(res.data.memoryRatio * 100, 1);
     }
   });
 }
