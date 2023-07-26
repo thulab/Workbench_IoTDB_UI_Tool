@@ -41,7 +41,7 @@
         </ul>
 
         <div class="page-detail-buttons">
-          <el-button plain class="el-button-delete" :disabled="!currentStorage" @click="handleDelStorage">删除</el-button>
+          <el-button plain class="el-button-delete" :disabled="!currentStorage || currentStorage === 'root.__system'" @click="handleDelStorage">删除</el-button>
         </div>
       </div>
 
@@ -69,16 +69,17 @@
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
+            <el-button :disabled="multipleSelection.length === 0" @click="handleDelRow('batch', null)">批量删除</el-button>
             <el-button link @click="handleRefresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
           </div>
         </div>
-        <div class="batch-operate" v-if="multipleSelection.length">
+        <!-- <div class="batch-operate" v-if="multipleSelection.length">
           <div class="select-tip-box">
             <el-icon size="16" class="m-r-12"><i-custom-warning-blue /></el-icon>
             <span class="select-tip">已选择 <span style="color: #495AD4">{{ multipleSelection.length }}</span> 项</span>
           </div>
           <el-button link type="primary" @click="handleDelRow('batch', null)">删除</el-button>
-        </div>
+        </div> -->
         <div class="storage-table-box">
           <el-table
             :data="tableData.measurements"
@@ -91,7 +92,7 @@
             :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
             @selection-change="handleSelectionChange"
           >
-            <el-table-column type="selection" width="55" />
+            <el-table-column type="selection" width="55" :selectable="isSelectabled" />
             <el-table-column label="设备名称" prop="deviceName" min-width="200" align="center" show-overflow-tooltip />
             <el-table-column label="测点名称" prop="timeseries" width="160" align="center" show-overflow-tooltip />
             <el-table-column label="数据类型" prop="dataType" width="140" align="center" show-overflow-tooltip />
@@ -104,11 +105,12 @@
             <el-table-column label="压缩方式" prop="compression" min-width="140" align="center" show-overflow-tooltip />
             <el-table-column label="最新值" prop="value" min-width="140" align="center" show-overflow-tooltip />
             <el-table-column label="最新值时间" prop="valueTime" min-width="200" align="center" show-overflow-tooltip />
-            <el-table-column label="操作" width="160" align="center" fixed="right">
+            <el-table-column label="操作" width="180" align="center" fixed="right">
               <template #default="{ row }">
-                <el-button type="primary" link size="small" @click="handleRowAlarm(row)">告警详情</el-button>
-                <el-button type="primary" link size="small" @click="handleRowTrend(row)">趋势</el-button>
-                <el-button type="primary" link size="small" @click="handleDelRow('row', row)">删除</el-button>
+                <el-button type="primary" link size="small" @click="handleRowData(row)">数据</el-button>
+                <el-button type="primary" link size="small" :disabled="currentStorage === 'root.__system'" @click="handleRowAlarm(row)">告警</el-button>
+                <el-button type="primary" link size="small" :disabled="currentStorage === 'root.__system'" @click="handleRowTrend(row)">趋势</el-button>
+                <el-button type="primary" link size="small" :disabled="currentStorage === 'root.__system'" @click="handleDelRow('row', row)">删除</el-button>
               </template>
             </el-table-column>
             <template #empty>
@@ -219,6 +221,13 @@ const getTtlTimeUnit = (val: string | undefined, options: Array<{ label: string,
   return data ? data.label : '';
 };
 
+function isSelectabled() {
+  if (currentStorage.value === 'root.__system') {
+    return false;
+  }
+  return true;
+}
+
 // 列表接口
 function getListData() {
   getMeasurementsInfosByFuzzy({
@@ -324,7 +333,7 @@ function handleImport() {
 
 // 删除行
 function handleDelRow(type: string, row: StorageDevice.MeasurementItem | null) {
-  ElMessageBox.confirm('是否删除测点？', '注意', {
+  ElMessageBox.confirm(type === 'batch' ? '确认删除这些测点吗？' : '是否删除测点？', '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
@@ -345,6 +354,15 @@ function handleDelRow(type: string, row: StorageDevice.MeasurementItem | null) {
         }
       });
     });
+}
+
+function handleRowData(row: StorageDevice.MeasurementItem) {
+  router.push({
+    name: 'DataSearch',
+    query: {
+      measurement: `${row.deviceName}.${row.timeseries}`,
+    },
+  });
 }
 
 function handleRowAlarm(row: StorageDevice.MeasurementItem) {
@@ -398,7 +416,7 @@ function handleConfirmEditTTL() {
     return;
   }
   if ((editTTLModel.value && !editTTLUnitModel.value) || (!editTTLModel.value && editTTLUnitModel.value)) {
-    ElMessage.error('存活时间和存活时间单位必须同时填写');
+    ElMessage.error('请同时配置时间及其单位');
     return;
   }
   const reqObj = {

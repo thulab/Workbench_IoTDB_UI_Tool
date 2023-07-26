@@ -26,7 +26,7 @@
             </el-select>
           </base-form-item>
           <base-form-item label="采样策略：" prop="aggregation" :rules="requiredRules">
-            <el-select v-model="searchFormData.aggregation" :disabled="isRunningTab" style="width: 80px;">
+            <el-select v-model="searchFormData.aggregation" :disabled="isRunningTab" style="width: 80px;" @change="handleChangeAggregation">
               <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" />
             </el-select>
           </base-form-item>
@@ -65,6 +65,7 @@
             :data-tab="dataTab"
             :aggregation="searchFormData.aggregation"
             @handleOperate="handleOperatePath"
+            @handleOperateAll="handleOperateAll"
           />
         </el-aside>
       </el-container>
@@ -284,6 +285,14 @@ function handleReset() {
   searchFormData.aggregation = 'avg';
 }
 
+function handleChangeAggregation(val: string) {
+  if (val === 'last_value') {
+    pathList.value.forEach((item) => {
+      item.disabled = false;
+    });
+  }
+}
+
 // 查询
 function handleSearch() {
   if (!checkedData.value.length) return;
@@ -424,6 +433,9 @@ function handleTrendTab(type: 'running' | 'history') {
       handleReset();
       handleSearch();
     } else {
+      pathList.value.forEach((item) => {
+        item.disabled = false;
+      });
       const currentChecked = chartData.value.map((item) => item.path);
       const cloneChecked = pathList.value.map((item) => item.path);
       const del = difference(currentChecked, cloneChecked);
@@ -480,6 +492,10 @@ function handleOperatePath(type: 'add' | 'del' | 'detail', path: string) {
     }
     handleSearch();
   }
+}
+
+function handleOperateAll() {
+  setOption({ legend: legendSelected.value, series: seriesData.value.series });
 }
 
 onMounted(() => {

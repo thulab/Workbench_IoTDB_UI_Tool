@@ -71,7 +71,7 @@
               </el-dropdown-menu>
             </template>
           </el-dropdown>
-          <el-button :disabled="!multipleSelection.length" type="primary" @click="handleDel('batch', null)">批量删除</el-button>
+          <!-- <el-button :disabled="!multipleSelection.length" type="primary" @click="handleDel('batch', null)">批量删除</el-button> -->
         </div>
       </div>
       <div class="page-table-box">
@@ -88,7 +88,7 @@
           @selection-change="handleSelectionChange"
           @sort-change="handleSortChange"
         >
-          <el-table-column type="selection" width="55" />
+          <!-- <el-table-column type="selection" width="55" /> -->
           <el-table-column label="告警名称" prop="alarmName" min-width="160" align="center" show-overflow-tooltip />
           <el-table-column label="告警级别" prop="alarmLevel" sortable="custom" min-width="120" align="center">
             <template #default="{ row }">
@@ -102,13 +102,14 @@
           <el-table-column label="告警值" prop="alarmValue" min-width="160" align="center" show-overflow-tooltip />
           <el-table-column label="告警时间" prop="createTime" sortable="custom" min-width="180" align="center" show-overflow-tooltip />
           <el-table-column label="告警描述" prop="alarmDesc" min-width="140" align="center" show-overflow-tooltip />
-          <el-table-column label="操作" width="100" align="center" fixed="right">
+          <el-table-column label="是否确认" width="100" align="center" fixed="right">
             <template #default="{ row }">
-              <div style="display: flex; align-items: center;">
-                <el-button v-if="!row.hasRead" type="primary" link size="small" @click="handleStatus(row)">已阅</el-button>
-                <el-icon v-else size="16" class="p-x-5 m-r-12"><i-custom-success-green /></el-icon>
-                <el-button type="primary" link size="small" @click="handleDel('row', row)">删除</el-button>
+              <el-button v-if="!row.hasRead" type="primary" link size="small" @click="handleStatus(row)">确认</el-button>
+              <div v-else class="operate-confirm-box">
+                <el-icon size="16" class="p-x-5"><i-custom-success-green /></el-icon>
+                已确认
               </div>
+              <!-- <el-button type="primary" link size="small" @click="handleDel('row', row)">删除</el-button> -->
             </template>
           </el-table-column>
           <template #empty>
@@ -393,5 +394,12 @@ onMounted(() => {
   position: absolute;
   right: 6px;
   top: 3px;
+}
+
+.operate-confirm-box{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #44C795;
 }
 </style>

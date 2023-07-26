@@ -13,6 +13,15 @@
     </el-tooltip>
   </div>
 
+  <el-checkbox
+    v-if="isExpand"
+    class="m-b-8"
+    v-model="isCheckAll"
+    label="全选"
+    :disabled="!allCheckAbled"
+    @change="handleCheckedAll"
+  />
+
   <h4 v-if="!isExpand" class="collapse-title">已选测点</h4>
 
   <div class="path-list-box" v-if="isExpand">
@@ -20,23 +29,23 @@
       <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
       <span class="data-empty-text">暂无数据</span>
     </div>
-    <ul class="list-box" v-else>
+    <ul class="list-box" v-else :key="listKey">
       <li v-for="(item, index) in pathList" :key="item.path" :class="['path-item-box']">
         <div class="path-text-box">
-          <el-checkbox v-if="historyDisabled(item)" :checked="false" :disabled="true" class="m-r-8" />
+          <el-checkbox v-if="item.disabled" :checked="false" :disabled="true" class="m-r-8" />
           <el-checkbox v-else :checked="item.checked" @change="val => handleChecked(val, item, index)" class="m-r-8" />
           <div class="path-text"><text-tooltip :content="item.path" /></div>
         </div>
         <div class="path-detail-box">
           <div class="path-detail-item">
             <span class="detail-label">颜色：</span>
-            <el-color-picker v-model="item.color" :disabled="historyDisabled(item)" color-format="hex" :predefine="predefineColors" @change="val => handleChangeColor(val, item, index)" />
+            <el-color-picker v-model="item.color" :disabled="item.disabled" color-format="hex" :predefine="predefineColors" @change="val => handleChangeColor(val, item, index)" />
           </div>
           <div class="path-detail-item">
             <span class="detail-label">线宽：</span>
             <el-input-number
               v-model.number="item.width"
-              :disabled="historyDisabled(item)"
+              :disabled="item.disabled"
               :min="1"
               :max="10"
               step-strictly
@@ -80,11 +89,16 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: 'update:isExpand', isExpand: boolean): void;
   (event: 'handleSelect', payload: string): void;
-  (evnet: 'handleOperate', payload: 'add' | 'del' | 'detail', data: string): void;
+  (event: 'handleOperate', payload: 'add' | 'del' | 'detail', data: string): void;
+  (event: 'handleOperateAll'): void;
 }>();
 
+const listKey = ref(0);
 const pathList = useVModel(props, 'modelValue');
 const isExpand = useVModel(props, 'isExpand', emit);
+const isCheckAll = ref(false);
+
+const allCheckAbled = computed(() => pathList.value.length > 0 && pathList.value.filter((item) => !item.disabled).length > 0);
 
 const predefineColors = ['#4992ff', '#7cffb2', '#fddd60', '#ff6e76', '#58d9f9', '#05c091', '#ff8a45', '#8d48e3', '#dd79ff', '#8AC211'];
 
@@ -92,10 +106,6 @@ const current = ref('');
 const pathVisible = ref(false);
 const editPathList = ref<string[]>([]);
 const defaultColor = ref('');
-
-const historyDisabled = computed(() => function (item: Trend.LineObj) {
-  return props.dataTab === 'history' && item.disabled && props.aggregation !== 'last_value';
-});
 
 function handleAdd() {
   if (pathList.value.length === 10) return;
@@ -106,8 +116,20 @@ function handleAdd() {
   pathVisible.value = true;
 }
 
+function handleCheckedAll(val: CheckboxValueType) {
+  pathList.value.forEach((item) => {
+    if (!item.disabled) {
+      item.checked = !!val;
+    }
+  });
+  nextTick(() => {
+    listKey.value++;
+  });
+  emit('handleOperateAll');
+}
+
 function handleSavePath(data: Trend.LineObj) {
-  pathList.value.push({ ...data, checked: true });
+  pathList.value.push({ ...data, checked: true, disabled: false });
   emit('handleOperate', 'add', data.path);
 }
 
@@ -160,7 +182,7 @@ watch(
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 
   .path-list-title{
     font-size: 14px;
@@ -188,7 +210,7 @@ watch(
 .path-list-box{
   border-radius: 2px;
   background: #FFF;
-  height: calc(100% - 54px);
+  height: calc(100% - 82px);
   overflow-y: auto;
 
   .list-empty-wrapper{

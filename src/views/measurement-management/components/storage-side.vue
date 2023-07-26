@@ -38,7 +38,12 @@ const { requestFn: deleteStorageGroups } = useRequest(StorageApi.deleteStorageGr
 // 获取数据库
 function getStorageList(isInitial?: boolean) {
   getGroup({}).then((res) => {
-    storageList.value = res.data?.pathNames.filter((item) => item !== 'root.__system') || [];
+    let data = res.data?.pathNames || [];
+    if (data.some((s) => s === 'root.__system')) {
+      data = data.filter((item) => item !== 'root.__system');
+      data.push('root.__system');
+    }
+    storageList.value = data;
     if (route.query.databse && isInitial) {
       currentStorage.value = route.query.databse as string;
     } else {
@@ -54,6 +59,7 @@ function handleAddStorage() {
 
 // 删除数据库
 function handleDeleteStorage(item: string) {
+  if (item === 'root.__system') return;
   ElMessageBox.confirm('此操作会删除数据库下全部测点和数据，是否删除？', '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',

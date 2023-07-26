@@ -206,6 +206,7 @@ const remoteMethod = debounce((query: string) => {
 }, 500);
 
 // 获取物理量
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getMeasurementList(val: string) {
   getMeasurementsInfosByFuzzy({
     dataBaseOrDevice: 'device',
@@ -294,7 +295,16 @@ function getDeviceAlign(val: string) {
 function handleChangeDevice(val: string) {
   formData.measurementList = [];
   getDeviceAlign(val);
-  getMeasurementList(val);
+  // getMeasurementList(val);
+  formData.measurementList.push({
+    deviceName: !addDevice.value ? formData.deviceName : `${props.groupName}.${formData.deviceName}`,
+    timeseries: '',
+    dataType: 'BOOLEAN',
+    encoding: 'PLAIN',
+    compression: 'SNAPPY',
+    isEditable: true,
+  });
+  activeName.value = 'measurement_0';
 }
 
 // 切换数据类型

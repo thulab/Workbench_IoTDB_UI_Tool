@@ -3,7 +3,7 @@
     <div class="search-form-wrapper">
       <el-form :model="searchFormData" style="flex: 1" ref="searchFormRef" label-position="left" label-width="80px" size="default" inline :disabled="getListLoading">
         <el-row>
-          <base-form-item label="测点选择：" prop="path" :error="errorDeviceTip" class="m-r-20">
+          <base-form-item label="测点选择：" prop="path" class="m-r-20">
             <template #label>
               测点选择：<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
@@ -92,6 +92,7 @@
         </h4>
         <div class="page-detail-buttons">
           <el-button @click="handleSearch" :disabled="getListLoading">刷新</el-button>
+          <el-button class="m-l-12" @click="handleImport">导入</el-button>
           <el-dropdown class="more-icon m-l-12" :disabled="getListLoading" v-show="searchDetailInfos.status && tableData.length > 0" @command="val => handleCommandDown(val)">
             <el-button class="export-btn">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
             <template #dropdown>
@@ -113,10 +114,10 @@
           <template #icon><i-ep-arrow-right-bold /></template>
         </el-button>
       </div> -->
-      <div class="table-empty-wrapper" v-if="firstLoad" style="background-color: #fff;">
+      <!-- <div class="table-empty-wrapper" v-if="firstLoad" style="background-color: #fff;">
         <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-        <span class="data-empty-text">无数据</span>
-      </div>
+        <span class="data-empty-text">暂无数据</span>
+      </div> -->
       <div v-loading="getListLoading">
         <div v-if="searchDetailInfos.status">
           <dynamic-table
@@ -148,6 +149,11 @@
         </div>
       </div>
     </div>
+
+    <modal-import
+      v-model:visible="importVisible"
+      @handle-close="handleImportClose"
+    />
   </div>
 </template>
 
@@ -163,6 +169,7 @@ import {
 } from '@/utils/date';
 import DynamicTable from '@/components/dynamic-table.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
+import ModalImport from './components/modal-import.vue';
 
 const route = useRoute();
 const { maxTableHeight } = useTableHeight(330);
@@ -184,12 +191,12 @@ const aggregateFunctions = [
 ];
 
 const currentQueryTime = ref('');
-const timeType = ref('datetime');
-const errorDeviceTip = ref('');
+const timeType = ref('datetimerange');
+// const errorDeviceTip = ref('');
 const searchFormData = reactive({
   path: [] as string[],
   time: todayNow(),
-  datetimerange: getStartAndEnd(0) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
+  datetimerange: [new Date('1970-1-1').getTime(), todayNow()] as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
   timeInterval: undefined as number | undefined,
   unitInterval: 's',
   aggregation: '',
@@ -237,6 +244,7 @@ const pagination = reactive({
   totalColumnPage: 0,
   totalColumnCount: 0,
 });
+const importVisible = ref(false);
 // const tableHeight = computed(() => (tableData.value.length > 0 ? maxTableHeight.value : maxTableHeight.value ));
 
 const getListLoading = ref(false);
@@ -301,7 +309,7 @@ function getListData() {
   }, controller).then((res) => {
     // eslint-disable-next-line no-undef
     const list: DynamicTableColumn[] = [];
-    res.data.metaDataList?.forEach((item: string, index: number) => {
+    res.data?.metaDataList?.forEach((item: string, index: number) => {
       list.push({
         label: item,
         prop: `t${index}`,
@@ -311,17 +319,17 @@ function getListData() {
       });
     });
     columns.value = list;
-    tableData.value = res.data.valueList?.map((item: any[]) => {
+    tableData.value = res.data?.valueList?.map((item: any[]) => {
       const obj = {} as Record<string, string>;
       item.forEach((childItem, index) => {
         obj[`t${index}`] = childItem;
       });
       return obj;
     });
-    hasNext.value = res.data.hasNext;
-    pagination.totalColumnPage = res.data.totalColumnPage;
-    pagination.totalColumnCount = res.data.totalColumnCount;
-    searchDetailInfos.value = res.data;
+    hasNext.value = res.data?.hasNext;
+    pagination.totalColumnPage = res.data?.totalColumnPage;
+    pagination.totalColumnCount = res.data?.totalColumnCount;
+    searchDetailInfos.value = res.data || {};
   }).finally(() => {
     getListLoading.value = false;
   });
@@ -331,16 +339,16 @@ function getListData() {
 function handleReset() {
   searchFormRef.value?.resetFields();
   searchFormData.time = todayNow();
-  searchFormData.datetimerange = getStartAndEnd(0) as [DateModelType, DateModelType];
+  searchFormData.datetimerange = [new Date('1970-1-1').getTime(), todayNow()] as [DateModelType, DateModelType];
 }
 
 // 查询
 function handleSearch() {
-  if (!searchFormData.path.length) {
-    errorDeviceTip.value = '请输入测点名称后进行搜索';
-    return;
-  }
-  errorDeviceTip.value = '';
+  // if (!searchFormData.path.length) {
+  //   errorDeviceTip.value = '请输入测点名称后进行搜索';
+  //   return;
+  // }
+  // errorDeviceTip.value = '';
   if (getListLoading.value) {
     controller.abort();
     return;
@@ -389,6 +397,18 @@ function queryData(columnNum?: number) {
 //   getListData();
 // }
 
+// 导入
+function handleImport() {
+  importVisible.value = true;
+}
+
+// 导入物理量
+function handleImportClose(reload: boolean) {
+  if (reload) {
+    handleSearch();
+  }
+}
+
 // 导出
 function handleExportData(exportType: string) {
   let startTime = 0;
@@ -425,14 +445,14 @@ function handleTimeType(type: 'datetime' | 'datetimerange') {
   if (timeType.value === type || getListLoading.value) return;
   timeType.value = type;
   searchFormData.time = todayNow();
-  searchFormData.datetimerange = getStartAndEnd(0) as [DateModelType, DateModelType];
+  searchFormData.datetimerange = [new Date('1970-1-1').getTime(), todayNow()] as [DateModelType, DateModelType];
 }
 // 下载
 function handleCommandDown(val: string) {
-  if (!copySearchFormData.path.length) {
-    errorDeviceTip.value = '请输入测点名称后进行搜索';
-    return;
-  }
+  // if (!copySearchFormData.path.length) {
+  //   errorDeviceTip.value = '请输入测点名称后进行搜索';
+  //   return;
+  // }
   handleExportData(val);
 }
 
@@ -441,6 +461,8 @@ onMounted(() => {
   handleReset();
   if (route.query.measurement) {
     searchFormData.path = [route.query.measurement] as string[];
+    handleSearch();
+  } else {
     handleSearch();
   }
 });
