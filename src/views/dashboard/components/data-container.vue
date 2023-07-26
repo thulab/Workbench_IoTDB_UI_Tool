@@ -1,7 +1,7 @@
 <template>
   <div class="data-empty-wrapper" v-if="isEmpty">
     <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-    <span class="data-empty-text">无数据</span>
+    <span class="data-empty-text">暂无数据</span>
   </div>
   <slot v-else></slot>
 </template>
