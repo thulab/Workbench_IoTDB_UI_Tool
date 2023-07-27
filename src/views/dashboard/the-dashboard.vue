@@ -2,115 +2,117 @@
   <el-container class="details-wrapper">
     <el-main class="p-0">
       <el-scrollbar>
-        <div class="module-box-wrapper m-b-16" v-loading="loading">
-          <div class="module-title-wrapper">
-            <h4 class="module-title">系统信息</h4>
-            <p class="module-details">
-              <span class="module-label-text">数据截止：</span>
-              <span class="module-content-text m-r-16">{{ systemTime }}</span>
-              <el-button link @click="() => handleRefreshSystem()"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
-            </p>
-          </div>
-          <ul class="system-info-list">
-            <li class="system-info-item">
-              <el-icon size="24"><i-custom-system-status /></el-icon>
-              <span class="module-label-text">服务器状态(Running)：</span>
-              <span class="module-content-text" v-if="!systemData.dataNodeRatio && !systemData.configNodeRatio">-</span>
-              <span class="module-content-text" v-else>Datanode {{systemData.dataNodeRatio ? `${systemData.dataNodeRatio}个` : '-'}} Confignode {{ systemData.configNodeRatio ? `${systemData.configNodeRatio}个` : '-'}}</span>
-            </li>
-            <li class="system-info-item">
-              <el-icon size="24"><i-custom-active-status /></el-icon>
-              <span class="module-label-text">是否激活：</span>
-              <span class="module-content-text" :style="{ color: systemData.active ? '#44C795' : '#D43030' }">{{ systemData.active ? '是' : '否' }}</span>
-            </li>
-            <li class="system-info-item">
-              <el-icon size="24"><i-custom-time /></el-icon>
-              <span class="module-label-text">激活到期：</span>
-              <span class="module-content-text">{{ systemData.expirationTime || '-' }}</span>
-            </li>
-            <li class="system-info-item">
-              <el-icon size="24"><i-custom-storage-num /></el-icon>
-              <span class="module-label-text">数据库数量：</span>
-              <span class="module-content-text">{{ toThousands(systemData.databaseNum, '-') }}</span>
-            </li>
-            <li class="system-info-item">
-              <el-icon size="24"><i-custom-device-num /></el-icon>
-              <span class="module-label-text">设备数量：</span>
-              <span class="module-content-text">{{ toThousands(systemData.deviceNum, '-') }}</span>
-            </li>
-            <li class="system-info-item">
-              <el-icon size="24"><i-custom-measure-num /></el-icon>
-              <span class="module-label-text">测点数量：</span>
-              <span class="module-content-text">{{ toThousands(systemData.measurementNum, '-') }}</span>
-            </li>
-          </ul>
+        <div style="display: flex; flex-direction: column; height: 100%;">
+          <div class="module-box-wrapper m-b-16" v-loading="loading">
+            <div class="module-title-wrapper">
+              <h4 class="module-title">系统信息</h4>
+              <p class="module-details">
+                <span class="module-label-text">数据截止：</span>
+                <span class="module-content-text m-r-16">{{ systemTime }}</span>
+                <el-button link @click="() => handleRefreshSystem()"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+              </p>
+            </div>
+            <ul class="system-info-list">
+              <li class="system-info-item">
+                <el-icon size="24"><i-custom-system-status /></el-icon>
+                <span class="module-label-text">服务器状态(Running)：</span>
+                <span class="module-content-text" v-if="!systemData.dataNodeRatio && !systemData.configNodeRatio">-</span>
+                <span class="module-content-text" v-else>Datanode {{systemData.dataNodeRatio ? `${systemData.dataNodeRatio}个` : '-'}} Confignode {{ systemData.configNodeRatio ? `${systemData.configNodeRatio}个` : '-'}}</span>
+              </li>
+              <li class="system-info-item">
+                <el-icon size="24"><i-custom-active-status /></el-icon>
+                <span class="module-label-text">是否激活：</span>
+                <span class="module-content-text" :style="{ color: systemData.active ? '#44C795' : '#D43030' }">{{ systemData.active ? '是' : '否' }}</span>
+              </li>
+              <li class="system-info-item">
+                <el-icon size="24"><i-custom-time /></el-icon>
+                <span class="module-label-text">激活到期：</span>
+                <span class="module-content-text">{{ systemData.expirationTime || '-' }}</span>
+              </li>
+              <li class="system-info-item">
+                <el-icon size="24"><i-custom-storage-num /></el-icon>
+                <span class="module-label-text">数据库数量：</span>
+                <span class="module-content-text">{{ toThousands(systemData.databaseNum, '-') }}</span>
+              </li>
+              <li class="system-info-item">
+                <el-icon size="24"><i-custom-device-num /></el-icon>
+                <span class="module-label-text">设备数量：</span>
+                <span class="module-content-text">{{ toThousands(systemData.deviceNum, '-') }}</span>
+              </li>
+              <li class="system-info-item">
+                <el-icon size="24"><i-custom-measure-num /></el-icon>
+                <span class="module-label-text">测点数量：</span>
+                <span class="module-content-text">{{ toThousands(systemData.measurementNum, '-') }}</span>
+              </li>
+            </ul>
 
-          <div class="table-box-wrapper">
-            <el-table
-              :data="tableData"
-              v-loading="loading"
-              style="width: 100%;"
-              :max-height="260"
-              tooltip-effect="light"
-              :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
-            >
-              <el-table-column label="节点" prop="address" min-width="200" align="center" show-overflow-tooltip />
-              <el-table-column label="类型" prop="type" min-width="120" align="center" show-overflow-tooltip />
-              <el-table-column label="状态" prop="status" min-width="120" align="center" show-overflow-tooltip />
-              <el-table-column label="版本" prop="version" min-width="90" align="center" show-overflow-tooltip />
-              <el-table-column label="物理机" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
-              <template #empty>
-                <div class="table-empty-wrapper">
-                  <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-                  <span class="data-empty-text">暂无数据</span>
-                </div>
-              </template>
-            </el-table>
-          </div>
-        </div>
-
-        <div class="module-box-wrapper monitor-info-wrapper">
-          <div class="module-title-wrapper">
-            <h4 class="module-title">监控信息</h4>
-            <p class="module-details">
-              <span class="module-label-text">数据截止：</span>
-              <span class="module-content-text m-r-16">{{ monitorTime }}</span>
-              <el-button link @click="handleRefreshMonitor"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
-            </p>
+            <div class="table-box-wrapper">
+              <el-table
+                :data="tableData"
+                v-loading="loading"
+                style="width: 100%;"
+                :max-height="260"
+                tooltip-effect="light"
+                :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
+              >
+                <el-table-column label="节点" prop="address" min-width="200" align="center" show-overflow-tooltip />
+                <el-table-column label="类型" prop="type" min-width="120" align="center" show-overflow-tooltip />
+                <el-table-column label="状态" prop="status" min-width="120" align="center" show-overflow-tooltip />
+                <el-table-column label="版本" prop="version" min-width="90" align="center" show-overflow-tooltip />
+                <el-table-column label="物理机" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
+                <template #empty>
+                  <div class="table-empty-wrapper">
+                    <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+                    <span class="data-empty-text">暂无数据</span>
+                  </div>
+                </template>
+              </el-table>
+            </div>
           </div>
 
-          <template v-if="tableData.length">
-            <div class="search-form-box">
-              <span class="search-from-label">节点：</span>
-              <el-select v-model="monitorNode" placeholder="全部" style="width: 256px;" @change="handleChangeNode">
-                <el-option v-for="(item, index) in nodeList" :key="`${item.address}(${item.type})_${index}`" :value="item.nodeID" :label="item.address ? `${item.address}(${item.type})` : '全部'" />
-              </el-select>
+          <div class="module-box-wrapper monitor-info-wrapper">
+            <div class="module-title-wrapper">
+              <h4 class="module-title">监控信息</h4>
+              <p class="module-details">
+                <span class="module-label-text">数据截止：</span>
+                <span class="module-content-text m-r-16">{{ monitorTime }}</span>
+                <el-button link @click="handleRefreshMonitor"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+              </p>
             </div>
 
-            <monitor-datanode
-              v-if="currentNodeType === 'datanode'"
-              ref="monitorDatanodeRef"
-              :node="monitorNode"
-              :node-type="currentNodeType"
-              @handleFetch="handleFetch"
-            />
-            <monitor-confignode
-              v-else-if="currentNodeType === 'confignode'"
-              ref="monitorConfignodeRef"
-              :node="monitorNode"
-              :node-type="currentNodeType"
-              @handleFetch="handleFetch"
-            />
-            <monitor-all
-              v-else
-              ref="monitorAllRef"
-              @handleFetch="handleFetch"
-            />
-          </template>
+            <template v-if="tableData.length && enablePrometheus">
+              <div class="search-form-box">
+                <span class="search-from-label">节点：</span>
+                <el-select v-model="monitorNode" placeholder="全部" style="width: 256px;" @change="handleChangeNode">
+                  <el-option v-for="(item, index) in nodeList" :key="`${item.address}(${item.type})_${index}`" :value="item.nodeID" :label="item.address ? `${item.address}(${item.type})` : '全部'" />
+                </el-select>
+              </div>
 
-          <div v-else class="table-empty-wrapper monitor-empty-box">
-            <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-            <span class="data-empty-text">暂无数据</span>
+              <monitor-datanode
+                v-if="currentNodeType === 'datanode'"
+                ref="monitorDatanodeRef"
+                :node="monitorNode"
+                :node-type="currentNodeType"
+                @handleFetch="handleFetch"
+              />
+              <monitor-confignode
+                v-else-if="currentNodeType === 'confignode'"
+                ref="monitorConfignodeRef"
+                :node="monitorNode"
+                :node-type="currentNodeType"
+                @handleFetch="handleFetch"
+              />
+              <monitor-all
+                v-else
+                ref="monitorAllRef"
+                @handleFetch="handleFetch"
+              />
+            </template>
+
+            <div v-else class="table-empty-wrapper monitor-empty-box">
+              <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+              <span class="data-empty-text">暂无数据</span>
+            </div>
           </div>
         </div>
       </el-scrollbar>
@@ -121,12 +123,15 @@
 <script lang="ts" setup>
 import { assign, concat } from 'lodash-es';
 import dayjs from 'dayjs';
+import { useUserStore } from '@/stores';
 import { DashboardApi } from '@/api';
 import { toThousands } from '@/utils/format';
 import MonitorAll from './components/monitor-all.vue';
 import MonitorDatanode from './components/monitor-datanode.vue';
 import MonitorConfignode from './components/monitor-confignode.vue';
 
+const userStore = useUserStore();
+const enablePrometheus = computed(() => userStore.enablePrometheus);
 const systemData = reactive<Dashboard.SystemData>({
   dataNodeRatio: '-',
   configNodeRatio: '-',
@@ -153,14 +158,17 @@ function getMonitorData() {
   monitorTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
   if (currentNodeType.value === 'datanode') {
     nextTick(() => {
+      monitorDatanodeRef.value?.initialAssign();
       monitorDatanodeRef.value?.getInitial();
     });
   } else if (currentNodeType.value === 'confignode') {
     nextTick(() => {
+      monitorConfignodeRef.value?.initialAssign();
       monitorConfignodeRef.value?.getInitial();
     });
   } else {
     nextTick(() => {
+      monitorAllRef.value?.initialAssign();
       monitorAllRef.value?.getInitial();
     });
   }
@@ -312,7 +320,8 @@ onUnmounted(() => {
 }
 
 .monitor-info-wrapper{
-  min-height: calc(100% - 400px);
+  // min-height: calc(100% - 400px);
+  flex: 1;
   display: flex;
   flex-direction: column;
 }
