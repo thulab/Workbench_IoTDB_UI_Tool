@@ -80,7 +80,8 @@
               </p>
             </div>
 
-            <template v-if="tableData.length && enablePrometheus">
+            <!--  v-if="tableData.length && enablePrometheus" -->
+            <div>
               <div class="search-form-box">
                 <span class="search-from-label">节点：</span>
                 <el-select v-model="monitorNode" placeholder="全部" style="width: 256px;" @change="handleChangeNode">
@@ -107,9 +108,9 @@
                 ref="monitorAllRef"
                 @handleFetch="handleFetch"
               />
-            </template>
+            </div>
 
-            <div v-else class="table-empty-wrapper monitor-empty-box">
+            <div v-if="false" class="table-empty-wrapper monitor-empty-box">
               <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
               <span class="data-empty-text">暂无数据</span>
             </div>
@@ -131,6 +132,7 @@ import MonitorDatanode from './components/monitor-datanode.vue';
 import MonitorConfignode from './components/monitor-confignode.vue';
 
 const userStore = useUserStore();
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const enablePrometheus = computed(() => userStore.enablePrometheus);
 const systemData = reactive<Dashboard.SystemData>({
   dataNodeRatio: '-',
@@ -234,9 +236,10 @@ function handleChangeNode(val: string) {
   handleRefreshMonitor();
 }
 
-onMounted(async () => {
-  await getSystemData();
-  getMonitorData();
+onMounted(() => {
+  getSystemData().then(() => {
+    getMonitorData();
+  });
 });
 
 onUnmounted(() => {

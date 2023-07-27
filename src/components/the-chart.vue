@@ -29,9 +29,9 @@ const setOption = (option:ECOption) => {
     chartInstance.setOption(option, true);
   } else {
     // 容器高度有问题时，延迟加载
-    nextTick(() => {
+    setTimeout(() => {
       setOption(option);
-    });
+    }, 100);
   }
 };
 
