@@ -7,7 +7,7 @@
     <el-main class="p-0">
       <el-scrollbar>
         <div class="chart-container-box">
-          <the-chart :option="treeDataOptions" key="memoryChart" />
+          <the-chart :option="treeDataOptions" />
         </div>
       </el-scrollbar>
     </el-main>
@@ -40,5 +40,14 @@ function handleRefresh() {}
     line-height: 21px;
     color: #495AD4;
   }
+}
+
+:deep(.el-scrollbar__view){
+  height: 100%;
+}
+
+.chart-container-box{
+  width: 100%;
+  height: 100%;
 }
 </style>
