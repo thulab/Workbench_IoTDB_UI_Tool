@@ -15,8 +15,9 @@ export const getOptionField = (val: string | number | boolean | undefined | null
   return data ? data[labelField] : '';
 };
 
-export function toThousands(num: number) {
+export function toThousands(num: number, defaultFormat: string = '') {
   if (num === 0) return num;
+  if (!num) return defaultFormat;
   const resNum = `${num}`;
   if (resNum.length < 6) return resNum;
   return resNum.replace(/(\d)(?=(?:\d{3})+$)/g, '$1,');

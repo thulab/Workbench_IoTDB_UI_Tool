@@ -15,7 +15,8 @@
             <li class="system-info-item">
               <el-icon size="24"><i-custom-system-status /></el-icon>
               <span class="module-label-text">服务器状态(Running)：</span>
-              <span class="module-content-text">Datanode {{systemData.dataNodeRatio}}个 Confignode {{ systemData.configNodeRatio}}个</span>
+              <span class="module-content-text" v-if="!systemData.dataNodeRatio && !systemData.configNodeRatio">-</span>
+              <span class="module-content-text" v-else>Datanode {{systemData.dataNodeRatio ? `${systemData.dataNodeRatio}个` : '-'}} Confignode {{ systemData.configNodeRatio ? `${systemData.configNodeRatio}个` : '-'}}</span>
             </li>
             <li class="system-info-item">
               <el-icon size="24"><i-custom-active-status /></el-icon>
@@ -25,22 +26,22 @@
             <li class="system-info-item">
               <el-icon size="24"><i-custom-time /></el-icon>
               <span class="module-label-text">激活到期：</span>
-              <span class="module-content-text">{{ systemData.expirationTime }}</span>
+              <span class="module-content-text">{{ systemData.expirationTime || '-' }}</span>
             </li>
             <li class="system-info-item">
               <el-icon size="24"><i-custom-storage-num /></el-icon>
               <span class="module-label-text">数据库数量：</span>
-              <span class="module-content-text">{{ toThousands(systemData.databaseNum) }}</span>
+              <span class="module-content-text">{{ toThousands(systemData.databaseNum, '-') }}</span>
             </li>
             <li class="system-info-item">
               <el-icon size="24"><i-custom-device-num /></el-icon>
               <span class="module-label-text">设备数量：</span>
-              <span class="module-content-text">{{ toThousands(systemData.deviceNum) }}</span>
+              <span class="module-content-text">{{ toThousands(systemData.deviceNum, '-') }}</span>
             </li>
             <li class="system-info-item">
               <el-icon size="24"><i-custom-measure-num /></el-icon>
               <span class="module-label-text">测点数量：</span>
-              <span class="module-content-text">{{ toThousands(systemData.measurementNum) }}</span>
+              <span class="module-content-text">{{ toThousands(systemData.measurementNum, '-') }}</span>
             </li>
           </ul>
 
@@ -49,7 +50,7 @@
               :data="tableData"
               v-loading="loading"
               style="width: 100%;"
-              :max-height="240"
+              :max-height="260"
               tooltip-effect="light"
               :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
             >
@@ -68,7 +69,7 @@
           </div>
         </div>
 
-        <div class="module-box-wrapper">
+        <div class="module-box-wrapper monitor-info-wrapper">
           <div class="module-title-wrapper">
             <h4 class="module-title">监控信息</h4>
             <p class="module-details">
@@ -78,32 +79,39 @@
             </p>
           </div>
 
-          <div class="search-form-box">
-            <span class="search-from-label">节点：</span>
-            <el-select v-model="monitorNode" placeholder="全部" style="width: 256px;" @change="handleChangeNode">
-              <el-option v-for="(item, index) in nodeList" :key="`${item.address}(${item.type})_${index}`" :value="item.nodeID" :label="item.address ? `${item.address}(${item.type})` : '全部'" />
-            </el-select>
-          </div>
+          <template v-if="tableData.length">
+            <div class="search-form-box">
+              <span class="search-from-label">节点：</span>
+              <el-select v-model="monitorNode" placeholder="全部" style="width: 256px;" @change="handleChangeNode">
+                <el-option v-for="(item, index) in nodeList" :key="`${item.address}(${item.type})_${index}`" :value="item.nodeID" :label="item.address ? `${item.address}(${item.type})` : '全部'" />
+              </el-select>
+            </div>
 
-          <monitor-datanode
-            v-if="currentNodeType === 'datanode'"
-            ref="monitorDatanodeRef"
-            :node="monitorNode"
-            :node-type="currentNodeType"
-            @handleFetch="handleFetch"
-          />
-          <monitor-confignode
-            v-else-if="currentNodeType === 'confignode'"
-            ref="monitorConfignodeRef"
-            :node="monitorNode"
-            :node-type="currentNodeType"
-            @handleFetch="handleFetch"
-          />
-          <monitor-all
-            v-else
-            ref="monitorAllRef"
-            @handleFetch="handleFetch"
-          />
+            <monitor-datanode
+              v-if="currentNodeType === 'datanode'"
+              ref="monitorDatanodeRef"
+              :node="monitorNode"
+              :node-type="currentNodeType"
+              @handleFetch="handleFetch"
+            />
+            <monitor-confignode
+              v-else-if="currentNodeType === 'confignode'"
+              ref="monitorConfignodeRef"
+              :node="monitorNode"
+              :node-type="currentNodeType"
+              @handleFetch="handleFetch"
+            />
+            <monitor-all
+              v-else
+              ref="monitorAllRef"
+              @handleFetch="handleFetch"
+            />
+          </template>
+
+          <div v-else class="table-empty-wrapper monitor-empty-box">
+            <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+            <span class="data-empty-text">暂无数据</span>
+          </div>
         </div>
       </el-scrollbar>
     </el-main>
@@ -162,7 +170,6 @@ function getSystemData() {
   systemTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
   return getSystemInfo().then((res) => {
     assign(systemData, res.data);
-    systemData.expirationTime = res.data.expirationTime || '-';
     tableData.value = res.data.nodes || [];
     nodeList.value = concat([{
       nodeID: '',
@@ -234,6 +241,7 @@ onUnmounted(() => {
   border-radius: 6px;
   background: #FFF;
   padding: 16px;
+  box-sizing: border-box;
 }
 
 .module-title-wrapper{
@@ -299,8 +307,18 @@ onUnmounted(() => {
   }
 }
 
+:deep(.el-scrollbar__view){
+  height: 100%;
+}
+
 .monitor-info-wrapper{
-  min-height: calc(100% - 516px);
+  min-height: calc(100% - 400px);
+  display: flex;
+  flex-direction: column;
+}
+
+.monitor-empty-box{
+  flex: 1;
 }
 </style>
 <style lang="scss">
