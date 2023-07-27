@@ -6,7 +6,6 @@
     class="new-storage-container"
     align-center
     :close-on-click-modal="false"
-    @close="handleClose"
   >
     <div class="import-box">
       <el-steps :active="activeStep" align-center finish-status="success" class="import-step-box">
@@ -20,8 +19,7 @@
       <div class="select-file-box" v-if="activeStep === 0">
         <div class="select-item-box" style="align-items: center;">
           <span class="select-item-label">模板下载：</span>
-          <el-button v-if="false" link class="template-button" @click="downloadTemplate">data _template.csv</el-button>
-          <a href="/api/file/exportMeasurementTemplate" class="template-button" target="_blank">data _template.csv</a>
+          <a href="/api/file/importDataTemplate" class="template-button" target="_blank">data _template.csv</a>
         </div>
         <div class="select-item-box">
           <span class="select-item-label">导入文件：</span>
@@ -68,15 +66,13 @@
         <div class="error-box" v-if="uploadStatus === 'error'">
           <el-icon size="44"><i-custom-error /></el-icon>
           <span class="error-tip" style="color: #D43030;">{{uploadResult.errMsg}}</span>
-          <el-button v-if="false" link style="color: #495AD4;text-decoration: underline;" @click="handleDownError">详情</el-button>
-          <a v-if="uploadResult.filePath" :href="'/api/file/downloadMeasurementErrorInfo?fileName=' + uploadResult.filePath" class="error-link" target="_self" rel="noopener noreferrer">详情</a>
+          <a v-if="uploadResult.filePath" :href="'/api/file/downloadErrorInfo?fileName=' + uploadResult.filePath" class="error-link" target="_self" rel="noopener noreferrer">详情</a>
         </div>
 
         <div class="partial-box" v-if="uploadStatus === 'partial'">
           <el-icon size="44"><i-custom-message-warning /></el-icon>
           <span class="error-tip">导入成功{{uploadResult.successNum}}条数据，导入失败{{uploadResult.failNum}}条数据</span>
-          <el-button v-if="false" link class="error-link" @click="handleDownError">详情</el-button>
-          <a v-if="uploadResult.filePath" :href="'/api/file/downloadMeasurementErrorInfo?fileName=' + uploadResult.filePath" class="error-link" target="_self" rel="noopener noreferrer">详情</a>
+          <a v-if="uploadResult.filePath" :href="'/api/file/downloadErrorInfo?fileName=' + uploadResult.filePath" class="error-link" target="_self" rel="noopener noreferrer">详情</a>
         </div>
       </div>
     </div>
@@ -98,7 +94,7 @@ import { genFileId } from 'element-plus';
 import type {
   UploadInstance, UploadProps, UploadRawFile,
 } from 'element-plus';
-import { StorageApi } from '@/api';
+import { SearchApi } from '@/api';
 
 const props = defineProps<{
   visible: boolean;
@@ -109,7 +105,7 @@ const emit = defineEmits<{
   (e: 'handle-close', reload: boolean): void;
 }>();
 
-const { requestFn: importMeasurementData } = useRequest(StorageApi.importMeasurementData);
+const { requestFn: importQueryData } = useRequest(SearchApi.importQueryData);
 
 const dialogVisible = useVModel(props, 'visible', emit);
 const uploadRef = ref<UploadInstance>();
@@ -123,15 +119,6 @@ const uploadResult = reactive({
   filePath: '',
   errMsg: '',
 });
-
-// 下载模板
-function downloadTemplate() {
-  window.open('/api/file/exportMeasurementTemplate');
-}
-
-function handleDownError() {
-  window.open(`/api/file/downloadMeasurementErrorInfo?fileName=${uploadResult.filePath}`);
-}
 
 const checkValid = (name: string) => {
   const suffix = name.split('.');
@@ -170,7 +157,7 @@ const handleRemove: UploadProps['onRemove'] = () => {
 const customUpload: UploadProps['httpRequest'] = (options) => {
   const formData = new FormData();
   formData.append('file', options.file);
-  return importMeasurementData(formData, isCSV.value ? 'csv' : 'xlsx').then(((res) => {
+  return importQueryData(formData, isCSV.value ? 'csv' : 'xlsx').then(((res) => {
     if (res.code === 0) {
       uploadResult.successNum = res.data.successNum;
       uploadResult.failNum = res.data.failNum;

@@ -39,6 +39,14 @@ class SearchApi {
     return http.post('/file/dataGetExportId', data);
   }
 
+  // 导入
+  static importQueryData(data: FormData, fileType: string = 'csv'): HttpResponseP<StorageDevice.ImportMeasurementDataRes> {
+    if (fileType === 'csv') {
+      return http.post('/file/importDataCSVData', data, { timeout: 60 * 30 * 1000 });
+    }
+    return http.post('/file/importDataExcelData', data, { timeout: 60 * 30 * 1000 });
+  }
+
   // 历史趋势查询
   static getHistoryTrend(data: Search.QueryHistoryTrend): HttpResponseP<Search.QueryHistoryTrendResponse> {
     return http.post('/trend/history', data);

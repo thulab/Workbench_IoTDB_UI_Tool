@@ -9,7 +9,7 @@ import ICustomTrendActive from '@/assets/icons/trend-active.svg?raw';
 import ICustomCalculate from '@/assets/icons/calculate.svg?raw';
 import ICustomCalculateActive from '@/assets/icons/calculate-active.svg?raw';
 import ICustomAuthRole from '@/assets/icons/auth-role.svg?raw';
-import ICustomLogManagement from '@/assets/icons/log-management.svg?raw';
+// import ICustomLogManagement from '@/assets/icons/log-management.svg?raw';
 import ICustomAuditLog from '@/assets/icons/audit-log.svg?raw';
 import ICustomWhiteList from '@/assets/icons/white-list.svg?raw';
 

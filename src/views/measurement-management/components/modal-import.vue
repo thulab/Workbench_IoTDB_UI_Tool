@@ -6,7 +6,6 @@
     class="new-storage-container"
     align-center
     :close-on-click-modal="false"
-    @close="handleClose"
   >
     <div class="import-box">
       <el-steps :active="activeStep" align-center finish-status="success" class="import-step-box">
@@ -20,7 +19,6 @@
       <div class="select-file-box" v-if="activeStep === 0">
         <div class="select-item-box" style="align-items: center;">
           <span class="select-item-label">模板下载：</span>
-          <el-button v-if="false" link class="template-button" @click="downloadTemplate">timeseries_template.csv</el-button>
           <a href="/api/file/exportMeasurementTemplate" class="template-button" target="_blank">timeseries_template.csv</a>
         </div>
         <div class="select-item-box">
@@ -68,15 +66,13 @@
         <div class="error-box" v-if="uploadStatus === 'error'">
           <el-icon size="44"><i-custom-error /></el-icon>
           <span class="error-tip" style="color: #D43030;">{{uploadResult.errMsg}}</span>
-          <el-button v-if="false" link style="color: #495AD4;text-decoration: underline;" @click="handleDownError">详情</el-button>
-          <a v-if="uploadResult.filePath" :href="'/api/file/downloadMeasurementErrorInfo?fileName=' + uploadResult.filePath" class="error-link" target="_self" rel="noopener noreferrer">详情</a>
+          <a v-if="uploadResult.filePath" :href="'/api/file/downloadErrorInfo?fileName=' + uploadResult.filePath" class="error-link" target="_self" rel="noopener noreferrer">详情</a>
         </div>
 
         <div class="partial-box" v-if="uploadStatus === 'partial'">
           <el-icon size="44"><i-custom-message-warning /></el-icon>
           <span class="error-tip">导入成功{{uploadResult.successNum}}条数据，导入失败{{uploadResult.failNum}}条数据</span>
-          <el-button v-if="false" link class="error-link" @click="handleDownError">详情</el-button>
-          <a v-if="uploadResult.filePath" :href="'/api/file/downloadMeasurementErrorInfo?fileName=' + uploadResult.filePath" class="error-link" target="_self" rel="noopener noreferrer">详情</a>
+          <a v-if="uploadResult.filePath" :href="'/api/file/downloadErrorInfo?fileName=' + uploadResult.filePath" class="error-link" target="_self" rel="noopener noreferrer">详情</a>
         </div>
       </div>
     </div>
@@ -123,15 +119,6 @@ const uploadResult = reactive({
   filePath: '',
   errMsg: '',
 });
-
-// 下载模板
-function downloadTemplate() {
-  window.open('/api/file/exportMeasurementTemplate');
-}
-
-function handleDownError() {
-  window.open(`/api/file/downloadMeasurementErrorInfo?fileName=${uploadResult.filePath}`);
-}
 
 const checkValid = (name: string) => {
   const suffix = name.split('.');
