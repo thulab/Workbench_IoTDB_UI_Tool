@@ -75,6 +75,8 @@
           <a v-if="uploadResult.filePath" :href="'/api/file/downloadErrorInfo?fileName=' + uploadResult.filePath" class="error-link" target="_self" rel="noopener noreferrer">详情</a>
         </div>
       </div>
+
+      <p class="error-info-tip" v-if="activeStep === 2 && (uploadStatus === 'error' || uploadStatus === 'partial')">为避免格式错误，推荐使用文本编辑器查看</p>
     </div>
 
     <div class="m-t-12" style="text-align: right;" v-if="activeStep === 0">
@@ -272,6 +274,14 @@ watch(
       margin-top: 4px;
     }
   }
+}
+
+.error-info-tip{
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  color: #D43030;
+  margin: 4px 74px 0;
 }
 
 .select-result-box{
