@@ -515,6 +515,25 @@ function getFile() {
   });
 }
 
+function initialAssign() {
+  cpuData.dataCpu = '';
+  cpuData.configCpu = '';
+  dataNodeMemoryData.dataVal = 0;
+  dataNodeMemoryData.totalVal = 0;
+  dataNodeMemoryData.percent = 0;
+  configNodeMemoryData.dataVal = 0;
+  configNodeMemoryData.totalVal = 0;
+  configNodeMemoryData.percent = 0;
+  dataNodeSystemData.dataVal = 0;
+  dataNodeSystemData.totalVal = 0;
+  dataNodeSystemData.percent = 0;
+  configNodeSystemData.dataVal = 0;
+  configNodeSystemData.totalVal = 0;
+  configNodeSystemData.percent = 0;
+  writeSpeed.value = null;
+  fileTotal.value = null;
+}
+
 function getInitial() {
   Promise.allSettled([
     getCpu(),
@@ -527,5 +546,5 @@ function getInitial() {
   });
 }
 
-defineExpose({ getInitial });
+defineExpose({ getInitial, initialAssign });
 </script>

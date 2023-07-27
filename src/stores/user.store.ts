@@ -33,6 +33,8 @@ export const useUserStore = defineStore('UserStore', () => {
   const pathPrivilegesVals = computed(() => allPrivileges.value?.pathPrivileges || []);
   // 角色
   const rolesToPrivilegesVals = computed(() => allPrivileges.value?.rolesToPrivileges || []);
+  // 是否开启监控
+  const enablePrometheus = computed(() => allPrivileges.value?.enablePrometheus);
 
   // 加载用户权限
   function loadPrivileges(forceReload?: boolean) {
@@ -72,6 +74,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
   return {
     userInfo,
+    enablePrometheus,
     loadPrivileges,
     loadPrivilegesEnum,
     privilegesEnum,

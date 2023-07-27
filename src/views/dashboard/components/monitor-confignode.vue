@@ -13,9 +13,11 @@
     <div class="monitor-chart-box-4" v-loading="cpuLoadLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">CPU 负载</h4>
-        <div class="chart-container-box">
-          <the-chart :option="cpuDataOptions" key="cpuLoad" />
-        </div>
+        <data-container :is-empty="cpuData.dataVal === null">
+          <div class="chart-container-box">
+            <the-chart :option="cpuDataOptions" key="cpuLoad" />
+          </div>
+        </data-container>
       </div>
     </div>
     <div class="monitor-chart-box-4" v-loading="memoryLoading">
@@ -31,9 +33,11 @@
     <div class="monitor-chart-box-4" v-loading="memoryLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">内存使用情况</h4>
-        <div class="chart-container-box">
-          <the-chart :option="memoryDataOptions" key="memoryData" />
-        </div>
+        <data-container :is-empty="memoryData.dataCount === null">
+          <div class="chart-container-box">
+            <the-chart :option="memoryDataOptions" key="memoryData" />
+          </div>
+        </data-container>
       </div>
     </div>
     <div class="monitor-chart-box-4" v-loading="ioLoading">
@@ -76,7 +80,7 @@ const cpuCount = ref();
 const cpuData = reactive<GaugeChartData>({
   themeColor: '#495AD4',
   opacityColor: '#929CE5',
-  dataVal: 0,
+  dataVal: null,
   dataCount: null,
 });
 
@@ -228,13 +232,13 @@ const { requestFn: getMetricDiskIOUsedRate, loading: ioLoading } = useRequest(Da
 
 function getCpu() {
   return getMetricCPU(props.node, props.nodeType).then((res) => {
-    cpuCount.value = res.data?.cpu || null;
+    cpuCount.value = (res.data?.cpu || res.data?.cpu === 0) ? res.data?.cpu : null;
   });
 }
 
 function getCpuLoad() {
   return getMetricCPULoad(props.node, props.nodeType).then((res) => {
-    cpuData.dataVal = res.data.cpuLoad ? transformDecimal(res.data.cpuLoad * 100, 1) : 0;
+    cpuData.dataVal = (res.data.cpuLoad || res.data.cpuLoad === 0) ? transformDecimal(res.data.cpuLoad * 100, 1) : null;
   });
 }
 
@@ -255,6 +259,16 @@ function getIo() {
   });
 }
 
+function initialAssign() {
+  cpuCount.value = null;
+  cpuData.dataVal = null;
+  cpuData.dataCount = null;
+  memoryData.dataVal = 0;
+  memoryData.dataCount = null;
+  diskIOCategory.value = [];
+  diskIOData.value = [];
+}
+
 function getInitial() {
   Promise.allSettled([
     getCpu(),
@@ -266,5 +280,5 @@ function getInitial() {
   });
 }
 
-defineExpose({ getInitial });
+defineExpose({ getInitial, initialAssign });
 </script>
