@@ -5,7 +5,7 @@ import ICustomMeasurementActive from '@/assets/icons/measurement-active.svg?raw'
 
 const route = [
   {
-    path: '/',
+    path: '/measurement-management',
     component: Layout,
     redirect: { name: 'MeasurementManagement' },
     meta: {
@@ -15,7 +15,7 @@ const route = [
     },
     children: [
       {
-        path: 'measurement-management',
+        path: 'list',
         name: 'MeasurementManagement',
         component: () => import('@/views/measurement-management/measurement-management.vue'),
         meta: { keepAlive: true },
