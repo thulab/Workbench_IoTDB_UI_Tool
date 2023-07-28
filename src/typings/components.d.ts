@@ -80,6 +80,7 @@ declare module 'vue' {
     ICustomLogoTitle: typeof import('~icons/custom/logo-title')['default']
     ICustomMeasureNum: typeof import('~icons/custom/measure-num')['default']
     ICustomMessageWarning: typeof import('~icons/custom/message-warning')['default']
+    ICustomModelDoc: typeof import('~icons/custom/model-doc')['default']
     ICustomNavClose: typeof import('~icons/custom/nav-close')['default']
     ICustomNavOpen: typeof import('~icons/custom/nav-open')['default']
     ICustomNewRole: typeof import('~icons/custom/new-role')['default']

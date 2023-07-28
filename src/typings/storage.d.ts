@@ -66,4 +66,19 @@ declare namespace StorageDevice{
     dataType: IotdbDataType;
     viewType: string;
   }
+
+  export interface ModelData {
+    node: string;
+    newNodePath: string;
+    nodeType: string; // database, database_device, device, timeseries, interna
+    deviceCount: number;
+    timeseriesCount: number;
+    timeseriesType: string; // BASE，VIEW
+    dataType: string;
+  }
+
+  export interface GetModelRes {
+    list: ModelData[];
+    hasNext: boolean;
+  }
 }

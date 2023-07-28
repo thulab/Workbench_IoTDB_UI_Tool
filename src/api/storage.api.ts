@@ -87,5 +87,10 @@ class StorageApi {
   static exportMeasurementData(data: Record<string, string | number | Date | null> & PageQuery): HttpResponseP {
     return http.post('/file/measurementDataExportId', data);
   }
+
+  // 数据模型
+  static getDataModelTree(data: { nodePath: string } & PageQuery): HttpResponseP<StorageDevice.GetModelRes> {
+    return http.post('/model/getNextNodes', data);
+  }
 }
 export default StorageApi;
