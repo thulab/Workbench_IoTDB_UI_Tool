@@ -17,8 +17,8 @@
     </el-header>
     <el-main class="p-0">
       <el-scrollbar>
-        <div class="chart-container-box">
-          <the-chart :option="treeDataOptions" />
+        <div class="chart-container-box" v-loading="dataLoading">
+          <the-chart :option="realTreeOptions" :click-func="clickFunction" />
         </div>
       </el-scrollbar>
     </el-main>
@@ -31,8 +31,18 @@ import databaseIcon from '@/assets/icons/model-database.svg';
 import deviceIcom from '@/assets/icons/model-device.svg';
 import baseMeasurementIcom from '@/assets/icons/base-measurement.svg';
 import viewMeasurementIcom from '@/assets/icons/view-measurement.svg';
+import { StorageApi } from '@/api';
 
-const treeDataOptions = computed<ECOption>(() => ({
+const pagination = reactive({
+  pageSize: 10,
+  pageNum: 1,
+});
+const initialTreeDepth = ref(1);
+const treeData = ref<StorageDevice.ModelData[]>([]);
+
+const { requestFn: getDataModelTree, loading: dataLoading } = useRequest(StorageApi.getDataModelTree);
+
+const treeDataOptions = (children: StorageDevice.ModelData[], deep: number = 1) => ({
   tooltip: {
     trigger: 'item',
     triggerOn: 'mousemove',
@@ -41,11 +51,11 @@ const treeDataOptions = computed<ECOption>(() => ({
     borderWidth: 1,
     borderColor: '#DFE1ED',
     formatter: (params: Object) => {
-      const { data } = params as unknown as { data: Record<string, string | boolean | number | any> };
+      const { data } = params as unknown as { data: StorageDevice.ModelData };
       if (data.nodeType === 'database' || data.nodeType === 'internal') {
-        return `<h4 style="font-size: 14px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;margin-right: 24px;"><el-icon size="24"><i-custom-device-num /></el-icon><span style="color: #131926;">设备数量：</span>${data.deviceCount || '-'}</p><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;"><el-icon size="24"><i-custom-measure-num /></el-icon><span style="color: #131926;">测点数量：</span>${data.timeseriesCount || '-'}</p>`;
+        return `<h4 style="font-size: 14px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;margin-right: 24px;"><el-icon size="24"><i-custom-device-num /></el-icon><span style="color: #131926;">设备数量：</span>${(data.deviceCount || data.deviceCount === 0) ? data.deviceCount : '-'}</p><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;"><el-icon size="24"><i-custom-measure-num /></el-icon><span style="color: #131926;">测点数量：</span>${(data.timeseriesCount || data.timeseriesCount) ? data.timeseriesCount : '-'}</p>`;
       } if (data.nodeType === 'device' || data.nodeType === 'database_device') {
-        return `<h4 style="font-size: 14px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;"><el-icon size="24"><i-custom-measure-num /></el-icon><span style="color: #131926;">测点数量：</span>${data.timeseriesCount || '-'}</p>`;
+        return `<h4 style="font-size: 14px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;"><el-icon size="24"><i-custom-measure-num /></el-icon><span style="color: #131926;">测点数量：</span>${(data.timeseriesCount || data.timeseriesCount) ? data.timeseriesCount : '-'}</p>`;
       } if (data.nodeType === 'timeseries') {
         return `<h4 style="font-size: 14px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4><p font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;margin-bottom: 16px;"><span style="color: #131926;">数据类型：</span>${data.dataType || '-'}</p><p font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;margin-bottom: 16px;"><span style="color: #131926;">最新值：</span>${data.value || '-'}</p><p font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;"><span style="color: #131926;">最新值时间：</span>${data.valueTime || '-'}</p>`;
       }
@@ -78,17 +88,21 @@ const treeDataOptions = computed<ECOption>(() => ({
           fontSize: 12,
           padding: [8, 10, 8, 10],
         },
-        children: [],
+        children,
       }],
       expandAndCollapse: true,
-      initialTreeDepth: 2,
+      initialTreeDepth: deep,
       label: {
         position: 'bottom',
         color: '#424561',
+        fontSize: 12,
+        lineHeight: 18,
+        fontWeight: 400,
+        backgroundColor: '#fff',
         borderColor: '#495AD4',
         borderWidth: 1,
         borderRadius: 1,
-        padding: [6, 8, 6, 8],
+        padding: [2, 8, 2, 8],
         verticalAlign: 'middle',
         align: 'center',
         rich: {
@@ -120,34 +134,30 @@ const treeDataOptions = computed<ECOption>(() => ({
             width: 24,
             height: 24,
           },
+          textSpace: {
+            padding: [0, 0, 0, 8],
+          },
+          root: {
+            backgroundColor: '#495AD4',
+            borderRadius: 2,
+            color: '#ffffff',
+            // fontSize: 12,
+            // padding: [8, 10, 8, 10],
+          },
         },
-        formatter: (params: any) => {
+        formatter: (params: { data: StorageDevice.ModelData }) => {
           if (params.data.nodeType === 'database') {
-            return [
-              '{database|}',
-              `${params.data.node}`,
-            ].join('\n');
+            return `{database|}{textSpace|${params.data.node}}`;
           } if (params.data.nodeType === 'database_device') {
-            return [
-              '{database|}',
-              '{device|}',
-              `${params.data.node}`,
-            ].join('\n');
+            return `{database|}{device|}{textSpace|${params.data.node}}`;
           } if (params.data.nodeType === 'device') {
-            return [
-              '{device|}',
-              `${params.data.node}`,
-            ].join('\n');
+            return `{device|}{textSpace|${params.data.node}}`;
           } if (params.data.nodeType === 'timeseries' && params.data.timeseriesType === 'BASE') {
-            return [
-              '{base|}',
-              `${params.data.node}`,
-            ].join('\n');
+            return `{base|}{textSpace|${params.data.node}}`;
           } if (params.data.nodeType === 'timeseries' && params.data.timeseriesType === 'VIEW') {
-            return [
-              '{view|}',
-              `${params.data.node}`,
-            ].join('\n');
+            return `{view|}{textSpace|${params.data.node}}`;
+          // } if (params.data.nodeType === 'root') {
+          //   return `{root|${params.data.node}}`;
           }
           return `${params.data.node}`;
         },
@@ -167,14 +177,94 @@ const treeDataOptions = computed<ECOption>(() => ({
       animationDurationUpdate: 750,
     },
   ],
-}));
+} as ECOption);
+
+const realTreeOptions = computed(() => treeDataOptions(treeData.value, initialTreeDepth.value));
 
 function handleDoc() {
   window.open('https://www.timecho.com/docs/zh/UserGuide/V1.2.x/Basic-Concept/Data-Model-and-Terminology.html');
 }
 
+function getModalTreeData() {
+  getDataModelTree({
+    ...pagination,
+    nodePath: 'root',
+  }).then((res) => {
+    const data = res.data.list || [];
+    if (res.data.hasNext) {
+      data.push({
+        node: '下一页',
+        newNodePath: 'root',
+        nodeType: 'next',
+        pageNum: 1,
+        pageSize: 10,
+        hasNext: true,
+      });
+    }
+    treeData.value = data;
+  });
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function dealData(data: StorageDevice.ModelData[]) {
+  for (let i = 0; i < data.length; i++) {
+    data[i].collapsed = true;
+    if (data[i].children?.length) {
+      if (data[i].hasNext) {
+        data[i].children?.push({
+          node: '下一页',
+          newNodePath: data[i].newNodePath,
+          nodeType: 'next',
+          pageNum: data[i].pageNum,
+          pageSize: data[i].pageSize,
+        });
+      }
+      if (data[i].pageNum !== 1) {
+        data[i].children?.unshift({
+          node: '上一页',
+          newNodePath: data[i].newNodePath.substring(0, data[i].newNodePath.lastIndexOf(data[i].node)),
+          nodeType: 'next',
+          pageNum: data[i].pageNum,
+          pageSize: data[i].pageSize,
+        });
+      }
+    }
+  }
+}
+
+let loading = false;
+function clickFunction(params: { data: StorageDevice.ModelData }) {
+  if (loading) return;
+  loading = true;
+  const data = params.data || {};
+  if (data.nodeType === 'next') {
+    data.pageNum += 1;
+  } else if (data.nodeType === 'pre' && data.pageNum >= 1) {
+    data.pageNum -= 1;
+  } else {
+    data.pageNum = 1;
+    data.pageSize = 10;
+  }
+  getDataModelTree({
+    pageNum: data.pageNum,
+    pageSize: data.pageSize,
+    nodePath: data.newNodePath,
+  }).then((res) => {
+    // res
+    console.log(res);
+  }).finally(() => {
+    loading = false;
+  });
+}
+
 // 刷新
-function handleRefresh() {}
+function handleRefresh() {
+  getModalTreeData();
+}
+
+onMounted(() => {
+  handleRefresh();
+});
 </script>
 
 <style lang="scss" scoped>

@@ -71,10 +71,17 @@ declare namespace StorageDevice{
     node: string;
     newNodePath: string;
     nodeType: string; // database, database_device, device, timeseries, interna
-    deviceCount: number;
-    timeseriesCount: number;
-    timeseriesType: string; // BASE，VIEW
-    dataType: string;
+    deviceCount?: number;
+    timeseriesCount?: number;
+    timeseriesType?: string; // BASE，VIEW
+    dataType?: string;
+    value?: string;
+    valueTime?: string;
+    pageNum: number;
+    pageSize: number;
+    children?: ModelData[];
+    collapsed?: boolean;
+    hasNext?: boolean;
   }
 
   export interface GetModelRes {

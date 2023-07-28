@@ -5,9 +5,6 @@
 <script lang="ts" setup>
 import { vElementSize } from '@vueuse/components';
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
-import {
-  ref, onMounted, onUnmounted, watch, nextTick,
-} from 'vue';
 import { debounce } from 'lodash-es';
 
 const chartContainer = ref<HTMLElement | null>(null);
@@ -15,7 +12,8 @@ let chartInstance: echarts.ECharts;
 
 const props = defineProps<
 {
-  option: ECOption
+  option: ECOption,
+  clickFunc?: Function,
 }>();
 
 const setOption = (option:ECOption) => {
@@ -25,6 +23,12 @@ const setOption = (option:ECOption) => {
   } else if (chartContainer.value && chartContainer.value.clientHeight) {
     // 实例不存在，容器存在，容器高度存在
     chartInstance = echarts.init(chartContainer.value);
+    // 若存在click事件，执行
+    chartInstance.on('click', (params) => {
+      if (props.clickFunc) {
+        props.clickFunc(params);
+      }
+    });
     // 初次加载，设置notMerge为true
     chartInstance.setOption(option, true);
   } else {
