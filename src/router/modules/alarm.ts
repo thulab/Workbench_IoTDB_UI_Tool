@@ -3,7 +3,7 @@ import { Layout } from '@/router/constant-routes';
 import ICustomAlarmConfig from '@/assets/icons/alarm-config.svg?raw';
 import ICustomAlarmRecord from '@/assets/icons/alarm-record.svg?raw';
 import ICustomAlarm from '@/assets/icons/alarm.svg?raw';
-import ICustomAlarmActive from '~icons/custom/alarm-active.svg?raw';
+import ICustomAlarmActive from '@/assets/icons/alarm-active.svg?raw';
 
 const route = [
   {
