@@ -17,8 +17,14 @@
     </el-header>
     <el-main class="p-0">
       <el-scrollbar>
-        <div class="chart-container-box" v-loading="dataLoading">
-          <the-chart :option="realTreeOptions" :click-func="clickFunction" />
+        <div class="model-container" v-loading="initialLoading">
+          <div v-if="treeData.children?.length === 0" class="table-empty-wrapper" style="height: 100%;">
+            <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+            <span class="data-empty-text">暂无数据</span>
+          </div>
+          <div v-else class="chart-container-box" v-loading="dataLoading">
+            <the-chart :option="realTreeOptions" :click-func="clickFunction" />
+          </div>
         </div>
       </el-scrollbar>
     </el-main>
@@ -33,16 +39,33 @@ import baseMeasurementIcom from '@/assets/icons/base-measurement.svg';
 import viewMeasurementIcom from '@/assets/icons/view-measurement.svg';
 import { StorageApi } from '@/api';
 
-const pagination = reactive({
-  pageSize: 10,
-  pageNum: 1,
-});
 const initialTreeDepth = ref(1);
-const treeData = ref<StorageDevice.ModelData[]>([]);
+const treeData = ref<StorageDevice.ModelData>({
+  node: 'root',
+  nodePath: 'root',
+  nodeType: 'root',
+  pageNum: 1,
+  pageSize: 10,
+  children: [],
+});
+const initialLoading = ref(true);
 
 const { requestFn: getDataModelTree, loading: dataLoading } = useRequest(StorageApi.getDataModelTree);
+const { requestFn: getLastValue } = useRequest(StorageApi.getLastValue);
 
-const treeDataOptions = (children: StorageDevice.ModelData[], deep: number = 1) => ({
+const chartWidth = computed(() => {
+  // 2级 200。3级 400 4级 600 以上100％
+  if (initialTreeDepth.value === 1) {
+    return 200;
+  } if (initialTreeDepth.value === 2) {
+    return 400;
+  } if (initialTreeDepth.value === 3) {
+    return 600;
+  }
+  return 'auto';
+});
+
+const treeDataOptions = (detailData: StorageDevice.ModelData, width: number | string, deep: number = 1) => ({
   tooltip: {
     trigger: 'item',
     triggerOn: 'mousemove',
@@ -76,22 +99,10 @@ const treeDataOptions = (children: StorageDevice.ModelData[], deep: number = 1) 
         min: 0.5,
         max: 3,
       },
-      data: [{
-        node: 'root',
-        newNodePath: 'root',
-        nodeType: 'root',
-        label: {
-          show: true,
-          backgroundColor: '#495AD4',
-          borderRadius: 2,
-          color: '#ffffff',
-          fontSize: 12,
-          padding: [8, 10, 8, 10],
-        },
-        children,
-      }],
+      data: [detailData],
       expandAndCollapse: true,
       initialTreeDepth: deep,
+      width,
       label: {
         position: 'bottom',
         color: '#424561',
@@ -137,13 +148,6 @@ const treeDataOptions = (children: StorageDevice.ModelData[], deep: number = 1) 
           textSpace: {
             padding: [0, 0, 0, 8],
           },
-          root: {
-            backgroundColor: '#495AD4',
-            borderRadius: 2,
-            color: '#ffffff',
-            // fontSize: 12,
-            // padding: [8, 10, 8, 10],
-          },
         },
         formatter: (params: { data: StorageDevice.ModelData }) => {
           if (params.data.nodeType === 'database') {
@@ -156,8 +160,6 @@ const treeDataOptions = (children: StorageDevice.ModelData[], deep: number = 1) 
             return `{base|}{textSpace|${params.data.node}}`;
           } if (params.data.nodeType === 'timeseries' && params.data.timeseriesType === 'VIEW') {
             return `{view|}{textSpace|${params.data.node}}`;
-          // } if (params.data.nodeType === 'root') {
-          //   return `{root|${params.data.node}}`;
           }
           return `${params.data.node}`;
         },
@@ -179,33 +181,50 @@ const treeDataOptions = (children: StorageDevice.ModelData[], deep: number = 1) 
   ],
 } as ECOption);
 
-const realTreeOptions = computed(() => treeDataOptions(treeData.value, initialTreeDepth.value));
+const realTreeOptions = computed(() => treeDataOptions(treeData.value, chartWidth.value, initialTreeDepth.value));
 
 function handleDoc() {
   window.open('https://www.timecho.com/docs/zh/UserGuide/V1.2.x/Basic-Concept/Data-Model-and-Terminology.html');
 }
 
 function getModalTreeData() {
+  initialLoading.value = true;
   getDataModelTree({
-    ...pagination,
+    pageNum: 1,
+    pageSize: 10,
     nodePath: 'root',
   }).then((res) => {
     const data = res.data.list || [];
     if (res.data.hasNext) {
       data.push({
         node: '下一页',
-        newNodePath: 'root',
+        nodePath: 'root',
         nodeType: 'next',
         pageNum: 1,
         pageSize: 10,
-        hasNext: true,
       });
     }
-    treeData.value = data;
+    treeData.value = {
+      node: 'root',
+      nodePath: 'root',
+      nodeType: 'root',
+      pageNum: 1,
+      pageSize: 10,
+      collapsed: false,
+      label: {
+        backgroundColor: '#495AD4',
+        borderRadius: 2,
+        color: '#ffffff',
+        fontSize: 12,
+        padding: [3, 10, 3, 10],
+      },
+      children: data.map((item) => ({ ...item, collapsed: true })) || [],
+    };
+  }).finally(() => {
+    initialLoading.value = false;
   });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function dealData(data: StorageDevice.ModelData[]) {
   for (let i = 0; i < data.length; i++) {
     data[i].collapsed = true;
@@ -213,17 +232,17 @@ function dealData(data: StorageDevice.ModelData[]) {
       if (data[i].hasNext) {
         data[i].children?.push({
           node: '下一页',
-          newNodePath: data[i].newNodePath,
+          nodePath: data[i].nodePath,
           nodeType: 'next',
           pageNum: data[i].pageNum,
           pageSize: data[i].pageSize,
         });
       }
-      if (data[i].pageNum !== 1) {
+      if (data[i].hasPre) {
         data[i].children?.unshift({
           node: '上一页',
-          newNodePath: data[i].newNodePath.substring(0, data[i].newNodePath.lastIndexOf(data[i].node)),
-          nodeType: 'next',
+          nodePath: data[i].nodePath,
+          nodeType: 'pre',
           pageNum: data[i].pageNum,
           pageSize: data[i].pageSize,
         });
@@ -232,9 +251,45 @@ function dealData(data: StorageDevice.ModelData[]) {
   }
 }
 
+const deepSearchSelf = (data: StorageDevice.ModelData, path: string, index: number, levelData: StorageDevice.ModelData) => {
+  if (data.nodePath === path) {
+    data.collapsed = !levelData.collapsed;
+    data.children = levelData.children || [];
+    data.pageNum = levelData.pageNum;
+    data.pageSize = levelData.pageSize;
+    initialTreeDepth.value = index;
+  } else {
+    index++;
+    if (data.children && data.children.length) {
+      for (let i = 0; i < data.children.length; i++) {
+        deepSearchSelf(data.children[i], path, index, levelData);
+      }
+    }
+  }
+};
+
+async function getLast(deviceName: string, measurementName: string, viewType: string = 'BASE') {
+  const data = {
+    value: '',
+    valueTime: '',
+  };
+  await getLastValue(deviceName, measurementName, viewType).then((newRes) => {
+    data.value = newRes.data.value || '-';
+    data.valueTime = newRes.data.valueTime || '-';
+  });
+  return data;
+}
+
 let loading = false;
 function clickFunction(params: { data: StorageDevice.ModelData }) {
   if (loading) return;
+  if (params.data.nodeType !== 'next' && params.data.nodeType !== 'pre') {
+    if (params.data.nodeType === 'timeseries') return;
+    if (!params.data.collapsed) {
+      params.data.collapsed = false;
+      return;
+    }
+  }
   loading = true;
   const data = params.data || {};
   if (data.nodeType === 'next') {
@@ -248,10 +303,47 @@ function clickFunction(params: { data: StorageDevice.ModelData }) {
   getDataModelTree({
     pageNum: data.pageNum,
     pageSize: data.pageSize,
-    nodePath: data.newNodePath,
+    nodePath: data.nodePath,
   }).then((res) => {
-    // res
-    console.log(res);
+    const list = res.data.list || [];
+    const promiseQueue: Array<Promise<{
+      value: string;
+      valueTime: string;
+    }>> = [];
+    list.forEach((item) => {
+      item.collapsed = true;
+      if (item.nodeType === 'timeseries') {
+        promiseQueue.push(getLast(data.nodePath, item.node, item.timeseriesType));
+      }
+    });
+    if (promiseQueue.length) {
+      Promise.allSettled(promiseQueue).then((results) => {
+        data.children = list.map((r, i) => {
+          if (results[i]?.status === 'fulfilled') {
+            return { ...r, value: results[i]?.value.value, valueTime: results[i]?.value.valueTime };
+          }
+          return { ...r };
+        });
+        data.pageNum = res.data.pageNum;
+        data.pageSize = res.data.pageSize;
+        data.hasNext = res.data.hasNext;
+        data.hasPre = res.data.hasPre;
+        dealData([data]);
+        if (data.children?.length) {
+          deepSearchSelf(treeData.value, data.nodePath, 1, { ...data });
+        }
+      });
+    } else {
+      data.children = list;
+      data.pageNum = res.data.pageNum;
+      data.pageSize = res.data.pageSize;
+      data.hasNext = res.data.hasNext;
+      data.hasPre = res.data.hasPre;
+      dealData([data]);
+      if (data.children?.length) {
+        deepSearchSelf(treeData.value, data.nodePath, 1, { ...data });
+      }
+    }
   }).finally(() => {
     loading = false;
   });
@@ -259,6 +351,15 @@ function clickFunction(params: { data: StorageDevice.ModelData }) {
 
 // 刷新
 function handleRefresh() {
+  treeData.value = {
+    node: 'root',
+    nodePath: 'root',
+    nodeType: 'root',
+    pageNum: 1,
+    pageSize: 10,
+    children: [],
+  };
+  initialTreeDepth.value = 1;
   getModalTreeData();
 }
 
@@ -287,6 +388,11 @@ onMounted(() => {
 }
 
 :deep(.el-scrollbar__view){
+  height: 100%;
+}
+
+.model-container{
+  width: 100%;
   height: 100%;
 }
 
