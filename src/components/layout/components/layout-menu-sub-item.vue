@@ -8,8 +8,8 @@
         :index="subItem.path">
         <template #title>
           <el-icon v-if="subItem.icon">
-            <i class="active" v-if="isCollapse && subItem.activeIcon" v-html="subItem.activeIcon"></i>
-            <i class="normal" v-html="subItem.icon"></i>
+            <i v-if="isCollapse && subItem.activeIcon && rootMenu?.activeIndex?.indexOf(subItem.path) == 0" v-html="subItem.activeIcon"></i>
+            <i v-else v-html="subItem.icon"></i>
           </el-icon>
           <span>{{ subItem.title }}</span>
         </template>
@@ -22,8 +22,8 @@
 
         :index="subItem.path">
         <el-icon v-if="subItem.icon">
-          <i class="active" v-if="isCollapse && subItem.activeIcon" v-html="subItem.activeIcon"></i>
-          <i class="normal" v-html="subItem.icon"></i>
+          <i v-if="isCollapse && subItem.activeIcon && subItem.path === rootMenu?.activeIndex" v-html="subItem.activeIcon"></i>
+          <i v-else v-html="subItem.icon"></i>
         </el-icon>
         <template
           v-if="!subItem.isLink"
@@ -46,10 +46,12 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { type MenuProvider } from 'element-plus';
 import useMenuStore from '@/stores/menu';
 
 const menuStore = useMenuStore();
 const isCollapse = computed((): boolean => menuStore.isCollapse);
+const rootMenu = inject<MenuProvider>('rootMenu');
 
 const props = defineProps<{ menuList: MenuOptions[] }>();
 

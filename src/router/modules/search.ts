@@ -3,7 +3,7 @@ import { Layout } from '@/router/constant-routes';
 import ICustomQueryData from '@/assets/icons/query-data.svg?raw';
 import ICustomQuerySQL from '@/assets/icons/query-sql.svg?raw';
 import ICustomQuery from '@/assets/icons/query.svg?raw';
-import ICustomQueryActive from '~icons/custom/query-active.svg?raw';
+import ICustomQueryActive from '@/assets/icons/query-active.svg?raw';
 
 const route = [
   {
