@@ -2,51 +2,46 @@
   <el-dialog
     title="添加路径"
     v-model="dialogVisible"
-    width="480px"
+    width="600px"
     align-center
     :close-on-click-modal="false"
   >
 
-    <el-radio-group v-model="pathType" @change="handleChangePath" class="path-radio-group">
+    <el-radio-group v-model="pathType" class="path-radio-group">
+      <el-radio label="input">
+        <span class="radio-label">路径模式：<el-tooltip effect="light" content="支持使用“*、**”进行模糊匹配，“*”代表一层，“**”代表一层或多层" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
+        <el-input v-model="inputPath" placeholder='请输入序列路径，支持使用"*、**"进行模糊匹配，例如"root.ln.d1.*/root.ln.d1.**"' style="width: 466px;" class="path-input">
+          <!-- <template #prepend>root.</template> -->
+        </el-input>
+      </el-radio>
       <el-radio label="select">
-        <span class="radio-label">已有路径：<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
+        <span class="radio-label">精确路径：<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
         <div class="search-path-box">
-          <el-select-v2 v-model="searchType" class="path-type-select" style="width: 88px;" placeholder="" :options="pathOptions" @change="handleChangeType">
-            <template #default="{ item }">
-              <div style="display: flex; width: 56px;">
-                <text-tooltip :content="item.label" />
-              </div>
-            </template>
-          </el-select-v2>
           <el-select
             v-model="selectPath"
-            placeholder="请输入完整路径"
+            placeholder="请输入精确路径"
             filterable
             remote
             clearable
             collapse-tags
             :remote-show-suffix="false"
             :remote-method="remoteMethod"
-            style="width: 258px;"
+            :loading="measurementLoading"
+            style="width: 466px;"
             class="path-select"
           >
             <template #prefix>
               <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
             </template>
-            <el-option v-for="item in options" :key="item" :label="item" :value="item">
-              <div style="display: flex; width: 200px;">
-                <text-tooltip :content="item" />
+            <el-option v-for="item in options" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries">
+              <div style="display: flex; width: 400px;">
+                <text-tooltip :content="item.timeseries" />
               </div>
             </el-option>
           </el-select>
         </div>
       </el-radio>
-      <el-radio label="input">
-        <span class="radio-label">路径模式：</span>
-        <el-input v-model="inputPath" placeholder="请输入完整路径" @change="handleInputPath" style="width: 346px;" class="path-input">
-          <template #prepend>root.</template>
-        </el-input>
-      </el-radio>
+
     </el-radio-group>
 
     <template #footer>
@@ -59,6 +54,7 @@
 </template>
 
 <script lang="ts" setup>
+import { debounce } from 'lodash-es';
 import { StorageApi } from '@/api';
 
 const props = defineProps<{
@@ -73,104 +69,32 @@ const emit = defineEmits<{
 
 const dialogVisible = useVModel(props, 'visible', emit);
 
-const pathOptions = [
-  { label: 'database', value: 'database' },
-  { label: 'device', value: 'device' },
-  { label: 'timeseries', value: 'timeseries' },
-];
-
 const pathType = ref('select');
 const inputPath = ref('');
 const selectPath = ref('');
-const searchType = ref('database');
-const options = ref<string[]>([]);
+const options = ref<StorageDevice.MeasurementDataItem[]>([]);
 
-const { requestFn: getGroup } = useRequest(StorageApi.getStorageGroups);
-const { requestFn: getDevice } = useRequest(StorageApi.getDeviceByGroup);
-const { requestFn: getMeasurement } = useRequest(StorageApi.getMeasurementAllList);
+const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementAllObjList);
 
 let lastQuery = '';
-// 获取数据库
-const getStorageList = (query: string) => {
-  getGroup({}).then((res) => {
-    if (lastQuery === query) {
-      const data = res.data?.pathNames.filter((item) => item !== 'root.__system') || [];
-      options.value = data.filter((item) => item.includes(query));
-    }
-  });
-};
-
-// 查询设备
-const getDeviceList = (query: string) => {
-  getDevice({
-    groupName: 'root',
-    keyword: query,
-    pageNum: 1,
-    pageSize: 100,
-  }).then((res) => {
-    if (lastQuery === query) {
-      options.value = res.data?.pathNames || [];
-    }
-  });
-};
-
-// 查询测点
-const getMeasurementList = (query: string) => {
-  getMeasurement(query).then((res) => {
+// 查询数据
+const remoteMethod = debounce((query: string) => {
+  lastQuery = query;
+  getMeasurement(lastQuery).then((res) => {
     if (lastQuery === query) {
       options.value = res.data?.measurements || [];
     }
   });
-};
-
-// 查询数据
-const remoteMethod = (query: string) => {
-  options.value = [];
-  lastQuery = query;
-  if (searchType.value === 'database') {
-    getStorageList(lastQuery);
-  } else if (searchType.value === 'device') {
-    getDeviceList(lastQuery);
-  } else {
-    getMeasurementList(lastQuery);
-  }
-};
-
-// 变更路径查询方式
-function handleChangePath() {
-  // inputPath.value = '';
-  // selectPath.value = '';
-}
-
-// 已有路径搜索方式变更
-function handleChangeType() {
-  inputPath.value = '';
-  selectPath.value = '';
-  remoteMethod('');
-}
-
-function handleInputPath(val: string) {
-  const res = val.replace(/(\s*$)/g, '');
-  const reg = /[.|*]$/;
-  if (reg.test(res)) {
-    inputPath.value = '';
-  } else {
-    inputPath.value = res;
-  }
-}
+}, 500);
 
 const handleConfirm = () => {
-  let res = selectPath.value;
-  if (pathType.value === 'input') {
-    handleInputPath(inputPath.value);
-    res = inputPath.value;
+  let res = inputPath.value;
+  if (pathType.value === 'select') {
+    res = selectPath.value;
   }
   if (!res) {
     ElMessage.error('路径不能为空');
     return;
-  }
-  if (pathType.value === 'input') {
-    res = `root.${inputPath.value}`;
   }
   const flag = props.pathList.some((item) => item === res);
   if (flag) {
@@ -186,7 +110,6 @@ watch(
   (newVal) => {
     if (newVal) {
       pathType.value = 'select';
-      searchType.value = 'database';
       inputPath.value = '';
       selectPath.value = '';
       options.value = [];
@@ -222,6 +145,11 @@ watch(
 
   :deep(.el-radio:last-child) {
     margin: 0;
+  }
+
+  :deep(.el-radio__label) {
+    display: inline-flex;
+    align-items: center;
   }
 }
 
