@@ -84,6 +84,7 @@ declare namespace StorageDevice{
     hasNext?: boolean;
     hasPre?: boolean;
     label?: Object;
+    leafDeep?: number;
   }
 
   export interface GetModelRes {
