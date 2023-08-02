@@ -1,6 +1,7 @@
 import { Layout } from '@/router/constant-routes';
 // 采用raw加载svg文件，v-html渲染
-import ICustomAlarmConfig from '@/assets/icons/alarm-config.svg?raw';
+import ICustomDashboard from '@/assets/icons/dashboard.svg?raw';
+import ICustomDashboardActive from '@/assets/icons/dashboard-active.svg?raw';
 
 const route = [
   {
@@ -8,10 +9,10 @@ const route = [
     component: Layout,
     redirect: { name: 'Dashboard' },
     meta: {
-      title: 'dashboard',
-      icon: ICustomAlarmConfig,
-      activeIcon: ICustomAlarmConfig,
-      hiddenMenu: true,
+      title: '首页',
+      icon: ICustomDashboard,
+      activeIcon: ICustomDashboardActive,
+      // hiddenMenu: true,
       order: 5,
     },
     children: [
@@ -19,7 +20,7 @@ const route = [
         path: 'dashboard',
         name: 'Dashboard',
         component: () => import('@/views/dashboard/the-dashboard.vue'),
-        meta: { keepAlive: true, title: 'dashboard', icon: ICustomAlarmConfig },
+        meta: { keepAlive: true, title: 'dashboard', icon: ICustomDashboard },
       },
     ],
   },
