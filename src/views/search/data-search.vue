@@ -339,7 +339,7 @@ function getListData() {
 function handleReset() {
   searchFormRef.value?.resetFields();
   searchFormData.time = todayNow();
-  searchFormData.datetimerange = [new Date('1970-1-1').getTime(), todayNow()] as [DateModelType, DateModelType];
+  searchFormData.datetimerange = ['1970-01-01 00:00:00', todayNow()] as [DateModelType, DateModelType];
 }
 
 // 查询
@@ -445,7 +445,7 @@ function handleTimeType(type: 'datetime' | 'datetimerange') {
   if (timeType.value === type || getListLoading.value) return;
   timeType.value = type;
   searchFormData.time = todayNow();
-  searchFormData.datetimerange = [new Date('1970-1-1').getTime(), todayNow()] as [DateModelType, DateModelType];
+  searchFormData.datetimerange = ['1970-01-01 00:00:00', todayNow()] as [DateModelType, DateModelType];
 }
 // 下载
 function handleCommandDown(val: string) {
