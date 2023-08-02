@@ -5,6 +5,8 @@ import useAppStore from '@/stores/app';
 
 const appStore = useAppStore();
 zhCn.el.pagination.goto = '跳至';
+zhCn.el.select.noData = '暂无数据';
+zhCn.el.select.noMatch = '暂无数据';
 const locale = computed(() => zhCn);
 
 </script>
