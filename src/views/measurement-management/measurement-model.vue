@@ -77,7 +77,7 @@ const chartWidth = computed(() => {
   return 'auto';
 });
 
-const treeDataOptions = (detailData: StorageDevice.ModelData, width: number | string, deep: number = 1) => ({
+const treeDataOptions = (detailData: StorageDevice.ModelData, width: number | 'auto', deep: number = 1) => ({
   tooltip: {
     trigger: 'item',
     triggerOn: 'mousemove',
@@ -388,8 +388,12 @@ function clickFunction(params: { data: StorageDevice.ModelData }) {
       Promise.allSettled(promiseQueue).then((results) => {
         data.children = list.map((r, i) => {
           if (results[i]?.status === 'fulfilled') {
+            const resultItem = results[i] as PromiseFulfilledResult<{
+              value: string;
+              valueTime: string;
+            }>;
             return {
-              ...r, leafDeep: data.leafDeep!, value: results[i]?.value.value, valueTime: results[i]?.value.valueTime,
+              ...r, leafDeep: data.leafDeep!, value: resultItem.value.value, valueTime: resultItem.value.valueTime,
             };
           }
           return { ...r, leafDeep: data.leafDeep! };
