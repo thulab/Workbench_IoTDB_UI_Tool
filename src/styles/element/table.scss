@@ -34,3 +34,8 @@
 .el-table .descending .sort-caret.descending{
   border-top-color: #495AD4 !important;
 }
+
+.el-table__header, .el-table__body, .el-table__footer{
+  width: 100% !important;
+  table-layout: fixed !important;
+}
