@@ -105,8 +105,8 @@ const treeDataOptions = (detailData: StorageDevice.ModelData, width: number | st
       top: '1%',
       left: '7%',
       bottom: '1%',
-      right: '20%',
-      roam: true,
+      right: '7%',
+      roam: false,
       scaleLimit: {
         min: 0.5,
         max: 3,
@@ -430,6 +430,7 @@ function handleRefresh() {
     children: [],
   };
   // initialTreeDepth.value = 1;
+  deepList.value = [];
   getModalTreeData();
 }
 
@@ -469,5 +470,6 @@ onMounted(() => {
 .chart-container-box{
   width: 100%;
   height: 100%;
+  overflow: auto;
 }
 </style>
