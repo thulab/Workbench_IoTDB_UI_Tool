@@ -8,7 +8,7 @@
   </div>
 
   <ul class="storage-list-box" :loading="storageLoading">
-    <li v-for="item in storageList" :key="item" :class="['storage-item-box', currentStorage === item && 'storage-item-box-active']" @click="handleSelectStorage(item)">
+    <li v-for="item in storageList" :key="item" :class="['storage-item-box', currentStorage === item && 'storage-item-box-active']" @click="e => handleSelectStorage(item, e)">
       <span class="storage-item-text"><text-tooltip :content="item" /></span>
       <div class="storage-item-delete-box" @click="handleDeleteStorage(item)">
         <i-custom-delete class="storage-item-delete" />
@@ -57,6 +57,20 @@ function handleAddStorage() {
   emit('handleAddStorage');
 }
 
+const canStopPropagation = (e: HTMLElement):boolean => {
+  const { classList } = e;
+
+  if (classList.contains('storage-item-delete-box')
+      || classList.contains('storage-item-delete')
+      || classList.contains('storage-item-delete-active')) {
+    return true;
+  }
+  if ((e.tagName === 'path' || e.tagName === 'g') && e.parentElement) {
+    return canStopPropagation(e.parentElement);
+  }
+  return false;
+};
+
 // 删除数据库
 function handleDeleteStorage(item: string) {
   if (item === 'root.__system') return;
@@ -77,7 +91,8 @@ function handleDeleteStorage(item: string) {
 }
 
 // 选择
-function handleSelectStorage(item: string) {
+function handleSelectStorage(item: string, e: MouseEvent) {
+  if (canStopPropagation(e.target as HTMLElement)) return;
   currentStorage.value = item;
 }
 
