@@ -17,6 +17,7 @@
     v-if="isExpand"
     class="m-b-8"
     v-model="isCheckAll"
+    :indeterminate="isIndeterminate"
     label="全选"
     :disabled="!allCheckAbled"
     @change="handleCheckedAll"
@@ -97,6 +98,18 @@ const listKey = ref(0);
 const pathList = useVModel(props, 'modelValue');
 const isExpand = useVModel(props, 'isExpand', emit);
 const isCheckAll = ref(false);
+const isIndeterminate = computed(() => {
+  if (pathList.value.length === 0) return false;
+  const allLength = pathList.value.length;
+  const checkedLength = pathList.value.filter((item) => item.checked).length;
+  if (allLength === 0 || checkedLength === 0) return false;
+  if (checkedLength === allLength) {
+    isCheckAll.value = true;
+  } else {
+    isCheckAll.value = false;
+  }
+  return checkedLength > 0 && checkedLength < allLength;
+});
 
 const allCheckAbled = computed(() => pathList.value.length > 0 && pathList.value.filter((item) => !item.disabled).length > 0);
 
