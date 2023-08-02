@@ -48,36 +48,26 @@ const treeData = ref<StorageDevice.ModelData>({
   children: [],
 });
 const initialLoading = ref(true);
-const deepList = ref<number[]>([]);
 
 const { requestFn: getDataModelTree, loading: dataLoading } = useRequest(StorageApi.getDataModelTree);
 const { requestFn: getLastValue } = useRequest(StorageApi.getLastValue);
 
-const initialTreeDepth = computed(() => {
-  if (deepList.value.length === 0) {
-    return 0;
-  }
-  const maxValue = deepList.value.reduce((max, cur) => {
-    if (cur > max) { return cur; }
-    return max;
-  }, 0);
-  return maxValue;
-});
+const maxExpandLevel = ref(0);
 
 const chartWidth = computed(() => {
   // 2级 200。3级 400 4级 600 以上100％
-  if (initialTreeDepth.value < 1) {
+  if (maxExpandLevel.value < 1) {
     return 200;
   }
-  if (initialTreeDepth.value === 1) {
+  if (maxExpandLevel.value === 1) {
     return 400;
-  } if (initialTreeDepth.value === 2) {
+  } if (maxExpandLevel.value === 2) {
     return 600;
   }
   return 'auto';
 });
 
-const treeDataOptions = (detailData: StorageDevice.ModelData, width: number | 'auto', deep: number = 1) => ({
+const treeDataOptions = (detailData: StorageDevice.ModelData, width: number | 'auto') => ({
   tooltip: {
     trigger: 'item',
     triggerOn: 'mousemove',
@@ -88,9 +78,9 @@ const treeDataOptions = (detailData: StorageDevice.ModelData, width: number | 'a
     formatter: (params: Object) => {
       const { data } = params as unknown as { data: StorageDevice.ModelData };
       if (data.nodeType === 'database' || data.nodeType === 'internal') {
-        return `<h4 style="font-size: 14px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;margin-right: 24px;"><el-icon size="24"><i-custom-device-num /></el-icon><span style="color: #131926;">设备数量：</span>${(data.deviceCount || data.deviceCount === 0) ? data.deviceCount : '-'}</p><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;"><el-icon size="24"><i-custom-measure-num /></el-icon><span style="color: #131926;">测点数量：</span>${(data.timeseriesCount || data.timeseriesCount) ? data.timeseriesCount : '-'}</p>`;
+        return `<h4 style="font-size: 14px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;margin-right: 24px;"><el-icon size="24"><i-custom-device-num /></el-icon><span style="color: #131926;">设备数量：</span>${(data.deviceCount || data.deviceCount === 0) ? data.deviceCount : '-'}</p><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;"><el-icon size="24"><i-custom-measure-num /></el-icon><span style="color: #131926;">测点数量：</span>${(data.timeseriesCount || data.timeseriesCount === 0) ? data.timeseriesCount : '-'}</p>`;
       } if (data.nodeType === 'device' || data.nodeType === 'database_device') {
-        return `<h4 style="font-size: 14px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;"><el-icon size="24"><i-custom-measure-num /></el-icon><span style="color: #131926;">测点数量：</span>${(data.timeseriesCount || data.timeseriesCount) ? data.timeseriesCount : '-'}</p>`;
+        return `<h4 style="font-size: 14px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;"><el-icon size="24"><i-custom-measure-num /></el-icon><span style="color: #131926;">测点数量：</span>${(data.timeseriesCount || data.timeseriesCount === 0) ? data.timeseriesCount : '-'}</p>`;
       } if (data.nodeType === 'timeseries') {
         return `<h4 style="font-size: 14px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4><p font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;margin-bottom: 16px;"><span style="color: #131926;">数据类型：</span>${data.dataType || '-'}</p><p font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;margin-bottom: 16px;"><span style="color: #131926;">最新值：</span>${data.value || '-'}</p><p font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;"><span style="color: #131926;">最新值时间：</span>${data.valueTime || '-'}</p>`;
       }
@@ -113,7 +103,7 @@ const treeDataOptions = (detailData: StorageDevice.ModelData, width: number | 'a
       },
       data: [detailData],
       expandAndCollapse: true,
-      initialTreeDepth: deep,
+      initialTreeDepth: 1,
       width,
       label: {
         position: 'bottom',
@@ -193,10 +183,36 @@ const treeDataOptions = (detailData: StorageDevice.ModelData, width: number | 'a
   ],
 } as ECOption);
 
-const realTreeOptions = computed(() => treeDataOptions(treeData.value, chartWidth.value, 1));
+const realTreeOptions = computed(() => treeDataOptions(treeData.value, chartWidth.value));
 
 function handleDoc() {
   window.open('https://www.timecho.com/docs/zh/UserGuide/V1.2.x/Basic-Concept/Data-Model-and-Terminology.html');
+}
+// 获取数据模型树当前展开的最大层级, 如果大于 2 就直接返回 3，用于设定宽度
+
+function getMaxExpandLevel(data: StorageDevice.ModelData, level = 0) {
+  // 如果节点为叶子节点，返回当前层级
+  if (!data.children || data.children.length === 0) {
+    return level;
+  }
+
+  let maxLevel = level;
+  // 遍历子节点
+  for (let i = 0; i < data.children.length; i++) {
+    const child = data.children[i];
+    // 如果子节点是展开状态
+    if (child.collapsed === false && child.children && child.children.length > 0) {
+      // 递归获取子节点的最大展开层级
+      const childLevel = getMaxExpandLevel(child, level + 1);
+      // 更新最大层级
+      maxLevel = Math.max(maxLevel, childLevel);
+      if (maxLevel > 2) {
+        return 3;
+      }
+    }
+  }
+
+  return maxLevel;
 }
 
 function getModalTreeData() {
@@ -281,34 +297,6 @@ const deepSearchSelf = (data: StorageDevice.ModelData, path: string, index: numb
   }
 };
 
-const pushDeepList = (depth: number) => {
-  deepList.value.push(depth);
-};
-
-const removeDeepList = (depth: number) => {
-  const i = deepList.value.findIndex((da) => da === depth);
-  if (i !== -1) {
-    deepList.value.splice(i, 1);
-  }
-};
-
-const deepDepthSelf = (data: StorageDevice.ModelData[], topCollapsed: Boolean) => {
-  data.forEach((item) => {
-    if (item.children && item.children.length > 0) {
-      if (!item.collapsed) {
-        if (!topCollapsed) {
-          pushDeepList(item.leafDeep!);
-        } else {
-          removeDeepList(item.leafDeep!);
-        }
-        if (item.children) {
-          deepDepthSelf(item.children, topCollapsed);
-        }
-      }
-    }
-  });
-};
-
 async function getLast(deviceName: string, measurementName: string, viewType: string = 'BASE') {
   const data = {
     value: '',
@@ -349,13 +337,11 @@ function clickFunction(params: { data: StorageDevice.ModelData }) {
     if (params.data.nodeType === 'timeseries') return;
     if (!params.data.collapsed) {
       setCollapsed(params.data, true);
-      removeDeepList(params.data.leafDeep || -1);
-      deepDepthSelf(params.data.children || [], params.data.collapsed!);
+      maxExpandLevel.value = getMaxExpandLevel(treeData.value, 0);
       return;
     }
     setCollapsed(params.data, false);
-    pushDeepList(params.data.leafDeep || -1);
-    deepDepthSelf(params.data.children || [], params.data.collapsed!);
+    maxExpandLevel.value = getMaxExpandLevel(treeData.value, 0);
     if (params.data.children && params.data.children.length !== 0) { return; }
   }
   loading = true;
@@ -417,6 +403,7 @@ function clickFunction(params: { data: StorageDevice.ModelData }) {
       if (data.children?.length) {
         deepSearchSelf(treeData.value, data.nodePath, 1, { ...data });
       }
+      maxExpandLevel.value = getMaxExpandLevel(treeData.value, 0);
     }
   }).finally(() => {
     loading = false;
@@ -434,7 +421,7 @@ function handleRefresh() {
     children: [],
   };
   // initialTreeDepth.value = 1;
-  deepList.value = [];
+  maxExpandLevel.value = 0;
   getModalTreeData();
 }
 
