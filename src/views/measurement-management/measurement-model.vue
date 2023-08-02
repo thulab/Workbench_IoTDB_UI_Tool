@@ -392,6 +392,7 @@ function clickFunction(params: { data: StorageDevice.ModelData }) {
         if (data.children?.length) {
           deepSearchSelf(treeData.value, data.nodePath, 1, { ...data });
         }
+        maxExpandLevel.value = getMaxExpandLevel(treeData.value, 0);
       });
     } else {
       data.children = list.map((item) => ({ ...item, leafDeep: data.leafDeep ? (data.leafDeep + 1) : 1 }));
