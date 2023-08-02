@@ -37,7 +37,7 @@
           <br>
           <li class="storage-info-item"><el-icon size="24"><i-custom-device-num /></el-icon><span class="storage-info-item-label">设备数量：</span>{{ storageInfos?.deviceCount || 0 }}</li>
           <li class="storage-info-item"><el-icon size="24"><i-custom-measure-num /></el-icon><span class="storage-info-item-label">测点数量：</span>{{ storageInfos?.measurementCount || 0 }}</li>
-          <li class="storage-info-item"><el-icon size="24"><i-custom-total-num /></el-icon><span class="storage-info-item-label">数据总量：</span>{{ storageInfos?.dataCount || 0 }}</li>
+          <li class="storage-info-item"><el-icon size="24"><i-custom-total-num /></el-icon><span class="storage-info-item-label">数据总量：</span>{{ !storageInfos?.dataCount || storageInfos?.dataCount < 0 ? 0 : storageInfos?.dataCount}}</li>
         </ul>
 
         <div class="page-detail-buttons">
