@@ -1,7 +1,7 @@
 <template>
-  <el-container class="details-wrapper">
-    <el-main class="p-0">
-      <el-scrollbar>
+  <el-scrollbar>
+    <el-container class="details-wrapper">
+      <el-main class="p-16">
         <div style="display: flex; flex-direction: column; height: 100%;">
           <div class="module-box-wrapper m-b-16" v-loading="loading">
             <div class="module-title-wrapper">
@@ -116,9 +116,9 @@
             </div>
           </div>
         </div>
-      </el-scrollbar>
-    </el-main>
-  </el-container>
+      </el-main>
+    </el-container>
+  </el-scrollbar>
 </template>
 
 <script lang="ts" setup>
