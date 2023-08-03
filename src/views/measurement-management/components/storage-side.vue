@@ -10,7 +10,7 @@
   <ul class="storage-list-box" :loading="storageLoading">
     <li v-for="item in storageList" :key="item" :class="['storage-item-box', currentStorage === item && 'storage-item-box-active']" @click="e => handleSelectStorage(item, e)">
       <span class="storage-item-text"><text-tooltip :content="item" /></span>
-      <div class="storage-item-delete-box" @click="handleDeleteStorage(item)">
+      <div class="storage-item-delete-box" :style="{ cursor: item === 'root.__system' ? 'not-allowed' : 'pointer' }" @click="handleDeleteStorage(item)">
         <i-custom-delete class="storage-item-delete" />
         <i-custom-delete-active class="storage-item-delete-active" />
       </div>
