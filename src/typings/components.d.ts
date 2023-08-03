@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     BaseFormItem: typeof import('./../components/base-form-item.vue')['default']
+    copy: typeof import('./../components/layout/the-layout copy.vue')['default']
     DynamicTable: typeof import('./../components/dynamic-table.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']
@@ -134,6 +135,7 @@ declare module 'vue' {
     TextTooltip: typeof import('./../components/text-tooltip.vue')['default']
     TheChart: typeof import('./../components/the-chart.vue')['default']
     TheLayout: typeof import('./../components/layout/the-layout.vue')['default']
+    TheLayout2: typeof import('./../components/layout/the-layout2.vue')['default']
     TimeseriesSelect: typeof import('./../components/timeseries-select.vue')['default']
   }
   export interface ComponentCustomProperties {
