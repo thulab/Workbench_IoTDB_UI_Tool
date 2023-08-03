@@ -36,7 +36,7 @@
       </div>
     </div>
 
-    <el-dialog title="保存模板" v-model="nameDialogVisible" width="400px" align-center>
+    <el-dialog title="保存模板" v-model="nameDialogVisible" width="480px" align-center>
       <el-form ref="saveFormRef" :model="saveForm" :rules="saveFormRules" label-position="left">
         <el-form-item label="名称：" prop="sqlName">
           <el-input type="hidden" />
@@ -51,9 +51,9 @@
       </template>
     </el-dialog>
 
-    <el-dialog title="重命名" v-model="renameDialogVisible" width="400px" align-center>
-      <el-form ref="resaveFormRef" :model="resaveForm" :rules="resaveFormRules" label-width="73px" label-position="right">
-        <el-form-item label="原名称：" prop="oldSqlName">
+    <el-dialog title="重命名" v-model="renameDialogVisible" width="480px" align-center>
+      <el-form ref="resaveFormRef" :model="resaveForm" :rules="resaveFormRules" label-width="80px" label-position="right">
+        <el-form-item label="原名称：" prop="oldSqlName" class="type-input-disabled">
           <el-input type="hidden" />
           <el-input v-model="resaveForm.oldSqlName" disabled />
         </el-form-item>
@@ -428,6 +428,17 @@ watch(
   :deep(.el-tabs__item.is-active) {
     background-color: var(--el-color-primary);
     color: #fff;
+  }
+}
+
+.type-input-disabled{
+  :deep(.el-input__inner){
+    color: #131926;
+    -webkit-text-fill-color: #131926;
+  }
+
+  :deep(.el-input__wrapper){
+    box-shadow: none;
   }
 }
 
