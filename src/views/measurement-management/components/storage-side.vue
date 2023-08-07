@@ -8,13 +8,16 @@
   </div>
 
   <ul class="storage-list-box" :loading="storageLoading">
-    <li v-for="item in storageList" :key="item" :class="['storage-item-box', currentStorage === item && 'storage-item-box-active']" @click="e => handleSelectStorage(item, e)">
-      <span class="storage-item-text"><text-tooltip :content="item" /></span>
-      <div class="storage-item-delete-box" :style="{ cursor: item === 'root.__system' ? 'not-allowed' : 'pointer' }" @click="handleDeleteStorage(item)">
-        <i-custom-delete class="storage-item-delete" />
-        <i-custom-delete-active class="storage-item-delete-active" />
-      </div>
-    </li>
+    <template v-if="storageList.length">
+      <li v-for="item in storageList" :key="item" :class="['storage-item-box', currentStorage === item && 'storage-item-box-active']" @click="e => handleSelectStorage(item, e)">
+        <span class="storage-item-text"><text-tooltip :content="item" /></span>
+        <div class="storage-item-delete-box" :style="{ cursor: item === 'root.__system' ? 'not-allowed' : 'pointer' }" @click="handleDeleteStorage(item)">
+          <i-custom-delete class="storage-item-delete" />
+          <i-custom-delete-active class="storage-item-delete-active" />
+        </div>
+      </li>
+    </template>
+    <li v-else class="item-box-empty">暂无数据</li>
   </ul>
 </template>
 
@@ -207,5 +210,19 @@ defineExpose({ getStorageList });
 .storage-item-box-active{
   background-color: #F7F8FC;
   color: #495AD4;
+}
+
+.item-box-empty{
+  padding: 0 8px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 12px;
+  color: #656A85;
+  margin: 200px 0 0;
 }
 </style>
