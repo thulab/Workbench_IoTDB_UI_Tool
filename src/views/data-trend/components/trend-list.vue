@@ -19,6 +19,7 @@
     v-model="isCheckAll"
     :indeterminate="isIndeterminate"
     label="全选"
+    :key="listKey"
     :disabled="!allCheckAbled"
     @change="handleCheckedAll"
   />
