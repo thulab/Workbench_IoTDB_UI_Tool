@@ -135,6 +135,11 @@
           />
         </div>
       </template>
+
+      <div v-else class="table-empty-wrapper" style="height: calc(100% - 190px);">
+        <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+        <span class="data-empty-text">暂无数据</span>
+      </div>
     </el-scrollbar>
 
     <modal-storage
@@ -496,6 +501,10 @@ watch(
   height: 100%;
   background-color: #fff;
   border-radius: 6px;
+
+  :deep(.el-scrollbar__view){
+    height: 100%;
+  }
 
   .page-info-box {
     display: flex;
