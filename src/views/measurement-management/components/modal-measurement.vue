@@ -3,7 +3,6 @@
     title="新建测点"
     v-model="dialogVisible"
     width="748px"
-    align-center
     :close-on-click-modal="false"
   >
     <el-form ref="formRef" :model="formData" label-position="left">
@@ -236,7 +235,9 @@ function handleChangeAdd(val: CheckboxValueType) {
     isEditable: true,
   });
   isAligned.value = false;
-  activeName.value = 'measurement_0';
+  nextTick(() => {
+    activeName.value = 'measurement_0';
+  });
 }
 
 // 复制
@@ -252,7 +253,9 @@ function handleCopyRow(data: Partial<StorageDevice.MeasurementItem>, e: MouseEve
     compression: data.compression,
     isEditable: true,
   });
-  activeName.value = `measurement_${formData.measurementList.length - 1}`;
+  nextTick(() => {
+    activeName.value = `measurement_${formData.measurementList.length - 1}`;
+  });
 }
 
 // 删除
@@ -304,7 +307,9 @@ function handleChangeDevice(val: string) {
     compression: 'SNAPPY',
     isEditable: true,
   });
-  activeName.value = 'measurement_0';
+  nextTick(() => {
+    activeName.value = 'measurement_0';
+  });
 }
 
 // 切换数据类型
@@ -322,7 +327,9 @@ function handleAddRow() {
     compression: 'SNAPPY',
     isEditable: true,
   });
-  activeName.value = `measurement_${formData.measurementList.length - 1}`;
+  nextTick(() => {
+    activeName.value = `measurement_${formData.measurementList.length - 1}`;
+  });
 }
 
 // 保存

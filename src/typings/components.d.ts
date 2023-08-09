@@ -8,7 +8,6 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     BaseFormItem: typeof import('./../components/base-form-item.vue')['default']
-    copy: typeof import('./../components/layout/the-layout copy.vue')['default']
     DynamicTable: typeof import('./../components/dynamic-table.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']
@@ -44,7 +43,6 @@ declare module 'vue' {
     ElRow: typeof import('element-plus/es')['ElRow']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     ElSelect: typeof import('element-plus/es')['ElSelect']
-    ElSelectV2: typeof import('element-plus/es')['ElSelectV2']
     ElStep: typeof import('element-plus/es')['ElStep']
     ElSteps: typeof import('element-plus/es')['ElSteps']
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
@@ -114,7 +112,6 @@ declare module 'vue' {
     ICustomUserNormal: typeof import('~icons/custom/user-normal')['default']
     ICustomUserRoleAdd: typeof import('~icons/custom/user-role-add')['default']
     ICustomWaiting: typeof import('~icons/custom/waiting')['default']
-    ICustomWarningBlue: typeof import('~icons/custom/warning-blue')['default']
     IEpArrowDown: typeof import('~icons/ep/arrow-down')['default']
     IEpArrowLeftBold: typeof import('~icons/ep/arrow-left-bold')['default']
     IEpArrowRightBold: typeof import('~icons/ep/arrow-right-bold')['default']
@@ -129,7 +126,6 @@ declare module 'vue' {
     LayoutTabs: typeof import('./../components/layout/layout-tabs.vue')['default']
     LayoutTabsMoreOperation: typeof import('./../components/layout/components/layout-tabs-more-operation.vue')['default']
     ModalResetPassword: typeof import('./../components/modal-reset-password.vue')['default']
-    OverflowClick: typeof import('./../components/overflow-click.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TextTooltip: typeof import('./../components/text-tooltip.vue')['default']
