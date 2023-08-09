@@ -40,7 +40,7 @@
         </div>
       </el-form-item>
       <h4 class="module-title" style="border: none;">测点</h4>
-      <div v-loading="measurementLoading" class="measurement-list-box">
+      <el-scrollbar :max-height="400" :min-height="152" class="measurement-list-box">
         <el-collapse accordion v-model="activeName">
           <el-collapse-item v-for="(item, index) in formData.measurementList" :key="index" :name="'measurement_' + index">
             <template #title>
@@ -96,7 +96,7 @@
             </el-row>
           </el-collapse-item>
         </el-collapse>
-      </div>
+      </el-scrollbar>
 
       <el-button style="width: 100%;" class="m-t-16" :disabled="addControl" @click="handleAddRow"><i-custom-add class="m-r-4" />添加测点</el-button>
     </el-form>
@@ -421,9 +421,9 @@ watch(
 }
 
 .measurement-list-box{
-  min-height: 152px;
-  max-height: 500px;
-  overflow-y: auto;
+  // min-height: 152px;
+  // max-height: 500px;
+  // overflow-y: auto;
   border-bottom: none;
 
   :deep(.el-form-item--default) {

@@ -8,7 +8,7 @@
       />
     </div>
 
-    <el-scrollbar class="storage-details-wrapper">
+    <div class="storage-details-wrapper">
       <h4 class="storage-info-title">数据库信息</h4>
       <div class="page-info-box">
         <ul class="storage-info-list">
@@ -140,7 +140,7 @@
         <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
         <span class="data-empty-text">暂无数据</span>
       </div>
-    </el-scrollbar>
+    </div>
 
     <modal-storage
       v-model:visible="storageVisible"
