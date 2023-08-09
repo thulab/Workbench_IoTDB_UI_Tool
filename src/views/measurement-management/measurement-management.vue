@@ -58,8 +58,8 @@
           </div>
 
           <div class="search-form-buttons">
-            <el-button type="primary" @click="handleAddMeasure">新建</el-button>
-            <el-button class="m-l-16" @click="handleImport">导入</el-button>
+            <el-button type="primary" :disabled="currentStorage === 'root.__system'" @click="handleAddMeasure">新建</el-button>
+            <el-button class="m-l-16" :disabled="currentStorage === 'root.__system'" @click="handleImport">导入</el-button>
             <el-dropdown class="m-x-16" :disabled="!(totalCount > 0)" @command="val => handleCommandDown(val)">
               <el-button class="export-btn" :disabled="!(totalCount > 0)">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip></el-button>
               <template #dropdown>
@@ -69,7 +69,7 @@
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
-            <el-button :disabled="multipleSelection.length === 0" @click="handleDelRow('batch', null)">批量删除</el-button>
+            <el-button :disabled="multipleSelection.length === 0" type="primary" @click="handleDelRow('batch', null)">批量删除</el-button>
             <el-button link @click="handleRefresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
           </div>
         </div>

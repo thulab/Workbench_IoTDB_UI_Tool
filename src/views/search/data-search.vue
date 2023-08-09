@@ -93,7 +93,7 @@
         <div class="page-detail-buttons">
           <el-button @click="handleSearch" :disabled="getListLoading">刷新</el-button>
           <el-button class="m-l-12" @click="handleImport">导入</el-button>
-          <el-dropdown class="more-icon m-l-12" :disabled="getListLoading" v-show="searchDetailInfos.status && tableData.length > 0" @command="val => handleCommandDown(val)">
+          <el-dropdown class="more-icon m-l-12" :disabled="getListLoading" v-show="searchDetailInfos.status" @command="val => handleCommandDown(val)">
             <el-button class="export-btn">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
             <template #dropdown>
               <el-dropdown-menu>
