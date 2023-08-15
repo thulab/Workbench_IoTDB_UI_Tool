@@ -50,7 +50,7 @@ const treeData = ref<StorageDevice.ModelData>({
 const initialLoading = ref(true);
 
 const { requestFn: getDataModelTree, loading: dataLoading } = useRequest(StorageApi.getDataModelTree);
-const { requestFn: getLastValue } = useRequest(StorageApi.getLastValue);
+const { requestFn: getBatchLastValue } = useRequest(StorageApi.getBatchLastValue);
 
 const maxExpandLevel = ref(0);
 
@@ -297,18 +297,6 @@ const deepSearchSelf = (data: StorageDevice.ModelData, path: string, index: numb
   }
 };
 
-async function getLast(deviceName: string, measurementName: string, viewType: string = 'BASE') {
-  const data = {
-    value: '',
-    valueTime: '',
-  };
-  await getLastValue(deviceName, measurementName, viewType).then((newRes) => {
-    data.value = newRes.data.value || '-';
-    data.valueTime = newRes.data.valueTime || '-';
-  });
-  return data;
-}
-
 let loading = false;
 
 const getItemByPath = (data: StorageDevice.ModelData, nodePath: string) => {
@@ -360,30 +348,20 @@ function clickFunction(params: { data: StorageDevice.ModelData }) {
     nodePath: data.nodePath,
   }).then((res) => {
     const list = res.data.list || [];
-    const promiseQueue: Array<Promise<{
-      value: string;
-      valueTime: string;
-    }>> = [];
+    const timeseriesList: string[] = [];
+    const viewTypeList: string[] = [];
     list.forEach((item) => {
       item.collapsed = true;
       if (item.nodeType === 'timeseries') {
-        promiseQueue.push(getLast(data.nodePath, item.node, item.timeseriesType));
+        timeseriesList.push(item.nodePath);
+        viewTypeList.push(item.timeseriesType || 'BASE');
       }
     });
-    if (promiseQueue.length) {
-      Promise.allSettled(promiseQueue).then((results) => {
-        data.children = list.map((r, i) => {
-          if (results[i]?.status === 'fulfilled') {
-            const resultItem = results[i] as PromiseFulfilledResult<{
-              value: string;
-              valueTime: string;
-            }>;
-            return {
-              ...r, leafDeep: data.leafDeep!, value: resultItem.value.value, valueTime: resultItem.value.valueTime,
-            };
-          }
-          return { ...r, leafDeep: data.leafDeep! };
-        });
+    if (timeseriesList.length || viewTypeList.length) {
+      getBatchLastValue(timeseriesList, viewTypeList).then((newRes) => {
+        data.children = list.map((r, i) => ({
+          ...r, leafDeep: data.leafDeep!, value: newRes.data.values[i], valueTime: newRes.data.timestamps[i],
+        }));
         data.pageNum = res.data.pageNum;
         data.pageSize = res.data.pageSize;
         data.hasNext = res.data.hasNext;

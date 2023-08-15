@@ -64,6 +64,11 @@ class StorageApi {
     return http.get('/data/getLastValue', { params: { deviceName, measurementName, viewType } });
   }
 
+  // 批量查询物理量的最新值和时间
+  static getBatchLastValue(paths: string[], viewTypeList: string[]):HttpResponseP<StorageDevice.GetBatchLastValueRes> {
+    return http.post('/data/getBatchLastValue', { paths, viewTypeList });
+  }
+
   // 保存物理量
   static saveMeasurementList(data: StorageDevice.SaveMeasurementListRequest):HttpResponseP<{ measurements
   :string[] }> {

@@ -216,7 +216,7 @@ const { requestFn: getMeasurementsInfosByFuzzy, data: tableData, loading } = use
     measurements: [],
   },
 });
-const { requestFn: getLastValue } = useRequest(StorageApi.getLastValue);
+const { requestFn: getBatchLastValue } = useRequest(StorageApi.getBatchLastValue);
 const { requestFn: deleteMeasurements } = useRequest(StorageApi.deleteMeasurements);
 const { requestFn: exportMeasurementData } = useRequest(StorageApi.exportMeasurementData);
 
@@ -243,13 +243,17 @@ function getListData() {
   }).then((res) => {
     totalCount.value = res.data.totalCount;
     if (tableData.value.measurements?.length) {
+      const timeseriesList: string[] = [];
+      const viewTypeList: string[] = [];
       tableData.value.measurements.forEach((item) => {
-        if (item && item.timeseries) {
-          getLastValue(item.deviceName, item.timeseries, item.viewType || 'BASE').then((newRes) => {
-            if (newRes.code === 0) {
-              item.value = newRes.data.value || '-';
-              item.valueTime = newRes.data.valueTime || '-';
-            }
+        timeseriesList.push(`${item.deviceName}.${item.timeseries}`);
+        viewTypeList.push(item.viewType || 'BASE');
+      });
+      getBatchLastValue(timeseriesList, viewTypeList).then((newRes) => {
+        if (newRes.data.values.length || newRes.data.timestamps.length) {
+          tableData.value.measurements.forEach((item, index) => {
+            item.value = newRes.data.values[index] || '-';
+            item.valueTime = newRes.data.timestamps[index] || '-';
           });
         }
       });

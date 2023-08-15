@@ -111,7 +111,7 @@
 <script setup lang="ts">
 import type { FormInstance } from 'element-plus';
 import { useRouter } from 'vue-router';
-import { CalculateApi } from '@/api';
+import { CalculateApi, StorageApi } from '@/api';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalCalculate from './components/modal-calculate.vue';
 import ModalExpression from './components/modal-expression.vue';
@@ -142,20 +142,24 @@ const { requestFn: getCalculateList, data: tableData, loading } = useRequest(Cal
     list: [],
   },
 });
-const { requestFn: getLastValue } = useRequest(CalculateApi.getLastValue);
+const { requestFn: getBatchLastValue } = useRequest(StorageApi.getBatchLastValue);
 const { requestFn: deleteCalculate } = useRequest(CalculateApi.deleteCalculate);
 
 const tableDataPagination = computed(() => tableData.value.list.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
 
 function getNewVal() {
   if (tableDataPagination.value.length) {
+    const timeseriesList: string[] = [];
+    const viewTypeList: string[] = [];
     tableDataPagination.value.forEach((item) => {
-      if (item && item.measurement) {
-        getLastValue(item.measurement).then((newRes) => {
-          if (newRes.code === 0) {
-            item.value = newRes.data.value || '-';
-            item.valueTime = newRes.data.time || '-';
-          }
+      timeseriesList.push(item.measurement);
+      viewTypeList.push('VIEW');
+    });
+    getBatchLastValue(timeseriesList, viewTypeList).then((newRes) => {
+      if (newRes.data.values.length || newRes.data.timestamps.length) {
+        tableDataPagination.value.forEach((item, index) => {
+          item.value = newRes.data.values[index] || '-';
+          item.valueTime = newRes.data.timestamps[index] || '-';
         });
       }
     });

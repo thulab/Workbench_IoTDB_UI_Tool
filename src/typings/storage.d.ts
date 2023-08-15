@@ -47,6 +47,11 @@ declare namespace StorageDevice{
     valueTime: string;
   }
 
+  export interface GetBatchLastValueRes {
+    values: string[];
+    timestamps: string[];
+  }
+
   export interface SaveMeasurementListRequest {
     measurementDTOList: Partial<MeasurementItem>[];
     deviceName: string;
