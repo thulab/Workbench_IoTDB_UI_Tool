@@ -5,22 +5,23 @@
     width="780px"
     align-center
     :close-on-click-modal="false"
+    id="calculate-modal"
   >
     <el-form ref="formRef" :model="formData" class="source-form" label-position="left">
       <base-form-item label="计算名称：" prop="name" :rules="requiredRules" class="form-label-width">
-        <el-input v-model="formData.name" show-word-limit maxlength="20" placeholder="请输入计算名称" />
+        <el-input v-model="formData.name" show-word-limit maxlength="20" placeholder="请输入计算名称" id="calculate-modal-name" />
       </base-form-item>
       <base-form-item label="计算描述：" prop="desc" class="form-label-width form-label-normal">
-        <el-input type="textarea" v-model="formData.desc" show-word-limit maxlength="100" placeholder="请输入计算描述" :resize="'none'" class="desc-textarea" />
+        <el-input type="textarea" v-model="formData.desc" show-word-limit maxlength="100" placeholder="请输入计算描述" :resize="'none'" class="desc-textarea" id="calculate-modal-desc" />
       </base-form-item>
       <base-form-item label="结果测点：" prop="measurement" :rules="requiredRules" class="form-label-width">
         <template #label>
           结果测点：<el-tooltip effect="light" content="数据类型根据表达式计算逻辑推断生成，编码方式及压缩方式为null" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
         </template>
-        <el-input v-model="formData.measurement" placeholder="请输入结果测点名称" v-if="editType === 'add'">
+        <el-input v-model="formData.measurement" placeholder="请输入结果测点名称" v-if="editType === 'add'" id="calculate-modal-measurement">
           <template #prepend>root.</template>
         </el-input>
-        <el-input v-model="formData.measurement" v-else disabled class="input-disabled" />
+        <el-input v-model="formData.measurement" v-else disabled class="input-disabled" id="calculate-modal-measurement-disabled" />
       </base-form-item>
       <base-form-item label="计算表达式：" prop="expression" :rules="requiredExpressionRules" class="form-expression-box">
         <template #label>
@@ -67,8 +68,8 @@
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="saveLoading" @click="handleConfirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="calculate-modal-cancel">取消</el-button>
+        <el-button type="primary" :loading="saveLoading" @click="handleConfirm" id="calculate-modal-confirm">确定</el-button>
       </div>
     </template>
   </el-dialog>

@@ -5,6 +5,7 @@
     width="480px"
     align-center
     :close-on-click-modal="false"
+    id="calculate-modal-expression"
   >
     <el-scrollbar :max-height="300">
       <pre class="expression-text">{{ content }}</pre>

@@ -1,6 +1,6 @@
 <template>
   <div class="search_div maxheight">
-    <el-input class="m-b-8 filter-input" v-model="filterMeasurementText" placeholder="请输入测点名称" @input="getMeasurementList">
+    <el-input class="m-b-8 filter-input" v-model="filterMeasurementText" placeholder="请输入测点名称" @input="getMeasurementList" id="calculate-modal-input-measurement">
       <!-- <template #suffix><i-ep-search /></template> -->
     </el-input>
 

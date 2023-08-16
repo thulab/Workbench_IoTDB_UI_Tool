@@ -4,23 +4,25 @@
     :title="title"
     width="480px"
     align-center
-    :close-on-click-modal="false">
+    :close-on-click-modal="false"
+    id="modal-reset-pwd"
+  >
     <el-form label-width="100px" ref="formRef" :rules="rules" :model="formData" label-position="left">
       <label><input type="password" autocomplete="new-password" hidden></label>
       <base-form-item label="用户名：">
         <el-text>{{ userName }}</el-text>
       </base-form-item>
       <base-form-item label="输入密码：" prop="password" required>
-        <el-input v-model="formData.password" maxlength="32" autocomplete="off" placeholder="请输入密码" show-password />
+        <el-input v-model="formData.password" maxlength="32" autocomplete="off" placeholder="请输入密码" show-password id="modal-reset-pwd-input-pwd" />
       </base-form-item>
       <base-form-item label="确认密码：" prop="confirmPassword" required>
-        <el-input v-model="formData.confirmPassword" maxlength="32" autocomplete="off" placeholder="请再次输入密码" show-password />
+        <el-input v-model="formData.confirmPassword" maxlength="32" autocomplete="off" placeholder="请再次输入密码" show-password id="modal-reset-pwd-input-pwd-again" />
       </base-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="loading" @click="handleConfirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="modal-reset-pwd-cancel">取消</el-button>
+        <el-button type="primary" :loading="loading" @click="handleConfirm" id="modal-reset-pwd-confirm">确定</el-button>
       </span>
     </template>
   </el-dialog>

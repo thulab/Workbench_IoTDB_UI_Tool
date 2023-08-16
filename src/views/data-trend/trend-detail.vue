@@ -18,28 +18,29 @@
               :clearable="false"
               :prefix-icon="ICustomCalender"
               :disabled="isRunningTab"
+              id="trend-search-datetimerange"
             />
           </base-form-item>
           <base-form-item label="采样周期：" prop="unitInterval" :rules="requiredRules">
-            <el-select v-model="searchFormData.unitInterval" :disabled="isRunningTab" style="width: 80px;">
+            <el-select v-model="searchFormData.unitInterval" :disabled="isRunningTab" style="width: 80px;" id="trend-search-unitInterval">
               <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" />
             </el-select>
           </base-form-item>
           <base-form-item label="采样策略：" prop="aggregation" :rules="requiredRules">
-            <el-select v-model="searchFormData.aggregation" :disabled="isRunningTab" style="width: 80px;" @change="handleChangeAggregation">
+            <el-select v-model="searchFormData.aggregation" :disabled="isRunningTab" style="width: 80px;" @change="handleChangeAggregation" id="trend-search-aggregation">
               <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" />
             </el-select>
           </base-form-item>
           <div class="play-pause-buttons">
             <el-icon size="30" v-if="!isRunningTab" style="cursor: not-allowed;"><i-custom-play-disabled /></el-icon>
             <template v-else>
-              <el-icon size="30" v-if="!loading" @click="handlePlay(true)"><i-custom-play-active /></el-icon>
-              <el-icon size="30" v-else @click="handlePlay(false)"><i-custom-pause /></el-icon>
+              <el-icon size="30" v-if="!loading" @click="handlePlay(true)" id="trend-search-run"><i-custom-play-active /></el-icon>
+              <el-icon size="30" v-else @click="handlePlay(false)" id="trend-search-pause"><i-custom-pause /></el-icon>
             </template>
           </div>
         </el-form>
         <div class="search-form-buttons" v-if="!isRunningTab">
-          <el-button @click="handleReset">重置</el-button>
+          <el-button @click="handleReset" id="trend-search-reset">重置</el-button>
           <el-tooltip
             placement="top-start"
             effect="light"
@@ -48,7 +49,7 @@
             :disabled="searchAbled"
             popper-class="tooltip-box-width"
           >
-            <el-button :class="[!searchAbled && 'hover-btn-disabled']" type="primary" @click="handleSearch">应用</el-button>
+            <el-button :class="[!searchAbled && 'hover-btn-disabled']" type="primary" @click="handleSearch" id="trend-search-search">应用</el-button>
           </el-tooltip>
         </div>
       </div>

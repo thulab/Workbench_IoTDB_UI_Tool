@@ -1,6 +1,6 @@
 <template>
   <div class="search_div maxheight">
-    <el-select v-model="storageName" style="width: 100%;" placeholder="请选择数据库" @change="handleSelectDatabase" :loading="storageLoading" :placement="'bottom-start'" fit-input-width>
+    <el-select v-model="storageName" style="width: 100%;" placeholder="请选择数据库" @change="handleSelectDatabase" :loading="storageLoading" :placement="'bottom-start'" fit-input-width id="sql-search-data-select-databse">
       <el-option v-for="item in storageList" :key="item" :value="item" :label="item">
         <div style="display: flex; width: 160px;">
           <text-tooltip :content="item" />
@@ -22,7 +22,9 @@
       v-loading="deviceLoading && !deviceName"
       :placement="'bottom-start'"
       fit-input-width
-      @change="handleSelectDevice">
+      @change="handleSelectDevice"
+      id="sql-search-data-select-device"
+    >
       <el-option v-for="item in deviceList" :key="item" :label="item" :value="item">
         <div style="display: flex; width: 160px;">
           <text-tooltip :content="item" />
@@ -30,14 +32,14 @@
       </el-option>
     </el-select>
 
-    <el-input class="m-y-10" :disabled="!deviceName" v-model="filterMeasurementText" placeholder="请输入测点名称" @input="handleInput('measurement')">
+    <el-input class="m-y-10" :disabled="!deviceName" v-model="filterMeasurementText" placeholder="请输入测点名称" @input="handleInput('measurement')" id="sql-search-data-input-measurement">
       <template #suffix><i-ep-search /></template>
     </el-input>
 
     <div class="search-buttons">
-      <el-button v-if="false" type="primary" @click="handleAdd(storageName)">当前数据库</el-button>
-      <el-button v-if="false" type="primary" @click="handleAdd(deviceName)">当前设备</el-button>
-      <el-button @click="handleReset">重置</el-button>
+      <el-button v-if="false" type="primary" @click="handleAdd(storageName)" id="sql-search-data-add-databse">当前数据库</el-button>
+      <el-button v-if="false" type="primary" @click="handleAdd(deviceName)" id="sql-search-data-add-device">当前设备</el-button>
+      <el-button @click="handleReset" id="sql-search-data-reset">重置</el-button>
     </div>
     <el-table
       v-if="measurementList && measurementList.length > 0"

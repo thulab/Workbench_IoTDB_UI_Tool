@@ -5,6 +5,7 @@
     width="480px"
     align-center
     :close-on-click-modal="false"
+    id="trend-modal-path"
   >
     <el-form ref="formRef" :model="formData">
       <base-form-item label="测点名称：" prop="path" :rules="requiredRules">
@@ -22,6 +23,7 @@
           :loading="measurementLoading"
           style="width: 363px;"
           class="path-select"
+          id="trend-modal-select-path"
         >
           <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :disabled="item.dataType === 'TEXT' || pathList.includes(item.timeseries)">
             <div style="display: flex; width: 320px;">
@@ -32,17 +34,17 @@
       </base-form-item>
       <div class="chart-detail-box">
         <base-form-item label="颜色：" prop="color" :rules="requiredRules">
-          <el-color-picker v-model="formData.color" color-format="hex" :predefine="predefineColors" />
+          <el-color-picker v-model="formData.color" color-format="hex" :predefine="predefineColors" id="trend-modal-color" />
         </base-form-item>
         <base-form-item class="chart-width-box" label="线宽：" prop="width" :rules="requiredNumberRules">
-          <el-input-number v-model.number="formData.width" :min="1" :max="10" step-strictly controls-position="right" style="width: 40px;" />
+          <el-input-number v-model.number="formData.width" :min="1" :max="10" step-strictly controls-position="right" style="width: 40px;" id="trend-modal-input" />
         </base-form-item>
       </div>
     </el-form>
     <template #footer>
       <div class="dialog-footer m-t-10">
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleConfirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="trend-modal-cancel">取消</el-button>
+        <el-button type="primary" @click="handleConfirm" id="trend-modal-confirm">确定</el-button>
       </div>
     </template>
   </el-dialog>

@@ -6,16 +6,17 @@
     class="new-storage-container"
     align-center
     :close-on-click-modal="false"
+    id="white-list-modal"
   >
     <el-form ref="formRef" :model="formData" :rules="rules" class="m-t-14" label-position="left">
       <base-form-item label="IP地址:" prop="ip">
-        <el-input v-model.trim="formData.ip" placeholder="请输入IP地址" />
+        <el-input v-model.trim="formData.ip" placeholder="请输入IP地址" id="white-list-modal-ip" />
       </base-form-item>
     </el-form>
     <template #footer>
       <div class="dialog-footer m-t-16">
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="saveloading" @click="handleConfirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="white-list-modal-cancel">取消</el-button>
+        <el-button type="primary" :loading="saveloading" @click="handleConfirm" id="white-list-modal-confirm">确定</el-button>
       </div>
     </template>
   </el-dialog>

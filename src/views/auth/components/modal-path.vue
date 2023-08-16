@@ -5,16 +5,17 @@
     width="600px"
     align-center
     :close-on-click-modal="false"
+    id="auth-path-modal"
   >
 
     <el-radio-group v-model="pathType" class="path-radio-group">
-      <el-radio label="input">
+      <el-radio label="input" id="auth-path-modal-input-radio">
         <span class="radio-label">路径模式：<el-tooltip effect="light" content="支持使用“*、**”进行模糊匹配，“*”代表一层，“**”代表一层或多层" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
-        <el-input v-model="inputPath" placeholder='请输入序列路径，支持使用"*、**"进行模糊匹配，例如"root.ln.d1.*/root.ln.d1.**"' style="width: 466px;" class="path-input">
+        <el-input v-model="inputPath" placeholder='请输入序列路径，支持使用"*、**"进行模糊匹配，例如"root.ln.d1.*/root.ln.d1.**"' style="width: 466px;" class="path-input" id="auth-path-modal-input-path">
           <!-- <template #prepend>root.</template> -->
         </el-input>
       </el-radio>
-      <el-radio label="select">
+      <el-radio label="select" id="auth-path-modal-select-radio">
         <span class="radio-label">精确路径：<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
         <div class="search-path-box">
           <el-select
@@ -29,6 +30,7 @@
             :loading="measurementLoading"
             style="width: 466px;"
             class="path-select"
+            id="auth-path-modal-select-path"
           >
             <template #prefix>
               <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
@@ -46,8 +48,8 @@
 
     <template #footer>
       <div class="dialog-footer m-t-6">
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleConfirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="auth-path-modal-cancel">取消</el-button>
+        <el-button type="primary" @click="handleConfirm" id="auth-path-modal-confirm">确定</el-button>
       </div>
     </template>
   </el-dialog>

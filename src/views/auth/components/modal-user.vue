@@ -4,23 +4,25 @@
     title="新建用户"
     width="480px"
     align-center
-    :close-on-click-modal="false">
+    :close-on-click-modal="false"
+    id="auth-user-modal"
+  >
     <el-form label-width="90px" ref="formRef" :rules="rules" :model="formData" label-position="left">
       <label><input type="password" autocomplete="new-password" hidden></label>
       <base-form-item label="用户名：" prop="userName">
-        <el-input v-model="formData.userName" maxlength="32" placeholder="请输入用户名" show-word-limit />
+        <el-input v-model="formData.userName" maxlength="32" placeholder="请输入用户名" show-word-limit id="auth-user-modal-name" />
       </base-form-item>
       <base-form-item label="输入密码：" prop="password" required>
-        <el-input v-model="formData.password" maxlength="32" autocomplete="off" placeholder="请输入密码" show-password />
+        <el-input v-model="formData.password" maxlength="32" autocomplete="off" placeholder="请输入密码" show-password id="auth-user-modal-pwd" />
       </base-form-item>
       <base-form-item label="确认密码：" prop="confirmPassword" required>
-        <el-input v-model="formData.confirmPassword" maxlength="32" autocomplete="off" placeholder="请再次输入密码" show-password />
+        <el-input v-model="formData.confirmPassword" maxlength="32" autocomplete="off" placeholder="请再次输入密码" show-password id="auth-user-modal-pwd-again" />
       </base-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="loading" @click="handleConfirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="auth-user-modal-cancel">取消</el-button>
+        <el-button type="primary" :loading="loading" @click="handleConfirm" id="auth-user-modal-confirm">确定</el-button>
       </span>
     </template>
   </el-dialog>
