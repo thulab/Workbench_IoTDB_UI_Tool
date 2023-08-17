@@ -10,7 +10,9 @@
           :inactive-value="0"
           style="
 
---el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;" />
+--el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;"
+          id="white-list-status"
+        />
       </div>
 
       <h4 class="detail-title-text">白名单列表</h4>
@@ -22,15 +24,15 @@
         <div class="search-form-wrapper">
           <div class="search-form-box">
             <span class="search-from-label">IP地址：</span>
-            <el-input v-model="searchKeyword" placeholder="请输入IP地址" @keyup.enter="handleRefresh">
+            <el-input v-model="searchKeyword" placeholder="请输入IP地址" @keyup.enter="handleRefresh" id="white-list-search-ip">
               <template #prefix>
-                <i-custom-search-icon class="remote-select-search-icon" @click="handleRefresh" />
+                <i-custom-search-icon class="remote-select-search-icon" @click="handleRefresh" id="white-list-search-icon" />
               </template>
             </el-input>
           </div>
 
           <div class="search-form-buttons">
-            <el-button type="primary" @click="handleAdd" class="handle-add-button">
+            <el-button type="primary" @click="handleAdd" class="handle-add-button" id="white-list-add">
               <el-icon size="24" class="m-r-4"><i-custom-new-white-list /></el-icon>
               添加白名单
             </el-button>
@@ -50,9 +52,9 @@
           >
             <el-table-column label="IP地址" prop="ip" align="center" />
             <el-table-column label="操作" width="120" align="center">
-              <template #default="{ row }">
-                <el-button type="primary" link size="small" :disabled="row === '127.0.0.1'" @click="handleEditRow(row)">编辑</el-button>
-                <el-button type="primary" link size="small" :disabled="row === '127.0.0.1'" @click="handleDelRow(row)">删除</el-button>
+              <template #default="{ row, $index }">
+                <el-button type="primary" link size="small" :disabled="row === '127.0.0.1'" @click="handleEditRow(row)" :id="`white-list-table-${$index}-edit`">编辑</el-button>
+                <el-button type="primary" link size="small" :disabled="row === '127.0.0.1'" @click="handleDelRow(row)" :id="`white-list-table-${$index}-del`">删除</el-button>
               </template>
             </el-table-column>
             <template #empty>

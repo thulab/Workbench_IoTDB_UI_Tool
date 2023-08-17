@@ -19,6 +19,7 @@
               placeholder="请输入账号"
               maxlength="32"
               @keyup.enter="submitForm"
+              id="login-user"
             >
               <template #prefix>
                 <el-icon size="30"><i-custom-user-name /></el-icon>
@@ -33,6 +34,7 @@
               autocomplete="off"
               placeholder="请输入密码"
               @keyup.enter="submitForm"
+              id="login-pwd"
             >
               <template #prefix>
                 <el-icon size="30"><i-custom-password /></el-icon>
@@ -46,7 +48,7 @@
             </el-input>
           </el-form-item>
           <el-form-item class="m-b-0">
-            <el-button class="login-button" type="primary" :loading="loading" @click="submitForm">登录</el-button>
+            <el-button class="login-button" type="primary" :loading="loading" @click="submitForm" id="login-submit">登录</el-button>
           </el-form-item>
         </el-form>
       </div>

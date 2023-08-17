@@ -2,8 +2,8 @@
   <div class="storage-list-title">
     <h4>数据库</h4>
     <div class="storage-operate-buttons">
-      <el-button link class="m-r-8 border-refresh-icon" @click="getStorageList()"><i-custom-refresh /></el-button>
-      <el-button link style="margin: 0;" @click="handleAddStorage"><i-custom-new-storage /></el-button>
+      <el-button link class="m-r-8 border-refresh-icon" @click="getStorageList()" id="mesaurement-side-refresh"><i-custom-refresh /></el-button>
+      <el-button link style="margin: 0;" @click="handleAddStorage" id="mesaurement-side-add"><i-custom-new-storage /></el-button>
     </div>
   </div>
 

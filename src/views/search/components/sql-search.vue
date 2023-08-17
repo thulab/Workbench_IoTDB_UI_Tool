@@ -5,10 +5,10 @@
         <span>SQL输入</span>
       </div>
       <div class="sql-right-icon-box">
-        <el-button link @click="handleSave"><i-custom-sql-save />保存</el-button>
-        <el-button link :disabled="!runFlag" @click="querySqlRun"><i-custom-sql-run />运行</el-button>
-        <el-button link :disabled="runFlag" @click="stopquery"><i-custom-sql-abort />取消</el-button>
-        <el-button link @click="emptyQuery"><i-custom-sql-empty />清空</el-button>
+        <el-button link @click="handleSave" id="sql-search-operate-save"><i-custom-sql-save />保存</el-button>
+        <el-button link :disabled="!runFlag" @click="querySqlRun" id="sql-search-operate-run"><i-custom-sql-run />运行</el-button>
+        <el-button link :disabled="runFlag" @click="stopquery" id="sql-search-operate-stop"><i-custom-sql-abort />取消</el-button>
+        <el-button link @click="emptyQuery" id="sql-search-operate-empty"><i-custom-sql-empty />清空</el-button>
       </div>
     </div>
 
@@ -31,7 +31,7 @@
       <span class="run-result-tip"><i-custom-info-warning />默认最多展示1000行100列，如需更多请导出查看</span>
     </div>
     <div class="tabs" v-if="tableData.list && tableData.list.length > 0">
-      <el-tabs v-model="activeName" type="card" class="tabs-nav-list">
+      <el-tabs v-model="activeName" type="card" class="tabs-nav-list" id="sql-search-result-tabs">
         <el-tab-pane v-for="(item, index) of columnList" :key="index" :name="`t${index}`">
           <template #label>
             <span>运行结果{{ index + 1 }}</span>
@@ -50,9 +50,9 @@
             </ul> -->
             <div></div>
             <div class="run-result-buttons">
-              <el-button link @click="handleCommandDown('refresh', index)"><i-custom-refresh />刷新</el-button>
+              <el-button link @click="handleCommandDown('refresh', index)" id="sql-search-refresh"><i-custom-refresh />刷新</el-button>
               <el-dropdown :disabled="!sqlResult[index].status" class="more-icon m-l-12" @command="val => handleCommandDown(val, index)" v-show="sqlResult[index].status && tableDataPagination[index]?.list?.length > 0">
-                <el-button link class="export-btn" :disabled="!sqlResult[index].status">
+                <el-button link class="export-btn" :disabled="!sqlResult[index].status" id="sql-search-download">
                   <i-custom-download />导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
                 </el-button>
                 <template #dropdown>

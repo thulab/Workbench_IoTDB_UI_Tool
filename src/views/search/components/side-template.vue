@@ -1,6 +1,6 @@
 <template>
   <div class="search_div maxheight" v-loading="loading">
-    <el-input placeholder="请输入模板名称" v-model="filterText" size="small" @input="getQueryList">
+    <el-input placeholder="请输入模板名称" v-model="filterText" size="small" @input="getQueryList" id="sql-search-template-search">
       <template #suffix>
         <i-custom-search-icon />
       </template>
@@ -32,7 +32,6 @@
 </template>
 
 <script lang="ts" setup>
-import { markRaw } from 'vue';
 import { debounce } from 'lodash-es';
 import { SearchApi } from '@/api';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';

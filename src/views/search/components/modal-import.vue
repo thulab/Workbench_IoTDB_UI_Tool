@@ -6,9 +6,10 @@
     class="new-storage-container"
     align-center
     :close-on-click-modal="false"
+    id="data-search-modal-import"
   >
     <div class="import-box">
-      <el-steps :active="activeStep" align-center finish-status="success" class="import-step-box">
+      <el-steps :active="activeStep" align-center finish-status="success" class="import-step-box" id="data-search-import-steps">
         <el-step title="选择文件">
           <template #title>选择文件</template>
         </el-step>
@@ -37,6 +38,7 @@
             :on-change="handleChange"
             :on-remove="handleRemove"
             :http-request="customUpload"
+            id="data-search-import-upload"
           >
             <el-icon size="80" v-if="!uploadFileInfo"><i-custom-upload /></el-icon>
             <el-icon size="80" v-else><i-custom-file-info /></el-icon>
@@ -80,13 +82,13 @@
     </div>
 
     <div class="m-t-12" style="text-align: right;" v-if="activeStep === 0">
-      <el-button plain :disabled="!uploadFileInfo" @click="handleNext">下一步</el-button>
+      <el-button plain :disabled="!uploadFileInfo" @click="handleNext" id="data-search-import-next">下一步</el-button>
     </div>
 
     <div class="m-t-12" style="height: 28px;" v-if="activeStep === 1"></div>
 
     <div class="m-t-12" style="text-align: center;" v-if="activeStep === 2">
-      <el-button type="primary" @click="handleClose">完成</el-button>
+      <el-button type="primary" @click="handleClose" id="data-search-import-close">完成</el-button>
     </div>
   </el-dialog>
 </template>

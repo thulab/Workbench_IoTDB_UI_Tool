@@ -9,7 +9,7 @@
       :disabled="pathList.length !== 10"
       popper-class="tooltip-box-width"
     >
-      <el-button link :class="[pathList.length === 10 && 'hover-btn-disabled', 'p-0']" @click="handleAdd"><i-custom-new-trend /></el-button>
+      <el-button link :class="[pathList.length === 10 && 'hover-btn-disabled', 'p-0']" @click="handleAdd" id="trend-add-path"><i-custom-new-trend /></el-button>
     </el-tooltip>
   </div>
 
@@ -22,6 +22,7 @@
     :key="listKey"
     :disabled="!allCheckAbled"
     @change="handleCheckedAll"
+    id="trend-path-checkbox"
   />
 
   <h4 v-if="!isExpand" class="collapse-title">已选测点</h4>
@@ -34,14 +35,14 @@
     <ul class="list-box" v-else :key="listKey">
       <li v-for="(item, index) in pathList" :key="item.path" :class="['path-item-box']">
         <div class="path-text-box">
-          <el-checkbox v-if="item.disabled" :checked="false" :disabled="true" class="m-r-8" />
-          <el-checkbox v-else :checked="item.checked" @change="val => handleChecked(val, item, index)" class="m-r-8" />
+          <el-checkbox v-if="item.disabled" :checked="false" :disabled="true" class="m-r-8" :id="`trend-path-checkbox-${index}-false`" />
+          <el-checkbox v-else :checked="item.checked" @change="val => handleChecked(val, item, index)" class="m-r-8" :id="`trend-path-checkbox-${index}-true`" />
           <div class="path-text"><text-tooltip :content="item.path" /></div>
         </div>
         <div class="path-detail-box">
           <div class="path-detail-item">
             <span class="detail-label">颜色：</span>
-            <el-color-picker v-model="item.color" :disabled="item.disabled" color-format="hex" :predefine="predefineColors" @change="val => handleChangeColor(val, item, index)" />
+            <el-color-picker v-model="item.color" :disabled="item.disabled" color-format="hex" :predefine="predefineColors" @change="val => handleChangeColor(val, item, index)" :id="`trend-path-color-${index}`" />
           </div>
           <div class="path-detail-item">
             <span class="detail-label">线宽：</span>
@@ -55,10 +56,11 @@
               style="width: 40px;"
               @change="val => handleChangeWidth(val, item, index)"
               @blur="ev => handleBlurWidth(ev, item, index)"
+              :id="`trend-path-input-${index}`"
             />
           </div>
         </div>
-        <el-icon size="14" class="delete-icon" @click="handleDel(item, index)"><i-custom-close-circle /></el-icon>
+        <el-icon size="14" class="delete-icon" @click="handleDel(item, index)" :id="`trend-path-${index}-del`"><i-custom-close-circle /></el-icon>
       </li>
     </ul>
   </div>

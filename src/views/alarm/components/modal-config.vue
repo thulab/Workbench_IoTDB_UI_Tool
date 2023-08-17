@@ -6,6 +6,7 @@
     class="new-storage-container"
     align-center
     :close-on-click-modal="false"
+    id="alarm-config-modal"
   >
     <el-form ref="formRef" :model="formData" class="source-form" label-position="right" label-width="90px">
       <el-row>
@@ -26,6 +27,7 @@
               :disabled="editType === 'edit'"
               @change="handleChangePath"
               style="width: 235px;"
+              id="alarm-config-modal-measurement"
             >
               <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :disabled="item.dataType === 'TEXT' || item.viewType === 'VIEW'">
                 <div style="display: flex; width: 200px;">
@@ -37,14 +39,14 @@
         </el-col>
         <el-col :span="12">
           <base-form-item label="数据类型：" prop="measurementType" class="m-l-45 type-input-disabled">
-            <el-input v-model="formData.measurementType" disabled style="width: 80px;" />
+            <el-input v-model="formData.measurementType" disabled style="width: 80px;" id="alarm-config-modal-measurementType" />
           </base-form-item>
         </el-col>
       </el-row>
       <el-row>
         <el-col :span="24">
           <base-form-item label="告警名称：" prop="alarmName" :rules="requiredRules">
-            <el-input v-model="formData.alarmName" show-word-limit maxlength="20" placeholder="请输入告警名称" />
+            <el-input v-model="formData.alarmName" show-word-limit maxlength="20" placeholder="请输入告警名称" id="alarm-config-modal-name" />
           </base-form-item>
         </el-col>
       </el-row>
@@ -58,6 +60,7 @@
               @change="handleChangeBooleanRule"
               style="width: 235px;"
               placeholder="请选择"
+              id="alarm-config-modal-rule-BOOLEAN"
             >
               <el-option
                 v-for="item in booleanRuleEnum"
@@ -67,7 +70,7 @@
               />
             </el-select>
             <div v-else class="number-rule-box">
-              <el-select v-model="formData.alarmRulesType" :disabled="!formData.measurementType" style="width: 114px;" class="m-r-8">
+              <el-select v-model="formData.alarmRulesType" :disabled="!formData.measurementType" style="width: 114px;" class="m-r-8" id="alarm-config-modal-rule">
                 <el-option
                   v-for="item in numberRuleEnum"
                   :key="item.value"
@@ -75,7 +78,7 @@
                   :value="item.value"
                 />
               </el-select>
-              <el-input v-model="formData.alarmRulesTypeVal" :disabled="!formData.measurementType" placeholder="请输入" style="width: 114px;" />
+              <el-input v-model="formData.alarmRulesTypeVal" :disabled="!formData.measurementType" placeholder="请输入" style="width: 114px;" id="alarm-config-modal-rule-val" />
             </div>
           </base-form-item>
         </el-col>
@@ -86,6 +89,7 @@
               :disabled="changeBoolean"
               placeholder="请输入持续时间"
               style="width: 235px;"
+              id="alarm-config-modal-duration"
             >
               <template #append>
                 <el-select
@@ -93,6 +97,7 @@
                   :disabled="changeBoolean"
                   style="width: 56px;"
                   placeholder=" "
+                  id="alarm-config-modal-duration-unit"
                 >
                   <el-option label="ms" value="ms" />
                   <el-option label="s" value="s" />
@@ -110,7 +115,7 @@
             <template #label>
               告警级别：<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
-            <el-select v-model="formData.alarmLevel" style="width: 235px;" class="level-select-box">
+            <el-select v-model="formData.alarmLevel" style="width: 235px;" class="level-select-box" id="alarm-config-modal-level">
               <template #prefix>
                 <el-icon v-if="formData.alarmLevel" :style="{ color: getLevelColor }" size="20"><i-custom-alarm-level /></el-icon>
               </template>
@@ -134,6 +139,7 @@
               v-model="formData.alarmFrequency"
               :disabled="changeBoolean"
               style="width: 235px;"
+              id="alarm-config-modal-frequency"
             >
               <el-option
                 v-for="item in frequencyEnum"
@@ -148,15 +154,15 @@
       <el-row class="m-b-12">
         <el-col :span="24">
           <base-form-item label="告警说明：" prop="alarmDesc">
-            <el-input type="textarea" v-model="formData.alarmDesc" show-word-limit maxlength="100" placeholder="请输入告警说明" :resize="'none'" class="alarm-desc-textarea" />
+            <el-input type="textarea" v-model="formData.alarmDesc" show-word-limit maxlength="100" placeholder="请输入告警说明" :resize="'none'" class="alarm-desc-textarea" id="alarm-config-modal-desc" />
           </base-form-item>
         </el-col>
       </el-row>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleConfirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="alarm-config-modal-cancel">取消</el-button>
+        <el-button type="primary" @click="handleConfirm" id="alarm-config-modal-confirm">确定</el-button>
       </span>
     </template>
   </el-dialog>
