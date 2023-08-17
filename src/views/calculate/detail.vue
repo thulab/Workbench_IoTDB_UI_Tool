@@ -4,12 +4,12 @@
       <div class="search-form-wrapper">
         <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
           <base-form-item label="" prop="name" style="margin-left: -8px;">
-            <el-input v-model="searchFormData.name" placeholder="请输入名称" style="width: 346px;">
+            <el-input v-model="searchFormData.name" placeholder="请输入名称" style="width: 346px;" id="calculate-search-name">
               <template #prefix>
                 <i-custom-search-icon class="remote-select-search-icon" />
               </template>
               <template #prepend>
-                <el-select v-model="searchFormData.type" style="width: 88px;" placeholder="">
+                <el-select v-model="searchFormData.type" style="width: 88px;" placeholder="" id="calculate-search-type">
                   <el-option label="计算名称" value="name" />
                   <el-option label="结果测点" value="measurement" />
                   <el-option label="计算描述" value="desc" />
@@ -19,8 +19,8 @@
           </base-form-item>
         </el-form>
         <div class="search-form-buttons">
-          <el-button @click="handleReset">重置</el-button>
-          <el-button type="primary" @click="handleSearch">查询</el-button>
+          <el-button @click="handleReset" id="calculate-search-reset">重置</el-button>
+          <el-button type="primary" @click="handleSearch" id="calculate-search-search">查询</el-button>
         </div>
       </div>
     </el-header>
@@ -29,9 +29,9 @@
         <div class="page-table-title-box">
           <h4 class="page-table-title">计算列表</h4>
           <div class="operate-buttons">
-            <el-button type="primary" @click="handleAdd">新建计算</el-button>
-            <el-button :disabled="!multipleSelection.length" type="primary" @click="handleDel('batch', null)">批量删除</el-button>
-            <el-button link @click="getNewVal"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+            <el-button type="primary" @click="handleAdd" id="calculate-add">新建计算</el-button>
+            <el-button :disabled="!multipleSelection.length" type="primary" @click="handleDel('batch', null)" id="calculate-batch-del">批量删除</el-button>
+            <el-button link @click="getNewVal" id="calculate-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
           </div>
         </div>
         <div class="page-table-box">
@@ -64,9 +64,9 @@
             <el-table-column label="操作" width="180" align="center" fixed="right">
               <template #default="{ row }">
                 <div>
-                  <el-button type="primary" link size="small" @click="handleQuery(row)">查看数据</el-button>
-                  <el-button type="primary" link size="small" @click="handleEdit(row)">编辑</el-button>
-                  <el-button type="primary" link size="small" @click="handleDel('row', row)">删除</el-button>
+                  <el-button type="primary" link size="small" @click="handleQuery(row)" :id="`calculate-table-${row.measurement}-data`">查看数据</el-button>
+                  <el-button type="primary" link size="small" @click="handleEdit(row)" :id="`calculate-table-${row.measurement}-edit`">编辑</el-button>
+                  <el-button type="primary" link size="small" @click="handleDel('row', row)" :id="`calculate-table-${row.measurement}-del`">删除</el-button>
                 </div>
               </template>
             </el-table-column>

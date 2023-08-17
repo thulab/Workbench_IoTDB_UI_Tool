@@ -4,21 +4,21 @@
       <div class="search-form-wrapper">
         <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
           <base-form-item label="操作用户：" prop="username">
-            <el-input v-model="searchFormData.username" placeholder="请输入用户名称" style="width: 172px;">
+            <el-input v-model="searchFormData.username" placeholder="请输入用户名称" style="width: 172px;" id="audit-search-name">
               <template #prefix>
                 <i-custom-search-icon class="remote-select-search-icon" />
               </template>
             </el-input>
           </base-form-item>
           <base-form-item label="IP来源：" prop="address">
-            <el-input v-model="searchFormData.address" placeholder="请输入 IP 来源" style="width: 172px;">
+            <el-input v-model="searchFormData.address" placeholder="请输入 IP 来源" style="width: 172px;" id="audit-search-ip">
               <template #prefix>
                 <i-custom-search-icon class="remote-select-search-icon" />
               </template>
             </el-input>
           </base-form-item>
           <base-form-item label="操作详情：" prop="log">
-            <el-input v-model="searchFormData.log" placeholder="请输入操作详情" style="width: 172px;">
+            <el-input v-model="searchFormData.log" placeholder="请输入操作详情" style="width: 172px;" id="audit-search-log">
               <template #prefix>
                 <i-custom-search-icon class="remote-select-search-icon" />
               </template>
@@ -35,11 +35,12 @@
                 :shortcuts="shortcutsDaterange"
                 :disabled-date="disabledDate"
                 :prefix-icon="ICustomCalender"
+                id="audit-search-time"
               />
             </base-form-item>
             <div class="search-form-buttons">
-              <el-button @click="handleReset">重置</el-button>
-              <el-button type="primary" @click="handleSearch">查询</el-button>
+              <el-button @click="handleReset" id="audit-search-reset">重置</el-button>
+              <el-button type="primary" @click="handleSearch" id="audit-search-search">查询</el-button>
             </div>
           </el-row>
         </el-form>
@@ -97,7 +98,7 @@
       </div>
     </el-main>
 
-    <el-dialog title="操作详情" v-model="dialogVisible" width="480px" :close-on-click-modal="false" align-center>
+    <el-dialog title="操作详情" v-model="dialogVisible" width="480px" :close-on-click-modal="false" align-center id="audit-modal-detail">
       <div class="detail-text">{{ editDetail }}</div>
     </el-dialog>
   </el-container>

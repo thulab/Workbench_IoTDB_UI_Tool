@@ -18,9 +18,9 @@
             <span class="storage-info-item-label">数据保存时间：<el-tooltip effect="light" content="数据保存时间（TTL），到期后系统将自动删除数据，此处不填代表永久存储" placement="top" popper-class="tooltip-box-width"><i-custom-question class="ttl-tip" /></el-tooltip></span>
             <span v-if="!editTTL">{{ storageInfos?.ttl ? (storageInfos.ttl + getTtlTimeUnit(storageInfos.ttlUnit, ttlUnitOptions)) : '∞'}}</span>
             <div v-if="currentStorage && editTTL" class="edit-ttl-box">
-              <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" style="width:120px;">
+              <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" style="width:120px;" id="mesaurement-edit-ttl">
                 <template #append>
-                  <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder=" " style="width:50px;">
+                  <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder=" " style="width:50px;" id="mesaurement-edit-ttlunit">
                     <el-option label="毫秒" value="millisecond" />
                     <el-option label="秒" value="second" />
                     <el-option label="分" value="minute" />
@@ -29,10 +29,10 @@
                   </el-select>
                 </template>
               </el-input>
-              <el-button class="m-l-12" plain @click="editTTL = false">取消</el-button>
-              <el-button type="primary" @click="handleConfirmEditTTL">确定</el-button>
+              <el-button class="m-l-12" plain @click="editTTL = false" id="mesaurement-ttl-cancel">取消</el-button>
+              <el-button type="primary" @click="handleConfirmEditTTL" id="mesaurement-ttl-confirm">确定</el-button>
             </div>
-            <el-button link v-if="currentStorage && !editTTL" class="m-l-12" @click="handleEditTTL"><i-custom-edit /></el-button>
+            <el-button link v-if="currentStorage && !editTTL" class="m-l-12" @click="handleEditTTL" id="mesaurement-ttl-edit-button"><i-custom-edit /></el-button>
           </li>
           <br>
           <li class="storage-info-item"><el-icon size="24"><i-custom-device-num /></el-icon><span class="storage-info-item-label">设备数量：</span>{{ storageInfos?.deviceCount || 0 }}</li>
@@ -41,7 +41,7 @@
         </ul>
 
         <div class="page-detail-buttons">
-          <el-button plain class="el-button-delete" :disabled="!currentStorage || currentStorage === 'root.__system'" @click="handleDelStorage">删除</el-button>
+          <el-button plain class="el-button-delete" :disabled="!currentStorage || currentStorage === 'root.__system'" @click="handleDelStorage" id="mesaurement-top-delete-databse">删除</el-button>
         </div>
       </div>
 
@@ -50,7 +50,7 @@
         <div class="search-form-wrapper">
           <div class="search-form-box">
             <span class="search-from-label">测点选择：</span>
-            <el-input v-model="searchKeyword" placeholder="请输入测点名称" @keyup.enter="handleRefresh">
+            <el-input v-model="searchKeyword" placeholder="请输入测点名称" @keyup.enter="handleRefresh" id="mesaurement-search">
               <template #prefix>
                 <i-custom-search-icon class="remote-select-search-icon" @click="handleRefresh" />
               </template>
@@ -58,10 +58,10 @@
           </div>
 
           <div class="search-form-buttons">
-            <el-button type="primary" :disabled="currentStorage === 'root.__system'" @click="handleAddMeasure">新建</el-button>
-            <el-button class="m-l-16" :disabled="currentStorage === 'root.__system'" @click="handleImport">导入</el-button>
+            <el-button type="primary" :disabled="currentStorage === 'root.__system'" @click="handleAddMeasure" id="mesaurement-add">新建</el-button>
+            <el-button class="m-l-16" :disabled="currentStorage === 'root.__system'" @click="handleImport" id="mesaurement-import">导入</el-button>
             <el-dropdown class="m-x-16" :disabled="!(totalCount > 0)" @command="val => handleCommandDown(val)">
-              <el-button class="export-btn" :disabled="!(totalCount > 0)">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip></el-button>
+              <el-button class="export-btn" :disabled="!(totalCount > 0)" id="mesaurement-download">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip></el-button>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
@@ -69,8 +69,8 @@
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
-            <el-button :disabled="multipleSelection.length === 0" type="primary" @click="handleDelRow('batch', null)">批量删除</el-button>
-            <el-button link @click="handleRefresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+            <el-button :disabled="multipleSelection.length === 0" type="primary" @click="handleDelRow('batch', null)" id="mesaurement-batch-del">批量删除</el-button>
+            <el-button link @click="handleRefresh" id="mesaurement-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
           </div>
         </div>
         <!-- <div class="batch-operate" v-if="multipleSelection.length">
@@ -107,10 +107,10 @@
             <el-table-column label="最新值时间" prop="valueTime" min-width="200" align="center" show-overflow-tooltip />
             <el-table-column label="操作" width="180" align="center" fixed="right">
               <template #default="{ row }">
-                <el-button type="primary" link size="small" @click="handleRowData(row)">数据</el-button>
-                <el-button type="primary" link size="small" :disabled="currentStorage === 'root.__system'" @click="handleRowAlarm(row)">告警</el-button>
-                <el-button type="primary" link size="small" :disabled="currentStorage === 'root.__system'" @click="handleRowTrend(row)">趋势</el-button>
-                <el-button type="primary" link size="small" :disabled="currentStorage === 'root.__system'" @click="handleDelRow('row', row)">删除</el-button>
+                <el-button type="primary" link size="small" @click="handleRowData(row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-data`">数据</el-button>
+                <el-button type="primary" link size="small" :disabled="currentStorage === 'root.__system'" @click="handleRowAlarm(row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-alarm`">告警</el-button>
+                <el-button type="primary" link size="small" :disabled="currentStorage === 'root.__system'" @click="handleRowTrend(row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-trend`">趋势</el-button>
+                <el-button type="primary" link size="small" :disabled="currentStorage === 'root.__system'" @click="handleDelRow('row', row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-del`">删除</el-button>
               </template>
             </el-table-column>
             <template #empty>

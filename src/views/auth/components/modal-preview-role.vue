@@ -6,6 +6,7 @@
     class="preview-role-modal"
     align-center
     :close-on-click-modal="true"
+    id="auth-preview-modal"
   >
     <el-scrollbar :max-height="maxHeight">
       <div class="table-list-box m-t-8">

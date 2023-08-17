@@ -10,9 +10,9 @@
           content="iotdb树形模型指导文档"
           popper-class="tooltip-box-width"
         >
-          <el-button link class="m-r-4" @click="handleDoc"><el-icon size="24"><i-custom-model-doc /></el-icon></el-button>
+          <el-button link class="m-r-4" @click="handleDoc" id="measurement-tree-doc"><el-icon size="24"><i-custom-model-doc /></el-icon></el-button>
         </el-tooltip>
-        <el-button link @click="handleRefresh"><el-icon size="24"><i-custom-refresh /></el-icon></el-button>
+        <el-button link @click="handleRefresh" id="measurement-tree-refresh"><el-icon size="24"><i-custom-refresh /></el-icon></el-button>
       </div>
     </el-header>
     <el-main class="p-0">

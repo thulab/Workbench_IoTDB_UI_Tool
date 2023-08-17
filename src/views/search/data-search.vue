@@ -25,6 +25,7 @@
                 :shortcuts="shortcutsDate"
                 :clearable="false"
                 :prefix-icon="ICustomCalender"
+                id="data-search-datetime"
               />
               <el-date-picker
                 v-else
@@ -36,6 +37,7 @@
                 :shortcuts="shortcutsDaterange"
                 :clearable="false"
                 :prefix-icon="ICustomCalender"
+                id="data-search-datetimerange"
               />
             </div>
           </el-form-item>
@@ -47,9 +49,9 @@
                 采样周期：<el-tooltip effect="light" content="请输入正整数" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
               </template>
               <el-input type="hidden" />
-              <el-input v-model.number="searchFormData.timeInterval" style="width: 100px;" placeholder="" @input="handleInputInterval">
+              <el-input v-model.number="searchFormData.timeInterval" style="width: 100px;" placeholder="" @input="handleInputInterval" id="data-search-timeInterval">
                 <template #append>
-                  <el-select v-model="searchFormData.unitInterval" style="width: 50px;" placeholder="">
+                  <el-select v-model="searchFormData.unitInterval" style="width: 50px;" placeholder="" id="data-search-unitInterval">
                     <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" />
                   </el-select>
                 </template>
@@ -58,14 +60,14 @@
             </el-form-item>
             <el-form-item label="采样策略：" prop="aggregation">
               <el-input type="hidden" />
-              <el-select v-model="searchFormData.aggregation" style="width: 80px;" clearable>
+              <el-select v-model="searchFormData.aggregation" style="width: 80px;" clearable id="data-search-aggregation">
                 <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" />
               </el-select>
             </el-form-item>
           </div>
           <el-form-item class="search-form-buttons">
-            <el-button @click="handleReset" :disabled="getListLoading">重置</el-button>
-            <el-button type="primary" @click="handleSearch">{{getListLoading ? '取消查询' : '查询'}}</el-button>
+            <el-button @click="handleReset" :disabled="getListLoading" id="data-search-reset">重置</el-button>
+            <el-button type="primary" @click="handleSearch" id="data-search-search">{{getListLoading ? '取消查询' : '查询'}}</el-button>
           </el-form-item>
         </el-row>
       </el-form>

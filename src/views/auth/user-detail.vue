@@ -11,12 +11,12 @@
         <el-scrollbar>
           <div class="detail-title-box" v-if="!isManager">
             <h4 class="detail-title-text">角色详情</h4>
-            <el-button type="primary" v-if="canEdit && !isEdit" @click="pageType = 'edit'">编辑</el-button>
-            <el-button type="primary" v-else-if="isEdit" @click="handleReset('view')">退出编辑</el-button>
+            <el-button type="primary" v-if="canEdit && !isEdit" @click="pageType = 'edit'" id="auth-user-edit">编辑</el-button>
+            <el-button type="primary" v-else-if="isEdit" @click="handleReset('view')" id="auth-user-view">退出编辑</el-button>
           </div>
           <div class="detail-role-list" v-if="!isManager">
-            拥有角色：<el-tag :closable="isEdit" type="info" v-for="(item, index,) in authData.rolesToPrivileges" :key="item.roleName" @close="handleDeleteRole(index)" @click="showRoleDetail(item)">{{ item.roleName }}</el-tag>
-            <el-button link @click="addRole()" v-if="isEdit"><el-icon size="24px" class="m-l-16">
+            拥有角色：<el-tag :closable="isEdit" type="info" v-for="(item, index,) in authData.rolesToPrivileges" :key="item.roleName" @close="handleDeleteRole(index)" @click="showRoleDetail(item)" :id="`auth-user-role-${item.roleName}-${index}`">{{ item.roleName }}</el-tag>
+            <el-button link @click="addRole()" v-if="isEdit" id="auth-user-add-role"><el-icon size="24px" class="m-l-16">
               <i-custom-user-role-add />
             </el-icon>
             </el-button>
@@ -97,14 +97,14 @@
                 </template>
               </el-table-column>
             </el-table>
-            <el-button style="width: 100%;" class="m-t-24" @click="handleAddRow" v-if="canEdit && isEdit"><i-custom-add class="m-r-4" />添加路径</el-button>
+            <el-button style="width: 100%;" class="m-t-24" @click="handleAddRow" v-if="canEdit && isEdit" id="auth-user-path"><i-custom-add class="m-r-4" />添加路径</el-button>
           </div>
         </el-scrollbar>
       </el-main>
       <el-footer v-if="canEdit && isEdit">
         <div class="operate-buttons">
-          <el-button @click="handleReset('edit')">重置</el-button>
-          <el-button type="primary" @click="handleSave" :loading="saveLoading">应用</el-button>
+          <el-button @click="handleReset('edit')" id="auth-user-reset">重置</el-button>
+          <el-button type="primary" @click="handleSave" :loading="saveLoading" id="auth-user-save">应用</el-button>
         </div>
       </el-footer>
     </el-container>

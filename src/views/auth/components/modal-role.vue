@@ -5,16 +5,17 @@
     width="480px"
     align-center
     :close-on-click-modal="false"
+    id="auth-role-modal"
   >
     <el-form ref="formRef" :model="formData">
       <base-form-item label="角色名：" prop="name" :rules="requiredRules">
-        <el-input v-model="formData.name" placeholder="请输入角色名" maxlength="20" show-word-limit />
+        <el-input v-model="formData.name" placeholder="请输入角色名" maxlength="20" show-word-limit id="auth-role-modal-name" />
       </base-form-item>
     </el-form>
     <template #footer>
       <div class="dialog-footer m-t-34">
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="loading" @click="handleConfirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="auth-role-modal-cancel">取消</el-button>
+        <el-button type="primary" :loading="loading" @click="handleConfirm" id="auth-role-modal-confirm">确定</el-button>
       </div>
     </template>
   </el-dialog>

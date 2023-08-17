@@ -8,8 +8,8 @@
     <el-container class="role-details-wrapper p-0">
       <el-header class="detail-title-box">
         <h4 class="detail-title-text">权限详情</h4>
-        <el-button type="primary" v-if="isView" :disabled="!currentRole" @click="pageType = 'edit'">编辑</el-button>
-        <el-button type="primary" v-else @click="handleReset('view')">退出编辑</el-button>
+        <el-button type="primary" v-if="isView" :disabled="!currentRole" @click="pageType = 'edit'" id="auth-role-edit">编辑</el-button>
+        <el-button type="primary" v-else @click="handleReset('view')" id="auth-role-view">退出编辑</el-button>
       </el-header>
       <el-main class="p-x-16 p-t-0 p-b-16" v-loading="loading">
         <div class="table-list-box">
@@ -92,14 +92,14 @@
             </template>
           </el-table>
 
-          <el-button v-if="!isView" style="width: 100%;" class="m-t-24" @click="handleAddRow"><i-custom-add class="m-r-4" />添加路径</el-button>
+          <el-button v-if="!isView" style="width: 100%;" class="m-t-24" @click="handleAddRow" id="auth-role-path"><i-custom-add class="m-r-4" />添加路径</el-button>
         </div>
       </el-main>
 
       <el-footer v-if="!isView">
         <div class="operate-buttons">
-          <el-button @click="handleReset('edit')">重置</el-button>
-          <el-button type="primary" @click="handleSave" :loading="saveLoading">应用</el-button>
+          <el-button @click="handleReset('edit')" id="auth-role-reset">重置</el-button>
+          <el-button type="primary" @click="handleSave" :loading="saveLoading" id="auth-role-save">应用</el-button>
         </div>
       </el-footer>
     </el-container>

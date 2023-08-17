@@ -3,7 +3,7 @@
     <div class="sql-wrapper">
       <div class="sql-search-wrapper">
         <div class="sql-tab-box">
-          <el-tabs v-model="activiteSql" editable type="card" closable class="sql-tab-list" @tab-click="handleTabClick" @tab-remove="handleTabRemove" @tab-add="handleTabAdd">
+          <el-tabs v-model="activiteSql" editable type="card" closable class="sql-tab-list" @tab-click="handleTabClick" @tab-remove="handleTabRemove" @tab-add="handleTabAdd" id="sql-search-top-tabs">
             <el-tab-pane v-for="item in sqlList" :key="item.id" :label="item.queryName" :name="item.id">
               <template #label>
                 <span style="font-size: 12px; line-height: 1.2;display: flex; width: 118px;"><text-tooltip :content="item.queryName" /></span>
@@ -40,13 +40,13 @@
       <el-form ref="saveFormRef" :model="saveForm" :rules="saveFormRules" label-position="left">
         <el-form-item label="名称：" prop="sqlName">
           <el-input type="hidden" />
-          <el-input v-model="saveForm.sqlName" placeholder="请输入" maxlength="25" show-word-limit />
+          <el-input v-model="saveForm.sqlName" placeholder="请输入" maxlength="25" show-word-limit id="sql-search-modal-save" />
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="handleNameCancel">取消</el-button>
-          <el-button type="primary" :loading="saveLoading" @click="handleNameConfirm">确定</el-button>
+          <el-button @click="handleNameCancel" id="sql-search-modal-save-cancel">取消</el-button>
+          <el-button type="primary" :loading="saveLoading" @click="handleNameConfirm" id="sql-search-modal-save-confirm">确定</el-button>
         </span>
       </template>
     </el-dialog>
@@ -55,17 +55,17 @@
       <el-form ref="resaveFormRef" :model="resaveForm" :rules="resaveFormRules" label-width="80px" label-position="right">
         <el-form-item label="原名称：" prop="oldSqlName" class="type-input-disabled">
           <el-input type="hidden" />
-          <el-input v-model="resaveForm.oldSqlName" disabled />
+          <el-input v-model="resaveForm.oldSqlName" disabled id="sql-search-modal-resave-old" />
         </el-form-item>
         <el-form-item label="新名称：" prop="sqlName">
           <el-input type="hidden" />
-          <el-input v-model="resaveForm.sqlName" placeholder="请输入" maxlength="25" show-word-limit />
+          <el-input v-model="resaveForm.sqlName" placeholder="请输入" maxlength="25" show-word-limit id="sql-search-modal-resave" />
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="renameDialogVisible = false">取消</el-button>
-          <el-button type="primary" :loading="saveLoading" @click="handleRenameConfirm">确定</el-button>
+          <el-button @click="renameDialogVisible = false" id="sql-search-modal-resave-cancel">取消</el-button>
+          <el-button type="primary" :loading="saveLoading" @click="handleRenameConfirm" id="sql-search-modal-confirm">确定</el-button>
         </span>
       </template>
     </el-dialog>

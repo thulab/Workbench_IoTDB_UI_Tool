@@ -6,11 +6,12 @@
     class="new-storage-container"
     align-center
     :close-on-click-modal="false"
+    id="measurement-model-database"
   >
     <el-form ref="formRef" :model="formData" :rules="rules" class="source-form m-t-8" label-position="left" label-width="112px">
       <el-form-item label="数据库名称:" prop="groupName">
         <el-input type="hidden" />
-        <el-input v-model="formData.groupName" placeholder="请输入数据库名称" maxlength="59" show-word-limit>
+        <el-input v-model="formData.groupName" placeholder="请输入数据库名称" maxlength="59" show-word-limit id="measurement-model-groupName">
           <template #prepend>root.</template>
         </el-input>
       </el-form-item>
@@ -18,9 +19,9 @@
         <template #label><span style="margin-left: 9px;">数据保存时间:</span><el-tooltip effect="light" content="数据保存时间（TTL），到期后系统将自动删除数据，此处不填代表永久存储" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
         </template>
         <el-input type="hidden" />
-        <el-input v-model="formData.ttl" min="0" max="9007199254740992" class="ttl-input">
+        <el-input v-model="formData.ttl" min="0" max="9007199254740992" class="ttl-input" id="measurement-model-ttl">
           <template #append>
-            <el-select v-model="formData.ttlUnit" style="width: 56px;" placeholder="">
+            <el-select v-model="formData.ttlUnit" style="width: 56px;" placeholder="" id="measurement-model-ttlunit">
               <el-option label="毫秒" value="millisecond" />
               <el-option label="秒" value="second" />
               <el-option label="分" value="minute" />
@@ -33,8 +34,8 @@
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="saveloading" @click="handleConfirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="measurement-model-cancel">取消</el-button>
+        <el-button type="primary" :loading="saveloading" @click="handleConfirm" id="measurement-model-confirm">确定</el-button>
       </span>
     </template>
   </el-dialog>

@@ -3,7 +3,7 @@
     <div class="search-form-wrapper">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
         <base-form-item label="告警名称：" prop="alarmName">
-          <el-input v-model="searchFormData.alarmName" placeholder="请输入告警名称" style="width: 172px;" />
+          <el-input v-model="searchFormData.alarmName" placeholder="请输入告警名称" style="width: 172px;" id="alarm-config-search-name" />
         </base-form-item>
         <base-form-item label="告警测点：" prop="measurements">
           <template #label>
@@ -15,7 +15,7 @@
           <template #label>
             告警级别：<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减。" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
-          <el-select v-model="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" class="level-select-box" style="width: 80px;">
+          <el-select v-model="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" class="level-select-box" style="width: 80px;" id="alarm-config-search-level">
             <template #prefix>
               <el-icon v-if="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" size="20"><i-custom-alarm-level /></el-icon>
             </template>
@@ -29,7 +29,7 @@
           </el-select>
         </base-form-item>
         <base-form-item label="状态：" prop="status" class="m-r-0">
-          <el-select v-model="searchFormData.status" style="width: 80px;">
+          <el-select v-model="searchFormData.status" style="width: 80px;" id="alarm-config-search-status">
             <el-option v-for="item in statusOptions" :key="item.value" :value="item.value" :label="item.label" />
           </el-select>
         </base-form-item>
@@ -43,6 +43,7 @@
               :disabled-date="disabledDate"
               :shortcuts="shortcutsDaterange"
               :prefix-icon="ICustomCalender"
+              id="alarm-config-search-datetimerange-create"
             />
           </base-form-item>
           <base-form-item label="更新时间：" prop="updatetimerange">
@@ -54,11 +55,12 @@
               :disabled-date="disabledDate"
               :shortcuts="shortcutsDaterange"
               :prefix-icon="ICustomCalender"
+              id="alarm-config-search-datetimerange-update"
             />
           </base-form-item>
           <div class="search-form-buttons">
-            <el-button @click="handleReset">重置</el-button>
-            <el-button type="primary" @click="handleSearch">查询</el-button>
+            <el-button @click="handleReset" id="alarm-config-search-reset">重置</el-button>
+            <el-button type="primary" @click="handleSearch" id="alarm-config-search-search">查询</el-button>
           </div>
         </el-row>
       </el-form>
@@ -68,8 +70,8 @@
       <div class="page-table-title-box">
         <h4 class="page-table-title">告警配置</h4>
         <div class="operate-buttons">
-          <el-button type="primary" @click="handleAdd">新建告警</el-button>
-          <el-button :disabled="!multipleSelection.length" type="primary" @click="handleDel('batch', null)">批量删除</el-button>
+          <el-button type="primary" @click="handleAdd" id="alarm-config-add">新建告警</el-button>
+          <el-button :disabled="!multipleSelection.length" type="primary" @click="handleDel('batch', null)" id="alarm-config-batch-del">批量删除</el-button>
         </div>
       </div>
       <div class="page-table-box">
@@ -109,9 +111,9 @@
           <el-table-column label="操作" width="140" align="center" fixed="right">
             <template #default="{ row }">
               <div>
-                <el-button v-if="row.status !== 3" type="primary" link size="small" @click="handleStatus(row)">{{ row.status === 1 ? '禁用' : '启用' }}</el-button>
-                <el-button :disabled="row.status === 3" type="primary" :style="{ 'margin-left': row.status !== 3 ? '12px' : '40px' }" link size="small" @click="handleEdit(row)">编辑</el-button>
-                <el-button type="primary" link size="small" @click="handleDel('row', row)">删除</el-button>
+                <el-button v-if="row.status !== 3" type="primary" link size="small" @click="handleStatus(row)" :id="`alarm-config-table-${row.measurement}-status`">{{ row.status === 1 ? '禁用' : '启用' }}</el-button>
+                <el-button :disabled="row.status === 3" type="primary" :style="{ 'margin-left': row.status !== 3 ? '12px' : '40px' }" link size="small" @click="handleEdit(row)" :id="`alarm-config-table-${row.measurement}-edit`">编辑</el-button>
+                <el-button type="primary" link size="small" @click="handleDel('row', row)" :id="`alarm-config-table-${row.measurement}-del`">删除</el-button>
               </div>
             </template>
           </el-table-column>

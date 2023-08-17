@@ -4,6 +4,7 @@
     v-model="dialogVisible"
     width="748px"
     :close-on-click-modal="false"
+    id="measurement-modal-measurement"
   >
     <el-form ref="formRef" :model="formData" label-position="left">
       <h4 class="module-title">设备</h4>
@@ -21,6 +22,7 @@
             :loading="deviceLoading"
             style="width: 400px;"
             @change="handleChangeDevice"
+            id="measurement-modal-select-device"
           >
             <el-option v-for="item in deviceList" :key="item" :label="item" :value="item">
               <div style="display: flex; width: 360px;">
@@ -29,13 +31,13 @@
             </el-option>
           </el-select>
           <div v-else class="device-input-group">
-            <el-input :value="groupName + '.'" disabled class="device-input-prepend" style="width: 144px;" />
-            <el-input v-model="formData.deviceName" placeholder="请输入设备名称" class="device-input-box" style="width: 256px;" />
+            <el-input :value="groupName + '.'" disabled class="device-input-prepend" style="width: 144px;" id="measurement-modal-input-groupName" />
+            <el-input v-model="formData.deviceName" placeholder="请输入设备名称" class="device-input-box" style="width: 256px;" id="measurement-modal-input-deviceName" />
           </div>
 
           <div class="device-operate m-l-12">
-            <el-checkbox v-model="addDevice" label="新建设备" @change="handleChangeAdd" />
-            <el-checkbox v-model="isAligned" label="按设备对齐" :disabled="!addDevice" />
+            <el-checkbox v-model="addDevice" label="新建设备" @change="handleChangeAdd" id="measurement-modal-checkbox-device-add" />
+            <el-checkbox v-model="isAligned" label="按设备对齐" :disabled="!addDevice" id="measurement-modal-checkbox-device-align" />
           </div>
         </div>
       </el-form-item>
@@ -54,8 +56,8 @@
                 </el-col>
                 <el-col :span="4">
                   <div class="operate-box">
-                    <el-button link @click="(e)=>handleCopyRow(item, e)"><i-custom-copy /></el-button>
-                    <el-button link class="m-x-12" @click="(e)=>handleDelRow(index, e)"><i-custom-delete /></el-button>
+                    <el-button link @click="(e)=>handleCopyRow(item, e)" :id="`measurement-modal-collapse-${index}-copy`"><i-custom-copy /></el-button>
+                    <el-button link class="m-x-12" @click="(e)=>handleDelRow(index, e)" :id="`measurement-modal-collapse-${index}-del`"><i-custom-delete /></el-button>
                   </div>
                 </el-col>
               </el-row>
@@ -64,7 +66,7 @@
               <el-col :span="8">
                 <el-form-item label="测点名称：" :prop="'measurementList[' + index + '].timeseries'" :rules="requiredRules">
                   <el-input type="hidden" />
-                  <el-input v-model="item.timeseries" placeholder="请输入测点名称" :disabled="!item.isEditable || !formData.deviceName" />
+                  <el-input v-model="item.timeseries" placeholder="请输入测点名称" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-timeseries`" />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -72,7 +74,7 @@
               <el-col :span="8">
                 <el-form-item label="数据类型：" :prop="'measurementList[' + index + '].dataType'" :rules="requiredRules">
                   <el-input type="hidden" />
-                  <el-select v-model="item.dataType" placeholder="请选择数据类型" @change="val => handleChangeRowDataType(val, item, index)" :disabled="!item.isEditable || !formData.deviceName">
+                  <el-select v-model="item.dataType" placeholder="请选择数据类型" @change="val => handleChangeRowDataType(val, item, index)" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-dataType`">
                     <el-option v-for="dtype in dataTypeOptions" :key="dtype" :label="dtype" :value="dtype" />
                   </el-select>
                 </el-form-item>
@@ -80,7 +82,7 @@
               <el-col :span="8">
                 <el-form-item label="编码方式：" :prop="'measurementList[' + index + '].encoding'" :rules="requiredRules">
                   <el-input type="hidden" />
-                  <el-select v-model="item.encoding" placeholder="请选择数据类型" :disabled="!item.isEditable || !item.dataType || !formData.deviceName">
+                  <el-select v-model="item.encoding" placeholder="请选择数据类型" :disabled="!item.isEditable || !item.dataType || !formData.deviceName" :id="`measurement-modal-collapse-${index}-encoding`">
                     <el-option v-for="enc in encodingOptions(item.dataType as string)" :key="enc" :label="enc" :value="enc" />
                   </el-select>
                 </el-form-item>
@@ -88,7 +90,7 @@
               <el-col :span="8">
                 <el-form-item label="压缩方式：" :prop="'measurementList[' + index + '].compression'" :rules="requiredRules" style="margin-right: 0;">
                   <el-input type="hidden" />
-                  <el-select v-model="item.compression" placeholder="请选择数据类型" :disabled="!item.isEditable || !formData.deviceName">
+                  <el-select v-model="item.compression" placeholder="请选择数据类型" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-compression`">
                     <el-option v-for="com in compressionOptions" :key="com" :label="com" :value="com" />
                   </el-select>
                 </el-form-item>
@@ -98,12 +100,12 @@
         </el-collapse>
       </el-scrollbar>
 
-      <el-button style="width: 100%;" class="m-t-16" :disabled="addControl" @click="handleAddRow"><i-custom-add class="m-r-4" />添加测点</el-button>
+      <el-button style="width: 100%;" class="m-t-16" :disabled="addControl" @click="handleAddRow" id="measurement-modal-collapse-add"><i-custom-add class="m-r-4" />添加测点</el-button>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="saveLoading" @click="handleConfirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="measurement-modal-cancel">取消</el-button>
+        <el-button type="primary" :loading="saveLoading" @click="handleConfirm" id="measurement-modal-confirm">确定</el-button>
       </span>
     </template>
   </el-dialog>

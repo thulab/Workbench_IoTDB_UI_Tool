@@ -3,7 +3,7 @@
     <div class="search-form-wrapper">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
         <base-form-item label="告警名称：" prop="alarmName">
-          <el-input v-model="searchFormData.alarmName" placeholder="请输入告警名称" style="width: 172px;" />
+          <el-input v-model="searchFormData.alarmName" placeholder="请输入告警名称" style="width: 172px;" id="alarm-record-search-name" />
         </base-form-item>
         <base-form-item label="告警测点：" prop="measurements">
           <template #label>
@@ -15,7 +15,7 @@
           <template #label>
             告警级别：<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减。" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
-          <el-select v-model="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" class="level-select-box" style="width: 80px;">
+          <el-select v-model="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" class="level-select-box" style="width: 80px;" id="alarm-record-search-level">
             <template #prefix>
               <el-icon v-if="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" size="20"><i-custom-alarm-level /></el-icon>
             </template>
@@ -38,6 +38,7 @@
               :disabled-date="disabledDate"
               :shortcuts="shortcutsDaterange"
               :prefix-icon="ICustomCalender"
+              id="alarm-record-search-time"
             />
           </base-form-item>
           <base-form-item label="仅查看最新状态：" prop="status">
@@ -47,11 +48,13 @@
               :inactive-value="0"
               style="
 
---el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;" />
+--el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;"
+              id="alarm-record-search-status"
+            />
           </base-form-item>
           <div class="search-form-buttons">
-            <el-button @click="handleReset">重置</el-button>
-            <el-button type="primary" @click="handleSearch">查询</el-button>
+            <el-button @click="handleReset" id="alarm-record-search-reset">重置</el-button>
+            <el-button type="primary" @click="handleSearch" id="alarm-record-search-search">查询</el-button>
           </div>
         </el-row>
       </el-form>
@@ -63,7 +66,7 @@
         <h4 class="page-table-title">告警记录</h4>
         <div class="operate-buttons">
           <el-dropdown class="m-r-12" :disabled="!totalCount" @command="val => handleCommandDown(val)">
-            <el-button type="primary" class="export-btn" :disabled="!totalCount">导出<el-tooltip effect="light" content="此导出操作为搜索结果导出。excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question-white /></el-tooltip></el-button>
+            <el-button type="primary" class="export-btn" :disabled="!totalCount" id="alarm-record-download">导出<el-tooltip effect="light" content="此导出操作为搜索结果导出。excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question-white /></el-tooltip></el-button>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
@@ -104,7 +107,7 @@
           <el-table-column label="告警描述" prop="alarmDesc" min-width="140" align="center" show-overflow-tooltip />
           <el-table-column label="是否确认" width="100" align="center" fixed="right">
             <template #default="{ row }">
-              <el-button v-if="!row.hasRead" type="primary" link size="small" @click="handleStatus(row)">确认</el-button>
+              <el-button v-if="!row.hasRead" type="primary" link size="small" @click="handleStatus(row)" :id="`alarm-record-table-${row.measurement}-confirm`">确认</el-button>
               <div v-else class="operate-confirm-box">
                 <el-icon size="16" class="p-x-5"><i-custom-success-green /></el-icon>
                 已确认
