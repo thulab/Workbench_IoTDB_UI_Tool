@@ -49,15 +49,18 @@
             <div class="table-box-wrapper">
               <el-table
                 :data="tableData"
+                ref="tableRef"
                 v-loading="loading"
                 style="width: 100%;"
                 :max-height="260"
                 tooltip-effect="light"
                 :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
+                :default-sort="{ prop: 'type', order: 'ascending' }"
+                @sort-change="handleSortChange"
               >
                 <el-table-column label="节点" prop="address" min-width="200" align="center" show-overflow-tooltip />
-                <el-table-column label="类型" prop="type" min-width="120" align="center" show-overflow-tooltip />
-                <el-table-column label="状态" prop="status" min-width="120" align="center" show-overflow-tooltip />
+                <el-table-column label="类型" prop="type" sortable="custom" min-width="120" align="center" show-overflow-tooltip />
+                <el-table-column label="状态" prop="status" sortable="custom" min-width="120" align="center" show-overflow-tooltip />
                 <el-table-column label="版本" prop="version" min-width="90" align="center" show-overflow-tooltip />
                 <el-table-column label="物理机" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
                 <template #empty>
@@ -124,6 +127,7 @@
 <script lang="ts" setup>
 import { assign, concat } from 'lodash-es';
 import dayjs from 'dayjs';
+import type { ElTable } from 'element-plus';
 import { useUserStore } from '@/stores';
 import { DashboardApi } from '@/api';
 import { toThousands } from '@/utils/format';
@@ -134,6 +138,7 @@ import MonitorConfignode from './components/monitor-confignode.vue';
 const userStore = useUserStore();
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const enablePrometheus = computed(() => userStore.enablePrometheus);
+const tableRef = ref<InstanceType<typeof ElTable>>();
 const systemData = reactive<Dashboard.SystemData>({
   dataNodeRatio: '-',
   configNodeRatio: '-',
@@ -142,6 +147,10 @@ const systemData = reactive<Dashboard.SystemData>({
   databaseNum: 0,
   deviceNum: 0,
   measurementNum: 0,
+});
+const searchFormData = reactive({
+  orderBy: 'type',
+  asc: 'asc',
 });
 const tableData = ref<Dashboard.NodeItem[]>([]);
 const refreshInterval = ref();
@@ -234,6 +243,18 @@ function handleChangeNode(val: string) {
     }
   }
   handleRefreshMonitor();
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function handleSortChange({ column, prop, order }:SortMethod<Alarm.QueryConfigResult>) {
+  const lastOrderBy = searchFormData.orderBy;
+  const lastAsc = searchFormData.asc;
+  searchFormData.asc = order === 'ascending' ? 'asc' : 'desc';
+  searchFormData.orderBy = prop;
+  if (!order) {
+    tableRef.value?.sort(lastOrderBy, lastAsc === 'asc' ? 'descending' : 'ascending');
+  }
+  handleRefreshSystem();
 }
 
 onMounted(() => {

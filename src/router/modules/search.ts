@@ -4,6 +4,7 @@ import ICustomQueryData from '@/assets/icons/query-data.svg?raw';
 import ICustomQuerySQL from '@/assets/icons/query-sql.svg?raw';
 import ICustomQuery from '@/assets/icons/query.svg?raw';
 import ICustomQueryActive from '@/assets/icons/query-active.svg?raw';
+import ICustomQueryStatistic from '@/assets/icons/query-statistic.svg?raw';
 
 const route = [
   {
@@ -22,6 +23,12 @@ const route = [
         name: 'DataSearch',
         component: () => import('@/views/search/data-search.vue'),
         meta: { keepAlive: true, title: '数据查询', icon: ICustomQueryData },
+      },
+      {
+        path: 'statistic-search',
+        name: 'StatisticSearch',
+        component: () => import('@/views/search/statistic-search.vue'),
+        meta: { keepAlive: true, title: '统计查询', icon: ICustomQueryStatistic },
       },
       {
         path: 'sql-search',

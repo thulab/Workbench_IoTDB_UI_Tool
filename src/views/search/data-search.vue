@@ -93,10 +93,10 @@
           <span class="run-result-tip"><i-custom-info-warning />默认最多展示1000行100列，如需更多请导出查看</span>
         </h4>
         <div class="page-detail-buttons">
-          <el-button @click="handleSearch" :disabled="getListLoading">刷新</el-button>
-          <el-button class="m-l-12" @click="handleImport">导入</el-button>
+          <el-button @click="handleSearch" :disabled="getListLoading" id="data-search-refresh">刷新</el-button>
+          <el-button class="m-l-12" @click="handleImport" id="data-search-import">导入</el-button>
           <el-dropdown class="more-icon m-l-12" :disabled="getListLoading" v-show="searchDetailInfos.status" @command="val => handleCommandDown(val)">
-            <el-button class="export-btn">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
+            <el-button class="export-btn" id="data-search-download">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
