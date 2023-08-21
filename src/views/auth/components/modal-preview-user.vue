@@ -61,7 +61,7 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
-import { union, flatten } from 'lodash-es';
+import { union, difference } from 'lodash-es';
 import { useUserStore } from '@/stores';
 import { AuthApi } from '@/api';
 
@@ -105,21 +105,72 @@ function getDetail() {
  * 全局权限表格数据
  */
 const entityTableData = computed(() => {
-  const roleEntityPrivileges: string[][] = [];
-  if (authData.value.rolesToPrivileges.length) {
-    authData.value.rolesToPrivileges.forEach((item) => {
-      roleEntityPrivileges.push(item.entityPrivileges || []);
-    });
-  }
-  const result = union(authData.value.entityPrivileges, flatten(roleEntityPrivileges));
+  const roleEntityPrivileges: string[] = (authData.value.rolesToPrivileges || []).flatMap((item) => item.entityPrivileges);
+  const result = union(authData.value.entityPrivileges, roleEntityPrivileges);
   return [{ privileges: result }];
 });
 
-// TODO 待处理合并
-const tableData = computed(() => [{
-  path: '',
-  privileges: [],
-}]);
+/**
+ * 将角色的路径权限合并到一起
+ * @param data 合并完的结果
+ * @param role 要合并的角色
+ */
+function mergeRolePathPrivileges(data: Array<{ path: string, privileges: string[] }>, role: Auth.AuthByRoleRes) {
+  role.pathPrivileges.forEach((item) => {
+    const path = data.find((pathItem) => pathItem.path === item.path);
+    if (!path) {
+      data.push({
+        path: item.path,
+        privileges: item.privileges,
+      });
+    } else {
+      path.privileges = union(path.privileges, item.privileges);
+    }
+  });
+}
+
+/**
+ * 角色路径权限，合并到一起。独立计算属性（计算属性有缓存，角色不变，这里就不变）
+ */
+const rolePathPrivileges = computed(() => {
+  const result: Array<{ path: string, privileges: string[] }> = [];
+  authData.value.rolesToPrivileges?.forEach((role) => {
+    mergeRolePathPrivileges(result, role);
+  });
+  return result;
+});
+
+function joinRolePathPrivileges(data: Array<{ path: string, privileges: string[] }>, role: { path: string, privileges: string[] }) {
+  const path = data.find((pathItem) => pathItem.path === role.path);
+  if (path) {
+    path.privileges = union(path.privileges || [], role.privileges);
+  }
+}
+
+const tableData = computed(() => {
+  const rolePaths = rolePathPrivileges.value.map((item) => item.path);
+  const userPrivileges = authData.value.pathPrivileges || [];
+  difference(rolePaths, userPrivileges.map((item) => item.path)).forEach((path) => {
+    userPrivileges.push({ path, privileges: [] });
+  });
+
+  const result: Array<{ path: string, privileges: string[] }> = userPrivileges.map((item) => ({
+    path: item.path,
+    privileges: item.privileges,
+  }));
+
+  rolePathPrivileges.value?.forEach((item) => {
+    joinRolePathPrivileges(result, item);
+  });
+
+  if (result.length === 0) {
+    return [{
+      path: '',
+      privileges: [],
+    }];
+  }
+  return result;
+});
 
 function calcColumnWidth(child: Auth.PrivilegeEnum) {
   if (child.privileges.length > 0) {
