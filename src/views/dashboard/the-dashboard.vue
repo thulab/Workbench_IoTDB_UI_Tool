@@ -187,7 +187,7 @@ function getMonitorData() {
 
 function getSystemData() {
   systemTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
-  return getSystemInfo().then((res) => {
+  return getSystemInfo(searchFormData.orderBy, searchFormData.asc).then((res) => {
     assign(systemData, res.data);
     tableData.value = res.data.nodes || [];
     nodeList.value = concat([{

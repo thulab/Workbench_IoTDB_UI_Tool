@@ -3,8 +3,8 @@ import http from '@/utils/http';
 // 首页
 class DashboardApi {
   // 获取系统信息
-  static getSystemInfo(): HttpResponseP<Dashboard.SystemInfoRes> {
-    return http.get('/home/getSystemInfo');
+  static getSystemInfo(orderBy: string, asc: string): HttpResponseP<Dashboard.SystemInfoRes> {
+    return http.get('/home/getSystemInfo', { params: { orderBy, asc } });
   }
 
   // 内存
