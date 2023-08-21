@@ -51,5 +51,15 @@ class SearchApi {
   static getHistoryTrend(data: Search.QueryHistoryTrend): HttpResponseP<Search.QueryHistoryTrendResponse> {
     return http.post('/trend/history', data);
   }
+
+  // 统计查询-最大最小值
+  static getStatisticSearchMinMax(data: Search.StatisticSearch): HttpResponseP<Search.StatisticSearchMinMaxObj[]> {
+    return http.post('/data/getStatisticalMaxMinValue', data);
+  }
+
+  // 统计查询-平均总和
+  static getStatisticSearchAvgSum(data: Search.StatisticSearch): HttpResponseP<Search.StatisticSearchAvgSumObj[]> {
+    return http.post('/data/getStatisticalAvgSumValue', data);
+  }
 }
 export default SearchApi;

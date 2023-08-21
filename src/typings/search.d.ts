@@ -80,4 +80,25 @@ declare namespace Search{
     normal: TrendData[];
     abnormal: string[];
   }
+
+  export interface StatisticSearch {
+    measurements: string[];
+    startTime: DateModelType;
+    endTime: DateModelType;
+    timestamp: number;
+  }
+
+  export interface StatisticSearchMinMaxObj {
+    measurement: string;
+    minValue: string;
+    minTime: string;
+    maxValue: string;
+    maxTime: string;
+  }
+
+  export interface StatisticSearchAvgSumObj {
+    measurement: string;
+    avgValue: string;
+    sumValue: string;
+  }
 }

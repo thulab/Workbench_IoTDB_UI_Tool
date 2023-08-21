@@ -24,7 +24,7 @@
       </el-form>
       <div class="search-form-buttons">
         <el-button @click="handleReset" :disabled="getListLoading" id="statistic-search-reset">重置</el-button>
-        <el-button type="primary" @click="handleSearch" id="statistic-search-search">{{getListLoading ? '取消查询' : '查询'}}</el-button>
+        <el-button :disabled="searchFormData.path.length === 0" type="primary" @click="handleSearch" id="statistic-search-search">{{getListLoading ? '取消查询' : '查询'}}</el-button>
       </div>
     </div>
 
@@ -32,8 +32,8 @@
       <div class="page-info-box">
         <h4 class="page-info-title">查询详情</h4>
         <div class="page-detail-buttons">
-          <el-dropdown class="m-r-16" :disabled="getListLoading" @command="val => handleCommandDown(val)">
-            <el-button class="export-btn" id="statistic-search-download" :disabled="getListLoading">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
+          <el-dropdown class="m-r-16" :disabled="getListLoading || tableData.length === 0" @command="val => handleCommandDown(val)">
+            <el-button class="export-btn" id="statistic-search-download" :disabled="getListLoading || tableData.length === 0">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
@@ -41,12 +41,12 @@
               </el-dropdown-menu>
             </template>
           </el-dropdown>
-          <el-button link @click="handleSearch" :disabled="getListLoading" id="statistic-search-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+          <el-button link @click="handleSearch" :disabled="getListLoading || searchFormData.path.length === 0" id="statistic-search-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
         </div>
       </div>
 
       <el-table
-        :data="tableData"
+        :data="tableDataPagination"
         v-loading="getListLoading"
         style="width: 100%;"
         :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
@@ -55,13 +55,13 @@
         ref="tableRef"
         :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
       >
-        <el-table-column label="测点名称" prop="timeseries" width="160" align="center" show-overflow-tooltip />
-        <el-table-column label="最小值" prop="dataType" width="140" align="center" show-overflow-tooltip />
-        <el-table-column label="最小值时间" prop="encoding" min-width="140" align="center" show-overflow-tooltip />
-        <el-table-column label="最大值" prop="value" min-width="140" align="center" show-overflow-tooltip />
-        <el-table-column label="最大值时间" prop="valueTime" min-width="200" align="center" show-overflow-tooltip />
-        <el-table-column label="平均值" prop="valueTime" min-width="200" align="center" show-overflow-tooltip />
-        <el-table-column label="总和" prop="valueTime" min-width="200" align="center" show-overflow-tooltip />
+        <el-table-column label="测点名称" prop="measurement" width="160" align="center" show-overflow-tooltip />
+        <el-table-column label="最小值" prop="minValue" width="160" align="center" show-overflow-tooltip />
+        <el-table-column label="最小值时间" prop="minTime" min-width="200" align="center" show-overflow-tooltip />
+        <el-table-column label="最大值" prop="maxValue" min-width="160" align="center" show-overflow-tooltip />
+        <el-table-column label="最大值时间" prop="maxTime" min-width="200" align="center" show-overflow-tooltip />
+        <el-table-column label="平均值" prop="avgValue" min-width="160" align="center" show-overflow-tooltip />
+        <el-table-column label="总和" prop="sumValue" min-width="160" align="center" show-overflow-tooltip />
         <template #empty>
           <div class="table-empty-wrapper">
             <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
@@ -90,9 +90,10 @@
 import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash-es';
+import { SearchApi } from '@/api';
 import { useTableHeight } from '@/composition-api';
 import {
-  getStartAndEnd, today, getOneInterval, getOneIntervalNow,
+  getStartAndEnd, today, getOneInterval, getOneIntervalNow, formatDate,
 } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
 
@@ -103,12 +104,11 @@ const pagination = reactive({
   pageSize: 10,
   pageNum: 1,
 });
-const totalCount = ref(0);
 const searchFormData = reactive({
   path: [] as string[],
   datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
 });
-let copySearchFormData = cloneDeep(searchFormData);
+let copySearchFormData = cloneDeep({ ...searchFormData });
 const shortcutsDaterange = [
   {
     text: '今天',
@@ -125,28 +125,82 @@ const shortcutsDaterange = [
 ];
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 const getListLoading = ref(false);
-const tableData = ref<Array<Record<string, any>>>([]);
+const timestamp = ref(0);
+const tableData = ref<Array<Search.StatisticSearchMinMaxObj & Search.StatisticSearchAvgSumObj>>([]);
+const minMaxList = ref<Search.StatisticSearchMinMaxObj[]>([]);
+const avgSumList = ref<Search.StatisticSearchAvgSumObj[]>([]);
 
-const controller = new AbortController();
+const totalCount = computed(() => copySearchFormData.path.length);
+
+const tableDataPagination = computed(() => tableData.value.slice(
+  ((pagination.pageNum || 1) - 1) * pagination.pageSize,
+  (pagination.pageNum || 1) * pagination.pageSize,
+) as Array<Search.StatisticSearchMinMaxObj & Search.StatisticSearchAvgSumObj>);
+
+const searchPaginationPath = computed(() => copySearchFormData.path.splice(
+  ((pagination.pageNum || 1) - 1) * pagination.pageSize,
+  (pagination.pageNum || 1) * pagination.pageSize,
+) as string[]);
+
+const { requestFn: getMinMax } = useRequest(SearchApi.getStatisticSearchMinMax);
+const { requestFn: getAvgSum } = useRequest(SearchApi.getStatisticSearchAvgSum);
+
+function getMinMaxData() {
+  return getMinMax({
+    measurements: searchPaginationPath.value,
+    startTime: formatDate(copySearchFormData.datetimerange[0] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
+    endTime: formatDate(copySearchFormData.datetimerange[1] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
+    timestamp: timestamp.value,
+  }).then((res) => {
+    minMaxList.value = res.data || [];
+  });
+}
+
+function getAvgSumData() {
+  return getAvgSum({
+    measurements: searchPaginationPath.value,
+    startTime: formatDate(copySearchFormData.datetimerange[0] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
+    endTime: formatDate(copySearchFormData.datetimerange[1] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
+    timestamp: timestamp.value,
+  }).then((res) => {
+    avgSumList.value = res.data || [];
+  });
+}
 
 function getListData() {
-
+  tableData.value = [];
+  minMaxList.value = [];
+  avgSumList.value = [];
+  getListLoading.value = true;
+  Promise.allSettled([
+    getMinMaxData(),
+    getAvgSumData(),
+  ]).then(() => {
+    tableData.value = minMaxList.value.map((item, index) => ({
+      measurement: item.measurement,
+      minValue: item.minValue || '-',
+      minTime: item.minTime || '-',
+      maxValue: item.maxValue || '-',
+      maxTime: item.maxTime || '-',
+      avgValue: avgSumList.value[index].avgValue || '-',
+      sumValue: avgSumList.value[index].sumValue || '-',
+    }));
+    getListLoading.value = false;
+  });
 }
 
 // 重置
 function handleReset() {
-  searchFormRef.value?.resetFields();
+  searchFormData.path = [];
   searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
 }
 
 // 查询
 function handleSearch() {
-  if (getListLoading.value) {
-    controller.abort();
-    return;
-  }
+  if (getListLoading.value) return;
   pagination.pageNum = 1;
-  copySearchFormData = cloneDeep(searchFormData);
+  copySearchFormData = cloneDeep({ ...searchFormData });
+  timestamp.value = Number(new Date());
   getListData();
 }
 
@@ -181,7 +235,6 @@ function handleCommandDown(val: string) {
 
 onMounted(() => {
   handleReset();
-  handleSearch();
 });
 
 </script>
