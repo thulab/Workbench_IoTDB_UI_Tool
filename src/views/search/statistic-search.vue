@@ -46,7 +46,7 @@
       </div>
 
       <el-table
-        :data="tableDataPagination"
+        :data="tableData"
         v-loading="getListLoading"
         style="width: 100%;"
         :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
@@ -132,11 +132,6 @@ const minMaxList = ref<Search.StatisticSearchMinMaxObj[]>([]);
 const avgSumList = ref<Search.StatisticSearchAvgSumObj[]>([]);
 
 const totalCount = computed(() => copySearchFormData.path.length);
-
-const tableDataPagination = computed(() => tableData.value.slice(
-  ((pagination.pageNum || 1) - 1) * pagination.pageSize,
-  (pagination.pageNum || 1) * pagination.pageSize,
-) as Array<Search.StatisticSearchMinMaxObj & Search.StatisticSearchAvgSumObj>);
 
 const searchPaginationPath = computed(() => copySearchFormData.path.slice(
   ((pagination.pageNum || 1) - 1) * pagination.pageSize,
@@ -229,17 +224,20 @@ function handleSearch() {
   copySearchFormData.datetimerange = searchFormData.datetimerange;
   timestamp.value = Number(new Date());
   getListData();
+  // getListDataBatch();
 }
 
 function onChangePageSize(val: number) {
   pagination.pageSize = val;
   pagination.pageNum = 1;
   getListData();
+  // getListDataBatch();
 }
 
 function onChangePage(page: number) {
   pagination.pageNum = page;
   getListData();
+  // getListDataBatch();
 }
 
 // 下载
