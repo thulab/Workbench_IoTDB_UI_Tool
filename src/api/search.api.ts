@@ -61,5 +61,15 @@ class SearchApi {
   static getStatisticSearchAvgSum(data: Search.StatisticSearch): HttpResponseP<Search.StatisticSearchAvgSumObj[]> {
     return http.post('/data/getStatisticalAvgSumValue', data);
   }
+
+  // 统计查询-批量
+  static getStatisticData(data: Search.StatisticSearch): HttpResponseP<Array<Search.StatisticSearchMinMaxObj & Search.StatisticSearchAvgSumObj>> {
+    return http.post('/data/getStatisticInfo', data);
+  }
+
+  // 统计查询-导出
+  static exportStatisticData(data: Search.StatisticSearch): HttpResponseP {
+    return http.post('/file/statisticsGetExportId', data);
+  }
 }
 export default SearchApi;

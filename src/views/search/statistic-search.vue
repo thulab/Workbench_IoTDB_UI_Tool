@@ -55,8 +55,8 @@
         ref="tableRef"
         :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
       >
-        <el-table-column label="测点名称" prop="measurement" width="160" align="center" show-overflow-tooltip />
-        <el-table-column label="最小值" prop="minValue" width="160" align="center" show-overflow-tooltip />
+        <el-table-column label="测点名称" prop="measurement" min-width="200" align="center" show-overflow-tooltip />
+        <el-table-column label="最小值" prop="minValue" min-width="160" align="center" show-overflow-tooltip />
         <el-table-column label="最小值时间" prop="minTime" min-width="200" align="center" show-overflow-tooltip />
         <el-table-column label="最大值" prop="maxValue" min-width="160" align="center" show-overflow-tooltip />
         <el-table-column label="最大值时间" prop="maxTime" min-width="200" align="center" show-overflow-tooltip />
@@ -88,8 +88,6 @@
 
 <script setup lang="ts">
 import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
-import dayjs from 'dayjs';
-import { cloneDeep } from 'lodash-es';
 import { SearchApi } from '@/api';
 import { useTableHeight } from '@/composition-api';
 import {
@@ -108,7 +106,10 @@ const searchFormData = reactive({
   path: [] as string[],
   datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
 });
-let copySearchFormData = cloneDeep({ ...searchFormData });
+const copySearchFormData = reactive({
+  path: [] as string[],
+  datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
+});
 const shortcutsDaterange = [
   {
     text: '今天',
@@ -137,13 +138,15 @@ const tableDataPagination = computed(() => tableData.value.slice(
   (pagination.pageNum || 1) * pagination.pageSize,
 ) as Array<Search.StatisticSearchMinMaxObj & Search.StatisticSearchAvgSumObj>);
 
-const searchPaginationPath = computed(() => copySearchFormData.path.splice(
+const searchPaginationPath = computed(() => copySearchFormData.path.slice(
   ((pagination.pageNum || 1) - 1) * pagination.pageSize,
   (pagination.pageNum || 1) * pagination.pageSize,
 ) as string[]);
 
 const { requestFn: getMinMax } = useRequest(SearchApi.getStatisticSearchMinMax);
 const { requestFn: getAvgSum } = useRequest(SearchApi.getStatisticSearchAvgSum);
+const { requestFn: getStatisticData } = useRequest(SearchApi.getStatisticData);
+const { requestFn: exportStatisticData } = useRequest(SearchApi.exportStatisticData);
 
 function getMinMaxData() {
   return getMinMax({
@@ -189,6 +192,29 @@ function getListData() {
   });
 }
 
+// 批量查询列表数据
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function getListDataBatch() {
+  getListLoading.value = true;
+  getStatisticData({
+    measurements: searchPaginationPath.value,
+    startTime: formatDate(copySearchFormData.datetimerange[0] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
+    endTime: formatDate(copySearchFormData.datetimerange[1] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
+    timestamp: timestamp.value,
+  }).then((res) => {
+    tableData.value = res.data?.map((item) => ({
+      measurement: item.measurement,
+      minValue: item.minValue || '-',
+      minTime: item.minTime || '-',
+      maxValue: item.maxValue || '-',
+      maxTime: item.maxTime || '-',
+      avgValue: item.avgValue || '-',
+      sumValue: item.sumValue || '-',
+    }));
+    getListLoading.value = false;
+  });
+}
+
 // 重置
 function handleReset() {
   searchFormData.path = [];
@@ -199,7 +225,8 @@ function handleReset() {
 function handleSearch() {
   if (getListLoading.value) return;
   pagination.pageNum = 1;
-  copySearchFormData = cloneDeep({ ...searchFormData });
+  copySearchFormData.path = searchFormData.path;
+  copySearchFormData.datetimerange = searchFormData.datetimerange;
   timestamp.value = Number(new Date());
   getListData();
 }
@@ -217,20 +244,18 @@ function onChangePage(page: number) {
 
 // 下载
 function handleCommandDown(val: string) {
-  const startTime = dayjs(copySearchFormData.datetimerange[0]).valueOf();
-  const endTime = dayjs(copySearchFormData.datetimerange[1]).valueOf();
-  console.log(val, startTime, endTime);
-  // exportData({
-  //   measurements: copySearchFormData.path,
-  //   startTime,
-  //   endTime,
-  // }).then((res) => {
-  //   let url = `/api/file/exportExcelData?exportId=${res.data}`;
-  //   if (exportType === 'csv') {
-  //     url = `/api/file/exportCSVData?exportId=${res.data}`;
-  //   }
-  //   window.open(url);
-  // });
+  exportStatisticData({
+    measurements: copySearchFormData.path,
+    startTime: formatDate(copySearchFormData.datetimerange[0] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
+    endTime: formatDate(copySearchFormData.datetimerange[1] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
+    timestamp: timestamp.value,
+  }).then((res) => {
+    let url = `/api/file/exportExcelStatistics?exportId=${res.data}`;
+    if (val === 'csv') {
+      url = `/api/file/exportCSVStatistics?exportId=${res.data}`;
+    }
+    window.open(url);
+  });
 }
 
 onMounted(() => {
