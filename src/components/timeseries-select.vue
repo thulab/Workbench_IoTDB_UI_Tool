@@ -17,9 +17,9 @@
       <template #prefix>
         <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
       </template>
-      <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+      <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :disabled="isBooleanTextDisabled ? (item.dataType === 'BOOLEAN' || item.dataType === 'TEXT') : false">
         <div class="remote-select-search-text">
-          <text-tooltip :content="item.label" />
+          <text-tooltip :content="item.timeseries" />
         </div>
       </el-option>
     </el-select>
@@ -50,13 +50,14 @@ const props = defineProps<{
   placeholder?: string;
   viewText?: string;
   filterSystem?: boolean;
+  isBooleanTextDisabled?: boolean;
 }>();
 const model = useVModel(props, 'modelValue');
 const dialogVisible = ref(false);
+const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);
 
-const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementAllList);
+const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementAllObjList);
 
-const options = ref<Array<{ label: string; value: string }>>([]);
 let lastMeasurementQuery = '';
 const remoteMethod = debounce((query: string) => {
   lastMeasurementQuery = query;
@@ -64,9 +65,9 @@ const remoteMethod = debounce((query: string) => {
     if (lastMeasurementQuery === query) {
       let measurements = res.data?.measurements || [];
       if (props.filterSystem) {
-        measurements = measurements.filter((item) => !item.startsWith('root.__system'));
+        measurements = measurements.filter((item) => !item.timeseries.startsWith('root.__system'));
       }
-      options.value = measurements.map((item) => ({ label: item, value: item })) || [];
+      measurementList.value = measurements;
     }
   });
 }, 500);

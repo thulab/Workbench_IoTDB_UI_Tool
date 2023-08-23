@@ -53,12 +53,12 @@ class SearchApi {
   }
 
   // 统计查询-最大最小值
-  static getStatisticSearchMinMax(data: Search.StatisticSearch): HttpResponseP<Search.StatisticSearchMinMaxObj[]> {
+  static getStatisticSearchMinMax(data: Search.StatisticSearch): HttpResponseP<{ data: Search.StatisticSearchMinMaxObj[], code: number, message: string }> {
     return http.post('/data/getStatisticalMaxMinValue', data);
   }
 
   // 统计查询-平均总和
-  static getStatisticSearchAvgSum(data: Search.StatisticSearch): HttpResponseP<Search.StatisticSearchAvgSumObj[]> {
+  static getStatisticSearchAvgSum(data: Search.StatisticSearch): HttpResponseP<{ data: Search.StatisticSearchAvgSumObj[], code: number, message: string }> {
     return http.post('/data/getStatisticalAvgSumValue', data);
   }
 

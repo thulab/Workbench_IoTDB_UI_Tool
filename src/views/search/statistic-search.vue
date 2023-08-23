@@ -6,7 +6,7 @@
           <template #label>
             测点选择：<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
-          <timeseries-select v-model="searchFormData.path" :is-show-view-btn="true" />
+          <timeseries-select v-model="searchFormData.path" :is-show-view-btn="true" :is-boolean-text-disabled="true" />
         </base-form-item>
         <base-form-item label="查询时间：" prop="datetimerange" style="margin-right: 0;">
           <el-date-picker
@@ -55,11 +55,11 @@
         ref="tableRef"
         :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
       >
-        <el-table-column label="测点名称" prop="measurement" min-width="200" align="center" show-overflow-tooltip />
+        <el-table-column label="测点名称" prop="measurement" min-width="240" align="center" show-overflow-tooltip />
         <el-table-column label="最小值" prop="minValue" min-width="160" align="center" show-overflow-tooltip />
-        <el-table-column label="最小值时间" prop="minTime" min-width="200" align="center" show-overflow-tooltip />
+        <el-table-column label="最小值时间" prop="minTime" min-width="180" align="center" show-overflow-tooltip />
         <el-table-column label="最大值" prop="maxValue" min-width="160" align="center" show-overflow-tooltip />
-        <el-table-column label="最大值时间" prop="maxTime" min-width="200" align="center" show-overflow-tooltip />
+        <el-table-column label="最大值时间" prop="maxTime" min-width="180" align="center" show-overflow-tooltip />
         <el-table-column label="平均值" prop="avgValue" min-width="160" align="center" show-overflow-tooltip />
         <el-table-column label="总和" prop="sumValue" min-width="160" align="center" show-overflow-tooltip />
         <template #empty>
@@ -130,7 +130,7 @@ const timestamp = ref(0);
 const tableData = ref<Array<Search.StatisticSearchMinMaxObj & Search.StatisticSearchAvgSumObj>>([]);
 const minMaxList = ref<Search.StatisticSearchMinMaxObj[]>([]);
 const avgSumList = ref<Search.StatisticSearchAvgSumObj[]>([]);
-
+const tableErrorMessage = ref<string[]>([]);
 const totalCount = computed(() => copySearchFormData.path.length);
 
 const searchPaginationPath = computed(() => copySearchFormData.path.slice(
@@ -150,7 +150,10 @@ function getMinMaxData() {
     endTime: formatDate(copySearchFormData.datetimerange[1] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
     timestamp: timestamp.value,
   }).then((res) => {
-    minMaxList.value = res.data || [];
+    minMaxList.value = res.data.data || [];
+    if (res.data.message) {
+      tableErrorMessage.value.push(res.data.message);
+    }
   });
 }
 
@@ -161,7 +164,10 @@ function getAvgSumData() {
     endTime: formatDate(copySearchFormData.datetimerange[1] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
     timestamp: timestamp.value,
   }).then((res) => {
-    avgSumList.value = res.data || [];
+    avgSumList.value = res.data.data || [];
+    if (res.data.message) {
+      tableErrorMessage.value.push(res.data.message);
+    }
   });
 }
 
@@ -169,6 +175,7 @@ function getListData() {
   tableData.value = [];
   minMaxList.value = [];
   avgSumList.value = [];
+  tableErrorMessage.value = [];
   getListLoading.value = true;
   Promise.allSettled([
     getMinMaxData(),
@@ -183,6 +190,9 @@ function getListData() {
       avgValue: avgSumList.value[index].avgValue || '-',
       sumValue: avgSumList.value[index].sumValue || '-',
     }));
+    if (tableErrorMessage.value.length) {
+      ElMessage.error(tableErrorMessage.value[0]);
+    }
     getListLoading.value = false;
   });
 }
