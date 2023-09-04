@@ -7,13 +7,13 @@
     :close-on-click-modal="false"
     id="auth-role-modal"
   >
-    <el-form ref="formRef" :model="formData">
+    <el-form ref="formRef" :model="formData" class="m-t-14 m-b-34">
       <base-form-item label="角色名：" prop="name" :rules="requiredRules">
         <el-input v-model="formData.name" placeholder="请输入角色名" maxlength="20" show-word-limit id="auth-role-modal-name" />
       </base-form-item>
     </el-form>
     <template #footer>
-      <div class="dialog-footer m-t-34">
+      <div class="dialog-footer">
         <el-button @click="dialogVisible = false" id="auth-role-modal-cancel">取消</el-button>
         <el-button type="primary" :loading="loading" @click="handleConfirm" id="auth-role-modal-confirm">确定</el-button>
       </div>
@@ -37,11 +37,21 @@ const emit = defineEmits<{
 const dialogVisible = useVModel(props, 'visible', emit);
 
 const formRef = ref<FormInstance>();
+const formData = reactive({
+  name: '',
+});
 
 const requiredRules = ref([
   {
     required: true,
-    message: '请输入相应内容后进行操作',
+    validator: (rule: any, value: any, callback: any) => {
+      if (!value || !value.trim()) {
+        return callback(new Error('请输入相应内容后进行操作'));
+      } if (/[\u4e00-\u9fa5]+/.test(value)) {
+        return callback(new Error('格式错误，不能包含中文'));
+      }
+      return callback();
+    },
     trigger: 'blur',
   },
   {
@@ -51,10 +61,6 @@ const requiredRules = ref([
     trigger: 'blur',
   },
 ]);
-
-const formData = reactive({
-  name: '',
-});
 
 const { requestFn: saveRole, loading } = useRequest(AuthApi.saveRole);
 

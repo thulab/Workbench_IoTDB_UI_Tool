@@ -8,13 +8,7 @@
     id="auth-path-modal"
   >
 
-    <el-radio-group v-model="pathType" class="path-radio-group">
-      <el-radio label="input" id="auth-path-modal-input-radio">
-        <span class="radio-label">路径模式：<el-tooltip effect="light" content="支持使用“*、**”进行模糊匹配，“*”代表一层，“**”代表一层或多层" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
-        <el-input v-model="inputPath" placeholder='请输入序列路径，支持使用"*、**"进行模糊匹配，例如"root.ln.d1.*/root.ln.d1.**"' style="width: 466px;" class="path-input" id="auth-path-modal-input-path">
-          <!-- <template #prepend>root.</template> -->
-        </el-input>
-      </el-radio>
+    <el-radio-group v-model="pathType" class="path-radio-group m-y-6">
       <el-radio label="select" id="auth-path-modal-select-radio">
         <span class="radio-label">精确路径：<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
         <div class="search-path-box">
@@ -43,11 +37,16 @@
           </el-select>
         </div>
       </el-radio>
-
+      <el-radio label="input" id="auth-path-modal-input-radio">
+        <span class="radio-label">路径模式：<el-tooltip effect="light" content="支持使用“*、**”进行模糊匹配，“*”代表一层，“**”代表一层或多层" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
+        <el-input v-model="inputPath" placeholder='请输入序列路径，支持使用"*、**"进行模糊匹配，例如"root.ln.d1.*/root.ln.d1.**"' style="width: 466px;" class="path-input" id="auth-path-modal-input-path" @change="handleInputPath">
+          <!-- <template #prepend>root.</template> -->
+        </el-input>
+      </el-radio>
     </el-radio-group>
 
     <template #footer>
-      <div class="dialog-footer m-t-6">
+      <div class="dialog-footer">
         <el-button @click="dialogVisible = false" id="auth-path-modal-cancel">取消</el-button>
         <el-button type="primary" @click="handleConfirm" id="auth-path-modal-confirm">确定</el-button>
       </div>
@@ -89,14 +88,28 @@ const remoteMethod = debounce((query: string) => {
   });
 }, 500);
 
+function handleInputPath(val: string) {
+  const res = val.replace(/(\s*$)/g, '');
+  const reg = /[.|*]$/;
+  if (reg.test(res)) {
+    inputPath.value = '';
+  } else {
+    inputPath.value = res;
+  }
+}
+
 const handleConfirm = () => {
-  let res = inputPath.value;
-  if (pathType.value === 'select') {
-    res = selectPath.value;
+  let res = selectPath.value;
+  if (pathType.value === 'input') {
+    handleInputPath(inputPath.value);
+    res = inputPath.value;
   }
   if (!res) {
     ElMessage.error('路径不能为空');
     return;
+  }
+  if (pathType.value === 'input') {
+    res = `root.${inputPath.value}`;
   }
   const flag = props.pathList.some((item) => item === res);
   if (flag) {
@@ -142,7 +155,7 @@ watch(
 
 .path-radio-group{
   :deep(.el-radio) {
-    margin: 0 0 24px;
+    margin: 0 0 20px;
   }
 
   :deep(.el-radio:last-child) {
