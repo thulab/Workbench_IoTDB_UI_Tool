@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import { union, difference } from 'lodash-es';
 import { UserApi } from '@/api';
 
 const { requestFn: getLoginUserPrivileges } = useRequest(UserApi.getLoginUserPrivileges);
@@ -36,6 +37,63 @@ export const useUserStore = defineStore('UserStore', () => {
   // 是否开启监控
   const enablePrometheus = computed(() => allPrivileges.value?.enablePrometheus);
 
+  // 用户+角色 全局权限
+  const userAllEntityPrivileges = computed(() => {
+    const roleEntityPrivileges: string[] = (allPrivileges.value?.rolesToPrivileges || []).flatMap((item) => item.entityPrivileges);
+    const result = union(allPrivileges.value?.entityPrivileges, roleEntityPrivileges);
+    return result;
+  });
+
+  /**
+ * 角色路径权限，合并到一起。独立计算属性（计算属性有缓存，角色不变，这里就不变）
+ */
+  const rolePathPrivileges = computed(() => {
+    const result: Array<{ path: string, privileges: string[] }> = [];
+    allPrivileges.value?.rolesToPrivileges?.forEach((role) => {
+      role.pathPrivileges.forEach((item) => {
+        const pathData = result.find((pathItem) => pathItem.path === item.path);
+        if (!pathData) {
+          result.push({
+            path: item.path,
+            privileges: item.privileges,
+          });
+        } else {
+          pathData.privileges = union(pathData.privileges, item.privileges);
+        }
+      });
+    });
+    return result;
+  });
+
+  // 用户+角色 路径权限
+  const userAllPathPrivileges = computed(() => {
+    const rolePaths = rolePathPrivileges.value.map((item) => item.path);
+    const userPrivileges = allPrivileges.value?.pathPrivileges || [];
+    difference(rolePaths, userPrivileges.map((item) => item.path)).forEach((path) => {
+      userPrivileges.push({ path, privileges: [] });
+    });
+
+    const result: Array<{ path: string, privileges: string[] }> = userPrivileges.map((item) => ({
+      path: item.path,
+      privileges: item.privileges,
+    }));
+
+    rolePathPrivileges.value?.forEach((item) => {
+      const pathData = result.find((pathItem) => pathItem.path === item.path);
+      if (pathData) {
+        pathData.privileges = union(pathData.privileges || [], item.privileges);
+      }
+    });
+    return result;
+  });
+
+  // 用户+角色 所有权限
+  const userAllPrivileges = computed(() => {
+    const allPathPrivileges: string[] = (userAllPathPrivileges.value || []).flatMap((item) => item.privileges);
+    const result = union(userAllEntityPrivileges.value, allPathPrivileges);
+    return result;
+  });
+
   // 加载用户权限
   function loadPrivileges(forceReload?: boolean) {
     if (!forceReload && !userInfo.value.name) return;
@@ -57,7 +115,6 @@ export const useUserStore = defineStore('UserStore', () => {
   }
 
   loadPrivileges(false);
-
   function setUser(name: string) {
     userInfo.value.name = name;
     if (name) {
