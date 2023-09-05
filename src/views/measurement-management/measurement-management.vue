@@ -232,6 +232,7 @@ const canReadWriteSchemaByPath = computed(() => {
 });
 
 const canWriteSchemaByPath = computed(() => {
+  if (userAllEntityPrivileges.value.includes('WRITE_SCHEMA')) return true;
   if (!currentStorage.value) return false;
   const authList = getPathAuthList(currentStorage.value, userAllPathPrivileges.value);
   if (authList.length) {
@@ -241,6 +242,7 @@ const canWriteSchemaByPath = computed(() => {
 });
 
 function rowCanWriteSchemaByPath(path: string) {
+  if (userAllEntityPrivileges.value.includes('WRITE_SCHEMA')) return true;
   const authList = getPathAuthList(path, userAllPathPrivileges.value);
   if (authList.length) {
     return authList.includes('WRITE_SCHEMA');
