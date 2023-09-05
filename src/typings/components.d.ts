@@ -7,6 +7,8 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AuthContainer: typeof import('./../components/auth-container.vue')['default']
+    AuthTooltip: typeof import('./../components/auth-tooltip.vue')['default']
     BaseFormItem: typeof import('./../components/base-form-item.vue')['default']
     DynamicTable: typeof import('./../components/dynamic-table.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']

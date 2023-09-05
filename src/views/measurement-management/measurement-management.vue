@@ -3,6 +3,8 @@
     <div class="storage-list-wrapper">
       <storage-side
         ref="storageSideRef"
+        :can-read-write-schema="canReadWriteSchema"
+        :can-manage-database="canManageDatabase"
         @handleAddStorage="storageVisible = true"
         @handleSelectStorage="val => currentStorage = val"
       />
@@ -12,74 +14,78 @@
       <h4 class="storage-info-title">数据库信息</h4>
       <div class="page-info-box">
         <ul class="storage-info-list">
-          <li class="storage-info-item"><el-icon size="24"><i-custom-storage-num /></el-icon><span class="storage-info-item-label">数据库名称：</span><text-tooltip :content="currentStorage" /></li>
+          <li class="storage-info-item"><el-icon size="24"><i-custom-storage-num /></el-icon><span class="storage-info-item-label">数据库名称：</span><text-tooltip :content="canReadWriteSchemaByPath ? currentStorage : '-'" /></li>
           <li class="storage-info-item storage-info-item-ttl">
             <el-icon size="24"><i-custom-time /></el-icon>
             <span class="storage-info-item-label">数据保存时间：<el-tooltip effect="light" content="数据保存时间（TTL），到期后系统将自动删除数据，此处不填代表永久存储" placement="top" popper-class="tooltip-box-width"><i-custom-question class="ttl-tip" /></el-tooltip></span>
-            <span v-if="!editTTL">{{ storageInfos?.ttl ? (storageInfos.ttl + getTtlTimeUnit(storageInfos.ttlUnit, ttlUnitOptions)) : '∞'}}</span>
-            <div v-if="currentStorage && editTTL" class="edit-ttl-box">
-              <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" style="width:120px;" id="mesaurement-edit-ttl">
-                <template #append>
-                  <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder=" " style="width:50px;" id="mesaurement-edit-ttlunit">
-                    <el-option label="毫秒" value="millisecond" />
-                    <el-option label="秒" value="second" />
-                    <el-option label="分" value="minute" />
-                    <el-option label="小时" value="hour" />
-                    <el-option label="天" value="day" />
-                  </el-select>
-                </template>
-              </el-input>
-              <el-button class="m-l-12" plain @click="editTTL = false" id="mesaurement-ttl-cancel">取消</el-button>
-              <el-button type="primary" @click="handleConfirmEditTTL" id="mesaurement-ttl-confirm">确定</el-button>
-            </div>
-            <el-button link v-if="currentStorage && !editTTL" class="m-l-12" @click="handleEditTTL" id="mesaurement-ttl-edit-button"><i-custom-edit /></el-button>
+            <template v-if="!canReadWriteSchemaByPath">-</template>
+            <template v-else>
+              <span v-if="!editTTL">{{ storageInfos?.ttl ? (storageInfos.ttl + getTtlTimeUnit(storageInfos.ttlUnit, ttlUnitOptions)) : '∞'}}</span>
+              <div v-if="currentStorage && editTTL" class="edit-ttl-box">
+                <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" style="width:120px;" id="mesaurement-edit-ttl">
+                  <template #append>
+                    <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder=" " style="width:50px;" id="mesaurement-edit-ttlunit">
+                      <el-option label="毫秒" value="millisecond" />
+                      <el-option label="秒" value="second" />
+                      <el-option label="分" value="minute" />
+                      <el-option label="小时" value="hour" />
+                      <el-option label="天" value="day" />
+                    </el-select>
+                  </template>
+                </el-input>
+                <el-button class="m-l-12" plain @click="editTTL = false" id="mesaurement-ttl-cancel">取消</el-button>
+                <el-button type="primary" @click="handleConfirmEditTTL" id="mesaurement-ttl-confirm">确定</el-button>
+              </div>
+              <auth-tooltip :is-disabled="!currentStorage || canWriteSchemaByPath">
+                <el-button link v-if="currentStorage && !editTTL" :disabled="!canWriteSchemaByPath" class="m-l-12" @click="handleEditTTL" id="mesaurement-ttl-edit-button"><i-custom-edit /></el-button>
+              </auth-tooltip>
+            </template>
           </li>
           <br>
-          <li class="storage-info-item"><el-icon size="24"><i-custom-device-num /></el-icon><span class="storage-info-item-label">设备数量：</span>{{ storageInfos?.deviceCount || 0 }}</li>
-          <li class="storage-info-item"><el-icon size="24"><i-custom-measure-num /></el-icon><span class="storage-info-item-label">测点数量：</span>{{ storageInfos?.measurementCount || 0 }}</li>
-          <li class="storage-info-item"><el-icon size="24"><i-custom-total-num /></el-icon><span class="storage-info-item-label">数据总量：</span>{{ !storageInfos?.dataCount || storageInfos?.dataCount < 0 ? 0 : storageInfos?.dataCount}}</li>
+          <li class="storage-info-item"><el-icon size="24"><i-custom-device-num /></el-icon><span class="storage-info-item-label">设备数量：</span>{{ canReadWriteSchemaByPath ? (storageInfos?.deviceCount || 0) : '-' }}</li>
+          <li class="storage-info-item"><el-icon size="24"><i-custom-measure-num /></el-icon><span class="storage-info-item-label">测点数量：</span>{{ canReadWriteSchemaByPath ? (storageInfos?.measurementCount || 0) : '-' }}</li>
+          <li class="storage-info-item"><el-icon size="24"><i-custom-total-num /></el-icon><span class="storage-info-item-label">数据总量：</span>{{ canReadWriteSchemaByPath ? (!storageInfos?.dataCount || storageInfos?.dataCount < 0 ? 0 : storageInfos?.dataCount) : '-'}}</li>
         </ul>
 
         <div class="page-detail-buttons">
-          <el-button plain class="el-button-delete" :disabled="!currentStorage || currentStorage === 'root.__system'" @click="handleDelStorage" id="mesaurement-top-delete-databse">删除</el-button>
+          <auth-tooltip :is-disabled="!currentStorage || currentStorage === 'root.__system' || canManageDatabase">
+            <el-button plain class="el-button-delete" :disabled="!currentStorage || currentStorage === 'root.__system' || !canManageDatabase" @click="handleDelStorage" id="mesaurement-top-delete-databse">删除</el-button>
+          </auth-tooltip>
         </div>
       </div>
 
       <h4 class="storage-info-title">测点列表</h4>
-      <template v-if="currentStorage">
-        <div class="search-form-wrapper">
-          <div class="search-form-box">
-            <span class="search-from-label">测点选择：</span>
-            <el-input v-model="searchKeyword" placeholder="请输入测点名称" @keyup.enter="handleRefresh" id="mesaurement-search">
-              <template #prefix>
-                <i-custom-search-icon class="remote-select-search-icon" @click="handleRefresh" />
-              </template>
-            </el-input>
-          </div>
-
-          <div class="search-form-buttons">
-            <el-button type="primary" :disabled="currentStorage === 'root.__system'" @click="handleAddMeasure" id="mesaurement-add">新建</el-button>
-            <el-button class="m-l-16" :disabled="currentStorage === 'root.__system'" @click="handleImport" id="mesaurement-import">导入</el-button>
-            <el-dropdown class="m-x-16" :disabled="!(totalCount > 0)" @command="val => handleCommandDown(val)">
-              <el-button class="export-btn" :disabled="!(totalCount > 0)" id="mesaurement-download">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip></el-button>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
-                  <el-dropdown-item command="xlsx">以.xlsx格式导出</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-            <el-button :disabled="multipleSelection.length === 0" type="primary" @click="handleDelRow('batch', null)" id="mesaurement-batch-del">批量删除</el-button>
-            <el-button link @click="handleRefresh" id="mesaurement-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
-          </div>
+      <div class="search-form-wrapper">
+        <div class="search-form-box">
+          <span class="search-from-label">测点选择：</span>
+          <el-input v-model="searchKeyword" placeholder="请输入测点名称" @keyup.enter="handleRefresh" id="mesaurement-search">
+            <template #prefix>
+              <i-custom-search-icon class="remote-select-search-icon" @click="handleRefresh" />
+            </template>
+          </el-input>
         </div>
-        <!-- <div class="batch-operate" v-if="multipleSelection.length">
-          <div class="select-tip-box">
-            <el-icon size="16" class="m-r-12"><i-custom-warning-blue /></el-icon>
-            <span class="select-tip">已选择 <span style="color: #495AD4">{{ multipleSelection.length }}</span> 项</span>
-          </div>
-          <el-button link type="primary" @click="handleDelRow('batch', null)">删除</el-button>
-        </div> -->
+
+        <div class="search-form-buttons">
+          <auth-tooltip :is-disabled="!currentStorage || currentStorage === 'root.__system' || canWriteSchemaByPath">
+            <el-button type="primary" :disabled="!currentStorage || currentStorage === 'root.__system' || !canWriteSchemaByPath" @click="handleAddMeasure" id="mesaurement-add">新建</el-button>
+          </auth-tooltip>
+          <auth-tooltip :is-disabled="!currentStorage || currentStorage === 'root.__system' || canWriteSchemaByPath">
+            <el-button class="m-l-16" :disabled="!currentStorage || currentStorage === 'root.__system' || !canWriteSchemaByPath" @click="handleImport" id="mesaurement-import">导入</el-button>
+          </auth-tooltip>
+          <el-dropdown class="m-x-16" :disabled="!currentStorage || !(totalCount > 0)" @command="val => handleCommandDown(val)">
+            <el-button class="export-btn" :disabled="!currentStorage || !(totalCount > 0)" id="mesaurement-download">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip></el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
+                <el-dropdown-item command="xlsx">以.xlsx格式导出</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+          <el-button :disabled="!currentStorage || multipleSelection.length === 0" type="primary" @click="handleDelRow('batch', null)" id="mesaurement-batch-del">批量删除</el-button>
+          <el-button :disabled="!currentStorage" link @click="handleRefresh" id="mesaurement-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+        </div>
+      </div>
+      <auth-container :is-auth="(currentStorage && canReadWriteSchemaByPath) || (!currentStorage && canReadWriteSchema)" style="height: calc(100% - 222px);">
         <div class="storage-table-box">
           <el-table
             :data="tableData.measurements"
@@ -110,7 +116,9 @@
                 <el-button type="primary" link size="small" @click="handleRowData(row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-data`">数据</el-button>
                 <el-button type="primary" link size="small" :disabled="currentStorage === 'root.__system'" @click="handleRowAlarm(row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-alarm`">告警</el-button>
                 <el-button type="primary" link size="small" :disabled="currentStorage === 'root.__system'" @click="handleRowTrend(row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-trend`">趋势</el-button>
-                <el-button type="primary" link size="small" :disabled="currentStorage === 'root.__system'" @click="handleDelRow('row', row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-del`">删除</el-button>
+                <auth-tooltip :is-disabled="currentStorage === 'root.__system' || rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)">
+                  <el-button type="primary" link size="small" :disabled="currentStorage === 'root.__system' || !rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)" @click="handleDelRow('row', row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-del`">删除</el-button>
+                </auth-tooltip>
               </template>
             </el-table-column>
             <template #empty>
@@ -134,16 +142,12 @@
             @current-change="onChangePage"
           />
         </div>
-      </template>
-
-      <div v-else class="table-empty-wrapper" style="height: calc(100% - 190px);">
-        <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-        <span class="data-empty-text">暂无数据</span>
-      </div>
+      </auth-container>
     </div>
 
     <modal-storage
       v-model:visible="storageVisible"
+      :can-write-schema="canWriteSchema"
       @handleSave="handleSaveStorage"
     />
 
@@ -162,8 +166,11 @@
 
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
 import { useTableHeight } from '@/composition-api';
 import { StorageApi } from '@/api';
+import { useUserStore } from '@/stores';
+import { getPathAuthList } from '@/utils/auth';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import StorageSide from './components/storage-side.vue';
 import ModalStorage from './components/modal-storage.vue';
@@ -172,6 +179,14 @@ import ModalImport from './components/modal-import.vue';
 
 const router = useRouter();
 const route = useRoute();
+const userStore = useUserStore();
+const {
+  canManageDatabase,
+  canWriteSchema,
+  canReadWriteSchema,
+  userAllEntityPrivileges,
+  userAllPathPrivileges,
+} = storeToRefs(userStore);
 
 const ttlUnitOptions = [
   { label: '毫秒', value: 'millisecond' },
@@ -205,6 +220,33 @@ const editTTLUnitModel = ref('day');
 const storageVisible = ref(false);
 const measurementVisible = ref(false);
 const importVisible = ref(false);
+
+const canReadWriteSchemaByPath = computed(() => {
+  if (userAllEntityPrivileges.value.includes('READ_SCHEMA') || userAllEntityPrivileges.value.includes('WRITE_SCHEMA')) return true;
+  if (!currentStorage.value) return false;
+  const authList = getPathAuthList(currentStorage.value, userAllPathPrivileges.value);
+  if (authList.length) {
+    return authList.includes('READ_SCHEMA') || authList.includes('WRITE_SCHEMA');
+  }
+  return false;
+});
+
+const canWriteSchemaByPath = computed(() => {
+  if (!currentStorage.value) return false;
+  const authList = getPathAuthList(currentStorage.value, userAllPathPrivileges.value);
+  if (authList.length) {
+    return authList.includes('WRITE_SCHEMA');
+  }
+  return false;
+});
+
+function rowCanWriteSchemaByPath(path: string) {
+  const authList = getPathAuthList(path, userAllPathPrivileges.value);
+  if (authList.length) {
+    return authList.includes('WRITE_SCHEMA');
+  }
+  return false;
+}
 
 const { requestFn: deleteStorageGroups } = useRequest(StorageApi.deleteStorageGroups);
 const { requestFn: getStorageGroupsInfo } = useRequest(StorageApi.getStorageGroupsInfo);
@@ -465,6 +507,7 @@ watch(
         } else {
           searchKeyword.value = '';
         }
+        if (!canReadWriteSchemaByPath.value) return;
         getStorageInfo(val);
         handleRefresh();
       }

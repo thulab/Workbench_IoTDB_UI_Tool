@@ -12,32 +12,38 @@
         >
           <el-button link class="m-r-4" @click="handleDoc" id="measurement-tree-doc"><el-icon size="24"><i-custom-model-doc /></el-icon></el-button>
         </el-tooltip>
-        <el-button link @click="handleRefresh" id="measurement-tree-refresh"><el-icon size="24"><i-custom-refresh /></el-icon></el-button>
+        <auth-tooltip :is-disabled="canReadWriteSchema">
+          <el-button :disabled="!canReadWriteSchema" link @click="handleRefresh" id="measurement-tree-refresh"><el-icon size="24"><i-custom-refresh /></el-icon></el-button>
+        </auth-tooltip>
       </div>
     </el-header>
     <el-main class="p-0">
       <el-scrollbar>
-        <div class="model-container" v-loading="initialLoading">
-          <div v-if="treeData.children?.length === 0" class="table-empty-wrapper" style="height: 100%;">
-            <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-            <span class="data-empty-text">暂无数据</span>
+        <auth-container :is-auth="canReadWriteSchema" style="height: 100%;">
+          <div class="model-container" v-loading="initialLoading">
+            <div v-if="treeData.children?.length === 0" class="table-empty-wrapper" style="height: 100%;">
+              <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+              <span class="data-empty-text">暂无数据</span>
+            </div>
+            <div v-else class="chart-container-box" v-loading="dataLoading">
+              <the-chart :option="realTreeOptions" :click-func="clickFunction" />
+            </div>
           </div>
-          <div v-else class="chart-container-box" v-loading="dataLoading">
-            <the-chart :option="realTreeOptions" :click-func="clickFunction" />
-          </div>
-        </div>
+        </auth-container>
       </el-scrollbar>
     </el-main>
   </el-container>
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
 import { type ECOption } from '@/plugins/echarts-plugin';
 import databaseIcon from '@/assets/icons/model-database.svg';
 import deviceIcom from '@/assets/icons/model-device.svg';
 import baseMeasurementIcom from '@/assets/icons/base-measurement.svg';
 import viewMeasurementIcom from '@/assets/icons/view-measurement.svg';
 import { StorageApi } from '@/api';
+import { useUserStore } from '@/stores';
 
 const treeData = ref<StorageDevice.ModelData>({
   node: 'root',
@@ -48,6 +54,11 @@ const treeData = ref<StorageDevice.ModelData>({
   children: [],
 });
 const initialLoading = ref(true);
+
+const userStore = useUserStore();
+const {
+  canReadWriteSchema,
+} = storeToRefs(userStore);
 
 const { requestFn: getDataModelTree, loading: dataLoading } = useRequest(StorageApi.getDataModelTree);
 const { requestFn: getBatchLastValue } = useRequest(StorageApi.getBatchLastValue);

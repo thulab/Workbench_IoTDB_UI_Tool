@@ -3,28 +3,39 @@
     <h4>数据库</h4>
     <div class="storage-operate-buttons">
       <el-button link class="m-r-8 border-refresh-icon" @click="getStorageList()" id="mesaurement-side-refresh"><i-custom-refresh /></el-button>
-      <el-button link style="margin: 0;" @click="handleAddStorage" id="mesaurement-side-add"><i-custom-new-storage /></el-button>
+      <auth-tooltip :is-disabled="canManageDatabase">
+        <el-button link style="margin: 0;" :disabled="!canManageDatabase" @click="handleAddStorage" id="mesaurement-side-add"><i-custom-new-storage /></el-button>
+      </auth-tooltip>
     </div>
   </div>
 
-  <ul class="storage-list-box" v-loading="storageLoading">
-    <template v-if="storageList.length">
-      <li v-for="item in storageList" :key="item" :class="['storage-item-box', currentStorage === item && 'storage-item-box-active']" @click="e => handleSelectStorage(item, e)">
-        <span class="storage-item-text"><text-tooltip :content="item" /></span>
-        <div class="storage-item-delete-box" :style="{ cursor: item === 'root.__system' ? 'not-allowed' : 'pointer' }" @click="handleDeleteStorage(item)">
-          <i-custom-delete class="storage-item-delete" />
-          <i-custom-delete-active class="storage-item-delete-active" />
-        </div>
-      </li>
-    </template>
-    <li v-else class="item-box-empty">暂无数据</li>
-  </ul>
+  <auth-container :is-auth="canReadWriteSchema" style="height: calc(100% - 70px);">
+    <ul class="storage-list-box" v-loading="storageLoading">
+      <template v-if="storageList.length">
+        <li v-for="item in storageList" :key="item" :class="['storage-item-box', currentStorage === item && 'storage-item-box-active']" @click="e => handleSelectStorage(item, e)">
+          <span class="storage-item-text"><text-tooltip :content="item" /></span>
+          <auth-tooltip :is-disabled="canManageDatabase || item === 'root.__system'">
+            <div class="storage-item-delete-box" :style="{ cursor: item === 'root.__system' || !canManageDatabase ? 'not-allowed' : 'pointer' }" @click="handleDeleteStorage(item)">
+              <i-custom-delete class="storage-item-delete" />
+              <i-custom-delete-active class="storage-item-delete-active" />
+            </div>
+          </auth-tooltip>
+        </li>
+      </template>
+      <li v-else class="item-box-empty">暂无数据</li>
+    </ul>
+  </auth-container>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { StorageApi } from '@/api';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
+
+const props = defineProps<{
+  canReadWriteSchema: boolean;
+  canManageDatabase: boolean;
+}>();
 
 const emit = defineEmits<{
   (event: 'handleAddStorage'): void;
@@ -76,6 +87,7 @@ const canStopPropagation = (e: HTMLElement):boolean => {
 
 // 删除数据库
 function handleDeleteStorage(item: string) {
+  if (!props.canManageDatabase) return;
   if (item === 'root.__system') return;
   ElMessageBox.confirm('此操作会删除数据库下全部测点和数据，是否删除？', '注意', {
     confirmButtonText: '确定',
@@ -100,6 +112,7 @@ function handleSelectStorage(item: string, e: MouseEvent) {
 }
 
 onMounted(() => {
+  if (!props.canReadWriteSchema) return;
   getStorageList(true);
 });
 
@@ -107,6 +120,18 @@ watch(
   () => currentStorage.value,
   (val) => {
     emit('handleSelectStorage', val);
+  },
+  {
+    immediate: true,
+  },
+);
+
+watch(
+  () => props.canReadWriteSchema,
+  (val) => {
+    if (val) {
+      getStorageList();
+    }
   },
   {
     immediate: true,

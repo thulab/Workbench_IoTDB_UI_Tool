@@ -94,6 +94,10 @@ export const useUserStore = defineStore('UserStore', () => {
     return result;
   });
 
+  const canManageDatabase = computed(() => userAllEntityPrivileges.value.includes('MANAGE_DATABASE'));
+  const canWriteSchema = computed(() => userAllEntityPrivileges.value.includes('WRITE_SCHEMA'));
+  const canReadWriteSchema = computed(() => userAllPrivileges.value.includes('READ_SCHEMA') || userAllPrivileges.value.includes('WRITE_SCHEMA'));
+
   // 加载用户权限
   function loadPrivileges(forceReload?: boolean) {
     if (!forceReload && !userInfo.value.name) return;
@@ -144,6 +148,12 @@ export const useUserStore = defineStore('UserStore', () => {
     entityPrivilegesVals,
     pathPrivilegesVals,
     rolesToPrivilegesVals,
+    userAllEntityPrivileges,
+    userAllPathPrivileges,
+    userAllPrivileges,
+    canManageDatabase,
+    canWriteSchema,
+    canReadWriteSchema,
     setUser,
     clearUserStore,
   };

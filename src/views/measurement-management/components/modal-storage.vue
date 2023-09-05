@@ -19,17 +19,19 @@
         <template #label><span style="margin-left: 9px;">数据保存时间:</span><el-tooltip effect="light" content="数据保存时间（TTL），到期后系统将自动删除数据，此处不填代表永久存储" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
         </template>
         <el-input type="hidden" />
-        <el-input v-model="formData.ttl" min="0" max="9007199254740992" class="ttl-input" id="measurement-model-ttl">
-          <template #append>
-            <el-select v-model="formData.ttlUnit" style="width: 56px;" placeholder="" id="measurement-model-ttlunit">
-              <el-option label="毫秒" value="millisecond" />
-              <el-option label="秒" value="second" />
-              <el-option label="分" value="minute" />
-              <el-option label="小时" value="hour" />
-              <el-option label="天" value="day" />
-            </el-select>
-          </template>
-        </el-input>
+        <auth-tooltip :is-disabled="canWriteSchema">
+          <el-input v-model="formData.ttl" min="0" max="9007199254740992" :disabled="!canWriteSchema" class="ttl-input" id="measurement-model-ttl">
+            <template #append>
+              <el-select v-model="formData.ttlUnit" style="width: 56px;" placeholder="" id="measurement-model-ttlunit" :disabled="!canWriteSchema">
+                <el-option label="毫秒" value="millisecond" />
+                <el-option label="秒" value="second" />
+                <el-option label="分" value="minute" />
+                <el-option label="小时" value="hour" />
+                <el-option label="天" value="day" />
+              </el-select>
+            </template>
+          </el-input>
+        </auth-tooltip>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -47,6 +49,7 @@ import { StorageApi } from '@/api';
 
 const props = defineProps<{
   visible: boolean;
+  canWriteSchema: boolean;
 }>();
 
 const emit = defineEmits<{
