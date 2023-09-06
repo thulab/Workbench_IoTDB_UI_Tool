@@ -96,7 +96,14 @@ export const useUserStore = defineStore('UserStore', () => {
 
   const canManageDatabase = computed(() => userAllEntityPrivileges.value.includes('MANAGE_DATABASE'));
   const canWriteSchema = computed(() => userAllEntityPrivileges.value.includes('WRITE_SCHEMA'));
-  const canReadWriteSchema = computed(() => userAllPrivileges.value.includes('READ_SCHEMA') || userAllPrivileges.value.includes('WRITE_SCHEMA'));
+  const canReadWriteSchema = computed(() => userAllPrivileges.value.includes('READ_SCHEMA')
+          || userAllPrivileges.value.includes('WRITE_SCHEMA'));
+  const canReadWriteData = computed(() => userAllPrivileges.value.includes('READ_DATA')
+          || userAllPrivileges.value.includes('WRITE_DATA'));
+  const canReadWriteSchemaData = computed(() => userAllPrivileges.value.includes('READ_SCHEMA')
+          || userAllPrivileges.value.includes('WRITE_SCHEMA')
+          || userAllPrivileges.value.includes('READ_DATA')
+          || userAllPrivileges.value.includes('WRITE_DATA'));
 
   // 加载用户权限
   function loadPrivileges(forceReload?: boolean) {
@@ -154,6 +161,8 @@ export const useUserStore = defineStore('UserStore', () => {
     canManageDatabase,
     canWriteSchema,
     canReadWriteSchema,
+    canReadWriteData,
+    canReadWriteSchemaData,
     setUser,
     clearUserStore,
   };

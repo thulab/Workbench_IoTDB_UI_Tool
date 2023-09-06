@@ -23,8 +23,12 @@
         </base-form-item>
       </el-form>
       <div class="search-form-buttons">
-        <el-button @click="handleReset" :disabled="getListLoading" id="statistic-search-reset">重置</el-button>
-        <el-button :disabled="searchFormData.path.length === 0" type="primary" @click="handleSearch" id="statistic-search-search">{{getListLoading ? '取消查询' : '查询'}}</el-button>
+        <auth-tooltip :is-disabled="canReadWriteData">
+          <el-button @click="handleReset" :disabled="getListLoading || !canReadWriteData" id="statistic-search-reset">重置</el-button>
+        </auth-tooltip>
+        <auth-tooltip :is-disabled="canReadWriteData">
+          <el-button :disabled="searchFormData.path.length === 0 || !canReadWriteData" type="primary" @click="handleSearch" id="statistic-search-search">{{getListLoading ? '取消查询' : '查询'}}</el-button>
+        </auth-tooltip>
       </div>
     </div>
 
@@ -32,69 +36,81 @@
       <div class="page-info-box">
         <h4 class="page-info-title">查询详情</h4>
         <div class="page-detail-buttons">
-          <el-dropdown class="m-r-16" :disabled="getListLoading || tableData.length === 0" @command="val => handleCommandDown(val)">
-            <el-button class="export-btn" id="statistic-search-download" :disabled="getListLoading || tableData.length === 0">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
-                <el-dropdown-item command="xlsx">以.xlsx格式导出</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-          <el-button link @click="handleSearch" :disabled="getListLoading || searchFormData.path.length === 0" id="statistic-search-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+          <auth-tooltip :is-disabled="canReadWriteData">
+            <el-dropdown class="m-r-16" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData" @command="val => handleCommandDown(val)">
+              <el-button class="export-btn" id="statistic-search-download" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
+                  <el-dropdown-item command="xlsx">以.xlsx格式导出</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </auth-tooltip>
+          <auth-tooltip :is-disabled="canReadWriteData">
+            <el-button link @click="handleSearch" :disabled="getListLoading || searchFormData.path.length === 0 || !canReadWriteData" id="statistic-search-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+          </auth-tooltip>
         </div>
       </div>
 
-      <el-table
-        :data="tableData"
-        v-loading="getListLoading"
-        style="width: 100%;"
-        :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
-        :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
-        tooltip-effect="light"
-        ref="tableRef"
-        :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
-      >
-        <el-table-column label="测点名称" prop="measurement" min-width="240" align="center" show-overflow-tooltip />
-        <el-table-column label="最小值" prop="minValue" min-width="160" align="center" show-overflow-tooltip />
-        <el-table-column label="最小值时间" prop="minTime" min-width="180" align="center" show-overflow-tooltip />
-        <el-table-column label="最大值" prop="maxValue" min-width="160" align="center" show-overflow-tooltip />
-        <el-table-column label="最大值时间" prop="maxTime" min-width="180" align="center" show-overflow-tooltip />
-        <el-table-column label="平均值" prop="avgValue" min-width="160" align="center" show-overflow-tooltip />
-        <el-table-column label="总和" prop="sumValue" min-width="160" align="center" show-overflow-tooltip />
-        <template #empty>
-          <div class="table-empty-wrapper">
-            <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-            <span class="data-empty-text">暂无数据</span>
-          </div>
-        </template>
-      </el-table>
+      <auth-container :is-auth="canReadWriteData" style="height: 100%;">
+        <el-table
+          :data="tableData"
+          v-loading="getListLoading"
+          style="width: 100%;"
+          :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+          :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+          tooltip-effect="light"
+          ref="tableRef"
+          :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
+        >
+          <el-table-column label="测点名称" prop="measurement" min-width="240" align="center" show-overflow-tooltip />
+          <el-table-column label="最小值" prop="minValue" min-width="160" align="center" show-overflow-tooltip />
+          <el-table-column label="最小值时间" prop="minTime" min-width="180" align="center" show-overflow-tooltip />
+          <el-table-column label="最大值" prop="maxValue" min-width="160" align="center" show-overflow-tooltip />
+          <el-table-column label="最大值时间" prop="maxTime" min-width="180" align="center" show-overflow-tooltip />
+          <el-table-column label="平均值" prop="avgValue" min-width="160" align="center" show-overflow-tooltip />
+          <el-table-column label="总和" prop="sumValue" min-width="160" align="center" show-overflow-tooltip />
+          <template #empty>
+            <div class="table-empty-wrapper">
+              <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+              <span class="data-empty-text">暂无数据</span>
+            </div>
+          </template>
+        </el-table>
 
-      <el-pagination
-        v-if="totalCount > 0"
-        v-model:currentPage="pagination.pageNum"
-        v-model:page-size="pagination.pageSize"
-        class="m-t-20"
-        layout="prev, pager, next, sizes, jumper"
-        background
-        :page-sizes="[10, 20, 50, 100]"
-        :total="totalCount"
-        @size-change="onChangePageSize"
-        @current-change="onChangePage"
-      />
+        <el-pagination
+          v-if="totalCount > 0"
+          v-model:currentPage="pagination.pageNum"
+          v-model:page-size="pagination.pageSize"
+          class="m-t-20"
+          layout="prev, pager, next, sizes, jumper"
+          background
+          :page-sizes="[10, 20, 50, 100]"
+          :total="totalCount"
+          @size-change="onChangePageSize"
+          @current-change="onChangePage"
+        />
+      </auth-container>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
+import { storeToRefs } from 'pinia';
 import { SearchApi } from '@/api';
 import { useTableHeight } from '@/composition-api';
 import {
   getStartAndEnd, today, getOneInterval, getOneIntervalNow, formatDate,
 } from '@/utils/date';
+import { useUserStore } from '@/stores';
 import ICustomCalender from '~icons/custom/calender.svg';
 
+const userStore = useUserStore();
+const {
+  canReadWriteData,
+} = storeToRefs(userStore);
 const { maxTableHeight } = useTableHeight(280);
 
 const searchFormRef = ref<FormInstance>();
@@ -274,6 +290,9 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .page-container {
+  display: flex;
+  flex-direction: column;
+
   .el-button:focus-visible {
     outline: none;
   }
@@ -291,6 +310,10 @@ onMounted(() => {
   padding: 16px 16px 10px;
   border-radius: 2px;
   background: #f7f8fc;
+  box-sizing: border-box;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 
   .page-info-title {
     font-size: 14px;

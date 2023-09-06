@@ -5,25 +5,27 @@
       placement="top-start"
       effect="light"
       trigger="hover"
-      content="最多同时展示10条测点趋势"
-      :disabled="pathList.length !== 10"
+      :content="canReadWriteSchemaData ? '最多同时展示10条测点趋势' : '暂无权限'"
+      :disabled="canReadWriteSchemaData ? pathList.length !== 10 : false"
       popper-class="tooltip-box-width"
     >
-      <el-button link :class="[pathList.length === 10 && 'hover-btn-disabled', 'p-0']" @click="handleAdd" id="trend-add-path"><i-custom-new-trend /></el-button>
+      <el-button link :class="[(pathList.length === 10 || !canReadWriteSchemaData) && 'hover-btn-disabled', 'p-0']" @click="handleAdd" id="trend-add-path"><i-custom-new-trend /></el-button>
     </el-tooltip>
   </div>
 
-  <el-checkbox
-    v-if="isExpand"
-    class="m-b-8"
-    v-model="isCheckAll"
-    :indeterminate="isIndeterminate"
-    label="全选"
-    :key="listKey"
-    :disabled="!allCheckAbled"
-    @change="handleCheckedAll"
-    id="trend-path-checkbox"
-  />
+  <auth-tooltip :is-disabled="canReadWriteSchemaData">
+    <el-checkbox
+      v-if="isExpand"
+      class="m-b-8"
+      v-model="isCheckAll"
+      :indeterminate="isIndeterminate"
+      label="全选"
+      :key="listKey"
+      :disabled="!allCheckAbled || !canReadWriteSchemaData"
+      @change="handleCheckedAll"
+      id="trend-path-checkbox"
+    />
+  </auth-tooltip>
 
   <h4 v-if="!isExpand" class="collapse-title">已选测点</h4>
 
@@ -32,37 +34,39 @@
       <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
       <span class="data-empty-text">暂无数据</span>
     </div>
-    <ul class="list-box" v-else :key="listKey">
-      <li v-for="(item, index) in pathList" :key="item.path" :class="['path-item-box']">
-        <div class="path-text-box">
-          <el-checkbox v-if="item.disabled" :checked="false" :disabled="true" class="m-r-8" :id="`trend-path-checkbox-${index}-false`" />
-          <el-checkbox v-else :checked="item.checked" @change="val => handleChecked(val, item, index)" class="m-r-8" :id="`trend-path-checkbox-${index}-true`" />
-          <div class="path-text"><text-tooltip :content="item.path" /></div>
-        </div>
-        <div class="path-detail-box">
-          <div class="path-detail-item">
-            <span class="detail-label">颜色：</span>
-            <el-color-picker v-model="item.color" :disabled="item.disabled" color-format="hex" :predefine="predefineColors" @change="val => handleChangeColor(val, item, index)" :id="`trend-path-color-${index}`" />
+    <auth-container v-else :is-auth="canReadWriteSchemaData">
+      <ul class="list-box" :key="listKey">
+        <li v-for="(item, index) in pathList" :key="item.path" :class="['path-item-box']">
+          <div class="path-text-box">
+            <el-checkbox v-if="item.disabled" :checked="false" :disabled="true" class="m-r-8" :id="`trend-path-checkbox-${index}-false`" />
+            <el-checkbox v-else :checked="item.checked" @change="val => handleChecked(val, item, index)" class="m-r-8" :id="`trend-path-checkbox-${index}-true`" />
+            <div class="path-text"><text-tooltip :content="item.path" /></div>
           </div>
-          <div class="path-detail-item">
-            <span class="detail-label">线宽：</span>
-            <el-input-number
-              v-model.number="item.width"
-              :disabled="item.disabled"
-              :min="1"
-              :max="10"
-              step-strictly
-              controls-position="right"
-              style="width: 40px;"
-              @change="val => handleChangeWidth(val, item, index)"
-              @blur="ev => handleBlurWidth(ev, item, index)"
-              :id="`trend-path-input-${index}`"
-            />
+          <div class="path-detail-box">
+            <div class="path-detail-item">
+              <span class="detail-label">颜色：</span>
+              <el-color-picker v-model="item.color" :disabled="item.disabled" color-format="hex" :predefine="predefineColors" @change="val => handleChangeColor(val, item, index)" :id="`trend-path-color-${index}`" />
+            </div>
+            <div class="path-detail-item">
+              <span class="detail-label">线宽：</span>
+              <el-input-number
+                v-model.number="item.width"
+                :disabled="item.disabled"
+                :min="1"
+                :max="10"
+                step-strictly
+                controls-position="right"
+                style="width: 40px;"
+                @change="val => handleChangeWidth(val, item, index)"
+                @blur="ev => handleBlurWidth(ev, item, index)"
+                :id="`trend-path-input-${index}`"
+              />
+            </div>
           </div>
-        </div>
-        <el-icon size="14" class="delete-icon" @click="handleDel(item, index)" :id="`trend-path-${index}-del`"><i-custom-close-circle /></el-icon>
-      </li>
-    </ul>
+          <el-icon size="14" class="delete-icon" @click="handleDel(item, index)" :id="`trend-path-${index}-del`"><i-custom-close-circle /></el-icon>
+        </li>
+      </ul>
+    </auth-container>
   </div>
 
   <el-icon :class="['expand-icon', !isExpand && 'collapse-icon']" size="24" @click="handleExpand">
@@ -88,6 +92,7 @@ const props = defineProps<{
   isExpand: boolean;
   dataTab: 'running' | 'history';
   aggregation: 'avg' | 'max_value' | 'min_value' | 'last_value' | string;
+  canReadWriteSchemaData: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -124,6 +129,7 @@ const editPathList = ref<string[]>([]);
 const defaultColor = ref('');
 
 function handleAdd() {
+  if (!props.canReadWriteSchemaData) return;
   if (pathList.value.length === 10) return;
   editPathList.value = pathList.value.map((item) => item.path);
   const existedColor = pathList.value.map((item) => item.color);
@@ -219,8 +225,8 @@ watch(
 .hover-btn-disabled, .hover-btn-disabled:focus{
   color: var(--el-button-disabled-text-color) !important;
   cursor: not-allowed !important;
-  background-color: var(--el-button-disabled-bg-color) !important;
-  border-color: var(--el-button-disabled-border-color) !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
 }
 
 .path-list-box{

@@ -34,22 +34,30 @@
           <div class="play-pause-buttons">
             <el-icon size="30" v-if="!isRunningTab" style="cursor: not-allowed;"><i-custom-play-disabled /></el-icon>
             <template v-else>
-              <el-icon size="30" v-if="!loading" @click="handlePlay(true)" id="trend-search-run"><i-custom-play-active /></el-icon>
-              <el-icon size="30" v-else @click="handlePlay(false)" id="trend-search-pause"><i-custom-pause /></el-icon>
+              <auth-tooltip :is-disabled="canReadWriteSchemaData">
+                <el-button link v-if="!loading" :disabled="!canReadWriteSchemaData" @click="handlePlay(true)" id="trend-search-run">
+                  <el-icon size="30"><i-custom-play-active /></el-icon>
+                </el-button>
+                <el-button link v-else :disabled="!canReadWriteSchemaData" @click="handlePlay(false)" id="trend-search-pause">
+                  <el-icon size="30"><i-custom-pause /></el-icon>
+                </el-button>
+              </auth-tooltip>
             </template>
           </div>
         </el-form>
         <div class="search-form-buttons" v-if="!isRunningTab">
-          <el-button @click="handleReset" id="trend-search-reset">重置</el-button>
+          <auth-tooltip :is-disabled="canReadWriteSchemaData">
+            <el-button :disabled="!canReadWriteSchemaData" @click="handleReset" id="trend-search-reset">重置</el-button>
+          </auth-tooltip>
           <el-tooltip
             placement="top-start"
             effect="light"
             trigger="hover"
-            content="请先添加测点并选中"
-            :disabled="searchAbled"
+            :content="canReadWriteSchemaData ? '请先添加测点并选中' : '暂无权限'"
+            :disabled="canReadWriteSchemaData ? searchAbled : false"
             popper-class="tooltip-box-width"
           >
-            <el-button :class="[!searchAbled && 'hover-btn-disabled']" type="primary" @click="handleSearch" id="trend-search-search">应用</el-button>
+            <el-button :class="[(!searchAbled || !canReadWriteSchemaData) && 'hover-btn-disabled']" type="primary" @click="handleSearch" id="trend-search-search">应用</el-button>
           </el-tooltip>
         </div>
       </div>
@@ -65,6 +73,7 @@
             v-model:is-expand="isExpand"
             :data-tab="dataTab"
             :aggregation="searchFormData.aggregation"
+            :can-read-write-schema-data="canReadWriteSchemaData"
             @handleOperate="handleOperatePath"
             @handleOperateAll="handleOperateAll"
           />
@@ -77,6 +86,7 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
 import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import dayjs from 'dayjs';
 import {
@@ -88,11 +98,16 @@ import { echarts, type ECOption } from '@/plugins/echarts-plugin';
 import {
   getStartAndEnd, today, getOneInterval, getOneIntervalNow,
 } from '@/utils/date';
+import { useUserStore } from '@/stores';
 import { useWebsocket } from '@/composition-api';
 import ICustomCalender from '~icons/custom/calender.svg';
 import TrendList from './components/trend-list.vue';
 
 const route = useRoute();
+const userStore = useUserStore();
+const {
+  canReadWriteSchemaData,
+} = storeToRefs(userStore);
 const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
 const isExpand = ref(true);
@@ -296,6 +311,7 @@ function handleChangeAggregation(val: string) {
 
 // 查询
 function handleSearch() {
+  if (!canReadWriteSchemaData.value) return;
   if (!checkedData.value.length) return;
   const timerange = dayjs(searchFormData.datetimerange[1]).valueOf() - dayjs(searchFormData.datetimerange[0]).valueOf();
   const timeinterval = timeUnits.find((time) => time.value === searchFormData.unitInterval)?.timestamp;

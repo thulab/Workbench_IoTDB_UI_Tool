@@ -66,8 +66,12 @@
             </el-form-item>
           </div>
           <el-form-item class="search-form-buttons">
-            <el-button @click="handleReset" :disabled="getListLoading" id="data-search-reset">重置</el-button>
-            <el-button type="primary" @click="handleSearch" id="data-search-search">{{getListLoading ? '取消查询' : '查询'}}</el-button>
+            <auth-tooltip :is-disabled="canReadWriteData">
+              <el-button @click="handleReset" :disabled="getListLoading || !canReadWriteData" id="data-search-reset">重置</el-button>
+            </auth-tooltip>
+            <auth-tooltip :is-disabled="canReadWriteData">
+              <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="data-search-search">{{getListLoading ? '取消查询' : '查询'}}</el-button>
+            </auth-tooltip>
           </el-form-item>
         </el-row>
       </el-form>
@@ -93,17 +97,23 @@
           <span class="run-result-tip"><i-custom-info-warning />默认最多展示1000行100列，如需更多请导出查看</span>
         </h4>
         <div class="page-detail-buttons">
-          <el-button @click="handleSearch" :disabled="getListLoading" id="data-search-refresh">刷新</el-button>
-          <el-button class="m-l-12" @click="handleImport" id="data-search-import">导入</el-button>
-          <el-dropdown class="more-icon m-l-12" :disabled="getListLoading" v-show="searchDetailInfos.status" @command="val => handleCommandDown(val)">
-            <el-button class="export-btn" id="data-search-download">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
-                <el-dropdown-item command="xlsx">以.xlsx格式导出</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+          <auth-tooltip :is-disabled="canReadWriteData">
+            <el-button @click="handleSearch" :disabled="getListLoading || !canReadWriteData" id="data-search-refresh">刷新</el-button>
+          </auth-tooltip>
+          <auth-tooltip :is-disabled="canReadWriteData">
+            <el-button class="m-l-12" :disabled="!canReadWriteData" @click="handleImport" id="data-search-import">导入</el-button>
+          </auth-tooltip>
+          <auth-tooltip :is-disabled="canReadWriteData">
+            <el-dropdown class="more-icon m-l-12" :disabled="getListLoading || !canReadWriteData" v-show="searchDetailInfos.status" @command="val => handleCommandDown(val)">
+              <el-button class="export-btn" id="data-search-download" :disabled="!canReadWriteData">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
+                  <el-dropdown-item command="xlsx">以.xlsx格式导出</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </auth-tooltip>
         </div>
       </div>
 
@@ -120,18 +130,19 @@
         <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
         <span class="data-empty-text">暂无数据</span>
       </div> -->
-      <div v-loading="getListLoading">
-        <div v-if="searchDetailInfos.status">
-          <dynamic-table
-            :columns="columns"
-            :table-data="tableDataPagination"
-            :height="maxTableHeight"
-            :max-height="maxTableHeight"
-            v-model:current-page="pagination.pageNum"
-            v-model:page-size="pagination.pageSize"
-            :total="tableData.length"
-            :show-pagination="true"
-          />
+      <auth-container :is-auth="canReadWriteData" style="height: 100%;">
+        <div v-loading="getListLoading">
+          <div v-if="searchDetailInfos.status">
+            <dynamic-table
+              :columns="columns"
+              :table-data="tableDataPagination"
+              :height="maxTableHeight"
+              :max-height="maxTableHeight"
+              v-model:current-page="pagination.pageNum"
+              v-model:page-size="pagination.pageSize"
+              :total="tableData.length"
+              :show-pagination="true"
+            />
           <!-- <div class="pagination-container" v-if="tableData.length > 0">
             <el-button plain class="btn-page btn-first" @click="handleClickPage('first')" :disabled="pagination.pageNum === 1">第一页</el-button>
             <el-button type="primary" class="btn-page btn-prev" @click="handleClickPage('prev')" :disabled="pagination.pageNum === 1">上一页</el-button>
@@ -145,11 +156,12 @@
               />
             </el-select>
           </div> -->
+          </div>
+          <div class="table-error-wrapper" v-if="searchDetailInfos.errMsg">
+            Msg: {{ searchDetailInfos.errMsg }}
+          </div>
         </div>
-        <div class="table-error-wrapper" v-if="searchDetailInfos.errMsg">
-          Msg: {{ searchDetailInfos.errMsg }}
-        </div>
-      </div>
+      </auth-container>
     </div>
 
     <modal-import
@@ -162,6 +174,7 @@
 <script setup lang="ts">
 import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import dayjs from 'dayjs';
+import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import { cloneDeep } from 'lodash-es';
 import { useTableHeight } from '@/composition-api';
@@ -169,11 +182,16 @@ import { SearchApi } from '@/api';
 import {
   getStartAndEnd, today, getOneDay, getOneInterval, todayNow, getOneIntervalNow,
 } from '@/utils/date';
+import { useUserStore } from '@/stores';
 import DynamicTable from '@/components/dynamic-table.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalImport from './components/modal-import.vue';
 
 const route = useRoute();
+const userStore = useUserStore();
+const {
+  canReadWriteData,
+} = storeToRefs(userStore);
 const { maxTableHeight } = useTableHeight(330);
 
 const searchFormRef = ref<FormInstance>();
