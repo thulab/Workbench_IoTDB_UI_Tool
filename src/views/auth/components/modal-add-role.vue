@@ -9,12 +9,12 @@
     id="auth-user-add-role-modal"
   >
     <el-form ref="formRef" :model="formData">
-      <base-form-item label="关联角色：" prop="name" :rules="requiredRules" class="m-t-12 m-b-0">
-        <el-select v-model="formData.name" style="width:100%" placeholder="请输入角色名称" collapse-tags multiple filterable :loading="getRoleListLoading" id="auth-user-add-role-modal-select-name">
+      <base-form-item label="关联角色：" prop="name" class="m-t-12 m-b-0">
+        <el-select v-model="formData.name" style="width:100%" placeholder="请输入角色名称" collapse-tags multiple filterable :loading="loading" id="auth-user-add-role-modal-select-name" @change="handleChangeSelect" ref="roleSelectRef">
           <template #prefix>
             <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
           </template>
-          <el-option v-for="item in roleList" :key="item" :label="item" :value="item" :disabled="selected.includes(item)">
+          <el-option v-for="item in roleList" :key="item" :label="item" :value="item" :disabled="isCanSelect(item)">
             <div class="remote-select-search-text">
               <text-tooltip :content="item" />
             </div>
@@ -25,14 +25,14 @@
     <template #footer>
       <div class="dialog-footer m-t-34">
         <el-button @click="dialogVisible = false" id="auth-user-add-role-modal-cancel">取消</el-button>
-        <el-button type="primary" @click="handleConfirm" id="auth-user-add-role-modal-confirm">确定</el-button>
+        <el-button type="primary" :disabled="formData.name.length === 0" @click="handleConfirm" id="auth-user-add-role-modal-confirm">确定</el-button>
       </div>
     </template>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import type { FormInstance } from 'element-plus';
+import type { ElSelect } from 'element-plus';
 import { AuthApi } from '@/api';
 
 const props = defineProps<{
@@ -45,44 +45,49 @@ const emit = defineEmits<{
   (event: 'add-role', name: string[]): void;
 }>();
 
-const { requestFn: getRoleList, data: roleList, loading: getRoleListLoading } = useRequest(AuthApi.getRoleList, {
-  initData: [],
-});
+const { requestFn: getList, loading } = useRequest(AuthApi.getRoleList);
 
 const dialogVisible = useVModel(props, 'visible', emit);
 
-const formRef = ref<FormInstance>();
-
-const requiredRules = ref([
-  {
-    required: true,
-    message: '请输入相应内容后进行操作',
-    trigger: 'change',
-  },
-]);
-
-const formData = reactive({
+const formData = reactive<{ name: string[] }>({
   name: [],
 });
+const roleList = ref<string[]>([]);
+const roleSelectRef = ref<InstanceType<typeof ElSelect>>();
+
+function getRoleList() {
+  getList().then((res) => {
+    roleList.value = res.data.map((item) => item);
+    roleList.value.unshift('全部');
+  });
+}
+
+function handleChangeSelect(vals: string[]) {
+  if (vals.includes('全部')) {
+    formData.name = roleList.value.filter((item) => !props.selected.includes(item));
+    formData.name.shift();
+    roleSelectRef.value?.blur();
+  }
+}
+
+function isCanSelect(item: string) {
+  if (item === '全部') {
+    return roleList.value.length === (props.selected.length + 1);
+  }
+  return props.selected.includes(item);
+}
 
 const handleConfirm = () => {
-  formRef.value?.validate((valid) => {
-    if (valid) {
-      dialogVisible.value = false;
-      emit('add-role', formData.name);
-    }
-  });
+  dialogVisible.value = false;
+  emit('add-role', formData.name);
 };
-onMounted(() => {
-  getRoleList();
-});
 
 watch(
   () => props.visible,
   (newVal) => {
     if (newVal) {
+      formData.name = [];
       getRoleList();
-      formRef.value?.resetFields();
     }
   },
 );

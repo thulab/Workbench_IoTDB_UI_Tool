@@ -60,6 +60,10 @@
   }
 }
 
+.el-select-dropdown__item.is-disabled{
+  opacity: 0.6;
+}
+
 .el-select__tags .el-tag--info{
   background-color: #F0F1FA !important;
   color: #656A85 !important;

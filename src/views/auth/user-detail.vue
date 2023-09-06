@@ -37,8 +37,17 @@
                     <i-custom-correct v-if="row.allChecked" />
                   </el-icon>
                   <template v-else>
-                    <el-checkbox :checked="true" :disabled="row.rolePrivileges.length >= entityPrivilegesEnumKeys.length" v-if="row.privileges.length >= entityPrivilegesEnumKeys.length" @change="e=>handleAllCheckedEntity(row, false)" />
-                    <el-checkbox :checked="false" v-else @change="e=>handleAllCheckedEntity(row, true)" />
+                    <el-checkbox
+                      v-if="row.privileges.length >= entityPrivilegesEnumKeys.length"
+                      :checked="true"
+                      :disabled="row.rolePrivileges.length >= entityPrivilegesEnumKeys.length"
+                      @change="e=>handleAllCheckedEntity(row, false)"
+                    />
+                    <el-checkbox
+                      v-else
+                      :checked="false"
+                      @change="e=>handleAllCheckedEntity(row, true)"
+                    />
                   </template>
                 </template>
               </el-table-column>
@@ -49,11 +58,20 @@
                       <i-custom-correct v-if="row.privileges.includes(child.privileges)" />
                     </el-icon>
                     <template v-else>
-                      <el-checkbox
-                        :checked="true"
-                        :disabled="row.rolePrivileges.includes(child.privileges)"
+                      <el-tooltip
                         v-if="row.privileges.includes(child.privileges)"
-                        @change="handleCheckedEntity(row, child.privileges, false)" />
+                        placement="top-start"
+                        effect="light"
+                        trigger="hover"
+                        content="该权限为角色所有，如需修改请修改角色权限"
+                        :disabled="!row.rolePrivileges.includes(child.privileges)"
+                        popper-class="tooltip-box-width"
+                      >
+                        <el-checkbox
+                          :checked="true"
+                          :disabled="row.rolePrivileges.includes(child.privileges)"
+                          @change="handleCheckedEntity(row, child.privileges, false)" />
+                      </el-tooltip>
                       <el-checkbox :checked="false" v-else @change="handleCheckedEntity(row, child.privileges, true)" />
                     </template>
                   </template>
@@ -71,8 +89,17 @@
                     <i-custom-correct v-if="row.allChecked" />
                   </el-icon>
                   <template v-else>
-                    <el-checkbox :checked="true" :disabled="row.rolePrivileges.length >= pathPrivilegesEnumKeys.length" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" @change="e=>handleAllCheckedPath(row, false)" />
-                    <el-checkbox :checked="false" v-else @change="e=>handleAllCheckedPath(row, true)" />
+                    <el-checkbox
+                      v-if="row.privileges.length >= pathPrivilegesEnumKeys.length"
+                      :checked="true"
+                      :disabled="row.rolePrivileges.length >= pathPrivilegesEnumKeys.length"
+                      @change="e=>handleAllCheckedPath(row, false)"
+                    />
+                    <el-checkbox
+                      v-else
+                      :checked="false"
+                      @change="e=>handleAllCheckedPath(row, true)"
+                    />
                   </template>
                 </template>
               </el-table-column>
@@ -83,11 +110,20 @@
                       <i-custom-correct v-if="row.privileges.includes(child.privileges)" />
                     </el-icon>
                     <template v-else>
-                      <el-checkbox
-                        :checked="true"
-                        :disabled="row.rolePrivileges.includes(child.privileges)"
+                      <el-tooltip
                         v-if="row.privileges.includes(child.privileges)"
-                        @change="handleCheckedPath(row, child.privileges, false)" />
+                        placement="top-start"
+                        effect="light"
+                        trigger="hover"
+                        content="该权限为角色所有，如需修改请修改角色权限"
+                        :disabled="!row.rolePrivileges.includes(child.privileges)"
+                        popper-class="tooltip-box-width"
+                      >
+                        <el-checkbox
+                          :checked="true"
+                          :disabled="row.rolePrivileges.includes(child.privileges)"
+                          @change="handleCheckedPath(row, child.privileges, false)" />
+                      </el-tooltip>
                       <el-checkbox :checked="false" v-else @change="handleCheckedPath(row, child.privileges, true)" />
                     </template>
                   </template>
@@ -118,7 +154,7 @@
       :path-list="editPathList"
       @handle-save="handleSavePath"
     />
-    <modal-add-role v-model:visible="addRoleVisible" :selected="[]" @add-role="handleAddRole" />
+    <modal-add-role v-model:visible="addRoleVisible" :selected="selectRoleList" @add-role="handleAddRole" />
     <modal-preview-role
       v-if="currentRole"
       v-model:visible="previewRoleVisible"
@@ -137,6 +173,7 @@ import List from './components/user-list.vue';
 import ModalPath from './components/modal-path.vue';
 import ModalAddRole from './components/modal-add-role.vue';
 import ModalPreviewRole from './components/modal-preview-role.vue';
+import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
 const userStore = useUserStore();
 const {
@@ -174,6 +211,7 @@ const { requestFn: getUserAuth, data: authData, loading } = useRequest(AuthApi.g
     rolesToPrivileges: [],
   },
 });
+const selectRoleList = computed(() => authData.value.rolesToPrivileges.map((item) => item.roleName) || []);
 
 const { requestFn: updateUserAuth, loading: saveLoading } = useRequest(AuthApi.updateUserAuth);
 
@@ -370,7 +408,15 @@ function handleAddRole(roleNames: string[]) {
   });
 }
 function handleDeleteRole(index: number) {
-  authData.value.rolesToPrivileges.splice(index, 1);
+  ElMessageBox.confirm('是否删除该角色？', '注意', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+    icon: ICustomMessageWarning,
+  })
+    .then(() => {
+      authData.value.rolesToPrivileges.splice(index, 1);
+    });
 }
 function showRoleDetail(role: Auth.AuthByRoleRes) {
   currentRole.value = role;

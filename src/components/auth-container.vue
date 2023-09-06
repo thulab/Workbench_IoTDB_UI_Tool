@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="isAuth === false" class="auth-tip-container">
-      <img src="@/assets/data-empty.png" alt="" class="auth-tip-img">
+      <img src="@/assets/auth-tip.png" alt="" class="auth-tip-img">
       <span class="auth-tip-text">暂无权限</span>
     </div>
     <slot v-if="isAuth"></slot>

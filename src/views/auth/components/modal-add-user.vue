@@ -13,7 +13,7 @@
         <el-select
           v-model="formData.name"
           style="width:100%"
-          placeholder="请输入关联用户"
+          placeholder="请输入用户名称"
           collapse-tags
           multiple
           filterable
