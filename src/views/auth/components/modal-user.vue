@@ -70,16 +70,16 @@ const rules = reactive<FormRules>({
       message: '请以字母开头，只能包含字母、数字和下划线',
       trigger: 'blur',
     },
-    {
-      validator: (rule: any, value: any, callback: any) => {
-        if (value && props.userList.some((item) => item.name === value)) {
-          callback(new Error('该用户已存在，请重新输入'));
-        } else {
-          callback();
-        }
-      },
-      trigger: 'blur',
-    },
+    // {
+    //   validator: (rule: any, value: any, callback: any) => {
+    //     if (value && props.userList.some((item) => item.name === value)) {
+    //       callback(new Error('该用户已存在，请重新输入'));
+    //     } else {
+    //       callback();
+    //     }
+    //   },
+    //   trigger: 'blur',
+    // },
   ],
   password: [
     {

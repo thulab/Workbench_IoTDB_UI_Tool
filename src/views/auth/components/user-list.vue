@@ -41,7 +41,7 @@
     </li>
   </ul>
   <modal-reset-password title="编辑用户" :user-name="editUser" v-model:visible="modalVisible" />
-  <modal-user v-model:visible="modalUserVisible" v-if="list" :user-list="list" @handle-save="getList" />
+  <modal-user v-model:visible="modalUserVisible" :user-list="list" @handle-save="getList" />
 </template>
 
 <script setup lang="ts">
