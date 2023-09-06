@@ -106,7 +106,7 @@ export const useUserStore = defineStore('UserStore', () => {
           || userAllPrivileges.value.includes('WRITE_DATA'));
   const canUsePipe = computed(() => userAllEntityPrivileges.value.includes('USE_PIPE'));
   const canManageUser = computed(() => userAllEntityPrivileges.value.includes('MANAGE_USER'));
-  const canManageRole = computed(() => userAllEntityPrivileges.value.includes('MANAGE_ROLE1'));
+  const canManageRole = computed(() => userAllEntityPrivileges.value.includes('MANAGE_ROLE'));
   const canAlterPwd = computed(() => userAllEntityPrivileges.value.includes('ALTER_PASSWORD'));
 
   // 加载用户权限
