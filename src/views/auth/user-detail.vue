@@ -3,6 +3,9 @@
     <el-aside width="240px" class="list-wrapper">
       <list
         ref="listRef"
+        :can-manage-user="canManageUser"
+        :can-alter-pwd="canAlterPwd"
+        :user-name="userName"
         @handle-select="val => currentUser = val"
       />
     </el-aside>
@@ -16,10 +19,11 @@
           </div>
           <div class="detail-role-list" v-if="!isManager">
             拥有角色：<el-tag :closable="isEdit" type="info" v-for="(item, index,) in authData.rolesToPrivileges" :key="item.roleName" @close="handleDeleteRole(index)" @click="showRoleDetail(item)" :id="`auth-user-role-${item.roleName}-${index}`">{{ item.roleName }}</el-tag>
-            <el-button link @click="addRole()" v-if="isEdit" id="auth-user-add-role"><el-icon size="24px" class="m-l-16">
-              <i-custom-user-role-add />
-            </el-icon>
-            </el-button>
+            <auth-tooltip :is-disabled="canManageRole">
+              <el-button link :disabled="!canManageRole" @click="addRole()" v-if="isEdit" id="auth-user-add-role">
+                <el-icon size="24px" class="m-l-16"><i-custom-user-role-add /></el-icon>
+              </el-button>
+            </auth-tooltip>
           </div>
           <div class="detail-title-box">
             <h4 class="detail-title-text">权限详情</h4>
@@ -140,6 +144,9 @@ const {
   entityPrivilegesEnumKeys,
   pathPrivilegesEnumGroup,
   pathPrivilegesEnumKeys,
+  canManageUser,
+  canManageRole,
+  canAlterPwd,
 } = storeToRefs(userStore);
 const userName = computed(() => userStore.userInfo.name);
 

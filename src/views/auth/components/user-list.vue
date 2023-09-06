@@ -16,10 +16,12 @@
         </el-icon>
         <text-tooltip :content="item.name" />
       </span>
-      <div class="item-edit-box" @click="handleEdit(item.name)">
-        <i-custom-edit class="item-edit" />
-        <i-custom-edit class="item-edit-active" />
-      </div>
+      <auth-tooltip :is-disabled="(canManageUser && canAlterPwd) || userName === item.name">
+        <div class="item-edit-box" :style="{ cursor: !((canManageUser && canAlterPwd) || userName === item.name) ? 'not-allowed' : 'pointer' }" @click="handleEdit(item.name)">
+          <i-custom-edit class="item-edit" />
+          <i-custom-edit class="item-edit-active" />
+        </div>
+      </auth-tooltip>
       <el-popconfirm
         v-if="item.isManager === 0"
         confirm-button-text="确定"
@@ -48,6 +50,12 @@ import ModalResetPassword from '@/components/modal-reset-password.vue';
 import ModalUser from './modal-user.vue';
 import ICustomError from '~icons/custom/error.svg';
 
+const props = defineProps<{
+  canManageUser: boolean;
+  canAlterPwd: boolean;
+  userName: string;
+}>();
+
 const emit = defineEmits<{
   (event: 'handleSelect', payload?: Auth.DBUser): void;
 }>();
@@ -74,6 +82,7 @@ function handleDelete(item: string) {
 }
 
 function handleEdit(item: string) {
+  if (!((props.canManageUser && props.canAlterPwd) || props.userName === item)) return;
   editUser.value = item;
   modalVisible.value = true;
 }

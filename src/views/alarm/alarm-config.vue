@@ -59,8 +59,12 @@
             />
           </base-form-item>
           <div class="search-form-buttons">
-            <el-button @click="handleReset" id="alarm-config-search-reset">重置</el-button>
-            <el-button type="primary" @click="handleSearch" id="alarm-config-search-search">查询</el-button>
+            <auth-tooltip :is-disabled="canUsePipe">
+              <el-button @click="handleReset" :disabled="!canUsePipe" id="alarm-config-search-reset">重置</el-button>
+            </auth-tooltip>
+            <auth-tooltip :is-disabled="canUsePipe">
+              <el-button type="primary" :disabled="!canUsePipe" @click="handleSearch" id="alarm-config-search-search">查询</el-button>
+            </auth-tooltip>
           </div>
         </el-row>
       </el-form>
@@ -70,74 +74,80 @@
       <div class="page-table-title-box">
         <h4 class="page-table-title">告警配置</h4>
         <div class="operate-buttons">
-          <el-button type="primary" @click="handleAdd" id="alarm-config-add">新建告警</el-button>
-          <el-button :disabled="!multipleSelection.length" type="primary" @click="handleDel('batch', null)" id="alarm-config-batch-del">批量删除</el-button>
+          <auth-tooltip :is-disabled="canUsePipe">
+            <el-button type="primary" :disabled="!canUsePipe" @click="handleAdd" id="alarm-config-add">新建告警</el-button>
+          </auth-tooltip>
+          <auth-tooltip :is-disabled="canUsePipe">
+            <el-button :disabled="!multipleSelection.length || !canUsePipe" type="primary" @click="handleDel('batch', null)" id="alarm-config-batch-del">批量删除</el-button>
+          </auth-tooltip>
         </div>
       </div>
-      <div class="page-table-box">
-        <el-table
-          :data="tableData.list"
-          v-loading="loading"
-          style="width: 100%;"
-          :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
-          :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
-          tooltip-effect="light"
-          ref="tableRef"
-          :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
-          :default-sort="{ prop: 'createTime', order: 'descending' }"
-          @selection-change="handleSelectionChange"
-          @sort-change="handleSortChange"
-        >
-          <el-table-column type="selection" width="55" />
-          <el-table-column label="告警测点" prop="measurement" min-width="200" align="center" show-overflow-tooltip />
-          <el-table-column label="告警名称" prop="alarmName" min-width="160" align="center" show-overflow-tooltip />
-          <el-table-column label="告警级别" prop="alarmLevel" sortable="custom" width="120" align="center">
-            <template #default="{ row }">
-              <span v-if="row.alarmLevel" style="display: flex; align-items: center; justify-content: center; margin-left: -20px;">
-                <el-icon size="20" :style="{ color: getLevelColor(row) }"><i-custom-alarm-level /></el-icon>
-                {{ getOptionField(row.alarmLevel, enumStore.alarmLevelEnum) }}
-              </span>
-            </template>
-          </el-table-column>
-          <el-table-column label="创建时间" prop="createTime" sortable="custom" min-width="180" align="center" show-overflow-tooltip />
-          <el-table-column label="更新时间" prop="updateTime" sortable="custom" min-width="180" align="center" show-overflow-tooltip />
-          <el-table-column label="告警描述" prop="alarmDesc" min-width="140" align="center" show-overflow-tooltip />
-          <el-table-column label="告警规则" prop="alarmRules" min-width="160" align="center" show-overflow-tooltip />
-          <el-table-column label="状态" prop="status" min-width="90" align="center" show-overflow-tooltip>
-            <template #default="{ row }">
-              {{ getOptionField(row.status, statusOptions, 'value', 'label') }}
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" width="140" align="center" fixed="right">
-            <template #default="{ row }">
-              <div>
-                <el-button v-if="row.status !== 3" type="primary" link size="small" @click="handleStatus(row)" :id="`alarm-config-table-${row.measurement}-status`">{{ row.status === 1 ? '禁用' : '启用' }}</el-button>
-                <el-button :disabled="row.status === 3" type="primary" :style="{ 'margin-left': row.status !== 3 ? '12px' : '40px' }" link size="small" @click="handleEdit(row)" :id="`alarm-config-table-${row.measurement}-edit`">编辑</el-button>
-                <el-button type="primary" link size="small" @click="handleDel('row', row)" :id="`alarm-config-table-${row.measurement}-del`">删除</el-button>
+      <auth-container :is-auth="canUsePipe" style="height: 100%;">
+        <div class="page-table-box">
+          <el-table
+            :data="tableData.list"
+            v-loading="loading"
+            style="width: 100%;"
+            :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+            :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+            tooltip-effect="light"
+            ref="tableRef"
+            :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
+            :default-sort="{ prop: 'createTime', order: 'descending' }"
+            @selection-change="handleSelectionChange"
+            @sort-change="handleSortChange"
+          >
+            <el-table-column type="selection" width="55" />
+            <el-table-column label="告警测点" prop="measurement" min-width="200" align="center" show-overflow-tooltip />
+            <el-table-column label="告警名称" prop="alarmName" min-width="160" align="center" show-overflow-tooltip />
+            <el-table-column label="告警级别" prop="alarmLevel" sortable="custom" width="120" align="center">
+              <template #default="{ row }">
+                <span v-if="row.alarmLevel" style="display: flex; align-items: center; justify-content: center; margin-left: -20px;">
+                  <el-icon size="20" :style="{ color: getLevelColor(row) }"><i-custom-alarm-level /></el-icon>
+                  {{ getOptionField(row.alarmLevel, enumStore.alarmLevelEnum) }}
+                </span>
+              </template>
+            </el-table-column>
+            <el-table-column label="创建时间" prop="createTime" sortable="custom" min-width="180" align="center" show-overflow-tooltip />
+            <el-table-column label="更新时间" prop="updateTime" sortable="custom" min-width="180" align="center" show-overflow-tooltip />
+            <el-table-column label="告警描述" prop="alarmDesc" min-width="140" align="center" show-overflow-tooltip />
+            <el-table-column label="告警规则" prop="alarmRules" min-width="160" align="center" show-overflow-tooltip />
+            <el-table-column label="状态" prop="status" min-width="90" align="center" show-overflow-tooltip>
+              <template #default="{ row }">
+                {{ getOptionField(row.status, statusOptions, 'value', 'label') }}
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="140" align="center" fixed="right">
+              <template #default="{ row }">
+                <div>
+                  <el-button v-if="row.status !== 3" type="primary" link size="small" @click="handleStatus(row)" :id="`alarm-config-table-${row.measurement}-status`">{{ row.status === 1 ? '禁用' : '启用' }}</el-button>
+                  <el-button :disabled="row.status === 3" type="primary" :style="{ 'margin-left': row.status !== 3 ? '12px' : '40px' }" link size="small" @click="handleEdit(row)" :id="`alarm-config-table-${row.measurement}-edit`">编辑</el-button>
+                  <el-button type="primary" link size="small" @click="handleDel('row', row)" :id="`alarm-config-table-${row.measurement}-del`">删除</el-button>
+                </div>
+              </template>
+            </el-table-column>
+            <template #empty>
+              <div class="table-empty-wrapper">
+                <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+                <span class="data-empty-text">暂无数据</span>
               </div>
             </template>
-          </el-table-column>
-          <template #empty>
-            <div class="table-empty-wrapper">
-              <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-              <span class="data-empty-text">暂无数据</span>
-            </div>
-          </template>
-        </el-table>
+          </el-table>
 
-        <el-pagination
-          v-if="totalCount > 0"
-          v-model:currentPage="pagination.pageNum"
-          v-model:page-size="pagination.pageSize"
-          class="m-t-20"
-          layout="prev, pager, next, sizes, jumper"
-          background
-          :page-sizes="[10, 20, 50, 100]"
-          :total="totalCount"
-          @size-change="onChangePageSize"
-          @current-change="onChangePage"
-        />
-      </div>
+          <el-pagination
+            v-if="totalCount > 0"
+            v-model:currentPage="pagination.pageNum"
+            v-model:page-size="pagination.pageSize"
+            class="m-t-20"
+            layout="prev, pager, next, sizes, jumper"
+            background
+            :page-sizes="[10, 20, 50, 100]"
+            :total="totalCount"
+            @size-change="onChangePageSize"
+            @current-change="onChangePage"
+          />
+        </div>
+      </auth-container>
     </div>
 
     <modal-config
@@ -154,19 +164,24 @@ import type {
   FormInstance, DateModelType, ElTable,
 } from 'element-plus';
 import { useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
 import dayjs from 'dayjs';
 import {
   getStartAndEnd, today, getOneInterval, getOneIntervalNow,
 } from '@/utils/date';
 import { getOptionField } from '@/utils/format';
 import { AlarmApi } from '@/api';
-import { useEnumStore } from '@/stores';
+import { useEnumStore, useUserStore } from '@/stores';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalConfig from './components/modal-config.vue';
 
 const enumStore = useEnumStore();
 const route = useRoute();
+const userStore = useUserStore();
+const {
+  canUsePipe,
+} = storeToRefs(userStore);
 
 const { maxTableHeight } = useTableHeight(320);
 const searchFormRef = ref<FormInstance>();
@@ -351,6 +366,12 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+
+.page-container{
+  display: flex;
+  flex-direction: column;
+}
+
 .search-form-wrapper{
   width: 100%;
 
@@ -389,5 +410,11 @@ onMounted(() => {
     line-height: 21px;
     color: #495AD4;
   }
+}
+
+.page-table-details{
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 </style>

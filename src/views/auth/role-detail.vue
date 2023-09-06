@@ -2,6 +2,7 @@
   <el-container>
     <el-aside width="240px" class="role-list-wrapper">
       <role-list
+        :can-manage-role="canManageRole"
         @handleSelect="val => currentRole = val"
       />
     </el-aside>
@@ -15,10 +16,11 @@
           </div>
           <div class="detail-user-list">
             拥有用户：<el-tag :closable="!isView" type="info" v-for="(item, index) in userList" :key="item" @close="handleDeleteUser(index)" @click="showAuthDetail(item)" :id="`auth-user-${item}-${index}`">{{ item }}</el-tag>
-            <el-button link @click="handleAddUser" v-if="!isView" id="auth-user-add-role"><el-icon size="24px" class="m-l-16">
-              <i-custom-user-role-add />
-            </el-icon>
-            </el-button>
+            <auth-tooltip :is-disabled="canManageUser">
+              <el-button link :disabled="!canManageUser" @click="handleAddUser" v-if="!isView" id="auth-user-add-role">
+                <el-icon size="24px" class="m-l-16"><i-custom-user-role-add /></el-icon>
+              </el-button>
+            </auth-tooltip>
           </div>
           <div class="detail-title-box">
             <h4 class="detail-title-text">权限详情</h4>
@@ -165,6 +167,8 @@ const {
   entityPrivilegesEnumKeys,
   pathPrivilegesEnumGroup,
   pathPrivilegesEnumKeys,
+  canManageUser,
+  canManageRole,
 } = storeToRefs(userStore);
 
 const { requestFn: getAuthByRole, data: authData, loading } = useRequest(AuthApi.getAuthByRole, {

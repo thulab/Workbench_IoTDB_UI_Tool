@@ -7,29 +7,31 @@
     </div>
   </div>
 
-  <ul class="list-box" v-loading="loading">
-    <template v-if="list.length">
-      <li v-for="item in list" :key="item" :class="['item-box', current === item && 'item-box-active']" @click="e=>handleSelect(item, e)">
-        <span class="item-text"><text-tooltip :content="item" /></span>
-        <el-popconfirm
-          confirm-button-text="确定"
-          cancel-button-text="取消"
-          title="删除角色后相关联的用户权限将立即消失，是否删除该角色？"
-          :icon="ICustomError"
-          width="300"
-          @confirm="handleDelete(item)"
-        >
-          <template #reference>
-            <div class="item-delete-box">
-              <i-custom-delete class="item-delete" />
-              <i-custom-delete-active class="item-delete-active" />
-            </div>
-          </template>
-        </el-popconfirm>
-      </li>
-    </template>
-    <li v-else class="item-box-empty">暂无角色</li>
-  </ul>
+  <auth-container :is-auth="canManageRole" style="height: calc(100% - 70px);">
+    <ul class="list-box" v-loading="loading">
+      <template v-if="list.length">
+        <li v-for="item in list" :key="item" :class="['item-box', current === item && 'item-box-active']" @click="e=>handleSelect(item, e)">
+          <span class="item-text"><text-tooltip :content="item" /></span>
+          <el-popconfirm
+            confirm-button-text="确定"
+            cancel-button-text="取消"
+            title="删除角色后相关联的用户权限将立即消失，是否删除该角色？"
+            :icon="ICustomError"
+            width="300"
+            @confirm="handleDelete(item)"
+          >
+            <template #reference>
+              <div class="item-delete-box">
+                <i-custom-delete class="item-delete" />
+                <i-custom-delete-active class="item-delete-active" />
+              </div>
+            </template>
+          </el-popconfirm>
+        </li>
+      </template>
+      <li v-else class="item-box-empty">暂无角色</li>
+    </ul>
+  </auth-container>
 
   <modal-role
     v-model:visible="dialogVisible"
@@ -41,6 +43,10 @@
 import { AuthApi } from '@/api';
 import ICustomError from '~icons/custom/error.svg';
 import modalRole from './modal-role.vue';
+
+const props = defineProps<{
+  canManageRole: boolean;
+}>();
 
 const emit = defineEmits<{
   (event: 'handleSelect', payload: string): void;
@@ -95,6 +101,7 @@ function handleSelect(item: string, e: MouseEvent) {
 }
 
 onMounted(() => {
+  if (!props.canManageRole) return;
   getList();
 });
 
@@ -102,6 +109,18 @@ watch(
   () => current.value,
   (val) => {
     emit('handleSelect', val);
+  },
+  {
+    immediate: true,
+  },
+);
+
+watch(
+  () => props.canManageRole,
+  (val) => {
+    if (val) {
+      getList();
+    }
   },
   {
     immediate: true,

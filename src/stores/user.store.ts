@@ -104,6 +104,10 @@ export const useUserStore = defineStore('UserStore', () => {
           || userAllPrivileges.value.includes('WRITE_SCHEMA')
           || userAllPrivileges.value.includes('READ_DATA')
           || userAllPrivileges.value.includes('WRITE_DATA'));
+  const canUsePipe = computed(() => userAllEntityPrivileges.value.includes('USE_PIPE'));
+  const canManageUser = computed(() => userAllEntityPrivileges.value.includes('MANAGE_USER'));
+  const canManageRole = computed(() => userAllEntityPrivileges.value.includes('MANAGE_ROLE1'));
+  const canAlterPwd = computed(() => userAllEntityPrivileges.value.includes('ALTER_PASSWORD'));
 
   // 加载用户权限
   function loadPrivileges(forceReload?: boolean) {
@@ -163,6 +167,10 @@ export const useUserStore = defineStore('UserStore', () => {
     canReadWriteSchema,
     canReadWriteData,
     canReadWriteSchemaData,
+    canUsePipe,
+    canManageUser,
+    canManageRole,
+    canAlterPwd,
     setUser,
     clearUserStore,
   };
