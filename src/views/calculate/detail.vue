@@ -317,6 +317,7 @@ function handleDel(type: string, data: Calculate.CalculateItem | null) {
 
 onMounted(() => {
   handleReset();
+  if (!canReadWriteSchema.value) return;
   handleSearch();
 });
 </script>

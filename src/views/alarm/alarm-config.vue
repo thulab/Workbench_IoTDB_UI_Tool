@@ -360,6 +360,7 @@ onMounted(() => {
   searchFormData.asc = 'desc';
   searchFormData.orderBy = 'createTime';
   searchFormData.measurements = (route.query.measurement ? [route.query.measurement] : []) as string[];
+  if (!canUsePipe.value) return;
   handleSearch();
 });
 

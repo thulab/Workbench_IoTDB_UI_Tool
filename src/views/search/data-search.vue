@@ -477,6 +477,7 @@ function handleCommandDown(val: string) {
 }
 
 onMounted(() => {
+  if (!canReadWriteData.value) return;
   firstLoad.value = true;
   handleReset();
   if (route.query.measurement) {

@@ -416,6 +416,7 @@ function handleRefresh() {
 }
 
 onMounted(() => {
+  if (!canReadWriteSchema.value) return;
   handleRefresh();
 });
 </script>
