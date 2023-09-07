@@ -110,7 +110,10 @@ const isIndeterminate = computed(() => {
   if (pathList.value.length === 0) return false;
   const allLength = pathList.value.length;
   const checkedLength = pathList.value.filter((item) => item.checked).length;
-  if (allLength === 0 || checkedLength === 0) return false;
+  if (allLength === 0 || checkedLength === 0) {
+    isCheckAll.value = false;
+    return false;
+  }
   if (checkedLength === allLength) {
     isCheckAll.value = true;
   } else {
@@ -223,10 +226,8 @@ watch(
 }
 
 .hover-btn-disabled, .hover-btn-disabled:focus{
-  color: var(--el-button-disabled-text-color) !important;
   cursor: not-allowed !important;
-  background-color: transparent !important;
-  border-color: transparent !important;
+  opacity: 0.8;
 }
 
 .path-list-box{

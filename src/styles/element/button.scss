@@ -42,6 +42,10 @@
       background-color: transparent !important;
     }
 
+    &.is-disabled, &.is-disabled:hover, &.is-disabled:focus{
+      opacity: 0.8;
+    }
+
     .el-button__text--expand{
       letter-spacing: 0 !important;
       margin-right: 0 !important;

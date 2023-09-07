@@ -3,7 +3,9 @@
     <h4>用户列表</h4>
     <div class="operate-buttons">
       <el-button link class="m-r-8 border-refresh-icon" @click="getList" id="auth-user-refresh"><i-custom-refresh /></el-button>
-      <el-button link style="margin: 0;" @click="handleAdd" id="auth-user-add"><i-custom-user-add /></el-button>
+      <auth-tooltip :is-disabled="canManageUser">
+        <el-button link :disabled="!canManageUser" style="margin: 0;" @click="handleAdd" id="auth-user-add"><i-custom-user-add /></el-button>
+      </auth-tooltip>
     </div>
   </div>
 

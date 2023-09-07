@@ -211,7 +211,7 @@ const { requestFn: getUserAuth, data: authData, loading } = useRequest(AuthApi.g
     rolesToPrivileges: [],
   },
 });
-const selectRoleList = computed(() => authData.value.rolesToPrivileges.map((item) => item.roleName) || []);
+const selectRoleList = computed(() => authData.value?.rolesToPrivileges?.map((item) => item.roleName) || []);
 
 const { requestFn: updateUserAuth, loading: saveLoading } = useRequest(AuthApi.updateUserAuth);
 
