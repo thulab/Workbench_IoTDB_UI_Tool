@@ -33,8 +33,8 @@
         <div class="page-table-title-box">
           <h4 class="page-table-title">计算列表</h4>
           <div class="operate-buttons">
-            <auth-tooltip :is-disabled="canReadWriteSchema || (!canReadWriteSchema && canAllWriteSchema)">
-              <el-button type="primary" :disabled="!canReadWriteSchema || (canReadWriteSchema && !canAllWriteSchema)" @click="handleAdd" id="calculate-add">新建计算</el-button>
+            <auth-tooltip :is-disabled="canAllWriteSchema">
+              <el-button type="primary" :disabled="!canAllWriteSchema" @click="handleAdd" id="calculate-add">新建计算</el-button>
             </auth-tooltip>
             <auth-tooltip :is-disabled="canWriteSchema">
               <el-button :disabled="!multipleSelection.length || !canWriteSchema" type="primary" @click="handleDel('batch', null)" id="calculate-batch-del">批量删除</el-button>

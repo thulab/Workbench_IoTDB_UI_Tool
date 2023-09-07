@@ -155,10 +155,12 @@ const intitalEntityVals = ref<string[]>([]);
 const intitalPathVals = ref<Array<{ path: string, privileges: string[] }>>([]);
 const pageType = ref<'edit' | 'view'>('view');
 const userList = ref<string[]>([]);
+const sourceUsers = ref<string[]>([]);
 const userVisible = ref(false);
 const previewVisible = ref(false);
 const previewUser = ref('');
-
+const loading = ref(true);
+const saveLoading = ref(false);
 const isView = computed(() => pageType.value === 'view');
 
 const userStore = useUserStore();
@@ -171,22 +173,41 @@ const {
   canManageRole,
 } = storeToRefs(userStore);
 
-const { requestFn: getAuthByRole, data: authData, loading } = useRequest(AuthApi.getAuthByRole, {
+const { requestFn: getAuthByRole, data: authData } = useRequest(AuthApi.getAuthByRole, {
   initData: {
     roleName: '',
     entityPrivileges: [],
     pathPrivileges: [{ path: '', privileges: [] }],
   },
 });
-const { requestFn: updateAuthByRole, loading: saveLoading } = useRequest(AuthApi.updateAuthByRole);
+const { requestFn: getUserNamesByRoleName } = useRequest(AuthApi.getUserNamesByRoleName);
+const { requestFn: updateAuthByRole } = useRequest(AuthApi.updateAuthByRole);
+const { requestFn: updateRoleWithUsers } = useRequest(AuthApi.updateRoleWithUsers);
 
-function getDetail() {
-  getAuthByRole(currentRole.value).then(() => {
+function getRoleUserList() {
+  return getUserNamesByRoleName(currentRole.value).then((res) => {
+    sourceUsers.value = res.data || [];
+    userList.value = res.data || [];
+  });
+}
+
+function getRoleAuth() {
+  return getAuthByRole(currentRole.value).then(() => {
     intitalEntityVals.value = cloneDeep(authData.value.entityPrivileges);
     intitalPathVals.value = cloneDeep(authData.value.pathPrivileges);
     if (authData.value.pathPrivileges.length === 0) {
       authData.value.pathPrivileges.push({ path: '', privileges: [] });
     }
+  });
+}
+
+function getDetail() {
+  loading.value = true;
+  Promise.allSettled([
+    getRoleUserList(),
+    getRoleAuth(),
+  ]).finally(() => {
+    loading.value = false;
   });
 }
 
@@ -255,14 +276,18 @@ function calcColumnWidth(child: Auth.PrivilegeEnum) {
   return child.width;
 }
 
-// 更新权限
-function handleSave() {
+function updateUsers() {
+  const addUsers = difference(userList.value, sourceUsers.value);
+  const cancelUsers = difference(sourceUsers.value, userList.value);
+  return updateRoleWithUsers({
+    roleName: currentRole.value,
+    addUsers,
+    cancelUsers,
+  });
+}
+
+function updateAuth() {
   const pathPrivileges = authData.value.pathPrivileges.filter((item) => item.path);
-  const flag = pathPrivileges.some((data) => !data.privileges.length);
-  if (flag) {
-    ElMessage.error('路径权限不允许为空，请选择权限后重新操作');
-    return;
-  }
   const cancelPathPrivileges: Array<{ path: string, privileges: string[] }> = [];
   const addPathPrivileges: Array<{ path: string, privileges: string[] }> = [];
   const initialPathKeys = intitalPathVals.value.map((data) => data.path) || [];
@@ -300,13 +325,30 @@ function handleSave() {
     cancelPathPrivileges: cancelPathPrivileges.filter((item) => item.privileges.length > 0),
     addPathPrivileges: addPathPrivileges.filter((item) => item.privileges.length > 0),
   };
-  updateAuthByRole(data).then(() => {
-    ElMessage.success('保存成功');
-    pageType.value = 'view';
-    getDetail();
-  }).catch(() => {
-    pageType.value = 'edit';
-    getDetail();
+  return updateAuthByRole(data);
+}
+
+// 更新权限
+function handleSave() {
+  const pathPrivileges = authData.value.pathPrivileges.filter((item) => item.path);
+  const flag = pathPrivileges.some((data) => !data.privileges.length);
+  if (flag) {
+    ElMessage.error('路径权限不允许为空，请选择权限后重新操作');
+    return;
+  }
+  saveLoading.value = true;
+  Promise.allSettled([
+    updateUsers(),
+    updateAuth(),
+  ]).then((results) => {
+    if (results.some((res) => res.status === 'rejected')) {
+      pageType.value = 'edit';
+      getDetail();
+    } else {
+      ElMessage.success('保存成功');
+      pageType.value = 'view';
+      getDetail();
+    }
   });
 }
 
@@ -347,9 +389,12 @@ watch(
       pathVisible.value = false;
       userVisible.value = false;
       userList.value = [];
+      loading.value = true;
+      saveLoading.value = false;
       if (val) {
         getDetail();
       } else {
+        loading.value = false;
         authData.value.pathPrivileges = [{ path: '', privileges: [] }];
       }
     }

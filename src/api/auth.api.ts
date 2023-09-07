@@ -17,6 +17,11 @@ class AuthApi {
     return http.post('/privileges/createRole', null, { params: { roleName } });
   }
 
+  // 查询角色绑定的所有用户名
+  static getUserNamesByRoleName(roleName: string): HttpResponseP<string[]> {
+    return http.get('/privileges/getUserNamesByRoleName', { params: { roleName } });
+  }
+
   // 根据角色查询权限
   static getAuthByRole(roleName: string): HttpResponseP<Auth.AuthByRoleRes> {
     return http.get('/privileges/getPrivilegesByRoleName', { params: { roleName } });
@@ -25,6 +30,11 @@ class AuthApi {
   // 根据角色更新权限
   static updateAuthByRole(data: Auth.UpdateAuthByRole): HttpResponseP {
     return http.post('/privileges/upsertPrivilegesByRoleName', data);
+  }
+
+  // 更新角色关联用户集合
+  static updateRoleWithUsers(data: Auth.UpdateRoleUsers): HttpResponseP {
+    return http.post('/privileges/relateRoleWithUsers', data);
   }
 
   // 用户列表

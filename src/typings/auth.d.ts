@@ -23,6 +23,12 @@ declare namespace Auth{
     addPathPrivileges: Array<{ path: string, privileges: string[] }>;
   }
 
+  export interface UpdateRoleUsers {
+    roleName: string;
+    cancelUsers: string[];
+    addUsers: string[];
+  }
+
   export interface AuthByRoleRes {
     roleName: string;
     entityPrivileges: string[];
