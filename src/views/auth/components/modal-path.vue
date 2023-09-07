@@ -39,7 +39,7 @@
       </el-radio>
       <el-radio label="input" id="auth-path-modal-input-radio">
         <span class="radio-label">路径模式：<el-tooltip effect="light" content="支持使用“*、**”进行模糊匹配，“*”代表一层，“**”代表一层或多层" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
-        <el-input v-model="inputPath" placeholder='请输入序列路径，支持使用"*、**"进行模糊匹配，例如"root.ln.d1.*/root.ln.d1.**"' style="width: 466px;" class="path-input" id="auth-path-modal-input-path" @change="handleInputPath">
+        <el-input v-model="inputPath" placeholder='请输入序列路径，支持使用"*、**"进行模糊匹配，例如"root.ln.d1.*/root.ln.d1.**"' style="width: 466px;" class="path-input" id="auth-path-modal-input-path">
           <!-- <template #prepend>root.</template> -->
         </el-input>
       </el-radio>
@@ -88,11 +88,12 @@ const remoteMethod = debounce((query: string) => {
   });
 }, 500);
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleInputPath(val: string) {
   const res = val.replace(/(\s*$)/g, '');
-  const reg = /[.|*]$/;
+  const reg = /[.]$/;
   if (reg.test(res)) {
-    inputPath.value = '';
+    ElMessage.warning('路径不能为以.结尾');
   } else {
     inputPath.value = res;
   }
@@ -101,16 +102,22 @@ function handleInputPath(val: string) {
 const handleConfirm = () => {
   let res = selectPath.value;
   if (pathType.value === 'input') {
-    handleInputPath(inputPath.value);
+    const validInputRes = inputPath.value.replace(/(\s*$)/g, '');
+    const reg = /[.]$/;
+    if (reg.test(validInputRes)) {
+      ElMessage.warning('路径不能为以.结尾');
+      return;
+    }
+    inputPath.value = validInputRes;
     res = inputPath.value;
   }
   if (!res) {
     ElMessage.error('路径不能为空');
     return;
   }
-  if (pathType.value === 'input') {
-    res = `root.${inputPath.value}`;
-  }
+  // if (pathType.value === 'input') {
+  //   res = `root.${inputPath.value}`;
+  // }
   const flag = props.pathList.some((item) => item === res);
   if (flag) {
     ElMessage.error('该路径已存在，请勿重复添加');
