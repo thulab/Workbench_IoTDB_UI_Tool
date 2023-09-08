@@ -14,11 +14,11 @@
       <h4 class="storage-info-title">数据库信息</h4>
       <div class="page-info-box">
         <ul class="storage-info-list">
-          <li class="storage-info-item"><el-icon size="24"><i-custom-storage-num /></el-icon><span class="storage-info-item-label">数据库名称：</span><text-tooltip :content="canReadWriteSchemaByPath ? currentStorage : '-'" /></li>
+          <li class="storage-info-item"><el-icon size="24"><i-custom-storage-num /></el-icon><span class="storage-info-item-label">数据库名称：</span><text-tooltip :content="canReadWriteSchema ? currentStorage : '-'" /></li>
           <li class="storage-info-item storage-info-item-ttl">
             <el-icon size="24"><i-custom-time /></el-icon>
             <span class="storage-info-item-label">数据保存时间：<el-tooltip effect="light" content="数据保存时间（TTL），到期后系统将自动删除数据，此处不填代表永久存储" placement="top" popper-class="tooltip-box-width"><i-custom-question class="ttl-tip" /></el-tooltip></span>
-            <template v-if="!canReadWriteSchemaByPath">-</template>
+            <template v-if="!canReadWriteSchema">-</template>
             <template v-else>
               <span v-if="!editTTL">{{ storageInfos?.ttl ? (storageInfos.ttl + getTtlTimeUnit(storageInfos.ttlUnit, ttlUnitOptions)) : '∞'}}</span>
               <div v-if="currentStorage && editTTL" class="edit-ttl-box">
@@ -42,9 +42,9 @@
             </template>
           </li>
           <br>
-          <li class="storage-info-item"><el-icon size="24"><i-custom-device-num /></el-icon><span class="storage-info-item-label">设备数量：</span>{{ canReadWriteSchemaByPath ? (storageInfos?.deviceCount || 0) : '-' }}</li>
-          <li class="storage-info-item"><el-icon size="24"><i-custom-measure-num /></el-icon><span class="storage-info-item-label">测点数量：</span>{{ canReadWriteSchemaByPath ? (storageInfos?.measurementCount || 0) : '-' }}</li>
-          <li class="storage-info-item"><el-icon size="24"><i-custom-total-num /></el-icon><span class="storage-info-item-label">数据总量：</span>{{ canReadWriteSchemaByPath ? (!storageInfos?.dataCount || storageInfos?.dataCount < 0 ? 0 : storageInfos?.dataCount) : '-'}}</li>
+          <li class="storage-info-item"><el-icon size="24"><i-custom-device-num /></el-icon><span class="storage-info-item-label">设备数量：</span>{{ canReadWriteSchema ? (storageInfos?.deviceCount || 0) : '-' }}</li>
+          <li class="storage-info-item"><el-icon size="24"><i-custom-measure-num /></el-icon><span class="storage-info-item-label">测点数量：</span>{{ canReadWriteSchema ? (storageInfos?.measurementCount || 0) : '-' }}</li>
+          <li class="storage-info-item"><el-icon size="24"><i-custom-total-num /></el-icon><span class="storage-info-item-label">数据总量：</span>{{ canReadWriteSchema ? (!storageInfos?.dataCount || storageInfos?.dataCount < 0 ? 0 : storageInfos?.dataCount) : '-'}}</li>
         </ul>
 
         <div class="page-detail-buttons">
@@ -85,7 +85,7 @@
           <el-button :disabled="!currentStorage" link @click="handleRefresh" id="mesaurement-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
         </div>
       </div>
-      <auth-container :is-auth="(currentStorage && canReadWriteSchemaByPath) || (!currentStorage && canReadWriteSchema)" style="height: calc(100% - 222px);">
+      <auth-container :is-auth="canReadWriteSchema" style="height: calc(100% - 222px);">
         <div class="storage-table-box">
           <el-table
             :data="tableData.measurements"
@@ -221,6 +221,7 @@ const storageVisible = ref(false);
 const measurementVisible = ref(false);
 const importVisible = ref(false);
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const canReadWriteSchemaByPath = computed(() => {
   if (userAllEntityPrivileges.value.includes('READ_SCHEMA') || userAllEntityPrivileges.value.includes('WRITE_SCHEMA')) return true;
   if (!currentStorage.value) return false;
@@ -509,7 +510,6 @@ watch(
         } else {
           searchKeyword.value = '';
         }
-        if (!canReadWriteSchemaByPath.value) return;
         getStorageInfo(val);
         handleRefresh();
       }
