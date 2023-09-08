@@ -36,7 +36,7 @@
                 <el-button class="m-l-12" plain @click="editTTL = false" id="mesaurement-ttl-cancel">取消</el-button>
                 <el-button type="primary" @click="handleConfirmEditTTL" id="mesaurement-ttl-confirm">确定</el-button>
               </div>
-              <auth-tooltip :is-disabled="!currentStorage || canWriteSchemaByPath">
+              <auth-tooltip :is-disabled="canWriteSchemaByPath">
                 <el-button link v-if="currentStorage && !editTTL" :disabled="!canWriteSchemaByPath" class="m-l-12" @click="handleEditTTL" id="mesaurement-ttl-edit-button"><i-custom-edit /></el-button>
               </auth-tooltip>
             </template>
@@ -48,7 +48,7 @@
         </ul>
 
         <div class="page-detail-buttons">
-          <auth-tooltip :is-disabled="!currentStorage || currentStorage === 'root.__system' || canManageDatabase">
+          <auth-tooltip :is-disabled="canManageDatabase">
             <el-button plain class="el-button-delete" :disabled="!currentStorage || currentStorage === 'root.__system' || !canManageDatabase" @click="handleDelStorage" id="mesaurement-top-delete-databse">删除</el-button>
           </auth-tooltip>
         </div>
@@ -66,23 +66,29 @@
         </div>
 
         <div class="search-form-buttons">
-          <auth-tooltip :is-disabled="!currentStorage || currentStorage === 'root.__system' || canWriteSchemaByPath">
+          <auth-tooltip :is-disabled="canWriteSchemaByPath">
             <el-button type="primary" :disabled="!currentStorage || currentStorage === 'root.__system' || !canWriteSchemaByPath" @click="handleAddMeasure" id="mesaurement-add">新建</el-button>
           </auth-tooltip>
-          <auth-tooltip :is-disabled="!currentStorage || currentStorage === 'root.__system' || canWriteSchemaByPath">
+          <auth-tooltip :is-disabled="canWriteSchemaByPath">
             <el-button class="m-l-16" :disabled="!currentStorage || currentStorage === 'root.__system' || !canWriteSchemaByPath" @click="handleImport" id="mesaurement-import">导入</el-button>
           </auth-tooltip>
-          <el-dropdown class="m-x-16" :disabled="!currentStorage || !(totalCount > 0)" @command="val => handleCommandDown(val)">
-            <el-button class="export-btn" :disabled="!currentStorage || !(totalCount > 0)" id="mesaurement-download">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip></el-button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
-                <el-dropdown-item command="xlsx">以.xlsx格式导出</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-          <el-button :disabled="!currentStorage || multipleSelection.length === 0" type="primary" @click="handleDelRow('batch', null)" id="mesaurement-batch-del">批量删除</el-button>
-          <el-button :disabled="!currentStorage" link @click="handleRefresh" id="mesaurement-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+          <auth-tooltip :is-disabled="canReadWriteSchema">
+            <el-dropdown class="m-x-16" :disabled="!currentStorage || !(totalCount > 0) || !canReadWriteSchema" @command="val => handleCommandDown(val)">
+              <el-button class="export-btn" :disabled="!currentStorage || !(totalCount > 0) || !canReadWriteSchema" id="mesaurement-download">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip></el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
+                  <el-dropdown-item command="xlsx">以.xlsx格式导出</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </auth-tooltip>
+          <auth-tooltip :is-disabled="canWriteSchema">
+            <el-button :disabled="!currentStorage || multipleSelection.length === 0 || !canWriteSchema" type="primary" @click="handleDelRow('batch', null)" id="mesaurement-batch-del">批量删除</el-button>
+          </auth-tooltip>
+          <auth-tooltip :is-disabled="canReadWriteSchema">
+            <el-button :disabled="!currentStorage || !canReadWriteSchema" link @click="handleRefresh" id="mesaurement-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+          </auth-tooltip>
         </div>
       </div>
       <auth-container :is-auth="canReadWriteSchema" style="height: calc(100% - 222px);">
@@ -116,7 +122,7 @@
                 <el-button type="primary" link size="small" @click="handleRowData(row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-data`">数据</el-button>
                 <el-button type="primary" link size="small" :disabled="currentStorage === 'root.__system'" @click="handleRowAlarm(row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-alarm`">告警</el-button>
                 <el-button type="primary" link size="small" :disabled="currentStorage === 'root.__system'" @click="handleRowTrend(row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-trend`">趋势</el-button>
-                <auth-tooltip :is-disabled="currentStorage === 'root.__system' || rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)">
+                <auth-tooltip :is-disabled="rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)">
                   <el-button type="primary" link size="small" :disabled="currentStorage === 'root.__system' || !rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)" @click="handleDelRow('row', row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-del`">删除</el-button>
                 </auth-tooltip>
               </template>
@@ -340,6 +346,7 @@ function handleSaveStorage() {
 
 // 查询
 function handleRefresh() {
+  if (!canReadWriteSchema.value) return;
   pagination.pageNum = 1;
   getListData();
 }

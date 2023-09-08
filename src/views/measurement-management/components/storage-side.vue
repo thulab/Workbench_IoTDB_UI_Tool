@@ -14,7 +14,7 @@
       <template v-if="storageList.length">
         <li v-for="item in storageList" :key="item" :class="['storage-item-box', currentStorage === item && 'storage-item-box-active']" @click="e => handleSelectStorage(item, e)">
           <span class="storage-item-text"><text-tooltip :content="item" /></span>
-          <auth-tooltip :is-disabled="canManageDatabase || item === 'root.__system'">
+          <auth-tooltip :is-disabled="canManageDatabase">
             <div class="storage-item-delete-box" :style="{ cursor: item === 'root.__system' || !canManageDatabase ? 'not-allowed' : 'pointer' }" @click="handleDeleteStorage(item)">
               <i-custom-delete class="storage-item-delete" />
               <i-custom-delete-active class="storage-item-delete-active" />
