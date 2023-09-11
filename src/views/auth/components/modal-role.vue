@@ -55,7 +55,7 @@ const requiredRules = ref([
     trigger: 'blur',
   },
   {
-    pattern: /[A-Za-z0-9!@#$%^&*()_+-=]+$/,
+    pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
     message: '格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
     trigger: 'blur',
   },
