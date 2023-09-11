@@ -10,7 +10,7 @@
     <el-form label-width="90px" ref="formRef" :rules="rules" :model="formData" label-position="left">
       <label><input type="password" autocomplete="new-password" hidden></label>
       <base-form-item label="用户名：" prop="userName" :error="errorName">
-        <el-input v-model="formData.userName" maxlength="32" placeholder="请输入用户名" show-word-limit id="auth-user-modal-name" />
+        <el-input v-model.trim="formData.userName" maxlength="32" placeholder="请输入用户名" show-word-limit id="auth-user-modal-name" />
       </base-form-item>
       <base-form-item label="输入密码：" prop="password" required>
         <el-input v-model="formData.password" maxlength="32" autocomplete="off" placeholder="请输入密码" show-password id="auth-user-modal-pwd" />
@@ -67,8 +67,8 @@ const rules = reactive<FormRules>({
       trigger: 'blur',
     },
     {
-      pattern: /[\u4e00-\u9fa5A-Za-z0-9!@#$%^&*()_+-=]+$/,
-      message: '格式不符，请输入中文、英文大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
+      pattern: /[A-Za-z0-9!@#$%^&*()_+-=]+$/,
+      message: '格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
       trigger: 'blur',
     },
   ],
@@ -86,7 +86,7 @@ const rules = reactive<FormRules>({
     },
     {
       pattern: /[A-Za-z0-9!@#$%^&*()_+-=]+$/,
-      message: '格式不符，请输入英文大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
+      message: '格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
       trigger: 'blur',
     },
   ],

@@ -9,7 +9,7 @@
   >
     <el-form ref="formRef" :model="formData" class="m-t-14 m-b-34">
       <base-form-item label="角色名：" prop="name" :rules="requiredRules" :error="errorName">
-        <el-input v-model="formData.name" placeholder="请输入角色名" maxlength="32" show-word-limit id="auth-role-modal-name" />
+        <el-input v-model.trim="formData.name" placeholder="请输入角色名" maxlength="32" show-word-limit id="auth-role-modal-name" />
       </base-form-item>
     </el-form>
     <template #footer>
@@ -55,8 +55,8 @@ const requiredRules = ref([
     trigger: 'blur',
   },
   {
-    pattern: /[\u4e00-\u9fa5A-Za-z0-9!@#$%^&*()_+-=]+$/,
-    message: '格式不符，请输入中文、英文大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
+    pattern: /[A-Za-z0-9!@#$%^&*()_+-=]+$/,
+    message: '格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
     trigger: 'blur',
   },
 ]);
