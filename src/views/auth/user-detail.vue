@@ -82,7 +82,7 @@
           <div class="table-list-box  m-x-16 m-b-16" v-if="canEdit">
             <h4 class="table-box-title">路径</h4>
             <el-table :data="tableData" style="width: 100%" tooltip-effect="light" :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
-              <el-table-column label="路径名称" align="center" width="193" prop="path" show-overflow-tooltip />
+              <el-table-column label="路径名称" align="center" min-width="193" prop="path" show-overflow-tooltip />
               <el-table-column label="全选" align="center" width="193">
                 <template #default="{ row }">
                   <el-icon v-if="!isEdit || !row.path" class="moveDown3" size="21">
@@ -129,7 +129,7 @@
                   </template>
                 </el-table-column>
               </el-table-column>
-              <el-table-column label="操作" align="center">
+              <el-table-column label="操作" align="center" width="194" fixed="right">
                 <template #default="{ row }">
                   <el-button link @click="handleDelRow(row)" v-if="row.path" :disabled="pageType === 'view' || row.rolePrivileges.length > 0">
                     <el-icon size="24"><i-custom-close /></el-icon>
