@@ -2,7 +2,7 @@
   <el-dialog
     v-model="dialogVisible"
     title="新建用户"
-    width="480px"
+    width="490px"
     align-center
     :close-on-click-modal="false"
     id="auth-user-modal"

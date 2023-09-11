@@ -2,7 +2,7 @@
   <el-dialog
     title="新建角色"
     v-model="dialogVisible"
-    width="480px"
+    width="490px"
     align-center
     :close-on-click-modal="false"
     id="auth-role-modal"

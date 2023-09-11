@@ -2,12 +2,12 @@
   <el-dialog
     v-model="dialogVisible"
     :title="title"
-    width="480px"
+    width="490px"
     align-center
     :close-on-click-modal="false"
     id="modal-reset-pwd"
   >
-    <el-form label-width="100px" ref="formRef" :rules="rules" :model="formData" label-position="left">
+    <el-form label-width="90px" ref="formRef" :rules="rules" :model="formData" label-position="left">
       <label><input type="password" autocomplete="new-password" hidden></label>
       <base-form-item label="用户名：">
         <el-text>{{ userName }}</el-text>
@@ -68,8 +68,8 @@ const rules = reactive<FormRules>({
       trigger: 'blur',
     },
     {
-      pattern: /^[A-Za-z][A-Za-z0-9_]+$/,
-      message: '请以字母开头，只能包含字母、数字和下划线',
+      pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
+      message: '格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
       trigger: 'blur',
     },
   ],
