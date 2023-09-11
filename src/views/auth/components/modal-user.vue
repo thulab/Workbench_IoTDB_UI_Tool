@@ -9,7 +9,7 @@
   >
     <el-form label-width="90px" ref="formRef" :rules="rules" :model="formData" label-position="left">
       <label><input type="password" autocomplete="new-password" hidden></label>
-      <base-form-item label="用户名：" prop="userName">
+      <base-form-item label="用户名：" prop="userName" :error="errorName">
         <el-input v-model="formData.userName" maxlength="32" placeholder="请输入用户名" show-word-limit id="auth-user-modal-name" />
       </base-form-item>
       <base-form-item label="输入密码：" prop="password" required>
@@ -45,6 +45,7 @@ const emit = defineEmits<{
 }>();
 
 const dialogVisible = useVModel(props, 'visible', emit);
+const errorName = ref('');
 
 const formData = reactive({
   userName: '',
@@ -66,20 +67,10 @@ const rules = reactive<FormRules>({
       trigger: 'blur',
     },
     {
-      pattern: /^[A-Za-z][A-Za-z0-9_]+$/,
-      message: '请以字母开头，只能包含字母、数字和下划线',
+      pattern: /[\u4e00-\u9fa5A-Za-z0-9!@#$%^&*()_+-=]+$/,
+      message: '格式不符，请输入中文、英文大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
       trigger: 'blur',
     },
-    // {
-    //   validator: (rule: any, value: any, callback: any) => {
-    //     if (value && props.userList.some((item) => item.name === value)) {
-    //       callback(new Error('该用户已存在，请重新输入'));
-    //     } else {
-    //       callback();
-    //     }
-    //   },
-    //   trigger: 'blur',
-    // },
   ],
   password: [
     {
@@ -94,8 +85,8 @@ const rules = reactive<FormRules>({
       trigger: 'blur',
     },
     {
-      pattern: /^[A-Za-z][A-Za-z0-9_]+$/,
-      message: '请以字母开头，只能包含字母、数字和下划线',
+      pattern: /[A-Za-z0-9!@#$%^&*()_+-=]+$/,
+      message: '格式不符，请输入英文大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
       trigger: 'blur',
     },
   ],
@@ -117,15 +108,18 @@ const rules = reactive<FormRules>({
 const { requestFn: addUser, loading } = useRequest(AuthApi.addUser);
 
 const handleConfirm = () => {
+  errorName.value = '';
   formRef.value?.validate((valid) => {
     if (valid) {
       addUser(formData.userName, formData.password).then(() => {
         ElMessage.success('新建用户成功');
         dialogVisible.value = false;
         emit('handleSave');
+      }).catch((err) => {
+        if (err.code === 1360) {
+          errorName.value = err.message;
+        }
       });
-    } else {
-      ElMessage.error('存在必填项未编辑或必填项输入规则有误');
     }
   });
 };
@@ -134,6 +128,7 @@ watch(
   () => props.visible,
   (newVal) => {
     if (newVal) {
+      errorName.value = '';
       formRef.value?.resetFields();
     }
   },

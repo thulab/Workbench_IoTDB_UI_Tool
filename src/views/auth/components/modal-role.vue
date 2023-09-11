@@ -8,8 +8,8 @@
     id="auth-role-modal"
   >
     <el-form ref="formRef" :model="formData" class="m-t-14 m-b-34">
-      <base-form-item label="角色名：" prop="name" :rules="requiredRules">
-        <el-input v-model="formData.name" placeholder="请输入角色名" maxlength="20" show-word-limit id="auth-role-modal-name" />
+      <base-form-item label="角色名：" prop="name" :rules="requiredRules" :error="errorName">
+        <el-input v-model="formData.name" placeholder="请输入角色名" maxlength="32" show-word-limit id="auth-role-modal-name" />
       </base-form-item>
     </el-form>
     <template #footer>
@@ -35,6 +35,7 @@ const emit = defineEmits<{
 }>();
 
 const dialogVisible = useVModel(props, 'visible', emit);
+const errorName = ref('');
 
 const formRef = ref<FormInstance>();
 const formData = reactive({
@@ -44,20 +45,18 @@ const formData = reactive({
 const requiredRules = ref([
   {
     required: true,
-    validator: (rule: any, value: any, callback: any) => {
-      if (!value || !value.trim()) {
-        return callback(new Error('请输入相应内容后进行操作'));
-      } if (/[\u4e00-\u9fa5]+/.test(value)) {
-        return callback(new Error('格式错误，不能包含中文'));
-      }
-      return callback();
-    },
+    message: '请输入相应内容后进行操作',
     trigger: 'blur',
   },
   {
     min: 4,
-    max: 20,
+    max: 32,
     message: '字符长度不小于4，请重新输入',
+    trigger: 'blur',
+  },
+  {
+    pattern: /[\u4e00-\u9fa5A-Za-z0-9!@#$%^&*()_+-=]+$/,
+    message: '格式不符，请输入中文、英文大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
     trigger: 'blur',
   },
 ]);
@@ -65,12 +64,17 @@ const requiredRules = ref([
 const { requestFn: saveRole, loading } = useRequest(AuthApi.saveRole);
 
 const handleConfirm = () => {
+  errorName.value = '';
   formRef.value?.validate((valid) => {
     if (valid) {
       saveRole(formData.name).then(() => {
         ElMessage.success('创建成功');
         dialogVisible.value = false;
         emit('handleSave');
+      }).catch((err) => {
+        if (err.code === 1360) {
+          errorName.value = err.message;
+        }
       });
     }
   });
@@ -80,6 +84,7 @@ watch(
   () => props.visible,
   (newVal) => {
     if (newVal) {
+      errorName.value = '';
       formRef.value?.resetFields();
     }
   },
