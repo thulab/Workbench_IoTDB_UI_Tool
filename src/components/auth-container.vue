@@ -25,6 +25,7 @@ defineProps<{
   height: 100%;
   padding: 16px 0;
   box-sizing: border-box;
+  background-color: #fff;
 
   .auth-tip-img{
     width: 150px;

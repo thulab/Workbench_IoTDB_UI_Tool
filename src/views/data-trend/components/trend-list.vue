@@ -30,12 +30,12 @@
   <h4 v-if="!isExpand" class="collapse-title">已选测点</h4>
 
   <div class="path-list-box" v-if="isExpand">
-    <div class="list-empty-wrapper" v-if="!pathList.length">
-      <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-      <span class="data-empty-text">暂无数据</span>
-    </div>
-    <auth-container v-else :is-auth="canReadWriteSchemaData">
-      <ul class="list-box" :key="listKey">
+    <auth-container :is-auth="canReadWriteSchemaData" style="height: calc(100% - 82px);">
+      <div class="list-empty-wrapper" v-if="!pathList.length">
+        <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+        <span class="data-empty-text">暂无数据</span>
+      </div>
+      <ul class="list-box" v-else :key="listKey">
         <li v-for="(item, index) in pathList" :key="item.path" :class="['path-item-box']">
           <div class="path-text-box">
             <el-checkbox v-if="item.disabled" :checked="false" :disabled="true" class="m-r-8" :id="`trend-path-checkbox-${index}-false`" />
