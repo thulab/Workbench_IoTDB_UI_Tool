@@ -23,7 +23,7 @@
             </auth-tooltip>
           </div>
           <div class="detail-title-box">
-            <h4 class="detail-title-text">权限详情</h4>
+            <h4 class="detail-title-text">权限详情<span class="tip-text"><i-custom-info-warning />移除父级路径权限时其包含的子路径权限会同步移除，请谨慎操作</span></h4>
           </div>
           <div class="table-list-box">
             <h4 class="table-box-title">全局</h4>
@@ -442,6 +442,22 @@ watch(
     font-weight: 700;
     line-height: 21px;
     color: #495AD4;
+    display: flex;
+
+    .tip-text {
+      align-self: flex-end;
+      margin: 0 0 0 12px;
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      color: #808080;
+      font-weight: 400;
+
+      svg {
+        color: #ccc;
+        margin-right: 4px;
+      }
+    }
   }
 }
 
