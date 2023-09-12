@@ -31,7 +31,7 @@
         </el-table>
       </div>
 
-      <div class="table-list-box">
+      <div class="table-list-box" v-if="name !== 'root'">
         <h4 class="table-box-title">路径</h4>
         <el-table :data="tableData" style="width: 100%" tooltip-effect="light" border>
           <el-table-column label="路径名称" prop="path" align="center" width="193" show-overflow-tooltip />
