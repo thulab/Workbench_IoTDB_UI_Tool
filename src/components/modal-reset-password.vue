@@ -122,8 +122,6 @@ const handleConfirm = () => {
         }
         emit('handleSave');
       });
-    } else {
-      ElMessage.error('存在必填项未编辑或必填项输入规则有误');
     }
   });
 };
