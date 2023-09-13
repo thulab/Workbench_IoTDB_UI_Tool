@@ -75,12 +75,24 @@ const rules = reactive<FormRules>({
   ],
   confirmPassword: [
     {
+      required: true,
+      message: '请输入相应内容后进行操作',
+      trigger: 'blur',
+    },
+    {
+      min: 4,
+      max: 32,
+      message: '字符长度不小于4，请重新输入',
+      trigger: 'blur',
+    },
+    {
+      pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
+      message: '格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
+      trigger: 'blur',
+    },
+    {
       validator: (rule: any, value: any, callback: any) => {
-        if (value === '') {
-          callback(new Error('请输入相应内容后进行操作'));
-        } else if (!/^[A-Za-z0-9!@#$%^&*()_+\-=]+$/.test(value)) {
-          callback(new Error('格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）'));
-        } else if (value !== formData.password) {
+        if (value !== formData.password) {
           callback(new Error('密码不一致，请重新输入'));
         } else {
           callback();
