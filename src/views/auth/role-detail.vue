@@ -11,7 +11,9 @@
         <el-scrollbar>
           <div class="detail-title-box">
             <h4 class="detail-title-text">用户详情</h4>
-            <el-button type="primary" v-if="isView" :disabled="!currentRole" @click="pageType = 'edit'" id="auth-role-edit">编辑</el-button>
+            <auth-tooltip v-if="isView" :is-disabled="canManageRole">
+              <el-button type="primary" :disabled="!currentRole || !canManageRole" @click="pageType = 'edit'" id="auth-role-edit">编辑</el-button>
+            </auth-tooltip>
             <el-button type="primary" v-else @click="handleReset('view')" id="auth-role-view">退出编辑</el-button>
           </div>
           <div class="detail-user-list">

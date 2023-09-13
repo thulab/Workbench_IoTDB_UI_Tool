@@ -2,7 +2,9 @@
   <div class="list-title">
     <h4>角色列表</h4>
     <div class="operate-buttons">
-      <el-button link class="m-r-8 border-refresh-icon" @click="getList" id="auth-role-refresh"><i-custom-refresh /></el-button>
+      <auth-tooltip :is-disabled="canManageRole">
+        <el-button link class="m-r-8 border-refresh-icon" :disabled="!canManageRole" @click="getList" id="auth-role-refresh"><i-custom-refresh /></el-button>
+      </auth-tooltip>
       <auth-tooltip :is-disabled="canManageRole">
         <el-button link :disabled="!canManageRole" style="margin: 0;" @click="handleAdd" id="auth-role-add"><i-custom-new-role /></el-button>
       </auth-tooltip>
