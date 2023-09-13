@@ -27,6 +27,7 @@ import { AuthApi } from '@/api';
 
 const props = defineProps<{
   visible: boolean;
+  list: string[];
 }>();
 
 const emit = defineEmits<{
@@ -57,6 +58,16 @@ const requiredRules = ref([
   {
     pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
     message: '格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
+    trigger: 'blur',
+  },
+  {
+    validator: (rule: any, value: any, callback: any) => {
+      if (value && props.list.some((item) => item === value)) {
+        callback(new Error('该角色已存在，请重新输入'));
+      } else {
+        callback();
+      }
+    },
     trigger: 'blur',
   },
 ]);

@@ -39,6 +39,7 @@
 
   <modal-role
     v-model:visible="dialogVisible"
+    :list="list"
     @handle-save="getList"
   />
 </template>

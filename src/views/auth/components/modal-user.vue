@@ -71,6 +71,16 @@ const rules = reactive<FormRules>({
       message: '格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
       trigger: 'blur',
     },
+    {
+      validator: (rule: any, value: any, callback: any) => {
+        if (value && props.userList.some((item) => item.name === value)) {
+          callback(new Error('该用户已存在，请重新输入'));
+        } else {
+          callback();
+        }
+      },
+      trigger: 'blur',
+    },
   ],
   password: [
     {
