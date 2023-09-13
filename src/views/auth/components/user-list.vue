@@ -25,7 +25,7 @@
         </div>
       </auth-tooltip>
       <el-popconfirm
-        v-if="item.isManager === 0"
+        v-if="item.isManager === 0 && userName !== item.name"
         confirm-button-text="确定"
         cancel-button-text="取消"
         width="160px"
