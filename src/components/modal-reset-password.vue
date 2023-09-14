@@ -9,7 +9,7 @@
   >
     <el-form label-width="90px" ref="formRef" :rules="rules" :model="formData" label-position="left">
       <label><input type="password" autocomplete="new-password" hidden></label>
-      <base-form-item label="用户名：">
+      <base-form-item label="用户名：" required>
         <el-text>{{ userName }}</el-text>
       </base-form-item>
       <base-form-item label="输入密码：" prop="password">
