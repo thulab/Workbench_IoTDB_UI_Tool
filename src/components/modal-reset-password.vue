@@ -7,7 +7,7 @@
     :close-on-click-modal="false"
     id="modal-reset-pwd"
   >
-    <el-form label-width="90px" ref="formRef" :rules="rules" :model="formData" label-position="left">
+    <el-form label-width="90px" ref="formRef" :rules="rules" :model="formData" label-position="left" :key="formKey">
       <label><input type="password" autocomplete="new-password" hidden></label>
       <base-form-item label="用户名：" required>
         <el-text>{{ userName }}</el-text>
@@ -48,6 +48,7 @@ const emit = defineEmits<{
 
 const dialogVisible = useVModel(props, 'visible', emit);
 const userStore = useUserStore();
+const formKey = ref(0);
 
 const formData = reactive({
   password: '',
@@ -131,6 +132,7 @@ watch(
   (newVal) => {
     if (newVal) {
       formRef.value?.resetFields();
+      formKey.value++;
     }
   },
 );

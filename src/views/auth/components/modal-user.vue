@@ -7,16 +7,16 @@
     :close-on-click-modal="false"
     id="auth-user-modal"
   >
-    <el-form label-width="90px" ref="formRef" :rules="rules" :model="formData" label-position="left">
+    <el-form label-width="90px" ref="formRef" :rules="rules" :model="formData" label-position="left" :key="formKey">
       <label><input type="password" autocomplete="new-password" hidden></label>
       <base-form-item label="用户名：" prop="userName" :error="errorName">
         <el-input v-model.trim="formData.userName" maxlength="32" placeholder="请输入用户名" show-word-limit id="auth-user-modal-name" />
       </base-form-item>
       <base-form-item label="输入密码：" prop="password" required>
-        <el-input v-model="formData.password" maxlength="32" autocomplete="off" placeholder="请输入密码" show-password id="auth-user-modal-pwd" />
+        <el-input v-model="formData.password" type="password" maxlength="32" autocomplete="off" placeholder="请输入密码" show-password id="auth-user-modal-pwd" />
       </base-form-item>
       <base-form-item label="确认密码：" prop="confirmPassword" required>
-        <el-input v-model="formData.confirmPassword" maxlength="32" autocomplete="off" placeholder="请再次输入密码" show-password id="auth-user-modal-pwd-again" />
+        <el-input v-model="formData.confirmPassword" type="password" maxlength="32" autocomplete="off" placeholder="请再次输入密码" show-password id="auth-user-modal-pwd-again" />
       </base-form-item>
     </el-form>
     <template #footer>
@@ -46,6 +46,7 @@ const emit = defineEmits<{
 
 const dialogVisible = useVModel(props, 'visible', emit);
 const errorName = ref('');
+const formKey = ref(0);
 
 const formData = reactive({
   userName: '',
@@ -154,6 +155,7 @@ watch(
     if (newVal) {
       errorName.value = '';
       formRef.value?.resetFields();
+      formKey.value++;
     }
   },
 );
