@@ -58,18 +58,18 @@ const rules = reactive<FormRules>({
     {
       required: true,
       message: '请输入相应内容后进行操作',
-      trigger: 'blur',
+      trigger: ['blur', 'change'],
     },
     {
       min: 4,
       max: 32,
       message: '字符长度不小于4，请重新输入',
-      trigger: 'blur',
+      trigger: ['blur', 'change'],
     },
     {
       pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
       message: '格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
-      trigger: 'blur',
+      trigger: ['blur', 'change'],
     },
     {
       validator: (rule: any, value: any, callback: any) => {
@@ -79,39 +79,53 @@ const rules = reactive<FormRules>({
           callback();
         }
       },
-      trigger: 'blur',
+      trigger: ['blur', 'change'],
     },
   ],
   password: [
     {
       required: true,
       message: '请输入相应内容后进行操作',
-      trigger: 'blur',
+      trigger: ['blur', 'change'],
     },
     {
       min: 4,
       max: 32,
       message: '字符长度不小于4，请重新输入',
-      trigger: 'blur',
+      trigger: ['blur', 'change'],
     },
     {
       pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
       message: '格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
-      trigger: 'blur',
+      trigger: ['blur', 'change'],
     },
   ],
   confirmPassword: [
     {
+      required: true,
+      message: '请输入相应内容后进行操作',
+      trigger: ['blur', 'change'],
+    },
+    {
+      min: 4,
+      max: 32,
+      message: '字符长度不小于4，请重新输入',
+      trigger: ['blur', 'change'],
+    },
+    {
+      pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
+      message: '格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
+      trigger: ['blur', 'change'],
+    },
+    {
       validator: (rule: any, value: any, callback: any) => {
-        if (value === '') {
-          callback(new Error('请输入相应内容后进行操作'));
-        } else if (value !== formData.password) {
+        if (value !== formData.password) {
           callback(new Error('密码不一致，请重新输入'));
         } else {
           callback();
         }
       },
-      trigger: 'blur',
+      trigger: ['blur', 'change'],
     },
   ],
 });
