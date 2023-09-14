@@ -109,6 +109,15 @@ export const useUserStore = defineStore('UserStore', () => {
   const canManageRole = computed(() => userAllEntityPrivileges.value.includes('MANAGE_ROLE'));
   const canAlterPwd = computed(() => userAllEntityPrivileges.value.includes('MANAGE_USER'));
 
+  function loadPrivilegesEnum(forceReload?: boolean) {
+    if (!userInfo.value.name) return;
+    if (forceReload || !entityPrivilegesEnumGroup.value.length) {
+      getPrivilegesEnum().then((res) => {
+        privilegesEnum.value = res.data;
+      });
+    }
+  }
+
   // 加载用户权限
   function loadPrivileges(forceReload?: boolean) {
     if (!forceReload && !userInfo.value.name) return;
@@ -116,15 +125,8 @@ export const useUserStore = defineStore('UserStore', () => {
       getLoginUserPrivileges().then((res) => {
         userInfo.value.name = res.data.userName;
         allPrivileges.value = res.data;
-      });
-    }
-  }
-
-  function loadPrivilegesEnum(forceReload?: boolean) {
-    if (!userInfo.value.name) return;
-    if (forceReload || !entityPrivilegesEnumGroup.value.length) {
-      getPrivilegesEnum().then((res) => {
-        privilegesEnum.value = res.data;
+      }).finally(() => {
+        loadPrivilegesEnum(false);
       });
     }
   }

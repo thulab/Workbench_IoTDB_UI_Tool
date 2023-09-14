@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="添加路径"
+    title="添加路径权限"
     v-model="dialogVisible"
     width="600px"
     align-center
