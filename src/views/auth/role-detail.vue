@@ -157,7 +157,7 @@ const intitalEntityVals = ref<string[]>([]);
 const intitalPathVals = ref<Array<{ path: string, privileges: string[] }>>([]);
 const pageType = ref<'edit' | 'view'>('view');
 const userList = ref<string[]>([]);
-const sourceUsers = ref<string[]>([]);
+let sourceUsers: string[] = [];
 const userVisible = ref(false);
 const previewVisible = ref(false);
 const previewUser = ref('');
@@ -188,7 +188,7 @@ const { requestFn: updateRoleWithUsers } = useRequest(AuthApi.updateRoleWithUser
 
 function getRoleUserList() {
   return getUserNamesByRoleName(currentRole.value).then((res) => {
-    sourceUsers.value = res.data || [];
+    sourceUsers = cloneDeep(res.data || []);
     userList.value = res.data || [];
   });
 }
@@ -279,8 +279,8 @@ function calcColumnWidth(child: Auth.PrivilegeEnum) {
 }
 
 function updateUsers() {
-  const addUsers = difference(userList.value, sourceUsers.value);
-  const cancelUsers = difference(sourceUsers.value, userList.value);
+  const addUsers = difference(userList.value, sourceUsers);
+  const cancelUsers = difference(sourceUsers, userList.value);
   return updateRoleWithUsers({
     roleName: currentRole.value,
     addUsers,
@@ -351,6 +351,8 @@ function handleSave() {
       pageType.value = 'view';
       getDetail();
     }
+  }).finally(() => {
+    saveLoading.value = false;
   });
 }
 
