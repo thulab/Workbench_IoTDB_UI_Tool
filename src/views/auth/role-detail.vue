@@ -54,12 +54,6 @@
                   </template>
                 </el-table-column>
               </el-table-column>
-              <template #empty>
-                <div class="table-empty-wrapper">
-                  <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-                  <span class="data-empty-text">无数据</span>
-                </div>
-              </template>
             </el-table>
           </div>
           <div class="table-list-box">
@@ -98,12 +92,6 @@
                   </el-button>
                 </template>
               </el-table-column>
-              <template #empty>
-                <div class="table-empty-wrapper">
-                  <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-                  <span class="data-empty-text">无数据</span>
-                </div>
-              </template>
             </el-table>
 
             <el-button v-if="!isView" style="width: 100%;" class="m-t-24" @click="handleAddRow" id="auth-role-path"><i-custom-add class="m-r-4" />添加路径</el-button>
@@ -231,6 +219,9 @@ function handleSavePath(path: string) {
 // 删除行
 function handleDelRow(index: number) {
   authData.value.pathPrivileges.splice(index, 1);
+  if (authData.value.pathPrivileges.length === 0) {
+    authData.value.pathPrivileges.push({ path: '', privileges: [] });
+  }
 }
 
 // 全局
