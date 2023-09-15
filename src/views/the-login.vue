@@ -12,11 +12,25 @@
         <h5 class="login-title">账号密码登录</h5>
         <el-form :hide-required-asterisk="true" :model="loginForm" :rules="rules" ref="formRef" class="login-form-box">
           <label><input type="password" autocomplete="new-password" hidden></label>
+          <el-form-item prop="connection">
+            <el-input
+              v-model="loginForm.connection"
+              autocomplete="off"
+              placeholder="请选择连接实例"
+              readonly
+              id="login-connection"
+              @click="handleSelectConnection"
+            >
+              <template #prefix>
+                <el-icon size="30"><i-custom-connection /></el-icon>
+              </template>
+            </el-input>
+          </el-form-item>
           <el-form-item prop="user">
             <el-input
               v-model="loginForm.user"
               autocomplete="off"
-              placeholder="请输入账号"
+              placeholder="请输入用户名"
               maxlength="32"
               @keyup.enter="submitForm"
               id="login-user"
@@ -54,6 +68,10 @@
       </div>
       <p class="right-text">copyrightⒸ Timecho</p>
     </div>
+
+    <modal-connection
+      v-model:visible="connectionVisible"
+    />
   </div>
 </template>
 
@@ -62,17 +80,20 @@ import { useRouter } from 'vue-router';
 import type { FormInstance, FormRules } from 'element-plus';
 import { UserApi } from '@/api';
 import { useUserStore } from '@/stores';
+import ModalConnection from '@/components/modal-connection.vue';
 
 const router = useRouter();
 const userStore = useUserStore();
 
 const formRef = ref<FormInstance>();
 const loginForm = reactive({
+  connection: '',
   user: '',
   password: '',
 });
 const pwdType = ref('password');
 const loading = ref(false);
+const connectionVisible = ref(false);
 
 const { requestFn: login } = useRequest(UserApi.login);
 
@@ -97,6 +118,13 @@ const validatepassword = (rule: any, value: any, callback: any) => {
 };
 
 const rules = reactive<FormRules>({
+  connection: [
+    {
+      required: true,
+      message: '请选择连接实例',
+      trigger: 'blur',
+    },
+  ],
   user: [
     {
       required: true,
@@ -121,6 +149,10 @@ function handleChangePwdType() {
     pwdType.value = 'password';
   }
   formRef.value?.clearValidate('password');
+}
+
+function handleSelectConnection() {
+  connectionVisible.value = true;
 }
 
 const submitForm = () => {
@@ -234,7 +266,7 @@ onUnmounted(() => {
   margin: 36px 0 0;
 
   :deep(.el-form-item--default) {
-    margin-bottom: 36px;
+    margin-bottom: 24px;
   }
 
   :deep(.el-input) {
@@ -244,7 +276,7 @@ onUnmounted(() => {
 
 .login-button{
   width: 100%;
-  margin-top: 84px;
+  margin-top: 48px;
   border-radius: 4px;
   height: 36px !important;
   font-size: 14px !important;
