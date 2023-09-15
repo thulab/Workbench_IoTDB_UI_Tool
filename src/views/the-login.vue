@@ -71,6 +71,7 @@
 
     <modal-connection
       v-model:visible="connectionVisible"
+      v-model="connectionList"
     />
   </div>
 </template>
@@ -78,7 +79,7 @@
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
 import type { FormInstance, FormRules } from 'element-plus';
-import { UserApi } from '@/api';
+import { UserApi, ConnectionApi } from '@/api';
 import { useUserStore } from '@/stores';
 import ModalConnection from '@/components/modal-connection.vue';
 
@@ -86,7 +87,12 @@ const router = useRouter();
 const userStore = useUserStore();
 
 const formRef = ref<FormInstance>();
-const loginForm = reactive({
+const loginForm = reactive<{
+  connection: string | number;
+  user: string;
+  password: string;
+}
+>({
   connection: '',
   user: '',
   password: '',
@@ -94,8 +100,10 @@ const loginForm = reactive({
 const pwdType = ref('password');
 const loading = ref(false);
 const connectionVisible = ref(false);
+const connectionList = ref<Connection.ConnectionItem[]>([]);
 
 const { requestFn: login } = useRequest(UserApi.login);
+const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
 
 const validateuser = (rule: any, value: any, callback: any) => {
   if (value === '') {
@@ -151,6 +159,15 @@ function handleChangePwdType() {
   formRef.value?.clearValidate('password');
 }
 
+// 获取实例列表
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function getList() {
+  getConnectionList().then((res) => {
+    connectionList.value = res.data || [];
+    loginForm.connection = connectionList.value[0].id;
+  });
+}
+
 function handleSelectConnection() {
   connectionVisible.value = true;
 }
@@ -174,6 +191,7 @@ onMounted(() => {
   userStore.clearUserStore();
   sessionStorage.setItem('UserStore', '');
   sessionStorage.setItem('nologin', '1');
+  // getList();
 });
 
 onUnmounted(() => {

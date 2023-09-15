@@ -6,6 +6,7 @@ import AuthApi from './auth.api';
 import CalculateApi from './calculate.api';
 import LogApi from './log.api';
 import DashboardApi from './dashboard.api';
+import ConnectionApi from './connection.api';
 
 export {
   SearchApi,
@@ -16,4 +17,5 @@ export {
   CalculateApi,
   LogApi,
   DashboardApi,
+  ConnectionApi,
 };

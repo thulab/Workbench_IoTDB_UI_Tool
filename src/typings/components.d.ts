@@ -63,6 +63,7 @@ declare module 'vue' {
     ICustomAdd: typeof import('~icons/custom/add')['default']
     ICustomAlarmLevel: typeof import('~icons/custom/alarm-level')['default']
     ICustomArrowRightExpand: typeof import('~icons/custom/arrow-right-expand')['default']
+    ICustomBorderRefresh: typeof import('~icons/custom/border-refresh')['default']
     ICustomClose: typeof import('~icons/custom/close')['default']
     ICustomCloseCircle: typeof import('~icons/custom/close-circle')['default']
     ICustomConnection: typeof import('~icons/custom/connection')['default']
