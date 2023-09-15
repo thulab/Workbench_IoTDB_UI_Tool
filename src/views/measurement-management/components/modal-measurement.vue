@@ -64,9 +64,9 @@
             </template>
             <el-row>
               <el-col :span="8">
-                <el-form-item label="测点名称：" :prop="'measurementList[' + index + '].timeseries'" :rules="requiredRules">
+                <el-form-item label="测点名称：" :prop="'measurementList[' + index + '].timeseries'" :rules="requiredRules" class="m-r-0">
                   <el-input type="hidden" />
-                  <el-input v-model="item.timeseries" placeholder="请输入测点名称" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-timeseries`" />
+                  <el-input v-model="item.timeseries" placeholder="请输入测点名称" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-timeseries`" style="width: 144px;" />
                 </el-form-item>
               </el-col>
             </el-row>
