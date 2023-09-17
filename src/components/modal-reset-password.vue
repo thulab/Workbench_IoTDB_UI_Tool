@@ -12,11 +12,14 @@
       <base-form-item label="用户名：" required>
         <el-text>{{ userName }}</el-text>
       </base-form-item>
+      <base-form-item label="原始密码：" prop="rawPassword">
+        <el-input v-model="formData.rawPassword" maxlength="32" autocomplete="off" placeholder="请输入原始密码" show-password id="modal-reset-pwd-input-raw-pwd" />
+      </base-form-item>
       <base-form-item label="输入密码：" prop="password">
-        <el-input v-model="formData.password" type="password" maxlength="32" autocomplete="off" placeholder="请输入密码" show-password id="modal-reset-pwd-input-pwd" />
+        <el-input v-model="formData.password" maxlength="32" autocomplete="off" placeholder="请输入密码" show-password id="modal-reset-pwd-input-pwd" />
       </base-form-item>
       <base-form-item label="确认密码：" prop="confirmPassword">
-        <el-input v-model="formData.confirmPassword" type="password" maxlength="32" autocomplete="off" placeholder="请再次输入密码" show-password id="modal-reset-pwd-input-pwd-again" />
+        <el-input v-model="formData.confirmPassword" maxlength="32" autocomplete="off" placeholder="请再次输入密码" show-password id="modal-reset-pwd-input-pwd-again" />
       </base-form-item>
     </el-form>
     <template #footer>
@@ -51,11 +54,30 @@ const userStore = useUserStore();
 const formKey = ref(0);
 
 const formData = reactive({
+  rawPassword: '',
   password: '',
   confirmPassword: '',
 });
 
 const rules = reactive<FormRules>({
+  rawPassword: [
+    {
+      required: true,
+      message: '请输入相应内容后进行操作',
+      trigger: 'blur',
+    },
+    {
+      min: 4,
+      max: 32,
+      message: '字符长度不小于4，请重新输入',
+      trigger: 'blur',
+    },
+    {
+      pattern: /^[A-Za-z][A-Za-z0-9_]+$/,
+      message: '请以字母开头，只能包含字母、数字和下划线',
+      trigger: 'blur',
+    },
+  ],
   password: [
     {
       required: true,
@@ -108,7 +130,7 @@ const { requestFn: updateUser, loading } = useRequest(AuthApi.updateUser);
 const handleConfirm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
-      updateUser(props.userName, formData.password).then(() => {
+      updateUser(props.userName, formData.rawPassword, formData.password).then(() => {
         ElMessage.success(`${props.title}成功`);
         dialogVisible.value = false;
         if (userStore.userInfo.name === props.userName) {

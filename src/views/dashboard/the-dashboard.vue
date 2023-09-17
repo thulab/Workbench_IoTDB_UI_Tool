@@ -3,79 +3,151 @@
     <el-container class="details-wrapper">
       <el-main class="p-16">
         <div style="display: flex; flex-direction: column; height: 100%;">
-          <div class="module-box-wrapper m-b-16" v-loading="loading">
-            <div class="module-title-wrapper">
-              <h4 class="module-title">系统信息</h4>
-              <p class="module-details">
-                <span class="module-label-text">数据截止：</span>
-                <span class="module-content-text m-r-16">{{ systemTime }}</span>
-                <el-button link @click="() => handleRefreshSystem()" id="dashboard-system-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
-              </p>
-            </div>
-            <ul class="system-info-list">
-              <li class="system-info-item">
-                <el-icon size="24"><i-custom-system-status /></el-icon>
-                <span class="module-label-text">服务器状态(Running)：</span>
-                <span class="module-content-text" v-if="!systemData.dataNodeRatio && !systemData.configNodeRatio">-</span>
-                <span class="module-content-text" v-else>Datanode {{systemData.dataNodeRatio ? `${systemData.dataNodeRatio}个` : '-'}} Confignode {{ systemData.configNodeRatio ? `${systemData.configNodeRatio}个` : '-'}}</span>
-              </li>
-              <li class="system-info-item">
-                <el-icon size="24"><i-custom-active-status /></el-icon>
-                <span class="module-label-text">是否激活：</span>
-                <span class="module-content-text" :style="{ color: systemData.active ? '#44C795' : '#D43030' }">{{ systemData.active ? '是' : '否' }}</span>
-              </li>
-              <li class="system-info-item">
-                <el-icon size="24"><i-custom-time /></el-icon>
-                <span class="module-label-text">激活到期：</span>
-                <span class="module-content-text">{{ systemData.expirationTime || '-' }}</span>
-              </li>
-              <li class="system-info-item">
-                <el-icon size="24"><i-custom-storage-num /></el-icon>
-                <span class="module-label-text">数据库数量：</span>
-                <span class="module-content-text">{{ toThousands(systemData.databaseNum, '-') }}</span>
-              </li>
-              <li class="system-info-item">
-                <el-icon size="24"><i-custom-device-num /></el-icon>
-                <span class="module-label-text">设备数量：</span>
-                <span class="module-content-text">{{ toThousands(systemData.deviceNum, '-') }}</span>
-              </li>
-              <li class="system-info-item">
-                <el-icon size="24"><i-custom-measure-num /></el-icon>
-                <span class="module-label-text">测点数量：</span>
-                <span class="module-content-text">{{ toThousands(systemData.measurementNum, '-') }}</span>
-              </li>
-            </ul>
+          <div v-loading="loading">
+            <div class="module-box-wrapper m-b-16">
+              <div class="module-title-wrapper">
+                <h4 class="module-title">主集群系统信息</h4>
+                <p class="module-details">
+                  <span class="module-label-text">数据截止：</span>
+                  <span class="module-content-text m-r-16">{{ systemTime }}</span>
+                  <el-button link @click="() => handleRefreshSystem()" id="dashboard-system-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+                </p>
+              </div>
+              <ul class="system-info-list">
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-system-status /></el-icon>
+                  <span class="module-label-text">服务器状态(Running)：</span>
+                  <span class="module-content-text" v-if="!systemData.dataNodeRatio && !systemData.configNodeRatio">-</span>
+                  <span class="module-content-text" v-else>Datanode {{systemData.dataNodeRatio ? `${systemData.dataNodeRatio}个` : '-'}} Confignode {{ systemData.configNodeRatio ? `${systemData.configNodeRatio}个` : '-'}}</span>
+                </li>
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-active-status /></el-icon>
+                  <span class="module-label-text">是否激活：</span>
+                  <span class="module-content-text" :style="{ color: systemData.active ? '#44C795' : '#D43030' }">{{ systemData.active ? '是' : '否' }}</span>
+                </li>
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-time /></el-icon>
+                  <span class="module-label-text">激活到期：</span>
+                  <span class="module-content-text">{{ systemData.expirationTime || '-' }}</span>
+                </li>
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-storage-num /></el-icon>
+                  <span class="module-label-text">数据库数量：</span>
+                  <span class="module-content-text">{{ toThousands(systemNumberData.databaseNum, '-') }}</span>
+                </li>
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-device-num /></el-icon>
+                  <span class="module-label-text">设备数量：</span>
+                  <span class="module-content-text">{{ toThousands(systemNumberData.deviceNum, '-') }}</span>
+                </li>
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-measure-num /></el-icon>
+                  <span class="module-label-text">测点数量：</span>
+                  <span class="module-content-text">{{ toThousands(systemNumberData.measurementNum, '-') }}</span>
+                </li>
+              </ul>
 
-            <div class="table-box-wrapper">
-              <el-table
-                :data="tableData"
-                ref="tableRef"
-                v-loading="loading"
-                style="width: 100%;"
-                :max-height="260"
-                tooltip-effect="light"
-                :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
-                :default-sort="{ prop: 'type', order: 'ascending' }"
-                @sort-change="handleSortChange"
-              >
-                <el-table-column label="节点" prop="address" min-width="200" align="center" show-overflow-tooltip />
-                <el-table-column label="类型" prop="type" sortable="custom" min-width="120" align="center" show-overflow-tooltip />
-                <el-table-column label="状态" prop="status" sortable="custom" min-width="120" align="center" show-overflow-tooltip />
-                <el-table-column label="版本" prop="version" min-width="90" align="center" show-overflow-tooltip />
-                <el-table-column label="物理机" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
-                <template #empty>
-                  <div class="table-empty-wrapper">
-                    <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-                    <span class="data-empty-text">暂无数据</span>
-                  </div>
-                </template>
-              </el-table>
+              <div class="table-box-wrapper">
+                <el-table
+                  :data="tableData"
+                  ref="tableRef"
+                  v-loading="loading"
+                  style="width: 100%;"
+                  :max-height="260"
+                  tooltip-effect="light"
+                  :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
+                  :default-sort="{ prop: 'type', order: 'ascending' }"
+                  @sort-change="({ column, prop, order }) => handleSortChange({ column, prop, order }, 'master')"
+                >
+                  <el-table-column label="节点" prop="address" min-width="200" align="center" show-overflow-tooltip />
+                  <el-table-column label="类型" prop="type" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
+                  <el-table-column label="状态" prop="status" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
+                  <el-table-column label="版本" prop="version" min-width="90" align="center" show-overflow-tooltip />
+                  <el-table-column label="物理机" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
+                  <template #empty>
+                    <div class="table-empty-wrapper">
+                      <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+                      <span class="data-empty-text">暂无数据</span>
+                    </div>
+                  </template>
+                </el-table>
+              </div>
+            </div>
+
+            <div class="module-box-wrapper m-b-16" v-if="slaveData">
+              <div class="module-title-wrapper">
+                <h4 class="module-title">备集群系统信息</h4>
+                <p class="module-details">
+                  <span class="module-label-text">数据截止：</span>
+                  <span class="module-content-text m-r-16">{{ systemTime }}</span>
+                  <el-button link @click="() => handleRefreshSystem()" id="dashboard-system-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+                </p>
+              </div>
+              <ul class="system-info-list">
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-system-status /></el-icon>
+                  <span class="module-label-text">服务器状态(Running)：</span>
+                  <span class="module-content-text" v-if="!slaveData.dataNodeRatio && !slaveData.configNodeRatio">-</span>
+                  <span class="module-content-text" v-else>Datanode {{slaveData.dataNodeRatio ? `${slaveData.dataNodeRatio}个` : '-'}} Confignode {{ slaveData.configNodeRatio ? `${slaveData.configNodeRatio}个` : '-'}}</span>
+                </li>
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-active-status /></el-icon>
+                  <span class="module-label-text">是否激活：</span>
+                  <span class="module-content-text" :style="{ color: slaveData.active ? '#44C795' : '#D43030' }">{{ slaveData.active ? '是' : '否' }}</span>
+                </li>
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-time /></el-icon>
+                  <span class="module-label-text">激活到期：</span>
+                  <span class="module-content-text">{{ slaveData.expirationTime || '-' }}</span>
+                </li>
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-storage-num /></el-icon>
+                  <span class="module-label-text">数据库数量：</span>
+                  <span class="module-content-text">{{ toThousands(systemNumberData.databaseNum, '-') }}</span>
+                </li>
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-device-num /></el-icon>
+                  <span class="module-label-text">设备数量：</span>
+                  <span class="module-content-text">{{ toThousands(systemNumberData.deviceNum, '-') }}</span>
+                </li>
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-measure-num /></el-icon>
+                  <span class="module-label-text">测点数量：</span>
+                  <span class="module-content-text">{{ toThousands(systemNumberData.measurementNum, '-') }}</span>
+                </li>
+              </ul>
+
+              <div class="table-box-wrapper">
+                <el-table
+                  :data="slaveTableData"
+                  ref="slaveTableRef"
+                  v-loading="loading"
+                  style="width: 100%;"
+                  :max-height="260"
+                  tooltip-effect="light"
+                  :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
+                  :default-sort="{ prop: 'type', order: 'ascending' }"
+                  @sort-change="({ column, prop, order }) => handleSortChange({ column, prop, order }, 'slave')"
+                >
+                  <el-table-column label="节点" prop="address" min-width="200" align="center" show-overflow-tooltip />
+                  <el-table-column label="类型" prop="type" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
+                  <el-table-column label="状态" prop="status" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
+                  <el-table-column label="版本" prop="version" min-width="90" align="center" show-overflow-tooltip />
+                  <el-table-column label="物理机" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
+                  <template #empty>
+                    <div class="table-empty-wrapper">
+                      <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+                      <span class="data-empty-text">暂无数据</span>
+                    </div>
+                  </template>
+                </el-table>
+              </div>
             </div>
           </div>
 
           <div class="module-box-wrapper monitor-info-wrapper">
             <div class="module-title-wrapper">
-              <h4 class="module-title">监控信息</h4>
+              <h4 class="module-title">主集群监控信息</h4>
               <p class="module-details">
                 <span class="module-label-text">数据截止：</span>
                 <span class="module-content-text m-r-16">{{ monitorTime }}</span>
@@ -139,20 +211,30 @@ const userStore = useUserStore();
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const enablePrometheus = computed(() => userStore.enablePrometheus);
 const tableRef = ref<InstanceType<typeof ElTable>>();
+const slaveTableRef = ref<InstanceType<typeof ElTable>>();
 const systemData = reactive<Dashboard.SystemData>({
   dataNodeRatio: '-',
   configNodeRatio: '-',
   active: false,
   expirationTime: '-',
+});
+const slaveData = ref<Dashboard.SystemData | null>({
+  dataNodeRatio: '-',
+  configNodeRatio: '-',
+  active: false,
+  expirationTime: '-',
+});
+const systemNumberData = reactive<Dashboard.SystemNumberData>({
   databaseNum: 0,
   deviceNum: 0,
   measurementNum: 0,
 });
 const searchFormData = reactive({
-  orderBy: 'type',
-  asc: 'asc',
+  orderBy: ['type', 'type'],
+  asc: ['asc', 'asc'],
 });
 const tableData = ref<Dashboard.NodeItem[]>([]);
+const slaveTableData = ref<Dashboard.NodeItem[]>([]);
 const refreshInterval = ref();
 const systemTime = ref();
 const monitorTime = ref();
@@ -188,8 +270,13 @@ function getMonitorData() {
 function getSystemData() {
   systemTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
   return getSystemInfo(searchFormData.orderBy, searchFormData.asc).then((res) => {
-    assign(systemData, res.data);
-    tableData.value = res.data.nodes || [];
+    assign(systemNumberData, res.data);
+    assign(systemData, res.data.masterNodeInfo);
+    tableData.value = res.data.masterNodeInfo.nodes || [];
+    if (res.data.slaveNodeInfo) {
+      assign(slaveData.value, res.data.slaveNodeInfo);
+      slaveTableData.value = res.data.slaveNodeInfo.nodes || [];
+    }
     nodeList.value = concat([{
       nodeID: '',
       address: '',
@@ -197,7 +284,7 @@ function getSystemData() {
       status: '',
       version: '',
       physicalMachine: '',
-    }], res.data.nodes ? [...res.data.nodes] : []);
+    }], res.data.masterNodeInfo.nodes ? [...res.data.masterNodeInfo.nodes] : []);
     const flag = nodeList.value.some((s) => s.nodeID === monitorNode.value);
     if (!flag) {
       monitorNode.value = '';
@@ -246,13 +333,14 @@ function handleChangeNode(val: string) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function handleSortChange({ column, prop, order }:SortMethod<Alarm.QueryConfigResult>) {
-  const lastOrderBy = searchFormData.orderBy;
-  const lastAsc = searchFormData.asc;
-  searchFormData.asc = order === 'ascending' ? 'asc' : 'desc';
-  searchFormData.orderBy = prop;
-  if (!order) {
-    tableRef.value?.sort(lastOrderBy, lastAsc === 'asc' ? 'descending' : 'ascending');
+function handleSortChange({ column, prop, order }:SortMethod<Alarm.QueryConfigResult>, type: 'master' | 'slave') {
+  if (type === 'master') {
+    searchFormData.asc[0] = order === 'ascending' ? 'asc' : 'desc';
+    searchFormData.orderBy[0] = prop;
+  }
+  if (type === 'slave') {
+    searchFormData.asc[1] = order === 'ascending' ? 'asc' : 'desc';
+    searchFormData.orderBy[1] = prop;
   }
   handleRefreshSystem();
 }

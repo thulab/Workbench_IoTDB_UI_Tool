@@ -53,8 +53,8 @@ class AuthApi {
   }
 
   // 更新用户
-  static updateUser(name: string, password: string): HttpResponseP {
-    return http.post('/privileges/updateUser', { name, password: encodeAES(password) });
+  static updateUser(name: string, rawPassword: string, password: string): HttpResponseP {
+    return http.post('/privileges/updateUser', { name, rawPassword: encodeAES(rawPassword), password: encodeAES(password) });
   }
 
   // 根据用户查询权限

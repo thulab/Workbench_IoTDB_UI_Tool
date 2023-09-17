@@ -9,18 +9,33 @@ declare namespace Dashboard{
     physicalMachine: string;
   }
 
-  export interface SystemData {
-    dataNodeRatio: string;
-    configNodeRatio: string;
-    active: boolean | null;
-    expirationTime: string | null;
+  export interface SystemNumberData {
     databaseNum: number;
     deviceNum: number;
     measurementNum: number;
   }
 
-  export interface SystemInfoRes extends SystemData {
+  export interface SystemData {
+    dataNodeRatio: string;
+    configNodeRatio: string;
+    active: boolean | null;
+    expirationTime: string | null;
+  }
+
+  export interface ClusterNodeData {
+    dataNodeRatio: string;
+    configNodeRatio: string;
+    active: boolean | null;
+    expirationTime: string | null;
     nodes: NodeItem[];
+  }
+
+  export interface SystemInfoRes {
+    databaseNum: number;
+    deviceNum: number;
+    measurementNum: number;
+    masterNodeInfo: ClusterNodeData;
+    slaveNodeInfo: ClusterNodeData | null;
   }
 
   export interface DiskIOUsedRateRes {
