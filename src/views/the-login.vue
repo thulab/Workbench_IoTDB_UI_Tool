@@ -61,6 +61,22 @@
               </template> -->
             </el-input>
           </el-form-item>
+          <el-form-item prop="captcha">
+            <el-input
+              v-model="loginForm.captcha"
+              autocomplete="off"
+              placeholder="请输入验证码"
+              @keyup.enter="submitForm"
+              id="login-captcha"
+            >
+              <template #prefix>
+                <el-icon size="22" style="padding: 4px;"><i-ep-circle-check /></el-icon>
+              </template>
+              <template #suffix>
+                <the-captcha ref="captchaRef" :height="30" :width="100" @update:code="val=>captcha = val" />
+              </template>
+            </el-input>
+          </el-form-item>
           <el-form-item class="m-b-0">
             <el-button class="login-button" type="primary" :loading="loading" @click="submitForm" id="login-submit">登录</el-button>
           </el-form-item>
@@ -82,25 +98,31 @@ import type { FormInstance, FormRules } from 'element-plus';
 import { UserApi, ConnectionApi } from '@/api';
 import { useUserStore } from '@/stores';
 import ModalConnection from '@/components/modal-connection.vue';
+import TheCaptcha from '@/components/the-captcha.vue';
 
 const router = useRouter();
 const userStore = useUserStore();
 
 const formRef = ref<FormInstance>();
+const captchaRef = ref<InstanceType<typeof TheCaptcha> | null>(null);
 const loginForm = reactive<{
   connection: string | number;
   user: string;
   password: string;
+  captcha: string;
 }
 >({
   connection: '',
   user: '',
   password: '',
+  captcha: '',
 });
 const pwdType = ref('password');
 const loading = ref(false);
 const connectionVisible = ref(false);
 const connectionList = ref<Connection.ConnectionItem[]>([]);
+
+const captcha = ref('');
 
 const { requestFn: login } = useRequest(UserApi.login);
 const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
@@ -125,6 +147,16 @@ const validatepassword = (rule: any, value: any, callback: any) => {
   return callback();
 };
 
+const validateCaptcha = (rule: any, value: any, callback: any) => {
+  if (value === '') {
+    return callback(new Error('验证码不能为空'));
+  }
+  if (value !== captcha.value) {
+    return callback(new Error('验证码输入错误'));
+  }
+  return callback();
+};
+
 const rules = reactive<FormRules>({
   connection: [
     {
@@ -144,6 +176,13 @@ const rules = reactive<FormRules>({
     {
       required: true,
       validator: validatepassword,
+      trigger: 'blur',
+    },
+  ],
+  captcha: [
+    {
+      required: true,
+      validator: validateCaptcha,
       trigger: 'blur',
     },
   ],
@@ -174,15 +213,18 @@ function handleSelectConnection() {
 
 const submitForm = () => {
   formRef.value?.validate((valid) => {
-    if (valid) {
+    if (valid && captcha.value === loginForm.captcha) {
       loading.value = true;
       login(loginForm.user, loginForm.password).then(() => {
         userStore.setUser(loginForm.user);
         router.push({ path: '/' });
         sessionStorage.setItem('nologin', '0');
       }).catch(() => {
+        captchaRef.value?.onRefresh();
         loading.value = false;
       });
+    } else if (captcha.value !== loginForm.captcha) {
+      captchaRef.value?.onRefresh();
     }
   });
 };
@@ -294,7 +336,7 @@ onUnmounted(() => {
 
 .login-button{
   width: 100%;
-  margin-top: 48px;
+  margin-top: 24px;
   border-radius: 4px;
   height: 36px !important;
   font-size: 14px !important;
