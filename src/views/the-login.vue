@@ -147,11 +147,11 @@ const validatepassword = (rule: any, value: any, callback: any) => {
   return callback();
 };
 
-const validateCaptcha = (rule: any, value: any, callback: any) => {
+const validateCaptcha = (rule: any, value: string, callback: any) => {
   if (value === '') {
     return callback(new Error('验证码不能为空'));
   }
-  if (value !== captcha.value) {
+  if (value.toLowerCase() !== captcha.value.toLowerCase()) {
     return callback(new Error('验证码输入错误'));
   }
   return callback();
@@ -223,7 +223,7 @@ const submitForm = () => {
         captchaRef.value?.onRefresh();
         loading.value = false;
       });
-    } else if (captcha.value !== loginForm.captcha) {
+    } else if (captcha.value.toLowerCase() !== loginForm.captcha.toLowerCase()) {
       captchaRef.value?.onRefresh();
     }
   });
