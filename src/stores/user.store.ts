@@ -125,8 +125,10 @@ export const useUserStore = defineStore('UserStore', () => {
       getLoginUserPrivileges().then((res) => {
         userInfo.value.name = res.data.userName;
         allPrivileges.value = res.data;
-      }).finally(() => {
         loadPrivilegesEnum(false);
+      }).catch(() => {
+        userInfo.value.name = '';
+        window.location.href = `/login?timestamp=${new Date().getTime()}`;
       });
     }
   }
