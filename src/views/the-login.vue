@@ -6,8 +6,8 @@
     <div class="login-form-wrapper">
       <div class="login-form-container">
         <div class="login-logo-box">
-          <i-custom-logo-timecho class="timecho-logo" />
-          <i-custom-logo-title class="title-logo" />
+          <i-custom-timecho-logo class="title-logo" />
+          <!-- <i-custom-logo-title class="title-logo" /> -->
         </div>
         <h5 class="login-title">账号密码登录</h5>
         <el-form :hide-required-asterisk="true" :model="loginForm" :rules="rules" ref="formRef" class="login-form-box">
@@ -253,7 +253,7 @@ onUnmounted(() => {
 
   .title-logo{
     width: 137px;
-    height: 26px;
+    height: 30px;
   }
 }
 

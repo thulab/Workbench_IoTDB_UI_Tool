@@ -3,8 +3,8 @@
     class="menu"
     :style="{ width: isCollapse ? '40px' : '216px' }">
     <div class="logo flex-align-center" :style="{ paddingLeft: isCollapse ? '6px' : '14px' }" @click="handleDashboard">
-      <el-icon alt="logo"><i-custom-logo /></el-icon>
-      <el-icon class="title" v-show="!isCollapse"><i-custom-title /></el-icon>
+      <el-icon alt="logo" v-if="isCollapse"><i-custom-logo /></el-icon>
+      <el-icon class="title" v-if="!isCollapse"><i-custom-timecho-logo-white /></el-icon>
       <!-- <span v-show="!isCollapse">{{ systemTitle }}</span> -->
     </div>
     <el-scrollbar>
