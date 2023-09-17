@@ -285,7 +285,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 30px 0 76px;
+  margin: 30px 0 40px;
 
   .timecho-logo{
     width: 37px;

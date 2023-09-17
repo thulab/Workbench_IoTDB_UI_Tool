@@ -72,6 +72,10 @@ import { toThousands } from '@/utils/format';
 import { DashboardApi } from '@/api';
 import DataContainer from './data-container.vue';
 
+const props = defineProps<{
+  clusterType: 'master' | 'slave';
+}>();
+
 const emit = defineEmits<{
   (event: 'handleFetch',): void;
 }>();
@@ -440,6 +444,8 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData, to
 const diskDataOptions = computed(() => memoryChartOptions(dataNodeMemoryData, configNodeMemoryData, 'TiB'));
 const systemDataOptions = computed(() => memoryChartOptions(dataNodeSystemData, configNodeSystemData, 'GiB'));
 
+const isMaster = computed(() => props.clusterType === 'master');
+
 const { requestFn: getMetricAllCPU, loading: cpuLoading } = useRequest(DashboardApi.getMetricAllCPU);
 const { requestFn: getMetricAllDisk, loading: diskLoading } = useRequest(DashboardApi.getMetricAllDisk);
 const { requestFn: getMetricAllMemory, loading: systemLoading } = useRequest(DashboardApi.getMetricAllMemory);
@@ -447,7 +453,7 @@ const { requestFn: getMetricInsertNumPerSecond, loading: speedLoading } = useReq
 const { requestFn: getMetricAllFileCount, loading: fileLoading } = useRequest(DashboardApi.getMetricAllFileCount);
 
 function getCpu() {
-  return getMetricAllCPU().then((res) => {
+  return getMetricAllCPU(isMaster.value).then((res) => {
     if (res.data) {
       res.data.forEach((item) => {
         if (item.nodeType === 'datanode') {
@@ -464,7 +470,7 @@ function getCpu() {
 }
 
 function getDisk() {
-  return getMetricAllDisk().then((res) => {
+  return getMetricAllDisk(isMaster.value).then((res) => {
     if (res.data) {
       res.data.forEach((item) => {
         if (item.nodeType === 'datanode') {
@@ -484,7 +490,7 @@ function getDisk() {
 }
 
 function getSystem() {
-  return getMetricAllMemory().then((res) => {
+  return getMetricAllMemory(isMaster.value).then((res) => {
     if (res.data) {
       res.data.forEach((item) => {
         if (item.nodeType === 'datanode') {
@@ -504,13 +510,13 @@ function getSystem() {
 }
 
 function getSpeed() {
-  return getMetricInsertNumPerSecond().then((res) => {
+  return getMetricInsertNumPerSecond(isMaster.value).then((res) => {
     writeSpeed.value = res.data;
   });
 }
 
 function getFile() {
-  return getMetricAllFileCount().then((res) => {
+  return getMetricAllFileCount(isMaster.value).then((res) => {
     fileTotal.value = res.data;
   });
 }

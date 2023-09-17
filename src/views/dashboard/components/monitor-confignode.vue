@@ -62,6 +62,7 @@ import DataContainer from './data-container.vue';
 const props = defineProps<{
   node: string;
   nodeType: string;
+  clusterType: 'master' | 'slave';
 }>();
 
 const emit = defineEmits<{
@@ -94,6 +95,8 @@ const memoryData = reactive<GaugeChartData>({
 
 const diskIOCategory = ref<string[]>([]);
 const diskIOData = ref<number[]>([]);
+
+const isMaster = computed(() => props.clusterType === 'master');
 
 const gaugeChartOptions = (optionData: GaugeChartData) => ({
   series: [
@@ -231,19 +234,19 @@ const { requestFn: getMetricMemory, loading: memoryLoading } = useRequest(Dashbo
 const { requestFn: getMetricDiskIOUsedRate, loading: ioLoading } = useRequest(DashboardApi.getMetricDiskIOUsedRate);
 
 function getCpu() {
-  return getMetricCPU(props.node, props.nodeType).then((res) => {
+  return getMetricCPU(props.node, props.nodeType, isMaster.value).then((res) => {
     cpuCount.value = (res.data?.cpu || res.data?.cpu === 0) ? res.data?.cpu : null;
   });
 }
 
 function getCpuLoad() {
-  return getMetricCPULoad(props.node, props.nodeType).then((res) => {
+  return getMetricCPULoad(props.node, props.nodeType, isMaster.value).then((res) => {
     cpuData.dataVal = (res.data.cpuLoad || res.data.cpuLoad === 0) ? transformDecimal(res.data.cpuLoad * 100, 1) : null;
   });
 }
 
 function getMemory() {
-  return getMetricMemory(props.node, props.nodeType).then((res) => {
+  return getMetricMemory(props.node, props.nodeType, isMaster.value).then((res) => {
     if (res.data) {
       memoryData.dataCount = res.data.memoryTotal;
       memoryData.valueUnit = res.data.unit;
@@ -253,7 +256,7 @@ function getMemory() {
 }
 
 function getIo() {
-  return getMetricDiskIOUsedRate(props.node).then((res) => {
+  return getMetricDiskIOUsedRate(props.node, isMaster.value).then((res) => {
     diskIOCategory.value = res.data.map((item) => item.diskName);
     diskIOData.value = res.data.map((item) => transformDecimal(item.nodeRate, 6));
   });

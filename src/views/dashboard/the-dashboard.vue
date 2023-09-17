@@ -145,7 +145,7 @@
 
           <div class="module-box-wrapper monitor-info-wrapper">
             <div class="module-title-wrapper">
-              <h4 class="module-title">主集群监控信息</h4>
+              <h4 class="module-title">监控信息</h4>
               <p class="module-details">
                 <span class="module-label-text">数据截止：</span>
                 <span class="module-content-text m-r-16">{{ monitorTime }}</span>
@@ -156,6 +156,10 @@
             <!--  v-if="tableData.length && enablePrometheus" -->
             <div>
               <div class="search-form-box">
+                <ul class="search-cluster-list" v-if="slaveData">
+                  <li :class="['search-cluster-type', { 'search-cluster-active': clusterType === 'master' }]" @click="handleChangeCluster('master')">主集群</li>
+                  <li :class="['search-cluster-type', { 'search-cluster-active': clusterType === 'slave' }]" @click="handleChangeCluster('slave')">备集群</li>
+                </ul>
                 <span class="search-from-label">节点：</span>
                 <el-select v-model="monitorNode" placeholder="全部" style="width: 256px;" @change="handleChangeNode" id="dashboard-monitor-select-node">
                   <el-option v-for="(item, index) in nodeList" :key="`${item.address}(${item.type})_${index}`" :value="item.nodeID" :label="item.address ? `${item.address}(${item.type})` : '全部'" />
@@ -167,6 +171,7 @@
                 ref="monitorDatanodeRef"
                 :node="monitorNode"
                 :node-type="currentNodeType"
+                :cluster-type="clusterType"
                 @handleFetch="handleFetch"
               />
               <monitor-confignode
@@ -174,11 +179,13 @@
                 ref="monitorConfignodeRef"
                 :node="monitorNode"
                 :node-type="currentNodeType"
+                :cluster-type="clusterType"
                 @handleFetch="handleFetch"
               />
               <monitor-all
                 v-else
                 ref="monitorAllRef"
+                :cluster-type="clusterType"
                 @handleFetch="handleFetch"
               />
             </div>
@@ -231,6 +238,7 @@ const searchFormData = reactive({
   orderBy: ['type', 'type'],
   asc: ['asc', 'asc'],
 });
+const clusterType = ref<'master' | 'slave'>('master');
 const tableData = ref<Dashboard.NodeItem[]>([]);
 const slaveTableData = ref<Dashboard.NodeItem[]>([]);
 const refreshInterval = ref();
@@ -345,6 +353,11 @@ function handleSortChange({ column, prop, order }:SortMethod<Alarm.QueryConfigRe
   handleRefreshSystem();
 }
 
+function handleChangeCluster(type: 'master' | 'slave') {
+  clusterType.value = type;
+  handleRefreshMonitor();
+}
+
 onMounted(() => {
   getSystemData().then(() => {
     getMonitorData();
@@ -417,6 +430,29 @@ onUnmounted(() => {
   margin: 18px 0 6px;
   display: flex;
   align-items: center;
+
+  .search-cluster-list {
+    display: flex;
+    margin-right: 36px;
+    border-radius: 12px;
+    background-color: #f0f1fa;
+    padding: 3px 4px;
+
+    .search-cluster-type {
+      padding: 3px 12px;
+      cursor: pointer;
+      border-radius: 12px;
+      background-color: transparent;
+      font-size: 12px;
+      line-height: 12px;
+      color: #656a85;
+    }
+
+    .search-cluster-active {
+      background-color: #495ad4;
+      color: #fff;
+    }
+  }
 
   .search-from-label{
     font-size: 14px;
