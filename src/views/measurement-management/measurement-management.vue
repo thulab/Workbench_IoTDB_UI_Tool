@@ -577,7 +577,7 @@ watch(
 
   .storage-info-item {
     font-size: 12px;
-    line-height: 12px;
+    line-height: 1.2;
     color: #656A85;
     margin: 0 20px 6px 0;
     display: inline-flex;
