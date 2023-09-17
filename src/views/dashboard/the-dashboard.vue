@@ -51,7 +51,6 @@
                 <el-table
                   :data="tableData"
                   ref="tableRef"
-                  v-loading="loading"
                   style="width: 100%;"
                   :max-height="260"
                   tooltip-effect="light"
@@ -121,7 +120,6 @@
                 <el-table
                   :data="slaveTableData"
                   ref="slaveTableRef"
-                  v-loading="loading"
                   style="width: 100%;"
                   :max-height="260"
                   tooltip-effect="light"
