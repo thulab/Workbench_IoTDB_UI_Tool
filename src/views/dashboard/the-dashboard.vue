@@ -276,6 +276,8 @@ function getSystemData() {
     if (res.data.slaveNodeInfo) {
       assign(slaveData.value, res.data.slaveNodeInfo);
       slaveTableData.value = res.data.slaveNodeInfo.nodes || [];
+    } else {
+      slaveData.value = null;
     }
     nodeList.value = concat([{
       nodeID: '',
