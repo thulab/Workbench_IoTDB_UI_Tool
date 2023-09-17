@@ -107,6 +107,7 @@
             <el-table-column type="selection" width="55" :selectable="isSelectabled" />
             <el-table-column label="设备名称" prop="deviceName" min-width="200" align="center" show-overflow-tooltip />
             <el-table-column label="测点名称" prop="timeseries" width="160" align="center" show-overflow-tooltip />
+            <el-table-column label="测点描述" prop="alias" width="120" align="center" show-overflow-tooltip />
             <el-table-column label="数据类型" prop="dataType" width="140" align="center" show-overflow-tooltip />
             <el-table-column label="测点类型" prop="viewType" width="140" align="center" show-overflow-tooltip>
               <template #default="{ row }">

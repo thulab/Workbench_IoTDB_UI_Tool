@@ -2,6 +2,7 @@ declare namespace StorageDevice{
   export interface MeasurementItem {
     deviceName: string;
     timeseries: string;
+    alias?: string;
     dataType: IotdbDataType;
     encoding: EncodingType;
     compression: CompressionType;

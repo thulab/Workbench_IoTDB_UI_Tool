@@ -6,7 +6,7 @@
     :close-on-click-modal="false"
     id="measurement-modal-measurement"
   >
-    <el-form ref="formRef" :model="formData" label-position="left">
+    <el-form ref="formRef" :model="formData" label-position="right">
       <h4 class="module-title">设备</h4>
       <el-form-item label="设备名称：" prop="deviceName" class="p-t-8" :rules="!addDevice ? requiredRules : deviceRules">
         <el-input type="hidden" />
@@ -67,6 +67,12 @@
                 <el-form-item label="测点名称：" :prop="'measurementList[' + index + '].timeseries'" :rules="requiredRules" class="m-r-0">
                   <el-input type="hidden" />
                   <el-input v-model="item.timeseries" placeholder="请输入测点名称" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-timeseries`" style="width: 144px;" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item label="测点描述：" :prop="'measurementList[' + index + '].alias'" label-width="83px">
+                  <el-input type="hidden" />
+                  <el-input v-model="item.alias" placeholder="请输入测点描述" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-alias`" />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -131,7 +137,7 @@ const dialogVisible = useVModel(props, 'visible', emit);
 const activeName = ref('measurement_0');
 
 const { requestFn: getDevice, loading: deviceLoading } = useRequest(StorageApi.getDeviceByGroup);
-const { requestFn: getMeasurementsInfosByFuzzy, loading: measurementLoading } = useRequest(StorageApi.getMeasurementsInfosByFuzzy);
+const { requestFn: getMeasurementsInfosByFuzzy } = useRequest(StorageApi.getMeasurementsInfosByFuzzy);
 const { requestFn: getIsAlignedDevice } = useRequest(StorageApi.getIsAlignedDevice);
 const { requestFn: saveMeasurementList, loading: saveLoading } = useRequest(StorageApi.saveMeasurementList);
 const { requestFn: deleteMeasurements } = useRequest(StorageApi.deleteMeasurements);
@@ -231,6 +237,7 @@ function handleChangeAdd(val: CheckboxValueType) {
   formData.measurementList.push({
     deviceName: !val ? '' : `${props.groupName}`,
     timeseries: '',
+    alias: '',
     dataType: 'BOOLEAN',
     encoding: 'PLAIN',
     compression: 'SNAPPY',
@@ -250,6 +257,7 @@ function handleCopyRow(data: Partial<StorageDevice.MeasurementItem>, e: MouseEve
   formData.measurementList.push({
     deviceName: data.deviceName,
     timeseries: `${data.timeseries}_copy`,
+    alias: '',
     dataType: data.dataType,
     encoding: data.encoding,
     compression: data.compression,
@@ -304,6 +312,7 @@ function handleChangeDevice(val: string) {
   formData.measurementList.push({
     deviceName: !addDevice.value ? formData.deviceName : `${props.groupName}.${formData.deviceName}`,
     timeseries: '',
+    alias: '',
     dataType: 'BOOLEAN',
     encoding: 'PLAIN',
     compression: 'SNAPPY',
@@ -324,6 +333,7 @@ function handleAddRow() {
   formData.measurementList.push({
     deviceName: !addDevice.value ? formData.deviceName : `${props.groupName}.${formData.deviceName}`,
     timeseries: '',
+    alias: '',
     dataType: 'BOOLEAN',
     encoding: 'PLAIN',
     compression: 'SNAPPY',
@@ -369,6 +379,7 @@ watch(
       formData.measurementList.push({
         deviceName: formData.deviceName,
         timeseries: '',
+        alias: '',
         dataType: 'BOOLEAN',
         encoding: 'PLAIN',
         compression: 'SNAPPY',
