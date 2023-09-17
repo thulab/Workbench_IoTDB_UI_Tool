@@ -159,8 +159,7 @@ listeningWindow();
       font-size: 28px;
 
       &.title {
-        margin-left: 16px;
-        height: 20px;
+        height: 25px;
         width: 105px;
         font-size: 105px;
       }
