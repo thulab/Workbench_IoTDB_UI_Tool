@@ -213,7 +213,7 @@ function handleSelectConnection() {
 
 const submitForm = () => {
   formRef.value?.validate((valid) => {
-    if (valid && captcha.value === loginForm.captcha) {
+    if (valid) {
       loading.value = true;
       login(loginForm.user, loginForm.password).then(() => {
         userStore.setUser(loginForm.user);
