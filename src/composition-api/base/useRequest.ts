@@ -6,7 +6,7 @@ import { ref, type Ref } from 'vue';
 // 1001
 // 9999 其他错误
 // 1330 无权限
-const alertErrorCode = [1001, 9999, 1330];
+const alertErrorCode = [1001, 9999];
 
 interface Opt<T> {
   initData?: T;
