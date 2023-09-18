@@ -2,7 +2,7 @@
   <el-dialog
     title="实例管理"
     v-model="dialogVisible"
-    width="748px"
+    width="780px"
     align-center
     :close-on-click-modal="false"
     id="connection-modal"
@@ -16,7 +16,11 @@
             <el-button link style="margin: 0;" @click="handleAdd" id="connection-side-add"><i-custom-new-connection /></el-button>
           </div>
         </div>
-        <el-input placeholder="请输入实例名称" v-model="filterText" id="connection-list-input" @keyup.enter="handleFilter" />
+        <el-input placeholder="请输入实例名称" v-model="filterText" id="connection-list-input" @keyup.enter="handleFilter" class="connection-search-input">
+          <template #prefix>
+            <i-custom-search-icon class="remote-select-search-icon" />
+          </template>
+        </el-input>
         <div class="connection-list-box">
           <div class="list-empty-wrapper" v-if="!filterList.length">
             <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
@@ -24,7 +28,13 @@
           </div>
           <ul class="list-box" v-else>
             <li v-for="item in filterList" :key="item.id" :class="['connection-item-box', current === item.id && 'connection-item-box-active']" @click="e => handleSelect(item, e)">
-              <span class="connection-item-text"><text-tooltip :content="item.name" /></span>
+              <span class="connection-item-text">
+                <el-icon size="30" style="margin-right: 4px;">
+                  <i-custom-connection-cluster v-if="item.type === 1" />
+                  <i-custom-connection-double-live v-else-if="item.type === 2" />
+                  <i-custom-connection-stand-alone v-else />
+                </el-icon>
+                <text-tooltip :content="item.name" /></span>
               <div class="connection-item-delete-box" @click="handleDelete(item)">
                 <i-custom-delete class="connection-item-delete" />
                 <i-custom-delete-active class="connection-item-delete-active" />
@@ -161,26 +171,31 @@ watch(
   height: 510px;
   border-radius: 6px;
   border: 1px solid #DFE1ED;
+  margin-right: 8px;
 }
 
 .connection-list-title{
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px 26px;
+  padding: 12px 16px 0;
 
   h4{
     font-size: 14px;
     font-weight: 700;
-    line-height: 20px;
+    line-height: 21px;
     color: #495AD4;
   }
+}
+
+.connection-search-input{
+  padding: 20px 16px 16px;
 }
 
 .connection-list-box{
   border-radius: 2px;
   background: #FFF;
-  height: calc(100% - 82px);
+  height: calc(100% - 104px);
   overflow-y: auto;
 
   .list-empty-wrapper{
@@ -213,7 +228,7 @@ watch(
   font-size: 12px;
   font-weight: 300;
   color: #131926;
-  padding-left: 16px;
+  padding-left: 8px;
   box-sizing: border-box;
   cursor: pointer;
   position: relative;
@@ -221,6 +236,7 @@ watch(
   .connection-item-text{
     width: 200px;
     display: inline-flex;
+    align-items: center;
     line-height: 1.2;
   }
 
