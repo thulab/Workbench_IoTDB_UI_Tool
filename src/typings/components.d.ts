@@ -112,6 +112,7 @@ declare module 'vue' {
     ICustomTimechoLogo: typeof import('~icons/custom/timecho-logo')['default']
     ICustomTimechoLogoWhite: typeof import('~icons/custom/timecho-logo-white')['default']
     ICustomTitle: typeof import('~icons/custom/title')['default']
+    ICustomToggle: typeof import('~icons/custom/toggle')['default']
     ICustomTotalNum: typeof import('~icons/custom/total-num')['default']
     ICustomUpload: typeof import('~icons/custom/upload')['default']
     ICustomUserAdd: typeof import('~icons/custom/user-add')['default']

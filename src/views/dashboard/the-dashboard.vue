@@ -245,11 +245,18 @@ const refreshInterval = ref();
 const systemTime = ref();
 const monitorTime = ref();
 const monitorNode = ref('');
-const nodeList = ref<Dashboard.NodeItem[]>([]);
+const masterNodes = ref<Dashboard.NodeItem[]>([]);
+const slaveNodes = ref<Dashboard.NodeItem[]>([]);
 const currentNodeType = ref('');
 const monitorAllRef = ref<InstanceType<typeof MonitorAll>>();
 const monitorDatanodeRef = ref<InstanceType<typeof MonitorDatanode>>();
 const monitorConfignodeRef = ref<InstanceType<typeof MonitorConfignode>>();
+const nodeList = computed(() => {
+  if (clusterType.value === 'slave') {
+    return slaveNodes.value;
+  }
+  return masterNodes.value;
+});
 
 const { requestFn: getSystemInfo, loading } = useRequest(DashboardApi.getSystemInfo);
 
@@ -279,13 +286,7 @@ function getSystemData() {
     assign(systemNumberData, res.data);
     assign(systemData, res.data.masterNodeInfo);
     tableData.value = res.data.masterNodeInfo.nodes || [];
-    if (res.data.slaveNodeInfo) {
-      assign(slaveData.value, res.data.slaveNodeInfo);
-      slaveTableData.value = res.data.slaveNodeInfo.nodes || [];
-    } else {
-      slaveData.value = null;
-    }
-    nodeList.value = concat([{
+    masterNodes.value = concat([{
       nodeID: '',
       address: '',
       type: '',
@@ -293,7 +294,27 @@ function getSystemData() {
       version: '',
       physicalMachine: '',
     }], res.data.masterNodeInfo.nodes ? [...res.data.masterNodeInfo.nodes] : []);
-    const flag = nodeList.value.some((s) => s.nodeID === monitorNode.value);
+    if (res.data.slaveNodeInfo) {
+      assign(slaveData.value, res.data.slaveNodeInfo);
+      slaveTableData.value = res.data.slaveNodeInfo.nodes || [];
+      slaveNodes.value = concat([{
+        nodeID: '',
+        address: '',
+        type: '',
+        status: '',
+        version: '',
+        physicalMachine: '',
+      }], res.data.slaveNodeInfo.nodes ? [...res.data.slaveNodeInfo.nodes] : []);
+    } else {
+      slaveData.value = null;
+      slaveTableData.value = [];
+      slaveNodes.value = [];
+    }
+
+    let flag = masterNodes.value.some((s) => s.nodeID === monitorNode.value);
+    if (slaveData.value && clusterType.value === 'slave') {
+      flag = slaveNodes.value.some((s) => s.nodeID === monitorNode.value);
+    }
     if (!flag) {
       monitorNode.value = '';
       currentNodeType.value = '';

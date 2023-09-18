@@ -7,6 +7,14 @@
       <el-icon class="title" v-if="!isCollapse"><i-custom-timecho-logo-white /></el-icon>
       <!-- <span v-show="!isCollapse">{{ systemTitle }}</span> -->
     </div>
+    <div class="connection-box flex-align-center" :style="{ padding: isCollapse ? '0 0 0 5px' : '0 20px' }">
+      <div class="connection-divider"></div>
+      <el-icon size="30"><i-custom-connection /></el-icon>
+      <div v-if="!isCollapse" class="connection-info flex-align-center">
+        <span class="connection-name">{{ connectionName }}</span>
+        <el-icon size="20" style="cursor: pointer;" @click="handleToggleConnection"><i-custom-toggle /></el-icon>
+      </div>
+    </div>
     <el-scrollbar>
       <el-menu
         :default-active="activeMenu"
@@ -18,6 +26,11 @@
         <layout-menu-sub-item :menu-list="menuList" />
       </el-menu>
     </el-scrollbar>
+
+    <modal-connection
+      v-model:visible="connectionVisible"
+      v-model="connectionList"
+    />
   </div>
 </template>
 
@@ -26,17 +39,22 @@ import { ref, computed, onMounted } from 'vue';
 import { type RouteRecordRaw, useRoute, useRouter } from 'vue-router';
 // import { storeToRefs } from 'pinia';
 import useMenuStore from '@/stores/menu';
+import { useConnectionStore } from '@/stores';
 // import useAppStore from '@/stores/app';
+import ModalConnection from '@/components/modal-connection.vue';
 import LayoutMenuSubItem from './components/layout-menu-sub-item.vue';
 
 // const appStore = useAppStore();
 
 // const { systemTitle } = storeToRefs(appStore);
-
+const connectionStore = useConnectionStore();
 const route = useRoute();
 const menuStore = useMenuStore();
 const router = useRouter();
 const allRoutes = computed(() => router.options.routes);
+const connectionVisible = ref(false);
+const connectionList = ref<Connection.ConnectionItem[]>([]);
+const connectionName = computed(() => connectionStore.connectionInfo.name || '连接实例');
 
 const getRoutePath = (routeItem: RouteRecordRaw, parentPath: string) => {
   const path = routeItem.path.indexOf('/') === 0 ? routeItem.path : `${parentPath}/${routeItem.path}`;
@@ -84,6 +102,10 @@ const getMenuList = () => {
 
 function handleDashboard() {
   router.push({ name: 'Dashboard' });
+}
+
+function handleToggleConnection() {
+  connectionVisible.value = true;
 }
 
 onMounted(async () => {
@@ -180,8 +202,41 @@ listeningWindow();
     }
   }
 
+  .connection-box{
+    box-sizing: border-box;
+    height: 40px;
+    background-color: #fff;
+    position: relative;
+
+    .connection-divider{
+      width: calc(100% - 16px);
+      margin: 0 8px;
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      height: 1px;
+      background-color: #DFE1ED;
+    }
+
+    .connection-info{
+      margin: 0 0 0 8px;
+      font-size: 14px;
+      line-height: 21px;
+      color: #131926;
+      flex: 1;
+      justify-content: space-between;
+
+      .connection-name{
+        max-width: 110px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+
   .el-scrollbar {
-    height: calc(100% - 55px);
+    height: calc(100% - 100px);
 
     .el-menu {
       flex: 1;
