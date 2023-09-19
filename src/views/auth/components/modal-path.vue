@@ -83,7 +83,7 @@ const remoteMethod = debounce((query: string) => {
   lastQuery = query;
   getMeasurement(lastQuery).then((res) => {
     if (lastQuery === query) {
-      options.value = res.data?.measurements || [];
+      options.value = res.data?.measurements?.filter((item) => !item.timeseries.startsWith('root.__system')) || [];
     }
   });
 }, 500);
