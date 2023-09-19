@@ -320,6 +320,18 @@ onMounted(() => {
   if (!canReadWriteSchema.value) return;
   handleSearch();
 });
+
+watch(
+  () => canReadWriteSchema.value,
+  (val) => {
+    if (val) {
+      handleSearch();
+    }
+  },
+  {
+    immediate: true,
+  },
+);
 </script>
 
 <style lang="scss" scoped>

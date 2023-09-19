@@ -66,11 +66,11 @@
         </div>
 
         <div class="search-form-buttons">
-          <auth-tooltip :is-disabled="canWriteSchemaByPath">
-            <el-button type="primary" :disabled="!currentStorage || currentStorage === 'root.__system' || !canWriteSchemaByPath" @click="handleAddMeasure" id="mesaurement-add">新建</el-button>
+          <auth-tooltip :is-disabled="canWriteSchemaByParentPath">
+            <el-button type="primary" :disabled="!currentStorage || currentStorage === 'root.__system' || !canWriteSchemaByParentPath" @click="handleAddMeasure" id="mesaurement-add">新建</el-button>
           </auth-tooltip>
-          <auth-tooltip :is-disabled="canWriteSchemaByPath">
-            <el-button class="m-l-16" :disabled="!currentStorage || currentStorage === 'root.__system' || !canWriteSchemaByPath" @click="handleImport" id="mesaurement-import">导入</el-button>
+          <auth-tooltip :is-disabled="canWriteSchemaByParentPath">
+            <el-button class="m-l-16" :disabled="!currentStorage || currentStorage === 'root.__system' || !canWriteSchemaByParentPath" @click="handleImport" id="mesaurement-import">导入</el-button>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canReadWriteSchema">
             <el-dropdown class="m-x-16" :disabled="!currentStorage || !(totalCount > 0) || !canReadWriteSchema" @command="val => handleCommandDown(val)">
@@ -179,7 +179,7 @@ import { storeToRefs } from 'pinia';
 import { useTableHeight } from '@/composition-api';
 import { StorageApi } from '@/api';
 import { useUserStore } from '@/stores';
-import { getPathAuthList } from '@/utils/auth';
+import { getPathAuthList, getParentPathAuthList } from '@/utils/auth';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import StorageSide from './components/storage-side.vue';
 import ModalStorage from './components/modal-storage.vue';
@@ -245,6 +245,16 @@ const canWriteSchemaByPath = computed(() => {
   if (userAllEntityPrivileges.value.includes('WRITE_SCHEMA')) return true;
   if (!currentStorage.value) return false;
   const authList = getPathAuthList(currentStorage.value, userAllPathPrivileges.value);
+  if (authList.length) {
+    return authList.includes('WRITE_SCHEMA');
+  }
+  return false;
+});
+
+const canWriteSchemaByParentPath = computed(() => {
+  if (userAllEntityPrivileges.value.includes('WRITE_SCHEMA')) return true;
+  if (!currentStorage.value) return false;
+  const authList = getParentPathAuthList(currentStorage.value, userAllPathPrivileges.value);
   if (authList.length) {
     return authList.includes('WRITE_SCHEMA');
   }
