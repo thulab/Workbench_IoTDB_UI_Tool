@@ -488,6 +488,25 @@ onMounted(() => {
   }
 });
 
+watch(
+  () => canReadWriteData.value,
+  (val) => {
+    if (val) {
+      firstLoad.value = true;
+      handleReset();
+      if (route.query.measurement) {
+        searchFormData.path = [route.query.measurement] as string[];
+        handleSearch();
+      } else {
+        handleSearch();
+      }
+    }
+  },
+  {
+    immediate: true,
+  },
+);
+
 </script>
 
 <style lang="scss" scoped>

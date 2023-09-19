@@ -419,6 +419,18 @@ onMounted(() => {
   if (!canReadWriteSchema.value) return;
   handleRefresh();
 });
+
+watch(
+  () => canReadWriteSchema.value,
+  (val) => {
+    if (val) {
+      handleRefresh();
+    }
+  },
+  {
+    immediate: true,
+  },
+);
 </script>
 
 <style lang="scss" scoped>

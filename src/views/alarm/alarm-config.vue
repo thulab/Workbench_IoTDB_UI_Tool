@@ -364,6 +364,18 @@ onMounted(() => {
   handleSearch();
 });
 
+watch(
+  () => canUsePipe.value,
+  (val) => {
+    if (val) {
+      handleSearch();
+    }
+  },
+  {
+    immediate: true,
+  },
+);
+
 </script>
 
 <style lang="scss" scoped>
