@@ -62,6 +62,7 @@ declare module 'vue' {
     HelloWorld: typeof import('./../components/hello-world.vue')['default']
     ICustomActiveStatus: typeof import('~icons/custom/active-status')['default']
     ICustomAdd: typeof import('~icons/custom/add')['default']
+    ICustomAddBorder: typeof import('~icons/custom/add-border')['default']
     ICustomAlarmLevel: typeof import('~icons/custom/alarm-level')['default']
     ICustomArrowRightExpand: typeof import('~icons/custom/arrow-right-expand')['default']
     ICustomBorderRefresh: typeof import('~icons/custom/border-refresh')['default']
