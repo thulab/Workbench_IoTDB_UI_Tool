@@ -31,7 +31,7 @@ const showError = (message: string, code?: number) => {
     }).finally(() => {
       window.__errBoxShowing__ = false;
     });
-  } else if (code && !alertErrorCode.includes(code)) {
+  } else if (code && !alertErrorCode.includes(code) && code !== 1320) {
     ElMessage.error({ message, grouping: true });
   }
 };

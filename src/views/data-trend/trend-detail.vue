@@ -7,7 +7,7 @@
             <li :class="['search-data-type', { 'search-data-active': dataTab === 'running' }]" @click="handleTrendTab('running')">实时趋势</li>
             <li :class="['search-data-type', { 'search-data-active': dataTab === 'history' }]" @click="handleTrendTab('history')">历史趋势</li>
           </ul>
-          <base-form-item label="时间范围：" prop="datetimerange" :rules="requiredRules">
+          <base-form-item v-show="!isRunningTab" label="时间范围：" prop="datetimerange" :rules="requiredRules">
             <el-date-picker
               v-model="searchFormData.datetimerange"
               type="datetimerange"
@@ -21,17 +21,17 @@
               id="trend-search-datetimerange"
             />
           </base-form-item>
-          <base-form-item label="采样周期：" prop="unitInterval" :rules="requiredRules">
+          <base-form-item v-show="!isRunningTab" label="采样周期：" prop="unitInterval" :rules="requiredRules">
             <el-select v-model="searchFormData.unitInterval" :disabled="isRunningTab" style="width: 80px;" id="trend-search-unitInterval">
               <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" />
             </el-select>
           </base-form-item>
-          <base-form-item label="采样策略：" prop="aggregation" :rules="requiredRules">
+          <base-form-item v-show="!isRunningTab" label="采样策略：" prop="aggregation" :rules="requiredRules">
             <el-select v-model="searchFormData.aggregation" :disabled="isRunningTab" style="width: 80px;" @change="handleChangeAggregation" id="trend-search-aggregation">
               <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" />
             </el-select>
           </base-form-item>
-          <div class="play-pause-buttons">
+          <div class="play-pause-buttons" v-show="isRunningTab">
             <el-icon size="30" v-if="!isRunningTab" style="cursor: not-allowed;"><i-custom-play-disabled /></el-icon>
             <template v-else>
               <auth-tooltip :is-disabled="canReadWriteSchemaData">
@@ -133,6 +133,7 @@ const shortcutsDaterange = [
 ];
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 const timeUnits = [
+  { label: '1s', value: '1s', timestamp: 1000 },
   { label: '1min', value: '1m', timestamp: 60000 },
   { label: '5min', value: '5m', timestamp: 300000 },
   { label: '10min', value: '10m', timestamp: 600000 },
