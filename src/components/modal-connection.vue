@@ -66,7 +66,7 @@
           </div>
         </div>
         <el-scrollbar v-loading="detailLoading">
-          <el-form ref="formRef" :model="formData" label-position="left" label-width="140px" :key="formKey">
+          <el-form ref="formRef" :model="formData" label-position="left" label-width="140px" :key="formKey" :disabled="editType === 'view'">
             <base-form-item label="连接类型：" prop="type" :rules="requiredRules" class="base-form-box">
               <el-radio-group v-model="formData.type" @change="val => handleChangeType(val as 0 | 1 | 2)">
                 <el-radio :label="0">单机版</el-radio>
@@ -275,7 +275,7 @@ const formData = reactive<Connection.ConnectionDetail>({
     prometheusUrl: '',
   },
 });
-const sourceData = cloneDeep(formData);
+let sourceData = cloneDeep(formData);
 const connectionList = ref<Connection.ConnectionItem[]>([]);
 const filterList = ref<Connection.ConnectionItem[]>([]);
 const current = ref<string | number>('');
@@ -294,7 +294,7 @@ const isDisabledSlaveHosts = computed(() => {
 
 const isCanSave = computed(() => {
   if (formData.id) {
-    return isEqual(formData, sourceData);
+    return !isEqual(formData, sourceData);
   }
   return true;
 });
@@ -359,6 +359,7 @@ function getDetail(id: number) {
   editType.value = 'view';
   getConnectionDetail(id).then((res) => {
     assign(formData, res.data);
+    sourceData = cloneDeep(formData);
   });
 }
 
