@@ -1,1 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30" height="30" viewBox="0 0 30 30" fill="none"><g opacity="1"  transform="translate(0 0)  rotate(0)"><mask id="bg-mask-0" fill="white"><use transform="translate(0 0)  rotate(NaN)" xlink:href="#path_0"></use></mask><g mask="url(#bg-mask-0)" ><path id="矩形 3 (轮廓)" fill-rule="evenodd" style="fill:#A0A3B8" opacity="1" d="M6.25,12v-4c0,-0.41 0.34,-0.75 0.75,-0.75h6c0.41,0 0.75,0.34 0.75,0.75v4c0,0.41 -0.34,0.75 -0.75,0.75h-6c-0.41,0 -0.75,-0.34 -0.75,-0.75zM7.75,8.75v2.5h4.5v-2.5z"></path><path id="矩形 3 (轮廓)" fill-rule="evenodd" style="fill:#A0A3B8" opacity="1" d="M16.25,21v-4c0,-0.41 0.34,-0.75 0.75,-0.75h6c0.41,0 0.75,0.34 0.75,0.75v4c0,0.41 -0.34,0.75 -0.75,0.75h-6c-0.41,0 -0.75,-0.34 -0.75,-0.75zM17.75,17.75v2.5h4.5v-2.5z"></path><path id="直线 1 (轮廓)" fill-rule="evenodd" style="fill:#A0A3B8" opacity="1" d="M8 14.75L12 14.75C12.41 14.75 12.75 14.41 12.75 14C12.75 13.59 12.41 13.25 12 13.25L8 13.25C7.59 13.25 7.25 13.59 7.25 14C7.25 14.41 7.59 14.75 8 14.75Z"></path><path id="直线 1 (轮廓)" fill-rule="evenodd" style="fill:#A0A3B8" opacity="1" d="M18 23.75L22 23.75C22.41 23.75 22.75 23.41 22.75 23C22.75 22.59 22.41 22.25 22 22.25L18 22.25C17.59 22.25 17.25 22.59 17.25 23C17.25 23.41 17.59 23.75 18 23.75Z"></path><path id="直线 4 (轮廓)" fill-rule="evenodd" style="fill:#A0A3B8" opacity="1" d="M13 10.75L20 10.75C20.41 10.75 20.75 10.41 20.75 10C20.75 9.59 20.41 9.25 20 9.25L13 9.25C12.59 9.25 12.25 9.59 12.25 10C12.25 10.41 12.59 10.75 13 10.75Z"></path><path id="直线 4 (轮廓)" fill-rule="evenodd" style="fill:#A0A3B8" opacity="1" d="M10 19.75L17 19.75C17.41 19.75 17.75 19.41 17.75 19C17.75 18.59 17.41 18.25 17 18.25L10 18.25C9.59 18.25 9.25 18.59 9.25 19C9.25 19.41 9.59 19.75 10 19.75Z"></path><path id="直线 5 (轮廓)" fill-rule="evenodd" style="fill:#A0A3B8" opacity="1" d="M19.25 10L19.25 15C19.25 15.41 19.59 15.75 20 15.75C20.41 15.75 20.75 15.41 20.75 15L20.75 10C20.75 9.59 20.41 9.25 20 9.25C19.59 9.25 19.25 9.59 19.25 10Z"></path><path id="直线 5 (轮廓)" fill-rule="evenodd" style="fill:#A0A3B8" opacity="1" d="M9.25 16L9.25 19C9.25 19.41 9.59 19.75 10 19.75C10.41 19.75 10.75 19.41 10.75 19L10.75 16C10.75 15.59 10.41 15.25 10 15.25C9.59 15.25 9.25 15.59 9.25 16Z"></path></g></g><defs><rect id="path_0" x="0" y="0" width="30" height="30" /></defs></svg>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30" height="30"
+  viewBox="0 0 30 30" fill="none">
+  <g opacity="1" transform="translate(0 0)  rotate(0)">
+    <mask id="bg-mask-0" fill="white">
+      <use transform="translate(0 0)  rotate(0)" xlink:href="#path_0"></use>
+    </mask>
+    <g mask="url(#bg-mask-0)">
+      <path id="矩形 3 (轮廓)" fill-rule="evenodd" style="fill:#A0A3B8" opacity="1"
+        d="M6.25,12v-4c0,-0.41 0.34,-0.75 0.75,-0.75h6c0.41,0 0.75,0.34 0.75,0.75v4c0,0.41 -0.34,0.75 -0.75,0.75h-6c-0.41,0 -0.75,-0.34 -0.75,-0.75zM7.75,8.75v2.5h4.5v-2.5z">
+      </path>
+      <path id="矩形 3 (轮廓)" fill-rule="evenodd" style="fill:#A0A3B8" opacity="1"
+        d="M16.25,21v-4c0,-0.41 0.34,-0.75 0.75,-0.75h6c0.41,0 0.75,0.34 0.75,0.75v4c0,0.41 -0.34,0.75 -0.75,0.75h-6c-0.41,0 -0.75,-0.34 -0.75,-0.75zM17.75,17.75v2.5h4.5v-2.5z">
+      </path>
+      <path id="直线 1 (轮廓)" fill-rule="evenodd" style="fill:#A0A3B8" opacity="1"
+        d="M8 14.75L12 14.75C12.41 14.75 12.75 14.41 12.75 14C12.75 13.59 12.41 13.25 12 13.25L8 13.25C7.59 13.25 7.25 13.59 7.25 14C7.25 14.41 7.59 14.75 8 14.75Z">
+      </path>
+      <path id="直线 1 (轮廓)" fill-rule="evenodd" style="fill:#A0A3B8" opacity="1"
+        d="M18 23.75L22 23.75C22.41 23.75 22.75 23.41 22.75 23C22.75 22.59 22.41 22.25 22 22.25L18 22.25C17.59 22.25 17.25 22.59 17.25 23C17.25 23.41 17.59 23.75 18 23.75Z">
+      </path>
+      <path id="直线 4 (轮廓)" fill-rule="evenodd" style="fill:#A0A3B8" opacity="1"
+        d="M13 10.75L20 10.75C20.41 10.75 20.75 10.41 20.75 10C20.75 9.59 20.41 9.25 20 9.25L13 9.25C12.59 9.25 12.25 9.59 12.25 10C12.25 10.41 12.59 10.75 13 10.75Z">
+      </path>
+      <path id="直线 4 (轮廓)" fill-rule="evenodd" style="fill:#A0A3B8" opacity="1"
+        d="M10 19.75L17 19.75C17.41 19.75 17.75 19.41 17.75 19C17.75 18.59 17.41 18.25 17 18.25L10 18.25C9.59 18.25 9.25 18.59 9.25 19C9.25 19.41 9.59 19.75 10 19.75Z">
+      </path>
+      <path id="直线 5 (轮廓)" fill-rule="evenodd" style="fill:#A0A3B8" opacity="1"
+        d="M19.25 10L19.25 15C19.25 15.41 19.59 15.75 20 15.75C20.41 15.75 20.75 15.41 20.75 15L20.75 10C20.75 9.59 20.41 9.25 20 9.25C19.59 9.25 19.25 9.59 19.25 10Z">
+      </path>
+      <path id="直线 5 (轮廓)" fill-rule="evenodd" style="fill:#A0A3B8" opacity="1"
+        d="M9.25 16L9.25 19C9.25 19.41 9.59 19.75 10 19.75C10.41 19.75 10.75 19.41 10.75 19L10.75 16C10.75 15.59 10.41 15.25 10 15.25C9.59 15.25 9.25 15.59 9.25 16Z">
+      </path>
+    </g>
+  </g>
+  <defs>
+    <rect id="path_0" x="0" y="0" width="30" height="30" />
+  </defs>
+</svg>

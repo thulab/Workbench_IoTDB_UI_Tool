@@ -19,17 +19,17 @@ class ConnectionApi {
   }
 
   // 保存更新连接实例
-  static saveConnection(data: Connection.ConnectionDetail): HttpResponseP {
+  static saveConnection(data: Connection.ConnectionDetail): HttpResponseP<number> {
     return http.post('/connection/saveOrUpdateConnection', { ...data, password: '' });
   }
 
   // 测试连接实例
   static testConnection(data: Connection.ConnectionDetail): HttpResponseP {
-    return http.post('/connection/testConnection', data);
+    return http.post('/connection/testConnection', { ...data, password: encodeAES(data.password) });
   }
 
   // 登录保存连接实例
-  static loginByConnection(data: Connection.ConnectionDetail): HttpResponseP {
+  static loginByConnection(data: Connection.ConnectionDetail): HttpResponseP<number> {
     return http.post('/loginAndSave', { ...data, password: encodeAES(data.password) });
   }
 }

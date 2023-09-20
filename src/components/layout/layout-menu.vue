@@ -29,6 +29,7 @@
 
     <modal-connection
       v-model:visible="connectionVisible"
+      :is-toggle="true"
     />
   </div>
 </template>

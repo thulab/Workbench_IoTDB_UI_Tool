@@ -18,6 +18,6 @@ declare namespace Connection{
     username: string;
     password?: string;
     masterCluster: ConnectionClusterData;
-    slaveCluster?: ConnectionClusterData;
+    slaveCluster?: ConnectionClusterData | null;
   }
 }

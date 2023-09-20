@@ -6,13 +6,14 @@
     align-center
     :close-on-click-modal="false"
     id="connection-modal"
+    :before-close="handleClose"
   >
     <el-container class="connection-wrapper">
       <el-aside width="240px" class="connection-list-wrapper">
         <div class="connection-list-title">
           <h4>实例列表</h4>
           <div>
-            <el-button link class="m-r-8" @click="getList" id="connection-side-refresh"><i-custom-border-refresh /></el-button>
+            <el-button link class="m-r-8" @click="handleRefresh" id="connection-side-refresh"><i-custom-border-refresh /></el-button>
             <el-button link style="margin: 0;" @click="handleAddConnection" id="connection-side-add"><i-custom-new-connection /></el-button>
           </div>
         </div>
@@ -21,7 +22,7 @@
             <i-custom-search-icon class="remote-select-search-icon" />
           </template>
         </el-input>
-        <div class="connection-list-box">
+        <div class="connection-list-box" v-loading="listLoading">
           <div class="list-empty-wrapper" v-if="!filterList.length">
             <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
             <span class="data-empty-text">暂无数据</span>
@@ -55,16 +56,16 @@
           </ul>
         </div>
       </el-aside>
-      <el-main class="connection-detail-wrapper" v-if="!editType" />
-      <el-main class="connection-detail-wrapper" v-if="editType">
+      <el-main class="connection-detail-wrapper" v-if="!connectionList.length" />
+      <el-main class="connection-detail-wrapper" v-if="connectionList.length > 0">
         <div class="connection-operate-buttons">
           <h4 class="connection-detail-title">实例详情</h4>
-          <div>
-            <el-button v-if="isView" type="primary" @click="handleEdit(true)" id="connection-detail-edit">编辑</el-button>
-            <el-button v-else type="primary" @click="handleEdit(false)" id="connection-detail-view">退出编辑</el-button>
+          <div v-if="editType === 'edit' || editType === 'view'">
+            <el-button v-if="editType === 'view'" type="primary" @click="handleEdit('edit')" id="connection-detail-edit">编辑</el-button>
+            <el-button v-else type="primary" @click="handleEdit('view')" id="connection-detail-view">退出编辑</el-button>
           </div>
         </div>
-        <el-scrollbar>
+        <el-scrollbar v-loading="detailLoading">
           <el-form ref="formRef" :model="formData" label-position="left" label-width="140px" :key="formKey">
             <base-form-item label="连接类型：" prop="type" :rules="requiredRules" class="base-form-box">
               <el-radio-group v-model="formData.type" @change="val => handleChangeType(val as 0 | 1 | 2)">
@@ -204,12 +205,17 @@
             </template>
           </el-form>
         </el-scrollbar>
-        <div class="connection-form-buttons" v-if="!isView">
-          <el-button plain @click="handleTest('test')">测试</el-button>
-          <div>
-            <el-button plain @click="handleReset">重置</el-button>
-            <el-button type="primary" :disabled="!isCanSave" @click="handleSave">保存</el-button>
-            <el-button type="primary" v-if="isToggle" @click="handleTest('login')">保存连接</el-button>
+        <div class="connection-form-buttons">
+          <template v-if="editType === 'add' || editType === 'edit'">
+            <el-button plain @click="handleTest('test')" :loading="testLoading">测试</el-button>
+            <div>
+              <el-button plain @click="handleReset">重置</el-button>
+              <el-button type="primary" :disabled="!isCanSave" :loading="saveLoading" @click="handleSave">保存</el-button>
+              <el-button type="primary" v-if="isToggle" :loading="connectLoading" @click="handleTest('login')">保存连接</el-button>
+            </div>
+          </template>
+          <div style="text-align: right;" v-if="editType === 'view' && isToggle">
+            <el-button type="primary" @click="handleToggle">切换实例</el-button>
           </div>
         </div>
       </el-main>
@@ -232,15 +238,15 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
+  (event: 'handleClose', id?: number): void;
 }>();
 
 const userStore = useUserStore();
 const connectionStore = useConnectionStore();
 const dialogVisible = useVModel(props, 'visible', emit);
 const filterText = ref('');
-const isView = ref(true);
 const formKey = ref(0);
-const editType = ref<'add' | 'edit' | 'view' | ''>('');
+const editType = ref<'add' | 'edit' | 'view'>('view');
 const activeNames = ref<string[]>(['masterCluster', 'slaveCluster']);
 const formRef = ref<FormInstance>();
 const requiredRules = ref([
@@ -271,7 +277,7 @@ const formData = reactive<Connection.ConnectionDetail>({
 });
 const sourceData = cloneDeep(formData);
 const connectionList = ref<Connection.ConnectionItem[]>([]);
-let filterList: Connection.ConnectionItem[] = cloneDeep(connectionList.value);
+const filterList = ref<Connection.ConnectionItem[]>([]);
 const current = ref<string | number>('');
 const errorPwd = ref('');
 const isDisabledMasterHosts = computed(() => {
@@ -293,16 +299,28 @@ const isCanSave = computed(() => {
   return true;
 });
 
-const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
-const { requestFn: getConnectionDetail } = useRequest(ConnectionApi.getConnectionDetail);
+const { requestFn: getConnectionList, loading: listLoading } = useRequest(ConnectionApi.getConnectionList);
+const { requestFn: getConnectionDetail, loading: detailLoading } = useRequest(ConnectionApi.getConnectionDetail);
 const { requestFn: deleteConnection } = useRequest(ConnectionApi.deleteConnection);
-const { requestFn: saveConnection } = useRequest(ConnectionApi.saveConnection);
-const { requestFn: testConnection } = useRequest(ConnectionApi.testConnection);
-const { requestFn: loginByConnection } = useRequest(ConnectionApi.loginByConnection);
+const { requestFn: saveConnection, loading: saveLoading } = useRequest(ConnectionApi.saveConnection);
+const { requestFn: testConnection, loading: testLoading } = useRequest(ConnectionApi.testConnection);
+const { requestFn: loginByConnection, loading: connectLoading } = useRequest(ConnectionApi.loginByConnection);
 
-function handleAddConnection() {
-  editType.value = 'add';
-  isView.value = false;
+function handleClose() {
+  dialogVisible.value = false;
+  emit('handleClose');
+}
+
+function handleChangeConnection() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  return new Promise((resolve, reject) => {
+    ElMessageBox.confirm('当前内容未填写完整，是否继续填写？', '注意', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+      icon: ICustomMessageWarning,
+    }).then(() => resolve(false)).catch(() => resolve(true));
+  });
 }
 
 function handleChangeType(type: 0 | 1 | 2) {
@@ -318,7 +336,7 @@ function handleChangeType(type: 0 | 1 | 2) {
     ],
     prometheusUrl: '',
   };
-  formData.slaveCluster = {
+  formData.slaveCluster = type === 0 ? null : {
     hostAndPortVOS: [
       { host: '', port: '' },
     ],
@@ -326,38 +344,56 @@ function handleChangeType(type: 0 | 1 | 2) {
   };
 }
 
+async function handleAddConnection() {
+  if (editType.value === 'add') {
+    const flag = await handleChangeConnection();
+    if (!flag) return;
+  }
+  current.value = '';
+  editType.value = 'add';
+  handleChangeType(0);
+}
+
 function getDetail(id: number) {
   handleChangeType(0);
+  editType.value = 'view';
   getConnectionDetail(id).then((res) => {
     assign(formData, res.data);
   });
 }
 
 function handleReset() {
-  handleChangeType(0);
-  if (filterList.length) {
-    current.value = +filterList[0].id;
+  if (editType.value === 'edit') {
+    current.value = +filterList.value[0].id || +connectionList.value[0].id;
     getDetail(current.value);
   } else {
+    handleChangeType(0);
     current.value = '';
   }
 }
 
 // 获取实例列表
-function getList() {
+function getList(id?: number) {
   getConnectionList().then((res) => {
     connectionList.value = res.data || [];
-    filterList = cloneDeep(connectionList.value);
-    if (filterList.length) {
-      current.value = +filterList[0].id;
+    filterList.value = res.data || [];
+    if (filterList.value.length) {
+      current.value = id || +filterList.value[0].id;
       getDetail(current.value);
     }
   });
 }
 
+async function handleRefresh() {
+  if (editType.value === 'add') {
+    const flag = await handleChangeConnection();
+    if (!flag) return;
+    getList();
+  }
+}
+
 function handleFilter() {
-  const res = connectionList.value.filter((item) => item.name.includes(filterText.value));
-  filterList = cloneDeep(res);
+  filterList.value = connectionList.value.filter((item) => item.name.includes(filterText.value));
 }
 
 const canStopPropagation = (e: HTMLElement):boolean => {
@@ -390,8 +426,12 @@ function handleDelete(item: Connection.ConnectionItem) {
 }
 
 // 选择
-function handleSelect(item: Connection.ConnectionItem, e: MouseEvent) {
+async function handleSelect(item: Connection.ConnectionItem, e: MouseEvent) {
   if (canStopPropagation(e.target as HTMLElement)) return;
+  if (editType.value === 'add') {
+    const flag = await handleChangeConnection();
+    if (!flag) return;
+  }
   current.value = +item.id;
   getDetail(current.value);
 }
@@ -412,8 +452,14 @@ function handleDelHost(type: 'master' | 'slave', index: number) {
   }
 }
 
-function handleEdit(flag: boolean) {
-  isView.value = flag;
+function handleEdit(type: 'edit' | 'view') {
+  errorPwd.value = '';
+  formRef.value?.clearValidate();
+  editType.value = type;
+}
+
+function handleToggle() {
+  errorPwd.value = '当前实例密码未填写，请编辑后进行连接';
 }
 
 function handleTest(type: 'test' | 'login') {
@@ -426,19 +472,18 @@ function handleTest(type: 'test' | 'login') {
         if (type === 'test') {
           testConnection(formData).then(() => {
             ElMessage.success('连接成功');
-            getList();
           });
         } else {
-          loginByConnection(formData).then(() => {
+          loginByConnection(formData).then((res) => {
+            formData.id = res.data;
             userStore.setUser(formData.username);
             sessionStorage.setItem('nologin', '0');
             connectionStore.setConnection({
-              id: formData.id,
+              id: +formData.id,
               type: formData.type,
               name: formData.name,
               username: formData.username,
             });
-            dialogVisible.value = false;
             window.location.reload();
           });
         }
@@ -450,9 +495,9 @@ function handleTest(type: 'test' | 'login') {
 function handleSave() {
   formRef.value?.validate((valid) => {
     if (valid) {
-      saveConnection(formData).then(() => {
-        ElMessage.success('连接成功');
-        getList();
+      saveConnection(formData).then((res) => {
+        ElMessage.success('保存成功');
+        getList(res.data);
       });
     }
   });
@@ -463,10 +508,10 @@ watch(
   (newVal) => {
     if (newVal) {
       handleChangeType(0);
-      editType.value = '';
+      editType.value = 'view';
       filterText.value = '';
       formKey.value++;
-      isView.value = true;
+      getList();
     }
   },
 );
@@ -706,5 +751,10 @@ watch(
   display: flex;
   justify-content: space-between;
   margin-top: 24px;
+}
+</style>
+<style lang="scss">
+.is-message-box {
+  z-index: 9990 !important;
 }
 </style>

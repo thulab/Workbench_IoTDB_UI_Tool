@@ -13,14 +13,18 @@
         <el-form :hide-required-asterisk="true" :model="loginForm" :rules="rules" ref="formRef" class="login-form-box">
           <label><input type="password" autocomplete="new-password" hidden></label>
           <div class="connection-box">
-            <el-form-item prop="connection" class="connection-form-item">
-              <el-icon size="30" class="connection-icon"><i-custom-connection /></el-icon>
+            <el-form-item prop="connection">
               <el-select
                 v-model="loginForm.connection"
                 placeholder="请选择所要连接的实例"
                 id="login-connection"
                 style="width: 292px;"
+                fit-input-width
+                placement="bottom-start"
               >
+                <template #prefix>
+                  <el-icon size="30"><i-custom-connection /></el-icon>
+                </template>
                 <el-option-group
                   v-for="group in connectionOptions"
                   :key="group.label"
@@ -31,7 +35,11 @@
                     :key="item.id"
                     :label="`${item.name}(用户名:${item.username})`"
                     :value="item.id"
-                  />
+                  >
+                    <div style="display: flex; width: 240px;">
+                      <text-tooltip :content="`${item.name}(用户名:${item.username})`" />
+                    </div>
+                  </el-option>
                 </el-option-group>
               </el-select>
             </el-form-item>
@@ -98,6 +106,7 @@
 
     <modal-connection
       v-model:visible="connectionVisible"
+      @handleClose="getList"
     />
   </div>
 </template>
@@ -378,21 +387,7 @@ onUnmounted(() => {
 
   :deep(.el-select .el-input__suffix) {
     background-color: #fff;
-  }
-
-  .connection-form-item{
-    position: relative;
-
-    .connection-icon{
-      position: absolute;
-      z-index: 1;
-      left: 5px;
-      top: 4px;
-    }
-
-    :deep(.el-input__wrapper){
-      padding-left: 39px;
-    }
+    width: 20px;
   }
 }
 
@@ -412,5 +407,29 @@ onUnmounted(() => {
   font-weight: 300;
   line-height: 18px;
   color: #fff;
+}
+
+:deep(.el-select-dropdown__item){
+  color: #424561;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+:deep(.el-select-dropdown__item.selected) {
+  color: #495AD4;
+}
+
+:deep(.el-select-group__title) {
+  color: #656A85;
+  font-size: 12px;
+  font-weight: 300;
+}
+
+:deep(.el-select-dropdown__item:hover) {
+  background-color: #F7F8FC;
+}
+
+.el-select-group__wrap:not(:last-of-type)::after {
+  background-color: #DFE1ED;
 }
 </style>
