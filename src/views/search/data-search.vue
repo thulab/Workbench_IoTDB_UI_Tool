@@ -476,17 +476,17 @@ function handleCommandDown(val: string) {
   handleExportData(val);
 }
 
-onMounted(() => {
-  if (!canReadWriteData.value) return;
-  firstLoad.value = true;
-  handleReset();
-  if (route.query.measurement) {
-    searchFormData.path = [route.query.measurement] as string[];
-    handleSearch();
-  } else {
-    handleSearch();
-  }
-});
+// onMounted(() => {
+//   if (!canReadWriteData.value) return;
+//   firstLoad.value = true;
+//   handleReset();
+//   if (route.query.measurement) {
+//     searchFormData.path = [route.query.measurement] as string[];
+//     handleSearch();
+//   } else {
+//     handleSearch();
+//   }
+// });
 
 watch(
   () => canReadWriteData.value,
