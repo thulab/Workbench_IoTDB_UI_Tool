@@ -1,8 +1,9 @@
 declare namespace Connection{
   export interface ConnectionItem {
-    id?: number;
+    id: number | string;
     type: number;
     name: string;
+    username: string;
   }
 
   export interface ConnectionClusterData {
@@ -11,7 +12,7 @@ declare namespace Connection{
   }
 
   export interface ConnectionDetail {
-    id?: number | string;
+    id: number | string;
     type: 0 | 1 | 2;
     name: string;
     username: string;

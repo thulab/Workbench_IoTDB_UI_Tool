@@ -55,7 +55,8 @@
           </ul>
         </div>
       </el-aside>
-      <el-main class="connection-detail-wrapper">
+      <el-main class="connection-detail-wrapper" v-if="!editType" />
+      <el-main class="connection-detail-wrapper" v-if="editType">
         <div class="connection-operate-buttons">
           <h4 class="connection-detail-title">实例详情</h4>
           <div>
@@ -66,7 +67,7 @@
         <el-scrollbar>
           <el-form ref="formRef" :model="formData" label-position="left" label-width="140px" :key="formKey">
             <base-form-item label="连接类型：" prop="type" :rules="requiredRules" class="base-form-box">
-              <el-radio-group v-model="formData.type" @change="handleChangeType">
+              <el-radio-group v-model="formData.type" @change="val => handleChangeType(val as 0 | 1 | 2)">
                 <el-radio :label="0">单机版</el-radio>
                 <el-radio :label="1">集群版</el-radio>
                 <el-radio :label="2">双活版</el-radio>
@@ -100,7 +101,7 @@
               <base-form-item label="用户名：" prop="username" :rules="requiredRules" class="base-form-box">
                 <el-input v-model="formData.username" placeholder="请输入用户名" id="connection-modal-username" />
               </base-form-item>
-              <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box">
+              <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd">
                 <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password" />
               </base-form-item>
             </template>
@@ -131,7 +132,7 @@
               <base-form-item label="用户名：" prop="username" :rules="requiredRules" class="base-form-box">
                 <el-input v-model="formData.username" placeholder="请输入用户名" id="connection-modal-username" />
               </base-form-item>
-              <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box">
+              <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd">
                 <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password" />
               </base-form-item>
             </template>
@@ -140,7 +141,7 @@
               <base-form-item label="用户名：" prop="username" :rules="requiredRules" class="base-form-box">
                 <el-input v-model="formData.username" placeholder="请输入用户名" id="connection-modal-username" />
               </base-form-item>
-              <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box">
+              <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd">
                 <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password" />
               </base-form-item>
 
@@ -203,12 +204,12 @@
             </template>
           </el-form>
         </el-scrollbar>
-        <div class="connection-form-buttons">
-          <el-button plain>测试</el-button>
+        <div class="connection-form-buttons" v-if="!isView">
+          <el-button plain @click="handleTest('test')">测试</el-button>
           <div>
-            <el-button plain>重置</el-button>
-            <el-button type="primary">保存</el-button>
-            <el-button type="primary">连接</el-button>
+            <el-button plain @click="handleReset">重置</el-button>
+            <el-button type="primary" :disabled="!isCanSave" @click="handleSave">保存</el-button>
+            <el-button type="primary" v-if="isToggle" @click="handleTest('login')">保存连接</el-button>
           </div>
         </div>
       </el-main>
@@ -218,25 +219,29 @@
 
 <script lang="ts" setup>
 import type { FormInstance } from 'element-plus';
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep, isEqual, assign } from 'lodash-es';
 import { ConnectionApi } from '@/api';
+import { useUserStore, useConnectionStore } from '@/stores';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ICustomError from '~icons/custom/error.svg';
 
 const props = defineProps<{
   visible: boolean;
   modelValue: Connection.ConnectionItem[];
+  isToggle?: boolean;
 }>();
 
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
-  (event: 'handleSave',): void;
 }>();
 
+const userStore = useUserStore();
+const connectionStore = useConnectionStore();
 const dialogVisible = useVModel(props, 'visible', emit);
 const filterText = ref('');
 const isView = ref(true);
 const formKey = ref(0);
+const editType = ref<'add' | 'edit' | 'view' | ''>('');
 const activeNames = ref<string[]>(['masterCluster', 'slaveCluster']);
 const formRef = ref<FormInstance>();
 const requiredRules = ref([
@@ -265,9 +270,11 @@ const formData = reactive<Connection.ConnectionDetail>({
     prometheusUrl: '',
   },
 });
+const sourceData = cloneDeep(formData);
 const connectionList = useVModel(props, 'modelValue');
 let filterList: Connection.ConnectionItem[] = cloneDeep(connectionList.value);
-const current = ref<undefined | number>();
+const current = ref<string | number>('');
+const errorPwd = ref('');
 const isDisabledMasterHosts = computed(() => {
   const hosts = formData.masterCluster.hostAndPortVOS;
   const flag = hosts.some((item) => !item.host || !item.port);
@@ -280,17 +287,72 @@ const isDisabledSlaveHosts = computed(() => {
   return flag;
 });
 
-const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
-const { requestFn: deleteConnection } = useRequest(ConnectionApi.deleteConnection);
+const isCanSave = computed(() => {
+  if (formData.id) {
+    return isEqual(formData, sourceData);
+  }
+  return true;
+});
 
-function handleAddConnection() {}
+const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
+const { requestFn: getConnectionDetail } = useRequest(ConnectionApi.getConnectionDetail);
+const { requestFn: deleteConnection } = useRequest(ConnectionApi.deleteConnection);
+const { requestFn: saveConnection } = useRequest(ConnectionApi.saveConnection);
+const { requestFn: testConnection } = useRequest(ConnectionApi.testConnection);
+const { requestFn: loginByConnection } = useRequest(ConnectionApi.loginByConnection);
+
+function handleAddConnection() {
+  editType.value = 'add';
+  isView.value = false;
+}
+
+function handleChangeType(type: 0 | 1 | 2) {
+  formRef.value?.resetFields();
+  errorPwd.value = '';
+  formData.type = type;
+  formData.name = '';
+  formData.username = '';
+  formData.password = '';
+  formData.masterCluster = {
+    hostAndPortVOS: [
+      { host: '', port: '' },
+    ],
+    prometheusUrl: '',
+  };
+  formData.slaveCluster = {
+    hostAndPortVOS: [
+      { host: '', port: '' },
+    ],
+    prometheusUrl: '',
+  };
+}
+
+function getDetail(id: number) {
+  handleChangeType(0);
+  getConnectionDetail(id).then((res) => {
+    assign(formData, res.data);
+  });
+}
+
+function handleReset() {
+  handleChangeType(0);
+  if (filterList.length) {
+    current.value = +filterList[0].id;
+    getDetail(current.value);
+  } else {
+    current.value = '';
+  }
+}
 
 // 获取实例列表
 function getList() {
   getConnectionList().then((res) => {
     connectionList.value = res.data || [];
     filterList = cloneDeep(connectionList.value);
-    current.value = filterList[0].id;
+    if (filterList.length) {
+      current.value = +filterList[0].id;
+      getDetail(current.value);
+    }
   });
 }
 
@@ -321,7 +383,7 @@ function handleDelete(item: Connection.ConnectionItem) {
     icon: ICustomMessageWarning,
   })
     .then(() => {
-      deleteConnection(item.id!).then(() => {
+      deleteConnection(+item.id).then(() => {
         ElMessage.success('删除成功');
         getList();
       });
@@ -331,7 +393,8 @@ function handleDelete(item: Connection.ConnectionItem) {
 // 选择
 function handleSelect(item: Connection.ConnectionItem, e: MouseEvent) {
   if (canStopPropagation(e.target as HTMLElement)) return;
-  current.value = item.id;
+  current.value = +item.id;
+  getDetail(current.value);
 }
 
 function handleAddHost(type: 'master' | 'slave') {
@@ -350,46 +413,58 @@ function handleDelHost(type: 'master' | 'slave', index: number) {
   }
 }
 
-function handleChangeType(type: 0 | 1 | 2) {
-  formRef.value?.resetFields();
-  formData.type = type;
-  formData.name = '';
-  formData.username = '';
-  formData.password = '';
-  formData.masterCluster = {
-    hostAndPortVOS: [
-      { host: '', port: '' },
-    ],
-    prometheusUrl: '',
-  };
-  formData.slaveCluster = {
-    hostAndPortVOS: [
-      { host: '', port: '' },
-    ],
-    prometheusUrl: '',
-  };
-}
-
 function handleEdit(flag: boolean) {
   isView.value = flag;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const handleConfirm = () => {
+function handleTest(type: 'test' | 'login') {
   formRef.value?.validate((valid) => {
     if (valid) {
-      ElMessage.success('创建成功！');
-      dialogVisible.value = false;
-      emit('handleSave');
+      if (!formData.password) {
+        errorPwd.value = '当前实例密码未填写，请编辑后进行连接';
+      } else {
+        errorPwd.value = '';
+        if (type === 'test') {
+          testConnection(formData).then(() => {
+            ElMessage.success('连接成功');
+            getList();
+          });
+        } else {
+          loginByConnection(formData).then(() => {
+            userStore.setUser(formData.username);
+            sessionStorage.setItem('nologin', '0');
+            connectionStore.setConnection({
+              id: formData.id,
+              type: formData.type,
+              name: formData.name,
+              username: formData.username,
+            });
+            dialogVisible.value = false;
+            window.location.reload();
+          });
+        }
+      }
     }
   });
-};
+}
+
+function handleSave() {
+  formRef.value?.validate((valid) => {
+    if (valid) {
+      saveConnection(formData).then(() => {
+        ElMessage.success('连接成功');
+        getList();
+      });
+    }
+  });
+}
 
 watch(
   () => props.visible,
   (newVal) => {
     if (newVal) {
       handleChangeType(0);
+      editType.value = '';
       filterText.value = '';
       formKey.value++;
       isView.value = true;

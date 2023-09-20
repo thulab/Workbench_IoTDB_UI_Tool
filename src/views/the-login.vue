@@ -12,20 +12,31 @@
         <h5 class="login-title">账号密码登录</h5>
         <el-form :hide-required-asterisk="true" :model="loginForm" :rules="rules" ref="formRef" class="login-form-box">
           <label><input type="password" autocomplete="new-password" hidden></label>
-          <el-form-item prop="connection">
-            <el-input
-              v-model="loginForm.connection"
-              autocomplete="off"
-              placeholder="请选择连接实例"
-              readonly
-              id="login-connection"
-              @click="handleSelectConnection"
-            >
-              <template #prefix>
-                <el-icon size="30"><i-custom-connection /></el-icon>
-              </template>
-            </el-input>
-          </el-form-item>
+          <div class="connection-box">
+            <el-form-item prop="connection" class="connection-form-item">
+              <el-icon size="30" class="connection-icon"><i-custom-connection /></el-icon>
+              <el-select
+                v-model="loginForm.connection"
+                placeholder="请选择所要连接的实例"
+                id="login-connection"
+                style="width: 292px;"
+              >
+                <el-option-group
+                  v-for="group in connectionOptions"
+                  :key="group.label"
+                  :label="group.label"
+                >
+                  <el-option
+                    v-for="item in group.options"
+                    :key="item.id"
+                    :label="`${item.name}(用户名:${item.username})`"
+                    :value="item.id"
+                  />
+                </el-option-group>
+              </el-select>
+            </el-form-item>
+            <el-button type="primary" class="m-l-12" @click="handleSelectConnection">编辑</el-button>
+          </div>
           <el-form-item prop="user">
             <el-input
               v-model="loginForm.user"
@@ -70,7 +81,7 @@
               id="login-captcha"
             >
               <template #prefix>
-                <el-icon size="22" style="padding: 4px;"><i-ep-circle-check /></el-icon>
+                <el-icon size="30"><i-custom-verification-code /></el-icon>
               </template>
               <template #suffix>
                 <the-captcha ref="captchaRef" :height="30" :width="100" @update:code="val=>captcha = val" />
@@ -121,6 +132,7 @@ const pwdType = ref('password');
 const loading = ref(false);
 const connectionVisible = ref(false);
 const connectionList = ref<Connection.ConnectionItem[]>([]);
+const connectionOptions = ref<Array<{ label: string, options: Array<Connection.ConnectionItem> }>>([]);
 
 const captcha = ref('');
 
@@ -203,7 +215,26 @@ function handleChangePwdType() {
 function getList() {
   getConnectionList().then((res) => {
     connectionList.value = res.data || [];
-    loginForm.connection = connectionList.value[0].id;
+    const standAloneList: Connection.ConnectionItem[] = [];
+    const doubleLiveList: Connection.ConnectionItem[] = [];
+    const clusterList: Connection.ConnectionItem[] = [];
+    connectionList.value.forEach((item) => {
+      if (item.type === 1) {
+        doubleLiveList.push(item);
+      } else if (item.type === 2) {
+        clusterList.push(item);
+      } else {
+        standAloneList.push(item);
+      }
+    });
+    connectionOptions.value = [
+      { label: '单机版', options: standAloneList },
+      { label: '集群版', options: standAloneList },
+      { label: '双活版', options: standAloneList },
+    ];
+    if (connectionList.value.length) {
+      loginForm.connection = connectionList.value[0].id;
+    }
   });
 }
 
@@ -331,6 +362,33 @@ onUnmounted(() => {
 
   :deep(.el-input) {
     height: 36px !important;
+  }
+}
+
+.connection-box{
+  display: flex;
+
+  :deep(.el-button) {
+    height: 36px !important;
+  }
+
+  :deep(.el-select .el-input__suffix) {
+    background-color: #fff;
+  }
+
+  .connection-form-item{
+    position: relative;
+
+    .connection-icon{
+      position: absolute;
+      z-index: 1;
+      left: 5px;
+      top: 4px;
+    }
+
+    :deep(.el-input__wrapper){
+      padding-left: 39px;
+    }
   }
 }
 
