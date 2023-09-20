@@ -227,7 +227,6 @@ import ICustomError from '~icons/custom/error.svg';
 
 const props = defineProps<{
   visible: boolean;
-  modelValue: Connection.ConnectionItem[];
   isToggle?: boolean;
 }>();
 
@@ -271,7 +270,7 @@ const formData = reactive<Connection.ConnectionDetail>({
   },
 });
 const sourceData = cloneDeep(formData);
-const connectionList = useVModel(props, 'modelValue');
+const connectionList = ref<Connection.ConnectionItem[]>([]);
 let filterList: Connection.ConnectionItem[] = cloneDeep(connectionList.value);
 const current = ref<string | number>('');
 const errorPwd = ref('');

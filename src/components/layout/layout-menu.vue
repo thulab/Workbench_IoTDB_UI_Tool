@@ -29,7 +29,6 @@
 
     <modal-connection
       v-model:visible="connectionVisible"
-      v-model="connectionList"
     />
   </div>
 </template>
@@ -53,7 +52,6 @@ const menuStore = useMenuStore();
 const router = useRouter();
 const allRoutes = computed(() => router.options.routes);
 const connectionVisible = ref(false);
-const connectionList = ref<Connection.ConnectionItem[]>([]);
 const connectionName = computed(() => connectionStore.connectionInfo.name || '连接实例');
 
 const getRoutePath = (routeItem: RouteRecordRaw, parentPath: string) => {

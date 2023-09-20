@@ -3,8 +3,8 @@ import { encodeAES } from '@/utils/secret';
 
 class UserApi {
   // 登录
-  static login(user: string, password: string): HttpResponseP {
-    return http.post('/login', { user, password: encodeAES(password) });
+  static login(user: string, password: string, id: number): HttpResponseP {
+    return http.post('/login', { user, password: encodeAES(password), id });
   }
 
   // 退出登录

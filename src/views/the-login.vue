@@ -98,7 +98,6 @@
 
     <modal-connection
       v-model:visible="connectionVisible"
-      v-model="connectionList"
     />
   </div>
 </template>
@@ -107,13 +106,13 @@
 import { useRouter } from 'vue-router';
 import type { FormInstance, FormRules } from 'element-plus';
 import { UserApi, ConnectionApi } from '@/api';
-import { useUserStore } from '@/stores';
+import { useUserStore, useConnectionStore } from '@/stores';
 import ModalConnection from '@/components/modal-connection.vue';
 import TheCaptcha from '@/components/the-captcha.vue';
 
 const router = useRouter();
 const userStore = useUserStore();
-
+const connectionStore = useConnectionStore();
 const formRef = ref<FormInstance>();
 const captchaRef = ref<InstanceType<typeof TheCaptcha> | null>(null);
 const loginForm = reactive<{
@@ -220,20 +219,21 @@ function getList() {
     const clusterList: Connection.ConnectionItem[] = [];
     connectionList.value.forEach((item) => {
       if (item.type === 1) {
-        doubleLiveList.push(item);
-      } else if (item.type === 2) {
         clusterList.push(item);
+      } else if (item.type === 2) {
+        doubleLiveList.push(item);
       } else {
         standAloneList.push(item);
       }
     });
     connectionOptions.value = [
       { label: '单机版', options: standAloneList },
-      { label: '集群版', options: standAloneList },
-      { label: '双活版', options: standAloneList },
+      { label: '集群版', options: clusterList },
+      { label: '双活版', options: doubleLiveList },
     ];
     if (connectionList.value.length) {
-      loginForm.connection = connectionList.value[0].id;
+      loginForm.connection = +connectionList.value[0].id;
+      loginForm.user = connectionList.value[0].username;
     }
   });
 }
@@ -246,8 +246,12 @@ const submitForm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
       loading.value = true;
-      login(loginForm.user, loginForm.password).then(() => {
+      login(loginForm.user, loginForm.password, +loginForm.connection).then(() => {
         userStore.setUser(loginForm.user);
+        const connectionData = connectionList.value.find((item) => item.id === loginForm.connection);
+        if (connectionData) {
+          connectionStore.setConnection(connectionData);
+        }
         router.push({ path: '/' });
         sessionStorage.setItem('nologin', '0');
       }).catch(() => {
@@ -264,7 +268,7 @@ onMounted(() => {
   userStore.clearUserStore();
   sessionStorage.setItem('UserStore', '');
   sessionStorage.setItem('nologin', '1');
-  // getList();
+  getList();
 });
 
 onUnmounted(() => {

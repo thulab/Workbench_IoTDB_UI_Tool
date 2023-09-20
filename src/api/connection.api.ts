@@ -15,7 +15,7 @@ class ConnectionApi {
 
   // 删除连接实例
   static deleteConnection(id: number): HttpResponseP {
-    return http.delete('/connection/deleteConnectionById', { params: { id } });
+    return http.get('/connection/deleteConnectionById', { params: { id } });
   }
 
   // 保存更新连接实例
