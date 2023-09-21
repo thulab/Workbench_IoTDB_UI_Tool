@@ -215,7 +215,7 @@
               <el-button type="primary" v-if="isToggle" :loading="connectLoading" @click="handleTest('login')">保存连接</el-button>
             </div>
           </template>
-          <div style="text-align: right;" v-if="editType === 'view' && isToggle">
+          <div style="text-align: right; flex: 1;" v-if="editType === 'view' && isToggle">
             <el-button type="primary" @click="handleToggle">切换实例</el-button>
           </div>
         </div>
