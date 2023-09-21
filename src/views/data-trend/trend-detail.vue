@@ -98,16 +98,19 @@ import { echarts, type ECOption } from '@/plugins/echarts-plugin';
 import {
   getStartAndEnd, today, getOneInterval, getOneIntervalNow,
 } from '@/utils/date';
-import { useUserStore } from '@/stores';
+import { useUserStore, useConnectionStore } from '@/stores';
 import { useWebsocket } from '@/composition-api';
 import ICustomCalender from '~icons/custom/calender.svg';
 import TrendList from './components/trend-list.vue';
 
 const route = useRoute();
 const userStore = useUserStore();
+const userName = computed(() => userStore.userInfo.name);
 const {
   canReadWriteSchemaData,
 } = storeToRefs(userStore);
+const connectionStore = useConnectionStore();
+const connectionId = computed(() => connectionStore.connectionInfo.id);
 const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
 const isExpand = ref(true);
@@ -524,13 +527,19 @@ onMounted(() => {
       width: 2,
       checked: true,
     });
-    if (socketInstance.value && socketInstance.value.readyState === 1) {
+  }
+  if (socketInstance.value && socketInstance.value.readyState === 1) {
+    socketInstance.value?.send(JSON.stringify({ operate: 'SET_CONNECT', connectionId: connectionId.value, user: userName.value }));
+    if (route.query.measurement) {
       socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [route.query.measurement as string] }));
-    } else {
-      socketInstance.value?.addEventListener('open', () => {
-        socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [route.query.measurement as string] }));
-      });
     }
+  } else {
+    socketInstance.value?.addEventListener('open', () => {
+      socketInstance.value?.send(JSON.stringify({ operate: 'SET_CONNECT', connectionId: connectionId.value, user: userName.value }));
+      if (route.query.measurement) {
+        socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [route.query.measurement as string] }));
+      }
+    });
   }
   setOption(chartOptions.value);
 
