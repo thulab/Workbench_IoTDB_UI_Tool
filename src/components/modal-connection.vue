@@ -56,8 +56,8 @@
           </ul>
         </div>
       </el-aside>
-      <el-main class="connection-detail-wrapper" v-if="!connectionList.length" />
-      <el-main class="connection-detail-wrapper" v-if="connectionList.length > 0">
+      <el-main class="connection-detail-wrapper" v-if="!filterList.length && editType !== 'add'" />
+      <el-main class="connection-detail-wrapper" v-if="filterList.length || editType === 'add'">
         <div class="connection-operate-buttons">
           <h4 class="connection-detail-title">实例详情</h4>
           <div v-if="editType === 'edit' || editType === 'view'">
@@ -67,6 +67,7 @@
         </div>
         <el-scrollbar v-loading="detailLoading">
           <el-form ref="formRef" :model="formData" label-position="left" label-width="140px" :key="formKey" :disabled="editType === 'view'">
+            <label><input type="password" autocomplete="new-password" hidden></label>
             <base-form-item label="连接类型：" prop="type" :rules="requiredRules" class="base-form-box">
               <el-radio-group v-model="formData.type" @change="val => handleChangeType(val as 0 | 1 | 2)">
                 <el-radio :label="0">单机版</el-radio>
@@ -97,13 +98,13 @@
                 <template #label>
                   Prometheus 信息：<el-tooltip effect="light" content="配置prometheus可在界面查看部分监控信息，推荐您进行配置使用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                 </template>
-                <el-input v-model="formData.masterCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl" />
+                <el-input v-model="formData.masterCluster.prometheusUrl" :placeholder="editType === 'view' ? '' : '例如：http://ip:port/api/v1/query'" id="connection-modal-prometheusUrl-stand-alone" />
               </base-form-item>
               <base-form-item label="用户名：" prop="username" :rules="requiredRules" class="base-form-box">
                 <el-input v-model="formData.username" placeholder="请输入用户名" id="connection-modal-username" />
               </base-form-item>
               <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd">
-                <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password" />
+                <el-input v-model="formData.password" :placeholder="editType === 'view' ? '' : '请输入密码'" show-password autocomplete="off" id="connection-modal-password-stand-alone" />
               </base-form-item>
             </template>
             <!-- 集群版 -->
@@ -128,13 +129,13 @@
                 <template #label>
                   Prometheus 信息：<el-tooltip effect="light" content="配置prometheus可在界面查看部分监控信息，推荐您进行配置使用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                 </template>
-                <el-input v-model="formData.masterCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl" />
+                <el-input v-model="formData.masterCluster.prometheusUrl" :placeholder="editType === 'view' ? '' : '例如：http://ip:port/api/v1/query'" id="connection-modal-prometheusUrl-double-live" />
               </base-form-item>
               <base-form-item label="用户名：" prop="username" :rules="requiredRules" class="base-form-box">
                 <el-input v-model="formData.username" placeholder="请输入用户名" id="connection-modal-username" />
               </base-form-item>
               <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd">
-                <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password" />
+                <el-input v-model="formData.password" :placeholder="editType === 'view' ? '' : '请输入密码'" show-password autocomplete="off" id="connection-modal-password-double-live" />
               </base-form-item>
             </template>
             <!-- 双活版 -->
@@ -143,7 +144,7 @@
                 <el-input v-model="formData.username" placeholder="请输入用户名" id="connection-modal-username" />
               </base-form-item>
               <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd">
-                <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password" />
+                <el-input v-model="formData.password" :placeholder="editType === 'view' ? '' : '请输入密码'" show-password autocomplete="off" id="connection-modal-password-cluster" />
               </base-form-item>
 
               <el-collapse v-model="activeNames" class="connection-cluster-box">
@@ -171,7 +172,7 @@
                     <template #label>
                       Prometheus 信息：<el-tooltip effect="light" content="配置prometheus可在界面查看部分监控信息，推荐您进行配置使用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                     </template>
-                    <el-input v-model="formData.masterCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl" />
+                    <el-input v-model="formData.masterCluster.prometheusUrl" :placeholder="editType === 'view' ? '' : '例如：http://ip:port/api/v1/query'" id="connection-modal-prometheusUrl-master-cluster" />
                   </base-form-item>
                 </el-collapse-item>
                 <el-collapse-item title="备集群信息" name="slaveCluster" v-if="formData.slaveCluster">
@@ -198,7 +199,7 @@
                     <template #label>
                       Prometheus 信息：<el-tooltip effect="light" content="配置prometheus可在界面查看部分监控信息，推荐您进行配置使用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                     </template>
-                    <el-input v-model="formData.slaveCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl" />
+                    <el-input v-model="formData.slaveCluster.prometheusUrl" :placeholder="editType === 'view' ? '' : '例如：http://ip:port/api/v1/query'" id="connection-modal-prometheusUrl-slave-cluster" />
                   </base-form-item>
                 </el-collapse-item>
               </el-collapse>
@@ -326,6 +327,7 @@ function handleChangeConnection() {
 function handleChangeType(type: 0 | 1 | 2) {
   formRef.value?.resetFields();
   errorPwd.value = '';
+  formData.id = editType.value === 'add' ? '' : formData.id;
   formData.type = type;
   formData.name = '';
   formData.username = '';
@@ -345,7 +347,7 @@ function handleChangeType(type: 0 | 1 | 2) {
 }
 
 async function handleAddConnection() {
-  if (editType.value === 'add') {
+  if (editType.value === 'add' && connectionList.value.length > 0) {
     const flag = await handleChangeConnection();
     if (!flag) return;
   }
@@ -359,17 +361,17 @@ function getDetail(id: number) {
   editType.value = 'view';
   getConnectionDetail(id).then((res) => {
     assign(formData, res.data);
+    formData.password = '';
     sourceData = cloneDeep(formData);
   });
 }
 
 function handleReset() {
-  if (editType.value === 'edit') {
-    current.value = +filterList.value[0].id || +connectionList.value[0].id;
+  handleChangeType(0);
+  editType.value = 'view';
+  if (filterList.value.length) {
+    current.value = +filterList.value[0].id;
     getDetail(current.value);
-  } else {
-    handleChangeType(0);
-    current.value = '';
   }
 }
 
@@ -389,12 +391,22 @@ async function handleRefresh() {
   if (editType.value === 'add') {
     const flag = await handleChangeConnection();
     if (!flag) return;
-    getList();
   }
+  getList();
+  editType.value = 'view';
 }
 
-function handleFilter() {
+async function handleFilter() {
+  if (editType.value === 'add') {
+    const flag = await handleChangeConnection();
+    if (!flag) return;
+  }
   filterList.value = connectionList.value.filter((item) => item.name.includes(filterText.value));
+  editType.value = 'view';
+  if (filterList.value.length) {
+    current.value = +filterList.value[0].id;
+    getDetail(current.value);
+  }
 }
 
 const canStopPropagation = (e: HTMLElement):boolean => {
@@ -412,18 +424,10 @@ const canStopPropagation = (e: HTMLElement):boolean => {
 };
 
 function handleDelete(item: Connection.ConnectionItem) {
-  ElMessageBox.confirm('是否删除该实例？', '注意', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-    icon: ICustomMessageWarning,
-  })
-    .then(() => {
-      deleteConnection(+item.id).then(() => {
-        ElMessage.success('删除成功');
-        getList();
-      });
-    });
+  deleteConnection(+item.id).then(() => {
+    ElMessage.success('删除成功');
+    getList();
+  });
 }
 
 // 选择
@@ -457,6 +461,9 @@ function handleEdit(type: 'edit' | 'view') {
   errorPwd.value = '';
   formRef.value?.clearValidate();
   editType.value = type;
+  if (editType.value === 'view') {
+    getDetail(+current.value);
+  }
 }
 
 function handleToggle() {
@@ -647,7 +654,9 @@ watch(
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 0 7px 16px;
+    padding: 2px 7px 0;
+    flex: 0 0 28px;
+    margin-bottom: 16px;
   }
 
   .connection-detail-title{
