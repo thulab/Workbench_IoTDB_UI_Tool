@@ -134,11 +134,11 @@ const handleConfirm = () => {
         ElMessage.success(`${props.title}成功`);
         dialogVisible.value = false;
         if (userStore.userInfo.name === props.userName) {
-          ElMessageBox.confirm('密码已修改，请重新登录', '提示', {
+          ElMessageBox.alert('密码已修改，请重新登录', '提示', {
             confirmButtonText: '确定',
-            cancelButtonText: '取消',
             type: 'warning',
-          }).then(() => {
+            showClose: false,
+          }).finally(() => {
             UserApi.logout();
             window.location.href = `/login?timestamp=${new Date().getTime()}`;
           });
