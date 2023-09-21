@@ -126,7 +126,8 @@ export const useUserStore = defineStore('UserStore', () => {
         userInfo.value.name = res.data.userName;
         allPrivileges.value = res.data;
         loadPrivilegesEnum(false);
-      }).catch(() => {
+      }).catch((err) => {
+        console.log(err, '登录失败');
         userInfo.value.name = '';
         window.location.href = `/login?timestamp=${new Date().getTime()}`;
       });
