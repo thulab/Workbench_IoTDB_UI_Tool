@@ -20,12 +20,15 @@
             <el-button type="primary" v-else-if="isEdit" @click="handleReset('view')" id="auth-user-view">退出编辑</el-button>
           </div>
           <div class="detail-role-list" v-if="!isManager">
-            拥有角色：<el-tag :closable="isEdit" type="info" v-for="(item, index,) in authData.rolesToPrivileges" :key="item.roleName" @close="handleDeleteRole(index)" @click="showRoleDetail(item)" :id="`auth-user-role-${item.roleName}-${index}`">{{ item.roleName }}</el-tag>
-            <auth-tooltip :is-disabled="canManageRole">
-              <el-button link :disabled="!canManageRole" @click="addRole()" v-if="isEdit" id="auth-user-add-role">
-                <el-icon size="24px" class="m-l-16"><i-custom-user-role-add /></el-icon>
-              </el-button>
-            </auth-tooltip>
+            <span class="p-t-4">拥有角色：</span>
+            <div class="detail-role-box">
+              <el-tag :closable="isEdit" type="info" v-for="(item, index,) in authData.rolesToPrivileges" :key="item.roleName" @close="handleDeleteRole(index)" @click="showRoleDetail(item)" :id="`auth-user-role-${item.roleName}-${index}`">{{ item.roleName }}</el-tag>
+              <auth-tooltip :is-disabled="canManageRole">
+                <el-button link :disabled="!canManageRole" @click="addRole()" v-if="isEdit" id="auth-user-add-role" class="m-l-8 p-0">
+                  <el-icon size="24px"><i-custom-user-role-add /></el-icon>
+                </el-button>
+              </auth-tooltip>
+            </div>
           </div>
           <div class="detail-title-box">
             <h4 class="detail-title-text">权限详情<span class="tip-text"><i-custom-info-warning />移除父级路径权限时其包含的子路径权限会同步移除，请谨慎操作</span></h4>
@@ -562,13 +565,18 @@ watch(
 
 .detail-role-list{
   margin: 12px 16px;
-  height: 28px;
-  display: inline-flex;
+  display: flex;
   font-size: 14px;
-  align-items: center;
 
   .el-tag{
     cursor: pointer;
+    margin: 0 8px 8px 0;
+  }
+
+  .detail-role-box{
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
   }
 
   .el-tag--info {
@@ -578,10 +586,6 @@ watch(
     border-radius: 2px;
     font-size: 12px;
     font-weight: 300;
-  }
-
-  .el-tag + .el-tag {
-    margin: 0 0 0 8px;
   }
 }
 

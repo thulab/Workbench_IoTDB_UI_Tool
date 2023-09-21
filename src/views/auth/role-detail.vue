@@ -17,12 +17,15 @@
             <el-button type="primary" v-else @click="handleReset('view')" id="auth-role-view">退出编辑</el-button>
           </div>
           <div class="detail-user-list">
-            拥有用户：<el-tag :closable="!isView" type="info" v-for="(item, index) in userList" :key="item" @close="handleDeleteUser(index)" @click="showAuthDetail(item)" :id="`auth-user-${item}-${index}`">{{ item }}</el-tag>
-            <auth-tooltip :is-disabled="canManageUser">
-              <el-button link :disabled="!canManageUser" @click="handleAddUser" v-if="!isView" id="auth-user-add-role">
-                <el-icon size="24px" class="m-l-16"><i-custom-user-role-add /></el-icon>
-              </el-button>
-            </auth-tooltip>
+            <span class="p-t-4">拥有用户：</span>
+            <div class="detail-user-box">
+              <el-tag :closable="!isView" type="info" v-for="(item, index) in userList" :key="item" @close="handleDeleteUser(index)" @click="showAuthDetail(item)" :id="`auth-user-${item}-${index}`">{{ item }}</el-tag>
+              <auth-tooltip :is-disabled="canManageUser">
+                <el-button link :disabled="!canManageUser" @click="handleAddUser" v-if="!isView" id="auth-user-add-role" class="m-l-8 p-0">
+                  <el-icon size="24px"><i-custom-user-role-add /></el-icon>
+                </el-button>
+              </auth-tooltip>
+            </div>
           </div>
           <div class="detail-title-box">
             <h4 class="detail-title-text">权限详情<span class="tip-text"><i-custom-info-warning />移除父级路径权限时其包含的子路径权限会同步移除，请谨慎操作</span></h4>
@@ -492,11 +495,17 @@ watch(
   margin: 18px 16px 32px;
   font-size: 14px;
   color: #131926;
-  display: inline-flex;
-  align-items: center;
+  display: flex;
 
   .el-tag{
     cursor: pointer;
+    margin: 0 8px 8px 0;
+  }
+
+  .detail-user-box{
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
   }
 
   .el-tag--info {
@@ -506,10 +515,6 @@ watch(
     border-radius: 2px;
     font-size: 12px;
     font-weight: 300;
-  }
-
-  .el-tag + .el-tag {
-    margin: 0 0 0 8px;
   }
 }
 </style>
