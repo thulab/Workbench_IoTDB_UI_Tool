@@ -15,7 +15,7 @@
         <h4 class="monitor-info-module-title">磁盘空间</h4>
         <data-container :is-empty="diskData.dataCount === null">
           <div class="monitor-info-module-box">
-            <p class="monitor-info-module-text">{{ diskData.dataCount }}<span class="monitor-info-module-unit">{{ diskData.valueUnit }}</span></p>
+            <p class="monitor-info-module-text">{{ diskData.dataCount }}<span class="monitor-info-module-unit">GiB</span></p>
           </div>
         </data-container>
       </div>
