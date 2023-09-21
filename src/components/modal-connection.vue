@@ -8,7 +8,7 @@
     id="connection-modal"
     :before-close="handleClose"
   >
-    <el-container class="connection-wrapper">
+    <el-container class="connection-wrapper" v-loading="listLoading">
       <el-aside width="240px" class="connection-list-wrapper">
         <div class="connection-list-title">
           <h4>实例列表</h4>
@@ -22,7 +22,7 @@
             <i-custom-search-icon class="remote-select-search-icon" />
           </template>
         </el-input>
-        <div class="connection-list-box" v-loading="listLoading">
+        <div class="connection-list-box">
           <div class="list-empty-wrapper" v-if="!filterList.length">
             <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
             <span class="data-empty-text">暂无数据</span>
@@ -515,10 +515,16 @@ watch(
   () => props.visible,
   (newVal) => {
     if (newVal) {
-      handleChangeType(0);
       editType.value = 'view';
+      formData.id = '';
+      handleChangeType(0);
+      sourceData = cloneDeep(formData);
       filterText.value = '';
       formKey.value++;
+      connectionList.value = [];
+      filterList.value = [];
+      activeNames.value = ['masterCluster', 'slaveCluster'];
+      current.value = '';
       getList();
     }
   },
