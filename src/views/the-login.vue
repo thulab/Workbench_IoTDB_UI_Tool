@@ -241,8 +241,11 @@ function getList() {
       { label: '双活版', options: doubleLiveList },
     ];
     if (connectionList.value.length) {
-      loginForm.connection = +connectionList.value[0].id;
-      loginForm.user = connectionList.value[0].username;
+      const firstConnection = connectionOptions.value.find((item) => item.options.length);
+      if (firstConnection) {
+        loginForm.connection = firstConnection?.options[0].id;
+        loginForm.user = firstConnection?.options[0].username;
+      }
     }
   });
 }

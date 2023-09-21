@@ -281,6 +281,11 @@ const connectionList = ref<Connection.ConnectionItem[]>([]);
 const filterList = ref<Connection.ConnectionItem[]>([]);
 const current = ref<string | number>('');
 const errorPwd = ref('');
+const listLoading = ref(false);
+const detailLoading = ref(false);
+const testLoading = ref(false);
+const connectLoading = ref(false);
+const saveLoading = ref(false);
 const isDisabledMasterHosts = computed(() => {
   const hosts = formData.masterCluster.hostAndPortVOS;
   const flag = hosts.some((item) => !item.host || !item.port);
@@ -300,12 +305,12 @@ const isCanSave = computed(() => {
   return true;
 });
 
-const { requestFn: getConnectionList, loading: listLoading } = useRequest(ConnectionApi.getConnectionList);
-const { requestFn: getConnectionDetail, loading: detailLoading } = useRequest(ConnectionApi.getConnectionDetail);
+const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
+const { requestFn: getConnectionDetail } = useRequest(ConnectionApi.getConnectionDetail);
 const { requestFn: deleteConnection } = useRequest(ConnectionApi.deleteConnection);
-const { requestFn: saveConnection, loading: saveLoading } = useRequest(ConnectionApi.saveConnection);
-const { requestFn: testConnection, loading: testLoading } = useRequest(ConnectionApi.testConnection);
-const { requestFn: loginByConnection, loading: connectLoading } = useRequest(ConnectionApi.loginByConnection);
+const { requestFn: saveConnection } = useRequest(ConnectionApi.saveConnection);
+const { requestFn: testConnection } = useRequest(ConnectionApi.testConnection);
+const { requestFn: loginByConnection } = useRequest(ConnectionApi.loginByConnection);
 
 function handleClose() {
   dialogVisible.value = false;
@@ -346,6 +351,12 @@ function handleChangeType(type: 0 | 1 | 2) {
   };
 }
 
+function resetOperateLoading() {
+  testLoading.value = false;
+  connectLoading.value = false;
+  saveLoading.value = false;
+}
+
 async function handleAddConnection() {
   if (editType.value === 'add' && connectionList.value.length > 0) {
     const flag = await handleChangeConnection();
@@ -354,15 +365,20 @@ async function handleAddConnection() {
   current.value = '';
   editType.value = 'add';
   handleChangeType(0);
+  resetOperateLoading();
 }
 
 function getDetail(id: number) {
   handleChangeType(0);
   editType.value = 'view';
+  resetOperateLoading();
+  detailLoading.value = true;
   getConnectionDetail(id).then((res) => {
     assign(formData, res.data);
     formData.password = '';
     sourceData = cloneDeep(formData);
+  }).finally(() => {
+    detailLoading.value = false;
   });
 }
 
@@ -377,13 +393,17 @@ function handleReset() {
 
 // 获取实例列表
 function getList(id?: number) {
+  listLoading.value = true;
   getConnectionList().then((res) => {
     connectionList.value = res.data || [];
-    filterList.value = res.data || [];
+    filterList.value = connectionList.value.filter((item) => item.name.includes(filterText.value));
+    editType.value = 'view';
     if (filterList.value.length) {
       current.value = id || +filterList.value[0].id;
       getDetail(current.value);
     }
+  }).finally(() => {
+    listLoading.value = false;
   });
 }
 
@@ -392,6 +412,7 @@ async function handleRefresh() {
     const flag = await handleChangeConnection();
     if (!flag) return;
   }
+  resetOperateLoading();
   getList();
   editType.value = 'view';
 }
@@ -437,6 +458,7 @@ async function handleSelect(item: Connection.ConnectionItem, e: MouseEvent) {
     const flag = await handleChangeConnection();
     if (!flag) return;
   }
+  resetOperateLoading();
   current.value = +item.id;
   getDetail(current.value);
 }
@@ -461,6 +483,7 @@ function handleEdit(type: 'edit' | 'view') {
   errorPwd.value = '';
   formRef.value?.clearValidate();
   editType.value = type;
+  resetOperateLoading();
   if (editType.value === 'view') {
     getDetail(+current.value);
   }
@@ -478,10 +501,14 @@ function handleTest(type: 'test' | 'login') {
       } else {
         errorPwd.value = '';
         if (type === 'test') {
+          testLoading.value = true;
           testConnection(formData).then(() => {
             ElMessage.success('连接成功');
+          }).finally(() => {
+            testLoading.value = false;
           });
         } else {
+          connectLoading.value = true;
           loginByConnection(formData).then((res) => {
             formData.id = res.data;
             userStore.setUser(formData.username);
@@ -493,6 +520,8 @@ function handleTest(type: 'test' | 'login') {
               username: formData.username,
             });
             window.location.reload();
+          }).finally(() => {
+            connectLoading.value = false;
           });
         }
       }
@@ -503,9 +532,12 @@ function handleTest(type: 'test' | 'login') {
 function handleSave() {
   formRef.value?.validate((valid) => {
     if (valid) {
+      saveLoading.value = true;
       saveConnection(formData).then((res) => {
         ElMessage.success('保存成功');
         getList(res.data);
+      }).finally(() => {
+        saveLoading.value = false;
       });
     }
   });
@@ -525,6 +557,9 @@ watch(
       filterList.value = [];
       activeNames.value = ['masterCluster', 'slaveCluster'];
       current.value = '';
+      listLoading.value = false;
+      detailLoading.value = false;
+      resetOperateLoading();
       getList();
     }
   },
