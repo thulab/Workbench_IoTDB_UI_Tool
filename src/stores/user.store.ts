@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { union, difference } from 'lodash-es';
 import { UserApi } from '@/api';
+import { useRouter } from 'vue-router';
 import { useConnectionStore } from './connection.store';
 
 const { requestFn: getLoginUserPrivileges } = useRequest(UserApi.getLoginUserPrivileges);
@@ -9,6 +10,7 @@ const { requestFn: getPrivilegesEnum } = useRequest(UserApi.getPrivilegesEnum);
 
 export const useUserStore = defineStore('UserStore', () => {
   const connectionStore = useConnectionStore();
+  const router = useRouter();
 
   const userInfo = ref({
     name: '',
@@ -130,10 +132,15 @@ export const useUserStore = defineStore('UserStore', () => {
         allPrivileges.value = res.data;
         connectionStore.setConnection(res.data.connectionNamesVO);
         loadPrivilegesEnum(false);
-      }).catch((err) => {
-        console.log(err, '登录失败');
+      }).catch(() => {
         userInfo.value.name = '';
-        window.location.href = `/login?timestamp=${new Date().getTime()}`;
+        // window.location.href = `/login?timestamp=${new Date().getTime()}`;
+        router.push({
+          path: '/login',
+          query: {
+            timestamp: new Date().getTime(),
+          },
+        });
       });
     }
   }
