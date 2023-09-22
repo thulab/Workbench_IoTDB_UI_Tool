@@ -114,6 +114,12 @@ export const useUserStore = defineStore('UserStore', () => {
   const canManageRole = computed(() => userAllEntityPrivileges.value.includes('MANAGE_ROLE'));
   const canAlterPwd = computed(() => userAllEntityPrivileges.value.includes('MANAGE_USER'));
 
+  function clearUserStore() {
+    userInfo.value.name = '';
+    allPrivileges.value = undefined;
+    privilegesEnum.value = undefined;
+  }
+
   function loadPrivilegesEnum(forceReload?: boolean) {
     if (!userInfo.value.name) return;
     if (forceReload || !entityPrivilegesEnumGroup.value.length) {
@@ -132,9 +138,11 @@ export const useUserStore = defineStore('UserStore', () => {
         allPrivileges.value = res.data;
         connectionStore.setConnection(res.data.connectionNamesVO);
         loadPrivilegesEnum(false);
-      }).catch(() => {
-        userInfo.value.name = '';
-        // window.location.href = `/login?timestamp=${new Date().getTime()}`;
+      }).catch((err) => {
+        console.log(err, 'err');
+        clearUserStore();
+        sessionStorage.setItem('UserStore', '');
+        sessionStorage.setItem('nologin', '1');
         router.push({
           path: '/login',
           query: {
@@ -152,12 +160,6 @@ export const useUserStore = defineStore('UserStore', () => {
       loadPrivileges(true);
       loadPrivilegesEnum(true);
     }
-  }
-
-  function clearUserStore() {
-    userInfo.value.name = '';
-    allPrivileges.value = undefined;
-    privilegesEnum.value = undefined;
   }
 
   return {
