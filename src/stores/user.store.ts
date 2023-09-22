@@ -2,11 +2,14 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { union, difference } from 'lodash-es';
 import { UserApi } from '@/api';
+import { useConnectionStore } from './connection.store';
 
 const { requestFn: getLoginUserPrivileges } = useRequest(UserApi.getLoginUserPrivileges);
 const { requestFn: getPrivilegesEnum } = useRequest(UserApi.getPrivilegesEnum);
 
 export const useUserStore = defineStore('UserStore', () => {
+  const connectionStore = useConnectionStore();
+
   const userInfo = ref({
     name: '',
   } as {
@@ -125,6 +128,12 @@ export const useUserStore = defineStore('UserStore', () => {
       getLoginUserPrivileges().then((res) => {
         userInfo.value.name = res.data.userName;
         allPrivileges.value = res.data;
+        connectionStore.setConnection({
+          id: +res.data.id,
+          type: res.data.type,
+          name: res.data.name,
+          username: res.data.username,
+        });
         loadPrivilegesEnum(false);
       }).catch((err) => {
         console.log(err, '登录失败');
