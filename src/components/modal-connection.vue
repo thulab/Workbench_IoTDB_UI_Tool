@@ -98,13 +98,13 @@
                 <template #label>
                   Prometheus 信息：<el-tooltip effect="light" content="配置prometheus可在界面查看部分监控信息，推荐您进行配置使用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                 </template>
-                <el-input v-model="formData.masterCluster.prometheusUrl" :placeholder="editType === 'view' ? '' : '例如：http://ip:port/api/v1/query'" id="connection-modal-prometheusUrl-stand-alone" />
+                <el-input v-model="formData.masterCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl-stand-alone" />
               </base-form-item>
               <base-form-item label="用户名：" prop="username" :rules="requiredRules" class="base-form-box">
                 <el-input v-model="formData.username" placeholder="请输入用户名" id="connection-modal-username" />
               </base-form-item>
               <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd">
-                <el-input v-model="formData.password" :placeholder="editType === 'view' ? '' : '请输入密码'" show-password autocomplete="off" id="connection-modal-password-stand-alone" />
+                <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password-stand-alone" />
               </base-form-item>
             </template>
             <!-- 集群版 -->
@@ -129,13 +129,13 @@
                 <template #label>
                   Prometheus 信息：<el-tooltip effect="light" content="配置prometheus可在界面查看部分监控信息，推荐您进行配置使用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                 </template>
-                <el-input v-model="formData.masterCluster.prometheusUrl" :placeholder="editType === 'view' ? '' : '例如：http://ip:port/api/v1/query'" id="connection-modal-prometheusUrl-double-live" />
+                <el-input v-model="formData.masterCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl-double-live" />
               </base-form-item>
               <base-form-item label="用户名：" prop="username" :rules="requiredRules" class="base-form-box">
                 <el-input v-model="formData.username" placeholder="请输入用户名" id="connection-modal-username" />
               </base-form-item>
               <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd">
-                <el-input v-model="formData.password" :placeholder="editType === 'view' ? '' : '请输入密码'" show-password autocomplete="off" id="connection-modal-password-double-live" />
+                <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password-double-live" />
               </base-form-item>
             </template>
             <!-- 双活版 -->
@@ -144,7 +144,7 @@
                 <el-input v-model="formData.username" placeholder="请输入用户名" id="connection-modal-username" />
               </base-form-item>
               <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd">
-                <el-input v-model="formData.password" :placeholder="editType === 'view' ? '' : '请输入密码'" show-password autocomplete="off" id="connection-modal-password-cluster" />
+                <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password-cluster" />
               </base-form-item>
 
               <el-collapse v-model="activeNames" class="connection-cluster-box">
@@ -172,7 +172,7 @@
                     <template #label>
                       Prometheus 信息：<el-tooltip effect="light" content="配置prometheus可在界面查看部分监控信息，推荐您进行配置使用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                     </template>
-                    <el-input v-model="formData.masterCluster.prometheusUrl" :placeholder="editType === 'view' ? '' : '例如：http://ip:port/api/v1/query'" id="connection-modal-prometheusUrl-master-cluster" />
+                    <el-input v-model="formData.masterCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl-master-cluster" />
                   </base-form-item>
                 </el-collapse-item>
                 <el-collapse-item title="备集群信息" name="slaveCluster" v-if="formData.slaveCluster">
@@ -199,7 +199,7 @@
                     <template #label>
                       Prometheus 信息：<el-tooltip effect="light" content="配置prometheus可在界面查看部分监控信息，推荐您进行配置使用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                     </template>
-                    <el-input v-model="formData.slaveCluster.prometheusUrl" :placeholder="editType === 'view' ? '' : '例如：http://ip:port/api/v1/query'" id="connection-modal-prometheusUrl-slave-cluster" />
+                    <el-input v-model="formData.slaveCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl-slave-cluster" />
                   </base-form-item>
                 </el-collapse-item>
               </el-collapse>
