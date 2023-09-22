@@ -120,8 +120,8 @@
                     <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].port`" :rules="requiredRules">
                       <el-input v-model.trim="item.port" placeholder="请输入端口号" style="width: 100px" :id="`connection-modal-master-${index}-port`" />
                     </base-form-item>
-                    <el-button link v-if="index === 0" @click="handleAddHost('master')" id="connection-ip-add-master" class="m-l-6" :disabled="isDisabledMasterHosts"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
-                    <el-button link v-if="index !== 0" @click="handleDelHost('master', index)" :id="'connection-ip-del-master' + index" class="m-l-6"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
+                    <el-button link v-if="index === 0 && editType !== 'view'" @click="handleAddHost('master')" id="connection-ip-add-master" class="m-l-6" :disabled="isDisabledMasterHosts"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
+                    <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost('master', index)" :id="'connection-ip-del-master' + index" class="m-l-6"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
                   </div>
                 </div>
               </div>
@@ -163,8 +163,8 @@
                         <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].port`" :rules="requiredRules">
                           <el-input v-model.trim="item.port" placeholder="请输入端口号" style="width: 100px" :id="`connection-modal-master-${index}-port`" />
                         </base-form-item>
-                        <el-button link v-if="index === 0" @click="handleAddHost('master')" id="connection-ip-add-master" class="m-l-6" :disabled="isDisabledMasterHosts"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
-                        <el-button link v-if="index !== 0" @click="handleDelHost('master', index)" :id="'connection-ip-del-master' + index" class="m-l-6"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
+                        <el-button link v-if="index === 0 && editType !== 'view'" @click="handleAddHost('master')" id="connection-ip-add-master" class="m-l-6" :disabled="isDisabledMasterHosts"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
+                        <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost('master', index)" :id="'connection-ip-del-master' + index" class="m-l-6"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
                       </div>
                     </div>
                   </div>
@@ -190,8 +190,8 @@
                         <base-form-item label="" :prop="`slaveCluster.hostAndPortVOS[${index}].port`" :rules="requiredRules">
                           <el-input v-model.trim="item.port" placeholder="请输入端口号" style="width: 100px" :id="`connection-modal-slave-${index}-port`" />
                         </base-form-item>
-                        <el-button link v-if="index === 0" @click="handleAddHost('slave')" id="connection-ip-add-slave" class="m-l-6" :disabled="isDisabledSlaveHosts"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
-                        <el-button link v-if="index !== 0" @click="handleDelHost('slave', index)" :id="'connection-ip-del-slave' + index" class="m-l-6"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
+                        <el-button link v-if="index === 0 && editType !== 'view'" @click="handleAddHost('slave')" id="connection-ip-add-slave" class="m-l-6" :disabled="isDisabledSlaveHosts"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
+                        <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost('slave', index)" :id="'connection-ip-del-slave' + index" class="m-l-6"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
                       </div>
                     </div>
                   </div>
