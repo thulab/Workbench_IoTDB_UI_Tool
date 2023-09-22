@@ -69,10 +69,10 @@
                   <el-input v-model="item.timeseries" placeholder="请输入测点名称" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-timeseries`" style="width: 144px;" />
                 </el-form-item>
               </el-col>
-              <el-col :span="8">
+              <el-col :span="16">
                 <el-form-item label="测点描述：" :prop="'measurementList[' + index + '].alias'" label-width="83px">
                   <el-input type="hidden" />
-                  <el-input v-model="item.alias" placeholder="请输入测点描述" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-alias`" />
+                  <el-input v-model="item.alias" placeholder="请输入测点描述" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-alias`" maxlength="50" show-word-limit />
                 </el-form-item>
               </el-col>
             </el-row>

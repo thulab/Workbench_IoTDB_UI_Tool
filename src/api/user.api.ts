@@ -14,7 +14,7 @@ class UserApi {
   }
 
   // 当前登录用户权限
-  static getLoginUserPrivileges(): HttpResponseP<Auth.UserPrivileges & { connectionNamesVO: Connection.ConnectionItem }> {
+  static getLoginUserPrivileges(): HttpResponseP<Auth.UserPrivileges & { connection: Connection.ConnectionDetail }> {
     return http.get('/privileges/getLoginUserPrivileges');
   }
 
