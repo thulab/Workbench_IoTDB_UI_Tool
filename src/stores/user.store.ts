@@ -128,12 +128,7 @@ export const useUserStore = defineStore('UserStore', () => {
       getLoginUserPrivileges().then((res) => {
         userInfo.value.name = res.data.userName;
         allPrivileges.value = res.data;
-        connectionStore.setConnection({
-          id: +res.data.id,
-          type: res.data.type,
-          name: res.data.name,
-          username: res.data.username,
-        });
+        connectionStore.setConnection(res.data.connectionNamesVO);
         loadPrivilegesEnum(false);
       }).catch((err) => {
         console.log(err, '登录失败');
