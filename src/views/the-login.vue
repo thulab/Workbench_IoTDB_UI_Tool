@@ -21,6 +21,7 @@
                 style="width: 292px;"
                 fit-input-width
                 placement="bottom-start"
+                @change="handleChangeConnection"
               >
                 <template #prefix>
                   <el-icon size="30"><i-custom-connection /></el-icon>
@@ -248,6 +249,13 @@ function getList() {
       }
     }
   });
+}
+
+function handleChangeConnection(val: number) {
+  const data = connectionList.value.find((item) => item.id === val);
+  if (data) {
+    loginForm.user = data.username;
+  }
 }
 
 function handleSelectConnection() {
