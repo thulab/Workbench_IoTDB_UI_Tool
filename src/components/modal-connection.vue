@@ -66,17 +66,17 @@
           </div>
         </div>
         <el-scrollbar v-loading="detailLoading">
-          <el-form ref="formRef" :model="formData" label-position="left" label-width="140px" :key="formKey" :disabled="editType === 'view'">
+          <el-form ref="formRef" :model="formData" label-position="left" label-width="140px" :key="formKey">
             <label><input type="password" autocomplete="new-password" hidden></label>
             <base-form-item label="连接类型：" prop="type" :rules="requiredRules" class="base-form-box">
-              <el-radio-group v-model="formData.type" @change="val => handleChangeType(val as 0 | 1 | 2)">
+              <el-radio-group v-model="formData.type" @change="val => handleChangeType(val as 0 | 1 | 2)" :disabled="isView">
                 <el-radio :label="0">单机版</el-radio>
                 <el-radio :label="1">集群版</el-radio>
                 <el-radio :label="2">双活版</el-radio>
               </el-radio-group>
             </base-form-item>
             <base-form-item label="实例名称：" prop="name" :rules="requiredRules" class="base-form-box">
-              <el-input v-model="formData.name" placeholder="请输入实例名称" maxlength="50" show-word-limit id="connection-modal-name" />
+              <el-input v-model="formData.name" placeholder="请输入实例名称" maxlength="50" show-word-limit id="connection-modal-name" :disabled="isView" />
             </base-form-item>
             <!-- 单机版 -->
             <template v-if="formData.type === 0">
@@ -85,11 +85,11 @@
                 <div class="ip-port-list">
                   <div class="ip-port-item" v-for="(item, index) in formData.masterCluster.hostAndPortVOS" :key="`${index}_master_host_port`">
                     <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].host`" :rules="requiredRules">
-                      <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 162px" :id="`connection-modal-master-${index}-host`" />
+                      <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 162px" :id="`connection-modal-master-${index}-host`" :disabled="isView" />
                     </base-form-item>
                     <span class="ip-port-divider">:</span>
-                    <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].port`" :rules="requiredRules">
-                      <el-input v-model.trim="item.port" placeholder="请输入端口号" style="width: 100px" :id="`connection-modal-master-${index}-port`" />
+                    <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].port`" :rules="requiredPortRules">
+                      <el-input v-model.number="item.port" placeholder="请输入端口号" style="width: 100px" :id="`connection-modal-master-${index}-port`" :disabled="isView" />
                     </base-form-item>
                   </div>
                 </div>
@@ -98,13 +98,13 @@
                 <template #label>
                   Prometheus 信息：<el-tooltip effect="light" content="配置prometheus可在界面查看部分监控信息，推荐您进行配置使用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                 </template>
-                <el-input v-model="formData.masterCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl-stand-alone" />
+                <el-input v-model="formData.masterCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl-stand-alone" :disabled="isView" />
               </base-form-item>
               <base-form-item label="用户名：" prop="username" :rules="requiredRules" class="base-form-box">
-                <el-input v-model="formData.username" placeholder="请输入用户名" id="connection-modal-username" />
+                <el-input v-model="formData.username" placeholder="请输入用户名" id="connection-modal-username" :disabled="disabledUserPwd" />
               </base-form-item>
               <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd">
-                <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password-stand-alone" />
+                <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password-stand-alone" :disabled="disabledUserPwd" />
               </base-form-item>
             </template>
             <!-- 集群版 -->
@@ -114,11 +114,11 @@
                 <div class="ip-port-list">
                   <div class="ip-port-item" v-for="(item, index) in formData.masterCluster.hostAndPortVOS" :key="`${index}_master_host_port`">
                     <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].host`" :rules="requiredRules">
-                      <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 162px" :id="`connection-modal-master-${index}-host`" />
+                      <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 162px" :id="`connection-modal-master-${index}-host`" :disabled="isView" />
                     </base-form-item>
                     <span class="ip-port-divider">:</span>
-                    <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].port`" :rules="requiredRules">
-                      <el-input v-model.trim="item.port" placeholder="请输入端口号" style="width: 100px" :id="`connection-modal-master-${index}-port`" />
+                    <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].port`" :rules="requiredPortRules">
+                      <el-input v-model.number="item.port" placeholder="请输入端口号" style="width: 100px" :id="`connection-modal-master-${index}-port`" :disabled="isView" />
                     </base-form-item>
                     <el-button link v-if="index === 0 && editType !== 'view'" @click="handleAddHost('master')" id="connection-ip-add-master" class="m-l-6" :disabled="isDisabledMasterHosts"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
                     <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost('master', index)" :id="'connection-ip-del-master' + index" class="m-l-6"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
@@ -129,22 +129,22 @@
                 <template #label>
                   Prometheus 信息：<el-tooltip effect="light" content="配置prometheus可在界面查看部分监控信息，推荐您进行配置使用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                 </template>
-                <el-input v-model="formData.masterCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl-double-live" />
+                <el-input v-model="formData.masterCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl-double-live" :disabled="isView" />
               </base-form-item>
               <base-form-item label="用户名：" prop="username" :rules="requiredRules" class="base-form-box">
-                <el-input v-model="formData.username" placeholder="请输入用户名" id="connection-modal-username" />
+                <el-input v-model="formData.username" placeholder="请输入用户名" id="connection-modal-username" :disabled="disabledUserPwd" />
               </base-form-item>
               <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd">
-                <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password-double-live" />
+                <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password-double-live" :disabled="disabledUserPwd" />
               </base-form-item>
             </template>
             <!-- 双活版 -->
             <template v-if="formData.type === 2">
               <base-form-item label="用户名：" prop="username" :rules="requiredRules" class="base-form-box">
-                <el-input v-model="formData.username" placeholder="请输入用户名" id="connection-modal-username" />
+                <el-input v-model="formData.username" placeholder="请输入用户名" id="connection-modal-username" :disabled="disabledUserPwd" />
               </base-form-item>
               <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd">
-                <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password-cluster" />
+                <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password-cluster" :disabled="disabledUserPwd" />
               </base-form-item>
 
               <el-collapse v-model="activeNames" class="connection-cluster-box">
@@ -157,11 +157,11 @@
                     <div class="ip-port-list">
                       <div class="ip-port-item" v-for="(item, index) in formData.masterCluster.hostAndPortVOS" :key="`${index}_master_host_port`">
                         <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].host`" :rules="requiredRules">
-                          <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 162px" :id="`connection-modal-master-${index}-host`" />
+                          <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 162px" :id="`connection-modal-master-${index}-host`" :disabled="isView" />
                         </base-form-item>
                         <span class="ip-port-divider">:</span>
-                        <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].port`" :rules="requiredRules">
-                          <el-input v-model.trim="item.port" placeholder="请输入端口号" style="width: 100px" :id="`connection-modal-master-${index}-port`" />
+                        <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].port`" :rules="requiredPortRules">
+                          <el-input v-model.number="item.port" placeholder="请输入端口号" style="width: 100px" :id="`connection-modal-master-${index}-port`" :disabled="isView" />
                         </base-form-item>
                         <el-button link v-if="index === 0 && editType !== 'view'" @click="handleAddHost('master')" id="connection-ip-add-master" class="m-l-6" :disabled="isDisabledMasterHosts"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
                         <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost('master', index)" :id="'connection-ip-del-master' + index" class="m-l-6"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
@@ -172,7 +172,7 @@
                     <template #label>
                       Prometheus 信息：<el-tooltip effect="light" content="配置prometheus可在界面查看部分监控信息，推荐您进行配置使用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                     </template>
-                    <el-input v-model="formData.masterCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl-master-cluster" />
+                    <el-input v-model="formData.masterCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl-master-cluster" :disabled="isView" />
                   </base-form-item>
                 </el-collapse-item>
                 <el-collapse-item title="备集群信息" name="slaveCluster" v-if="formData.slaveCluster">
@@ -184,11 +184,11 @@
                     <div class="ip-port-list">
                       <div class="ip-port-item" v-for="(item, index) in formData.slaveCluster.hostAndPortVOS" :key="`${index}_slave_host_port`">
                         <base-form-item label="" :prop="`slaveCluster.hostAndPortVOS[${index}].host`" :rules="requiredRules">
-                          <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 162px" :id="`connection-modal-slave-${index}-host`" />
+                          <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 162px" :id="`connection-modal-slave-${index}-host`" :disabled="isView" />
                         </base-form-item>
                         <span class="ip-port-divider">:</span>
-                        <base-form-item label="" :prop="`slaveCluster.hostAndPortVOS[${index}].port`" :rules="requiredRules">
-                          <el-input v-model.trim="item.port" placeholder="请输入端口号" style="width: 100px" :id="`connection-modal-slave-${index}-port`" />
+                        <base-form-item label="" :prop="`slaveCluster.hostAndPortVOS[${index}].port`" :rules="requiredPortRules">
+                          <el-input v-model.number="item.port" placeholder="请输入端口号" style="width: 100px" :id="`connection-modal-slave-${index}-port`" :disabled="isView" />
                         </base-form-item>
                         <el-button link v-if="index === 0 && editType !== 'view'" @click="handleAddHost('slave')" id="connection-ip-add-slave" class="m-l-6" :disabled="isDisabledSlaveHosts"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
                         <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost('slave', index)" :id="'connection-ip-del-slave' + index" class="m-l-6"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
@@ -199,7 +199,7 @@
                     <template #label>
                       Prometheus 信息：<el-tooltip effect="light" content="配置prometheus可在界面查看部分监控信息，推荐您进行配置使用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                     </template>
-                    <el-input v-model="formData.slaveCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl-slave-cluster" />
+                    <el-input v-model="formData.slaveCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl-slave-cluster" :disabled="isView" />
                   </base-form-item>
                 </el-collapse-item>
               </el-collapse>
@@ -212,11 +212,11 @@
             <div>
               <el-button plain @click="handleReset">重置</el-button>
               <el-button type="primary" :disabled="!isCanSave" :loading="saveLoading" @click="handleSave">保存</el-button>
-              <el-button type="primary" v-if="isToggle" :loading="connectLoading" @click="handleTest('login')">保存连接</el-button>
+              <el-button type="primary" v-if="isToggle" :loading="connectLoading" @click="handleTest('login')">连接实例</el-button>
             </div>
           </template>
           <div style="text-align: right; flex: 1;" v-if="editType === 'view' && isToggle">
-            <el-button type="primary" @click="handleToggle">切换实例</el-button>
+            <el-button type="primary" :loading="loginLoading" @click="handleToggle">连接实例</el-button>
           </div>
         </div>
       </el-main>
@@ -227,7 +227,7 @@
 <script lang="ts" setup>
 import type { FormInstance } from 'element-plus';
 import { cloneDeep, isEqual, assign } from 'lodash-es';
-import { ConnectionApi } from '@/api';
+import { ConnectionApi, UserApi } from '@/api';
 import { useUserStore, useConnectionStore } from '@/stores';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ICustomError from '~icons/custom/error.svg';
@@ -254,6 +254,25 @@ const requiredRules = ref([
   {
     required: true,
     message: '请输入内容后操作',
+    trigger: ['blur', 'change'],
+  },
+]);
+const requiredPortRules = ref([
+  {
+    required: true,
+    message: '请输入内容后操作',
+    trigger: ['blur', 'change'],
+  },
+  {
+    validator: (rule: any, value: any, callback: any) => {
+      if (!/^\+?[1-9][0-9]*$/.test(`${value}`)) {
+        return callback(new Error('输入有误'));
+      }
+      if (value > 65535) {
+        return callback(new Error('输入有误'));
+      }
+      return callback();
+    },
     trigger: ['blur', 'change'],
   },
 ]);
@@ -286,15 +305,17 @@ const detailLoading = ref(false);
 const testLoading = ref(false);
 const connectLoading = ref(false);
 const saveLoading = ref(false);
+const loginLoading = ref(false);
+const toggleStatus = ref(false);
 const isDisabledMasterHosts = computed(() => {
   const hosts = formData.masterCluster.hostAndPortVOS;
-  const flag = hosts.some((item) => !item.host || !item.port);
+  const flag = hosts.some((item) => !item.host || (!item.port && item.port !== 0));
   return flag;
 });
 
 const isDisabledSlaveHosts = computed(() => {
   const hosts = formData.slaveCluster?.hostAndPortVOS || [];
-  const flag = hosts.some((item) => !item.host || !item.port);
+  const flag = hosts.some((item) => !item.host || (!item.port && item.port !== 0));
   return flag;
 });
 
@@ -305,12 +326,24 @@ const isCanSave = computed(() => {
   return true;
 });
 
+const isView = computed(() => editType.value === 'view');
+const disabledUserPwd = computed(() => {
+  if (editType.value === 'add' || editType.value === 'edit') {
+    return false;
+  }
+  if (editType.value === 'view') {
+    return !toggleStatus.value;
+  }
+  return false;
+});
+
 const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
 const { requestFn: getConnectionDetail } = useRequest(ConnectionApi.getConnectionDetail);
 const { requestFn: deleteConnection } = useRequest(ConnectionApi.deleteConnection);
 const { requestFn: saveConnection } = useRequest(ConnectionApi.saveConnection);
 const { requestFn: testConnection } = useRequest(ConnectionApi.testConnection);
 const { requestFn: loginByConnection } = useRequest(ConnectionApi.loginByConnection);
+const { requestFn: login } = useRequest(UserApi.login);
 
 function handleClose() {
   dialogVisible.value = false;
@@ -355,6 +388,8 @@ function resetOperateLoading() {
   testLoading.value = false;
   connectLoading.value = false;
   saveLoading.value = false;
+  loginLoading.value = false;
+  toggleStatus.value = false;
 }
 
 async function handleAddConnection() {
@@ -383,11 +418,16 @@ function getDetail(id: number) {
 }
 
 function handleReset() {
-  handleChangeType(0);
-  editType.value = 'view';
-  if (filterList.value.length) {
-    current.value = +filterList.value[0].id;
-    getDetail(current.value);
+  if (editType.value === 'edit') {
+    formData.id = sourceData.id;
+    formData.type = sourceData.type;
+    formData.name = sourceData.name;
+    formData.username = sourceData.username;
+    formData.password = '';
+    formData.masterCluster = sourceData.masterCluster;
+    formData.slaveCluster = sourceData.slaveCluster || null;
+  } else {
+    handleChangeType(0);
   }
 }
 
@@ -486,11 +526,10 @@ function handleEdit(type: 'edit' | 'view') {
   resetOperateLoading();
   if (editType.value === 'view') {
     getDetail(+current.value);
+  } else {
+    formData.username = sourceData.username;
+    formData.password = '';
   }
-}
-
-function handleToggle() {
-  errorPwd.value = '当前实例密码未填写，请编辑后进行连接';
 }
 
 function handleTest(type: 'test' | 'login') {
@@ -543,6 +582,34 @@ function handleSave() {
   });
 }
 
+function handleToggle() {
+  if (toggleStatus.value) {
+    if (!formData.password) {
+      errorPwd.value = '当前实例密码未填写，请编辑后进行连接';
+    } else {
+      errorPwd.value = '';
+      loginLoading.value = true;
+      login(formData.username, formData.password, +formData.id).then(() => {
+        toggleStatus.value = false;
+        userStore.setUser(formData.username);
+        sessionStorage.setItem('nologin', '0');
+        connectionStore.setConnection({
+          id: +formData.id,
+          type: formData.type,
+          name: formData.name,
+          username: formData.username,
+        });
+        window.location.reload();
+      }).finally(() => {
+        loginLoading.value = false;
+      });
+    }
+  } else {
+    errorPwd.value = '';
+    toggleStatus.value = true;
+  }
+}
+
 watch(
   () => props.visible,
   (newVal) => {
@@ -559,8 +626,13 @@ watch(
       current.value = '';
       listLoading.value = false;
       detailLoading.value = false;
+      toggleStatus.value = false;
       resetOperateLoading();
-      getList();
+      if (props.isToggle && connectionStore.connectionInfo.id) {
+        getList(+connectionStore.connectionInfo.id);
+      } else {
+        getList();
+      }
     }
   },
 );

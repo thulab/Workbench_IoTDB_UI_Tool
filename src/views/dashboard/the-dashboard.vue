@@ -5,7 +5,7 @@
         <div style="display: flex; flex-direction: column; height: 100%;" v-loading="loading">
           <div class="module-box-wrapper m-b-16">
             <div class="module-title-wrapper">
-              <h4 class="module-title">主集群系统信息</h4>
+              <h4 class="module-title">{{slaveData ? '主集群系统信息' : '系统信息'}}</h4>
               <p class="module-details">
                 <span class="module-label-text">数据截止：</span>
                 <span class="module-content-text m-r-16">{{ systemTime }}</span>

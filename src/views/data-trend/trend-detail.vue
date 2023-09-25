@@ -21,7 +21,7 @@
               id="trend-search-datetimerange"
             />
           </base-form-item>
-          <base-form-item v-show="!isRunningTab" label="采样周期：" prop="unitInterval" :rules="requiredRules">
+          <base-form-item v-show="!isRunningTab" label="采样：" prop="unitInterval" :rules="requiredRules">
             <el-select v-model="searchFormData.unitInterval" :disabled="isRunningTab" style="width: 80px;" id="trend-search-unitInterval">
               <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" />
             </el-select>

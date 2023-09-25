@@ -64,18 +64,18 @@ const rules = reactive<FormRules>({
     {
       required: true,
       message: '请输入相应内容后进行操作',
-      trigger: 'blur',
+      trigger: ['blur', 'change'],
     },
     {
       min: 4,
       max: 32,
       message: '字符长度不小于4，请重新输入',
-      trigger: 'blur',
+      trigger: ['blur', 'change'],
     },
     {
-      pattern: /^[A-Za-z][A-Za-z0-9_]+$/,
-      message: '请以字母开头，只能包含字母、数字和下划线',
-      trigger: 'blur',
+      pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
+      message: '格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
+      trigger: ['blur', 'change'],
     },
   ],
   password: [
