@@ -7,15 +7,30 @@
       <el-icon class="title" v-if="!isCollapse"><i-custom-timecho-logo-white /></el-icon>
       <!-- <span v-show="!isCollapse">{{ systemTitle }}</span> -->
     </div>
-    <div class="connection-box flex-align-center" :style="{ padding: isCollapse ? '0 0 0 5px' : '0 20px' }">
+    <div class="connection-box" :style="{ padding: isCollapse ? '0 0 0 5px' : '0 20px' }">
       <div class="connection-divider"></div>
-      <el-icon size="30"><i-custom-connection /></el-icon>
-      <div v-if="!isCollapse" class="connection-info flex-align-center">
-        <span class="connection-name">{{ connectionName }}</span>
-        <el-icon size="20" style="cursor: pointer;" @click="handleToggleConnection"><i-custom-toggle /></el-icon>
+      <div class="flex-align-center" style="height: 48px;">
+        <el-icon size="30"><i-custom-connection /></el-icon>
+        <div v-if="!isCollapse" class="connection-info flex-align-center">
+          <span class="connection-name">{{ connectionName }}</span>
+          <el-icon size="20" style="cursor: pointer;" @click="handleToggleConnection"><i-custom-toggle /></el-icon>
+        </div>
+      </div>
+      <div v-if="!isCollapse" class="flex-align-center" style="height: 44px;">
+        <div class="connection-host-box flex-align-center">
+          <el-icon size="20" style="margin-right: 4px;" v-if="connectionStore.connectionInfo.data.type !== 2">
+            <i-custom-connection-stand-alone v-if="connectionStore.connectionInfo.data.type === 0" />
+            <i-custom-connection-cluster v-if="connectionStore.connectionInfo.data.type === 1" />
+          </el-icon>
+          <ul class="cluster-list" v-else>
+            <li :class="['cluster-type', { 'cluster-active': clusterType === 'master' }]" @click="handleChangeCluster('master')">主</li>
+            <li :class="['cluster-type', { 'cluster-active': clusterType === 'slave' }]" @click="handleChangeCluster('slave')">备</li>
+          </ul>
+          <span class="connection-host-port">{{ connectionHost }}</span>
+        </div>
       </div>
     </div>
-    <el-scrollbar>
+    <el-scrollbar :style="{ height: !isCollapse ? 'calc(100% - 138px)' : 'calc(100% - 96px)' }">
       <el-menu
         :default-active="activeMenu"
         :router="true"
@@ -39,8 +54,9 @@ import { ref, computed, onMounted } from 'vue';
 import { type RouteRecordRaw, useRoute, useRouter } from 'vue-router';
 // import { storeToRefs } from 'pinia';
 import useMenuStore from '@/stores/menu';
-import { useConnectionStore } from '@/stores';
+import { useConnectionStore, useUserStore } from '@/stores';
 // import useAppStore from '@/stores/app';
+import { ConnectionApi } from '@/api';
 import ModalConnection from '@/components/modal-connection.vue';
 import LayoutMenuSubItem from './components/layout-menu-sub-item.vue';
 
@@ -48,12 +64,23 @@ import LayoutMenuSubItem from './components/layout-menu-sub-item.vue';
 
 // const { systemTitle } = storeToRefs(appStore);
 const connectionStore = useConnectionStore();
+const userStore = useUserStore();
 const route = useRoute();
 const menuStore = useMenuStore();
 const router = useRouter();
 const allRoutes = computed(() => router.options.routes);
 const connectionVisible = ref(false);
-const connectionName = computed(() => connectionStore.connectionInfo.name || '连接实例');
+const clusterType = ref<'master' | 'slave'>('master');
+const connectionName = computed(() => connectionStore.connectionInfo.data.name || '连接实例');
+const connectionHost = computed(() => {
+  const { type, masterCluster, slaveCluster } = connectionStore.connectionInfo.data;
+  if (type === 2 && clusterType.value === 'slave' && slaveCluster) {
+    return `${slaveCluster.hostAndPortVOS[0].host}:${slaveCluster.hostAndPortVOS[0].port}`;
+  }
+  return `${masterCluster.hostAndPortVOS[0].host}:${masterCluster.hostAndPortVOS[0].port}`;
+});
+
+const { requestFn: changeCluster } = useRequest(ConnectionApi.changeCluster);
 
 const getRoutePath = (routeItem: RouteRecordRaw, parentPath: string) => {
   const path = routeItem.path.indexOf('/') === 0 ? routeItem.path : `${parentPath}/${routeItem.path}`;
@@ -88,6 +115,13 @@ const routesToMenu = (routeItem: RouteRecordRaw, parentPath: string) => {
   }
   return menu;
 };
+
+function handleChangeCluster(type: 'master' | 'slave') {
+  clusterType.value = type;
+  changeCluster(type === 'master' ? 0 : 1).then(() => {
+    userStore.loadPrivileges(true);
+  });
+}
 
 const getMenuList = () => {
   const menuList = [] as Array<MenuOptions>;
@@ -203,18 +237,17 @@ listeningWindow();
 
   .connection-box{
     box-sizing: border-box;
-    height: 40px;
     background-color: #fff;
     position: relative;
 
     .connection-divider{
-      width: calc(100% - 16px);
-      margin: 0 8px;
+      width: 100%;
+      margin: 0;
       position: absolute;
       left: 0;
       bottom: 0;
       height: 1px;
-      background-color: #DFE1ED;
+      background-color: #A0A3B8;
     }
 
     .connection-info{
@@ -232,10 +265,42 @@ listeningWindow();
         white-space: nowrap;
       }
     }
+
+    .cluster-list {
+      display: flex;
+      margin-right: 8px;
+      border-radius: 12px;
+      background-color: #f0f1fa;
+      padding: 1px;
+
+      .cluster-type {
+        padding: 3px 5px;
+        cursor: pointer;
+        border-radius: 12px;
+        background-color: transparent;
+        font-size: 12px;
+        line-height: 12px;
+        color: #656a85;
+      }
+
+      .cluster-active {
+        background-color: #495ad4;
+        color: #fff;
+      }
+    }
+
+    .connection-host-port{
+      font-size: 12px;
+      color: #424561;
+      max-width: 120px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
   }
 
   .el-scrollbar {
-    height: calc(100% - 100px);
+    // height: calc(100% - 100px);
 
     .el-menu {
       flex: 1;

@@ -309,13 +309,13 @@ const loginLoading = ref(false);
 const toggleStatus = ref(false);
 const isDisabledMasterHosts = computed(() => {
   const hosts = formData.masterCluster.hostAndPortVOS;
-  const flag = hosts.some((item) => !item.host || (!item.port && item.port !== 0));
+  const flag = hosts.some((item) => !item.host || !item.port);
   return flag;
 });
 
 const isDisabledSlaveHosts = computed(() => {
   const hosts = formData.slaveCluster?.hostAndPortVOS || [];
-  const flag = hosts.some((item) => !item.host || (!item.port && item.port !== 0));
+  const flag = hosts.some((item) => !item.host || !item.port);
   return flag;
 });
 
@@ -536,7 +536,7 @@ function handleTest(type: 'test' | 'login') {
   formRef.value?.validate((valid) => {
     if (valid) {
       if (!formData.password) {
-        errorPwd.value = '当前实例密码未填写，请编辑后进行连接';
+        errorPwd.value = '请填写密码后进行操作';
       } else {
         errorPwd.value = '';
         if (type === 'test') {
@@ -553,10 +553,8 @@ function handleTest(type: 'test' | 'login') {
             userStore.setUser(formData.username);
             sessionStorage.setItem('nologin', '0');
             connectionStore.setConnection({
-              id: +formData.id,
-              type: formData.type,
-              name: formData.name,
-              username: formData.username,
+              ...formData,
+              password: '',
             });
             window.location.reload();
           }).finally(() => {
@@ -585,7 +583,7 @@ function handleSave() {
 function handleToggle() {
   if (toggleStatus.value) {
     if (!formData.password) {
-      errorPwd.value = '当前实例密码未填写，请编辑后进行连接';
+      errorPwd.value = '请填写密码后进行操作';
     } else {
       errorPwd.value = '';
       loginLoading.value = true;
@@ -594,10 +592,8 @@ function handleToggle() {
         userStore.setUser(formData.username);
         sessionStorage.setItem('nologin', '0');
         connectionStore.setConnection({
-          id: +formData.id,
-          type: formData.type,
-          name: formData.name,
-          username: formData.username,
+          ...formData,
+          password: '',
         });
         window.location.reload();
       }).finally(() => {
@@ -628,8 +624,8 @@ watch(
       detailLoading.value = false;
       toggleStatus.value = false;
       resetOperateLoading();
-      if (props.isToggle && connectionStore.connectionInfo.id) {
-        getList(+connectionStore.connectionInfo.id);
+      if (props.isToggle && connectionStore.connectionInfo.data.id) {
+        getList(+connectionStore.connectionInfo.data.id);
       } else {
         getList();
       }

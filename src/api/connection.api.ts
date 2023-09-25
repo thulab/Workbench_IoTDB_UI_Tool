@@ -32,5 +32,10 @@ class ConnectionApi {
   static loginByConnection(data: Connection.ConnectionDetail): HttpResponseP<number> {
     return http.post('/loginAndSave', { ...data, password: encodeAES(data.password) });
   }
+
+  // 更改主备集群
+  static changeCluster(type: number): HttpResponseP {
+    return http.get('/changeCluster', { params: { type } });
+  }
 }
 export default ConnectionApi;

@@ -136,12 +136,7 @@ export const useUserStore = defineStore('UserStore', () => {
       getLoginUserPrivileges().then((res) => {
         userInfo.value.name = res.data.userName;
         allPrivileges.value = res.data;
-        connectionStore.setConnection({
-          id: res.data.connection.id,
-          type: res.data.connection.type,
-          name: res.data.connection.name,
-          username: res.data.connection.username,
-        });
+        connectionStore.setConnection(res.data.connection);
         loadPrivilegesEnum(false);
       }).catch((err) => {
         console.log(err, 'err');

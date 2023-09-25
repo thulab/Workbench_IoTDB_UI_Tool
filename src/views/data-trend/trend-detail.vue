@@ -110,7 +110,7 @@ const {
   canReadWriteSchemaData,
 } = storeToRefs(userStore);
 const connectionStore = useConnectionStore();
-const connectionId = computed(() => connectionStore.connectionInfo.id);
+const connectionId = computed(() => connectionStore.connectionInfo.data.id);
 const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
 const isExpand = ref(true);

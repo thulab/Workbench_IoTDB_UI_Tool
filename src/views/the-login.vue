@@ -268,10 +268,6 @@ const submitForm = () => {
       loading.value = true;
       login(loginForm.user, loginForm.password, +loginForm.connection).then(() => {
         userStore.setUser(loginForm.user);
-        const connectionData = connectionList.value.find((item) => item.id === loginForm.connection);
-        if (connectionData) {
-          connectionStore.setConnection(connectionData);
-        }
         router.push({ path: '/' });
         sessionStorage.setItem('nologin', '0');
       }).catch(() => {
