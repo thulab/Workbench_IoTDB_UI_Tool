@@ -317,13 +317,13 @@ function handleChangeAggregation(val: string) {
 function handleSearch() {
   if (!canReadWriteSchemaData.value) return;
   if (!checkedData.value.length) return;
-  const timerange = dayjs(searchFormData.datetimerange[1]).valueOf() - dayjs(searchFormData.datetimerange[0]).valueOf();
-  const timeinterval = timeUnits.find((time) => time.value === searchFormData.unitInterval)?.timestamp;
-  const point = timeinterval ? Math.ceil(timerange / timeinterval) : 0;
-  if (point > 2000) {
-    ElMessage.warning('当前数据点较多，无法绘制，请缩短时间范围或调整采样周期重试');
-    return;
-  }
+  // const timerange = dayjs(searchFormData.datetimerange[1]).valueOf() - dayjs(searchFormData.datetimerange[0]).valueOf();
+  // const timeinterval = timeUnits.find((time) => time.value === searchFormData.unitInterval)?.timestamp;
+  // const point = timeinterval ? Math.ceil(timerange / timeinterval) : 0;
+  // if (point > 2000) {
+  //   ElMessage.warning('当前数据点较多，无法绘制，请缩短时间范围或调整采样周期重试');
+  //   return;
+  // }
   const start = dayjs(searchFormData.datetimerange[0]).valueOf();
   const end = dayjs(searchFormData.datetimerange[1]).valueOf();
   getHistoryTrend({
