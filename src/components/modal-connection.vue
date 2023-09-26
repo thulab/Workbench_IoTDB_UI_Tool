@@ -211,7 +211,7 @@
             <el-button plain @click="handleTest('test')" :loading="testLoading">测试</el-button>
             <div>
               <el-button plain @click="handleReset">重置</el-button>
-              <el-button type="primary" :disabled="!isCanSave" :loading="saveLoading" @click="handleSave">保存</el-button>
+              <el-button type="primary" v-if="current !== connectionStore.connectionInfo.data.id" :disabled="!isCanSave" :loading="saveLoading" @click="handleSave">保存</el-button>
               <el-button type="primary" v-if="isToggle" :loading="connectLoading" @click="handleTest('login')">连接实例</el-button>
             </div>
           </template>
