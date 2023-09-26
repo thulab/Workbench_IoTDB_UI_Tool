@@ -601,7 +601,7 @@ function handleToggle() {
       });
     }
   } else {
-    errorPwd.value = '';
+    errorPwd.value = '请填写密码后进行操作';
     toggleStatus.value = true;
   }
 }

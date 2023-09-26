@@ -80,6 +80,8 @@ declare module 'vue' {
     ICustomDeviceNum: typeof import('~icons/custom/device-num')['default']
     ICustomDownload: typeof import('~icons/custom/download')['default']
     ICustomEdit: typeof import('~icons/custom/edit')['default']
+    ICustomEditActive: typeof import('~icons/custom/edit-active')['default']
+    ICustomEditNormal: typeof import('~icons/custom/edit-normal')['default']
     ICustomError: typeof import('~icons/custom/error')['default']
     ICustomFileInfo: typeof import('~icons/custom/file-info')['default']
     ICustomInfoWarning: typeof import('~icons/custom/info-warning')['default']

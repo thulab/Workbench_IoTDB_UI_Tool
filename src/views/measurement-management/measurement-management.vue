@@ -107,8 +107,18 @@
             <el-table-column type="selection" width="55" :selectable="isSelectabled" />
             <el-table-column label="设备名称" prop="deviceName" min-width="200" align="center" show-overflow-tooltip />
             <el-table-column label="测点名称" prop="timeseries" width="160" align="center" show-overflow-tooltip />
-            <el-table-column label="测点描述" prop="alias" width="120" align="center" show-overflow-tooltip>
-              <template #default="{ row }">{{ row.alias || '-' }}</template>
+            <el-table-column label="测点描述" prop="alias" width="160" align="center">
+              <template #default="{ row }">
+                <div class="row-alias-box">
+                  <div class="row-alias-text">
+                    <text-tooltip :content="row.alias || ''" />
+                  </div>
+                  <div class="edit-box flex-align-center" @click="handleEditAlias(row)">
+                    <i-custom-edit-normal class="edit-icon" />
+                    <i-custom-edit-active class="edit-icon-active" />
+                  </div>
+                </div>
+              </template>
             </el-table-column>
             <el-table-column label="数据类型" prop="dataType" width="140" align="center" show-overflow-tooltip />
             <el-table-column label="测点类型" prop="viewType" width="140" align="center" show-overflow-tooltip>
@@ -170,6 +180,13 @@
       v-model:visible="importVisible"
       @handle-close="handleImportClose"
     />
+
+    <modal-alias
+      v-model:visible="aliasVisible"
+      :measurement="editMeasurement"
+      :alias="editAlias"
+      @handleSave="getListData"
+    />
   </div>
 </template>
 
@@ -185,6 +202,7 @@ import StorageSide from './components/storage-side.vue';
 import ModalStorage from './components/modal-storage.vue';
 import ModalMeasurement from './components/modal-measurement.vue';
 import ModalImport from './components/modal-import.vue';
+import ModalAlias from './components/modal-alias.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -229,6 +247,9 @@ const editTTLUnitModel = ref('day');
 const storageVisible = ref(false);
 const measurementVisible = ref(false);
 const importVisible = ref(false);
+const aliasVisible = ref(false);
+const editMeasurement = ref('');
+const editAlias = ref('');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const canReadWriteSchemaByPath = computed(() => {
@@ -507,6 +528,12 @@ function handleConfirmEditTTL() {
   });
 }
 
+function handleEditAlias(row: StorageDevice.MeasurementItem) {
+  editMeasurement.value = `${row.deviceName}.${row.timeseries}`;
+  editAlias.value = row.alias || '';
+  aliasVisible.value = true;
+}
+
 onMounted(() => {
   searchKeyword.value = (route.query.measurement || '') as string;
 });
@@ -682,5 +709,40 @@ watch(
 .select-tip-box{
   display: flex;
   align-items: center;
+}
+
+.row-alias-box{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .row-alias-text{
+    max-width: 120px;
+    display: flex;
+  }
+
+  .edit-box{
+    flex: 0 0 16px;
+    cursor: pointer;
+
+    svg{
+      width: 16px;
+      height: 16px;
+    }
+
+    .edit-icon-active{
+      display: none;
+    }
+
+    &:hover {
+      .edit-icon{
+        display: none;
+      }
+
+      .edit-icon-active{
+        display: block;
+      }
+    }
+  }
 }
 </style>
