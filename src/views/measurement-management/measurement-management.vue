@@ -113,7 +113,7 @@
                   <div class="row-alias-text">
                     <text-tooltip :content="row.alias || ''" />
                   </div>
-                  <div class="edit-box flex-align-center" @click="handleEditAlias(row)">
+                  <div v-if="row.viewType !== 'VIEW'" class="edit-box flex-align-center" @click="handleEditAlias(row)">
                     <i-custom-edit-normal class="edit-icon" />
                     <i-custom-edit-active class="edit-icon-active" />
                   </div>
