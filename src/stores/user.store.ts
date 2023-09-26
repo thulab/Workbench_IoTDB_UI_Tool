@@ -137,6 +137,8 @@ export const useUserStore = defineStore('UserStore', () => {
         userInfo.value.name = res.data.userName;
         allPrivileges.value = res.data;
         connectionStore.setConnection(res.data.connection);
+        connectionStore.setConnectionMasterType(res.data.isMaster);
+        connectionStore.setSlaveConnectionStatus(res.data.slaveIsConnection);
         loadPrivilegesEnum(false);
       }).catch((err) => {
         console.log(err, 'err');

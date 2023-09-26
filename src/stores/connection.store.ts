@@ -23,14 +23,28 @@ export const useConnectionStore = defineStore('ConnectionStore', () => {
       },
     },
   });
+  const connectionIsMaster = ref(true);
+  const slaveConnectionStatus = ref(true);
 
   function setConnection(data: Connection.ConnectionDetail) {
     connectionInfo.data = data;
   }
 
+  function setConnectionMasterType(data: boolean) {
+    connectionIsMaster.value = data;
+  }
+
+  function setSlaveConnectionStatus(data: boolean) {
+    slaveConnectionStatus.value = data;
+  }
+
   return {
     connectionInfo,
     setConnection,
+    connectionIsMaster,
+    setConnectionMasterType,
+    slaveConnectionStatus,
+    setSlaveConnectionStatus,
   };
 }, {
   persist: {

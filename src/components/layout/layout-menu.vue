@@ -70,8 +70,9 @@ const menuStore = useMenuStore();
 const router = useRouter();
 const allRoutes = computed(() => router.options.routes);
 const connectionVisible = ref(false);
-const clusterType = ref<'master' | 'slave'>('master');
+const clusterType = computed(() => (connectionStore.connectionIsMaster ? 'master' : 'slave'));
 const connectionName = computed(() => connectionStore.connectionInfo.data.name || '连接实例');
+const slaveConnectionStatus = computed(() => connectionStore.slaveConnectionStatus);
 const connectionHost = computed(() => {
   const { type, masterCluster, slaveCluster } = connectionStore.connectionInfo.data;
   if (type === 2 && clusterType.value === 'slave' && slaveCluster) {
@@ -117,10 +118,17 @@ const routesToMenu = (routeItem: RouteRecordRaw, parentPath: string) => {
 };
 
 function handleChangeCluster(type: 'master' | 'slave') {
-  clusterType.value = type;
-  changeCluster(type === 'master' ? 0 : 1).then(() => {
-    userStore.loadPrivileges(true);
-  });
+  if (!slaveConnectionStatus.value) {
+    ElMessageBox.alert('备集群状态异常，请检查后重试', '提示', {
+      confirmButtonText: '确定',
+      type: 'warning',
+      showClose: false,
+    });
+  } else {
+    changeCluster(type === 'master' ? 0 : 1).then(() => {
+      userStore.loadPrivileges(true);
+    });
+  }
 }
 
 const getMenuList = () => {
