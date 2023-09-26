@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30" height="30"
+  viewBox="0 0 30 30" fill="none">
+  <g opacity="1" transform="translate(0 0)  rotate(0)">
+    <mask id="bg-mask-0" fill="white">
+      <use transform="translate(0 0)  rotate(0)" xlink:href="#path_0"></use>
+    </mask>
+    <g mask="url(#bg-mask-0)">
+      <g opacity="1" transform="translate(6.25 6.25)  rotate(0)">
+        <path id="路径 3 (轮廓)" fill-rule="evenodd" style="fill:#131926" opacity="1"
+          d="M0.75 17.5L15.76 17.5C16.17 17.5 16.51 17.16 16.51 16.75C16.51 16.34 16.17 16 15.76 16L15.76 16L0.75 16C0.34 16 0 16.34 0 16.75C0 17.16 0.34 17.5 0.75 17.5Z">
+        </path>
+        <path id="路径 3 (轮廓)" fill-rule="evenodd" style="fill:#131926" opacity="1"
+          d="M0.75 4.5L14.75 4.5C15.16 4.5 15.5 4.16 15.5 3.75C15.5 3.34 15.16 3 14.75 3L0.75 3C0.34 3 0 3.34 0 3.75C0 4.16 0.34 4.5 0.75 4.5Z">
+        </path>
+        <path id="矩形 1 (轮廓)" fill-rule="evenodd" style="fill:#131926" opacity="1"
+          d="M0,13.75v-13c0,-0.41 0.34,-0.75 0.75,-0.75h15c0.41,0 0.75,0.34 0.75,0.75v13c0,0.41 -0.34,0.75 -0.75,0.75h-15c-0.41,0 -0.75,-0.34 -0.75,-0.75zM1.5,1.5v11.5h13.5v-11.5z">
+        </path>
+      </g>
+      <path id="直线 4 (轮廓)" fill-rule="evenodd" style="fill:#495AD4" opacity="1"
+        d="M11 13.25L10 13.25C9.59 13.25 9.25 13.59 9.25 14C9.25 14.41 9.59 14.75 10 14.75L11 14.75C11.41 14.75 11.75 14.41 11.75 14C11.75 13.59 11.41 13.25 11 13.25Z">
+      </path>
+      <path id="直线 4 (轮廓)" fill-rule="evenodd" style="fill:#495AD4" opacity="1"
+        d="M19 13.25L14 13.25C13.59 13.25 13.25 13.59 13.25 14C13.25 14.41 13.59 14.75 14 14.75L19 14.75C19.41 14.75 19.75 14.41 19.75 14C19.75 13.59 19.41 13.25 19 13.25Z">
+      </path>
+    </g>
+  </g>
+  <defs>
+    <rect id="path_0" x="0" y="0" width="30" height="30" />
+  </defs>
+</svg>

@@ -88,6 +88,8 @@ declare module 'vue' {
     ICustomLogoTimecho: typeof import('~icons/custom/logo-timecho')['default']
     ICustomLogoTitle: typeof import('~icons/custom/logo-title')['default']
     ICustomMeasureNum: typeof import('~icons/custom/measure-num')['default']
+    ICustomMenuConnectionCluster: typeof import('~icons/custom/menu-connection-cluster')['default']
+    ICustomMenuConnectionStandAlone: typeof import('~icons/custom/menu-connection-stand-alone')['default']
     ICustomMessageWarning: typeof import('~icons/custom/message-warning')['default']
     ICustomModelDoc: typeof import('~icons/custom/model-doc')['default']
     ICustomNavClose: typeof import('~icons/custom/nav-close')['default']

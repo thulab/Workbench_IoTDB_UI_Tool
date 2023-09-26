@@ -18,9 +18,9 @@
       </div>
       <div v-if="!isCollapse" class="flex-align-center" style="height: 44px;">
         <div class="connection-host-box flex-align-center">
-          <el-icon size="20" style="margin-right: 4px;" v-if="connectionStore.connectionInfo.data.type !== 2">
-            <i-custom-connection-stand-alone v-if="connectionStore.connectionInfo.data.type === 0" />
-            <i-custom-connection-cluster v-if="connectionStore.connectionInfo.data.type === 1" />
+          <el-icon size="30" style="margin-right: 4px;" v-if="connectionStore.connectionInfo.data.type !== 2">
+            <i-custom-menu-connection-stand-alone v-if="connectionStore.connectionInfo.data.type === 0" />
+            <i-custom-menu-connection-cluster v-if="connectionStore.connectionInfo.data.type === 1" />
           </el-icon>
           <ul class="cluster-list" v-else>
             <li :class="['cluster-type', { 'cluster-active': clusterType === 'master' }]" @click="handleChangeCluster('master')">主</li>
@@ -291,8 +291,9 @@ listeningWindow();
 
     .connection-host-port{
       font-size: 12px;
+      line-height: 18px;
       color: #424561;
-      max-width: 120px;
+      max-width: 142px;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
