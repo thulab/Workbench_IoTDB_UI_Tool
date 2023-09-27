@@ -237,9 +237,9 @@ function getList() {
       }
     });
     connectionOptions.value = [
-      { label: '单机版', options: standAloneList },
-      { label: '集群版', options: clusterList },
-      { label: '双活版', options: doubleLiveList },
+      { label: '单机', options: standAloneList },
+      { label: '集群', options: clusterList },
+      { label: '双活', options: doubleLiveList },
     ];
     if (connectionList.value.length) {
       const firstConnection = connectionOptions.value.find((item) => item.options.length);

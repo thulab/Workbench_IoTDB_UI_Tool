@@ -33,12 +33,12 @@ class DashboardApi {
   }
 
   // disk
-  static getMetricDisk(nodeID: string, nodeType: string, isMaster: boolean): HttpResponseP<Dashboard.MetricDiskRes> {
-    return http.get('/home/getMetricDisk', { params: { nodeID, nodeType, isMaster } });
+  static getMetricDisk(nodeID: string, isMaster: boolean): HttpResponseP<Dashboard.MetricDiskRes> {
+    return http.get('/home/getMetricDisk', { params: { nodeID, isMaster } });
   }
 
   // disk-all
-  static getMetricAllDisk(isMaster: boolean): HttpResponseP<Dashboard.MetricDiskRes[]> {
+  static getMetricAllDisk(isMaster: boolean): HttpResponseP<Dashboard.MetricDiskRes> {
     return http.get('/home/getMetricAllDisk', { params: { isMaster } });
   }
 

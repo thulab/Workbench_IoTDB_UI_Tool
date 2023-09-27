@@ -13,11 +13,17 @@
     <div class="monitor-chart-box-media" v-loading="diskLoading">
       <div class="monitor-chart-container">
         <h4 class="monitor-info-module-title">磁盘空间</h4>
-        <data-container :is-empty="diskData.dataCount === null">
-          <div class="monitor-info-module-box">
-            <p class="monitor-info-module-text">{{ diskData.dataCount }}<span class="monitor-info-module-unit">GiB</span></p>
-          </div>
-        </data-container>
+        <div class="monitor-module-legend-box">
+          <p class="monitor-info-legend" style="margin-right: 32px;">
+            <i class="legeng-icon" style="background-color: #495AD4;"></i>磁盘已用空间
+          </p>
+          <p class="monitor-info-legend">
+            <i class="legeng-icon" style="background-color: #009DEA;"></i>IoTDB 已用空间
+          </p>
+        </div>
+        <div class="chart-container-box">
+          <the-chart :option="diskMemoryOptions" key="diskChart" />
+        </div>
       </div>
     </div>
     <div class="monitor-chart-box-media" v-loading="memoryLoading">
@@ -107,6 +113,15 @@ interface GaugeChartData {
   valueUnit?: string;
 }
 
+interface DiskMemoryDetail {
+  diskTotal: number;
+  totalUnit: string;
+  diskMemory: string;
+  diskMemoryVal: number;
+  ioTDBMemory: string;
+  ioTDBMemoryVal: number;
+}
+
 const cpuCount = ref();
 const cpuData = reactive<GaugeChartData>({
   themeColor: '#495AD4',
@@ -129,6 +144,15 @@ const memoryData = reactive<GaugeChartData>({
   dataVal: 0,
   dataCount: null,
   valueUnit: 'GiB',
+});
+
+const diskMemoryData = reactive<DiskMemoryDetail>({
+  diskTotal: 0,
+  totalUnit: '',
+  diskMemory: '',
+  diskMemoryVal: 0,
+  ioTDBMemory: '',
+  ioTDBMemoryVal: 0,
 });
 
 const fileTotal = ref();
@@ -263,6 +287,92 @@ const diskIOChartOptions = (categoryList: string[], valueList: number[]) => ({
   ],
 } as ECOption);
 
+const diskChartOptions = (diskMemoryChartData: DiskMemoryDetail): ECOption => ({
+  tooltip: {
+    show: false,
+  },
+  grid: {
+    left: 10,
+    right: 40,
+    top: 20,
+    bottom: 20,
+    containLabel: true,
+  },
+  barWidth: 20,
+  yAxis: {
+    type: 'category',
+    data: ['IoTDB 已用空间', '磁盘已用空间'],
+    axisTick: {
+      show: false,
+    },
+    axisLine: {
+      lineStyle: {
+        color: '#DFE1ED',
+      },
+    },
+    axisLabel: {
+      color: '#424561',
+    },
+  },
+  xAxis: {
+    type: 'value',
+    max: diskMemoryChartData.diskTotal,
+    axisLabel: {
+      showMaxLabel: true,
+      color: '#424561',
+      formatter(value, index) {
+        if (index === 0) {
+          return value + diskMemoryChartData.totalUnit;
+        }
+        return value;
+      },
+    },
+    splitLine: {
+      lineStyle: {
+        color: '#DFE1ED',
+      },
+    },
+  },
+  series: [
+    {
+      type: 'bar',
+      data: [
+        {
+          name: 'IoTDB 已用空间',
+          value: diskMemoryChartData.ioTDBMemoryVal,
+          itemStyle: {
+            color: '#009DEA',
+          },
+          label: {
+            show: true,
+            position: 'right',
+            formatter: diskMemoryChartData.ioTDBMemory,
+            fontSize: 12,
+            fontWeight: 700,
+            color: '#009DEA',
+          },
+        },
+        {
+          name: '磁盘已用空间',
+          value: diskMemoryChartData.diskMemoryVal,
+          itemStyle: {
+            color: '#495AD4',
+          },
+          label: {
+            show: true,
+            position: 'right',
+            formatter: diskMemoryChartData.diskMemory,
+            fontSize: 12,
+            fontWeight: 700,
+            color: '#495AD4',
+          },
+        },
+      ],
+    },
+  ],
+} as ECOption);
+
+const diskMemoryOptions = computed(() => diskChartOptions(diskMemoryData));
 const cpuDataOptions = computed(() => gaugeChartOptions(cpuData));
 const diskDataOptions = computed(() => gaugeChartOptions(diskData));
 const memoryDataOptions = computed(() => gaugeChartOptions(memoryData));
@@ -288,12 +398,16 @@ function getCpuLoad() {
 }
 
 function getDisk() {
-  return getMetricDisk(props.node, props.nodeType, isMaster.value).then((res) => {
-    if (res.data) {
-      diskData.dataCount = res.data.diskTotal;
-      diskData.valueUnit = res.data.unit;
-      diskData.dataVal = transformDecimal(res.data.diskRatio * 100, 1);
-    }
+  return getMetricDisk(props.node, isMaster.value).then((res) => {
+    const {
+      diskTotal, totalUnit, diskUse, useUnit, diskUseRatio, ioTDBUse, ioTDBUnit, ioTDBUseRatio,
+    } = res.data;
+    diskMemoryData.diskTotal = diskTotal || 0;
+    diskMemoryData.totalUnit = totalUnit || '';
+    diskMemoryData.diskMemory = `${diskUse} ${useUnit}`;
+    diskMemoryData.diskMemoryVal = diskUseRatio * diskTotal;
+    diskMemoryData.ioTDBMemory = `${ioTDBUse} ${ioTDBUnit}`;
+    diskMemoryData.ioTDBMemoryVal = ioTDBUseRatio * diskTotal;
   });
 }
 
