@@ -9,14 +9,14 @@
     </div>
     <div class="connection-box" :style="{ padding: isCollapse ? '0 0 0 5px' : '0 20px' }">
       <div class="connection-divider"></div>
-      <div class="flex-align-center" style="height: 48px;">
+      <div class="flex-align-center" style="height: 40px;">
         <el-icon size="30"><i-custom-connection /></el-icon>
         <div v-if="!isCollapse" class="connection-info flex-align-center">
           <span class="connection-name">{{ connectionName }}</span>
           <el-icon size="20" style="cursor: pointer;" @click="handleToggleConnection"><i-custom-toggle /></el-icon>
         </div>
       </div>
-      <div v-if="!isCollapse" class="flex-align-center" style="height: 44px;">
+      <div v-if="!isCollapse" class="flex-align-center" style="height: 36px;">
         <div class="connection-host-box flex-align-center">
           <el-icon size="30" style="margin-right: 4px;" v-if="connectionStore.connectionInfo.data.type !== 2">
             <i-custom-menu-connection-stand-alone v-if="connectionStore.connectionInfo.data.type === 0" />
@@ -30,7 +30,7 @@
         </div>
       </div>
     </div>
-    <el-scrollbar :style="{ height: !isCollapse ? 'calc(100% - 138px)' : 'calc(100% - 96px)' }">
+    <el-scrollbar :style="{ height: !isCollapse ? 'calc(100% - 124px)' : 'calc(100% - 88px)' }">
       <el-menu
         :default-active="activeMenu"
         :router="true"
