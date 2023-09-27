@@ -497,7 +497,7 @@ const diskChartOptions = (diskMemoryChartData: DiskMemoryDetail): ECOption => ({
       showMaxLabel: true,
       color: '#424561',
       formatter(value, index) {
-        if (index === 0) {
+        if (index === 0 || value === diskMemoryChartData.diskTotal) {
           return value + diskMemoryChartData.totalUnit;
         }
         return value;

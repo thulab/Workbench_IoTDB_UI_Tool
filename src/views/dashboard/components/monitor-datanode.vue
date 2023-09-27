@@ -21,9 +21,11 @@
             <i class="legeng-icon" style="background-color: #009DEA;"></i>IoTDB 已用空间
           </p>
         </div>
-        <div class="chart-container-box">
-          <the-chart :option="diskMemoryOptions" key="diskChart" />
-        </div>
+        <data-container :is-empty="diskData.dataCount === null">
+          <div class="chart-container-box">
+            <the-chart :option="diskMemoryOptions" key="diskChart" />
+          </div>
+        </data-container>
       </div>
     </div>
     <div class="monitor-chart-box-media" v-loading="memoryLoading">
@@ -131,8 +133,8 @@ const cpuData = reactive<GaugeChartData>({
 });
 
 const diskData = reactive<GaugeChartData>({
-  themeColor: '#009DEA',
-  opacityColor: '#66C4F2',
+  themeColor: '#495AD4',
+  opacityColor: '#929CE5',
   dataVal: 0,
   dataCount: null,
   valueUnit: 'TiB',
@@ -321,7 +323,7 @@ const diskChartOptions = (diskMemoryChartData: DiskMemoryDetail): ECOption => ({
       showMaxLabel: true,
       color: '#424561',
       formatter(value, index) {
-        if (index === 0) {
+        if (index === 0 || value === diskMemoryChartData.diskTotal) {
           return value + diskMemoryChartData.totalUnit;
         }
         return value;
@@ -408,6 +410,8 @@ function getDisk() {
     diskMemoryData.diskMemoryVal = diskUseRatio * diskTotal;
     diskMemoryData.ioTDBMemory = `${ioTDBUse} ${ioTDBUnit}`;
     diskMemoryData.ioTDBMemoryVal = ioTDBUseRatio * diskTotal;
+    diskData.dataCount = diskTotal;
+    diskData.dataVal = transformDecimal(diskUseRatio * 100, 1);
   });
 }
 
@@ -440,6 +444,12 @@ function initialAssign() {
   cpuData.dataCount = null;
   diskData.dataVal = 0;
   diskData.dataCount = null;
+  diskMemoryData.diskTotal = 0;
+  diskMemoryData.totalUnit = '';
+  diskMemoryData.diskMemory = '';
+  diskMemoryData.diskMemoryVal = 0;
+  diskMemoryData.ioTDBMemory = '';
+  diskMemoryData.ioTDBMemoryVal = 0;
   memoryData.dataVal = 0;
   memoryData.dataCount = null;
   fileTotal.value = null;
