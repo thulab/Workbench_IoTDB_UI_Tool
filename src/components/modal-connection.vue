@@ -211,7 +211,7 @@
             <el-button plain @click="handleTest('test')" :loading="testLoading">测试</el-button>
             <div>
               <el-button plain @click="handleReset">重置</el-button>
-              <el-button type="primary" v-if="current !== connectionStore.connectionInfo.data.id" :disabled="!isCanSave" :loading="saveLoading" @click="handleSave">保存</el-button>
+              <el-button type="primary" v-if="current !== connectionStore.connectionInfo.data.id || route.name === 'login'" :disabled="!isCanSave" :loading="saveLoading" @click="handleSave">保存</el-button>
               <el-button type="primary" v-if="isToggle" :loading="connectLoading" @click="handleTest('login')">连接实例</el-button>
             </div>
           </template>
@@ -227,6 +227,7 @@
 <script lang="ts" setup>
 import type { FormInstance } from 'element-plus';
 import { cloneDeep, isEqual, assign } from 'lodash-es';
+import { useRoute } from 'vue-router';
 import { ConnectionApi, UserApi } from '@/api';
 import { useUserStore, useConnectionStore } from '@/stores';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
@@ -242,6 +243,7 @@ const emit = defineEmits<{
   (event: 'handleClose', id?: number): void;
 }>();
 
+const route = useRoute();
 const userStore = useUserStore();
 const connectionStore = useConnectionStore();
 const dialogVisible = useVModel(props, 'visible', emit);
