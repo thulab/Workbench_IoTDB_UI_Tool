@@ -23,7 +23,7 @@ export const useConnectionStore = defineStore('ConnectionStore', () => {
       },
     },
   });
-  const connectionIsMaster = ref(true);
+  const connectionIsMaster = ref();
   const slaveConnectionStatus = ref(true);
 
   function setConnection(data: Connection.ConnectionDetail) {
@@ -49,6 +49,7 @@ export const useConnectionStore = defineStore('ConnectionStore', () => {
 }, {
   persist: {
     storage: sessionStorage,
+    paths: ['connectionInfo'],
   },
 });
 

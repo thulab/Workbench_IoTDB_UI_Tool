@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 
-export default function useWebsocket(url: string, receiveData: Function) {
+export default function useWebsocket(url: string, receiveData: Function, isInit: boolean = true) {
   const socketInstance = ref<WebSocket | null>();
 
   /**
@@ -15,6 +15,9 @@ export default function useWebsocket(url: string, receiveData: Function) {
     if (!('WebSocket' in window)) {
       ElMessage.warning('您的浏览器不支持webSocket,请使用更高版本浏览器！');
     } else {
+      if (socketInstance.value) {
+        socketInstance.value.close();
+      }
       // 实例化socket
       socketInstance.value = new WebSocket(`ws://${window.location.host}${url}`);
       // 监听socket连接
@@ -37,7 +40,9 @@ export default function useWebsocket(url: string, receiveData: Function) {
     }
   }
 
-  initWebsocket();
+  if (isInit) {
+    initWebsocket();
+  }
 
   return {
     socketInstance,

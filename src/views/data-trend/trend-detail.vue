@@ -111,6 +111,7 @@ const {
 } = storeToRefs(userStore);
 const connectionStore = useConnectionStore();
 const connectionId = computed(() => connectionStore.connectionInfo.data.id);
+const connectionType = computed(() => (connectionStore.connectionIsMaster ? 0 : 1));
 const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
 const isExpand = ref(true);
@@ -417,7 +418,7 @@ function handleData(data: any) {
   }
 }
 
-const { socketInstance, initWebsocket } = useWebsocket('/api/trendData', handleData);
+const { socketInstance, initWebsocket } = useWebsocket('/api/trendData', handleData, false);
 
 function handlePlay(val: boolean) {
   if (val) {
@@ -519,7 +520,7 @@ function handleOperateAll() {
   setOption({ legend: legendSelected.value, series: seriesData.value.series });
 }
 
-onMounted(() => {
+function init() {
   if (route.query.measurement) {
     pathList.value.push({
       path: route.query.measurement as string,
@@ -529,20 +530,26 @@ onMounted(() => {
     });
   }
   if (socketInstance.value && socketInstance.value.readyState === 1) {
-    socketInstance.value?.send(JSON.stringify({ operate: 'SET_CONNECT', connectionId: connectionId.value, user: userName.value }));
+    socketInstance.value?.send(JSON.stringify({
+      operate: 'SET_CONNECT', connectionId: connectionId.value, user: userName.value, type: connectionType.value,
+    }));
     if (route.query.measurement) {
       socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [route.query.measurement as string] }));
     }
   } else {
     socketInstance.value?.addEventListener('open', () => {
-      socketInstance.value?.send(JSON.stringify({ operate: 'SET_CONNECT', connectionId: connectionId.value, user: userName.value }));
+      socketInstance.value?.send(JSON.stringify({
+        operate: 'SET_CONNECT', connectionId: connectionId.value, user: userName.value, type: connectionType.value,
+      }));
       if (route.query.measurement) {
         socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [route.query.measurement as string] }));
       }
     });
   }
   setOption(chartOptions.value);
+}
 
+onMounted(() => {
   window.addEventListener('beforeunload', () => {
     chartContainer.value = null;
     if (chartInstance) {
@@ -554,6 +561,23 @@ onMounted(() => {
     }
   });
 });
+
+watch(
+  () => connectionStore.connectionIsMaster,
+  (val, old) => {
+    if (val !== old && (val === true || val === false)) {
+      if (socketInstance.value) {
+        socketInstance.value.close();
+      }
+      initWebsocket(() => {
+        init();
+      });
+    }
+  },
+  {
+    immediate: true,
+  },
+);
 
 onUnmounted(() => {
   chartContainer.value = null;
