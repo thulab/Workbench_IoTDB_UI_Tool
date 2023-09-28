@@ -28,9 +28,11 @@
             <i class="legeng-icon" style="background-color: #009DEA;"></i>IoTDB 已用空间
           </p>
         </div>
-        <div class="chart-container-box">
-          <the-chart :option="diskMemoryOptions" key="diskChart" />
-        </div>
+        <data-container :is-empty="diskMemoryData.diskTotal === null">
+          <div class="chart-container-box">
+            <the-chart :option="diskMemoryOptions" key="diskChart" />
+          </div>
+        </data-container>
       </div>
     </div>
     <div class="monitor-chart-box-3" v-loading="systemLoading">
@@ -93,7 +95,7 @@ interface PieChartData {
 }
 
 interface DiskMemoryDetail {
-  diskTotal: number;
+  diskTotal: number | null;
   totalUnit: string;
   diskMemory: string;
   diskMemoryVal: number;
@@ -142,7 +144,7 @@ const configNodeSystemData = reactive<PieChartData>({
 });
 
 const diskMemoryData = reactive<DiskMemoryDetail>({
-  diskTotal: 0,
+  diskTotal: null,
   totalUnit: '',
   diskMemory: '',
   diskMemoryVal: 0,
@@ -581,7 +583,7 @@ function getDisk() {
     const {
       diskTotal, totalUnit, diskUse, useUnit, diskUseRatio, ioTDBUse, ioTDBUnit, ioTDBUseRatio,
     } = res.data;
-    diskMemoryData.diskTotal = diskTotal || 0;
+    diskMemoryData.diskTotal = diskTotal || null;
     diskMemoryData.totalUnit = totalUnit || '';
     diskMemoryData.diskMemory = `${diskUse} ${useUnit}`;
     diskMemoryData.diskMemoryVal = diskUseRatio * diskTotal;
@@ -637,6 +639,12 @@ function initialAssign() {
   configNodeSystemData.dataVal = 0;
   configNodeSystemData.totalVal = 0;
   configNodeSystemData.percent = 0;
+  diskMemoryData.diskTotal = null;
+  diskMemoryData.totalUnit = '';
+  diskMemoryData.diskMemory = '';
+  diskMemoryData.diskMemoryVal = 0;
+  diskMemoryData.ioTDBMemory = '';
+  diskMemoryData.ioTDBMemoryVal = 0;
   writeSpeed.value = null;
   fileTotal.value = null;
 }

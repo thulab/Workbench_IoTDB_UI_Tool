@@ -54,7 +54,7 @@ import { ref, computed, onMounted } from 'vue';
 import { type RouteRecordRaw, useRoute, useRouter } from 'vue-router';
 // import { storeToRefs } from 'pinia';
 import useMenuStore from '@/stores/menu';
-import { useConnectionStore, useUserStore } from '@/stores';
+import { useConnectionStore } from '@/stores';
 // import useAppStore from '@/stores/app';
 import { ConnectionApi } from '@/api';
 import ModalConnection from '@/components/modal-connection.vue';
@@ -64,7 +64,6 @@ import LayoutMenuSubItem from './components/layout-menu-sub-item.vue';
 
 // const { systemTitle } = storeToRefs(appStore);
 const connectionStore = useConnectionStore();
-const userStore = useUserStore();
 const route = useRoute();
 const menuStore = useMenuStore();
 const router = useRouter();
@@ -126,7 +125,7 @@ function handleChangeCluster(type: 'master' | 'slave') {
     });
   } else {
     changeCluster(type === 'master' ? 0 : 1).then(() => {
-      userStore.loadPrivileges(true);
+      window.location.reload();
     });
   }
 }

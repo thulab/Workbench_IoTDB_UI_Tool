@@ -203,7 +203,7 @@
 import { assign, concat } from 'lodash-es';
 import dayjs from 'dayjs';
 import type { ElTable } from 'element-plus';
-import { useUserStore } from '@/stores';
+import { useUserStore, useConnectionStore } from '@/stores';
 import { DashboardApi } from '@/api';
 import { toThousands } from '@/utils/format';
 import MonitorAll from './components/monitor-all.vue';
@@ -211,6 +211,7 @@ import MonitorDatanode from './components/monitor-datanode.vue';
 import MonitorConfignode from './components/monitor-confignode.vue';
 
 const userStore = useUserStore();
+const connectionStore = useConnectionStore();
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const enablePrometheus = computed(() => userStore.enablePrometheus);
 const tableRef = ref<InstanceType<typeof ElTable>>();
@@ -378,10 +379,21 @@ function handleChangeCluster(type: 'master' | 'slave') {
 }
 
 onMounted(() => {
+  clusterType.value = connectionStore.connectionIsMaster ? 'master' : 'slave';
   getSystemData().then(() => {
     getMonitorData();
   });
 });
+
+watch(
+  () => connectionStore.connectionIsMaster,
+  (val) => {
+    clusterType.value = val ? 'master' : 'slave';
+  },
+  {
+    immediate: true,
+  },
+);
 
 onUnmounted(() => {
   clearTimeout(refreshInterval.value);
