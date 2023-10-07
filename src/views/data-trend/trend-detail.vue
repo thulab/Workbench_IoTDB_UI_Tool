@@ -358,7 +358,6 @@ function handleSearch() {
     if (overPath.length) {
       const paths = overPath.join(',');
       ElMessage.warning(`${paths}测点超过最大画图点数，已为您自动调整后展示`);
-      searchFormData.unitInterval = 'auto';
     }
     setOption(chartOptions.value, true);
     setOption({
