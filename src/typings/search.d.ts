@@ -79,6 +79,7 @@ declare namespace Search{
   export interface QueryHistoryTrendResponse {
     normal: TrendData[];
     abnormal: string[];
+    changeAuto: string[];
   }
 
   export interface StatisticSearch {

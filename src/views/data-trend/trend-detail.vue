@@ -26,8 +26,8 @@
               <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" />
             </el-select>
           </base-form-item>
-          <base-form-item v-show="!isRunningTab" label="采样策略：" prop="aggregation" :rules="requiredRules">
-            <el-select v-model="searchFormData.aggregation" :disabled="isRunningTab" style="width: 80px;" @change="handleChangeAggregation" id="trend-search-aggregation">
+          <base-form-item v-show="!isRunningTab" label="采样策略：" prop="aggregation" :rules="requiredRules" class="m-r-0">
+            <el-select v-model="searchFormData.aggregation" :disabled="isRunningTab || searchFormData.unitInterval === 'origin'" style="width: 80px;" @change="handleChangeAggregation" id="trend-search-aggregation">
               <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" />
             </el-select>
           </base-form-item>
@@ -45,7 +45,7 @@
             </template>
           </div>
         </el-form>
-        <div class="search-form-buttons" v-if="!isRunningTab">
+        <div class="search-form-buttons" :style="{ visibility: !isRunningTab ? 'visible' : 'hidden' }">
           <auth-tooltip :is-disabled="canReadWriteSchemaData">
             <el-button :disabled="!canReadWriteSchemaData" @click="handleReset" id="trend-search-reset">重置</el-button>
           </auth-tooltip>
@@ -61,6 +61,7 @@
           </el-tooltip>
         </div>
       </div>
+      <p class="trend-tip" :style="{ visibility: !isRunningTab ? 'visible' : 'hidden' }"><el-icon size="16" style="margin-right: 6px;"><i-custom-info-warning /></el-icon>最大绘制<span style="font-weight: 700; color: #495AD4; margin: 0 4px;">2000</span>个点，超出后系统将自动调整</p>
     </el-header>
     <el-main class="p-0">
       <el-container class="chart-detail-wrapper">
@@ -118,8 +119,8 @@ const isExpand = ref(true);
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({
   datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
-  unitInterval: '10m',
-  aggregation: 'avg',
+  unitInterval: 'auto',
+  aggregation: 'last_value',
 });
 const shortcutsDaterange = [
   {
@@ -137,6 +138,8 @@ const shortcutsDaterange = [
 ];
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 const timeUnits = [
+  { label: '自动', value: 'auto', timestamp: 1000 },
+  { label: '原始值', value: 'origin', timestamp: 1000 },
   { label: '1s', value: '1s', timestamp: 1000 },
   { label: '1min', value: '1m', timestamp: 60000 },
   { label: '5min', value: '5m', timestamp: 300000 },
@@ -149,10 +152,10 @@ const timeUnits = [
   { label: '1m', value: '1mo', timestamp: 2592000000 },
 ];
 const aggregateFunctions = [
-  { label: '平均值', value: 'avg' },
+  { label: '最新值', value: 'last_value' },
   { label: '最大值', value: 'max_value' },
   { label: '最小值', value: 'min_value' },
-  { label: '最新值', value: 'last_value' },
+  { label: '平均值', value: 'avg' },
 ];
 const requiredRules = ref([
   {
@@ -302,8 +305,8 @@ const onResize = debounce(() => {
 // 重置
 function handleReset() {
   searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
-  searchFormData.unitInterval = '10m';
-  searchFormData.aggregation = 'avg';
+  searchFormData.unitInterval = 'auto';
+  searchFormData.aggregation = 'last_value';
 }
 
 function handleChangeAggregation(val: string) {
@@ -318,13 +321,15 @@ function handleChangeAggregation(val: string) {
 function handleSearch() {
   if (!canReadWriteSchemaData.value) return;
   if (!checkedData.value.length) return;
-  // const timerange = dayjs(searchFormData.datetimerange[1]).valueOf() - dayjs(searchFormData.datetimerange[0]).valueOf();
-  // const timeinterval = timeUnits.find((time) => time.value === searchFormData.unitInterval)?.timestamp;
-  // const point = timeinterval ? Math.ceil(timerange / timeinterval) : 0;
-  // if (point > 2000) {
-  //   ElMessage.warning('当前数据点较多，无法绘制，请缩短时间范围或调整采样周期重试');
-  //   return;
-  // }
+  const timerange = dayjs(searchFormData.datetimerange[1]).valueOf() - dayjs(searchFormData.datetimerange[0]).valueOf();
+  if (searchFormData.unitInterval !== 'auto' && searchFormData.unitInterval !== 'origin') {
+    const timeinterval = timeUnits.find((time) => time.value === searchFormData.unitInterval)?.timestamp;
+    const point = timeinterval ? Math.ceil(timerange / timeinterval) : 0;
+    if (point > 2000) {
+      ElMessage.warning('超过最大画图点数，已为您自动调整后展示');
+      searchFormData.unitInterval = 'auto';
+    }
+  }
   const start = dayjs(searchFormData.datetimerange[0]).valueOf();
   const end = dayjs(searchFormData.datetimerange[1]).valueOf();
   getHistoryTrend({
@@ -349,6 +354,12 @@ function handleSearch() {
         item.disabled = false;
       }
     });
+    const overPath = res.data?.changeAuto || [];
+    if (overPath.length) {
+      const paths = overPath.join(',');
+      ElMessage.warning(`${paths}测点超过最大画图点数，已为您自动调整后展示`);
+      searchFormData.unitInterval = 'auto';
+    }
     setOption(chartOptions.value, true);
     setOption({
       xAxis: {
@@ -658,6 +669,16 @@ onUnmounted(() => {
   cursor: not-allowed !important;
   background-color: var(--el-button-disabled-bg-color) !important;
   border-color: var(--el-button-disabled-border-color) !important;
+}
+
+.trend-tip{
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 12px;
+  line-height: 12px;
+  color: #656A85;
+  font-weight: 300;
 }
 
 .chart-detail-wrapper{

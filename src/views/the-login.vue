@@ -116,13 +116,12 @@
 import { useRouter } from 'vue-router';
 import type { FormInstance, FormRules } from 'element-plus';
 import { UserApi, ConnectionApi } from '@/api';
-import { useUserStore, useConnectionStore } from '@/stores';
+import { useUserStore } from '@/stores';
 import ModalConnection from '@/components/modal-connection.vue';
 import TheCaptcha from '@/components/the-captcha.vue';
 
 const router = useRouter();
 const userStore = useUserStore();
-const connectionStore = useConnectionStore();
 const formRef = ref<FormInstance>();
 const captchaRef = ref<InstanceType<typeof TheCaptcha> | null>(null);
 const loginForm = reactive<{
@@ -241,13 +240,14 @@ function getList() {
       { label: '集群', options: clusterList },
       { label: '双活', options: doubleLiveList },
     ];
-    if (connectionList.value.length) {
-      const firstConnection = connectionOptions.value.find((item) => item.options.length);
-      if (firstConnection) {
-        loginForm.connection = firstConnection?.options[0].id;
-        loginForm.user = firstConnection?.options[0].username;
-      }
-    }
+    // 默认选中第一个
+    // if (connectionList.value.length) {
+    //   const firstConnection = connectionOptions.value.find((item) => item.options.length);
+    //   if (firstConnection) {
+    //     loginForm.connection = firstConnection?.options[0].id;
+    //     loginForm.user = firstConnection?.options[0].username;
+    //   }
+    // }
   });
 }
 
