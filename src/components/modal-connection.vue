@@ -100,11 +100,11 @@
                 </template>
                 <el-input v-model="formData.masterCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl-stand-alone" :disabled="isView" />
               </base-form-item>
-              <base-form-item label="用户名：" prop="username" :rules="requiredRules" class="base-form-box">
-                <el-input v-model="formData.username" placeholder="请输入用户名" id="connection-modal-username" :disabled="disabledUserPwd" />
+              <base-form-item label="用户名：" prop="username" :rules="requiredUserRules" class="base-form-box">
+                <el-input v-model="formData.username" placeholder="请输入用户名" maxlength="32" id="connection-modal-username" :disabled="disabledUserPwd" />
               </base-form-item>
-              <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd">
-                <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password-stand-alone" :disabled="disabledUserPwd" />
+              <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd" :rules="requiredPwdRules">
+                <el-input v-model="formData.password" placeholder="请输入密码" maxlength="32" show-password autocomplete="off" id="connection-modal-password-stand-alone" :disabled="disabledUserPwd" />
               </base-form-item>
             </template>
             <!-- 集群版 -->
@@ -131,20 +131,20 @@
                 </template>
                 <el-input v-model="formData.masterCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl-double-live" :disabled="isView" />
               </base-form-item>
-              <base-form-item label="用户名：" prop="username" :rules="requiredRules" class="base-form-box">
-                <el-input v-model="formData.username" placeholder="请输入用户名" id="connection-modal-username" :disabled="disabledUserPwd" />
+              <base-form-item label="用户名：" prop="username" :rules="requiredUserRules" class="base-form-box">
+                <el-input v-model="formData.username" placeholder="请输入用户名" maxlength="32" id="connection-modal-username" :disabled="disabledUserPwd" />
               </base-form-item>
-              <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd">
-                <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password-double-live" :disabled="disabledUserPwd" />
+              <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd" :rules="requiredPwdRules">
+                <el-input v-model="formData.password" placeholder="请输入密码" maxlength="32" show-password autocomplete="off" id="connection-modal-password-double-live" :disabled="disabledUserPwd" />
               </base-form-item>
             </template>
             <!-- 双活版 -->
             <template v-if="formData.type === 2">
-              <base-form-item label="用户名：" prop="username" :rules="requiredRules" class="base-form-box">
-                <el-input v-model="formData.username" placeholder="请输入用户名" id="connection-modal-username" :disabled="disabledUserPwd" />
+              <base-form-item label="用户名：" prop="username" :rules="requiredUserRules" class="base-form-box">
+                <el-input v-model="formData.username" placeholder="请输入用户名" maxlength="32" id="connection-modal-username" :disabled="disabledUserPwd" />
               </base-form-item>
-              <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd">
-                <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password-cluster" :disabled="disabledUserPwd" />
+              <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd" :rules="requiredPwdRules">
+                <el-input v-model="formData.password" placeholder="请输入密码" maxlength="32" show-password autocomplete="off" id="connection-modal-password-cluster" :disabled="disabledUserPwd" />
               </base-form-item>
 
               <el-collapse v-model="activeNames" class="connection-cluster-box">
@@ -256,6 +256,37 @@ const requiredRules = ref([
   {
     required: true,
     message: '请输入内容后操作',
+    trigger: ['blur', 'change'],
+  },
+]);
+const requiredUserRules = ref([
+  {
+    required: true,
+    message: '请输入内容后操作',
+    trigger: ['blur', 'change'],
+  },
+  {
+    min: 4,
+    max: 32,
+    message: '字符长度不小于4，请重新输入',
+    trigger: ['blur', 'change'],
+  },
+  {
+    pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
+    message: '格式不符，请重新输入',
+    trigger: ['blur', 'change'],
+  },
+]);
+const requiredPwdRules = ref([
+  {
+    min: 4,
+    max: 32,
+    message: '字符长度不小于4，请重新输入',
+    trigger: ['blur', 'change'],
+  },
+  {
+    pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
+    message: '格式不符，请重新输入',
     trigger: ['blur', 'change'],
   },
 ]);
