@@ -379,7 +379,6 @@ function handleChangeCluster(type: 'master' | 'slave') {
 }
 
 onMounted(() => {
-  clusterType.value = connectionStore.connectionIsMaster ? 'master' : 'slave';
   getSystemData().then(() => {
     getMonitorData();
   });
@@ -387,8 +386,10 @@ onMounted(() => {
 
 watch(
   () => connectionStore.connectionIsMaster,
-  (val) => {
-    clusterType.value = val ? 'master' : 'slave';
+  (val, old) => {
+    if (val !== old && (val === true || val === false)) {
+      clusterType.value = val ? 'master' : 'slave';
+    }
   },
   {
     immediate: true,
