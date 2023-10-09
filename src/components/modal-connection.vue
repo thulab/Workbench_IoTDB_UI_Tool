@@ -364,6 +364,7 @@ const { requestFn: saveConnection } = useRequest(ConnectionApi.saveConnection);
 const { requestFn: testConnection } = useRequest(ConnectionApi.testConnection);
 const { requestFn: loginByConnection } = useRequest(ConnectionApi.loginByConnection);
 const { requestFn: login } = useRequest(UserApi.login);
+const { requestFn: logout } = useRequest(UserApi.logout);
 
 function handleClose() {
   dialogVisible.value = false;
@@ -607,17 +608,19 @@ function handleToggle() {
     } else {
       errorPwd.value = '';
       loginLoading.value = true;
-      login(formData.username, formData.password, +formData.id).then(() => {
-        toggleStatus.value = false;
-        userStore.setUser(formData.username);
-        sessionStorage.setItem('nologin', '0');
-        connectionStore.setConnection({
-          ...formData,
-          password: '',
+      logout().then(() => {
+        login(formData.username, formData.password!, +formData.id).then(() => {
+          toggleStatus.value = false;
+          userStore.setUser(formData.username);
+          sessionStorage.setItem('nologin', '0');
+          connectionStore.setConnection({
+            ...formData,
+            password: '',
+          });
+          window.location.reload();
+        }).finally(() => {
+          loginLoading.value = false;
         });
-        window.location.reload();
-      }).finally(() => {
-        loginLoading.value = false;
       });
     }
   } else {

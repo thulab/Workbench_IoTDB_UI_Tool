@@ -7,10 +7,10 @@
       <el-icon class="title" v-if="!isCollapse"><i-custom-timecho-logo-white /></el-icon>
       <!-- <span v-show="!isCollapse">{{ systemTitle }}</span> -->
     </div>
-    <div class="connection-box" :style="{ padding: isCollapse ? '0 0 0 5px' : '0 20px' }">
+    <div class="connection-box" :style="{ padding: isCollapse ? '0 0 0 5px' : '0 16px 0 10px' }">
       <div class="connection-divider"></div>
       <div class="flex-align-center" style="height: 40px;">
-        <el-icon size="30"><i-custom-connection /></el-icon>
+        <el-icon size="30" :style="{ marginLeft: isCollapse ? '0' : '-4px' }"><i-custom-connection /></el-icon>
         <div v-if="!isCollapse" class="connection-info flex-align-center">
           <span class="connection-name">{{ connectionName }}</span>
           <el-icon size="20" style="cursor: pointer;" @click="handleToggleConnection"><i-custom-toggle /></el-icon>
@@ -287,6 +287,7 @@ listeningWindow();
         background-color: transparent;
         font-size: 12px;
         line-height: 12px;
+        font-weight: 300;
         color: #656a85;
       }
 
