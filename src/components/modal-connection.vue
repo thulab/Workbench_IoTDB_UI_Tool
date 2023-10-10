@@ -85,7 +85,7 @@
                 <div class="ip-port-list">
                   <div class="ip-port-item" v-for="(item, index) in formData.masterCluster.hostAndPortVOS" :key="`${index}_master_host_port`">
                     <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].host`" :rules="requiredRules">
-                      <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 162px" :id="`connection-modal-master-${index}-host`" :disabled="isView" />
+                      <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 169px" :id="`connection-modal-master-${index}-host`" :disabled="isView" />
                     </base-form-item>
                     <span class="ip-port-divider">:</span>
                     <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].port`" :rules="requiredPortRules">
@@ -114,7 +114,7 @@
                 <div class="ip-port-list">
                   <div class="ip-port-item" v-for="(item, index) in formData.masterCluster.hostAndPortVOS" :key="`${index}_master_host_port`">
                     <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].host`" :rules="requiredRules">
-                      <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 162px" :id="`connection-modal-master-${index}-host`" :disabled="isView" />
+                      <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 169px" :id="`connection-modal-master-${index}-host`" :disabled="isView" />
                     </base-form-item>
                     <span class="ip-port-divider">:</span>
                     <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].port`" :rules="requiredPortRules">
@@ -157,7 +157,7 @@
                     <div class="ip-port-list">
                       <div class="ip-port-item" v-for="(item, index) in formData.masterCluster.hostAndPortVOS" :key="`${index}_master_host_port`">
                         <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].host`" :rules="requiredRules">
-                          <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 162px" :id="`connection-modal-master-${index}-host`" :disabled="isView" />
+                          <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 169px" :id="`connection-modal-master-${index}-host`" :disabled="isView" />
                         </base-form-item>
                         <span class="ip-port-divider">:</span>
                         <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].port`" :rules="requiredPortRules">
@@ -168,7 +168,7 @@
                       </div>
                     </div>
                   </div>
-                  <base-form-item label="Prometheus 信息：" prop="masterCluster.prometheusUrl" class="optional-form-item m-b-0">
+                  <base-form-item label="Prometheus 信息：" prop="masterCluster.prometheusUrl" class="optional-form-item m-b-0 p-r-28">
                     <template #label>
                       Prometheus 信息：<el-tooltip effect="light" content="配置prometheus可在界面查看部分监控信息，推荐您进行配置使用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                     </template>
@@ -184,7 +184,7 @@
                     <div class="ip-port-list">
                       <div class="ip-port-item" v-for="(item, index) in formData.slaveCluster.hostAndPortVOS" :key="`${index}_slave_host_port`">
                         <base-form-item label="" :prop="`slaveCluster.hostAndPortVOS[${index}].host`" :rules="requiredRules">
-                          <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 162px" :id="`connection-modal-slave-${index}-host`" :disabled="isView" />
+                          <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 169px" :id="`connection-modal-slave-${index}-host`" :disabled="isView" />
                         </base-form-item>
                         <span class="ip-port-divider">:</span>
                         <base-form-item label="" :prop="`slaveCluster.hostAndPortVOS[${index}].port`" :rules="requiredPortRules">
@@ -195,7 +195,7 @@
                       </div>
                     </div>
                   </div>
-                  <base-form-item label="Prometheus 信息：" prop="slaveCluster.prometheusUrl" class="optional-form-item m-b-0">
+                  <base-form-item label="Prometheus 信息：" prop="slaveCluster.prometheusUrl" class="optional-form-item m-b-0 p-r-28">
                     <template #label>
                       Prometheus 信息：<el-tooltip effect="light" content="配置prometheus可在界面查看部分监控信息，推荐您进行配置使用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                     </template>
