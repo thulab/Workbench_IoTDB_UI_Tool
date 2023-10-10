@@ -425,10 +425,10 @@ async function handleAddConnection() {
 }
 
 function getDetail(id: number) {
-  handleChangeType(0);
   editType.value = 'view';
   resetOperateLoading();
   detailLoading.value = true;
+  // handleChangeType(0);
   getConnectionDetail(id).then((res) => {
     assign(formData, res.data);
     formData.password = '';
@@ -455,6 +455,7 @@ function handleReset() {
 // 获取实例列表
 function getList(id?: number) {
   listLoading.value = true;
+  detailLoading.value = true;
   getConnectionList().then((res) => {
     connectionList.value = res.data || [];
     filterList.value = connectionList.value.filter((item) => item.name.includes(filterText.value));
@@ -462,6 +463,8 @@ function getList(id?: number) {
     if (filterList.value.length) {
       current.value = id || +filterList.value[0].id;
       getDetail(current.value);
+    } else {
+      detailLoading.value = false;
     }
   }).finally(() => {
     listLoading.value = false;
