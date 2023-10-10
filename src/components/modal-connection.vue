@@ -28,7 +28,7 @@
             <span class="data-empty-text">暂无数据</span>
           </div>
           <ul class="list-box" v-else>
-            <li v-for="item in filterList" :key="item.id" :class="['connection-item-box', current === item.id && 'connection-item-box-active']" @click="e => handleSelect(item, e)">
+            <li v-for="item in filterList" :key="item.id" :class="['connection-item-box', current === item.id ? 'connection-item-box-active' : '']" @click="e => handleSelect(item, e)">
               <span class="connection-item-text">
                 <el-icon size="30" style="margin-right: 4px;">
                   <i-custom-connection-cluster v-if="item.type === 1" />
