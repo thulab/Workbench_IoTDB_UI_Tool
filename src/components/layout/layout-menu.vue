@@ -266,7 +266,7 @@ listeningWindow();
       justify-content: space-between;
 
       .connection-name{
-        max-width: 110px;
+        max-width: 120px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;

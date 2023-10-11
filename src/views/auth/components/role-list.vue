@@ -14,7 +14,7 @@
   <auth-container :is-auth="canManageRole" style="height: calc(100% - 70px);">
     <ul class="list-box" v-loading="loading">
       <template v-if="list.length">
-        <li v-for="item in list" :key="item" :class="['item-box', current === item && 'item-box-active']" @click="e=>handleSelect(item, e)">
+        <li v-for="item in list" :key="item" :class="['item-box', current === item ? 'item-box-active' : '']" @click="e=>handleSelect(item, e)">
           <span class="item-text"><text-tooltip :content="item" /></span>
           <el-popconfirm
             confirm-button-text="确定"

@@ -10,7 +10,7 @@
   </div>
 
   <ul class="list-box" v-loading="loading">
-    <li v-for="item in list" :key="item.name" :class="['item-box', current === item.name && 'item-box-active']" @click="e=>handleSelect(item.name, e)">
+    <li v-for="item in list" :key="item.name" :class="['item-box', current === item.name ? 'item-box-active' : '']" @click="e=>handleSelect(item.name, e)">
       <span class="item-text">
         <el-icon size="30">
           <i-custom-user-manager v-if="item.isManager" />

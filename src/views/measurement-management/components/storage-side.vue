@@ -12,7 +12,7 @@
   <auth-container :is-auth="canReadWriteSchema" style="height: calc(100% - 70px);">
     <ul class="storage-list-box" v-loading="storageLoading">
       <template v-if="storageList.length">
-        <li v-for="item in storageList" :key="item" :class="['storage-item-box', currentStorage === item && 'storage-item-box-active']" @click="e => handleSelectStorage(item, e)">
+        <li v-for="item in storageList" :key="item" :class="['storage-item-box', currentStorage === item ? 'storage-item-box-active' : '']" @click="e => handleSelectStorage(item, e)">
           <span class="storage-item-text"><text-tooltip :content="item" /></span>
           <auth-tooltip :is-disabled="canManageDatabase">
             <div class="storage-item-delete-box" :style="{ cursor: item === 'root.__system' || !canManageDatabase ? 'not-allowed' : 'pointer' }" @click="handleDeleteStorage(item)">
