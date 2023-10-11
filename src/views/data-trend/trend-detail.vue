@@ -57,7 +57,7 @@
             :disabled="canReadWriteSchemaData ? searchAbled : false"
             popper-class="tooltip-box-width"
           >
-            <el-button :class="[(!searchAbled || !canReadWriteSchemaData) && 'hover-btn-disabled']" type="primary" @click="handleSearch" id="trend-search-search">应用</el-button>
+            <el-button :class="[(!searchAbled || !canReadWriteSchemaData) ? 'hover-btn-disabled' : '']" type="primary" @click="handleSearch" id="trend-search-search">应用</el-button>
           </el-tooltip>
         </div>
       </div>
@@ -68,7 +68,7 @@
         <el-main class="p-0">
           <div ref="chartContainer" class="chart-container" v-element-size="onResize"></div>
         </el-main>
-        <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand && 'p-0']">
+        <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand ? 'p-0' : '']">
           <trend-list
             v-model="pathList"
             v-model:is-expand="isExpand"

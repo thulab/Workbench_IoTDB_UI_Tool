@@ -9,7 +9,7 @@
       :disabled="canReadWriteSchemaData ? pathList.length !== 10 : false"
       popper-class="tooltip-box-width"
     >
-      <el-button link :class="[(pathList.length === 10 || !canReadWriteSchemaData) && 'hover-btn-disabled', 'p-0']" @click="handleAdd" id="trend-add-path"><i-custom-new-trend /></el-button>
+      <el-button link :class="[(pathList.length === 10 || !canReadWriteSchemaData) ? 'hover-btn-disabled' : '', 'p-0']" @click="handleAdd" id="trend-add-path"><i-custom-new-trend /></el-button>
     </el-tooltip>
   </div>
 
@@ -69,7 +69,7 @@
     </auth-container>
   </div>
 
-  <el-icon :class="['expand-icon', !isExpand && 'collapse-icon']" size="24" @click="handleExpand">
+  <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="handleExpand">
     <i-custom-arrow-right-expand />
   </el-icon>
 
