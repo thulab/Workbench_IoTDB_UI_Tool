@@ -341,7 +341,9 @@ const isDisabledSlaveHosts = computed(() => {
 
 const isCanSave = computed(() => {
   if (formData.id) {
-    return !isEqual(formData, sourceData);
+    const formDataStr = JSON.stringify(formData);
+    const sourceDataStr = JSON.stringify(sourceData);
+    return !isEqual(formDataStr, sourceDataStr);
   }
   return true;
 });
@@ -445,8 +447,14 @@ function handleReset() {
     formData.name = sourceData.name;
     formData.username = sourceData.username;
     formData.password = '';
-    formData.masterCluster = sourceData.masterCluster;
-    formData.slaveCluster = sourceData.slaveCluster || null;
+    formData.masterCluster.hostAndPortVOS = [...sourceData.masterCluster.hostAndPortVOS];
+    formData.masterCluster.prometheusUrl = sourceData.masterCluster.prometheusUrl;
+    if (sourceData.slaveCluster) {
+      formData.slaveCluster!.hostAndPortVOS = [...sourceData.slaveCluster.hostAndPortVOS];
+      formData.slaveCluster!.prometheusUrl = sourceData.slaveCluster.prometheusUrl;
+    } else {
+      formData.slaveCluster = null;
+    }
   } else {
     handleChangeType(0);
   }
