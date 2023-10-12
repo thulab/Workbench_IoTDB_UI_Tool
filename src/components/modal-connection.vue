@@ -447,11 +447,9 @@ function handleReset() {
     formData.name = sourceData.name;
     formData.username = sourceData.username;
     formData.password = '';
-    formData.masterCluster.hostAndPortVOS = [...sourceData.masterCluster.hostAndPortVOS];
-    formData.masterCluster.prometheusUrl = sourceData.masterCluster.prometheusUrl;
+    formData.masterCluster = cloneDeep(sourceData.masterCluster);
     if (sourceData.slaveCluster) {
-      formData.slaveCluster!.hostAndPortVOS = [...sourceData.slaveCluster.hostAndPortVOS];
-      formData.slaveCluster!.prometheusUrl = sourceData.slaveCluster.prometheusUrl;
+      formData.slaveCluster = cloneDeep(sourceData.slaveCluster);
     } else {
       formData.slaveCluster = null;
     }

@@ -21,6 +21,7 @@
                 style="width: 292px;"
                 fit-input-width
                 placement="bottom-start"
+                :loading="connectionLoading"
                 @change="handleChangeConnection"
               >
                 <template #prefix>
@@ -141,6 +142,7 @@ const loading = ref(false);
 const connectionVisible = ref(false);
 const connectionList = ref<Connection.ConnectionItem[]>([]);
 const connectionOptions = ref<Array<{ label: string, options: Array<Connection.ConnectionItem> }>>([]);
+const connectionLoading = ref(false);
 
 const captcha = ref('');
 
@@ -221,6 +223,7 @@ function handleChangePwdType() {
 // 获取实例列表
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getList() {
+  connectionLoading.value = true;
   getConnectionList().then((res) => {
     connectionList.value = res.data || [];
     const standAloneList: Connection.ConnectionItem[] = [];
@@ -248,6 +251,8 @@ function getList() {
     //     loginForm.user = firstConnection?.options[0].username;
     //   }
     // }
+  }).finally(() => {
+    connectionLoading.value = false;
   });
 }
 
@@ -289,6 +294,8 @@ onMounted(() => {
 
 onUnmounted(() => {
   loading.value = false;
+  connectionOptions.value = [];
+  connectionLoading.value = false;
 });
 
 </script>
