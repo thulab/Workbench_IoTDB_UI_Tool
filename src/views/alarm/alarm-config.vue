@@ -186,7 +186,7 @@ const {
 const { maxTableHeight } = useTableHeight(320);
 const searchFormRef = ref<FormInstance>();
 const tableRef = ref<InstanceType<typeof ElTable>>();
-const levelOptions = [{ name: '全部', value: '', paramMap: { color: '#656A85', icon: '' } }, ...enumStore.alarmLevelEnum];
+const levelOptions = [{ name: '全部', value: '', paramMap: { color: '#424561', icon: '' } }, ...enumStore.alarmLevelEnum];
 const statusOptions = [
   { label: '全部', value: '' },
   { label: '启用', value: 1 },
@@ -238,7 +238,7 @@ const getLevelColor = computed(() => function (data?: Alarm.QueryConfigResult) {
       const res = levelOptions.find((f) => f.value === searchFormData.alarmLevel);
       return res?.paramMap?.color;
     }
-    return '#656A85';
+    return '#424561';
   }
   const res = levelOptions.find((f) => f.value === data.alarmLevel);
   return res?.paramMap?.color;

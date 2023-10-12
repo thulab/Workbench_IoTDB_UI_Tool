@@ -287,7 +287,7 @@ const getLevelColor = computed(() => {
     const res = levelEnum.value.find((f: ConfigEnumData) => f.value === formData.alarmLevel);
     return res?.paramMap?.color;
   }
-  return '#656A85';
+  return '#424561';
 });
 
 const { requestFn: saveAlarmConfig } = useRequest(AlarmApi.saveAlarmConfig);
