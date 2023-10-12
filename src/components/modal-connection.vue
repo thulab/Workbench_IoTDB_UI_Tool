@@ -429,6 +429,7 @@ async function handleAddConnection() {
 function getDetail(id: number) {
   editType.value = 'view';
   resetOperateLoading();
+  errorPwd.value = '';
   detailLoading.value = true;
   // handleChangeType(0);
   getConnectionDetail(id).then((res) => {
