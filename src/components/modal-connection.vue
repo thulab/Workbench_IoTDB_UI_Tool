@@ -397,6 +397,7 @@ async function handleAddConnection() {
   if (editType.value === 'add' && connectionList.value.length > 0) {
     const flag = await handleChangeConnection();
     if (!flag) return;
+    filterList.value.shift();
   }
   current.value = '';
   filterList.value.unshift({
@@ -486,6 +487,7 @@ async function handleFilter() {
     const flag = await handleChangeConnection();
     if (!flag) return;
   }
+  editType.value = 'edit';
   filterList.value = connectionList.value.filter((item) => item.name.includes(filterText.value));
   if (filterList.value.length) {
     current.value = +filterList.value[0].id;
