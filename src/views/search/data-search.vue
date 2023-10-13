@@ -1,13 +1,13 @@
 <template>
   <div class="page-container">
     <div class="search-form-wrapper">
-      <el-form :model="searchFormData" style="flex: 1" ref="searchFormRef" label-position="left" label-width="80px" size="default" inline :disabled="getListLoading">
+      <el-form :model="searchFormData" style="flex: 1" ref="searchFormRef" label-position="left" label-width="80px" size="default" inline>
         <el-row>
           <base-form-item label="测点选择：" prop="path" class="m-r-20">
             <template #label>
               测点选择：<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
-            <timeseries-select v-model="searchFormData.path" :is-show-view-btn="true" />
+            <timeseries-select v-model="searchFormData.path" :is-show-view-btn="true" :disabled="getListLoading" />
           </base-form-item>
           <el-form-item label="查询时间：" prop="time" style="margin-right: 0;">
             <div class="search-time-wrapper">
@@ -26,6 +26,7 @@
                 :clearable="false"
                 :prefix-icon="ICustomCalender"
                 id="data-search-datetime"
+                :disabled="getListLoading"
               />
               <el-date-picker
                 v-else
@@ -38,6 +39,7 @@
                 :clearable="false"
                 :prefix-icon="ICustomCalender"
                 id="data-search-datetimerange"
+                :disabled="getListLoading"
               />
             </div>
           </el-form-item>
@@ -49,9 +51,9 @@
                 采样周期：<el-tooltip effect="light" content="请输入正整数" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
               </template>
               <el-input type="hidden" />
-              <el-input v-model.number="searchFormData.timeInterval" style="width: 100px;" placeholder="" @input="handleInputInterval" id="data-search-timeInterval">
+              <el-input v-model.number="searchFormData.timeInterval" style="width: 100px;" placeholder="" @input="handleInputInterval" id="data-search-timeInterval" :disabled="getListLoading">
                 <template #append>
-                  <el-select v-model="searchFormData.unitInterval" style="width: 50px;" placeholder="" id="data-search-unitInterval">
+                  <el-select v-model="searchFormData.unitInterval" style="width: 50px;" placeholder="" id="data-search-unitInterval" :disabled="getListLoading">
                     <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" />
                   </el-select>
                 </template>
@@ -60,7 +62,7 @@
             </el-form-item>
             <el-form-item label="采样策略：" prop="aggregation">
               <el-input type="hidden" />
-              <el-select v-model="searchFormData.aggregation" style="width: 80px;" clearable id="data-search-aggregation">
+              <el-select v-model="searchFormData.aggregation" style="width: 80px;" clearable id="data-search-aggregation" :disabled="getListLoading">
                 <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" />
               </el-select>
             </el-form-item>
@@ -101,7 +103,7 @@
             <el-button @click="handleSearch" :disabled="getListLoading || !canReadWriteData" id="data-search-refresh">刷新</el-button>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canReadWriteData">
-            <el-button class="m-l-12" :disabled="!canReadWriteData" @click="handleImport" id="data-search-import">导入</el-button>
+            <el-button class="m-l-12" :disabled="!canReadWriteData || getListLoading" @click="handleImport" id="data-search-import">导入</el-button>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canReadWriteData">
             <el-dropdown class="more-icon m-l-12" :disabled="getListLoading || !canReadWriteData" v-show="searchDetailInfos.status" @command="val => handleCommandDown(val)">

@@ -13,6 +13,7 @@
       :remote-method="remoteMethod"
       :loading="measurementLoading"
       style="width: 256px;"
+      :disabled="disabled"
     >
       <template #prefix>
         <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
@@ -51,6 +52,7 @@ const props = defineProps<{
   viewText?: string;
   filterSystem?: boolean;
   isBooleanTextDisabled?: boolean;
+  disabled?: boolean;
 }>();
 const model = useVModel(props, 'modelValue');
 const dialogVisible = ref(false);
