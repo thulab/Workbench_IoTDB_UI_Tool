@@ -43,7 +43,9 @@ export function addRoutes() {
         if (authRouteIndex !== -1) {
           if (!iotdbShowAuth()) {
             item.children?.splice(authRouteIndex, 1);
-            item.redirect.name = 'AuditLog';
+            if (item.redirect && (item.redirect as any).name) {
+              (item.redirect as any).name = 'AuditLog';
+            }
           }
         }
       }
