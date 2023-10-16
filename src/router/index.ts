@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
 import { HOME_URL } from '@/config/app-config';
 import Login from '@/views/the-login.vue';
+import { iotdbShowAuth } from '@/utils/auth';
 import { registerGuard as registerAuthGuard } from './guard/auth-guard';
 
 const metaRouters = import.meta.glob('./modules/*.ts', { eager: true, import: 'default' }) as Record<string, Array<RouteRecordRaw>>;
@@ -36,6 +37,17 @@ const router = createRouter({
 
 export function addRoutes() {
   asyncRoutes.forEach((item) => {
+    if (item.path === '/system') {
+      if (item.children?.length) {
+        const authRouteIndex = item.children.findIndex((child) => child.path === 'auth');
+        if (authRouteIndex !== -1) {
+          if (!iotdbShowAuth()) {
+            item.children?.splice(authRouteIndex, 1);
+            item.redirect.name = 'AuditLog';
+          }
+        }
+      }
+    }
     routes.push(item);
     router.addRoute(item);
   });

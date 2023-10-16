@@ -289,6 +289,7 @@ onMounted(() => {
   userStore.clearUserStore();
   sessionStorage.setItem('UserStore', '');
   sessionStorage.setItem('ConnectionStore', '');
+  sessionStorage.setItem('iotdbVersion', '');
   sessionStorage.setItem('nologin', '1');
   getList();
 });

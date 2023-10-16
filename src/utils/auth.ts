@@ -27,4 +27,20 @@ export const getParentPathAuthList = (path: string, dataPrivilegeLMap: Array<{ p
   return getParentPathAuthList(path, dataPrivilegeLMap, level + 1);
 };
 
+// 1.2.3及以上版本布置权限最新版
+export const iotdbShowAuth = () => {
+  const iotdbVersion = sessionStorage.getItem('iotdbVersion') || '';
+  const versionArr = iotdbVersion.split('.') || [];
+  if (versionArr.length) {
+    if (+versionArr[1] >= 2) {
+      if (+versionArr[1] === 2) {
+        return +versionArr[2] >= 3;
+      }
+      return true;
+    }
+    return false;
+  }
+  return false;
+};
+
 export default { getPathAuthList };
