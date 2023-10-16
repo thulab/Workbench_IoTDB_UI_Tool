@@ -510,6 +510,13 @@ const canStopPropagation = (e: HTMLElement):boolean => {
 };
 
 function handleDelete(item: Connection.ConnectionItem) {
+  if (item.id === '' && editType.value === 'add') {
+    filterList.value.shift();
+    resetOperateLoading();
+    editType.value = 'edit';
+    getList();
+    return;
+  }
   deleteConnection(+item.id).then(() => {
     ElMessage.success('删除成功');
     getList();
@@ -519,6 +526,7 @@ function handleDelete(item: Connection.ConnectionItem) {
 // 选择
 async function handleSelect(item: Connection.ConnectionItem, e: MouseEvent) {
   if (canStopPropagation(e.target as HTMLElement)) return;
+  if (editType.value === 'add' && item.id === '') return;
   if (editType.value === 'add') {
     const flag = await handleChangeConnection();
     if (!flag) return;
