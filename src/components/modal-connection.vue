@@ -761,7 +761,7 @@ watch(
   height: 510px;
   border-radius: 6px;
   border: 1px solid #DFE1ED;
-  padding: 10px 9px;
+  padding: 0;
   display: flex;
   flex-direction: column;
 
@@ -769,9 +769,8 @@ watch(
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2px 7px 0;
+    padding: 12px 16px 10px;
     flex: 0 0 28px;
-    margin-bottom: 16px;
   }
 
   .connection-detail-title{
@@ -779,6 +778,10 @@ watch(
     font-weight: 700;
     line-height: 21px;
     color: #495AD4;
+  }
+
+  .el-scrollbar{
+    padding: 0 9px;
   }
 }
 
@@ -876,6 +879,7 @@ watch(
   display: flex;
   justify-content: space-between;
   margin-top: 24px;
+  padding: 0 9px 10px;
 }
 </style>
 <style lang="scss">
