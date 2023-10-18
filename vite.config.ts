@@ -51,6 +51,7 @@ export default defineConfig(({ mode }) => {
               // named imports
               'useVModel', // import { useVModel } from '@vueuse/core',
               'useDark',
+              'useSessionStorage',
             ],
           },
 

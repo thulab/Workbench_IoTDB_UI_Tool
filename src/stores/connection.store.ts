@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { reactive } from 'vue';
 
 export const useConnectionStore = defineStore('ConnectionStore', () => {
-  const connectionInfo = reactive<{ data: Connection.ConnectionDetail }>({
+  const connectionInfo = reactive<{ data: Connection.ConnectionDetail, currentVersion?: string }>({
     data: {
       id: '',
       type: 0,
@@ -22,6 +22,7 @@ export const useConnectionStore = defineStore('ConnectionStore', () => {
         prometheusUrl: '',
       },
     },
+    currentVersion: '',
   });
   const connectionIsMaster = ref();
   const slaveConnectionStatus = ref(true);
