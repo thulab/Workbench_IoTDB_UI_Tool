@@ -70,9 +70,12 @@
                 </el-form-item>
               </el-col>
               <el-col :span="16">
-                <el-form-item label="测点描述：" :prop="'measurementList[' + index + '].alias'" label-width="83px">
+                <el-form-item label="别名：" :prop="'measurementList[' + index + '].alias'" label-width="83px">
+                  <template #label>
+                    别名：<el-tooltip effect="light" content="仅支持输入字母大小写、数字、下划线、UNICODE 中文字符，除“!@#$%^&*()_+-=”外的特殊字符以及实数需要用反引号进行引用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+                  </template>
                   <el-input type="hidden" />
-                  <el-input v-model="item.alias" placeholder="请输入测点描述" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-alias`" maxlength="50" show-word-limit />
+                  <el-input v-model="item.alias" placeholder="请输入别名" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-alias`" maxlength="50" show-word-limit />
                 </el-form-item>
               </el-col>
             </el-row>
