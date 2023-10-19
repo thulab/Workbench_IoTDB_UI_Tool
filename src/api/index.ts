@@ -7,6 +7,7 @@ import CalculateApi from './calculate.api';
 import LogApi from './log.api';
 import DashboardApi from './dashboard.api';
 import ConnectionApi from './connection.api';
+import DataSyncApi from './data-sync.api';
 
 export {
   SearchApi,
@@ -18,4 +19,5 @@ export {
   LogApi,
   DashboardApi,
   ConnectionApi,
+  DataSyncApi,
 };
