@@ -28,7 +28,7 @@
                   <el-icon size="30"><i-custom-connection /></el-icon>
                 </template>
                 <el-option-group
-                  v-for="group in connectionOptions"
+                  v-for="group in realConnectionOptions"
                   :key="group.label"
                   :label="group.label"
                 >
@@ -145,6 +145,7 @@ const connectionOptions = ref<Array<{ label: string, options: Array<Connection.C
 const connectionLoading = ref(false);
 
 const captcha = ref('');
+const realConnectionOptions = computed(() => connectionOptions.value.filter((item) => item.options.length > 0));
 
 const { requestFn: login } = useRequest(UserApi.login);
 const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
