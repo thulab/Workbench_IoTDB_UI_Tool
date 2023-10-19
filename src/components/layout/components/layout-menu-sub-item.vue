@@ -13,13 +13,12 @@
           </el-icon>
           <span>{{ subItem.title }}</span>
         </template>
-        <layout-menu-sub-item :menu-list="subItem.children" />
+        <layout-menu-sub-item :menu-list="subItem.children" :show-auth-menu="showAuthMenu" />
       </el-sub-menu>
     </template>
     <template v-else>
       <el-divider v-if="subItem.showTopLine" />
       <el-menu-item
-
         :index="subItem.path">
         <el-icon v-if="subItem.icon">
           <i v-if="isCollapse && subItem.activeIcon && subItem.path === rootMenu?.activeIndex" v-html="subItem.activeIcon"></i>
@@ -53,12 +52,20 @@ const menuStore = useMenuStore();
 const isCollapse = computed((): boolean => menuStore.isCollapse);
 const rootMenu = inject<MenuProvider>('rootMenu');
 
-const props = defineProps<{ menuList: MenuOptions[] }>();
+const props = defineProps<{
+  menuList: MenuOptions[],
+  showAuthMenu?: boolean,
+}>();
 
 const menus = computed<MenuOptions[]>(() => {
   const { menuList } = props;
   menuList.sort((a, b) => ((a.order || 0) - (b.order || 0)));
-  return menuList;
+  return menuList.filter((item) => {
+    if (item.isAuthMenu) {
+      return props.showAuthMenu;
+    }
+    return true;
+  });
 });
 
 </script>

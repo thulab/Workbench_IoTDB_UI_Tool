@@ -38,7 +38,7 @@
         :collapse-transition="false"
         :default-openeds="['/system/auth']"
         :unique-opened="false">
-        <layout-menu-sub-item :menu-list="menuList" />
+        <layout-menu-sub-item :menu-list="menuList" :show-auth-menu="showAuthMenu" />
       </el-menu>
     </el-scrollbar>
 
@@ -58,6 +58,7 @@ import { useConnectionStore } from '@/stores';
 // import useAppStore from '@/stores/app';
 import { ConnectionApi } from '@/api';
 import ModalConnection from '@/components/modal-connection.vue';
+import { iotdbShowAuth } from '@/utils/auth';
 import LayoutMenuSubItem from './components/layout-menu-sub-item.vue';
 
 // const appStore = useAppStore();
@@ -80,6 +81,8 @@ const connectionHost = computed(() => {
   return `${masterCluster.hostAndPortVOS[0].host}:${masterCluster.hostAndPortVOS[0].port}`;
 });
 
+const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion));
+
 const { requestFn: changeCluster } = useRequest(ConnectionApi.changeCluster);
 
 const getRoutePath = (routeItem: RouteRecordRaw, parentPath: string) => {
@@ -100,6 +103,7 @@ const routesToMenu = (routeItem: RouteRecordRaw, parentPath: string) => {
     order: routeItem.meta?.order,
     hideLine: routeItem.meta?.hideLine,
     showTopLine: routeItem.meta?.showTopLine,
+    isAuthMenu: routeItem.meta?.isAuthMenu,
   } as MenuOptions;
   if (routeItem.children && routeItem.children.length > 0) {
     if (routeItem.children.length === 1 && !routeItem.meta?.alwayShow && (!routeItem.children[0].children?.length || routeItem.children[0].children?.length <= 1)) {
@@ -168,6 +172,7 @@ const listeningWindow = () => {
   })();
 };
 listeningWindow();
+
 </script>
 
 <style scoped lang="scss">

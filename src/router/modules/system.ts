@@ -32,19 +32,24 @@ const route = [
           title: '权限管理',
           hideLine: true,
           icon: ICustomAuth,
+          isAuthMenu: true,
         },
         children: [
           {
             path: 'user',
             name: 'UserManagement',
             component: () => import('@/views/auth/user-detail.vue'),
-            meta: { keepAlive: true, title: '用户管理', icon: ICustomAuthUser },
+            meta: {
+              keepAlive: true, title: '用户管理', icon: ICustomAuthUser, isAuthMenu: true,
+            },
           },
           {
             path: 'role',
             name: 'RoleManagement',
             component: () => import('@/views/auth/role-detail.vue'),
-            meta: { keepAlive: true, title: '角色管理', icon: ICustomAuthRole },
+            meta: {
+              keepAlive: true, title: '角色管理', icon: ICustomAuthRole, isAuthMenu: true,
+            },
           },
         ],
       },

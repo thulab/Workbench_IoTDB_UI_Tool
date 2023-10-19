@@ -59,6 +59,7 @@ declare global {
   const useDark: typeof import('@vueuse/core')['useDark']
   const useDataTypeIcon: typeof import('../composition-api/index')['useDataTypeIcon']
   const useRequest: typeof import('../composition-api/index')['useRequest']
+  const useSessionStorage: typeof import('@vueuse/core')['useSessionStorage']
   const useSlots: typeof import('vue')['useSlots']
   const useTable: typeof import('../composition-api/index')['useTable']
   const useTableHeight: typeof import('../composition-api/index')['useTableHeight']

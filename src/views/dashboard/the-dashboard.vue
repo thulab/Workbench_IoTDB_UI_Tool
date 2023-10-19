@@ -375,6 +375,8 @@ function handleSortChange({ column, prop, order }:SortMethod<Alarm.QueryConfigRe
 
 function handleChangeCluster(type: 'master' | 'slave') {
   clusterType.value = type;
+  monitorNode.value = '';
+  currentNodeType.value = '';
   handleRefreshMonitor();
 }
 

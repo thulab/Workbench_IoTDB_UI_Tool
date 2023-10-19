@@ -27,17 +27,25 @@ export const getParentPathAuthList = (path: string, dataPrivilegeLMap: Array<{ p
   return getParentPathAuthList(path, dataPrivilegeLMap, level + 1);
 };
 
+const splitVersion = (version: string) => {
+  if (version.indexOf('-') > -1) {
+    return version.split('-')[0].split('.');
+  }
+  return version.split('.');
+};
+
 // 1.2.3及以上版本布置权限最新版
-export const iotdbShowAuth = () => {
-  const iotdbVersion = sessionStorage.getItem('iotdbVersion') || '';
-  const versionArr = iotdbVersion.split('.') || [];
+export const iotdbShowAuth = (version?: string) => {
+  const iotdbVersion = version || sessionStorage.getItem('iotdbVersion') || '';
+  const versionArr = splitVersion(iotdbVersion) || [];
   if (versionArr.length) {
-    if (+versionArr[1] >= 2) {
-      if (+versionArr[1] === 2) {
-        return +versionArr[2] >= 3;
-      }
-      return true;
-    }
+    const [majorStr, minorStr, releaseStr] = versionArr;
+    const major = +majorStr; // 主版本
+    const minor = +minorStr; // 次版本
+    const release = +releaseStr; // 修订版本
+    if (major > 1) return true;
+    if (major === 1 && minor > 2) return true;
+    if (major === 1 && minor === 2 && release >= 3) return true;
     return false;
   }
   return false;

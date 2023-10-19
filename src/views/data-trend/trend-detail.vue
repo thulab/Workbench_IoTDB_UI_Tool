@@ -117,6 +117,8 @@ const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
 const isExpand = ref(true);
 const searchFormRef = ref<FormInstance>();
+
+const minDataTime = ref(-1);
 const searchFormData = reactive({
   datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
   unitInterval: 'auto',
@@ -376,6 +378,9 @@ function handleData(data: any) {
   } = JSON.parse(data) || [];
   if (loading.value && jsonData.operate === 'get') {
     const minTime = dayjs().subtract(10, 'minute').valueOf();
+    if (chartData.value.length === 0) {
+      minDataTime.value = dayjs().valueOf();
+    }
     jsonData.data.forEach((item) => {
       const index = chartData.value.findIndex((f) => f.path === item.path);
       if (index !== -1) {
@@ -398,10 +403,11 @@ function handleData(data: any) {
         chartData.value.push(dataItem);
       }
     });
+    const min = minTime > minDataTime.value ? minTime : minDataTime.value;
     setOption({
       legend: legendSelected.value,
       series: seriesData.value.series,
-      xAxis: { min: minTime, show: true },
+      xAxis: { min, show: true },
       dataZoom: [
         {
           type: 'slider',
@@ -465,6 +471,7 @@ function handleTrendTab(type: 'running' | 'history') {
       handleReset();
       handleSearch();
     } else {
+      minDataTime.value = dayjs().valueOf();
       pathList.value.forEach((item) => {
         item.disabled = false;
       });

@@ -404,7 +404,7 @@ function getDisk() {
     const {
       diskTotal, totalUnit, diskUse, useUnit, diskUseRatio, ioTDBUse, ioTDBUnit, ioTDBUseRatio,
     } = res.data;
-    diskMemoryData.diskTotal = diskTotal || 0;
+    diskMemoryData.diskTotal = diskTotal;
     diskMemoryData.totalUnit = totalUnit || '';
     diskMemoryData.diskMemory = `${diskUse} ${useUnit}`;
     diskMemoryData.diskMemoryVal = diskUseRatio * diskTotal;

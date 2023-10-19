@@ -70,6 +70,7 @@
     "useWebsocket": true,
     "IconEpArrowRight": true,
     "IconEpMoon": true,
-    "IconEpSunny": true
+    "IconEpSunny": true,
+    "useSessionStorage": true
   }
 }
