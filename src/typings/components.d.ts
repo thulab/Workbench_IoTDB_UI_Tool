@@ -106,6 +106,7 @@ declare module 'vue' {
     ICustomPlayActive: typeof import('~icons/custom/play-active')['default']
     ICustomPlayDisabled: typeof import('~icons/custom/play-disabled')['default']
     ICustomQuestion: typeof import('~icons/custom/question')['default']
+    ICustomQuestionNew: typeof import('~icons/custom/question-new')['default']
     ICustomQuestionWhite: typeof import('~icons/custom/question-white')['default']
     ICustomRefresh: typeof import('~icons/custom/refresh')['default']
     ICustomSearchIcon: typeof import('~icons/custom/search-icon')['default']

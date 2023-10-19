@@ -102,6 +102,13 @@
         </div>
       </div>
     </el-main>
+
+    <modal-sync
+      v-model:visible="editVisible"
+      :edit-type="editType"
+      :edit-data="editData"
+      @handleSave="handleSearch"
+    />
   </el-container>
 </template>
 
@@ -109,6 +116,7 @@
 import { CalculateApi } from '@/api';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ICustomMessageError from '~icons/custom/error.svg';
+import ModalSync from './components/modal-sync.vue';
 
 const { maxTableHeight } = useTableHeight(300);
 const searchFormData = reactive({
