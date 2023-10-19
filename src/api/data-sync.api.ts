@@ -22,8 +22,8 @@ class DataSyncApi {
     return http.post('/synchron/saveSynchronTask', data);
   }
 
-  static saveAdvancedTask(advancedInput: string): HttpResponseP {
-    return http.post('/synchron/saveAdvancedTask', { advancedInput });
+  static saveAdvancedTask(advancedTask: string): HttpResponseP {
+    return http.post('/synchron/saveAdvancedTask', { advancedTask });
   }
 
   static getTaskDetail(taskName: string): HttpResponseP<DataSync.SynchronData> {
