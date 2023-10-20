@@ -30,8 +30,8 @@
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item command="del">批量删除</el-dropdown-item>
-                  <el-dropdown-item command="run">批量启动</el-dropdown-item>
-                  <el-dropdown-item command="stop">批量静止</el-dropdown-item>
+                  <el-dropdown-item command="running">批量启动</el-dropdown-item>
+                  <el-dropdown-item command="stopped">批量静止</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -52,30 +52,30 @@
           >
             <el-table-column type="selection" width="55" />
             <el-table-column label="任务名称" prop="name" min-width="120" align="center" show-overflow-tooltip />
-            <el-table-column label="同步数据" prop="desc" min-width="160" align="center" show-overflow-tooltip />
-            <el-table-column label="同步范围" prop="desc" min-width="120" align="center" show-overflow-tooltip />
-            <el-table-column label="目标地址" prop="desc" min-width="160" align="center" show-overflow-tooltip />
-            <el-table-column label="任务状态" prop="measurement" width="160" align="center" show-overflow-tooltip>
+            <el-table-column label="同步数据" prop="measurement" min-width="160" align="center" show-overflow-tooltip />
+            <el-table-column label="同步范围" prop="range" min-width="120" align="center" show-overflow-tooltip />
+            <el-table-column label="目标地址" prop="resourceAddress" min-width="160" align="center" show-overflow-tooltip />
+            <el-table-column label="任务状态" prop="status" width="160" align="center" show-overflow-tooltip>
               <template #default="{ row }">
                 <el-tooltip
                   placement="top-start"
                   effect="light"
                   trigger="hover"
                   content="错误详情"
-                  :disabled="false"
+                  :disabled="!row.exceptionMessage"
                   popper-class="tooltip-box-width"
                 >
-                  <span class="stop-error-button" @click="handleStatusInfo(row)">{{ row.measurement }}</span>
+                  <span :class="[row.exceptionMessage ? 'stop-error-button' : '']" @click="handleStatusInfo(row)">{{ row.status }}</span>
                 </el-tooltip>
               </template>
             </el-table-column>
-            <el-table-column label="创建时间" prop="valueTime" min-width="200" align="center" show-overflow-tooltip />
+            <el-table-column label="创建时间" prop="creationTime" min-width="200" align="center" show-overflow-tooltip />
             <el-table-column label="操作" width="180" align="center" fixed="right">
               <template #default="{ row }">
                 <div>
-                  <el-button type="primary" link size="small" @click="handleEdit(row)" :id="`data-sync-table-${row.measurement}-data`">详情</el-button>
-                  <el-button type="primary" link size="small" @click="handleStatus('row', row, row.status)" :id="`data-sync-table-${row.measurement}-edit`">启动</el-button>
-                  <el-button type="primary" link size="small" @click="handleDel('row', row)" :id="`data-sync-table-${row.measurement}-del`">删除</el-button>
+                  <el-button type="primary" link size="small" @click="handleEdit(row)" :id="`data-sync-table-${row.name}-view`">详情</el-button>
+                  <el-button type="primary" link size="small" @click="handleStatus('row', row, row.status)" :id="`data-sync-table-${row.name}-status`">{{row.status === 'running' ? '停止' : '启动'}}</el-button>
+                  <el-button type="primary" link size="small" @click="handleDel('row', row)" :id="`data-sync-table-${row.name}-del`">删除</el-button>
                 </div>
               </template>
             </el-table-column>
@@ -113,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import { CalculateApi } from '@/api';
+import { DataSyncApi } from '@/api';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ICustomMessageError from '~icons/custom/error.svg';
 import ModalSync from './components/modal-sync.vue';
@@ -121,37 +121,29 @@ import ModalSync from './components/modal-sync.vue';
 const { maxTableHeight } = useTableHeight(300);
 const searchFormData = reactive({
   name: '',
-  type: 'name',
 });
 const pagination = reactive({
   pageSize: 10,
   pageNum: 1,
 });
+const tableData = ref<DataSync.SynchronListData[]>([]);
 const totalCount = ref(0);
-const multipleSelection = ref<Calculate.CalculateItem[]>([]);
+const multipleSelection = ref<DataSync.SynchronListData[]>([]);
 const editType = ref('add');
 const editVisible = ref(false);
-const editData = ref();
+const editData = ref('');
 
-const { requestFn: getCalculateList, data: tableData, loading } = useRequest(CalculateApi.getCalculateList, {
-  initData: {
-    totalCount: 0,
-    totalPage: 1,
-    list: [],
-  },
-});
-const { requestFn: deleteCalculate } = useRequest(CalculateApi.deleteCalculate);
+const { requestFn: getDataSynchronList, loading } = useRequest(DataSyncApi.getDataSynchronList);
+const { requestFn: deleteDataSynchronByNames } = useRequest(DataSyncApi.deleteDataSynchronByNames);
+const { requestFn: startTaskByNames } = useRequest(DataSyncApi.startTaskByNames);
+const { requestFn: stopTaskByNames } = useRequest(DataSyncApi.stopTaskByNames);
 
-const tableDataPagination = computed(() => tableData.value.list.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
+const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
 
 function getListData() {
-  getCalculateList({
-    ...pagination,
-    name: searchFormData.type === 'name' ? searchFormData.name : '',
-    measurement: searchFormData.type === 'measurement' ? searchFormData.name : '',
-    desc: searchFormData.type === 'desc' ? searchFormData.name : '',
-  }).then((res) => {
-    totalCount.value = res.data.totalCount;
+  getDataSynchronList(searchFormData.name).then((res) => {
+    tableData.value = res.data || [];
+    totalCount.value = tableData.value.length;
   });
 }
 
@@ -175,12 +167,13 @@ function onChangePage(page: number) {
   pagination.pageNum = page;
 }
 
-function handleSelectionChange(vals: Calculate.CalculateItem[]) {
+function handleSelectionChange(vals: DataSync.SynchronListData[]) {
   multipleSelection.value = vals;
 }
 
-function handleStatusInfo(row: Calculate.CalculateItem) {
-  ElMessageBox.confirm(row.desc, '报错详情', {
+function handleStatusInfo(row: DataSync.SynchronListData) {
+  if (!row.exceptionMessage || row.status === 'running') return;
+  ElMessageBox.confirm(row.exceptionMessage, '报错详情', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
@@ -190,21 +183,42 @@ function handleStatusInfo(row: Calculate.CalculateItem) {
 
 function handleAdd() {
   editType.value = 'add';
-  editData.value = undefined;
+  editData.value = '';
   editVisible.value = true;
 }
 
-function handleEdit(row: Calculate.CalculateItem) {
+function handleEdit(row: DataSync.SynchronListData) {
   editType.value = 'view';
-  editData.value = { ...row };
+  editData.value = row.name;
   editVisible.value = true;
 }
 
-function handleStatus(type: string, data: Calculate.CalculateItem | null, status: string) {
-  console.log(type, data, status);
+function handleStatus(type: string, data: DataSync.SynchronListData | null, status: 'running' | 'stopped') {
+  let statusData: string[] = [];
+  if (status === 'running') {
+    if (type === 'batch') {
+      statusData = multipleSelection.value.filter((item) => item.status === 'running').map((d) => d.name);
+    } else {
+      statusData = [data!.name];
+    }
+    stopTaskByNames(statusData).then(() => {
+      ElMessage.success('停止成功');
+      handleSearch();
+    });
+  } else {
+    if (type === 'batch') {
+      statusData = multipleSelection.value.filter((item) => item.status === 'stopped').map((d) => d.name);
+    } else {
+      statusData = [data!.name];
+    }
+    startTaskByNames(statusData).then(() => {
+      ElMessage.success('启动成功');
+      handleSearch();
+    });
+  }
 }
 
-function handleDel(type: string, data: Calculate.CalculateItem | null) {
+function handleDel(type: string, data: DataSync.SynchronListData | null) {
   ElMessageBox.confirm(type === 'batch' ? '确认删除这些任务吗？' : '是否删除该任务？', '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
@@ -214,18 +228,18 @@ function handleDel(type: string, data: Calculate.CalculateItem | null) {
     .then(() => {
       let arr = [];
       if (type === 'batch') {
-        arr = multipleSelection.value?.map((i) => i.measurement);
+        arr = multipleSelection.value?.map((i) => i.name);
       } else {
-        arr = data?.measurement ? [data.measurement] : [];
+        arr = [data!.name];
       }
-      deleteCalculate(arr).then(() => {
+      deleteDataSynchronByNames(arr).then(() => {
         ElMessage.success('删除成功');
         handleSearch();
       });
     });
 }
 
-function handleCommandDown(val: 'del' | 'run' | 'stop') {
+function handleCommandDown(val: 'del' | 'running' | 'stopped') {
   if (val === 'del') {
     handleDel('batch', null);
   } else {
@@ -277,11 +291,7 @@ onMounted(() => {
 }
 
 .stop-error-button{
-  // color: #495AD4;
-  // cursor: pointer;
-
-  // &:hover{
-  //   text-decoration: underline;
-  // }
+  cursor: pointer;
+  text-decoration: underline;
 }
 </style>

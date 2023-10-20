@@ -225,9 +225,7 @@ const chartOptions = computed<ECOption>(() => ({
       const circle = '<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:';
       checkedData.value.forEach((item) => {
         const data = paramsData.find((f) => f.seriesName === item.path);
-        if (data) {
-          res += `<div style="margin: 10px 0 0;">${circle}${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;margin-left:2px">${data.seriesName}</span><span style="float:right;margin-left:20px;font-size:14px;color:#666;font-weight:900">${data.data[1]}</span></div>`;
-        }
+        res += `<div style="margin: 10px 0 0;">${circle}${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;margin-left:2px">${data ? data.seriesName : item.path}</span><span style="float:right;margin-left:20px;font-size:14px;color:#666;font-weight:900">${data ? data.data[1] : null}</span></div>`;
       });
       return `<div style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0].axisValueLabel}</div>${res}`;
     },

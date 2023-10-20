@@ -8,6 +8,7 @@ declare namespace DataSync {
     targetAddress: string;
     status: string;
     exceptionMessage: string;
+    creationTime: DateModelType;
   }
 
   export interface SynchronFormData {

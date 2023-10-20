@@ -12,7 +12,7 @@
       <el-tabs type="card" v-model="activeTab">
         <el-tab-pane label="界面选择" name="select">
           <el-scrollbar class="p-16">
-            <el-form ref="formRef" :model="formData" label-position="left" class="form-wrapper">
+            <el-form ref="formRef" :model="formData" label-position="left" class="form-wrapper" :disabled="editType === 'view'">
               <label><input type="password" autocomplete="new-password" hidden></label>
               <base-form-item label="任务名称:" prop="name" :rules="requiredNameRules" class="form-label-width">
                 <el-input v-model="formData.name" placeholder="请输入任务名称" id="data-sync-modal-name" style="width: 240px;" />
@@ -264,7 +264,7 @@ import ICustomCalender from '~icons/custom/calender.svg';
 const props = defineProps<{
   visible: boolean;
   editType: string;
-  editData?: Calculate.CalculateItem;
+  editData: string;
 }>();
 
 const emit = defineEmits<{
@@ -280,19 +280,19 @@ const codeMirrorReady = ref(false);
 const requiredRules = ref([
   {
     required: true,
-    message: '请输入相应内容后进行操作',
+    message: '请输入内容后操作',
     trigger: ['blur', 'change'],
   },
 ]);
 const requiredNameRules = ref([
   {
     required: true,
-    message: '请输入相应内容后进行操作',
+    message: '请输入内容后操作',
     trigger: ['blur', 'change'],
   },
   {
     pattern: /^[A-Za-z0-9_]+$/,
-    message: '格式不符，支持输入字母大小写、数字、下划线、关键字',
+    message: '格式不符，请输入字母大小写、数字、下划线、关键字',
     trigger: ['blur', 'change'],
   },
 ]);
@@ -410,7 +410,7 @@ watch(
     if (newVal) {
       formRef.value?.resetFields();
       saveLoading.value = false;
-      if (props.editType === 'view' && props.editData) {
+      if (props.editType === 'view') {
         console.log('查看');
       } else {
         console.log('新增');
