@@ -148,10 +148,10 @@ const { requestFn: deleteMeasurements } = useRequest(StorageApi.deleteMeasuremen
 const dataTypeOptions = ['BOOLEAN', 'INT32', 'INT64', 'FLOAT', 'DOUBLE', 'TEXT'];
 const encoding: { [key: string]: string[] } = {
   BOOLEAN: ['PLAIN', 'RLE'],
-  INT32: ['RLE', 'PLAIN', 'TS_2DIFF', 'GORILLA', 'FREQ', 'ZIGZAG', 'CHIMP', 'SPRINTZ', 'RLBE'],
-  INT64: ['RLE', 'PLAIN', 'TS_2DIFF', 'GORILLA', 'FREQ', 'ZIGZAG', 'CHIMP', 'SPRINTZ', 'RLBE'],
-  FLOAT: ['GORILLA', 'PLAIN', 'RLE', 'TS_2DIFF', 'FREQ', 'CHIMP', 'SPRINTZ', 'RLBE'],
-  DOUBLE: ['GORILLA', 'PLAIN', 'RLE', 'TS_2DIFF', 'FREQ', 'CHIMP', 'SPRINTZ', 'RLBE'],
+  INT32: ['RLE', 'PLAIN', 'TS_2DIFF', 'GORILLA', 'ZIGZAG', 'CHIMP', 'SPRINTZ', 'RLBE'],
+  INT64: ['RLE', 'PLAIN', 'TS_2DIFF', 'GORILLA', 'ZIGZAG', 'CHIMP', 'SPRINTZ', 'RLBE'],
+  FLOAT: ['GORILLA', 'PLAIN', 'RLE', 'TS_2DIFF', 'CHIMP', 'SPRINTZ', 'RLBE'],
+  DOUBLE: ['GORILLA', 'PLAIN', 'RLE', 'TS_2DIFF', 'CHIMP', 'SPRINTZ', 'RLBE'],
   TEXT: ['PLAIN', 'DICTIONARY'],
 };
 const compressionOptions = ['UNCOMPRESSED', 'SNAPPY', 'LZ4', 'GZIP', 'ZSTD', 'LZMA2'];
