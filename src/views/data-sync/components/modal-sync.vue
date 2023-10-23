@@ -7,7 +7,7 @@
     :close-on-click-modal="false"
     id="data-sync-modal"
   >
-    <div class="form-wrapper">
+    <div class="form-wrapper" v-loading="loading">
       <span class="tabs-tip"><el-icon size="14" style="margin-right: 2px;"><i-custom-info-warning /></el-icon>最终提交信息为您提交时所在的页签内容</span>
       <el-tabs type="card" v-model="activeTab" @tab-click="handleTabClick">
         <el-tab-pane label="界面选择" name="select">
@@ -460,14 +460,14 @@ function handleTabClick(tab: TabsPaneContext) {
 }
 
 function getPlugin() {
-  getPilePluginsList().then((res) => {
+  return getPilePluginsList().then((res) => {
     dealOptions.value = res.data.processor || [];
     sendOptions.value = res.data.connector || [];
   });
 }
 
 function getSelectDetail() {
-  getTaskDetail(props.editData).then((res) => {
+  return getTaskDetail(props.editData).then((res) => {
     formData.value = {
       ...res.data,
       path: res.data.whole ? '' : res.data.path.substring(5),
@@ -483,7 +483,7 @@ function getSelectDetail() {
 }
 
 function getInputDetail() {
-  getAdvancedTaskDetail(props.editData).then((res) => {
+  return getAdvancedTaskDetail(props.editData).then((res) => {
     taskInputVal.value = res.data.advancedInput || '';
   });
 }
@@ -494,7 +494,7 @@ function getDetail() {
     getPlugin(),
     getSelectDetail(),
     getInputDetail(),
-  ]).finally(() => {
+  ]).then(() => {
     loading.value = false;
   });
 }
@@ -561,6 +561,9 @@ watch(
       loading.value = false;
       saveLoading.value = false;
       logSendBatchDisabled.value = false;
+      activeTab.value = 'select';
+      dealOptions.value = [];
+      sendOptions.value = [];
       codeEditorRef.value?.setCodeEditorReadonly(props.editType === 'view');
       if (props.editType === 'view') {
         getDetail();
@@ -570,7 +573,10 @@ watch(
         nextTick(() => {
           formRef.value?.clearValidate();
         });
-        getPlugin();
+        loading.value = true;
+        getPlugin().finally(() => {
+          loading.value = false;
+        });
       }
     }
   },
