@@ -4,9 +4,8 @@ declare namespace DataSync {
     name: string;
     measurement: string;
     range: string;
-    resourceAddress: string;
     targetAddress: string;
-    status: string;
+    state: string;
     exceptionMessage: string;
     creationTime: DateModelType;
   }
@@ -18,17 +17,15 @@ declare namespace DataSync {
     reforward: boolean;
     isSynchronHistory: boolean;
     datetimerange: [DateModelType, DateModelType],
-    // startTime: DateModelType;
-    // endTime: DateModelType;
+    startTime: DateModelType;
+    endTime: DateModelType;
     isSynchronRealTime: boolean;
-    triggerMode: number;
-    isCustomProcessorPlugin: boolean;
+    triggerMode: string;
     processorPluginType: string;
-    processorPlugin: string;
+    processorPluginName: string;
     processorPluginParam: string;
-    isCustomConnectorPlugin: boolean;
     connectorPluginType: string;
-    connectorPlugin: string;
+    connectorPluginName: string;
     connectorPluginParam: string;
     targetInfos: Array<{ host: string, port: number | string }>;
     isLogSendBatch: boolean;
@@ -49,7 +46,7 @@ declare namespace DataSync {
     startTime: DateModelType;
     endTime: DateModelType;
     isSynchronRealTime: boolean;
-    triggerMode: number;
+    triggerMode: string;
     isCustomProcessorPlugin: boolean;
     processorPlugin: string;
     processorPluginParam: string;
@@ -58,15 +55,22 @@ declare namespace DataSync {
     connectorPluginParam: string;
     targetInfos: Array<{ host: string, port: number | string }>;
     isLogSendBatch: boolean;
-    logSendBatchWaitTime: string;
-    logSendBatchSize: string;
+    logSendBatchWaitTime: string | number;
+    logSendBatchSize: string | number;
     targetUserName: string;
     targetPassword: string;
     targetVersion: string;
     targetOverTime: string | number;
   }
 
-  export interface PluginList {
+  export interface PluginData {
+    pluginDesc: string;
+    pluginName: string;
+    pluginType: string;
+  }
 
+  export interface PluginList {
+    connector: PluginData[];
+    processor: PluginData[];
   }
 }

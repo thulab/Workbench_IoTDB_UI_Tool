@@ -9,7 +9,7 @@
   >
     <div class="form-wrapper">
       <span class="tabs-tip"><el-icon size="14" style="margin-right: 2px;"><i-custom-info-warning /></el-icon>最终提交信息为您提交时所在的页签内容</span>
-      <el-tabs type="card" v-model="activeTab">
+      <el-tabs type="card" v-model="activeTab" @tab-click="handleTabClick">
         <el-tab-pane label="界面选择" name="select">
           <el-scrollbar class="p-16">
             <el-form ref="formRef" :model="formData" label-position="left" class="form-wrapper" :disabled="editType === 'view'">
@@ -63,7 +63,7 @@
                     id="data-sync-modal-history-switch"
                   />
                 </base-form-item>
-                <base-form-item label="时间范围：" prop="datetimerange" :rules="requiredRules" class="m-l-24">
+                <base-form-item v-if="formData.isSynchronHistory" label="时间范围：" prop="datetimerange" :rules="requiredRules" class="m-l-24">
                   <el-date-picker
                     v-model="formData.datetimerange"
                     type="datetimerange"
@@ -92,11 +92,11 @@
                     id="data-sync-modal-running-switch"
                   />
                 </base-form-item>
-                <base-form-item label="触发模式：" prop="triggerMode" :rules="requiredRules" class="m-l-24">
-                  <el-radio-group v-model="formData.triggerMode">
-                    <el-radio :label="1">混合模式</el-radio>
-                    <el-radio :label="2">日志模式</el-radio>
-                    <el-radio :label="3">文件模式</el-radio>
+                <base-form-item v-if="formData.isSynchronRealTime" label="触发模式：" prop="triggerMode" :rules="requiredRules" class="m-l-24">
+                  <el-radio-group v-model="formData.triggerMode" @change="val => handleChangeTriggerMode(val as string as 'hybrid' | 'log' | 'file')">
+                    <el-radio :label="'hybrid'">混合模式</el-radio>
+                    <el-radio :label="'log'">日志模式</el-radio>
+                    <el-radio :label="'file'">文件模式</el-radio>
                   </el-radio-group>
                 </base-form-item>
               </div>
@@ -105,18 +105,18 @@
                 <base-form-item label="处理插件：" prop="processorPluginType" :rules="requiredRules" class="form-label-width">
                   <el-select v-model="formData.processorPluginType" :style="{ width: formData.processorPluginType === 'custom' ? '152px' : '360px' }" id="data-sync-modal-select-deal">
                     <el-option
-                      v-for="item in dealOptions"
-                      :key="item.value"
-                      :label="item.name"
-                      :value="item.value"
+                      v-for="(item, i) in dealOptions"
+                      :key="`${item.pluginName}_${i}_deal`"
+                      :label="item.pluginType === 'external' ? item.pluginDesc : `${item.pluginDesc}(${item.pluginName})`"
+                      :value="item.pluginName"
                     />
                   </el-select>
                 </base-form-item>
-                <base-form-item label="" prop="processorPlugin" :rules="requiredRules" class="form-item-no-label m-l-8">
-                  <el-input v-model="formData.processorPlugin" placeholder="请输入处理插件名称" style="width:200px;" id="data-sync-modal-deal-name" />
+                <base-form-item v-if="formData.processorPluginType === 'custom'" label="" prop="processorPluginName" :rules="requiredRules" class="form-item-no-label m-l-8">
+                  <el-input v-model="formData.processorPluginName" placeholder="请输入处理插件名称" style="width:200px;" id="data-sync-modal-deal-name" />
                 </base-form-item>
               </div>
-              <base-form-item label="插件参数：" prop="processorPluginParam" :rules="requiredRules" class="form-label-width">
+              <base-form-item v-if="formData.processorPluginType === 'custom'" label="插件参数：" prop="processorPluginParam" :rules="requiredRules" class="form-label-width">
                 <el-input v-model="formData.processorPluginParam" type="textarea" placeholder="请输入插件参数，例如:'processor' = '`alarm-processer`', 'processor.alarm_id' = '582'" style="width:360px;" :resize="'none'" :rows="4" id="data-sync-modal-deal-params" />
               </base-form-item>
               <h4 class="form-module-title">发送设置</h4>
@@ -124,18 +124,30 @@
                 <base-form-item label="发送插件：" prop="connectorPluginType" :rules="requiredRules" class="form-label-width">
                   <el-select v-model="formData.connectorPluginType" :style="{ width: formData.connectorPluginType === 'custom' ? '152px' : '360px' }" id="data-sync-modal-select-send">
                     <el-option
-                      v-for="item in sendOptions"
-                      :key="item.value"
-                      :label="item.name"
-                      :value="item.value"
+                      v-for="(item, i) in sendOptions"
+                      :key="`${item.pluginName}_${i}_send`"
+                      :label="item.pluginType === 'external' ? item.pluginDesc : `${item.pluginDesc}(${item.pluginName})`"
+                      :value="item.pluginName"
                     />
                   </el-select>
                 </base-form-item>
-                <base-form-item label="" prop="connectorPlugin" :rules="requiredRules" class="form-item-no-label m-l-8">
-                  <el-input v-model="formData.connectorPlugin" placeholder="请输入发送插件名称" style="width:200px;" id="data-sync-modal-send-name" />
+                <base-form-item v-if="formData.connectorPluginType === 'custom'" label="" prop="connectorPluginName" :rules="requiredRules" class="form-item-no-label m-l-8">
+                  <el-input v-model="formData.connectorPluginName" placeholder="请输入发送插件名称" style="width:200px;" id="data-sync-modal-send-name" />
                 </base-form-item>
               </div>
-              <template v-if="true">
+              <base-form-item v-if="formData.connectorPluginType === 'custom'" label="插件参数：" prop="connectorPluginParam" :rules="requiredRules" class="form-label-width">
+                <el-input
+                  v-model="formData.connectorPluginParam"
+                  type="textarea"
+                  placeholder="请输入插件参数，例如：
+'connector' = '`alarm-connector`',
+ 'connector.send_alarm_url' = 'http://192.20.10.31:9091/api/alarm/addRecords'"
+                  style="width:360px;"
+                  :resize="'none'"
+                  :rows="4"
+                  id="data-sync-modal-send-params" />
+              </base-form-item>
+              <template v-if="formData.connectorPluginType !== 'custom' && formData.connectorPluginType !== 'do-nothing-connector'">
                 <div class="ip-port-box">
                   <span class="form-label">目标端信息：<el-tooltip effect="light" content="请确保目标端已经创建了发送端的所有测点，或已开启自动创建元数据，否则将会导致失败！" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip></span>
                   <div class="ip-port-list">
@@ -152,10 +164,12 @@
                     </div>
                   </div>
                 </div>
-                <div class="flex-align-center">
+                <!-- 单线程数据传输/多线程数据传输 -->
+                <div class="flex-align-center" v-if="formData.connectorPluginType === 'iotdb-thrift-sync-connector' || formData.connectorPluginType === 'iotdb-thrift-async-connector'">
                   <base-form-item label="攒批发送模式:" prop="isLogSendBatch" :rules="requiredRules" class="form-label-width">
                     <el-switch
                       v-model="formData.isLogSendBatch"
+                      :disabled="logSendBatchDisabled"
                       :active-value="true"
                       :inactive-value="false"
                       style="
@@ -164,26 +178,29 @@
                       id="data-sync-modal-send-switch"
                     />
                   </base-form-item>
-                  <div class="flex-align-center m-l-36">
-                    <base-form-item label="等待时间：" prop="desc" :rules="requiredRules" class="form-item-label-short">
-                      <template #label>
-                        等待时间:<el-tooltip effect="light" content="一批数据在发送前的最长等待时间" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
-                      </template>
-                      <el-input v-model="formData.name" placeholder="请输入时间" id="data-sync-modal-time" style="width: 100px;" />
-                      <span class="m-l-8 form-item-unit">s</span>
-                    </base-form-item>
-                  </div>
-                  <div class="flex-align-center m-l-24">
-                    <base-form-item label="攒批大小：" prop="desc" :rules="requiredRules" class="form-item-label-short">
-                      <template #label>
-                        攒批大小:<el-tooltip effect="light" content="一批数据最大的攒批大小" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
-                      </template>
-                      <el-input v-model="formData.name" placeholder="请输入大小" id="data-sync-modal-size" style="width: 100px;" />
-                      <span class="m-l-8 form-item-unit">byte</span>
-                    </base-form-item>
-                  </div>
+                  <template v-if="formData.isLogSendBatch">
+                    <div class="flex-align-center m-l-36">
+                      <base-form-item label="等待时间：" prop="logSendBatchWaitTime" :rules="requiredNumberRules" class="form-item-label-short">
+                        <template #label>
+                          等待时间:<el-tooltip effect="light" content="一批数据在发送前的最长等待时间" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                        </template>
+                        <el-input v-model="formData.logSendBatchWaitTime" placeholder="请输入时间" id="data-sync-modal-time" style="width: 100px;" />
+                        <span class="m-l-8 form-item-unit">s</span>
+                      </base-form-item>
+                    </div>
+                    <div class="flex-align-center m-l-24">
+                      <base-form-item label="攒批大小：" prop="logSendBatchSize" :rules="requiredNumberRules" class="form-item-label-short">
+                        <template #label>
+                          攒批大小:<el-tooltip effect="light" content="一批数据最大的攒批大小" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                        </template>
+                        <el-input v-model="formData.logSendBatchSize" placeholder="请输入大小" id="data-sync-modal-size" style="width: 100px;" />
+                        <span class="m-l-8 form-item-unit">byte</span>
+                      </base-form-item>
+                    </div>
+                  </template>
                 </div>
-                <template v-if="true">
+                <!-- 向1.1.x以上版本传输 -->
+                <template v-if="formData.connectorPluginType === 'iotdb-legacy-pipe-connector'">
                   <base-form-item label="目标端用户名:" prop="targetUserName" :rules="requiredRules" class="form-label-width">
                     <template #label>
                       目标端用户名:<el-tooltip effect="light" content="该用户需要支持数据写入的权限" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
@@ -200,8 +217,9 @@
                     <el-input v-model="formData.targetVersion" placeholder="请输入目标端版本" id="data-sync-modal-targetVersion" style="width: 200px;" />
                   </base-form-item>
                 </template>
-                <div class="flex-align-center">
-                  <base-form-item label="超时时长：" prop="targetOverTime" :rules="requiredRules" class="form-label-width">
+                <!-- 跨网闸传输 -->
+                <div class="flex-align-center" v-if="formData.connectorPluginType === 'iotdb-air-gap-connector'">
+                  <base-form-item label="超时时长：" prop="targetOverTime" :rules="requiredNumberRules" class="form-label-width">
                     <template #label>
                       超时时长:<el-tooltip effect="light" content="发送端与目标端在首次尝试建立连接时握手请求的超时时长" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                     </template>
@@ -210,18 +228,6 @@
                   </base-form-item>
                 </div>
               </template>
-              <base-form-item label="插件参数：" prop="connectorPluginParam" :rules="requiredRules" class="form-label-width">
-                <el-input
-                  v-model="formData.connectorPluginParam"
-                  type="textarea"
-                  placeholder="请输入插件参数，例如：
-'connector' = '`alarm-connector`',
- 'connector.send_alarm_url' = 'http://192.20.10.31:9091/api/alarm/addRecords'"
-                  style="width:360px;"
-                  :resize="'none'"
-                  :rows="4"
-                  id="data-sync-modal-send-params" />
-              </base-form-item>
             </el-form>
           </el-scrollbar>
         </el-tab-pane>
@@ -245,7 +251,7 @@
     </div>
     <template #footer>
       <div class="dialog-footer" v-if="editType !== 'view'">
-        <el-button @click="dialogVisible = false" id="data-sync-modal-cancel">重置</el-button>
+        <el-button @click="handleResetForm" id="data-sync-modal-cancel">重置</el-button>
         <el-button type="primary" :loading="saveLoading" @click="handleConfirm" id="data-sync-modal-confirm">确定</el-button>
       </div>
     </template>
@@ -253,11 +259,14 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
-// import { CalculateApi } from '@/api';
+import type {
+  FormInstance, SingleOrRange, DateModelType, TabsPaneContext,
+} from 'element-plus';
+import { cloneDeep } from 'lodash-es';
+import { DataSyncApi } from '@/api';
 import CodeEditor from '@/views/search/components/code-editor.vue';
 import {
-  getStartAndEnd, today, todayNow, getOneInterval, getOneIntervalNow,
+  getStartAndEnd, today, todayNow, getOneInterval, getOneIntervalNow, formatDate,
 } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
 
@@ -265,6 +274,7 @@ const props = defineProps<{
   visible: boolean;
   editType: string;
   editData: string;
+  editTime: DateModelType;
 }>();
 
 const emit = defineEmits<{
@@ -315,6 +325,28 @@ const requiredPortRules = ref([
     trigger: ['blur', 'change'],
   },
 ]);
+const requiredNumberRules = ref([
+  {
+    required: true,
+    message: '请输入内容后操作',
+    trigger: ['blur', 'change'],
+  },
+  {
+    validator: (rule: any, value: any, callback: any) => {
+      if (value.toString().indexOf('.') > -1) {
+        return callback(new Error('输入有误'));
+      }
+      if (!/^-?\d+$/.test(`${value}`)) {
+        return callback(new Error('输入有误'));
+      }
+      if (value > Number.MAX_SAFE_INTEGER || value < Number.MIN_SAFE_INTEGER) {
+        return callback(new Error('输入有误'));
+      }
+      return callback();
+    },
+    trigger: ['blur', 'change'],
+  },
+]);
 const shortcutsDaterange = [
   {
     text: '今天',
@@ -329,18 +361,8 @@ const shortcutsDaterange = [
     value: () => getOneIntervalNow(7),
   },
 ];
-const dealOptions = ref<Array<{ name: string, value: string }>>([
-  { name: 'do-nothing-processor', value: 'do-nothing-processor' },
-  { name: '自定义', value: 'custom' },
-]);
-const sendOptions = ref<Array<{ name: string, value: string }>>([
-  { name: '单线程数据传输(iotdb-thrift-sync-connector)', value: 'iotdb-thrift-sync-connector' },
-  { name: '多线程数据传输(iotdb-thrift-async-connector)', value: 'iotdb-thrift-async-connector' },
-  { name: '向1.1.x以上版本传输(iotdb-legacy-pipe-connector)', value: 'iotdb-legacy-pipe-connector' },
-  { name: '跨网闸传输(iotdb-air-gap-connector)', value: 'iotdb-air-gap-connector' },
-  { name: '对传入事件不做处理(do-nothing-connector)', value: 'do-nothing-connector' },
-  { name: '自定义', value: 'custom' },
-]);
+const dealOptions = ref<DataSync.PluginData[]>([]);
+const sendOptions = ref<DataSync.PluginData[]>([]);
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 const formData = ref<DataSync.SynchronFormData>({
   name: '',
@@ -348,16 +370,18 @@ const formData = ref<DataSync.SynchronFormData>({
   path: '',
   reforward: true,
   isSynchronHistory: true,
-  datetimerange: [new Date('1970-1-1').getTime(), todayNow()] as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
+  startTime: '' as DateModelType,
+  endTime: '' as DateModelType,
+  datetimerange: [new Date('1970-1-1').getTime(), props.editTime || todayNow()] as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
   isSynchronRealTime: true,
-  triggerMode: 1,
-  isCustomProcessorPlugin: false,
-  processorPluginType: '',
-  processorPlugin: '',
+  triggerMode: 'hybrid',
+  // 处理
+  processorPluginType: 'do-nothing-processor',
+  processorPluginName: '',
   processorPluginParam: '',
-  isCustomConnectorPlugin: false,
-  connectorPluginType: '',
-  connectorPlugin: '',
+  // 发送
+  connectorPluginType: 'iotdb-thrift-sync-connector',
+  connectorPluginName: '',
   connectorPluginParam: '',
   targetInfos: [{ host: '', port: '' }],
   isLogSendBatch: true,
@@ -368,8 +392,10 @@ const formData = ref<DataSync.SynchronFormData>({
   targetVersion: '',
   targetOverTime: '',
 });
+let sourceData = cloneDeep(formData.value);
 const taskInputVal = ref('');
-
+const logSendBatchDisabled = ref(false);
+const loading = ref(false);
 const saveLoading = ref(false);
 
 const isDisabledHosts = computed(() => {
@@ -377,6 +403,12 @@ const isDisabledHosts = computed(() => {
   const flag = hosts.some((item) => !item.host || !item.port);
   return flag;
 });
+
+const { requestFn: getPilePluginsList } = useRequest(DataSyncApi.getPilePluginsList);
+const { requestFn: getTaskDetail } = useRequest(DataSyncApi.getTaskDetail);
+const { requestFn: getAdvancedTaskDetail } = useRequest(DataSyncApi.getAdvancedTaskDetail);
+const { requestFn: saveSynchronTask } = useRequest(DataSyncApi.saveSynchronTask);
+const { requestFn: saveAdvancedTask } = useRequest(DataSyncApi.saveAdvancedTask);
 
 function handleAddHost() {
   formData.value.targetInfos.push({ host: '', port: '' });
@@ -386,22 +418,139 @@ function handleDelHost(index: number) {
   formData.value.targetInfos.splice(index, 1);
 }
 
-const handleConfirm = () => {
-  formRef.value?.validate((valid) => {
-    if (valid) {
-      saveLoading.value = true;
-      // saveCalculate({
-      //   ...formData.value,
-      //   measurement: `root.${formData.value.measurement}`,
-      // }).then(() => {
-      //   ElMessage.success('创建成功');
-      //   dialogVisible.value = false;
-      //   emit('handleSave');
-      // }).finally(() => {
-      //   saveLoading.value = false;
-      // });
+function handleChangeTriggerMode(val: 'hybrid' | 'log' | 'file') {
+  if (val === 'file') {
+    formData.value.isLogSendBatch = false;
+    logSendBatchDisabled.value = true;
+  } else {
+    logSendBatchDisabled.value = false;
+  }
+}
+
+function handleResetForm() {
+  if (activeTab.value === 'select') {
+    formRef.value?.resetFields();
+    formData.value.whole = true;
+    formData.value.reforward = true;
+    formData.value.isSynchronHistory = true;
+    if (props.editType === 'add') {
+      formData.value.datetimerange = [new Date('1970-1-1').getTime(), props.editTime];
+      formData.value.startTime = new Date('1970-1-1').getTime();
+      formData.value.endTime = props.editTime;
+    } else if (sourceData.startTime && sourceData.endTime) {
+      formData.value.datetimerange = [sourceData.startTime, sourceData.endTime];
+    } else {
+      formData.value.datetimerange = [new Date('1970-1-1').getTime(), props.editTime];
     }
+    formData.value.isSynchronRealTime = true;
+    formData.value.triggerMode = 'hybrid';
+    formData.value.processorPluginType = 'do-nothing-processor';
+    formData.value.connectorPluginType = 'iotdb-thrift-sync-connector';
+    formData.value.targetInfos = [{ host: '', port: '' }];
+    formData.value.isLogSendBatch = true;
+  } else {
+    taskInputVal.value = '';
+  }
+}
+
+function handleTabClick(tab: TabsPaneContext) {
+  if (tab.props.name === 'select') {
+    formRef.value?.clearValidate();
+  }
+}
+
+function getPlugin() {
+  getPilePluginsList().then((res) => {
+    dealOptions.value = res.data.processor || [];
+    sendOptions.value = res.data.connector || [];
   });
+}
+
+function getSelectDetail() {
+  getTaskDetail(props.editData).then((res) => {
+    formData.value = {
+      ...res.data,
+      path: res.data.whole ? '' : res.data.path.substring(5),
+      datetimerange: res.data.startTime && res.data.endTime ? [res.data.startTime, res.data.endTime] : [new Date('1970-1-1').getTime(), props.editTime || todayNow()],
+      processorPluginType: res.data.isCustomProcessorPlugin ? 'custom' : res.data.processorPlugin,
+      processorPluginName: res.data.isCustomProcessorPlugin ? res.data.processorPlugin : '',
+      connectorPluginType: res.data.isCustomConnectorPlugin ? 'custom' : res.data.connectorPlugin,
+      connectorPluginName: res.data.isCustomConnectorPlugin ? res.data.connectorPlugin : '',
+      targetInfos: res.data.targetInfos || [],
+    };
+    sourceData = cloneDeep(formData.value);
+  });
+}
+
+function getInputDetail() {
+  getAdvancedTaskDetail(props.editData).then((res) => {
+    taskInputVal.value = res.data.advancedInput || '';
+  });
+}
+
+function getDetail() {
+  loading.value = true;
+  Promise.allSettled([
+    getPlugin(),
+    getSelectDetail(),
+    getInputDetail(),
+  ]).finally(() => {
+    loading.value = false;
+  });
+}
+
+const handleConfirm = () => {
+  if (activeTab.value === 'select') {
+    formRef.value?.validate((valid) => {
+      if (valid) {
+        saveLoading.value = true;
+        const params = {
+          name: formData.value.name,
+          whole: formData.value.whole,
+          path: formData.value.whole ? 'root' : `root.${formData.value.path}`,
+          reforward: formData.value.reforward,
+          isSynchronHistory: formData.value.isSynchronHistory,
+          startTime: formData.value.isSynchronHistory ? formatDate(formData.value.datetimerange[0], 'YYYY-MM-DD HH:mm:ss.SSSZ') : '',
+          endTime: formData.value.isSynchronHistory ? formatDate(formData.value.datetimerange[1], 'YYYY-MM-DD HH:mm:ss.SSSZ') : '',
+          isSynchronRealTime: formData.value.isSynchronRealTime,
+          triggerMode: formData.value.triggerMode,
+          isCustomProcessorPlugin: formData.value.processorPluginType === 'custom',
+          processorPlugin: formData.value.processorPluginType === 'custom' ? formData.value.processorPluginName : formData.value.processorPluginType,
+          processorPluginParam: formData.value.processorPluginType === 'custom' ? formData.value.processorPluginParam : '',
+          isCustomConnectorPlugin: formData.value.connectorPluginType === 'custom',
+          connectorPlugin: formData.value.connectorPluginType === 'custom' ? formData.value.connectorPluginName : formData.value.connectorPluginType,
+          connectorPluginParam: formData.value.connectorPluginType === 'custom' ? formData.value.connectorPluginParam : '',
+          targetInfos: formData.value.connectorPluginType !== 'custom' && formData.value.connectorPluginType !== 'do-nothing-connector' ? formData.value.targetInfos : [],
+          isLogSendBatch: formData.value.isLogSendBatch,
+          logSendBatchWaitTime: formData.value.isLogSendBatch ? formData.value.logSendBatchWaitTime : '',
+          logSendBatchSize: formData.value.isLogSendBatch ? formData.value.logSendBatchSize : '',
+          targetUserName: formData.value.connectorPluginType === 'iotdb-legacy-pipe-connector' ? formData.value.targetUserName : '',
+          targetPassword: formData.value.connectorPluginType === 'iotdb-legacy-pipe-connector' ? formData.value.targetPassword : '',
+          targetVersion: formData.value.connectorPluginType === 'iotdb-legacy-pipe-connector' ? formData.value.targetVersion : '',
+          targetOverTime: formData.value.connectorPluginType === 'iotdb-air-gap-connector' ? formData.value.targetOverTime : '',
+        };
+        saveSynchronTask(params).then(() => {
+          ElMessage.success('创建成功');
+          dialogVisible.value = false;
+          emit('handleSave');
+        }).finally(() => {
+          saveLoading.value = false;
+        });
+      }
+    });
+  } else {
+    if (!taskInputVal.value || !taskInputVal.value.trim()) {
+      ElMessage.error('请输入相应内容后进行操作');
+      return;
+    }
+    saveAdvancedTask(taskInputVal.value).then(() => {
+      ElMessage.success('创建成功');
+      dialogVisible.value = false;
+      emit('handleSave');
+    }).finally(() => {
+      saveLoading.value = false;
+    });
+  }
 };
 
 watch(
@@ -409,11 +558,19 @@ watch(
   (newVal) => {
     if (newVal) {
       formRef.value?.resetFields();
+      loading.value = false;
       saveLoading.value = false;
+      logSendBatchDisabled.value = false;
+      codeEditorRef.value?.setCodeEditorReadonly(props.editType === 'view');
       if (props.editType === 'view') {
-        console.log('查看');
+        getDetail();
       } else {
-        console.log('新增');
+        handleResetForm();
+        sourceData = cloneDeep(formData.value);
+        nextTick(() => {
+          formRef.value?.clearValidate();
+        });
+        getPlugin();
       }
     }
   },
@@ -643,25 +800,6 @@ watch(
       width: 28px;
       text-align: center;
       margin-top: 5px;
-    }
-  }
-}
-
-.data-sync-expression-box{
-  width: 100%;
-  height: 216px;
-  box-sizing: border-box;
-  position: relative;
-
-  .code-box{
-    width: calc(100% - 238px);
-
-    :deep(.cm-scroller::-webkit-scrollbar-track){
-      background-color: #F7F8FC !important;
-    }
-
-    :deep(.cm-scroller::-webkit-scrollbar-corner){
-      background-color: #F7F8FC !important;
     }
   }
 }

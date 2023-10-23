@@ -49,8 +49,16 @@ const insertContent = (content: string) => {
   }
 };
 
+const setCodeEditorReadonly = (val: boolean) => {
+  config.value.disabled = val;
+  if (view.value) {
+    getEditorTools(view.value).toggleDisabled(val);
+  }
+};
+
 defineExpose({
   insertContent,
+  setCodeEditorReadonly,
 });
 
 onMounted(() => {

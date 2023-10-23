@@ -54,8 +54,8 @@
             <el-table-column label="任务名称" prop="name" min-width="120" align="center" show-overflow-tooltip />
             <el-table-column label="同步数据" prop="measurement" min-width="160" align="center" show-overflow-tooltip />
             <el-table-column label="同步范围" prop="range" min-width="120" align="center" show-overflow-tooltip />
-            <el-table-column label="目标地址" prop="resourceAddress" min-width="160" align="center" show-overflow-tooltip />
-            <el-table-column label="任务状态" prop="status" width="160" align="center" show-overflow-tooltip>
+            <el-table-column label="目标地址" prop="targetAddress" min-width="160" align="center" show-overflow-tooltip />
+            <el-table-column label="任务状态" prop="state" width="160" align="center" show-overflow-tooltip>
               <template #default="{ row }">
                 <el-tooltip
                   placement="top-start"
@@ -65,7 +65,7 @@
                   :disabled="!row.exceptionMessage"
                   popper-class="tooltip-box-width"
                 >
-                  <span :class="[row.exceptionMessage ? 'stop-error-button' : '']" @click="handleStatusInfo(row)">{{ row.status }}</span>
+                  <span :class="[row.exceptionMessage ? 'stop-error-button' : '']" @click="handleStatusInfo(row)">{{ row.state }}</span>
                 </el-tooltip>
               </template>
             </el-table-column>
@@ -74,7 +74,7 @@
               <template #default="{ row }">
                 <div>
                   <el-button type="primary" link size="small" @click="handleEdit(row)" :id="`data-sync-table-${row.name}-view`">详情</el-button>
-                  <el-button type="primary" link size="small" @click="handleStatus('row', row, row.status)" :id="`data-sync-table-${row.name}-status`">{{row.status === 'running' ? '停止' : '启动'}}</el-button>
+                  <el-button type="primary" link size="small" @click="handleStatus('row', row, row.state)" :id="`data-sync-table-${row.name}-state`">{{row.state === 'running' ? '停止' : '启动'}}</el-button>
                   <el-button type="primary" link size="small" @click="handleDel('row', row)" :id="`data-sync-table-${row.name}-del`">删除</el-button>
                 </div>
               </template>
@@ -107,13 +107,16 @@
       v-model:visible="editVisible"
       :edit-type="editType"
       :edit-data="editData"
+      :edit-time="editTime"
       @handleSave="handleSearch"
     />
   </el-container>
 </template>
 
 <script setup lang="ts">
+import type { DateModelType } from 'element-plus';
 import { DataSyncApi } from '@/api';
+import { todayNow } from '@/utils/date';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ICustomMessageError from '~icons/custom/error.svg';
 import ModalSync from './components/modal-sync.vue';
@@ -132,6 +135,7 @@ const multipleSelection = ref<DataSync.SynchronListData[]>([]);
 const editType = ref('add');
 const editVisible = ref(false);
 const editData = ref('');
+const editTime = ref<DateModelType>('');
 
 const { requestFn: getDataSynchronList, loading } = useRequest(DataSyncApi.getDataSynchronList);
 const { requestFn: deleteDataSynchronByNames } = useRequest(DataSyncApi.deleteDataSynchronByNames);
@@ -172,7 +176,7 @@ function handleSelectionChange(vals: DataSync.SynchronListData[]) {
 }
 
 function handleStatusInfo(row: DataSync.SynchronListData) {
-  if (!row.exceptionMessage || row.status === 'running') return;
+  if (!row.exceptionMessage || row.state === 'running') return;
   ElMessageBox.confirm(row.exceptionMessage, '报错详情', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
@@ -184,20 +188,22 @@ function handleStatusInfo(row: DataSync.SynchronListData) {
 function handleAdd() {
   editType.value = 'add';
   editData.value = '';
+  editTime.value = todayNow();
   editVisible.value = true;
 }
 
 function handleEdit(row: DataSync.SynchronListData) {
   editType.value = 'view';
   editData.value = row.name;
+  editTime.value = todayNow();
   editVisible.value = true;
 }
 
-function handleStatus(type: string, data: DataSync.SynchronListData | null, status: 'running' | 'stopped') {
+function handleStatus(type: string, data: DataSync.SynchronListData | null, state: 'running' | 'stopped') {
   let statusData: string[] = [];
-  if (status === 'running') {
+  if (state === 'running') {
     if (type === 'batch') {
-      statusData = multipleSelection.value.filter((item) => item.status === 'running').map((d) => d.name);
+      statusData = multipleSelection.value.filter((item) => item.state === 'running').map((d) => d.name);
     } else {
       statusData = [data!.name];
     }
@@ -207,7 +213,7 @@ function handleStatus(type: string, data: DataSync.SynchronListData | null, stat
     });
   } else {
     if (type === 'batch') {
-      statusData = multipleSelection.value.filter((item) => item.status === 'stopped').map((d) => d.name);
+      statusData = multipleSelection.value.filter((item) => item.state === 'stopped').map((d) => d.name);
     } else {
       statusData = [data!.name];
     }
