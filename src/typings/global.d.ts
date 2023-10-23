@@ -101,7 +101,7 @@ declare global {
   }
 
   type IotdbDataType = 'BOOLEAN' | 'INT32' | 'INT64' | 'FLOAT' | 'DOUBLE' | 'TEXT';
-  type EncodingType = 'RLE' | 'PLAIN' | 'TS_2DIFF' | 'GORILLA' | 'FREQ' | 'ZIGZAG' | 'CHIMP' | 'SPRINTZ' | 'RLBE' | 'DICTIONARY';
+  type EncodingType = 'RLE' | 'PLAIN' | 'TS_2DIFF' | 'GORILLA' | 'ZIGZAG' | 'CHIMP' | 'SPRINTZ' | 'RLBE' | 'DICTIONARY';
   type CompressionType = 'UNCOMPRESSED' | 'SNAPPY' | 'LZ4' | 'GZIP' | 'ZSTD' | 'LZMA2';
 
   interface DynamicTableColumn extends Partial<TableColumnCtx<Record<string, any>>> {
