@@ -238,12 +238,13 @@
             <code-editor
               v-show="codeMirrorReady"
               v-model:model-value="taskInputVal"
-              @ready="()=>codeMirrorReady = true"
+              @ready="codeEditorReady"
               :style="{
                 height: `576px`,
                 backgroundColor: '#F7F8FC',
               }"
               ref="codeEditorRef"
+              :key="codeMirrorKey"
             />
           </el-scrollbar>
         </el-tab-pane>
@@ -287,6 +288,7 @@ const formRef = ref<FormInstance>();
 const codeEditorRef = ref<InstanceType<typeof CodeEditor>>();
 const activeTab = ref('select');
 const codeMirrorReady = ref(false);
+const codeMirrorKey = ref(0);
 const requiredRules = ref([
   {
     required: true,
@@ -409,6 +411,11 @@ const { requestFn: getTaskDetail } = useRequest(DataSyncApi.getTaskDetail);
 const { requestFn: getAdvancedTaskDetail } = useRequest(DataSyncApi.getAdvancedTaskDetail);
 const { requestFn: saveSynchronTask } = useRequest(DataSyncApi.saveSynchronTask);
 const { requestFn: saveAdvancedTask } = useRequest(DataSyncApi.saveAdvancedTask);
+
+function codeEditorReady() {
+  codeMirrorReady.value = true;
+  codeEditorRef.value?.setCodeEditorReadonly(props.editType === 'view');
+}
 
 function handleAddHost() {
   formData.value.targetInfos.push({ host: '', port: '' });
@@ -589,6 +596,8 @@ watch(
   () => props.visible,
   (newVal) => {
     if (newVal) {
+      codeMirrorReady.value = false;
+      codeMirrorKey.value++;
       formRef.value?.resetFields();
       errorName.value = '';
       loading.value = false;
@@ -599,7 +608,6 @@ watch(
       sendOptions.value = [];
       taskInputVal.value = '';
       handleResetForm();
-      codeEditorRef.value?.setCodeEditorReadonly(props.editType === 'view');
       if (props.editType === 'view') {
         getDetail();
       } else {
