@@ -2,7 +2,7 @@
   <el-container class="data-sync-detail-wrapper">
     <el-header class="p-x-0" style="height: auto;">
       <div class="search-form-wrapper">
-        <el-form :model="searchFormData" label-position="left" size="default" inline>
+        <el-form :model="searchFormData" label-position="left" size="default" inline @submit.prevent>
           <base-form-item label="任务名称：" prop="name">
             <el-input v-model="searchFormData.name" placeholder="请输入任务名称" id="data-sync-search-name">
               <template #prefix>
