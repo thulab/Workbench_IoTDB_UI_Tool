@@ -14,7 +14,7 @@
           <el-scrollbar class="p-16">
             <el-form ref="formRef" :model="formData" label-position="left" class="form-wrapper" :disabled="editType === 'view'">
               <label><input type="password" autocomplete="new-password" hidden></label>
-              <base-form-item label="任务名称:" prop="name" :rules="requiredNameRules" class="form-label-width">
+              <base-form-item label="任务名称:" prop="name" :rules="requiredNameRules" class="form-label-width" :error="errorName">
                 <el-input v-model="formData.name" placeholder="请输入任务名称" id="data-sync-modal-name" style="width: 240px;" />
               </base-form-item>
               <h4 class="form-module-title">抽取设置</h4>
@@ -33,7 +33,7 @@
                       popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip></el-radio>
                   </el-radio-group>
                 </base-form-item>
-                <base-form-item label="" prop="path" :rules="requiredRules" class="form-item-no-label m-l-24">
+                <base-form-item v-if="!formData.whole" label="" prop="path" :rules="formData.whole ? [] : requiredRules" class="form-item-no-label m-l-24">
                   <el-input v-model="formData.path" placeholder="请输入前缀路径" style="width:335px;" id="data-sync-modal-path">
                     <template #prepend>root.</template>
                   </el-input>
@@ -90,6 +90,7 @@
 
       --el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;"
                     id="data-sync-modal-running-switch"
+                    @change="val => handleChangeRunningSwitch(val as boolean)"
                   />
                 </base-form-item>
                 <base-form-item v-if="formData.isSynchronRealTime" label="触发模式：" prop="triggerMode" :rules="requiredRules" class="m-l-24">
@@ -184,7 +185,7 @@
                         <template #label>
                           等待时间:<el-tooltip effect="light" content="一批数据在发送前的最长等待时间" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                         </template>
-                        <el-input v-model="formData.logSendBatchWaitTime" placeholder="请输入时间" id="data-sync-modal-time" style="width: 100px;" />
+                        <el-input v-model.number="formData.logSendBatchWaitTime" placeholder="请输入时间" id="data-sync-modal-time" style="width: 100px;" />
                         <span class="m-l-8 form-item-unit">s</span>
                       </base-form-item>
                     </div>
@@ -193,7 +194,7 @@
                         <template #label>
                           攒批大小:<el-tooltip effect="light" content="一批数据最大的攒批大小" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                         </template>
-                        <el-input v-model="formData.logSendBatchSize" placeholder="请输入大小" id="data-sync-modal-size" style="width: 100px;" />
+                        <el-input v-model.number="formData.logSendBatchSize" placeholder="请输入大小" id="data-sync-modal-size" style="width: 100px;" />
                         <span class="m-l-8 form-item-unit">byte</span>
                       </base-form-item>
                     </div>
@@ -223,7 +224,7 @@
                     <template #label>
                       超时时长:<el-tooltip effect="light" content="发送端与目标端在首次尝试建立连接时握手请求的超时时长" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                     </template>
-                    <el-input v-model="formData.targetOverTime" placeholder="请输入目标端超时时长" id="data-sync-modal-time-over" style="width: 200px;" />
+                    <el-input v-model.number="formData.targetOverTime" placeholder="请输入目标端超时时长" id="data-sync-modal-time-over" style="width: 200px;" />
                     <span class="m-l-8 form-item-unit">ms</span>
                   </base-form-item>
                 </div>
@@ -395,6 +396,7 @@ const formData = ref<DataSync.SynchronFormData>({
 let sourceData = cloneDeep(formData.value);
 const taskInputVal = ref('');
 const logSendBatchDisabled = ref(false);
+const errorName = ref('');
 const loading = ref(false);
 const saveLoading = ref(false);
 
@@ -416,6 +418,18 @@ function handleAddHost() {
 
 function handleDelHost(index: number) {
   formData.value.targetInfos.splice(index, 1);
+}
+
+function handleChangeRunningSwitch(val: boolean) {
+  if (!val) {
+    formData.value.isLogSendBatch = false;
+    logSendBatchDisabled.value = true;
+  } else if (formData.value.triggerMode === 'file') {
+    formData.value.isLogSendBatch = false;
+    logSendBatchDisabled.value = true;
+  } else {
+    logSendBatchDisabled.value = false;
+  }
 }
 
 function handleChangeTriggerMode(val: 'hybrid' | 'log' | 'file') {
@@ -455,6 +469,7 @@ function handleResetForm() {
 
 function handleTabClick(tab: TabsPaneContext) {
   if (tab.props.name === 'select') {
+    errorName.value = '';
     formRef.value?.clearValidate();
   }
 }
@@ -501,9 +516,14 @@ function getDetail() {
 
 const handleConfirm = () => {
   if (activeTab.value === 'select') {
+    errorName.value = '';
     formRef.value?.validate((valid) => {
       if (valid) {
         saveLoading.value = true;
+        if (!formData.value.isSynchronHistory && !formData.value.isSynchronRealTime) {
+          ElMessage.error('历史数据与实时数据状态不能同时为关，请修改后重新操作');
+          return;
+        }
         const params = {
           name: formData.value.name,
           whole: formData.value.whole,
@@ -535,6 +555,10 @@ const handleConfirm = () => {
           emit('handleSave');
         }).finally(() => {
           saveLoading.value = false;
+        }).catch((err) => {
+          if (err.code === 1370) {
+            errorName.value = err.message;
+          }
         });
       }
     });
@@ -558,6 +582,7 @@ watch(
   (newVal) => {
     if (newVal) {
       formRef.value?.resetFields();
+      errorName.value = '';
       loading.value = false;
       saveLoading.value = false;
       logSendBatchDisabled.value = false;
@@ -771,7 +796,7 @@ watch(
     flex: 0 0 auto;
     position: relative;
     padding: 0 8px 0 0;
-    width: 105px;
+    width: 113px;
     box-sizing: border-box;
 
     &::before{
@@ -782,7 +807,7 @@ watch(
 
     svg{
       position: absolute;
-      right: 12px;
+      right: 20px;
       top: 0;
     }
   }
