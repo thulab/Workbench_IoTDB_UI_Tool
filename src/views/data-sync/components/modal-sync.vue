@@ -393,7 +393,6 @@ const formData = ref<DataSync.SynchronFormData>({
   targetVersion: '',
   targetOverTime: '',
 });
-let sourceData = cloneDeep(formData.value);
 const taskInputVal = ref('');
 const logSendBatchDisabled = ref(false);
 const errorName = ref('');
@@ -444,24 +443,30 @@ function handleChangeTriggerMode(val: 'hybrid' | 'log' | 'file') {
 function handleResetForm() {
   if (activeTab.value === 'select') {
     formRef.value?.resetFields();
+    formData.value.name = '';
     formData.value.whole = true;
+    formData.value.path = '';
     formData.value.reforward = true;
     formData.value.isSynchronHistory = true;
-    if (props.editType === 'add') {
-      formData.value.datetimerange = [new Date('1970-1-1').getTime(), props.editTime];
-      formData.value.startTime = new Date('1970-1-1').getTime();
-      formData.value.endTime = props.editTime;
-    } else if (sourceData.startTime && sourceData.endTime) {
-      formData.value.datetimerange = [sourceData.startTime, sourceData.endTime];
-    } else {
-      formData.value.datetimerange = [new Date('1970-1-1').getTime(), props.editTime];
-    }
+    formData.value.datetimerange = [new Date('1970-1-1').getTime(), props.editTime];
+    formData.value.startTime = new Date('1970-1-1').getTime();
+    formData.value.endTime = props.editTime;
     formData.value.isSynchronRealTime = true;
     formData.value.triggerMode = 'hybrid';
     formData.value.processorPluginType = 'do-nothing-processor';
+    formData.value.processorPluginName = '';
+    formData.value.processorPluginParam = '';
     formData.value.connectorPluginType = 'iotdb-thrift-sync-connector';
+    formData.value.connectorPluginName = '';
+    formData.value.connectorPluginParam = '';
     formData.value.targetInfos = [{ host: '', port: '' }];
     formData.value.isLogSendBatch = true;
+    formData.value.logSendBatchWaitTime = '';
+    formData.value.logSendBatchSize = '';
+    formData.value.targetUserName = '';
+    formData.value.targetPassword = '';
+    formData.value.targetVersion = '';
+    formData.value.targetOverTime = '';
   } else {
     taskInputVal.value = '';
   }
@@ -493,7 +498,6 @@ function getSelectDetail() {
       connectorPluginName: res.data.isCustomConnectorPlugin ? res.data.connectorPlugin : '',
       targetInfos: res.data.targetInfos || [],
     };
-    sourceData = cloneDeep(formData.value);
   });
 }
 
@@ -560,6 +564,8 @@ const handleConfirm = () => {
             errorName.value = err.message;
           }
         });
+      } else {
+        ElMessage.error('存在必填项未编辑或必填项输入规则有误');
       }
     });
   } else {
@@ -589,12 +595,12 @@ watch(
       activeTab.value = 'select';
       dealOptions.value = [];
       sendOptions.value = [];
+      taskInputVal.value = '';
+      handleResetForm();
       codeEditorRef.value?.setCodeEditorReadonly(props.editType === 'view');
       if (props.editType === 'view') {
         getDetail();
       } else {
-        handleResetForm();
-        sourceData = cloneDeep(formData.value);
         nextTick(() => {
           formRef.value?.clearValidate();
         });
