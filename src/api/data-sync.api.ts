@@ -6,12 +6,12 @@ class DataSyncApi {
     return http.get('/synchron/getDataSynchronList', { params: { taskName } });
   }
 
-  static startTaskByNames(taskName: string[]): HttpResponseP {
-    return http.post('/synchron/startTaskByNames', { taskName });
+  static startTaskByNames(taskNames: string[]): HttpResponseP {
+    return http.post('/synchron/startTaskByNames', { taskNames });
   }
 
-  static stopTaskByNames(taskName: string[]): HttpResponseP {
-    return http.post('/synchron/stopTaskByNames', { taskName });
+  static stopTaskByNames(taskNames: string[]): HttpResponseP {
+    return http.post('/synchron/stopTaskByNames', { taskNames });
   }
 
   static deleteDataSynchronByNames(taskNames: string[]): HttpResponseP {

@@ -15,7 +15,7 @@
             <el-form ref="formRef" :model="formData" label-position="left" class="form-wrapper" :disabled="editType === 'view'">
               <label><input type="password" autocomplete="new-password" hidden></label>
               <base-form-item label="任务名称:" prop="name" :rules="requiredNameRules" class="form-label-width" :error="errorName">
-                <el-input v-model="formData.name" placeholder="请输入任务名称" id="data-sync-modal-name" style="width: 240px;" />
+                <el-input v-model="formData.name" placeholder="请输入任务名称" type="textarea" :rows="2" id="data-sync-modal-name" :resize="'none'" style="width: 360px;" maxlength="100" show-word-limit />
               </base-form-item>
               <h4 class="form-module-title">抽取设置</h4>
               <div class="flex-align-center">
