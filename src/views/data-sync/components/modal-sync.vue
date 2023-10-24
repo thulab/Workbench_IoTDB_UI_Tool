@@ -263,7 +263,6 @@
 import type {
   FormInstance, SingleOrRange, DateModelType, TabsPaneContext,
 } from 'element-plus';
-import { cloneDeep } from 'lodash-es';
 import { DataSyncApi } from '@/api';
 import CodeEditor from '@/views/search/components/code-editor.vue';
 import {
