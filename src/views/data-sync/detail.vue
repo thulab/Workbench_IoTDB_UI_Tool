@@ -51,7 +51,7 @@
             @selection-change="handleSelectionChange"
           >
             <el-table-column type="selection" width="55" />
-            <el-table-column label="任务名称" prop="name" min-width="120" align="center" show-overflow-tooltip />
+            <el-table-column label="任务名称" prop="name" min-width="180" align="center" show-overflow-tooltip />
             <el-table-column label="同步数据" prop="measurement" min-width="160" align="center" show-overflow-tooltip />
             <el-table-column label="同步范围" prop="range" min-width="120" align="center" show-overflow-tooltip />
             <el-table-column label="目标地址" prop="targetAddress" min-width="160" align="center" show-overflow-tooltip />
