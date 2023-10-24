@@ -515,6 +515,9 @@ function getDetail() {
     getInputDetail(),
   ]).then(() => {
     loading.value = false;
+    nextTick(() => {
+      formRef.value?.clearValidate();
+    });
   });
 }
 
