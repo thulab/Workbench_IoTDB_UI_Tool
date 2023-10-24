@@ -519,11 +519,11 @@ const handleConfirm = () => {
     errorName.value = '';
     formRef.value?.validate((valid) => {
       if (valid) {
-        saveLoading.value = true;
         if (!formData.value.isSynchronHistory && !formData.value.isSynchronRealTime) {
           ElMessage.error('历史数据与实时数据状态不能同时为关，请修改后重新操作');
           return;
         }
+        saveLoading.value = true;
         const params = {
           name: formData.value.name,
           whole: formData.value.whole,
