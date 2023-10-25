@@ -31,7 +31,7 @@
                 <el-dropdown-menu>
                   <el-dropdown-item command="del">批量删除</el-dropdown-item>
                   <el-dropdown-item command="running">批量启动</el-dropdown-item>
-                  <el-dropdown-item command="stopped">批量静止</el-dropdown-item>
+                  <el-dropdown-item command="stopped">批量停止</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -74,7 +74,7 @@
               <template #default="{ row }">
                 <div>
                   <el-button type="primary" link size="small" @click="handleEdit(row)" :id="`data-sync-table-${row.name}-view`">详情</el-button>
-                  <el-button type="primary" link size="small" @click="handleStatus('row', row, row.state)" :id="`data-sync-table-${row.name}-state`">{{row.state === 'running' ? '停止' : '启动'}}</el-button>
+                  <el-button type="primary" link size="small" @click="handleStatus('row', row, row.state === 'running' ? 'stopped' : 'running')" :id="`data-sync-table-${row.name}-state`">{{row.state === 'running' ? '停止' : '启动'}}</el-button>
                   <el-button type="primary" link size="small" @click="handleDel('row', row)" :id="`data-sync-table-${row.name}-del`">删除</el-button>
                 </div>
               </template>
@@ -110,6 +110,11 @@
       :edit-time="editTime"
       @handleSave="handleSearch"
     />
+
+    <modal-error-message
+      v-model:visible="errorMessageVisible"
+      :content="editErrorMessage"
+    />
   </el-container>
 </template>
 
@@ -118,8 +123,8 @@ import type { DateModelType } from 'element-plus';
 import { DataSyncApi } from '@/api';
 import { todayNow } from '@/utils/date';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
-import ICustomMessageError from '~icons/custom/error.svg';
 import ModalSync from './components/modal-sync.vue';
+import ModalErrorMessage from './components/modal-error-message.vue';
 
 const { maxTableHeight } = useTableHeight(300);
 const searchFormData = reactive({
@@ -136,6 +141,8 @@ const editType = ref('add');
 const editVisible = ref(false);
 const editData = ref('');
 const editTime = ref<DateModelType>('');
+const errorMessageVisible = ref(false);
+const editErrorMessage = ref('');
 
 const { requestFn: getDataSynchronList, loading } = useRequest(DataSyncApi.getDataSynchronList);
 const { requestFn: deleteDataSynchronByNames } = useRequest(DataSyncApi.deleteDataSynchronByNames);
@@ -177,12 +184,8 @@ function handleSelectionChange(vals: DataSync.SynchronListData[]) {
 
 function handleStatusInfo(row: DataSync.SynchronListData) {
   if (!row.exceptionMessage || row.state === 'running') return;
-  ElMessageBox.confirm(row.exceptionMessage, '报错详情', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-    icon: ICustomMessageError,
-  });
+  editErrorMessage.value = row.exceptionMessage;
+  errorMessageVisible.value = true;
 }
 
 function handleAdd() {
@@ -201,24 +204,26 @@ function handleEdit(row: DataSync.SynchronListData) {
 
 function handleStatus(type: string, data: DataSync.SynchronListData | null, state: 'running' | 'stopped') {
   let statusData: string[] = [];
+  const realStatus = state === 'running' ? 'stopped' : 'running';
+  if (type === 'batch') {
+    statusData = multipleSelection.value.filter((item) => item.state === realStatus).map((d) => d.name);
+  } else if (data?.state === realStatus) {
+    statusData = [data!.name];
+  } else {
+    statusData = [];
+  }
+  if (!statusData.length) {
+    ElMessage.warning(state === 'running' ? '当前没有需要启动的任务' : '当前没有需要停止的任务');
+    return;
+  }
   if (state === 'running') {
-    if (type === 'batch') {
-      statusData = multipleSelection.value.filter((item) => item.state === 'running').map((d) => d.name);
-    } else {
-      statusData = [data!.name];
-    }
-    stopTaskByNames(statusData).then(() => {
-      ElMessage.success('停止成功');
+    startTaskByNames(statusData).then(() => {
+      ElMessage.success('启动成功');
       handleSearch();
     });
   } else {
-    if (type === 'batch') {
-      statusData = multipleSelection.value.filter((item) => item.state === 'stopped').map((d) => d.name);
-    } else {
-      statusData = [data!.name];
-    }
-    startTaskByNames(statusData).then(() => {
-      ElMessage.success('启动成功');
+    stopTaskByNames(statusData).then(() => {
+      ElMessage.success('停止成功');
       handleSearch();
     });
   }
