@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { ElScrollbar } from 'element-plus';
+import { ElScrollbar } from 'element-plus';
 
 const props = defineProps<{
   visible: boolean;
@@ -42,10 +42,15 @@ watch(
   () => props.visible,
   (newVal) => {
     if (newVal) {
-      if (scrollRef.value) {
-        scrollRef.value.setScrollTop(0);
-      }
+      nextTick(() => {
+        if (scrollRef.value) {
+          scrollRef.value.scrollTo(0, 0);
+        }
+      });
     }
+  },
+  {
+    immediate: true,
   },
 );
 </script>
@@ -58,8 +63,7 @@ watch(
 
 .expression-text{
   padding: 0 12px;
-
-  // white-space: pre-line;
+  margin-top: -3px;
   font-size: 14px;
   line-height: 21px;
   font-weight: 300;
