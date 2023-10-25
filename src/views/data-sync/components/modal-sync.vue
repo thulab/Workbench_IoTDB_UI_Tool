@@ -303,8 +303,8 @@ const requiredNameRules = ref([
     trigger: ['blur', 'change'],
   },
   {
-    pattern: /^[A-Za-z0-9_]+$/,
-    message: '格式不符，请输入字母大小写、数字、下划线、关键字',
+    pattern: /^[A-Za-z0-9_\u4e00-\u9fa5]+$/,
+    message: '格式不符，请输入中文、字母大小写、数字、下划线、关键字',
     trigger: ['blur', 'change'],
   },
 ]);
