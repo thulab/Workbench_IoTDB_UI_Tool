@@ -9,7 +9,7 @@
   >
     <div class="error-message-box">
       <el-icon size="16"><i-custom-error /></el-icon>
-      <el-scrollbar :height="100">
+      <el-scrollbar :height="100" ref="scrollRef">
         <div class="expression-text">{{ content }}</div>
       </el-scrollbar>
     </div>
@@ -24,6 +24,8 @@
 </template>
 
 <script lang="ts" setup>
+import type { ElScrollbar } from 'element-plus';
+
 const props = defineProps<{
   visible: boolean;
   content: string;
@@ -34,6 +36,18 @@ const emit = defineEmits<{
 }>();
 
 const dialogVisible = useVModel(props, 'visible', emit);
+const scrollRef = ref<InstanceType<typeof ElScrollbar> | null>(null);
+
+watch(
+  () => props.visible,
+  (newVal) => {
+    if (newVal) {
+      if (scrollRef.value) {
+        scrollRef.value.setScrollTop(0);
+      }
+    }
+  },
+);
 </script>
 
 <style lang="scss" scoped>
