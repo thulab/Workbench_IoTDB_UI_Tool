@@ -38,7 +38,7 @@
         :collapse-transition="false"
         :default-openeds="['/system/auth']"
         :unique-opened="false">
-        <layout-menu-sub-item :menu-list="menuList" :show-auth-menu="showAuthMenu" />
+        <layout-menu-sub-item :menu-list="menuList" :show-auth-menu="true" />
       </el-menu>
     </el-scrollbar>
 
@@ -58,7 +58,7 @@ import { useConnectionStore } from '@/stores';
 // import useAppStore from '@/stores/app';
 import { ConnectionApi } from '@/api';
 import ModalConnection from '@/components/modal-connection.vue';
-import { iotdbShowAuth } from '@/utils/auth';
+// import { iotdbShowAuth } from '@/utils/auth';
 import LayoutMenuSubItem from './components/layout-menu-sub-item.vue';
 
 // const appStore = useAppStore();
@@ -81,7 +81,7 @@ const connectionHost = computed(() => {
   return `${masterCluster.hostAndPortVOS[0].host}:${masterCluster.hostAndPortVOS[0].port}`;
 });
 
-const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion));
+// const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion));
 
 const { requestFn: changeCluster } = useRequest(ConnectionApi.changeCluster);
 

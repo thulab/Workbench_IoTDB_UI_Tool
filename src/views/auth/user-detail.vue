@@ -1,178 +1,181 @@
 <template>
-  <el-container>
-    <el-aside width="240px" class="list-wrapper">
-      <list
-        ref="listRef"
-        :can-manage-user="canManageUser"
-        :can-alter-pwd="canAlterPwd"
-        :user-name="userName"
-        @handle-select="val => currentUser = val"
-      />
-    </el-aside>
-    <el-container class="details-wrapper">
-      <el-main class="p-0" v-loading="loading || roleLoading">
-        <el-scrollbar>
-          <div class="detail-title-box" v-if="!isManager">
-            <h4 class="detail-title-text">角色详情</h4>
-            <auth-tooltip :is-disabled="canManageUser" v-if="canEdit && !isEdit">
-              <el-button type="primary" :disabled="!canManageUser" @click="pageType = 'edit'" id="auth-user-edit">编辑</el-button>
-            </auth-tooltip>
-            <el-button type="primary" v-else-if="isEdit" @click="handleReset('view')" id="auth-user-view">退出编辑</el-button>
-          </div>
-          <div class="detail-role-list" v-if="!isManager">
-            <span class="p-t-4">拥有角色：</span>
-            <div class="detail-role-box">
-              <el-tag :closable="isEdit" type="info" v-for="(item, index,) in authData.rolesToPrivileges" :key="item.roleName" @close="handleDeleteRole(index)" @click="showRoleDetail(item)" :id="`auth-user-role-${item.roleName}-${index}`">{{ item.roleName }}</el-tag>
-              <auth-tooltip :is-disabled="canManageRole">
-                <el-button link :disabled="!canManageRole" @click="addRole()" v-if="isEdit" id="auth-user-add-role" class="m-l-8 p-0">
-                  <el-icon size="24px"><i-custom-user-role-add /></el-icon>
-                </el-button>
+  <version-container :is-show="showAuthMenu">
+    <el-container>
+      <el-aside width="240px" class="list-wrapper">
+        <list
+          ref="listRef"
+          :can-manage-user="canManageUser"
+          :can-alter-pwd="canAlterPwd"
+          :user-name="userName"
+          @handle-select="val => currentUser = val"
+        />
+      </el-aside>
+      <el-container class="details-wrapper">
+        <el-main class="p-0" v-loading="loading || roleLoading">
+          <el-scrollbar>
+            <div class="detail-title-box" v-if="!isManager">
+              <h4 class="detail-title-text">角色详情</h4>
+              <auth-tooltip :is-disabled="canManageUser" v-if="canEdit && !isEdit">
+                <el-button type="primary" :disabled="!canManageUser" @click="pageType = 'edit'" id="auth-user-edit">编辑</el-button>
               </auth-tooltip>
+              <el-button type="primary" v-else-if="isEdit" @click="handleReset('view')" id="auth-user-view">退出编辑</el-button>
             </div>
-          </div>
-          <div class="detail-title-box">
-            <h4 class="detail-title-text">权限详情<span class="tip-text"><i-custom-info-warning />移除父级路径权限时其包含的子路径权限会同步移除，请谨慎操作</span></h4>
-          </div>
-          <div class="table-list-box m-x-16">
-            <h4 class="table-box-title">全局</h4>
-            <el-table :data="entityTableData" style="width: 100%">
-              <el-table-column label="全选" align="center" width="60">
-                <template #default="{ row }">
-                  <el-icon v-if="!isEdit" class="moveDown3" size="21">
-                    <i-custom-correct v-if="row.allChecked" />
-                  </el-icon>
-                  <template v-else>
-                    <el-checkbox
-                      v-if="row.privileges.length >= entityPrivilegesEnumKeys.length"
-                      :checked="true"
-                      :disabled="row.rolePrivileges.length >= entityPrivilegesEnumKeys.length"
-                      @change="e=>handleAllCheckedEntity(row, false)"
-                    />
-                    <el-checkbox
-                      v-else
-                      :checked="false"
-                      @change="e=>handleAllCheckedEntity(row, true)"
-                    />
-                  </template>
-                </template>
-              </el-table-column>
-              <el-table-column :label="group.group" v-for="group in entityPrivilegesEnumGroup" :key="group.group" align="center">
-                <el-table-column :label="child.privileges" v-for="child in group.children" :key="child.privileges" align="center" :width="calcColumnWidth(child)">
-                  <template #default="{ row }">
-                    <el-icon v-if="!isEdit" class="move-down3" size="21">
-                      <i-custom-correct v-if="row.privileges.includes(child.privileges)" />
-                    </el-icon>
-                    <template v-else>
-                      <el-tooltip
-                        v-if="row.privileges.includes(child.privileges)"
-                        placement="top-start"
-                        effect="light"
-                        trigger="hover"
-                        content="该权限为角色所有，如需修改请修改角色权限"
-                        :disabled="!row.rolePrivileges.includes(child.privileges)"
-                        popper-class="tooltip-box-width"
-                      >
-                        <el-checkbox
-                          :checked="true"
-                          :disabled="row.rolePrivileges.includes(child.privileges)"
-                          @change="handleCheckedEntity(row, child.privileges, false)" />
-                      </el-tooltip>
-                      <el-checkbox :checked="false" v-else @change="handleCheckedEntity(row, child.privileges, true)" />
-                    </template>
-                  </template>
-                </el-table-column>
-              </el-table-column>
-            </el-table>
-          </div>
-          <div class="table-list-box  m-x-16 m-b-16" v-if="canEdit">
-            <h4 class="table-box-title">路径</h4>
-            <el-table :data="tableData" style="width: 100%" tooltip-effect="light" :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
-              <el-table-column label="路径名称" align="center" min-width="193" prop="path" show-overflow-tooltip />
-              <el-table-column label="全选" align="center" width="193">
-                <template #default="{ row }">
-                  <el-icon v-if="!isEdit || !row.path" class="moveDown3" size="21">
-                    <i-custom-correct v-if="row.allChecked" />
-                  </el-icon>
-                  <template v-else>
-                    <el-checkbox
-                      v-if="row.privileges.length >= pathPrivilegesEnumKeys.length"
-                      :checked="true"
-                      :disabled="row.rolePrivileges.length >= pathPrivilegesEnumKeys.length"
-                      @change="e=>handleAllCheckedPath(row, false)"
-                    />
-                    <el-checkbox
-                      v-else
-                      :checked="false"
-                      @change="e=>handleAllCheckedPath(row, true)"
-                    />
-                  </template>
-                </template>
-              </el-table-column>
-              <el-table-column v-for="(group, index) in pathPrivilegesEnumGroup" :label="group.group" :key="group.group + '_' + index + '_column'" align="center">
-                <el-table-column v-for="(child, childIndex) in group.children" :label="child.privileges" :key="child.privileges + '_' + childIndex + '_col'" :prop="child.privileges" align="center" :width="calcColumnWidth(child)">
-                  <template #default="{ row }">
-                    <el-icon v-if="!isEdit || !row.path" class="move-down3" size="21">
-                      <i-custom-correct v-if="row.privileges.includes(child.privileges)" />
-                    </el-icon>
-                    <template v-else>
-                      <el-tooltip
-                        v-if="row.privileges.includes(child.privileges)"
-                        placement="top-start"
-                        effect="light"
-                        trigger="hover"
-                        content="该权限为角色所有，如需修改请修改角色权限"
-                        :disabled="!row.rolePrivileges.includes(child.privileges)"
-                        popper-class="tooltip-box-width"
-                      >
-                        <el-checkbox
-                          :checked="true"
-                          :disabled="row.rolePrivileges.includes(child.privileges)"
-                          @change="handleCheckedPath(row, child.privileges, false)" />
-                      </el-tooltip>
-                      <el-checkbox :checked="false" v-else @change="handleCheckedPath(row, child.privileges, true)" />
-                    </template>
-                  </template>
-                </el-table-column>
-              </el-table-column>
-              <el-table-column label="操作" align="center" width="194" fixed="right">
-                <template #default="{ row }">
-                  <el-button link @click="handleDelRow(row)" v-if="row.path" :disabled="pageType === 'view' || row.rolePrivileges.length > 0">
-                    <el-icon size="24"><i-custom-close /></el-icon>
+            <div class="detail-role-list" v-if="!isManager">
+              <span class="p-t-4">拥有角色：</span>
+              <div class="detail-role-box">
+                <el-tag :closable="isEdit" type="info" v-for="(item, index,) in authData.rolesToPrivileges" :key="item.roleName" @close="handleDeleteRole(index)" @click="showRoleDetail(item)" :id="`auth-user-role-${item.roleName}-${index}`">{{ item.roleName }}</el-tag>
+                <auth-tooltip :is-disabled="canManageRole">
+                  <el-button link :disabled="!canManageRole" @click="addRole()" v-if="isEdit" id="auth-user-add-role" class="m-l-8 p-0">
+                    <el-icon size="24px"><i-custom-user-role-add /></el-icon>
                   </el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-            <el-button style="width: 100%;" class="m-t-24" @click="handleAddRow" v-if="canEdit && isEdit" id="auth-user-path"><i-custom-add class="m-r-4" />添加路径</el-button>
+                </auth-tooltip>
+              </div>
+            </div>
+            <div class="detail-title-box">
+              <h4 class="detail-title-text">权限详情<span class="tip-text"><i-custom-info-warning />移除父级路径权限时其包含的子路径权限会同步移除，请谨慎操作</span></h4>
+            </div>
+            <div class="table-list-box m-x-16">
+              <h4 class="table-box-title">全局</h4>
+              <el-table :data="entityTableData" style="width: 100%">
+                <el-table-column label="全选" align="center" width="60">
+                  <template #default="{ row }">
+                    <el-icon v-if="!isEdit" class="moveDown3" size="21">
+                      <i-custom-correct v-if="row.allChecked" />
+                    </el-icon>
+                    <template v-else>
+                      <el-checkbox
+                        v-if="row.privileges.length >= entityPrivilegesEnumKeys.length"
+                        :checked="true"
+                        :disabled="row.rolePrivileges.length >= entityPrivilegesEnumKeys.length"
+                        @change="e=>handleAllCheckedEntity(row, false)"
+                      />
+                      <el-checkbox
+                        v-else
+                        :checked="false"
+                        @change="e=>handleAllCheckedEntity(row, true)"
+                      />
+                    </template>
+                  </template>
+                </el-table-column>
+                <el-table-column :label="group.group" v-for="group in entityPrivilegesEnumGroup" :key="group.group" align="center">
+                  <el-table-column :label="child.privileges" v-for="child in group.children" :key="child.privileges" align="center" :width="calcColumnWidth(child)">
+                    <template #default="{ row }">
+                      <el-icon v-if="!isEdit" class="move-down3" size="21">
+                        <i-custom-correct v-if="row.privileges.includes(child.privileges)" />
+                      </el-icon>
+                      <template v-else>
+                        <el-tooltip
+                          v-if="row.privileges.includes(child.privileges)"
+                          placement="top-start"
+                          effect="light"
+                          trigger="hover"
+                          content="该权限为角色所有，如需修改请修改角色权限"
+                          :disabled="!row.rolePrivileges.includes(child.privileges)"
+                          popper-class="tooltip-box-width"
+                        >
+                          <el-checkbox
+                            :checked="true"
+                            :disabled="row.rolePrivileges.includes(child.privileges)"
+                            @change="handleCheckedEntity(row, child.privileges, false)" />
+                        </el-tooltip>
+                        <el-checkbox :checked="false" v-else @change="handleCheckedEntity(row, child.privileges, true)" />
+                      </template>
+                    </template>
+                  </el-table-column>
+                </el-table-column>
+              </el-table>
+            </div>
+            <div class="table-list-box  m-x-16 m-b-16" v-if="canEdit">
+              <h4 class="table-box-title">路径</h4>
+              <el-table :data="tableData" style="width: 100%" tooltip-effect="light" :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
+                <el-table-column label="路径名称" align="center" min-width="193" prop="path" show-overflow-tooltip />
+                <el-table-column label="全选" align="center" width="193">
+                  <template #default="{ row }">
+                    <el-icon v-if="!isEdit || !row.path" class="moveDown3" size="21">
+                      <i-custom-correct v-if="row.allChecked" />
+                    </el-icon>
+                    <template v-else>
+                      <el-checkbox
+                        v-if="row.privileges.length >= pathPrivilegesEnumKeys.length"
+                        :checked="true"
+                        :disabled="row.rolePrivileges.length >= pathPrivilegesEnumKeys.length"
+                        @change="e=>handleAllCheckedPath(row, false)"
+                      />
+                      <el-checkbox
+                        v-else
+                        :checked="false"
+                        @change="e=>handleAllCheckedPath(row, true)"
+                      />
+                    </template>
+                  </template>
+                </el-table-column>
+                <el-table-column v-for="(group, index) in pathPrivilegesEnumGroup" :label="group.group" :key="group.group + '_' + index + '_column'" align="center">
+                  <el-table-column v-for="(child, childIndex) in group.children" :label="child.privileges" :key="child.privileges + '_' + childIndex + '_col'" :prop="child.privileges" align="center" :width="calcColumnWidth(child)">
+                    <template #default="{ row }">
+                      <el-icon v-if="!isEdit || !row.path" class="move-down3" size="21">
+                        <i-custom-correct v-if="row.privileges.includes(child.privileges)" />
+                      </el-icon>
+                      <template v-else>
+                        <el-tooltip
+                          v-if="row.privileges.includes(child.privileges)"
+                          placement="top-start"
+                          effect="light"
+                          trigger="hover"
+                          content="该权限为角色所有，如需修改请修改角色权限"
+                          :disabled="!row.rolePrivileges.includes(child.privileges)"
+                          popper-class="tooltip-box-width"
+                        >
+                          <el-checkbox
+                            :checked="true"
+                            :disabled="row.rolePrivileges.includes(child.privileges)"
+                            @change="handleCheckedPath(row, child.privileges, false)" />
+                        </el-tooltip>
+                        <el-checkbox :checked="false" v-else @change="handleCheckedPath(row, child.privileges, true)" />
+                      </template>
+                    </template>
+                  </el-table-column>
+                </el-table-column>
+                <el-table-column label="操作" align="center" width="194" fixed="right">
+                  <template #default="{ row }">
+                    <el-button link @click="handleDelRow(row)" v-if="row.path" :disabled="pageType === 'view' || row.rolePrivileges.length > 0">
+                      <el-icon size="24"><i-custom-close /></el-icon>
+                    </el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <el-button style="width: 100%;" class="m-t-24" @click="handleAddRow" v-if="canEdit && isEdit" id="auth-user-path"><i-custom-add class="m-r-4" />添加路径</el-button>
+            </div>
+          </el-scrollbar>
+        </el-main>
+        <el-footer v-if="canEdit && isEdit">
+          <div class="operate-buttons">
+            <el-button @click="handleReset('edit')" id="auth-user-reset">重置</el-button>
+            <el-button type="primary" @click="handleSave" :loading="saveLoading" id="auth-user-save">应用</el-button>
           </div>
-        </el-scrollbar>
-      </el-main>
-      <el-footer v-if="canEdit && isEdit">
-        <div class="operate-buttons">
-          <el-button @click="handleReset('edit')" id="auth-user-reset">重置</el-button>
-          <el-button type="primary" @click="handleSave" :loading="saveLoading" id="auth-user-save">应用</el-button>
-        </div>
-      </el-footer>
-    </el-container>
+        </el-footer>
+      </el-container>
 
-    <modal-path
-      v-model:visible="pathVisible"
-      :path-list="editPathList"
-      @handle-save="handleSavePath"
-    />
-    <modal-add-role v-model:visible="addRoleVisible" :selected="selectRoleList" @add-role="handleAddRole" />
-    <modal-preview-role
-      v-if="currentRole"
-      v-model:visible="previewRoleVisible"
-      :name="currentRole.roleName"
-      :entity-privileges="currentRole.entityPrivileges || []"
-      :path-privileges="currentRole.pathPrivileges || []" />
-  </el-container>
+      <modal-path
+        v-model:visible="pathVisible"
+        :path-list="editPathList"
+        @handle-save="handleSavePath"
+      />
+      <modal-add-role v-model:visible="addRoleVisible" :selected="selectRoleList" @add-role="handleAddRole" />
+      <modal-preview-role
+        v-if="currentRole"
+        v-model:visible="previewRoleVisible"
+        :name="currentRole.roleName"
+        :entity-privileges="currentRole.entityPrivileges || []"
+        :path-privileges="currentRole.pathPrivileges || []" />
+    </el-container>
+  </version-container>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { useUserStore } from '@/stores';
+import { useUserStore, useConnectionStore } from '@/stores';
 import { AuthApi } from '@/api';
+import { iotdbShowAuth } from '@/utils/auth';
 import { cloneDeep, union, difference } from 'lodash-es';
 import List from './components/user-list.vue';
 import ModalPath from './components/modal-path.vue';
@@ -180,6 +183,7 @@ import ModalAddRole from './components/modal-add-role.vue';
 import ModalPreviewRole from './components/modal-preview-role.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
+const connectionStore = useConnectionStore();
 const userStore = useUserStore();
 const {
   entityPrivilegesEnumGroup,
@@ -208,6 +212,9 @@ const isManager = computed(() => currentUser.value?.isManager === 1);
 const canEdit = computed(() => currentUser.value?.isManager === 0);
 const pageType = ref<'view' | 'edit'>('view');
 const isEdit = computed(() => pageType.value === 'edit');
+
+const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion));
+
 const { requestFn: getUserAuth, data: authData, loading } = useRequest(AuthApi.getUserAuth, {
   initData: {
     userName: '',

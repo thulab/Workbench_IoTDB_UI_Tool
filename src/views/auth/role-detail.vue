@@ -1,140 +1,143 @@
 <template>
-  <el-container>
-    <el-aside width="240px" class="role-list-wrapper">
-      <role-list
-        :can-manage-role="canManageRole"
-        @handleSelect="val => currentRole = val"
-      />
-    </el-aside>
-    <el-container class="role-details-wrapper">
-      <el-main class="p-0" v-loading="loading">
-        <el-scrollbar>
-          <div class="detail-title-box">
-            <h4 class="detail-title-text">用户详情</h4>
-            <auth-tooltip v-if="isView" :is-disabled="canManageRole">
-              <el-button type="primary" :disabled="!currentRole || !canManageRole" @click="pageType = 'edit'" id="auth-role-edit">编辑</el-button>
-            </auth-tooltip>
-            <el-button type="primary" v-else @click="handleReset('view')" id="auth-role-view">退出编辑</el-button>
-          </div>
-          <div class="detail-user-list">
-            <span class="p-t-4">拥有用户：</span>
-            <div class="detail-user-box">
-              <el-tag :closable="!isView" type="info" v-for="(item, index) in userList" :key="item" @close="handleDeleteUser(index)" @click="showAuthDetail(item)" :id="`auth-user-${item}-${index}`">{{ item }}</el-tag>
-              <auth-tooltip :is-disabled="canManageUser">
-                <el-button link :disabled="!canManageUser" @click="handleAddUser" v-if="!isView" id="auth-user-add-role" class="m-l-8 p-0">
-                  <el-icon size="24px"><i-custom-user-role-add /></el-icon>
-                </el-button>
+  <version-container :is-show="showAuthMenu">
+    <el-container>
+      <el-aside width="240px" class="role-list-wrapper">
+        <role-list
+          :can-manage-role="canManageRole"
+          @handleSelect="val => currentRole = val"
+        />
+      </el-aside>
+      <el-container class="role-details-wrapper">
+        <el-main class="p-0" v-loading="loading">
+          <el-scrollbar>
+            <div class="detail-title-box">
+              <h4 class="detail-title-text">用户详情</h4>
+              <auth-tooltip v-if="isView" :is-disabled="canManageRole">
+                <el-button type="primary" :disabled="!currentRole || !canManageRole" @click="pageType = 'edit'" id="auth-role-edit">编辑</el-button>
               </auth-tooltip>
+              <el-button type="primary" v-else @click="handleReset('view')" id="auth-role-view">退出编辑</el-button>
             </div>
-          </div>
-          <div class="detail-title-box">
-            <h4 class="detail-title-text">权限详情<span class="tip-text"><i-custom-info-warning />移除父级路径权限时其包含的子路径权限会同步移除，请谨慎操作</span></h4>
-          </div>
-          <div class="table-list-box">
-            <h4 class="table-box-title">全局</h4>
-            <el-table :data="[authData.entityPrivileges]" style="width: 100%;" border>
-              <el-table-column label="全选" align="center" width="58" fixed="left">
-                <template #default="{ row }">
-                  <el-icon v-if="isView" size="21">
-                    <i-custom-correct style="transform: translateY(3px);" v-if="row.length >= entityPrivilegesEnumKeys.length" />
-                  </el-icon>
-                  <template v-else>
-                    <el-checkbox :checked="true" v-if="row.length >= entityPrivilegesEnumKeys.length" @change="val => handleCheckedEntity(val)" />
-                    <el-checkbox :checked="false" v-else @change="val => handleCheckedEntity(val)" />
-                  </template>
-                </template>
-              </el-table-column>
-              <el-table-column v-for="(column, index) in entityPrivilegesEnumGroup" :label="column.group" :key="column.group + '_' + index + '_column'" align="center">
-                <el-table-column v-for="(col, ci) in column.children" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :width="calcColumnWidth(col)">
+            <div class="detail-user-list">
+              <span class="p-t-4">拥有用户：</span>
+              <div class="detail-user-box">
+                <el-tag :closable="!isView" type="info" v-for="(item, index) in userList" :key="item" @close="handleDeleteUser(index)" @click="showAuthDetail(item)" :id="`auth-user-${item}-${index}`">{{ item }}</el-tag>
+                <auth-tooltip :is-disabled="canManageUser">
+                  <el-button link :disabled="!canManageUser" @click="handleAddUser" v-if="!isView" id="auth-user-add-role" class="m-l-8 p-0">
+                    <el-icon size="24px"><i-custom-user-role-add /></el-icon>
+                  </el-button>
+                </auth-tooltip>
+              </div>
+            </div>
+            <div class="detail-title-box">
+              <h4 class="detail-title-text">权限详情<span class="tip-text"><i-custom-info-warning />移除父级路径权限时其包含的子路径权限会同步移除，请谨慎操作</span></h4>
+            </div>
+            <div class="table-list-box">
+              <h4 class="table-box-title">全局</h4>
+              <el-table :data="[authData.entityPrivileges]" style="width: 100%;" border>
+                <el-table-column label="全选" align="center" width="58" fixed="left">
                   <template #default="{ row }">
                     <el-icon v-if="isView" size="21">
-                      <i-custom-correct style="transform: translateY(3px);" v-if="row.includes(col.privileges)" />
+                      <i-custom-correct style="transform: translateY(3px);" v-if="row.length >= entityPrivilegesEnumKeys.length" />
                     </el-icon>
                     <template v-else>
-                      <el-checkbox :checked="true" v-if="row.includes(col.privileges)" @change="val => handleCheckedEntity(val, col.privileges)" />
-                      <el-checkbox :checked="false" v-else @change="val => handleCheckedEntity(val, col.privileges)" />
+                      <el-checkbox :checked="true" v-if="row.length >= entityPrivilegesEnumKeys.length" @change="val => handleCheckedEntity(val)" />
+                      <el-checkbox :checked="false" v-else @change="val => handleCheckedEntity(val)" />
                     </template>
                   </template>
                 </el-table-column>
-              </el-table-column>
-            </el-table>
-          </div>
-          <div class="table-list-box">
-            <h4 class="table-box-title">路径</h4>
-            <el-table :data="authData.pathPrivileges" style="width: 100%" tooltip-effect="light" border :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
-              <el-table-column label="路径名称" prop="path" align="center" min-width="193" show-overflow-tooltip />
-              <el-table-column label="全选" align="center" width="193">
-                <template #default="{ row, $index }">
-                  <el-icon v-if="isView || !row.path" size="21">
-                    <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" />
-                  </el-icon>
-                  <template v-else-if="row.path">
-                    <!-- eslint-disable-next-line vue/max-len -->
-                    <el-checkbox :checked="true" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" @change="val => handleCheckedPath(val, $index)" />
-                    <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index)" />
-                  </template>
-                </template>
-              </el-table-column>
-              <el-table-column v-for="(column, index) in pathPrivilegesEnumGroup" :label="column.group" :key="column.group + '_' + index + '_column'" align="center">
-                <el-table-column v-for="(col, ci) in column.children" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :width="calcColumnWidth(col)">
+                <el-table-column v-for="(column, index) in entityPrivilegesEnumGroup" :label="column.group" :key="column.group + '_' + index + '_column'" align="center">
+                  <el-table-column v-for="(col, ci) in column.children" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :width="calcColumnWidth(col)">
+                    <template #default="{ row }">
+                      <el-icon v-if="isView" size="21">
+                        <i-custom-correct style="transform: translateY(3px);" v-if="row.includes(col.privileges)" />
+                      </el-icon>
+                      <template v-else>
+                        <el-checkbox :checked="true" v-if="row.includes(col.privileges)" @change="val => handleCheckedEntity(val, col.privileges)" />
+                        <el-checkbox :checked="false" v-else @change="val => handleCheckedEntity(val, col.privileges)" />
+                      </template>
+                    </template>
+                  </el-table-column>
+                </el-table-column>
+              </el-table>
+            </div>
+            <div class="table-list-box">
+              <h4 class="table-box-title">路径</h4>
+              <el-table :data="authData.pathPrivileges" style="width: 100%" tooltip-effect="light" border :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
+                <el-table-column label="路径名称" prop="path" align="center" min-width="193" show-overflow-tooltip />
+                <el-table-column label="全选" align="center" width="193">
                   <template #default="{ row, $index }">
-                    <el-icon v-if="isView" size="21">
-                      <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.includes(col.privileges)" />
+                    <el-icon v-if="isView || !row.path" size="21">
+                      <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" />
                     </el-icon>
                     <template v-else-if="row.path">
-                      <el-checkbox :checked="true" v-if="row.privileges.includes(col.privileges)" @change="val => handleCheckedPath(val, $index, col.privileges)" />
-                      <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index, col.privileges)" />
+                      <!-- eslint-disable-next-line vue/max-len -->
+                      <el-checkbox :checked="true" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" @change="val => handleCheckedPath(val, $index)" />
+                      <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index)" />
                     </template>
                   </template>
                 </el-table-column>
-              </el-table-column>
-              <el-table-column label="操作" align="center" width="194" fixed="right">
-                <template #default="{ row, $index }">
-                  <el-button v-if="row.path" link @click="handleDelRow($index)" :disabled="isView">
-                    <el-icon size="21"><i-custom-close /></el-icon>
-                  </el-button>
-                </template>
-              </el-table-column>
-            </el-table>
+                <el-table-column v-for="(column, index) in pathPrivilegesEnumGroup" :label="column.group" :key="column.group + '_' + index + '_column'" align="center">
+                  <el-table-column v-for="(col, ci) in column.children" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :width="calcColumnWidth(col)">
+                    <template #default="{ row, $index }">
+                      <el-icon v-if="isView" size="21">
+                        <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.includes(col.privileges)" />
+                      </el-icon>
+                      <template v-else-if="row.path">
+                        <el-checkbox :checked="true" v-if="row.privileges.includes(col.privileges)" @change="val => handleCheckedPath(val, $index, col.privileges)" />
+                        <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index, col.privileges)" />
+                      </template>
+                    </template>
+                  </el-table-column>
+                </el-table-column>
+                <el-table-column label="操作" align="center" width="194" fixed="right">
+                  <template #default="{ row, $index }">
+                    <el-button v-if="row.path" link @click="handleDelRow($index)" :disabled="isView">
+                      <el-icon size="21"><i-custom-close /></el-icon>
+                    </el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
 
-            <el-button v-if="!isView" style="width: 100%;" class="m-t-24" @click="handleAddRow" id="auth-role-path"><i-custom-add class="m-r-4" />添加路径</el-button>
+              <el-button v-if="!isView" style="width: 100%;" class="m-t-24" @click="handleAddRow" id="auth-role-path"><i-custom-add class="m-r-4" />添加路径</el-button>
+            </div>
+          </el-scrollbar>
+        </el-main>
+
+        <el-footer v-if="!isView">
+          <div class="operate-buttons">
+            <el-button @click="handleReset('edit')" id="auth-role-reset">重置</el-button>
+            <el-button type="primary" @click="handleSave" :loading="saveLoading" id="auth-role-save">应用</el-button>
           </div>
-        </el-scrollbar>
-      </el-main>
+        </el-footer>
+      </el-container>
 
-      <el-footer v-if="!isView">
-        <div class="operate-buttons">
-          <el-button @click="handleReset('edit')" id="auth-role-reset">重置</el-button>
-          <el-button type="primary" @click="handleSave" :loading="saveLoading" id="auth-role-save">应用</el-button>
-        </div>
-      </el-footer>
+      <modal-path
+        v-model:visible="pathVisible"
+        :path-list="editPathList"
+        @handleSave="handleSavePath"
+      />
+
+      <modal-add-user
+        v-model:visible="userVisible"
+        :selected="userList"
+        @add-user="addUserConfirm"
+      />
+
+      <modal-preview-user
+        v-model:visible="previewVisible"
+        :name="previewUser"
+      />
     </el-container>
-
-    <modal-path
-      v-model:visible="pathVisible"
-      :path-list="editPathList"
-      @handleSave="handleSavePath"
-    />
-
-    <modal-add-user
-      v-model:visible="userVisible"
-      :selected="userList"
-      @add-user="addUserConfirm"
-    />
-
-    <modal-preview-user
-      v-model:visible="previewVisible"
-      :name="previewUser"
-    />
-  </el-container>
+  </version-container>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { cloneDeep, difference } from 'lodash-es';
 import type { CheckboxValueType } from 'element-plus';
-import { useUserStore } from '@/stores/user.store';
+import { useUserStore, useConnectionStore } from '@/stores';
 import { AuthApi } from '@/api';
+import { iotdbShowAuth } from '@/utils/auth';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import RoleList from './components/role-list.vue';
 import ModalPath from './components/modal-path.vue';
@@ -156,6 +159,7 @@ const loading = ref(true);
 const saveLoading = ref(false);
 const isView = computed(() => pageType.value === 'view');
 
+const connectionStore = useConnectionStore();
 const userStore = useUserStore();
 const {
   entityPrivilegesEnumGroup,
@@ -165,6 +169,8 @@ const {
   canManageUser,
   canManageRole,
 } = storeToRefs(userStore);
+
+const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion));
 
 const { requestFn: getAuthByRole, data: authData } = useRequest(AuthApi.getAuthByRole, {
   initData: {
