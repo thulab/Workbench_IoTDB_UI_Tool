@@ -669,7 +669,7 @@ watch(
 
 .form-label-width{
   :deep(.el-form-item__label) {
-    width: 113px;
+    width: 120px;
 
     svg{
       position: relative;
@@ -819,7 +819,7 @@ watch(
     flex: 0 0 auto;
     position: relative;
     padding: 0 8px 0 0;
-    width: 113px;
+    width: 120px;
     box-sizing: border-box;
 
     &::before{
@@ -830,7 +830,7 @@ watch(
 
     svg{
       position: absolute;
-      right: 20px;
+      right: 28px;
       top: 0;
     }
   }
