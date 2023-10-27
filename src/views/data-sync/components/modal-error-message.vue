@@ -68,7 +68,9 @@ watch(
   line-height: 21px;
   font-weight: 300;
   color: #424561;
-  word-break: break-all;
+
+  // word-break: break-all;
   word-wrap: break-word;
+  white-space: pre-wrap;
 }
 </style>
