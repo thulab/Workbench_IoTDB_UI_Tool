@@ -113,6 +113,8 @@ declare module 'vue' {
     ICustomSqlSave: typeof import('~icons/custom/sql-save')['default']
     ICustomStorageNum: typeof import('~icons/custom/storage-num')['default']
     ICustomSuccessGreen: typeof import('~icons/custom/success-green')['default']
+    ICustomSyncRunning: typeof import('~icons/custom/sync-running')['default']
+    ICustomSyncStopped: typeof import('~icons/custom/sync-stopped')['default']
     ICustomSystemStatus: typeof import('~icons/custom/system-status')['default']
     ICustomTemplate: typeof import('~icons/custom/template')['default']
     ICustomTime: typeof import('~icons/custom/time')['default']

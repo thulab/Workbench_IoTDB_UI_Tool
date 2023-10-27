@@ -57,16 +57,20 @@
             <el-table-column label="目标地址" prop="targetAddress" min-width="160" align="center" show-overflow-tooltip />
             <el-table-column label="任务状态" prop="state" width="160" align="center" show-overflow-tooltip>
               <template #default="{ row }">
-                <el-tooltip
-                  placement="top-start"
-                  effect="light"
-                  trigger="hover"
-                  content="错误详情"
-                  :disabled="!row.exceptionMessage"
-                  popper-class="tooltip-box-width"
-                >
-                  <span :class="[row.exceptionMessage ? 'stop-error-button' : '']" @click="handleStatusInfo(row)">{{ row.state }}</span>
-                </el-tooltip>
+                <div class="flex-center">
+                  <el-icon v-if="row.state === 'stopped'" size="16"><i-custom-sync-stopped /></el-icon>
+                  <el-icon v-else size="16"><i-custom-sync-running /></el-icon>
+                  <el-tooltip
+                    placement="top-start"
+                    effect="light"
+                    trigger="hover"
+                    content="错误详情"
+                    :disabled="!row.exceptionMessage"
+                    popper-class="tooltip-box-width"
+                  >
+                    <span :class="[row.exceptionMessage ? 'stop-error-button' : '', 'm-l-4']" @click="handleStatusInfo(row)">{{ row.state }}</span>
+                  </el-tooltip>
+                </div>
               </template>
             </el-table-column>
             <el-table-column label="创建时间" prop="creationTime" min-width="200" align="center" show-overflow-tooltip />
