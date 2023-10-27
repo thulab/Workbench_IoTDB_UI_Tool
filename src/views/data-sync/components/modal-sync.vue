@@ -97,10 +97,9 @@
                   <template #label>
                     触发模式:<el-tooltip
                       effect="light"
-                      content="日志模式：该模式下，任务仅使用操作日志进行数据处理、发送
-文件模式：该模式下，任务仅使用数据文件进行数据处理、发送"
                       placement="top"
-                      popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                      popper-class="table-tooltip-max-width">
+                      <template #content>日志模式：该模式下，任务仅使用操作日志进行数据处理、发送<br>文件模式：该模式下，任务仅使用数据文件进行数据处理、发送</template><i-custom-question /></el-tooltip>
                   </template>
                   <el-radio-group v-model="formData.triggerMode" @change="val => handleChangeTriggerMode(val as string as 'hybrid' | 'log' | 'file')">
                     <el-radio :label="'hybrid'">混合模式</el-radio>
