@@ -93,7 +93,15 @@
                     @change="val => handleChangeRunningSwitch(val as boolean)"
                   />
                 </base-form-item>
-                <base-form-item v-if="formData.isSynchronRealTime" label="触发模式：" prop="triggerMode" :rules="requiredRules" class="m-l-24">
+                <base-form-item v-if="formData.isSynchronRealTime" label="触发模式：" prop="triggerMode" :rules="requiredRules" class="form-item-label-short m-l-24">
+                  <template #label>
+                    触发模式:<el-tooltip
+                      effect="light"
+                      content="日志模式：该模式下，任务仅使用操作日志进行数据处理、发送
+文件模式：该模式下，任务仅使用数据文件进行数据处理、发送"
+                      placement="top"
+                      popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                  </template>
                   <el-radio-group v-model="formData.triggerMode" @change="val => handleChangeTriggerMode(val as string as 'hybrid' | 'log' | 'file')">
                     <el-radio :label="'hybrid'">混合模式</el-radio>
                     <el-radio :label="'log'">日志模式</el-radio>
