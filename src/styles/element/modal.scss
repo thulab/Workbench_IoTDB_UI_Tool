@@ -52,8 +52,13 @@
   font-size: 20px !important;
 }
 
-.el-message-box__message p{
-  white-space: pre-wrap;
+.el-message-box__message{
+  max-height: 200px;
+  overflow-y: scroll;
+
+  p{
+    white-space: pre-wrap;
+  }
 }
 
 .el-message-box__status {
