@@ -125,7 +125,7 @@
                 </base-form-item>
               </div>
               <base-form-item v-if="formData.processorPluginType === 'custom'" label="插件参数：" prop="processorPluginParam" :rules="requiredRules" class="form-label-width">
-                <el-input v-model="formData.processorPluginParam" type="textarea" placeholder="请输入插件参数，例如:'processor' = '`alarm-processer`', 'processor.alarm_id' = '582'" style="width:360px;" :resize="'none'" :rows="4" id="data-sync-modal-deal-params" />
+                <el-input v-model="formData.processorPluginParam" type="textarea" placeholder="请输入插件参数，例如:'processor.alarm_id' = '582'" style="width:360px;" :resize="'none'" :rows="4" id="data-sync-modal-deal-params" />
               </base-form-item>
               <h4 class="form-module-title">发送设置</h4>
               <div class="flex-align-center">
@@ -148,7 +148,6 @@
                   v-model="formData.connectorPluginParam"
                   type="textarea"
                   placeholder="请输入插件参数，例如：
-'connector' = '`alarm-connector`',
  'connector.send_alarm_url' = 'http://192.20.10.31:9091/api/alarm/addRecords'"
                   style="width:360px;"
                   :resize="'none'"
