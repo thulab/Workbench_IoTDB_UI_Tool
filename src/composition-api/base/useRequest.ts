@@ -4,9 +4,8 @@
 import { ref, type Ref } from 'vue';
 
 // 1001
-// 9999 其他错误
 // 1330 无权限
-const alertErrorCode = [1001, 9999];
+const alertErrorCode = [1001];
 
 interface Opt<T> {
   initData?: T;
@@ -31,7 +30,7 @@ const showError = (message: string, code?: number) => {
     }).finally(() => {
       window.__errBoxShowing__ = false;
     });
-  } else if (code && !alertErrorCode.includes(code) && code !== 1320) {
+  } else if (code && !alertErrorCode.includes(code) && code !== 1320 && code !== 9999) {
     ElMessage.error({ message, grouping: true });
   }
 };

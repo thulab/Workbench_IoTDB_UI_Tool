@@ -363,6 +363,18 @@ const handleConfirm = () => {
           dialogVisible.value = false;
           emit('handleSave');
         }
+      }).catch((err) => {
+        if (err.code === 9999) {
+          ElMessageBox.confirm(err.message, '错误', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'error',
+          })
+            .finally(() => {
+              dialogVisible.value = false;
+              emit('handleSave');
+            });
+        }
       });
     } else {
       ElMessage.error('请输入相应内容');
