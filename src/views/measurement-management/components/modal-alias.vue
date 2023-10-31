@@ -5,17 +5,17 @@
     width="480px"
     align-center
     :close-on-click-modal="false"
-    id="alias-model-database"
+    id="alias-modal-database"
   >
     <el-form ref="formRef" :model="formData" label-position="left">
       <base-form-item label="测点描述:" prop="alias">
-        <el-input v-model="formData.alias" placeholder="请输入测点描述" maxlength="50" show-word-limit id="alias-model-alias" type="textarea" :resize="'none'" />
+        <el-input v-model="formData.alias" placeholder="请输入测点描述" maxlength="50" show-word-limit id="alias-modal-alias" type="textarea" :resize="'none'" />
       </base-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false" id="alias-model-cancel">取消</el-button>
-        <el-button type="primary" :loading="saveloading" @click="handleConfirm" id="alias-model-confirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="alias-modal-cancel">取消</el-button>
+        <el-button type="primary" :loading="saveloading" @click="handleConfirm" id="alias-modal-confirm">确定</el-button>
       </span>
     </template>
   </el-dialog>
