@@ -124,7 +124,7 @@
                   <el-input v-model="formData.processorPluginName" placeholder="请输入处理插件名称" style="width:200px;" id="data-sync-modal-deal-name" />
                 </base-form-item>
               </div>
-              <base-form-item v-if="formData.processorPluginType === 'custom'" label="插件参数：" prop="processorPluginParam" :rules="requiredRules" class="form-label-width">
+              <base-form-item v-if="formData.processorPluginType === 'custom'" label="插件参数：" prop="processorPluginParam" class="form-label-width">
                 <el-input v-model="formData.processorPluginParam" type="textarea" placeholder="请输入插件参数，例如:'processor.alarm_id' = '582'" style="width:360px;" :resize="'none'" :rows="4" id="data-sync-modal-deal-params" />
               </base-form-item>
               <h4 class="form-module-title">发送设置</h4>
@@ -143,7 +143,7 @@
                   <el-input v-model="formData.connectorPluginName" placeholder="请输入发送插件名称" style="width:200px;" id="data-sync-modal-send-name" />
                 </base-form-item>
               </div>
-              <base-form-item v-if="formData.connectorPluginType === 'custom'" label="插件参数：" prop="connectorPluginParam" :rules="requiredRules" class="form-label-width">
+              <base-form-item v-if="formData.connectorPluginType === 'custom'" label="插件参数：" prop="connectorPluginParam" class="form-label-width">
                 <el-input
                   v-model="formData.connectorPluginParam"
                   type="textarea"
