@@ -542,11 +542,11 @@ const handleConfirm = () => {
           ElMessage.error('历史数据与实时数据状态不能同时为关，请修改后重新操作');
           return;
         }
-        if (formData.value.processorPluginType === 'custom' && formData.value.processorPluginParam.toLocaleLowerCase().includes('processor')) {
+        if (formData.value.processorPluginType === 'custom' && formData.value.processorPluginParam.toLocaleLowerCase().includes("'processor'")) {
           ElMessage.error("插件参数中不能包含 'processor'");
           return;
         }
-        if (formData.value.connectorPluginType === 'custom' && formData.value.connectorPluginParam.toLocaleLowerCase().includes('connector')) {
+        if (formData.value.connectorPluginType === 'custom' && formData.value.connectorPluginParam.toLocaleLowerCase().includes("'connector'")) {
           ElMessage.error("插件参数中不能包含 'connector'");
           return;
         }
