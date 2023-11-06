@@ -24,11 +24,6 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Login',
     component: Login,
   },
-  {
-    path: '/data-flow',
-    name: 'DataFlow',
-    component: () => import('@/views/data-flow/detail.vue'),
-  },
 ];
 
 const router = createRouter({

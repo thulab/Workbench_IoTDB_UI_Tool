@@ -144,6 +144,7 @@ declare module 'vue' {
     LayoutTabs: typeof import('./../components/layout/layout-tabs.vue')['default']
     LayoutTabsMoreOperation: typeof import('./../components/layout/components/layout-tabs-more-operation.vue')['default']
     ModalConnection: typeof import('./../components/modal-connection.vue')['default']
+    ModalFlow: typeof import('./../components/modal-flow.vue')['default']
     ModalResetPassword: typeof import('./../components/modal-reset-password.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
