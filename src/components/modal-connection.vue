@@ -64,10 +64,10 @@
           <h4 class="connection-detail-title">实例详情</h4>
         </div>
         <el-scrollbar v-loading="detailLoading">
-          <el-form ref="formRef" :model="formData" label-position="left" label-width="140px" :key="formKey">
+          <el-form ref="formRef" :model="formData" label-position="left" label-width="140px" :key="formKey" :disabled="!isShowSave">
             <label><input type="password" autocomplete="new-password" hidden></label>
             <base-form-item label="连接类型：" prop="type" :rules="requiredRules" class="base-form-box">
-              <el-radio-group v-model="formData.type" @change="val => handleChangeType(val as 0 | 1 | 2)">
+              <el-radio-group v-model="formData.type" @change="val => handleChangeType(val as 0 | 1 | 2)" :disabled="editType !== 'add'">
                 <el-radio :label="0">单机</el-radio>
                 <el-radio :label="1">集群</el-radio>
                 <el-radio :label="2">双活</el-radio>
@@ -205,10 +205,10 @@
           </el-form>
         </el-scrollbar>
         <div class="connection-form-buttons">
-          <el-button plain @click="handleTest('test')" :loading="testLoading">测试</el-button>
+          <el-button plain v-if="isShowSave" @click="handleTest('test')" :loading="testLoading">测试</el-button>
           <div>
-            <el-button plain @click="handleReset">重置</el-button>
-            <el-button type="primary" v-if="current !== connectionStore.connectionInfo.data.id || route.name === 'Login'" :disabled="!isCanSave" :loading="saveLoading" @click="handleSave">保存</el-button>
+            <el-button plain v-if="isShowSave" @click="handleReset">重置</el-button>
+            <el-button type="primary" v-if="isShowSave" :disabled="!isCanSave" :loading="saveLoading" @click="handleSave">保存</el-button>
             <el-button type="primary" v-if="isToggle && current !== connectionStore.connectionInfo.data.id" :loading="connectLoading" @click="handleTest('login')">连接实例</el-button>
           </div>
         </div>
@@ -338,6 +338,8 @@ const isCanSave = computed(() => {
   }
   return true;
 });
+
+const isShowSave = computed(() => current.value !== connectionStore.connectionInfo.data.id || route.name === 'Login');
 
 const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
 const { requestFn: getConnectionDetail } = useRequest(ConnectionApi.getConnectionDetail);
