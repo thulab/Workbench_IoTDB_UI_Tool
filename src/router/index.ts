@@ -24,6 +24,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Login',
     component: Login,
   },
+  {
+    path: '/flow',
+    name: 'Flow',
+    component: () => import('@/components/modal-flow.vue'),
+  },
 ];
 
 const router = createRouter({
