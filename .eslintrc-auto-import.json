@@ -71,6 +71,10 @@
     "IconEpArrowRight": true,
     "IconEpMoon": true,
     "IconEpSunny": true,
-    "useSessionStorage": true
+    "useSessionStorage": true,
+    "ExtractDefaultPropTypes": true,
+    "ExtractPropTypes": true,
+    "ExtractPublicPropTypes": true,
+    "WritableComputedRef": true
   }
 }
