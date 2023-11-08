@@ -364,15 +364,17 @@ const handleConfirm = () => {
           emit('handleSave');
         }
       }).catch((err) => {
-        if (err.code === 9999) {
+        if (err.code === 9999 || err.code === 1380) {
           ElMessageBox.confirm(err.message, '错误', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'error',
           })
             .finally(() => {
-              dialogVisible.value = false;
-              emit('handleSave');
+              if (err.code === 9999) {
+                dialogVisible.value = false;
+                emit('handleSave');
+              }
             });
         }
       });
