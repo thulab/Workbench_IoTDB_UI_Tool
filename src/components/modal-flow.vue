@@ -1,29 +1,29 @@
 <template>
-  <!-- <el-dialog
+  <el-dialog
     title="流程图管理"
     v-model="dialogVisible"
-    width="780px"
+    width="1024px"
     align-center
     :close-on-click-modal="false"
     :close-on-press-escape="false"
-    id="connection-modal"
+    id="flow-graph-modal"
     :before-close="handleClose"
-  > -->
-  <el-container class="page-container p-0">
-    <el-header class="detail-title-box">
-      <h4 class="detail-title-text">数据流程图</h4>
-      <div class="operate-buttons">
-      </div>
-    </el-header>
-    <el-main class="p-0">
-      <div class="flow-container" id="flow-container">
-        <div class="flow-stencil-wrapper" ref="stencilContainerRef"></div>
-        <div class="flow-graph-wrapper" ref="graphContainerRef" id="graph-container"></div>
-        <div class="flow-operate-wrapper"></div>
-      </div>
-    </el-main>
-  </el-container>
-  <!-- </el-dialog> -->
+  >
+    <el-container class="flow-graph-container p-0" :style="{ height: maxHeight + 'px' }">
+      <el-header class="detail-title-box">
+        <h4 class="detail-title-text">数据流程图</h4>
+        <div class="operate-buttons">
+        </div>
+      </el-header>
+      <el-main class="p-0">
+        <div class="flow-container" id="flow-container">
+          <div class="flow-stencil-wrapper" ref="stencilContainerRef"></div>
+          <div class="flow-graph-wrapper" ref="graphContainerRef" id="graph-container"></div>
+          <div class="flow-operate-wrapper"></div>
+        </div>
+      </el-main>
+    </el-container>
+  </el-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -61,6 +61,8 @@ const standAloneList = ref<Connection.ConnectionItem[]>([]);
 const doubleLiveList = ref<Connection.ConnectionItem[]>([]);
 const clusterList = ref<Connection.ConnectionItem[]>([]);
 const listLoading = ref(false);
+
+const maxHeight = computed(() => window.innerHeight - 100);
 
 const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
 
@@ -540,49 +542,27 @@ function loadStencil() {
   stencil.value?.load(doubleLiveNodes as (Node | Node.Metadata)[], 'group4');
 }
 
-onMounted(() => {
-  // const flowContainer = document.getElementById('flow-container');
-  // const stencilContainer = document.createElement('div');
-  // stencilContainer.id = 'stencil';
-  // stencilContainer.classList.add('flow-stencil-wrapper');
-  // const graphContainer = document.createElement('div');
-  // graphContainer.id = 'graph-container';
-  // graphContainer.classList.add('flow-graph-wrapper');
-  // flowContainer!.appendChild(stencilContainer);
-  // flowContainer!.appendChild(graphContainer);
-  initialGraph();
-  graphWatchEvent();
-  graphBindEvent();
-  getList().then(() => {
-    loadStencil();
-  });
-});
-
 watch(
   () => props.visible,
   (newVal) => {
     if (newVal) {
-      // const flowContainer = document.getElementById('flow-container');
-      // const stencilContainer = document.createElement('div');
-      // stencilContainer.id = 'stencil';
-      // stencilContainer.classList.add('flow-stencil-wrapper');
-      // const graphContainer = document.createElement('div');
-      // graphContainer.id = 'graph-container';
-      // graphContainer.classList.add('flow-graph-wrapper');
-      // flowContainer!.appendChild(stencilContainer);
-      // flowContainer!.appendChild(graphContainer);
-      // initialGraph();
-      // graphWatchEvent();
-      // graphBindEvent();
-      // getList().then(() => {
-      //   loadStencil();
-      // });
+      nextTick(() => {
+        initialGraph();
+        graphWatchEvent();
+        graphBindEvent();
+        getList().then(() => {
+          loadStencil();
+        });
+      });
+    } else {
+      graph.value?.dispose();
     }
   },
 );
 </script>
 
 <style lang="scss" scoped>
+
 .detail-title-box{
   height: 41px;
   width: 100%;
