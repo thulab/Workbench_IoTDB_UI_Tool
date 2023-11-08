@@ -36,10 +36,12 @@ import { Keyboard } from '@antv/x6-plugin-keyboard';
 import { Transform } from '@antv/x6-plugin-transform';
 import { Scroller } from '@antv/x6-plugin-scroller';
 import { Export } from '@antv/x6-plugin-export';
+import { register, getTeleport } from '@antv/x6-vue-shape';
 import { ConnectionApi } from '@/api';
 import connectionClusterSvg from '@/assets/icons/connection-cluster.svg';
 import connectionDoubleLiveSvg from '@/assets/icons/connection-double-live.svg';
 import connectionStandAloneSvg from '@/assets/icons/connection-stand-alone.svg';
+import CustomVueNode from './flow-graph/custom-vue-node.vue';
 
 const props = defineProps<{
   visible: boolean;
@@ -151,6 +153,47 @@ const ports = {
     },
   ],
 };
+
+register({
+  shape: 'custom-vue-node',
+  component: CustomVueNode,
+  width: 52,
+  height: 52,
+  markup: [
+    {
+      tagName: 'rect',
+      selector: 'body',
+    },
+    {
+      tagName: 'image',
+    },
+    {
+      tagName: 'text',
+      selector: 'label',
+    },
+  ],
+  attrs: {
+    body: {
+      stroke: '#5F95FF',
+      fill: '#5F95FF',
+    },
+    image: {
+      width: 26,
+      height: 26,
+      refX: 13,
+      refY: 16,
+    },
+    label: {
+      refX: 3,
+      refY: 2,
+      textAnchor: 'left',
+      textVerticalAnchor: 'top',
+      fontSize: 12,
+      fill: '#fff',
+    },
+  },
+  ports: { ...ports },
+});
 
 Graph.registerNode(
   'custom-rect',
@@ -302,51 +345,6 @@ function initialGraph() {
       pannable: true,
     }))
     .use(new Export());
-
-  // const source = graph.value.addNode({
-  //   x: 130,
-  //   y: 30,
-  //   width: 100,
-  //   height: 40,
-  //   label: 'Hello',
-  //   attrs: {
-  //     body: {
-  //       stroke: '#8f8f8f',
-  //       strokeWidth: 1,
-  //       fill: '#fff',
-  //       rx: 6,
-  //       ry: 6,
-  //     },
-  //   },
-  // });
-
-  // const target = graph.value.addNode({
-  //   x: 180,
-  //   y: 160,
-  //   width: 100,
-  //   height: 40,
-  //   label: 'World',
-  //   attrs: {
-  //     body: {
-  //       stroke: '#8f8f8f',
-  //       strokeWidth: 1,
-  //       fill: '#fff',
-  //       rx: 6,
-  //       ry: 6,
-  //     },
-  //   },
-  // });
-
-  // graph.value.addEdge({
-  //   source,
-  //   target,
-  //   attrs: {
-  //     line: {
-  //       stroke: '#8f8f8f',
-  //       strokeWidth: 1,
-  //     },
-  //   },
-  // });
 
   graph.value.centerContent();
 
@@ -510,7 +508,7 @@ function loadStencil() {
     label: '文字输入',
   });
   const standAloneNodes = standAloneList.value.map((item) => graph.value?.createNode({
-    shape: 'custom-image',
+    shape: 'custom-vue-node',
     label: item.name,
     attrs: {
       image: {
@@ -519,7 +517,7 @@ function loadStencil() {
     },
   }));
   const clusterNodes = clusterList.value.map((item) => graph.value?.createNode({
-    shape: 'custom-image',
+    shape: 'custom-vue-node',
     label: item.name,
     attrs: {
       image: {
@@ -528,7 +526,7 @@ function loadStencil() {
     },
   }));
   const doubleLiveNodes = doubleLiveList.value.map((item) => graph.value?.createNode({
-    shape: 'custom-image',
+    shape: 'custom-vue-node',
     label: item.name,
     attrs: {
       image: {
