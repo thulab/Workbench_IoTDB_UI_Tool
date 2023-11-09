@@ -19,7 +19,115 @@
         <div class="flow-container" id="flow-container">
           <div class="flow-stencil-wrapper" ref="stencilContainerRef"></div>
           <div class="flow-graph-wrapper" ref="graphContainerRef" id="graph-container"></div>
-          <div class="flow-operate-wrapper"></div>
+          <div class="flow-operate-wrapper">
+            <!-- 文本 -->
+            <div v-show="isShowTextStyle" class="text-style-box">
+              <div class="text-style-detail-item">
+                <span class="detail-label">文字大小：</span>
+                <el-input-number
+                  v-model.number="textStyle.fontSize"
+                  :min="12"
+                  step-strictly
+                  :controls="false"
+                  @change="val => handleChangeTextFontSize(val as number)"
+                />
+              </div>
+              <div class="text-style-detail-item">
+                <span class="detail-label">文字颜色：</span>
+                <el-color-picker v-model="textStyle.color" color-format="hex" @change="val => handleChangeTextColor(val as string)" />
+              </div></div>
+            <!-- 节点 -->
+            <div v-show="isShowNodeStyle" class="node-style-box">
+              <div class="node-style-detail-item">
+                <span class="detail-label">节点宽度：</span>
+                <el-input-number
+                  v-model.number="nodeStyle.nodeWidth"
+                  :min="0"
+                  step-strictly
+                  :controls="false"
+                  @change="val => handleChangeNodeWidth(val as number)"
+                />
+              </div>
+              <div class="node-style-detail-item">
+                <span class="detail-label">节点高度：</span>
+                <el-input-number
+                  v-model.number="nodeStyle.nodeHeight"
+                  :min="0"
+                  step-strictly
+                  :controls="false"
+                  @change="val => handleChangeNodeHeight(val as number)"
+                />
+              </div>
+              <div class="node-style-detail-item">
+                <span class="detail-label">x轴位置：</span>
+                <el-input-number
+                  v-model.number="nodeStyle.x"
+                  step-strictly
+                  :controls="false"
+                  @change="val => handleChangeNodeX(val as number)"
+                />
+              </div>
+              <div class="node-style-detail-item">
+                <span class="detail-label">y轴位置：</span>
+                <el-input-number
+                  v-model.number="nodeStyle.y"
+                  step-strictly
+                  :controls="false"
+                  @change="val => handleChangeNodeY(val as number)"
+                />
+              </div>
+              <div class="node-style-detail-item">
+                <span class="detail-label">旋转度数：</span>
+                <el-input-number
+                  v-model.number="nodeStyle.angle"
+                  step-strictly
+                  :controls="false"
+                  @change="val => handleChangeNodeAngle(val as number)"
+                />
+              </div>
+            </div>
+            <!-- 边 箭头 -->
+            <div v-show="isShowEdgeStyle" class="edge-style-box">
+              <div class="edge-style-detail-item">
+                <span class="detail-label">连线类型：</span>
+                <el-select v-model="edgeStyle.lineType" @change="handleChangeLineType">
+                  <el-option
+                    v-for="item in lineTypeList"
+                    :key="item.value"
+                    :label="item.name"
+                    :value="item.value"
+                  />
+                </el-select>
+              </div>
+              <div class="edge-style-detail-item">
+                <span class="detail-label">连线颜色：</span>
+                <el-color-picker v-model="edgeStyle.color" color-format="hex" @change="val => handleChangeLineColor(val as string)" />
+              </div>
+              <div class="edge-style-detail-item">
+                <span class="detail-label">箭头样式：</span>
+                <el-select v-model="edgeStyle.arrowType" @change="handleChangeArrowType">
+                  <el-option
+                    v-for="item in arrowTypeList"
+                    :key="item.value"
+                    :label="item.name"
+                    :value="item.value"
+                  />
+                </el-select>
+              </div>
+              <div class="edge-style-detail-item">
+                <span class="detail-label">箭头宽度：</span>
+                <el-slider v-model="edgeStyle.arrowWidth" :min="1" :max="50" @change="handleChangeArrowWidth" />
+              </div>
+              <div class="edge-style-detail-item">
+                <span class="detail-label">箭头高度：</span>
+                <el-slider v-model="edgeStyle.arrowHeight" :min="1" :max="50" @change="handleChangeArrowHeight" />
+              </div>
+              <div class="edge-style-detail-item">
+                <span class="detail-label">箭头偏移量：</span>
+                <el-slider v-model="edgeStyle.arrowOffset" :min="-50" :max="50" @change="handleChangeArrowOffset" />
+              </div>
+            </div>
+          </div>
         </div>
       </el-main>
     </el-container>
@@ -30,17 +138,15 @@
 import { Graph, Shape } from '@antv/x6';
 import { Stencil } from '@antv/x6-plugin-stencil';
 import { Snapline } from '@antv/x6-plugin-snapline';
-import { Clipboard } from '@antv/x6-plugin-clipboard';
-import { History } from '@antv/x6-plugin-history';
-import { Keyboard } from '@antv/x6-plugin-keyboard';
-import { Transform } from '@antv/x6-plugin-transform';
+// import { Clipboard } from '@antv/x6-plugin-clipboard';
+// import { History } from '@antv/x6-plugin-history';
+// import { Keyboard } from '@antv/x6-plugin-keyboard';
+// import { Transform } from '@antv/x6-plugin-transform';
 import { Scroller } from '@antv/x6-plugin-scroller';
 import { Export } from '@antv/x6-plugin-export';
-import { register, getTeleport } from '@antv/x6-vue-shape';
+import { register } from '@antv/x6-vue-shape';
+import insertCss from 'insert-css';
 import { ConnectionApi } from '@/api';
-import connectionClusterSvg from '@/assets/icons/connection-cluster.svg';
-import connectionDoubleLiveSvg from '@/assets/icons/connection-double-live.svg';
-import connectionStandAloneSvg from '@/assets/icons/connection-stand-alone.svg';
 import CustomVueNode from './flow-graph/custom-vue-node.vue';
 
 const props = defineProps<{
@@ -53,6 +159,18 @@ const emit = defineEmits<{
   (event: 'handleClose', id?: number): void;
 }>();
 
+const lineTypeList = [
+  { name: '直线连接', value: 'normal' },
+  { name: '圆弧连接', value: 'smooth' },
+  { name: '流动连接', value: 'dashed' },
+];
+
+const arrowTypeList = [
+  { name: '实心箭头', value: 'block' },
+  { name: '经典箭头', value: 'classic' },
+  { name: '菱形箭头', value: 'diamond' },
+];
+
 const dialogVisible = useVModel(props, 'visible', emit);
 const stencilContainerRef = ref<HTMLElement | null>(null);
 const graphContainerRef = ref<HTMLElement | null>(null);
@@ -63,6 +181,31 @@ const standAloneList = ref<Connection.ConnectionItem[]>([]);
 const doubleLiveList = ref<Connection.ConnectionItem[]>([]);
 const clusterList = ref<Connection.ConnectionItem[]>([]);
 const listLoading = ref(false);
+const isShowTextStyle = ref(false);
+const currentText = ref();
+const textStyle = reactive({
+  fontSize: 14,
+  color: '#495AD4',
+});
+const isShowNodeStyle = ref(false);
+const currentNode = ref();
+const nodeStyle = reactive({
+  nodeWidth: 30,
+  nodeHeight: 30,
+  x: 0,
+  y: 0,
+  angle: 0,
+});
+const isShowEdgeStyle = ref(false);
+const currentEdge = ref();
+const edgeStyle = reactive({
+  lineType: 'normal',
+  color: '#495AD4',
+  arrowType: 'block',
+  arrowWidth: 10,
+  arrowHeight: 10,
+  arrowOffset: 0,
+});
 
 const maxHeight = computed(() => window.innerHeight - 100);
 
@@ -83,7 +226,7 @@ const ports = {
         circle: {
           r: 4,
           magnet: true,
-          stroke: '#5F95FF',
+          stroke: '#495AD4',
           strokeWidth: 1,
           fill: '#fff',
           style: {
@@ -98,7 +241,7 @@ const ports = {
         circle: {
           r: 4,
           magnet: true,
-          stroke: '#5F95FF',
+          stroke: '#495AD4',
           strokeWidth: 1,
           fill: '#fff',
           style: {
@@ -113,7 +256,7 @@ const ports = {
         circle: {
           r: 4,
           magnet: true,
-          stroke: '#5F95FF',
+          stroke: '#495AD4',
           strokeWidth: 1,
           fill: '#fff',
           style: {
@@ -128,7 +271,7 @@ const ports = {
         circle: {
           r: 4,
           magnet: true,
-          stroke: '#5F95FF',
+          stroke: '#495AD4',
           strokeWidth: 1,
           fill: '#fff',
           style: {
@@ -159,39 +302,8 @@ register({
   component: CustomVueNode,
   width: 52,
   height: 52,
-  markup: [
-    {
-      tagName: 'rect',
-      selector: 'body',
-    },
-    {
-      tagName: 'image',
-    },
-    {
-      tagName: 'text',
-      selector: 'label',
-    },
-  ],
-  attrs: {
-    body: {
-      stroke: '#5F95FF',
-      fill: '#5F95FF',
-    },
-    image: {
-      width: 26,
-      height: 26,
-      refX: 13,
-      refY: 16,
-    },
-    label: {
-      refX: 3,
-      refY: 2,
-      textAnchor: 'left',
-      textVerticalAnchor: 'top',
-      fontSize: 12,
-      fill: '#fff',
-    },
-  },
+  x: 0,
+  y: 0,
   ports: { ...ports },
 });
 
@@ -227,50 +339,6 @@ Graph.registerNode(
   true,
 );
 
-Graph.registerNode(
-  'custom-image',
-  {
-    inherit: 'rect',
-    width: 52,
-    height: 52,
-    markup: [
-      {
-        tagName: 'rect',
-        selector: 'body',
-      },
-      {
-        tagName: 'image',
-      },
-      {
-        tagName: 'text',
-        selector: 'label',
-      },
-    ],
-    attrs: {
-      body: {
-        stroke: '#5F95FF',
-        fill: '#5F95FF',
-      },
-      image: {
-        width: 26,
-        height: 26,
-        refX: 13,
-        refY: 16,
-      },
-      label: {
-        refX: 3,
-        refY: 2,
-        textAnchor: 'left',
-        textVerticalAnchor: 'top',
-        fontSize: 12,
-        fill: '#fff',
-      },
-    },
-    ports: { ...ports },
-  },
-  true,
-);
-
 function initialGraph() {
   // #region 初始化画布
   graph.value = new Graph({
@@ -286,10 +354,7 @@ function initialGraph() {
     connecting: {
       router: 'manhattan',
       connector: {
-        name: 'rounded',
-        args: {
-          radius: 8,
-        },
+        name: 'normal',
       },
       anchor: 'center',
       connectionPoint: 'anchor',
@@ -301,16 +366,21 @@ function initialGraph() {
         return new Shape.Edge({
           attrs: {
             line: {
-              stroke: '#A2B1C3',
+              stroke: '#495AD4',
               strokeWidth: 2,
+              strokeDasharray: 'none',
               targetMarker: {
                 name: 'block',
-                width: 12,
-                height: 8,
+                width: 10,
+                height: 10,
+                offset: 0,
+              },
+              style: {
+                animation: 'none',
               },
             },
           },
-          zIndex: 0,
+          zIndex: 1,
         });
       },
       validateConnection({ targetMagnet }) {
@@ -322,8 +392,8 @@ function initialGraph() {
         name: 'stroke',
         args: {
           attrs: {
-            fill: '#5F95FF',
-            stroke: '#5F95FF',
+            fill: '#495AD4',
+            stroke: '#495AD4',
           },
         },
       },
@@ -333,13 +403,13 @@ function initialGraph() {
   // #region 使用插件
   graph.value
     .use(new Snapline())
-    .use(new Clipboard())
-    .use(new History())
-    .use(new Keyboard())
-    .use(new Transform({
-      resizing: true,
-      rotating: true,
-    }))
+    // .use(new Clipboard())
+    // .use(new History())
+    // .use(new Keyboard())
+    // .use(new Transform({
+    //   resizing: true,
+    //   rotating: true,
+    // }))
     .use(new Scroller({
       enabled: true,
       pannable: true,
@@ -385,7 +455,6 @@ function initialGraph() {
   });
 
   stencilContainerRef.value!.appendChild(stencil.value.container);
-  // document.getElementById('stencil')!.appendChild(stencil.value.container);
 }
 
 // 控制连接桩显示/隐藏
@@ -395,6 +464,7 @@ const showPorts = (portList: NodeListOf<SVGElement>, show: boolean) => {
   }
 };
 
+// 事件监听
 function graphWatchEvent() {
   graph.value?.on('node:mouseenter', () => {
     const container = document.getElementById('graph-container')!;
@@ -410,80 +480,114 @@ function graphWatchEvent() {
     ) as NodeListOf<SVGElement>;
     showPorts(allPorts, false);
   });
+  graph.value?.on('node:click', ({ node }) => {
+    isShowEdgeStyle.value = false;
+    isShowNodeStyle.value = true;
+    currentNode.value = node;
+    nodeStyle.nodeWidth = node.size().width;
+    nodeStyle.nodeHeight = node.size().height;
+    nodeStyle.x = node.position().x;
+    nodeStyle.y = node.position().y;
+    nodeStyle.angle = node.getAngle();
+  });
+  graph.value?.on('edge:click', ({ edge }) => {
+    isShowNodeStyle.value = false;
+    isShowEdgeStyle.value = true;
+    currentEdge.value = edge;
+    if (!edge.getConnector()) {
+      edgeStyle.lineType = 'normal';
+    } else if (edge.getConnector().name === 'smooth' && edge.attr().line.style!.animation === 'none') {
+      edgeStyle.lineType = 'smooth';
+    } else if (edge.getConnector().name === 'smooth' && edge.attr().line.style!.animation !== 'none') {
+      edgeStyle.lineType = 'dashed';
+    } else {
+      edgeStyle.lineType = 'normal';
+    }
+    edgeStyle.color = edge.attr().line.stroke as string || '#495AD4';
+    edgeStyle.arrowType = edge.attr().line.targetMarker!.name as string || 'block';
+    edgeStyle.arrowWidth = edge.attr().line.targetMarker!.width as number || 10;
+    edgeStyle.arrowHeight = edge.attr().line.targetMarker!.height as number || 10;
+    const offset = edge.attr().line.targetMarker!.offset as number;
+    if (!offset && offset !== 0) {
+      edgeStyle.arrowOffset = -5;
+    } else {
+      edgeStyle.arrowOffset = offset;
+    }
+  });
 }
 
 // #region 快捷键与事件
-function graphBindEvent() {
-  graph.value?.bindKey(['ctrl+c'], () => {
-    const cells = graph.value?.getSelectedCells();
-    if (cells.length) {
-      graph.value?.copy(cells);
-    }
-    return false;
-  });
-  graph.value?.bindKey(['ctrl+x'], () => {
-    const cells = graph.value?.getSelectedCells();
-    if (cells.length) {
-      graph.value?.cut(cells);
-    }
-    return false;
-  });
-  graph.value?.bindKey(['ctrl+v'], () => {
-    if (!graph.value?.isClipboardEmpty()) {
-      const cells = graph.value?.paste({ offset: 32 });
-      graph.value?.cleanSelection();
-      graph.value?.select(cells);
-    }
-    return false;
-  });
+// function graphBindEvent() {
+//   graph.value?.bindKey(['ctrl+c'], () => {
+//     const cells = graph.value?.getSelectedCells();
+//     if (cells.length) {
+//       graph.value?.copy(cells);
+//     }
+//     return false;
+//   });
+//   graph.value?.bindKey(['ctrl+x'], () => {
+//     const cells = graph.value?.getSelectedCells();
+//     if (cells.length) {
+//       graph.value?.cut(cells);
+//     }
+//     return false;
+//   });
+//   graph.value?.bindKey(['ctrl+v'], () => {
+//     if (!graph.value?.isClipboardEmpty()) {
+//       const cells = graph.value?.paste({ offset: 32 });
+//       graph.value?.cleanSelection();
+//       graph.value?.select(cells);
+//     }
+//     return false;
+//   });
 
-  // undo redo
-  graph.value?.bindKey(['ctrl+z'], () => {
-    if (graph.value?.canUndo()) {
-      graph.value?.undo();
-    }
-    return false;
-  });
-  graph.value?.bindKey(['ctrl+shift+z'], () => {
-    if (graph.value?.canRedo()) {
-      graph.value?.redo();
-    }
-    return false;
-  });
+//   // undo redo
+//   graph.value?.bindKey(['ctrl+z'], () => {
+//     if (graph.value?.canUndo()) {
+//       graph.value?.undo();
+//     }
+//     return false;
+//   });
+//   graph.value?.bindKey(['ctrl+shift+z'], () => {
+//     if (graph.value?.canRedo()) {
+//       graph.value?.redo();
+//     }
+//     return false;
+//   });
 
-  // select all
-  graph.value?.bindKey(['ctrl+a'], () => {
-    const nodes = graph.value?.getNodes();
-    if (nodes) {
-      graph.value?.select(nodes);
-    }
-  });
+//   // select all
+//   graph.value?.bindKey(['ctrl+a'], () => {
+//     const nodes = graph.value?.getNodes();
+//     if (nodes) {
+//       graph.value?.select(nodes);
+//     }
+//   });
 
-  // delete
-  graph.value?.bindKey('backspace', () => {
-    const cells = graph.value?.getSelectedCells();
-    if (cells.length) {
-      graph.value?.removeCells(cells);
-    }
-  });
+//   // delete
+//   graph.value?.bindKey('backspace', () => {
+//     const cells = graph.value?.getSelectedCells();
+//     if (cells.length) {
+//       graph.value?.removeCells(cells);
+//     }
+//   });
 
-  // zoom
-  graph.value?.bindKey(['ctrl+1'], () => {
-    const zoom = graph.value?.zoom();
-    if (zoom! < 1.5) {
-      graph.value?.zoom(0.1);
-    }
-  });
-  graph.value?.bindKey(['ctrl+2'], () => {
-    const zoom = graph.value?.zoom();
-    if (zoom! > 0.5) {
-      graph.value?.zoom(-0.1);
-    }
-  });
-}
+//   // zoom
+//   graph.value?.bindKey(['ctrl+1'], () => {
+//     const zoom = graph.value?.zoom();
+//     if (zoom! < 1.5) {
+//       graph.value?.zoom(0.1);
+//     }
+//   });
+//   graph.value?.bindKey(['ctrl+2'], () => {
+//     const zoom = graph.value?.zoom();
+//     if (zoom! > 0.5) {
+//       graph.value?.zoom(-0.1);
+//     }
+//   });
+// }
 
-// 获取实例列表
 function getList() {
+  // 获取实例列表
   listLoading.value = true;
   return getConnectionList().then((res) => {
     const data = res.data || [];
@@ -509,29 +613,26 @@ function loadStencil() {
   });
   const standAloneNodes = standAloneList.value.map((item) => graph.value?.createNode({
     shape: 'custom-vue-node',
-    label: item.name,
-    attrs: {
-      image: {
-        'xlink:href': connectionStandAloneSvg,
-      },
+    id: `${item.id}`,
+    data: {
+      text: item.name,
+      type: 0,
     },
   }));
   const clusterNodes = clusterList.value.map((item) => graph.value?.createNode({
     shape: 'custom-vue-node',
-    label: item.name,
-    attrs: {
-      image: {
-        'xlink:href': connectionClusterSvg,
-      },
+    id: `${item.id}`,
+    data: {
+      text: item.name,
+      type: 1,
     },
   }));
   const doubleLiveNodes = doubleLiveList.value.map((item) => graph.value?.createNode({
     shape: 'custom-vue-node',
-    label: item.name,
-    attrs: {
-      image: {
-        'xlink:href': connectionDoubleLiveSvg,
-      },
+    id: `${item.id}`,
+    data: {
+      text: item.name,
+      type: 2,
     },
   }));
   stencil.value?.load([baseNode] as (Node | Node.Metadata)[], 'group1');
@@ -540,6 +641,99 @@ function loadStencil() {
   stencil.value?.load(doubleLiveNodes as (Node | Node.Metadata)[], 'group4');
 }
 
+// #text 样式开始
+function handleChangeTextFontSize(val: number) {}
+
+function handleChangeTextColor(val: string) {}
+// #endtext
+
+// #node 样式开始
+function handleChangeNodeWidth(val: number) {
+  currentNode.value.prop('size', { width: val, height: currentNode.value.size().height });
+}
+
+function handleChangeNodeHeight(val: number) {
+  currentNode.value.prop('size', { width: currentNode.value.size().width, height: val });
+}
+
+function handleChangeNodeX(val: number) {
+  currentNode.value.prop('position', { x: val, y: currentNode.value.position().y });
+}
+
+function handleChangeNodeY(val: number) {
+  currentNode.value.prop('position', { x: currentNode.value.position().x, y: val });
+}
+
+function handleChangeNodeAngle(val: number) {
+  currentNode.value.prop('angle', val);
+}
+// #endnode
+
+// #line 样式开始
+function handleChangeLineType(val: string) {
+  if (val === 'dashed') {
+    currentEdge.value.setConnector('smooth');
+    currentEdge.value.attr('line', {
+      stroke: currentEdge.value.attr().line.stroke,
+      strokeDasharray: 5,
+      targetMarker: currentEdge.value.attr().line.targetMarker!.name,
+      style: {
+        animation: 'ant-line 30s infinite linear',
+      },
+    });
+    insertCss(`
+      @keyframes ant-line {
+        to {
+            stroke-dashoffset: -1000
+        }
+      }
+    `);
+  } else if (val === 'smooth') {
+    currentEdge.value.setConnector('smooth', { radius: 10 });
+    currentEdge.value.attr('line', {
+      stroke: currentEdge.value.attr().line.stroke,
+      strokeDasharray: 'none',
+      targetMarker: currentEdge.value.attr().line.targetMarker!.name,
+      style: {
+        animation: 'none',
+      },
+    });
+  } else {
+    currentEdge.value.setConnector('normal');
+    currentEdge.value.attr('line', {
+      stroke: currentEdge.value.attr().line.stroke,
+      strokeDasharray: 'none',
+      targetMarker: currentEdge.value.attr().line.targetMarker!.name,
+      style: {
+        animation: 'none',
+      },
+    });
+  }
+}
+
+function handleChangeLineColor(val: string) {
+  currentEdge.value.attr('line/stroke', val);
+}
+// #endline
+
+// #arrow 样式开始
+function handleChangeArrowType(val: string) {
+  currentEdge.value.attr('line/targetMarker/name', val);
+}
+
+function handleChangeArrowWidth(val: number) {
+  currentEdge.value.attr('line/targetMarker/width', val);
+}
+
+function handleChangeArrowHeight(val: number) {
+  currentEdge.value.attr('line/targetMarker/height', val);
+}
+
+function handleChangeArrowOffset(val: number) {
+  currentEdge.value.attr('line/targetMarker/offset', val);
+}
+// #endarrow
+
 watch(
   () => props.visible,
   (newVal) => {
@@ -547,7 +741,7 @@ watch(
       nextTick(() => {
         initialGraph();
         graphWatchEvent();
-        graphBindEvent();
+        // graphBindEvent();
         getList().then(() => {
           loadStencil();
         });
@@ -601,5 +795,61 @@ watch(
 
 .flow-operate-wrapper{
   width: 200px;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+
+.node-style-box, .edge-style-box{
+  padding: 10px 10px 10px 0;
+}
+
+.node-style-detail-item{
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+
+  .detail-label{
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 12px;
+    color: #131926;
+    width: 64px;
+  }
+
+  :deep(.el-input-number) {
+    flex: 1;
+  }
+
+  :deep(.el-input__inner) {
+    height: 22px !important;
+  }
+}
+
+.edge-style-detail-item{
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+
+  .detail-label{
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 12px;
+    color: #131926;
+    width: 80px;
+  }
+
+  :deep(.el-input-number), :deep(.el-select), :deep(.el-slider) {
+    flex: 1;
+  }
+
+  :deep(.el-input__inner) {
+    height: 22px !important;
+  }
+}
+
+@keyframes ant-line {
+  to {
+      stroke-dashoffset: -1000
+  }
 }
 </style>
