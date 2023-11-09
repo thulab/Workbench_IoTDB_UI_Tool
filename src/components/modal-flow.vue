@@ -17,6 +17,7 @@
       </el-header>
       <el-main class="p-0">
         <div class="flow-container" id="flow-container">
+          <TeleportContainer />
           <div class="flow-stencil-wrapper" ref="stencilContainerRef"></div>
           <div class="flow-graph-wrapper" ref="graphContainerRef" id="graph-container"></div>
           <div class="flow-operate-wrapper">
@@ -141,10 +142,10 @@ import { Snapline } from '@antv/x6-plugin-snapline';
 // import { Clipboard } from '@antv/x6-plugin-clipboard';
 // import { History } from '@antv/x6-plugin-history';
 // import { Keyboard } from '@antv/x6-plugin-keyboard';
-// import { Transform } from '@antv/x6-plugin-transform';
+import { Transform } from '@antv/x6-plugin-transform';
 import { Scroller } from '@antv/x6-plugin-scroller';
 import { Export } from '@antv/x6-plugin-export';
-import { register } from '@antv/x6-vue-shape';
+import { register, getTeleport } from '@antv/x6-vue-shape';
 import insertCss from 'insert-css';
 import { ConnectionApi } from '@/api';
 import CustomVueNode from './flow-graph/custom-vue-node.vue';
@@ -171,18 +172,17 @@ const arrowTypeList = [
   { name: '菱形箭头', value: 'diamond' },
 ];
 
+const TeleportContainer = getTeleport();
 const dialogVisible = useVModel(props, 'visible', emit);
 const stencilContainerRef = ref<HTMLElement | null>(null);
 const graphContainerRef = ref<HTMLElement | null>(null);
 const graph = ref<Graph>();
 const stencil = ref<Stencil>();
-const connectionList = ref<Connection.ConnectionItem[]>([]);
 const standAloneList = ref<Connection.ConnectionItem[]>([]);
 const doubleLiveList = ref<Connection.ConnectionItem[]>([]);
 const clusterList = ref<Connection.ConnectionItem[]>([]);
 const listLoading = ref(false);
 const isShowTextStyle = ref(false);
-const currentText = ref();
 const textStyle = reactive({
   fontSize: 14,
   color: '#495AD4',
@@ -316,12 +316,12 @@ Graph.registerNode(
     attrs: {
       body: {
         strokeWidth: 1,
-        stroke: '#5F95FF',
-        fill: '#EFF4FF',
+        stroke: '#495AD4',
+        fill: '#fff',
       },
       text: {
-        fontSize: 12,
-        fill: '#262626',
+        fontSize: 14,
+        fill: '#495AD4',
       },
     },
     ports: { ...ports },
@@ -331,6 +331,8 @@ Graph.registerNode(
         args: {
           attrs: {
             backgroundColor: '#EFF4FF',
+            fontSize: 14,
+            color: '#495AD4',
           },
         },
       },
@@ -343,7 +345,12 @@ function initialGraph() {
   // #region 初始化画布
   graph.value = new Graph({
     container: graphContainerRef.value!,
-    grid: true,
+    grid: {
+      visible: true,
+    },
+    background: {
+      color: '#fff',
+    },
     mousewheel: {
       enabled: true,
       zoomAtMousePosition: true,
@@ -380,7 +387,7 @@ function initialGraph() {
               },
             },
           },
-          zIndex: 1,
+          zIndex: 0,
         });
       },
       validateConnection({ targetMagnet }) {
@@ -406,10 +413,10 @@ function initialGraph() {
     // .use(new Clipboard())
     // .use(new History())
     // .use(new Keyboard())
-    // .use(new Transform({
-    //   resizing: true,
-    //   rotating: true,
-    // }))
+    .use(new Transform({
+      resizing: true,
+      rotating: false,
+    }))
     .use(new Scroller({
       enabled: true,
       pannable: true,
@@ -480,17 +487,27 @@ function graphWatchEvent() {
     ) as NodeListOf<SVGElement>;
     showPorts(allPorts, false);
   });
+  // 节点单击
   graph.value?.on('node:click', ({ node }) => {
+    if (node.prop().shape === 'custom-rect') {
+      isShowTextStyle.value = true;
+      isShowNodeStyle.value = false;
+      textStyle.fontSize = node.attrs!.text.fontSize as number || 14;
+      textStyle.color = node.attrs!.text.fill as string || '#495AD4';
+    } else {
+      isShowTextStyle.value = false;
+      isShowNodeStyle.value = true;
+      nodeStyle.nodeWidth = node.size().width;
+      nodeStyle.nodeHeight = node.size().height;
+      nodeStyle.x = node.position().x;
+      nodeStyle.y = node.position().y;
+      nodeStyle.angle = node.getAngle();
+    }
     isShowEdgeStyle.value = false;
-    isShowNodeStyle.value = true;
     currentNode.value = node;
-    nodeStyle.nodeWidth = node.size().width;
-    nodeStyle.nodeHeight = node.size().height;
-    nodeStyle.x = node.position().x;
-    nodeStyle.y = node.position().y;
-    nodeStyle.angle = node.getAngle();
   });
   graph.value?.on('edge:click', ({ edge }) => {
+    isShowTextStyle.value = false;
     isShowNodeStyle.value = false;
     isShowEdgeStyle.value = true;
     currentEdge.value = edge;
@@ -600,7 +617,6 @@ function getList() {
         standAloneList.value.push(item);
       }
     });
-    connectionList.value = [...standAloneList.value, ...clusterList.value, ...doubleLiveList.value];
   }).finally(() => {
     listLoading.value = false;
   });
@@ -642,9 +658,13 @@ function loadStencil() {
 }
 
 // #text 样式开始
-function handleChangeTextFontSize(val: number) {}
+function handleChangeTextFontSize(val: number) {
+  currentNode.value.attr('text/fontSize', val);
+}
 
-function handleChangeTextColor(val: string) {}
+function handleChangeTextColor(val: string) {
+  currentNode.value.attr('text/fill', val);
+}
 // #endtext
 
 // #node 样式开始
@@ -738,6 +758,14 @@ watch(
   () => props.visible,
   (newVal) => {
     if (newVal) {
+      standAloneList.value = [];
+      doubleLiveList.value = [];
+      clusterList.value = [];
+      isShowTextStyle.value = false;
+      isShowNodeStyle.value = false;
+      currentNode.value = undefined;
+      isShowEdgeStyle.value = false;
+      currentEdge.value = undefined;
       nextTick(() => {
         initialGraph();
         graphWatchEvent();
@@ -779,6 +807,7 @@ watch(
   display: flex;
   border: 1px solid #dfe3e8;
   box-sizing: border-box;
+  position: relative;
 }
 
 .flow-stencil-wrapper{
@@ -788,9 +817,15 @@ watch(
   border-right: 1px solid #dfe3e8;
 }
 
+:deep(.x6-widget-stencil-group-content) {
+  max-height: 190px;
+  overflow-y: auto;
+}
+
 .flow-graph-wrapper{
   width: calc(100% - 400px);
   height: 100%;
+  position: relative;
 }
 
 .flow-operate-wrapper{
@@ -799,33 +834,11 @@ watch(
   box-sizing: border-box;
 }
 
-.node-style-box, .edge-style-box{
+.text-style-box, .node-style-box, .edge-style-box{
   padding: 10px 10px 10px 0;
 }
 
-.node-style-detail-item{
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-
-  .detail-label{
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 12px;
-    color: #131926;
-    width: 64px;
-  }
-
-  :deep(.el-input-number) {
-    flex: 1;
-  }
-
-  :deep(.el-input__inner) {
-    height: 22px !important;
-  }
-}
-
-.edge-style-detail-item{
+.text-style-detail-item, .node-style-detail-item, .edge-style-detail-item{
   display: flex;
   align-items: center;
   margin-bottom: 12px;
@@ -844,12 +857,6 @@ watch(
 
   :deep(.el-input__inner) {
     height: 22px !important;
-  }
-}
-
-@keyframes ant-line {
-  to {
-      stroke-dashoffset: -1000
   }
 }
 </style>
