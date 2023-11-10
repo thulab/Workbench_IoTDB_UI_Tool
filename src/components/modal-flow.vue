@@ -13,16 +13,22 @@
     <el-container class="flow-graph-container p-0" :style="{ height: maxHeight + 'px' }">
       <el-header class="detail-title-box">
         <h4 class="detail-title-text">数据流程图</h4>
-        <div class="operate-buttons">
+        <div class="operate-buttons" v-if="editType === 'edit'">
+          <el-button link @click="handleSaveView">退出编辑</el-button>
+          <el-button link @click="handleEmpty">清空</el-button>
+        </div>
+        <div class="operate-buttons" v-if="editType === 'view'">
+          <el-button link @click="handleEdit">编辑</el-button>
+          <el-button link @click="handleExport">导出</el-button>
         </div>
       </el-header>
       <el-main class="p-0">
         <div class="flow-container" id="flow-container">
           <TeleportContainer />
           <ContextMenu v-show="isShowContextMenu" ref="contextMenuRef" @handleClickOperate="handleClickOperate" />
-          <div class="flow-stencil-wrapper" ref="stencilContainerRef"></div>
+          <div class="flow-stencil-wrapper" ref="stencilContainerRef" v-show="isEdit"></div>
           <div class="flow-graph-wrapper" ref="graphContainerRef" id="graph-container"></div>
-          <div class="flow-operate-wrapper">
+          <div class="flow-operate-wrapper" v-show="isEdit">
             <!-- 文本 -->
             <div v-show="isShowTextStyle" class="text-style-box">
               <div class="text-style-detail-item">
@@ -119,15 +125,15 @@
               </div>
               <div class="edge-style-detail-item">
                 <span class="detail-label">箭头宽度：</span>
-                <el-slider v-model="edgeStyle.arrowWidth" :min="1" :max="50" @change="handleChangeArrowWidth" />
+                <el-slider v-model="edgeStyle.arrowWidth" :min="1" :max="50" @change="val => handleChangeArrowWidth(val as number)" />
               </div>
               <div class="edge-style-detail-item">
                 <span class="detail-label">箭头高度：</span>
-                <el-slider v-model="edgeStyle.arrowHeight" :min="1" :max="50" @change="handleChangeArrowHeight" />
+                <el-slider v-model="edgeStyle.arrowHeight" :min="1" :max="50" @change="val => handleChangeArrowHeight(val as number)" />
               </div>
               <div class="edge-style-detail-item">
                 <span class="detail-label">箭头偏移量：</span>
-                <el-slider v-model="edgeStyle.arrowOffset" :min="-50" :max="50" @change="handleChangeArrowOffset" />
+                <el-slider v-model="edgeStyle.arrowOffset" :min="-50" :max="50" @change="val => handleChangeArrowOffset(val as number)" />
               </div>
             </div>
           </div>
@@ -213,8 +219,11 @@ const operateNode = ref();
 const isShowContextMenu = ref(false);
 const contextMenuRef = ref<InstanceType<typeof ContextMenu>>();
 const contextMenuTimer = ref();
+const editType = ref<'view' | 'edit'>('view');
+const viewNode = ref();
 
 const maxHeight = computed(() => window.innerHeight - 100);
+const isEdit = computed(() => editType.value === 'edit');
 
 const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
 
@@ -558,6 +567,18 @@ function graphWatchEvent() {
   });
 }
 
+// view 状态事件监听
+function graphWatchViewEvent() {
+  // 节点单击
+  graph.value?.on('node:click', ({ node }) => {
+    if (node.prop().shape === 'custom-rect') {
+      // 文本输入不做处理
+    } else {
+      viewNode.value = node;
+    }
+  });
+}
+
 // #region 快捷键与事件
 // function graphBindEvent() {
 //   graph.value?.bindKey(['ctrl+c'], () => {
@@ -789,6 +810,7 @@ function onMouseDown() {
   }, 200);
 }
 
+// 右键操作
 function handleClickOperate(key: string) {
   // 复制
   if (key === 'copy') {
@@ -827,6 +849,44 @@ function handleClickOperate(key: string) {
   }
 }
 
+// 状态变更重置操作
+function resetState() {
+  isShowTextStyle.value = false;
+  isShowNodeStyle.value = false;
+  isShowEdgeStyle.value = false;
+  isShowContextMenu.value = false;
+}
+
+// 保存至查看状态
+function handleSaveView() {
+  graph.value!.toJSON();
+  graph.value!.hideGrid();
+  graph.value?.off();
+  graphWatchViewEvent();
+  resetState();
+  viewNode.value = undefined;
+  editType.value = 'view';
+}
+
+// 清空
+function handleEmpty() {
+  graph.value!.clearCells();
+}
+
+// 编辑态
+function handleEdit() {
+  graph.value!.showGrid();
+  graph.value?.off();
+  graphWatchEvent();
+  resetState();
+  editType.value = 'edit';
+}
+
+// 导出
+function handleExport() {
+  graph.value!.exportPNG('chart', { padding: 20, quality: 1 });
+}
+
 watch(
   () => isShowContextMenu.value,
   (newVal) => {
@@ -853,16 +913,21 @@ watch(
       operateNode.value = undefined;
       isShowContextMenu.value = false;
       contextMenuTimer.value = undefined;
+      editType.value = 'view';
+      viewNode.value = undefined;
       nextTick(() => {
         initialGraph();
-        graphWatchEvent();
+        graph.value!.hideGrid();
+        graphWatchViewEvent();
         // graphBindEvent();
         getList().then(() => {
           loadStencil();
         });
       });
     } else {
+      document.removeEventListener('mousedown', onMouseDown);
       graph.value?.dispose();
+      graph.value?.off();
     }
   },
 );
@@ -910,7 +975,7 @@ watch(
 }
 
 .flow-graph-wrapper{
-  width: calc(100% - 400px) !important;
+  flex: 1;
   height: 100% !important;
   position: relative;
 }
@@ -950,7 +1015,8 @@ watch(
 
 <style lang="scss">
 .x6-graph-scroller {
-  width: calc(100% - 400px) !important;
+  // width: calc(100% - 400px) !important;
+  flex: 1;
   height: 100% !important;
   position: relative;
 }
