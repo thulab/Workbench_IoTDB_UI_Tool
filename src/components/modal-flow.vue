@@ -4,6 +4,7 @@
     v-model="dialogVisible"
     width="1024px"
     align-center
+    fullscreen
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     id="flow-graph-modal"
@@ -18,6 +19,7 @@
       <el-main class="p-0">
         <div class="flow-container" id="flow-container">
           <TeleportContainer />
+          <ContextMenu v-show="isShowContextMenu" ref="contextMenuRef" @handleClickOperate="handleClickOperate" />
           <div class="flow-stencil-wrapper" ref="stencilContainerRef"></div>
           <div class="flow-graph-wrapper" ref="graphContainerRef" id="graph-container"></div>
           <div class="flow-operate-wrapper">
@@ -139,8 +141,8 @@
 import { Graph, Shape } from '@antv/x6';
 import { Stencil } from '@antv/x6-plugin-stencil';
 import { Snapline } from '@antv/x6-plugin-snapline';
-// import { Clipboard } from '@antv/x6-plugin-clipboard';
-// import { History } from '@antv/x6-plugin-history';
+import { Clipboard } from '@antv/x6-plugin-clipboard';
+import { History } from '@antv/x6-plugin-history';
 // import { Keyboard } from '@antv/x6-plugin-keyboard';
 import { Transform } from '@antv/x6-plugin-transform';
 import { Scroller } from '@antv/x6-plugin-scroller';
@@ -149,6 +151,7 @@ import { register, getTeleport } from '@antv/x6-vue-shape';
 import insertCss from 'insert-css';
 import { ConnectionApi } from '@/api';
 import CustomVueNode from './flow-graph/custom-vue-node.vue';
+import ContextMenu from './flow-graph/context-menu.vue';
 
 const props = defineProps<{
   visible: boolean;
@@ -206,6 +209,10 @@ const edgeStyle = reactive({
   arrowHeight: 10,
   arrowOffset: 0,
 });
+const operateNode = ref();
+const isShowContextMenu = ref(false);
+const contextMenuRef = ref<InstanceType<typeof ContextMenu>>();
+const contextMenuTimer = ref();
 
 const maxHeight = computed(() => window.innerHeight - 100);
 
@@ -410,8 +417,12 @@ function initialGraph() {
   // #region 使用插件
   graph.value
     .use(new Snapline())
-    // .use(new Clipboard())
-    // .use(new History())
+    .use(new Clipboard({
+      enabled: true,
+    }))
+    .use(new History({
+      enabled: true,
+    }))
     // .use(new Keyboard())
     .use(new Transform({
       resizing: true,
@@ -506,6 +517,7 @@ function graphWatchEvent() {
     isShowEdgeStyle.value = false;
     currentNode.value = node;
   });
+  // 边单击
   graph.value?.on('edge:click', ({ edge }) => {
     isShowTextStyle.value = false;
     isShowNodeStyle.value = false;
@@ -530,6 +542,19 @@ function graphWatchEvent() {
     } else {
       edgeStyle.arrowOffset = offset;
     }
+  });
+  // 节点右击
+  graph.value?.on('node:contextmenu', ({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    e, x, y, node, view,
+  }) => {
+    if (contextMenuTimer.value) {
+      clearTimeout(contextMenuTimer.value);
+      contextMenuTimer.value = undefined;
+    }
+    isShowContextMenu.value = true;
+    operateNode.value = node;
+    contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
   });
 }
 
@@ -633,6 +658,7 @@ function loadStencil() {
     data: {
       text: item.name,
       type: 0,
+      id: `${item.id}`,
     },
   }));
   const clusterNodes = clusterList.value.map((item) => graph.value?.createNode({
@@ -641,6 +667,7 @@ function loadStencil() {
     data: {
       text: item.name,
       type: 1,
+      id: `${item.id}`,
     },
   }));
   const doubleLiveNodes = doubleLiveList.value.map((item) => graph.value?.createNode({
@@ -649,6 +676,7 @@ function loadStencil() {
     data: {
       text: item.name,
       type: 2,
+      id: `${item.id}`,
     },
   }));
   stencil.value?.load([baseNode] as (Node | Node.Metadata)[], 'group1');
@@ -754,6 +782,62 @@ function handleChangeArrowOffset(val: number) {
 }
 // #endarrow
 
+function onMouseDown() {
+  contextMenuTimer.value = setTimeout(() => {
+    isShowContextMenu.value = false;
+    operateNode.value = undefined;
+  }, 200);
+}
+
+function handleClickOperate(key: string) {
+  // 复制
+  if (key === 'copy') {
+    if (!operateNode.value) {
+      ElMessage.info('请先选中节点再复制');
+    } else {
+      graph.value!.copy([operateNode.value], { deep: false, useLocalStorage: false });
+      ElMessage.success('复制成功');
+    }
+  }
+  // 粘贴
+  if (key === 'paste') {
+    if (graph.value!.isClipboardEmpty()) {
+      ElMessage.info('剪切板为空，不可粘贴');
+    } else {
+      graph.value!.paste();
+      graph.value!.cleanClipboard();
+      ElMessage.success('粘贴成功');
+    }
+  }
+  // 撤销
+  if (key === 'undo') {
+    if (graph.value!.canUndo()) {
+      graph.value!.undo();
+    } else {
+      ElMessage.info('没有需要撤销的操作');
+    }
+  }
+  // 恢复
+  if (key === 'redo') {
+    if (graph.value!.canRedo()) {
+      graph.value!.redo();
+    } else {
+      ElMessage.info('没有需要恢复的操作');
+    }
+  }
+}
+
+watch(
+  () => isShowContextMenu.value,
+  (newVal) => {
+    if (newVal) {
+      document.addEventListener('mousedown', onMouseDown);
+    } else {
+      document.removeEventListener('mousedown', onMouseDown);
+    }
+  },
+);
+
 watch(
   () => props.visible,
   (newVal) => {
@@ -766,6 +850,9 @@ watch(
       currentNode.value = undefined;
       isShowEdgeStyle.value = false;
       currentEdge.value = undefined;
+      operateNode.value = undefined;
+      isShowContextMenu.value = false;
+      contextMenuTimer.value = undefined;
       nextTick(() => {
         initialGraph();
         graphWatchEvent();
@@ -823,8 +910,8 @@ watch(
 }
 
 .flow-graph-wrapper{
-  width: calc(100% - 400px);
-  height: 100%;
+  width: calc(100% - 400px) !important;
+  height: 100% !important;
   position: relative;
 }
 
@@ -858,5 +945,13 @@ watch(
   :deep(.el-input__inner) {
     height: 22px !important;
   }
+}
+</style>
+
+<style lang="scss">
+.x6-graph-scroller {
+  width: calc(100% - 400px) !important;
+  height: 100% !important;
+  position: relative;
 }
 </style>
