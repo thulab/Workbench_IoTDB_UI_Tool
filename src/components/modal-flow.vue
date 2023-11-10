@@ -35,7 +35,8 @@
                 <span class="detail-label">文字大小：</span>
                 <el-input-number
                   v-model.number="textStyle.fontSize"
-                  :min="12"
+                  :min="1"
+                  :max="100"
                   step-strictly
                   :controls="false"
                   @change="val => handleChangeTextFontSize(val as number)"
@@ -494,6 +495,7 @@ const showPorts = (portList: NodeListOf<SVGElement>, show: boolean) => {
 // 事件监听
 function graphWatchEvent() {
   graph.value?.on('node:mouseenter', () => {
+    if (!isEdit.value) return;
     const container = document.getElementById('graph-container')!;
     const allPorts = container.querySelectorAll(
       '.x6-port-body',
@@ -501,6 +503,7 @@ function graphWatchEvent() {
     showPorts(allPorts, true);
   });
   graph.value?.on('node:mouseleave', () => {
+    if (!isEdit.value) return;
     const container = document.getElementById('graph-container')!;
     const allPorts = container.querySelectorAll(
       '.x6-port-body',
@@ -509,6 +512,7 @@ function graphWatchEvent() {
   });
   // 节点单击
   graph.value?.on('node:click', ({ node }) => {
+    if (!isEdit.value) return;
     if (node.prop().shape === 'custom-rect') {
       isShowTextStyle.value = true;
       isShowNodeStyle.value = false;
@@ -528,6 +532,7 @@ function graphWatchEvent() {
   });
   // 边单击
   graph.value?.on('edge:click', ({ edge }) => {
+    if (!isEdit.value) return;
     isShowTextStyle.value = false;
     isShowNodeStyle.value = false;
     isShowEdgeStyle.value = true;
@@ -557,6 +562,7 @@ function graphWatchEvent() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     e, x, y, node, view,
   }) => {
+    if (!isEdit.value) return;
     if (contextMenuTimer.value) {
       clearTimeout(contextMenuTimer.value);
       contextMenuTimer.value = undefined;
@@ -571,6 +577,7 @@ function graphWatchEvent() {
 function graphWatchViewEvent() {
   // 节点单击
   graph.value?.on('node:click', ({ node }) => {
+    if (isEdit.value) return;
     if (node.prop().shape === 'custom-rect') {
       // 文本输入不做处理
     } else {
@@ -861,7 +868,7 @@ function resetState() {
 function handleSaveView() {
   graph.value!.toJSON();
   graph.value!.hideGrid();
-  graph.value?.off();
+  // graph.value?.off();
   graphWatchViewEvent();
   resetState();
   viewNode.value = undefined;
@@ -876,7 +883,7 @@ function handleEmpty() {
 // 编辑态
 function handleEdit() {
   graph.value!.showGrid();
-  graph.value?.off();
+  // graph.value?.off();
   graphWatchEvent();
   resetState();
   editType.value = 'edit';
