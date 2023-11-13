@@ -14,7 +14,7 @@
       <el-header class="detail-title-box">
         <h4 class="detail-title-text">数据流程图</h4>
         <div class="operate-buttons" v-if="editType === 'edit'">
-          <el-button link @click="handleSaveView">退出编辑</el-button>
+          <el-button link @click="handleSaveView" :loading="saveLoading">退出编辑</el-button>
           <el-button link @click="handleEmpty">清空</el-button>
         </div>
         <div class="operate-buttons" v-if="editType === 'view'">
@@ -23,7 +23,7 @@
         </div>
       </el-header>
       <el-main class="p-0">
-        <div class="flow-container" id="flow-container">
+        <div class="flow-container" id="flow-container" v-loading="graphLoading">
           <TeleportContainer />
           <ContextMenu v-show="isShowContextMenu" ref="contextMenuRef" @handleClickOperate="handleClickOperate" />
           <div class="flow-stencil-wrapper" ref="stencilContainerRef" v-show="isEdit" v-loading="listLoading"></div>
@@ -138,14 +138,13 @@
               </div>
             </div>
           </div>
-          <div class="connection-detail-wrapper" v-show="false">
+          <div class="connection-detail-wrapper" v-show="!isEdit && viewNode">
             <connection-form
               ref="connectionFormRef"
-              v-model:edit-type="editType"
-              v-model:detail-loading="detailLoading"
+              v-model:edit-type="connectionEditType"
+              v-model:detail-loading="connectionDetailLoading"
               :current="current"
               :is-toggle="isToggle"
-              @handleRefreshList="getList"
             />
           </div>
         </div>
@@ -233,14 +232,19 @@ const contextMenuRef = ref<InstanceType<typeof ContextMenu>>();
 const contextMenuTimer = ref();
 const editType = ref<'view' | 'edit'>('view');
 const viewNode = ref();
+const connectionEditType = ref('edit');
 const connectionFormRef = ref<InstanceType<typeof ConnectionForm>>();
-const detailLoading = ref(false);
+const connectionDetailLoading = ref(false);
 const current = ref<string | number>('');
+const saveLoading = ref(false);
+const graphLoading = ref(false);
 
 const maxHeight = computed(() => window.innerHeight - 100);
 const isEdit = computed(() => editType.value === 'edit');
 
 const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
+const { requestFn: getRelationalGraph } = useRequest(ConnectionApi.getRelationalGraph);
+const { requestFn: saveRelationalGraph } = useRequest(ConnectionApi.saveRelationalGraph);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleClose() {
@@ -373,18 +377,16 @@ Graph.registerNode(
 );
 
 function initialGraph(isDisabled?: boolean) {
+  if (graph.value) {
+    graph.value.dispose();
+  }
   // #region 初始化画布
   graph.value = new Graph({
     container: graphContainerRef.value!,
-    // grid: {
-    //   visible: true,
-    // },
+    interacting: !isDisabled,
     grid: !isDisabled,
     background: {
       color: '#fff',
-    },
-    translating: {
-      restrict: !!isDisabled,
     },
     autoResize: true,
     mousewheel: {
@@ -583,24 +585,40 @@ function graphWatchEvent() {
     }
   });
   // 节点单击
-  graph.value?.on('node:click', ({ node }) => {
-    if (!isEdit.value) return;
-    if (node.prop().shape === 'custom-rect') {
-      isShowTextStyle.value = true;
-      isShowNodeStyle.value = false;
-      textStyle.fontSize = node.attrs!.text.fontSize as number || 14;
-      textStyle.color = node.attrs!.text.fill as string || '#495AD4';
+  graph.value?.on('node:click', async ({ node }) => {
+    if (isEdit.value) {
+      if (node.prop().shape === 'custom-rect') {
+        isShowTextStyle.value = true;
+        isShowNodeStyle.value = false;
+        textStyle.fontSize = node.attrs!.text.fontSize as number || 14;
+        textStyle.color = node.attrs!.text.fill as string || '#495AD4';
+      } else {
+        isShowTextStyle.value = false;
+        isShowNodeStyle.value = true;
+        nodeStyle.nodeWidth = node.size().width;
+        nodeStyle.nodeHeight = node.size().height;
+        nodeStyle.x = node.position().x;
+        nodeStyle.y = node.position().y;
+        nodeStyle.angle = node.getAngle();
+      }
+      isShowEdgeStyle.value = false;
+      currentNode.value = node;
+    } else if (node.prop().shape === 'custom-rect') { // view 状态事件监听
+      // 文本输入不做处理
+    } else if (!viewNode.value) {
+      viewNode.value = node;
+      current.value = +node.data.id;
+      connectionFormRef.value?.getDetail(current.value);
     } else {
-      isShowTextStyle.value = false;
-      isShowNodeStyle.value = true;
-      nodeStyle.nodeWidth = node.size().width;
-      nodeStyle.nodeHeight = node.size().height;
-      nodeStyle.x = node.position().x;
-      nodeStyle.y = node.position().y;
-      nodeStyle.angle = node.getAngle();
+      if (connectionFormRef.value?.isCanSave) {
+        const flag = await connectionFormRef.value?.handleChangeConnection();
+        if (!flag) return;
+      }
+      if (current.value === +node.data.id) return;
+      viewNode.value = node;
+      current.value = +node.data.id;
+      connectionFormRef.value?.getDetail(current.value);
     }
-    isShowEdgeStyle.value = false;
-    currentNode.value = node;
   });
   // 边单击
   graph.value?.on('edge:click', ({ edge }) => {
@@ -642,19 +660,6 @@ function graphWatchEvent() {
     isShowContextMenu.value = true;
     operateNode.value = node;
     contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
-  });
-}
-
-// view 状态事件监听
-function graphWatchViewEvent() {
-  // 节点单击
-  graph.value?.on('node:click', ({ node }) => {
-    if (isEdit.value) return;
-    if (node.prop().shape === 'custom-rect') {
-      // 文本输入不做处理
-    } else {
-      viewNode.value = node;
-    }
   });
 }
 
@@ -936,15 +941,35 @@ function resetState() {
   isShowContextMenu.value = false;
 }
 
+// 获取画布数据
+function getGraphData() {
+  graphLoading.value = true;
+  getRelationalGraph().then((res) => {
+    if (res.data.detail) {
+      const data = JSON.parse(res.data.detail);
+      graph.value?.fromJSON(data);
+      graph.value?.centerContent();
+    }
+  }).finally(() => {
+    graphLoading.value = false;
+  });
+}
+
 // 保存至查看状态
 function handleSaveView() {
-  graph.value!.toJSON();
-  initialGraph(true);
-  // graph.value!.hideGrid();
-  graphWatchViewEvent();
-  resetState();
-  viewNode.value = undefined;
-  editType.value = 'view';
+  const data = graph.value!.toJSON();
+  saveLoading.value = true;
+  saveRelationalGraph(JSON.stringify(data)).then(() => {
+    ElMessage.success('保存成功');
+    initialGraph(true);
+    graphWatchEvent();
+    resetState();
+    viewNode.value = undefined;
+    editType.value = 'view';
+    getGraphData();
+  }).finally(() => {
+    saveLoading.value = false;
+  });
 }
 
 // 清空
@@ -954,7 +979,6 @@ function handleEmpty() {
 
 // 编辑态
 function handleEdit() {
-  // graph.value!.showGrid();
   initialGraph(false);
   graphWatchEvent();
   resetState();
@@ -962,6 +986,7 @@ function handleEdit() {
   getList().then(() => {
     loadStencil();
   });
+  getGraphData();
 }
 
 // 导出
@@ -998,14 +1023,13 @@ watch(
       contextMenuTimer.value = undefined;
       editType.value = 'view';
       viewNode.value = undefined;
+      saveLoading.value = false;
+      graphLoading.value = false;
       nextTick(() => {
         initialGraph(true);
-        // graph.value!.hideGrid();
-        graphWatchViewEvent();
+        graphWatchEvent();
         // graphBindEvent();
-        // getList().then(() => {
-        //   loadStencil();
-        // });
+        getGraphData();
       });
     } else {
       document.removeEventListener('mousedown', onMouseDown);
@@ -1067,6 +1091,7 @@ watch(
   width: 200px;
   padding: 0 12px;
   box-sizing: border-box;
+  border-left: 1px solid #dfe3e8;
 }
 
 .text-style-box, .node-style-box, .edge-style-box{
@@ -1097,9 +1122,7 @@ watch(
 
 .connection-detail-wrapper{
   width: 500px;
-  height: 510px;
-  border-radius: 6px;
-  border: 1px solid #DFE1ED;
+  border-left: 1px solid #dfe3e8;
   padding: 0;
   display: flex;
   flex-direction: column;

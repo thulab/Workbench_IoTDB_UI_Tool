@@ -37,5 +37,15 @@ class ConnectionApi {
   static changeCluster(type: number): HttpResponseP {
     return http.get('/changeCluster', { params: { type } });
   }
+
+  // 存储关系图
+  static saveRelationalGraph(data: string): HttpResponseP {
+    return http.post('/relationalGraph/save', { detail: data });
+  }
+
+  // 获取关系图
+  static getRelationalGraph(): HttpResponseP<{ detail: string }> {
+    return http.get('/relationalGraph/get');
+  }
 }
 export default ConnectionApi;
