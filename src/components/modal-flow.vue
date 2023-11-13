@@ -26,7 +26,7 @@
         <div class="flow-container" id="flow-container">
           <TeleportContainer />
           <ContextMenu v-show="isShowContextMenu" ref="contextMenuRef" @handleClickOperate="handleClickOperate" />
-          <div class="flow-stencil-wrapper" ref="stencilContainerRef" v-show="isEdit"></div>
+          <div class="flow-stencil-wrapper" ref="stencilContainerRef" v-show="isEdit" v-loading="listLoading"></div>
           <div class="flow-graph-wrapper" ref="graphContainerRef" id="graph-container"></div>
           <div class="flow-operate-wrapper" v-show="isEdit">
             <!-- 文本 -->
@@ -138,6 +138,16 @@
               </div>
             </div>
           </div>
+          <div class="connection-detail-wrapper" v-show="false">
+            <connection-form
+              ref="connectionFormRef"
+              v-model:edit-type="editType"
+              v-model:detail-loading="detailLoading"
+              :current="current"
+              :is-toggle="isToggle"
+              @handleRefreshList="getList"
+            />
+          </div>
         </div>
       </el-main>
     </el-container>
@@ -159,6 +169,7 @@ import insertCss from 'insert-css';
 import { ConnectionApi } from '@/api';
 import CustomVueNode from './flow-graph/custom-vue-node.vue';
 import ContextMenu from './flow-graph/context-menu.vue';
+import ConnectionForm from './connection/connection-form.vue';
 
 const props = defineProps<{
   visible: boolean;
@@ -222,6 +233,9 @@ const contextMenuRef = ref<InstanceType<typeof ContextMenu>>();
 const contextMenuTimer = ref();
 const editType = ref<'view' | 'edit'>('view');
 const viewNode = ref();
+const connectionFormRef = ref<InstanceType<typeof ConnectionForm>>();
+const detailLoading = ref(false);
+const current = ref<string | number>('');
 
 const maxHeight = computed(() => window.innerHeight - 100);
 const isEdit = computed(() => editType.value === 'edit');
@@ -358,16 +372,21 @@ Graph.registerNode(
   true,
 );
 
-function initialGraph() {
+function initialGraph(isDisabled?: boolean) {
   // #region 初始化画布
   graph.value = new Graph({
     container: graphContainerRef.value!,
-    grid: {
-      visible: true,
-    },
+    // grid: {
+    //   visible: true,
+    // },
+    grid: !isDisabled,
     background: {
       color: '#fff',
     },
+    translating: {
+      restrict: !!isDisabled,
+    },
+    autoResize: true,
     mousewheel: {
       enabled: true,
       zoomAtMousePosition: true,
@@ -428,14 +447,14 @@ function initialGraph() {
   graph.value
     .use(new Snapline())
     .use(new Clipboard({
-      enabled: true,
+      enabled: !isDisabled,
     }))
     .use(new History({
-      enabled: true,
+      enabled: !isDisabled,
     }))
     // .use(new Keyboard())
     .use(new Transform({
-      resizing: true,
+      resizing: !isDisabled,
       rotating: false,
     }))
     .use(new Scroller({
@@ -447,42 +466,44 @@ function initialGraph() {
   graph.value.centerContent();
 
   // #region 初始化 stencil
-  stencil.value = new Stencil({
-    title: '流程图',
-    target: graph.value,
-    stencilGraphWidth: 200,
-    stencilGraphHeight: 0,
-    collapsable: false,
-    groups: [
-      {
-        title: '基础图形',
-        name: 'group1',
-        collapsed: false,
+  if (!isDisabled) {
+    stencil.value = new Stencil({
+      title: '流程图',
+      target: graph.value,
+      stencilGraphWidth: 200,
+      stencilGraphHeight: 0,
+      collapsable: false,
+      groups: [
+        {
+          title: '基础图形',
+          name: 'group1',
+          collapsed: false,
+        },
+        {
+          title: '单机实例',
+          name: 'group2',
+          collapsed: false,
+        },
+        {
+          title: '集群实例',
+          name: 'group3',
+          collapsed: false,
+        },
+        {
+          title: '双活实例',
+          name: 'group4',
+          collapsed: false,
+        },
+      ],
+      layoutOptions: {
+        columns: 3,
+        columnWidth: 60,
+        rowHeight: 55,
       },
-      {
-        title: '单机实例',
-        name: 'group2',
-        collapsed: false,
-      },
-      {
-        title: '集群实例',
-        name: 'group3',
-        collapsed: false,
-      },
-      {
-        title: '双活实例',
-        name: 'group4',
-        collapsed: false,
-      },
-    ],
-    layoutOptions: {
-      columns: 3,
-      columnWidth: 60,
-      rowHeight: 55,
-    },
-  });
+    });
 
-  stencilContainerRef.value!.appendChild(stencil.value.container);
+    stencilContainerRef.value!.appendChild(stencil.value.container);
+  }
 }
 
 // 控制连接桩显示/隐藏
@@ -509,6 +530,57 @@ function graphWatchEvent() {
       '.x6-port-body',
     ) as NodeListOf<SVGElement>;
     showPorts(allPorts, false);
+  });
+  // 调整节点大小后触发
+  graph.value?.on('node:resized', ({ node }) => {
+    if (!isEdit.value) return;
+    if (node.prop().shape === 'custom-rect') {
+      // 文本输入不做处理
+    } else {
+      isShowTextStyle.value = false;
+      isShowNodeStyle.value = true;
+      nodeStyle.nodeWidth = node.size().width;
+      nodeStyle.nodeHeight = node.size().height;
+      nodeStyle.x = node.position().x;
+      nodeStyle.y = node.position().y;
+      nodeStyle.angle = node.getAngle();
+      isShowEdgeStyle.value = false;
+      currentNode.value = node;
+    }
+  });
+  // 鼠标抬起
+  graph.value?.on('node:mouseup', ({ node }) => {
+    if (!isEdit.value) return;
+    if (node.prop().shape === 'custom-rect') {
+      // 文本输入不做处理
+    } else {
+      isShowTextStyle.value = false;
+      isShowNodeStyle.value = true;
+      nodeStyle.nodeWidth = node.size().width;
+      nodeStyle.nodeHeight = node.size().height;
+      nodeStyle.x = node.position().x;
+      nodeStyle.y = node.position().y;
+      nodeStyle.angle = node.getAngle();
+      isShowEdgeStyle.value = false;
+      currentNode.value = node;
+    }
+  });
+  // 放置到画布上节点
+  graph.value?.on('node:added', ({ node }) => {
+    if (!isEdit.value) return;
+    if (node.prop().shape === 'custom-rect') {
+      // 文本输入不做处理
+    } else {
+      isShowTextStyle.value = false;
+      isShowNodeStyle.value = true;
+      nodeStyle.nodeWidth = node.size().width;
+      nodeStyle.nodeHeight = node.size().height;
+      nodeStyle.x = node.position().x;
+      nodeStyle.y = node.position().y;
+      nodeStyle.angle = node.getAngle();
+      isShowEdgeStyle.value = false;
+      currentNode.value = node;
+    }
   });
   // 节点单击
   graph.value?.on('node:click', ({ node }) => {
@@ -867,8 +939,8 @@ function resetState() {
 // 保存至查看状态
 function handleSaveView() {
   graph.value!.toJSON();
-  graph.value!.hideGrid();
-  // graph.value?.off();
+  initialGraph(true);
+  // graph.value!.hideGrid();
   graphWatchViewEvent();
   resetState();
   viewNode.value = undefined;
@@ -882,11 +954,14 @@ function handleEmpty() {
 
 // 编辑态
 function handleEdit() {
-  graph.value!.showGrid();
-  // graph.value?.off();
+  // graph.value!.showGrid();
+  initialGraph(false);
   graphWatchEvent();
   resetState();
   editType.value = 'edit';
+  getList().then(() => {
+    loadStencil();
+  });
 }
 
 // 导出
@@ -909,6 +984,7 @@ watch(
   () => props.visible,
   (newVal) => {
     if (newVal) {
+      listLoading.value = false;
       standAloneList.value = [];
       doubleLiveList.value = [];
       clusterList.value = [];
@@ -923,13 +999,13 @@ watch(
       editType.value = 'view';
       viewNode.value = undefined;
       nextTick(() => {
-        initialGraph();
-        graph.value!.hideGrid();
+        initialGraph(true);
+        // graph.value!.hideGrid();
         graphWatchViewEvent();
         // graphBindEvent();
-        getList().then(() => {
-          loadStencil();
-        });
+        // getList().then(() => {
+        //   loadStencil();
+        // });
       });
     } else {
       document.removeEventListener('mousedown', onMouseDown);
@@ -1017,6 +1093,16 @@ watch(
   :deep(.el-input__inner) {
     height: 22px !important;
   }
+}
+
+.connection-detail-wrapper{
+  width: 500px;
+  height: 510px;
+  border-radius: 6px;
+  border: 1px solid #DFE1ED;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 </style>
 
