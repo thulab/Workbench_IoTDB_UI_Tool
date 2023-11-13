@@ -10,6 +10,7 @@ declare module 'vue' {
     AuthContainer: typeof import('./../components/auth-container.vue')['default']
     AuthTooltip: typeof import('./../components/auth-tooltip.vue')['default']
     BaseFormItem: typeof import('./../components/base-form-item.vue')['default']
+    ConnectionForm: typeof import('./../components/connection/connection-form.vue')['default']
     ContextMenu: typeof import('./../components/flow-graph/context-menu.vue')['default']
     CustomVueNode: typeof import('./../components/flow-graph/custom-vue-node.vue')['default']
     DynamicTable: typeof import('./../components/dynamic-table.vue')['default']
