@@ -161,6 +161,7 @@ import { Clipboard } from '@antv/x6-plugin-clipboard';
 import { History } from '@antv/x6-plugin-history';
 // import { Keyboard } from '@antv/x6-plugin-keyboard';
 import { Transform } from '@antv/x6-plugin-transform';
+import { Selection } from '@antv/x6-plugin-selection';
 import { Scroller } from '@antv/x6-plugin-scroller';
 import { Export } from '@antv/x6-plugin-export';
 import { register, getTeleport } from '@antv/x6-vue-shape';
@@ -340,6 +341,11 @@ register({
   x: 0,
   y: 0,
   ports: { ...ports },
+  tools: [
+    {
+      name: 'button-remove', // 工具名称
+    },
+  ],
 });
 
 Graph.registerNode(
@@ -455,6 +461,9 @@ function initialGraph(isDisabled?: boolean) {
       enabled: !isDisabled,
     }))
     // .use(new Keyboard())
+    .use(new Selection({
+      enabled: !isDisabled,
+    }))
     .use(new Transform({
       resizing: !isDisabled,
       rotating: false,
@@ -465,7 +474,7 @@ function initialGraph(isDisabled?: boolean) {
     }))
     .use(new Export());
 
-  graph.value.centerContent();
+  // graph.value.centerContent();
 
   // #region 初始化 stencil
   if (!isDisabled) {
@@ -646,6 +655,17 @@ function graphWatchEvent() {
     } else {
       edgeStyle.arrowOffset = offset;
     }
+  });
+  // 画布右击
+  graph.value?.on('blank:contextmenu', ({ e }) => {
+    if (!isEdit.value) return;
+    if (contextMenuTimer.value) {
+      clearTimeout(contextMenuTimer.value);
+      contextMenuTimer.value = undefined;
+    }
+    isShowContextMenu.value = true;
+    operateNode.value = graph.value!.getSelectedCells()[0];
+    contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
   });
   // 节点右击
   graph.value?.on('node:contextmenu', ({
