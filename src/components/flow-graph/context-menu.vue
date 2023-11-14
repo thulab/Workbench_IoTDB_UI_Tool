@@ -20,6 +20,7 @@ const contextMenuList = [
   { label: '粘贴', key: 'paste' },
   { label: '撤销', key: 'undo' },
   { label: '恢复', key: 'redo' },
+  { label: '删除', key: 'del' },
 ];
 
 function handleClickOperate(key: string) {

@@ -341,11 +341,6 @@ register({
   x: 0,
   y: 0,
   ports: { ...ports },
-  tools: [
-    {
-      name: 'button-remove', // 工具名称
-    },
-  ],
 });
 
 Graph.registerNode(
@@ -949,6 +944,15 @@ function handleClickOperate(key: string) {
       graph.value!.redo();
     } else {
       ElMessage.info('没有需要恢复的操作');
+    }
+  }
+  // 删除
+  if (key === 'del') {
+    if (!operateNode.value) {
+      ElMessage.info('请先选中节点再删除');
+    } else {
+      operateNode.value.remove();
+      ElMessage.success('删除成功');
     }
   }
 }
