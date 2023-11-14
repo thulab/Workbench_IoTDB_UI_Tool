@@ -144,7 +144,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Graph, Shape } from '@antv/x6';
+import { Graph, Shape, type JSONObject } from '@antv/x6';
 import { Stencil } from '@antv/x6-plugin-stencil';
 import { Snapline } from '@antv/x6-plugin-snapline';
 import { Clipboard } from '@antv/x6-plugin-clipboard';
@@ -155,7 +155,6 @@ import { Selection } from '@antv/x6-plugin-selection';
 import { Scroller } from '@antv/x6-plugin-scroller';
 import { Export } from '@antv/x6-plugin-export';
 import { register, getTeleport } from '@antv/x6-vue-shape';
-import insertCss from 'insert-css';
 import { ConnectionApi } from '@/api';
 import CustomVueNode from './flow-graph/custom-vue-node.vue';
 import ContextMenu from './flow-graph/context-menu.vue';
@@ -611,19 +610,21 @@ function graphWatchEvent() {
     isShowNodeStyle.value = false;
     isShowEdgeStyle.value = true;
     currentEdge.value = edge;
+    const style = edge.attr().line.style as JSONObject;
+    const targetMarker = edge.attr().line.targetMarker as JSONObject;
     if (!edge.getConnector()) {
       edgeStyle.lineType = 'normal';
-    } else if (edge.getConnector().name === 'smooth' && edge.attr().line.style!.animation === 'none') {
+    } else if (edge.getConnector().name === 'smooth' && style.animation === 'none') {
       edgeStyle.lineType = 'smooth';
-    } else if (edge.getConnector().name === 'smooth' && edge.attr().line.style!.animation !== 'none') {
+    } else if (edge.getConnector().name === 'normal' && style.animation !== 'none') {
       edgeStyle.lineType = 'dashed';
     } else {
       edgeStyle.lineType = 'normal';
     }
     edgeStyle.color = edge.attr().line.stroke as string || '#495AD4';
-    edgeStyle.arrowType = edge.attr().line.targetMarker!.name as string || 'block';
-    edgeStyle.arrowWidth = edge.attr().line.targetMarker!.width as number || 10;
-    edgeStyle.arrowHeight = edge.attr().line.targetMarker!.height as number || 10;
+    edgeStyle.arrowType = targetMarker.name as string || 'block';
+    edgeStyle.arrowWidth = targetMarker.width as number || 12;
+    edgeStyle.arrowHeight = targetMarker.height as number || 8;
   });
   // 画布右击
   graph.value?.on('blank:contextmenu', ({ e }) => {
@@ -633,7 +634,11 @@ function graphWatchEvent() {
       contextMenuTimer.value = undefined;
     }
     isShowContextMenu.value = true;
-    operateNode.value = graph.value!.getSelectedCells()[0];
+    if (graph.value && graph.value.getSelectedCells().length > 0) {
+      [operateNode.value] = graph.value!.getSelectedCells();
+    } else {
+      operateNode.value = undefined;
+    }
     contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
   });
   // 节点右击
@@ -726,11 +731,11 @@ function getList() {
 }
 
 function loadStencil() {
-  const baseNode = graph.value?.createNode({
+  const baseNode = graph.value!.createNode({
     shape: 'custom-rect',
     label: '文字输入',
   });
-  const standAloneNodes = standAloneList.value.map((item) => graph.value?.createNode({
+  const standAloneNodes = standAloneList.value.map((item) => graph.value!.createNode({
     shape: 'custom-vue-node',
     id: `${item.id}`,
     data: {
@@ -739,7 +744,7 @@ function loadStencil() {
       id: `${item.id}`,
     },
   }));
-  const clusterNodes = clusterList.value.map((item) => graph.value?.createNode({
+  const clusterNodes = clusterList.value.map((item) => graph.value!.createNode({
     shape: 'custom-vue-node',
     id: `${item.id}`,
     data: {
@@ -748,7 +753,7 @@ function loadStencil() {
       id: `${item.id}`,
     },
   }));
-  const doubleLiveNodes = doubleLiveList.value.map((item) => graph.value?.createNode({
+  const doubleLiveNodes = doubleLiveList.value.map((item) => graph.value!.createNode({
     shape: 'custom-vue-node',
     id: `${item.id}`,
     data: {
@@ -757,10 +762,10 @@ function loadStencil() {
       id: `${item.id}`,
     },
   }));
-  stencil.value?.load([baseNode] as (Node | Node.Metadata)[], 'group1');
-  stencil.value?.load(standAloneNodes as (Node | Node.Metadata)[], 'group2');
-  stencil.value?.load(clusterNodes as (Node | Node.Metadata)[], 'group3');
-  stencil.value?.load(doubleLiveNodes as (Node | Node.Metadata)[], 'group4');
+  stencil.value?.load([baseNode], 'group1');
+  stencil.value?.load(standAloneNodes, 'group2');
+  stencil.value?.load(clusterNodes, 'group3');
+  stencil.value?.load(doubleLiveNodes, 'group4');
 }
 
 // #text 样式开始
@@ -790,28 +795,19 @@ function handleChangeNodeAngle(val: number) {
 // #line 样式开始
 function handleChangeLineType(val: string) {
   if (val === 'dashed') {
-    currentEdge.value.setConnector('smooth');
+    currentEdge.value.setConnector('normal');
     currentEdge.value.attr('line', {
-      stroke: currentEdge.value.attr().line.stroke,
+      ...currentEdge.value.attr().line,
       strokeDasharray: 5,
-      targetMarker: currentEdge.value.attr().line.targetMarker!.name,
       style: {
         animation: 'ant-line 30s infinite linear',
       },
     });
-    insertCss(`
-      @keyframes ant-line {
-        to {
-            stroke-dashoffset: -1000
-        }
-      }
-    `);
   } else if (val === 'smooth') {
     currentEdge.value.setConnector('smooth', { radius: 10 });
     currentEdge.value.attr('line', {
-      stroke: currentEdge.value.attr().line.stroke,
+      ...currentEdge.value.attr().line,
       strokeDasharray: 'none',
-      targetMarker: currentEdge.value.attr().line.targetMarker!.name,
       style: {
         animation: 'none',
       },
@@ -819,9 +815,8 @@ function handleChangeLineType(val: string) {
   } else {
     currentEdge.value.setConnector('normal');
     currentEdge.value.attr('line', {
-      stroke: currentEdge.value.attr().line.stroke,
+      ...currentEdge.value.attr().line,
       strokeDasharray: 'none',
-      targetMarker: currentEdge.value.attr().line.targetMarker!.name,
       style: {
         animation: 'none',
       },
@@ -830,21 +825,45 @@ function handleChangeLineType(val: string) {
 }
 
 function handleChangeLineColor(val: string) {
-  currentEdge.value.attr('line/stroke', val);
+  currentEdge.value.attr('line', {
+    ...currentEdge.value.attr().line,
+    stroke: val,
+  });
 }
 // #endline
 
 // #arrow 样式开始
 function handleChangeArrowType(val: string) {
-  currentEdge.value.attr('line/targetMarker/name', val);
+  currentEdge.value.attr('line', {
+    ...currentEdge.value.attr().line,
+    targetMarker: {
+      name: val,
+      width: currentEdge.value.attr().line.targetMarker!.width,
+      height: currentEdge.value.attr().line.targetMarker!.height,
+    },
+  });
 }
 
 function handleChangeArrowWidth(val: number) {
-  currentEdge.value.attr('line/targetMarker/width', val);
+  currentEdge.value.attr('line', {
+    ...currentEdge.value.attr().line,
+    targetMarker: {
+      name: currentEdge.value.attr().line.targetMarker!.name,
+      width: val,
+      height: currentEdge.value.attr().line.targetMarker!.height,
+    },
+  });
 }
 
 function handleChangeArrowHeight(val: number) {
-  currentEdge.value.attr('line/targetMarker/height', val);
+  currentEdge.value.attr('line', {
+    ...currentEdge.value.attr().line,
+    targetMarker: {
+      name: currentEdge.value.attr().line.targetMarker!.name,
+      width: currentEdge.value.attr().line.targetMarker!.width,
+      height: val,
+    },
+  });
 }
 // #endarrow
 
@@ -1196,5 +1215,11 @@ watch(
   flex: 1;
   height: 100% !important;
   position: relative;
+}
+
+@keyframes ant-line {
+  to {
+      stroke-dashoffset: -1000
+  }
 }
 </style>
