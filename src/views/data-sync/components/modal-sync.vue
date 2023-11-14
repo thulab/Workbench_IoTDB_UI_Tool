@@ -8,7 +8,7 @@
     id="data-sync-modal"
   >
     <div class="form-wrapper" v-loading="loading">
-      <span class="tabs-tip"><el-icon size="14" style="margin-right: 2px;"><i-custom-info-warning /></el-icon>最终提交信息为您提交时所在的页签内容</span>
+      <!-- <span class="tabs-tip"><el-icon size="14" style="margin-right: 2px;"><i-custom-info-warning /></el-icon>最终提交信息为您提交时所在的页签内容</span> -->
       <el-tabs type="card" v-model="activeTab" @tab-click="handleTabClick">
         <el-tab-pane label="界面选择" name="select">
           <el-scrollbar class="p-16">
@@ -17,7 +17,7 @@
               <base-form-item label="任务名称:" prop="name" :rules="requiredNameRules" class="form-label-width" :error="errorName">
                 <el-input v-model="formData.name" placeholder="请输入字母、数字、汉字、下划线，其他字符需用反引号进行整体修饰，例如：`数据同步-1`" type="textarea" :rows="2" id="data-sync-modal-name" :resize="'none'" style="width: 360px;" maxlength="100" show-word-limit />
               </base-form-item>
-              <h4 class="form-module-title">抽取设置</h4>
+              <h4 class="form-module-title">数据抽取</h4>
               <div class="flex-align-center">
                 <base-form-item label="同步测点:" prop="whole" :rules="requiredRules" class="form-label-width">
                   <template #label>
@@ -41,7 +41,12 @@
               </div>
               <base-form-item label="二次转发:" prop="reforward" :rules="requiredRules" class="form-label-width">
                 <template #label>
-                  二次转发:<el-tooltip effect="light" content="转发数据：对同步到数据库的新数据进行转发。例如：如构建 A->B->C的数据转发，那么B->C的同步需要将该参数为“是”后，A->B 中A通过同步写入B的数据才能被正确转发到C，需注意构建A<->B的双向数据转发，那么A->B和B->A的同步都需将该参数设置为“否”，否则会造成数据无休止的集群间循环转发，请谨慎操作！" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                  二次转发:<el-tooltip
+                    effect="light"
+                    content="对其他同步任务发送到此数据库的数据进行转发，例如有A->B，B->C两个同步任务，若B->C选择二次转发，则A中的数据也会发送至C。
+需注意构建双活集群时请将此参数设置为“否”，否则将造成无休止数据循环。"
+                    placement="top"
+                    popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                 </template>
                 <el-radio-group v-model="formData.reforward">
                   <el-radio :label="true">是</el-radio>
@@ -93,22 +98,21 @@
                     @change="val => handleChangeRunningSwitch(val as boolean)"
                   />
                 </base-form-item>
-                <base-form-item v-if="formData.isSynchronRealTime" label="触发模式：" prop="triggerMode" :rules="requiredRules" class="form-item-label-short m-l-24">
+                <base-form-item v-if="formData.isSynchronRealTime" label="发送模式：" prop="triggerMode" :rules="requiredRules" class="form-item-label-short m-l-24">
                   <template #label>
-                    触发模式:<el-tooltip
+                    发送模式:<el-tooltip
                       effect="light"
                       placement="top"
                       popper-class="table-tooltip-max-width">
-                      <template #content>日志模式：该模式下，任务仅使用操作日志进行数据处理、发送<br>文件模式：该模式下，任务仅使用数据文件进行数据处理、发送</template><i-custom-question /></el-tooltip>
+                      <template #content>实时模式：该模式下，任务仅使用实时模式进行数据发送<br>批量模式：该模式下，任务仅使用批量模式进行数据发送</template><i-custom-question /></el-tooltip>
                   </template>
-                  <el-radio-group v-model="formData.triggerMode" @change="val => handleChangeTriggerMode(val as string as 'hybrid' | 'log' | 'file')">
-                    <el-radio :label="'hybrid'">混合模式</el-radio>
-                    <el-radio :label="'log'">日志模式</el-radio>
-                    <el-radio :label="'file'">文件模式</el-radio>
+                  <el-radio-group v-model="formData.triggerMode" @change="val => handleChangeTriggerMode(val as string as 'stream' | 'batch')">
+                    <el-radio :label="'stream'">实时模式</el-radio>
+                    <el-radio :label="'batch'">批量模式</el-radio>
                   </el-radio-group>
                 </base-form-item>
               </div>
-              <h4 class="form-module-title">处理设置</h4>
+              <!-- <h4 class="form-module-title">处理设置</h4>
               <div class="flex-align-center">
                 <base-form-item label="处理插件：" prop="processorPluginType" :rules="requiredRules" class="form-label-width">
                   <el-select v-model="formData.processorPluginType" :style="{ width: formData.processorPluginType === 'custom' ? '152px' : '360px' }" id="data-sync-modal-select-deal">
@@ -126,8 +130,8 @@
               </div>
               <base-form-item v-if="formData.processorPluginType === 'custom'" label="插件参数：" prop="processorPluginParam" class="form-label-width">
                 <el-input v-model="formData.processorPluginParam" type="textarea" placeholder="请输入插件参数，例如:'processor.alarm_id' = '582'" style="width:360px;" :resize="'none'" :rows="4" id="data-sync-modal-deal-params" />
-              </base-form-item>
-              <h4 class="form-module-title">发送设置</h4>
+              </base-form-item> -->
+              <h4 class="form-module-title">数据发送</h4>
               <div class="flex-align-center">
                 <base-form-item label="发送插件：" prop="connectorPluginType" :rules="requiredRules" class="form-label-width">
                   <el-select v-model="formData.connectorPluginType" :style="{ width: formData.connectorPluginType === 'custom' ? '152px' : '360px' }" id="data-sync-modal-select-send">
@@ -239,7 +243,7 @@
           </el-scrollbar>
         </el-tab-pane>
 
-        <el-tab-pane label="高级输入" name="input">
+        <!-- <el-tab-pane label="高级输入" name="input">
           <el-scrollbar>
             <code-editor
               v-show="codeMirrorReady"
@@ -253,7 +257,7 @@
               :key="codeMirrorKey"
             />
           </el-scrollbar>
-        </el-tab-pane>
+        </el-tab-pane> -->
       </el-tabs>
       <a v-show="activeTab === 'input'" href="https://www.timecho.com/docs/zh/UserGuide/V1.2.x/User-Manual/Data-Sync_timecho.html" rel="noopener noreferrer" target="_blank" class="operate-link"><i-custom-question-new />操作说明</a>
     </div>
@@ -380,9 +384,9 @@ const formData = ref<DataSync.SynchronFormData>({
   isSynchronHistory: true,
   startTime: '' as DateModelType,
   endTime: '' as DateModelType,
-  datetimerange: [new Date('1970-1-1').getTime(), props.editTime || todayNow()] as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
+  datetimerange: [new Date('1970-1-1').getTime(), todayNow()] as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
   isSynchronRealTime: true,
-  triggerMode: 'hybrid',
+  triggerMode: 'stream',
   // 处理
   processorPluginType: 'do-nothing-processor',
   processorPluginName: '',
@@ -418,6 +422,7 @@ const { requestFn: getAdvancedTaskDetail } = useRequest(DataSyncApi.getAdvancedT
 const { requestFn: saveSynchronTask } = useRequest(DataSyncApi.saveSynchronTask);
 const { requestFn: saveAdvancedTask } = useRequest(DataSyncApi.saveAdvancedTask);
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function codeEditorReady() {
   codeMirrorReady.value = true;
   codeEditorRef.value?.setCodeEditorReadonly(props.editType === 'view');
@@ -435,7 +440,7 @@ function handleChangeRunningSwitch(val: boolean) {
   if (!val) {
     formData.value.isLogSendBatch = false;
     logSendBatchDisabled.value = true;
-  } else if (formData.value.triggerMode === 'file') {
+  } else if (formData.value.triggerMode === 'batch') {
     formData.value.isLogSendBatch = false;
     logSendBatchDisabled.value = true;
   } else {
@@ -443,8 +448,8 @@ function handleChangeRunningSwitch(val: boolean) {
   }
 }
 
-function handleChangeTriggerMode(val: 'hybrid' | 'log' | 'file') {
-  if (val === 'file') {
+function handleChangeTriggerMode(val: 'stream' | 'batch') {
+  if (val === 'batch') {
     formData.value.isLogSendBatch = false;
     logSendBatchDisabled.value = true;
   } else {
@@ -464,7 +469,7 @@ function handleResetForm() {
     formData.value.startTime = new Date('1970-1-1').getTime();
     formData.value.endTime = props.editTime;
     formData.value.isSynchronRealTime = true;
-    formData.value.triggerMode = 'hybrid';
+    formData.value.triggerMode = 'stream';
     formData.value.processorPluginType = 'do-nothing-processor';
     formData.value.processorPluginName = '';
     formData.value.processorPluginParam = '';
@@ -513,6 +518,7 @@ function getSelectDetail() {
   });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getInputDetail() {
   return getAdvancedTaskDetail(props.editData).then((res) => {
     taskInputVal.value = res.data.advancedInput || '';
@@ -524,7 +530,7 @@ function getDetail() {
   Promise.allSettled([
     getPlugin(),
     getSelectDetail(),
-    getInputDetail(),
+    // getInputDetail(),
   ]).then(() => {
     loading.value = false;
     nextTick(() => {
