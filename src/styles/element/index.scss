@@ -36,6 +36,10 @@
   --el-scrollbar-hover-opacity: 1 !important;
 }
 
+.el-slider{
+  --el-slider-button-size: 10px;
+}
+
 .el-tabs__nav-next, .el-tabs__nav-prev{
   line-height: 28px !important;
 }

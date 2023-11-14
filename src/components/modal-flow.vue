@@ -8,20 +8,27 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     id="flow-graph-modal"
+    class="flow-graph-modal"
+    :show-close="false"
     :before-close="handleClose"
   >
-    <el-container class="flow-graph-container p-0" :style="{ height: maxHeight + 'px' }">
-      <el-header class="detail-title-box">
-        <h4 class="detail-title-text">数据流程图</h4>
+    <template #header>
+      <div class="flow-graph-operate-header">
+        <div class="flow-graph-operate-left">
+          <el-button link class="flow-graph-close-btn" @click="handleClose"><el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>返回</el-button>
+          <span class="flow-graph-header-title">拓扑图</span>
+        </div>
         <div class="operate-buttons" v-if="editType === 'edit'">
-          <el-button link @click="handleSaveView" :loading="saveLoading">退出编辑</el-button>
-          <el-button link @click="handleEmpty">清空</el-button>
+          <el-button link @click="handleSaveView" :loading="saveLoading"><el-icon size="24" class="m-r-6"><i-custom-circle-close-half /></el-icon>退出编辑</el-button>
+          <el-button link @click="handleEmpty"><el-icon size="24" class="m-r-6"><i-custom-delete /></el-icon>清空</el-button>
         </div>
         <div class="operate-buttons" v-if="editType === 'view'">
-          <el-button link @click="handleEdit">编辑</el-button>
-          <el-button link @click="handleExport">导出</el-button>
+          <el-button link @click="handleEdit"><el-icon size="24" class="m-r-6"><i-custom-edit /></el-icon>编辑</el-button>
+          <el-button link @click="handleExport"><el-icon size="24" class="m-r-6"><i-custom-export /></el-icon>导出</el-button>
         </div>
-      </el-header>
+      </div>
+    </template>
+    <el-container class="flow-graph-container p-0">
       <el-main class="p-0">
         <div class="flow-container" id="flow-container" v-loading="graphLoading">
           <TeleportContainer />
@@ -31,6 +38,7 @@
           <div class="flow-operate-wrapper" v-show="isEdit">
             <!-- 文本 -->
             <div v-show="isShowTextStyle" class="text-style-box">
+              <h4 class="operate-style-title">样式</h4>
               <div class="text-style-detail-item">
                 <span class="detail-label">文字大小：</span>
                 <el-input-number
@@ -48,26 +56,8 @@
               </div></div>
             <!-- 节点 -->
             <div v-show="isShowNodeStyle" class="node-style-box">
-              <div class="node-style-detail-item">
-                <span class="detail-label">节点宽度：</span>
-                <el-input-number
-                  v-model.number="nodeStyle.nodeWidth"
-                  :min="0"
-                  step-strictly
-                  :controls="false"
-                  @change="val => handleChangeNodeWidth(val as number)"
-                />
-              </div>
-              <div class="node-style-detail-item">
-                <span class="detail-label">节点高度：</span>
-                <el-input-number
-                  v-model.number="nodeStyle.nodeHeight"
-                  :min="0"
-                  step-strictly
-                  :controls="false"
-                  @change="val => handleChangeNodeHeight(val as number)"
-                />
-              </div>
+              <h4 class="operate-style-title">样式</h4>
+              <h5 class="operate-style-module-title">位置</h5>
               <div class="node-style-detail-item">
                 <span class="detail-label">x轴位置：</span>
                 <el-input-number
@@ -98,6 +88,8 @@
             </div>
             <!-- 边 箭头 -->
             <div v-show="isShowEdgeStyle" class="edge-style-box">
+              <h4 class="operate-style-title">样式</h4>
+              <h5 class="operate-style-module-title">连线</h5>
               <div class="edge-style-detail-item">
                 <span class="detail-label">连线类型：</span>
                 <el-select v-model="edgeStyle.lineType" @change="handleChangeLineType">
@@ -113,6 +105,7 @@
                 <span class="detail-label">连线颜色：</span>
                 <el-color-picker v-model="edgeStyle.color" color-format="hex" @change="val => handleChangeLineColor(val as string)" />
               </div>
+              <h5 class="operate-style-module-title">箭头</h5>
               <div class="edge-style-detail-item">
                 <span class="detail-label">箭头样式：</span>
                 <el-select v-model="edgeStyle.arrowType" @change="handleChangeArrowType">
@@ -132,13 +125,9 @@
                 <span class="detail-label">箭头高度：</span>
                 <el-slider v-model="edgeStyle.arrowHeight" :min="1" :max="50" @change="val => handleChangeArrowHeight(val as number)" />
               </div>
-              <div class="edge-style-detail-item">
-                <span class="detail-label">箭头偏移量：</span>
-                <el-slider v-model="edgeStyle.arrowOffset" :min="-50" :max="50" @change="val => handleChangeArrowOffset(val as number)" />
-              </div>
             </div>
           </div>
-          <div class="connection-detail-wrapper" v-show="!isEdit && viewNode">
+          <div class="connection-detail-wrapper-box" v-show="!isEdit && viewNode">
             <connection-form
               ref="connectionFormRef"
               v-model:edit-type="connectionEditType"
@@ -160,7 +149,7 @@ import { Stencil } from '@antv/x6-plugin-stencil';
 import { Snapline } from '@antv/x6-plugin-snapline';
 import { Clipboard } from '@antv/x6-plugin-clipboard';
 import { History } from '@antv/x6-plugin-history';
-// import { Keyboard } from '@antv/x6-plugin-keyboard';
+import { Keyboard } from '@antv/x6-plugin-keyboard';
 import { Transform } from '@antv/x6-plugin-transform';
 import { Selection } from '@antv/x6-plugin-selection';
 import { Scroller } from '@antv/x6-plugin-scroller';
@@ -212,8 +201,6 @@ const textStyle = reactive({
 const isShowNodeStyle = ref(false);
 const currentNode = ref();
 const nodeStyle = reactive({
-  nodeWidth: 30,
-  nodeHeight: 30,
   x: 0,
   y: 0,
   angle: 0,
@@ -226,7 +213,6 @@ const edgeStyle = reactive({
   arrowType: 'block',
   arrowWidth: 10,
   arrowHeight: 10,
-  arrowOffset: 0,
 });
 const operateNode = ref();
 const isShowContextMenu = ref(false);
@@ -241,7 +227,7 @@ const current = ref<string | number>('');
 const saveLoading = ref(false);
 const graphLoading = ref(false);
 
-const maxHeight = computed(() => window.innerHeight - 100);
+// const maxHeight = computed(() => window.innerHeight - 100);
 const isEdit = computed(() => editType.value === 'edit');
 
 const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
@@ -418,9 +404,8 @@ function initialGraph(isDisabled?: boolean) {
               strokeDasharray: 'none',
               targetMarker: {
                 name: 'block',
-                width: 10,
-                height: 10,
-                offset: 0,
+                width: 12,
+                height: 8,
               },
               style: {
                 animation: 'none',
@@ -456,12 +441,14 @@ function initialGraph(isDisabled?: boolean) {
     .use(new History({
       enabled: !isDisabled,
     }))
-    // .use(new Keyboard())
+    .use(new Keyboard({
+      enabled: !isDisabled,
+    }))
     .use(new Selection({
       enabled: !isDisabled,
     }))
     .use(new Transform({
-      resizing: !isDisabled,
+      resizing: false,
       rotating: false,
     }))
     .use(new Scroller({
@@ -546,8 +533,6 @@ function graphWatchEvent() {
     } else {
       isShowTextStyle.value = false;
       isShowNodeStyle.value = true;
-      nodeStyle.nodeWidth = node.size().width;
-      nodeStyle.nodeHeight = node.size().height;
       nodeStyle.x = node.position().x;
       nodeStyle.y = node.position().y;
       nodeStyle.angle = node.getAngle();
@@ -563,8 +548,6 @@ function graphWatchEvent() {
     } else {
       isShowTextStyle.value = false;
       isShowNodeStyle.value = true;
-      nodeStyle.nodeWidth = node.size().width;
-      nodeStyle.nodeHeight = node.size().height;
       nodeStyle.x = node.position().x;
       nodeStyle.y = node.position().y;
       nodeStyle.angle = node.getAngle();
@@ -580,8 +563,6 @@ function graphWatchEvent() {
     } else {
       isShowTextStyle.value = false;
       isShowNodeStyle.value = true;
-      nodeStyle.nodeWidth = node.size().width;
-      nodeStyle.nodeHeight = node.size().height;
       nodeStyle.x = node.position().x;
       nodeStyle.y = node.position().y;
       nodeStyle.angle = node.getAngle();
@@ -600,8 +581,6 @@ function graphWatchEvent() {
       } else {
         isShowTextStyle.value = false;
         isShowNodeStyle.value = true;
-        nodeStyle.nodeWidth = node.size().width;
-        nodeStyle.nodeHeight = node.size().height;
         nodeStyle.x = node.position().x;
         nodeStyle.y = node.position().y;
         nodeStyle.angle = node.getAngle();
@@ -645,12 +624,6 @@ function graphWatchEvent() {
     edgeStyle.arrowType = edge.attr().line.targetMarker!.name as string || 'block';
     edgeStyle.arrowWidth = edge.attr().line.targetMarker!.width as number || 10;
     edgeStyle.arrowHeight = edge.attr().line.targetMarker!.height as number || 10;
-    const offset = edge.attr().line.targetMarker!.offset as number;
-    if (!offset && offset !== 0) {
-      edgeStyle.arrowOffset = -5;
-    } else {
-      edgeStyle.arrowOffset = offset;
-    }
   });
   // 画布右击
   graph.value?.on('blank:contextmenu', ({ e }) => {
@@ -680,74 +653,58 @@ function graphWatchEvent() {
 }
 
 // #region 快捷键与事件
-// function graphBindEvent() {
-//   graph.value?.bindKey(['ctrl+c'], () => {
-//     const cells = graph.value?.getSelectedCells();
-//     if (cells.length) {
-//       graph.value?.copy(cells);
-//     }
-//     return false;
-//   });
-//   graph.value?.bindKey(['ctrl+x'], () => {
-//     const cells = graph.value?.getSelectedCells();
-//     if (cells.length) {
-//       graph.value?.cut(cells);
-//     }
-//     return false;
-//   });
-//   graph.value?.bindKey(['ctrl+v'], () => {
-//     if (!graph.value?.isClipboardEmpty()) {
-//       const cells = graph.value?.paste({ offset: 32 });
-//       graph.value?.cleanSelection();
-//       graph.value?.select(cells);
-//     }
-//     return false;
-//   });
+function graphBindEvent() {
+  graph.value?.bindKey(['command+c', 'ctrl+c'], () => {
+    const cells = graph.value?.getSelectedCells() || [];
+    if (cells.length) {
+      graph.value?.copy(cells, { deep: false, useLocalStorage: false });
+      ElMessage.success('复制成功');
+    } else {
+      ElMessage.info('请先选中节点再复制');
+    }
+    return false;
+  });
+  graph.value?.bindKey(['command+v', 'ctrl+v'], () => {
+    if (!graph.value?.isClipboardEmpty()) {
+      graph.value?.paste({ offset: 32 });
+      graph.value?.cleanClipboard();
+      ElMessage.success('粘贴成功');
+    } else {
+      ElMessage.info('剪切板为空，不可粘贴');
+    }
+    return false;
+  });
 
-//   // undo redo
-//   graph.value?.bindKey(['ctrl+z'], () => {
-//     if (graph.value?.canUndo()) {
-//       graph.value?.undo();
-//     }
-//     return false;
-//   });
-//   graph.value?.bindKey(['ctrl+shift+z'], () => {
-//     if (graph.value?.canRedo()) {
-//       graph.value?.redo();
-//     }
-//     return false;
-//   });
+  // undo redo
+  graph.value?.bindKey(['command+z', 'ctrl+z'], () => {
+    if (graph.value?.canUndo()) {
+      graph.value?.undo();
+    } else {
+      ElMessage.info('没有需要撤销的操作');
+    }
+    return false;
+  });
+  graph.value?.bindKey(['command+shift+z', 'ctrl+y'], () => {
+    if (graph.value?.canRedo()) {
+      graph.value?.redo();
+    } else {
+      ElMessage.info('没有需要恢复的操作');
+    }
+    return false;
+  });
 
-//   // select all
-//   graph.value?.bindKey(['ctrl+a'], () => {
-//     const nodes = graph.value?.getNodes();
-//     if (nodes) {
-//       graph.value?.select(nodes);
-//     }
-//   });
-
-//   // delete
-//   graph.value?.bindKey('backspace', () => {
-//     const cells = graph.value?.getSelectedCells();
-//     if (cells.length) {
-//       graph.value?.removeCells(cells);
-//     }
-//   });
-
-//   // zoom
-//   graph.value?.bindKey(['ctrl+1'], () => {
-//     const zoom = graph.value?.zoom();
-//     if (zoom! < 1.5) {
-//       graph.value?.zoom(0.1);
-//     }
-//   });
-//   graph.value?.bindKey(['ctrl+2'], () => {
-//     const zoom = graph.value?.zoom();
-//     if (zoom! > 0.5) {
-//       graph.value?.zoom(-0.1);
-//     }
-//   });
-// }
+  // delete
+  graph.value?.bindKey(['backspace', 'delete'], () => {
+    const cells = graph.value?.getSelectedCells() || [];
+    if (cells.length) {
+      graph.value?.removeCells(cells);
+      ElMessage.success('删除成功');
+    } else {
+      ElMessage.info('请先选中节点再删除');
+    }
+    return false;
+  });
+}
 
 function getList() {
   // 获取实例列表
@@ -817,14 +774,6 @@ function handleChangeTextColor(val: string) {
 // #endtext
 
 // #node 样式开始
-function handleChangeNodeWidth(val: number) {
-  currentNode.value.prop('size', { width: val, height: currentNode.value.size().height });
-}
-
-function handleChangeNodeHeight(val: number) {
-  currentNode.value.prop('size', { width: currentNode.value.size().width, height: val });
-}
-
 function handleChangeNodeX(val: number) {
   currentNode.value.prop('position', { x: val, y: currentNode.value.position().y });
 }
@@ -897,10 +846,6 @@ function handleChangeArrowWidth(val: number) {
 function handleChangeArrowHeight(val: number) {
   currentEdge.value.attr('line/targetMarker/height', val);
 }
-
-function handleChangeArrowOffset(val: number) {
-  currentEdge.value.attr('line/targetMarker/offset', val);
-}
 // #endarrow
 
 function onMouseDown() {
@@ -926,7 +871,7 @@ function handleClickOperate(key: string) {
     if (graph.value!.isClipboardEmpty()) {
       ElMessage.info('剪切板为空，不可粘贴');
     } else {
-      graph.value!.paste();
+      graph.value!.paste({ offset: 32 });
       graph.value!.cleanClipboard();
       ElMessage.success('粘贴成功');
     }
@@ -988,6 +933,7 @@ function handleSaveView() {
     ElMessage.success('保存成功');
     initialGraph(true);
     graphWatchEvent();
+    graphBindEvent();
     resetState();
     viewNode.value = undefined;
     editType.value = 'view';
@@ -1006,6 +952,7 @@ function handleEmpty() {
 function handleEdit() {
   initialGraph(false);
   graphWatchEvent();
+  graphBindEvent();
   resetState();
   editType.value = 'edit';
   getList().then(() => {
@@ -1023,6 +970,7 @@ function handleExport() {
 function handleRefresh() {
   initialGraph(true);
   graphWatchEvent();
+  graphBindEvent();
   resetState();
   viewNode.value = undefined;
   editType.value = 'view';
@@ -1063,7 +1011,7 @@ watch(
       nextTick(() => {
         initialGraph(true);
         graphWatchEvent();
-        // graphBindEvent();
+        graphBindEvent();
         getGraphData();
       });
     } else {
@@ -1076,39 +1024,83 @@ watch(
 </script>
 
 <style lang="scss" scoped>
+.flow-graph-modal{
+  background-color: #fff;
+  border-radius: 6px;
+}
 
-.detail-title-box{
-  height: 41px;
-  width: 100%;
+.flow-graph-operate-header{
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #DFE1ED;
-  padding: 0 16px;
-  box-sizing: border-box;
+  justify-content: space-between;
 
-  .detail-title-text{
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 21px;
-    color: #495AD4;
+  .flow-graph-operate-left{
+    display: flex;
+    height: 36px;
+    align-items: center;
+    border-radius:2px;
+    border: 1px solid #DFE1ED;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    color: #656A85;
+    box-sizing: border-box;
+
+    .flow-graph-close-btn, .flow-graph-header-title{
+      width: 75px;
+      text-align: center;
+    }
+
+    .flow-graph-header-title{
+      position: relative;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &::before{
+        position: absolute;
+        content: '';
+        display: block;
+        width: 1px;
+        height: 26px;
+        top: 5px;
+        left: 0;
+        background-color: #DFE1ED;
+      }
+    }
   }
+
+  .operate-buttons{
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    color: #656A85;
+
+    .el-button + .el-button {
+      margin-left: 24px;
+    }
+  }
+}
+
+.flow-graph-container{
+  height: 100%;
+  border: 1px solid #DFE1ED;
+  box-sizing: border-box;
 }
 
 .flow-container{
   width: 100%;
   height: 100%;
   display: flex;
-  border: 1px solid #dfe3e8;
-  box-sizing: border-box;
   position: relative;
 }
 
 .flow-stencil-wrapper{
-  width: 200px;
+  width: 268px;
   height: 100%;
   position: relative;
-  border-right: 1px solid #dfe3e8;
+  border-right: 1px solid #DFE1ED;
 }
 
 :deep(.x6-widget-stencil-group-content) {
@@ -1123,14 +1115,32 @@ watch(
 }
 
 .flow-operate-wrapper{
-  width: 200px;
-  padding: 0 12px;
+  width: 292px;
+  padding: 16px;
   box-sizing: border-box;
-  border-left: 1px solid #dfe3e8;
+  border-left: 1px solid #DFE1ED;
+
+  .operate-style-title{
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 21px;
+    color: #495AD4;
+    margin: 0 0 24px;
+  }
+
+  .operate-style-module-title{
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 21px;
+    color: #424561;
+    padding: 0 0 6px;
+    border-bottom: 1px solid #DFE1ED;
+    margin: 0 0 8px;
+  }
 }
 
 .text-style-box, .node-style-box, .edge-style-box{
-  padding: 10px 10px 10px 0;
+  // padding: 10px 10px 10px 0;
 }
 
 .text-style-detail-item, .node-style-detail-item, .edge-style-detail-item{
@@ -1139,32 +1149,48 @@ watch(
   margin-bottom: 12px;
 
   .detail-label{
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 400;
-    line-height: 12px;
-    color: #131926;
-    width: 80px;
+    line-height: 21px;
+    color: #424561;
+    width: 84px;
   }
 
   :deep(.el-input-number), :deep(.el-select), :deep(.el-slider) {
     flex: 1;
   }
+}
 
-  :deep(.el-input__inner) {
-    height: 22px !important;
-  }
+.connection-detail-wrapper-box{
+  width: 500px;
+  border-left: 1px solid #DFE1ED;
+  padding: 0;
 }
 
 .connection-detail-wrapper{
-  width: 500px;
-  border-left: 1px solid #dfe3e8;
-  padding: 0;
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 </style>
 
 <style lang="scss">
+.flow-graph-modal{
+  .el-dialog__header{
+    border-bottom: none !important;
+    padding: 20px 0 0 !important;
+  }
+
+  .el-dialog__body{
+    padding: 8px 16px 16px !important;
+    height: calc(100% - 80px);
+  }
+}
+
+.el-select-dropdown__item{
+  text-align: center;
+}
+
 .x6-graph-scroller {
   // width: calc(100% - 400px) !important;
   flex: 1;
