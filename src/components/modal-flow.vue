@@ -145,6 +145,7 @@
               v-model:detail-loading="connectionDetailLoading"
               :current="current"
               :is-toggle="isToggle"
+              @handleRefreshList="handleRefresh"
             />
           </div>
         </div>
@@ -1015,7 +1016,17 @@ function handleEdit() {
 
 // 导出
 function handleExport() {
-  graph.value!.exportPNG('chart', { padding: 20, quality: 1 });
+  graph.value!.exportPNG('chart', { preserveDimensions: true, padding: 20, quality: 1 });
+}
+
+// 保存实例信息
+function handleRefresh() {
+  initialGraph(true);
+  graphWatchEvent();
+  resetState();
+  viewNode.value = undefined;
+  editType.value = 'view';
+  getGraphData();
 }
 
 watch(
