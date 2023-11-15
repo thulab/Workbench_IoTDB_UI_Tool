@@ -92,7 +92,7 @@
               <h5 class="operate-style-module-title">连线</h5>
               <div class="edge-style-detail-item">
                 <span class="detail-label">连线类型：</span>
-                <el-select v-model="edgeStyle.lineType" @change="handleChangeLineType">
+                <el-select v-model="edgeStyle.lineType" @change="handleChangeLineType" popper-class="center-select">
                   <el-option
                     v-for="item in lineTypeList"
                     :key="item.value"
@@ -108,7 +108,7 @@
               <h5 class="operate-style-module-title">箭头</h5>
               <div class="edge-style-detail-item">
                 <span class="detail-label">箭头样式：</span>
-                <el-select v-model="edgeStyle.arrowType" @change="handleChangeArrowType">
+                <el-select v-model="edgeStyle.arrowType" @change="handleChangeArrowType" popper-class="center-select">
                   <el-option
                     v-for="item in arrowTypeList"
                     :key="item.value"
@@ -371,7 +371,14 @@ function initialGraph(isDisabled?: boolean) {
   graph.value = new Graph({
     container: graphContainerRef.value!,
     interacting: !isDisabled,
-    grid: !isDisabled,
+    grid: {
+      visible: !isDisabled,
+      type: 'dot',
+      args: {
+        color: '#dfe1ed',
+        thickness: 1,
+      },
+    },
     background: {
       color: '#fff',
     },
@@ -1206,8 +1213,10 @@ watch(
   }
 }
 
-.el-select-dropdown__item{
-  text-align: center;
+.center-select{
+  .el-select-dropdown__item{
+    text-align: center;
+  }
 }
 
 .x6-graph-scroller {

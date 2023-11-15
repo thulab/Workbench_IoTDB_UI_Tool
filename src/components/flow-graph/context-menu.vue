@@ -31,28 +31,31 @@ function handleClickOperate(key: string) {
 .context-menu-box{
   position: absolute;
   z-index: 10;
-  width: 64px;
+  width: 72px;
+  border: 1px solid #DFE1ED;
   background-color: #fff;
-  border-radius: 6px;
+  border-radius: 2px;
+  padding: 11px 0;
+  box-sizing: border-box;
   display: block;
   top: -9999px;
   left: -9999px;
-  box-shadow: 0 6px 16px 0 rgb(0 0 0 / 8%), 0 3px 6px -4px rgb(0 0 0 / 12%), 0 9px 28px 8px rgb(0 0 0 / 5%);
+  box-shadow: 0 4.26px 14.2px 0 rgb(32 37 71 / 6%);
   overflow: hidden;
 
   .context-menu-item{
     width: 100%;
-    height: 32px;
+    height: 24px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 14px;
+    font-size: 12px;
     color: #424561;
     cursor: pointer;
 
     &:hover{
-      background-color: #495AD4;
-      color: #fff;
+      background-color: #F7F8FC;
+      color: #495AD4;
     }
   }
 }
