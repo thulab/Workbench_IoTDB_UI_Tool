@@ -392,7 +392,7 @@ const formData = ref<DataSync.SynchronFormData>({
   processorPluginName: '',
   processorPluginParam: '',
   // 发送
-  connectorPluginType: 'iotdb-thrift-sync-connector',
+  connectorPluginType: 'iotdb-thrift-async-connector',
   connectorPluginName: '',
   connectorPluginParam: '',
   targetInfos: [{ host: '', port: '' }],
@@ -473,7 +473,7 @@ function handleResetForm() {
     formData.value.processorPluginType = 'do-nothing-processor';
     formData.value.processorPluginName = '';
     formData.value.processorPluginParam = '';
-    formData.value.connectorPluginType = 'iotdb-thrift-sync-connector';
+    formData.value.connectorPluginType = 'iotdb-thrift-async-connector';
     formData.value.connectorPluginName = '';
     formData.value.connectorPluginParam = '';
     formData.value.targetInfos = [{ host: '', port: '' }];
