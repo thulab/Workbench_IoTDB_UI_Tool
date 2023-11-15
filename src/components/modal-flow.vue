@@ -48,6 +48,7 @@
                   step-strictly
                   :controls="false"
                   @change="val => handleChangeTextFontSize(val as number)"
+                  @blur="handleBlurTextFontSize"
                 />
               </div>
               <div class="text-style-detail-item">
@@ -425,8 +426,8 @@ function initialGraph(isDisabled?: boolean) {
               strokeDasharray: 'none',
               targetMarker: {
                 name: 'block',
-                width: 12,
-                height: 8,
+                width: 8,
+                height: 12,
               },
               style: {
                 animation: 'none',
@@ -670,8 +671,8 @@ function graphWatchEvent() {
     }
     edgeStyle.color = edge.attr().line.stroke as string || '#495AD4';
     edgeStyle.arrowType = targetMarker.name as string || 'block';
-    edgeStyle.arrowWidth = targetMarker.width as number || 12;
-    edgeStyle.arrowHeight = targetMarker.height as number || 8;
+    edgeStyle.arrowWidth = targetMarker.height as number || 8;
+    edgeStyle.arrowHeight = targetMarker.width as number || 12;
   });
   // 画布单击
   graph.value?.on('blank:click', () => {
@@ -828,6 +829,16 @@ function handleChangeTextFontSize(val: number) {
   currentNode.value.attr('text/fontSize', val);
 }
 
+function handleBlurTextFontSize(ev: FocusEvent) {
+  const val = (ev?.target as unknown as { value: string | null | undefined })?.value || '';
+  if (!val) {
+    nextTick(() => {
+      textStyle.fontSize = 14;
+    });
+    currentNode.value.attr('text/fontSize', 14);
+  }
+}
+
 function handleChangeTextColor(val: string) {
   currentNode.value.attr('text/fill', val);
 }
@@ -899,24 +910,26 @@ function handleChangeArrowType(val: string) {
   });
 }
 
+// 箭头理解偏差，反向取值
 function handleChangeArrowWidth(val: number) {
-  currentEdge.value.attr('line', {
-    ...currentEdge.value.attr().line,
-    targetMarker: {
-      name: currentEdge.value.attr().line.targetMarker!.name,
-      width: val,
-      height: currentEdge.value.attr().line.targetMarker!.height,
-    },
-  });
-}
-
-function handleChangeArrowHeight(val: number) {
   currentEdge.value.attr('line', {
     ...currentEdge.value.attr().line,
     targetMarker: {
       name: currentEdge.value.attr().line.targetMarker!.name,
       width: currentEdge.value.attr().line.targetMarker!.width,
       height: val,
+    },
+  });
+}
+
+// 箭头理解偏差，反向取值
+function handleChangeArrowHeight(val: number) {
+  currentEdge.value.attr('line', {
+    ...currentEdge.value.attr().line,
+    targetMarker: {
+      name: currentEdge.value.attr().line.targetMarker!.name,
+      height: currentEdge.value.attr().line.targetMarker!.height,
+      width: val,
     },
   });
 }
@@ -1271,6 +1284,56 @@ watch(
   flex: 1;
   height: 100% !important;
   position: relative;
+}
+
+.x6-widget-stencil{
+  background-color: #fff;
+}
+
+.x6-widget-stencil-content{
+  padding-top: 12px;
+}
+
+.x6-widget-stencil-group.collapsed{
+  max-height: 19px;
+}
+
+.x6-widget-stencil-group > .x6-widget-stencil-group-title{
+  background-color: #fff;
+  font-size: 14px;
+  line-height: 14px;
+  font-weight: 700;
+  color: #495AD4;
+  height: 18px;
+  display: flex;
+  align-items: center;
+}
+
+.x6-widget-stencil-title{
+  display: none;
+}
+
+.x6-widget-stencil-title:hover, .x6-widget-stencil-group > .x6-widget-stencil-group-title:hover{
+  color: #495AD4;
+}
+
+.x6-widget-stencil.collapsable > .x6-widget-stencil-title, .x6-widget-stencil-group.collapsable > .x6-widget-stencil-group-title{
+  padding-left: 24px;
+}
+
+.x6-widget-stencil.collapsable > .x6-widget-stencil-title::before, .x6-widget-stencil-group.collapsable > .x6-widget-stencil-group-title::before{
+  background-image: url('@/assets/icons/arrow.svg');
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 1 !important;
+  width: 16px;
+  height: 16px;
+  left: 8px;
+  top: 0;
+}
+
+.x6-widget-stencil.collapsable.collapsed > .x6-widget-stencil-title::before, .x6-widget-stencil-group.collapsable.collapsed > .x6-widget-stencil-group-title::before{
+  background-image: url('@/assets/icons/arrow-right.svg');
 }
 
 @keyframes ant-line {
