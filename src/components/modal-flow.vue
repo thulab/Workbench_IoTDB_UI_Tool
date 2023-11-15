@@ -35,7 +35,7 @@
           <ContextMenu v-show="isShowContextMenu" ref="contextMenuRef" @handleClickOperate="handleClickOperate" />
           <div class="flow-stencil-wrapper" ref="stencilContainerRef" v-show="isEdit" v-loading="listLoading"></div>
           <div class="flow-graph-wrapper" ref="graphContainerRef" id="graph-container"></div>
-          <div class="flow-operate-wrapper" v-show="isEdit">
+          <div class="flow-operate-wrapper" v-show="isEdit && (isShowTextStyle || isShowNodeStyle || isShowEdgeStyle)">
             <!-- 文本 -->
             <div v-show="isShowTextStyle" class="text-style-box">
               <h4 class="operate-style-title">样式</h4>
@@ -233,8 +233,11 @@ const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionL
 const { requestFn: getRelationalGraph } = useRequest(ConnectionApi.getRelationalGraph);
 const { requestFn: saveRelationalGraph } = useRequest(ConnectionApi.saveRelationalGraph);
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function handleClose() {
+async function handleClose() {
+  if (viewNode.value && connectionFormRef.value?.isCanSave) {
+    const flag = await connectionFormRef.value?.handleChangeConnection();
+    if (!flag) return;
+  }
   dialogVisible.value = false;
   emit('handleClose');
 }
@@ -318,7 +321,7 @@ const ports = {
       group: 'bottom',
       args: {
         x: 36,
-        y: 60,
+        y: 80,
       },
     },
     {
@@ -521,11 +524,11 @@ function initialGraph(isDisabled?: boolean) {
       layoutOptions: {
         columns: 3,
         columnWidth: 84,
-        rowHeight: 100,
+        rowHeight: 92,
         center: false,
         resizeToFit: false,
-        marginX: 10,
-        marginY: 16,
+        marginX: 12,
+        marginY: 12,
         dx: 0,
         dy: 0,
       },
@@ -533,6 +536,14 @@ function initialGraph(isDisabled?: boolean) {
 
     stencilContainerRef.value!.appendChild(stencil.value.container);
   }
+}
+
+// 状态变更重置操作
+function resetState() {
+  isShowTextStyle.value = false;
+  isShowNodeStyle.value = false;
+  isShowEdgeStyle.value = false;
+  isShowContextMenu.value = false;
 }
 
 // 控制连接桩显示/隐藏
@@ -661,6 +672,14 @@ function graphWatchEvent() {
     edgeStyle.arrowType = targetMarker.name as string || 'block';
     edgeStyle.arrowWidth = targetMarker.width as number || 12;
     edgeStyle.arrowHeight = targetMarker.height as number || 8;
+  });
+  // 画布单击
+  graph.value?.on('blank:click', () => {
+    if (isEdit.value) {
+      resetState();
+    } else {
+      viewNode.value = undefined;
+    }
   });
   // 画布右击
   graph.value?.on('blank:contextmenu', ({ e }) => {
@@ -958,14 +977,6 @@ function handleClickOperate(key: string) {
   }
 }
 
-// 状态变更重置操作
-function resetState() {
-  isShowTextStyle.value = false;
-  isShowNodeStyle.value = false;
-  isShowEdgeStyle.value = false;
-  isShowContextMenu.value = false;
-}
-
 // 获取画布数据
 function getGraphData() {
   graphLoading.value = true;
@@ -1004,7 +1015,11 @@ function handleEmpty() {
 }
 
 // 编辑态
-function handleEdit() {
+async function handleEdit() {
+  if (viewNode.value && connectionFormRef.value?.isCanSave) {
+    const flag = await connectionFormRef.value?.handleChangeConnection();
+    if (!flag) return;
+  }
   initialGraph(false);
   graphWatchEvent();
   graphBindEvent();
@@ -1017,7 +1032,11 @@ function handleEdit() {
 }
 
 // 导出
-function handleExport() {
+async function handleExport() {
+  if (viewNode.value && connectionFormRef.value?.isCanSave) {
+    const flag = await connectionFormRef.value?.handleChangeConnection();
+    if (!flag) return;
+  }
   graph.value!.exportPNG('chart', { preserveDimensions: true, padding: 20, quality: 1 });
 }
 
@@ -1160,7 +1179,7 @@ watch(
 }
 
 :deep(.x6-widget-stencil-group-content) {
-  max-height: 316px;
+  max-height: 288px;
   overflow: hidden auto;
 }
 

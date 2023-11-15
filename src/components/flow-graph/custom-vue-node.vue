@@ -45,7 +45,5 @@ export default defineComponent({
   line-height: 14px;
   color: #424561;
   justify-content: center;
-
-  // width: 60px;
 }
 </style>
