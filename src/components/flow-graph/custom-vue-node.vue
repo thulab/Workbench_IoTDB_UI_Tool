@@ -1,10 +1,10 @@
 <template>
   <div class="custom-node-box">
     <div class="custom-node-label-box">
-      <el-icon size="20" style="margin-right: 4px;">
-        <i-custom-connection-cluster v-if="type === 1" />
-        <i-custom-connection-double-live v-else-if="type === 2" />
-        <i-custom-connection-stand-alone v-else />
+      <el-icon size="60" class="m-b-6">
+        <i-custom-graph-cluster v-if="type === 1" />
+        <i-custom-graph-double-live v-else-if="type === 2" />
+        <i-custom-graph-stand-alone v-else />
       </el-icon>
       <text-tooltip :content="text" />
     </div>
@@ -36,13 +36,16 @@ export default defineComponent({
   position: relative;
   width: 100%;
   height: 100%;
-  background-color: #5F95FF;
-  color: #fff;
 }
 
 .custom-node-label-box{
   display: flex;
   flex-flow: row wrap;
-  width: 50px;
+  font-size: 12px;
+  line-height: 14px;
+  color: #424561;
+  justify-content: center;
+
+  // width: 60px;
 }
 </style>

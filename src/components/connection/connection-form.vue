@@ -381,14 +381,14 @@ function handleTest(type: 'test' | 'login') {
         errorPwd.value = '';
         if (type === 'test') {
           testLoading.value = true;
-          testConnection(formData).then(() => {
+          testConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id }).then(() => {
             ElMessage.success('连接成功');
           }).finally(() => {
             testLoading.value = false;
           });
         } else {
           connectLoading.value = true;
-          loginByConnection(formData).then((res) => {
+          loginByConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id }).then((res) => {
             formData.id = res.data;
             userStore.setUser(formData.username);
             sessionStorage.setItem('nologin', '0');
@@ -417,7 +417,7 @@ function handleSave() {
   formRef.value?.validate((valid) => {
     if (valid) {
       saveLoading.value = true;
-      saveConnection(formData).then((res) => {
+      saveConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id }).then((res) => {
         ElMessage.success('保存成功');
         emit('handleRefreshList', +res.data);
       }).finally(() => {

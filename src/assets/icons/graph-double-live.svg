@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="59.999985694885254"
+  height="60" viewBox="0 0 59.999985694885254 60" fill="none">
+  <g opacity="1" transform="translate(0 0)  rotate(0)">
+    <rect fill="#495AD4" opacity="1" transform="translate(0 0)  rotate(0)" x="0" y="0" width="60" height="60" rx="4"
+      ry="4" />
+    <g mask="url(#bg-mask-0)">
+      <path id="矩形 3 (轮廓)" fill-rule="evenodd" style="fill:#FFFFFF" opacity="1"
+        d="M12.5,24v-8c0,-0.83 0.67,-1.5 1.5,-1.5h12c0.83,0 1.5,0.67 1.5,1.5v8c0,0.83 -0.67,1.5 -1.5,1.5h-12c-0.83,0 -1.5,-0.67 -1.5,-1.5zM15.5,17.5v5h9v-5z">
+      </path>
+      <path id="矩形 3 (轮廓)" fill-rule="evenodd" style="fill:#FFFFFF" opacity="1"
+        d="M32.5,42v-8c0,-0.83 0.67,-1.5 1.5,-1.5h12c0.83,0 1.5,0.67 1.5,1.5v8c0,0.83 -0.67,1.5 -1.5,1.5h-12c-0.83,0 -1.5,-0.67 -1.5,-1.5zM35.5,35.5v5h9v-5z">
+      </path>
+      <path id="直线 1 (轮廓)" fill-rule="evenodd" style="fill:#FFFFFF" opacity="1"
+        d="M16 29.5L24 29.5C24.83 29.5 25.5 28.83 25.5 28C25.5 27.17 24.83 26.5 24 26.5L16 26.5C15.17 26.5 14.5 27.17 14.5 28C14.5 28.83 15.17 29.5 16 29.5Z">
+      </path>
+      <path id="直线 1 (轮廓)" fill-rule="evenodd" style="fill:#FFFFFF" opacity="1"
+        d="M36 47.5L44 47.5C44.83 47.5 45.5 46.83 45.5 46C45.5 45.17 44.83 44.5 44 44.5L36 44.5C35.17 44.5 34.5 45.17 34.5 46C34.5 46.83 35.17 47.5 36 47.5Z">
+      </path>
+      <path id="直线 4 (轮廓)" fill-rule="evenodd" style="fill:#FFFFFF" opacity="1"
+        d="M26 21.5L40 21.5C40.83 21.5 41.5 20.83 41.5 20C41.5 19.17 40.83 18.5 40 18.5L26 18.5C25.17 18.5 24.5 19.17 24.5 20C24.5 20.83 25.17 21.5 26 21.5Z">
+      </path>
+      <path id="直线 4 (轮廓)" fill-rule="evenodd" style="fill:#FFFFFF" opacity="1"
+        d="M20 39.5L34 39.5C34.83 39.5 35.5 38.83 35.5 38C35.5 37.17 34.83 36.5 34 36.5L20 36.5C19.17 36.5 18.5 37.17 18.5 38C18.5 38.83 19.17 39.5 20 39.5Z">
+      </path>
+      <path id="直线 5 (轮廓)" fill-rule="evenodd" style="fill:#FFFFFF" opacity="1"
+        d="M38.5 20L38.5 30C38.5 30.83 39.17 31.5 40 31.5C40.83 31.5 41.5 30.83 41.5 30L41.5 20C41.5 19.17 40.83 18.5 40 18.5C39.17 18.5 38.5 19.17 38.5 20Z">
+      </path>
+      <path id="直线 5 (轮廓)" fill-rule="evenodd" style="fill:#FFFFFF" opacity="1"
+        d="M18.5 32L18.5 38C18.5 38.83 19.17 39.5 20 39.5C20.83 39.5 21.5 38.83 21.5 38L21.5 32C21.5 31.17 20.83 30.5 20 30.5C19.17 30.5 18.5 31.17 18.5 32Z">
+      </path>
+    </g>
+  </g>
+  <defs>
+    <rect id="path_0" x="0" y="0" width="60" height="60" />
+  </defs>
+</svg>

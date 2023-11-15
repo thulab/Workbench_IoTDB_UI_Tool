@@ -258,7 +258,7 @@ const ports = {
       },
     },
     right: {
-      position: 'right',
+      position: 'absolute',
       attrs: {
         circle: {
           r: 4,
@@ -273,7 +273,7 @@ const ports = {
       },
     },
     bottom: {
-      position: 'bottom',
+      position: 'absolute',
       attrs: {
         circle: {
           r: 4,
@@ -288,7 +288,7 @@ const ports = {
       },
     },
     left: {
-      position: 'left',
+      position: 'absolute',
       attrs: {
         circle: {
           r: 4,
@@ -309,12 +309,24 @@ const ports = {
     },
     {
       group: 'right',
+      args: {
+        x: 66,
+        y: 30,
+      },
     },
     {
       group: 'bottom',
+      args: {
+        x: 36,
+        y: 60,
+      },
     },
     {
       group: 'left',
+      args: {
+        x: 6,
+        y: 30,
+      },
     },
   ],
 };
@@ -322,8 +334,8 @@ const ports = {
 register({
   shape: 'custom-vue-node',
   component: CustomVueNode,
-  width: 52,
-  height: 52,
+  width: 72,
+  height: 80,
   x: 0,
   y: 0,
   ports: { ...ports },
@@ -470,14 +482,25 @@ function initialGraph(isDisabled?: boolean) {
     stencil.value = new Stencil({
       title: '流程图',
       target: graph.value,
-      stencilGraphWidth: 200,
+      stencilGraphWidth: 268,
       stencilGraphHeight: 0,
+      stencilGraphPadding: 0,
       collapsable: false,
       groups: [
         {
           title: '基础图形',
           name: 'group1',
           collapsed: false,
+          layoutOptions: {
+            columns: 1,
+            columnWidth: 84,
+            rowHeight: 60,
+            resizeToFit: true,
+            marginX: 6,
+            marginY: 12,
+            dx: 0,
+            dy: 0,
+          },
         },
         {
           title: '单机实例',
@@ -497,8 +520,14 @@ function initialGraph(isDisabled?: boolean) {
       ],
       layoutOptions: {
         columns: 3,
-        columnWidth: 60,
-        rowHeight: 55,
+        columnWidth: 84,
+        rowHeight: 100,
+        center: false,
+        resizeToFit: false,
+        marginX: 10,
+        marginY: 16,
+        dx: 0,
+        dy: 0,
       },
     });
 
@@ -600,11 +629,11 @@ function graphWatchEvent() {
       current.value = +node.data.id;
       connectionFormRef.value?.getDetail(current.value);
     } else {
+      if (current.value === +node.data.id) return;
       if (connectionFormRef.value?.isCanSave) {
         const flag = await connectionFormRef.value?.handleChangeConnection();
         if (!flag) return;
       }
-      if (current.value === +node.data.id) return;
       viewNode.value = node;
       current.value = +node.data.id;
       connectionFormRef.value?.getDetail(current.value);
@@ -811,7 +840,7 @@ function handleChangeLineType(val: string) {
       },
     });
   } else if (val === 'smooth') {
-    currentEdge.value.setConnector('smooth', { radius: 10 });
+    currentEdge.value.setConnector('smooth');
     currentEdge.value.attr('line', {
       ...currentEdge.value.attr().line,
       strokeDasharray: 'none',
@@ -998,9 +1027,9 @@ function handleRefresh() {
   graphWatchEvent();
   graphBindEvent();
   resetState();
-  viewNode.value = undefined;
-  editType.value = 'view';
   getGraphData();
+  editType.value = 'view';
+  connectionFormRef.value?.getDetail(+current.value);
 }
 
 watch(
@@ -1127,11 +1156,12 @@ watch(
   height: 100%;
   position: relative;
   border-right: 1px solid #DFE1ED;
+  box-sizing: content-box;
 }
 
 :deep(.x6-widget-stencil-group-content) {
-  max-height: 190px;
-  overflow-y: auto;
+  max-height: 316px;
+  overflow: hidden auto;
 }
 
 .flow-graph-wrapper{
@@ -1187,16 +1217,14 @@ watch(
   }
 }
 
-.connection-detail-wrapper-box{
+.connection-detail-wrapper{
   width: 500px;
+  height: 100%;
+  border-radius: 6px;
   border-left: 1px solid #DFE1ED;
   padding: 0;
-}
-
-.connection-detail-wrapper{
   display: flex;
   flex-direction: column;
-  height: 100%;
 }
 </style>
 
