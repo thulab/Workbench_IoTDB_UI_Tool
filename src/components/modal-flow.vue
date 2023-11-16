@@ -39,6 +39,28 @@
             <!-- 文本 -->
             <div v-show="isShowTextStyle" class="text-style-box">
               <h4 class="operate-style-title">样式</h4>
+              <div class="node-style-detail-item">
+                <span class="detail-label">文本框宽度：</span>
+                <el-input-number
+                  v-model.number="textStyle.nodeWidth"
+                  :min="0"
+                  step-strictly
+                  :controls="false"
+                  @change="val => handleChangeNodeWidth(val as number)"
+                  @blur="ev => handleBlurTextStyle(ev, 'nodeWidth')"
+                />
+              </div>
+              <div class="node-style-detail-item">
+                <span class="detail-label">文本框高度：</span>
+                <el-input-number
+                  v-model.number="textStyle.nodeHeight"
+                  :min="0"
+                  step-strictly
+                  :controls="false"
+                  @change="val => handleChangeNodeHeight(val as number)"
+                  @blur="ev => handleBlurTextStyle(ev, 'nodeHeight')"
+                />
+              </div>
               <div class="text-style-detail-item">
                 <span class="detail-label">文字大小：</span>
                 <el-input-number
@@ -48,13 +70,14 @@
                   step-strictly
                   :controls="false"
                   @change="val => handleChangeTextFontSize(val as number)"
-                  @blur="handleBlurTextFontSize"
+                  @blur="ev => handleBlurTextStyle(ev, 'fontSize')"
                 />
               </div>
               <div class="text-style-detail-item">
                 <span class="detail-label">文字颜色：</span>
                 <el-color-picker v-model="textStyle.color" color-format="hex" @change="val => handleChangeTextColor(val as string)" />
-              </div></div>
+              </div>
+            </div>
             <!-- 节点 -->
             <div v-show="isShowNodeStyle" class="node-style-box">
               <h4 class="operate-style-title">样式</h4>
@@ -66,6 +89,7 @@
                   step-strictly
                   :controls="false"
                   @change="val => handleChangeNodeX(val as number)"
+                  @blur="ev => handleBlurNodeStyle(ev, 'x')"
                 />
               </div>
               <div class="node-style-detail-item">
@@ -75,6 +99,7 @@
                   step-strictly
                   :controls="false"
                   @change="val => handleChangeNodeY(val as number)"
+                  @blur="ev => handleBlurNodeStyle(ev, 'y')"
                 />
               </div>
               <div class="node-style-detail-item">
@@ -84,6 +109,7 @@
                   step-strictly
                   :controls="false"
                   @change="val => handleChangeNodeAngle(val as number)"
+                  @blur="ev => handleBlurNodeStyle(ev, 'angle')"
                 />
               </div>
             </div>
@@ -197,6 +223,8 @@ const isShowTextStyle = ref(false);
 const textStyle = reactive({
   fontSize: 14,
   color: '#495AD4',
+  nodeWidth: 100,
+  nodeHeight: 30,
 });
 const isShowNodeStyle = ref(false);
 const currentNode = ref();
@@ -349,12 +377,12 @@ Graph.registerNode(
   'custom-rect',
   {
     inherit: 'rect',
-    width: 66,
-    height: 36,
+    width: 100,
+    height: 30,
     attrs: {
       body: {
-        strokeWidth: 1,
-        stroke: '#495AD4',
+        // stroke: '#fff',
+        strokeWidth: 0,
         fill: '#fff',
       },
       text: {
@@ -362,7 +390,35 @@ Graph.registerNode(
         fill: '#495AD4',
       },
     },
-    ports: { ...ports },
+    ports: {
+      groups: ports.groups,
+      items: [
+        {
+          group: 'top',
+        },
+        {
+          group: 'right',
+          args: {
+            x: '100%',
+            y: '50%',
+          },
+        },
+        {
+          group: 'bottom',
+          args: {
+            x: '50%',
+            y: '100%',
+          },
+        },
+        {
+          group: 'left',
+          args: {
+            x: 0,
+            y: '50%',
+          },
+        },
+      ],
+    },
     tools: [
       {
         name: 'node-editor',
@@ -497,10 +553,11 @@ function initialGraph(isDisabled?: boolean) {
           collapsed: false,
           layoutOptions: {
             columns: 1,
-            columnWidth: 84,
-            rowHeight: 60,
-            resizeToFit: true,
-            marginX: 6,
+            columnWidth: 110,
+            rowHeight: 42,
+            center: false,
+            resizeToFit: false,
+            marginX: 10,
             marginY: 12,
             dx: 0,
             dy: 0,
@@ -575,46 +632,64 @@ function graphWatchEvent() {
   // 调整节点大小后触发
   graph.value?.on('node:resized', ({ node }) => {
     if (!isEdit.value) return;
+    isShowEdgeStyle.value = false;
+    currentNode.value = node;
     if (node.prop().shape === 'custom-rect') {
-      // 文本输入不做处理
+      // 文本输入
+      isShowTextStyle.value = true;
+      isShowNodeStyle.value = false;
+      textStyle.fontSize = node.attrs!.text.fontSize as number || 14;
+      textStyle.color = node.attrs!.text.fill as string || '#495AD4';
+      textStyle.nodeWidth = node.size().width;
+      textStyle.nodeHeight = node.size().height;
     } else {
       isShowTextStyle.value = false;
       isShowNodeStyle.value = true;
       nodeStyle.x = node.position().x;
       nodeStyle.y = node.position().y;
       nodeStyle.angle = node.getAngle();
-      isShowEdgeStyle.value = false;
-      currentNode.value = node;
     }
   });
   // 鼠标抬起
   graph.value?.on('node:mouseup', ({ node }) => {
     if (!isEdit.value) return;
+    isShowEdgeStyle.value = false;
+    currentNode.value = node;
     if (node.prop().shape === 'custom-rect') {
-      // 文本输入不做处理
+      // 文本输入
+      isShowTextStyle.value = true;
+      isShowNodeStyle.value = false;
+      textStyle.fontSize = node.attrs!.text.fontSize as number || 14;
+      textStyle.color = node.attrs!.text.fill as string || '#495AD4';
+      textStyle.nodeWidth = node.size().width;
+      textStyle.nodeHeight = node.size().height;
     } else {
       isShowTextStyle.value = false;
       isShowNodeStyle.value = true;
       nodeStyle.x = node.position().x;
       nodeStyle.y = node.position().y;
       nodeStyle.angle = node.getAngle();
-      isShowEdgeStyle.value = false;
-      currentNode.value = node;
     }
   });
   // 放置到画布上节点
   graph.value?.on('node:added', ({ node }) => {
     if (!isEdit.value) return;
+    isShowEdgeStyle.value = false;
+    currentNode.value = node;
     if (node.prop().shape === 'custom-rect') {
-      // 文本输入不做处理
+      // 文本输入
+      isShowTextStyle.value = true;
+      isShowNodeStyle.value = false;
+      textStyle.fontSize = node.attrs!.text.fontSize as number || 14;
+      textStyle.color = node.attrs!.text.fill as string || '#495AD4';
+      textStyle.nodeWidth = node.size().width;
+      textStyle.nodeHeight = node.size().height;
     } else {
       isShowTextStyle.value = false;
       isShowNodeStyle.value = true;
       nodeStyle.x = node.position().x;
       nodeStyle.y = node.position().y;
       nodeStyle.angle = node.getAngle();
-      isShowEdgeStyle.value = false;
-      currentNode.value = node;
     }
   });
   // 节点单击
@@ -625,6 +700,8 @@ function graphWatchEvent() {
         isShowNodeStyle.value = false;
         textStyle.fontSize = node.attrs!.text.fontSize as number || 14;
         textStyle.color = node.attrs!.text.fill as string || '#495AD4';
+        textStyle.nodeWidth = node.size().width;
+        textStyle.nodeHeight = node.size().height;
       } else {
         isShowTextStyle.value = false;
         isShowNodeStyle.value = true;
@@ -829,22 +906,36 @@ function handleChangeTextFontSize(val: number) {
   currentNode.value.attr('text/fontSize', val);
 }
 
-function handleBlurTextFontSize(ev: FocusEvent) {
-  const val = (ev?.target as unknown as { value: string | null | undefined })?.value || '';
-  if (!val) {
-    nextTick(() => {
-      textStyle.fontSize = 14;
-    });
-    currentNode.value.attr('text/fontSize', 14);
-  }
-}
-
 function handleChangeTextColor(val: string) {
   currentNode.value.attr('text/fill', val);
+}
+
+function handleBlurTextStyle(ev: FocusEvent, key: 'nodeWidth' | 'nodeHeight' | 'fontSize') {
+  const val = (ev?.target as unknown as { value: string | number | null | undefined })?.value || '';
+  if (!val) {
+    nextTick(() => {
+      if (key === 'nodeWidth') {
+        textStyle.nodeWidth = currentNode.value.size().width;
+      } else if (key === 'nodeHeight') {
+        textStyle.nodeHeight = currentNode.value.size().height;
+      } else {
+        textStyle.fontSize = 14;
+        currentNode.value.attr('text/fontSize', 14);
+      }
+    });
+  }
 }
 // #endtext
 
 // #node 样式开始
+function handleChangeNodeWidth(val: number) {
+  currentNode.value.prop('size', { width: val, height: currentNode.value.size().height });
+}
+
+function handleChangeNodeHeight(val: number) {
+  currentNode.value.prop('size', { width: currentNode.value.size().width, height: val });
+}
+
 function handleChangeNodeX(val: number) {
   currentNode.value.prop('position', { x: val, y: currentNode.value.position().y });
 }
@@ -855,6 +946,21 @@ function handleChangeNodeY(val: number) {
 
 function handleChangeNodeAngle(val: number) {
   currentNode.value.prop('angle', val);
+}
+
+function handleBlurNodeStyle(ev: FocusEvent, key: 'x' | 'y' | 'angle') {
+  const val = (ev?.target as unknown as { value: string | number | null | undefined })?.value || '';
+  if (!val) {
+    nextTick(() => {
+      if (key === 'x') {
+        nodeStyle.x = currentNode.value.position().x;
+      } else if (key === 'y') {
+        nodeStyle.y = currentNode.value.position().y;
+      } else {
+        nodeStyle.angle = currentNode.value.angle();
+      }
+    });
+  }
 }
 // #endnode
 
