@@ -342,22 +342,22 @@ const ports = {
     {
       group: 'right',
       args: {
-        x: 66,
-        y: 30,
+        x: '100%',
+        y: '50%',
       },
     },
     {
       group: 'bottom',
       args: {
-        x: 36,
-        y: 80,
+        x: '50%',
+        y: '100%',
       },
     },
     {
       group: 'left',
       args: {
-        x: 6,
-        y: 30,
+        x: 0,
+        y: '50%',
       },
     },
   ],
@@ -493,7 +493,6 @@ function initialGraph(isDisabled?: boolean) {
           tools: [
             {
               name: 'button-remove',
-              args: { distance: -40 },
             },
           ],
           zIndex: 0,
@@ -532,7 +531,7 @@ function initialGraph(isDisabled?: boolean) {
       enabled: !isDisabled,
     }))
     .use(new Transform({
-      resizing: false,
+      resizing: !isDisabled,
       rotating: false,
     }))
     .use(new Scroller({
@@ -640,7 +639,6 @@ function graphWatchEvent() {
     cell.addTools([
       {
         name: 'button-remove',
-        args: { distance: -40 },
       },
     ]);
   });
@@ -671,6 +669,14 @@ function graphWatchEvent() {
       textStyle.nodeWidth = node.size().width;
       textStyle.nodeHeight = node.size().height;
     } else {
+      // 高度=总高度减文字高度和间距
+      // 宽度=总宽度
+      // 二者取更小的那一个
+      const height = node.size().height - 20;
+      const { width } = node.size();
+      node.setData({
+        iconSize: Math.min(width, height),
+      });
       isShowTextStyle.value = false;
       isShowNodeStyle.value = true;
       nodeStyle.x = node.position().x;
@@ -903,6 +909,7 @@ function loadStencil() {
       text: item.name,
       type: 0,
       id: `${item.id}`,
+      iconSize: 60,
     },
   }));
   const clusterNodes = clusterList.value.map((item) => graph.value!.createNode({
@@ -912,6 +919,7 @@ function loadStencil() {
       text: item.name,
       type: 1,
       id: `${item.id}`,
+      iconSize: 60,
     },
   }));
   const doubleLiveNodes = doubleLiveList.value.map((item) => graph.value!.createNode({
@@ -921,6 +929,7 @@ function loadStencil() {
       text: item.name,
       type: 2,
       id: `${item.id}`,
+      iconSize: 60,
     },
   }));
   stencil.value?.load([baseNode], 'group1');
