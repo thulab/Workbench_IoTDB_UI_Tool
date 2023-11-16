@@ -176,7 +176,7 @@
                   </div>
                 </div>
                 <!-- 单线程数据传输/多线程数据传输 -->
-                <div class="flex-align-center" v-if="formData.connectorPluginType === 'iotdb-thrift-sync-connector' || formData.connectorPluginType === 'iotdb-thrift-async-connector' || formData.connectorPluginType === 'iotdb-thrift-connector'">
+                <div class="flex-align-center" v-if="formData.connectorPluginType === 'iotdb-thrift-sync-connector' || formData.connectorPluginType === 'iotdb-thrift-async-connector' || formData.connectorPluginType === 'iotdb-thrift-connector' || formData.connectorPluginType === 'iotdb-thrift-connector'">
                   <base-form-item label="攒批发送模式:" prop="isLogSendBatch" :rules="requiredRules" class="form-label-width">
                     <el-switch
                       v-model="formData.isLogSendBatch"
@@ -392,7 +392,7 @@ const formData = ref<DataSync.SynchronFormData>({
   processorPluginName: '',
   processorPluginParam: '',
   // 发送
-  connectorPluginType: 'iotdb-thrift-async-connector',
+  connectorPluginType: 'iotdb-thrift-connector',
   connectorPluginName: '',
   connectorPluginParam: '',
   targetInfos: [{ host: '', port: '' }],
@@ -473,7 +473,7 @@ function handleResetForm() {
     formData.value.processorPluginType = 'do-nothing-processor';
     formData.value.processorPluginName = '';
     formData.value.processorPluginParam = '';
-    formData.value.connectorPluginType = 'iotdb-thrift-async-connector';
+    formData.value.connectorPluginType = 'iotdb-thrift-connector';
     formData.value.connectorPluginName = '';
     formData.value.connectorPluginParam = '';
     formData.value.targetInfos = [{ host: '', port: '' }];
