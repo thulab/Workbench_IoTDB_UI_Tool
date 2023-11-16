@@ -99,7 +99,6 @@
             </el-input>
           </el-form-item>
           <el-form-item class="m-b-0">
-            <el-button type="primary" @click="flowVisible = true">流程图</el-button>
             <el-button class="login-button" type="primary" :loading="loading" @click="submitForm" id="login-submit">登录</el-button>
           </el-form-item>
         </el-form>
@@ -111,10 +110,6 @@
       v-model:visible="connectionVisible"
       @handleClose="getList"
     />
-
-    <modal-flow
-      v-model:visible="flowVisible"
-    />
   </div>
 </template>
 
@@ -124,7 +119,6 @@ import type { FormInstance, FormRules } from 'element-plus';
 import { UserApi, ConnectionApi } from '@/api';
 import { useUserStore } from '@/stores';
 import ModalConnection from '@/components/modal-connection.vue';
-import ModalFlow from '@/components/modal-flow.vue';
 import TheCaptcha from '@/components/the-captcha.vue';
 
 const router = useRouter();
@@ -145,7 +139,7 @@ const loginForm = reactive<{
 });
 const pwdType = ref('password');
 const loading = ref(false);
-const flowVisible = ref(false);
+
 const connectionVisible = ref(false);
 const connectionList = ref<Connection.ConnectionItem[]>([]);
 const connectionOptions = ref<Array<{ label: string, options: Array<Connection.ConnectionItem> }>>([]);

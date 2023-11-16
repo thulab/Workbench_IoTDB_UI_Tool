@@ -89,6 +89,7 @@ declare module 'vue' {
     ICustomError: typeof import('~icons/custom/error')['default']
     ICustomExport: typeof import('~icons/custom/export')['default']
     ICustomFileInfo: typeof import('~icons/custom/file-info')['default']
+    ICustomGraph: typeof import('~icons/custom/graph')['default']
     ICustomGraphCluster: typeof import('~icons/custom/graph-cluster')['default']
     ICustomGraphDoubleLive: typeof import('~icons/custom/graph-double-live')['default']
     ICustomGraphStandAlone: typeof import('~icons/custom/graph-stand-alone')['default']

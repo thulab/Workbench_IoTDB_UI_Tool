@@ -15,6 +15,7 @@
           <h4>实例列表</h4>
           <div>
             <el-button link class="m-r-8" @click="handleRefresh" id="connection-side-refresh"><i-custom-border-refresh /></el-button>
+            <el-button link class="m-r-8 m-l-0" @click="handleGraph" id="connection-side-graph"><i-custom-graph /></el-button>
             <el-button link style="margin: 0;" @click="handleAddConnection" id="connection-side-add"><i-custom-new-connection /></el-button>
           </div>
         </div>
@@ -69,6 +70,11 @@
         @handleRefreshList="getList"
       />
     </el-container>
+
+    <modal-flow
+      v-model:visible="flowVisible"
+      :is-toggle="isToggle"
+    />
   </el-dialog>
 </template>
 
@@ -76,6 +82,7 @@
 import { useRoute } from 'vue-router';
 import { ConnectionApi } from '@/api';
 import { useConnectionStore } from '@/stores';
+import ModalFlow from '@/components/modal-flow.vue';
 import ICustomError from '~icons/custom/error.svg';
 import ConnectionForm from './connection/connection-form.vue';
 
@@ -100,6 +107,7 @@ const filterList = ref<Connection.ConnectionItem[]>([]);
 const current = ref<string | number>('');
 const listLoading = ref(false);
 const detailLoading = ref(false);
+const flowVisible = ref(false);
 
 const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
 const { requestFn: deleteConnection } = useRequest(ConnectionApi.deleteConnection);
@@ -163,6 +171,10 @@ async function handleRefresh() {
   connectionFormRef.value?.resetOperateLoading();
   editType.value = 'edit';
   getList();
+}
+
+function handleGraph() {
+  flowVisible.value = true;
 }
 
 async function handleFilter() {
