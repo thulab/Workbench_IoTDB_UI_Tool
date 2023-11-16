@@ -730,11 +730,11 @@ function graphWatchEvent() {
   // 节点删除
   graph.value?.on('node:removed', ({ node }) => {
     if (!isEdit.value) return;
-    if (isShowTextStyle.value && node.prop().shape === 'custom-rect' && +currentNode.value.data.id === +node.data.id) {
+    if (isShowTextStyle.value && node.prop().shape === 'custom-rect' && currentNode.value && +currentNode.value.data.id === +node.data.id) {
       isShowTextStyle.value = false;
       currentNode.value = undefined;
     }
-    if (isShowNodeStyle.value && node.prop().shape === 'custom-vue-node' && +currentNode.value.data.id === +node.data.id) {
+    if (isShowNodeStyle.value && node.prop().shape === 'custom-vue-node' && currentNode.value && +currentNode.value.data.id === +node.data.id) {
       isShowNodeStyle.value = false;
       currentNode.value = undefined;
     }
@@ -1157,6 +1157,7 @@ async function handleEdit() {
     const flag = await connectionFormRef.value?.handleChangeConnection();
     if (!flag) return;
   }
+  viewNode.value = undefined;
   initialGraph(false);
   graphWatchEvent();
   graphBindEvent();
