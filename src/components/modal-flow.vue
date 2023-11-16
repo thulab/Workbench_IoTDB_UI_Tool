@@ -490,6 +490,12 @@ function initialGraph(isDisabled?: boolean) {
               },
             },
           },
+          tools: [
+            {
+              name: 'button-remove',
+              args: { distance: -40 },
+            },
+          ],
           zIndex: 0,
         });
       },
@@ -628,6 +634,28 @@ function graphWatchEvent() {
       '.x6-port-body',
     ) as NodeListOf<SVGElement>;
     showPorts(allPorts, false);
+  });
+  graph.value?.on('edge:mouseenter', ({ cell }) => {
+    if (!isEdit.value) return;
+    cell.addTools([
+      {
+        name: 'button-remove',
+        args: { distance: -40 },
+      },
+    ]);
+  });
+  graph.value?.on('edge:mouseleave', ({ cell }) => {
+    if (!isEdit.value) return;
+    if (cell.hasTool('button-remove')) {
+      cell.removeTool('button-remove');
+    }
+  });
+  // 删除边
+  graph.value?.on('edge:removed', () => {
+    if (isShowEdgeStyle.value) {
+      isShowEdgeStyle.value = false;
+      currentEdge.value = undefined;
+    }
   });
   // 调整节点大小后触发
   graph.value?.on('node:resized', ({ node }) => {
