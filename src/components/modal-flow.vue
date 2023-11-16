@@ -1184,7 +1184,13 @@ async function handleExport() {
     const flag = await connectionFormRef.value?.handleChangeConnection();
     if (!flag) return;
   }
-  graph.value!.exportPNG('chart', { preserveDimensions: true, padding: 20, quality: 1 });
+  graph.value!.exportPNG('chart', {
+    copyStyles: true,
+    width: graph.value!.size.options.width + 200,
+    height: graph.value!.size.options.height + 200,
+    padding: 100,
+    quality: 1,
+  });
 }
 
 // 保存实例信息
