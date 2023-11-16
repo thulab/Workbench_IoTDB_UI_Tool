@@ -171,7 +171,9 @@
 </template>
 
 <script lang="ts" setup>
-import { Graph, Shape, type JSONObject } from '@antv/x6';
+import {
+  Graph, Shape, Edge, Node, type JSONObject,
+} from '@antv/x6';
 import { Stencil } from '@antv/x6-plugin-stencil';
 import { Snapline } from '@antv/x6-plugin-snapline';
 import { Clipboard } from '@antv/x6-plugin-clipboard';
@@ -199,7 +201,7 @@ const emit = defineEmits<{
 
 const lineTypeList = [
   { name: '直线连接', value: 'normal' },
-  { name: '圆弧连接', value: 'smooth' },
+  { name: '圆弧连接', value: 'rounded' },
   { name: '流动连接', value: 'dashed' },
 ];
 
@@ -243,6 +245,7 @@ const edgeStyle = reactive({
   arrowHeight: 10,
 });
 const operateNode = ref();
+const operateEdge = ref();
 const isShowContextMenu = ref(false);
 const contextMenuRef = ref<InstanceType<typeof ContextMenu>>();
 const contextMenuTimer = ref();
@@ -490,12 +493,6 @@ function initialGraph(isDisabled?: boolean) {
               },
             },
           },
-          tools: [
-            {
-              name: 'button-remove',
-              args: { distance: -40 },
-            },
-          ],
           zIndex: 0,
         });
       },
@@ -617,6 +614,48 @@ const showPorts = (portList: NodeListOf<SVGElement>, show: boolean) => {
   }
 };
 
+function getEdgeStyle(edge: Edge) {
+  isShowTextStyle.value = false;
+  isShowNodeStyle.value = false;
+  isShowEdgeStyle.value = true;
+  currentEdge.value = edge;
+  const style = edge.attr().line.style as JSONObject;
+  const targetMarker = edge.attr().line.targetMarker as JSONObject;
+  if (!edge.getConnector()) {
+    edgeStyle.lineType = 'normal';
+  } else if (edge.getConnector().name === 'rounded' && style.animation === 'none') {
+    edgeStyle.lineType = 'rounded';
+  } else if (edge.getConnector().name === 'normal' && style.animation !== 'none') {
+    edgeStyle.lineType = 'dashed';
+  } else {
+    edgeStyle.lineType = 'normal';
+  }
+  edgeStyle.color = edge.attr().line.stroke as string || '#495AD4';
+  edgeStyle.arrowType = targetMarker.name as string || 'block';
+  edgeStyle.arrowWidth = targetMarker.height as number || 8;
+  edgeStyle.arrowHeight = targetMarker.width as number || 12;
+}
+
+function getNodeStyle(node: Node) {
+  isShowEdgeStyle.value = false;
+  currentNode.value = node;
+  if (node.prop().shape === 'custom-rect') {
+    // 文本输入
+    isShowTextStyle.value = true;
+    isShowNodeStyle.value = false;
+    textStyle.fontSize = node.attrs!.text.fontSize as number || 14;
+    textStyle.color = node.attrs!.text.fill as string || '#495AD4';
+    textStyle.nodeWidth = node.size().width;
+    textStyle.nodeHeight = node.size().height;
+  } else {
+    isShowTextStyle.value = false;
+    isShowNodeStyle.value = true;
+    nodeStyle.x = node.position().x;
+    nodeStyle.y = node.position().y;
+    nodeStyle.angle = node.getAngle();
+  }
+}
+
 // 事件监听
 function graphWatchEvent() {
   graph.value?.on('node:mouseenter', () => {
@@ -635,24 +674,19 @@ function graphWatchEvent() {
     ) as NodeListOf<SVGElement>;
     showPorts(allPorts, false);
   });
-  graph.value?.on('edge:mouseenter', ({ cell }) => {
+  // 添加边
+  graph.value?.on('edge:added', ({ edge }) => {
     if (!isEdit.value) return;
-    cell.addTools([
-      {
-        name: 'button-remove',
-        args: { distance: -40 },
-      },
-    ]);
+    getEdgeStyle(edge);
   });
-  graph.value?.on('edge:mouseleave', ({ cell }) => {
+  // 边单击
+  graph.value?.on('edge:click', ({ edge }) => {
     if (!isEdit.value) return;
-    if (cell.hasTool('button-remove')) {
-      cell.removeTool('button-remove');
-    }
+    getEdgeStyle(edge);
   });
   // 删除边
-  graph.value?.on('edge:removed', () => {
-    if (isShowEdgeStyle.value) {
+  graph.value?.on('edge:removed', ({ edge }) => {
+    if (isShowEdgeStyle.value && edge.id === currentEdge.value.id) {
       isShowEdgeStyle.value = false;
       currentEdge.value = undefined;
     }
@@ -660,85 +694,22 @@ function graphWatchEvent() {
   // 调整节点大小后触发
   graph.value?.on('node:resized', ({ node }) => {
     if (!isEdit.value) return;
-    isShowEdgeStyle.value = false;
-    currentNode.value = node;
-    if (node.prop().shape === 'custom-rect') {
-      // 文本输入
-      isShowTextStyle.value = true;
-      isShowNodeStyle.value = false;
-      textStyle.fontSize = node.attrs!.text.fontSize as number || 14;
-      textStyle.color = node.attrs!.text.fill as string || '#495AD4';
-      textStyle.nodeWidth = node.size().width;
-      textStyle.nodeHeight = node.size().height;
-    } else {
-      isShowTextStyle.value = false;
-      isShowNodeStyle.value = true;
-      nodeStyle.x = node.position().x;
-      nodeStyle.y = node.position().y;
-      nodeStyle.angle = node.getAngle();
-    }
+    getNodeStyle(node);
   });
   // 鼠标抬起
   graph.value?.on('node:mouseup', ({ node }) => {
     if (!isEdit.value) return;
-    isShowEdgeStyle.value = false;
-    currentNode.value = node;
-    if (node.prop().shape === 'custom-rect') {
-      // 文本输入
-      isShowTextStyle.value = true;
-      isShowNodeStyle.value = false;
-      textStyle.fontSize = node.attrs!.text.fontSize as number || 14;
-      textStyle.color = node.attrs!.text.fill as string || '#495AD4';
-      textStyle.nodeWidth = node.size().width;
-      textStyle.nodeHeight = node.size().height;
-    } else {
-      isShowTextStyle.value = false;
-      isShowNodeStyle.value = true;
-      nodeStyle.x = node.position().x;
-      nodeStyle.y = node.position().y;
-      nodeStyle.angle = node.getAngle();
-    }
+    getNodeStyle(node);
   });
   // 放置到画布上节点
   graph.value?.on('node:added', ({ node }) => {
     if (!isEdit.value) return;
-    isShowEdgeStyle.value = false;
-    currentNode.value = node;
-    if (node.prop().shape === 'custom-rect') {
-      // 文本输入
-      isShowTextStyle.value = true;
-      isShowNodeStyle.value = false;
-      textStyle.fontSize = node.attrs!.text.fontSize as number || 14;
-      textStyle.color = node.attrs!.text.fill as string || '#495AD4';
-      textStyle.nodeWidth = node.size().width;
-      textStyle.nodeHeight = node.size().height;
-    } else {
-      isShowTextStyle.value = false;
-      isShowNodeStyle.value = true;
-      nodeStyle.x = node.position().x;
-      nodeStyle.y = node.position().y;
-      nodeStyle.angle = node.getAngle();
-    }
+    getNodeStyle(node);
   });
   // 节点单击
   graph.value?.on('node:click', async ({ node }) => {
     if (isEdit.value) {
-      if (node.prop().shape === 'custom-rect') {
-        isShowTextStyle.value = true;
-        isShowNodeStyle.value = false;
-        textStyle.fontSize = node.attrs!.text.fontSize as number || 14;
-        textStyle.color = node.attrs!.text.fill as string || '#495AD4';
-        textStyle.nodeWidth = node.size().width;
-        textStyle.nodeHeight = node.size().height;
-      } else {
-        isShowTextStyle.value = false;
-        isShowNodeStyle.value = true;
-        nodeStyle.x = node.position().x;
-        nodeStyle.y = node.position().y;
-        nodeStyle.angle = node.getAngle();
-      }
-      isShowEdgeStyle.value = false;
-      currentNode.value = node;
+      getNodeStyle(node);
     } else if (node.prop().shape === 'custom-rect') { // view 状态事件监听
       // 文本输入不做处理
     } else if (!viewNode.value) {
@@ -756,28 +727,17 @@ function graphWatchEvent() {
       connectionFormRef.value?.getDetail(current.value);
     }
   });
-  // 边单击
-  graph.value?.on('edge:click', ({ edge }) => {
+  // 节点删除
+  graph.value?.on('node:removed', ({ node }) => {
     if (!isEdit.value) return;
-    isShowTextStyle.value = false;
-    isShowNodeStyle.value = false;
-    isShowEdgeStyle.value = true;
-    currentEdge.value = edge;
-    const style = edge.attr().line.style as JSONObject;
-    const targetMarker = edge.attr().line.targetMarker as JSONObject;
-    if (!edge.getConnector()) {
-      edgeStyle.lineType = 'normal';
-    } else if (edge.getConnector().name === 'smooth' && style.animation === 'none') {
-      edgeStyle.lineType = 'smooth';
-    } else if (edge.getConnector().name === 'normal' && style.animation !== 'none') {
-      edgeStyle.lineType = 'dashed';
-    } else {
-      edgeStyle.lineType = 'normal';
+    if (isShowTextStyle.value && node.prop().shape === 'custom-rect' && +currentNode.value.data.id === +node.data.id) {
+      isShowTextStyle.value = false;
+      currentNode.value = undefined;
     }
-    edgeStyle.color = edge.attr().line.stroke as string || '#495AD4';
-    edgeStyle.arrowType = targetMarker.name as string || 'block';
-    edgeStyle.arrowWidth = targetMarker.height as number || 8;
-    edgeStyle.arrowHeight = targetMarker.width as number || 12;
+    if (isShowNodeStyle.value && node.prop().shape === 'custom-vue-node' && +currentNode.value.data.id === +node.data.id) {
+      isShowNodeStyle.value = false;
+      currentNode.value = undefined;
+    }
   });
   // 画布单击
   graph.value?.on('blank:click', () => {
@@ -796,9 +756,15 @@ function graphWatchEvent() {
     }
     isShowContextMenu.value = true;
     if (graph.value && graph.value.getSelectedCells().length > 0) {
-      [operateNode.value] = graph.value!.getSelectedCells();
+      const [cell] = graph.value!.getSelectedCells();
+      if (cell.shape === 'edge') {
+        operateEdge.value = cell;
+      } else {
+        operateNode.value = cell;
+      }
     } else {
       operateNode.value = undefined;
+      operateEdge.value = undefined;
     }
     contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
   });
@@ -814,6 +780,20 @@ function graphWatchEvent() {
     }
     isShowContextMenu.value = true;
     operateNode.value = node;
+    contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
+  });
+  // 边右击
+  graph.value?.on('edge:contextmenu', ({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    e, x, y, view, edge,
+  }) => {
+    if (!isEdit.value) return;
+    if (contextMenuTimer.value) {
+      clearTimeout(contextMenuTimer.value);
+      contextMenuTimer.value = undefined;
+    }
+    isShowContextMenu.value = true;
+    operateEdge.value = edge;
     contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
   });
 }
@@ -1003,8 +983,8 @@ function handleChangeLineType(val: string) {
         animation: 'ant-line 30s infinite linear',
       },
     });
-  } else if (val === 'smooth') {
-    currentEdge.value.setConnector('smooth');
+  } else if (val === 'rounded') {
+    currentEdge.value.setConnector('rounded', { args: 20 });
     currentEdge.value.attr('line', {
       ...currentEdge.value.attr().line,
       strokeDasharray: 'none',
@@ -1073,6 +1053,7 @@ function onMouseDown() {
   contextMenuTimer.value = setTimeout(() => {
     isShowContextMenu.value = false;
     operateNode.value = undefined;
+    operateEdge.value = undefined;
   }, 200);
 }
 
@@ -1113,12 +1094,21 @@ function handleClickOperate(key: string) {
       ElMessage.info('没有需要恢复的操作');
     }
   }
-  // 删除
+  // 删除节点
   if (key === 'del') {
     if (!operateNode.value) {
       ElMessage.info('请先选中节点再删除');
     } else {
       operateNode.value.remove();
+      ElMessage.success('删除成功');
+    }
+  }
+  // 删除边
+  if (key === 'delEdge') {
+    if (!operateEdge.value) {
+      ElMessage.info('请先选中边再删除');
+    } else {
+      operateEdge.value.remove();
       ElMessage.success('删除成功');
     }
   }
@@ -1229,6 +1219,7 @@ watch(
       isShowEdgeStyle.value = false;
       currentEdge.value = undefined;
       operateNode.value = undefined;
+      operateEdge.value = undefined;
       isShowContextMenu.value = false;
       contextMenuTimer.value = undefined;
       editType.value = 'view';
