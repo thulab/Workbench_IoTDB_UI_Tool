@@ -1,6 +1,6 @@
 <template>
   <div class="custom-node-box">
-    <el-icon :size="iconSize" class="m-b-6">
+    <el-icon size="60" class="m-b-6">
       <i-custom-graph-cluster v-if="type === 1" />
       <i-custom-graph-double-live v-else-if="type === 2" />
       <i-custom-graph-stand-alone v-else />
@@ -21,17 +21,12 @@ export default defineComponent({
     return {
       type: 0,
       text: '',
-      iconSize: 60,
     };
   },
   mounted() {
     const node = (this as any).getNode();
     this.type = node.data.type;
     this.text = node.data.text;
-    node.on('change:data', ({ current }: any) => {
-      const { iconSize } = current;
-      this.iconSize = iconSize;
-    });
   },
 });
 </script>
