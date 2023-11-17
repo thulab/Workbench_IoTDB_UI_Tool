@@ -138,7 +138,7 @@
               v-model:edit-type="connectionEditType"
               v-model:detail-loading="connectionDetailLoading"
               :current="current"
-              :is-toggle="isToggle"
+              :is-toggle="true"
               @handleRefreshList="handleRefresh"
             />
           </div>

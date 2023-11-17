@@ -158,7 +158,7 @@
 <script lang="ts" setup>
 import type { FormInstance } from 'element-plus';
 import { cloneDeep, isEqual, assign } from 'lodash-es';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { ConnectionApi } from '@/api';
 import { useUserStore, useConnectionStore } from '@/stores';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
@@ -177,6 +177,7 @@ const emit = defineEmits<{
 }>();
 
 const route = useRoute();
+const router = useRouter();
 const userStore = useUserStore();
 const connectionStore = useConnectionStore();
 const editType = useVModel(props, 'editType', emit);
@@ -396,7 +397,11 @@ function handleTest(type: 'test' | 'login') {
               ...formData,
               password: '',
             });
-            window.location.reload();
+            if (route.name === 'Login') {
+              router.push({ path: '/' });
+            } else {
+              window.location.reload();
+            }
           }).finally(() => {
             connectLoading.value = false;
           }).catch((err) => {
