@@ -24,7 +24,7 @@
         </div>
         <div class="operate-buttons" v-if="editType === 'view'">
           <el-button link @click="handleEdit"><el-icon size="24" class="m-r-6"><i-custom-edit /></el-icon>编辑</el-button>
-          <el-button link @click="handleExport"><el-icon size="24" class="m-r-6"><i-custom-export /></el-icon>导出</el-button>
+          <!-- <el-button link @click="handleExport"><el-icon size="24" class="m-r-6"><i-custom-export /></el-icon>导出</el-button> -->
         </div>
       </div>
     </template>
@@ -39,28 +39,6 @@
             <!-- 文本 -->
             <div v-show="isShowTextStyle" class="text-style-box">
               <h4 class="operate-style-title">样式</h4>
-              <div class="node-style-detail-item">
-                <span class="detail-label">文本框宽度：</span>
-                <el-input-number
-                  v-model.number="textStyle.nodeWidth"
-                  :min="0"
-                  step-strictly
-                  :controls="false"
-                  @change="val => handleChangeNodeWidth(val as number)"
-                  @blur="ev => handleBlurTextStyle(ev, 'nodeWidth')"
-                />
-              </div>
-              <div class="node-style-detail-item">
-                <span class="detail-label">文本框高度：</span>
-                <el-input-number
-                  v-model.number="textStyle.nodeHeight"
-                  :min="0"
-                  step-strictly
-                  :controls="false"
-                  @change="val => handleChangeNodeHeight(val as number)"
-                  @blur="ev => handleBlurTextStyle(ev, 'nodeHeight')"
-                />
-              </div>
               <div class="text-style-detail-item">
                 <span class="detail-label">文字大小：</span>
                 <el-input-number
@@ -70,7 +48,7 @@
                   step-strictly
                   :controls="false"
                   @change="val => handleChangeTextFontSize(val as number)"
-                  @blur="ev => handleBlurTextStyle(ev, 'fontSize')"
+                  @blur="ev => handleBlurTextStyle(ev)"
                 />
               </div>
               <div class="text-style-detail-item">
@@ -225,8 +203,6 @@ const isShowTextStyle = ref(false);
 const textStyle = reactive({
   fontSize: 14,
   color: '#495AD4',
-  nodeWidth: 100,
-  nodeHeight: 30,
 });
 const isShowNodeStyle = ref(false);
 const currentNode = ref();
@@ -308,7 +284,7 @@ const ports = {
       },
     },
     bottom: {
-      position: 'absolute',
+      position: 'bottom',
       attrs: {
         circle: {
           r: 4,
@@ -351,10 +327,6 @@ const ports = {
     },
     {
       group: 'bottom',
-      args: {
-        x: 36,
-        y: 80,
-      },
     },
     {
       group: 'left',
@@ -470,7 +442,7 @@ function initialGraph(isDisabled?: boolean) {
       connector: {
         name: 'normal',
       },
-      anchor: 'center',
+      // anchor: 'center',
       connectionPoint: 'anchor',
       allowBlank: false,
       snap: {
@@ -529,7 +501,7 @@ function initialGraph(isDisabled?: boolean) {
       enabled: !isDisabled,
     }))
     .use(new Transform({
-      resizing: false,
+      resizing: !isDisabled,
       rotating: false,
     }))
     .use(new Scroller({
@@ -645,8 +617,6 @@ function getNodeStyle(node: Node) {
     isShowNodeStyle.value = false;
     textStyle.fontSize = node.attrs!.text.fontSize as number || 14;
     textStyle.color = node.attrs!.text.fill as string || '#495AD4';
-    textStyle.nodeWidth = node.size().width;
-    textStyle.nodeHeight = node.size().height;
   } else {
     isShowTextStyle.value = false;
     isShowNodeStyle.value = true;
@@ -695,6 +665,33 @@ function graphWatchEvent() {
   graph.value?.on('node:resized', ({ node }) => {
     if (!isEdit.value) return;
     getNodeStyle(node);
+    if (node.prop().shape === 'custom-vue-node') {
+      // 高度=总高度减文字高度和间距
+      // 宽度=总宽度
+      // 二者取更小的那一个
+      const height = node.size().height - 20;
+      const { width } = node.size();
+      node.setData({
+        iconSize: Math.min(width, height),
+      });
+      const portList = node.ports.items;
+      const rightPort = portList.find((port) => port.group === 'right');
+      const leftPort = portList.find((port) => port.group === 'left');
+      node.setPortProp(rightPort!.id!, {
+        name: 'absolute',
+        args: {
+          x: node.size().width / 2 + node.data.iconSize / 2,
+          y: node.data.iconSize / 2,
+        },
+      });
+      node.setPortProp(leftPort!.id!, {
+        name: 'absolute',
+        args: {
+          x: node.size().width / 2 - node.data.iconSize / 2,
+          y: node.data.iconSize / 2,
+        },
+      });
+    }
   });
   // 鼠标抬起
   graph.value?.on('node:mouseup', ({ node }) => {
@@ -883,6 +880,7 @@ function loadStencil() {
       text: item.name,
       type: 0,
       id: `${item.id}`,
+      iconSize: 60,
     },
   }));
   const clusterNodes = clusterList.value.map((item) => graph.value!.createNode({
@@ -892,6 +890,7 @@ function loadStencil() {
       text: item.name,
       type: 1,
       id: `${item.id}`,
+      iconSize: 60,
     },
   }));
   const doubleLiveNodes = doubleLiveList.value.map((item) => graph.value!.createNode({
@@ -901,6 +900,7 @@ function loadStencil() {
       text: item.name,
       type: 2,
       id: `${item.id}`,
+      iconSize: 60,
     },
   }));
   stencil.value?.load([baseNode], 'group1');
@@ -918,32 +918,18 @@ function handleChangeTextColor(val: string) {
   currentNode.value.attr('text/fill', val);
 }
 
-function handleBlurTextStyle(ev: FocusEvent, key: 'nodeWidth' | 'nodeHeight' | 'fontSize') {
+function handleBlurTextStyle(ev: FocusEvent) {
   const val = (ev?.target as unknown as { value: string | number | null | undefined })?.value || '';
   if (!val) {
     nextTick(() => {
-      if (key === 'nodeWidth') {
-        textStyle.nodeWidth = currentNode.value.size().width;
-      } else if (key === 'nodeHeight') {
-        textStyle.nodeHeight = currentNode.value.size().height;
-      } else {
-        textStyle.fontSize = 14;
-        currentNode.value.attr('text/fontSize', 14);
-      }
+      textStyle.fontSize = 14;
+      currentNode.value.attr('text/fontSize', 14);
     });
   }
 }
 // #endtext
 
 // #node 样式开始
-function handleChangeNodeWidth(val: number) {
-  currentNode.value.prop('size', { width: val, height: currentNode.value.size().height });
-}
-
-function handleChangeNodeHeight(val: number) {
-  currentNode.value.prop('size', { width: currentNode.value.size().width, height: val });
-}
-
 function handleChangeNodeX(val: number) {
   currentNode.value.prop('position', { x: val, y: currentNode.value.position().y });
 }
@@ -1170,6 +1156,7 @@ async function handleEdit() {
 }
 
 // 导出
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function handleExport() {
   if (viewNode.value && connectionFormRef.value?.isCanSave) {
     const flag = await connectionFormRef.value?.handleChangeConnection();
@@ -1466,6 +1453,12 @@ watch(
 
 .x6-widget-stencil.collapsable.collapsed > .x6-widget-stencil-title::before, .x6-widget-stencil-group.collapsable.collapsed > .x6-widget-stencil-group-title::before{
   background-image: url('@/assets/icons/arrow-right.svg');
+}
+
+.x6-widget-transform {
+  margin: -1px 0 0 -1px;
+  padding: 0;
+  border: 1px solid #495AD4;
 }
 
 @keyframes ant-line {
