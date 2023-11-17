@@ -9,110 +9,110 @@
   >
     <div class="form-wrapper" v-loading="loading">
       <!-- <span class="tabs-tip"><el-icon size="14" style="margin-right: 2px;"><i-custom-info-warning /></el-icon>最终提交信息为您提交时所在的页签内容</span> -->
-      <el-tabs type="card" v-model="activeTab" @tab-click="handleTabClick">
-        <el-tab-pane label="界面选择" name="select">
-          <el-scrollbar class="p-16">
-            <el-form ref="formRef" :model="formData" label-position="left" class="form-wrapper" :disabled="editType === 'view'">
-              <label><input type="password" autocomplete="new-password" hidden></label>
-              <base-form-item label="任务名称:" prop="name" :rules="requiredNameRules" class="form-label-width" :error="errorName">
-                <el-input v-model="formData.name" placeholder="请输入字母、数字、汉字、下划线，其他字符需用反引号进行整体修饰，例如：`数据同步-1`" type="textarea" :rows="2" id="data-sync-modal-name" :resize="'none'" style="width: 360px;" maxlength="100" show-word-limit />
-              </base-form-item>
-              <h4 class="form-module-title">数据抽取</h4>
-              <div class="flex-align-center">
-                <base-form-item label="同步测点:" prop="whole" :rules="requiredRules" class="form-label-width">
-                  <template #label>
-                    同步测点:<el-tooltip effect="light" content="需用反引号修饰不合法字符或者是不合法路径节点，例如：root.`a@b`" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
-                  </template>
-                  <el-radio-group v-model="formData.whole">
-                    <el-radio :label="true">全局</el-radio>
-                    <el-radio :label="false" class="radio-tip">前缀路径<el-tooltip
-                      effect="light"
-                      content="路径前缀不需要能够构成完整的路径，例如：输入'root.database'，则同步的数据范围为'root.database*.**'
+      <!-- <el-tabs type="card" v-model="activeTab" @tab-click="handleTabClick">
+        <el-tab-pane label="界面选择" name="select"> -->
+      <el-scrollbar class="p-4" style="height: 470px;">
+        <el-form ref="formRef" :model="formData" label-position="left" class="form-wrapper" :disabled="editType === 'view'">
+          <label><input type="password" autocomplete="new-password" hidden></label>
+          <base-form-item label="任务名称:" prop="name" :rules="requiredNameRules" class="form-label-width" :error="errorName">
+            <el-input v-model="formData.name" placeholder="请输入字母、数字、汉字、下划线，其他字符需用反引号进行整体修饰，例如：`数据同步-1`" type="textarea" :rows="2" id="data-sync-modal-name" :resize="'none'" style="width: 360px;" maxlength="100" show-word-limit />
+          </base-form-item>
+          <h4 class="form-module-title">数据抽取</h4>
+          <div class="flex-align-center">
+            <base-form-item label="同步测点:" prop="whole" :rules="requiredRules" class="form-label-width">
+              <template #label>
+                同步测点:<el-tooltip effect="light" content="需用反引号修饰不合法字符或者是不合法路径节点，例如：root.`a@b`" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+              </template>
+              <el-radio-group v-model="formData.whole">
+                <el-radio :label="true">全局</el-radio>
+                <el-radio :label="false" class="radio-tip">前缀路径<el-tooltip
+                  effect="light"
+                  content="路径前缀不需要能够构成完整的路径，例如：输入'root.database'，则同步的数据范围为'root.database*.**'
 注：root.__system不会被同步"
-                      placement="top"
-                      popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip></el-radio>
-                  </el-radio-group>
-                </base-form-item>
-                <base-form-item v-if="!formData.whole" label="" prop="path" :rules="formData.whole ? [] : requiredRules" class="form-item-no-label m-l-24">
-                  <el-input v-model="formData.path" placeholder="请输入前缀路径" style="width:335px;" id="data-sync-modal-path">
-                    <template #prepend>root.</template>
-                  </el-input>
-                </base-form-item>
-              </div>
-              <base-form-item label="二次转发:" prop="reforward" :rules="requiredRules" class="form-label-width">
-                <template #label>
-                  二次转发:<el-tooltip
-                    effect="light"
-                    content="对其他同步任务发送到此数据库的数据进行转发，例如有A->B，B->C两个同步任务，若B->C选择二次转发，则A中的数据也会发送至C。
+                  placement="top"
+                  popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip></el-radio>
+              </el-radio-group>
+            </base-form-item>
+            <base-form-item v-if="!formData.whole" label="" prop="path" :rules="formData.whole ? [] : requiredRules" class="form-item-no-label m-l-24">
+              <el-input v-model="formData.path" placeholder="请输入前缀路径" style="width:335px;" id="data-sync-modal-path">
+                <template #prepend>root.</template>
+              </el-input>
+            </base-form-item>
+          </div>
+          <base-form-item label="二次转发:" prop="reforward" :rules="requiredRules" class="form-label-width">
+            <template #label>
+              二次转发:<el-tooltip
+                effect="light"
+                content="对其他同步任务发送到此数据库的数据进行转发，例如有A->B，B->C两个同步任务，若B->C选择二次转发，则A中的数据也会发送至C。
 需注意构建双活集群时请将此参数设置为“否”，否则将造成无休止数据循环。"
-                    placement="top"
-                    popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
-                </template>
-                <el-radio-group v-model="formData.reforward">
-                  <el-radio :label="true">是</el-radio>
-                  <el-radio :label="false">否</el-radio>
-                </el-radio-group>
-              </base-form-item>
-              <div class="flex-align-center">
-                <base-form-item label="历史数据:" prop="isSynchronHistory" :rules="requiredRules" class="form-label-width">
-                  <template #label>
-                    历史数据:<el-tooltip effect="light" content="创建任务前写入数据库的数据称为历史数据，请注意历史数据与实时数据不能同时为关闭状态！" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
-                  </template>
-                  <el-switch
-                    v-model="formData.isSynchronHistory"
-                    :active-value="true"
-                    :inactive-value="false"
-                    style="
+                placement="top"
+                popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+            </template>
+            <el-radio-group v-model="formData.reforward">
+              <el-radio :label="true">是</el-radio>
+              <el-radio :label="false">否</el-radio>
+            </el-radio-group>
+          </base-form-item>
+          <div class="flex-align-center">
+            <base-form-item label="历史数据:" prop="isSynchronHistory" :rules="requiredRules" class="form-label-width">
+              <template #label>
+                历史数据:<el-tooltip effect="light" content="创建任务前写入数据库的数据称为历史数据，请注意历史数据与实时数据不能同时为关闭状态！" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+              </template>
+              <el-switch
+                v-model="formData.isSynchronHistory"
+                :active-value="true"
+                :inactive-value="false"
+                style="
 
       --el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;"
-                    id="data-sync-modal-history-switch"
-                  />
-                </base-form-item>
-                <base-form-item v-if="formData.isSynchronHistory" label="时间范围：" prop="datetimerange" :rules="requiredRules" class="m-l-24">
-                  <el-date-picker
-                    v-model="formData.datetimerange"
-                    type="datetimerange"
-                    range-separator="～"
-                    unlink-panels
-                    :disabled-date="disabledDate"
-                    :shortcuts="shortcutsDaterange"
-                    :clearable="false"
-                    :prefix-icon="ICustomCalender"
-                    id="data-sync-modal-history-datetimerange"
-                  />
-                </base-form-item>
-              </div>
-              <div class="flex-align-center">
-                <base-form-item label="实时数据:" prop="isSynchronRealTime" :rules="requiredRules" class="form-label-width">
-                  <template #label>
-                    实时数据:<el-tooltip effect="light" content="创建任务后写入数据库的数据称为实时数据，请注意实时数据与历史数据不能同时为关闭状态！" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
-                  </template>
-                  <el-switch
-                    v-model="formData.isSynchronRealTime"
-                    :active-value="true"
-                    :inactive-value="false"
-                    style="
+                id="data-sync-modal-history-switch"
+              />
+            </base-form-item>
+            <base-form-item v-if="formData.isSynchronHistory" label="时间范围：" prop="datetimerange" :rules="requiredRules" class="m-l-24">
+              <el-date-picker
+                v-model="formData.datetimerange"
+                type="datetimerange"
+                range-separator="～"
+                unlink-panels
+                :disabled-date="disabledDate"
+                :shortcuts="shortcutsDaterange"
+                :clearable="false"
+                :prefix-icon="ICustomCalender"
+                id="data-sync-modal-history-datetimerange"
+              />
+            </base-form-item>
+          </div>
+          <div class="flex-align-center">
+            <base-form-item label="实时数据:" prop="isSynchronRealTime" :rules="requiredRules" class="form-label-width">
+              <template #label>
+                实时数据:<el-tooltip effect="light" content="创建任务后写入数据库的数据称为实时数据，请注意实时数据与历史数据不能同时为关闭状态！" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+              </template>
+              <el-switch
+                v-model="formData.isSynchronRealTime"
+                :active-value="true"
+                :inactive-value="false"
+                style="
 
       --el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;"
-                    id="data-sync-modal-running-switch"
-                    @change="val => handleChangeRunningSwitch(val as boolean)"
-                  />
-                </base-form-item>
-                <base-form-item v-if="formData.isSynchronRealTime" label="发送模式：" prop="triggerMode" :rules="requiredRules" class="form-item-label-short m-l-24">
-                  <template #label>
-                    发送模式:<el-tooltip
-                      effect="light"
-                      placement="top"
-                      popper-class="table-tooltip-max-width">
-                      <template #content>实时模式：该模式下，任务仅使用实时模式进行数据发送<br>批量模式：该模式下，任务仅使用批量模式进行数据发送</template><i-custom-question /></el-tooltip>
-                  </template>
-                  <el-radio-group v-model="formData.triggerMode" @change="val => handleChangeTriggerMode(val as string as 'stream' | 'batch')">
-                    <el-radio :label="'stream'">实时模式</el-radio>
-                    <el-radio :label="'batch'">批量模式</el-radio>
-                  </el-radio-group>
-                </base-form-item>
-              </div>
-              <!-- <h4 class="form-module-title">处理设置</h4>
+                id="data-sync-modal-running-switch"
+                @change="val => handleChangeRunningSwitch(val as boolean)"
+              />
+            </base-form-item>
+            <base-form-item v-if="formData.isSynchronRealTime" label="发送模式：" prop="triggerMode" :rules="requiredRules" class="form-item-label-short m-l-24">
+              <template #label>
+                发送模式:<el-tooltip
+                  effect="light"
+                  placement="top"
+                  popper-class="table-tooltip-max-width">
+                  <template #content>实时模式：该模式下，任务仅使用实时模式进行数据发送<br>批量模式：该模式下，任务仅使用批量模式进行数据发送</template><i-custom-question /></el-tooltip>
+              </template>
+              <el-radio-group v-model="formData.triggerMode" @change="val => handleChangeTriggerMode(val as string as 'stream' | 'batch')">
+                <el-radio :label="'stream'">实时模式</el-radio>
+                <el-radio :label="'batch'">批量模式</el-radio>
+              </el-radio-group>
+            </base-form-item>
+          </div>
+          <!-- <h4 class="form-module-title">处理设置</h4>
               <div class="flex-align-center">
                 <base-form-item label="处理插件：" prop="processorPluginType" :rules="requiredRules" class="form-label-width">
                   <el-select v-model="formData.processorPluginType" :style="{ width: formData.processorPluginType === 'custom' ? '152px' : '360px' }" id="data-sync-modal-select-deal">
@@ -131,119 +131,119 @@
               <base-form-item v-if="formData.processorPluginType === 'custom'" label="插件参数：" prop="processorPluginParam" class="form-label-width">
                 <el-input v-model="formData.processorPluginParam" type="textarea" placeholder="请输入插件参数，例如:'processor.alarm_id' = '582'" style="width:360px;" :resize="'none'" :rows="4" id="data-sync-modal-deal-params" />
               </base-form-item> -->
-              <h4 class="form-module-title">数据发送</h4>
-              <div class="flex-align-center">
-                <base-form-item label="发送插件：" prop="connectorPluginType" :rules="requiredRules" class="form-label-width">
-                  <el-select v-model="formData.connectorPluginType" :style="{ width: formData.connectorPluginType === 'custom' ? '152px' : '360px' }" id="data-sync-modal-select-send">
-                    <el-option
-                      v-for="(item, i) in sendOptions"
-                      :key="`${item.pluginName}_${i}_send`"
-                      :label="item.pluginType === 'external' ? item.pluginDesc : `${item.pluginDesc}(${item.pluginName})`"
-                      :value="item.pluginName"
-                    />
-                  </el-select>
-                </base-form-item>
-                <base-form-item v-if="formData.connectorPluginType === 'custom'" label="" prop="connectorPluginName" :rules="requiredRules" class="form-item-no-label m-l-8">
-                  <el-input v-model="formData.connectorPluginName" placeholder="请输入发送插件名称" style="width:200px;" id="data-sync-modal-send-name" />
-                </base-form-item>
-              </div>
-              <base-form-item v-if="formData.connectorPluginType === 'custom'" label="插件参数：" prop="connectorPluginParam" class="form-label-width">
-                <el-input
-                  v-model="formData.connectorPluginParam"
-                  type="textarea"
-                  placeholder="请输入插件参数，例如：
+          <h4 class="form-module-title">数据发送</h4>
+          <div class="flex-align-center">
+            <base-form-item label="发送插件：" prop="connectorPluginType" :rules="requiredRules" class="form-label-width">
+              <el-select v-model="formData.connectorPluginType" :style="{ width: formData.connectorPluginType === 'custom' ? '152px' : '360px' }" id="data-sync-modal-select-send">
+                <el-option
+                  v-for="(item, i) in sendOptions"
+                  :key="`${item.pluginName}_${i}_send`"
+                  :label="item.pluginType === 'external' ? item.pluginDesc : `${item.pluginDesc}(${item.pluginName})`"
+                  :value="item.pluginName"
+                />
+              </el-select>
+            </base-form-item>
+            <base-form-item v-if="formData.connectorPluginType === 'custom'" label="" prop="connectorPluginName" :rules="requiredRules" class="form-item-no-label m-l-8">
+              <el-input v-model="formData.connectorPluginName" placeholder="请输入发送插件名称" style="width:200px;" id="data-sync-modal-send-name" />
+            </base-form-item>
+          </div>
+          <base-form-item v-if="formData.connectorPluginType === 'custom'" label="插件参数：" prop="connectorPluginParam" class="form-label-width">
+            <el-input
+              v-model="formData.connectorPluginParam"
+              type="textarea"
+              placeholder="请输入插件参数，例如：
  'connector.send_alarm_url' = 'http://192.20.10.31:9091/api/alarm/addRecords'"
-                  style="width:360px;"
-                  :resize="'none'"
-                  :rows="4"
-                  id="data-sync-modal-send-params" />
-              </base-form-item>
-              <template v-if="formData.connectorPluginType !== 'custom' && formData.connectorPluginType !== 'do-nothing-connector'">
-                <div class="ip-port-box">
-                  <span class="form-label">目标端信息：<el-tooltip effect="light" content="请确保目标端已经创建了发送端的所有测点，或已开启自动创建元数据，否则将会导致失败！" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip></span>
-                  <div class="ip-port-list">
-                    <div class="ip-port-item" v-for="(item, index) in formData.targetInfos" :key="`${index}_host_port`">
-                      <base-form-item label="" :prop="`targetInfos[${index}].host`" :rules="requiredRules">
-                        <el-input v-model.trim="item.host" placeholder="请输入目标端 IP" style="width: 200px" :id="`data-sync-modal-${index}-host`" />
-                      </base-form-item>
-                      <span class="ip-port-divider">:</span>
-                      <base-form-item label="" :prop="`targetInfos[${index}].port`" :rules="requiredPortRules">
-                        <el-input v-model.number="item.port" placeholder="请输入目标端端口号" style="width: 132px" :id="`data-sync-modal-${index}-port`" />
-                      </base-form-item>
-                      <el-button link v-if="index === 0 && editType !== 'view'" @click="handleAddHost" id="target-ip-add" class="m-l-6" :disabled="isDisabledHosts"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
-                      <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost(index)" :id="'target-ip-del' + index" class="m-l-6"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
-                    </div>
-                  </div>
+              style="width:360px;"
+              :resize="'none'"
+              :rows="4"
+              id="data-sync-modal-send-params" />
+          </base-form-item>
+          <template v-if="formData.connectorPluginType !== 'custom' && formData.connectorPluginType !== 'do-nothing-connector'">
+            <div class="ip-port-box">
+              <span class="form-label">目标端信息：<el-tooltip effect="light" content="请确保目标端已经创建了发送端的所有测点，或已开启自动创建元数据，否则将会导致失败！" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip></span>
+              <div class="ip-port-list">
+                <div class="ip-port-item" v-for="(item, index) in formData.targetInfos" :key="`${index}_host_port`">
+                  <base-form-item label="" :prop="`targetInfos[${index}].host`" :rules="requiredRules">
+                    <el-input v-model.trim="item.host" placeholder="请输入目标端 IP" style="width: 200px" :id="`data-sync-modal-${index}-host`" />
+                  </base-form-item>
+                  <span class="ip-port-divider">:</span>
+                  <base-form-item label="" :prop="`targetInfos[${index}].port`" :rules="requiredPortRules">
+                    <el-input v-model.number="item.port" placeholder="请输入目标端端口号" style="width: 132px" :id="`data-sync-modal-${index}-port`" />
+                  </base-form-item>
+                  <el-button link v-if="index === 0 && editType !== 'view'" @click="handleAddHost" id="target-ip-add" class="m-l-6" :disabled="isDisabledHosts"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
+                  <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost(index)" :id="'target-ip-del' + index" class="m-l-6"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
                 </div>
-                <!-- 单线程数据传输/多线程数据传输 -->
-                <div class="flex-align-center" v-if="formData.connectorPluginType === 'iotdb-thrift-sync-connector' || formData.connectorPluginType === 'iotdb-thrift-async-connector' || formData.connectorPluginType === 'iotdb-thrift-connector' || formData.connectorPluginType === 'iotdb-thrift-connector'">
-                  <base-form-item label="攒批发送模式:" prop="isLogSendBatch" :rules="requiredRules" class="form-label-width">
-                    <el-switch
-                      v-model="formData.isLogSendBatch"
-                      :disabled="logSendBatchDisabled"
-                      :active-value="true"
-                      :inactive-value="false"
-                      style="
+              </div>
+            </div>
+            <!-- 单线程数据传输/多线程数据传输 -->
+            <div class="flex-align-center" v-if="formData.connectorPluginType === 'iotdb-thrift-sync-connector' || formData.connectorPluginType === 'iotdb-thrift-async-connector' || formData.connectorPluginType === 'iotdb-thrift-connector' || formData.connectorPluginType === 'iotdb-thrift-connector'">
+              <base-form-item label="攒批发送模式:" prop="isLogSendBatch" :rules="requiredRules" class="form-label-width">
+                <el-switch
+                  v-model="formData.isLogSendBatch"
+                  :disabled="logSendBatchDisabled"
+                  :active-value="true"
+                  :inactive-value="false"
+                  style="
 
       --el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;"
-                      id="data-sync-modal-send-switch"
-                    />
+                  id="data-sync-modal-send-switch"
+                />
+              </base-form-item>
+              <template v-if="formData.isLogSendBatch">
+                <div class="flex-align-center m-l-36">
+                  <base-form-item label="等待时间：" prop="logSendBatchWaitTime" :rules="requiredNumberRules" class="form-item-label-short">
+                    <template #label>
+                      等待时间:<el-tooltip effect="light" content="一批数据在发送前的最长等待时间" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                    </template>
+                    <el-input v-model.number="formData.logSendBatchWaitTime" placeholder="请输入时间" id="data-sync-modal-time" style="width: 100px;" />
+                    <span class="m-l-8 form-item-unit">s</span>
                   </base-form-item>
-                  <template v-if="formData.isLogSendBatch">
-                    <div class="flex-align-center m-l-36">
-                      <base-form-item label="等待时间：" prop="logSendBatchWaitTime" :rules="requiredNumberRules" class="form-item-label-short">
-                        <template #label>
-                          等待时间:<el-tooltip effect="light" content="一批数据在发送前的最长等待时间" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
-                        </template>
-                        <el-input v-model.number="formData.logSendBatchWaitTime" placeholder="请输入时间" id="data-sync-modal-time" style="width: 100px;" />
-                        <span class="m-l-8 form-item-unit">s</span>
-                      </base-form-item>
-                    </div>
-                    <div class="flex-align-center m-l-24">
-                      <base-form-item label="攒批大小：" prop="logSendBatchSize" :rules="requiredNumberRules" class="form-item-label-short">
-                        <template #label>
-                          攒批大小:<el-tooltip effect="light" content="一批数据最大的攒批大小" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
-                        </template>
-                        <el-input v-model.number="formData.logSendBatchSize" placeholder="请输入大小" id="data-sync-modal-size" style="width: 100px;" />
-                        <span class="m-l-8 form-item-unit">byte</span>
-                      </base-form-item>
-                    </div>
-                  </template>
                 </div>
-                <!-- 向1.1.x以上版本传输 -->
-                <template v-if="formData.connectorPluginType === 'iotdb-legacy-pipe-connector'">
-                  <base-form-item label="目标端用户名:" prop="targetUserName" :rules="requiredRules" class="form-label-width">
+                <div class="flex-align-center m-l-24">
+                  <base-form-item label="攒批大小：" prop="logSendBatchSize" :rules="requiredNumberRules" class="form-item-label-short">
                     <template #label>
-                      目标端用户名:<el-tooltip effect="light" content="该用户需要支持数据写入的权限" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                      攒批大小:<el-tooltip effect="light" content="一批数据最大的攒批大小" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                     </template>
-                    <el-input v-model="formData.targetUserName" placeholder="请输入目标端用户名" id="data-sync-modal-targetUserName" style="width: 200px;" />
-                  </base-form-item>
-                  <base-form-item label="目标端密码:" prop="targetPassword" :rules="requiredRules" class="form-label-width">
-                    <el-input v-model="formData.targetPassword" placeholder="请输入目标端密码" id="data-sync-modal-password" style="width: 200px;" show-password autocomplete="off" />
-                  </base-form-item>
-                  <base-form-item label="目标端版本:" prop="targetVersion" :rules="requiredRules" class="form-label-width">
-                    <template #label>
-                      目标端版本:<el-tooltip effect="light" content="请输入V1.1.x以上版本" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
-                    </template>
-                    <el-input v-model="formData.targetVersion" placeholder="请输入目标端版本" id="data-sync-modal-targetVersion" style="width: 200px;" />
-                  </base-form-item>
-                </template>
-                <!-- 跨网闸传输 -->
-                <div class="flex-align-center" v-if="formData.connectorPluginType === 'iotdb-air-gap-connector'">
-                  <base-form-item label="超时时长：" prop="targetOverTime" :rules="requiredNumberRules" class="form-label-width">
-                    <template #label>
-                      超时时长:<el-tooltip effect="light" content="发送端与目标端在首次尝试建立连接时握手请求的超时时长" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
-                    </template>
-                    <el-input v-model.number="formData.targetOverTime" placeholder="请输入目标端超时时长" id="data-sync-modal-time-over" style="width: 200px;" />
-                    <span class="m-l-8 form-item-unit">ms</span>
+                    <el-input v-model.number="formData.logSendBatchSize" placeholder="请输入大小" id="data-sync-modal-size" style="width: 100px;" />
+                    <span class="m-l-8 form-item-unit">byte</span>
                   </base-form-item>
                 </div>
               </template>
-            </el-form>
-          </el-scrollbar>
-        </el-tab-pane>
+            </div>
+            <!-- 向1.1.x以上版本传输 -->
+            <template v-if="formData.connectorPluginType === 'iotdb-legacy-pipe-connector'">
+              <base-form-item label="目标端用户名:" prop="targetUserName" :rules="requiredRules" class="form-label-width">
+                <template #label>
+                  目标端用户名:<el-tooltip effect="light" content="该用户需要支持数据写入的权限" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                </template>
+                <el-input v-model="formData.targetUserName" placeholder="请输入目标端用户名" id="data-sync-modal-targetUserName" style="width: 200px;" />
+              </base-form-item>
+              <base-form-item label="目标端密码:" prop="targetPassword" :rules="requiredRules" class="form-label-width">
+                <el-input v-model="formData.targetPassword" placeholder="请输入目标端密码" id="data-sync-modal-password" style="width: 200px;" show-password autocomplete="off" />
+              </base-form-item>
+              <base-form-item label="目标端版本:" prop="targetVersion" :rules="requiredRules" class="form-label-width">
+                <template #label>
+                  目标端版本:<el-tooltip effect="light" content="请输入V1.1.x以上版本" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                </template>
+                <el-input v-model="formData.targetVersion" placeholder="请输入目标端版本" id="data-sync-modal-targetVersion" style="width: 200px;" />
+              </base-form-item>
+            </template>
+            <!-- 跨网闸传输 -->
+            <div class="flex-align-center" v-if="formData.connectorPluginType === 'iotdb-air-gap-connector'">
+              <base-form-item label="超时时长：" prop="targetOverTime" :rules="requiredNumberRules" class="form-label-width">
+                <template #label>
+                  超时时长:<el-tooltip effect="light" content="发送端与目标端在首次尝试建立连接时握手请求的超时时长" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                </template>
+                <el-input v-model.number="formData.targetOverTime" placeholder="请输入目标端超时时长" id="data-sync-modal-time-over" style="width: 200px;" />
+                <span class="m-l-8 form-item-unit">ms</span>
+              </base-form-item>
+            </div>
+          </template>
+        </el-form>
+      </el-scrollbar>
+      <!-- </el-tab-pane> -->
 
-        <!-- <el-tab-pane label="高级输入" name="input">
+      <!-- <el-tab-pane label="高级输入" name="input">
           <el-scrollbar>
             <code-editor
               v-show="codeMirrorReady"
@@ -258,7 +258,7 @@
             />
           </el-scrollbar>
         </el-tab-pane> -->
-      </el-tabs>
+      <!-- </el-tabs> -->
       <a v-show="activeTab === 'input'" href="https://www.timecho.com/docs/zh/UserGuide/V1.2.x/User-Manual/Data-Sync_timecho.html" rel="noopener noreferrer" target="_blank" class="operate-link"><i-custom-question-new />操作说明</a>
     </div>
     <template #footer>
