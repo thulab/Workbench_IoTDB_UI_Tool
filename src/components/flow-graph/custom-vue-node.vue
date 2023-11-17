@@ -21,12 +21,12 @@ export default defineComponent({
     return {
       type: 0,
       text: '',
-      iconSize: 60,
+      iconSize: 72,
     };
   },
   mounted() {
     const node = (this as any).getNode();
-    this.iconSize = node.data.iconSize || 60;
+    this.iconSize = node.data.iconSize || 72;
     node.on('change:data', ({ current }: any) => {
       const { iconSize } = current;
       this.iconSize = iconSize;
@@ -46,11 +46,20 @@ export default defineComponent({
 }
 
 .custom-node-label-box{
-  display: inline-grid;
+  display: flex;
+  justify-content: center;
   text-align: center;
   font-size: 12px;
   line-height: 14px;
   color: #424561;
+  position: absolute;
   width: 100%;
+  left: 0;
+  bottom: 0;
+
+  // overflow: hidden;
+  // white-space: nowrap;
+  // text-overflow: ellipsis;
+  // word-break: break-all;
 }
 </style>

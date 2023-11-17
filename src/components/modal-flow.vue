@@ -127,7 +127,7 @@
                 <el-slider v-model="edgeStyle.arrowWidth" :min="1" :max="50" @change="val => handleChangeArrowWidth(val as number)" />
               </div>
               <div class="edge-style-detail-item">
-                <span class="detail-label">箭头高度：</span>
+                <span class="detail-label">箭头长度：</span>
                 <el-slider v-model="edgeStyle.arrowHeight" :min="1" :max="50" @change="val => handleChangeArrowHeight(val as number)" />
               </div>
             </div>
@@ -162,6 +162,7 @@ import { Selection } from '@antv/x6-plugin-selection';
 import { Scroller } from '@antv/x6-plugin-scroller';
 import { Export } from '@antv/x6-plugin-export';
 import { register, getTeleport } from '@antv/x6-vue-shape';
+import html2canvas from 'html2canvas';
 import { ConnectionApi } from '@/api';
 import CustomVueNode from './flow-graph/custom-vue-node.vue';
 import ContextMenu from './flow-graph/context-menu.vue';
@@ -269,7 +270,7 @@ const ports = {
       },
     },
     right: {
-      position: 'absolute',
+      position: 'right',
       attrs: {
         circle: {
           r: 4,
@@ -299,7 +300,7 @@ const ports = {
       },
     },
     left: {
-      position: 'absolute',
+      position: 'left',
       attrs: {
         circle: {
           r: 4,
@@ -320,20 +321,12 @@ const ports = {
     },
     {
       group: 'right',
-      args: {
-        x: 66,
-        y: 30,
-      },
     },
     {
       group: 'bottom',
     },
     {
       group: 'left',
-      args: {
-        x: 6,
-        y: 30,
-      },
     },
   ],
 };
@@ -342,7 +335,7 @@ register({
   shape: 'custom-vue-node',
   component: CustomVueNode,
   width: 72,
-  height: 80,
+  height: 92,
   x: 0,
   y: 0,
   ports: { ...ports },
@@ -442,7 +435,7 @@ function initialGraph(isDisabled?: boolean) {
       connector: {
         name: 'normal',
       },
-      // anchor: 'center',
+      anchor: 'center',
       connectionPoint: 'anchor',
       allowBlank: false,
       snap: {
@@ -457,8 +450,8 @@ function initialGraph(isDisabled?: boolean) {
               strokeDasharray: 'none',
               targetMarker: {
                 name: 'block',
-                width: 8,
-                height: 12,
+                width: 12,
+                height: 8,
               },
               style: {
                 animation: 'none',
@@ -501,7 +494,10 @@ function initialGraph(isDisabled?: boolean) {
       enabled: !isDisabled,
     }))
     .use(new Transform({
-      resizing: !isDisabled,
+      resizing: {
+        enabled: !isDisabled,
+        preserveAspectRatio: true,
+      },
       rotating: false,
     }))
     .use(new Scroller({
@@ -557,7 +553,7 @@ function initialGraph(isDisabled?: boolean) {
       layoutOptions: {
         columns: 3,
         columnWidth: 84,
-        rowHeight: 92,
+        rowHeight: 104,
         center: false,
         resizeToFit: false,
         marginX: 12,
@@ -604,8 +600,8 @@ function getEdgeStyle(edge: Edge) {
   }
   edgeStyle.color = edge.attr().line.stroke as string || '#495AD4';
   edgeStyle.arrowType = targetMarker.name as string || 'block';
-  edgeStyle.arrowWidth = targetMarker.height as number || 8;
-  edgeStyle.arrowHeight = targetMarker.width as number || 12;
+  edgeStyle.arrowWidth = targetMarker.height as number || 12;
+  edgeStyle.arrowHeight = targetMarker.width as number || 8;
 }
 
 function getNodeStyle(node: Node) {
@@ -672,24 +668,7 @@ function graphWatchEvent() {
       const height = node.size().height - 20;
       const { width } = node.size();
       node.setData({
-        iconSize: Math.min(width, height),
-      });
-      const portList = node.ports.items;
-      const rightPort = portList.find((port) => port.group === 'right');
-      const leftPort = portList.find((port) => port.group === 'left');
-      node.setPortProp(rightPort!.id!, {
-        name: 'absolute',
-        args: {
-          x: node.size().width / 2 + node.data.iconSize / 2,
-          y: node.data.iconSize / 2,
-        },
-      });
-      node.setPortProp(leftPort!.id!, {
-        name: 'absolute',
-        args: {
-          x: node.size().width / 2 - node.data.iconSize / 2,
-          y: node.data.iconSize / 2,
-        },
+        iconSize: Math.ceil(Math.min(width, height)),
       });
     }
   });
@@ -880,7 +859,7 @@ function loadStencil() {
       text: item.name,
       type: 0,
       id: `${item.id}`,
-      iconSize: 60,
+      iconSize: 72,
     },
   }));
   const clusterNodes = clusterList.value.map((item) => graph.value!.createNode({
@@ -890,7 +869,7 @@ function loadStencil() {
       text: item.name,
       type: 1,
       id: `${item.id}`,
-      iconSize: 60,
+      iconSize: 72,
     },
   }));
   const doubleLiveNodes = doubleLiveList.value.map((item) => graph.value!.createNode({
@@ -900,7 +879,7 @@ function loadStencil() {
       text: item.name,
       type: 2,
       id: `${item.id}`,
-      iconSize: 60,
+      iconSize: 72,
     },
   }));
   stencil.value?.load([baseNode], 'group1');
@@ -1107,7 +1086,7 @@ function getGraphData() {
     if (res.data.detail) {
       const data = JSON.parse(res.data.detail);
       graph.value?.fromJSON(data);
-      graph.value?.centerContent();
+      graph.value?.zoomToFit({ padding: 20, maxScale: 1 });
     }
   }).finally(() => {
     graphLoading.value = false;
@@ -1155,6 +1134,13 @@ async function handleEdit() {
   getGraphData();
 }
 
+function backingScale() {
+  if (window.devicePixelRatio && window.devicePixelRatio > 1) {
+    return window.devicePixelRatio;
+  }
+  return 1;
+}
+
 // 导出
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function handleExport() {
@@ -1162,13 +1148,40 @@ async function handleExport() {
     const flag = await connectionFormRef.value?.handleChangeConnection();
     if (!flag) return;
   }
-  graph.value!.exportPNG('chart', {
-    copyStyles: true,
-    width: graph.value!.size.options.width + 200,
-    height: graph.value!.size.options.height + 200,
-    padding: 100,
-    quality: 1,
-  });
+  // graph.value!.exportPNG('chart', {
+  //   copyStyles: true,
+  //   width: graph.value!.size.options.width + 200,
+  //   height: graph.value!.size.options.height + 200,
+  //   padding: 100,
+  //   quality: 1,
+  // });
+  const scaleBy = backingScale();
+  const w = parseInt(`${graph.value!.size.options.width + 200}`, 10);
+  const h = parseInt(`${graph.value!.size.options.height + 200}`, 10);
+  const canvas = document.createElement('canvas');
+  canvas.width = w * scaleBy;
+  canvas.height = h * scaleBy;
+  canvas.style.width = `${w}px`;
+  canvas.style.height = `${h}px`;
+  const context = canvas.getContext('2d');
+  context!.scale(1, 1);
+
+  html2canvas(document.querySelector('.flow-graph-wrapper')!, {
+    canvas,
+    useCORS: true,
+    // background: 'none',
+    logging: false,
+  })
+    .then((res) => {
+      const imgsrc = res.toDataURL('image/png', 1);
+      const a = document.createElement('a');
+      a.download = 'aaaa.png';
+      a.href = imgsrc;
+      a.click();
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 }
 
 // 保存实例信息
@@ -1311,7 +1324,7 @@ watch(
 }
 
 :deep(.x6-widget-stencil-group-content) {
-  max-height: 288px;
+  max-height: 324px;
   overflow: hidden auto;
 }
 
@@ -1459,6 +1472,11 @@ watch(
   margin: -1px 0 0 -1px;
   padding: 0;
   border: 1px solid #495AD4;
+}
+
+.over-flow>span{
+  text-align: center;
+  width: 100%;
 }
 
 @keyframes ant-line {
