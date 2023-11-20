@@ -307,7 +307,7 @@ function handleChangeType(type: 0 | 1 | 2) {
 function handleChangeConnection() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return new Promise((resolve, reject) => {
-    ElMessageBox.confirm('当前内容未填写完整，是否继续填写？', '注意', {
+    ElMessageBox.confirm(editType.value === 'add' ? '当前内容未填写完整，是否继续填写？' : '当前内容未进行保存，是否保存？', '注意', {
       confirmButtonText: '继续',
       cancelButtonText: '放弃',
       type: 'warning',

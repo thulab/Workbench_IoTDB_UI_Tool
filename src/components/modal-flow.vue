@@ -1324,7 +1324,7 @@ watch(
 }
 
 :deep(.x6-widget-stencil-group-content) {
-  max-height: 324px;
+  max-height: 318px;
   overflow: hidden auto;
 }
 
