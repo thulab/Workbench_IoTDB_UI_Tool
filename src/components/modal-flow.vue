@@ -706,7 +706,7 @@ function graphWatchEvent() {
   // 节点删除
   graph.value?.on('node:removed', ({ node }) => {
     if (!isEdit.value) return;
-    if (isShowTextStyle.value && node.prop().shape === 'custom-rect' && currentNode.value && +currentNode.value.data.id === +node.data.id) {
+    if (isShowTextStyle.value && node.prop().shape === 'custom-rect' && currentNode.value && +currentNode.value.id === +node.id) {
       isShowTextStyle.value = false;
       currentNode.value = undefined;
     }
