@@ -1331,6 +1331,7 @@ watch(
 :deep(.x6-widget-stencil-group-content) {
   max-height: 318px;
   overflow: hidden auto;
+  margin-top: 1px;
 }
 
 .flow-graph-wrapper{
