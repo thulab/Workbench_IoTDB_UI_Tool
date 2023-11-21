@@ -33,7 +33,7 @@
       <el-main class="p-0">
         <div class="flow-container" id="flow-container" v-loading="graphLoading">
           <TeleportContainer />
-          <ContextMenu v-show="isShowContextMenu" ref="contextMenuRef" @handleClickOperate="handleClickOperate" />
+          <ContextMenu v-show="isShowContextMenu" ref="contextMenuRef" :context-menu-type="contextMenuType" @handleClickOperate="handleClickOperate" />
           <div class="flow-stencil-wrapper" ref="stencilContainerRef" v-show="isEdit" v-loading="listLoading"></div>
           <div class="flow-graph-wrapper" ref="graphContainerRef" id="graph-container"></div>
           <div class="flow-operate-wrapper" v-show="isEdit && (isShowTextStyle || isShowNodeStyle || isShowEdgeStyle)">
@@ -239,6 +239,7 @@ const connectionDetailLoading = ref(false);
 const current = ref<string | number>('');
 const saveLoading = ref(false);
 const graphLoading = ref(false);
+const contextMenuType = ref('');
 
 // const maxHeight = computed(() => window.innerHeight - 100);
 const isEdit = computed(() => editType.value === 'edit');
@@ -735,18 +736,21 @@ function graphWatchEvent() {
       clearTimeout(contextMenuTimer.value);
       contextMenuTimer.value = undefined;
     }
-    isShowContextMenu.value = true;
     if (graph.value && graph.value.getSelectedCells().length > 0) {
       const [cell] = graph.value!.getSelectedCells();
       if (cell.shape === 'edge') {
         operateEdge.value = cell;
+        contextMenuType.value = 'edge';
       } else {
         operateNode.value = cell;
+        contextMenuType.value = 'node';
       }
     } else {
       operateNode.value = undefined;
       operateEdge.value = undefined;
+      contextMenuType.value = '';
     }
+    isShowContextMenu.value = true;
     contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
   });
   // 节点右击
@@ -761,6 +765,7 @@ function graphWatchEvent() {
     }
     isShowContextMenu.value = true;
     operateNode.value = node;
+    contextMenuType.value = 'node';
     contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
   });
   // 边右击
@@ -775,48 +780,69 @@ function graphWatchEvent() {
     }
     isShowContextMenu.value = true;
     operateEdge.value = edge;
+    contextMenuType.value = 'edge';
     contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
   });
+}
+
+// 复制
+function handleCopy() {
+  const cells = graph.value?.getSelectedCells() || [];
+  if (cells.length) {
+    graph.value?.copy(cells, { deep: false, useLocalStorage: false });
+    ElMessage.success({ message: '复制成功', grouping: true });
+  } else {
+    ElMessage.info({ message: '请先选中节点再复制', grouping: true });
+  }
+}
+
+// 粘贴
+function handlePaste() {
+  if (!graph.value?.isClipboardEmpty()) {
+    graph.value?.paste({ offset: 32 });
+    // graph.value?.cleanClipboard();
+    ElMessage.success({ message: '粘贴成功', grouping: true });
+  } else {
+    ElMessage.info({ message: '剪切板为空，不可粘贴', grouping: true });
+  }
+}
+
+// 撤销
+function handleUndo() {
+  if (graph.value?.canUndo()) {
+    graph.value?.undo();
+  } else {
+    ElMessage.info({ message: '没有需要撤销的操作', grouping: true });
+  }
+}
+
+// 恢复
+function handleRedo() {
+  if (graph.value?.canRedo()) {
+    graph.value?.redo();
+  } else {
+    ElMessage.info({ message: '没有需要恢复的操作', grouping: true });
+  }
 }
 
 // #region 快捷键与事件
 function graphBindEvent() {
   graph.value?.bindKey(['command+c', 'ctrl+c'], () => {
-    const cells = graph.value?.getSelectedCells() || [];
-    if (cells.length) {
-      graph.value?.copy(cells, { deep: false, useLocalStorage: false });
-      ElMessage.success({ message: '复制成功', grouping: true });
-    } else {
-      ElMessage.info({ message: '请先选中节点再复制', grouping: true });
-    }
+    handleCopy();
     return false;
   });
   graph.value?.bindKey(['command+v', 'ctrl+v'], () => {
-    if (!graph.value?.isClipboardEmpty()) {
-      graph.value?.paste({ offset: 32 });
-      // graph.value?.cleanClipboard();
-      ElMessage.success({ message: '粘贴成功', grouping: true });
-    } else {
-      ElMessage.info({ message: '剪切板为空，不可粘贴', grouping: true });
-    }
+    handlePaste();
     return false;
   });
 
   // undo redo
   graph.value?.bindKey(['command+z', 'ctrl+z'], () => {
-    if (graph.value?.canUndo()) {
-      graph.value?.undo();
-    } else {
-      ElMessage.info({ message: '没有需要撤销的操作', grouping: true });
-    }
+    handleUndo();
     return false;
   });
   graph.value?.bindKey(['command+shift+z', 'ctrl+y'], () => {
-    if (graph.value?.canRedo()) {
-      graph.value?.redo();
-    } else {
-      ElMessage.info({ message: '没有需要恢复的操作', grouping: true });
-    }
+    handleRedo();
     return false;
   });
 
@@ -826,8 +852,9 @@ function graphBindEvent() {
     if (cells.length) {
       graph.value?.removeCells(cells);
       ElMessage.success({ message: '删除成功', grouping: true });
+      contextMenuType.value = '';
     } else {
-      ElMessage.info({ message: '请先选中节点再删除', grouping: true });
+      ElMessage.info({ message: '请先选中节点/边再删除', grouping: true });
     }
     return false;
   });
@@ -1024,6 +1051,7 @@ function onMouseDown() {
     isShowContextMenu.value = false;
     operateNode.value = undefined;
     operateEdge.value = undefined;
+    contextMenuType.value = '';
   }, 200);
 }
 
@@ -1031,38 +1059,19 @@ function onMouseDown() {
 function handleClickOperate(key: string) {
   // 复制
   if (key === 'copy') {
-    if (!operateNode.value) {
-      ElMessage.info({ message: '请先选中节点再复制', grouping: true });
-    } else {
-      graph.value!.copy([operateNode.value], { deep: false, useLocalStorage: false });
-      ElMessage.success({ message: '复制成功', grouping: true });
-    }
+    handleCopy();
   }
   // 粘贴
   if (key === 'paste') {
-    if (graph.value!.isClipboardEmpty()) {
-      ElMessage.info({ message: '剪切板为空，不可粘贴', grouping: true });
-    } else {
-      graph.value!.paste({ offset: 32 });
-      // graph.value!.cleanClipboard();
-      ElMessage.success({ message: '粘贴成功', grouping: true });
-    }
+    handlePaste();
   }
   // 撤销
   if (key === 'undo') {
-    if (graph.value!.canUndo()) {
-      graph.value!.undo();
-    } else {
-      ElMessage.info({ message: '没有需要撤销的操作', grouping: true });
-    }
+    handleUndo();
   }
   // 恢复
   if (key === 'redo') {
-    if (graph.value!.canRedo()) {
-      graph.value!.redo();
-    } else {
-      ElMessage.info({ message: '没有需要恢复的操作', grouping: true });
-    }
+    handleRedo();
   }
   // 删除节点
   if (key === 'del') {
@@ -1071,6 +1080,7 @@ function handleClickOperate(key: string) {
     } else {
       operateNode.value.remove();
       ElMessage.success({ message: '删除成功', grouping: true });
+      contextMenuType.value = '';
     }
   }
   // 删除边
@@ -1080,6 +1090,7 @@ function handleClickOperate(key: string) {
     } else {
       operateEdge.value.remove();
       ElMessage.success({ message: '删除成功', grouping: true });
+      contextMenuType.value = '';
     }
   }
 }
@@ -1227,6 +1238,7 @@ watch(
       operateNode.value = undefined;
       operateEdge.value = undefined;
       isShowContextMenu.value = false;
+      contextMenuType.value = '';
       contextMenuTimer.value = undefined;
       editType.value = 'view';
       viewNode.value = undefined;
