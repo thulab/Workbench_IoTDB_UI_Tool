@@ -11,6 +11,7 @@
     class="flow-graph-modal"
     :show-close="false"
     :before-close="handleClose"
+    destroy-on-close
   >
     <template #header>
       <div class="flow-graph-operate-header">
@@ -65,6 +66,7 @@
                 <el-input-number
                   v-model.number="nodeStyle.x"
                   step-strictly
+                  :max="7000"
                   :controls="false"
                   @change="val => handleChangeNodeX(val as number)"
                   @blur="ev => handleBlurNodeStyle(ev, 'x')"
@@ -75,6 +77,7 @@
                 <el-input-number
                   v-model.number="nodeStyle.y"
                   step-strictly
+                  :max="7000"
                   :controls="false"
                   @change="val => handleChangeNodeY(val as number)"
                   @blur="ev => handleBlurNodeStyle(ev, 'y')"

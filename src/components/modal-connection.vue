@@ -74,6 +74,7 @@
     <modal-flow
       v-model:visible="flowVisible"
       :is-toggle="isToggle"
+      @handleClose="getList"
     />
   </el-dialog>
 </template>
