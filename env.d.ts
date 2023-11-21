@@ -10,6 +10,8 @@ interface ImportMetaEnv {
   readonly VITE_APP_VERSION: string;
   readonly VITE_APP_TITLE: string
   readonly CONFIG_API_PROXY: string;
+  readonly VITE_APP_TYPE: string;
+  readonly VITE_APP_PAGE_TITLE: string;
   // 更多环境变量...
 }
 

@@ -13,6 +13,7 @@ const route = [
       icon: ICustomDataSync,
       activeIcon: ICustomDataSyncActive,
       order: 35,
+      appType: 2,
     },
     children: [
       {

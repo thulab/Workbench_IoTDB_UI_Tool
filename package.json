@@ -12,7 +12,9 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:workbench": "vite --mode workbench",
     "build": "run-p type-check build-only",
+    "build:workbench": "run-p type-check build-only --mode workbench",
     "preview": "vite preview",
     "test:unit": "vitest --environment jsdom --root src/",
     "build-only": "vite build",
