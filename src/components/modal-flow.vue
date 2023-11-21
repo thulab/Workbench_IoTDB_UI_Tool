@@ -66,6 +66,7 @@
                 <el-input-number
                   v-model.number="nodeStyle.x"
                   step-strictly
+                  :min="-7000"
                   :max="7000"
                   :controls="false"
                   @change="val => handleChangeNodeX(val as number)"
@@ -77,6 +78,7 @@
                 <el-input-number
                   v-model.number="nodeStyle.y"
                   step-strictly
+                  :min="-7000"
                   :max="7000"
                   :controls="false"
                   @change="val => handleChangeNodeY(val as number)"
