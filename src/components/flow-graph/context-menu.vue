@@ -3,13 +3,17 @@
     <li
       v-for="item in contextMenuList"
       :key="item.key"
-      class="context-menu-item"
+      :class="['context-menu-item', { 'disabled-menu': disabledKey(item.key) }]"
       @click="handleClickOperate(item.key)"
     >{{ item.label }}</li>
   </ul>
 </template>
 
 <script setup lang="ts">
+
+const props = defineProps<{
+  contextMenuType: string;
+}>();
 
 const emit = defineEmits<{
   (evnet: 'handleClickOperate', key: string):void;
@@ -24,7 +28,22 @@ const contextMenuList = [
   { label: '删除边', key: 'delEdge' },
 ];
 
+const disabledKey = (key: string) => {
+  if (key === 'paste') {
+    return false;
+  }
+  if (key === 'del') {
+    return props.contextMenuType !== 'node';
+  }
+  if (key === 'delEdge') {
+    return props.contextMenuType !== 'edge';
+  }
+  return false;
+};
+
 function handleClickOperate(key: string) {
+  const flag = disabledKey(key);
+  if (flag) return;
   emit('handleClickOperate', key);
 }
 </script>
@@ -57,6 +76,17 @@ function handleClickOperate(key: string) {
     &:hover{
       background-color: #F7F8FC;
       color: #495AD4;
+    }
+  }
+
+  .disabled-menu{
+    opacity: 0.7;
+    cursor: not-allowed;
+
+    &:hover{
+      background-color: #fff;
+      color: #424561;
+      opacity: 0.7;
     }
   }
 }
