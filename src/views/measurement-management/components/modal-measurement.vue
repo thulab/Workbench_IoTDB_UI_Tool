@@ -478,6 +478,7 @@ watch(
     text-overflow: ellipsis;
     white-space: nowrap;
     height: 100%;
+    text-align: left;
   }
 }
 
