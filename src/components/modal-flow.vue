@@ -25,7 +25,7 @@
         </div>
         <div class="operate-buttons" v-if="editType === 'view'">
           <el-button link @click="handleEdit"><el-icon size="24" class="m-r-6"><i-custom-edit /></el-icon>编辑</el-button>
-          <!-- <el-button link @click="handleExport"><el-icon size="24" class="m-r-6"><i-custom-export /></el-icon>导出</el-button> -->
+          <el-button link @click="handleExport"><el-icon size="24" class="m-r-6"><i-custom-export /></el-icon>导出</el-button>
         </div>
       </div>
     </template>
@@ -155,8 +155,9 @@
 
 <script lang="ts" setup>
 import {
-  Graph, Shape, Edge, Node, type JSONObject,
+  Graph, Shape, Edge, Node, type JSONObject, ToolsView, EdgeView,
 } from '@antv/x6';
+import { createApp, h } from 'vue';
 import { Stencil } from '@antv/x6-plugin-stencil';
 import { Snapline } from '@antv/x6-plugin-snapline';
 import { Clipboard } from '@antv/x6-plugin-clipboard';
@@ -169,9 +170,11 @@ import { Export } from '@antv/x6-plugin-export';
 import { register, getTeleport } from '@antv/x6-vue-shape';
 import html2canvas from 'html2canvas';
 import { ConnectionApi } from '@/api';
+import graphStandAloneIcon from '@/assets/icons/graph-stand-alone.svg';
 import CustomVueNode from './flow-graph/custom-vue-node.vue';
 import ContextMenu from './flow-graph/context-menu.vue';
 import ConnectionForm from './connection/connection-form.vue';
+import Tooltip from './flow-graph/tooltip.vue';
 
 const props = defineProps<{
   visible: boolean;
@@ -240,9 +243,98 @@ const current = ref<string | number>('');
 const saveLoading = ref(false);
 const graphLoading = ref(false);
 const contextMenuType = ref('');
+const app = ref();
 
 // const maxHeight = computed(() => window.innerHeight - 100);
 const isEdit = computed(() => editType.value === 'edit');
+
+class TooltipTool extends ToolsView.ToolItem<EdgeView, TooltipToolOptions> {
+  private knob!: HTMLDivElement;
+
+  render() {
+    if (!this.knob) {
+      this.knob = ToolsView.createElement('div', false) as HTMLDivElement;
+      this.knob.style.position = 'absolute';
+      this.container.style.position = 'relative';
+      this.container.appendChild(this.knob);
+    }
+    return this;
+  }
+
+  private toggleTooltip(visible: boolean) {
+    const { tooltip } = this.options;
+    if (app.value && this.knob) {
+      app.value!.unmount(this.knob!);
+    }
+    if (visible) {
+      app.value = createApp({
+        setup() {
+          return () => h(Tooltip, {
+            visible,
+            content: tooltip,
+          });
+        },
+      });
+      app.value.mount(this.knob);
+    }
+    console.log(app, tooltip);
+  }
+
+  private updatePosition(e?: MouseEvent) {
+    const { style } = this.knob;
+    if (e) {
+      const p = this.graph.clientToGraph(e.clientX, e.clientY);
+      style.display = 'block';
+      // style.left = `${p.x}px`;
+      // style.top = `${p.y}px`;
+      style.left = `${p.x}px`;
+      style.top = `${p.y}px`;
+    } else {
+      style.display = 'none';
+      style.left = '-1000px';
+      style.top = '-1000px';
+    }
+  }
+
+  private onMouseEnter({ e }: { e: MouseEvent }) {
+    this.updatePosition(e);
+    this.toggleTooltip(true);
+  }
+
+  private onMouseLeave() {
+    this.updatePosition();
+    this.toggleTooltip(false);
+  }
+
+  private onMouseMove() {
+    this.updatePosition();
+    this.toggleTooltip(false);
+  }
+
+  delegateEvents() {
+    this.cellView.on('cell:mouseenter', this.onMouseEnter, this);
+    this.cellView.on('cell:mouseleave', this.onMouseLeave, this);
+    this.cellView.on('cell:mousemove', this.onMouseMove, this);
+    return super.delegateEvents();
+  }
+
+  protected onRemove() {
+    this.cellView.off('cell:mouseenter', this.onMouseEnter, this);
+    this.cellView.off('cell:mouseleave', this.onMouseLeave, this);
+    this.cellView.off('cell:mousemove', this.onMouseMove, this);
+  }
+}
+
+TooltipTool.config({
+  tagName: 'div',
+  isSVGElement: false,
+});
+
+export interface TooltipToolOptions extends ToolsView.ToolItem.Options {
+  tooltip?: string;
+}
+
+Graph.registerNodeTool('tooltip', TooltipTool, true);
 
 const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
 const { requestFn: getRelationalGraph } = useRequest(ConnectionApi.getRelationalGraph);
@@ -409,6 +501,57 @@ Graph.registerNode(
   true,
 );
 
+Graph.registerNode(
+  'custom-rect-tooltip',
+  {
+    inherit: 'rect',
+    width: 72,
+    height: 92,
+    attrs: {
+      body: {
+        // stroke: '#fff',
+        strokeWidth: 0,
+        fill: 'none',
+      },
+      image: {
+        width: 72,
+        height: 72,
+      },
+      text: {
+        fontSize: 12,
+        lineHeight: 14,
+        fill: '#424561',
+        'text-anchor': 'left',
+        textVerticalAnchor: 'bottom',
+        ref: 'rect',
+        refX: 0,
+        refY: 0.99,
+        refWidth: 1,
+        textWrap: {
+          width: '100%',
+          height: 14,
+          ellipsis: true,
+        },
+      },
+    },
+    markup: [
+      { tagName: 'rect', selector: 'body' },
+      { tagName: 'image', selector: 'image' },
+      { tagName: 'text', selector: 'text' },
+    ],
+    ports: { ...ports },
+    tools: [
+      {
+        name: 'tooltip',
+        args: {
+          tooltip: 'tooltip',
+        },
+      },
+    ],
+  },
+  true,
+);
+
 function initialGraph(isDisabled?: boolean) {
   if (graph.value) {
     graph.value.dispose();
@@ -555,6 +698,11 @@ function initialGraph(isDisabled?: boolean) {
           name: 'group4',
           collapsed: false,
         },
+        {
+          title: '自定义实例',
+          name: 'group5',
+          collapsed: false,
+        },
       ],
       layoutOptions: {
         columns: 3,
@@ -676,6 +824,12 @@ function graphWatchEvent() {
       node.setData({
         iconSize: Math.ceil(Math.min(width, height)),
       });
+    } else if (node.prop().shape === 'custom-rect-tooltip') {
+      const height = node.size().height - 20;
+      const { width } = node.size();
+      const size = Math.ceil(Math.min(width, height));
+      node.attr('image/width', size);
+      node.attr('image/height', size);
     }
   });
   // 鼠标抬起
@@ -914,10 +1068,31 @@ function loadStencil() {
       iconSize: 72,
     },
   }));
+  const customNodes = standAloneList.value.map((item) => graph.value!.createNode({
+    shape: 'custom-rect-tooltip',
+    label: item.name,
+    attrs: {
+      image: {
+        'xlink:href': graphStandAloneIcon,
+      },
+      text: {
+        text: item.name,
+      },
+    },
+    tools: [
+      {
+        name: 'tooltip',
+        args: {
+          tooltip: item.name,
+        },
+      },
+    ],
+  }));
   stencil.value?.load([baseNode], 'group1');
   stencil.value?.load(standAloneNodes, 'group2');
   stencil.value?.load(clusterNodes, 'group3');
   stencil.value?.load(doubleLiveNodes, 'group4');
+  stencil.value?.load(customNodes, 'group5');
 }
 
 // #text 样式开始
@@ -1495,6 +1670,10 @@ watch(
 .over-flow>span{
   text-align: center;
   width: 100%;
+}
+
+.x6-graph-svg-stage{
+  position: relative;
 }
 
 @keyframes ant-line {
