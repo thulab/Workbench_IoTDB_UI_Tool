@@ -433,10 +433,10 @@ Graph.registerNode(
         fontSize: 12,
         lineHeight: 14,
         fill: '#424561',
-        'text-anchor': 'left',
+        textAnchor: 'middle',
         textVerticalAnchor: 'bottom',
         ref: 'rect',
-        refX: 0,
+        refX: 0.5,
         refY: 0.99,
         refWidth: 1,
         textWrap: {
