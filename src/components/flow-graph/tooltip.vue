@@ -7,7 +7,7 @@
     popper-class="tooltip-box-width"
     :visible="visible"
   >
-    <slot></slot>
+    <div></div>
   </el-tooltip>
 </template>
 

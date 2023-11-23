@@ -155,9 +155,8 @@
 
 <script lang="ts" setup>
 import {
-  Graph, Shape, Edge, Node, type JSONObject, ToolsView, EdgeView,
+  Graph, Shape, Edge, Node, type JSONObject,
 } from '@antv/x6';
-import { createApp, h } from 'vue';
 import { Stencil } from '@antv/x6-plugin-stencil';
 import { Snapline } from '@antv/x6-plugin-snapline';
 import { Clipboard } from '@antv/x6-plugin-clipboard';
@@ -168,13 +167,13 @@ import { Selection } from '@antv/x6-plugin-selection';
 import { Scroller } from '@antv/x6-plugin-scroller';
 import { Export } from '@antv/x6-plugin-export';
 import { register, getTeleport } from '@antv/x6-vue-shape';
-import html2canvas from 'html2canvas';
+// import html2canvas from 'html2canvas';
 import { ConnectionApi } from '@/api';
 import graphStandAloneIcon from '@/assets/icons/graph-stand-alone.svg';
 import CustomVueNode from './flow-graph/custom-vue-node.vue';
 import ContextMenu from './flow-graph/context-menu.vue';
 import ConnectionForm from './connection/connection-form.vue';
-import Tooltip from './flow-graph/tooltip.vue';
+import TooltipTool from './flow-graph/graph';
 
 const props = defineProps<{
   visible: boolean;
@@ -243,96 +242,9 @@ const current = ref<string | number>('');
 const saveLoading = ref(false);
 const graphLoading = ref(false);
 const contextMenuType = ref('');
-const app = ref();
 
 // const maxHeight = computed(() => window.innerHeight - 100);
 const isEdit = computed(() => editType.value === 'edit');
-
-class TooltipTool extends ToolsView.ToolItem<EdgeView, TooltipToolOptions> {
-  private knob!: HTMLDivElement;
-
-  render() {
-    if (!this.knob) {
-      this.knob = ToolsView.createElement('div', false) as HTMLDivElement;
-      this.knob.style.position = 'absolute';
-      this.container.style.position = 'relative';
-      this.container.appendChild(this.knob);
-    }
-    return this;
-  }
-
-  private toggleTooltip(visible: boolean) {
-    const { tooltip } = this.options;
-    if (app.value && this.knob) {
-      app.value!.unmount(this.knob!);
-    }
-    if (visible) {
-      app.value = createApp({
-        setup() {
-          return () => h(Tooltip, {
-            visible,
-            content: tooltip,
-          });
-        },
-      });
-      app.value.mount(this.knob);
-    }
-    console.log(app, tooltip);
-  }
-
-  private updatePosition(e?: MouseEvent) {
-    const { style } = this.knob;
-    if (e) {
-      const p = this.graph.clientToGraph(e.clientX, e.clientY);
-      style.display = 'block';
-      // style.left = `${p.x}px`;
-      // style.top = `${p.y}px`;
-      style.left = `${p.x}px`;
-      style.top = `${p.y}px`;
-    } else {
-      style.display = 'none';
-      style.left = '-1000px';
-      style.top = '-1000px';
-    }
-  }
-
-  private onMouseEnter({ e }: { e: MouseEvent }) {
-    this.updatePosition(e);
-    this.toggleTooltip(true);
-  }
-
-  private onMouseLeave() {
-    this.updatePosition();
-    this.toggleTooltip(false);
-  }
-
-  private onMouseMove() {
-    this.updatePosition();
-    this.toggleTooltip(false);
-  }
-
-  delegateEvents() {
-    this.cellView.on('cell:mouseenter', this.onMouseEnter, this);
-    this.cellView.on('cell:mouseleave', this.onMouseLeave, this);
-    this.cellView.on('cell:mousemove', this.onMouseMove, this);
-    return super.delegateEvents();
-  }
-
-  protected onRemove() {
-    this.cellView.off('cell:mouseenter', this.onMouseEnter, this);
-    this.cellView.off('cell:mouseleave', this.onMouseLeave, this);
-    this.cellView.off('cell:mousemove', this.onMouseMove, this);
-  }
-}
-
-TooltipTool.config({
-  tagName: 'div',
-  isSVGElement: false,
-});
-
-export interface TooltipToolOptions extends ToolsView.ToolItem.Options {
-  tooltip?: string;
-}
 
 Graph.registerNodeTool('tooltip', TooltipTool, true);
 
@@ -559,7 +471,19 @@ function initialGraph(isDisabled?: boolean) {
   // #region 初始化画布
   graph.value = new Graph({
     container: graphContainerRef.value!,
-    interacting: !isDisabled,
+    interacting: {
+      edgeMovable: !isDisabled,
+      edgeLabelMovable: !isDisabled,
+      arrowheadMovable: !isDisabled,
+      vertexMovable: !isDisabled,
+      vertexAddable: !isDisabled,
+      vertexDeletable: !isDisabled,
+      useEdgeTools: !isDisabled,
+      nodeMovable: !isDisabled,
+      magnetConnectable: !isDisabled,
+      stopDelegateOnDragging: !isDisabled,
+      toolsAddable: true,
+    },
     grid: {
       visible: !isDisabled,
       type: 'dot',
@@ -1339,40 +1263,40 @@ async function handleExport() {
     const flag = await connectionFormRef.value?.handleChangeConnection();
     if (!flag) return;
   }
-  // graph.value!.exportPNG('chart', {
-  //   copyStyles: true,
-  //   width: graph.value!.size.options.width + 200,
-  //   height: graph.value!.size.options.height + 200,
-  //   padding: 100,
-  //   quality: 1,
-  // });
-  const scaleBy = backingScale();
-  const w = parseInt(`${graph.value!.size.options.width + 200}`, 10);
-  const h = parseInt(`${graph.value!.size.options.height + 200}`, 10);
-  const canvas = document.createElement('canvas');
-  canvas.width = w * scaleBy;
-  canvas.height = h * scaleBy;
-  canvas.style.width = `${w}px`;
-  canvas.style.height = `${h}px`;
-  const context = canvas.getContext('2d');
-  context!.scale(1, 1);
+  graph.value!.exportPNG('chart', {
+    copyStyles: true,
+    width: graph.value!.size.options.width + 200,
+    height: graph.value!.size.options.height + 200,
+    padding: 100,
+    quality: 1,
+  });
+  // const scaleBy = backingScale();
+  // const w = parseInt(`${graph.value!.size.options.width + 200}`, 10);
+  // const h = parseInt(`${graph.value!.size.options.height + 200}`, 10);
+  // const canvas = document.createElement('canvas');
+  // canvas.width = w * scaleBy;
+  // canvas.height = h * scaleBy;
+  // canvas.style.width = `${w}px`;
+  // canvas.style.height = `${h}px`;
+  // const context = canvas.getContext('2d');
+  // context!.scale(1, 1);
 
-  html2canvas(document.querySelector('.flow-graph-wrapper')!, {
-    canvas,
-    useCORS: true,
-    // background: 'none',
-    logging: false,
-  })
-    .then((res) => {
-      const imgsrc = res.toDataURL('image/png', 1);
-      const a = document.createElement('a');
-      a.download = 'aaaa.png';
-      a.href = imgsrc;
-      a.click();
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  // html2canvas(document.querySelector('.flow-graph-wrapper')!, {
+  //   canvas,
+  //   useCORS: true,
+  //   // background: 'none',
+  //   logging: false,
+  // })
+  //   .then((res) => {
+  //     const imgsrc = res.toDataURL('image/png', 1);
+  //     const a = document.createElement('a');
+  //     a.download = 'aaaa.png';
+  //     a.href = imgsrc;
+  //     a.click();
+  //   })
+  //   .catch((error) => {
+  //     console.log(error);
+  //   });
 }
 
 // 保存实例信息

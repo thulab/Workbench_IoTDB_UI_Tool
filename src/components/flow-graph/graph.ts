@@ -1,4 +1,4 @@
-import { Graph, ToolsView, EdgeView } from '@antv/x6';
+import { ToolsView, EdgeView } from '@antv/x6';
 import { createApp, h } from 'vue';
 import Tooltip from './tooltip.vue';
 
@@ -18,7 +18,9 @@ class TooltipTool extends ToolsView.ToolItem<EdgeView, TooltipToolOptions> {
 
   private toggleTooltip(visible: boolean) {
     const { tooltip } = this.options;
-    app.value!.unmount(this.knob);
+    if (app.value) {
+      app.value.unmount(this.knob);
+    }
     if (visible) {
       app.value = createApp({
         setup() {
@@ -84,7 +86,4 @@ TooltipTool.config({
 export interface TooltipToolOptions extends ToolsView.ToolItem.Options {
   tooltip?: string;
 }
-
-Graph.registerNodeTool('tooltip', TooltipTool, true);
-
 export default TooltipTool;
