@@ -995,6 +995,11 @@ function loadStencil() {
   const customNodes = standAloneList.value.map((item) => graph.value!.createNode({
     shape: 'custom-rect-tooltip',
     label: item.name,
+    id: `${item.id}`,
+    data: {
+      text: item.name,
+      id: `${item.id}`,
+    },
     attrs: {
       image: {
         'xlink:href': graphStandAloneIcon,

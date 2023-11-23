@@ -32,7 +32,6 @@ class TooltipTool extends ToolsView.ToolItem<EdgeView, TooltipToolOptions> {
       });
       app.value.mount(this.knob);
     }
-    console.log(app);
   }
 
   private updatePosition(e?: MouseEvent) {
