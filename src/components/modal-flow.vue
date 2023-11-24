@@ -1216,7 +1216,7 @@ function handleSaveView() {
   const data = graph.value!.toJSON();
   saveLoading.value = true;
   saveRelationalGraph(JSON.stringify(data)).then(() => {
-    ElMessage.success('保存成功');
+    ElMessage.success({ message: '保存成功', duration: 1500 });
     initialGraph(true);
     graphWatchEvent();
     graphBindEvent();
