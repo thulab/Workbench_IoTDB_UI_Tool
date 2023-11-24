@@ -1,12 +1,14 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
 import { HOME_URL } from '@/config/app-config';
 import Login from '@/views/the-login.vue';
+import { getRouterByType } from '@/utils/system-version';
 import { registerGuard as registerAuthGuard } from './guard/auth-guard';
 
 const metaRouters = import.meta.glob('./modules/*.ts', { eager: true, import: 'default' }) as Record<string, Array<RouteRecordRaw>>;
 export const asyncRoutes: Array<RouteRecordRaw> = [];
 Object.keys(metaRouters).forEach((item) => {
-  asyncRoutes.push(...metaRouters[item]);
+  const data: Array<RouteRecordRaw> = getRouterByType(metaRouters[item]);
+  asyncRoutes.push(...data);
 });
 
 const routes: Array<RouteRecordRaw> = [

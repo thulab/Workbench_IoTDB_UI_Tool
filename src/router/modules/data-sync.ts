@@ -14,6 +14,7 @@ const route = [
       activeIcon: ICustomDataSyncActive,
       showTopLine: true,
       order: 35,
+      appType: 2,
     },
     children: [
       {

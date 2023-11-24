@@ -12,10 +12,13 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:workbench": "vite --mode workbench",
     "build": "run-p type-check build-only",
+    "build:workbench": "run-p type-check build-only:workbench",
     "preview": "vite preview",
     "test:unit": "vitest --environment jsdom --root src/",
     "build-only": "vite build",
+    "build-only:workbench": "vite build --mode workbench",
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
     "lint-css": "stylelint src/**/*.{css,less,scss,vue} --fix",

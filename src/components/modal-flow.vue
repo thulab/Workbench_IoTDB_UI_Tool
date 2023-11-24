@@ -25,7 +25,7 @@
         </div>
         <div class="operate-buttons" v-if="editType === 'view'">
           <el-button link @click="handleEdit"><el-icon size="24" class="m-r-6"><i-custom-edit /></el-icon>编辑</el-button>
-          <!-- <el-button link @click="handleExport"><el-icon size="24" class="m-r-6"><i-custom-export /></el-icon>导出</el-button> -->
+          <el-button link @click="handleExport"><el-icon size="24" class="m-r-6"><i-custom-export /></el-icon>导出</el-button>
         </div>
       </div>
     </template>
@@ -167,11 +167,13 @@ import { Selection } from '@antv/x6-plugin-selection';
 import { Scroller } from '@antv/x6-plugin-scroller';
 import { Export } from '@antv/x6-plugin-export';
 import { register, getTeleport } from '@antv/x6-vue-shape';
-import html2canvas from 'html2canvas';
+// import html2canvas from 'html2canvas';
 import { ConnectionApi } from '@/api';
+import graphStandAloneIcon from '@/assets/icons/graph-stand-alone.svg';
 import CustomVueNode from './flow-graph/custom-vue-node.vue';
 import ContextMenu from './flow-graph/context-menu.vue';
 import ConnectionForm from './connection/connection-form.vue';
+import TooltipTool from './flow-graph/graph';
 
 const props = defineProps<{
   visible: boolean;
@@ -243,6 +245,8 @@ const contextMenuType = ref('');
 
 // const maxHeight = computed(() => window.innerHeight - 100);
 const isEdit = computed(() => editType.value === 'edit');
+
+Graph.registerNodeTool('tooltip', TooltipTool, true);
 
 const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
 const { requestFn: getRelationalGraph } = useRequest(ConnectionApi.getRelationalGraph);
@@ -409,6 +413,57 @@ Graph.registerNode(
   true,
 );
 
+Graph.registerNode(
+  'custom-rect-tooltip',
+  {
+    inherit: 'rect',
+    width: 72,
+    height: 92,
+    attrs: {
+      body: {
+        // stroke: '#fff',
+        strokeWidth: 0,
+        fill: 'none',
+      },
+      image: {
+        width: 72,
+        height: 72,
+      },
+      text: {
+        fontSize: 12,
+        lineHeight: 14,
+        fill: '#424561',
+        textAnchor: 'middle',
+        textVerticalAnchor: 'bottom',
+        ref: 'rect',
+        refX: 0.5,
+        refY: 0.99,
+        refWidth: 1,
+        textWrap: {
+          width: '100%',
+          height: 14,
+          ellipsis: true,
+        },
+      },
+    },
+    markup: [
+      { tagName: 'rect', selector: 'body' },
+      { tagName: 'image', selector: 'image' },
+      { tagName: 'text', selector: 'text' },
+    ],
+    ports: { ...ports },
+    tools: [
+      {
+        name: 'tooltip',
+        args: {
+          tooltip: 'tooltip',
+        },
+      },
+    ],
+  },
+  true,
+);
+
 function initialGraph(isDisabled?: boolean) {
   if (graph.value) {
     graph.value.dispose();
@@ -416,7 +471,19 @@ function initialGraph(isDisabled?: boolean) {
   // #region 初始化画布
   graph.value = new Graph({
     container: graphContainerRef.value!,
-    interacting: !isDisabled,
+    interacting: {
+      edgeMovable: !isDisabled,
+      edgeLabelMovable: !isDisabled,
+      arrowheadMovable: !isDisabled,
+      vertexMovable: !isDisabled,
+      vertexAddable: !isDisabled,
+      vertexDeletable: !isDisabled,
+      useEdgeTools: !isDisabled,
+      nodeMovable: !isDisabled,
+      magnetConnectable: !isDisabled,
+      stopDelegateOnDragging: !isDisabled,
+      toolsAddable: true,
+    },
     grid: {
       visible: !isDisabled,
       type: 'dot',
@@ -555,6 +622,11 @@ function initialGraph(isDisabled?: boolean) {
           name: 'group4',
           collapsed: false,
         },
+        {
+          title: '自定义实例',
+          name: 'group5',
+          collapsed: false,
+        },
       ],
       layoutOptions: {
         columns: 3,
@@ -676,6 +748,12 @@ function graphWatchEvent() {
       node.setData({
         iconSize: Math.ceil(Math.min(width, height)),
       });
+    } else if (node.prop().shape === 'custom-rect-tooltip') {
+      const height = node.size().height - 20;
+      const { width } = node.size();
+      const size = Math.ceil(Math.min(width, height));
+      node.attr('image/width', size);
+      node.attr('image/height', size);
     }
   });
   // 鼠标抬起
@@ -914,10 +992,36 @@ function loadStencil() {
       iconSize: 72,
     },
   }));
+  const customNodes = standAloneList.value.map((item) => graph.value!.createNode({
+    shape: 'custom-rect-tooltip',
+    label: item.name,
+    id: `${item.id}`,
+    data: {
+      text: item.name,
+      id: `${item.id}`,
+    },
+    attrs: {
+      image: {
+        'xlink:href': graphStandAloneIcon,
+      },
+      text: {
+        text: item.name,
+      },
+    },
+    tools: [
+      {
+        name: 'tooltip',
+        args: {
+          tooltip: item.name,
+        },
+      },
+    ],
+  }));
   stencil.value?.load([baseNode], 'group1');
   stencil.value?.load(standAloneNodes, 'group2');
   stencil.value?.load(clusterNodes, 'group3');
   stencil.value?.load(doubleLiveNodes, 'group4');
+  stencil.value?.load(customNodes, 'group5');
 }
 
 // #text 样式开始
@@ -1164,40 +1268,40 @@ async function handleExport() {
     const flag = await connectionFormRef.value?.handleChangeConnection();
     if (!flag) return;
   }
-  // graph.value!.exportPNG('chart', {
-  //   copyStyles: true,
-  //   width: graph.value!.size.options.width + 200,
-  //   height: graph.value!.size.options.height + 200,
-  //   padding: 100,
-  //   quality: 1,
-  // });
-  const scaleBy = backingScale();
-  const w = parseInt(`${graph.value!.size.options.width + 200}`, 10);
-  const h = parseInt(`${graph.value!.size.options.height + 200}`, 10);
-  const canvas = document.createElement('canvas');
-  canvas.width = w * scaleBy;
-  canvas.height = h * scaleBy;
-  canvas.style.width = `${w}px`;
-  canvas.style.height = `${h}px`;
-  const context = canvas.getContext('2d');
-  context!.scale(1, 1);
+  graph.value!.exportPNG('chart', {
+    copyStyles: true,
+    width: graph.value!.size.options.width + 200,
+    height: graph.value!.size.options.height + 200,
+    padding: 100,
+    quality: 1,
+  });
+  // const scaleBy = backingScale();
+  // const w = parseInt(`${graph.value!.size.options.width + 200}`, 10);
+  // const h = parseInt(`${graph.value!.size.options.height + 200}`, 10);
+  // const canvas = document.createElement('canvas');
+  // canvas.width = w * scaleBy;
+  // canvas.height = h * scaleBy;
+  // canvas.style.width = `${w}px`;
+  // canvas.style.height = `${h}px`;
+  // const context = canvas.getContext('2d');
+  // context!.scale(1, 1);
 
-  html2canvas(document.querySelector('.flow-graph-wrapper')!, {
-    canvas,
-    useCORS: true,
-    // background: 'none',
-    logging: false,
-  })
-    .then((res) => {
-      const imgsrc = res.toDataURL('image/png', 1);
-      const a = document.createElement('a');
-      a.download = 'aaaa.png';
-      a.href = imgsrc;
-      a.click();
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  // html2canvas(document.querySelector('.flow-graph-wrapper')!, {
+  //   canvas,
+  //   useCORS: true,
+  //   // background: 'none',
+  //   logging: false,
+  // })
+  //   .then((res) => {
+  //     const imgsrc = res.toDataURL('image/png', 1);
+  //     const a = document.createElement('a');
+  //     a.download = 'aaaa.png';
+  //     a.href = imgsrc;
+  //     a.click();
+  //   })
+  //   .catch((error) => {
+  //     console.log(error);
+  //   });
 }
 
 // 保存实例信息
@@ -1495,6 +1599,10 @@ watch(
 .over-flow>span{
   text-align: center;
   width: 100%;
+}
+
+.x6-graph-svg-stage{
+  position: relative;
 }
 
 @keyframes ant-line {
