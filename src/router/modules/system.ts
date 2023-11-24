@@ -103,7 +103,7 @@ const route = [
       activeIcon: ICustomTrendActive,
       showTopLine: true,
       order: 25,
-      appType: 1,
+      // appType: 1,
     },
     children: [
       {

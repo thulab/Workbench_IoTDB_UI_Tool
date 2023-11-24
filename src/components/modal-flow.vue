@@ -25,7 +25,7 @@
         </div>
         <div class="operate-buttons" v-if="editType === 'view'">
           <el-button link @click="handleEdit"><el-icon size="24" class="m-r-6"><i-custom-edit /></el-icon>编辑</el-button>
-          <el-button link @click="handleExport"><el-icon size="24" class="m-r-6"><i-custom-export /></el-icon>导出</el-button>
+          <!-- <el-button link @click="handleExport"><el-icon size="24" class="m-r-6"><i-custom-export /></el-icon>导出</el-button> -->
         </div>
       </div>
     </template>
@@ -166,11 +166,11 @@ import { Transform } from '@antv/x6-plugin-transform';
 import { Selection } from '@antv/x6-plugin-selection';
 import { Scroller } from '@antv/x6-plugin-scroller';
 import { Export } from '@antv/x6-plugin-export';
-import { register, getTeleport } from '@antv/x6-vue-shape';
-// import html2canvas from 'html2canvas';
+import { getTeleport } from '@antv/x6-vue-shape';
 import { ConnectionApi } from '@/api';
 import graphStandAloneIcon from '@/assets/icons/graph-stand-alone.svg';
-import CustomVueNode from './flow-graph/custom-vue-node.vue';
+import graphClusterIcon from '@/assets/icons/graph-cluster.svg';
+import graphDoubleLiveIcon from '@/assets/icons/graph-double-live.svg';
 import ContextMenu from './flow-graph/context-menu.vue';
 import ConnectionForm from './connection/connection-form.vue';
 import TooltipTool from './flow-graph/graph';
@@ -341,16 +341,6 @@ const ports = {
   ],
 };
 
-register({
-  shape: 'custom-vue-node',
-  component: CustomVueNode,
-  width: 72,
-  height: 92,
-  x: 0,
-  y: 0,
-  ports: { ...ports },
-});
-
 Graph.registerNode(
   'custom-rect',
   {
@@ -414,7 +404,7 @@ Graph.registerNode(
 );
 
 Graph.registerNode(
-  'custom-rect-tooltip',
+  'custom-vue-node',
   {
     inherit: 'rect',
     width: 72,
@@ -622,11 +612,6 @@ function initialGraph(isDisabled?: boolean) {
           name: 'group4',
           collapsed: false,
         },
-        {
-          title: '自定义实例',
-          name: 'group5',
-          collapsed: false,
-        },
       ],
       layoutOptions: {
         columns: 3,
@@ -743,12 +728,6 @@ function graphWatchEvent() {
       // 高度=总高度减文字高度和间距
       // 宽度=总宽度
       // 二者取更小的那一个
-      const height = node.size().height - 20;
-      const { width } = node.size();
-      node.setData({
-        iconSize: Math.ceil(Math.min(width, height)),
-      });
-    } else if (node.prop().shape === 'custom-rect-tooltip') {
       const height = node.size().height - 20;
       const { width } = node.size();
       const size = Math.ceil(Math.min(width, height));
@@ -964,36 +943,6 @@ function loadStencil() {
   });
   const standAloneNodes = standAloneList.value.map((item) => graph.value!.createNode({
     shape: 'custom-vue-node',
-    id: `${item.id}`,
-    data: {
-      text: item.name,
-      type: 0,
-      id: `${item.id}`,
-      iconSize: 72,
-    },
-  }));
-  const clusterNodes = clusterList.value.map((item) => graph.value!.createNode({
-    shape: 'custom-vue-node',
-    id: `${item.id}`,
-    data: {
-      text: item.name,
-      type: 1,
-      id: `${item.id}`,
-      iconSize: 72,
-    },
-  }));
-  const doubleLiveNodes = doubleLiveList.value.map((item) => graph.value!.createNode({
-    shape: 'custom-vue-node',
-    id: `${item.id}`,
-    data: {
-      text: item.name,
-      type: 2,
-      id: `${item.id}`,
-      iconSize: 72,
-    },
-  }));
-  const customNodes = standAloneList.value.map((item) => graph.value!.createNode({
-    shape: 'custom-rect-tooltip',
     label: item.name,
     id: `${item.id}`,
     data: {
@@ -1017,11 +966,60 @@ function loadStencil() {
       },
     ],
   }));
+  const clusterNodes = clusterList.value.map((item) => graph.value!.createNode({
+    shape: 'custom-vue-node',
+    label: item.name,
+    id: `${item.id}`,
+    data: {
+      text: item.name,
+      id: `${item.id}`,
+    },
+    attrs: {
+      image: {
+        'xlink:href': graphClusterIcon,
+      },
+      text: {
+        text: item.name,
+      },
+    },
+    tools: [
+      {
+        name: 'tooltip',
+        args: {
+          tooltip: item.name,
+        },
+      },
+    ],
+  }));
+  const doubleLiveNodes = doubleLiveList.value.map((item) => graph.value!.createNode({
+    shape: 'custom-vue-node',
+    label: item.name,
+    id: `${item.id}`,
+    data: {
+      text: item.name,
+      id: `${item.id}`,
+    },
+    attrs: {
+      image: {
+        'xlink:href': graphDoubleLiveIcon,
+      },
+      text: {
+        text: item.name,
+      },
+    },
+    tools: [
+      {
+        name: 'tooltip',
+        args: {
+          tooltip: item.name,
+        },
+      },
+    ],
+  }));
   stencil.value?.load([baseNode], 'group1');
   stencil.value?.load(standAloneNodes, 'group2');
   stencil.value?.load(clusterNodes, 'group3');
   stencil.value?.load(doubleLiveNodes, 'group4');
-  stencil.value?.load(customNodes, 'group5');
 }
 
 // #text 样式开始
@@ -1254,13 +1252,6 @@ async function handleEdit() {
   getGraphData();
 }
 
-function backingScale() {
-  if (window.devicePixelRatio && window.devicePixelRatio > 1) {
-    return window.devicePixelRatio;
-  }
-  return 1;
-}
-
 // 导出
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function handleExport() {
@@ -1275,33 +1266,6 @@ async function handleExport() {
     padding: 100,
     quality: 1,
   });
-  // const scaleBy = backingScale();
-  // const w = parseInt(`${graph.value!.size.options.width + 200}`, 10);
-  // const h = parseInt(`${graph.value!.size.options.height + 200}`, 10);
-  // const canvas = document.createElement('canvas');
-  // canvas.width = w * scaleBy;
-  // canvas.height = h * scaleBy;
-  // canvas.style.width = `${w}px`;
-  // canvas.style.height = `${h}px`;
-  // const context = canvas.getContext('2d');
-  // context!.scale(1, 1);
-
-  // html2canvas(document.querySelector('.flow-graph-wrapper')!, {
-  //   canvas,
-  //   useCORS: true,
-  //   // background: 'none',
-  //   logging: false,
-  // })
-  //   .then((res) => {
-  //     const imgsrc = res.toDataURL('image/png', 1);
-  //     const a = document.createElement('a');
-  //     a.download = 'aaaa.png';
-  //     a.href = imgsrc;
-  //     a.click();
-  //   })
-  //   .catch((error) => {
-  //     console.log(error);
-  //   });
 }
 
 // 保存实例信息

@@ -15,7 +15,7 @@ const route = [
       icon: ICustomAlarm,
       activeIcon: ICustomAlarmActive,
       order: 30,
-      appType: 1,
+      // appType: 1,
     },
     children: [
       {
