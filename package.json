@@ -1,6 +1,6 @@
 {
   "name": "iotdb-real-time",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "lint-staged": {
