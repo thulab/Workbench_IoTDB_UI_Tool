@@ -10,9 +10,9 @@
               </template>
               <template #prepend>
                 <el-select v-model="searchFormData.type" style="width: 88px;" placeholder="" id="calculate-search-type">
-                  <el-option label="计算名称" value="name" />
+                  <el-option :label="`${pageText}名称`" value="name" />
                   <el-option label="结果测点" value="measurement" />
-                  <el-option label="计算描述" value="desc" />
+                  <el-option :label="`${pageText}描述`" value="desc" />
                 </el-select>
               </template>
             </el-input>
@@ -31,10 +31,10 @@
     <el-main class="p-0">
       <div class="page-table-details">
         <div class="page-table-title-box">
-          <h4 class="page-table-title">计算列表</h4>
+          <h4 class="page-table-title">{{pageText}}列表</h4>
           <div class="operate-buttons">
             <auth-tooltip :is-disabled="canAllWriteSchema">
-              <el-button type="primary" :disabled="!canAllWriteSchema" @click="handleAdd" id="calculate-add">新建计算</el-button>
+              <el-button type="primary" :disabled="!canAllWriteSchema" @click="handleAdd" id="calculate-add">新建{{pageText}}</el-button>
             </auth-tooltip>
             <auth-tooltip :is-disabled="canWriteSchema">
               <el-button :disabled="!multipleSelection.length || !canWriteSchema" type="primary" @click="handleDel('batch', null)" id="calculate-batch-del">批量删除</el-button>
@@ -58,8 +58,8 @@
               @selection-change="handleSelectionChange"
             >
               <el-table-column type="selection" width="55" />
-              <el-table-column label="计算名称" prop="name" min-width="120" align="center" show-overflow-tooltip />
-              <el-table-column label="计算描述" prop="desc" min-width="160" align="center" show-overflow-tooltip />
+              <el-table-column :label="`${pageText}名称`" prop="name" min-width="120" align="center" show-overflow-tooltip />
+              <el-table-column :label="`${pageText}描述`" prop="desc" min-width="160" align="center" show-overflow-tooltip />
               <el-table-column label="结果测点" prop="measurement" width="160" align="center" show-overflow-tooltip>
                 <template #default="{ row }">
                   <span class="measurement-text-button" @click="handleView(row)">{{ row.measurement }}</span>
@@ -133,6 +133,8 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalCalculate from './components/modal-calculate.vue';
 import ModalExpression from './components/modal-expression.vue';
 
+const appType = Number(import.meta.env.VITE_APP_TYPE);
+const pageText = appType === 1 ? '计算' : '视图';
 const router = useRouter();
 const userStore = useUserStore();
 const {
@@ -295,7 +297,7 @@ function handleEdit(row: Calculate.CalculateItem) {
 }
 
 function handleDel(type: string, data: Calculate.CalculateItem | null) {
-  ElMessageBox.confirm(type === 'batch' ? '是否确认删除这些计算？' : '是否删除该计算？', '注意', {
+  ElMessageBox.confirm(type === 'batch' ? `是否确认删除这些${pageText}？` : `是否删除该${pageText}？`, '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
