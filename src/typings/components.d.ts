@@ -164,6 +164,7 @@ declare module 'vue' {
     TheLayout: typeof import('./../components/layout/the-layout.vue')['default']
     TheLayout2: typeof import('./../components/layout/the-layout2.vue')['default']
     TimeseriesSelect: typeof import('./../components/timeseries-select.vue')['default']
+    Tooltip: typeof import('./../components/flow-graph/tooltip.vue')['default']
     VersionContainer: typeof import('./../components/version-container.vue')['default']
   }
   export interface ComponentCustomProperties {

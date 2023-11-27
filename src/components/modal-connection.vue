@@ -174,7 +174,11 @@ async function handleRefresh() {
   getList();
 }
 
-function handleGraph() {
+async function handleGraph() {
+  if (editType.value === 'add') {
+    const flag = await connectionFormRef.value?.handleChangeConnection();
+    if (!flag) return;
+  }
   flowVisible.value = true;
 }
 

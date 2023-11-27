@@ -166,12 +166,14 @@ import { Transform } from '@antv/x6-plugin-transform';
 import { Selection } from '@antv/x6-plugin-selection';
 import { Scroller } from '@antv/x6-plugin-scroller';
 import { Export } from '@antv/x6-plugin-export';
-import { register, getTeleport } from '@antv/x6-vue-shape';
-import html2canvas from 'html2canvas';
+import { getTeleport } from '@antv/x6-vue-shape';
 import { ConnectionApi } from '@/api';
-import CustomVueNode from './flow-graph/custom-vue-node.vue';
+import graphStandAloneIcon from '@/assets/icons/graph-stand-alone.svg';
+import graphClusterIcon from '@/assets/icons/graph-cluster.svg';
+import graphDoubleLiveIcon from '@/assets/icons/graph-double-live.svg';
 import ContextMenu from './flow-graph/context-menu.vue';
 import ConnectionForm from './connection/connection-form.vue';
+import TooltipTool from './flow-graph/graph';
 
 const props = defineProps<{
   visible: boolean;
@@ -243,6 +245,8 @@ const contextMenuType = ref('');
 
 // const maxHeight = computed(() => window.innerHeight - 100);
 const isEdit = computed(() => editType.value === 'edit');
+
+Graph.registerNodeTool('tooltip', TooltipTool, true);
 
 const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
 const { requestFn: getRelationalGraph } = useRequest(ConnectionApi.getRelationalGraph);
@@ -337,16 +341,6 @@ const ports = {
   ],
 };
 
-register({
-  shape: 'custom-vue-node',
-  component: CustomVueNode,
-  width: 72,
-  height: 92,
-  x: 0,
-  y: 0,
-  ports: { ...ports },
-});
-
 Graph.registerNode(
   'custom-rect',
   {
@@ -409,6 +403,57 @@ Graph.registerNode(
   true,
 );
 
+Graph.registerNode(
+  'custom-vue-node',
+  {
+    inherit: 'rect',
+    width: 72,
+    height: 92,
+    attrs: {
+      body: {
+        // stroke: '#fff',
+        strokeWidth: 0,
+        fill: 'none',
+      },
+      image: {
+        width: 72,
+        height: 72,
+      },
+      text: {
+        fontSize: 12,
+        lineHeight: 14,
+        fill: '#424561',
+        textAnchor: 'middle',
+        textVerticalAnchor: 'bottom',
+        ref: 'rect',
+        refX: 0.5,
+        refY: 0.99,
+        refWidth: 1,
+        textWrap: {
+          width: '100%',
+          height: 14,
+          ellipsis: true,
+        },
+      },
+    },
+    markup: [
+      { tagName: 'rect', selector: 'body' },
+      { tagName: 'image', selector: 'image' },
+      { tagName: 'text', selector: 'text' },
+    ],
+    ports: { ...ports },
+    tools: [
+      {
+        name: 'tooltip',
+        args: {
+          tooltip: 'tooltip',
+        },
+      },
+    ],
+  },
+  true,
+);
+
 function initialGraph(isDisabled?: boolean) {
   if (graph.value) {
     graph.value.dispose();
@@ -416,7 +461,19 @@ function initialGraph(isDisabled?: boolean) {
   // #region 初始化画布
   graph.value = new Graph({
     container: graphContainerRef.value!,
-    interacting: !isDisabled,
+    interacting: {
+      edgeMovable: !isDisabled,
+      edgeLabelMovable: !isDisabled,
+      arrowheadMovable: !isDisabled,
+      vertexMovable: !isDisabled,
+      vertexAddable: !isDisabled,
+      vertexDeletable: !isDisabled,
+      useEdgeTools: !isDisabled,
+      nodeMovable: !isDisabled,
+      magnetConnectable: !isDisabled,
+      stopDelegateOnDragging: !isDisabled,
+      toolsAddable: true,
+    },
     grid: {
       visible: !isDisabled,
       type: 'dot',
@@ -673,9 +730,9 @@ function graphWatchEvent() {
       // 二者取更小的那一个
       const height = node.size().height - 20;
       const { width } = node.size();
-      node.setData({
-        iconSize: Math.ceil(Math.min(width, height)),
-      });
+      const size = Math.ceil(Math.min(width, height));
+      node.attr('image/width', size);
+      node.attr('image/height', size);
     }
   });
   // 鼠标抬起
@@ -886,33 +943,78 @@ function loadStencil() {
   });
   const standAloneNodes = standAloneList.value.map((item) => graph.value!.createNode({
     shape: 'custom-vue-node',
+    label: item.name,
     id: `${item.id}`,
     data: {
       text: item.name,
-      type: 0,
       id: `${item.id}`,
-      iconSize: 72,
     },
+    attrs: {
+      image: {
+        'xlink:href': graphStandAloneIcon,
+      },
+      text: {
+        text: item.name,
+      },
+    },
+    tools: [
+      {
+        name: 'tooltip',
+        args: {
+          tooltip: item.name,
+        },
+      },
+    ],
   }));
   const clusterNodes = clusterList.value.map((item) => graph.value!.createNode({
     shape: 'custom-vue-node',
+    label: item.name,
     id: `${item.id}`,
     data: {
       text: item.name,
-      type: 1,
       id: `${item.id}`,
-      iconSize: 72,
     },
+    attrs: {
+      image: {
+        'xlink:href': graphClusterIcon,
+      },
+      text: {
+        text: item.name,
+      },
+    },
+    tools: [
+      {
+        name: 'tooltip',
+        args: {
+          tooltip: item.name,
+        },
+      },
+    ],
   }));
   const doubleLiveNodes = doubleLiveList.value.map((item) => graph.value!.createNode({
     shape: 'custom-vue-node',
+    label: item.name,
     id: `${item.id}`,
     data: {
       text: item.name,
-      type: 2,
       id: `${item.id}`,
-      iconSize: 72,
     },
+    attrs: {
+      image: {
+        'xlink:href': graphDoubleLiveIcon,
+      },
+      text: {
+        text: item.name,
+      },
+    },
+    tools: [
+      {
+        name: 'tooltip',
+        args: {
+          tooltip: item.name,
+        },
+      },
+    ],
   }));
   stencil.value?.load([baseNode], 'group1');
   stencil.value?.load(standAloneNodes, 'group2');
@@ -1114,7 +1216,7 @@ function handleSaveView() {
   const data = graph.value!.toJSON();
   saveLoading.value = true;
   saveRelationalGraph(JSON.stringify(data)).then(() => {
-    ElMessage.success('保存成功');
+    ElMessage.success({ message: '保存成功', duration: 1500 });
     initialGraph(true);
     graphWatchEvent();
     graphBindEvent();
@@ -1150,13 +1252,6 @@ async function handleEdit() {
   getGraphData();
 }
 
-function backingScale() {
-  if (window.devicePixelRatio && window.devicePixelRatio > 1) {
-    return window.devicePixelRatio;
-  }
-  return 1;
-}
-
 // 导出
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function handleExport() {
@@ -1164,40 +1259,13 @@ async function handleExport() {
     const flag = await connectionFormRef.value?.handleChangeConnection();
     if (!flag) return;
   }
-  // graph.value!.exportPNG('chart', {
-  //   copyStyles: true,
-  //   width: graph.value!.size.options.width + 200,
-  //   height: graph.value!.size.options.height + 200,
-  //   padding: 100,
-  //   quality: 1,
-  // });
-  const scaleBy = backingScale();
-  const w = parseInt(`${graph.value!.size.options.width + 200}`, 10);
-  const h = parseInt(`${graph.value!.size.options.height + 200}`, 10);
-  const canvas = document.createElement('canvas');
-  canvas.width = w * scaleBy;
-  canvas.height = h * scaleBy;
-  canvas.style.width = `${w}px`;
-  canvas.style.height = `${h}px`;
-  const context = canvas.getContext('2d');
-  context!.scale(1, 1);
-
-  html2canvas(document.querySelector('.flow-graph-wrapper')!, {
-    canvas,
-    useCORS: true,
-    // background: 'none',
-    logging: false,
-  })
-    .then((res) => {
-      const imgsrc = res.toDataURL('image/png', 1);
-      const a = document.createElement('a');
-      a.download = 'aaaa.png';
-      a.href = imgsrc;
-      a.click();
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  graph.value!.exportPNG('chart', {
+    copyStyles: true,
+    width: graph.value!.size.options.width + 200,
+    height: graph.value!.size.options.height + 200,
+    padding: 100,
+    quality: 1,
+  });
 }
 
 // 保存实例信息
@@ -1341,7 +1409,7 @@ watch(
 }
 
 :deep(.x6-widget-stencil-group-content) {
-  max-height: 318px;
+  max-height: 340px;
   overflow: hidden auto;
   margin-top: 1px;
 }
@@ -1446,6 +1514,7 @@ watch(
 
 .x6-widget-stencil-group.collapsed{
   max-height: 19px;
+  margin-bottom: 12px;
 }
 
 .x6-widget-stencil-group > .x6-widget-stencil-group-title{
@@ -1495,6 +1564,10 @@ watch(
 .over-flow>span{
   text-align: center;
   width: 100%;
+}
+
+.x6-graph-svg-stage{
+  position: relative;
 }
 
 @keyframes ant-line {

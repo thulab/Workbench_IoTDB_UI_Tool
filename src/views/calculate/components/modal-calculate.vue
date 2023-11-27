@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="editType === 'add' ? '新建计算' : '编辑计算'"
+    :title="editType === 'add' ? `新建${pageText}` : `编辑${pageText}`"
     v-model="dialogVisible"
     width="780px"
     align-center
@@ -8,11 +8,11 @@
     id="calculate-modal"
   >
     <el-form ref="formRef" :model="formData" class="source-form" label-position="left">
-      <base-form-item label="计算名称：" prop="name" :rules="requiredRules" class="form-label-width">
-        <el-input v-model="formData.name" show-word-limit maxlength="20" placeholder="请输入计算名称" id="calculate-modal-name" />
+      <base-form-item :label="`${pageText}名称：`" prop="name" :rules="requiredRules" class="form-label-width">
+        <el-input v-model="formData.name" show-word-limit maxlength="20" :placeholder="`请输入${pageText}名称`" id="calculate-modal-name" />
       </base-form-item>
-      <base-form-item label="计算描述：" prop="desc" class="form-label-width form-label-normal">
-        <el-input type="textarea" v-model="formData.desc" show-word-limit maxlength="100" placeholder="请输入计算描述" :resize="'none'" class="desc-textarea" id="calculate-modal-desc" />
+      <base-form-item :label="`${pageText}描述：`" prop="desc" class="form-label-width form-label-normal">
+        <el-input type="textarea" v-model="formData.desc" show-word-limit maxlength="100" :placeholder="`请输入${pageText}描述`" :resize="'none'" class="desc-textarea" id="calculate-modal-desc" />
       </base-form-item>
       <base-form-item label="结果测点：" prop="measurement" :rules="requiredRules" class="form-label-width">
         <template #label>
@@ -23,9 +23,9 @@
         </el-input>
         <el-input v-model="formData.measurement" v-else disabled class="input-disabled" id="calculate-modal-measurement-disabled" />
       </base-form-item>
-      <base-form-item label="计算表达式：" prop="expression" :rules="requiredExpressionRules" class="form-expression-box">
+      <base-form-item :label="`${pageText}表达式：`" prop="expression" :rules="requiredExpressionRules" class="form-expression-box">
         <template #label>
-          计算表达式：<el-tooltip effect="light" placement="top">
+          {{pageText}}表达式：<el-tooltip effect="light" placement="top">
             <i-custom-question />
             <template #content>
               <p style="color: #131926;font-weight: 300;width: 230px;">支持使用运算符及函数(除聚合函数), 如: root.sgcc.wf03.wt01.temperature + 1，详细规则见
@@ -93,6 +93,8 @@ const emit = defineEmits<{
   (event: 'handleSave',): void;
 }>();
 
+const appType = Number(import.meta.env.VITE_APP_TYPE);
+const pageText = appType === 1 ? '计算' : '视图';
 const dialogVisible = useVModel(props, 'visible', emit);
 const formRef = ref<FormInstance>();
 const codeEditorRef = ref<InstanceType<typeof CodeEditor>>();

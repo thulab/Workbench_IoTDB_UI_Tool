@@ -103,7 +103,7 @@ const route = [
       activeIcon: ICustomTrendActive,
       showTopLine: true,
       order: 25,
-      appType: 1,
+      // appType: 1,
     },
     children: [
       {
@@ -124,6 +124,28 @@ const route = [
       activeIcon: ICustomCalculateActive,
       showTopLine: true,
       order: 26,
+      appType: 1,
+    },
+    children: [
+      {
+        path: 'detail',
+        name: 'CalculateDetail',
+        component: () => import('@/views/calculate/detail.vue'),
+        meta: { keepAlive: true },
+      },
+    ],
+  },
+  {
+    path: '/calculate',
+    component: Layout,
+    redirect: { name: 'CalculateDetail' },
+    meta: {
+      title: '视图',
+      icon: ICustomCalculate,
+      activeIcon: ICustomCalculateActive,
+      showTopLine: true,
+      order: 26,
+      appType: 2,
     },
     children: [
       {
