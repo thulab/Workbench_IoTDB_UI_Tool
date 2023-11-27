@@ -1409,7 +1409,7 @@ watch(
 }
 
 :deep(.x6-widget-stencil-group-content) {
-  max-height: 318px;
+  max-height: 340px;
   overflow: hidden auto;
   margin-top: 1px;
 }
@@ -1514,6 +1514,7 @@ watch(
 
 .x6-widget-stencil-group.collapsed{
   max-height: 19px;
+  margin-bottom: 12px;
 }
 
 .x6-widget-stencil-group > .x6-widget-stencil-group-title{
