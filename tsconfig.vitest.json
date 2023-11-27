@@ -3,7 +3,6 @@
   "exclude": [],
   "compilerOptions": {
     "composite": true,
-    "moduleResolution": "node",
     "lib": [],
     "types": [
       "node",
