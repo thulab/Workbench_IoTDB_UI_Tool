@@ -123,7 +123,7 @@
             <el-table-column label="数据类型" prop="dataType" width="140" align="center" show-overflow-tooltip />
             <el-table-column label="测点类型" prop="viewType" width="140" align="center" show-overflow-tooltip>
               <template #default="{ row }">
-                {{ row.viewType === 'VIEW' ? '计算序列' : '普通序列' }}
+                {{ row.viewType === 'VIEW' ? `${pageText}序列` : '普通序列' }}
               </template>
             </el-table-column>
             <el-table-column label="编码方式" prop="encoding" min-width="140" align="center" show-overflow-tooltip />
@@ -204,6 +204,8 @@ import ModalMeasurement from './components/modal-measurement.vue';
 import ModalImport from './components/modal-import.vue';
 import ModalAlias from './components/modal-alias.vue';
 
+const appType = Number(import.meta.env.VITE_APP_TYPE);
+const pageText = appType === 1 ? '计算' : '视图';
 const router = useRouter();
 const route = useRoute();
 const userStore = useUserStore();
