@@ -1,97 +1,102 @@
 <template>
-  <el-container class="details-wrapper">
-    <el-main class="p-0">
-      <h4 class="detail-title-text">白名单配置</h4>
-      <div class="config-switch-box">
-        <span class="config-label">白名单开关：</span>
-        <el-switch
-          v-model="configStatus"
-          :active-value="1"
-          :inactive-value="0"
-          style="
+  <active-container :is-show="connectionIsActive">
+    <el-container class="details-wrapper">
+      <el-main class="p-0">
+        <h4 class="detail-title-text">白名单配置</h4>
+        <div class="config-switch-box">
+          <span class="config-label">白名单开关：</span>
+          <el-switch
+            v-model="configStatus"
+            :active-value="1"
+            :inactive-value="0"
+            style="
 
 --el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;"
-          id="white-list-status"
-        />
-      </div>
-
-      <h4 class="detail-title-text">白名单列表</h4>
-      <div class="detail-no-config-box" v-if="!configStatus">
-        <img src="@/assets/white-list-empty.png" alt="" class="data-empty-img">
-        <span class="data-empty-text">当前状态所有 IP 均可连接，请谨慎操作</span>
-      </div>
-      <div class="list-container" v-else>
-        <div class="search-form-wrapper">
-          <div class="search-form-box">
-            <span class="search-from-label">IP地址：</span>
-            <el-input v-model="searchKeyword" placeholder="请输入IP地址" @keyup.enter="handleRefresh" id="white-list-search-ip">
-              <template #prefix>
-                <i-custom-search-icon class="remote-select-search-icon" @click="handleRefresh" id="white-list-search-icon" />
-              </template>
-            </el-input>
-          </div>
-
-          <div class="search-form-buttons">
-            <el-button type="primary" @click="handleAdd" class="handle-add-button" id="white-list-add">
-              <el-icon size="24" class="m-r-4"><i-custom-new-white-list /></el-icon>
-              添加白名单
-            </el-button>
-          </div>
-        </div>
-
-        <div class="table-box">
-          <el-table
-            :data="tableData"
-            v-loading="loading"
-            style="width: 100%;"
-            :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
-            :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
-            tooltip-effect="light"
-            :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
-            ref="tableRef"
-          >
-            <el-table-column label="IP地址" prop="ip" align="center" />
-            <el-table-column label="操作" width="120" align="center">
-              <template #default="{ row, $index }">
-                <el-button type="primary" link size="small" :disabled="row === '127.0.0.1'" @click="handleEditRow(row)" :id="`white-list-table-${$index}-edit`">编辑</el-button>
-                <el-button type="primary" link size="small" :disabled="row === '127.0.0.1'" @click="handleDelRow(row)" :id="`white-list-table-${$index}-del`">删除</el-button>
-              </template>
-            </el-table-column>
-            <template #empty>
-              <div class="table-empty-wrapper">
-                <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-                <span class="data-empty-text">暂无数据</span>
-              </div>
-            </template>
-          </el-table>
-
-          <el-pagination
-            v-if="totalCount > 0"
-            v-model:currentPage="pagination.pageNum"
-            v-model:page-size="pagination.pageSize"
-            class="m-t-20"
-            layout="prev, pager, next, sizes, jumper"
-            background
-            :page-sizes="[10, 20, 50, 100]"
-            :total="totalCount"
-            @size-change="onChangePageSize"
-            @current-change="onChangePage"
+            id="white-list-status"
           />
         </div>
-      </div>
-    </el-main>
-    <modal-ip
-      v-model:visible="dialogVisible"
-      :edit-data="editData"
-    />
-  </el-container>
+
+        <h4 class="detail-title-text">白名单列表</h4>
+        <div class="detail-no-config-box" v-if="!configStatus">
+          <img src="@/assets/white-list-empty.png" alt="" class="data-empty-img">
+          <span class="data-empty-text">当前状态所有 IP 均可连接，请谨慎操作</span>
+        </div>
+        <div class="list-container" v-else>
+          <div class="search-form-wrapper">
+            <div class="search-form-box">
+              <span class="search-from-label">IP地址：</span>
+              <el-input v-model="searchKeyword" placeholder="请输入IP地址" @keyup.enter="handleRefresh" id="white-list-search-ip">
+                <template #prefix>
+                  <i-custom-search-icon class="remote-select-search-icon" @click="handleRefresh" id="white-list-search-icon" />
+                </template>
+              </el-input>
+            </div>
+
+            <div class="search-form-buttons">
+              <el-button type="primary" @click="handleAdd" class="handle-add-button" id="white-list-add">
+                <el-icon size="24" class="m-r-4"><i-custom-new-white-list /></el-icon>
+                添加白名单
+              </el-button>
+            </div>
+          </div>
+
+          <div class="table-box">
+            <el-table
+              :data="tableData"
+              v-loading="loading"
+              style="width: 100%;"
+              :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+              :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+              tooltip-effect="light"
+              :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
+              ref="tableRef"
+            >
+              <el-table-column label="IP地址" prop="ip" align="center" />
+              <el-table-column label="操作" width="120" align="center">
+                <template #default="{ row, $index }">
+                  <el-button type="primary" link size="small" :disabled="row === '127.0.0.1'" @click="handleEditRow(row)" :id="`white-list-table-${$index}-edit`">编辑</el-button>
+                  <el-button type="primary" link size="small" :disabled="row === '127.0.0.1'" @click="handleDelRow(row)" :id="`white-list-table-${$index}-del`">删除</el-button>
+                </template>
+              </el-table-column>
+              <template #empty>
+                <div class="table-empty-wrapper">
+                  <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+                  <span class="data-empty-text">暂无数据</span>
+                </div>
+              </template>
+            </el-table>
+
+            <el-pagination
+              v-if="totalCount > 0"
+              v-model:currentPage="pagination.pageNum"
+              v-model:page-size="pagination.pageSize"
+              class="m-t-20"
+              layout="prev, pager, next, sizes, jumper"
+              background
+              :page-sizes="[10, 20, 50, 100]"
+              :total="totalCount"
+              @size-change="onChangePageSize"
+              @current-change="onChangePage"
+            />
+          </div>
+        </div>
+      </el-main>
+      <modal-ip
+        v-model:visible="dialogVisible"
+        :edit-data="editData"
+      />
+    </el-container>
+  </active-container>
 </template>
 
 <script setup lang="ts">
 import { useTableHeight } from '@/composition-api';
+import { useConnectionStore } from '@/stores';
 import ModalIp from './components/modal-ip.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
+const connectionStore = useConnectionStore();
+const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
 const { maxTableHeight } = useTableHeight(390);
 const configStatus = ref(1);
 const searchKeyword = ref('');
@@ -152,8 +157,21 @@ function handleDelRow(data: any) {
 }
 
 onMounted(() => {
+  if (!connectionIsActive.value) return;
   getListData();
 });
+
+watch(
+  () => connectionIsActive.value,
+  (val) => {
+    if (val) {
+      getListData();
+    }
+  },
+  {
+    immediate: true,
+  },
+);
 </script>
 
 <style lang="scss" scoped>

@@ -1,119 +1,124 @@
 <template>
-  <el-container class="audit-detail-wrapper">
-    <el-header class="p-x-0" style="height: auto;">
-      <div class="search-form-wrapper">
-        <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-          <base-form-item label="操作用户：" prop="username">
-            <el-input v-model="searchFormData.username" placeholder="请输入用户名称" style="width: 172px;" id="audit-search-name">
-              <template #prefix>
-                <i-custom-search-icon class="remote-select-search-icon" />
-              </template>
-            </el-input>
-          </base-form-item>
-          <base-form-item label="IP来源：" prop="address">
-            <el-input v-model="searchFormData.address" placeholder="请输入 IP 来源" style="width: 172px;" id="audit-search-ip">
-              <template #prefix>
-                <i-custom-search-icon class="remote-select-search-icon" />
-              </template>
-            </el-input>
-          </base-form-item>
-          <base-form-item label="操作详情：" prop="log">
-            <el-input v-model="searchFormData.log" placeholder="请输入操作详情" style="width: 172px;" id="audit-search-log">
-              <template #prefix>
-                <i-custom-search-icon class="remote-select-search-icon" />
-              </template>
-            </el-input>
-          </base-form-item>
-          <el-row>
-            <base-form-item label="时间范围：" prop="time">
-              <el-date-picker
-                v-model="searchFormData.time"
-                type="datetimerange"
-                range-separator="～"
-                unlink-panels
-                :clearable="false"
-                :shortcuts="shortcutsDaterange"
-                :disabled-date="disabledDate"
-                :prefix-icon="ICustomCalender"
-                id="audit-search-time"
-              />
+  <active-container :is-show="connectionIsActive">
+    <el-container class="audit-detail-wrapper">
+      <el-header class="p-x-0" style="height: auto;">
+        <div class="search-form-wrapper">
+          <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
+            <base-form-item label="操作用户：" prop="username">
+              <el-input v-model="searchFormData.username" placeholder="请输入用户名称" style="width: 172px;" id="audit-search-name">
+                <template #prefix>
+                  <i-custom-search-icon class="remote-select-search-icon" />
+                </template>
+              </el-input>
             </base-form-item>
-            <div class="search-form-buttons">
-              <el-button @click="handleReset" id="audit-search-reset">重置</el-button>
-              <el-button type="primary" @click="handleSearch" id="audit-search-search">查询</el-button>
-            </div>
-          </el-row>
-        </el-form>
-      </div>
-    </el-header>
-    <el-main class="p-0">
-      <div class="page-table-details">
-        <h4 class="page-table-title">日志列表</h4>
-        <div class="page-table-box">
-          <el-table
-            :data="tableData.list"
-            v-loading="loading"
-            style="width: 100%;"
-            :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
-            :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
-            tooltip-effect="light"
-            :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
-            ref="tableRef"
-          >
-            <el-table-column label="操作时间" prop="time" width="180" align="center" show-overflow-tooltip />
-            <el-table-column label="IP来源" prop="address" width="160" align="center" show-overflow-tooltip />
-            <el-table-column label="操作用户" prop="username" width="140" align="center" show-overflow-tooltip />
-            <el-table-column label="操作详情" prop="log" min-width="280" align="left">
-              <template #default="{ row, $index }">
-                <overflow-click
-                  class="detail-text-button"
-                  :content="row.log"
-                  :key="row.time + $index + '_' + row.log"
-                  :offset="24"
-                  @handleClick="() => handleView(row)"
+            <base-form-item label="IP来源：" prop="address">
+              <el-input v-model="searchFormData.address" placeholder="请输入 IP 来源" style="width: 172px;" id="audit-search-ip">
+                <template #prefix>
+                  <i-custom-search-icon class="remote-select-search-icon" />
+                </template>
+              </el-input>
+            </base-form-item>
+            <base-form-item label="操作详情：" prop="log">
+              <el-input v-model="searchFormData.log" placeholder="请输入操作详情" style="width: 172px;" id="audit-search-log">
+                <template #prefix>
+                  <i-custom-search-icon class="remote-select-search-icon" />
+                </template>
+              </el-input>
+            </base-form-item>
+            <el-row>
+              <base-form-item label="时间范围：" prop="time">
+                <el-date-picker
+                  v-model="searchFormData.time"
+                  type="datetimerange"
+                  range-separator="～"
+                  unlink-panels
+                  :clearable="false"
+                  :shortcuts="shortcutsDaterange"
+                  :disabled-date="disabledDate"
+                  :prefix-icon="ICustomCalender"
+                  id="audit-search-time"
                 />
-              </template>
-            </el-table-column>
-            <template #empty>
-              <div class="table-empty-wrapper">
-                <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-                <span class="data-empty-text">暂无数据</span>
+              </base-form-item>
+              <div class="search-form-buttons">
+                <el-button @click="handleReset" id="audit-search-reset">重置</el-button>
+                <el-button type="primary" @click="handleSearch" id="audit-search-search">查询</el-button>
               </div>
-            </template>
-          </el-table>
-
-          <el-pagination
-            v-if="totalCount > 0"
-            v-model:currentPage="pagination.pageNum"
-            v-model:page-size="pagination.pageSize"
-            class="m-t-20"
-            layout="prev, pager, next, sizes, jumper"
-            background
-            :page-sizes="[10, 20, 50, 100]"
-            :total="totalCount"
-            @size-change="onChangePageSize"
-            @current-change="onChangePage"
-          />
+            </el-row>
+          </el-form>
         </div>
-      </div>
-    </el-main>
+      </el-header>
+      <el-main class="p-0">
+        <div class="page-table-details">
+          <h4 class="page-table-title">日志列表</h4>
+          <div class="page-table-box">
+            <el-table
+              :data="tableData.list"
+              v-loading="loading"
+              style="width: 100%;"
+              :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+              :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+              tooltip-effect="light"
+              :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
+              ref="tableRef"
+            >
+              <el-table-column label="操作时间" prop="time" width="180" align="center" show-overflow-tooltip />
+              <el-table-column label="IP来源" prop="address" width="160" align="center" show-overflow-tooltip />
+              <el-table-column label="操作用户" prop="username" width="140" align="center" show-overflow-tooltip />
+              <el-table-column label="操作详情" prop="log" min-width="280" align="left">
+                <template #default="{ row, $index }">
+                  <overflow-click
+                    class="detail-text-button"
+                    :content="row.log"
+                    :key="row.time + $index + '_' + row.log"
+                    :offset="24"
+                    @handleClick="() => handleView(row)"
+                  />
+                </template>
+              </el-table-column>
+              <template #empty>
+                <div class="table-empty-wrapper">
+                  <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+                  <span class="data-empty-text">暂无数据</span>
+                </div>
+              </template>
+            </el-table>
 
-    <el-dialog title="操作详情" v-model="dialogVisible" width="480px" :close-on-click-modal="false" align-center id="audit-modal-detail">
-      <div class="detail-text">{{ editDetail }}</div>
-    </el-dialog>
-  </el-container>
+            <el-pagination
+              v-if="totalCount > 0"
+              v-model:currentPage="pagination.pageNum"
+              v-model:page-size="pagination.pageSize"
+              class="m-t-20"
+              layout="prev, pager, next, sizes, jumper"
+              background
+              :page-sizes="[10, 20, 50, 100]"
+              :total="totalCount"
+              @size-change="onChangePageSize"
+              @current-change="onChangePage"
+            />
+          </div>
+        </div>
+      </el-main>
+
+      <el-dialog title="操作详情" v-model="dialogVisible" width="480px" :close-on-click-modal="false" align-center id="audit-modal-detail">
+        <div class="detail-text">{{ editDetail }}</div>
+      </el-dialog>
+    </el-container>
+  </active-container>
 </template>
 
 <script setup lang="ts">
 import type { FormInstance } from 'element-plus';
 import { cloneDeep } from 'lodash-es';
 import { LogApi } from '@/api';
+import { useConnectionStore } from '@/stores';
 import {
   getStartAndEnd, today, formatDate, getOneInterval, getOneIntervalNow,
 } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
 import OverflowClick from './components/overflow-click.vue';
 
+const connectionStore = useConnectionStore();
+const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
 const { maxTableHeight } = useTableHeight(340);
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({
@@ -198,9 +203,23 @@ function handleView(row: Log.AuditData) {
 }
 
 onMounted(() => {
+  if (!connectionIsActive.value) return;
   handleReset();
   handleSearch();
 });
+
+watch(
+  () => connectionIsActive.value,
+  (val) => {
+    if (val) {
+      handleReset();
+      handleSearch();
+    }
+  },
+  {
+    immediate: true,
+  },
+);
 </script>
 
 <style lang="scss" scoped>

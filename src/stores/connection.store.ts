@@ -25,6 +25,7 @@ export const useConnectionStore = defineStore('ConnectionStore', () => {
     currentVersion: '',
   });
   const connectionIsMaster = ref();
+  const connectionIsActive = ref<boolean | null>(null);
   const slaveConnectionStatus = ref(true);
 
   function setConnection(data: Connection.ConnectionDetail) {
@@ -33,6 +34,10 @@ export const useConnectionStore = defineStore('ConnectionStore', () => {
 
   function setConnectionMasterType(data: boolean) {
     connectionIsMaster.value = data;
+  }
+
+  function setConnectionActive(data: boolean | null) {
+    connectionIsActive.value = data;
   }
 
   function setSlaveConnectionStatus(data: boolean) {
@@ -44,6 +49,8 @@ export const useConnectionStore = defineStore('ConnectionStore', () => {
     setConnection,
     connectionIsMaster,
     setConnectionMasterType,
+    connectionIsActive,
+    setConnectionActive,
     slaveConnectionStatus,
     setSlaveConnectionStatus,
   };
