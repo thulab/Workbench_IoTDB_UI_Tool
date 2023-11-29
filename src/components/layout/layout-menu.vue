@@ -70,7 +70,13 @@ const menuStore = useMenuStore();
 const router = useRouter();
 const allRoutes = computed(() => router.options.routes);
 const connectionVisible = ref(false);
-const clusterType = computed(() => (connectionStore.connectionIsMaster ? 'master' : 'slave'));
+// 因趋势 监听主备集群 websocket 会调用两次，不设置默认值，菜单侧因主备集群其一未能正常使用，接口返回慢，此处设置默认为'master'。
+const clusterType = computed(() => {
+  if (typeof connectionStore.connectionIsMaster === 'boolean') {
+    return connectionStore.connectionIsMaster ? 'master' : 'slave';
+  }
+  return 'master';
+});
 const connectionName = computed(() => connectionStore.connectionInfo.data.name || '连接实例');
 const slaveConnectionStatus = computed(() => connectionStore.slaveConnectionStatus);
 const connectionHost = computed(() => {
