@@ -58,8 +58,8 @@
             <el-table-column label="任务状态" prop="state" width="160" align="center" show-overflow-tooltip>
               <template #default="{ row }">
                 <div class="flex-center">
-                  <el-icon v-if="row.state === 'stopped'" size="16"><i-custom-sync-stopped /></el-icon>
-                  <el-icon v-else size="16"><i-custom-sync-running /></el-icon>
+                  <el-icon v-if="row.state === 'stopped'" size="16" class="m-t-4"><i-custom-sync-stopped /></el-icon>
+                  <el-icon v-else size="16" class="m-t-4"><i-custom-sync-running /></el-icon>
                   <el-tooltip
                     placement="top-start"
                     effect="light"
@@ -187,7 +187,7 @@ function handleSelectionChange(vals: DataSync.SynchronListData[]) {
 }
 
 function handleStatusInfo(row: DataSync.SynchronListData) {
-  if (!row.exceptionMessage || row.state === 'running') return;
+  if (!row.exceptionMessage) return;
   editErrorMessage.value = row.exceptionMessage;
   errorMessageVisible.value = true;
 }

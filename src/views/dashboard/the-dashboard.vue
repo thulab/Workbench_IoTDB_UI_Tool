@@ -17,7 +17,7 @@
                 <el-icon size="24"><i-custom-system-status /></el-icon>
                 <span class="module-label-text">服务器状态(Running)：</span>
                 <span class="module-content-text" v-if="!systemData.dataNodeRatio && !systemData.configNodeRatio">-</span>
-                <span class="module-content-text" v-else>Datanode {{systemData.dataNodeRatio ? `${systemData.dataNodeRatio}个` : '-'}} Confignode {{ systemData.configNodeRatio ? `${systemData.configNodeRatio}个` : '-'}}</span>
+                <span class="module-content-text" v-else>ConfigNode {{ systemData.configNodeRatio ? `${systemData.configNodeRatio}个` : '-'}} DataNode {{systemData.dataNodeRatio ? `${systemData.dataNodeRatio}个` : '-'}}</span>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-active-status /></el-icon>
@@ -86,7 +86,7 @@
                 <el-icon size="24"><i-custom-system-status /></el-icon>
                 <span class="module-label-text">服务器状态(Running)：</span>
                 <span class="module-content-text" v-if="!slaveData.dataNodeRatio && !slaveData.configNodeRatio">-</span>
-                <span class="module-content-text" v-else>Datanode {{slaveData.dataNodeRatio ? `${slaveData.dataNodeRatio}个` : '-'}} Confignode {{ slaveData.configNodeRatio ? `${slaveData.configNodeRatio}个` : '-'}}</span>
+                <span class="module-content-text" v-else>ConfigNode {{ slaveData.configNodeRatio ? `${slaveData.configNodeRatio}个` : '-'}} DataNode {{slaveData.dataNodeRatio ? `${slaveData.dataNodeRatio}个` : '-'}}</span>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-active-status /></el-icon>
@@ -165,7 +165,7 @@
               </div>
 
               <monitor-datanode
-                v-if="currentNodeType === 'datanode'"
+                v-if="currentNodeType === 'DataNode'"
                 ref="monitorDatanodeRef"
                 :node="monitorNode"
                 :node-type="currentNodeType"
@@ -173,7 +173,7 @@
                 @handleFetch="handleFetch"
               />
               <monitor-confignode
-                v-else-if="currentNodeType === 'confignode'"
+                v-else-if="currentNodeType === 'ConfigNode'"
                 ref="monitorConfignodeRef"
                 :node="monitorNode"
                 :node-type="currentNodeType"
@@ -261,12 +261,12 @@ const { requestFn: getSystemInfo, loading } = useRequest(DashboardApi.getSystemI
 
 function getMonitorData() {
   monitorTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
-  if (currentNodeType.value === 'datanode') {
+  if (currentNodeType.value === 'DataNode') {
     nextTick(() => {
       monitorDatanodeRef.value?.initialAssign();
       monitorDatanodeRef.value?.getInitial();
     });
-  } else if (currentNodeType.value === 'confignode') {
+  } else if (currentNodeType.value === 'ConfigNode') {
     nextTick(() => {
       monitorConfignodeRef.value?.initialAssign();
       monitorConfignodeRef.value?.getInitial();

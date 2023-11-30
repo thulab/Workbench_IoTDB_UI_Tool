@@ -565,9 +565,9 @@ function getCpu() {
   return getMetricAllCPU(isMaster.value).then((res) => {
     if (res.data) {
       res.data.forEach((item) => {
-        if (item.nodeType === 'datanode') {
+        if (item.nodeType === 'DataNode') {
           cpuData.dataCpu = (item.cpu || item.cpu === 0) ? item.cpu : '-';
-        } else if (item.nodeType === 'confignode') {
+        } else if (item.nodeType === 'ConfigNode') {
           cpuData.configCpu = (item.cpu || item.cpu === 0) ? item.cpu : '-';
         }
       });
@@ -596,12 +596,12 @@ function getSystem() {
   return getMetricAllMemory(isMaster.value).then((res) => {
     if (res.data) {
       res.data.forEach((item) => {
-        if (item.nodeType === 'datanode') {
+        if (item.nodeType === 'DataNode') {
           dataNodeSystemData.dataVal = item.memoryUse;
           dataNodeSystemData.totalVal = item.memoryTotal;
           dataNodeSystemData.percent = item.memoryRatio;
           dataNodeSystemData.valueUnit = item.unit;
-        } else if (item.nodeType === 'confignode') {
+        } else if (item.nodeType === 'ConfigNode') {
           configNodeSystemData.dataVal = item.memoryUse;
           configNodeSystemData.totalVal = item.memoryTotal;
           configNodeSystemData.percent = item.memoryRatio;
