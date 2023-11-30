@@ -81,16 +81,16 @@ const route = [
           icon: ICustomAuditLog,
         },
       },
-      {
-        path: 'white-list',
-        name: 'WhiteList',
-        component: () => import('@/views/white-list/detail.vue'),
-        meta: {
-          keepAlive: true,
-          title: '白名单管理',
-          icon: ICustomWhiteList,
-        },
-      },
+      // {
+      //   path: 'white-list',
+      //   name: 'WhiteList',
+      //   component: () => import('@/views/white-list/detail.vue'),
+      //   meta: {
+      //     keepAlive: true,
+      //     title: '白名单管理',
+      //     icon: ICustomWhiteList,
+      //   },
+      // },
     ],
   },
   {
