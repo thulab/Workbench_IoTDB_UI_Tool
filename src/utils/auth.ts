@@ -35,17 +35,19 @@ const splitVersion = (version: string) => {
 };
 
 // 1.2.3及以上版本布置权限最新版
-export const iotdbShowAuth = (version?: string) => {
+export const iotdbShowAuth = (version?: string, controlVersion: string = '1.2.3') => {
   const iotdbVersion = version || sessionStorage.getItem('iotdbVersion') || '';
   const versionArr = splitVersion(iotdbVersion) || [];
-  if (versionArr.length) {
+  const controlVersionArr = splitVersion(controlVersion) || [];
+  if (versionArr.length && controlVersionArr.length) {
     const [majorStr, minorStr, releaseStr] = versionArr;
+    const [majorControlStr, minorControlStr, releaseControlStr] = controlVersionArr;
     const major = +majorStr; // 主版本
     const minor = +minorStr; // 次版本
     const release = +releaseStr; // 修订版本
-    if (major > 1) return true;
-    if (major === 1 && minor > 2) return true;
-    if (major === 1 && minor === 2 && release >= 3) return true;
+    if (major > +majorControlStr) return true;
+    if (major === +majorControlStr && minor > +minorControlStr) return true;
+    if (major === +majorControlStr && minor === +minorControlStr && release >= +releaseControlStr) return true;
     return false;
   }
   return false;
