@@ -454,6 +454,13 @@ Graph.registerNode(
   true,
 );
 
+// 状态变更重置节点操作
+function resetNode() {
+  standAloneList.value = [];
+  doubleLiveList.value = [];
+  clusterList.value = [];
+}
+
 function initialGraph(isDisabled?: boolean) {
   if (graph.value) {
     graph.value.dispose();
@@ -1241,6 +1248,7 @@ async function handleEdit() {
     if (!flag) return;
   }
   viewNode.value = undefined;
+  resetNode();
   initialGraph(false);
   graphWatchEvent();
   graphBindEvent();
@@ -1295,17 +1303,12 @@ watch(
   (newVal) => {
     if (newVal) {
       listLoading.value = false;
-      standAloneList.value = [];
-      doubleLiveList.value = [];
-      clusterList.value = [];
-      isShowTextStyle.value = false;
-      isShowNodeStyle.value = false;
+      resetNode();
+      resetState();
       currentNode.value = undefined;
-      isShowEdgeStyle.value = false;
       currentEdge.value = undefined;
       operateNode.value = undefined;
       operateEdge.value = undefined;
-      isShowContextMenu.value = false;
       contextMenuType.value = '';
       contextMenuTimer.value = undefined;
       editType.value = 'view';
