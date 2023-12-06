@@ -519,6 +519,11 @@ watch(
     if (val !== old) {
       if (val) {
         pageType.value = 'view';
+        entityUserPrivileges.value = [];
+        pathUserPrivileges.value = [{ path: '', privileges: [] }];
+        sourceData.role = [];
+        sourceData.entityPrivileges = [];
+        sourceData.pathPrivileges = [];
         getDetail();
       }
     }
