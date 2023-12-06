@@ -172,6 +172,8 @@ function querySqlRun() {
     columnList.value = []; // 列名
     tableData.list = []; // 值
     sqlResult.value = [];
+    pagination.pageSize = 10;
+    pageNums.length = 0;
     controller = new AbortController();
     querySql({ sqls: codeVal.value?.split(';\n'), timestamp: timeNumber.value }, controller)
       .then((res) => {
@@ -312,6 +314,7 @@ function emptyQuery() {
       tableData.list = [];
       columnList.value = [];
       sqlResult.value = [];
+      pageNums.length = 0;
     });
 }
 
