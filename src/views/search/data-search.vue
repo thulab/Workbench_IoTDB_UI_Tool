@@ -361,6 +361,7 @@ function getListData() {
 function handleReset() {
   searchFormRef.value?.resetFields();
   searchFormData.time = todayNow();
+  searchFormData.unitInterval = 's';
   searchFormData.datetimerange = ['1970-01-01 00:00:00', todayNow()] as [DateModelType, DateModelType];
 }
 
