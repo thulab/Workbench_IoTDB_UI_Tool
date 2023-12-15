@@ -75,16 +75,19 @@ declare namespace StorageDevice{
 
   export interface ModelData {
     node: string;
+    label: string;
+    value: string;
     nodePath: string;
     nodeType: string; // database, database_device, device, timeseries, interna
+    leaf?: boolean,
     deviceCount?: number;
     timeseriesCount?: number;
     timeseriesType?: string; // BASE，VIEW
     dataType?: string;
-    value?: string;
+    newValue?: string;
     valueTime?: string;
     pageNum: number;
-    pageSize: number;
+    pageSize?: number;
     children?: ModelData[];
     collapsed?: boolean;
     hasNext?: boolean;
@@ -99,5 +102,6 @@ declare namespace StorageDevice{
     hasPre: boolean;
     pageNum: number;
     pageSize: number;
+    nodePath?: string;
   }
 }
