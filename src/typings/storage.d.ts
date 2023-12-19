@@ -75,8 +75,8 @@ declare namespace StorageDevice{
 
   export interface ModelData {
     node: string;
-    label: string;
-    value: string;
+    label?: string | Object;
+    value?: string;
     nodePath: string;
     nodeType: string; // database, database_device, device, timeseries, interna
     leaf?: boolean,
