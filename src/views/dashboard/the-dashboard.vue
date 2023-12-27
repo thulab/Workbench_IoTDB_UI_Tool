@@ -60,7 +60,7 @@
                 <el-table-column label="节点" prop="address" min-width="200" align="center" show-overflow-tooltip />
                 <el-table-column label="类型" prop="type" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
                 <el-table-column label="状态" prop="status" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
-                <el-table-column label="版本" prop="version" min-width="90" align="center" show-overflow-tooltip />
+                <el-table-column label="版本" prop="version" v-if="showVersionCol" min-width="90" align="center" show-overflow-tooltip />
                 <el-table-column label="物理机" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
                 <template #empty>
                   <div class="table-empty-wrapper">
@@ -129,7 +129,7 @@
                 <el-table-column label="节点" prop="address" min-width="200" align="center" show-overflow-tooltip />
                 <el-table-column label="类型" prop="type" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
                 <el-table-column label="状态" prop="status" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
-                <el-table-column label="版本" prop="version" min-width="90" align="center" show-overflow-tooltip />
+                <el-table-column label="版本" prop="version" v-if="showVersionCol" min-width="90" align="center" show-overflow-tooltip />
                 <el-table-column label="物理机" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
                 <template #empty>
                   <div class="table-empty-wrapper">
@@ -206,6 +206,7 @@ import type { ElTable } from 'element-plus';
 import { useUserStore, useConnectionStore } from '@/stores';
 import { DashboardApi } from '@/api';
 import { toThousands } from '@/utils/format';
+import { iotdbShowAuth } from '@/utils/auth';
 import MonitorAll from './components/monitor-all.vue';
 import MonitorDatanode from './components/monitor-datanode.vue';
 import MonitorConfignode from './components/monitor-confignode.vue';
@@ -256,6 +257,8 @@ const nodeList = computed(() => {
   }
   return masterNodes.value;
 });
+
+const showVersionCol = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.2.0'));
 
 const { requestFn: getSystemInfo, loading } = useRequest(DashboardApi.getSystemInfo);
 

@@ -1,149 +1,153 @@
 <template>
-  <el-container class="data-sync-detail-wrapper">
-    <el-header class="p-x-0" style="height: auto;">
-      <div class="search-form-wrapper">
-        <el-form :model="searchFormData" label-position="left" size="default" inline @submit.prevent>
-          <base-form-item label="任务名称：" prop="name">
-            <el-input v-model="searchFormData.name" placeholder="请输入任务名称" id="data-sync-search-name">
-              <template #prefix>
-                <i-custom-search-icon class="remote-select-search-icon" />
-              </template>
-            </el-input>
-          </base-form-item>
-        </el-form>
-        <div class="search-form-buttons">
-          <auth-tooltip :is-disabled="canUsePipe">
-            <el-button @click="handleReset" :disabled="!canUsePipe" id="data-sync-search-reset">重置</el-button>
-          </auth-tooltip>
-          <auth-tooltip :is-disabled="canUsePipe">
-            <el-button type="primary" @click="handleSearch" :disabled="!canUsePipe" id="data-sync-search-search">查询</el-button>
-          </auth-tooltip>
-        </div>
-      </div>
-    </el-header>
-    <el-main class="p-0">
-      <div class="page-table-details">
-        <div class="page-table-title-box">
-          <h4 class="page-table-title">任务列表</h4>
-          <div class="operate-buttons">
-            <auth-tooltip :is-disabled="canUsePipe">
-              <el-button type="primary" @click="handleAdd" :disabled="!canUsePipe" id="data-sync-add">新建任务</el-button>
-            </auth-tooltip>
-            <auth-tooltip :is-disabled="canUsePipe">
-              <el-dropdown :disabled="!multipleSelection.length || !canUsePipe" @command="val => handleCommandDown(val)" class="m-x-16">
-                <el-button type="primary" class="export-btn" :disabled="!multipleSelection.length || !canUsePipe" id="data-sync-batch">
-                  批量操作<el-icon class="el-icon--right"><i-ep-arrow-down /></el-icon>
-                </el-button>
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item command="del">批量删除</el-dropdown-item>
-                    <el-dropdown-item command="running">批量启动</el-dropdown-item>
-                    <el-dropdown-item command="stopped">批量停止</el-dropdown-item>
-                  </el-dropdown-menu>
+  <version-container :is-show="showAuthMenu" :versiton-tip="'1.2.1'">
+    <el-container class="data-sync-detail-wrapper">
+      <el-header class="p-x-0" style="height: auto;">
+        <div class="search-form-wrapper">
+          <el-form :model="searchFormData" label-position="left" size="default" inline @submit.prevent>
+            <base-form-item label="任务名称：" prop="name">
+              <el-input v-model="searchFormData.name" placeholder="请输入任务名称" id="data-sync-search-name">
+                <template #prefix>
+                  <i-custom-search-icon class="remote-select-search-icon" />
                 </template>
-              </el-dropdown>
+              </el-input>
+            </base-form-item>
+          </el-form>
+          <div class="search-form-buttons">
+            <auth-tooltip :is-disabled="canUsePipe">
+              <el-button @click="handleReset" :disabled="!canUsePipe" id="data-sync-search-reset">重置</el-button>
             </auth-tooltip>
             <auth-tooltip :is-disabled="canUsePipe">
-              <el-button link @click="handleSearch" :disabled="!canUsePipe" id="data-sync-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+              <el-button type="primary" @click="handleSearch" :disabled="!canUsePipe" id="data-sync-search-search">查询</el-button>
             </auth-tooltip>
           </div>
         </div>
-        <auth-container :is-auth="canUsePipe" style="height: 100%;">
-          <div class="page-table-box">
-            <el-table
-              :data="tableDataPagination"
-              v-loading="loading"
-              style="width: 100%;"
-              :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
-              :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
-              tooltip-effect="light"
-              :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
-              ref="tableRef"
-              @selection-change="handleSelectionChange"
-            >
-              <el-table-column type="selection" width="55" />
-              <el-table-column label="任务名称" prop="name" min-width="180" align="center" show-overflow-tooltip />
-              <el-table-column label="同步数据" prop="measurement" min-width="160" align="center" show-overflow-tooltip />
-              <el-table-column label="同步范围" prop="range" min-width="120" align="center" show-overflow-tooltip />
-              <el-table-column label="目标地址" prop="targetAddress" min-width="160" align="center" show-overflow-tooltip />
-              <el-table-column label="任务状态" prop="state" width="160" align="center" show-overflow-tooltip>
-                <template #default="{ row }">
-                  <div class="flex-center">
-                    <el-icon v-if="row.state === 'stopped'" size="16" class="m-t-4"><i-custom-sync-stopped /></el-icon>
-                    <el-icon v-else size="16" class="m-t-4"><i-custom-sync-running /></el-icon>
-                    <el-tooltip
-                      placement="top-start"
-                      effect="light"
-                      trigger="hover"
-                      content="错误详情"
-                      :disabled="!row.exceptionMessage"
-                      popper-class="tooltip-box-width"
-                    >
-                      <span :class="[row.exceptionMessage ? 'stop-error-button' : '', 'm-l-4']" @click="handleStatusInfo(row)">{{ row.state }}</span>
-                    </el-tooltip>
-                  </div>
-                </template>
-              </el-table-column>
-              <el-table-column label="创建时间" prop="creationTime" min-width="200" align="center" show-overflow-tooltip />
-              <el-table-column label="操作" width="180" align="center" fixed="right">
-                <template #default="{ row }">
-                  <div>
-                    <el-button type="primary" link size="small" @click="handleEdit(row)" :id="`data-sync-table-${row.name}-view`">详情</el-button>
-                    <el-button type="primary" link size="small" @click="handleStatus('row', row, row.state === 'running' ? 'stopped' : 'running')" :id="`data-sync-table-${row.name}-state`">{{row.state === 'running' ? '停止' : '启动'}}</el-button>
-                    <el-button type="primary" link size="small" @click="handleDel('row', row)" :id="`data-sync-table-${row.name}-del`">删除</el-button>
-                  </div>
-                </template>
-              </el-table-column>
-              <template #empty>
-                <div class="table-empty-wrapper">
-                  <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-                  <span class="data-empty-text">暂无数据</span>
-                </div>
-              </template>
-            </el-table>
-
-            <el-pagination
-              v-if="totalCount > 0"
-              v-model:currentPage="pagination.pageNum"
-              v-model:page-size="pagination.pageSize"
-              class="m-t-20"
-              layout="prev, pager, next, sizes, jumper"
-              background
-              :page-sizes="[10, 20, 50, 100]"
-              :total="totalCount"
-              @size-change="onChangePageSize"
-              @current-change="onChangePage"
-            />
+      </el-header>
+      <el-main class="p-0">
+        <div class="page-table-details">
+          <div class="page-table-title-box">
+            <h4 class="page-table-title">任务列表</h4>
+            <div class="operate-buttons">
+              <auth-tooltip :is-disabled="canUsePipe">
+                <el-button type="primary" @click="handleAdd" :disabled="!canUsePipe" id="data-sync-add">新建任务</el-button>
+              </auth-tooltip>
+              <auth-tooltip :is-disabled="canUsePipe">
+                <el-dropdown :disabled="!multipleSelection.length || !canUsePipe" @command="val => handleCommandDown(val)" class="m-x-16">
+                  <el-button type="primary" class="export-btn" :disabled="!multipleSelection.length || !canUsePipe" id="data-sync-batch">
+                    批量操作<el-icon class="el-icon--right"><i-ep-arrow-down /></el-icon>
+                  </el-button>
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item command="del">批量删除</el-dropdown-item>
+                      <el-dropdown-item command="running">批量启动</el-dropdown-item>
+                      <el-dropdown-item command="stopped">批量停止</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </auth-tooltip>
+              <auth-tooltip :is-disabled="canUsePipe">
+                <el-button link @click="handleSearch" :disabled="!canUsePipe" id="data-sync-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+              </auth-tooltip>
+            </div>
           </div>
-        </auth-container>
-      </div>
-    </el-main>
+          <auth-container :is-auth="canUsePipe" style="height: 100%;">
+            <div class="page-table-box">
+              <el-table
+                :data="tableDataPagination"
+                v-loading="loading"
+                style="width: 100%;"
+                :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+                :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+                tooltip-effect="light"
+                :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
+                ref="tableRef"
+                @selection-change="handleSelectionChange"
+              >
+                <el-table-column type="selection" width="55" />
+                <el-table-column label="任务名称" prop="name" min-width="180" align="center" show-overflow-tooltip />
+                <el-table-column label="同步数据" prop="measurement" min-width="160" align="center" show-overflow-tooltip />
+                <el-table-column label="同步范围" prop="range" min-width="120" align="center" show-overflow-tooltip />
+                <el-table-column label="目标地址" prop="targetAddress" min-width="160" align="center" show-overflow-tooltip />
+                <el-table-column label="任务状态" prop="state" width="160" align="center" show-overflow-tooltip>
+                  <template #default="{ row }">
+                    <div class="flex-center">
+                      <el-icon v-if="row.state === 'stopped'" size="16" class="m-t-4"><i-custom-sync-stopped /></el-icon>
+                      <el-icon v-else size="16" class="m-t-4"><i-custom-sync-running /></el-icon>
+                      <el-tooltip
+                        placement="top-start"
+                        effect="light"
+                        trigger="hover"
+                        content="错误详情"
+                        :disabled="!row.exceptionMessage"
+                        popper-class="tooltip-box-width"
+                      >
+                        <span :class="[row.exceptionMessage ? 'stop-error-button' : '', 'm-l-4']" @click="handleStatusInfo(row)">{{ row.state }}</span>
+                      </el-tooltip>
+                    </div>
+                  </template>
+                </el-table-column>
+                <el-table-column label="创建时间" prop="creationTime" min-width="200" align="center" show-overflow-tooltip />
+                <el-table-column label="操作" width="180" align="center" fixed="right">
+                  <template #default="{ row }">
+                    <div>
+                      <el-button type="primary" link size="small" @click="handleEdit(row)" :id="`data-sync-table-${row.name}-view`">详情</el-button>
+                      <el-button type="primary" link size="small" @click="handleStatus('row', row, row.state === 'running' ? 'stopped' : 'running')" :id="`data-sync-table-${row.name}-state`">{{row.state === 'running' ? '停止' : '启动'}}</el-button>
+                      <el-button type="primary" link size="small" @click="handleDel('row', row)" :id="`data-sync-table-${row.name}-del`">删除</el-button>
+                    </div>
+                  </template>
+                </el-table-column>
+                <template #empty>
+                  <div class="table-empty-wrapper">
+                    <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+                    <span class="data-empty-text">暂无数据</span>
+                  </div>
+                </template>
+              </el-table>
 
-    <modal-sync
-      v-model:visible="editVisible"
-      :edit-type="editType"
-      :edit-data="editData"
-      :edit-time="editTime"
-      @handleSave="handleSearch"
-    />
+              <el-pagination
+                v-if="totalCount > 0"
+                v-model:currentPage="pagination.pageNum"
+                v-model:page-size="pagination.pageSize"
+                class="m-t-20"
+                layout="prev, pager, next, sizes, jumper"
+                background
+                :page-sizes="[10, 20, 50, 100]"
+                :total="totalCount"
+                @size-change="onChangePageSize"
+                @current-change="onChangePage"
+              />
+            </div>
+          </auth-container>
+        </div>
+      </el-main>
 
-    <modal-error-message
-      v-model:visible="errorMessageVisible"
-      :content="editErrorMessage"
-    />
-  </el-container>
+      <modal-sync
+        v-model:visible="editVisible"
+        :edit-type="editType"
+        :edit-data="editData"
+        :edit-time="editTime"
+        @handleSave="handleSearch"
+      />
+
+      <modal-error-message
+        v-model:visible="errorMessageVisible"
+        :content="editErrorMessage"
+      />
+    </el-container>
+  </version-container>
 </template>
 
 <script setup lang="ts">
 import type { DateModelType } from 'element-plus';
 import { storeToRefs } from 'pinia';
 import { DataSyncApi } from '@/api';
-import { useUserStore } from '@/stores';
+import { useUserStore, useConnectionStore } from '@/stores';
 import { todayNow } from '@/utils/date';
+import { iotdbShowAuth } from '@/utils/auth';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalSync from './components/modal-sync.vue';
 import ModalErrorMessage from './components/modal-error-message.vue';
 
+const connectionStore = useConnectionStore();
 const userStore = useUserStore();
 const {
   canUsePipe,
@@ -172,6 +176,8 @@ const { requestFn: startTaskByNames } = useRequest(DataSyncApi.startTaskByNames)
 const { requestFn: stopTaskByNames } = useRequest(DataSyncApi.stopTaskByNames);
 
 const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
+
+const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.2.1'));
 
 function getListData() {
   getDataSynchronList(searchFormData.name).then((res) => {

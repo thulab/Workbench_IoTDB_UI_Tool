@@ -45,7 +45,7 @@
               v-model:model-value="formData.expression"
               @ready="()=>codeMirrorReady = true"
               :style="{
-                height: `216px`,
+                height: `288px`,
                 backgroundColor: '#F7F8FC',
               }"
               ref="codeEditorRef"
@@ -260,7 +260,7 @@ watch(
 
 .calculate-expression-box{
   width: 100%;
-  height: 216px;
+  height: 288px;
   box-sizing: border-box;
   position: relative;
 

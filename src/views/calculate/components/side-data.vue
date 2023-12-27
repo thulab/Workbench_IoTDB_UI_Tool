@@ -7,9 +7,11 @@
     <el-table
       v-if="measurementList && measurementList.length > 0"
       :data="measurementList"
-      :max-height="130"
+      :show-header="false"
+      :max-height="190"
       v-loading="measurementLoading"
       tooltip-effect="light"
+      cell-class-name="p-y-0"
       :tooltip-options="{ placement: 'left', popperClass: 'table-tooltip-max-width' }"
       @row-dblclick="(row, column, event)=>handleAdd(row)">
       <el-table-column align="center" label="测点" v-slot="{ row }" show-overflow-tooltip>

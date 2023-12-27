@@ -154,7 +154,8 @@ function getList(id?: number) {
     connectionList.value = [...standAloneList, ...clusterList, ...doubleLiveList];
     filterList.value = connectionList.value.filter((item) => item.name.includes(filterText.value));
     if (filterList.value.length) {
-      current.value = id || +filterList.value[0].id;
+      const flag = (!id && id !== 0) ? false : filterList.value.some((item) => +item.id === +id);
+      current.value = flag ? id! : +filterList.value[0].id;
       connectionFormRef.value?.getDetail(current.value);
     } else {
       detailLoading.value = false;
