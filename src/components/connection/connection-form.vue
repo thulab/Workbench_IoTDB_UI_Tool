@@ -383,7 +383,11 @@ function handleTest(type: 'test' | 'login') {
         if (type === 'test') {
           testLoading.value = true;
           testConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id }).then(() => {
-            ElMessage.success('连接成功');
+            let successMag = 'IoTDB连接成功';
+            if (formData.masterCluster.prometheusUrl || formData.slaveCluster?.prometheusUrl) {
+              successMag = 'IoTDB、Prometheus连接成功';
+            }
+            ElMessage.success(successMag);
           }).finally(() => {
             testLoading.value = false;
           });

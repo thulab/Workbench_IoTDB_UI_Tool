@@ -6,7 +6,17 @@
       </div>
       <div class="sql-right-icon-box">
         <el-button link @click="handleSave" id="sql-search-operate-save"><i-custom-sql-save />保存</el-button>
-        <el-button link :disabled="!runFlag" @click="querySqlRun" id="sql-search-operate-run"><i-custom-sql-run />运行</el-button>
+        <el-button link :disabled="!runFlag" @click="querySqlRun()" id="sql-search-operate-run"><i-custom-sql-run />全部运行</el-button>
+        <el-tooltip
+          placement="top-start"
+          effect="light"
+          trigger="hover"
+          content="请选中指定语句后操作"
+          :disabled="!!selectionCode"
+          popper-class="tooltip-max-width"
+        >
+          <el-button link :disabled="!runFlag || !selectionCode" @click="querySqlRun('part')" id="sql-search-operate-run"><i-custom-sql-run />部分运行</el-button>
+        </el-tooltip>
         <el-button link :disabled="runFlag" @click="stopquery" id="sql-search-operate-stop"><i-custom-sql-abort />取消</el-button>
         <el-button link @click="emptyQuery" id="sql-search-operate-empty"><i-custom-sql-empty />清空</el-button>
       </div>
@@ -22,6 +32,7 @@
           backgroundColor: '#f9fbfc',
         }"
         ref="codeEditorRef"
+        @update="handleUpdate"
       />
     </div>
   </div>
@@ -120,6 +131,7 @@ const currentQueryTime = ref('');
 const display = ref(false);
 const key = ref('1');
 const runFlag = ref(true);
+const selectionCode = ref('');
 
 const codeEditorHeight = computed(() => {
   const height = document.documentElement.clientHeight / 3;
@@ -154,13 +166,17 @@ const tableDataPagination = computed(() => tableData.list.map((item, index) => {
 let controller = new AbortController();
 
 // 执行sql
-function querySqlRun() {
-  if (!codeVal.value.length) {
+function querySqlRun(type?: string) {
+  let codeStr = codeVal.value.replace(/(\/\*[^*]*\*\/)|(\/\/[^*]*)|(--[^.].*)/gm, '').replace(/^\s+/gm, '');
+  if (type === 'part') {
+    codeStr = selectionCode.value;
+  }
+  if (!codeStr.length) {
     ElMessage.error('请先输入语句再运行');
     return;
   }
   if (runFlag.value) {
-    const sqlsArr = codeVal.value?.split(';\n');
+    const sqlsArr = codeStr?.split(';\n');
     if (sqlsArr?.length > 50) {
       ElMessage.warning('模版语句数量已达到上限，如有需要请新建模版进行操作');
       return;
@@ -175,7 +191,7 @@ function querySqlRun() {
     pagination.pageSize = 10;
     pageNums.length = 0;
     controller = new AbortController();
-    querySql({ sqls: codeVal.value?.split(';\n'), timestamp: timeNumber.value }, controller)
+    querySql({ sqls: sqlsArr, timestamp: timeNumber.value }, controller)
       .then((res) => {
         const { data } = res;
         activeName.value = 't0';
@@ -240,6 +256,10 @@ function querySqlRun() {
 
 function handleSave() {
   emit('save');
+}
+
+function handleUpdate() {
+  selectionCode.value = codeEditorRef.value!.getSelectionText().trim();
 }
 
 // 停止
@@ -311,6 +331,7 @@ function emptyQuery() {
   })
     .then(() => {
       codeVal.value = '';
+      selectionCode.value = '';
       tableData.list = [];
       columnList.value = [];
       sqlResult.value = [];
