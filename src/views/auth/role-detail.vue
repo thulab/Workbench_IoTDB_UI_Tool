@@ -46,7 +46,7 @@
                   </template>
                 </el-table-column>
                 <el-table-column v-for="(column, index) in entityPrivilegesEnumGroup" :label="column.group" :key="column.group + '_' + index + '_column'" align="center">
-                  <el-table-column v-for="(col, ci) in column.children" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :width="calcColumnWidth(col)">
+                  <el-table-column v-for="(col, ci) in column.children" :label="col.desc" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :width="calcColumnWidth(col)">
                     <template #default="{ row }">
                       <el-icon v-if="isView" size="21">
                         <i-custom-correct style="transform: translateY(3px);" v-if="row.includes(col.privileges)" />
@@ -77,7 +77,7 @@
                   </template>
                 </el-table-column>
                 <el-table-column v-for="(column, index) in pathPrivilegesEnumGroup" :label="column.group" :key="column.group + '_' + index + '_column'" align="center">
-                  <el-table-column v-for="(col, ci) in column.children" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :width="calcColumnWidth(col)">
+                  <el-table-column v-for="(col, ci) in column.children" :label="col.desc" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :width="calcColumnWidth(col)">
                     <template #default="{ row, $index }">
                       <el-icon v-if="isView" size="21">
                         <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.includes(col.privileges)" />
@@ -272,8 +272,8 @@ function handleReset(type: 'edit' | 'view') {
 }
 
 function calcColumnWidth(child: Auth.PrivilegeEnum) {
-  if (child.privileges.length > 0) {
-    return child.privileges.length * 8 + 32;
+  if (child.desc.length > 0) {
+    return child.desc.length * 16 + 64;
   }
   return child.width;
 }

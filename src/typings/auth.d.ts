@@ -8,6 +8,7 @@ declare namespace Auth{
   export interface PrivilegeEnum {
     privileges: string;
     width: number;
+    desc: string;
   }
 
   export interface PrivilegesEnum {

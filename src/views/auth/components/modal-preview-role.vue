@@ -20,7 +20,7 @@
             </template>
           </el-table-column>
           <el-table-column :label="group.group" v-for="group in entityPrivilegesEnumGroup" :key="group.group" align="center">
-            <el-table-column :label="child.privileges" v-for="child in group.children" :key="child.privileges" align="center" :width="calcColumnWidth(child)">
+            <el-table-column :label="child.desc" v-for="child in group.children" :key="child.privileges" align="center" :width="calcColumnWidth(child)">
               <template #default="{ row }">
                 <el-icon size="21">
                   <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.includes(child.privileges)" />
@@ -43,7 +43,7 @@
             </template>
           </el-table-column>
           <el-table-column v-for="(column, index) in pathPrivilegesEnumGroup" :label="column.group" :key="column.group + '_' + index + '_column'" align="center">
-            <el-table-column v-for="(col, ci) in column.children" :label="col.privileges" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :min-width="col.width || 180">
+            <el-table-column v-for="(col, ci) in column.children" :label="col.desc" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :min-width="col.width || 180">
               <template #default="{ row }">
                 <el-icon size="21">
                   <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.includes(col.privileges)" />
@@ -109,8 +109,8 @@ const tableData = computed(() => {
 });
 
 function calcColumnWidth(child: Auth.PrivilegeEnum) {
-  if (child.privileges.length > 0) {
-    return child.privileges.length * 8 + 32;
+  if (child.desc.length > 0) {
+    return child.desc.length * 16 + 64;
   }
   return child.width;
 }
