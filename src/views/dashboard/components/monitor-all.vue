@@ -22,10 +22,10 @@
         <h4 class="monitor-info-module-title">磁盘空间</h4>
         <div class="monitor-module-legend-box">
           <p class="monitor-info-legend" style="margin-right: 32px;">
-            <i class="legeng-icon" style="background-color: #495AD4;"></i>磁盘已用空间
+            <i class="legeng-icon" style="background-color: #495AD4;"></i>已用空间
           </p>
           <p class="monitor-info-legend">
-            <i class="legeng-icon" style="background-color: #009DEA;"></i>IoTDB 已用空间
+            <i class="legeng-icon" style="background-color: #DFE1ED;"></i>剩余空间
           </p>
         </div>
         <data-container :is-empty="diskMemoryData.diskTotal === null">
@@ -74,7 +74,7 @@
 
 <script setup lang="ts">
 import { type ECOption } from '@/plugins/echarts-plugin';
-import { toThousands } from '@/utils/format';
+import { toThousands, transformDecimal } from '@/utils/format';
 import { DashboardApi } from '@/api';
 import DataContainer from './data-container.vue';
 
@@ -97,10 +97,12 @@ interface PieChartData {
 interface DiskMemoryDetail {
   diskTotal: number | null;
   totalUnit: string;
-  diskMemory: string;
-  diskMemoryVal: number;
-  ioTDBMemory: string;
-  ioTDBMemoryVal: number;
+  diskMemory: number | string;
+  diskMemoryUnit: string;
+  diskUseRatio: number;
+  ioTDBMemory: number | string;
+  ioTDBMemoryUnit: string;
+  ioTDBUseRatio: number;
 }
 
 const cpuData = reactive<{
@@ -147,9 +149,11 @@ const diskMemoryData = reactive<DiskMemoryDetail>({
   diskTotal: null,
   totalUnit: '',
   diskMemory: '',
-  diskMemoryVal: 0,
+  diskMemoryUnit: '',
+  diskUseRatio: 0,
   ioTDBMemory: '',
-  ioTDBMemoryVal: 0,
+  ioTDBMemoryUnit: '',
+  ioTDBUseRatio: 0,
 });
 
 const writeSpeed = ref();
@@ -467,7 +471,21 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData, to
 
 const diskChartOptions = (diskMemoryChartData: DiskMemoryDetail): ECOption => ({
   tooltip: {
-    show: false,
+    trigger: 'axis',
+    show: true,
+    axisPointer: {
+      type: 'shadow',
+    },
+    formatter: (params) => {
+      let res = '';
+      const paramsData = params as unknown as Array<Record<string, any>>;
+      const circle = '<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:';
+      paramsData.forEach((item) => {
+        // eslint-disable-next-line no-nested-ternary
+        res += `<div style="margin: 10px 0 0;">${circle}${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;margin-left:2px">${item.seriesName}</span><span style="float:right;margin-left:20px;font-size:14px;color:#666;font-weight:900">${item.axisValueLabel === '磁盘空间' ? `${item.value} ${diskMemoryChartData.diskMemoryUnit}` : (item.value === undefined ? '-' : `${diskMemoryChartData.ioTDBMemory} ${diskMemoryChartData.ioTDBMemoryUnit}`)}</span></div>`;
+      });
+      return `<div style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0].axisValueLabel}</div>${res}`;
+    },
   },
   grid: {
     left: 10,
@@ -476,10 +494,10 @@ const diskChartOptions = (diskMemoryChartData: DiskMemoryDetail): ECOption => ({
     bottom: 20,
     containLabel: true,
   },
-  barWidth: 20,
+  barWidth: 30,
   yAxis: {
     type: 'category',
-    data: ['IoTDB 已用空间', '磁盘已用空间'],
+    data: ['IoTDB 空间', '磁盘空间'],
     axisTick: {
       show: false,
     },
@@ -490,6 +508,7 @@ const diskChartOptions = (diskMemoryChartData: DiskMemoryDetail): ECOption => ({
     },
     axisLabel: {
       color: '#424561',
+      fontWeight: 300,
     },
   },
   xAxis: {
@@ -498,6 +517,7 @@ const diskChartOptions = (diskMemoryChartData: DiskMemoryDetail): ECOption => ({
     axisLabel: {
       showMaxLabel: true,
       color: '#424561',
+      fontWeight: 300,
       formatter(value, index) {
         if (index === 0 || value === diskMemoryChartData.diskTotal) {
           return value + diskMemoryChartData.totalUnit;
@@ -513,39 +533,61 @@ const diskChartOptions = (diskMemoryChartData: DiskMemoryDetail): ECOption => ({
   },
   series: [
     {
+      name: '已用空间',
       type: 'bar',
+      stack: 'total',
       data: [
-        {
-          name: 'IoTDB 已用空间',
-          value: diskMemoryChartData.ioTDBMemoryVal,
-          itemStyle: {
-            color: '#009DEA',
-          },
-          label: {
-            show: true,
-            position: 'right',
-            formatter: diskMemoryChartData.ioTDBMemory,
-            fontSize: 12,
-            fontWeight: 700,
-            color: '#009DEA',
-          },
-        },
-        {
-          name: '磁盘已用空间',
-          value: diskMemoryChartData.diskMemoryVal,
-          itemStyle: {
-            color: '#495AD4',
-          },
-          label: {
-            show: true,
-            position: 'right',
-            formatter: diskMemoryChartData.diskMemory,
-            fontSize: 12,
-            fontWeight: 700,
-            color: '#495AD4',
-          },
-        },
+        transformDecimal(diskMemoryChartData.diskTotal! * diskMemoryChartData.ioTDBUseRatio, 1),
+        transformDecimal(diskMemoryChartData.diskTotal! * diskMemoryChartData.diskUseRatio, 1),
       ],
+      itemStyle: {
+        color: '#495AD4',
+      },
+      label: {
+        show: true,
+        position: 'top',
+        formatter: (params: any) => {
+          if (params.name === 'IoTDB 空间') {
+            return `${diskMemoryChartData.ioTDBMemory} ${diskMemoryChartData.ioTDBMemoryUnit}`;
+          }
+          return `${diskMemoryChartData.diskMemory} ${diskMemoryChartData.diskMemoryUnit}`;
+        },
+        fontSize: 12,
+        fontWeight: 700,
+        color: '#495AD4',
+      },
+      emphasis: {
+        focus: 'none',
+      },
+    },
+    {
+      name: '剩余空间',
+      type: 'bar',
+      stack: 'total',
+      // eslint-disable-next-line no-sparse-arrays
+      data: [
+        ,
+        transformDecimal(transformDecimal((1 - diskMemoryChartData.diskUseRatio), 1) * diskMemoryChartData.diskTotal!, 1),
+      ],
+      itemStyle: {
+        color: '#DFE1ED',
+      },
+      label: {
+        show: true,
+        position: 'top',
+        formatter: (params: any) => {
+          if (params.name === '磁盘空间') {
+            return `${params.value} ${diskMemoryChartData.diskMemoryUnit}`;
+          }
+          return '';
+        },
+        fontSize: 12,
+        fontWeight: 700,
+        color: '#495AD4',
+      },
+      emphasis: {
+        focus: 'none',
+      },
     },
   ],
 } as ECOption);
@@ -585,10 +627,12 @@ function getDisk() {
     } = res.data;
     diskMemoryData.diskTotal = diskTotal;
     diskMemoryData.totalUnit = totalUnit || '';
-    diskMemoryData.diskMemory = `${diskUse} ${useUnit}`;
-    diskMemoryData.diskMemoryVal = diskUseRatio * diskTotal;
-    diskMemoryData.ioTDBMemory = `${ioTDBUse} ${ioTDBUnit}`;
-    diskMemoryData.ioTDBMemoryVal = ioTDBUseRatio * diskTotal;
+    diskMemoryData.diskMemory = diskUse;
+    diskMemoryData.diskMemoryUnit = useUnit;
+    diskMemoryData.diskUseRatio = diskUseRatio;
+    diskMemoryData.ioTDBMemory = ioTDBUse;
+    diskMemoryData.ioTDBMemoryUnit = ioTDBUnit;
+    diskMemoryData.ioTDBUseRatio = ioTDBUseRatio;
   });
 }
 
@@ -642,9 +686,11 @@ function initialAssign() {
   diskMemoryData.diskTotal = null;
   diskMemoryData.totalUnit = '';
   diskMemoryData.diskMemory = '';
-  diskMemoryData.diskMemoryVal = 0;
+  diskMemoryData.diskMemoryUnit = '';
+  diskMemoryData.diskUseRatio = 0;
   diskMemoryData.ioTDBMemory = '';
-  diskMemoryData.ioTDBMemoryVal = 0;
+  diskMemoryData.ioTDBMemoryUnit = '';
+  diskMemoryData.ioTDBUseRatio = 0;
   writeSpeed.value = null;
   fileTotal.value = null;
 }

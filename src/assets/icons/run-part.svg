@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
+  viewBox="0 0 16 16" fill="none">
+  <g opacity="1" transform="translate(0 0)  rotate(0)">
+    <mask id="bg-mask-0" fill="white">
+      <use transform="translate(0 0)  rotate(0)" xlink:href="#path_0"></use>
+    </mask>
+    <g mask="url(#bg-mask-0)">
+      <path id="三角形 1 (轮廓)" fill-rule="evenodd" style="fill:#656A85" opacity="1"
+        d="M3.86665 4.30344L3.86665 11.6934C3.86665 12.0034 4.19665 12.1934 4.46665 12.0434L10.8667 8.34344C11.1367 8.19344 11.1367 7.80344 10.8667 7.65344L4.46665 3.95344C4.19665 3.80344 3.86665 3.99344 3.86665 4.30344ZM4.66665 11.0034L9.86665 8.00344L4.66665 4.99344L4.66665 11.0034Z">
+      </path>
+      <path id="路径 2 (轮廓)" fill-rule="evenodd" style="fill:#656A85" opacity="1"
+        d="M11.8667 4.2667L11.8667 11.7337C11.8667 11.9547 12.0457 12.1337 12.2667 12.1337C12.4877 12.1337 12.6667 11.9547 12.6667 11.7337L12.6667 4.2667C12.6667 4.0457 12.4877 3.8667 12.2667 3.8667C12.0457 3.8667 11.8667 4.0457 11.8667 4.2667Z">
+      </path>
+    </g>
+  </g>
+  <defs>
+    <rect id="path_0" x="0" y="0" width="16" height="16" rx="0" ry="0" />
+  </defs>
+</svg>

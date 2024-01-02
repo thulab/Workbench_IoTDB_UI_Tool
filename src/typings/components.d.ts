@@ -113,6 +113,8 @@ declare module 'vue' {
     ICustomQuestionNew: typeof import('~icons/custom/question-new')['default']
     ICustomQuestionWhite: typeof import('~icons/custom/question-white')['default']
     ICustomRefresh: typeof import('~icons/custom/refresh')['default']
+    ICustomRunAll: typeof import('~icons/custom/run-all')['default']
+    ICustomRunPart: typeof import('~icons/custom/run-part')['default']
     ICustomSearchIcon: typeof import('~icons/custom/search-icon')['default']
     ICustomSqlAbort: typeof import('~icons/custom/sql-abort')['default']
     ICustomSqlEmpty: typeof import('~icons/custom/sql-empty')['default']

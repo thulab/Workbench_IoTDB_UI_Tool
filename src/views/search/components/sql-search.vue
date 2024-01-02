@@ -6,7 +6,7 @@
       </div>
       <div class="sql-right-icon-box">
         <el-button link @click="handleSave" id="sql-search-operate-save"><i-custom-sql-save />保存</el-button>
-        <el-button link :disabled="!runFlag" @click="querySqlRun()" id="sql-search-operate-run"><i-custom-sql-run />全部运行</el-button>
+        <el-button link :disabled="!runFlag" @click="querySqlRun()" id="sql-search-operate-run"><i-custom-run-all />执行全部</el-button>
         <el-tooltip
           placement="top-start"
           effect="light"
@@ -15,7 +15,7 @@
           :disabled="!!selectionCode"
           popper-class="tooltip-max-width"
         >
-          <el-button link :disabled="!runFlag || !selectionCode" @click="querySqlRun('part')" id="sql-search-operate-run"><i-custom-sql-run />部分运行</el-button>
+          <el-button link :disabled="!runFlag || !selectionCode" @click="querySqlRun('part')" id="sql-search-operate-run"><i-custom-run-part />执行选中</el-button>
         </el-tooltip>
         <el-button link :disabled="runFlag" @click="stopquery" id="sql-search-operate-stop"><i-custom-sql-abort />取消</el-button>
         <el-button link @click="emptyQuery" id="sql-search-operate-empty"><i-custom-sql-empty />清空</el-button>
