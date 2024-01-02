@@ -1,6 +1,6 @@
 <template>
   <el-scrollbar>
-    <el-container class="details-wrapper">
+    <el-container class="details-wrapper" style="height: 100%;">
       <el-main class="p-16">
         <div style="display: flex; flex-direction: column; height: 100%;" v-loading="loading">
           <div class="module-box-wrapper m-b-16">
@@ -144,15 +144,14 @@
           <div class="module-box-wrapper monitor-info-wrapper">
             <div class="module-title-wrapper">
               <h4 class="module-title">监控信息</h4>
-              <p class="module-details">
+              <p class="module-details" v-if="showPrometheus">
                 <span class="module-label-text">数据截止：</span>
                 <span class="module-content-text m-r-16">{{ monitorTime }}</span>
                 <el-button link @click="handleRefreshMonitor" id="dashboard-monitor-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
               </p>
             </div>
 
-            <!--  v-if="tableData.length && enablePrometheus" -->
-            <div>
+            <div v-if="showPrometheus">
               <div class="search-form-box">
                 <ul class="search-cluster-list" v-if="slaveData">
                   <li :class="['search-cluster-type', { 'search-cluster-active': clusterType === 'master' }]" @click="handleChangeCluster('master')">主集群</li>
@@ -188,9 +187,14 @@
               />
             </div>
 
-            <div v-if="false" class="table-empty-wrapper monitor-empty-box">
+            <div v-if="!configurePrometheus" class="table-empty-wrapper monitor-empty-box">
               <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-              <span class="data-empty-text">暂无数据</span>
+              <span class="data-empty-text">未配置Prometheus，请配置后查看</span>
+            </div>
+
+            <div v-if="configurePrometheus && !enablePrometheus" class="table-empty-wrapper monitor-empty-box">
+              <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+              <span class="data-empty-text">Prometheus配置有误，请修改后查看</span>
             </div>
           </div>
         </div>
@@ -203,6 +207,7 @@
 import { assign, concat } from 'lodash-es';
 import dayjs from 'dayjs';
 import type { ElTable } from 'element-plus';
+import { storeToRefs } from 'pinia';
 import { useUserStore, useConnectionStore } from '@/stores';
 import { DashboardApi } from '@/api';
 import { toThousands } from '@/utils/format';
@@ -213,8 +218,11 @@ import MonitorConfignode from './components/monitor-confignode.vue';
 
 const userStore = useUserStore();
 const connectionStore = useConnectionStore();
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const enablePrometheus = computed(() => userStore.enablePrometheus);
+const {
+  enablePrometheus,
+  configurePrometheus,
+} = storeToRefs(userStore);
+const showPrometheus = computed(() => enablePrometheus.value && configurePrometheus.value);
 const tableRef = ref<InstanceType<typeof ElTable>>();
 const slaveTableRef = ref<InstanceType<typeof ElTable>>();
 const systemData = reactive<Dashboard.SystemData>({
@@ -385,7 +393,7 @@ function handleChangeCluster(type: 'master' | 'slave') {
 
 onMounted(() => {
   getSystemData().then(() => {
-    getMonitorData();
+    // getMonitorData();
   });
 });
 
@@ -394,6 +402,18 @@ watch(
   (val, old) => {
     if (val !== old && (val === true || val === false)) {
       clusterType.value = val ? 'master' : 'slave';
+    }
+  },
+  {
+    immediate: true,
+  },
+);
+
+watch(
+  () => showPrometheus.value,
+  (val, old) => {
+    if (val !== old && val) {
+      getMonitorData();
     }
   },
   {
