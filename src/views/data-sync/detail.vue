@@ -1,6 +1,6 @@
 <template>
   <version-container :is-show="showAuthMenu" :versiton-tip="'1.2.1'">
-    <el-container class="data-sync-detail-wrapper">
+    <el-container class="data-sync-detail-wrapper" v-if="showMain">
       <el-header class="p-x-0" style="height: auto;">
         <div class="search-form-wrapper">
           <el-form :model="searchFormData" label-position="left" size="default" inline @submit.prevent>
@@ -44,6 +44,16 @@
                   </template>
                 </el-dropdown>
               </auth-tooltip>
+              <el-tooltip
+                placement="top-start"
+                effect="light"
+                trigger="hover"
+                content="暂无数据"
+                :disabled="canUseMonitor && enablePrometheus && configurePrometheus"
+                popper-class="tooltip-box-width"
+              >
+                <el-button type="primary" @click="handleMonitor" :disabled="!(canUseMonitor && enablePrometheus && configurePrometheus)" id="data-sync-add">状态监控</el-button>
+              </el-tooltip>
               <auth-tooltip :is-disabled="canUsePipe">
                 <el-button link @click="handleSearch" :disabled="!canUsePipe" id="data-sync-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
               </auth-tooltip>
@@ -133,6 +143,9 @@
         :content="editErrorMessage"
       />
     </el-container>
+    <el-container class="data-sync-detail-wrapper" v-else>
+      <monitor-dashboard />
+    </el-container>
   </version-container>
 </template>
 
@@ -146,12 +159,15 @@ import { iotdbShowAuth } from '@/utils/auth';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalSync from './components/modal-sync.vue';
 import ModalErrorMessage from './components/modal-error-message.vue';
+import MonitorDashboard from './components/monitor-dashboard.vue';
 
 const connectionStore = useConnectionStore();
 const userStore = useUserStore();
 const {
   canUsePipe,
 } = storeToRefs(userStore);
+const enablePrometheus = computed(() => userStore.enablePrometheus);
+const configurePrometheus = computed(() => userStore.configurePrometheus);
 const { maxTableHeight } = useTableHeight(300);
 const searchFormData = reactive({
   name: '',
@@ -169,6 +185,7 @@ const editData = ref('');
 const editTime = ref<DateModelType>('');
 const errorMessageVisible = ref(false);
 const editErrorMessage = ref('');
+const showMain = ref(true);
 
 const { requestFn: getDataSynchronList, loading } = useRequest(DataSyncApi.getDataSynchronList);
 const { requestFn: deleteDataSynchronByNames } = useRequest(DataSyncApi.deleteDataSynchronByNames);
@@ -178,6 +195,8 @@ const { requestFn: stopTaskByNames } = useRequest(DataSyncApi.stopTaskByNames);
 const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
 
 const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.2.1'));
+
+const canUseMonitor = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.0'));
 
 function getListData() {
   getDataSynchronList(searchFormData.name).then((res) => {
@@ -284,6 +303,10 @@ function handleCommandDown(val: 'del' | 'running' | 'stopped') {
   } else {
     handleStatus('batch', null, val);
   }
+}
+
+function handleMonitor() {
+  showMain.value = false;
 }
 
 onMounted(() => {

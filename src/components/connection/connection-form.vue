@@ -481,6 +481,11 @@ function handleSave() {
       saveLoading.value = true;
       saveConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id }).then((res) => {
         ElMessage.success('保存成功');
+        if (!isShowSave.value) {
+          // 保存prometheus 直接生效
+          window.location.reload();
+          return;
+        }
         emit('handleRefreshList', +res.data);
       }).finally(() => {
         saveLoading.value = false;

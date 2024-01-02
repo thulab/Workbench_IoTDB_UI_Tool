@@ -41,6 +41,8 @@ export const useUserStore = defineStore('UserStore', () => {
   const rolesToPrivilegesVals = computed(() => allPrivileges.value?.rolesToPrivileges || []);
   // 是否开启监控
   const enablePrometheus = computed(() => allPrivileges.value?.enablePrometheus);
+  // 是否配置监控
+  const configurePrometheus = computed(() => allPrivileges.value?.configurePrometheus);
 
   // 用户+角色 全局权限
   const userAllEntityPrivileges = computed(() => {
@@ -170,6 +172,7 @@ export const useUserStore = defineStore('UserStore', () => {
   return {
     userInfo,
     enablePrometheus,
+    configurePrometheus,
     loadPrivileges,
     loadPrivilegesEnum,
     privilegesEnum,

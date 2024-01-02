@@ -39,6 +39,7 @@ declare namespace Auth{
   export interface UserPrivileges {
     userName: string;
     enablePrometheus?: boolean;
+    configurePrometheus?: boolean;
     entityPrivileges: string[];
     pathPrivileges: Array<{ path: string, privileges: string[] }>;
     rolesToPrivileges: Array<AuthByRoleRes>
