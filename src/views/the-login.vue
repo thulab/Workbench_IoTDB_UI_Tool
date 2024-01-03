@@ -45,7 +45,7 @@
                 </el-option-group>
               </el-select>
             </el-form-item>
-            <el-button type="primary" class="m-l-12" @click="handleSelectConnection">编辑</el-button>
+            <el-button type="primary" class="m-l-12" id="login-connection-edit" @click="handleSelectConnection">编辑</el-button>
           </div>
           <el-form-item prop="user">
             <el-input
@@ -94,7 +94,7 @@
                 <el-icon size="30"><i-custom-verification-code /></el-icon>
               </template>
               <template #suffix>
-                <the-captcha ref="captchaRef" :height="30" :width="100" @update:code="val=>captcha = val" />
+                <the-captcha ref="captchaRef" :height="30" :width="100" @update:code="val => captcha = val" />
               </template>
             </el-input>
           </el-form-item>
