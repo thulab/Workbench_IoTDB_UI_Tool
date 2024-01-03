@@ -120,7 +120,7 @@ function handleClose() {
 }
 
 async function handleAddConnection() {
-  if (editType.value === 'add' && connectionList.value.length > 0) {
+  if (editType.value === 'add' && filterList.value.length > 0) {
     const flag = await connectionFormRef.value?.handleChangeConnection();
     if (!flag) return;
     filterList.value.shift();
