@@ -49,10 +49,10 @@
                 effect="light"
                 trigger="hover"
                 content="暂无数据"
-                :disabled="canUseMonitor && enablePrometheus && configurePrometheus"
+                :disabled="showPrometheus"
                 popper-class="tooltip-box-width"
               >
-                <el-button type="primary" @click="handleMonitor" :disabled="!(canUseMonitor && enablePrometheus && configurePrometheus)" id="data-sync-add">状态监控</el-button>
+                <el-button type="primary" @click="handleMonitor" :disabled="!showPrometheus" id="data-sync-add">状态监控</el-button>
               </el-tooltip>
               <auth-tooltip :is-disabled="canUsePipe">
                 <el-button link @click="handleSearch" :disabled="!canUsePipe" id="data-sync-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
@@ -143,9 +143,7 @@
         :content="editErrorMessage"
       />
     </el-container>
-    <el-container class="data-sync-detail-wrapper" v-else>
-      <monitor-dashboard />
-    </el-container>
+    <monitor-dashboard v-else @handleClose="showMain = true" />
   </version-container>
 </template>
 
@@ -165,9 +163,10 @@ const connectionStore = useConnectionStore();
 const userStore = useUserStore();
 const {
   canUsePipe,
+  enablePrometheus,
+  configurePrometheus,
 } = storeToRefs(userStore);
-const enablePrometheus = computed(() => userStore.enablePrometheus);
-const configurePrometheus = computed(() => userStore.configurePrometheus);
+const showPrometheus = computed(() => enablePrometheus.value && configurePrometheus.value);
 const { maxTableHeight } = useTableHeight(300);
 const searchFormData = reactive({
   name: '',
@@ -195,8 +194,6 @@ const { requestFn: stopTaskByNames } = useRequest(DataSyncApi.stopTaskByNames);
 const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
 
 const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.2.1'));
-
-const canUseMonitor = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.0'));
 
 function getListData() {
   getDataSynchronList(searchFormData.name).then((res) => {
