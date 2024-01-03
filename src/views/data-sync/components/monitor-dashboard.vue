@@ -55,7 +55,7 @@
             </div>
             <div class="monitor-chart-box-2" v-loading="remainingTimeLoading">
               <div class="monitor-chart-container">
-                <h4 class="monitor-info-module-title">预估剩余时间</h4>
+                <h4 class="monitor-info-module-title">预估剩余时间<el-tooltip effect="light" content="当前时间可能存在误差，仅供参考" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></h4>
                 <data-container :is-empty="false">
                   <div class="monitor-info-module-box">
                     <p class="monitor-info-module-text">{{ remainingTime.dataCount }}<span class="monitor-info-module-unit">{{ remainingTime.valueUnit }}</span></p>
@@ -113,6 +113,39 @@ function handleClose() {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const lineChartOptions = (optionData: LineChartData) => ({
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'cross',
+    },
+  },
+  grid: {
+    left: 10,
+    right: 40,
+    top: 20,
+    bottom: 20,
+    containLabel: true,
+  },
+  legend: {
+    type: 'scroll',
+    orient: 'horizontal',
+    data: [],
+    selected: {},
+    left: 20,
+  },
+  xAxis: {
+    type: 'category',
+    boundaryGap: false,
+  },
+  yAxis: {
+    type: 'value',
+    axisLabel: {
+      formatter: '{value} W',
+    },
+    axisPointer: {
+      snap: true,
+    },
+  },
   series: [],
 } as ECOption);
 
@@ -237,5 +270,9 @@ onUnmounted(() => {
 
 .monitor-chart-box-2{
   height: 300px;
+}
+
+.monitor-info-module-title svg{
+  vertical-align: top;
 }
 </style>
