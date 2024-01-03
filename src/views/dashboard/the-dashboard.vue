@@ -78,7 +78,7 @@
               <p class="module-details">
                 <span class="module-label-text">数据截止：</span>
                 <span class="module-content-text m-r-16">{{ systemTime }}</span>
-                <el-button link @click="() => handleRefreshSystem()" id="dashboard-system-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+                <el-button link @click="() => handleRefreshSystem()" id="dashboard-system-slave-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
               </p>
             </div>
             <ul class="system-info-list">
@@ -154,8 +154,8 @@
             <div v-if="showPrometheus">
               <div class="search-form-box">
                 <ul class="search-cluster-list" v-if="slaveData">
-                  <li :class="['search-cluster-type', { 'search-cluster-active': clusterType === 'master' }]" @click="handleChangeCluster('master')">主集群</li>
-                  <li :class="['search-cluster-type', { 'search-cluster-active': clusterType === 'slave' }]" @click="handleChangeCluster('slave')">备集群</li>
+                  <li :class="['search-cluster-type', { 'search-cluster-active': clusterType === 'master' }]" id="search-cluster-type-master" @click="handleChangeCluster('master')">主集群</li>
+                  <li :class="['search-cluster-type', { 'search-cluster-active': clusterType === 'slave' }]" id="search-cluster-type-slave" @click="handleChangeCluster('slave')">备集群</li>
                 </ul>
                 <span class="search-from-label">节点：</span>
                 <el-select v-model="monitorNode" placeholder="全部" style="width: 256px;" @change="handleChangeNode" id="dashboard-monitor-select-node">

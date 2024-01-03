@@ -3,10 +3,10 @@
     <span class="username">{{ userName }}</span>
     <template #dropdown>
       <el-dropdown-menu>
-        <el-dropdown-item command="reset">
+        <el-dropdown-item command="reset" id="layout-header-reset">
           重置密码
         </el-dropdown-item>
-        <el-dropdown-item command="logout">
+        <el-dropdown-item command="logout" id="layout-header-logout">
           退出登录
         </el-dropdown-item>
       </el-dropdown-menu>

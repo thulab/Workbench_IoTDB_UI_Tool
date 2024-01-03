@@ -10,7 +10,7 @@
   </div>
 
   <ul class="list-box" v-loading="loading">
-    <li v-for="item in list" :key="item.name" :class="['item-box', current === item.name ? 'item-box-active' : '']" @click="e=>handleSelect(item.name, e)">
+    <li v-for="(item, i) in list" :key="item.name" :class="['item-box', current === item.name ? 'item-box-active' : '']" :id="`auth-user-${i}`" @click="e=>handleSelect(item.name, e)">
       <span class="item-text">
         <el-icon size="30">
           <i-custom-user-manager v-if="item.isManager" />
@@ -19,7 +19,7 @@
         <text-tooltip :content="item.name" />
       </span>
       <auth-tooltip :is-disabled="(canManageUser && canAlterPwd) || userName === item.name">
-        <div class="item-edit-box" :style="{ cursor: !((canManageUser && canAlterPwd) || userName === item.name) ? 'not-allowed' : 'pointer' }" @click="handleEdit(item.name)">
+        <div class="item-edit-box" :style="{ cursor: !((canManageUser && canAlterPwd) || userName === item.name) ? 'not-allowed' : 'pointer' }" :id="`auth-role-${i}-edit`" @click="handleEdit(item.name)">
           <i-custom-edit class="item-edit" />
           <i-custom-edit class="item-edit-active" />
         </div>
@@ -31,6 +31,7 @@
         width="160px"
         title="是否删除该用户？"
         :icon="ICustomError"
+        :id="`auth-user-${i}-confirm`"
         @confirm="handleDelete(item.name)"
       >
         <template #reference>

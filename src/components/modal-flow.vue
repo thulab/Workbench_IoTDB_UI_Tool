@@ -16,15 +16,15 @@
     <template #header>
       <div class="flow-graph-operate-header">
         <div class="flow-graph-operate-left">
-          <el-button link class="flow-graph-close-btn" @click="handleClose"><el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>返回</el-button>
+          <el-button link class="flow-graph-close-btn" id="flow-graph-close-btn" @click="handleClose"><el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>返回</el-button>
           <span class="flow-graph-header-title">拓扑图</span>
         </div>
         <div class="operate-buttons" v-if="editType === 'edit'">
-          <el-button link @click="handleSaveView" :loading="saveLoading"><el-icon size="24" class="m-r-6"><i-custom-circle-close-half /></el-icon>退出编辑</el-button>
-          <el-button link @click="handleEmpty"><el-icon size="24" class="m-r-6"><i-custom-delete /></el-icon>清空</el-button>
+          <el-button link @click="handleSaveView" id="flow-graph-view" :loading="saveLoading"><el-icon size="24" class="m-r-6"><i-custom-circle-close-half /></el-icon>退出编辑</el-button>
+          <el-button link @click="handleEmpty" id="flow-graph-empty"><el-icon size="24" class="m-r-6"><i-custom-delete /></el-icon>清空</el-button>
         </div>
         <div class="operate-buttons" v-if="editType === 'view'">
-          <el-button link @click="handleEdit"><el-icon size="24" class="m-r-6"><i-custom-edit /></el-icon>编辑</el-button>
+          <el-button link @click="handleEdit" id="flow-graph-edit"><el-icon size="24" class="m-r-6"><i-custom-edit /></el-icon>编辑</el-button>
           <!-- <el-button link @click="handleExport"><el-icon size="24" class="m-r-6"><i-custom-export /></el-icon>导出</el-button> -->
         </div>
       </div>
@@ -50,11 +50,12 @@
                   :controls="false"
                   @change="val => handleChangeTextFontSize(val as number)"
                   @blur="ev => handleBlurTextStyle(ev)"
+                  id="text-style-fontSize"
                 />
               </div>
               <div class="text-style-detail-item">
                 <span class="detail-label">文字颜色：</span>
-                <el-color-picker v-model="textStyle.color" color-format="hex" @change="val => handleChangeTextColor(val as string)" />
+                <el-color-picker v-model="textStyle.color" color-format="hex" @change="val => handleChangeTextColor(val as string)" id="text-style-color" />
               </div>
             </div>
             <!-- 节点 -->
@@ -71,6 +72,7 @@
                   :controls="false"
                   @change="val => handleChangeNodeX(val as number)"
                   @blur="ev => handleBlurNodeStyle(ev, 'x')"
+                  id="node-style-x"
                 />
               </div>
               <div class="node-style-detail-item">
@@ -83,6 +85,7 @@
                   :controls="false"
                   @change="val => handleChangeNodeY(val as number)"
                   @blur="ev => handleBlurNodeStyle(ev, 'y')"
+                  id="node-style-y"
                 />
               </div>
               <div class="node-style-detail-item">
@@ -93,6 +96,7 @@
                   :controls="false"
                   @change="val => handleChangeNodeAngle(val as number)"
                   @blur="ev => handleBlurNodeStyle(ev, 'angle')"
+                  id="node-style-angle"
                 />
               </div>
             </div>
@@ -102,7 +106,7 @@
               <h5 class="operate-style-module-title">连线</h5>
               <div class="edge-style-detail-item">
                 <span class="detail-label">连线类型：</span>
-                <el-select v-model="edgeStyle.lineType" @change="handleChangeLineType" popper-class="center-select">
+                <el-select v-model="edgeStyle.lineType" @change="handleChangeLineType" popper-class="center-select" id="line-style-type">
                   <el-option
                     v-for="item in lineTypeList"
                     :key="item.value"
@@ -113,12 +117,12 @@
               </div>
               <div class="edge-style-detail-item">
                 <span class="detail-label">连线颜色：</span>
-                <el-color-picker v-model="edgeStyle.color" color-format="hex" @change="val => handleChangeLineColor(val as string)" />
+                <el-color-picker v-model="edgeStyle.color" color-format="hex" @change="val => handleChangeLineColor(val as string)" id="line-style-color" />
               </div>
               <h5 class="operate-style-module-title">箭头</h5>
               <div class="edge-style-detail-item">
                 <span class="detail-label">箭头样式：</span>
-                <el-select v-model="edgeStyle.arrowType" @change="handleChangeArrowType" popper-class="center-select">
+                <el-select v-model="edgeStyle.arrowType" @change="handleChangeArrowType" popper-class="center-select" id="line-style-arrow">
                   <el-option
                     v-for="item in arrowTypeList"
                     :key="item.value"
@@ -129,11 +133,11 @@
               </div>
               <div class="edge-style-detail-item">
                 <span class="detail-label">箭头宽度：</span>
-                <el-slider v-model="edgeStyle.arrowWidth" :min="1" :max="50" @change="val => handleChangeArrowWidth(val as number)" />
+                <el-slider v-model="edgeStyle.arrowWidth" :min="1" :max="50" @change="val => handleChangeArrowWidth(val as number)" id="arrow-style-width" />
               </div>
               <div class="edge-style-detail-item">
                 <span class="detail-label">箭头长度：</span>
-                <el-slider v-model="edgeStyle.arrowHeight" :min="1" :max="50" @change="val => handleChangeArrowHeight(val as number)" />
+                <el-slider v-model="edgeStyle.arrowHeight" :min="1" :max="50" @change="val => handleChangeArrowHeight(val as number)" id="arrow-style-height" />
               </div>
             </div>
           </div>

@@ -1,5 +1,6 @@
 <template>
   <div
+    id="captcha"
     @click="onRefresh()"
     style="display: inline-block; overflow: hidden;"
     :style="{ width: width + 'px', height: height + 'px' }"

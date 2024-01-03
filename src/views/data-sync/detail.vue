@@ -37,9 +37,9 @@
                   </el-button>
                   <template #dropdown>
                     <el-dropdown-menu>
-                      <el-dropdown-item command="del">批量删除</el-dropdown-item>
-                      <el-dropdown-item command="running">批量启动</el-dropdown-item>
-                      <el-dropdown-item command="stopped">批量停止</el-dropdown-item>
+                      <el-dropdown-item command="del" id="data-sync-batch-del">批量删除</el-dropdown-item>
+                      <el-dropdown-item command="running" id="data-sync-batch-running">批量启动</el-dropdown-item>
+                      <el-dropdown-item command="stopped" id="data-sync-batch-stopped">批量停止</el-dropdown-item>
                     </el-dropdown-menu>
                   </template>
                 </el-dropdown>

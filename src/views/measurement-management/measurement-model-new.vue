@@ -27,7 +27,7 @@
                 :props="modelCascaderProps"
               >
                 <template #default="{ node, data }">
-                  <div class="flex-align-center cascader-node-box" @click="handleClickNode(node, data)">
+                  <div class="flex-align-center cascader-node-box" :id="`cascader-node-box-${data.lebel}`" @click="handleClickNode(node, data)">
                     <el-icon v-if="listLoading && (data.nodeType === 'next' || data.nodeType === 'pre')" class="el-icon is-loading"><i-ep-loading /></el-icon>
                     {{ data?.label }}
                   </div>

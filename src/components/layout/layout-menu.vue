@@ -2,7 +2,7 @@
   <div
     class="menu"
     :style="{ width: isCollapse ? '40px' : '216px' }">
-    <div class="logo flex-align-center" :style="{ paddingLeft: isCollapse ? '6px' : '14px' }" @click="handleDashboard">
+    <div class="logo flex-align-center" :style="{ paddingLeft: isCollapse ? '6px' : '14px' }" id="layout-menu-logo" @click="handleDashboard">
       <el-icon alt="logo" v-if="isCollapse"><i-custom-logo /></el-icon>
       <el-icon class="title" v-if="!isCollapse"><i-custom-timecho-logo-white /></el-icon>
       <!-- <span v-show="!isCollapse">{{ systemTitle }}</span> -->
@@ -13,7 +13,7 @@
         <el-icon size="30" :style="{ marginLeft: isCollapse ? '0' : '-4px' }"><i-custom-connection /></el-icon>
         <div v-if="!isCollapse" class="connection-info flex-align-center">
           <span class="connection-name">{{ connectionName }}</span>
-          <el-icon size="20" style="cursor: pointer;" @click="handleToggleConnection"><i-custom-toggle /></el-icon>
+          <el-icon size="20" style="cursor: pointer;" id="layout-menu-connection" @click="handleToggleConnection"><i-custom-toggle /></el-icon>
         </div>
       </div>
       <div v-if="!isCollapse" class="flex-align-center" style="height: 36px;">
@@ -23,8 +23,8 @@
             <i-custom-menu-connection-cluster v-if="connectionStore.connectionInfo.data.type === 1" />
           </el-icon>
           <ul class="cluster-list" v-else>
-            <li :class="['cluster-type', { 'cluster-active': clusterType === 'master' }]" @click="handleChangeCluster('master')">主</li>
-            <li :class="['cluster-type', { 'cluster-active': clusterType === 'slave' }]" @click="handleChangeCluster('slave')">备</li>
+            <li :class="['cluster-type', { 'cluster-active': clusterType === 'master' }]" id="layout-menu-connection-master" @click="handleChangeCluster('master')">主</li>
+            <li :class="['cluster-type', { 'cluster-active': clusterType === 'slave' }]" id="layout-menu-connection-slave" @click="handleChangeCluster('slave')">备</li>
           </ul>
           <span class="connection-host-port">{{ connectionHost }}</span>
         </div>

@@ -15,7 +15,7 @@
           :disabled="!!selectionCode"
           popper-class="tooltip-max-width"
         >
-          <el-button link :disabled="!runFlag || !selectionCode" @click="querySqlRun('part')" id="sql-search-operate-run"><i-custom-run-part />执行选中</el-button>
+          <el-button link :disabled="!runFlag || !selectionCode" @click="querySqlRun('part')" id="sql-search-operate-run-part"><i-custom-run-part />执行选中</el-button>
         </el-tooltip>
         <el-button link :disabled="runFlag" @click="stopquery" id="sql-search-operate-stop"><i-custom-sql-abort />取消</el-button>
         <el-button link @click="emptyQuery" id="sql-search-operate-empty"><i-custom-sql-empty />清空</el-button>
@@ -68,8 +68,8 @@
                 </el-button>
                 <template #dropdown>
                   <el-dropdown-menu>
-                    <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
-                    <el-dropdown-item command="xlsx">以.xlsx格式导出</el-dropdown-item>
+                    <el-dropdown-item command="csv" id="sql-search-download-csv">以.csv格式导出</el-dropdown-item>
+                    <el-dropdown-item command="xlsx" id="sql-search-download-xlsx">以.xlsx格式导出</el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>

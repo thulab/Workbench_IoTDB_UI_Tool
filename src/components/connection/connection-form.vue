@@ -7,7 +7,7 @@
       <el-form ref="formRef" :model="formData" label-position="left" label-width="140px" :key="formKey">
         <label><input type="password" autocomplete="new-password" hidden></label>
         <base-form-item label="连接类型：" prop="type" :rules="requiredRules" class="base-form-box">
-          <el-radio-group v-model="formData.type" @change="val => handleChangeType(val as 0 | 1 | 2)" :disabled="editType !== 'add' || !isShowSave">
+          <el-radio-group v-model="formData.type" @change="val => handleChangeType(val as 0 | 1 | 2)" :disabled="editType !== 'add' || !isShowSave" id="connection-modal-type">
             <el-radio :label="0">单机</el-radio>
             <el-radio :label="1">集群</el-radio>
             <el-radio :label="2">双活</el-radio>
@@ -151,11 +151,11 @@
       </el-form>
     </el-scrollbar>
     <div class="connection-form-buttons">
-      <el-button plain @click="handleTest" :loading="testLoading">测试</el-button>
+      <el-button plain @click="handleTest" id="connection-modal-test" :loading="testLoading">测试</el-button>
       <div>
-        <el-button plain v-if="isShowSave" @click="handleReset">重置</el-button>
-        <el-button type="primary" :disabled="!isCanSave" :loading="saveLoading" @click="handleSave">保存</el-button>
-        <el-button type="primary" v-if="isToggle && current !== connectionStore.connectionInfo.data.id" :loading="connectLoading" @click="handleTestLogin">连接实例</el-button>
+        <el-button plain v-if="isShowSave" @click="handleReset" id="connection-modal-reset">重置</el-button>
+        <el-button type="primary" :disabled="!isCanSave" :loading="saveLoading" @click="handleSave" id="connection-modal-save">保存</el-button>
+        <el-button type="primary" v-if="isToggle && current !== connectionStore.connectionInfo.data.id" :loading="connectLoading" id="connection-modal-login" @click="handleTestLogin">连接实例</el-button>
       </div>
     </div>
   </el-main>

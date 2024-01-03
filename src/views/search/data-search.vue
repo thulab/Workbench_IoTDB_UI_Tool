@@ -7,13 +7,13 @@
             <template #label>
               测点选择：<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
-            <timeseries-select v-model="searchFormData.path" :is-show-view-btn="true" :disabled="getListLoading" />
+            <timeseries-select v-model="searchFormData.path" :is-show-view-btn="true" :disabled="getListLoading" id="data-search-path" />
           </base-form-item>
           <el-form-item label="查询时间：" prop="time" style="margin-right: 0;">
             <div class="search-time-wrapper">
               <ul class="search-time-list">
-                <li :class="['search-time-type', { 'search-time-active': timeType === 'datetime' }]" @click="handleTimeType('datetime')">时间点</li>
-                <li :class="['search-time-type', { 'search-time-active': timeType === 'datetimerange' }]" @click="handleTimeType('datetimerange')">时间段</li>
+                <li :class="['search-time-type', { 'search-time-active': timeType === 'datetime' }]" id="data-search-type-datetime" @click="handleTimeType('datetime')">时间点</li>
+                <li :class="['search-time-type', { 'search-time-active': timeType === 'datetimerange' }]" id="data-search-type-datetimerange" @click="handleTimeType('datetimerange')">时间段</li>
               </ul>
               <el-input type="hidden" />
               <el-date-picker
@@ -110,8 +110,8 @@
               <el-button class="export-btn" id="data-search-download" :disabled="!canReadWriteData">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
-                  <el-dropdown-item command="xlsx">以.xlsx格式导出</el-dropdown-item>
+                  <el-dropdown-item command="csv" id="data-search-download-csv">以.csv格式导出</el-dropdown-item>
+                  <el-dropdown-item command="xlsx" id="data-search-download-xlsx">以.xlsx格式导出</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>

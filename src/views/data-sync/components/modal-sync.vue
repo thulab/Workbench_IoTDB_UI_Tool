@@ -23,7 +23,7 @@
               <template #label>
                 同步测点:<el-tooltip effect="light" content="需用反引号修饰不合法字符或者是不合法路径节点，例如：root.`a@b`" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
               </template>
-              <el-radio-group v-model="formData.whole">
+              <el-radio-group v-model="formData.whole" id="data-sync-modal-aync-type">
                 <el-radio :label="true">全局</el-radio>
                 <el-radio :label="false" class="radio-tip">前缀路径<el-tooltip
                   effect="light"
@@ -48,7 +48,7 @@
                 placement="top"
                 popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
             </template>
-            <el-radio-group v-model="formData.reforward">
+            <el-radio-group v-model="formData.reforward" id="data-sync-modal-reforward">
               <el-radio :label="true">是</el-radio>
               <el-radio :label="false">否</el-radio>
             </el-radio-group>
@@ -106,7 +106,7 @@
                   popper-class="table-tooltip-max-width">
                   <template #content>实时模式：该模式下，任务仅使用实时模式进行数据发送<br>批量模式：该模式下，任务仅使用批量模式进行数据发送</template><i-custom-question /></el-tooltip>
               </template>
-              <el-radio-group v-model="formData.triggerMode" @change="val => handleChangeTriggerMode(val as string as 'stream' | 'batch')">
+              <el-radio-group v-model="formData.triggerMode" @change="val => handleChangeTriggerMode(val as string as 'stream' | 'batch')" id="data-sync-modal-triggerMode">
                 <el-radio :label="'stream'">实时模式</el-radio>
                 <el-radio :label="'batch'">批量模式</el-radio>
               </el-radio-group>

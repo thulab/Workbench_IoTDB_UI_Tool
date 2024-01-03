@@ -69,7 +69,7 @@
     </auth-container>
   </div>
 
-  <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="handleExpand">
+  <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="handleExpand" id="trend-path-expand">
     <i-custom-arrow-right-expand />
   </el-icon>
 

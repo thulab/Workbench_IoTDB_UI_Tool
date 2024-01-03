@@ -3,6 +3,7 @@
     <li
       v-for="item in contextMenuList"
       :key="item.key"
+      :id="`context-menu-item-${item.key}`"
       :class="['context-menu-item', { 'disabled-menu': disabledKey(item.key) }]"
       @click="handleClickOperate(item.key)"
     >{{ item.label }}</li>

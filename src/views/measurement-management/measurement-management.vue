@@ -77,8 +77,8 @@
               <el-button class="export-btn" :disabled="!currentStorage || !(totalCount > 0) || !canReadWriteSchema" id="mesaurement-download">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip></el-button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
-                  <el-dropdown-item command="xlsx">以.xlsx格式导出</el-dropdown-item>
+                  <el-dropdown-item command="csv" id="mesaurement-download-csv">以.csv格式导出</el-dropdown-item>
+                  <el-dropdown-item command="xlsx" id="mesaurement-download-xlsx">以.xlsx格式导出</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>

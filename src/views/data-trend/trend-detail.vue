@@ -4,8 +4,8 @@
       <div class="search-form-wrapper">
         <el-form :model="searchFormData" ref="searchFormRef" label-position="left" label-width="88px" size="default" inline class="m-b-22">
           <ul class="search-data-list">
-            <li :class="['search-data-type', { 'search-data-active': dataTab === 'running' }]" @click="handleTrendTab('running')">实时趋势</li>
-            <li :class="['search-data-type', { 'search-data-active': dataTab === 'history' }]" @click="handleTrendTab('history')">历史趋势</li>
+            <li :class="['search-data-type', { 'search-data-active': dataTab === 'running' }]" id="search-data-type-running" @click="handleTrendTab('running')">实时趋势</li>
+            <li :class="['search-data-type', { 'search-data-active': dataTab === 'history' }]" id="search-data-type-history" @click="handleTrendTab('history')">历史趋势</li>
           </ul>
           <base-form-item v-show="!isRunningTab" label="时间范围：" prop="datetimerange" :rules="requiredRules">
             <el-date-picker

@@ -70,6 +70,7 @@
                     class="detail-text-button"
                     :content="row.log"
                     :key="row.time + $index + '_' + row.log"
+                    :id="row.time + $index + '_' + row.log"
                     :offset="24"
                     @handleClick="() => handleView(row)"
                   />

@@ -6,7 +6,7 @@
           <template #label>
             测点选择：<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
-          <timeseries-select v-model="searchFormData.path" :is-show-view-btn="true" :is-boolean-text-disabled="true" />
+          <timeseries-select v-model="searchFormData.path" :is-show-view-btn="true" :is-boolean-text-disabled="true" id="statistic-search-path" />
         </base-form-item>
         <base-form-item label="查询时间：" prop="datetimerange" style="margin-right: 0;">
           <el-date-picker
@@ -41,8 +41,8 @@
               <el-button class="export-btn" id="statistic-search-download" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
-                  <el-dropdown-item command="xlsx">以.xlsx格式导出</el-dropdown-item>
+                  <el-dropdown-item command="csv" id="statistic-search-download-csv">以.csv格式导出</el-dropdown-item>
+                  <el-dropdown-item command="xlsx" id="statistic-search-download-xlsx">以.xlsx格式导出</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>

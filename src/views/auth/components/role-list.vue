@@ -14,7 +14,7 @@
   <auth-container :is-auth="canManageRole" style="height: calc(100% - 70px);">
     <ul class="list-box" v-loading="loading">
       <template v-if="list.length">
-        <li v-for="item in list" :key="item" :class="['item-box', current === item ? 'item-box-active' : '']" @click="e=>handleSelect(item, e)">
+        <li v-for="(item, i) in list" :key="item" :class="['item-box', current === item ? 'item-box-active' : '']" :id="`auth-role-${i}`" @click="e=>handleSelect(item, e)">
           <span class="item-text"><text-tooltip :content="item" /></span>
           <el-popconfirm
             confirm-button-text="确定"
@@ -22,6 +22,7 @@
             title="删除角色后相关联的用户权限将立即消失，是否删除该角色？"
             :icon="ICustomError"
             width="300"
+            :id="`auth-role-${i}-confirm`"
             @confirm="handleDelete(item)"
           >
             <template #reference>

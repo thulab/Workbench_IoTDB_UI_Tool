@@ -9,7 +9,7 @@
           <template #label>
             告警测点：<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
-          <timeseries-select v-model="searchFormData.measurements" filter-system :is-show-view-btn="true" :placeholder="'请输入告警测点'" :viewText="'已选测点'" />
+          <timeseries-select v-model="searchFormData.measurements" filter-system :is-show-view-btn="true" :placeholder="'请输入告警测点'" :viewText="'已选测点'" id="alarm-record-search-measurements" />
         </base-form-item>
         <base-form-item label="告警级别：" prop="alarmLevel" class="m-r-0">
           <template #label>
@@ -69,8 +69,8 @@
             <el-button type="primary" class="export-btn" :disabled="!totalCount" id="alarm-record-download">导出<el-tooltip effect="light" content="此导出操作为搜索结果导出。excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question-white /></el-tooltip></el-button>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item command="csv">以.csv格式导出</el-dropdown-item>
-                <el-dropdown-item command="xlsx">以.xlsx格式导出</el-dropdown-item>
+                <el-dropdown-item command="csv" id="alarm-record-download-csv">以.csv格式导出</el-dropdown-item>
+                <el-dropdown-item command="xlsx" id="alarm-record-download-xlsx">以.xlsx格式导出</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
