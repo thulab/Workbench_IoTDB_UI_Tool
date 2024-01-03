@@ -65,7 +65,7 @@
                   <el-input v-model.number="item.port" placeholder="请输入端口号" style="width: 100px" :id="`connection-modal-master-${index}-port`" :disabled="!isShowSave" />
                 </base-form-item>
                 <el-button link v-if="index === 0 && editType !== 'view'" @click="handleAddHost('master')" id="connection-ip-add-master" class="m-l-6" :disabled="isDisabledMasterHosts || !isShowSave"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
-                <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost('master', index)" :id="'connection-ip-del-master' + index" class="m-l-6" :disabled="!isShowSave"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
+                <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost('master', index)" :id="`connection-ip-del-master-${index}`" class="m-l-6" :disabled="!isShowSave"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
               </div>
             </div>
           </div>
@@ -108,7 +108,7 @@
                       <el-input v-model.number="item.port" placeholder="请输入端口号" style="width: 100px" :id="`connection-modal-master-${index}-port`" :disabled="!isShowSave" />
                     </base-form-item>
                     <el-button link v-if="index === 0 && editType !== 'view'" @click="handleAddHost('master')" id="connection-ip-add-master" class="m-l-6" :disabled="isDisabledMasterHosts || !isShowSave"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
-                    <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost('master', index)" :id="'connection-ip-del-master' + index" class="m-l-6" :disabled="!isShowSave"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
+                    <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost('master', index)" :id="`connection-ip-del-master-${index}`" class="m-l-6" :disabled="!isShowSave"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
                   </div>
                 </div>
               </div>
@@ -135,7 +135,7 @@
                       <el-input v-model.number="item.port" placeholder="请输入端口号" style="width: 100px" :id="`connection-modal-slave-${index}-port`" :disabled="!isShowSave" />
                     </base-form-item>
                     <el-button link v-if="index === 0 && editType !== 'view'" @click="handleAddHost('slave')" id="connection-ip-add-slave" class="m-l-6" :disabled="isDisabledSlaveHosts || !isShowSave"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
-                    <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost('slave', index)" :id="'connection-ip-del-slave' + index" class="m-l-6" :disabled="!isShowSave"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
+                    <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost('slave', index)" :id="`connection-ip-del-slave-${index}`" class="m-l-6" :disabled="!isShowSave"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
                   </div>
                 </div>
               </div>
@@ -285,7 +285,9 @@ const isShowSave = computed(() => props.current !== connectionStore.connectionIn
 
 const { requestFn: getConnectionDetail } = useRequest(ConnectionApi.getConnectionDetail);
 const { requestFn: saveConnection } = useRequest(ConnectionApi.saveConnection);
+const { requestFn: savePrometheus } = useRequest(ConnectionApi.savePrometheus);
 const { requestFn: testConnection } = useRequest(ConnectionApi.testConnection);
+const { requestFn: testPrometheus } = useRequest(ConnectionApi.testPrometheus);
 const { requestFn: loginByConnection } = useRequest(ConnectionApi.loginByConnection);
 
 function handleChangeType(type: 0 | 1 | 2) {
@@ -439,7 +441,11 @@ function handleTestLogin() {
 
 function handleTestPrometheus() {
   testLoading.value = true;
-  testConnection({ ...formData }).then(() => {
+  testPrometheus({
+    prometheusUrlMaster: formData.masterCluster.prometheusUrl,
+    prometheusUrlSlave: formData.slaveCluster?.prometheusUrl || '',
+    doubleAlive: formData.type === 2,
+  }).then(() => {
     let successMag = 'Prometheus连接成功';
     if (formData.type === 2) {
       if (formData.masterCluster.prometheusUrl && formData.slaveCluster?.prometheusUrl) {
@@ -475,21 +481,39 @@ function handleTest() {
   });
 }
 
+function handleSaveConnection() {
+  saveLoading.value = true;
+  saveConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id }).then((res) => {
+    ElMessage.success('保存成功');
+    emit('handleRefreshList', +res.data);
+  }).finally(() => {
+    saveLoading.value = false;
+  });
+}
+
+// 保存prometheus 直接生效
+function handleSavePrometheus() {
+  saveLoading.value = true;
+  savePrometheus({
+    id: formData.id,
+    prometheusUrlMaster: formData.masterCluster.prometheusUrl,
+    prometheusUrlSlave: formData.slaveCluster?.prometheusUrl || '',
+  }).then(() => {
+    ElMessage.success('保存成功');
+    window.location.reload();
+  }).finally(() => {
+    saveLoading.value = false;
+  });
+}
+
 function handleSave() {
   formRef.value?.validate((valid) => {
     if (valid) {
-      saveLoading.value = true;
-      saveConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id }).then((res) => {
-        ElMessage.success('保存成功');
-        if (!isShowSave.value) {
-          // 保存prometheus 直接生效
-          window.location.reload();
-          return;
-        }
-        emit('handleRefreshList', +res.data);
-      }).finally(() => {
-        saveLoading.value = false;
-      });
+      if (!isShowSave.value) {
+        handleSavePrometheus();
+      } else {
+        handleSaveConnection();
+      }
     }
   });
 }

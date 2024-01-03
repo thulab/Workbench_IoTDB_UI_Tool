@@ -23,9 +23,19 @@ class ConnectionApi {
     return http.post('/connection/saveOrUpdateConnection', { ...data, password: '' });
   }
 
+  // 保存Prometheus
+  static savePrometheus(data: Connection.SavePrometheusDetail): HttpResponseP {
+    return http.post('/connection/updatePrometheus', data);
+  }
+
   // 测试连接实例
   static testConnection(data: Connection.ConnectionDetail): HttpResponseP {
     return http.post('/connection/testConnection', { ...data, password: encodeAES(data.password) });
+  }
+
+  // 测试Prometheus
+  static testPrometheus(data: Connection.PrometheusDetail): HttpResponseP {
+    return http.post('/connection/testPrometheus', data);
   }
 
   // 登录保存连接实例

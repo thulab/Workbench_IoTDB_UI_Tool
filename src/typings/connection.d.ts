@@ -20,4 +20,16 @@ declare namespace Connection{
     masterCluster: ConnectionClusterData;
     slaveCluster?: ConnectionClusterData | null;
   }
+
+  export interface PrometheusDetail {
+    prometheusUrlMaster: string;
+    prometheusUrlSlave: string;
+    doubleAlive: boolean;
+  }
+
+  export interface SavePrometheusDetail {
+    id: number | string;
+    prometheusUrlMaster: string;
+    prometheusUrlSlave: string;
+  }
 }
