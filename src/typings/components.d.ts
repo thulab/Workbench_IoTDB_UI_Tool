@@ -118,7 +118,6 @@ declare module 'vue' {
     ICustomSearchIcon: typeof import('~icons/custom/search-icon')['default']
     ICustomSqlAbort: typeof import('~icons/custom/sql-abort')['default']
     ICustomSqlEmpty: typeof import('~icons/custom/sql-empty')['default']
-    ICustomSqlRun: typeof import('~icons/custom/sql-run')['default']
     ICustomSqlSave: typeof import('~icons/custom/sql-save')['default']
     ICustomStorageNum: typeof import('~icons/custom/storage-num')['default']
     ICustomSuccessGreen: typeof import('~icons/custom/success-green')['default']
