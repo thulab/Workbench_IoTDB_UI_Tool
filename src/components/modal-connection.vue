@@ -46,11 +46,10 @@
                 v-if="item.id !== connectionStore.connectionInfo.data.id || route.name === 'Login'"
                 :icon="ICustomError"
                 width="200"
-                :id="`connection-item-${item.id}-del`"
                 @confirm="handleDelete(item)"
               >
                 <template #reference>
-                  <div class="connection-item-delete-box">
+                  <div class="connection-item-delete-box" :id="`connection-item-${item.id}-del`">
                     <i-custom-delete class="connection-item-delete" />
                     <i-custom-delete-active class="connection-item-delete-active" />
                   </div>

@@ -10,7 +10,7 @@
   </div>
 
   <ul class="list-box" v-loading="loading">
-    <li v-for="(item, i) in list" :key="item.name" :class="['item-box', current === item.name ? 'item-box-active' : '']" :id="`auth-user-${i}`" @click="e=>handleSelect(item.name, e)">
+    <li v-for="(item, i) in list" :key="item.name" :class="['item-box', current === item.name ? 'item-box-active' : '']" :id="`auth-user-${i}`" @click="e => handleSelect(item.name, e)">
       <span class="item-text">
         <el-icon size="30">
           <i-custom-user-manager v-if="item.isManager" />
@@ -31,11 +31,10 @@
         width="160px"
         title="是否删除该用户？"
         :icon="ICustomError"
-        :id="`auth-user-${i}-confirm`"
         @confirm="handleDelete(item.name)"
       >
         <template #reference>
-          <div class="item-delete-box">
+          <div class="item-delete-box" :id="`auth-user-${i}-confirm`">
             <i-custom-delete class="item-delete" />
             <i-custom-delete-active class="item-delete-active" />
           </div>
