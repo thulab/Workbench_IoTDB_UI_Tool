@@ -37,5 +37,17 @@ class DataSyncApi {
   static getPilePluginsList(): HttpResponseP<DataSync.PluginList> {
     return http.get('/synchron/getPilePluginsList');
   }
+
+  static getPipeMemoryCost(data: DataSync.PipeMonitorParams): HttpResponseP<DataSync.PipeMonitorData[]> {
+    return http.post('/synchron/getPipeMemoryCost', data);
+  }
+
+  static getPipeDelayTrend(data: DataSync.PipeMonitorParams): HttpResponseP<DataSync.PipeMonitorData[]> {
+    return http.post('/synchron/getPipeDelayTrend', data);
+  }
+
+  static getPipeEstimateRemainingTime(data: DataSync.PipeMonitorParams): HttpResponseP<{ remainTime: string, timeUnit: string }> {
+    return http.post('/synchron/getPipeEstimateRemainingTime', data);
+  }
 }
 export default DataSyncApi;

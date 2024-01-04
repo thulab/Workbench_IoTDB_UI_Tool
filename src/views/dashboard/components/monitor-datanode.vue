@@ -300,6 +300,7 @@ const diskChartOptions = (diskMemoryChartData: DiskMemoryDetail): ECOption => ({
     axisPointer: {
       type: 'shadow',
     },
+    confine: true,
     formatter: (params) => {
       let res = '';
       const paramsData = params as unknown as Array<Record<string, any>>;

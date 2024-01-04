@@ -308,7 +308,7 @@ function handleMonitor() {
 
 onMounted(() => {
   handleReset();
-  if (!canUsePipe.value) return;
+  if (!canUsePipe.value || !showAuthMenu.value) return;
   handleSearch();
 });
 

@@ -73,4 +73,20 @@ declare namespace DataSync {
     connector: PluginData[];
     processor: PluginData[];
   }
+
+  export interface PipeMonitorParams {
+    nodeID: string[];
+    startTime: DateModelType;
+    endTime: DateModelType;
+    step: number;
+    isMaster: boolean;
+    quantile?: string;
+  }
+  export interface PipeMonitorData {
+    nodeID: string;
+    nodeName: string;
+    unit: string;
+    total: { timestamp: number[], memoryCost: string[] };
+    used: { timestamp: number[], memoryCost: string[] };
+  }
 }
