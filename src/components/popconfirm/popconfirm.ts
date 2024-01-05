@@ -3,7 +3,7 @@ import { buildProps, iconPropType } from 'element-plus/es/utils/index';
 import { useTooltipContentProps } from 'element-plus/es/components/tooltip/index';
 import type { ExtractPropTypes } from 'vue';
 import type Popconfirm from './popconfirm.vue';
-import QuestionFilled from '~icons/ep/question-filled';
+import QuestionFilled from '~icons/ep/question-filled.svg';
 
 export const popconfirmProps = buildProps({
   /**
