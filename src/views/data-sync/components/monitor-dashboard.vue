@@ -149,6 +149,7 @@ const lineChartOptions = (optionData: DataSync.PipeMonitorData[], dataUnit: stri
       type: 'cross',
     },
     confine: true,
+    valueFormatter: (value: number | string) => `${value} ${dataUnit}`,
   },
   grid: {
     left: '3%',
