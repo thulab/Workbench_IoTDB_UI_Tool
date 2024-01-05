@@ -7,7 +7,7 @@
     :close-on-click-modal="false"
     id="auth-role-modal"
   >
-    <el-form ref="formRef" :model="formData" class="m-t-14 m-b-34">
+    <el-form ref="formRef" :model="formData" class="m-t-14 m-b-34" @submit.prevent>
       <base-form-item label="角色名：" prop="name" :rules="requiredRules" :error="errorName">
         <el-input v-model.trim="formData.name" placeholder="请输入角色名" maxlength="32" show-word-limit id="auth-role-modal-name" />
       </base-form-item>

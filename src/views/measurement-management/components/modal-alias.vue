@@ -7,7 +7,7 @@
     :close-on-click-modal="false"
     id="alias-modal-database"
   >
-    <el-form ref="formRef" :model="formData" label-position="left">
+    <el-form ref="formRef" :model="formData" label-position="left" @submit.prevent>
       <base-form-item label="测点描述:" prop="alias">
         <el-input v-model="formData.alias" placeholder="请输入测点描述" maxlength="50" show-word-limit id="alias-modal-alias" type="textarea" :resize="'none'" />
       </base-form-item>

@@ -3,7 +3,7 @@
     <el-container class="calculate-detail-wrapper">
       <el-header class="p-x-0" style="height: auto;">
         <div class="search-form-wrapper">
-          <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
+          <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline @submit.prevent>
             <base-form-item label="" prop="name" style="margin-left: -8px;">
               <el-input v-model="searchFormData.name" placeholder="请输入名称" style="width: 346px;" id="calculate-search-name">
                 <template #prefix>

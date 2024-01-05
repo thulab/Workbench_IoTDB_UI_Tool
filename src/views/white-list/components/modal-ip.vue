@@ -8,7 +8,7 @@
     :close-on-click-modal="false"
     id="white-list-modal"
   >
-    <el-form ref="formRef" :model="formData" :rules="rules" class="m-t-14" label-position="left">
+    <el-form ref="formRef" :model="formData" :rules="rules" class="m-t-14" label-position="left" @submit.prevent>
       <base-form-item label="IP地址:" prop="ip">
         <el-input v-model.trim="formData.ip" placeholder="请输入IP地址" id="white-list-modal-ip" />
       </base-form-item>

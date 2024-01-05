@@ -31,7 +31,7 @@
             </el-option>
           </el-select>
           <div v-else class="device-input-group">
-            <el-input :value="groupName + '.'" disabled class="device-input-prepend" style="width: 144px;" id="measurement-modal-input-groupName" />
+            <el-input :value="`${groupName}.`" disabled class="device-input-prepend" style="width: 144px;" id="measurement-modal-input-groupName" />
             <el-input v-model="formData.deviceName" placeholder="请输入设备名称" class="device-input-box" style="width: 256px;" id="measurement-modal-input-deviceName" />
           </div>
 
@@ -44,7 +44,7 @@
       <h4 class="module-title" style="border: none;">测点</h4>
       <el-scrollbar :max-height="400" :min-height="152" class="measurement-list-box">
         <el-collapse accordion v-model="activeName">
-          <el-collapse-item v-for="(item, index) in formData.measurementList" :key="index" :name="'measurement_' + index">
+          <el-collapse-item v-for="(item, index) in formData.measurementList" :key="index" :name="`measurement_${index}`">
             <template #title>
               <el-row class="collapse-title-box">
                 <el-col :span="12"><div v-if="formData.deviceName" class="all-path-name">{{!addDevice ? `${formData.deviceName}.${item.timeseries}` : `${groupName}.${formData.deviceName}.${item.timeseries}`}}</div></el-col>
@@ -56,21 +56,21 @@
                 </el-col>
                 <el-col :span="4">
                   <div class="operate-box">
-                    <el-button link @click="(e)=>handleCopyRow(item, e)" :id="`measurement-modal-collapse-${index}-copy`"><i-custom-copy /></el-button>
-                    <el-button link class="m-x-12" @click="(e)=>handleDelRow(index, e)" :id="`measurement-modal-collapse-${index}-del`"><i-custom-delete /></el-button>
+                    <el-button link @click="(e) => handleCopyRow(item, e)" :id="`measurement-modal-collapse-${index}-copy`"><i-custom-copy /></el-button>
+                    <el-button link class="m-x-12" @click="(e) => handleDelRow(index, e)" :id="`measurement-modal-collapse-${index}-del`"><i-custom-delete /></el-button>
                   </div>
                 </el-col>
               </el-row>
             </template>
             <el-row>
               <el-col :span="8">
-                <el-form-item label="测点名称：" :prop="'measurementList[' + index + '].timeseries'" :rules="requiredRules" class="m-r-0">
+                <el-form-item label="测点名称：" :prop="`measurementList[${index}].timeseries`" :rules="requiredRules" class="m-r-0">
                   <el-input type="hidden" />
                   <el-input v-model="item.timeseries" placeholder="请输入测点名称" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-timeseries`" style="width: 144px;" />
                 </el-form-item>
               </el-col>
               <el-col :span="16">
-                <el-form-item label="别名：" :prop="'measurementList[' + index + '].alias'" label-width="83px">
+                <el-form-item label="别名：" :prop="`measurementList[${index}].alias`" label-width="83px">
                   <template #label>
                     别名：<el-tooltip effect="light" content="仅支持输入字母大小写、数字、下划线、UNICODE 中文字符，除“!@#$%^&*()_+-=”外的特殊字符以及实数需要用反引号进行引用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                   </template>
@@ -81,7 +81,7 @@
             </el-row>
             <el-row>
               <el-col :span="8">
-                <el-form-item label="数据类型：" :prop="'measurementList[' + index + '].dataType'" :rules="requiredRules">
+                <el-form-item label="数据类型：" :prop="`measurementList[${index}].dataType`" :rules="requiredRules">
                   <el-input type="hidden" />
                   <el-select v-model="item.dataType" placeholder="请选择数据类型" @change="val => handleChangeRowDataType(val, item, index)" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-dataType`">
                     <el-option v-for="dtype in dataTypeOptions" :key="dtype" :label="dtype" :value="dtype" />
@@ -89,7 +89,7 @@
                 </el-form-item>
               </el-col>
               <el-col :span="8">
-                <el-form-item label="编码方式：" :prop="'measurementList[' + index + '].encoding'" :rules="requiredRules">
+                <el-form-item label="编码方式：" :prop="`measurementList[${index}].encoding`" :rules="requiredRules">
                   <el-input type="hidden" />
                   <el-select v-model="item.encoding" placeholder="请选择数据类型" :disabled="!item.isEditable || !item.dataType || !formData.deviceName" :id="`measurement-modal-collapse-${index}-encoding`">
                     <el-option v-for="enc in encodingOptions(item.dataType as string)" :key="enc" :label="enc" :value="enc" />
@@ -97,7 +97,7 @@
                 </el-form-item>
               </el-col>
               <el-col :span="8">
-                <el-form-item label="压缩方式：" :prop="'measurementList[' + index + '].compression'" :rules="requiredRules" style="margin-right: 0;">
+                <el-form-item label="压缩方式：" :prop="`measurementList[${index}].compression`" :rules="requiredRules" style="margin-right: 0;">
                   <el-input type="hidden" />
                   <el-select v-model="item.compression" placeholder="请选择数据类型" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-compression`">
                     <el-option v-for="com in compressionOptions" :key="com" :label="com" :value="com" />

@@ -39,13 +39,15 @@
                 </el-icon>
                 <text-tooltip :content="item.name" />
               </span>
-              <el-popconfirm
+              <popconfirm
                 confirm-button-text="确定"
                 cancel-button-text="取消"
                 title="是否删除该实例？"
                 v-if="item.id !== connectionStore.connectionInfo.data.id || route.name === 'Login'"
                 :icon="ICustomError"
                 width="200"
+                :cancel-button-id="`connection-item-${item.id}-del-cancel`"
+                :confirm-button-id="`connection-item-${item.id}-del-confirm`"
                 @confirm="handleDelete(item)"
               >
                 <template #reference>
@@ -54,7 +56,7 @@
                     <i-custom-delete-active class="connection-item-delete-active" />
                   </div>
                 </template>
-              </el-popconfirm>
+              </popconfirm>
             </li>
           </ul>
         </div>

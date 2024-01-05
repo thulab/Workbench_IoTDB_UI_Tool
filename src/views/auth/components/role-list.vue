@@ -16,21 +16,23 @@
       <template v-if="list.length">
         <li v-for="(item, i) in list" :key="item" :class="['item-box', current === item ? 'item-box-active' : '']" :id="`auth-role-${i}`" @click="e => handleSelect(item, e)">
           <span class="item-text"><text-tooltip :content="item" /></span>
-          <el-popconfirm
+          <popconfirm
             confirm-button-text="确定"
             cancel-button-text="取消"
             title="删除角色后相关联的用户权限将立即消失，是否删除该角色？"
             :icon="ICustomError"
             width="300"
+            :cancel-button-id="`auth-role-${i}-del-cancel`"
+            :confirm-button-id="`auth-role-${i}-del-confirm`"
             @confirm="handleDelete(item)"
           >
             <template #reference>
-              <div class="item-delete-box" :id="`auth-role-${i}-confirm`">
+              <div class="item-delete-box" :id="`auth-role-${i}-del`">
                 <i-custom-delete class="item-delete" />
                 <i-custom-delete-active class="item-delete-active" />
               </div>
             </template>
-          </el-popconfirm>
+          </popconfirm>
         </li>
       </template>
       <li v-else class="item-box-empty">暂无角色</li>

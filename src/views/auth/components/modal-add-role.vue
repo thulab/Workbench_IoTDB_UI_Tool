@@ -8,7 +8,7 @@
     :close-on-click-modal="false"
     id="auth-user-add-role-modal"
   >
-    <el-form ref="formRef" :model="formData">
+    <el-form ref="formRef" :model="formData" @submit.prevent>
       <base-form-item label="关联角色：" prop="name" class="m-t-12 m-b-0">
         <el-select v-model="formData.name" style="width:100%" placeholder="请输入角色名称" collapse-tags multiple filterable :loading="loading" id="auth-user-add-role-modal-select-name" @change="handleChangeSelect" ref="roleSelectRef">
           <template #prefix>

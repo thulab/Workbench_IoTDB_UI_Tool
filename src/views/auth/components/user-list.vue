@@ -24,22 +24,24 @@
           <i-custom-edit class="item-edit-active" />
         </div>
       </auth-tooltip>
-      <el-popconfirm
+      <popconfirm
         v-if="item.isManager === 0 && userName !== item.name"
         confirm-button-text="确定"
         cancel-button-text="取消"
         width="160px"
         title="是否删除该用户？"
         :icon="ICustomError"
+        :cancel-button-id="`auth-user-${i}-del-cancel`"
+        :confirm-button-id="`auth-user-${i}-del-confirm`"
         @confirm="handleDelete(item.name)"
       >
         <template #reference>
-          <div class="item-delete-box" :id="`auth-user-${i}-confirm`">
+          <div class="item-delete-box" :id="`auth-user-${i}-del`">
             <i-custom-delete class="item-delete" />
             <i-custom-delete-active class="item-delete-active" />
           </div>
         </template>
-      </el-popconfirm>
+      </popconfirm>
     </li>
   </ul>
   <modal-reset-password title="编辑用户" :user-name="editUser" v-model:visible="modalVisible" />

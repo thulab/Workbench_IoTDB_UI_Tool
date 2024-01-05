@@ -37,7 +37,7 @@
     </div>
 
     <el-dialog title="保存模板" v-model="nameDialogVisible" width="480px" align-center>
-      <el-form ref="saveFormRef" :model="saveForm" :rules="saveFormRules" label-position="left">
+      <el-form ref="saveFormRef" :model="saveForm" :rules="saveFormRules" label-position="left" @submit.prevent>
         <el-form-item label="名称：" prop="sqlName">
           <el-input type="hidden" />
           <el-input v-model="saveForm.sqlName" placeholder="请输入" maxlength="25" show-word-limit id="sql-search-modal-save" />
