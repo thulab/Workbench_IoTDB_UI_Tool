@@ -337,22 +337,27 @@ function handleTestLogin() {
 }
 
 function handleTestPrometheus() {
+  let successMag = 'Prometheus连接成功';
+  if (formData.type === 2) {
+    if (formData.masterCluster.prometheusUrl && formData.slaveCluster?.prometheusUrl) {
+      successMag = '主、备集群Prometheus连接成功';
+    } else if (formData.masterCluster.prometheusUrl) {
+      successMag = '主集群Prometheus连接成功';
+    } else if (formData.slaveCluster?.prometheusUrl) {
+      successMag = '备集群Prometheus连接成功';
+    } else {
+      successMag = '';
+    }
+  } else if (!formData.masterCluster.prometheusUrl) {
+    successMag = '';
+  }
+  if (!successMag) return;
   testLoading.value = true;
   testPrometheus({
     prometheusUrlMaster: formData.masterCluster.prometheusUrl,
     prometheusUrlSlave: formData.slaveCluster?.prometheusUrl || '',
     doubleAlive: formData.type === 2,
   }).then(() => {
-    let successMag = 'Prometheus连接成功';
-    if (formData.type === 2) {
-      if (formData.masterCluster.prometheusUrl && formData.slaveCluster?.prometheusUrl) {
-        successMag = '主、备集群Prometheus连接成功';
-      } else if (formData.masterCluster.prometheusUrl) {
-        successMag = '主集群Prometheus连接成功';
-      } else if (formData.slaveCluster?.prometheusUrl) {
-        successMag = '备集群Prometheus连接成功';
-      }
-    }
     ElMessage.success(successMag);
   }).finally(() => {
     testLoading.value = false;
