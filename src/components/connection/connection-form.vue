@@ -20,77 +20,55 @@
         <template v-if="formData.type === 0">
           <div class="ip-port-box base-form-box">
             <span class="form-label">实例信息：</span>
-            <div class="ip-port-list">
-              <div class="ip-port-item" v-for="(item, index) in formData.masterCluster.hostAndPortVOS" :key="`${index}_master_host_port`">
-                <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].host`" :rules="requiredRules">
-                  <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 169px" :id="`connection-modal-master-${index}-host`" :disabled="!isShowSave" />
-                </base-form-item>
-                <span class="ip-port-divider">:</span>
-                <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].port`" :rules="requiredPortRules">
-                  <el-input v-model.number="item.port" placeholder="请输入端口号" style="width: 100px" :id="`connection-modal-master-${index}-port`" :disabled="!isShowSave" />
-                </base-form-item>
-              </div>
-            </div>
-          </div>
-          <base-form-item label="Prometheus 信息：" prop="masterCluster.prometheusUrl" class="optional-form-item base-form-box">
-            <template #label>
-              Prometheus 信息：<el-tooltip effect="light" content="配置prometheus可在界面查看部分监控信息，推荐您进行配置使用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
-            </template>
-            <el-input v-model.trim="formData.masterCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl-stand-alone" />
-          </base-form-item>
-          <base-form-item label="用户名：" prop="username" :rules="requiredUserRules" class="base-form-box">
-            <el-input
-              v-model="formData.username"
-              placeholder="请输入用户名"
-              maxlength="32"
-              id="connection-modal-username-stand-alone"
-              :disabled="!isShowSave"
+            <host-port
+              v-model="formData.masterCluster.hostAndPortVOS"
+              :form-key="'masterCluster.hostAndPortVOS'"
+              :is-disabled="isShowSave"
             />
-          </base-form-item>
-          <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd">
-            <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password-stand-alone" :disabled="!isShowSave" />
-          </base-form-item>
+          </div>
+          <prometheus
+            v-model="formData.masterCluster.prometheusUrl"
+            :form-key="'masterCluster.prometheusUrl'"
+            :class-name="'optional-form-item base-form-box'"
+          />
+          <user-pwd
+            v-model:username.local="formData.username"
+            v-model:password.local="formData.password"
+            v-model:errorPwd.local="errorPwd"
+            :is-disabled="isShowSave"
+          />
         </template>
         <!-- 集群版 -->
         <template v-if="formData.type === 1">
           <div class="ip-port-box base-form-box">
             <span class="form-label">实例信息：</span>
-            <div class="ip-port-list">
-              <div class="ip-port-item" v-for="(item, index) in formData.masterCluster.hostAndPortVOS" :key="`${index}_master_host_port`">
-                <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].host`" :rules="requiredRules">
-                  <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 169px" :id="`connection-modal-master-${index}-host`" :disabled="!isShowSave" />
-                </base-form-item>
-                <span class="ip-port-divider">:</span>
-                <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].port`" :rules="requiredPortRules">
-                  <el-input v-model.number="item.port" placeholder="请输入端口号" style="width: 100px" :id="`connection-modal-master-${index}-port`" :disabled="!isShowSave" />
-                </base-form-item>
-                <el-button link v-if="index === 0 && editType !== 'view'" @click="handleAddHost('master')" id="connection-ip-add-master" class="m-l-6" :disabled="isDisabledMasterHosts || !isShowSave"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
-                <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost('master', index)" :id="`connection-ip-del-master-${index}`" class="m-l-6" :disabled="!isShowSave"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
-              </div>
-            </div>
+            <host-port
+              v-model="formData.masterCluster.hostAndPortVOS"
+              :form-key="'masterCluster.hostAndPortVOS'"
+              :is-disabled="isShowSave"
+              :show-operate="true"
+            />
           </div>
-          <base-form-item label="Prometheus 信息：" prop="masterCluster.prometheusUrl" class="optional-form-item base-form-box">
-            <template #label>
-              Prometheus 信息：<el-tooltip effect="light" content="配置prometheus可在界面查看部分监控信息，推荐您进行配置使用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
-            </template>
-            <el-input v-model.trim="formData.masterCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl-cluster" />
-          </base-form-item>
-          <base-form-item label="用户名：" prop="username" :rules="requiredUserRules" class="base-form-box">
-            <el-input v-model="formData.username" placeholder="请输入用户名" maxlength="32" id="connection-modal-username-cluster" :disabled="!isShowSave" />
-          </base-form-item>
-          <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd">
-            <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password-cluster" :disabled="!isShowSave" />
-          </base-form-item>
+          <prometheus
+            v-model="formData.masterCluster.prometheusUrl"
+            :form-key="'masterCluster.prometheusUrl'"
+            :class-name="'optional-form-item base-form-box'"
+          />
+          <user-pwd
+            v-model:username.local="formData.username"
+            v-model:password.local="formData.password"
+            v-model:errorPwd.local="errorPwd"
+            :is-disabled="isShowSave"
+          />
         </template>
         <!-- 双活版 -->
         <template v-if="formData.type === 2">
-          <base-form-item label="用户名：" prop="username" :rules="requiredUserRules" class="base-form-box">
-            <el-input v-model="formData.username" placeholder="请输入用户名" maxlength="32" id="connection-modal-username-double-live" :disabled="!isShowSave" />
-          </base-form-item>
-          <base-form-item label="密码：" prop="password" class="optional-form-item base-form-box" :error="errorPwd">
-            <el-input v-model="formData.password" placeholder="请输入密码" show-password autocomplete="off" id="connection-modal-password-double-live" :disabled="!isShowSave" />
-          </base-form-item>
-
+          <user-pwd
+            v-model:username.local="formData.username"
+            v-model:password.local="formData.password"
+            v-model:errorPwd.local="errorPwd"
+            :is-disabled="isShowSave"
+          />
           <el-collapse v-model="activeNames" class="connection-cluster-box">
             <el-collapse-item title="主集群信息" name="masterCluster">
               <template #title>
@@ -98,26 +76,18 @@
               </template>
               <div class="ip-port-box">
                 <span class="form-label">实例信息：</span>
-                <div class="ip-port-list">
-                  <div class="ip-port-item" v-for="(item, index) in formData.masterCluster.hostAndPortVOS" :key="`${index}_master_host_port`">
-                    <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].host`" :rules="requiredRules">
-                      <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 169px" :id="`connection-modal-master-${index}-host`" :disabled="!isShowSave" />
-                    </base-form-item>
-                    <span class="ip-port-divider">:</span>
-                    <base-form-item label="" :prop="`masterCluster.hostAndPortVOS[${index}].port`" :rules="requiredPortRules">
-                      <el-input v-model.number="item.port" placeholder="请输入端口号" style="width: 100px" :id="`connection-modal-master-${index}-port`" :disabled="!isShowSave" />
-                    </base-form-item>
-                    <el-button link v-if="index === 0 && editType !== 'view'" @click="handleAddHost('master')" id="connection-ip-add-master" class="m-l-6" :disabled="isDisabledMasterHosts || !isShowSave"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
-                    <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost('master', index)" :id="`connection-ip-del-master-${index}`" class="m-l-6" :disabled="!isShowSave"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
-                  </div>
-                </div>
+                <host-port
+                  v-model="formData.masterCluster.hostAndPortVOS"
+                  :form-key="'masterCluster.hostAndPortVOS'"
+                  :is-disabled="isShowSave"
+                  :show-operate="true"
+                />
               </div>
-              <base-form-item label="Prometheus 信息：" prop="masterCluster.prometheusUrl" class="optional-form-item m-b-0 p-r-28">
-                <template #label>
-                  Prometheus 信息：<el-tooltip effect="light" content="配置prometheus可在界面查看部分监控信息，推荐您进行配置使用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
-                </template>
-                <el-input v-model.trim="formData.masterCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl-master-double-live" />
-              </base-form-item>
+              <prometheus
+                v-model="formData.masterCluster.prometheusUrl"
+                :form-key="'masterCluster.prometheusUrl'"
+                :class-name="'optional-form-item m-b-0 p-r-28'"
+              />
             </el-collapse-item>
             <el-collapse-item title="备集群信息" name="slaveCluster" v-if="formData.slaveCluster">
               <template #title>
@@ -125,26 +95,18 @@
               </template>
               <div class="ip-port-box">
                 <span class="form-label">实例信息：</span>
-                <div class="ip-port-list">
-                  <div class="ip-port-item" v-for="(item, index) in formData.slaveCluster.hostAndPortVOS" :key="`${index}_slave_host_port`">
-                    <base-form-item label="" :prop="`slaveCluster.hostAndPortVOS[${index}].host`" :rules="requiredRules">
-                      <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 169px" :id="`connection-modal-slave-${index}-host`" :disabled="!isShowSave" />
-                    </base-form-item>
-                    <span class="ip-port-divider">:</span>
-                    <base-form-item label="" :prop="`slaveCluster.hostAndPortVOS[${index}].port`" :rules="requiredPortRules">
-                      <el-input v-model.number="item.port" placeholder="请输入端口号" style="width: 100px" :id="`connection-modal-slave-${index}-port`" :disabled="!isShowSave" />
-                    </base-form-item>
-                    <el-button link v-if="index === 0 && editType !== 'view'" @click="handleAddHost('slave')" id="connection-ip-add-slave" class="m-l-6" :disabled="isDisabledSlaveHosts || !isShowSave"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
-                    <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost('slave', index)" :id="`connection-ip-del-slave-${index}`" class="m-l-6" :disabled="!isShowSave"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
-                  </div>
-                </div>
+                <host-port
+                  v-model="formData.slaveCluster.hostAndPortVOS"
+                  :form-key="'slaveCluster.hostAndPortVOS'"
+                  :is-disabled="isShowSave"
+                  :show-operate="true"
+                />
               </div>
-              <base-form-item label="Prometheus 信息：" prop="slaveCluster.prometheusUrl" class="optional-form-item m-b-0 p-r-28">
-                <template #label>
-                  Prometheus 信息：<el-tooltip effect="light" content="配置prometheus可在界面查看部分监控信息，推荐您进行配置使用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
-                </template>
-                <el-input v-model.trim="formData.slaveCluster.prometheusUrl" placeholder="例如：http://ip:port/api/v1/query" id="connection-modal-prometheusUrl-slave-double-live" />
-              </base-form-item>
+              <prometheus
+                v-model="formData.slaveCluster.prometheusUrl"
+                :form-key="'slaveCluster.prometheusUrl'"
+                :class-name="'optional-form-item m-b-0 p-r-28'"
+              />
             </el-collapse-item>
           </el-collapse>
         </template>
@@ -198,43 +160,6 @@ const requiredRules = ref([
     trigger: ['blur', 'change'],
   },
 ]);
-const requiredUserRules = ref([
-  {
-    required: true,
-    message: '请输入内容后操作',
-    trigger: ['blur', 'change'],
-  },
-  {
-    min: 4,
-    max: 32,
-    message: '字符长度不小于4，请重新输入',
-    trigger: ['blur', 'change'],
-  },
-  {
-    pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
-    message: '格式不符，请重新输入',
-    trigger: ['blur', 'change'],
-  },
-]);
-const requiredPortRules = ref([
-  {
-    required: true,
-    message: '请输入内容后操作',
-    trigger: ['blur', 'change'],
-  },
-  {
-    validator: (rule: any, value: any, callback: any) => {
-      if (!/^\+?[1-9][0-9]*$/.test(`${value}`)) {
-        return callback(new Error('输入有误'));
-      }
-      if (value > 65535) {
-        return callback(new Error('输入有误'));
-      }
-      return callback();
-    },
-    trigger: ['blur', 'change'],
-  },
-]);
 const formData = reactive<Connection.ConnectionDetail>({
   id: '',
   type: 0,
@@ -259,18 +184,6 @@ const errorPwd = ref('');
 const testLoading = ref(false);
 const connectLoading = ref(false);
 const saveLoading = ref(false);
-
-const isDisabledMasterHosts = computed(() => {
-  const hosts = formData.masterCluster.hostAndPortVOS;
-  const flag = hosts.some((item) => !item.host || !item.port);
-  return flag;
-});
-
-const isDisabledSlaveHosts = computed(() => {
-  const hosts = formData.slaveCluster?.hostAndPortVOS || [];
-  const flag = hosts.some((item) => !item.host || !item.port);
-  return flag;
-});
 
 const isCanSave = computed(() => {
   if (formData.id) {
@@ -362,22 +275,6 @@ function handleReset() {
     }
   } else {
     handleChangeType(0);
-  }
-}
-
-function handleAddHost(type: 'master' | 'slave') {
-  if (type === 'master') {
-    formData.masterCluster.hostAndPortVOS.push({ host: '', port: '' });
-  } else {
-    formData.slaveCluster?.hostAndPortVOS.push({ host: '', port: '' });
-  }
-}
-
-function handleDelHost(type: 'master' | 'slave', index: number) {
-  if (type === 'master') {
-    formData.masterCluster.hostAndPortVOS.splice(index, 1);
-  } else {
-    formData.slaveCluster?.hostAndPortVOS.splice(index, 1);
   }
 }
 
@@ -588,28 +485,6 @@ defineExpose({
       margin-right: 4px;
     }
   }
-
-  .ip-port-list{
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    flex: 1;
-
-    :deep(.el-form-item__label) {
-      width: 0 !important;
-      padding: 0 !important;
-    }
-  }
-
-  .ip-port-item{
-    display: flex;
-
-    .ip-port-divider{
-      width: 28px;
-      text-align: center;
-      margin-top: 5px;
-    }
-  }
 }
 
 .optional-form-item{
@@ -641,13 +516,13 @@ defineExpose({
     margin-bottom: 8px;
   }
 
-  :deep(.el-collapse-item__content){
-    padding: 10px 8px !important;
-    background-color: #F7F8FC;
-  }
-
   :deep(.el-collapse-item__wrap) {
     border-bottom: none;
+
+    .el-collapse-item__content{
+      padding: 10px 8px !important;
+      background-color: #F7F8FC;
+    }
   }
 }
 

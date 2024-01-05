@@ -66,6 +66,7 @@ declare module 'vue' {
     ElTree: typeof import('element-plus/es')['ElTree']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     HelloWorld: typeof import('./../components/hello-world.vue')['default']
+    HostPort: typeof import('./../components/connection/host-port.vue')['default']
     ICustomActiveStatus: typeof import('~icons/custom/active-status')['default']
     ICustomAdd: typeof import('~icons/custom/add')['default']
     ICustomAddBorder: typeof import('~icons/custom/add-border')['default']
@@ -156,6 +157,7 @@ declare module 'vue' {
     ModalFlow: typeof import('./../components/modal-flow.vue')['default']
     ModalResetPassword: typeof import('./../components/modal-reset-password.vue')['default']
     Popconfirm: typeof import('./../components/popconfirm/popconfirm.vue')['default']
+    Prometheus: typeof import('./../components/connection/prometheus.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TextTooltip: typeof import('./../components/text-tooltip.vue')['default']
@@ -165,6 +167,7 @@ declare module 'vue' {
     TheLayout2: typeof import('./../components/layout/the-layout2.vue')['default']
     TimeseriesSelect: typeof import('./../components/timeseries-select.vue')['default']
     Tooltip: typeof import('./../components/flow-graph/tooltip.vue')['default']
+    UserPwd: typeof import('./../components/connection/user-pwd.vue')['default']
     VersionContainer: typeof import('./../components/version-container.vue')['default']
   }
   export interface ComponentCustomProperties {
