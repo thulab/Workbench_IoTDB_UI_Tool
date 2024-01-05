@@ -350,7 +350,7 @@ function getInitial() {
     refreshInterval.value = setTimeout(() => {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       getMonitorData();
-    }, 3000 * 1000);
+    }, 30 * 1000);
   });
 }
 

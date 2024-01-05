@@ -143,7 +143,7 @@
         :content="editErrorMessage"
       />
     </el-container>
-    <monitor-dashboard v-else @handleClose="showMain = true" />
+    <monitor-dashboard v-else @handleClose="handleCloseMonitor" />
   </version-container>
 </template>
 
@@ -304,6 +304,12 @@ function handleCommandDown(val: 'del' | 'running' | 'stopped') {
 
 function handleMonitor() {
   showMain.value = false;
+}
+
+function handleCloseMonitor() {
+  showMain.value = true;
+  handleReset();
+  handleSearch();
 }
 
 onMounted(() => {
