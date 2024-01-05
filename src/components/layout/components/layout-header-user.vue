@@ -1,5 +1,5 @@
 <template>
-  <el-dropdown @command="handleLoginCommand">
+  <el-dropdown @command="handleLoginCommand" :id="`layout-header-user-${userName}`">
     <span class="username">{{ userName }}</span>
     <template #dropdown>
       <el-dropdown-menu>

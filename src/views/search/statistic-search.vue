@@ -37,7 +37,7 @@
         <h4 class="page-info-title">查询详情</h4>
         <div class="page-detail-buttons">
           <auth-tooltip :is-disabled="canReadWriteData">
-            <el-dropdown class="m-r-16" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData" @command="val => handleCommandDown(val)">
+            <el-dropdown class="m-r-16" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData" @command="val => handleCommandDown(val)" id="statistic-search-download-dropdown">
               <el-button class="export-btn" id="statistic-search-download" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
               <template #dropdown>
                 <el-dropdown-menu>

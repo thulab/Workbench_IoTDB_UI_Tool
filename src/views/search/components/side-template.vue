@@ -14,13 +14,13 @@
             <text-tooltip :content="item.queryName" class-name="sql-item-text" />
           </div>
           <i-ep-more-filled @click="item.focused = true" v-if="!item.focused" class="more-icon" />
-          <el-dropdown v-else class="more-icon" @command="val => handleSqlCommand(val, item)">
+          <el-dropdown v-else :id="`sql-template-dropdown-${item.id}`" class="more-icon" @command="val => handleSqlCommand(val, item)">
             <i-ep-more-filled />
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item command="open">打开</el-dropdown-item>
-                <el-dropdown-item command="rename">重命名</el-dropdown-item>
-                <el-dropdown-item command="delete">删除</el-dropdown-item>
+                <el-dropdown-item command="open" :id="`sql-template-dropdown-open-${item.id}`">打开</el-dropdown-item>
+                <el-dropdown-item command="rename" :id="`sql-template-dropdown-rename-${item.id}`">重命名</el-dropdown-item>
+                <el-dropdown-item command="delete" :id="`sql-template-dropdown-delete-${item.id}`">删除</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>

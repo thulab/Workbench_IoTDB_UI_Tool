@@ -106,7 +106,7 @@
             <el-button class="m-l-12" :disabled="!canReadWriteData || getListLoading" @click="handleImport" id="data-search-import">导入</el-button>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canReadWriteData">
-            <el-dropdown class="more-icon m-l-12" :disabled="getListLoading || !canReadWriteData" v-show="searchDetailInfos.status" @command="val => handleCommandDown(val)">
+            <el-dropdown class="more-icon m-l-12" :disabled="getListLoading || !canReadWriteData" v-show="searchDetailInfos.status" @command="val => handleCommandDown(val)" id="data-search-download-dropdown">
               <el-button class="export-btn" id="data-search-download" :disabled="!canReadWriteData">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
               <template #dropdown>
                 <el-dropdown-menu>

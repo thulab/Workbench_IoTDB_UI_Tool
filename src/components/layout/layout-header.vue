@@ -3,6 +3,7 @@
     <div class="header-lf flex-center">
       <el-icon
         class="collapse-icon"
+        id="layout-header-collapse"
         @click="menuStore.setCollapse()">
         <i-custom-nav-open v-if="isCollapse" />
         <i-custom-nav-close v-else />

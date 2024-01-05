@@ -31,7 +31,7 @@
                 <el-button type="primary" @click="handleAdd" :disabled="!canUsePipe" id="data-sync-add">新建任务</el-button>
               </auth-tooltip>
               <auth-tooltip :is-disabled="canUsePipe">
-                <el-dropdown :disabled="!multipleSelection.length || !canUsePipe" @command="val => handleCommandDown(val)" class="m-x-16">
+                <el-dropdown :disabled="!multipleSelection.length || !canUsePipe" @command="val => handleCommandDown(val)" class="m-x-16" id="data-sync-batch-dropdown">
                   <el-button type="primary" class="export-btn" :disabled="!multipleSelection.length || !canUsePipe" id="data-sync-batch">
                     批量操作<el-icon class="el-icon--right"><i-ep-arrow-down /></el-icon>
                   </el-button>

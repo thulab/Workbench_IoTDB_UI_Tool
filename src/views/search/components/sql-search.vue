@@ -26,7 +26,7 @@
       <code-editor
         v-show="codeMirrorReady"
         v-model:model-value="codeVal"
-        @ready="()=>codeMirrorReady = true"
+        @ready="() => codeMirrorReady = true"
         :style="{
           height: `${codeEditorHeight}px`,
           backgroundColor: '#f9fbfc',
@@ -62,7 +62,7 @@
             <div></div>
             <div class="run-result-buttons">
               <el-button link @click="handleCommandDown('refresh', index)" id="sql-search-refresh"><i-custom-refresh />刷新</el-button>
-              <el-dropdown :disabled="!sqlResult[index].status" class="more-icon m-l-12" @command="val => handleCommandDown(val, index)" v-show="sqlResult[index].status && tableDataPagination[index]?.list?.length > 0">
+              <el-dropdown :disabled="!sqlResult[index].status" class="more-icon m-l-12" @command="val => handleCommandDown(val, index)" v-show="sqlResult[index].status && tableDataPagination[index]?.list?.length > 0" id="sql-search-download-dropdown">
                 <el-button link class="export-btn" :disabled="!sqlResult[index].status" id="sql-search-download">
                   <i-custom-download />导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
                 </el-button>

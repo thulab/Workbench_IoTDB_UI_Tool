@@ -11,7 +11,7 @@
             <i v-if="isCollapse && subItem.activeIcon && rootMenu?.activeIndex?.indexOf(subItem.path) == 0" v-html="subItem.activeIcon"></i>
             <i v-else v-html="subItem.icon"></i>
           </el-icon>
-          <span>{{ subItem.title }}</span>
+          <span :id="subItem.path">{{ subItem.title }}</span>
         </template>
         <layout-menu-sub-item :menu-list="subItem.children" :show-auth-menu="showAuthMenu" />
       </el-sub-menu>
@@ -19,6 +19,7 @@
     <template v-else>
       <el-divider v-if="subItem.showTopLine" />
       <el-menu-item
+        :id="subItem.path"
         :index="subItem.path">
         <el-icon v-if="subItem.icon">
           <i v-if="isCollapse && subItem.activeIcon && subItem.path === rootMenu?.activeIndex" v-html="subItem.activeIcon"></i>
