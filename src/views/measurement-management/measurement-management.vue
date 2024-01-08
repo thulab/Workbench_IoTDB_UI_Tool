@@ -25,11 +25,11 @@
                 <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" style="width:120px;" id="mesaurement-edit-ttl">
                   <template #append>
                     <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder=" " style="width:50px;" id="mesaurement-edit-ttlunit">
-                      <el-option label="毫秒" value="millisecond" />
-                      <el-option label="秒" value="second" />
-                      <el-option label="分" value="minute" />
-                      <el-option label="小时" value="hour" />
-                      <el-option label="天" value="day" />
+                      <el-option label="毫秒" value="millisecond" id="mesaurement-ttl-ms" />
+                      <el-option label="秒" value="second" id="mesaurement-ttl-s" />
+                      <el-option label="分" value="minute" id="mesaurement-ttl-m" />
+                      <el-option label="小时" value="hour" id="mesaurement-ttl-h" />
+                      <el-option label="天" value="day" id="mesaurement-ttl-d" />
                     </el-select>
                   </template>
                 </el-input>

@@ -23,11 +23,11 @@
           <el-input v-model="formData.ttl" min="0" max="9007199254740992" :disabled="!canWriteSchema" class="ttl-input" id="measurement-modal-ttl">
             <template #append>
               <el-select v-model="formData.ttlUnit" style="width: 56px;" placeholder="" id="measurement-modal-ttlunit" :disabled="!canWriteSchema">
-                <el-option label="毫秒" value="millisecond" />
-                <el-option label="秒" value="second" />
-                <el-option label="分" value="minute" />
-                <el-option label="小时" value="hour" />
-                <el-option label="天" value="day" />
+                <el-option label="毫秒" value="millisecond" id="measurement-modal-ttl-ms" />
+                <el-option label="秒" value="second" id="measurement-modal-ttl-s" />
+                <el-option label="分" value="minute" id="measurement-modal-ttl-m" />
+                <el-option label="小时" value="hour" id="measurement-modal-ttl-h" />
+                <el-option label="天" value="day" id="measurement-modal-ttl-d" />
               </el-select>
             </template>
           </el-input>

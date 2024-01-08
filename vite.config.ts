@@ -104,7 +104,7 @@ export default defineConfig(({ mode }) => {
         // locale messages resource pre-compile option
         include: resolve(srcPath, './locale/lang/**'),
       }),
-      VueDevTools(),
+      // VueDevTools(),
     ],
     resolve: {
       alias: {
