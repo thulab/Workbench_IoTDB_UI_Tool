@@ -32,7 +32,7 @@
             <div class="monitor-chart-box-2" v-loading="memoryLoading">
               <div class="monitor-chart-container">
                 <h4 class="monitor-info-module-title">内存</h4>
-                <data-container :is-empty="memoryData.length === 0">
+                <data-container :is-empty="isChartEmpty(memoryData)">
                   <div class="chart-container-box">
                     <the-chart :option="memoryDataOptions" key="memoryData" />
                   </div>
@@ -42,7 +42,7 @@
             <div class="monitor-chart-box-2" v-loading="p50Loading">
               <div class="monitor-chart-container">
                 <h4 class="monitor-info-module-title">P50延迟</h4>
-                <data-container :is-empty="p50Data.length === 0">
+                <data-container :is-empty="isChartEmpty(p50Data)">
                   <div class="chart-container-box">
                     <the-chart :option="p50DataOptions" key="p50Data" />
                   </div>
@@ -52,7 +52,7 @@
             <div class="monitor-chart-box-2" v-loading="p99Loading">
               <div class="monitor-chart-container">
                 <h4 class="monitor-info-module-title">P99延迟</h4>
-                <data-container :is-empty="p99Data.length === 0">
+                <data-container :is-empty="isChartEmpty(p99Data)">
                   <div class="chart-container-box">
                     <the-chart :option="p99DataOptions" key="p99Data" />
                   </div>
@@ -115,22 +115,6 @@ const memoryData = ref<DataSync.PipeMonitorData[]>([]);
 const p50Data = ref<DataSync.PipeMonitorData[]>([]);
 const p99Data = ref<DataSync.PipeMonitorData[]>([]);
 
-function getLegendSelected(optionData: DataSync.PipeMonitorData[]) {
-  const obj: { [key: string]: boolean } = {};
-  optionData.forEach((item, index) => {
-    if (monitorNode.value === '') {
-      if (index < 3) {
-        obj[item.nodeName] = true;
-      } else {
-        obj[item.nodeName] = false;
-      }
-    } else {
-      obj[item.nodeName] = true;
-    }
-  });
-  return obj;
-}
-
 const nodeList = computed(() => {
   if (clusterType.value === 'slave') {
     return slaveNodes.value;
@@ -178,7 +162,18 @@ const lineChartOptions = (optionData: DataSync.PipeMonitorData[], dataUnit: stri
     },
     left: monitorNode.value === '' && nodeIds.value.length > 1 ? 20 : 'center',
     data: optionData.map((item) => item.nodeName) || [],
-    selected: getLegendSelected(optionData),
+    selected: optionData.reduce((pre, cur, curI) => {
+      if (monitorNode.value === '') {
+        if (curI < 3) {
+          pre[cur.nodeName] = true;
+        } else {
+          pre[cur.nodeName] = false;
+        }
+      } else {
+        pre[cur.nodeName] = true;
+      }
+      return pre;
+    }, {} as Record<string, boolean>),
     selectedMode: monitorNode.value === '' && nodeIds.value.length > 1,
   },
   connectNulls: false,
@@ -225,11 +220,15 @@ const lineChartOptions = (optionData: DataSync.PipeMonitorData[], dataUnit: stri
   })),
 } as ECOption);
 
-const memoryDataOptions = computed(() => lineChartOptions(memoryData.value, memoryData.value[0].unit || ''));
-const p50DataOptions = computed(() => lineChartOptions(p50Data.value, p50Data.value[0].unit || ''));
-const p99DataOptions = computed(() => lineChartOptions(p99Data.value, p99Data.value[0].unit || ''));
+const memoryDataOptions = reactive(lineChartOptions(memoryData.value, memoryData.value[0]?.unit || ''));
+const p50DataOptions = reactive(lineChartOptions(p50Data.value, p50Data.value[0]?.unit || ''));
+const p99DataOptions = reactive(lineChartOptions(p99Data.value, p99Data.value[0]?.unit || ''));
 
 const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.0'));
+
+function isChartEmpty(optionData: DataSync.PipeMonitorData[]) {
+  return optionData.every((item) => item!.used!.timestamp!.length === 0);
+}
 
 const { requestFn: getSystemInfo, loading } = useRequest(DashboardApi.getSystemInfo);
 const { requestFn: getPipeMemoryCost, loading: memoryLoading } = useRequest(DataSyncApi.getPipeMemoryCost);
