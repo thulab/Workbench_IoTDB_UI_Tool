@@ -83,7 +83,10 @@ function handleAdd() {
 function handleDelete(item: string) {
   deleteRole(item).then(() => {
     ElMessage.success('删除成功');
-    getList();
+    // 动画出现两遍，nexttick不好用
+    setTimeout(() => {
+      getList();
+    }, 300);
   });
 }
 

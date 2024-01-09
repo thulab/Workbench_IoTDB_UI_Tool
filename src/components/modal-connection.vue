@@ -222,7 +222,10 @@ function handleDelete(item: Connection.ConnectionItem) {
   }
   deleteConnection(+item.id).then(() => {
     ElMessage.success('删除成功');
-    getList();
+    // 动画出现两遍，nexttick不好用
+    setTimeout(() => {
+      getList();
+    }, 300);
   });
 }
 
