@@ -34,7 +34,7 @@
                 <h4 class="monitor-info-module-title">内存</h4>
                 <data-container :is-empty="isChartEmpty(memoryData)">
                   <div class="chart-container-box">
-                    <the-chart :option="memoryDataOptions.data" key="memoryData" />
+                    <the-chart :option="memoryDataOptions.data" :key="`memoryData${chartKey}`" />
                   </div>
                 </data-container>
               </div>
@@ -44,7 +44,7 @@
                 <h4 class="monitor-info-module-title">P50延迟</h4>
                 <data-container :is-empty="isChartEmpty(p50Data)">
                   <div class="chart-container-box">
-                    <the-chart :option="p50DataOptions.data" key="p50Data" />
+                    <the-chart :option="p50DataOptions.data" :key="`p50Data${chartKey}`" />
                   </div>
                 </data-container>
               </div>
@@ -54,7 +54,7 @@
                 <h4 class="monitor-info-module-title">P99延迟</h4>
                 <data-container :is-empty="isChartEmpty(p99Data)">
                   <div class="chart-container-box">
-                    <the-chart :option="p99DataOptions.data" key="p99Data" />
+                    <the-chart :option="p99DataOptions.data" :key="`p99Data${chartKey}`" />
                   </div>
                 </data-container>
               </div>
@@ -115,6 +115,7 @@ const memoryData = ref<DataSync.PipeMonitorData[]>([]);
 const p50Data = ref<DataSync.PipeMonitorData[]>([]);
 const p99Data = ref<DataSync.PipeMonitorData[]>([]);
 const isInit = ref(true);
+const chartKey = ref(0);
 
 const nodeList = computed(() => {
   if (clusterType.value === 'slave') {
@@ -407,6 +408,7 @@ function getInitial() {
     getP99(),
     getRemainingTime(),
   ]).then(() => {
+    chartKey.value++;
     // 重置定时器
     clearTimeout(refreshInterval.value);
     isInit.value = false;
