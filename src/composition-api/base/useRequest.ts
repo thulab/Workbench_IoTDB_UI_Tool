@@ -21,6 +21,8 @@ const showError = (message: string, code?: number) => {
     ElMessageBox.confirm(message, '错误', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
+      confirmButtonClass: `request-error-confirm-${message}`,
+      cancelButtonClass: `request-error-cancel-${message}`,
       type: 'error',
     }).then(() => {
       if (code && code === 1008) {

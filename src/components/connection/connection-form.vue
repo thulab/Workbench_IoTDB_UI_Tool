@@ -231,6 +231,8 @@ function handleChangeConnection() {
     ElMessageBox.confirm(editType.value === 'add' ? '当前内容未填写完整，是否继续填写？' : '当前内容未进行保存，是否继续填写？', '注意', {
       confirmButtonText: '继续',
       cancelButtonText: '放弃',
+      confirmButtonClass: 'connection-form-continue-confirm',
+      cancelButtonClass: 'connection-form-continue-cancel',
       type: 'warning',
       icon: ICustomMessageWarning,
       closeOnClickModal: false,

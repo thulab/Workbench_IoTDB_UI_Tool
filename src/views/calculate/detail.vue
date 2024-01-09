@@ -304,6 +304,8 @@ function handleDel(type: string, data: Calculate.CalculateItem | null) {
   ElMessageBox.confirm(type === 'batch' ? `是否确认删除这些${pageText}？` : `是否删除该${pageText}？`, '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
+    confirmButtonClass: 'del-calculate-confirm',
+    cancelButtonClass: 'del-calculate-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
   })

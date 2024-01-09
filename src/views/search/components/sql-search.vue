@@ -326,6 +326,8 @@ function emptyQuery() {
   ElMessageBox.confirm('是否清空页面', '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
+    confirmButtonClass: 'empty-sql-confirm',
+    cancelButtonClass: 'empty-sql-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
   })

@@ -130,6 +130,7 @@ function handleChangeCluster(type: 'master' | 'slave') {
   if (!slaveConnectionStatus.value) {
     ElMessageBox.alert('备集群状态异常，请检查后重试', '提示', {
       confirmButtonText: '确定',
+      confirmButtonClass: 'change-slave-error-confirm',
       type: 'warning',
       showClose: false,
     });

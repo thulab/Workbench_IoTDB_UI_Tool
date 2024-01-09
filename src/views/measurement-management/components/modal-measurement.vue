@@ -278,6 +278,8 @@ function handleDelRow(i: number, e: MouseEvent) {
   ElMessageBox.confirm('是否删除测点？', '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
+    confirmButtonClass: 'measurement-modal-collapse-del-confirm',
+    cancelButtonClass: 'measurement-modal-collapse-del-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
   })
@@ -368,6 +370,8 @@ const handleConfirm = () => {
           ElMessageBox.confirm(err.message, '错误', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
+            confirmButtonClass: 'save-measurement-error-confirm',
+            cancelButtonClass: 'save-measurement-error-cancel',
             type: 'error',
           })
             .finally(() => {

@@ -277,6 +277,8 @@ function handleDel(type: string, data: DataSync.SynchronListData | null) {
   ElMessageBox.confirm(type === 'batch' ? '确认删除这些任务吗？' : '是否删除该任务？', '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
+    confirmButtonClass: 'del-data-sync-confirm',
+    cancelButtonClass: 'del-data-sync-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
   })

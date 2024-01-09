@@ -301,10 +301,13 @@ function handleStatus(row: Alarm.QueryRecordResult) {
   });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleDel(type: string, data: Alarm.QueryRecordResult | null) {
   ElMessageBox.confirm(type === 'batch' ? '确认删除这些告警记录吗？' : '确认删除该条告警记录吗？', '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
+    confirmButtonClass: 'alarm-record-del-confirm',
+    cancelButtonClass: 'alarm-record-del-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
   })

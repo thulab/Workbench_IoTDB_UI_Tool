@@ -32,6 +32,8 @@ const handleLogout = () => {
   ElMessageBox.confirm('您是否确认退出登录?', '温馨提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
+    confirmButtonClass: 'logout-confirm',
+    cancelButtonClass: 'logout-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
   }).then(() => {

@@ -136,6 +136,7 @@ const handleConfirm = () => {
         if (userStore.userInfo.name === props.userName) {
           ElMessageBox.alert('密码已修改，请重新登录', '提示', {
             confirmButtonText: '确定',
+            confirmButtonClass: 'reset-password-confirm',
             type: 'warning',
             showClose: false,
           }).finally(() => {

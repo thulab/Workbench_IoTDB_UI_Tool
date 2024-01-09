@@ -57,6 +57,8 @@ const handleSqlCommand = (val: string, data: Search.SqlList) => {
     ElMessageBox.confirm('是否删除模板', '注意', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
+      confirmButtonClass: 'del-sql-template-confirm',
+      cancelButtonClass: 'del-sql-template-cancel',
       type: 'warning',
       icon: ICustomMessageWarning,
     }).then(() => {

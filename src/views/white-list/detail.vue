@@ -147,6 +147,8 @@ function handleDelRow(data: any) {
   ElMessageBox.confirm('是否确认删除', '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
+    confirmButtonClass: 'del-white-list-confirm',
+    cancelButtonClass: 'del-white-list-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
   })

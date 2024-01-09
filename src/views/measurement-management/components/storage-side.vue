@@ -92,6 +92,8 @@ function handleDeleteStorage(item: string) {
   ElMessageBox.confirm('此操作会删除数据库下全部测点和数据，是否删除？', '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
+    confirmButtonClass: 'mesaurement-side-del-confirm',
+    cancelButtonClass: 'mesaurement-side-del-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
   })

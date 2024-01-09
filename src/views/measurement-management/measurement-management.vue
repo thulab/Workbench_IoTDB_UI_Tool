@@ -362,6 +362,8 @@ function handleDelStorage() {
   ElMessageBox.confirm('此操作会删除数据库下全部测点和数据，是否删除？', '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
+    confirmButtonClass: 'del-databse-confirm',
+    cancelButtonClass: 'del-databse-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
   })
@@ -433,6 +435,8 @@ function handleDelRow(type: string, row: StorageDevice.MeasurementItem | null) {
   ElMessageBox.confirm(type === 'batch' ? '确认删除这些测点吗？' : '是否删除测点？', '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
+    confirmButtonClass: 'mesaurement-table-del-confirm',
+    cancelButtonClass: 'mesaurement-table-del-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
   })

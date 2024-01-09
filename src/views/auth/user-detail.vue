@@ -47,12 +47,12 @@
                         v-if="row.privileges.length >= entityPrivilegesEnumKeys.length"
                         :checked="true"
                         :disabled="row.rolePrivileges.length >= entityPrivilegesEnumKeys.length"
-                        @change="e=>handleAllCheckedEntity(row, false)"
+                        @change="e => handleAllCheckedEntity(row, false)"
                       />
                       <el-checkbox
                         v-else
                         :checked="false"
-                        @change="e=>handleAllCheckedEntity(row, true)"
+                        @change="e => handleAllCheckedEntity(row, true)"
                       />
                     </template>
                   </template>
@@ -99,18 +99,18 @@
                         v-if="row.privileges.length >= pathPrivilegesEnumKeys.length"
                         :checked="true"
                         :disabled="row.rolePrivileges.length >= pathPrivilegesEnumKeys.length"
-                        @change="e=>handleAllCheckedPath(row, false)"
+                        @change="e => handleAllCheckedPath(row, false)"
                       />
                       <el-checkbox
                         v-else
                         :checked="false"
-                        @change="e=>handleAllCheckedPath(row, true)"
+                        @change="e => handleAllCheckedPath(row, true)"
                       />
                     </template>
                   </template>
                 </el-table-column>
-                <el-table-column v-for="(group, index) in pathPrivilegesEnumGroup" :label="group.group" :key="group.group + '_' + index + '_column'" align="center">
-                  <el-table-column v-for="(child, childIndex) in group.children" :label="child.desc" :key="child.privileges + '_' + childIndex + '_col'" :prop="child.privileges" align="center" :width="calcColumnWidth(child)">
+                <el-table-column v-for="(group, index) in pathPrivilegesEnumGroup" :label="group.group" :key="`${group.group}_${index}_column`" align="center">
+                  <el-table-column v-for="(child, childIndex) in group.children" :label="child.desc" :key="`${child.privileges}_${childIndex}_col`" :prop="child.privileges" align="center" :width="calcColumnWidth(child)">
                     <template #default="{ row }">
                       <el-icon v-if="!isEdit || !row.path" class="move-down3" size="21">
                         <i-custom-correct v-if="row.privileges.includes(child.privileges)" />
@@ -423,6 +423,8 @@ function handleDeleteRole(index: number) {
   ElMessageBox.confirm('是否删除该角色？', '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
+    confirmButtonClass: 'del-role-confirm',
+    cancelButtonClass: 'del-role-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
   })

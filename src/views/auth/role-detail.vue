@@ -45,8 +45,8 @@
                     </template>
                   </template>
                 </el-table-column>
-                <el-table-column v-for="(column, index) in entityPrivilegesEnumGroup" :label="column.group" :key="column.group + '_' + index + '_column'" align="center">
-                  <el-table-column v-for="(col, ci) in column.children" :label="col.desc" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :width="calcColumnWidth(col)">
+                <el-table-column v-for="(column, index) in entityPrivilegesEnumGroup" :label="column.group" :key="`${column.group}_${index}_column`" align="center">
+                  <el-table-column v-for="(col, ci) in column.children" :label="col.desc" :key="`${col.privileges}_${ci}_col`" :prop="col.privileges" align="center" :width="calcColumnWidth(col)">
                     <template #default="{ row }">
                       <el-icon v-if="isView" size="21">
                         <i-custom-correct style="transform: translateY(3px);" v-if="row.includes(col.privileges)" />
@@ -76,8 +76,8 @@
                     </template>
                   </template>
                 </el-table-column>
-                <el-table-column v-for="(column, index) in pathPrivilegesEnumGroup" :label="column.group" :key="column.group + '_' + index + '_column'" align="center">
-                  <el-table-column v-for="(col, ci) in column.children" :label="col.desc" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :width="calcColumnWidth(col)">
+                <el-table-column v-for="(column, index) in pathPrivilegesEnumGroup" :label="column.group" :key="`${column.group}_${index}_column`" align="center">
+                  <el-table-column v-for="(col, ci) in column.children" :label="col.desc" :key="`${col.privileges}_${ci}_col`" :prop="col.privileges" align="center" :width="calcColumnWidth(col)">
                     <template #default="{ row, $index }">
                       <el-icon v-if="isView" size="21">
                         <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.includes(col.privileges)" />
@@ -366,6 +366,8 @@ function handleDeleteUser(i: number) {
   ElMessageBox.confirm('是否删除该用户？', '注意', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
+    confirmButtonClass: 'del-user-confirm',
+    cancelButtonClass: 'del-user-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
   })
