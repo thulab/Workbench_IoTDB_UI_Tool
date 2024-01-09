@@ -15,7 +15,7 @@
           </div>
           <div class="monitor-dashboard-node-box">
             <span class="search-from-label">节点：</span>
-            <el-select v-model="monitorNode" placeholder="全部" style="width: 256px;" @change="handleRefreshMonitor" id="monitor-dashboard-select-node">
+            <el-select v-model="monitorNode" placeholder="全部" style="width: 256px;" @change="handleChangeNode" id="monitor-dashboard-select-node">
               <el-option v-for="(item, index) in nodeList" :key="`${item.address}(${item.type})_${index}`" :value="item.nodeID" :label="item.address ? `${item.address}(${item.type})` : '全部'" />
             </el-select>
           </div>
@@ -176,18 +176,6 @@ const lineChartOptions = (optionData: DataSync.PipeMonitorData[], dataUnit: stri
     },
     left: monitorNode.value === '' && nodeIds.value.length > 1 ? 20 : 'center',
     data: optionData.map((item) => item.nodeName) || [],
-    // selected: optionData.reduce((pre, cur, curI) => {
-    //   if (monitorNode.value === '') {
-    //     if (curI < 3) {
-    //       pre[cur.nodeName] = true;
-    //     } else {
-    //       pre[cur.nodeName] = false;
-    //     }
-    //   } else {
-    //     pre[cur.nodeName] = true;
-    //   }
-    //   return pre;
-    // }, {} as Record<string, boolean>),
     selectedMode: monitorNode.value === '' && nodeIds.value.length > 1,
   },
   connectNulls: false,
@@ -316,6 +304,8 @@ function getMemory() {
         },
       })
       : lineChartOptions(memoryData.value, memoryData.value[0]?.unit || '');
+  }).catch(() => {
+    memoryData.value = [];
   });
 }
 
@@ -351,6 +341,8 @@ function getP50() {
         },
       })
       : lineChartOptions(p50Data.value, p50Data.value[0]?.unit || '');
+  }).catch(() => {
+    p50Data.value = [];
   });
 }
 
@@ -386,6 +378,8 @@ function getP99() {
         },
       })
       : lineChartOptions(p99Data.value, p99Data.value[0]?.unit || '');
+  }).catch(() => {
+    p99Data.value = [];
   });
 }
 
@@ -399,16 +393,10 @@ function getRemainingTime() {
   }).then((res) => {
     remainingTime.remainTime = res.data.remainTime || null;
     remainingTime.timeUnit = res.data.timeUnit;
+  }).catch(() => {
+    remainingTime.remainTime = null;
+    remainingTime.timeUnit = '';
   });
-}
-
-// 图表数据初始赋值
-function initialAssign() {
-  memoryData.value = [];
-  p50Data.value = [];
-  p99Data.value = [];
-  remainingTime.remainTime = null;
-  remainingTime.timeUnit = '';
 }
 
 // 获取图表详情
@@ -421,8 +409,8 @@ function getInitial() {
   ]).then(() => {
     // 重置定时器
     clearTimeout(refreshInterval.value);
+    isInit.value = false;
     refreshInterval.value = setTimeout(() => {
-      isInit.value = false;
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       getMonitorData();
     }, 30 * 1000);
@@ -432,7 +420,12 @@ function getInitial() {
 function getMonitorData() {
   monitorTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
   getInitial();
-  initialAssign();
+}
+
+function handleChangeNode() {
+  clearTimeout(refreshInterval.value);
+  isInit.value = true;
+  getMonitorData();
 }
 
 // 刷新监控
