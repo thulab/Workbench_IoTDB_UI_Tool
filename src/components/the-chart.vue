@@ -16,6 +16,8 @@ const props = defineProps<
   clickFunc?: Function,
 }>();
 
+const legendSelected = ref<{ [key: string]: boolean }>({});
+
 const setOption = (option:ECOption) => {
   if (chartInstance) {
     // 实例存在直接设置
@@ -28,6 +30,12 @@ const setOption = (option:ECOption) => {
       if (props.clickFunc) {
         props.clickFunc(params);
       }
+    });
+    // 监听图例选择状态变化的事件
+    // { name: string, selected: { [name: string]: boolean } }
+    chartInstance.on('legendselectchanged', (params: any) => {
+    // 当图例选择状态发生变化时，可以在这里处理逻辑
+      legendSelected.value = params.selected;
     });
     // 初次加载，设置notMerge为true
     chartInstance.setOption(option, true);
@@ -64,6 +72,10 @@ onUnmounted(() => {
     chartInstance.clear();
     chartInstance.dispose();
   }
+});
+
+defineExpose({
+  legendSelected,
 });
 
 </script>

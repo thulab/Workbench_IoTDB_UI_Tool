@@ -34,7 +34,7 @@
                 <h4 class="monitor-info-module-title">内存</h4>
                 <data-container :is-empty="isChartEmpty(memoryData)">
                   <div class="chart-container-box">
-                    <the-chart :option="memoryDataOptions.data" :key="`memoryData${chartKey}`" />
+                    <the-chart :option="memoryDataOptions.data" key="memoryData" ref="memoryChartRef" />
                   </div>
                 </data-container>
               </div>
@@ -44,7 +44,7 @@
                 <h4 class="monitor-info-module-title">P50延迟</h4>
                 <data-container :is-empty="isChartEmpty(p50Data)">
                   <div class="chart-container-box">
-                    <the-chart :option="p50DataOptions.data" :key="`p50Data${chartKey}`" />
+                    <the-chart :option="p50DataOptions.data" key="p50Data" ref="p50ChartRef" />
                   </div>
                 </data-container>
               </div>
@@ -54,7 +54,7 @@
                 <h4 class="monitor-info-module-title">P99延迟</h4>
                 <data-container :is-empty="isChartEmpty(p99Data)">
                   <div class="chart-container-box">
-                    <the-chart :option="p99DataOptions.data" :key="`p99Data${chartKey}`" />
+                    <the-chart :option="p99DataOptions.data" key="p99Data" ref="p99ChartRef" />
                   </div>
                 </data-container>
               </div>
@@ -78,12 +78,13 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs';
-import { concat, merge } from 'lodash-es';
+import { concat } from 'lodash-es';
 import { type ECOption } from '@/plugins/echarts-plugin';
 import { iotdbShowAuth } from '@/utils/auth';
 import { useConnectionStore } from '@/stores';
 import { DashboardApi, DataSyncApi } from '@/api';
 import DataContainer from '@/views/dashboard/components/data-container.vue';
+import TheChart from '@/components/the-chart.vue';
 
 const emit = defineEmits<{
   (event: 'handleClose'): void;
@@ -94,6 +95,9 @@ interface RemainingTimeData {
   timeUnit: string;
 }
 
+const memoryChartRef = ref<InstanceType<typeof TheChart>>();
+const p50ChartRef = ref<InstanceType<typeof TheChart>>();
+const p99ChartRef = ref<InstanceType<typeof TheChart>>();
 const connectionStore = useConnectionStore();
 const refreshInterval = ref();
 const monitorTime = ref();
@@ -115,7 +119,6 @@ const memoryData = ref<DataSync.PipeMonitorData[]>([]);
 const p50Data = ref<DataSync.PipeMonitorData[]>([]);
 const p99Data = ref<DataSync.PipeMonitorData[]>([]);
 const isInit = ref(true);
-const chartKey = ref(0);
 
 const nodeList = computed(() => {
   if (clusterType.value === 'slave') {
@@ -139,7 +142,37 @@ const lineColor = computed(() => {
   return colorList[0];
 });
 
-const lineChartOptions = (optionData: DataSync.PipeMonitorData[], dataUnit: string) => ({
+function getLegendSelected(optionData: DataSync.PipeMonitorData[], chartName: string) {
+  let obj: { [key: string]: boolean } = {};
+  optionData.forEach((item, index) => {
+    if (monitorNode.value === '') {
+      if (isInit.value) {
+        if (index < 3) {
+          obj[item.nodeName] = true;
+        } else {
+          obj[item.nodeName] = false;
+        }
+      } else if (chartName === 'memory') {
+        obj = memoryChartRef.value!.legendSelected;
+      } else if (chartName === 'p50') {
+        obj = p50ChartRef.value!.legendSelected;
+      } else {
+        obj = p99ChartRef.value!.legendSelected;
+      }
+    } else {
+      nodeList.value.filter((f, fi) => fi !== 0).forEach((node) => {
+        if (item.nodeID === node.nodeID) {
+          obj[item.nodeName] = true;
+        } else {
+          obj[`${node.address}(DataNode)`] = false;
+        }
+      });
+    }
+  });
+  return obj;
+}
+
+const lineChartOptions = (optionData: DataSync.PipeMonitorData[], dataUnit: string, chartName: string) => ({
   color: lineColor.value,
   useUTC: false,
   tooltip: {
@@ -177,6 +210,7 @@ const lineChartOptions = (optionData: DataSync.PipeMonitorData[], dataUnit: stri
     },
     left: monitorNode.value === '' && nodeIds.value.length > 1 ? 20 : 'center',
     data: optionData.map((item) => item.nodeName) || [],
+    selected: getLegendSelected(optionData, chartName),
     selectedMode: monitorNode.value === '' && nodeIds.value.length > 1,
   },
   connectNulls: false,
@@ -224,13 +258,13 @@ const lineChartOptions = (optionData: DataSync.PipeMonitorData[], dataUnit: stri
 } as ECOption);
 
 const memoryDataOptions = reactive({
-  data: lineChartOptions(memoryData.value, memoryData.value[0]?.unit || ''),
+  data: lineChartOptions(memoryData.value, memoryData.value[0]?.unit || '', 'memory'),
 });
 const p50DataOptions = reactive({
-  data: lineChartOptions(p50Data.value, p50Data.value[0]?.unit || ''),
+  data: lineChartOptions(p50Data.value, p50Data.value[0]?.unit || '', 'p50'),
 });
 const p99DataOptions = reactive({
-  data: lineChartOptions(p99Data.value, p99Data.value[0]?.unit || ''),
+  data: lineChartOptions(p99Data.value, p99Data.value[0]?.unit || '', 'p99'),
 });
 
 const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.0'));
@@ -287,24 +321,7 @@ function getMemory() {
       const nodeData = nodeList.value.find((node) => node.nodeID === item.nodeID);
       return { ...item, nodeName: nodeData ? `${nodeData.address}(${nodeData.type})` : `${item.nodeID}(DataNode)` };
     });
-    memoryDataOptions.data = isInit.value
-      ? merge(lineChartOptions(memoryData.value, memoryData.value[0]?.unit || ''), {
-        legend: {
-          selected: memoryData.value.reduce((pre, cur, curI) => {
-            if (monitorNode.value === '') {
-              if (curI < 3) {
-                pre[cur.nodeName] = true;
-              } else {
-                pre[cur.nodeName] = false;
-              }
-            } else {
-              pre[cur.nodeName] = true;
-            }
-            return pre;
-          }, {} as Record<string, boolean>),
-        },
-      })
-      : lineChartOptions(memoryData.value, memoryData.value[0]?.unit || '');
+    memoryDataOptions.data = lineChartOptions(memoryData.value, memoryData.value[0]?.unit || '', 'memory');
   }).catch(() => {
     memoryData.value = [];
   });
@@ -324,24 +341,7 @@ function getP50() {
       const nodeData = nodeList.value.find((node) => node.nodeID === item.nodeID);
       return { ...item, nodeName: nodeData ? `${nodeData.address}(${nodeData.type})` : `${item.nodeID}(DataNode)` };
     });
-    p50DataOptions.data = isInit.value
-      ? merge(lineChartOptions(p50Data.value, p50Data.value[0]?.unit || ''), {
-        legend: {
-          selected: p50Data.value.reduce((pre, cur, curI) => {
-            if (monitorNode.value === '') {
-              if (curI < 3) {
-                pre[cur.nodeName] = true;
-              } else {
-                pre[cur.nodeName] = false;
-              }
-            } else {
-              pre[cur.nodeName] = true;
-            }
-            return pre;
-          }, {} as Record<string, boolean>),
-        },
-      })
-      : lineChartOptions(p50Data.value, p50Data.value[0]?.unit || '');
+    p50DataOptions.data = lineChartOptions(p50Data.value, p50Data.value[0]?.unit || '', 'p50');
   }).catch(() => {
     p50Data.value = [];
   });
@@ -361,24 +361,7 @@ function getP99() {
       const nodeData = nodeList.value.find((node) => node.nodeID === item.nodeID);
       return { ...item, nodeName: nodeData ? `${nodeData.address}(${nodeData.type})` : `${item.nodeID}(DataNode)` };
     });
-    p99DataOptions.data = isInit.value
-      ? merge(lineChartOptions(p99Data.value, p99Data.value[0]?.unit || ''), {
-        legend: {
-          selected: p99Data.value.reduce((pre, cur, curI) => {
-            if (monitorNode.value === '') {
-              if (curI < 3) {
-                pre[cur.nodeName] = true;
-              } else {
-                pre[cur.nodeName] = false;
-              }
-            } else {
-              pre[cur.nodeName] = true;
-            }
-            return pre;
-          }, {} as Record<string, boolean>),
-        },
-      })
-      : lineChartOptions(p99Data.value, p99Data.value[0]?.unit || '');
+    p99DataOptions.data = lineChartOptions(p99Data.value, p99Data.value[0]?.unit || '', 'p99');
   }).catch(() => {
     p99Data.value = [];
   });
@@ -408,7 +391,6 @@ function getInitial() {
     getP99(),
     getRemainingTime(),
   ]).then(() => {
-    chartKey.value++;
     // 重置定时器
     clearTimeout(refreshInterval.value);
     isInit.value = false;
