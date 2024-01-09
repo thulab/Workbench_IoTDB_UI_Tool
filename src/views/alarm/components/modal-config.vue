@@ -29,7 +29,7 @@
               style="width: 235px;"
               id="alarm-config-modal-measurement"
             >
-              <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="`alarm-config-timeseries-${item.timeseries}`" :id="`alarm-config-modal-measurement-select-${item.timeseries}`" :disabled="item.dataType === 'TEXT' || item.viewType === 'VIEW'">
+              <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :id="`alarm-config-modal-measurement-select-${item.timeseries}`" :disabled="item.dataType === 'TEXT' || item.viewType === 'VIEW'">
                 <div style="display: flex; width: 200px;">
                   <text-tooltip :content="item.timeseries" />
                 </div>
