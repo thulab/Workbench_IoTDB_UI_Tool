@@ -140,6 +140,7 @@
                   :key="`${item.pluginName}_${i}_send`"
                   :label="item.pluginType === 'external' ? item.pluginDesc : `${item.pluginDesc}(${item.pluginName})`"
                   :value="item.pluginName"
+                  :id="`data-sync-modal-select-send-select-${item.pluginName}`"
                 />
               </el-select>
             </base-form-item>
@@ -171,7 +172,7 @@
                     <el-input v-model.number="item.port" placeholder="请输入目标端端口号" style="width: 132px" :id="`data-sync-modal-${index}-port`" />
                   </base-form-item>
                   <el-button link v-if="index === 0 && editType !== 'view'" @click="handleAddHost" id="target-ip-add" class="m-l-6" :disabled="isDisabledHosts"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
-                  <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost(index)" :id="'target-ip-del' + index" class="m-l-6"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
+                  <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost(index)" :id="`target-ip-del${index}`" class="m-l-6"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
                 </div>
               </div>
             </div>

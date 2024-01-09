@@ -18,13 +18,13 @@
       <template #prefix>
         <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
       </template>
-      <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :disabled="isBooleanTextDisabled ? (item.dataType === 'BOOLEAN' || item.dataType === 'TEXT') : false">
+      <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :id="`timeseries-select-${item.timeseries}`" :disabled="isBooleanTextDisabled ? (item.dataType === 'BOOLEAN' || item.dataType === 'TEXT') : false">
         <div class="remote-select-search-text">
           <text-tooltip :content="item.timeseries" />
         </div>
       </el-option>
     </el-select>
-    <el-button v-if="isShowViewBtn" type="primary" :disabled="!model.length" class="m-l-12" @click="()=>dialogVisible = true">{{viewText || '已选测点' }}</el-button>
+    <el-button v-if="isShowViewBtn" type="primary" :disabled="!model.length" class="m-l-12" @click="() => dialogVisible = true">{{viewText || '已选测点' }}</el-button>
     <el-dialog :title="viewText || '已选测点'" v-model="dialogVisible" class="select-modal" align-center>
       <el-scrollbar :max-height="400">
         <ul class="select-list">

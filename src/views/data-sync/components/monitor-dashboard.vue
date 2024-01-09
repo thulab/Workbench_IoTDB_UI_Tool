@@ -16,7 +16,7 @@
           <div class="monitor-dashboard-node-box">
             <span class="search-from-label">节点：</span>
             <el-select v-model="monitorNode" placeholder="全部" style="width: 256px;" @change="handleChangeNode" id="monitor-dashboard-select-node">
-              <el-option v-for="(item, index) in nodeList" :key="`${item.address}(${item.type})_${index}`" :value="item.nodeID" :label="item.address ? `${item.address}(${item.type})` : '全部'" />
+              <el-option v-for="(item, index) in nodeList" :key="`${item.address}(${item.type})_${index}`" :value="item.nodeID" :id="`monitor-dashboard-select-node-select-${item.nodeID}`" :label="item.address ? `${item.address}(${item.type})` : '全部'" />
             </el-select>
           </div>
         </div>

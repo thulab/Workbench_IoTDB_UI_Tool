@@ -24,7 +24,7 @@
             @change="handleChangeDevice"
             id="measurement-modal-select-device"
           >
-            <el-option v-for="item in deviceList" :key="item" :label="item" :value="item">
+            <el-option v-for="item in deviceList" :key="item" :label="item" :value="item" :id="`measurement-modal-select-device-select-${item}`">
               <div style="display: flex; width: 360px;">
                 <text-tooltip :content="item" />
               </div>
@@ -84,7 +84,7 @@
                 <el-form-item label="数据类型：" :prop="`measurementList[${index}].dataType`" :rules="requiredRules">
                   <el-input type="hidden" />
                   <el-select v-model="item.dataType" placeholder="请选择数据类型" @change="val => handleChangeRowDataType(val, item, index)" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-dataType`">
-                    <el-option v-for="dtype in dataTypeOptions" :key="dtype" :label="dtype" :value="dtype" />
+                    <el-option v-for="dtype in dataTypeOptions" :key="dtype" :label="dtype" :value="dtype" :id="`measurement-modal-collapse-${index}-dataType-select-${dtype}`" />
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -92,7 +92,7 @@
                 <el-form-item label="编码方式：" :prop="`measurementList[${index}].encoding`" :rules="requiredRules">
                   <el-input type="hidden" />
                   <el-select v-model="item.encoding" placeholder="请选择数据类型" :disabled="!item.isEditable || !item.dataType || !formData.deviceName" :id="`measurement-modal-collapse-${index}-encoding`">
-                    <el-option v-for="enc in encodingOptions(item.dataType as string)" :key="enc" :label="enc" :value="enc" />
+                    <el-option v-for="enc in encodingOptions(item.dataType as string)" :key="enc" :label="enc" :value="enc" :id="`measurement-modal-collapse-${index}-encoding-select-${enc}`" />
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -100,7 +100,7 @@
                 <el-form-item label="压缩方式：" :prop="`measurementList[${index}].compression`" :rules="requiredRules" style="margin-right: 0;">
                   <el-input type="hidden" />
                   <el-select v-model="item.compression" placeholder="请选择数据类型" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-compression`">
-                    <el-option v-for="com in compressionOptions" :key="com" :label="com" :value="com" />
+                    <el-option v-for="com in compressionOptions" :key="com" :label="com" :value="com" :id="`measurement-modal-collapse-${index}-compression-select-${com}`" />
                   </el-select>
                 </el-form-item>
               </el-col>

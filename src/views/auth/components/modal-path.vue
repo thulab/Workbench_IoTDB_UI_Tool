@@ -29,7 +29,7 @@
             <template #prefix>
               <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
             </template>
-            <el-option v-for="item in options" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries">
+            <el-option v-for="item in options" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :id="`auth-path-modal-select-path-select-${item.timeseries}`">
               <div style="display: flex; width: 400px;">
                 <text-tooltip :content="item.timeseries" />
               </div>

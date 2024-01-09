@@ -14,7 +14,7 @@
           <template #prefix>
             <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
           </template>
-          <el-option v-for="item in roleList" :key="item" :label="item" :value="item" :disabled="isCanSelect(item)">
+          <el-option v-for="item in roleList" :key="item" :label="item" :value="item" :id="`auth-user-add-role-modal-select-name-select-${item}`" :disabled="isCanSelect(item)">
             <div class="remote-select-search-text">
               <text-tooltip :content="item" />
             </div>

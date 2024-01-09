@@ -19,7 +19,7 @@
             <template #prefix>
               <el-icon v-if="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" size="20"><i-custom-alarm-level /></el-icon>
             </template>
-            <el-option v-for="item in levelOptions" :key="item.value" :value="item.value" :label="item.name">
+            <el-option v-for="item in levelOptions" :key="item.value" :value="item.value" :label="item.name" :id="`alarm-config-search-level-select-${item.value}`">
               <span v-if="item.value" style="display: flex; align-items: center;">
                 <el-icon size="20" :style="{ color: item?.paramMap?.color }"><i-custom-alarm-level /></el-icon>
                 <span :style="{ color: item?.paramMap?.color }">{{ item.name }}</span>
@@ -30,7 +30,7 @@
         </base-form-item>
         <base-form-item label="状态：" prop="status" class="m-r-0">
           <el-select v-model="searchFormData.status" style="width: 80px;" id="alarm-config-search-status">
-            <el-option v-for="item in statusOptions" :key="item.value" :value="item.value" :label="item.label" />
+            <el-option v-for="item in statusOptions" :key="item.value" :value="item.value" :label="item.label" :id="`alarm-config-search-status-select-${item.value}`" />
           </el-select>
         </base-form-item>
         <el-row>

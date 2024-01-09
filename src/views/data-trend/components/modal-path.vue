@@ -25,7 +25,7 @@
           class="path-select"
           id="trend-modal-select-path"
         >
-          <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :disabled="item.dataType === 'TEXT' || pathList.includes(item.timeseries)">
+          <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :id="`trend-modal-select-path-select-${item.timeseries}`" :disabled="item.dataType === 'TEXT' || pathList.includes(item.timeseries)">
             <div style="display: flex; width: 320px;">
               <text-tooltip :content="item.timeseries" />
             </div>

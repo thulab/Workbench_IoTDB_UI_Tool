@@ -1,7 +1,7 @@
 <template>
   <div class="search_div maxheight">
     <el-select v-model="storageName" style="width: 100%;" placeholder="请选择数据库" @change="handleSelectDatabase" :loading="storageLoading" :placement="'bottom-start'" fit-input-width id="sql-search-data-select-databse">
-      <el-option v-for="item in storageList" :key="item" :value="item" :label="item">
+      <el-option v-for="item in storageList" :key="item" :value="item" :label="item" :id="`sql-search-data-select-databse-${item}`">
         <div style="display: flex; width: 160px;">
           <text-tooltip :content="item" />
         </div>
@@ -25,7 +25,7 @@
       @change="handleSelectDevice"
       id="sql-search-data-select-device"
     >
-      <el-option v-for="item in deviceList" :key="item" :label="item" :value="item">
+      <el-option v-for="item in deviceList" :key="item" :label="item" :value="item" :id="`sql-search-data-select-device-${item}`">
         <div style="display: flex; width: 160px;">
           <text-tooltip :content="item" />
         </div>
@@ -48,7 +48,7 @@
       v-loading="measurementLoading"
       tooltip-effect="light"
       :tooltip-options="{ placement: 'left', popperClass: 'table-tooltip-max-width' }"
-      @row-dblclick="(row, column, event)=>handleAdd(row)">
+      @row-dblclick="(row, column, event) => handleAdd(row)">
       <el-table-column align="center" label="测点" v-slot="{ row }" show-overflow-tooltip>
         {{ row }}
       </el-table-column>
@@ -172,8 +172,7 @@ onMounted(() => {
 
   &.maxheight {
     height: 65vh;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden auto;
   }
 }
 

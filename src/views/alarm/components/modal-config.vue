@@ -29,7 +29,7 @@
               style="width: 235px;"
               id="alarm-config-modal-measurement"
             >
-              <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :disabled="item.dataType === 'TEXT' || item.viewType === 'VIEW'">
+              <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="`alarm-config-timeseries-${item.timeseries}`" :id="`alarm-config-modal-measurement-select-${item.timeseries}`" :disabled="item.dataType === 'TEXT' || item.viewType === 'VIEW'">
                 <div style="display: flex; width: 200px;">
                   <text-tooltip :content="item.timeseries" />
                 </div>
@@ -67,6 +67,7 @@
                 :key="item.value"
                 :label="item.name"
                 :value="item.value"
+                :id="`alarm-config-modal-rule-BOOLEAN-select-${item.value}`"
               />
             </el-select>
             <div v-else class="number-rule-box">
@@ -76,6 +77,7 @@
                   :key="item.value"
                   :label="item.name"
                   :value="item.value"
+                  :id="`alarm-config-modal-rule-select-${item.value}`"
                 />
               </el-select>
               <el-input v-model="formData.alarmRulesTypeVal" :disabled="!formData.measurementType" placeholder="请输入" style="width: 114px;" id="alarm-config-modal-rule-val" />
@@ -99,10 +101,10 @@
                   placeholder=" "
                   id="alarm-config-modal-duration-unit"
                 >
-                  <el-option label="ms" value="ms" />
-                  <el-option label="s" value="s" />
-                  <el-option label="min" value="min" />
-                  <el-option label="h" value="h" />
+                  <el-option label="ms" value="ms" id="alarm-config-modal-duration-unit-ms" />
+                  <el-option label="s" value="s" id="alarm-config-modal-duration-unit-s" />
+                  <el-option label="min" value="min" id="alarm-config-modal-duration-unit-min" />
+                  <el-option label="h" value="h" id="alarm-config-modal-duration-unit-h" />
                 </el-select>
               </template>
             </el-input>
@@ -124,6 +126,7 @@
                 :key="item.value"
                 :label="item.name"
                 :value="item.value"
+                :id="`alarm-config-modal-level-select-${item.value}`"
               >
                 <span style="display: flex; align-items: center;">
                   <el-icon size="20" :style="{ color: item.paramMap?.color }"><i-custom-alarm-level /></el-icon>
@@ -146,6 +149,7 @@
                 :key="item.value"
                 :label="item.name"
                 :value="item.value"
+                :id="`alarm-config-modal-frequency-select-${item.value}`"
               />
             </el-select>
           </base-form-item>

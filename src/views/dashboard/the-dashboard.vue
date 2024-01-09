@@ -159,7 +159,7 @@
                 </ul>
                 <span class="search-from-label">节点：</span>
                 <el-select v-model="monitorNode" placeholder="全部" style="width: 256px;" @change="handleChangeNode" id="dashboard-monitor-select-node">
-                  <el-option v-for="(item, index) in nodeList" :key="`${item.address}(${item.type})_${index}`" :value="item.nodeID" :label="item.address ? `${item.address}(${item.type})` : '全部'" />
+                  <el-option v-for="(item, index) in nodeList" :key="`${item.address}(${item.type})_${index}`" :value="item.nodeID" :id="`dashboard-monitor-select-node-select-${item.nodeID}`" :label="item.address ? `${item.address}(${item.type})` : '全部'" />
                 </el-select>
               </div>
 

@@ -54,7 +54,7 @@
               <el-input v-model.number="searchFormData.timeInterval" style="width: 100px;" placeholder="" @input="handleInputInterval" id="data-search-timeInterval" :disabled="getListLoading">
                 <template #append>
                   <el-select v-model="searchFormData.unitInterval" style="width: 50px;" placeholder="" id="data-search-unitInterval" :disabled="getListLoading">
-                    <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" />
+                    <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-unitInterval-select-${item.value}`" />
                   </el-select>
                 </template>
               </el-input>
@@ -63,7 +63,7 @@
             <el-form-item label="采样策略：" prop="aggregation">
               <el-input type="hidden" />
               <el-select v-model="searchFormData.aggregation" style="width: 80px;" clearable id="data-search-aggregation" :disabled="getListLoading">
-                <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" />
+                <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-aggregation-select-${item.value}`" />
               </el-select>
             </el-form-item>
           </div>

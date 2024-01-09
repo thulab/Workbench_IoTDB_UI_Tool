@@ -23,12 +23,12 @@
           </base-form-item>
           <base-form-item v-show="!isRunningTab" label="采样周期：" prop="unitInterval" :rules="requiredRules">
             <el-select v-model="searchFormData.unitInterval" :disabled="isRunningTab" style="width: 80px;" id="trend-search-unitInterval">
-              <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" />
+              <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" :id="`trend-search-unitInterval-select-${item.value}`" />
             </el-select>
           </base-form-item>
           <base-form-item v-show="!isRunningTab" label="采样策略：" prop="aggregation" :rules="requiredRules" class="m-r-0">
             <el-select v-model="searchFormData.aggregation" :disabled="isRunningTab || searchFormData.unitInterval === 'origin'" style="width: 80px;" @change="handleChangeAggregation" id="trend-search-aggregation">
-              <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" />
+              <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" :id="`trend-search-aggregation-select-${item.value}`" />
             </el-select>
           </base-form-item>
           <div class="play-pause-buttons" v-show="isRunningTab">

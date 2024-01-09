@@ -37,6 +37,7 @@
                     :key="item.id"
                     :label="`${item.name}(用户名:${item.username})`"
                     :value="item.id"
+                    :id="`login-connection-select-${item.id}`"
                   >
                     <div style="display: flex; width: 240px;">
                       <text-tooltip :content="`${item.name}(用户名:${item.username})`" />

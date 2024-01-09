@@ -112,6 +112,7 @@
                     :key="item.value"
                     :label="item.name"
                     :value="item.value"
+                    :id="`line-style-type-select-${item.value}`"
                   />
                 </el-select>
               </div>
@@ -128,6 +129,7 @@
                     :key="item.value"
                     :label="item.name"
                     :value="item.value"
+                    :id="`line-style-arrow-select-${item.value}`"
                   />
                 </el-select>
               </div>

@@ -11,9 +11,9 @@
                 </template>
                 <template #prepend>
                   <el-select v-model="searchFormData.type" style="width: 88px;" placeholder="" id="calculate-search-type">
-                    <el-option :label="`${pageText}名称`" value="name" />
-                    <el-option label="结果测点" value="measurement" />
-                    <el-option :label="`${pageText}描述`" value="desc" />
+                    <el-option :label="`${pageText}名称`" value="name" id="calculate-search-type-name" />
+                    <el-option label="结果测点" value="measurement" id="calculate-search-type-measurement" />
+                    <el-option :label="`${pageText}描述`" value="desc" id="calculate-search-type-desc" />
                   </el-select>
                 </template>
               </el-input>
