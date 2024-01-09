@@ -34,7 +34,7 @@
                 <h4 class="monitor-info-module-title">内存</h4>
                 <data-container :is-empty="isChartEmpty(memoryData)">
                   <div class="chart-container-box">
-                    <the-chart :option="memoryDataOptions" key="memoryData" />
+                    <the-chart :option="memoryDataOptions.data" key="memoryData" />
                   </div>
                 </data-container>
               </div>
@@ -44,7 +44,7 @@
                 <h4 class="monitor-info-module-title">P50延迟</h4>
                 <data-container :is-empty="isChartEmpty(p50Data)">
                   <div class="chart-container-box">
-                    <the-chart :option="p50DataOptions" key="p50Data" />
+                    <the-chart :option="p50DataOptions.data" key="p50Data" />
                   </div>
                 </data-container>
               </div>
@@ -54,7 +54,7 @@
                 <h4 class="monitor-info-module-title">P99延迟</h4>
                 <data-container :is-empty="isChartEmpty(p99Data)">
                   <div class="chart-container-box">
-                    <the-chart :option="p99DataOptions" key="p99Data" />
+                    <the-chart :option="p99DataOptions.data" key="p99Data" />
                   </div>
                 </data-container>
               </div>
@@ -78,7 +78,7 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs';
-import { concat } from 'lodash-es';
+import { concat, merge } from 'lodash-es';
 import { type ECOption } from '@/plugins/echarts-plugin';
 import { iotdbShowAuth } from '@/utils/auth';
 import { useConnectionStore } from '@/stores';
@@ -114,6 +114,7 @@ const remainingTime = reactive<RemainingTimeData>({
 const memoryData = ref<DataSync.PipeMonitorData[]>([]);
 const p50Data = ref<DataSync.PipeMonitorData[]>([]);
 const p99Data = ref<DataSync.PipeMonitorData[]>([]);
+const isInit = ref(true);
 
 const nodeList = computed(() => {
   if (clusterType.value === 'slave') {
@@ -124,8 +125,21 @@ const nodeList = computed(() => {
 
 const nodeIds = computed(() => nodeList.value.filter((item, index) => index !== 0).map((data) => data.nodeID));
 
+const colorList = ['#4992ff', '#7cffb2', '#fddd60', '#ff6e76', '#58d9f9', '#05c091', '#ff8a45', '#8d48e3', '#dd79ff', '#8AC211'];
+
+const lineColor = computed(() => {
+  if (monitorNode.value === '') {
+    return colorList;
+  }
+  const index = nodeIds.value.findIndex((item) => item === monitorNode.value);
+  if (index !== -1) {
+    return colorList[index % 10];
+  }
+  return colorList[0];
+});
+
 const lineChartOptions = (optionData: DataSync.PipeMonitorData[], dataUnit: string) => ({
-  color: monitorNode.value === '' ? ['#4992ff', '#7cffb2', '#fddd60', '#ff6e76', '#58d9f9', '#05c091', '#ff8a45', '#8d48e3', '#dd79ff', '#8AC211'] : ['#8AC211'],
+  color: lineColor.value,
   useUTC: false,
   tooltip: {
     trigger: 'axis',
@@ -162,18 +176,18 @@ const lineChartOptions = (optionData: DataSync.PipeMonitorData[], dataUnit: stri
     },
     left: monitorNode.value === '' && nodeIds.value.length > 1 ? 20 : 'center',
     data: optionData.map((item) => item.nodeName) || [],
-    selected: optionData.reduce((pre, cur, curI) => {
-      if (monitorNode.value === '') {
-        if (curI < 3) {
-          pre[cur.nodeName] = true;
-        } else {
-          pre[cur.nodeName] = false;
-        }
-      } else {
-        pre[cur.nodeName] = true;
-      }
-      return pre;
-    }, {} as Record<string, boolean>),
+    // selected: optionData.reduce((pre, cur, curI) => {
+    //   if (monitorNode.value === '') {
+    //     if (curI < 3) {
+    //       pre[cur.nodeName] = true;
+    //     } else {
+    //       pre[cur.nodeName] = false;
+    //     }
+    //   } else {
+    //     pre[cur.nodeName] = true;
+    //   }
+    //   return pre;
+    // }, {} as Record<string, boolean>),
     selectedMode: monitorNode.value === '' && nodeIds.value.length > 1,
   },
   connectNulls: false,
@@ -220,9 +234,15 @@ const lineChartOptions = (optionData: DataSync.PipeMonitorData[], dataUnit: stri
   })),
 } as ECOption);
 
-const memoryDataOptions = reactive(lineChartOptions(memoryData.value, memoryData.value[0]?.unit || ''));
-const p50DataOptions = reactive(lineChartOptions(p50Data.value, p50Data.value[0]?.unit || ''));
-const p99DataOptions = reactive(lineChartOptions(p99Data.value, p99Data.value[0]?.unit || ''));
+const memoryDataOptions = reactive({
+  data: lineChartOptions(memoryData.value, memoryData.value[0]?.unit || ''),
+});
+const p50DataOptions = reactive({
+  data: lineChartOptions(p50Data.value, p50Data.value[0]?.unit || ''),
+});
+const p99DataOptions = reactive({
+  data: lineChartOptions(p99Data.value, p99Data.value[0]?.unit || ''),
+});
 
 const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.0'));
 
@@ -278,6 +298,24 @@ function getMemory() {
       const nodeData = nodeList.value.find((node) => node.nodeID === item.nodeID);
       return { ...item, nodeName: nodeData ? `${nodeData.address}(${nodeData.type})` : `${item.nodeID}(DataNode)` };
     });
+    memoryDataOptions.data = isInit.value
+      ? merge(lineChartOptions(memoryData.value, memoryData.value[0]?.unit || ''), {
+        legend: {
+          selected: memoryData.value.reduce((pre, cur, curI) => {
+            if (monitorNode.value === '') {
+              if (curI < 3) {
+                pre[cur.nodeName] = true;
+              } else {
+                pre[cur.nodeName] = false;
+              }
+            } else {
+              pre[cur.nodeName] = true;
+            }
+            return pre;
+          }, {} as Record<string, boolean>),
+        },
+      })
+      : lineChartOptions(memoryData.value, memoryData.value[0]?.unit || '');
   });
 }
 
@@ -295,6 +333,24 @@ function getP50() {
       const nodeData = nodeList.value.find((node) => node.nodeID === item.nodeID);
       return { ...item, nodeName: nodeData ? `${nodeData.address}(${nodeData.type})` : `${item.nodeID}(DataNode)` };
     });
+    p50DataOptions.data = isInit.value
+      ? merge(lineChartOptions(p50Data.value, p50Data.value[0]?.unit || ''), {
+        legend: {
+          selected: p50Data.value.reduce((pre, cur, curI) => {
+            if (monitorNode.value === '') {
+              if (curI < 3) {
+                pre[cur.nodeName] = true;
+              } else {
+                pre[cur.nodeName] = false;
+              }
+            } else {
+              pre[cur.nodeName] = true;
+            }
+            return pre;
+          }, {} as Record<string, boolean>),
+        },
+      })
+      : lineChartOptions(p50Data.value, p50Data.value[0]?.unit || '');
   });
 }
 
@@ -312,6 +368,24 @@ function getP99() {
       const nodeData = nodeList.value.find((node) => node.nodeID === item.nodeID);
       return { ...item, nodeName: nodeData ? `${nodeData.address}(${nodeData.type})` : `${item.nodeID}(DataNode)` };
     });
+    p99DataOptions.data = isInit.value
+      ? merge(lineChartOptions(p99Data.value, p99Data.value[0]?.unit || ''), {
+        legend: {
+          selected: p99Data.value.reduce((pre, cur, curI) => {
+            if (monitorNode.value === '') {
+              if (curI < 3) {
+                pre[cur.nodeName] = true;
+              } else {
+                pre[cur.nodeName] = false;
+              }
+            } else {
+              pre[cur.nodeName] = true;
+            }
+            return pre;
+          }, {} as Record<string, boolean>),
+        },
+      })
+      : lineChartOptions(p99Data.value, p99Data.value[0]?.unit || '');
   });
 }
 
@@ -348,6 +422,7 @@ function getInitial() {
     // 重置定时器
     clearTimeout(refreshInterval.value);
     refreshInterval.value = setTimeout(() => {
+      isInit.value = false;
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       getMonitorData();
     }, 30 * 1000);
@@ -356,18 +431,20 @@ function getInitial() {
 
 function getMonitorData() {
   monitorTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
-  initialAssign();
   getInitial();
+  initialAssign();
 }
 
 // 刷新监控
 function handleRefreshMonitor() {
   clearTimeout(refreshInterval.value);
+  isInit.value = false;
   getMonitorData();
 }
 
 onMounted(() => {
   if (!showAuthMenu.value) return;
+  isInit.value = true;
   getSystemData().then(() => {
     getMonitorData();
   });
