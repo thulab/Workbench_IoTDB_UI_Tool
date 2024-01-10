@@ -313,7 +313,7 @@ function getMemory() {
     nodeID: monitorNode.value === '' ? nodeIds.value : [monitorNode.value],
     startTime: dayjs(monitorTime.value).valueOf() - 6 * 60 * 60 * 1000,
     endTime: dayjs(monitorTime.value).valueOf(),
-    step: 15,
+    step: 180,
     isMaster: clusterType.value === 'master',
   }).then((res) => {
     const data = res.data || [];
@@ -332,7 +332,7 @@ function getP50() {
     nodeID: monitorNode.value === '' ? nodeIds.value : [monitorNode.value],
     startTime: dayjs(monitorTime.value).valueOf() - 6 * 60 * 60 * 1000,
     endTime: dayjs(monitorTime.value).valueOf(),
-    step: 15,
+    step: 180,
     isMaster: clusterType.value === 'master',
     quantile: '0.5',
   }).then((res) => {
@@ -352,7 +352,7 @@ function getP99() {
     nodeID: monitorNode.value === '' ? nodeIds.value : [monitorNode.value],
     startTime: dayjs(monitorTime.value).valueOf() - 6 * 60 * 60 * 1000,
     endTime: dayjs(monitorTime.value).valueOf(),
-    step: 15,
+    step: 180,
     isMaster: clusterType.value === 'master',
     quantile: '0.99',
   }).then((res) => {
@@ -372,7 +372,7 @@ function getRemainingTime() {
     nodeID: monitorNode.value === '' ? nodeIds.value : [monitorNode.value],
     startTime: dayjs(monitorTime.value).valueOf() - 6 * 60 * 60 * 1000,
     endTime: dayjs(monitorTime.value).valueOf(),
-    step: 15,
+    step: 180,
     isMaster: clusterType.value === 'master',
   }).then((res) => {
     remainingTime.remainTime = res.data.remainTime || null;

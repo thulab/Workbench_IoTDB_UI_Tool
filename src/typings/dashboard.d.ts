@@ -53,7 +53,7 @@ declare namespace Dashboard{
   }
 
   export interface MetricDiskRes {
-    diskTotal: number;
+    diskTotal: number | null;
     totalUnit: string;
     diskUse: number;
     useUnit: string;
@@ -61,6 +61,8 @@ declare namespace Dashboard{
     ioTDBUse: number;
     ioTDBUnit: string;
     ioTDBUseRatio: number;
+    diskRemain: number;
+    diskRemainUnit: string;
   }
 
   export interface MetricMemoryRes {

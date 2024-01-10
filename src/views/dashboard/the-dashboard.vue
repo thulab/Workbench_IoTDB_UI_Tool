@@ -266,7 +266,7 @@ const nodeList = computed(() => {
   return masterNodes.value;
 });
 
-const showVersionCol = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.2.0'));
+const showVersionCol = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.2.1'));
 
 const { requestFn: getSystemInfo, loading } = useRequest(DashboardApi.getSystemInfo);
 

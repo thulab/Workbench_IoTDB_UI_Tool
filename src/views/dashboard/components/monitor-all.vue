@@ -94,17 +94,6 @@ interface PieChartData {
   percent: number;
 }
 
-interface DiskMemoryDetail {
-  diskTotal: number | null;
-  totalUnit: string;
-  diskMemory: number | string;
-  diskMemoryUnit: string;
-  diskUseRatio: number;
-  ioTDBMemory: number | string;
-  ioTDBMemoryUnit: string;
-  ioTDBUseRatio: number;
-}
-
 const cpuData = reactive<{
   dataCpu: number | string,
   configCpu: number | string,
@@ -145,15 +134,17 @@ const configNodeSystemData = reactive<PieChartData>({
   percent: 0,
 });
 
-const diskMemoryData = reactive<DiskMemoryDetail>({
+const diskMemoryData = reactive<Dashboard.MetricDiskRes>({
   diskTotal: null,
   totalUnit: '',
-  diskMemory: '',
-  diskMemoryUnit: '',
+  diskUse: 0,
+  useUnit: '',
   diskUseRatio: 0,
-  ioTDBMemory: '',
-  ioTDBMemoryUnit: '',
+  ioTDBUse: 0,
+  ioTDBUnit: '',
   ioTDBUseRatio: 0,
+  diskRemain: 0,
+  diskRemainUnit: '',
 });
 
 const writeSpeed = ref();
@@ -469,7 +460,7 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData, to
   ],
 } as ECOption);
 
-const diskChartOptions = (diskMemoryChartData: DiskMemoryDetail): ECOption => ({
+const diskChartOptions = (diskMemoryChartData: Dashboard.MetricDiskRes): ECOption => ({
   tooltip: {
     trigger: 'axis',
     show: true,
@@ -483,7 +474,8 @@ const diskChartOptions = (diskMemoryChartData: DiskMemoryDetail): ECOption => ({
       const circle = '<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:';
       paramsData.forEach((item) => {
         // eslint-disable-next-line no-nested-ternary
-        res += `<div style="margin: 10px 0 0;">${circle}${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;margin-left:2px">${item.seriesName}</span><span style="float:right;margin-left:20px;font-size:14px;color:#666;font-weight:900">${item.axisValueLabel === '磁盘空间' ? `${item.value} ${diskMemoryChartData.diskMemoryUnit}` : (item.value === undefined ? '-' : `${diskMemoryChartData.ioTDBMemory} ${diskMemoryChartData.ioTDBMemoryUnit}`)}</span></div>`;
+        res += `<div style="margin: 10px 0 0;">${circle}${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;margin-left:2px">${item.seriesName}</span><span style="float:right;margin-left:20px;font-size:14px;color:#666;font-weight:900">${item.axisValueLabel === '磁盘空间' ? (item.seriesName === '已用空间'
+          ? `${diskMemoryChartData.diskUse} ${diskMemoryChartData.useUnit}` : `${diskMemoryChartData.diskRemain} ${diskMemoryChartData.diskRemainUnit}`) : (item.seriesName === '已用空间' ? `${diskMemoryChartData.ioTDBUse} ${diskMemoryChartData.ioTDBUnit}` : '-')}</span></div>`;
       });
       return `<div style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0].axisValueLabel}</div>${res}`;
     },
@@ -538,8 +530,8 @@ const diskChartOptions = (diskMemoryChartData: DiskMemoryDetail): ECOption => ({
       type: 'bar',
       stack: 'total',
       data: [
-        transformDecimal(diskMemoryChartData.diskTotal! * diskMemoryChartData.ioTDBUseRatio, 1),
-        transformDecimal(diskMemoryChartData.diskTotal! * diskMemoryChartData.diskUseRatio, 1),
+        transformDecimal(diskMemoryChartData.diskTotal! * diskMemoryChartData.ioTDBUseRatio, 3),
+        transformDecimal(diskMemoryChartData.diskTotal! * diskMemoryChartData.diskUseRatio, 3),
       ],
       itemStyle: {
         color: '#495AD4',
@@ -549,9 +541,9 @@ const diskChartOptions = (diskMemoryChartData: DiskMemoryDetail): ECOption => ({
         position: 'top',
         formatter: (params: any) => {
           if (params.name === 'IoTDB 空间') {
-            return `${diskMemoryChartData.ioTDBMemory} ${diskMemoryChartData.ioTDBMemoryUnit}`;
+            return `${diskMemoryChartData.ioTDBUse} ${diskMemoryChartData.ioTDBUnit}`;
           }
-          return `${diskMemoryChartData.diskMemory} ${diskMemoryChartData.diskMemoryUnit}`;
+          return `${diskMemoryChartData.diskUse} ${diskMemoryChartData.useUnit}`;
         },
         fontSize: 12,
         fontWeight: 700,
@@ -568,7 +560,7 @@ const diskChartOptions = (diskMemoryChartData: DiskMemoryDetail): ECOption => ({
       // eslint-disable-next-line no-sparse-arrays
       data: [
         ,
-        transformDecimal(transformDecimal((1 - diskMemoryChartData.diskUseRatio), 1) * diskMemoryChartData.diskTotal!, 1),
+        transformDecimal(diskMemoryChartData.diskTotal! - transformDecimal(diskMemoryChartData.diskTotal! * diskMemoryChartData.diskUseRatio, 3), 3),
       ],
       itemStyle: {
         color: '#DFE1ED',
@@ -578,7 +570,7 @@ const diskChartOptions = (diskMemoryChartData: DiskMemoryDetail): ECOption => ({
         position: 'top',
         formatter: (params: any) => {
           if (params.name === '磁盘空间') {
-            return `${params.value} ${diskMemoryChartData.diskMemoryUnit}`;
+            return `${diskMemoryChartData.diskRemain} ${diskMemoryChartData.diskRemainUnit}`;
           }
           return '';
         },
@@ -623,17 +615,16 @@ function getCpu() {
 
 function getDisk() {
   return getMetricAllDisk(isMaster.value).then((res) => {
-    const {
-      diskTotal, totalUnit, diskUse, useUnit, diskUseRatio, ioTDBUse, ioTDBUnit, ioTDBUseRatio,
-    } = res.data;
-    diskMemoryData.diskTotal = diskTotal;
-    diskMemoryData.totalUnit = totalUnit || '';
-    diskMemoryData.diskMemory = diskUse;
-    diskMemoryData.diskMemoryUnit = useUnit;
-    diskMemoryData.diskUseRatio = diskUseRatio;
-    diskMemoryData.ioTDBMemory = ioTDBUse;
-    diskMemoryData.ioTDBMemoryUnit = ioTDBUnit;
-    diskMemoryData.ioTDBUseRatio = ioTDBUseRatio;
+    diskMemoryData.diskTotal = res.data.diskTotal || null;
+    diskMemoryData.totalUnit = res.data.totalUnit || '';
+    diskMemoryData.diskUse = res.data.diskUse || 0;
+    diskMemoryData.useUnit = res.data.useUnit || '';
+    diskMemoryData.diskUseRatio = res.data.diskUseRatio || 0;
+    diskMemoryData.ioTDBUse = res.data.ioTDBUse || 0;
+    diskMemoryData.ioTDBUnit = res.data.ioTDBUnit || '';
+    diskMemoryData.ioTDBUseRatio = res.data.ioTDBUseRatio || 0;
+    diskMemoryData.diskRemain = res.data.diskRemain || 0;
+    diskMemoryData.diskRemainUnit = res.data.diskRemainUnit || '';
   });
 }
 
@@ -686,12 +677,14 @@ function initialAssign() {
   configNodeSystemData.percent = 0;
   diskMemoryData.diskTotal = null;
   diskMemoryData.totalUnit = '';
-  diskMemoryData.diskMemory = '';
-  diskMemoryData.diskMemoryUnit = '';
+  diskMemoryData.diskUse = 0;
+  diskMemoryData.useUnit = '';
   diskMemoryData.diskUseRatio = 0;
-  diskMemoryData.ioTDBMemory = '';
-  diskMemoryData.ioTDBMemoryUnit = '';
+  diskMemoryData.ioTDBUse = 0;
+  diskMemoryData.ioTDBUnit = '';
   diskMemoryData.ioTDBUseRatio = 0;
+  diskMemoryData.diskRemain = 0;
+  diskMemoryData.diskRemainUnit = '';
   writeSpeed.value = null;
   fileTotal.value = null;
 }
