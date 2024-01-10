@@ -167,7 +167,7 @@ let controller = new AbortController();
 
 // 执行sql
 function querySqlRun(type?: string) {
-  let codeStr = codeVal.value.replace(/(\/\*[^*]*\*\/)|(\/\/[^*]*)|(--[^.].*)/gm, '').replace(/^\s+/gm, '');
+  let codeStr = codeVal.value.replace(/(\/\*[^*]*\*\/)|(\/\/[^*]*)|(--.*$)/gm, '').replace(/^\s+/gm, '');
   if (type === 'part') {
     codeStr = selectionCode.value;
   }
