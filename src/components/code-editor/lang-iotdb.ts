@@ -18,7 +18,7 @@ export const IotdbSQL = SQLDialect.define({
   charSetCasts: true,
   doubleQuotedStrings: true,
   unquotedBitLiterals: true,
-  hashComments: true,
+  hashComments: false,
   spaceAfterDashes: true,
   specialVar: '@?',
   identifierQuotes: '`',
