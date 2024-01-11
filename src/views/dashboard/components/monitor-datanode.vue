@@ -354,7 +354,7 @@ const diskChartOptions = (diskMemoryChartData: Dashboard.MetricDiskRes): ECOptio
       type: 'bar',
       stack: 'total',
       data: [
-        transformDecimal(diskMemoryChartData.diskTotal! * diskMemoryChartData.ioTDBUseRatio, 3),
+        diskMemoryChartData.ioTDBUse === 0 ? 0.1 : transformDecimal(diskMemoryChartData.diskTotal! * diskMemoryChartData.ioTDBUseRatio, 3),
         transformDecimal(diskMemoryChartData.diskTotal! * diskMemoryChartData.diskUseRatio, 3),
       ],
       itemStyle: {
