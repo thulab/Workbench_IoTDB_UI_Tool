@@ -60,7 +60,7 @@ const getSelectionText = () => {
   if (view.value) {
     const { from, to } = view.value!.state.selection.main;
     const res = view.value!.state.sliceDoc(from, to);
-    const resWithoutComments = res.replace(/(\/\*[^*]*\*\/)|(\/\/[^*]*)|(--.*$)/gm, '');
+    const resWithoutComments = res.replace(/(\/\*[^*]*\*\/)|(--.*$)/gm, '');
     const resWithoutWhitespace = resWithoutComments.replace(/^\s+/gm, '');
     // if (replaceWrap) {
     //   return resWithoutComments.replace(/\n(?!;)/gm, ' ');
