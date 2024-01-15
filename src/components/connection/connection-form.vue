@@ -283,19 +283,22 @@ function handleReset() {
 function handleTestConnnection() {
   testLoading.value = true;
   testConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id }).then(() => {
-    let successMag = 'IoTDB连接成功';
+    let successMsg = 'IoTDB<br />连接成功';
     if (formData.type === 2) {
       if (formData.masterCluster.prometheusUrl && formData.slaveCluster?.prometheusUrl) {
-        successMag = 'IoTDB、主、备集群Prometheus连接成功';
+        successMsg = 'IoTDB、主、备集群Prometheus连接成功';
       } else if (formData.masterCluster.prometheusUrl) {
-        successMag = 'IoTDB、主集群Prometheus连接成功';
+        successMsg = 'IoTDB、主集群Prometheus连接成功';
       } else if (formData.slaveCluster?.prometheusUrl) {
-        successMag = 'IoTDB、备集群Prometheus连接成功';
+        successMsg = 'IoTDB、备集群Prometheus连接成功';
       }
     } else if (formData.masterCluster.prometheusUrl) {
-      successMag = 'IoTDB、Prometheus连接成功';
+      successMsg = 'IoTDB、Prometheus连接成功';
     }
-    ElMessage.success(successMag);
+    ElMessage.success({
+      message: successMsg,
+      grouping: true,
+    });
   }).finally(() => {
     testLoading.value = false;
   });
@@ -339,28 +342,31 @@ function handleTestLogin() {
 }
 
 function handleTestPrometheus() {
-  let successMag = 'Prometheus连接成功';
+  let successMsg = 'Prometheus连接成功';
   if (formData.type === 2) {
     if (formData.masterCluster.prometheusUrl && formData.slaveCluster?.prometheusUrl) {
-      successMag = '主、备集群Prometheus连接成功';
+      successMsg = '主、备集群Prometheus连接成功';
     } else if (formData.masterCluster.prometheusUrl) {
-      successMag = '主集群Prometheus连接成功';
+      successMsg = '主集群Prometheus连接成功';
     } else if (formData.slaveCluster?.prometheusUrl) {
-      successMag = '备集群Prometheus连接成功';
+      successMsg = '备集群Prometheus连接成功';
     } else {
-      successMag = '';
+      successMsg = '';
     }
   } else if (!formData.masterCluster.prometheusUrl) {
-    successMag = '';
+    successMsg = '';
   }
-  if (!successMag) return;
+  if (!successMsg) return;
   testLoading.value = true;
   testPrometheus({
     prometheusUrlMaster: formData.masterCluster.prometheusUrl,
     prometheusUrlSlave: formData.slaveCluster?.prometheusUrl || '',
     doubleAlive: formData.type === 2,
   }).then(() => {
-    ElMessage.success(successMag);
+    ElMessage.success({
+      message: successMsg,
+      grouping: true,
+    });
   }).finally(() => {
     testLoading.value = false;
   });
