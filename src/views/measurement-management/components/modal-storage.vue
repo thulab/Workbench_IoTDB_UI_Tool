@@ -3,15 +3,15 @@
     title="新建数据库"
     v-model="dialogVisible"
     width="480px"
-    class="new-storage-container"
+    class="new-database-container"
     align-center
     :close-on-click-modal="false"
-    id="measurement-modal-database"
+    id="new-database-modal-database"
   >
     <el-form ref="formRef" :model="formData" :rules="rules" class="source-form m-t-8" label-position="left" label-width="112px">
       <el-form-item label="数据库名称:" prop="groupName">
         <el-input type="hidden" />
-        <el-input v-model="formData.groupName" placeholder="请输入数据库名称" maxlength="59" show-word-limit id="measurement-modal-groupName">
+        <el-input v-model="formData.groupName" placeholder="请输入数据库名称" maxlength="59" show-word-limit id="new-database-modal-groupName">
           <template #prepend>root.</template>
         </el-input>
       </el-form-item>
@@ -20,14 +20,14 @@
         </template>
         <el-input type="hidden" />
         <auth-tooltip :is-disabled="canWriteSchema">
-          <el-input v-model="formData.ttl" min="0" max="9007199254740992" :disabled="!canWriteSchema" class="ttl-input" id="measurement-modal-ttl">
+          <el-input v-model="formData.ttl" min="0" max="9007199254740992" :disabled="!canWriteSchema" class="ttl-input" id="new-database-modal-ttl">
             <template #append>
-              <el-select v-model="formData.ttlUnit" style="width: 56px;" placeholder="" id="measurement-modal-ttlunit" :disabled="!canWriteSchema">
-                <el-option label="毫秒" value="millisecond" id="measurement-modal-ttl-ms" />
-                <el-option label="秒" value="second" id="measurement-modal-ttl-s" />
-                <el-option label="分" value="minute" id="measurement-modal-ttl-m" />
-                <el-option label="小时" value="hour" id="measurement-modal-ttl-h" />
-                <el-option label="天" value="day" id="measurement-modal-ttl-d" />
+              <el-select v-model="formData.ttlUnit" style="width: 56px;" placeholder="" id="new-database-modal-ttlunit" :disabled="!canWriteSchema">
+                <el-option label="毫秒" value="millisecond" id="new-database-modal-ttl-ms" />
+                <el-option label="秒" value="second" id="new-database-modal-ttl-s" />
+                <el-option label="分" value="minute" id="new-database-modal-ttl-m" />
+                <el-option label="小时" value="hour" id="new-database-modal-ttl-h" />
+                <el-option label="天" value="day" id="new-database-modal-ttl-d" />
               </el-select>
             </template>
           </el-input>
@@ -36,8 +36,8 @@
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false" id="measurement-modal-cancel">取消</el-button>
-        <el-button type="primary" :loading="saveloading" @click="handleConfirm" id="measurement-modal-confirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="new-database-modal-cancel">取消</el-button>
+        <el-button type="primary" :loading="saveloading" @click="handleConfirm" id="new-database-modal-confirm">确定</el-button>
       </span>
     </template>
   </el-dialog>
@@ -137,7 +137,7 @@ watch(
 
 <style scoped lang="scss">
 
-.new-storage-container{
+.new-database-container{
   position: relative;
 }
 </style>

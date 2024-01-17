@@ -57,7 +57,8 @@ async function responseInterceptor(response: HttpResponse<object>): Promise<Http
   if (response.status === 403 || (response.status === 401 && logined)) {
     return ElMessageBox.alert('登录已失效，请重新登录', '提示', {
       confirmButtonText: '确定',
-      confirmButtonClass: 'login-out-confirm',
+      customClass: 'login-expire-message-box',
+      confirmButtonClass: 'login-expire-confirm',
       type: 'error',
       showClose: false,
     }).finally(() => {

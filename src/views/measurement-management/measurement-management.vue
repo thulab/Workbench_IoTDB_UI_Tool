@@ -14,10 +14,10 @@
       <h4 class="storage-info-title">数据库信息</h4>
       <div class="page-info-box">
         <ul class="storage-info-list">
-          <li class="storage-info-item"><el-icon size="24"><i-custom-storage-num /></el-icon><span class="storage-info-item-label">数据库名称：</span><text-tooltip :content="canReadWriteSchema ? currentStorage : '-'" /></li>
-          <li class="storage-info-item storage-info-item-ttl">
+          <li class="storage-info-item" id="database-name-li"><el-icon size="24"><i-custom-storage-num /></el-icon><span class="storage-info-item-label" id="database-name-span">数据库名称：</span><text-tooltip :content="canReadWriteSchema ? currentStorage : '-'" /></li>
+          <li class="storage-info-item storage-info-item-ttl" id="ttl-li">
             <el-icon size="24"><i-custom-time /></el-icon>
-            <span class="storage-info-item-label">数据保存时间：<el-tooltip effect="light" content="数据保存时间（TTL），到期后系统将自动删除数据，此处不填代表永久存储" placement="top" popper-class="tooltip-box-width"><i-custom-question class="ttl-tip" /></el-tooltip></span>
+            <span class="storage-info-item-label" id="ttl-span">数据保存时间：<el-tooltip effect="light" content="数据保存时间（TTL），到期后系统将自动删除数据，此处不填代表永久存储" placement="top" popper-class="tooltip-box-width"><i-custom-question class="ttl-tip" /></el-tooltip></span>
             <template v-if="!canReadWriteSchema">-</template>
             <template v-else>
               <span v-if="!editTTL">{{ storageInfos?.ttl ? (storageInfos.ttl + getTtlTimeUnit(storageInfos.ttlUnit, ttlUnitOptions)) : '∞'}}</span>
@@ -42,9 +42,9 @@
             </template>
           </li>
           <br>
-          <li class="storage-info-item"><el-icon size="24"><i-custom-device-num /></el-icon><span class="storage-info-item-label">设备数量：</span>{{ canReadWriteSchema ? (storageInfos?.deviceCount || 0) : '-' }}</li>
-          <li class="storage-info-item"><el-icon size="24"><i-custom-measure-num /></el-icon><span class="storage-info-item-label">测点数量：</span>{{ canReadWriteSchema ? (storageInfos?.measurementCount || 0) : '-' }}</li>
-          <li class="storage-info-item"><el-icon size="24"><i-custom-total-num /></el-icon><span class="storage-info-item-label">数据总量：</span>{{ canReadWriteSchema ? (!storageInfos?.dataCount || storageInfos?.dataCount < 0 ? 0 : storageInfos?.dataCount) : '-'}}</li>
+          <li class="storage-info-item" id="device-total-li"><el-icon size="24"><i-custom-device-num /></el-icon><span class="storage-info-item-label" id="device-total-span">设备数量：</span>{{ canReadWriteSchema ? (storageInfos?.deviceCount || 0) : '-' }}</li>
+          <li class="storage-info-item" id="measurement-total-li"><el-icon size="24"><i-custom-measure-num /></el-icon><span class="storage-info-item-label" id="measurement-total-span">测点数量：</span>{{ canReadWriteSchema ? (storageInfos?.measurementCount || 0) : '-' }}</li>
+          <li class="storage-info-item" id="data-total-li"><el-icon size="24"><i-custom-total-num /></el-icon><span class="storage-info-item-label" id="data-total-span">数据总量：</span>{{ canReadWriteSchema ? (!storageInfos?.dataCount || storageInfos?.dataCount < 0 ? 0 : storageInfos?.dataCount) : '-'}}</li>
         </ul>
 
         <div class="page-detail-buttons">
@@ -152,7 +152,8 @@
             v-if="totalCount > 0"
             v-model:currentPage="pagination.pageNum"
             v-model:page-size="pagination.pageSize"
-            class="m-t-20"
+            class="m-t-20 measurement-table-pagination"
+            popper-class="measurement-table-pagination-popper"
             layout="prev, pager, next, sizes, jumper"
             background
             :page-sizes="[10, 20, 50, 100]"
