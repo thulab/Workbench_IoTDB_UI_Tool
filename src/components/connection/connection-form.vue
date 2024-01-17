@@ -283,7 +283,7 @@ function handleReset() {
 function handleTestConnnection() {
   testLoading.value = true;
   testConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id }).then(() => {
-    let successMsg = 'IoTDB<br />连接成功';
+    let successMsg = 'IoTDB连接成功';
     if (formData.type === 2) {
       if (formData.masterCluster.prometheusUrl && formData.slaveCluster?.prometheusUrl) {
         successMsg = 'IoTDB、主、备集群Prometheus连接成功';
