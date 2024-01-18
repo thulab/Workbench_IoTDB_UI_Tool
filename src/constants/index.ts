@@ -1,24 +1,15 @@
-export const LOCALE: { [key: string]: string } = {
-  ZH_CN: 'zh-cn',
-  EN: 'en',
-  DE: 'de',
-};
+import zhLocale from 'element-plus/es/locale/lang/zh-cn';
+import enLocale from 'element-plus/es/locale/lang/en';
+import deLocale from 'element-plus/es/locale/lang/de';
 
-// 配置语言列表
-export const localeList = [
-  {
-    label: '简体中文',
-    locale: LOCALE.ZH_CN,
-  },
-  {
-    label: 'English',
-    locale: LOCALE.EN,
-  },
-  {
-    label: 'German',
-    locale: LOCALE.DE,
-  },
-];
+export const langMap = { cn: 0, en: 1, de: 2 };
+export const langIndexMap = { 0: 'cn', 1: 'en', 2: 'de' };
+export const langName = [zhLocale.name, enLocale.name, deLocale.name];
+export const langNameMap = {
+  cn: langName[0],
+  en: langName[1],
+  de: langName[2],
+};
 
 // 数据查询 函数树
 export const functionTreeData = [

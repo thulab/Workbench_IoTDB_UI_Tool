@@ -1,6 +1,7 @@
 /* eslint-disable prefer-promise-reject-errors */
 import Axios, { type InternalAxiosRequestConfig } from 'axios';
 import NProgress from '@/config/nprogress-config';
+import { langNameMap } from '@/constants';
 
 let requestCount = 0;
 
@@ -18,13 +19,11 @@ function requestInterceptor(config: InternalAxiosRequestConfig): InternalAxiosRe
     NProgress.start();
     requestCount += 1;
   }
-  // if (config && config.headers) {
-  //   config.headers.Authorization = localStorage.getItem('authorization') || '';
-  // } else {
-  //   config.headers = {
-  //     Authorization: localStorage.getItem('authorization') || '',
-  //   };
-  // }
+  const langKey = (localStorage.getItem('lang') || 'cn') as 'cn' | 'en' | 'de';
+  if (config && config.headers) {
+    // config.headers.Authorization = localStorage.getItem('authorization') || '';
+    config.headers.lang = langNameMap[langKey];
+  }
   return config;
 }
 

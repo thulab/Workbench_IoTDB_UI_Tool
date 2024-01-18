@@ -1,19 +1,34 @@
 <script setup lang="ts">
 import { ElConfigProvider } from 'element-plus';
-import zhCn from 'element-plus/es/locale/lang/zh-cn';
+import zhLocale from 'element-plus/es/locale/lang/zh-cn';
+import enLocale from 'element-plus/es/locale/lang/en';
+import deLocale from 'element-plus/es/locale/lang/de';
+import { useI18n } from 'vue-i18n';
 import useAppStore from '@/stores/app';
+import { useLangSwitched } from '@/composition-api';
 
 const appStore = useAppStore();
-zhCn.el.pagination.goto = '跳至';
-zhCn.el.select.noData = '暂无数据';
-zhCn.el.select.noMatch = '暂无数据';
-const locale = computed(() => zhCn);
+zhLocale.el.pagination.goto = '跳至';
+zhLocale.el.select.noData = '暂无数据';
+zhLocale.el.select.noMatch = '暂无数据';
 
+const map = {
+  [zhLocale.name]: zhLocale,
+  [enLocale.name]: enLocale,
+  [deLocale.name]: deLocale,
+};
+
+const { locale } = useI18n();
+const language = ref(map[locale.value]);
+
+useLangSwitched(() => {
+  language.value = map[locale.value];
+});
 </script>
 
 <template>
   <el-config-provider
-    :locale="locale"
+    :locale="language"
     :size="appStore.elementSize"
     :button="{ autoInsertSpace: true }">
     <router-view />

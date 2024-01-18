@@ -1,13 +1,16 @@
 import { createI18n } from 'vue-i18n';
 import messages from '@intlify/unplugin-vue-i18n/messages';
-import { LOCALE } from '@/constants';
+import zhLocale from 'element-plus/es/locale/lang/zh-cn';
+// import enLocale from 'element-plus/es/locale/lang/en';
+// import deLocale from 'element-plus/es/locale/lang/de';
+import { langNameMap } from '@/constants';
 
-const locale = window.localStorage.getItem('locale') || LOCALE.ZH_CN;
+const locale: 'cn' | 'de' | 'en' = (window?.localStorage?.getItem('lang') || 'cn') as 'cn' | 'de' | 'en';
 
 const i18n = createI18n({
   legacy: false,
-  locale,
-  fallbackLocale: LOCALE.ZH_CN,
+  locale: langNameMap[locale],
+  fallbackLocale: zhLocale.name,
   messages,
   globalInjection: true,
 });

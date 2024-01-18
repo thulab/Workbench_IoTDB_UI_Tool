@@ -76,6 +76,8 @@
     "ExtractPropTypes": true,
     "ExtractPublicPropTypes": true,
     "WritableComputedRef": true,
-    "ElCascaderMenu": true
+    "ElCascaderMenu": true,
+    "useLangSwitched": true,
+    "useLangSwitch": true
   }
 }

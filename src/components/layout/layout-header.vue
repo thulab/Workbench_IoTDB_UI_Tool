@@ -33,11 +33,9 @@
         </span>
         <template #dropdown>
           <el-dropdown-menu class="operate-dropdown">
-            <el-dropdown-item
-              v-for="item in localeList"
-              :disabled="locale === item.locale"
-              :key="item.locale"
-              :command="item.locale">{{item.label}}</el-dropdown-item>
+            <el-dropdown-item :disabled="langIndex === 0" command="0">中文</el-dropdown-item>
+            <el-dropdown-item :disabled="langIndex === 1" command="1">English</el-dropdown-item>
+            <el-dropdown-item :disabled="langIndex === 2" command="2">Deutsch</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -60,24 +58,19 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { HOME_URL } from '@/config/app-config';
 import useMenuStore from '@/stores/menu';
-import { localeList } from '@/constants';
 import { useI18n } from 'vue-i18n';
+import { useLangSwitch } from '@/composition-api';
 import UserHeader from './components/layout-header-user.vue';
 import IconEpArrowRight from '~icons/ep/arrow-right.svg';
 import IconEpMoon from '~icons/ep/moon.svg';
 import IconEpSunny from '~icons/ep/sunny.svg';
 
 const route = useRoute();
-const { locale } = useI18n();
-
+const { langIndex, handleLangCommand } = useLangSwitch(useI18n());
 const matched = computed(() => route.matched.filter((item) => item.meta && item.meta.title && item.meta.title !== 'Home'));
 const menuStore = useMenuStore();
 const isCollapse = computed((): boolean => menuStore.isCollapse);
 const isDark = useDark();
-const handleLangCommand = (command: string) => {
-  locale.value = command;
-  window.localStorage.setItem('locale', command);
-};
 </script>
 
 <style scoped lang="scss">
