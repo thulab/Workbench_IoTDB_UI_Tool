@@ -5,6 +5,7 @@ import pinia from '@/stores';
 import baseComponents from '@/components';
 import i18n from '@/locale';
 
+import 'virtual:uno.css';
 import '@/styles/main.scss';
 
 const VITE_APP_VERSION = __APP_VERSION__;

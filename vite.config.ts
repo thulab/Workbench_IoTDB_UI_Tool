@@ -9,10 +9,11 @@ import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite';
-import VueDevTools from 'vite-plugin-vue-devtools';
+// import VueDevTools from 'vite-plugin-vue-devtools';
 import { FileSystemIconLoader } from 'unplugin-icons/loaders';
 import { execSync } from 'child_process';
 import dayjs from 'dayjs';
+import UnoCSS from 'unocss/vite';
 
 function runGit(str: string) {
   return execSync(str).toString().replace('\n', '');
@@ -105,6 +106,7 @@ export default defineConfig(({ mode }) => {
         include: resolve(srcPath, './locale/lang/**'),
       }),
       // VueDevTools(),
+      UnoCSS(),
     ],
     resolve: {
       alias: {
