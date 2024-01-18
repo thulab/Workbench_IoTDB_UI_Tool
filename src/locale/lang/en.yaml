@@ -1,10 +1,11 @@
 common:
   submit: Submit
+  confirm: OK
   cancel: Cancel
   detail: Detail
+  edit: Edit
   delete: Delete
   deleteConfirm: Are You Sure To Delete This?
-  edit: Edit
   operation: Operation
   save: Save
   clear: Clear
@@ -23,8 +24,11 @@ common:
   query: Query
   reset: Reset
   submitSuccess: Success
-  closeAll: Close All
-  closeOther: Close Other
-  confirm: OK
   more: More
   closeCurrent: Close Other
+  closeOther: Close Other
+  closeAll: Close All
+  notice: 注意
+measurement:
+  databaseName: 数据库
+  deleteDatabaseTip: 此操作会删除数据库下全部测点和数据，是否删除？

@@ -59,6 +59,7 @@ declare global {
   const useCssVars: typeof import('vue')['useCssVars']
   const useDark: typeof import('@vueuse/core')['useDark']
   const useDataTypeIcon: typeof import('../composition-api/index')['useDataTypeIcon']
+  const useI18n: typeof import('vue-i18n')['useI18n']
   const useLangSwitch: typeof import('../composition-api/index')['useLangSwitch']
   const useLangSwitched: typeof import('../composition-api/index')['useLangSwitched']
   const useRequest: typeof import('../composition-api/index')['useRequest']

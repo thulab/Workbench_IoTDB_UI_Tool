@@ -78,6 +78,7 @@
     "WritableComputedRef": true,
     "ElCascaderMenu": true,
     "useLangSwitched": true,
-    "useLangSwitch": true
+    "useLangSwitch": true,
+    "useI18n": true
   }
 }

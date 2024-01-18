@@ -1,6 +1,6 @@
 <template>
   <div class="storage-list-title">
-    <h4>数据库</h4>
+    <h4>{{ t('measurement.databaseName') }}</h4>
     <div class="storage-operate-buttons">
       <el-button link class="m-r-8 border-refresh-icon" @click="getStorageList()" id="mesaurement-side-refresh"><i-custom-refresh /></el-button>
       <auth-tooltip :is-disabled="canManageDatabase">
@@ -22,7 +22,7 @@
           </auth-tooltip>
         </li>
       </template>
-      <li v-else class="item-box-empty">暂无数据</li>
+      <li v-else class="item-box-empty">{{ t('common.noData') }}</li>
     </ul>
   </auth-container>
 </template>
@@ -43,6 +43,7 @@ const emit = defineEmits<{
 }>();
 
 const route = useRoute();
+const { t } = useI18n();
 const storageList = ref<string[]>([]);
 const currentStorage = ref(route.query.databse as string || '');
 
@@ -89,9 +90,9 @@ const canStopPropagation = (e: HTMLElement):boolean => {
 function handleDeleteStorage(item: string) {
   if (!props.canManageDatabase) return;
   if (item === 'root.__system') return;
-  ElMessageBox.confirm('此操作会删除数据库下全部测点和数据，是否删除？', '注意', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+  ElMessageBox.confirm(t('measurement.deleteDatabaseTip'), t('common.notice'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'mesaurement-side-del-confirm',
     cancelButtonClass: 'mesaurement-side-del-cancel',
     type: 'warning',
@@ -100,7 +101,7 @@ function handleDeleteStorage(item: string) {
     .then(() => {
       deleteStorageGroups(item).then((res) => {
         if (res.code === 0) {
-          ElMessage.success('删除成功');
+          ElMessage.success(t('common.deleteSuccess'));
           getStorageList();
         }
       });

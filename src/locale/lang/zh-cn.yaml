@@ -28,3 +28,7 @@ common:
   closeCurrent: 关闭当前
   closeOther: 关闭其他
   closeAll: 关闭全部
+  notice: 注意
+measurement:
+  databaseName: 数据库
+  deleteDatabaseTip: 此操作会删除数据库下全部测点和数据，是否删除？

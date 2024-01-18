@@ -54,6 +54,9 @@ export default defineConfig(({ mode }) => {
               'useDark',
               'useSessionStorage',
             ],
+            'vue-i18n': [
+              'useI18n',
+            ],
           },
 
         ],
