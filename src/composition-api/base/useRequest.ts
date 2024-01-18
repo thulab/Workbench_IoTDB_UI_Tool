@@ -33,7 +33,12 @@ const showError = (message: string, code?: number) => {
       window.__errBoxShowing__ = false;
     });
   } else if (code && !alertErrorCode.includes(code) && code !== 1320 && code !== 9999) {
-    ElMessage.error({ message, grouping: true, dangerouslyUseHTMLString: true });
+    ElMessage.error({
+      message,
+      grouping: true,
+      dangerouslyUseHTMLString: code === 2000,
+      duration: code === 2000 ? 4000 : 3000,
+    });
   }
 };
 
