@@ -81,4 +81,12 @@
 
 .el-message{
   align-items: start;
+
+  p {
+    line-height: 1.5;
+  }
+
+  svg{
+    margin-top: 4px;
+  }
 }
