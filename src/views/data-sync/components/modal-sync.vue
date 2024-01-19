@@ -264,8 +264,8 @@
     </div>
     <template #footer>
       <div class="dialog-footer" v-if="editType !== 'view'">
-        <el-button @click="handleResetForm" id="data-sync-modal-cancel">重置</el-button>
-        <el-button type="primary" :loading="saveLoading" @click="handleConfirm" id="data-sync-modal-confirm">确定</el-button>
+        <el-button @click="handleResetForm" id="data-sync-modal-cancel">{{ t('common.reset') }}</el-button>
+        <el-button type="primary" :loading="saveLoading" @click="handleConfirm" id="data-sync-modal-confirm">{{ t('common.confirm') }}</el-button>
       </div>
     </template>
   </el-dialog>
@@ -294,6 +294,7 @@ const emit = defineEmits<{
   (event: 'handleSave',): void;
 }>();
 
+const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const formRef = ref<FormInstance>();
 const codeEditorRef = ref<InstanceType<typeof CodeEditor>>();
@@ -303,14 +304,14 @@ const codeMirrorKey = ref(0);
 const requiredRules = ref([
   {
     required: true,
-    message: '请输入内容后操作',
+    message: t('common.formRuleEmptyOperate'),
     trigger: ['blur', 'change'],
   },
 ]);
 const requiredNameRules = ref([
   {
     required: true,
-    message: '请输入内容后操作',
+    message: t('common.formRuleEmptyOperate'),
     trigger: ['blur', 'change'],
   },
   {
@@ -322,7 +323,7 @@ const requiredNameRules = ref([
 const requiredPortRules = ref([
   {
     required: true,
-    message: '请输入内容后操作',
+    message: t('common.formRuleEmptyOperate'),
     trigger: ['blur', 'change'],
   },
   {
@@ -341,7 +342,7 @@ const requiredPortRules = ref([
 const requiredNumberRules = ref([
   {
     required: true,
-    message: '请输入内容后操作',
+    message: t('common.formRuleEmptyOperate'),
     trigger: ['blur', 'change'],
   },
   {
@@ -600,7 +601,7 @@ const handleConfirm = () => {
     });
   } else {
     if (!taskInputVal.value || !taskInputVal.value.trim()) {
-      ElMessage.error('请输入相应内容后进行操作');
+      ElMessage.error(t('common.formRuleEmpty'));
       return;
     }
     saveAdvancedTask(taskInputVal.value).then(() => {

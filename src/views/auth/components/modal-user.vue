@@ -21,8 +21,8 @@
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false" id="auth-user-modal-cancel">取消</el-button>
-        <el-button type="primary" :loading="loading" @click="handleConfirm" id="auth-user-modal-confirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="auth-user-modal-cancel">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="loading" @click="handleConfirm" id="auth-user-modal-confirm">{{ t('common.confirm') }}</el-button>
       </span>
     </template>
   </el-dialog>
@@ -44,6 +44,7 @@ const emit = defineEmits<{
   'handleSave':[],
 }>();
 
+const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const errorName = ref('');
 const formKey = ref(0);
@@ -58,7 +59,7 @@ const rules = reactive<FormRules>({
   userName: [
     {
       required: true,
-      message: '请输入相应内容后进行操作',
+      message: t('common.formRuleEmpty'),
       trigger: ['blur', 'change'],
     },
     {
@@ -86,7 +87,7 @@ const rules = reactive<FormRules>({
   password: [
     {
       required: true,
-      message: '请输入相应内容后进行操作',
+      message: t('common.formRuleEmpty'),
       trigger: ['blur', 'change'],
     },
     {
@@ -104,7 +105,7 @@ const rules = reactive<FormRules>({
   confirmPassword: [
     {
       required: true,
-      message: '请输入相应内容后进行操作',
+      message: t('common.formRuleEmpty'),
       trigger: ['blur', 'change'],
     },
     {

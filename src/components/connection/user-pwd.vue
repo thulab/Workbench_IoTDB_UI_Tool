@@ -12,6 +12,7 @@ defineProps<{
   isDisabled: boolean;
 }>();
 
+const { t } = useI18n();
 const username = defineModel<string>('username');
 const password = defineModel<string>('password');
 const errorPwd = defineModel<string>('errorPwd');
@@ -19,7 +20,7 @@ const errorPwd = defineModel<string>('errorPwd');
 const requiredUserRules = ref([
   {
     required: true,
-    message: '请输入内容后操作',
+    message: t('common.formRuleEmptyOperate'),
     trigger: ['blur', 'change'],
   },
   {

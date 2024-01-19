@@ -10,20 +10,20 @@
   >
     <div class="import-box">
       <el-steps :active="activeStep" align-center finish-status="success" class="import-step-box" id="data-search-import-steps">
-        <el-step title="选择文件">
-          <template #title>选择文件</template>
+        <el-step :title="t('common.chooseFile')">
+          <template #title>{{ t('common.chooseFile') }}</template>
         </el-step>
-        <el-step title="文件导入" />
-        <el-step title="导入结果" />
+        <el-step :title="t('common.fileImport')" />
+        <el-step :title="t('common.importResult')" />
       </el-steps>
 
       <div class="select-file-box" v-if="activeStep === 0">
         <div class="select-item-box" style="align-items: center;">
-          <span class="select-item-label">模板下载：</span>
+          <span class="select-item-label">{{ t('common.downloadTemplate') }}：</span>
           <a href="/api/file/importDataTemplate" class="template-button" target="_blank">data _template.csv</a>
         </div>
         <div class="select-item-box">
-          <span class="select-item-label">导入文件：</span>
+          <span class="select-item-label">{{ t('common.importFile') }}：</span>
           <el-upload
             ref="uploadRef"
             class="import-upload"
@@ -44,7 +44,7 @@
             <el-icon size="80" v-else><i-custom-file-info /></el-icon>
             <div class="file-info-box" v-if="uploadFileInfo">{{ uploadFileInfo.name }}</div>
             <div class="el-upload__text">
-              仅支持上传 csv 和 xlsx 文件，将文件拖到此处，或<em>{{!uploadFileInfo ? '点击上传' : '点击重新上传' }}</em>
+              {{ t('measurement.importMeasurementTip') }}<em>{{!uploadFileInfo ? t('common.clickUpload') : t('common.clickReupload') }}</em>
             </div>
             <template #tip>
               <div class="el-upload__tip">
@@ -56,39 +56,39 @@
 
       <div class="select-result-box" v-if="activeStep === 1">
         <el-icon size="80"><i-custom-waiting /></el-icon>
-        文件导入中…
+        {{ t('common.uploading') }}…
       </div>
 
       <div class="select-result-box" v-if="activeStep === 2">
         <div class="success-box" v-if="uploadStatus === 'success'">
           <el-icon size="44"><i-custom-success-green /></el-icon>
-          <span class="success-tip">导入成功！共{{uploadResult.successNum}}条数据</span>
+          <span class="success-tip">{{t('common.importSuccessTip', { total: uploadResult.successNum })}}</span>
         </div>
 
         <div class="error-box" v-if="uploadStatus === 'error'">
           <el-icon size="44"><i-custom-error /></el-icon>
           <span class="error-tip" style="color: #D43030;">{{uploadResult.errMsg}}</span>
-          <a v-if="uploadResult.filePath" :href="'/api/file/downloadErrorInfo?fileName=' + uploadResult.filePath" class="error-link" target="_self" rel="noopener noreferrer">详情</a>
+          <a v-if="uploadResult.filePath" :href="`/api/file/downloadErrorInfo?fileName=${uploadResult.filePath}`" class="error-link" target="_self" rel="noopener noreferrer">{{ t('common.detail') }}</a>
         </div>
 
         <div class="partial-box" v-if="uploadStatus === 'partial'">
           <el-icon size="44"><i-custom-message-warning /></el-icon>
-          <span class="error-tip">导入成功{{uploadResult.successNum}}条数据，导入失败{{uploadResult.failNum}}条数据</span>
-          <a v-if="uploadResult.filePath" :href="'/api/file/downloadErrorInfo?fileName=' + uploadResult.filePath" class="error-link" target="_self" rel="noopener noreferrer">详情</a>
+          <span class="error-tip">{{ t('common.importResultTip', { successNum: uploadResult.successNum, errorNum: uploadResult.failNum }) }}</span>
+          <a v-if="uploadResult.filePath" :href="`/api/file/downloadErrorInfo?fileName=${uploadResult.filePath}`" class="error-link" target="_self" rel="noopener noreferrer">{{ t('common.detail') }}</a>
         </div>
       </div>
 
-      <p class="error-info-tip" v-if="activeStep === 2 && (uploadStatus === 'error' || uploadStatus === 'partial')">为避免格式错误，推荐使用文本编辑器查看</p>
+      <p class="error-info-tip" v-if="activeStep === 2 && (uploadStatus === 'error' || uploadStatus === 'partial')">{{ t('common.importTip') }}</p>
     </div>
 
     <div class="m-t-12" style="text-align: right;" v-if="activeStep === 0">
-      <el-button plain :disabled="!uploadFileInfo" @click="handleNext" id="data-search-import-next">下一步</el-button>
+      <el-button plain :disabled="!uploadFileInfo" @click="handleNext" id="data-search-import-next">{{ t('common.next') }}</el-button>
     </div>
 
     <div class="m-t-12" style="height: 28px;" v-if="activeStep === 1"></div>
 
     <div class="m-t-12" style="text-align: center;" v-if="activeStep === 2">
-      <el-button type="primary" @click="handleClose" id="data-search-import-close">完成</el-button>
+      <el-button type="primary" @click="handleClose" id="data-search-import-close">{{ t('common.finish') }}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -111,6 +111,7 @@ const emit = defineEmits<{
 
 const { requestFn: importQueryData } = useRequest(SearchApi.importQueryData);
 
+const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const uploadRef = ref<UploadInstance>();
 const isCSV = ref(true);
@@ -136,7 +137,7 @@ const checkValid = (name: string) => {
 const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
   const isExcel = checkValid(rawFile.name);
   if (!isExcel) {
-    ElMessage.error('文件格式不正确，目前仅支持上传.csv和.xlsx文件');
+    ElMessage.error(t('measurement.importMeasurementRule'));
     return false;
   }
   uploadFileInfo.value = rawFile;

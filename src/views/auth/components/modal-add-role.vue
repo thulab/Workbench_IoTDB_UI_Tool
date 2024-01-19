@@ -24,8 +24,8 @@
     </el-form>
     <template #footer>
       <div class="dialog-footer m-t-34">
-        <el-button @click="dialogVisible = false" id="auth-user-add-role-modal-cancel">取消</el-button>
-        <el-button type="primary" :disabled="formData.name.length === 0" @click="handleConfirm" id="auth-user-add-role-modal-confirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="auth-user-add-role-modal-cancel">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" :disabled="formData.name.length === 0" @click="handleConfirm" id="auth-user-add-role-modal-confirm">{{ t('common.confirm') }}</el-button>
       </div>
     </template>
   </el-dialog>
@@ -47,6 +47,7 @@ const emit = defineEmits<{
 
 const { requestFn: getList, loading } = useRequest(AuthApi.getRoleList);
 
+const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 
 const formData = reactive<{ name: string[] }>({

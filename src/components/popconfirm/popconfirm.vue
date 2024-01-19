@@ -67,6 +67,7 @@ defineOptions({
 const props = defineProps(popconfirmProps);
 const emit = defineEmits(popconfirmEmits);
 
+const { t } = useI18n();
 const ns = useNamespace('popconfirm');
 const tooltipRef = ref<TooltipInstance>();
 
@@ -88,9 +89,9 @@ const cancel = (e: MouseEvent) => {
 };
 
 const finalConfirmButtonText = computed(
-  () => props.confirmButtonText || '确定',
+  () => props.confirmButtonText || t('common.confirm'),
 );
 const finalCancelButtonText = computed(
-  () => props.cancelButtonText || '取消',
+  () => props.cancelButtonText || t('common.cancel'),
 );
 </script>

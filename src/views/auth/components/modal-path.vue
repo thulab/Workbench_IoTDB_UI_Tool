@@ -10,7 +10,7 @@
 
     <el-radio-group v-model="pathType" class="path-radio-group m-y-6">
       <el-radio label="select" id="auth-path-modal-select-radio">
-        <span class="radio-label">精确路径：<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
+        <span class="radio-label">精确路径：<el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
         <div class="search-path-box">
           <el-select
             v-model="selectPath"
@@ -47,8 +47,8 @@
 
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogVisible = false" id="auth-path-modal-cancel">取消</el-button>
-        <el-button type="primary" @click="handleConfirm" id="auth-path-modal-confirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="auth-path-modal-cancel">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="handleConfirm" id="auth-path-modal-confirm">{{ t('common.confirm') }}</el-button>
       </div>
     </template>
   </el-dialog>
@@ -69,7 +69,7 @@ const emit = defineEmits<{
 }>();
 
 const dialogVisible = useVModel(props, 'visible', emit);
-
+const { t } = useI18n();
 const pathType = ref('select');
 const inputPath = ref('');
 const selectPath = ref('');

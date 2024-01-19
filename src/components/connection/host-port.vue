@@ -25,12 +25,13 @@ const props = defineProps<{
   showOperate?: boolean;
 }>();
 
+const { t } = useI18n();
 const hostAndPortList = useVModel(props, 'modelValue');
 
 const requiredRules = ref([
   {
     required: true,
-    message: '请输入内容后操作',
+    message: t('common.formRuleEmptyOperate'),
     trigger: ['blur', 'change'],
   },
 ]);
@@ -38,7 +39,7 @@ const requiredRules = ref([
 const requiredPortRules = ref([
   {
     required: true,
-    message: '请输入内容后操作',
+    message: t('common.formRuleEmptyOperate'),
     trigger: ['blur', 'change'],
   },
   {

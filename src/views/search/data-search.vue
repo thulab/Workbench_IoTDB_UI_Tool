@@ -3,9 +3,9 @@
     <div class="search-form-wrapper">
       <el-form :model="searchFormData" style="flex: 1" ref="searchFormRef" label-position="left" label-width="80px" size="default" inline>
         <el-row>
-          <base-form-item label="测点选择：" prop="path" class="m-r-20">
+          <base-form-item prop="path" class="m-r-20">
             <template #label>
-              测点选择：<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+              {{ t('measurement.measurementChoose') }}：<el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
             <timeseries-select v-model="searchFormData.path" :is-show-view-btn="true" :disabled="getListLoading" id="data-search-path" />
           </base-form-item>
@@ -69,10 +69,10 @@
           </div>
           <el-form-item class="search-form-buttons">
             <auth-tooltip :is-disabled="canReadWriteData">
-              <el-button @click="handleReset" :disabled="getListLoading || !canReadWriteData" id="data-search-reset">重置</el-button>
+              <el-button @click="handleReset" :disabled="getListLoading || !canReadWriteData" id="data-search-reset">{{ t('common.reset') }}</el-button>
             </auth-tooltip>
             <auth-tooltip :is-disabled="canReadWriteData">
-              <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="data-search-search">{{getListLoading ? '取消查询' : '查询'}}</el-button>
+              <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="data-search-search">{{getListLoading ? '取消查询' : t('common.query') }}</el-button>
             </auth-tooltip>
           </el-form-item>
         </el-row>
@@ -95,23 +95,23 @@
           <li class="run-result-item"><i-custom-query-start-time />开始时间：{{ formatSqlInfo('startQueryTime') }}</li>
           <li class="run-result-item"><i-custom-query-time />查询耗时：{{ formatSqlInfo('queryTime') }}</li>
         </ul> -->
-        <h4 class="page-info-title">查询详情
+        <h4 class="page-info-title">{{ t('common.searchDetail') }}
           <span class="run-result-tip"><i-custom-info-warning />默认最多展示1000行100列，如需更多请导出查看</span>
         </h4>
         <div class="page-detail-buttons">
           <auth-tooltip :is-disabled="canReadWriteData">
-            <el-button @click="handleSearch" :disabled="getListLoading || !canReadWriteData" id="data-search-refresh">刷新</el-button>
+            <el-button @click="handleSearch" :disabled="getListLoading || !canReadWriteData" id="data-search-refresh">{{ t('common.refresh') }}</el-button>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canReadWriteData">
-            <el-button class="m-l-12" :disabled="!canReadWriteData || getListLoading" @click="handleImport" id="data-search-import">导入</el-button>
+            <el-button class="m-l-12" :disabled="!canReadWriteData || getListLoading" @click="handleImport" id="data-search-import">{{ t('common.import') }}</el-button>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canReadWriteData">
             <el-dropdown class="more-icon m-l-12" :disabled="getListLoading || !canReadWriteData" v-show="searchDetailInfos.status" @command="val => handleCommandDown(val)" id="data-search-download-dropdown">
-              <el-button class="export-btn" id="data-search-download" :disabled="!canReadWriteData">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
+              <el-button class="export-btn" id="data-search-download" :disabled="!canReadWriteData">{{ t('common.export') }}<el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item command="csv" id="data-search-download-csv">以.csv格式导出</el-dropdown-item>
-                  <el-dropdown-item command="xlsx" id="data-search-download-xlsx">以.xlsx格式导出</el-dropdown-item>
+                  <el-dropdown-item command="csv" id="data-search-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
+                  <el-dropdown-item command="xlsx" id="data-search-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -130,7 +130,7 @@
       </div> -->
       <!-- <div class="table-empty-wrapper" v-if="firstLoad" style="background-color: #fff;">
         <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-        <span class="data-empty-text">暂无数据</span>
+        <span class="data-empty-text">{{ t('common.noData') }}</span>
       </div> -->
       <auth-container :is-auth="canReadWriteData" style="height: 100%;">
         <div v-loading="getListLoading">
@@ -189,6 +189,7 @@ import DynamicTable from '@/components/dynamic-table.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalImport from './components/modal-import.vue';
 
+const { t } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
 const {

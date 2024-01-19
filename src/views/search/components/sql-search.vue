@@ -5,7 +5,7 @@
         <span>SQL输入</span>
       </div>
       <div class="sql-right-icon-box">
-        <el-button link @click="handleSave" id="sql-search-operate-save"><i-custom-sql-save />保存</el-button>
+        <el-button link @click="handleSave" id="sql-search-operate-save"><i-custom-sql-save />{{ t('common.save') }}</el-button>
         <el-button link :disabled="!runFlag" @click="querySqlRun()" id="sql-search-operate-run"><i-custom-run-all />执行全部</el-button>
         <el-tooltip
           placement="top-start"
@@ -17,8 +17,8 @@
         >
           <el-button link :disabled="!runFlag || !selectionCode" @click="querySqlRun('part')" id="sql-search-operate-run-part"><i-custom-run-part />执行选中</el-button>
         </el-tooltip>
-        <el-button link :disabled="runFlag" @click="stopquery" id="sql-search-operate-stop"><i-custom-sql-abort />取消</el-button>
-        <el-button link @click="emptyQuery" id="sql-search-operate-empty"><i-custom-sql-empty />清空</el-button>
+        <el-button link :disabled="runFlag" @click="stopquery" id="sql-search-operate-stop"><i-custom-sql-abort />{{ t('common.cancel') }}</el-button>
+        <el-button link @click="emptyQuery" id="sql-search-operate-empty"><i-custom-sql-empty />{{ t('common.clear') }}</el-button>
       </div>
     </div>
 
@@ -61,15 +61,15 @@
             </ul> -->
             <div></div>
             <div class="run-result-buttons">
-              <el-button link @click="handleCommandDown('refresh', index)" id="sql-search-refresh"><i-custom-refresh />刷新</el-button>
+              <el-button link @click="handleCommandDown('refresh', index)" id="sql-search-refresh"><i-custom-refresh />{{ t('common.refresh') }}</el-button>
               <el-dropdown :disabled="!sqlResult[index].status" class="more-icon m-l-12" @command="val => handleCommandDown(val, index)" v-show="sqlResult[index].status && tableDataPagination[index]?.list?.length > 0" id="sql-search-download-dropdown">
                 <el-button link class="export-btn" :disabled="!sqlResult[index].status" id="sql-search-download">
-                  <i-custom-download />导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
+                  <i-custom-download />{{ t('common.export') }}<el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
                 </el-button>
                 <template #dropdown>
                   <el-dropdown-menu>
-                    <el-dropdown-item command="csv" id="sql-search-download-csv">以.csv格式导出</el-dropdown-item>
-                    <el-dropdown-item command="xlsx" id="sql-search-download-xlsx">以.xlsx格式导出</el-dropdown-item>
+                    <el-dropdown-item command="csv" id="sql-search-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
+                    <el-dropdown-item command="xlsx" id="sql-search-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
@@ -110,6 +110,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits(['save', 'update:code']);
 
+const { t } = useI18n();
 const codeEditorRef = ref<InstanceType<typeof CodeEditor>>();
 const codeVal = useVModel(props, 'code');
 const codeMirrorReady = ref(false);
@@ -323,9 +324,9 @@ function handleCommandDown(val: string, index: number) {
 
 // 清空
 function emptyQuery() {
-  ElMessageBox.confirm('是否清空页面', '注意', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+  ElMessageBox.confirm('是否清空页面', t('common.notice'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'empty-sql-confirm',
     cancelButtonClass: 'empty-sql-cancel',
     type: 'warning',

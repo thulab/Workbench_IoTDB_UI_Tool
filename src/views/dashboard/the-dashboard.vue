@@ -65,7 +65,7 @@
                 <template #empty>
                   <div class="table-empty-wrapper">
                     <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-                    <span class="data-empty-text">暂无数据</span>
+                    <span class="data-empty-text">{{ t('common.noData') }}</span>
                   </div>
                 </template>
               </el-table>
@@ -134,7 +134,7 @@
                 <template #empty>
                   <div class="table-empty-wrapper">
                     <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-                    <span class="data-empty-text">暂无数据</span>
+                    <span class="data-empty-text">{{ t('common.noData') }}</span>
                   </div>
                 </template>
               </el-table>
@@ -216,6 +216,7 @@ import MonitorAll from './components/monitor-all.vue';
 import MonitorDatanode from './components/monitor-datanode.vue';
 import MonitorConfignode from './components/monitor-confignode.vue';
 
+const { t } = useI18n();
 const userStore = useUserStore();
 const connectionStore = useConnectionStore();
 const {

@@ -43,7 +43,7 @@
             <code-editor
               v-show="codeMirrorReady"
               v-model:model-value="formData.expression"
-              @ready="()=>codeMirrorReady = true"
+              @ready="() => codeMirrorReady = true"
               :style="{
                 height: `288px`,
                 backgroundColor: '#F7F8FC',
@@ -68,8 +68,8 @@
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogVisible = false" id="calculate-modal-cancel">取消</el-button>
-        <el-button type="primary" :loading="saveLoading" @click="handleConfirm" id="calculate-modal-confirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="calculate-modal-cancel">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="saveLoading" @click="handleConfirm" id="calculate-modal-confirm">{{ t('common.confirm') }}</el-button>
       </div>
     </template>
   </el-dialog>
@@ -93,6 +93,7 @@ const emit = defineEmits<{
   (event: 'handleSave',): void;
 }>();
 
+const { t } = useI18n();
 const appType = Number(import.meta.env.VITE_APP_TYPE);
 const pageText = appType === 1 ? '计算' : '视图';
 const dialogVisible = useVModel(props, 'visible', emit);
@@ -105,7 +106,7 @@ const activeNameSide = ref('data');
 const requiredRules = ref([
   {
     required: true,
-    message: '请输入相应内容后进行操作',
+    message: t('common.formRuleEmpty'),
     trigger: ['blur', 'change'],
   },
 ]);
@@ -115,7 +116,7 @@ const requiredExpressionRules = ref([
     required: true,
     validator: (rule: any, value: any, callback: any) => {
       if (!value || !value.trim()) {
-        return callback(new Error('请输入相应内容后进行操作'));
+        return callback(new Error(t('common.formRuleEmpty')));
       }
       return callback();
     },

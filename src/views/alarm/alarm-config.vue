@@ -7,7 +7,7 @@
         </base-form-item>
         <base-form-item label="告警测点：" prop="measurements">
           <template #label>
-            告警测点：<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+            告警测点：<el-tooltip effect="light" :content="t('common.searchAllTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
           <timeseries-select v-model="searchFormData.measurements" filter-system :is-show-view-btn="true" :placeholder="'请输入告警测点'" :viewText="'已选测点'" id="alarm-config-search-measurements" />
         </base-form-item>
@@ -60,10 +60,10 @@
           </base-form-item>
           <div class="search-form-buttons">
             <auth-tooltip :is-disabled="canUsePipe">
-              <el-button @click="handleReset" :disabled="!canUsePipe" id="alarm-config-search-reset">重置</el-button>
+              <el-button @click="handleReset" :disabled="!canUsePipe" id="alarm-config-search-reset">{{ t('common.reset') }}</el-button>
             </auth-tooltip>
             <auth-tooltip :is-disabled="canUsePipe">
-              <el-button type="primary" :disabled="!canUsePipe" @click="handleSearch" id="alarm-config-search-search">查询</el-button>
+              <el-button type="primary" :disabled="!canUsePipe" @click="handleSearch" id="alarm-config-search-search">{{ t('common.query') }}</el-button>
             </auth-tooltip>
           </div>
         </el-row>
@@ -78,7 +78,7 @@
             <el-button type="primary" :disabled="!canUsePipe" @click="handleAdd" id="alarm-config-add">新建告警</el-button>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canUsePipe">
-            <el-button :disabled="!multipleSelection.length || !canUsePipe" type="primary" @click="handleDel('batch', null)" id="alarm-config-batch-del">批量删除</el-button>
+            <el-button :disabled="!multipleSelection.length || !canUsePipe" type="primary" @click="handleDel('batch', null)" id="alarm-config-batch-del">{{ t('common.batchDelete') }}</el-button>
           </auth-tooltip>
         </div>
       </div>
@@ -117,19 +117,19 @@
                 {{ getOptionField(row.status, statusOptions, 'value', 'label') }}
               </template>
             </el-table-column>
-            <el-table-column label="操作" width="140" align="center" fixed="right">
+            <el-table-column :label="t('common.operation')" width="140" align="center" fixed="right">
               <template #default="{ row }">
                 <div>
                   <el-button v-if="row.status !== 3" type="primary" link size="small" @click="handleStatus(row)" :id="`alarm-config-table-${row.measurement}-status`">{{ row.status === 1 ? '禁用' : '启用' }}</el-button>
-                  <el-button :disabled="row.status === 3" type="primary" :style="{ 'margin-left': row.status !== 3 ? '12px' : '40px' }" link size="small" @click="handleEdit(row)" :id="`alarm-config-table-${row.measurement}-edit`">编辑</el-button>
-                  <el-button type="primary" link size="small" @click="handleDel('row', row)" :id="`alarm-config-table-${row.measurement}-del`">删除</el-button>
+                  <el-button :disabled="row.status === 3" type="primary" :style="{ 'margin-left': row.status !== 3 ? '12px' : '40px' }" link size="small" @click="handleEdit(row)" :id="`alarm-config-table-${row.measurement}-edit`">{{ t('common.edit') }}</el-button>
+                  <el-button type="primary" link size="small" @click="handleDel('row', row)" :id="`alarm-config-table-${row.measurement}-del`">{{ t('common.delete') }}</el-button>
                 </div>
               </template>
             </el-table-column>
             <template #empty>
               <div class="table-empty-wrapper">
                 <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-                <span class="data-empty-text">暂无数据</span>
+                <span class="data-empty-text">{{ t('common.noData') }}</span>
               </div>
             </template>
           </el-table>
@@ -176,6 +176,7 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalConfig from './components/modal-config.vue';
 
+const { t } = useI18n();
 const enumStore = useEnumStore();
 const route = useRoute();
 const userStore = useUserStore();
@@ -328,9 +329,9 @@ function handleEdit(row: Alarm.QueryConfigResult) {
 }
 
 function handleDel(type: string, data: Alarm.QueryConfigResult | null) {
-  ElMessageBox.confirm(type === 'batch' ? '确认删除这些告警配置吗？' : '确认删除该条告警配置吗？', '注意', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+  ElMessageBox.confirm(type === 'batch' ? '确认删除这些告警配置吗？' : '确认删除该条告警配置吗？', t('common.notice'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'alarm-config-del-confirm',
     cancelButtonClass: 'alarm-config-del-cancel',
     type: 'warning',
@@ -345,7 +346,7 @@ function handleDel(type: string, data: Alarm.QueryConfigResult | null) {
       }
       deleteAlarmConfig(alarmConfigIds).then((res) => {
         if (res.code === 0) {
-          ElMessage.success('删除成功');
+          ElMessage.success(t('common.deleteSuccess'));
           handleSearch();
         }
       });

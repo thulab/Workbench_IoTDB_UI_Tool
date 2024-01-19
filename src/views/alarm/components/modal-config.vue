@@ -13,7 +13,7 @@
         <el-col :span="12">
           <base-form-item label="告警测点：" prop="measurement" :rules="editType === 'add' ? requiredRules : []">
             <template #label>
-              告警测点：<el-tooltip v-if="editType === 'add'" effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+              告警测点：<el-tooltip v-if="editType === 'add'" effect="light" :content="t('common.searchAllTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
             <el-select
               v-model="formData.measurement"
@@ -165,8 +165,8 @@
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false" id="alarm-config-modal-cancel">取消</el-button>
-        <el-button type="primary" @click="handleConfirm" id="alarm-config-modal-confirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="alarm-config-modal-cancel">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="handleConfirm" id="alarm-config-modal-confirm">{{ t('common.confirm') }}</el-button>
       </span>
     </template>
   </el-dialog>
@@ -190,6 +190,7 @@ const emit = defineEmits<{
   (event: 'handleSave',): void;
 }>();
 
+const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const enumStore = useEnumStore();
 const {
@@ -203,7 +204,7 @@ const formRef = ref<FormInstance>();
 const requiredRules = ref([
   {
     required: true,
-    message: '请输入相应内容后进行操作',
+    message: t('common.formRuleEmpty'),
     trigger: ['blur', 'change'],
   },
 ]);
@@ -227,7 +228,7 @@ const changeBoolean = computed(() => formData.measurementType === 'BOOLEAN' && f
 
 const checkRules = (rule: any, value: any, callback: any) => {
   if (!value) {
-    return callback(new Error('请输入相应内容后进行操作'));
+    return callback(new Error(t('common.formRuleEmpty')));
   }
   if (formData.measurementType !== 'BOOLEAN') {
     if (!formData.alarmRulesTypeVal) {
@@ -248,7 +249,7 @@ const checkRules = (rule: any, value: any, callback: any) => {
 const requiredRulesRules = ref([
   {
     required: true,
-    message: '请输入相应内容后进行操作',
+    message: t('common.formRuleEmpty'),
     trigger: ['blur', 'change'],
   },
   {
@@ -259,7 +260,7 @@ const requiredRulesRules = ref([
 
 const checkDuration = (rule: any, value: any, callback: any) => {
   if (!value && value !== 0) {
-    return callback(new Error('请输入相应内容后进行操作'));
+    return callback(new Error(t('common.formRuleEmpty')));
   }
   if (!/^\d+$/.test(`${value}`)) {
     return callback(new Error('只能输入正整数或0'));
@@ -277,7 +278,7 @@ const checkDuration = (rule: any, value: any, callback: any) => {
 const requiredDurationRules = ref([
   {
     required: true,
-    message: '请输入相应内容后进行操作',
+    message: t('common.formRuleEmpty'),
     trigger: ['blur', 'change'],
   },
   {

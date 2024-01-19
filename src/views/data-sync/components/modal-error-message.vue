@@ -16,8 +16,8 @@
 
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogVisible = false" id="error-message-modal-cancel">取消</el-button>
-        <el-button type="primary" @click="dialogVisible = false" id="error-message-modal-confirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="error-message-modal-cancel">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="dialogVisible = false" id="error-message-modal-confirm">{{ t('common.confirm') }}</el-button>
       </div>
     </template>
   </el-dialog>
@@ -35,6 +35,7 @@ const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
 }>();
 
+const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const scrollRef = ref<InstanceType<typeof ElScrollbar> | null>(null);
 

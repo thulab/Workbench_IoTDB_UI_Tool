@@ -10,7 +10,7 @@
     <el-form ref="formRef" :model="formData">
       <base-form-item label="测点名称：" prop="path" :rules="requiredRules">
         <template #label>
-          测点名称：<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+          测点名称：<el-tooltip effect="light" :content="t('common.searchAllTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
         </template>
         <el-select
           v-model="formData.path"
@@ -43,8 +43,8 @@
     </el-form>
     <template #footer>
       <div class="dialog-footer m-t-10">
-        <el-button @click="dialogVisible = false" id="trend-modal-cancel">取消</el-button>
-        <el-button type="primary" @click="handleConfirm" id="trend-modal-confirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="trend-modal-cancel">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="handleConfirm" id="trend-modal-confirm">{{ t('common.confirm') }}</el-button>
       </div>
     </template>
   </el-dialog>
@@ -67,6 +67,7 @@ const emit = defineEmits<{
   (event: 'handleSave', payload: Trend.LineObj): void;
 }>();
 
+const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const formRef = ref<FormInstance>();
 const formData = reactive<Trend.LineObj>({
@@ -77,7 +78,7 @@ const formData = reactive<Trend.LineObj>({
 const requiredRules = ref([
   {
     required: true,
-    message: '请输入相应内容后进行操作',
+    message: t('common.formRuleEmpty'),
     trigger: ['blur', 'change'],
   },
 ]);

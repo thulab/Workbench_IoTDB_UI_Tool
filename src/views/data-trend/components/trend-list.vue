@@ -33,7 +33,7 @@
     <auth-container :is-auth="canReadWriteSchemaData" style="height: calc(100% - 82px);">
       <div class="list-empty-wrapper" v-if="!pathList.length">
         <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-        <span class="data-empty-text">暂无数据</span>
+        <span class="data-empty-text">{{ t('common.noData') }}</span>
       </div>
       <ul class="list-box" v-else :key="listKey">
         <li v-for="(item, index) in pathList" :key="item.path" :class="['path-item-box']">
@@ -102,6 +102,7 @@ const emit = defineEmits<{
   (event: 'handleOperateAll'): void;
 }>();
 
+const { t } = useI18n();
 const listKey = ref(0);
 const pathList = useVModel(props, 'modelValue');
 const isExpand = useVModel(props, 'isExpand', emit);

@@ -24,8 +24,8 @@
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false" id="modal-reset-pwd-cancel">取消</el-button>
-        <el-button type="primary" :loading="loading" @click="handleConfirm" id="modal-reset-pwd-confirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="modal-reset-pwd-cancel">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="loading" @click="handleConfirm" id="modal-reset-pwd-confirm">{{ t('common.confirm') }}</el-button>
       </span>
     </template>
   </el-dialog>
@@ -49,6 +49,7 @@ const emit = defineEmits<{
   'handleSave':[],
 }>();
 
+const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const userStore = useUserStore();
 const formKey = ref(0);
@@ -63,7 +64,7 @@ const rules = reactive<FormRules>({
   rawPassword: [
     {
       required: true,
-      message: '请输入相应内容后进行操作',
+      message: t('common.formRuleEmpty'),
       trigger: ['blur', 'change'],
     },
     {
@@ -81,7 +82,7 @@ const rules = reactive<FormRules>({
   password: [
     {
       required: true,
-      message: '请输入相应内容后进行操作',
+      message: t('common.formRuleEmpty'),
       trigger: ['blur', 'change'],
     },
     {
@@ -99,7 +100,7 @@ const rules = reactive<FormRules>({
   confirmPassword: [
     {
       required: true,
-      message: '请输入相应内容后进行操作',
+      message: t('common.formRuleEmpty'),
       trigger: ['blur', 'change'],
     },
     {
@@ -134,8 +135,8 @@ const handleConfirm = () => {
         ElMessage.success(`${props.title}成功`);
         dialogVisible.value = false;
         if (userStore.userInfo.name === props.userName) {
-          ElMessageBox.alert('密码已修改，请重新登录', '提示', {
-            confirmButtonText: '确定',
+          ElMessageBox.alert('密码已修改，请重新登录', t('common.tip'), {
+            confirmButtonText: t('common.confirm'),
             customClass: 'reset-password-message-box',
             confirmButtonClass: 'reset-password-confirm',
             type: 'warning',

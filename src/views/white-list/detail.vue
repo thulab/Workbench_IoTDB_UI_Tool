@@ -52,16 +52,16 @@
               ref="tableRef"
             >
               <el-table-column label="IP地址" prop="ip" align="center" />
-              <el-table-column label="操作" width="120" align="center">
+              <el-table-column :label="t('common.operation')" width="120" align="center">
                 <template #default="{ row, $index }">
-                  <el-button type="primary" link size="small" :disabled="row === '127.0.0.1'" @click="handleEditRow(row)" :id="`white-list-table-${$index}-edit`">编辑</el-button>
-                  <el-button type="primary" link size="small" :disabled="row === '127.0.0.1'" @click="handleDelRow(row)" :id="`white-list-table-${$index}-del`">删除</el-button>
+                  <el-button type="primary" link size="small" :disabled="row === '127.0.0.1'" @click="handleEditRow(row)" :id="`white-list-table-${$index}-edit`">{{ t('common.edit') }}</el-button>
+                  <el-button type="primary" link size="small" :disabled="row === '127.0.0.1'" @click="handleDelRow(row)" :id="`white-list-table-${$index}-del`">{{ t('common.delete') }}</el-button>
                 </template>
               </el-table-column>
               <template #empty>
                 <div class="table-empty-wrapper">
                   <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-                  <span class="data-empty-text">暂无数据</span>
+                  <span class="data-empty-text">{{ t('common.noData') }}</span>
                 </div>
               </template>
             </el-table>
@@ -95,6 +95,7 @@ import { useConnectionStore } from '@/stores';
 import ModalIp from './components/modal-ip.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
+const { t } = useI18n();
 const connectionStore = useConnectionStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
 const { maxTableHeight } = useTableHeight(390);
@@ -144,16 +145,16 @@ function handleEditRow(data: any) {
 
 function handleDelRow(data: any) {
   console.log(data);
-  ElMessageBox.confirm('是否确认删除', '注意', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+  ElMessageBox.confirm('是否确认删除', t('common.notice'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'del-white-list-confirm',
     cancelButtonClass: 'del-white-list-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
   })
     .then(() => {
-      ElMessage.success('删除成功');
+      ElMessage.success(t('common.deleteSuccess'));
       handleRefresh();
     });
 }

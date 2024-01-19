@@ -2,7 +2,7 @@
   <version-container :is-show="showAuthMenu" :versiton-tip="'1.3.0'">
     <template #otherTip>
       <div class="monitor-dashboard-operate-left">
-        <el-button link class="monitor-dashboard-close-btn" id="monitor-dashboard-close-btn" @click="handleClose"><el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>返回</el-button>
+        <el-button link class="monitor-dashboard-close-btn" id="monitor-dashboard-close-btn" @click="handleClose"><el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>{{ t('common.goback') }}</el-button>
         <span class="monitor-dashboard-header-title">状态监控</span>
       </div>
     </template>
@@ -10,7 +10,7 @@
       <el-header class="monitor-dashboard-operate-header p-0">
         <div class="flex-align-center">
           <div class="monitor-dashboard-operate-left">
-            <el-button link class="monitor-dashboard-close-btn" id="monitor-dashboard-close-btn" @click="handleClose"><el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>返回</el-button>
+            <el-button link class="monitor-dashboard-close-btn" id="monitor-dashboard-close-btn" @click="handleClose"><el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>{{ t('common.goback') }}</el-button>
             <span class="monitor-dashboard-header-title">状态监控</span>
           </div>
           <div class="monitor-dashboard-node-box">
@@ -95,6 +95,7 @@ interface RemainingTimeData {
   timeUnit: string;
 }
 
+const { t } = useI18n();
 const memoryChartRef = ref<InstanceType<typeof TheChart>>();
 const p50ChartRef = ref<InstanceType<typeof TheChart>>();
 const p99ChartRef = ref<InstanceType<typeof TheChart>>();

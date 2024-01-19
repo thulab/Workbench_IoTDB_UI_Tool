@@ -4,7 +4,7 @@
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" label-width="78px" size="default" inline :disabled="getListLoading">
         <base-form-item label="测点选择：" prop="path" class="m-r-40">
           <template #label>
-            测点选择：<el-tooltip effect="light" content="仅展示100条搜索结果，如有需要请精确搜索" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+            测点选择：<el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
           <timeseries-select v-model="searchFormData.path" :is-show-view-btn="true" :is-boolean-text-disabled="true" id="statistic-search-path" />
         </base-form-item>
@@ -24,25 +24,25 @@
       </el-form>
       <div class="search-form-buttons">
         <auth-tooltip :is-disabled="canReadWriteData">
-          <el-button @click="handleReset" :disabled="getListLoading || !canReadWriteData" id="statistic-search-reset">重置</el-button>
+          <el-button @click="handleReset" :disabled="getListLoading || !canReadWriteData" id="statistic-search-reset">{{ t('common.reset') }}</el-button>
         </auth-tooltip>
         <auth-tooltip :is-disabled="canReadWriteData">
-          <el-button :disabled="searchFormData.path.length === 0 || !canReadWriteData" type="primary" @click="handleSearch" id="statistic-search-search">{{getListLoading ? '取消查询' : '查询'}}</el-button>
+          <el-button :disabled="searchFormData.path.length === 0 || !canReadWriteData" type="primary" @click="handleSearch" id="statistic-search-search">{{getListLoading ? '取消查询' : t('common.query') }}</el-button>
         </auth-tooltip>
       </div>
     </div>
 
     <div class="page-table-details">
       <div class="page-info-box">
-        <h4 class="page-info-title">查询详情</h4>
+        <h4 class="page-info-title">{{ t('common.searchDetail') }}</h4>
         <div class="page-detail-buttons">
           <auth-tooltip :is-disabled="canReadWriteData">
             <el-dropdown class="m-r-16" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData" @command="val => handleCommandDown(val)" id="statistic-search-download-dropdown">
-              <el-button class="export-btn" id="statistic-search-download" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData">导出<el-tooltip effect="light" content="excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
+              <el-button class="export-btn" id="statistic-search-download" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData">{{ t('common.export') }}<el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item command="csv" id="statistic-search-download-csv">以.csv格式导出</el-dropdown-item>
-                  <el-dropdown-item command="xlsx" id="statistic-search-download-xlsx">以.xlsx格式导出</el-dropdown-item>
+                  <el-dropdown-item command="csv" id="statistic-search-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
+                  <el-dropdown-item command="xlsx" id="statistic-search-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -74,7 +74,7 @@
           <template #empty>
             <div class="table-empty-wrapper">
               <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-              <span class="data-empty-text">暂无数据</span>
+              <span class="data-empty-text">{{ t('common.noData') }}</span>
             </div>
           </template>
         </el-table>
@@ -107,6 +107,7 @@ import {
 import { useUserStore } from '@/stores';
 import ICustomCalender from '~icons/custom/calender.svg';
 
+const { t } = useI18n();
 const userStore = useUserStore();
 const {
   canReadWriteData,

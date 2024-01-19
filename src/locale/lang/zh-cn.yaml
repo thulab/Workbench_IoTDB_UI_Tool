@@ -3,9 +3,16 @@ common:
   confirm: 确定
   cancel: 取消
   detail: 详情
+  searchDetail: 查询详情
+  operationDetail: 操作详情
   edit: 编辑
+  exitEdit: 退出编辑
+  goback: 返回
   delete: 删除
+  batchOperation: 批量操作
   batchDelete: 批量删除
+  batchRun: 批量启动
+  batchStop: 批量停止
   next: 下一步
   finish: 完成
   deleteConfirm: 是否确认删除?
@@ -16,7 +23,6 @@ common:
   clear: 清空
   noData: 暂无数据
   tip: 提示
-  deleteSuccess: 删除成功
   add: 新增
   create: 新建
   import: 导入
@@ -49,8 +55,11 @@ common:
   createSuccess: 创建成功
   editSuccess: 修改成功
   updateSuccess: 更新成功
+  saveSuccess: 保存成功
+  deleteSuccess: 删除成功
   formRuleEmpty: 请输入相应内容后进行操作
   formRuleEmptyShort: 请输入相应内容
+  formRuleEmptyOperate: 请输入内容后操作
   chooseFile: 选择文件
   fileImport: 文件导入
   importFile: 导入文件
@@ -62,6 +71,8 @@ common:
   importSuccessTip: 导入成功！共%{total}条数据
   importResultTip: 导入成功%{successNum}条数据，导入失败%{errorNum}条数据
   importTip: 为避免格式错误，推荐使用文本编辑器查看
+  searchTipLimit100: 仅展示100条搜索结果，如有需要请精确搜索
+  searchAllTipLimit100: 关键字搜索仅展示100条搜索结果，如有需要请精确搜索
 page:
   data: 数据
   alarm: 告警

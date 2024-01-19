@@ -13,9 +13,9 @@
             <div class="detail-title-box">
               <h4 class="detail-title-text">用户详情</h4>
               <auth-tooltip v-if="isView" :is-disabled="canManageRole">
-                <el-button type="primary" :disabled="!currentRole || !canManageRole" @click="pageType = 'edit'" id="auth-role-edit">编辑</el-button>
+                <el-button type="primary" :disabled="!currentRole || !canManageRole" @click="pageType = 'edit'" id="auth-role-edit">{{ t('common.edit') }}</el-button>
               </auth-tooltip>
-              <el-button type="primary" v-else @click="handleReset('view')" id="auth-role-view">退出编辑</el-button>
+              <el-button type="primary" v-else @click="handleReset('view')" id="auth-role-view">{{ t('common.exitEdit') }}</el-button>
             </div>
             <div class="detail-user-list">
               <span class="p-t-4">拥有用户：</span>
@@ -89,7 +89,7 @@
                     </template>
                   </el-table-column>
                 </el-table-column>
-                <el-table-column label="操作" align="center" width="194" fixed="right">
+                <el-table-column :label="t('common.operation')" align="center" width="194" fixed="right">
                   <template #default="{ row, $index }">
                     <el-button v-if="row.path" link @click="handleDelRow($index)" :disabled="isView">
                       <el-icon size="21"><i-custom-close /></el-icon>
@@ -105,7 +105,7 @@
 
         <el-footer v-if="!isView">
           <div class="operate-buttons">
-            <el-button @click="handleReset('edit')" id="auth-role-reset">重置</el-button>
+            <el-button @click="handleReset('edit')" id="auth-role-reset">{{ t('common.reset') }}</el-button>
             <el-button type="primary" @click="handleSave" :loading="saveLoading" id="auth-role-save">应用</el-button>
           </div>
         </el-footer>
@@ -144,6 +144,7 @@ import ModalPath from './components/modal-path.vue';
 import ModalAddUser from './components/modal-add-user.vue';
 import ModalPreviewUser from './components/modal-preview-user.vue';
 
+const { t } = useI18n();
 const currentRole = ref('');
 const pathVisible = ref(false);
 const editPathList = ref<string[]>([]);
@@ -347,7 +348,7 @@ function handleSave() {
       pageType.value = 'edit';
       getDetail();
     } else {
-      ElMessage.success('保存成功');
+      ElMessage.success(t('common.saveSuccess'));
       pageType.value = 'view';
       getDetail();
     }
@@ -363,9 +364,9 @@ function handleAddUser() {
 
 // 删除关联用户
 function handleDeleteUser(i: number) {
-  ElMessageBox.confirm('是否删除该用户？', '注意', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+  ElMessageBox.confirm('是否删除该用户？', t('common.notice'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'del-user-confirm',
     cancelButtonClass: 'del-user-cancel',
     type: 'warning',

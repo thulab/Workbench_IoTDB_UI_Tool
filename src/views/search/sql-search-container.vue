@@ -45,8 +45,8 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="handleNameCancel" id="sql-search-modal-save-cancel">取消</el-button>
-          <el-button type="primary" :loading="saveLoading" @click="handleNameConfirm" id="sql-search-modal-save-confirm">确定</el-button>
+          <el-button @click="handleNameCancel" id="sql-search-modal-save-cancel">{{ t('common.cancel') }}</el-button>
+          <el-button type="primary" :loading="saveLoading" @click="handleNameConfirm" id="sql-search-modal-save-confirm">{{ t('common.confirm') }}</el-button>
         </span>
       </template>
     </el-dialog>
@@ -64,8 +64,8 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="renameDialogVisible = false" id="sql-search-modal-resave-cancel">取消</el-button>
-          <el-button type="primary" :loading="saveLoading" @click="handleRenameConfirm" id="sql-search-modal-confirm">确定</el-button>
+          <el-button @click="renameDialogVisible = false" id="sql-search-modal-resave-cancel">{{ t('common.cancel') }}</el-button>
+          <el-button type="primary" :loading="saveLoading" @click="handleRenameConfirm" id="sql-search-modal-confirm">{{ t('common.confirm') }}</el-button>
         </span>
       </template>
     </el-dialog>
@@ -82,6 +82,7 @@ import SideData from './components/side-data.vue';
 import SideTemplate from './components/side-template.vue';
 import SqlSearch from './components/sql-search.vue';
 
+const { t } = useI18n();
 const sqlSearchRef = ref<Array<InstanceType<typeof SqlSearch>>>([]);
 const codeMirrorReady = ref(true);
 const nameDialogVisible = ref(false);
@@ -244,7 +245,7 @@ function handleTabRemove(targetName: TabPaneName) {
       sqls: code[targetName],
     }).then((res) => {
       if (res.code === 0) {
-        ElMessage.success('保存成功');
+        ElMessage.success(t('common.saveSuccess'));
         // code[targetName] = '';
         delete code[targetName];
         const nextTab = sqlList.value[index + 1] || sqlList.value[index - 1];
@@ -268,7 +269,7 @@ function handleNameConfirm() {
       };
       saveQuery(data).then((res) => {
         if (res.code === 0) {
-          ElMessage.success('保存成功');
+          ElMessage.success(t('common.saveSuccess'));
           nameDialogVisible.value = false;
           if (saveSource.value === 'save') {
             const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
@@ -315,7 +316,7 @@ function handleRenameConfirm() {
       };
       saveQuery(data).then((res) => {
         if (res.code === 0) {
-          ElMessage.success('保存成功');
+          ElMessage.success(t('common.saveSuccess'));
           renameDialogVisible.value = false;
           const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
           sqlList.value.splice(index, 1, { id: `${id}`, queryName: resaveForm.sqlName });
@@ -345,7 +346,7 @@ function handleSave() {
       sqls: code[activiteSql.value],
     }).then((res) => {
       if (res.code === 0) {
-        ElMessage.success('保存成功');
+        ElMessage.success(t('common.saveSuccess'));
       }
     });
   }

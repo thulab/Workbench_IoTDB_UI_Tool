@@ -26,8 +26,8 @@
       </auth-tooltip>
       <popconfirm
         v-if="item.isManager === 0 && userName !== item.name"
-        confirm-button-text="确定"
-        cancel-button-text="取消"
+        :confirm-button-text="t('common.confirm')"
+        :cancel-button-text="t('common.cancel')"
         width="160px"
         title="是否删除该用户？"
         :icon="ICustomError"
@@ -64,6 +64,7 @@ const emit = defineEmits<{
   (event: 'handleSelect', payload?: Auth.DBUser): void;
 }>();
 
+const { t } = useI18n();
 const current = ref('');
 const editUser = ref('');
 const modalVisible = ref(false);
@@ -80,7 +81,7 @@ function handleAdd() {
 // 删除角色
 function handleDelete(item: string) {
   deleteUser(item).then(() => {
-    ElMessage.success('删除成功');
+    ElMessage.success(t('common.deleteSuccess'));
     // 动画出现两遍，nexttick不好用
     setTimeout(() => {
       getList();

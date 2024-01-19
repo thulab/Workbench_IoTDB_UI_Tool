@@ -18,7 +18,7 @@
                 </template>
               </el-input>
             </base-form-item>
-            <base-form-item label="操作详情：" prop="log">
+            <base-form-item :label="`${t('common.operationDetail')}：`" prop="log">
               <el-input v-model="searchFormData.log" placeholder="请输入操作详情" style="width: 172px;" id="audit-search-log">
                 <template #prefix>
                   <i-custom-search-icon class="remote-select-search-icon" />
@@ -40,8 +40,8 @@
                 />
               </base-form-item>
               <div class="search-form-buttons">
-                <el-button @click="handleReset" id="audit-search-reset">重置</el-button>
-                <el-button type="primary" @click="handleSearch" id="audit-search-search">查询</el-button>
+                <el-button @click="handleReset" id="audit-search-reset">{{ t('common.reset') }}</el-button>
+                <el-button type="primary" @click="handleSearch" id="audit-search-search">{{ t('common.query') }}</el-button>
               </div>
             </el-row>
           </el-form>
@@ -64,13 +64,13 @@
               <el-table-column label="操作时间" prop="time" width="180" align="center" show-overflow-tooltip />
               <el-table-column label="IP来源" prop="address" width="160" align="center" show-overflow-tooltip />
               <el-table-column label="操作用户" prop="username" width="140" align="center" show-overflow-tooltip />
-              <el-table-column label="操作详情" prop="log" min-width="280" align="left">
+              <el-table-column :label="t('common.operationDetail')" prop="log" min-width="280" align="left">
                 <template #default="{ row, $index }">
                   <overflow-click
                     class="detail-text-button"
                     :content="row.log"
-                    :key="row.time + $index + '_' + row.log"
-                    :id="row.time + $index + '_' + row.log"
+                    :key="`${row.time + $index}_${row.log}`"
+                    :id="`${row.time + $index}_${row.log}`"
                     :offset="24"
                     @handleClick="() => handleView(row)"
                   />
@@ -79,7 +79,7 @@
               <template #empty>
                 <div class="table-empty-wrapper">
                   <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-                  <span class="data-empty-text">暂无数据</span>
+                  <span class="data-empty-text">{{ t('common.noData') }}</span>
                 </div>
               </template>
             </el-table>
@@ -100,7 +100,7 @@
         </div>
       </el-main>
 
-      <el-dialog title="操作详情" v-model="dialogVisible" width="480px" :close-on-click-modal="false" align-center id="audit-modal-detail">
+      <el-dialog :title="t('common.operationDetail')" v-model="dialogVisible" width="480px" :close-on-click-modal="false" align-center id="audit-modal-detail">
         <div class="detail-text">{{ editDetail }}</div>
       </el-dialog>
     </el-container>
@@ -118,6 +118,7 @@ import {
 import ICustomCalender from '~icons/custom/calender.svg';
 import OverflowClick from './components/overflow-click.vue';
 
+const { t } = useI18n();
 const connectionStore = useConnectionStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
 const { maxTableHeight } = useTableHeight(340);

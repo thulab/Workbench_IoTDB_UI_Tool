@@ -15,8 +15,8 @@
     </el-form>
     <template #footer>
       <div class="dialog-footer m-t-16">
-        <el-button @click="dialogVisible = false" id="white-list-modal-cancel">取消</el-button>
-        <el-button type="primary" :loading="saveloading" @click="handleConfirm" id="white-list-modal-confirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="white-list-modal-cancel">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="saveloading" @click="handleConfirm" id="white-list-modal-confirm">{{ t('common.confirm') }}</el-button>
       </div>
     </template>
   </el-dialog>
@@ -35,6 +35,7 @@ const emit = defineEmits<{
   (event: 'handleSave',): void;
 }>();
 
+const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const saveloading = ref(false);
 const formRef = ref<FormInstance>();
@@ -50,7 +51,7 @@ const rules = reactive({
       trigger: ['blur'],
       validator: (rule: any, value: any, callback: any) => {
         if (!value) {
-          return callback('请输入相应内容后进行操作');
+          return callback(t('common.formRuleEmpty'));
         } if (!ipRegExp.test(value)) {
           return callback('IP地址输入规则有误，请重新输入');
         }
@@ -63,7 +64,7 @@ const rules = reactive({
 const handleConfirm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
-      ElMessage.success('保存成功！');
+      ElMessage.success(`${t('common.saveSuccess')}！`);
       dialogVisible.value = false;
       emit('handleSave');
     }

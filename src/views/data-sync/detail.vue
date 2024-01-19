@@ -14,10 +14,10 @@
           </el-form>
           <div class="search-form-buttons">
             <auth-tooltip :is-disabled="canUsePipe">
-              <el-button @click="handleReset" :disabled="!canUsePipe" id="data-sync-search-reset">重置</el-button>
+              <el-button @click="handleReset" :disabled="!canUsePipe" id="data-sync-search-reset">{{ t('common.reset') }}</el-button>
             </auth-tooltip>
             <auth-tooltip :is-disabled="canUsePipe">
-              <el-button type="primary" @click="handleSearch" :disabled="!canUsePipe" id="data-sync-search-search">查询</el-button>
+              <el-button type="primary" @click="handleSearch" :disabled="!canUsePipe" id="data-sync-search-search">{{ t('common.query') }}</el-button>
             </auth-tooltip>
           </div>
         </div>
@@ -33,13 +33,13 @@
               <auth-tooltip :is-disabled="canUsePipe">
                 <el-dropdown :disabled="!multipleSelection.length || !canUsePipe" @command="val => handleCommandDown(val)" class="m-x-16" id="data-sync-batch-dropdown">
                   <el-button type="primary" class="export-btn" :disabled="!multipleSelection.length || !canUsePipe" id="data-sync-batch">
-                    批量操作<el-icon class="el-icon--right"><i-ep-arrow-down /></el-icon>
+                    {{ t('common.batchOperation') }}<el-icon class="el-icon--right"><i-ep-arrow-down /></el-icon>
                   </el-button>
                   <template #dropdown>
                     <el-dropdown-menu>
-                      <el-dropdown-item command="del" id="data-sync-batch-del">批量删除</el-dropdown-item>
-                      <el-dropdown-item command="running" id="data-sync-batch-running">批量启动</el-dropdown-item>
-                      <el-dropdown-item command="stopped" id="data-sync-batch-stopped">批量停止</el-dropdown-item>
+                      <el-dropdown-item command="del" id="data-sync-batch-del">{{ t('common.batchDelete') }}</el-dropdown-item>
+                      <el-dropdown-item command="running" id="data-sync-batch-running">{{ t('common.batchRun') }}</el-dropdown-item>
+                      <el-dropdown-item command="stopped" id="data-sync-batch-stopped">{{ t('common.batchStop') }}</el-dropdown-item>
                     </el-dropdown-menu>
                   </template>
                 </el-dropdown>
@@ -48,7 +48,7 @@
                 placement="top-start"
                 effect="light"
                 trigger="hover"
-                content="暂无数据"
+                :content="t('common.noData')"
                 :disabled="showPrometheus"
                 popper-class="tooltip-box-width"
               >
@@ -96,19 +96,19 @@
                   </template>
                 </el-table-column>
                 <el-table-column label="创建时间" prop="creationTime" min-width="200" align="center" show-overflow-tooltip />
-                <el-table-column label="操作" width="180" align="center" fixed="right">
+                <el-table-column :label="t('common.operation')" width="180" align="center" fixed="right">
                   <template #default="{ row }">
                     <div>
-                      <el-button type="primary" link size="small" @click="handleEdit(row)" :id="`data-sync-table-${row.name}-view`">详情</el-button>
+                      <el-button type="primary" link size="small" @click="handleEdit(row)" :id="`data-sync-table-${row.name}-view`">{{ t('common.detail') }}</el-button>
                       <el-button type="primary" link size="small" @click="handleStatus('row', row, row.state === 'running' ? 'stopped' : 'running')" :id="`data-sync-table-${row.name}-state`">{{row.state === 'running' ? '停止' : '启动'}}</el-button>
-                      <el-button type="primary" link size="small" @click="handleDel('row', row)" :id="`data-sync-table-${row.name}-del`">删除</el-button>
+                      <el-button type="primary" link size="small" @click="handleDel('row', row)" :id="`data-sync-table-${row.name}-del`">{{ t('common.delete') }}</el-button>
                     </div>
                   </template>
                 </el-table-column>
                 <template #empty>
                   <div class="table-empty-wrapper">
                     <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-                    <span class="data-empty-text">暂无数据</span>
+                    <span class="data-empty-text">{{ t('common.noData') }}</span>
                   </div>
                 </template>
               </el-table>
@@ -159,6 +159,7 @@ import ModalSync from './components/modal-sync.vue';
 import ModalErrorMessage from './components/modal-error-message.vue';
 import MonitorDashboard from './components/monitor-dashboard.vue';
 
+const { t } = useI18n();
 const connectionStore = useConnectionStore();
 const userStore = useUserStore();
 const {
@@ -274,9 +275,9 @@ function handleStatus(type: string, data: DataSync.SynchronListData | null, stat
 }
 
 function handleDel(type: string, data: DataSync.SynchronListData | null) {
-  ElMessageBox.confirm(type === 'batch' ? '确认删除这些任务吗？' : '是否删除该任务？', '注意', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+  ElMessageBox.confirm(type === 'batch' ? '确认删除这些任务吗？' : '是否删除该任务？', t('common.notice'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'del-data-sync-confirm',
     cancelButtonClass: 'del-data-sync-cancel',
     type: 'warning',
@@ -290,7 +291,7 @@ function handleDel(type: string, data: DataSync.SynchronListData | null) {
         arr = [data!.name];
       }
       deleteDataSynchronByNames(arr).then(() => {
-        ElMessage.success('删除成功');
+        ElMessage.success(t('common.deleteSuccess'));
         handleSearch();
       });
     });

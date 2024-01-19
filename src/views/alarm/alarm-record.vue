@@ -7,7 +7,7 @@
         </base-form-item>
         <base-form-item label="告警测点：" prop="measurements">
           <template #label>
-            告警测点：<el-tooltip effect="light" content="关键字搜索仅展示100条搜索结果，如有需要请精确搜索" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+            告警测点：<el-tooltip effect="light" :content="t('common.searchAllTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
           <timeseries-select v-model="searchFormData.measurements" filter-system :is-show-view-btn="true" :placeholder="'请输入告警测点'" :viewText="'已选测点'" id="alarm-record-search-measurements" />
         </base-form-item>
@@ -53,8 +53,8 @@
             />
           </base-form-item>
           <div class="search-form-buttons">
-            <el-button @click="handleReset" id="alarm-record-search-reset">重置</el-button>
-            <el-button type="primary" @click="handleSearch" id="alarm-record-search-search">查询</el-button>
+            <el-button @click="handleReset" id="alarm-record-search-reset">{{ t('common.reset') }}</el-button>
+            <el-button type="primary" @click="handleSearch" id="alarm-record-search-search">{{ t('common.query') }}</el-button>
           </div>
         </el-row>
       </el-form>
@@ -66,15 +66,15 @@
         <h4 class="page-table-title">告警记录</h4>
         <div class="operate-buttons">
           <el-dropdown class="m-r-12" :disabled="!totalCount" @command="val => handleCommandDown(val)" id="alarm-record-download-dropdown">
-            <el-button type="primary" class="export-btn" :disabled="!totalCount" id="alarm-record-download">导出<el-tooltip effect="light" content="此导出操作为搜索结果导出。excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question-white /></el-tooltip></el-button>
+            <el-button type="primary" class="export-btn" :disabled="!totalCount" id="alarm-record-download">{{ t('common.export') }}<el-tooltip effect="light" content="此导出操作为搜索结果导出。excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question-white /></el-tooltip></el-button>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item command="csv" id="alarm-record-download-csv">以.csv格式导出</el-dropdown-item>
-                <el-dropdown-item command="xlsx" id="alarm-record-download-xlsx">以.xlsx格式导出</el-dropdown-item>
+                <el-dropdown-item command="csv" id="alarm-record-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
+                <el-dropdown-item command="xlsx" id="alarm-record-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
-          <!-- <el-button :disabled="!multipleSelection.length" type="primary" @click="handleDel('batch', null)">批量删除</el-button> -->
+          <!-- <el-button :disabled="!multipleSelection.length" type="primary" @click="handleDel('batch', null)">{{ t('common.batchDelete') }}</el-button> -->
         </div>
       </div>
       <div class="page-table-box">
@@ -112,13 +112,13 @@
                 <el-icon size="16" class="p-x-5"><i-custom-success-green /></el-icon>
                 已确认
               </div>
-              <!-- <el-button type="primary" link size="small" @click="handleDel('row', row)">删除</el-button> -->
+              <!-- <el-button type="primary" link size="small" @click="handleDel('row', row)">{{ t('common.delete') }}</el-button> -->
             </template>
           </el-table-column>
           <template #empty>
             <div class="table-empty-wrapper">
               <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-              <span class="data-empty-text">暂无数据</span>
+              <span class="data-empty-text">{{ t('common.noData') }}</span>
             </div>
           </template>
         </el-table>
@@ -156,7 +156,7 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ICustomCalender from '~icons/custom/calender.svg';
 
 const enumStore = useEnumStore();
-
+const { t } = useI18n();
 const { maxTableHeight } = useTableHeight(320);
 const searchFormRef = ref<FormInstance>();
 const tableRef = ref<InstanceType<typeof ElTable>>();
@@ -303,9 +303,9 @@ function handleStatus(row: Alarm.QueryRecordResult) {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleDel(type: string, data: Alarm.QueryRecordResult | null) {
-  ElMessageBox.confirm(type === 'batch' ? '确认删除这些告警记录吗？' : '确认删除该条告警记录吗？', '注意', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+  ElMessageBox.confirm(type === 'batch' ? '确认删除这些告警记录吗？' : '确认删除该条告警记录吗？', t('common.notice'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'alarm-record-del-confirm',
     cancelButtonClass: 'alarm-record-del-cancel',
     type: 'warning',
@@ -320,7 +320,7 @@ function handleDel(type: string, data: Alarm.QueryRecordResult | null) {
       }
       deleteAlarmRecord(alarmRecordIds).then((res) => {
         if (res.code === 0) {
-          ElMessage.success('删除成功');
+          ElMessage.success(t('common.deleteSuccess'));
           handleSearch();
         }
       });

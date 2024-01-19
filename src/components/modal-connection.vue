@@ -27,7 +27,7 @@
         <div class="connection-list-box">
           <div class="list-empty-wrapper" v-if="!filterList.length">
             <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-            <span class="data-empty-text">暂无数据</span>
+            <span class="data-empty-text">{{ t('common.noData') }}</span>
           </div>
           <ul class="list-box" v-else>
             <li v-for="item in filterList" :key="item.id" :class="['connection-item-box', current === item.id ? 'connection-item-box-active' : '']" :id="`connection-item-${item.id === '' ? 'new' : item.id}`" @click="e => handleSelect(item, e)">
@@ -40,8 +40,8 @@
                 <text-tooltip :content="item.name" />
               </span>
               <popconfirm
-                confirm-button-text="确定"
-                cancel-button-text="取消"
+                :confirm-button-text="t('common.confirm')"
+                :cancel-button-text="t('common.cancel')"
                 title="是否删除该实例？"
                 v-if="item.id !== connectionStore.connectionInfo.data.id || route.name === 'Login'"
                 :icon="ICustomError"
@@ -99,6 +99,7 @@ const emit = defineEmits<{
   (event: 'handleClose', id?: number): void;
 }>();
 
+const { t } = useI18n();
 const route = useRoute();
 const connectionStore = useConnectionStore();
 const dialogVisible = useVModel(props, 'visible', emit);
@@ -221,7 +222,7 @@ function handleDelete(item: Connection.ConnectionItem) {
     return;
   }
   deleteConnection(+item.id).then(() => {
-    ElMessage.success('删除成功');
+    ElMessage.success(t('common.deleteSuccess'));
     // 动画出现两遍，nexttick不好用
     setTimeout(() => {
       getList();

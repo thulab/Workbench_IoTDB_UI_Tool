@@ -12,7 +12,7 @@
           @selection-change="handleSelectionChange"
         >
           <el-table-column fixed="left" v-if="showSelect" type="selection" width="50" align="center" />
-          <el-table-column :key="item.prop" v-for="item of columnsByPage" min-width="180px" :width="item.width + 'px'" :align="item.align" :fixed="item.fixed" show-overflow-tooltip>
+          <el-table-column :key="item.prop" v-for="item of columnsByPage" min-width="180px" :width="`${item.width}px`" :align="item.align" :fixed="item.fixed" show-overflow-tooltip>
             <template #header>
               <span style="display: flex; max-width: 100%;"><text-tooltip :content="item.label" /></span>
             </template>
@@ -24,7 +24,7 @@
           <template #empty>
             <div class="table-empty-wrapper">
               <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-              <span class="data-empty-text">暂无数据</span>
+              <span class="data-empty-text">{{ t('common.noData') }}</span>
             </div>
           </template>
         </el-table>
@@ -73,6 +73,7 @@ const emit = defineEmits<{
   (event: 'update:pageSize', payload: number): void;
 }>();
 
+const { t } = useI18n();
 const currentPageVM = useVModel(props, 'currentPage');
 const pageSizeVM = useVModel(props, 'pageSize');
 const columnPageSize = 100;

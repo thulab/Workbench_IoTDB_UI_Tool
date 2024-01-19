@@ -46,7 +46,7 @@
                 </el-option-group>
               </el-select>
             </el-form-item>
-            <el-button type="primary" class="m-l-12" id="login-connection-edit" @click="handleSelectConnection">编辑</el-button>
+            <el-button type="primary" class="m-l-12" id="login-connection-edit" @click="handleSelectConnection">{{ t('common.edit') }}</el-button>
           </div>
           <el-form-item prop="user">
             <el-input
@@ -122,6 +122,7 @@ import { useUserStore } from '@/stores';
 import ModalConnection from '@/components/modal-connection.vue';
 import TheCaptcha from '@/components/the-captcha.vue';
 
+const { t } = useI18n();
 const router = useRouter();
 const userStore = useUserStore();
 const formRef = ref<FormInstance>();

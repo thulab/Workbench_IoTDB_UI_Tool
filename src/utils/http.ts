@@ -3,6 +3,7 @@ import Axios, { type InternalAxiosRequestConfig } from 'axios';
 import NProgress from '@/config/nprogress-config';
 import { langNameMap } from '@/constants';
 
+const { t } = useI18n();
 let requestCount = 0;
 
 const http = Axios.create({
@@ -54,8 +55,8 @@ async function responseInterceptor(response: HttpResponse<object>): Promise<Http
   }
   const logined = sessionStorage.getItem('nologin') === '0';
   if (response.status === 403 || (response.status === 401 && logined)) {
-    return ElMessageBox.alert('登录已失效，请重新登录', '提示', {
-      confirmButtonText: '确定',
+    return ElMessageBox.alert('登录已失效，请重新登录', t('common.tip'), {
+      confirmButtonText: t('common.confirm'),
       customClass: 'login-expire-message-box',
       confirmButtonClass: 'login-expire-confirm',
       type: 'error',

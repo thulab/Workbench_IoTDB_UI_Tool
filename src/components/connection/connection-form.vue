@@ -115,8 +115,8 @@
     <div class="connection-form-buttons">
       <el-button plain @click="handleTest" id="connection-modal-test" :loading="testLoading">测试</el-button>
       <div>
-        <el-button plain v-if="isShowSave" @click="handleReset" id="connection-modal-reset">重置</el-button>
-        <el-button type="primary" :disabled="!isCanSave" :loading="saveLoading" @click="handleSave" id="connection-modal-save">保存</el-button>
+        <el-button plain v-if="isShowSave" @click="handleReset" id="connection-modal-reset">{{ t('common.reset') }}</el-button>
+        <el-button type="primary" :disabled="!isCanSave" :loading="saveLoading" @click="handleSave" id="connection-modal-save">{{ t('common.save') }}</el-button>
         <el-button type="primary" v-if="isToggle && current !== connectionStore.connectionInfo.data.id" :loading="connectLoading" id="connection-modal-login" @click="handleTestLogin">连接实例</el-button>
       </div>
     </div>
@@ -144,6 +144,7 @@ const emit = defineEmits<{
   (event: 'handleRefreshList', val: number): void;
 }>();
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
@@ -156,7 +157,7 @@ const formKey = ref(0);
 const requiredRules = ref([
   {
     required: true,
-    message: '请输入内容后操作',
+    message: t('common.formRuleEmptyOperate'),
     trigger: ['blur', 'change'],
   },
 ]);
@@ -228,7 +229,7 @@ function handleChangeType(type: 0 | 1 | 2) {
 function handleChangeConnection() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return new Promise((resolve, reject) => {
-    ElMessageBox.confirm(editType.value === 'add' ? '当前内容未填写完整，是否继续填写？' : '当前内容未进行保存，是否继续填写？', '注意', {
+    ElMessageBox.confirm(editType.value === 'add' ? '当前内容未填写完整，是否继续填写？' : '当前内容未进行保存，是否继续填写？', t('common.notice'), {
       confirmButtonText: '继续',
       cancelButtonText: '放弃',
       confirmButtonClass: 'connection-form-continue-confirm',
@@ -394,7 +395,7 @@ function handleTest() {
 function handleSaveConnection() {
   saveLoading.value = true;
   saveConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id }).then((res) => {
-    ElMessage.success('保存成功');
+    ElMessage.success(t('common.saveSuccess'));
     emit('handleRefreshList', +res.data);
   }).finally(() => {
     saveLoading.value = false;
@@ -409,7 +410,7 @@ function handleSavePrometheus() {
     prometheusUrlMaster: formData.masterCluster.prometheusUrl,
     prometheusUrlSlave: formData.slaveCluster?.prometheusUrl || '',
   }).then(() => {
-    ElMessage.success('保存成功');
+    ElMessage.success(t('common.saveSuccess'));
     window.location.reload();
   }).finally(() => {
     saveLoading.value = false;

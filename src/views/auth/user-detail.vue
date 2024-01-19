@@ -16,9 +16,9 @@
             <div class="detail-title-box" v-if="!isManager">
               <h4 class="detail-title-text">角色详情</h4>
               <auth-tooltip :is-disabled="canManageUser" v-if="canEdit && !isEdit">
-                <el-button type="primary" :disabled="!canManageUser" @click="pageType = 'edit'" id="auth-user-edit">编辑</el-button>
+                <el-button type="primary" :disabled="!canManageUser" @click="pageType = 'edit'" id="auth-user-edit">{{ t('common.edit') }}</el-button>
               </auth-tooltip>
-              <el-button type="primary" v-else-if="isEdit" @click="handleReset('view')" id="auth-user-view">退出编辑</el-button>
+              <el-button type="primary" v-else-if="isEdit" @click="handleReset('view')" id="auth-user-view">{{ t('common.exitEdit') }}</el-button>
             </div>
             <div class="detail-role-list" v-if="!isManager">
               <span class="p-t-4">拥有角色：</span>
@@ -135,7 +135,7 @@
                     </template>
                   </el-table-column>
                 </el-table-column>
-                <el-table-column label="操作" align="center" width="194" fixed="right">
+                <el-table-column :label="t('common.operation')" align="center" width="194" fixed="right">
                   <template #default="{ row }">
                     <el-button link @click="handleDelRow(row)" v-if="row.path" :disabled="pageType === 'view' || row.rolePrivileges.length > 0">
                       <el-icon size="24"><i-custom-close /></el-icon>
@@ -149,7 +149,7 @@
         </el-main>
         <el-footer v-if="canEdit && isEdit">
           <div class="operate-buttons">
-            <el-button @click="handleReset('edit')" id="auth-user-reset">重置</el-button>
+            <el-button @click="handleReset('edit')" id="auth-user-reset">{{ t('common.reset') }}</el-button>
             <el-button type="primary" @click="handleSave" :loading="saveLoading" id="auth-user-save">应用</el-button>
           </div>
         </el-footer>
@@ -183,6 +183,7 @@ import ModalAddRole from './components/modal-add-role.vue';
 import ModalPreviewRole from './components/modal-preview-role.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
+const { t } = useI18n();
 const connectionStore = useConnectionStore();
 const userStore = useUserStore();
 const {
@@ -420,9 +421,9 @@ function handleAddRole(roleNames: string[]) {
   });
 }
 function handleDeleteRole(index: number) {
-  ElMessageBox.confirm('是否删除该角色？', '注意', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+  ElMessageBox.confirm('是否删除该角色？', t('common.notice'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'del-role-confirm',
     cancelButtonClass: 'del-role-cancel',
     type: 'warning',
@@ -503,7 +504,7 @@ function handleSave() {
     addPathPrivileges: addPathPrivileges.filter((item) => item.privileges.length > 0),
   };
   updateUserAuth(data).then(() => {
-    ElMessage.success('保存成功');
+    ElMessage.success(t('common.saveSuccess'));
     pageType.value = 'view';
     if (userName.value === currentUser.value?.name) {
       userStore.loadPrivileges(true);

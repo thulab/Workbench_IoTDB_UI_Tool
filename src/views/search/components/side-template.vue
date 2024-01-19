@@ -20,7 +20,7 @@
               <el-dropdown-menu>
                 <el-dropdown-item command="open" :id="`sql-template-dropdown-open-${item.id}`">打开</el-dropdown-item>
                 <el-dropdown-item command="rename" :id="`sql-template-dropdown-rename-${item.id}`">重命名</el-dropdown-item>
-                <el-dropdown-item command="delete" :id="`sql-template-dropdown-delete-${item.id}`">删除</el-dropdown-item>
+                <el-dropdown-item command="delete" :id="`sql-template-dropdown-delete-${item.id}`">{{ t('common.delete') }}</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -38,6 +38,7 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
 const emit = defineEmits(['handleSqlOperate']);
 
+const { t } = useI18n();
 const filterText = ref('');
 const sqlList = ref<Search.SqlList[]>([]);
 const { requestFn: getQuery, loading } = useRequest(SearchApi.getQuery);
@@ -54,9 +55,9 @@ const getQueryList = debounce(() => {
 
 const handleSqlCommand = (val: string, data: Search.SqlList) => {
   if (val === 'delete') {
-    ElMessageBox.confirm('是否删除模板', '注意', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    ElMessageBox.confirm('是否删除模板', t('common.notice'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       confirmButtonClass: 'del-sql-template-confirm',
       cancelButtonClass: 'del-sql-template-cancel',
       type: 'warning',

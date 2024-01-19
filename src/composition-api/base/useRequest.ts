@@ -3,6 +3,8 @@
 
 import { ref, type Ref } from 'vue';
 
+const { t } = useI18n();
+
 // 1001
 // 1330 无权限
 const alertErrorCode = [1001];
@@ -19,8 +21,8 @@ const showError = (message: string, code?: number) => {
   if (code && alertErrorCode.includes(code) && !window.__errBoxShowing__) {
     window.__errBoxShowing__ = true;
     ElMessageBox.confirm(message, '错误', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       confirmButtonClass: `request-error-confirm-${message}`,
       cancelButtonClass: `request-error-cancel-${message}`,
       type: 'error',

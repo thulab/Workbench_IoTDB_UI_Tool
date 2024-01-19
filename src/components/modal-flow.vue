@@ -16,16 +16,16 @@
     <template #header>
       <div class="flow-graph-operate-header">
         <div class="flow-graph-operate-left">
-          <el-button link class="flow-graph-close-btn" id="flow-graph-close-btn" @click="handleClose"><el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>返回</el-button>
+          <el-button link class="flow-graph-close-btn" id="flow-graph-close-btn" @click="handleClose"><el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>{{ t('common.goback') }}</el-button>
           <span class="flow-graph-header-title">拓扑图</span>
         </div>
         <div class="operate-buttons" v-if="editType === 'edit'">
-          <el-button link @click="handleSaveView" id="flow-graph-view" :loading="saveLoading"><el-icon size="24" class="m-r-6"><i-custom-circle-close-half /></el-icon>退出编辑</el-button>
-          <el-button link @click="handleEmpty" id="flow-graph-empty"><el-icon size="24" class="m-r-6"><i-custom-delete /></el-icon>清空</el-button>
+          <el-button link @click="handleSaveView" id="flow-graph-view" :loading="saveLoading"><el-icon size="24" class="m-r-6"><i-custom-circle-close-half /></el-icon>{{ t('common.exitEdit') }}</el-button>
+          <el-button link @click="handleEmpty" id="flow-graph-empty"><el-icon size="24" class="m-r-6"><i-custom-delete /></el-icon>{{ t('common.clear') }}</el-button>
         </div>
         <div class="operate-buttons" v-if="editType === 'view'">
-          <el-button link @click="handleEdit" id="flow-graph-edit"><el-icon size="24" class="m-r-6"><i-custom-edit /></el-icon>编辑</el-button>
-          <!-- <el-button link @click="handleExport"><el-icon size="24" class="m-r-6"><i-custom-export /></el-icon>导出</el-button> -->
+          <el-button link @click="handleEdit" id="flow-graph-edit"><el-icon size="24" class="m-r-6"><i-custom-edit /></el-icon>{{ t('common.edit') }}</el-button>
+          <!-- <el-button link @click="handleExport"><el-icon size="24" class="m-r-6"><i-custom-export /></el-icon>{{ t('common.export') }}</el-button> -->
         </div>
       </div>
     </template>
@@ -203,6 +203,7 @@ const arrowTypeList = [
   { name: '菱形箭头', value: 'diamond' },
 ];
 
+const { t } = useI18n();
 const TeleportContainer = getTeleport();
 const dialogVisible = useVModel(props, 'visible', emit);
 const stencilContainerRef = ref<HTMLElement | null>(null);
@@ -921,7 +922,7 @@ function graphBindEvent() {
     const cells = graph.value?.getSelectedCells() || [];
     if (cells.length) {
       graph.value?.removeCells(cells);
-      ElMessage.success({ message: '删除成功', grouping: true });
+      ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
       contextMenuType.value = '';
     } else {
       ElMessage.info({ message: '请先选中节点/边再删除', grouping: true });
@@ -1194,7 +1195,7 @@ function handleClickOperate(key: string) {
       ElMessage.info({ message: '请先选中节点再删除', grouping: true });
     } else {
       operateNode.value.remove();
-      ElMessage.success({ message: '删除成功', grouping: true });
+      ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
       contextMenuType.value = '';
     }
   }
@@ -1204,7 +1205,7 @@ function handleClickOperate(key: string) {
       ElMessage.info({ message: '请先选中边再删除', grouping: true });
     } else {
       operateEdge.value.remove();
-      ElMessage.success({ message: '删除成功', grouping: true });
+      ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
       contextMenuType.value = '';
     }
   }
@@ -1229,7 +1230,7 @@ function handleSaveView() {
   const data = graph.value!.toJSON();
   saveLoading.value = true;
   saveRelationalGraph(JSON.stringify(data)).then(() => {
-    ElMessage.success({ message: '保存成功', duration: 1500 });
+    ElMessage.success({ message: t('common.saveSuccess'), duration: 1500 });
     initialGraph(true);
     graphWatchEvent();
     graphBindEvent();

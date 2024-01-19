@@ -22,6 +22,7 @@ import { UserApi } from '@/api';
 import ModalResetPassword from '@/components/modal-reset-password.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
+const { t } = useI18n();
 const userStore = useUserStore();
 const userName = computed(() => userStore.userInfo.name);
 const modalVisible = ref(false);
@@ -30,8 +31,8 @@ const { requestFn: logout } = useRequest(UserApi.logout);
 
 const handleLogout = () => {
   ElMessageBox.confirm('您是否确认退出登录?', '温馨提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'logout-confirm',
     cancelButtonClass: 'logout-cancel',
     type: 'warning',

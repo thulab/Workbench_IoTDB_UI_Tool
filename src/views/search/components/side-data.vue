@@ -39,7 +39,7 @@
     <div class="search-buttons">
       <el-button v-if="false" type="primary" @click="handleAdd(storageName)" id="sql-search-data-add-databse">当前数据库</el-button>
       <el-button v-if="false" type="primary" @click="handleAdd(deviceName)" id="sql-search-data-add-device">当前设备</el-button>
-      <el-button @click="handleReset" id="sql-search-data-reset">重置</el-button>
+      <el-button @click="handleReset" id="sql-search-data-reset">{{ t('common.reset') }}</el-button>
     </div>
     <el-table
       v-if="measurementList && measurementList.length > 0"
@@ -64,7 +64,7 @@ import { StorageApi } from '@/api';
 const { maxTableHeight } = useTableHeight(500);
 
 const emit = defineEmits(['get-function']);
-
+const { t } = useI18n();
 const { requestFn: getGroup, loading: storageLoading } = useRequest(StorageApi.getStorageGroups);
 const { requestFn: getDevice, loading: deviceLoading } = useRequest(StorageApi.getDeviceByGroup);
 const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementList);

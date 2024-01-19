@@ -47,7 +47,7 @@
         </el-form>
         <div class="search-form-buttons" :style="{ visibility: !isRunningTab ? 'visible' : 'hidden' }">
           <auth-tooltip :is-disabled="canReadWriteSchemaData">
-            <el-button :disabled="!canReadWriteSchemaData" @click="handleReset" id="trend-search-reset">重置</el-button>
+            <el-button :disabled="!canReadWriteSchemaData" @click="handleReset" id="trend-search-reset">{{ t('common.reset') }}</el-button>
           </auth-tooltip>
           <el-tooltip
             placement="top-start"
@@ -104,6 +104,7 @@ import { useWebsocket } from '@/composition-api';
 import ICustomCalender from '~icons/custom/calender.svg';
 import TrendList from './components/trend-list.vue';
 
+const { t } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
 const userName = computed(() => userStore.userInfo.name);
@@ -162,7 +163,7 @@ const aggregateFunctions = [
 const requiredRules = ref([
   {
     required: true,
-    message: '请输入相应内容后进行操作',
+    message: t('common.formRuleEmpty'),
     trigger: ['change'],
   },
 ]);

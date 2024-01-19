@@ -21,10 +21,10 @@
           </el-form>
           <div class="search-form-buttons">
             <auth-tooltip :is-disabled="canReadWriteSchema">
-              <el-button :disabled="!canReadWriteSchema" @click="handleReset" id="calculate-search-reset">重置</el-button>
+              <el-button :disabled="!canReadWriteSchema" @click="handleReset" id="calculate-search-reset">{{ t('common.reset') }}</el-button>
             </auth-tooltip>
             <auth-tooltip :is-disabled="canReadWriteSchema">
-              <el-button type="primary" :disabled="!canReadWriteSchema" @click="handleSearch" id="calculate-search-search">查询</el-button>
+              <el-button type="primary" :disabled="!canReadWriteSchema" @click="handleSearch" id="calculate-search-search">{{ t('common.query') }}</el-button>
             </auth-tooltip>
           </div>
         </div>
@@ -38,7 +38,7 @@
                 <el-button type="primary" :disabled="!canAllWriteSchema" @click="handleAdd" id="calculate-add">新建{{pageText}}</el-button>
               </auth-tooltip>
               <auth-tooltip :is-disabled="canWriteSchema">
-                <el-button :disabled="!multipleSelection.length || !canWriteSchema" type="primary" @click="handleDel('batch', null)" id="calculate-batch-del">批量删除</el-button>
+                <el-button :disabled="!multipleSelection.length || !canWriteSchema" type="primary" @click="handleDel('batch', null)" id="calculate-batch-del">{{ t('common.batchDelete') }}</el-button>
               </auth-tooltip>
               <auth-tooltip :is-disabled="canReadWriteSchema">
                 <el-button link :disabled="!canReadWriteSchema" @click="getNewVal" id="calculate-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
@@ -68,18 +68,18 @@
                 </el-table-column>
                 <el-table-column label="表达式" prop="expression" min-width="80" align="center" show-overflow-tooltip>
                   <template #default="{ row }">
-                    <el-button type="primary" link size="small" @click="handleExpression(row)">详情</el-button>
+                    <el-button type="primary" link size="small" @click="handleExpression(row)">{{ t('common.detail') }}</el-button>
                   </template>
                 </el-table-column>
                 <el-table-column label="最新结果" prop="value" min-width="140" align="center" show-overflow-tooltip />
                 <el-table-column label="最新结果时间" prop="valueTime" min-width="200" align="center" show-overflow-tooltip />
-                <el-table-column label="操作" width="180" align="center" fixed="right">
+                <el-table-column :label="t('common.operation')" width="180" align="center" fixed="right">
                   <template #default="{ row }">
                     <div>
                       <el-button type="primary" link size="small" @click="handleQuery(row)" :id="`calculate-table-${row.measurement}-data`">查看数据</el-button>
-                      <el-button type="primary" link size="small" @click="handleEdit(row)" :id="`calculate-table-${row.measurement}-edit`">编辑</el-button>
+                      <el-button type="primary" link size="small" @click="handleEdit(row)" :id="`calculate-table-${row.measurement}-edit`">{{ t('common.edit') }}</el-button>
                       <auth-tooltip :is-disabled="rowCanWriteSchemaByPath(row.measurement)">
-                        <el-button type="primary" :disabled="!rowCanWriteSchemaByPath(row.measurement)" link size="small" @click="handleDel('row', row)" :id="`calculate-table-${row.measurement}-del`">删除</el-button>
+                        <el-button type="primary" :disabled="!rowCanWriteSchemaByPath(row.measurement)" link size="small" @click="handleDel('row', row)" :id="`calculate-table-${row.measurement}-del`">{{ t('common.delete') }}</el-button>
                       </auth-tooltip>
                     </div>
                   </template>
@@ -87,7 +87,7 @@
                 <template #empty>
                   <div class="table-empty-wrapper">
                     <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-                    <span class="data-empty-text">暂无数据</span>
+                    <span class="data-empty-text">{{ t('common.noData') }}</span>
                   </div>
                 </template>
               </el-table>
@@ -135,6 +135,7 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalCalculate from './components/modal-calculate.vue';
 import ModalExpression from './components/modal-expression.vue';
 
+const { t } = useI18n();
 const appType = Number(import.meta.env.VITE_APP_TYPE);
 const pageText = appType === 1 ? '计算' : '视图';
 const router = useRouter();
@@ -301,9 +302,9 @@ function handleEdit(row: Calculate.CalculateItem) {
 }
 
 function handleDel(type: string, data: Calculate.CalculateItem | null) {
-  ElMessageBox.confirm(type === 'batch' ? `是否确认删除这些${pageText}？` : `是否删除该${pageText}？`, '注意', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+  ElMessageBox.confirm(type === 'batch' ? `是否确认删除这些${pageText}？` : `是否删除该${pageText}？`, t('common.notice'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'del-calculate-confirm',
     cancelButtonClass: 'del-calculate-cancel',
     type: 'warning',
@@ -317,7 +318,7 @@ function handleDel(type: string, data: Calculate.CalculateItem | null) {
         arr = data?.measurement ? [data.measurement] : [];
       }
       deleteCalculate(arr).then(() => {
-        ElMessage.success('删除成功');
+        ElMessage.success(t('common.deleteSuccess'));
         handleSearch();
       });
     });

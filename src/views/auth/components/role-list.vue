@@ -17,8 +17,8 @@
         <li v-for="(item, i) in list" :key="item" :class="['item-box', current === item ? 'item-box-active' : '']" :id="`auth-role-${i}`" @click="e => handleSelect(item, e)">
           <span class="item-text"><text-tooltip :content="item" /></span>
           <popconfirm
-            confirm-button-text="确定"
-            cancel-button-text="取消"
+            :confirm-button-text="t('common.confirm')"
+            :cancel-button-text="t('common.cancel')"
             title="删除角色后相关联的用户权限将立即消失，是否删除该角色？"
             :icon="ICustomError"
             width="300"
@@ -59,6 +59,7 @@ const emit = defineEmits<{
   (event: 'handleSelect', payload: string): void;
 }>();
 
+const { t } = useI18n();
 const list = ref<string[]>([]);
 const current = ref('');
 const dialogVisible = ref(false);
@@ -82,7 +83,7 @@ function handleAdd() {
 // 删除角色
 function handleDelete(item: string) {
   deleteRole(item).then(() => {
-    ElMessage.success('删除成功');
+    ElMessage.success(t('common.deleteSuccess'));
     // 动画出现两遍，nexttick不好用
     setTimeout(() => {
       getList();
