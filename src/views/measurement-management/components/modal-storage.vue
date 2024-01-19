@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="新建数据库"
+    :title="t('measurement.newDataBase')"
     v-model="dialogVisible"
     width="480px"
     class="new-database-container"
@@ -9,25 +9,25 @@
     id="new-database-modal-database"
   >
     <el-form ref="formRef" :model="formData" :rules="rules" class="source-form m-t-8" label-position="left" label-width="112px">
-      <el-form-item label="数据库名称:" prop="groupName">
+      <el-form-item :label="`${t('measurement.databaseName')}:`" prop="groupName">
         <el-input type="hidden" />
-        <el-input v-model="formData.groupName" placeholder="请输入数据库名称" maxlength="59" show-word-limit id="new-database-modal-groupName">
+        <el-input v-model="formData.groupName" :placeholder="t('measurement.databaseNamePlaceholder')" maxlength="59" show-word-limit id="new-database-modal-groupName">
           <template #prepend>root.</template>
         </el-input>
       </el-form-item>
       <el-form-item prop="ttl" class="m-b-6">
-        <template #label><span style="margin-left: 9px;">数据保存时间:</span><el-tooltip effect="light" content="数据保存时间（TTL），到期后系统将自动删除数据，此处不填代表永久存储" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+        <template #label><span style="margin-left: 9px;">{{ t('measurement.databaseTTL') }}:</span><el-tooltip effect="light" :content="t('measurement.databaseTTLTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
         </template>
         <el-input type="hidden" />
         <auth-tooltip :is-disabled="canWriteSchema">
           <el-input v-model="formData.ttl" min="0" max="9007199254740992" :disabled="!canWriteSchema" class="ttl-input" id="new-database-modal-ttl">
             <template #append>
               <el-select v-model="formData.ttlUnit" style="width: 56px;" placeholder="" id="new-database-modal-ttlunit" :disabled="!canWriteSchema">
-                <el-option label="毫秒" value="millisecond" id="new-database-modal-ttl-ms" />
-                <el-option label="秒" value="second" id="new-database-modal-ttl-s" />
-                <el-option label="分" value="minute" id="new-database-modal-ttl-m" />
-                <el-option label="小时" value="hour" id="new-database-modal-ttl-h" />
-                <el-option label="天" value="day" id="new-database-modal-ttl-d" />
+                <el-option :label="t('common.milliSecond')" value="millisecond" id="new-database-modal-ttl-ms" />
+                <el-option :label="t('common.second')" value="second" id="new-database-modal-ttl-s" />
+                <el-option :label="t('common.minute')" value="minute" id="new-database-modal-ttl-m" />
+                <el-option :label="t('common.hour')" value="hour" id="new-database-modal-ttl-h" />
+                <el-option :label="t('common.day')" value="day" id="new-database-modal-ttl-d" />
               </el-select>
             </template>
           </el-input>
@@ -36,8 +36,8 @@
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false" id="new-database-modal-cancel">取消</el-button>
-        <el-button type="primary" :loading="saveloading" @click="handleConfirm" id="new-database-modal-confirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="new-database-modal-cancel">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="saveloading" @click="handleConfirm" id="new-database-modal-confirm">{{ t('common.confirm') }}</el-button>
       </span>
     </template>
   </el-dialog>
@@ -58,13 +58,13 @@ const emit = defineEmits<{
 }>();
 
 const dialogVisible = useVModel(props, 'visible', emit);
-
+const { t } = useI18n();
 const formRef = ref<FormInstance>();
 const rules = reactive({
   groupName: [
     {
       required: true,
-      message: '请输入数据库名称',
+      message: t('measurement.databaseNamePlaceholder'),
       trigger: 'blur',
     },
     // {
@@ -77,7 +77,7 @@ const rules = reactive({
     {
       required: false,
       pattern: /^[1-9]\d*$/,
-      message: '存活时间只能为正整数',
+      message: t('measurement.databaseTTLRule'),
       trigger: 'blur',
     },
   ],
@@ -100,11 +100,11 @@ const handleConfirm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
       if (formData.ttl && +formData.ttl > 9007199254740992) {
-        ElMessage.error('存活时间不能超过9007199254740992');
+        ElMessage.error(t('measurement.databaseTTLSaveMaxRule'));
         return;
       }
       if (formData.ttl && !formData.ttlUnit) {
-        ElMessage.error('存活时间和存活时间单位必须同时填写');
+        ElMessage.error(t('measurement.databaseTTLSaveUnitRule'));
         return;
       }
       const reqObj = {
@@ -114,7 +114,7 @@ const handleConfirm = () => {
       };
       saveStorageGroups({ ...reqObj }).then((res) => {
         if (res.code === 0) {
-          ElMessage.success('创建成功！');
+          ElMessage.success(`${t('common.createSuccess')}!`);
           dialogVisible.value = false;
           emit('handleSave');
         }

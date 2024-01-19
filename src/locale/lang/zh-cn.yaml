@@ -5,14 +5,25 @@ common:
   detail: 详情
   edit: 编辑
   delete: 删除
+  batchDelete: 批量删除
+  next: 下一步
+  finish: 完成
   deleteConfirm: 是否确认删除?
   operation: 操作
+  previousPage: 上一页
+  nextPage: 下一页
   save: 保存
   clear: 清空
   noData: 暂无数据
   tip: 提示
   deleteSuccess: 删除成功
   add: 新增
+  create: 新建
+  import: 导入
+  export: 导出
+  exportTip: excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出
+  exportCSV: 以.csv格式导出
+  exportXLSX: 以.xlsx格式导出
   placeHolder: 请输入
   selectPlaceholder: 请选择
   refresh: 刷新
@@ -21,6 +32,7 @@ common:
   all: 全部
   success: 成功
   fail: 失败
+  error: 错误
   query: 查询
   reset: 重置
   submitSuccess: 操作成功
@@ -29,6 +41,80 @@ common:
   closeOther: 关闭其他
   closeAll: 关闭全部
   notice: 注意
+  milliSecond: 毫秒
+  second: 秒
+  minute: 分
+  hour: 小时
+  day: 天
+  createSuccess: 创建成功
+  editSuccess: 修改成功
+  updateSuccess: 更新成功
+  formRuleEmpty: 请输入相应内容后进行操作
+  formRuleEmptyShort: 请输入相应内容
+  chooseFile: 选择文件
+  fileImport: 文件导入
+  importFile: 导入文件
+  importResult: 导入结果
+  downloadTemplate: 模板下载
+  clickUpload: 点击上传
+  clickReupload: 点击重新上传
+  uploading: 文件导入中
+  importSuccessTip: 导入成功！共%{total}条数据
+  importResultTip: 导入成功%{successNum}条数据，导入失败%{errorNum}条数据
+  importTip: 为避免格式错误，推荐使用文本编辑器查看
+page:
+  data: 数据
+  alarm: 告警
+  trend: 趋势
 measurement:
-  databaseName: 数据库
+  databaseTitle: 数据库
   deleteDatabaseTip: 此操作会删除数据库下全部测点和数据，是否删除？
+  newDataBase: 新建数据库
+  databaseName: 数据库名称
+  databaseNamePlaceholder: 请输入数据库名称
+  databaseTTL: 数据保存时间
+  databaseTTLTip: 数据保存时间（TTL），到期后系统将自动删除数据，此处不填代表永久存储
+  databaseTTLRule: 存活时间只能为正整数
+  databaseTTLSaveMaxRule: 存活时间不能超过9007199254740992
+  databaseTTLSaveUnitRule: 存活时间和存活时间单位必须同时填写
+  newMeasurement: 新建测点
+  device: 设备
+  deviceName: 设备名称
+  deviceNameSelectPlaceholder: 请选择设备名称
+  deviceNameInputPlaceholder: 请输入设备名称
+  newDevice: 新建设备
+  deviceAlign: 按设备对齐
+  measurement: 测点
+  measurementName: 测点名称
+  measurementNamePlaceholder: 请输入测点名称
+  alias: 别名
+  aliasTip: 仅支持输入字母大小写、数字、下划线、UNICODE 中文字符，除“!{'@'}#$%^&*()_+-=”外的特殊字符以及实数需要用反引号进行引用
+  aliasPlaceholder: 请输入别名
+  dataType: 数据类型
+  encoding: 编码方式
+  compression: 压缩方式
+  addMeasurement: 添加测点
+  deviceRuleEmptyTip: 设备名称不能为空
+  deviceRuleTip: 请输入正确格式，只能由字母、数字、下划线以及UNICODE 中文字符组成
+  deleteMeasurementSingle: 是否删除测点
+  deleteMeasurementBatch: 确认删除这些测点吗
+  measurementAlias: 测点描述
+  measurementAliasPlaceholder: 请输入测点描述
+  batchImportMeasurement: 批量导入测点
+  importMeasurementTip: 仅支持上传 csv 和 xlsx 文件，将文件拖到此处，或
+  importMeasurementRule: 文件格式不正确，目前仅支持上传.csv和.xlsx文件
+  databaseInfo: 数据库信息
+  deviceNum: 设备数量
+  measurementNum: 测点数量
+  totalNum: 数据总量
+  measurementList: 测点列表
+  measurementChoose: 测点选择
+  measurementType: 测点类型
+  lastValue: 最新值
+  lastValueTime: 最新值时间
+  baseMeasurement: 普通序列
+  viewMeasurement: 视图序列
+  calculateMeasurement: 计算序列
+  deleteMeasurementTip: 此操作会删除数据库下全部测点和数据，是否删除？
+  databaseModel: 数据模型
+  databaseModelDoc: iotdb树形模型指导文档

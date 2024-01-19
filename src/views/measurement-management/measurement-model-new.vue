@@ -1,13 +1,13 @@
 <template>
   <el-container class="page-container p-0">
     <el-header class="detail-title-box">
-      <h4 class="detail-title-text">数据模型</h4>
+      <h4 class="detail-title-text">{{ t('measurement.databaseModel') }}</h4>
       <div class="operate-buttons">
         <el-tooltip
           placement="top-start"
           effect="light"
           trigger="hover"
-          content="iotdb树形模型指导文档"
+          :content="t('measurement.databaseModelDoc')"
           popper-class="tooltip-box-width"
         >
           <el-button link class="m-r-4" @click="handleDoc" id="measurement-tree-doc"><el-icon size="24"><i-custom-model-doc /></el-icon></el-button>
@@ -52,7 +52,7 @@ import CascaderPanel from '@/components/cascader-panel/cascader-panel.vue';
 const initialLoading = ref(false);
 const listLoading = ref(false);
 const modelCascaderPanelRef = ref<InstanceType<typeof CascaderPanel>>();
-
+const { t } = useI18n();
 const userStore = useUserStore();
 const {
   canReadWriteSchema,
@@ -89,8 +89,8 @@ function getDataPagination(data: StorageDevice.GetModelRes) {
     });
     if (data.hasNext) {
       data.list?.push({
-        label: '下一页',
-        node: '下一页',
+        label: t('common.nextPage'),
+        node: t('common.nextPage'),
         value: `${data.nodePath!}.next`,
         nodePath: data.nodePath!,
         nodeType: 'next',
@@ -100,8 +100,8 @@ function getDataPagination(data: StorageDevice.GetModelRes) {
     }
     if (data.hasPre) {
       data.list?.unshift({
-        label: '上一页',
-        node: '上一页',
+        label: t('common.previousPage'),
+        node: t('common.previousPage'),
         value: `${data.nodePath!}.pre`,
         nodePath: data.nodePath!,
         nodeType: 'pre',

@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="编辑"
+    :title="t('common.edit')"
     v-model="dialogVisible"
     width="480px"
     align-center
@@ -8,14 +8,14 @@
     id="alias-modal-database"
   >
     <el-form ref="formRef" :model="formData" label-position="left" @submit.prevent>
-      <base-form-item label="测点描述:" prop="alias">
-        <el-input v-model="formData.alias" placeholder="请输入测点描述" maxlength="50" show-word-limit id="alias-modal-alias" type="textarea" :resize="'none'" />
+      <base-form-item :label="`${t('measurement.measurementAlias')}:`" prop="alias">
+        <el-input v-model="formData.alias" :placeholder="t('measurement.measurementAliasPlaceholder')" maxlength="50" show-word-limit id="alias-modal-alias" type="textarea" :resize="'none'" />
       </base-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false" id="alias-modal-cancel">取消</el-button>
-        <el-button type="primary" :loading="saveloading" @click="handleConfirm" id="alias-modal-confirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="alias-modal-cancel">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="saveloading" @click="handleConfirm" id="alias-modal-confirm">{{ t('common.confirm') }}</el-button>
       </span>
     </template>
   </el-dialog>
@@ -36,6 +36,7 @@ const emit = defineEmits<{
   (event: 'handleSave'): void;
 }>();
 
+const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const saveloading = ref(false);
 const formRef = ref<FormInstance>();
@@ -49,7 +50,7 @@ const { requestFn: saveAlias } = useRequest(StorageApi.saveAlias);
 const handleConfirm = () => {
   saveloading.value = true;
   saveAlias(props.measurement, formData.alias).then(() => {
-    ElMessage.success('修改成功！');
+    ElMessage.success(`${t('common.editSuccess')}！`);
     dialogVisible.value = false;
     emit('handleSave');
   }).finally(() => {

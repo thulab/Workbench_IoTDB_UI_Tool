@@ -1,20 +1,20 @@
 <template>
   <el-dialog
-    title="新建测点"
+    :title="t('measurement.newMeasurement')"
     v-model="dialogVisible"
     width="748px"
     :close-on-click-modal="false"
     id="measurement-modal-measurement"
   >
     <el-form ref="formRef" :model="formData" label-position="right">
-      <h4 class="module-title">设备</h4>
-      <el-form-item label="设备名称：" prop="deviceName" class="p-t-8" :rules="!addDevice ? requiredRules : deviceRules">
+      <h4 class="module-title">{{ t('measurement.device') }}</h4>
+      <el-form-item :label="`${t('measurement.deviceName')}：`" prop="deviceName" class="p-t-8" :rules="!addDevice ? requiredRules : deviceRules">
         <el-input type="hidden" />
         <div class="device-box">
           <el-select
             v-if="!addDevice"
             v-model="formData.deviceName"
-            placeholder="请选择设备名称"
+            :placeholder="t('measurement.deviceNameSelectPlaceholder')"
             filterable
             remote
             remote-show-suffix
@@ -32,16 +32,16 @@
           </el-select>
           <div v-else class="device-input-group">
             <el-input :value="`${groupName}.`" disabled class="device-input-prepend" style="width: 144px;" id="measurement-modal-input-groupName" />
-            <el-input v-model="formData.deviceName" placeholder="请输入设备名称" class="device-input-box" style="width: 256px;" id="measurement-modal-input-deviceName" />
+            <el-input v-model="formData.deviceName" :placeholder="t('measurement.deviceNameInputPlaceholder')" class="device-input-box" style="width: 256px;" id="measurement-modal-input-deviceName" />
           </div>
 
           <div class="device-operate m-l-12">
-            <el-checkbox v-model="addDevice" label="新建设备" @change="handleChangeAdd" id="measurement-modal-checkbox-device-add" />
-            <el-checkbox v-model="isAligned" label="按设备对齐" :disabled="!addDevice" id="measurement-modal-checkbox-device-align" />
+            <el-checkbox v-model="addDevice" :label="t('measurement.newDevice')" @change="handleChangeAdd" id="measurement-modal-checkbox-device-add" />
+            <el-checkbox v-model="isAligned" :label="t('measurement.deviceAlign')" :disabled="!addDevice" id="measurement-modal-checkbox-device-align" />
           </div>
         </div>
       </el-form-item>
-      <h4 class="module-title" style="border: none;">测点</h4>
+      <h4 class="module-title" style="border: none;">{{ t('measurement.measurement') }}</h4>
       <el-scrollbar :max-height="400" :min-height="152" class="measurement-list-box">
         <el-collapse accordion v-model="activeName">
           <el-collapse-item v-for="(item, index) in formData.measurementList" :key="index" :name="`measurement_${index}`">
@@ -50,7 +50,7 @@
                 <el-col :span="12"><div v-if="formData.deviceName" class="all-path-name">{{!addDevice ? `${formData.deviceName}.${item.timeseries}` : `${groupName}.${formData.deviceName}.${item.timeseries}`}}</div></el-col>
                 <el-col :span="8">
                   <div class="collapse-data-type-box">
-                    <span class="data-type-label">数据类型</span>
+                    <span class="data-type-label">{{ t('measurement.dataType') }}</span>
                     <span>{{ item.dataType }}</span>
                   </div>
                 </el-col>
@@ -64,42 +64,42 @@
             </template>
             <el-row>
               <el-col :span="8">
-                <el-form-item label="测点名称：" :prop="`measurementList[${index}].timeseries`" :rules="requiredRules" class="m-r-0">
+                <el-form-item :label="`${t('measurement.measurementName')}：`" :prop="`measurementList[${index}].timeseries`" :rules="requiredRules" class="m-r-0">
                   <el-input type="hidden" />
-                  <el-input v-model="item.timeseries" placeholder="请输入测点名称" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-timeseries`" style="width: 144px;" />
+                  <el-input v-model="item.timeseries" :placeholder="t('measurement.measurementNamePlaceholder')" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-timeseries`" style="width: 144px;" />
                 </el-form-item>
               </el-col>
               <el-col :span="16">
-                <el-form-item label="别名：" :prop="`measurementList[${index}].alias`" label-width="83px">
+                <el-form-item :prop="`measurementList[${index}].alias`" label-width="83px">
                   <template #label>
-                    别名：<el-tooltip effect="light" content="仅支持输入字母大小写、数字、下划线、UNICODE 中文字符，除“!@#$%^&*()_+-=”外的特殊字符以及实数需要用反引号进行引用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+                    {{ t('measurement.alias') }}：<el-tooltip effect="light" :content="t('measurement.aliasTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                   </template>
                   <el-input type="hidden" />
-                  <el-input v-model="item.alias" placeholder="请输入别名" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-alias`" maxlength="50" show-word-limit />
+                  <el-input v-model="item.alias" :placeholder="t('measurement.aliasPlaceholder')" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-alias`" maxlength="50" show-word-limit />
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
               <el-col :span="8">
-                <el-form-item label="数据类型：" :prop="`measurementList[${index}].dataType`" :rules="requiredRules">
+                <el-form-item :label="`${t('measurement.dataType')}：`" :prop="`measurementList[${index}].dataType`" :rules="requiredRules">
                   <el-input type="hidden" />
-                  <el-select v-model="item.dataType" placeholder="请选择数据类型" @change="val => handleChangeRowDataType(val, item, index)" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-dataType`">
+                  <el-select v-model="item.dataType" @change="val => handleChangeRowDataType(val, item, index)" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-dataType`">
                     <el-option v-for="dtype in dataTypeOptions" :key="dtype" :label="dtype" :value="dtype" :id="`measurement-modal-collapse-${index}-dataType-select-${dtype}`" />
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="8">
-                <el-form-item label="编码方式：" :prop="`measurementList[${index}].encoding`" :rules="requiredRules">
+                <el-form-item :label="`${t('measurement.encoding')}：`" :prop="`measurementList[${index}].encoding`" :rules="requiredRules">
                   <el-input type="hidden" />
-                  <el-select v-model="item.encoding" placeholder="请选择数据类型" :disabled="!item.isEditable || !item.dataType || !formData.deviceName" :id="`measurement-modal-collapse-${index}-encoding`">
+                  <el-select v-model="item.encoding" :disabled="!item.isEditable || !item.dataType || !formData.deviceName" :id="`measurement-modal-collapse-${index}-encoding`">
                     <el-option v-for="enc in encodingOptions(item.dataType as string)" :key="enc" :label="enc" :value="enc" :id="`measurement-modal-collapse-${index}-encoding-select-${enc}`" />
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="8">
-                <el-form-item label="压缩方式：" :prop="`measurementList[${index}].compression`" :rules="requiredRules" style="margin-right: 0;">
+                <el-form-item :label="`${t('measurement.compression')}：`" :prop="`measurementList[${index}].compression`" :rules="requiredRules" style="margin-right: 0;">
                   <el-input type="hidden" />
-                  <el-select v-model="item.compression" placeholder="请选择数据类型" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-compression`">
+                  <el-select v-model="item.compression" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-compression`">
                     <el-option v-for="com in compressionOptions" :key="com" :label="com" :value="com" :id="`measurement-modal-collapse-${index}-compression-select-${com}`" />
                   </el-select>
                 </el-form-item>
@@ -109,12 +109,12 @@
         </el-collapse>
       </el-scrollbar>
 
-      <el-button style="width: 100%;" class="m-t-16" :disabled="addControl" @click="handleAddRow" id="measurement-modal-collapse-add"><i-custom-add class="m-r-4" />添加测点</el-button>
+      <el-button style="width: 100%;" class="m-t-16" :disabled="addControl" @click="handleAddRow" id="measurement-modal-collapse-add"><i-custom-add class="m-r-4" />{{ t('measurement.addMeasurement') }}</el-button>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false" id="measurement-modal-cancel">取消</el-button>
-        <el-button type="primary" :loading="saveLoading" @click="handleConfirm" id="measurement-modal-confirm">确定</el-button>
+        <el-button @click="dialogVisible = false" id="measurement-modal-cancel">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="saveLoading" @click="handleConfirm" id="measurement-modal-confirm">{{ t('common.confirm') }}</el-button>
       </span>
     </template>
   </el-dialog>
@@ -138,7 +138,7 @@ const emit = defineEmits<{
 
 const dialogVisible = useVModel(props, 'visible', emit);
 const activeName = ref('measurement_0');
-
+const { t } = useI18n();
 const { requestFn: getDevice, loading: deviceLoading } = useRequest(StorageApi.getDeviceByGroup);
 const { requestFn: getMeasurementsInfosByFuzzy } = useRequest(StorageApi.getMeasurementsInfosByFuzzy);
 const { requestFn: getIsAlignedDevice } = useRequest(StorageApi.getIsAlignedDevice);
@@ -162,19 +162,19 @@ const formRef = ref<FormInstance>();
 const deviceRules = ref([
   {
     required: true,
-    message: '设备名称不能为空',
+    message: t('measurement.deviceRuleEmptyTip'),
     trigger: ['blur', 'change'],
   },
   {
     pattern: /^`.*`$|^(["'.a-zA-Z0-9_\u4e00-\u9fa5]*)$/,
-    message: '请输入正确格式，只能由字母、数字、下划线以及UNICODE 中文字符组成',
+    message: t('measurement.deviceRuleTip'),
     trigger: 'blur',
   },
 ]);
 const requiredRules = ref([
   {
     required: true,
-    message: '请输入相应内容后进行操作',
+    message: t('common.formRuleEmpty'),
     trigger: ['blur', 'change'],
   },
 ]);
@@ -275,9 +275,9 @@ function handleCopyRow(data: Partial<StorageDevice.MeasurementItem>, e: MouseEve
 function handleDelRow(i: number, e: MouseEvent) {
   e.preventDefault();
   e.stopPropagation();
-  ElMessageBox.confirm('是否删除测点？', '注意', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+  ElMessageBox.confirm(`${t('measurement.deleteMeasurementSingle')}？`, t('common.notice'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'measurement-modal-collapse-del-confirm',
     cancelButtonClass: 'measurement-modal-collapse-del-cancel',
     type: 'warning',
@@ -290,7 +290,7 @@ function handleDelRow(i: number, e: MouseEvent) {
         const deviceName = !addDevice.value ? formData.deviceName : `${props.groupName}.${formData.deviceName}`;
         deleteMeasurements([`${deviceName}.${formData.measurementList[i].timeseries}`]).then((res) => {
           if (res.code === 0) {
-            ElMessage.success('删除成功');
+            ElMessage.success(t('common.deleteSuccess'));
             formData.measurementList.splice(i, 1);
           }
         });
@@ -361,15 +361,15 @@ const handleConfirm = () => {
         isAligned: isAligned.value,
       }).then((res) => {
         if (res.code === 0) {
-          ElMessage.success('创建成功！');
+          ElMessage.success(`${t('common.createSuccess')}！`);
           dialogVisible.value = false;
           emit('handleSave');
         }
       }).catch((err) => {
         if (err.code === 9999 || err.code === 1380) {
-          ElMessageBox.confirm(err.message, '错误', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
+          ElMessageBox.confirm(err.message, t('common.error'), {
+            confirmButtonText: t('common.confirm'),
+            cancelButtonText: t('common.cancel'),
             confirmButtonClass: 'save-measurement-error-confirm',
             cancelButtonClass: 'save-measurement-error-cancel',
             type: 'error',
@@ -383,7 +383,7 @@ const handleConfirm = () => {
         }
       });
     } else {
-      ElMessage.error('请输入相应内容');
+      ElMessage.error(t('common.formRuleEmptyShort'));
     }
   });
 };

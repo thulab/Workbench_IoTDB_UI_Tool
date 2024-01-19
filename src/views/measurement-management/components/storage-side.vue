@@ -1,6 +1,6 @@
 <template>
   <div class="storage-list-title">
-    <h4>{{ t('measurement.databaseName') }}</h4>
+    <h4>{{ t('measurement.databaseTitle') }}</h4>
     <div class="storage-operate-buttons">
       <el-button link class="m-r-8 border-refresh-icon" @click="getStorageList()" id="mesaurement-side-refresh"><i-custom-refresh /></el-button>
       <auth-tooltip :is-disabled="canManageDatabase">

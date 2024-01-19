@@ -30,5 +30,5 @@ common:
   closeAll: Alle Schließen
   notice: 注意
 measurement:
-  databaseName: 数据库
+  databaseTitle: 数据库
   deleteDatabaseTip: 此操作会删除数据库下全部测点和数据，是否删除？
