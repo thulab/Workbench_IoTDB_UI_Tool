@@ -610,6 +610,9 @@ function getCpu() {
       cpuData.dataCpu = '-';
       cpuData.configCpu = '-';
     }
+  }).catch(() => {
+    cpuData.dataCpu = '';
+    cpuData.configCpu = '';
   });
 }
 
@@ -625,6 +628,17 @@ function getDisk() {
     diskMemoryData.ioTDBUseRatio = res.data.ioTDBUseRatio || 0;
     diskMemoryData.diskRemain = res.data.diskRemain || 0;
     diskMemoryData.diskRemainUnit = res.data.diskRemainUnit || '';
+  }).catch(() => {
+    diskMemoryData.diskTotal = null;
+    diskMemoryData.totalUnit = '';
+    diskMemoryData.diskUse = 0;
+    diskMemoryData.useUnit = '';
+    diskMemoryData.diskUseRatio = 0;
+    diskMemoryData.ioTDBUse = 0;
+    diskMemoryData.ioTDBUnit = '';
+    diskMemoryData.ioTDBUseRatio = 0;
+    diskMemoryData.diskRemain = 0;
+    diskMemoryData.diskRemainUnit = '';
   });
 }
 
@@ -645,18 +659,29 @@ function getSystem() {
         }
       });
     }
+  }).catch(() => {
+    dataNodeSystemData.dataVal = 0;
+    dataNodeSystemData.totalVal = 0;
+    dataNodeSystemData.percent = 0;
+    configNodeSystemData.dataVal = 0;
+    configNodeSystemData.totalVal = 0;
+    configNodeSystemData.percent = 0;
   });
 }
 
 function getSpeed() {
   return getMetricInsertNumPerSecond(isMaster.value).then((res) => {
     writeSpeed.value = res.data;
+  }).catch(() => {
+    writeSpeed.value = null;
   });
 }
 
 function getFile() {
   return getMetricAllFileCount(isMaster.value).then((res) => {
     fileTotal.value = res.data;
+  }).catch(() => {
+    fileTotal.value = null;
   });
 }
 
