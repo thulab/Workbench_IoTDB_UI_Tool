@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="批量导入数据"
+    :title="t('search.batchImportData')"
     v-model="dialogVisible"
     width="748px"
     class="new-storage-container"

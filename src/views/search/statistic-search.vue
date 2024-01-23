@@ -2,13 +2,13 @@
   <div class="page-container">
     <div class="search-form-wrapper">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" label-width="78px" size="default" inline :disabled="getListLoading">
-        <base-form-item label="测点选择：" prop="path" class="m-r-40">
+        <base-form-item prop="path" class="m-r-40">
           <template #label>
-            测点选择：<el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+            {{ t('measurement.measurementChoose') }}：<el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
           <timeseries-select v-model="searchFormData.path" :is-show-view-btn="true" :is-boolean-text-disabled="true" id="statistic-search-path" />
         </base-form-item>
-        <base-form-item label="查询时间：" prop="datetimerange" style="margin-right: 0;">
+        <base-form-item :label="`${t('search.searchTime')}：`" prop="datetimerange" style="margin-right: 0;">
           <el-date-picker
             v-model="searchFormData.datetimerange"
             type="datetimerange"
@@ -64,13 +64,13 @@
           ref="tableRef"
           :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
         >
-          <el-table-column label="测点名称" prop="measurement" min-width="240" align="center" show-overflow-tooltip />
-          <el-table-column label="最小值" prop="minValue" min-width="160" align="center" show-overflow-tooltip />
-          <el-table-column label="最小值时间" prop="minTime" min-width="180" align="center" show-overflow-tooltip />
-          <el-table-column label="最大值" prop="maxValue" min-width="160" align="center" show-overflow-tooltip />
-          <el-table-column label="最大值时间" prop="maxTime" min-width="180" align="center" show-overflow-tooltip />
-          <el-table-column label="平均值" prop="avgValue" min-width="160" align="center" show-overflow-tooltip />
-          <el-table-column label="总和" prop="sumValue" min-width="160" align="center" show-overflow-tooltip />
+          <el-table-column :label="t('measurement.measurementName')" prop="measurement" min-width="240" align="center" show-overflow-tooltip />
+          <el-table-column :label="t('common.minValue')" prop="minValue" min-width="160" align="center" show-overflow-tooltip />
+          <el-table-column :label="t('common.minValueTime')" prop="minTime" min-width="180" align="center" show-overflow-tooltip />
+          <el-table-column :label="t('common.maxValue')" prop="maxValue" min-width="160" align="center" show-overflow-tooltip />
+          <el-table-column :label="t('common.maxValueTime')" prop="maxTime" min-width="180" align="center" show-overflow-tooltip />
+          <el-table-column :label="t('common.avg')" prop="avgValue" min-width="160" align="center" show-overflow-tooltip />
+          <el-table-column :label="t('common.total')" prop="sumValue" min-width="160" align="center" show-overflow-tooltip />
           <template #empty>
             <div class="table-empty-wrapper">
               <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
@@ -129,15 +129,15 @@ const copySearchFormData = reactive({
 });
 const shortcutsDaterange = [
   {
-    text: '今天',
+    text: t('common.today'),
     value: () => getStartAndEnd(0),
   },
   {
-    text: '昨天',
+    text: t('common.yesterday'),
     value: () => getOneInterval(1),
   },
   {
-    text: '最近7天',
+    text: t('common.7dayRecend'),
     value: () => getOneIntervalNow(7),
   },
 ];

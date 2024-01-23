@@ -3,7 +3,9 @@
 
 import { ref, type Ref } from 'vue';
 
-const { t } = useI18n();
+import i18n from '@/locale/index';
+
+const { t } = i18n.global;
 
 // 1001
 // 1330 无权限

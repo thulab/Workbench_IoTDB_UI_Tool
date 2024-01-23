@@ -19,28 +19,28 @@
 
       <div class="sql-search-aside">
         <div v-if="codeMirrorReady">
-          <h4 style="font-size: 14px;font-weight: 700;color: #495AD4;margin: 0 0 12px;">快捷操作</h4>
+          <h4 style="font-size: 14px;font-weight: 700;color: #495AD4;margin: 0 0 12px;">{{ t('search.quickActions') }}</h4>
           <el-tabs v-model="activeNameSide" class="tabs-nav-aside">
-            <el-tab-pane label="测点" name="data">
+            <el-tab-pane :label="t('measurement.measurement')" name="data">
               <side-data @get-function="getFunction" />
             </el-tab-pane>
-            <el-tab-pane label="函数" name="function">
+            <el-tab-pane :label="t('search.function')" name="function">
               <side-function @get-function="getFunction" />
             </el-tab-pane>
-            <el-tab-pane label="模板" name="template">
+            <el-tab-pane :label="t('search.template')" name="template">
               <side-template ref="sqlListRef" @handle-sql-operate="handleSqlOperate" />
             </el-tab-pane>
           </el-tabs>
-          <a href="https://www.timecho.com/docs/zh/UserGuide/V1.0.x/Reference/SQL-Reference.html" rel="noopener noreferrer" target="_blank" class="operate-link"><i-custom-question />操作说明</a>
+          <a href="https://www.timecho.com/docs/zh/UserGuide/V1.0.x/Reference/SQL-Reference.html" rel="noopener noreferrer" target="_blank" class="operate-link"><i-custom-question />{{ t('search.operatingInstructions') }}</a>
         </div>
       </div>
     </div>
 
-    <el-dialog title="保存模板" v-model="nameDialogVisible" width="480px" align-center>
+    <el-dialog :title="t('search.saveTemplate')" v-model="nameDialogVisible" width="480px" align-center>
       <el-form ref="saveFormRef" :model="saveForm" :rules="saveFormRules" label-position="left" @submit.prevent>
-        <el-form-item label="名称：" prop="sqlName">
+        <el-form-item :label="`${t('search.name')}：`" prop="sqlName">
           <el-input type="hidden" />
-          <el-input v-model="saveForm.sqlName" placeholder="请输入" maxlength="25" show-word-limit id="sql-search-modal-save" />
+          <el-input v-model="saveForm.sqlName" :placeholder="t('common.placeHolder')" maxlength="25" show-word-limit id="sql-search-modal-save" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -51,15 +51,15 @@
       </template>
     </el-dialog>
 
-    <el-dialog title="重命名" v-model="renameDialogVisible" width="480px" align-center>
+    <el-dialog :title="t('search.rename')" v-model="renameDialogVisible" width="480px" align-center>
       <el-form ref="resaveFormRef" :model="resaveForm" :rules="resaveFormRules" label-width="80px" label-position="right">
-        <el-form-item label="原名称：" prop="oldSqlName" class="type-input-disabled">
+        <el-form-item :label="`${t('search.oldName')}：`" prop="oldSqlName" class="type-input-disabled">
           <el-input type="hidden" />
           <el-input v-model="resaveForm.oldSqlName" disabled id="sql-search-modal-resave-old" />
         </el-form-item>
-        <el-form-item label="新名称：" prop="sqlName">
+        <el-form-item :label="`${t('search.newName')}：`" prop="sqlName">
           <el-input type="hidden" />
-          <el-input v-model="resaveForm.sqlName" placeholder="请输入" maxlength="25" show-word-limit id="sql-search-modal-resave" />
+          <el-input v-model="resaveForm.sqlName" :placeholder="t('common.placeHolder')" maxlength="25" show-word-limit id="sql-search-modal-resave" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -93,7 +93,7 @@ const { maxTableHeight: tabHeight } = useTableHeight(125);
 const activiteSql = ref<string>(`_${dayjs().format('YYYY-MM-DD HH:mm:ss:SSS')}`);
 
 // eslint-disable-next-line no-useless-escape
-const sqlList = ref<Search.SqlList[]>([{ id: activiteSql.value, queryName: `查询${dayjs().format('YYYY-MM-DD HH:mm:ss').replace(/\-|\:| /g, '')}` }]);
+const sqlList = ref<Search.SqlList[]>([{ id: activiteSql.value, queryName: `${t('common.query')}${dayjs().format('YYYY-MM-DD HH:mm:ss').replace(/\-|\:| /g, '')}` }]);
 const activeNameSide = ref('function');
 
 const code = reactive<Record<string, string>>({});
@@ -103,7 +103,7 @@ const saveFormRef = ref<FormInstance>();
 const resaveFormRef = ref<FormInstance>();
 const saveFormRules = reactive({
   sqlName: [
-    { required: true, message: '请填写名称后确定', trigger: 'blur' },
+    { required: true, message: t('search.nameRuleTip'), trigger: 'blur' },
   ],
 });
 const saveForm = reactive<{
@@ -128,9 +128,9 @@ const resaveFormRules = reactive({
       required: true,
       validator: (rule: any, value: any, callback: any) => {
         if (!value || !value.trim()) {
-          return callback(new Error('新名称为空，请重新输入'));
+          return callback(new Error(t('search.newNameTip')));
         } if (value === resaveForm.oldSqlName) {
-          return callback(new Error('与原名称相同，请重新输入'));
+          return callback(new Error(t('search.nameRepeatTip')));
         }
         return callback();
       },
@@ -192,7 +192,7 @@ function handleSqlOperate(val: string, data: Search.SqlList) {
       const currentSqlId = `_${dayjs().unix()}`;
       sqlList.value.splice(index, 1, {
         // eslint-disable-next-line no-useless-escape
-        queryName: `查询${dayjs().format('YYYYMMDDHHmmss')}`,
+        queryName: `${t('common.query')}${dayjs().format('YYYYMMDDHHmmss')}`,
         id: currentSqlId,
       });
       activiteSql.value = currentSqlId;
@@ -206,7 +206,7 @@ const handleTabAdd = throttle(() => {
   const currentSqlId = `_${dayjs().unix()}`;
   sqlList.value.push({
     // eslint-disable-next-line no-useless-escape
-    queryName: `查询${dayjs().format('YYYYMMDDHHmmss')}`,
+    queryName: `${t('common.query')}${dayjs().format('YYYYMMDDHHmmss')}`,
     id: currentSqlId,
   });
   activiteSql.value = currentSqlId;
@@ -224,7 +224,7 @@ function handleTabClick(tab: TabsPaneContext) {
 // 删除tab
 function handleTabRemove(targetName: TabPaneName) {
   if (sqlList.value.length === 1) {
-    ElMessage.info('只有一个页签不允许删除');
+    ElMessage.info(t('search.deleteTabTip'));
     return;
   }
   const index = sqlList.value.findIndex((f) => `${f.id}` === `${targetName}`);

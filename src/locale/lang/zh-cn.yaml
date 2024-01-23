@@ -50,8 +50,20 @@ common:
   milliSecond: 毫秒
   second: 秒
   minute: 分
+  minuteAll: 分钟
   hour: 小时
   day: 天
+  lastValue: 最新值
+  avg: 平均值
+  maxValue: 最大值
+  maxValueTime: 最大值时间
+  minValue: 最小值
+  minValueTime: 最小值时间
+  total: 总和
+  today: 今天
+  yesterday: 昨天
+  7dayAgo: 7天前
+  7dayRecend: 最近7天
   createSuccess: 创建成功
   editSuccess: 修改成功
   updateSuccess: 更新成功
@@ -129,3 +141,119 @@ measurement:
   deleteMeasurementTip: 此操作会删除数据库下全部测点和数据，是否删除？
   databaseModel: 数据模型
   databaseModelDoc: iotdb树形模型指导文档
+search:
+  datetime: 时间点
+  datetimerange: 时间段
+  timeInterval: 采样周期
+  inputNumberPlaceholder: 请输入正整数
+  aggregation: 采样策略
+  export1000Tip: 默认最多展示1000行100列，如需更多请导出查看
+  aggregationPlaceholder: 请选择采样策略
+  searchTime: 查询时间
+  quickActions: 快捷操作
+  function: 函数
+  template: 模板
+  operatingInstructions: 操作说明
+  saveTemplate: 保存模板
+  name: 名称
+  rename: 重命名
+  oldName: 原名称
+  newName: 新名称
+  nameRuleTip: 请填写名称后确定
+  newNameTip: 新名称为空，请重新输入
+  nameRepeatTip: 与原名称相同，请重新输入
+  deleteTabTip: 只有一个页签不允许删除
+  batchImportData: 批量导入数据
+  databaseSelectPlaceholder: 请选择数据库
+  deviceSelectPlaceholder: 请选择设备
+  templatePlaceholder: 请输入模板名称
+  open: 打开
+  noTemplate: 暂无模板
+  sqlInput: SQL输入
+  runAll: 执行全部
+  selectRunTip: 请选中指定语句后操作
+  runPart: 执行选中
+  runResult: 执行结果
+  runningResult: 运行结果
+  runEmptyTip: 请先输入语句再运行
+  runOverTip: 模版语句数量已达到上限，如有需要请新建模版进行操作
+  runRepeatTip: 查询正在运行中，请勿重复操作
+  emptyTip: 是否清空页面
+searchIotdb:
+  aggregate: 聚合函数
+  sum: 求和
+  count: 计算数据点数
+  avg: 求平均值
+  extreme: 求具有最大绝对值的值。如果正值和负值的最大绝对值相等，则返回正值。
+  maxValue: 求最大值
+  minValue: 求最小值
+  firstValue: 求时间戳最小的值
+  lastValue: 求时间戳最大的值
+  maxTime: 求最大时间戳
+  minTime: 求最小时间戳
+  math: 数学函数
+  sin: 正弦函数
+  cos: 余弦函数
+  tan: 正切函数
+  asin: 反正弦函数
+  acos: 反余弦函数
+  atan: 反正切函数
+  sinh: 双曲正弦函数
+  cosh: 双曲余弦函数
+  tanh: 双曲正切函数
+  degrees: 转角度
+  padins: 转弧度
+  abs: 求绝对值
+  sign: 符号函数
+  ceil: 向上取整
+  floor: 向下取整
+  round: 四舍五入
+  exp: 以e为底的指数
+  ln: 以e为底的对数
+  log10: 以10为底的对数
+  sqrt: 求平方根
+  comparison: 比较函数
+  onOff: 返回ts_value >= threshold的bool值
+  inRange: 返回ts_value >= lower && ts_value <= upper的bool值
+  logical: 字符串处理函数
+  stringContains: 判断字符串中是否存在s
+  stringMathes: 判断字符串是否能够被正则表达式regex匹配
+  length: 返回字符串的长度
+  locate: 获取target子串第一次出现在输入序列的位置，如果输入序列中不包含target则返回 -1
+  startSwith: 判断字符串是否有指定前缀
+  endSwitch: 判断字符串是否有指定后缀
+  concat: 拼接字符串和target字串
+  substr: 获取下标从start到end - 1的子串
+  upper: 将字符串转化为大写
+  lower: 将字符串转化为小写
+  trim: 移除字符串前后的空格
+  strcmp: 用于比较两个输入序列，如果值相同返回 0 , 序列1的值小于序列2的值返回一个负数，序列1的值大于序列2的值返回一个正数
+  conversion: 数据类型转换函数
+  cast: 将数据转换为type参数指定的类型
+  constant: 常序列生成函数
+  const: 根据输入属性 value 和 type 输出用户指定的常序列
+  pi: 常序列的值：π 的 double 值，圆的周长与其直径的比值，即圆周率，等于 Java标准库 中的Math.PI
+  e: 常序列的值：e 的 double 值，自然对数的底，它等于 Java 标准库 中的 Math.E
+  selection: 选择函数
+  topK: 返回某时间序列中值最大的k个数据点。若多于k个数据点的值并列最大，则返回时间戳最小的数据点
+  bottomK: 返回某时间序列中值最小的k个数据点。若多于k个数据点的值并列最小，则返回时间戳最小的数据点
+  continuousInterval: 区间查询函数
+  zeroDuration: 返回时间序列连续为0(false)的开始时间与持续时间，持续时间t(单位ms)满足t >= min && t <= max
+  nonZeroDuration: 返回时间序列连续不为0(false)的开始时间与持续时间，持续时间t(单位ms)满足t >= min && t <= max
+  zeroCount: 返回时间序列连续为0(false)的开始时间与其后数据点的个数，数据点个数n满足n >= min && n <= max
+  nonZeroCount: 返回时间序列连续不为0(false)的开始时间与其后数据点的个数，数据点个数n满足n >= min && n <= max
+  variationTrend: 趋势计算函数
+  timeDifference: 统计序列中某数据点的时间戳与前一数据点时间戳的差。范围内第一个数据点没有对应的结果输出
+  difference: 统计序列中某数据点的值与前一数据点的值的差。范围内第一个数据点没有对应的结果输出
+  nonNegativeDifference: 统计序列中某数据点的值与前一数据点的值的差的绝对值。范围内第一个数据点没有对应的结果输出
+  derivative: 统计序列中某数据点相对于前一数据点的变化率，数量上等同于 DIFFERENCE / TIME_DIFFERENCE。范围内第一个数据点没有对应的结果输出
+  nonNegativeDerivative: 统计序列中某数据点相对于前一数据点的变化率的绝对值，数量上等同于 NON_NEGATIVE_DIFFERENCE / TIME_DIFFERENCE。范围内第一个数据点没有对应的结果输出
+  diff: 统计序列中某数据点的值与前一数据点的值的差。第一个数据点没有对应的结果输出，输出值为null
+  sample: 采样函数
+  equalSizeBucketRandomSample: 返回符合采样比例的等分桶随机采样
+  equalSizeBucketAggSample: 返回符合采样比例的等分桶聚合采样
+  equalSizeBucketM4Sample: 返回符合采样比例的等分桶M4采样
+  equalSizeBucketOutlierSample: 返回符合采样比例和桶内采样个数的等分桶离群值采样
+  m4: 返回每个窗口内的第一个点（first）、最后一个点（last）、最小值点（bottom）、最大值点（top）。在一个窗口内的聚合点输出之前，M4会将它们按照时间戳递增排序并且去重
+
+

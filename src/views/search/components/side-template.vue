@@ -1,6 +1,6 @@
 <template>
   <div class="search_div maxheight" v-loading="loading">
-    <el-input placeholder="请输入模板名称" v-model="filterText" size="small" @input="getQueryList" id="sql-search-template-search">
+    <el-input :placeholder="t('search.templatePlaceholder')" v-model="filterText" size="small" @input="getQueryList" id="sql-search-template-search">
       <template #suffix>
         <i-custom-search-icon />
       </template>
@@ -18,15 +18,15 @@
             <i-ep-more-filled />
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item command="open" :id="`sql-template-dropdown-open-${item.id}`">打开</el-dropdown-item>
-                <el-dropdown-item command="rename" :id="`sql-template-dropdown-rename-${item.id}`">重命名</el-dropdown-item>
+                <el-dropdown-item command="open" :id="`sql-template-dropdown-open-${item.id}`">{{ t('search.open') }}</el-dropdown-item>
+                <el-dropdown-item command="rename" :id="`sql-template-dropdown-rename-${item.id}`">{{ t('search.rename') }}</el-dropdown-item>
                 <el-dropdown-item command="delete" :id="`sql-template-dropdown-delete-${item.id}`">{{ t('common.delete') }}</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
         </li>
       </template>
-      <li v-else class="sql-item-box-empty">暂无模板</li>
+      <li v-else class="sql-item-box-empty">{{ t('search.noTemplate') }}</li>
     </ul>
   </div>
 </template>
@@ -66,7 +66,7 @@ const handleSqlCommand = (val: string, data: Search.SqlList) => {
       deleteQueryS(`${data.id}`).then(() => {
         ElMessage({
           type: 'success',
-          message: '删除成功!',
+          message: `${t('common.deleteSuccess')}!`,
         });
         getQueryList();
         emit('handleSqlOperate', val, data);

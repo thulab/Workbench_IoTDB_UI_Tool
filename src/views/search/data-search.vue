@@ -12,15 +12,15 @@
           <el-form-item label="查询时间：" prop="time" style="margin-right: 0;">
             <div class="search-time-wrapper">
               <ul class="search-time-list">
-                <li :class="['search-time-type', { 'search-time-active': timeType === 'datetime' }]" id="data-search-type-datetime" @click="handleTimeType('datetime')">时间点</li>
-                <li :class="['search-time-type', { 'search-time-active': timeType === 'datetimerange' }]" id="data-search-type-datetimerange" @click="handleTimeType('datetimerange')">时间段</li>
+                <li :class="['search-time-type', { 'search-time-active': timeType === 'datetime' }]" id="data-search-type-datetime" @click="handleTimeType('datetime')">{{ t('search.datetime') }}</li>
+                <li :class="['search-time-type', { 'search-time-active': timeType === 'datetimerange' }]" id="data-search-type-datetimerange" @click="handleTimeType('datetimerange')">{{ t('search.datetimerange') }}</li>
               </ul>
               <el-input type="hidden" />
               <el-date-picker
                 v-if="timeType === 'datetime'"
                 v-model="searchFormData.time"
                 type="datetime"
-                placeholder="请选择"
+                :placeholder="t('common.selectPlaceholder')"
                 :disabled-date="disabledDate"
                 :shortcuts="shortcutsDate"
                 :clearable="false"
@@ -46,9 +46,9 @@
         </el-row>
         <el-row class="flex-justify-between">
           <div>
-            <el-form-item label="采样周期：" prop="timeInterval" class="m-r-20">
+            <el-form-item prop="timeInterval" class="m-r-20">
               <template #label>
-                采样周期：<el-tooltip effect="light" content="请输入正整数" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+                {{ t('search.timeInterval') }}：<el-tooltip effect="light" :content="t('search.inputNumberPlaceholder')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
               </template>
               <el-input type="hidden" />
               <el-input v-model.number="searchFormData.timeInterval" style="width: 100px;" placeholder="" @input="handleInputInterval" id="data-search-timeInterval" :disabled="getListLoading">
@@ -60,7 +60,7 @@
               </el-input>
 
             </el-form-item>
-            <el-form-item label="采样策略：" prop="aggregation">
+            <el-form-item :label="`${t('search.aggregation')}：`" prop="aggregation">
               <el-input type="hidden" />
               <el-select v-model="searchFormData.aggregation" style="width: 80px;" clearable id="data-search-aggregation" :disabled="getListLoading">
                 <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-aggregation-select-${item.value}`" />
@@ -96,7 +96,7 @@
           <li class="run-result-item"><i-custom-query-time />查询耗时：{{ formatSqlInfo('queryTime') }}</li>
         </ul> -->
         <h4 class="page-info-title">{{ t('common.searchDetail') }}
-          <span class="run-result-tip"><i-custom-info-warning />默认最多展示1000行100列，如需更多请导出查看</span>
+          <span class="run-result-tip"><i-custom-info-warning />{{ t('search.export1000Tip') }}</span>
         </h4>
         <div class="page-detail-buttons">
           <auth-tooltip :is-disabled="canReadWriteData">
@@ -200,17 +200,17 @@ const { maxTableHeight } = useTableHeight(330);
 const searchFormRef = ref<FormInstance>();
 const firstLoad = ref(true);
 const timeUnits = [
-  { label: '毫秒', value: 'ms' },
-  { label: '秒', value: 's' },
-  { label: '分钟', value: 'm' },
-  { label: '小时', value: 'h' },
-  { label: '天', value: 'd' },
+  { label: t('common.milliSecond'), value: 'ms' },
+  { label: t('common.second'), value: 's' },
+  { label: t('common.minuteAll'), value: 'm' },
+  { label: t('common.hour'), value: 'h' },
+  { label: t('common.day'), value: 'd' },
 ];
 const aggregateFunctions = [
-  { label: '最新值', value: 'last_value' },
-  { label: '平均值', value: 'avg' },
-  { label: '最大值', value: 'max_value' },
-  { label: '最小值', value: 'min_value' },
+  { label: t('common.lastValue'), value: 'last_value' },
+  { label: t('common.avg'), value: 'avg' },
+  { label: t('common.maxValue'), value: 'max_value' },
+  { label: t('common.minValue'), value: 'min_value' },
 ];
 
 const currentQueryTime = ref('');
@@ -227,29 +227,29 @@ const searchFormData = reactive({
 let copySearchFormData = cloneDeep(searchFormData);
 const shortcutsDate = [
   {
-    text: '今天',
+    text: t('common.today'),
     value: () => todayNow(),
   },
   {
-    text: '昨天',
+    text: t('common.yesterday'),
     value: () => getOneDay(1),
   },
   {
-    text: '7天前',
+    text: t('common.7dayAgo'),
     value: () => getOneDay(7),
   },
 ];
 const shortcutsDaterange = [
   {
-    text: '今天',
+    text: t('common.today'),
     value: () => getStartAndEnd(0),
   },
   {
-    text: '昨天',
+    text: t('common.yesterday'),
     value: () => getOneInterval(1),
   },
   {
-    text: '最近7天',
+    text: t('common.7dayRecend'),
     value: () => getOneIntervalNow(7),
   },
 ];
@@ -296,7 +296,7 @@ let controller = new AbortController();
 
 function getListData() {
   if (copySearchFormData.timeInterval && !copySearchFormData.aggregation) {
-    ElMessage.error('请选择采样策略');
+    ElMessage.error(t('search.aggregationPlaceholder'));
     return;
   }
   firstLoad.value = false;

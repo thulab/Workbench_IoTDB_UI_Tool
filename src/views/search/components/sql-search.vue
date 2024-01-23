@@ -2,20 +2,20 @@
   <div class="sql-input-area">
     <div class="sql-title-box">
       <div class="sql-title-text">
-        <span>SQL输入</span>
+        <span>{{ t('search.sqlInput') }}</span>
       </div>
       <div class="sql-right-icon-box">
         <el-button link @click="handleSave" id="sql-search-operate-save"><i-custom-sql-save />{{ t('common.save') }}</el-button>
-        <el-button link :disabled="!runFlag" @click="querySqlRun()" id="sql-search-operate-run"><i-custom-run-all />执行全部</el-button>
+        <el-button link :disabled="!runFlag" @click="querySqlRun()" id="sql-search-operate-run"><i-custom-run-all />{{ t('search.runAll') }}</el-button>
         <el-tooltip
           placement="top-start"
           effect="light"
           trigger="hover"
-          content="请选中指定语句后操作"
+          :content="t('search.selectRunTip')"
           :disabled="!!selectionCode"
           popper-class="tooltip-max-width"
         >
-          <el-button link :disabled="!runFlag || !selectionCode" @click="querySqlRun('part')" id="sql-search-operate-run-part"><i-custom-run-part />执行选中</el-button>
+          <el-button link :disabled="!runFlag || !selectionCode" @click="querySqlRun('part')" id="sql-search-operate-run-part"><i-custom-run-part />{{ t('search.runPart') }}</el-button>
         </el-tooltip>
         <el-button link :disabled="runFlag" @click="stopquery" id="sql-search-operate-stop"><i-custom-sql-abort />{{ t('common.cancel') }}</el-button>
         <el-button link @click="emptyQuery" id="sql-search-operate-empty"><i-custom-sql-empty />{{ t('common.clear') }}</el-button>
@@ -38,14 +38,14 @@
   </div>
   <div>
     <div class="run-result-title-box">
-      <h4 style="font-size: 14px;font-weight: 700;line-height: 20px;color:#495AD4;">执行结果</h4>
-      <span class="run-result-tip"><i-custom-info-warning />默认最多展示1000行100列，如需更多请导出查看</span>
+      <h4 style="font-size: 14px;font-weight: 700;line-height: 20px;color:#495AD4;">{{ t('search.runResult') }}</h4>
+      <span class="run-result-tip"><i-custom-info-warning />{{ t('search.export1000Tip') }}</span>
     </div>
     <div class="tabs" v-if="tableData.list && tableData.list.length > 0">
       <el-tabs v-model="activeName" type="card" class="tabs-nav-list" id="sql-search-result-tabs">
         <el-tab-pane v-for="(item, index) of columnList" :key="index" :name="`t${index}`">
           <template #label>
-            <span>运行结果{{ index + 1 }}</span>
+            <span>{{ t('search.runningResult') }}{{ index + 1 }}</span>
           </template>
           <div class="run-result-infos">
             <!-- <ul>
@@ -173,13 +173,13 @@ function querySqlRun(type?: string) {
     codeStr = selectionCode.value;
   }
   if (!codeStr.length) {
-    ElMessage.error('请先输入语句再运行');
+    ElMessage.error(t('search.runEmptyTip'));
     return;
   }
   if (runFlag.value) {
     const sqlsArr = codeStr?.split(';\n');
     if (sqlsArr?.length > 50) {
-      ElMessage.warning('模版语句数量已达到上限，如有需要请新建模版进行操作');
+      ElMessage.warning(t('search.runOverTip'));
       return;
     }
     display.value = false;
@@ -238,7 +238,7 @@ function querySqlRun(type?: string) {
       runFlag.value = true;
     }, 5000);
   } else {
-    ElMessage.error('查询正在运行中，请勿重复操作');
+    ElMessage.error(t('search.runRepeatTip'));
   }
 }
 // // 查询结果
@@ -324,7 +324,7 @@ function handleCommandDown(val: string, index: number) {
 
 // 清空
 function emptyQuery() {
-  ElMessageBox.confirm('是否清空页面', t('common.notice'), {
+  ElMessageBox.confirm(t('search.emptyTip'), t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'empty-sql-confirm',

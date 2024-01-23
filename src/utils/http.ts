@@ -3,7 +3,9 @@ import Axios, { type InternalAxiosRequestConfig } from 'axios';
 import NProgress from '@/config/nprogress-config';
 import { langNameMap } from '@/constants';
 
-const { t } = useI18n();
+import i18n from '@/locale/index';
+
+const { t } = i18n.global;
 let requestCount = 0;
 
 const http = Axios.create({

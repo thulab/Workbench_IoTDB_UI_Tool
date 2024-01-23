@@ -1,6 +1,6 @@
 <template>
   <div class="search_div maxheight">
-    <el-select v-model="storageName" style="width: 100%;" placeholder="请选择数据库" @change="handleSelectDatabase" :loading="storageLoading" :placement="'bottom-start'" fit-input-width id="sql-search-data-select-databse">
+    <el-select v-model="storageName" style="width: 100%;" :placeholder="t('search.databaseSelectPlaceholder')" @change="handleSelectDatabase" :loading="storageLoading" :placement="'bottom-start'" fit-input-width id="sql-search-data-select-databse">
       <el-option v-for="item in storageList" :key="item" :value="item" :label="item" :id="`sql-search-data-select-databse-${item}`">
         <div style="display: flex; width: 160px;">
           <text-tooltip :content="item" />
@@ -13,7 +13,7 @@
       style="width: 100%;"
       :disabled="!storageName"
       v-model="deviceName"
-      placeholder="请选择设备"
+      :placeholder="t('search.deviceSelectPlaceholder')"
       filterable
       remote
       remote-show-suffix
@@ -32,13 +32,13 @@
       </el-option>
     </el-select>
 
-    <el-input class="m-y-10" :disabled="!deviceName" v-model="filterMeasurementText" placeholder="请输入测点名称" @input="handleInput('measurement')" id="sql-search-data-input-measurement">
+    <el-input class="m-y-10" :disabled="!deviceName" v-model="filterMeasurementText" :placeholder="t('measurement.measurementNamePlaceholder')" @input="handleInput('measurement')" id="sql-search-data-input-measurement">
       <template #suffix><i-ep-search /></template>
     </el-input>
 
     <div class="search-buttons">
-      <el-button v-if="false" type="primary" @click="handleAdd(storageName)" id="sql-search-data-add-databse">当前数据库</el-button>
-      <el-button v-if="false" type="primary" @click="handleAdd(deviceName)" id="sql-search-data-add-device">当前设备</el-button>
+      <!-- <el-button v-if="false" type="primary" @click="handleAdd(storageName)" id="sql-search-data-add-databse">当前数据库</el-button>
+      <el-button v-if="false" type="primary" @click="handleAdd(deviceName)" id="sql-search-data-add-device">当前设备</el-button> -->
       <el-button @click="handleReset" id="sql-search-data-reset">{{ t('common.reset') }}</el-button>
     </div>
     <el-table
@@ -49,7 +49,7 @@
       tooltip-effect="light"
       :tooltip-options="{ placement: 'left', popperClass: 'table-tooltip-max-width' }"
       @row-dblclick="(row, column, event) => handleAdd(row)">
-      <el-table-column align="center" label="测点" v-slot="{ row }" show-overflow-tooltip>
+      <el-table-column align="center" :label="t('measurement.measurement')" v-slot="{ row }" show-overflow-tooltip>
         {{ row }}
       </el-table-column>
     </el-table>
