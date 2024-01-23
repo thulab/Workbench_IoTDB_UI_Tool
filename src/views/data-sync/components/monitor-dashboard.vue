@@ -3,7 +3,7 @@
     <template #otherTip>
       <div class="monitor-dashboard-operate-left">
         <el-button link class="monitor-dashboard-close-btn" id="monitor-dashboard-close-btn" @click="handleClose"><el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>{{ t('common.goback') }}</el-button>
-        <span class="monitor-dashboard-header-title">状态监控</span>
+        <span class="monitor-dashboard-header-title">{{ t('dataSync.monitorDashboard') }}</span>
       </div>
     </template>
     <el-container class="data-sync-detail-wrapper" v-loading="loading">
@@ -11,17 +11,17 @@
         <div class="flex-align-center">
           <div class="monitor-dashboard-operate-left">
             <el-button link class="monitor-dashboard-close-btn" id="monitor-dashboard-close-btn" @click="handleClose"><el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>{{ t('common.goback') }}</el-button>
-            <span class="monitor-dashboard-header-title">状态监控</span>
+            <span class="monitor-dashboard-header-title">{{ t('dataSync.monitorDashboard') }}</span>
           </div>
           <div class="monitor-dashboard-node-box">
-            <span class="search-from-label">节点：</span>
-            <el-select v-model="monitorNode" placeholder="全部" style="width: 256px;" @change="handleChangeNode" id="monitor-dashboard-select-node">
-              <el-option v-for="(item, index) in nodeList" :key="`${item.address}(${item.type})_${index}`" :value="item.nodeID" :id="`monitor-dashboard-select-node-select-${item.nodeID}`" :label="item.address ? `${item.address}(${item.type})` : '全部'" />
+            <span class="search-from-label">{{t('dashboard.node')}}：</span>
+            <el-select v-model="monitorNode" :placeholder="t('common.all')" style="width: 256px;" @change="handleChangeNode" id="monitor-dashboard-select-node">
+              <el-option v-for="(item, index) in nodeList" :key="`${item.address}(${item.type})_${index}`" :value="item.nodeID" :id="`monitor-dashboard-select-node-select-${item.nodeID}`" :label="item.address ? `${item.address}(${item.type})` : t('common.all')" />
             </el-select>
           </div>
         </div>
         <p class="monitor-dashboard-module-details">
-          <span class="module-label-text">数据截止：</span>
+          <span class="module-label-text">{{`${t('dashboard.deadTime')}：`}}</span>
           <span class="module-content-text m-r-16">{{ monitorTime }}</span>
           <el-button link @click="handleRefreshMonitor" id="monitor-dashboard-refresh"><el-icon size="24"><i-custom-refresh /></el-icon></el-button>
         </p>
@@ -31,7 +31,7 @@
           <div class="monitor-chart-wrapper">
             <div class="monitor-chart-box-2" v-loading="memoryLoading">
               <div class="monitor-chart-container">
-                <h4 class="monitor-info-module-title">内存</h4>
+                <h4 class="monitor-info-module-title">{{ t('dataSync.memory') }}</h4>
                 <data-container :is-empty="isChartEmpty(memoryData)">
                   <div class="chart-container-box">
                     <the-chart :option="memoryDataOptions.data" key="memoryData" ref="memoryChartRef" />
@@ -41,7 +41,7 @@
             </div>
             <div class="monitor-chart-box-2" v-loading="p50Loading">
               <div class="monitor-chart-container">
-                <h4 class="monitor-info-module-title">P50延迟</h4>
+                <h4 class="monitor-info-module-title">{{ t('dataSync.p50') }}</h4>
                 <data-container :is-empty="isChartEmpty(p50Data)">
                   <div class="chart-container-box">
                     <the-chart :option="p50DataOptions.data" key="p50Data" ref="p50ChartRef" />
@@ -51,7 +51,7 @@
             </div>
             <div class="monitor-chart-box-2" v-loading="p99Loading">
               <div class="monitor-chart-container">
-                <h4 class="monitor-info-module-title">P99延迟</h4>
+                <h4 class="monitor-info-module-title">{{ t('dataSync.p99') }}</h4>
                 <data-container :is-empty="isChartEmpty(p99Data)">
                   <div class="chart-container-box">
                     <the-chart :option="p99DataOptions.data" key="p99Data" ref="p99ChartRef" />
@@ -61,7 +61,7 @@
             </div>
             <div class="monitor-chart-box-2" v-loading="remainingTimeLoading">
               <div class="monitor-chart-container">
-                <h4 class="monitor-info-module-title">预估剩余时间<el-tooltip effect="light" content="当前时间可能存在误差，仅供参考" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></h4>
+                <h4 class="monitor-info-module-title">{{ t('dataSync.remainingTime') }}<el-tooltip effect="light" :content="t('dataSync.remainingTimeTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></h4>
                 <data-container :is-empty="remainingTime.remainTime === null">
                   <div class="monitor-info-module-box">
                     <p class="monitor-info-module-text">{{ remainingTime.remainTime }}<span class="monitor-info-module-unit">{{ remainingTime.timeUnit }}</span></p>

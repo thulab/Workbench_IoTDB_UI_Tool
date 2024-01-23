@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="报错详情"
+    :title="t('common.errorDetail')"
     v-model="dialogVisible"
     width="480px"
     align-center

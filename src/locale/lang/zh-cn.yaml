@@ -87,6 +87,9 @@ common:
   searchAllTipLimit100: 关键字搜索仅展示100条搜索结果，如有需要请精确搜索
   yes: 是
   no: 否
+  errorDetail: 错误详情
+  errorTip: 输入有误
+  errorEmptyTip: 存在必填项未编辑或必填项输入规则有误
 page:
   data: 数据
   alarm: 告警
@@ -288,5 +291,80 @@ dashboard:
   memoryUsage: 内存使用情况
   diskUsage: 磁盘使用情况
   diskIO: 磁盘 I/O 繁忙速率
+dataSync:
+  taskName: 任务名称
+  taskNamePlaceholder: 请输入任务名称
+  taskList: 任务列表
+  newTask: 新建任务
+  monitorDashboard: 状态监控
+  syncData: 同步数据
+  syncRange: 同步范围
+  address: 目标地址
+  status: 任务状态
+  createTime: 创建时间
+  stop: 停止
+  run: 启动
+  runTip: 当前没有需要启动的任务
+  stopTip: 当前没有需要启动的任务
+  runSuccess: 启动成功
+  stopSuccess: 停止成功
+  batchDelete: 确认删除这些任务吗？
+  singleDelete: 是否删除该任务？
+  taskDetail: 任务详情
+  taskNameContentPlaceholder: 请输入字母、数字、汉字、下划线，其他字符需用反引号进行整体修饰，例如：`数据同步-1`
+  dataExtraction: 数据抽取
+  syncMeasurement: 同步测点
+  syncMeasurementPlaceholder: 需用反引号修饰不合法字符或者是不合法路径节点，例如：root.`a{'@'}b`
+  all: 全局
+  prefix: 前缀路径
+  pathTip: 路径前缀不需要能够构成完整的路径，例如：输入'root.database'，则同步的数据范围为'root.database*.**' 注：root.__system不会被同步
+  pathPlaceholder: 请输入前缀路径
+  reforward: 二次转发
+  reforwardTip: 对其他同步任务发送到此数据库的数据进行转发，例如有A->B，B->C两个同步任务，若B->C选择二次转发，则A中的数据也会发送至C。需注意构建双活集群时请将此参数设置为“否”，否则将造成无休止数据循环。
+  historyData: 历史数据
+  historyDataTip: 创建任务前写入数据库的数据称为历史数据，请注意历史数据与实时数据不能同时为关闭状态！
+  datetimerange: 时间范围
+  realTime: 实时数据
+  realTimeTip: 创建任务后写入数据库的数据称为实时数据，请注意实时数据与历史数据不能同时为关闭状态！
+  triggerMode: 发送模式
+  triggerModeReal: 实时模式：该模式下，任务仅使用实时模式进行数据发送
+  triggerModeBatch: 批量模式：该模式下，任务仅使用批量模式进行数据发送
+  realMode: 实时模式
+  batchMode: 批量模式
+  dataSend: 数据发送
+  sendPlugin: 发送插件
+  sendPluginNamePlaceholder: 请输入发送插件名称
+  sendPluginParams: 插件参数
+  sendPluginParamsTip: 请输入插件参数，例如：'connector.send_alarm_url' = 'http://192.20.10.31:9091/api/alarm/addRecords'
+  targetInfo: 目标端信息
+  targetInfoTip: 请确保目标端已经创建了发送端的所有测点，或已开启自动创建元数据，否则将会导致失败！
+  targetInfoIp: 请输入目标端 IP
+  targetInfoHost: 请输入目标端端口号
+  logSendBatch: 攒批发送模式
+  waitTime: 等待时间
+  waitTimeTip: 一批数据在发送前的最长等待时间
+  waitTimePlaceholder: 请输入时间
+  batchSize: 攒批大小
+  batchSizeTip: 一批数据最大的攒批大小
+  batchSizePlaceholder: 请输入大小
+  targetUser: 目标端用户名
+  targetUserTip: 该用户需要支持数据写入的权限
+  targetUserPlaceholder: 请输入目标端用户名
+  targetPwd: 目标端密码
+  targetPwdPlaceholder: 请输入目标端密码
+  targetVersion: 目标端版本
+  targetVersionTip: 请输入V1.1.x以上版本
+  targetVersionPlaceholder: 请输入目标端版本
+  overTime: 超时时长
+  overTimeTip: 发送端与目标端在首次尝试建立连接时握手请求的超时时长
+  overTimePlaceholder: 请输入目标端超时时长
+  modeTip: 历史数据与实时数据状态不能同时为关，请修改后重新操作
+  processorPluginTip: 插件参数中不能包含 'processor'
+  connectorPluginTip: 插件参数中不能包含 'connector'
+  memory: 内存
+  p50: P50延迟
+  p99: P99延迟
+  remainingTime: 预估剩余时间
+  remainingTimeTip: 当前时间可能存在误差，仅供参考
 
 

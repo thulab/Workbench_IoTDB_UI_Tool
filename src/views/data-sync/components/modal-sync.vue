@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="editType === 'add' ? '新建任务' : '任务详情'"
+    :title="editType === 'add' ? t('dataSync.newTask') : t('dataSync.taskDetail')"
     v-model="dialogVisible"
     width="760px"
     align-center
@@ -14,49 +14,47 @@
       <el-scrollbar class="p-4" style="height: 470px;">
         <el-form ref="formRef" :model="formData" label-position="left" class="form-wrapper" :disabled="editType === 'view'">
           <label><input type="password" autocomplete="new-password" hidden></label>
-          <base-form-item label="任务名称:" prop="name" :rules="requiredNameRules" class="form-label-width" :error="errorName">
-            <el-input v-model="formData.name" placeholder="请输入字母、数字、汉字、下划线，其他字符需用反引号进行整体修饰，例如：`数据同步-1`" type="textarea" :rows="2" id="data-sync-modal-name" :resize="'none'" style="width: 360px;" maxlength="100" show-word-limit />
+          <base-form-item :label="`${t('dataSync.taskName')}:`" prop="name" :rules="requiredNameRules" class="form-label-width" :error="errorName">
+            <el-input v-model="formData.name" :placeholder="t('dataSync.taskNameContentPlaceholder')" type="textarea" :rows="2" id="data-sync-modal-name" :resize="'none'" style="width: 360px;" maxlength="100" show-word-limit />
           </base-form-item>
-          <h4 class="form-module-title">数据抽取</h4>
+          <h4 class="form-module-title">{{ t('dataSync.dataExtraction') }}</h4>
           <div class="flex-align-center">
-            <base-form-item label="同步测点:" prop="whole" :rules="requiredRules" class="form-label-width">
+            <base-form-item prop="whole" :rules="requiredRules" class="form-label-width">
               <template #label>
-                同步测点:<el-tooltip effect="light" content="需用反引号修饰不合法字符或者是不合法路径节点，例如：root.`a@b`" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                {{ t('dataSync.syncMeasurement') }}:<el-tooltip effect="light" :content="t('dataSync.syncMeasurementPlaceholder')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
               </template>
               <el-radio-group v-model="formData.whole" id="data-sync-modal-aync-type">
-                <el-radio :label="true">全局</el-radio>
-                <el-radio :label="false" class="radio-tip">前缀路径<el-tooltip
+                <el-radio :label="true">{{ t('dataSync.all') }}</el-radio>
+                <el-radio :label="false" class="radio-tip">{{ t('dataSync.prefix') }}<el-tooltip
                   effect="light"
-                  content="路径前缀不需要能够构成完整的路径，例如：输入'root.database'，则同步的数据范围为'root.database*.**'
-注：root.__system不会被同步"
+                  :content="t('dataSync.pathTip')"
                   placement="top"
                   popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip></el-radio>
               </el-radio-group>
             </base-form-item>
             <base-form-item v-if="!formData.whole" label="" prop="path" :rules="formData.whole ? [] : requiredRules" class="form-item-no-label m-l-24">
-              <el-input v-model="formData.path" placeholder="请输入前缀路径" style="width:335px;" id="data-sync-modal-path">
+              <el-input v-model="formData.path" :placeholder="t('dataSync.pathPlaceholder')" style="width:335px;" id="data-sync-modal-path">
                 <template #prepend>root.</template>
               </el-input>
             </base-form-item>
           </div>
-          <base-form-item label="二次转发:" prop="reforward" :rules="requiredRules" class="form-label-width">
+          <base-form-item prop="reforward" :rules="requiredRules" class="form-label-width">
             <template #label>
-              二次转发:<el-tooltip
+              {{ t('dataSync.reforward') }}:<el-tooltip
                 effect="light"
-                content="对其他同步任务发送到此数据库的数据进行转发，例如有A->B，B->C两个同步任务，若B->C选择二次转发，则A中的数据也会发送至C。
-需注意构建双活集群时请将此参数设置为“否”，否则将造成无休止数据循环。"
+                :content="t('dataSync.reforwardTip')"
                 placement="top"
                 popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
             </template>
             <el-radio-group v-model="formData.reforward" id="data-sync-modal-reforward">
-              <el-radio :label="true">是</el-radio>
-              <el-radio :label="false">否</el-radio>
+              <el-radio :label="true">{{ t('common.yes') }}</el-radio>
+              <el-radio :label="false">{{ t('common.no') }}</el-radio>
             </el-radio-group>
           </base-form-item>
           <div class="flex-align-center">
-            <base-form-item label="历史数据:" prop="isSynchronHistory" :rules="requiredRules" class="form-label-width">
+            <base-form-item prop="isSynchronHistory" :rules="requiredRules" class="form-label-width">
               <template #label>
-                历史数据:<el-tooltip effect="light" content="创建任务前写入数据库的数据称为历史数据，请注意历史数据与实时数据不能同时为关闭状态！" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                {{ t('dataSync.historyData') }}:<el-tooltip effect="light" :content="t('dataSync.historyDataTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
               </template>
               <el-switch
                 v-model="formData.isSynchronHistory"
@@ -68,7 +66,7 @@
                 id="data-sync-modal-history-switch"
               />
             </base-form-item>
-            <base-form-item v-if="formData.isSynchronHistory" label="时间范围：" prop="datetimerange" :rules="requiredRules" class="m-l-24">
+            <base-form-item v-if="formData.isSynchronHistory" :label="`${t('dataSync.datetimerange')}：`" prop="datetimerange" :rules="requiredRules" class="m-l-24">
               <el-date-picker
                 v-model="formData.datetimerange"
                 type="datetimerange"
@@ -83,9 +81,9 @@
             </base-form-item>
           </div>
           <div class="flex-align-center">
-            <base-form-item label="实时数据:" prop="isSynchronRealTime" :rules="requiredRules" class="form-label-width">
+            <base-form-item prop="isSynchronRealTime" :rules="requiredRules" class="form-label-width">
               <template #label>
-                实时数据:<el-tooltip effect="light" content="创建任务后写入数据库的数据称为实时数据，请注意实时数据与历史数据不能同时为关闭状态！" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                {{ t('dataSync.realTime') }}:<el-tooltip effect="light" :content="t('dataSync.realTimeTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
               </template>
               <el-switch
                 v-model="formData.isSynchronRealTime"
@@ -98,17 +96,17 @@
                 @change="val => handleChangeRunningSwitch(val as boolean)"
               />
             </base-form-item>
-            <base-form-item v-if="formData.isSynchronRealTime" label="发送模式：" prop="triggerMode" :rules="requiredRules" class="form-item-label-short m-l-24">
+            <base-form-item v-if="formData.isSynchronRealTime" prop="triggerMode" :rules="requiredRules" class="form-item-label-short m-l-24">
               <template #label>
-                发送模式:<el-tooltip
+                {{ t('dataSync.triggerMode') }}:<el-tooltip
                   effect="light"
                   placement="top"
                   popper-class="table-tooltip-max-width">
-                  <template #content>实时模式：该模式下，任务仅使用实时模式进行数据发送<br>批量模式：该模式下，任务仅使用批量模式进行数据发送</template><i-custom-question /></el-tooltip>
+                  <template #content>{{ t('dataSync.triggerModeReal') }}<br>{{ t('dataSync.triggerModeBatch') }}</template><i-custom-question /></el-tooltip>
               </template>
               <el-radio-group v-model="formData.triggerMode" @change="val => handleChangeTriggerMode(val as string as 'stream' | 'batch')" id="data-sync-modal-triggerMode">
-                <el-radio :label="'stream'">实时模式</el-radio>
-                <el-radio :label="'batch'">批量模式</el-radio>
+                <el-radio :label="'stream'">{{ t('dataSync.realMode') }}</el-radio>
+                <el-radio :label="'batch'">{{ t('dataSync.batchMode') }}</el-radio>
               </el-radio-group>
             </base-form-item>
           </div>
@@ -129,11 +127,12 @@
                 </base-form-item>
               </div>
               <base-form-item v-if="formData.processorPluginType === 'custom'" label="插件参数：" prop="processorPluginParam" class="form-label-width">
-                <el-input v-model="formData.processorPluginParam" type="textarea" placeholder="请输入插件参数，例如:'processor.alarm_id' = '582'" style="width:360px;" :resize="'none'" :rows="4" id="data-sync-modal-deal-params" />
+                <el-input v-model="formData.processorPluginParam" type="textarea" placeholder="请输入插件参数，例如:'processor.alarm_id' = '582'"
+                style="width:360px;" :resize="'none'" :rows="4" id="data-sync-modal-deal-params" />
               </base-form-item> -->
-          <h4 class="form-module-title">数据发送</h4>
+          <h4 class="form-module-title">{{ t('dataSync.dataSend') }}</h4>
           <div class="flex-align-center">
-            <base-form-item label="发送插件：" prop="connectorPluginType" :rules="requiredRules" class="form-label-width">
+            <base-form-item :label="`${t('dataSync.sendPlugin')}：`" prop="connectorPluginType" :rules="requiredRules" class="form-label-width">
               <el-select v-model="formData.connectorPluginType" :style="{ width: formData.connectorPluginType === 'custom' ? '152px' : '360px' }" id="data-sync-modal-select-send">
                 <el-option
                   v-for="(item, i) in sendOptions"
@@ -145,15 +144,14 @@
               </el-select>
             </base-form-item>
             <base-form-item v-if="formData.connectorPluginType === 'custom'" label="" prop="connectorPluginName" :rules="requiredRules" class="form-item-no-label m-l-8">
-              <el-input v-model="formData.connectorPluginName" placeholder="请输入发送插件名称" style="width:200px;" id="data-sync-modal-send-name" />
+              <el-input v-model="formData.connectorPluginName" :placeholder="t('dataSync.sendPluginNamePlaceholder')" style="width:200px;" id="data-sync-modal-send-name" />
             </base-form-item>
           </div>
-          <base-form-item v-if="formData.connectorPluginType === 'custom'" label="插件参数：" prop="connectorPluginParam" class="form-label-width">
+          <base-form-item v-if="formData.connectorPluginType === 'custom'" :label="`${t('dataSync.sendPluginParams')}：`" prop="connectorPluginParam" class="form-label-width">
             <el-input
               v-model="formData.connectorPluginParam"
               type="textarea"
-              placeholder="请输入插件参数，例如：
- 'connector.send_alarm_url' = 'http://192.20.10.31:9091/api/alarm/addRecords'"
+              :placeholder="t('dataSync.sendPluginParamsTip')"
               style="width:360px;"
               :resize="'none'"
               :rows="4"
@@ -161,15 +159,15 @@
           </base-form-item>
           <template v-if="formData.connectorPluginType !== 'custom' && formData.connectorPluginType !== 'do-nothing-connector'">
             <div class="ip-port-box">
-              <span class="form-label">目标端信息：<el-tooltip effect="light" content="请确保目标端已经创建了发送端的所有测点，或已开启自动创建元数据，否则将会导致失败！" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip></span>
+              <span class="form-label">{{ t('dataSync.targetInfo') }}：<el-tooltip effect="light" :content="t('dataSync.targetInfoTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip></span>
               <div class="ip-port-list">
                 <div class="ip-port-item" v-for="(item, index) in formData.targetInfos" :key="`${index}_host_port`">
                   <base-form-item label="" :prop="`targetInfos[${index}].host`" :rules="requiredRules">
-                    <el-input v-model.trim="item.host" placeholder="请输入目标端 IP" style="width: 200px" :id="`data-sync-modal-${index}-host`" />
+                    <el-input v-model.trim="item.host" :placeholder="t('dataSync.targetInfoIp')" style="width: 200px" :id="`data-sync-modal-${index}-host`" />
                   </base-form-item>
                   <span class="ip-port-divider">:</span>
                   <base-form-item label="" :prop="`targetInfos[${index}].port`" :rules="requiredPortRules">
-                    <el-input v-model.number="item.port" placeholder="请输入目标端端口号" style="width: 132px" :id="`data-sync-modal-${index}-port`" />
+                    <el-input v-model.number="item.port" :placeholder="t('dataSync.targetInfoHost')" style="width: 132px" :id="`data-sync-modal-${index}-port`" />
                   </base-form-item>
                   <el-button link v-if="index === 0 && editType !== 'view'" @click="handleAddHost" id="target-ip-add" class="m-l-6" :disabled="isDisabledHosts"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
                   <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost(index)" :id="`target-ip-del${index}`" class="m-l-6"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
@@ -178,7 +176,7 @@
             </div>
             <!-- 单线程数据传输/多线程数据传输 -->
             <div class="flex-align-center" v-if="formData.connectorPluginType === 'iotdb-thrift-sync-connector' || formData.connectorPluginType === 'iotdb-thrift-async-connector' || formData.connectorPluginType === 'iotdb-thrift-connector' || formData.connectorPluginType === 'iotdb-thrift-connector'">
-              <base-form-item label="攒批发送模式:" prop="isLogSendBatch" :rules="requiredRules" class="form-label-width">
+              <base-form-item :label="`${t('dataSync.logSendBatch')}:`" prop="isLogSendBatch" :rules="requiredRules" class="form-label-width">
                 <el-switch
                   v-model="formData.isLogSendBatch"
                   :disabled="logSendBatchDisabled"
@@ -192,20 +190,20 @@
               </base-form-item>
               <template v-if="formData.isLogSendBatch">
                 <div class="flex-align-center m-l-36">
-                  <base-form-item label="等待时间：" prop="logSendBatchWaitTime" :rules="requiredNumberRules" class="form-item-label-short">
+                  <base-form-item prop="logSendBatchWaitTime" :rules="requiredNumberRules" class="form-item-label-short">
                     <template #label>
-                      等待时间:<el-tooltip effect="light" content="一批数据在发送前的最长等待时间" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                      {{ t('dataSync.waitTime') }}:<el-tooltip effect="light" :content="t('dataSync.waitTimeTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                     </template>
-                    <el-input v-model.number="formData.logSendBatchWaitTime" placeholder="请输入时间" id="data-sync-modal-time" style="width: 100px;" />
+                    <el-input v-model.number="formData.logSendBatchWaitTime" :placeholder="t('dataSync.waitTimePlaceholder')" id="data-sync-modal-time" style="width: 100px;" />
                     <span class="m-l-8 form-item-unit">s</span>
                   </base-form-item>
                 </div>
                 <div class="flex-align-center m-l-24">
-                  <base-form-item label="攒批大小：" prop="logSendBatchSize" :rules="requiredNumberRules" class="form-item-label-short">
+                  <base-form-item prop="logSendBatchSize" :rules="requiredNumberRules" class="form-item-label-short">
                     <template #label>
-                      攒批大小:<el-tooltip effect="light" content="一批数据最大的攒批大小" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                      {{ t('dataSync.batchSize') }}:<el-tooltip effect="light" :content="t('dataSync.batchSizeTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                     </template>
-                    <el-input v-model.number="formData.logSendBatchSize" placeholder="请输入大小" id="data-sync-modal-size" style="width: 100px;" />
+                    <el-input v-model.number="formData.logSendBatchSize" :placeholder="t('dataSync.batchSizePlaceholder')" id="data-sync-modal-size" style="width: 100px;" />
                     <span class="m-l-8 form-item-unit">byte</span>
                   </base-form-item>
                 </div>
@@ -213,29 +211,29 @@
             </div>
             <!-- 向1.1.x以上版本传输 -->
             <template v-if="formData.connectorPluginType === 'iotdb-legacy-pipe-connector'">
-              <base-form-item label="目标端用户名:" prop="targetUserName" :rules="requiredRules" class="form-label-width">
+              <base-form-item prop="targetUserName" :rules="requiredRules" class="form-label-width">
                 <template #label>
-                  目标端用户名:<el-tooltip effect="light" content="该用户需要支持数据写入的权限" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                  {{ t('dataSync.targetUser') }}:<el-tooltip effect="light" :content="t('dataSync.targetUserTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                 </template>
-                <el-input v-model="formData.targetUserName" placeholder="请输入目标端用户名" id="data-sync-modal-targetUserName" style="width: 200px;" />
+                <el-input v-model="formData.targetUserName" :placeholder="t('dataSync.targetUserPlaceholder')" id="data-sync-modal-targetUserName" style="width: 200px;" />
               </base-form-item>
-              <base-form-item label="目标端密码:" prop="targetPassword" :rules="requiredRules" class="form-label-width">
-                <el-input v-model="formData.targetPassword" placeholder="请输入目标端密码" id="data-sync-modal-password" style="width: 200px;" show-password autocomplete="off" />
+              <base-form-item :label="`${t('dataSync.targetPwd')}:`" prop="targetPassword" :rules="requiredRules" class="form-label-width">
+                <el-input v-model="formData.targetPassword" :placeholder="t('dataSync.targetPwdPlaceholder')" id="data-sync-modal-password" style="width: 200px;" show-password autocomplete="off" />
               </base-form-item>
-              <base-form-item label="目标端版本:" prop="targetVersion" :rules="requiredRules" class="form-label-width">
+              <base-form-item prop="targetVersion" :rules="requiredRules" class="form-label-width">
                 <template #label>
-                  目标端版本:<el-tooltip effect="light" content="请输入V1.1.x以上版本" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                  {{ t('dataSync.targetVersion') }}:<el-tooltip effect="light" :content="t('dataSync.targetVersionTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                 </template>
-                <el-input v-model="formData.targetVersion" placeholder="请输入目标端版本" id="data-sync-modal-targetVersion" style="width: 200px;" />
+                <el-input v-model="formData.targetVersion" :placeholder="t('dataSync.targetVersionPlaceholder')" id="data-sync-modal-targetVersion" style="width: 200px;" />
               </base-form-item>
             </template>
             <!-- 跨网闸传输 -->
             <div class="flex-align-center" v-if="formData.connectorPluginType === 'iotdb-air-gap-connector'">
-              <base-form-item label="超时时长：" prop="targetOverTime" :rules="requiredNumberRules" class="form-label-width">
+              <base-form-item prop="targetOverTime" :rules="requiredNumberRules" class="form-label-width">
                 <template #label>
-                  超时时长:<el-tooltip effect="light" content="发送端与目标端在首次尝试建立连接时握手请求的超时时长" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                  {{ t('dataSync.overTime') }}:<el-tooltip effect="light" :content="t('dataSync.overTimeTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                 </template>
-                <el-input v-model.number="formData.targetOverTime" placeholder="请输入目标端超时时长" id="data-sync-modal-time-over" style="width: 200px;" />
+                <el-input v-model.number="formData.targetOverTime" :placeholder="t('dataSync.overTimePlaceholder')" id="data-sync-modal-time-over" style="width: 200px;" />
                 <span class="m-l-8 form-item-unit">ms</span>
               </base-form-item>
             </div>
@@ -260,7 +258,7 @@
           </el-scrollbar>
         </el-tab-pane> -->
       <!-- </el-tabs> -->
-      <a v-show="activeTab === 'input'" href="https://www.timecho.com/docs/zh/UserGuide/V1.2.x/User-Manual/Data-Sync_timecho.html" rel="noopener noreferrer" target="_blank" class="operate-link"><i-custom-question-new />操作说明</a>
+      <a v-show="activeTab === 'input'" href="https://www.timecho.com/docs/zh/UserGuide/V1.2.x/User-Manual/Data-Sync_timecho.html" rel="noopener noreferrer" target="_blank" class="operate-link"><i-custom-question-new />{{ t('search.operatingInstructions') }}</a>
     </div>
     <template #footer>
       <div class="dialog-footer" v-if="editType !== 'view'">
@@ -329,10 +327,10 @@ const requiredPortRules = ref([
   {
     validator: (rule: any, value: any, callback: any) => {
       if (!/^\+?[1-9][0-9]*$/.test(`${value}`)) {
-        return callback(new Error('输入有误'));
+        return callback(new Error(t('common.errorTip')));
       }
       if (value > 65535) {
-        return callback(new Error('输入有误'));
+        return callback(new Error(t('common.errorTip')));
       }
       return callback();
     },
@@ -348,13 +346,13 @@ const requiredNumberRules = ref([
   {
     validator: (rule: any, value: any, callback: any) => {
       if (value.toString().indexOf('.') > -1) {
-        return callback(new Error('输入有误'));
+        return callback(new Error(t('common.errorTip')));
       }
       if (!/^-?\d+$/.test(`${value}`)) {
-        return callback(new Error('输入有误'));
+        return callback(new Error(t('common.errorTip')));
       }
       if (value > Number.MAX_SAFE_INTEGER || value < Number.MIN_SAFE_INTEGER) {
-        return callback(new Error('输入有误'));
+        return callback(new Error(t('common.errorTip')));
       }
       return callback();
     },
@@ -363,15 +361,15 @@ const requiredNumberRules = ref([
 ]);
 const shortcutsDaterange = [
   {
-    text: '今天',
+    text: t('common.today'),
     value: () => getStartAndEnd(0),
   },
   {
-    text: '昨天',
+    text: t('common.yesterday'),
     value: () => getOneInterval(1),
   },
   {
-    text: '最近7天',
+    text: t('common.7dayRecend'),
     value: () => getOneIntervalNow(7),
   },
 ];
@@ -491,6 +489,7 @@ function handleResetForm() {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleTabClick(tab: TabsPaneContext) {
   if (tab.props.name === 'select') {
     errorName.value = '';
@@ -547,15 +546,15 @@ const handleConfirm = () => {
     formRef.value?.validate((valid) => {
       if (valid) {
         if (!formData.value.isSynchronHistory && !formData.value.isSynchronRealTime) {
-          ElMessage.error('历史数据与实时数据状态不能同时为关，请修改后重新操作');
+          ElMessage.error(t('dataSync.modeTip'));
           return;
         }
         if (formData.value.processorPluginType === 'custom' && formData.value.processorPluginParam.toLocaleLowerCase().includes("'processor'")) {
-          ElMessage.error("插件参数中不能包含 'processor'");
+          ElMessage.error(t('dataSync.processorPluginTip'));
           return;
         }
         if (formData.value.connectorPluginType === 'custom' && formData.value.connectorPluginParam.toLocaleLowerCase().includes("'connector'")) {
-          ElMessage.error("插件参数中不能包含 'connector'");
+          ElMessage.error(t('dataSync.connectorPluginTip'));
           return;
         }
         saveLoading.value = true;
@@ -585,7 +584,7 @@ const handleConfirm = () => {
           targetOverTime: formData.value.connectorPluginType === 'iotdb-air-gap-connector' ? formData.value.targetOverTime : '',
         };
         saveSynchronTask(params).then(() => {
-          ElMessage.success('创建成功');
+          ElMessage.success(t('common.createSuccess'));
           dialogVisible.value = false;
           emit('handleSave');
         }).finally(() => {
@@ -596,7 +595,7 @@ const handleConfirm = () => {
           }
         });
       } else {
-        ElMessage.error('存在必填项未编辑或必填项输入规则有误');
+        ElMessage.error(t('common.errorEmptyTip'));
       }
     });
   } else {
@@ -605,7 +604,7 @@ const handleConfirm = () => {
       return;
     }
     saveAdvancedTask(taskInputVal.value).then(() => {
-      ElMessage.success('创建成功');
+      ElMessage.success(t('common.createSuccess'));
       dialogVisible.value = false;
       emit('handleSave');
     }).finally(() => {

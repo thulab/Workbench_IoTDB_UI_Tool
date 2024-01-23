@@ -4,8 +4,8 @@
       <el-header class="p-x-0" style="height: auto;">
         <div class="search-form-wrapper">
           <el-form :model="searchFormData" label-position="left" size="default" inline @submit.prevent>
-            <base-form-item label="任务名称：" prop="name">
-              <el-input v-model="searchFormData.name" placeholder="请输入任务名称" id="data-sync-search-name">
+            <base-form-item :label="`${t('dataSync.taskName')}：`" prop="name">
+              <el-input v-model="searchFormData.name" :placeholder="t('dataSync.taskNamePlaceholder')" id="data-sync-search-name">
                 <template #prefix>
                   <i-custom-search-icon class="remote-select-search-icon" />
                 </template>
@@ -25,10 +25,10 @@
       <el-main class="p-0">
         <div class="page-table-details">
           <div class="page-table-title-box">
-            <h4 class="page-table-title">任务列表</h4>
+            <h4 class="page-table-title">{{ t('dataSync.taskList') }}</h4>
             <div class="operate-buttons">
               <auth-tooltip :is-disabled="canUsePipe">
-                <el-button type="primary" @click="handleAdd" :disabled="!canUsePipe" id="data-sync-add">新建任务</el-button>
+                <el-button type="primary" @click="handleAdd" :disabled="!canUsePipe" id="data-sync-add">{{ t('dataSync.newTask') }}</el-button>
               </auth-tooltip>
               <auth-tooltip :is-disabled="canUsePipe">
                 <el-dropdown :disabled="!multipleSelection.length || !canUsePipe" @command="val => handleCommandDown(val)" class="m-x-16" id="data-sync-batch-dropdown">
@@ -52,7 +52,7 @@
                 :disabled="showPrometheus"
                 popper-class="tooltip-box-width"
               >
-                <el-button type="primary" @click="handleMonitor" :disabled="!showPrometheus" id="data-sync-add">状态监控</el-button>
+                <el-button type="primary" @click="handleMonitor" :disabled="!showPrometheus" id="data-sync-add">{{ t('dataSync.monitorDashboard') }}</el-button>
               </el-tooltip>
               <auth-tooltip :is-disabled="canUsePipe">
                 <el-button link @click="handleSearch" :disabled="!canUsePipe" id="data-sync-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
@@ -73,11 +73,11 @@
                 @selection-change="handleSelectionChange"
               >
                 <el-table-column type="selection" width="55" />
-                <el-table-column label="任务名称" prop="name" min-width="180" align="center" show-overflow-tooltip />
-                <el-table-column label="同步数据" prop="measurement" min-width="160" align="center" show-overflow-tooltip />
-                <el-table-column label="同步范围" prop="range" min-width="120" align="center" show-overflow-tooltip />
-                <el-table-column label="目标地址" prop="targetAddress" min-width="160" align="center" show-overflow-tooltip />
-                <el-table-column label="任务状态" prop="state" width="160" align="center" show-overflow-tooltip>
+                <el-table-column :label="t('dataSync.taskName')" prop="name" min-width="180" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('dataSync.syncData')" prop="measurement" min-width="160" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('dataSync.syncRange')" prop="range" min-width="120" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('dataSync.address')" prop="targetAddress" min-width="160" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('dataSync.status')" prop="state" width="160" align="center" show-overflow-tooltip>
                   <template #default="{ row }">
                     <div class="flex-center">
                       <el-icon v-if="row.state === 'stopped'" size="16" class="m-t-4"><i-custom-sync-stopped /></el-icon>
@@ -86,7 +86,7 @@
                         placement="top-start"
                         effect="light"
                         trigger="hover"
-                        content="错误详情"
+                        :content="t('common.errorDetail')"
                         :disabled="!row.exceptionMessage"
                         popper-class="tooltip-box-width"
                       >
@@ -95,12 +95,12 @@
                     </div>
                   </template>
                 </el-table-column>
-                <el-table-column label="创建时间" prop="creationTime" min-width="200" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('dataSync.createTime')" prop="creationTime" min-width="200" align="center" show-overflow-tooltip />
                 <el-table-column :label="t('common.operation')" width="180" align="center" fixed="right">
                   <template #default="{ row }">
                     <div>
                       <el-button type="primary" link size="small" @click="handleEdit(row)" :id="`data-sync-table-${row.name}-view`">{{ t('common.detail') }}</el-button>
-                      <el-button type="primary" link size="small" @click="handleStatus('row', row, row.state === 'running' ? 'stopped' : 'running')" :id="`data-sync-table-${row.name}-state`">{{row.state === 'running' ? '停止' : '启动'}}</el-button>
+                      <el-button type="primary" link size="small" @click="handleStatus('row', row, row.state === 'running' ? 'stopped' : 'running')" :id="`data-sync-table-${row.name}-state`">{{row.state === 'running' ? t('dataSync.stop') : t('dataSync.run')}}</el-button>
                       <el-button type="primary" link size="small" @click="handleDel('row', row)" :id="`data-sync-table-${row.name}-del`">{{ t('common.delete') }}</el-button>
                     </div>
                   </template>
@@ -258,24 +258,24 @@ function handleStatus(type: string, data: DataSync.SynchronListData | null, stat
     statusData = [];
   }
   if (!statusData.length) {
-    ElMessage.warning(state === 'running' ? '当前没有需要启动的任务' : '当前没有需要停止的任务');
+    ElMessage.warning(state === 'running' ? t('dataSync.runTip') : t('dataSync.stopTip'));
     return;
   }
   if (state === 'running') {
     startTaskByNames(statusData).then(() => {
-      ElMessage.success('启动成功');
+      ElMessage.success(t('dataSync.runSuccess'));
       handleSearch();
     });
   } else {
     stopTaskByNames(statusData).then(() => {
-      ElMessage.success('停止成功');
+      ElMessage.success(t('dataSync.stopSuccess'));
       handleSearch();
     });
   }
 }
 
 function handleDel(type: string, data: DataSync.SynchronListData | null) {
-  ElMessageBox.confirm(type === 'batch' ? '确认删除这些任务吗？' : '是否删除该任务？', t('common.notice'), {
+  ElMessageBox.confirm(type === 'batch' ? t('dataSync.batchDelete') : t('dataSync.singleDelete'), t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'del-data-sync-confirm',
