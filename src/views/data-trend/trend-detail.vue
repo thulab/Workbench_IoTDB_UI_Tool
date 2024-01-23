@@ -4,10 +4,10 @@
       <div class="search-form-wrapper">
         <el-form :model="searchFormData" ref="searchFormRef" label-position="left" label-width="88px" size="default" inline class="m-b-22">
           <ul class="search-data-list">
-            <li :class="['search-data-type', { 'search-data-active': dataTab === 'running' }]" id="search-data-type-running" @click="handleTrendTab('running')">实时趋势</li>
-            <li :class="['search-data-type', { 'search-data-active': dataTab === 'history' }]" id="search-data-type-history" @click="handleTrendTab('history')">历史趋势</li>
+            <li :class="['search-data-type', { 'search-data-active': dataTab === 'running' }]" id="search-data-type-running" @click="handleTrendTab('running')">{{ t('dataTrend.realTrend') }}</li>
+            <li :class="['search-data-type', { 'search-data-active': dataTab === 'history' }]" id="search-data-type-history" @click="handleTrendTab('history')">{{ t('dataTrend.historyTrend') }}</li>
           </ul>
-          <base-form-item v-show="!isRunningTab" label="时间范围：" prop="datetimerange" :rules="requiredRules">
+          <base-form-item v-show="!isRunningTab" :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules">
             <el-date-picker
               v-model="searchFormData.datetimerange"
               type="datetimerange"
@@ -21,12 +21,12 @@
               id="trend-search-datetimerange"
             />
           </base-form-item>
-          <base-form-item v-show="!isRunningTab" label="采样周期：" prop="unitInterval" :rules="requiredRules">
+          <base-form-item v-show="!isRunningTab" :label="`${t('search.timeInterval')}：`" prop="unitInterval" :rules="requiredRules">
             <el-select v-model="searchFormData.unitInterval" :disabled="isRunningTab" style="width: 80px;" id="trend-search-unitInterval">
               <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" :id="`trend-search-unitInterval-select-${item.value}`" />
             </el-select>
           </base-form-item>
-          <base-form-item v-show="!isRunningTab" label="采样策略：" prop="aggregation" :rules="requiredRules" class="m-r-0">
+          <base-form-item v-show="!isRunningTab" :label="`${t('search.aggregation')}：`" prop="aggregation" :rules="requiredRules" class="m-r-0">
             <el-select v-model="searchFormData.aggregation" :disabled="isRunningTab || searchFormData.unitInterval === 'origin'" style="width: 80px;" @change="handleChangeAggregation" id="trend-search-aggregation">
               <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" :id="`trend-search-aggregation-select-${item.value}`" />
             </el-select>
@@ -53,15 +53,15 @@
             placement="top-start"
             effect="light"
             trigger="hover"
-            :content="canReadWriteSchemaData ? '请先添加测点并选中' : '暂无权限'"
+            :content="canReadWriteSchemaData ? t('dataTrend.measurementEmptyTip') : t('common.noAuth')"
             :disabled="canReadWriteSchemaData ? searchAbled : false"
             popper-class="tooltip-box-width"
           >
-            <el-button :class="[(!searchAbled || !canReadWriteSchemaData) ? 'hover-btn-disabled' : '']" type="primary" @click="handleSearch" id="trend-search-search">应用</el-button>
+            <el-button :class="[(!searchAbled || !canReadWriteSchemaData) ? 'hover-btn-disabled' : '']" type="primary" @click="handleSearch" id="trend-search-search">{{ t('common.apply') }}</el-button>
           </el-tooltip>
         </div>
       </div>
-      <p class="trend-tip" :style="{ visibility: !isRunningTab ? 'visible' : 'hidden' }"><el-icon size="16" style="margin-right: 6px;"><i-custom-info-warning /></el-icon>最大绘制<span style="font-weight: 700; color: #495AD4; margin: 0 4px;">2000</span>个点，超出后系统将自动调整</p>
+      <p class="trend-tip" :style="{ visibility: !isRunningTab ? 'visible' : 'hidden' }"><el-icon size="16" style="margin-right: 6px;"><i-custom-info-warning /></el-icon><span v-html="t('dataTrend.trendTip', { tip })"></span></p>
     </el-header>
     <el-main class="p-0">
       <el-container class="chart-detail-wrapper">
@@ -118,7 +118,7 @@ const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
 const isExpand = ref(true);
 const searchFormRef = ref<FormInstance>();
-
+const tip = ref('<span style="font-weight: 700; color: #495AD4; margin: 0 4px;">2000</span>');
 const minDataTime = ref(-1);
 const searchFormData = reactive({
   datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
@@ -127,22 +127,22 @@ const searchFormData = reactive({
 });
 const shortcutsDaterange = [
   {
-    text: '今天',
+    text: t('common.today'),
     value: () => getStartAndEnd(0),
   },
   {
-    text: '昨天',
+    text: t('common.yesterday'),
     value: () => getOneInterval(1),
   },
   {
-    text: '最近7天',
+    text: t('common.7dayRecend'),
     value: () => getOneIntervalNow(7),
   },
 ];
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 const timeUnits = [
-  { label: '自动', value: 'auto', timestamp: 1000 },
-  { label: '原始值', value: 'origin', timestamp: 1000 },
+  { label: t('common.auto'), value: 'auto', timestamp: 1000 },
+  { label: t('common.origin'), value: 'origin', timestamp: 1000 },
   { label: '1s', value: '1s', timestamp: 1000 },
   { label: '1min', value: '1m', timestamp: 60000 },
   { label: '5min', value: '5m', timestamp: 300000 },
@@ -155,10 +155,10 @@ const timeUnits = [
   { label: '1m', value: '1mo', timestamp: 2592000000 },
 ];
 const aggregateFunctions = [
-  { label: '最新值', value: 'last_value' },
-  { label: '最大值', value: 'max_value' },
-  { label: '最小值', value: 'min_value' },
-  { label: '平均值', value: 'avg' },
+  { label: t('common.lastValue'), value: 'last_value' },
+  { label: t('common.maxValue'), value: 'max_value' },
+  { label: t('common.minValue'), value: 'min_value' },
+  { label: t('common.avg'), value: 'avg' },
 ];
 const requiredRules = ref([
   {
@@ -327,7 +327,7 @@ function handleSearch() {
     const timeinterval = timeUnits.find((time) => time.value === searchFormData.unitInterval)?.timestamp;
     const point = timeinterval ? Math.ceil(timerange / timeinterval) : 0;
     if (point > 2000) {
-      ElMessage.warning('超过最大画图点数，已为您自动调整后展示');
+      ElMessage.warning(t('dataTrend.overTip'));
       searchFormData.unitInterval = 'auto';
     }
   }
@@ -345,7 +345,7 @@ function handleSearch() {
     const currentAll = pathList.value.filter((f) => f.disabled).map((item) => item.path);
     const differents = difference(abnormals, currentAll);
     if (differents.length) {
-      ElMessage.warning('boolean类型仅支持最新值计算，请修改采样策略后查看趋势');
+      ElMessage.warning(t('dataTrend.booleanTip'));
     }
     pathList.value.forEach((item) => {
       if (res.data.abnormal.includes(item.path)) {
@@ -358,7 +358,7 @@ function handleSearch() {
     const overPath = res.data?.changeAuto || [];
     if (overPath.length) {
       const paths = overPath.join(',');
-      ElMessage.warning(`${paths}测点超过最大画图点数，已为您自动调整后展示`);
+      ElMessage.warning(t('dataTrend.measurementTip', { measurement: paths }));
     }
     setOption(chartOptions.value, true);
     setOption({

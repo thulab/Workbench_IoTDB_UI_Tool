@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="添加测点"
+    :title="t('measurement.addMeasurement')"
     v-model="dialogVisible"
     width="480px"
     align-center
@@ -8,13 +8,13 @@
     id="trend-modal-path"
   >
     <el-form ref="formRef" :model="formData">
-      <base-form-item label="测点名称：" prop="path" :rules="requiredRules">
+      <base-form-item prop="path" :rules="requiredRules">
         <template #label>
-          测点名称：<el-tooltip effect="light" :content="t('common.searchAllTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+          {{t('measurement.measurementName')}}：<el-tooltip effect="light" :content="t('common.searchAllTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
         </template>
         <el-select
           v-model="formData.path"
-          placeholder="请选择测点"
+          :placeholder="t('measurement.measurementNameSelectPlaceholder')"
           filterable
           remote
           :remote-show-suffix="false"
@@ -33,10 +33,10 @@
         </el-select>
       </base-form-item>
       <div class="chart-detail-box">
-        <base-form-item label="颜色：" prop="color" :rules="requiredRules">
+        <base-form-item :label="`${t('common.color')}：`" prop="color" :rules="requiredRules">
           <el-color-picker v-model="formData.color" color-format="hex" :predefine="predefineColors" id="trend-modal-color" />
         </base-form-item>
-        <base-form-item class="chart-width-box" label="线宽：" prop="width" :rules="requiredNumberRules">
+        <base-form-item class="chart-width-box" :label="`${t('common.lineWidth')}：`" prop="width" :rules="requiredNumberRules">
           <el-input-number v-model.number="formData.width" :min="1" :max="10" step-strictly controls-position="right" style="width: 40px;" id="trend-modal-input" />
         </base-form-item>
       </div>
@@ -88,10 +88,10 @@ const checkNumber = (rule: any, value: any, callback: any) => {
     return callback();
   }
   if (!/^[1-9]\d*$/.test(`${value}`)) {
-    return callback(new Error('只支持输入1-10范围内的正整数'));
+    return callback(new Error(t('dataTrend.number10Tip')));
   }
   if (value < 1 || value > 10) {
-    return callback(new Error('只支持输入1-10范围内的正整数'));
+    return callback(new Error(t('dataTrend.number10Tip')));
   }
   return callback();
 };

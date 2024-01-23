@@ -36,6 +36,7 @@ common:
   startTime: 开始时间
   endTime: 结束时间
   all: 全部
+  allChoose: 全选
   success: 成功
   fail: 失败
   error: 错误
@@ -90,6 +91,13 @@ common:
   errorDetail: 错误详情
   errorTip: 输入有误
   errorEmptyTip: 存在必填项未编辑或必填项输入规则有误
+  datetimerange: 时间范围
+  noAuth: 暂无权限
+  apply: 应用
+  auto: 自动
+  origin: 原始值
+  color: 颜色
+  lineWidth: 线宽
 page:
   data: 数据
   alarm: 告警
@@ -115,6 +123,7 @@ measurement:
   measurement: 测点
   measurementName: 测点名称
   measurementNamePlaceholder: 请输入测点名称
+  measurementNameSelectPlaceholder: 请选择测点
   alias: 别名
   aliasTip: 仅支持输入字母大小写、数字、下划线、UNICODE 中文字符，除“!{'@'}#$%^&*()_+-=”外的特殊字符以及实数需要用反引号进行引用
   aliasPlaceholder: 请输入别名
@@ -323,7 +332,6 @@ dataSync:
   reforwardTip: 对其他同步任务发送到此数据库的数据进行转发，例如有A->B，B->C两个同步任务，若B->C选择二次转发，则A中的数据也会发送至C。需注意构建双活集群时请将此参数设置为“否”，否则将造成无休止数据循环。
   historyData: 历史数据
   historyDataTip: 创建任务前写入数据库的数据称为历史数据，请注意历史数据与实时数据不能同时为关闭状态！
-  datetimerange: 时间范围
   realTime: 实时数据
   realTimeTip: 创建任务后写入数据库的数据称为实时数据，请注意实时数据与历史数据不能同时为关闭状态！
   triggerMode: 发送模式
@@ -366,5 +374,16 @@ dataSync:
   p99: P99延迟
   remainingTime: 预估剩余时间
   remainingTimeTip: 当前时间可能存在误差，仅供参考
+dataTrend:
+  realTrend: 实时趋势
+  historyTrend: 历史趋势
+  measurementEmptyTip: 请先添加测点并选中
+  trendTip: 最大绘制%{tip}个点，超出后系统将自动调整
+  overTip: 超过最大画图点数，已为您自动调整后展示
+  booleanTip: boolean类型仅支持最新值计算，请修改采样策略后查看趋势
+  measurementTip: "%{measurement}测点超过最大画图点数，已为您自动调整后展示"
+  choosedMeasurement: 已选测点
+  overMeasurementTip: 最多同时展示10条测点趋势
+  number10Tip: 只支持输入1-10范围内的正整数
 
 

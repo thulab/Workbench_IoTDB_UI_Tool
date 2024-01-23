@@ -66,7 +66,7 @@
                 id="data-sync-modal-history-switch"
               />
             </base-form-item>
-            <base-form-item v-if="formData.isSynchronHistory" :label="`${t('dataSync.datetimerange')}：`" prop="datetimerange" :rules="requiredRules" class="m-l-24">
+            <base-form-item v-if="formData.isSynchronHistory" :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules" class="m-l-24">
               <el-date-picker
                 v-model="formData.datetimerange"
                 type="datetimerange"

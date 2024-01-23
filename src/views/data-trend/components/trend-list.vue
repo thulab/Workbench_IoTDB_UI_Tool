@@ -1,11 +1,11 @@
 <template>
   <div class="path-title-box" v-if="isExpand">
-    <h4 class="path-list-title">已选测点</h4>
+    <h4 class="path-list-title">{{ t('dataTrend.choosedMeasurement') }}</h4>
     <el-tooltip
       placement="top-start"
       effect="light"
       trigger="hover"
-      :content="canReadWriteSchemaData ? '最多同时展示10条测点趋势' : '暂无权限'"
+      :content="canReadWriteSchemaData ? t('dataTrend.overMeasurementTip') : t('common.noAuth')"
       :disabled="canReadWriteSchemaData ? pathList.length !== 10 : false"
       popper-class="tooltip-box-width"
     >
@@ -19,7 +19,7 @@
       class="m-b-8"
       v-model="isCheckAll"
       :indeterminate="isIndeterminate"
-      label="全选"
+      :label="t('common.allChoose')"
       :key="listKey"
       :disabled="!allCheckAbled || !canReadWriteSchemaData"
       @change="handleCheckedAll"
@@ -27,7 +27,7 @@
     />
   </auth-tooltip>
 
-  <h4 v-if="!isExpand" class="collapse-title">已选测点</h4>
+  <h4 v-if="!isExpand" class="collapse-title">{{ t('dataTrend.choosedMeasurement') }}</h4>
 
   <div class="path-list-box" v-if="isExpand">
     <auth-container :is-auth="canReadWriteSchemaData" style="height: calc(100% - 82px);">
@@ -44,11 +44,11 @@
           </div>
           <div class="path-detail-box">
             <div class="path-detail-item">
-              <span class="detail-label">颜色：</span>
+              <span class="detail-label">{{t('common.color')}}：</span>
               <el-color-picker v-model="item.color" :disabled="item.disabled" color-format="hex" :predefine="predefineColors" @change="val => handleChangeColor(val, item, index)" :id="`trend-path-color-${index}`" />
             </div>
             <div class="path-detail-item">
-              <span class="detail-label">线宽：</span>
+              <span class="detail-label">{{t('common.lineWidth')}}：</span>
               <el-input-number
                 v-model.number="item.width"
                 :disabled="item.disabled"
