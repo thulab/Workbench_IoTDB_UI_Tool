@@ -1,6 +1,6 @@
 <template>
   <div class="list-title">
-    <h4>角色列表</h4>
+    <h4>{{ t('auth.roleList') }}</h4>
     <div class="operate-buttons">
       <auth-tooltip :is-disabled="canManageRole">
         <el-button link class="m-r-8 border-refresh-icon" :disabled="!canManageRole" @click="getList" id="auth-role-refresh"><i-custom-refresh /></el-button>
@@ -19,7 +19,7 @@
           <popconfirm
             :confirm-button-text="t('common.confirm')"
             :cancel-button-text="t('common.cancel')"
-            title="删除角色后相关联的用户权限将立即消失，是否删除该角色？"
+            :title="t('auth.deleteRoleTip')"
             :icon="ICustomError"
             width="300"
             :cancel-button-id="`auth-role-${i}-del-cancel`"
@@ -35,7 +35,7 @@
           </popconfirm>
         </li>
       </template>
-      <li v-else class="item-box-empty">暂无角色</li>
+      <li v-else class="item-box-empty">{{ t('auth.noRole') }}</li>
     </ul>
   </auth-container>
 

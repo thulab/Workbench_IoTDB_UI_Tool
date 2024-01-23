@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="关联角色"
+    :title="t('auth.relateRole')"
     v-model="dialogVisible"
     width="480px"
     class="add-role-modal"
@@ -9,8 +9,8 @@
     id="auth-user-add-role-modal"
   >
     <el-form ref="formRef" :model="formData" @submit.prevent>
-      <base-form-item label="关联角色：" prop="name" class="m-t-12 m-b-0">
-        <el-select v-model="formData.name" style="width:100%" placeholder="请输入角色名称" collapse-tags multiple filterable :loading="loading" id="auth-user-add-role-modal-select-name" @change="handleChangeSelect" ref="roleSelectRef">
+      <base-form-item :label="`${t('auth.relateRole')}：`" prop="name" class="m-t-12 m-b-0">
+        <el-select v-model="formData.name" style="width:100%" :placeholder="t('auth.rolePlaceholder')" collapse-tags multiple filterable :loading="loading" id="auth-user-add-role-modal-select-name" @change="handleChangeSelect" ref="roleSelectRef">
           <template #prefix>
             <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
           </template>
@@ -59,12 +59,12 @@ const roleSelectRef = ref<InstanceType<typeof ElSelect>>();
 function getRoleList() {
   getList().then((res) => {
     roleList.value = res.data.map((item) => item);
-    roleList.value.unshift('全部');
+    roleList.value.unshift(t('common.all'));
   });
 }
 
 function handleChangeSelect(vals: string[]) {
-  if (vals.includes('全部')) {
+  if (vals.includes(t('common.all'))) {
     formData.name = roleList.value.filter((item) => !props.selected.includes(item));
     formData.name.shift();
     roleSelectRef.value?.blur();
@@ -72,7 +72,7 @@ function handleChangeSelect(vals: string[]) {
 }
 
 function isCanSelect(item: string) {
-  if (item === '全部') {
+  if (item === t('common.all')) {
     return roleList.value.length === (props.selected.length + 1);
   }
   return props.selected.includes(item);

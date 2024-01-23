@@ -110,6 +110,7 @@ common:
   expire: 失效
   ack: 确认
   acked: 已确认
+  allSituation: 全局
 page:
   data: 数据
   alarm: 告警
@@ -274,14 +275,17 @@ searchIotdb:
   difference: 统计序列中某数据点的值与前一数据点的值的差。范围内第一个数据点没有对应的结果输出
   nonNegativeDifference: 统计序列中某数据点的值与前一数据点的值的差的绝对值。范围内第一个数据点没有对应的结果输出
   derivative: 统计序列中某数据点相对于前一数据点的变化率，数量上等同于 DIFFERENCE / TIME_DIFFERENCE。范围内第一个数据点没有对应的结果输出
-  nonNegativeDerivative: 统计序列中某数据点相对于前一数据点的变化率的绝对值，数量上等同于 NON_NEGATIVE_DIFFERENCE / TIME_DIFFERENCE。范围内第一个数据点没有对应的结果输出
+  nonNegativeDerivative: >-
+    统计序列中某数据点相对于前一数据点的变化率的绝对值，数量上等同于 NON_NEGATIVE_DIFFERENCE /
+    TIME_DIFFERENCE。范围内第一个数据点没有对应的结果输出
   diff: 统计序列中某数据点的值与前一数据点的值的差。第一个数据点没有对应的结果输出，输出值为null
   sample: 采样函数
   equalSizeBucketRandomSample: 返回符合采样比例的等分桶随机采样
   equalSizeBucketAggSample: 返回符合采样比例的等分桶聚合采样
   equalSizeBucketM4Sample: 返回符合采样比例的等分桶M4采样
   equalSizeBucketOutlierSample: 返回符合采样比例和桶内采样个数的等分桶离群值采样
-  m4: 返回每个窗口内的第一个点（first）、最后一个点（last）、最小值点（bottom）、最大值点（top）。在一个窗口内的聚合点输出之前，M4会将它们按照时间戳递增排序并且去重
+  m4: >-
+    返回每个窗口内的第一个点（first）、最后一个点（last）、最小值点（bottom）、最大值点（top）。在一个窗口内的聚合点输出之前，M4会将它们按照时间戳递增排序并且去重
 dashboard:
   systemInfo: 系统信息
   masterSystemInfo: 主集群系统信息
@@ -336,10 +340,13 @@ dataSync:
   syncMeasurementPlaceholder: 需用反引号修饰不合法字符或者是不合法路径节点，例如：root.`a{'@'}b`
   all: 全局
   prefix: 前缀路径
-  pathTip: 路径前缀不需要能够构成完整的路径，例如：输入'root.database'，则同步的数据范围为'root.database*.**' 注：root.__system不会被同步
+  pathTip: >-
+    路径前缀不需要能够构成完整的路径，例如：输入'root.database'，则同步的数据范围为'root.database*.**'
+    注：root.__system不会被同步
   pathPlaceholder: 请输入前缀路径
   reforward: 二次转发
-  reforwardTip: 对其他同步任务发送到此数据库的数据进行转发，例如有A->B，B->C两个同步任务，若B->C选择二次转发，则A中的数据也会发送至C。需注意构建双活集群时请将此参数设置为“否”，否则将造成无休止数据循环。
+  reforwardTip: >-
+    对其他同步任务发送到此数据库的数据进行转发，例如有A->B，B->C两个同步任务，若B->C选择二次转发，则A中的数据也会发送至C。需注意构建双活集群时请将此参数设置为“否”，否则将造成无休止数据循环。
   historyData: 历史数据
   historyDataTip: 创建任务前写入数据库的数据称为历史数据，请注意历史数据与实时数据不能同时为关闭状态！
   realTime: 实时数据
@@ -353,7 +360,9 @@ dataSync:
   sendPlugin: 发送插件
   sendPluginNamePlaceholder: 请输入发送插件名称
   sendPluginParams: 插件参数
-  sendPluginParamsTip: 请输入插件参数，例如：'connector.send_alarm_url' = 'http://192.20.10.31:9091/api/alarm/addRecords'
+  sendPluginParamsTip: >-
+    请输入插件参数，例如：'connector.send_alarm_url' =
+    'http://192.20.10.31:9091/api/alarm/addRecords'
   targetInfo: 目标端信息
   targetInfoTip: 请确保目标端已经创建了发送端的所有测点，或已开启自动创建元数据，否则将会导致失败！
   targetInfoIp: 请输入目标端 IP
@@ -391,7 +400,7 @@ dataTrend:
   trendTip: 最大绘制%{tip}个点，超出后系统将自动调整
   overTip: 超过最大画图点数，已为您自动调整后展示
   booleanTip: boolean类型仅支持最新值计算，请修改采样策略后查看趋势
-  measurementTip: "%{measurement}测点超过最大画图点数，已为您自动调整后展示"
+  measurementTip: '%{measurement}测点超过最大画图点数，已为您自动调整后展示'
   choosedMeasurement: 已选测点
   overMeasurementTip: 最多同时展示10条测点趋势
   number10Tip: 只支持输入1-10范围内的正整数
@@ -424,7 +433,7 @@ calculate:
   resultMeasurementPlaceholder: 请输入结果测点名称
   calculateExpression: 计算表达式
   viewExpression: 视图表达式
-  expressionTip: "支持使用运算符及函数(除聚合函数), 如: root.sgcc.wf03.wt01.temperature + 1，详细规则见"
+  expressionTip: '支持使用运算符及函数(除聚合函数), 如: root.sgcc.wf03.wt01.temperature + 1，详细规则见'
 alarm:
   alarmName: 告警名称
   alarmNamePlaceholder: 请输入告警名称
@@ -459,4 +468,54 @@ alarm:
   durationRule: 请选择持续时间单位
   newSuccess: 新建告警成功
   editSuccess: 编辑告警成功
-
+auth:
+  roleDetail: 角色详情
+  havingRole: 拥有角色
+  detail: 权限详情
+  removeAuthTip: 移除父级路径权限时其包含的子路径权限会同步移除，请谨慎操作
+  path: 路径
+  pathName: 路径名称
+  addPath: 添加路径
+  deleteRole: 是否删除该角色？
+  pathEmptyTip: 路径权限不允许为空，请选择权限后重新操作
+  userDetail: 用户详情
+  havingUser: 拥有用户
+  deleteUser: 是否删除该用户？
+  relateRole: 关联角色
+  rolePlaceholder: 请输入角色名称
+  relateUser: 关联用户
+  userPlaceholder: 请输入用户名称
+  exactPath: 精确路径
+  exactPathPlaceholder: 请输入精确路径
+  pathMode: 路径模式
+  pathModePlaceholder: 请输入序列路径，支持使用"**"进行模糊匹配，例如"root.ln.d1.**"
+  pathModeTip: 支持使用“**”进行模糊匹配，“**”代表一层或多层
+  pathEndTip: 路径不能为以.或*结尾
+  pathEmptyRule: 路径不能为空
+  pathExistTip: 该路径已存在，请勿重复添加
+  addRole: 新建角色
+  roleName: 角色名
+  roleNamePlaceholder: 请输入角色名
+  roleNameLength: 字符长度不小于4，请重新输入
+  roleNameExg: 格式不符，请输入大小写字母、数字、特殊字符（!{'@'}#$%^&*()_+-=）
+  roleExist: 该角色已存在，请重新输入
+  addUser: 新建用户
+  userName: 用户名
+  userNamePlaceholder: 请输入用户名
+  pwd: 输入密码
+  pwdPlaceholder: 请输入密码
+  confirmPwd: 确认密码
+  confirmPwdAgain: 请再次输入密码
+  userNameLength: 字符长度不小于4，请重新输入
+  userNameExg: 格式不符，请输入大小写字母、数字、特殊字符（!{'@'}#$%^&*()_+-=）
+  userExist: 该用户已存在，请重新输入
+  pwdLength: 字符长度不小于4，请重新输入
+  pwdExg: 格式不符，请输入大小写字母、数字、特殊字符（!{'@'}#$%^&*()_+-=）
+  pwdUnSame: 密码不一致，请重新输入
+  userSuccess: 新建用户成功
+  roleList: 角色列表
+  deleteRoleTip: 删除角色后相关联的用户权限将立即消失，是否删除该角色？
+  noRole: 暂无角色
+  userList: 用户列表
+  deleteUserTip: 是否删除该用户？
+  editUser: 编辑用户

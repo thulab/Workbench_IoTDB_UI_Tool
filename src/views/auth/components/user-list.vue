@@ -1,6 +1,6 @@
 <template>
   <div class="list-title">
-    <h4>用户列表</h4>
+    <h4>{{ t('auth.userList') }}</h4>
     <div class="operate-buttons">
       <el-button link class="m-r-8 border-refresh-icon" @click="getList" id="auth-user-refresh"><i-custom-refresh /></el-button>
       <auth-tooltip :is-disabled="canManageUser">
@@ -29,7 +29,7 @@
         :confirm-button-text="t('common.confirm')"
         :cancel-button-text="t('common.cancel')"
         width="160px"
-        title="是否删除该用户？"
+        :title="t('auth.deleteUserTip')"
         :icon="ICustomError"
         :cancel-button-id="`auth-user-${i}-del-cancel`"
         :confirm-button-id="`auth-user-${i}-del-confirm`"
@@ -44,7 +44,7 @@
       </popconfirm>
     </li>
   </ul>
-  <modal-reset-password title="编辑用户" :user-name="editUser" v-model:visible="modalVisible" />
+  <modal-reset-password :title="t('auth.editUser')" :user-name="editUser" v-model:visible="modalVisible" />
   <modal-user v-model:visible="modalUserVisible" :user-list="list" @handle-save="getList" />
 </template>
 

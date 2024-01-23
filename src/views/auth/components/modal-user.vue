@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="dialogVisible"
-    title="新建用户"
+    :title="t('auth.addUser')"
     width="490px"
     align-center
     :close-on-click-modal="false"
@@ -9,14 +9,14 @@
   >
     <el-form label-width="90px" ref="formRef" :rules="rules" :model="formData" label-position="left" :key="formKey">
       <label><input type="password" autocomplete="new-password" hidden></label>
-      <base-form-item label="用户名：" prop="userName" :error="errorName">
-        <el-input v-model.trim="formData.userName" maxlength="32" placeholder="请输入用户名" show-word-limit id="auth-user-modal-name" />
+      <base-form-item :label="`${t('auth.userName')}：`" prop="userName" :error="errorName">
+        <el-input v-model.trim="formData.userName" maxlength="32" :placeholder="t('auth.userNamePlaceholder')" show-word-limit id="auth-user-modal-name" />
       </base-form-item>
-      <base-form-item label="输入密码：" prop="password" required>
-        <el-input v-model="formData.password" type="password" maxlength="32" autocomplete="off" placeholder="请输入密码" show-password id="auth-user-modal-pwd" />
+      <base-form-item :label="`${t('auth.pwd')}：`" prop="password" required>
+        <el-input v-model="formData.password" type="password" maxlength="32" autocomplete="off" :placeholder="t('auth.pwdPlaceholder')" show-password id="auth-user-modal-pwd" />
       </base-form-item>
-      <base-form-item label="确认密码：" prop="confirmPassword" required>
-        <el-input v-model="formData.confirmPassword" type="password" maxlength="32" autocomplete="off" placeholder="请再次输入密码" show-password id="auth-user-modal-pwd-again" />
+      <base-form-item :label="`${t('auth.confirmPwd')}：`" prop="confirmPassword" required>
+        <el-input v-model="formData.confirmPassword" type="password" maxlength="32" autocomplete="off" placeholder="t('auth.confirmPwdAgain')" show-password id="auth-user-modal-pwd-again" />
       </base-form-item>
     </el-form>
     <template #footer>
@@ -65,18 +65,18 @@ const rules = reactive<FormRules>({
     {
       min: 4,
       max: 32,
-      message: '字符长度不小于4，请重新输入',
+      message: t('auth.userNameLength'),
       trigger: ['blur', 'change'],
     },
     {
       pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
-      message: '格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
+      message: t('auth.userNameExg'),
       trigger: ['blur', 'change'],
     },
     {
       validator: (rule: any, value: any, callback: any) => {
         if (value && props.userList.some((item) => item.name === value)) {
-          callback(new Error('该用户已存在，请重新输入'));
+          callback(new Error(t('auth.userExist')));
         } else {
           callback();
         }
@@ -93,12 +93,12 @@ const rules = reactive<FormRules>({
     {
       min: 4,
       max: 32,
-      message: '字符长度不小于4，请重新输入',
+      message: t('auth.pwdLength'),
       trigger: ['blur', 'change'],
     },
     {
       pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
-      message: '格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
+      message: t('auth.pwdExg'),
       trigger: ['blur', 'change'],
     },
   ],
@@ -111,18 +111,18 @@ const rules = reactive<FormRules>({
     {
       min: 4,
       max: 32,
-      message: '字符长度不小于4，请重新输入',
+      message: t('auth.pwdLength'),
       trigger: ['blur', 'change'],
     },
     {
       pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
-      message: '格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
+      message: t('auth.pwdExg'),
       trigger: ['blur', 'change'],
     },
     {
       validator: (rule: any, value: any, callback: any) => {
         if (value !== formData.password) {
-          callback(new Error('密码不一致，请重新输入'));
+          callback(new Error(t('auth.pwdUnSame')));
         } else {
           callback();
         }
@@ -138,7 +138,7 @@ const handleConfirm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
       addUser(formData.userName, formData.password).then(() => {
-        ElMessage.success('新建用户成功');
+        ElMessage.success(t('auth.userSuccess'));
         dialogVisible.value = false;
         emit('handleSave');
       }).catch((err) => {

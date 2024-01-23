@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="新建角色"
+    :title="t('auth.addRole')"
     v-model="dialogVisible"
     width="490px"
     align-center
@@ -8,8 +8,8 @@
     id="auth-role-modal"
   >
     <el-form ref="formRef" :model="formData" class="m-t-14 m-b-34" @submit.prevent>
-      <base-form-item label="角色名：" prop="name" :rules="requiredRules" :error="errorName">
-        <el-input v-model.trim="formData.name" placeholder="请输入角色名" maxlength="32" show-word-limit id="auth-role-modal-name" />
+      <base-form-item :label="`${t('auth.roleName')}：`" prop="name" :rules="requiredRules" :error="errorName">
+        <el-input v-model.trim="formData.name" :placeholder="t('auth.roleNamePlaceholder')" maxlength="32" show-word-limit id="auth-role-modal-name" />
       </base-form-item>
     </el-form>
     <template #footer>
@@ -53,18 +53,18 @@ const requiredRules = ref([
   {
     min: 4,
     max: 32,
-    message: '字符长度不小于4，请重新输入',
+    message: t('auth.roleNameLength'),
     trigger: 'blur',
   },
   {
     pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
-    message: '格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
+    message: t('auth.roleNameExg'),
     trigger: 'blur',
   },
   {
     validator: (rule: any, value: any, callback: any) => {
       if (value && props.list.some((item) => item === value)) {
-        callback(new Error('该角色已存在，请重新输入'));
+        callback(new Error(t('auth.roleExist')));
       } else {
         callback();
       }
@@ -80,7 +80,7 @@ const handleConfirm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
       saveRole(formData.name).then(() => {
-        ElMessage.success('创建成功');
+        ElMessage.success(t('common.createSuccess'));
         dialogVisible.value = false;
         emit('handleSave');
       }).catch((err) => {

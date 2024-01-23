@@ -14,14 +14,14 @@
         <el-main class="p-0" v-loading="loading || roleLoading">
           <el-scrollbar>
             <div class="detail-title-box" v-if="!isManager">
-              <h4 class="detail-title-text">角色详情</h4>
+              <h4 class="detail-title-text">{{ t('auth.roleDetail') }}</h4>
               <auth-tooltip :is-disabled="canManageUser" v-if="canEdit && !isEdit">
                 <el-button type="primary" :disabled="!canManageUser" @click="pageType = 'edit'" id="auth-user-edit">{{ t('common.edit') }}</el-button>
               </auth-tooltip>
               <el-button type="primary" v-else-if="isEdit" @click="handleReset('view')" id="auth-user-view">{{ t('common.exitEdit') }}</el-button>
             </div>
             <div class="detail-role-list" v-if="!isManager">
-              <span class="p-t-4">拥有角色：</span>
+              <span class="p-t-4">{{t('auth.havingRole')}}：</span>
               <div class="detail-role-box">
                 <el-tag :closable="isEdit" type="info" v-for="(item, index,) in authData.rolesToPrivileges" :key="item.roleName" @close="handleDeleteRole(index)" @click="showRoleDetail(item)" :id="`auth-user-role-${item.roleName}-${index}`">{{ item.roleName }}</el-tag>
                 <auth-tooltip :is-disabled="canManageRole">
@@ -32,12 +32,12 @@
               </div>
             </div>
             <div class="detail-title-box">
-              <h4 class="detail-title-text">权限详情<span class="tip-text"><i-custom-info-warning />移除父级路径权限时其包含的子路径权限会同步移除，请谨慎操作</span></h4>
+              <h4 class="detail-title-text">{{ t('auth.detail') }}<span class="tip-text"><i-custom-info-warning />{{ t('auth.removeAuthTip') }}</span></h4>
             </div>
             <div class="table-list-box m-x-16">
-              <h4 class="table-box-title">全局</h4>
+              <h4 class="table-box-title">{{ t('common.allSituation') }}</h4>
               <el-table :data="entityTableData" style="width: 100%">
-                <el-table-column label="全选" align="center" width="60">
+                <el-table-column :label="t('common.allChoose')" align="center" width="60">
                   <template #default="{ row }">
                     <el-icon v-if="!isEdit" class="moveDown3" size="21">
                       <i-custom-correct v-if="row.allChecked" />
@@ -86,10 +86,10 @@
               </el-table>
             </div>
             <div class="table-list-box  m-x-16 m-b-16" v-if="canEdit">
-              <h4 class="table-box-title">路径</h4>
+              <h4 class="table-box-title">{{ t('auth.path') }}</h4>
               <el-table :data="tableData" style="width: 100%" tooltip-effect="light" :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
-                <el-table-column label="路径名称" align="center" min-width="193" prop="path" show-overflow-tooltip />
-                <el-table-column label="全选" align="center" width="193">
+                <el-table-column :label="t('auth.pathName')" align="center" min-width="193" prop="path" show-overflow-tooltip />
+                <el-table-column :label="t('common.allChoose')" align="center" width="193">
                   <template #default="{ row }">
                     <el-icon v-if="!isEdit || !row.path" class="moveDown3" size="21">
                       <i-custom-correct v-if="row.allChecked" />
@@ -143,14 +143,14 @@
                   </template>
                 </el-table-column>
               </el-table>
-              <el-button style="width: 100%;" class="m-t-24" @click="handleAddRow" v-if="canEdit && isEdit" id="auth-user-path"><i-custom-add class="m-r-4" />添加路径</el-button>
+              <el-button style="width: 100%;" class="m-t-24" @click="handleAddRow" v-if="canEdit && isEdit" id="auth-user-path"><i-custom-add class="m-r-4" />{{ t('auth.addPath') }}</el-button>
             </div>
           </el-scrollbar>
         </el-main>
         <el-footer v-if="canEdit && isEdit">
           <div class="operate-buttons">
             <el-button @click="handleReset('edit')" id="auth-user-reset">{{ t('common.reset') }}</el-button>
-            <el-button type="primary" @click="handleSave" :loading="saveLoading" id="auth-user-save">应用</el-button>
+            <el-button type="primary" @click="handleSave" :loading="saveLoading" id="auth-user-save">{{ t('common.apply') }}</el-button>
           </div>
         </el-footer>
       </el-container>
@@ -421,7 +421,7 @@ function handleAddRole(roleNames: string[]) {
   });
 }
 function handleDeleteRole(index: number) {
-  ElMessageBox.confirm('是否删除该角色？', t('common.notice'), {
+  ElMessageBox.confirm(t('auth.deleteRole'), t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'del-role-confirm',
@@ -455,7 +455,7 @@ function calcColumnWidth(child: Auth.PrivilegeEnum) {
 function handleSave() {
   const flag = tableData.value.filter((item) => item.path).some((data) => (!data.privileges.length));
   if (flag) {
-    ElMessage.error('路径权限不允许为空，请选择权限后重新操作');
+    ElMessage.error(t('auth.pathEmptyTip'));
     return;
   }
   const currentRoleNames = authData.value.rolesToPrivileges.map((item) => item.roleName);

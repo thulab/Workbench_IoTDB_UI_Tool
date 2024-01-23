@@ -10,9 +10,9 @@
   >
     <el-scrollbar :max-height="maxHeight" v-loading="loading">
       <div class="table-list-box m-t-8">
-        <h4 class="table-box-title">全局</h4>
+        <h4 class="table-box-title">{{ t('common.allSituation') }}</h4>
         <el-table :data="entityTableData" style="width: 100%;" border>
-          <el-table-column label="全选" align="center" width="58" fixed="left">
+          <el-table-column :label="t('common.allChoose')" align="center" width="58" fixed="left">
             <template #default="{ row }">
               <el-icon size="21">
                 <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.length >= entityPrivilegesEnumKeys.length" />
@@ -32,18 +32,18 @@
       </div>
 
       <div class="table-list-box" v-if="name !== 'root'">
-        <h4 class="table-box-title">路径</h4>
+        <h4 class="table-box-title">{{ t('auth.path') }}</h4>
         <el-table :data="tableData" style="width: 100%" tooltip-effect="light" border>
-          <el-table-column label="路径名称" prop="path" align="center" width="193" show-overflow-tooltip />
-          <el-table-column label="全选" align="center" width="193">
+          <el-table-column :label="t('auth.pathName')" prop="path" align="center" width="193" show-overflow-tooltip />
+          <el-table-column :label="t('common.allChoose')" align="center" width="193">
             <template #default="{ row }">
               <el-icon size="21">
                 <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" />
               </el-icon>
             </template>
           </el-table-column>
-          <el-table-column v-for="(column, index) in pathPrivilegesEnumGroup" :label="column.group" :key="column.group + '_' + index + '_column'" align="center">
-            <el-table-column v-for="(col, ci) in column.children" :label="col.desc" :key="col.privileges + '_' + ci + '_col'" :prop="col.privileges" align="center" :min-width="col.width || 180">
+          <el-table-column v-for="(column, index) in pathPrivilegesEnumGroup" :label="column.group" :key="`${column.group}_${index}_column`" align="center">
+            <el-table-column v-for="(col, ci) in column.children" :label="col.desc" :key="`${col.privileges}_${ci}_col`" :prop="col.privileges" align="center" :min-width="col.width || 180">
               <template #default="{ row }">
                 <el-icon size="21">
                   <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.includes(col.privileges)" />
@@ -74,6 +74,7 @@ const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
 }>();
 
+const { t } = useI18n();
 const maxHeight = computed(() => window.innerHeight - 100);
 
 const userStore = useUserStore();
@@ -86,7 +87,7 @@ const {
 
 const dialogVisible = useVModel(props, 'visible', emit);
 
-const title = computed(() => `${props.name}权限详情`);
+const title = computed(() => `${props.name}${t('auth.detail')}`);
 
 const { requestFn: getUserAuth, data: authData, loading } = useRequest(AuthApi.getUserAuth, {
   initData: {

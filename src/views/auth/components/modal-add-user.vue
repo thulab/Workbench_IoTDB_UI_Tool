@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="关联用户"
+    :title="t('auth.relateUser')"
     v-model="dialogVisible"
     width="480px"
     class="add-user-modal"
@@ -9,11 +9,11 @@
     id="auth-role-add-user-modal"
   >
     <el-form ref="formRef" :model="formData" @submit.prevent>
-      <base-form-item label="关联用户：" prop="name" class="m-t-12 m-b-0">
+      <base-form-item :label="`${t('auth.relateUser')}：`" prop="name" class="m-t-12 m-b-0">
         <el-select
           v-model="formData.name"
           style="width:100%"
-          placeholder="请输入用户名称"
+          :placeholder="t('auth.userPlaceholder')"
           collapse-tags
           multiple
           filterable
@@ -74,12 +74,12 @@ const handleConfirm = () => {
 function getUserList() {
   getList().then((res) => {
     userList.value = res.data.map((item) => item.name);
-    userList.value.unshift('全部');
+    userList.value.unshift(t('common.all'));
   });
 }
 
 function handleChangeSelect(vals: string[]) {
-  if (vals.includes('全部')) {
+  if (vals.includes(t('common.all'))) {
     formData.name = userList.value.filter((item) => !props.selected.includes(item));
     formData.name.shift();
     userSelectRef.value?.blur();
@@ -87,7 +87,7 @@ function handleChangeSelect(vals: string[]) {
 }
 
 function isCanSelect(item: string) {
-  if (item === '全部') {
+  if (item === t('common.all')) {
     return userList.value.length === (props.selected.length + 1);
   }
   return props.selected.includes(item);

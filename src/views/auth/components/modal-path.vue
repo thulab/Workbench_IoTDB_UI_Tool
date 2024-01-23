@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="添加路径"
+    :title="t('auth.addPath')"
     v-model="dialogVisible"
     width="600px"
     align-center
@@ -10,11 +10,11 @@
 
     <el-radio-group v-model="pathType" class="path-radio-group m-y-6">
       <el-radio label="select" id="auth-path-modal-select-radio">
-        <span class="radio-label">精确路径：<el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
+        <span class="radio-label">{{t('auth.exactPath')}}：<el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
         <div class="search-path-box">
           <el-select
             v-model="selectPath"
-            placeholder="请输入精确路径"
+            :placeholder="t('auth.exactPathPlaceholder')"
             filterable
             remote
             clearable
@@ -38,8 +38,8 @@
         </div>
       </el-radio>
       <el-radio label="input" id="auth-path-modal-input-radio">
-        <span class="radio-label">路径模式：<el-tooltip effect="light" content="支持使用“**”进行模糊匹配，“**”代表一层或多层" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
-        <el-input v-model="inputPath" placeholder='请输入序列路径，支持使用"**"进行模糊匹配，例如"root.ln.d1.**"' style="width: 466px;" class="path-input" id="auth-path-modal-input-path">
+        <span class="radio-label">{{t('auth.pathMode')}}：<el-tooltip effect="light" :content="t('auth.pathModeTip')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
+        <el-input v-model="inputPath" :placeholder="t('auth.pathModePlaceholder')" style="width: 466px;" class="path-input" id="auth-path-modal-input-path">
           <!-- <template #prepend>root.</template> -->
         </el-input>
       </el-radio>
@@ -93,14 +93,14 @@ const handleConfirm = () => {
   if (pathType.value === 'input') {
     const validInputRes = inputPath.value.replace(/(\s*$)/g, '');
     if (validInputRes.endsWith('.') || (validInputRes.endsWith('*') && !validInputRes.endsWith('**'))) {
-      ElMessage.warning('路径不能为以.或*结尾');
+      ElMessage.warning(t('auth.pathEndTip'));
       return;
     }
     inputPath.value = validInputRes;
     res = inputPath.value;
   }
   if (!res) {
-    ElMessage.error('路径不能为空');
+    ElMessage.error(t('auth.pathEmptyRule'));
     return;
   }
   // if (pathType.value === 'input') {
@@ -108,7 +108,7 @@ const handleConfirm = () => {
   // }
   const flag = props.pathList.some((item) => item === res);
   if (flag) {
-    ElMessage.error('该路径已存在，请勿重复添加');
+    ElMessage.error(t('auth.pathExistTip'));
     return;
   }
   dialogVisible.value = false;
