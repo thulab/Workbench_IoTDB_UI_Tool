@@ -85,6 +85,8 @@ common:
   importTip: 为避免格式错误，推荐使用文本编辑器查看
   searchTipLimit100: 仅展示100条搜索结果，如有需要请精确搜索
   searchAllTipLimit100: 关键字搜索仅展示100条搜索结果，如有需要请精确搜索
+  yes: 是
+  no: 否
 page:
   data: 数据
   alarm: 告警
@@ -127,6 +129,7 @@ measurement:
   importMeasurementTip: 仅支持上传 csv 和 xlsx 文件，将文件拖到此处，或
   importMeasurementRule: 文件格式不正确，目前仅支持上传.csv和.xlsx文件
   databaseInfo: 数据库信息
+  databaseNum: 数据库数量
   deviceNum: 设备数量
   measurementNum: 测点数量
   totalNum: 数据总量
@@ -255,5 +258,35 @@ searchIotdb:
   equalSizeBucketM4Sample: 返回符合采样比例的等分桶M4采样
   equalSizeBucketOutlierSample: 返回符合采样比例和桶内采样个数的等分桶离群值采样
   m4: 返回每个窗口内的第一个点（first）、最后一个点（last）、最小值点（bottom）、最大值点（top）。在一个窗口内的聚合点输出之前，M4会将它们按照时间戳递增排序并且去重
+dashboard:
+  systemInfo: 系统信息
+  masterSystemInfo: 主集群系统信息
+  slaveSystemInfo: 备集群系统信息
+  deadTime: 数据截止
+  serverStatus: 服务器状态
+  expirationTime: 激活到期
+  isActive: 是否激活
+  node: 节点
+  type: 类型
+  status: 状态
+  version: 版本
+  physicalMachine: 物理机
+  monitorInfo: 监控信息
+  masterCluster: 主集群
+  slaveCluster: 备集群
+  unconfigPrometheus: 未配置Prometheus，请配置后查看
+  configPrometheusError: Prometheus配置有误，请修改后查看
+  cpuNum: CPU 核数
+  cpuLoad: CPU 负载
+  diskMemory: 磁盘空间
+  useMemory: 已用空间
+  residueMemory: 剩余空间
+  systemMemory: 系统内存
+  writeSpeed: 每秒写入点数
+  fileTotal: 文件总数
+  iotdbMemory: IoTDB 空间
+  memoryUsage: 内存使用情况
+  diskUsage: 磁盘使用情况
+  diskIO: 磁盘 I/O 繁忙速率
 
 

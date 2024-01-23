@@ -2,7 +2,7 @@
   <div class="monitor-chart-wrapper">
     <div class="monitor-chart-box-4" v-loading="cpuLoading">
       <div class="monitor-chart-container">
-        <h4 class="monitor-info-module-title">CPU 核数</h4>
+        <h4 class="monitor-info-module-title">{{t('dashboard.cpuNum')}}</h4>
         <data-container :is-empty="cpuCount === null">
           <div class="monitor-info-module-box">
             <p class="monitor-info-module-text">{{ cpuCount }}</p>
@@ -12,7 +12,7 @@
     </div>
     <div class="monitor-chart-box-4" v-loading="cpuLoadLoading">
       <div class="monitor-chart-container">
-        <h4 class="monitor-info-module-title">CPU 负载</h4>
+        <h4 class="monitor-info-module-title">{{ t('dashboard.cpuLoad') }}</h4>
         <data-container :is-empty="cpuData.dataVal === null">
           <div class="chart-container-box">
             <the-chart :option="cpuDataOptions" key="cpuLoad" />
@@ -22,7 +22,7 @@
     </div>
     <div class="monitor-chart-box-4" v-loading="memoryLoading">
       <div class="monitor-chart-container">
-        <h4 class="monitor-info-module-title">系统内存</h4>
+        <h4 class="monitor-info-module-title">{{ t('dashboard.systemMemory') }}</h4>
         <data-container :is-empty="memoryData.dataCount === null">
           <div class="monitor-info-module-box">
             <p class="monitor-info-module-text">{{ memoryData.dataCount }}<span class="monitor-info-module-unit">{{ memoryData.valueUnit }}</span></p>
@@ -32,7 +32,7 @@
     </div>
     <div class="monitor-chart-box-4" v-loading="memoryLoading">
       <div class="monitor-chart-container">
-        <h4 class="monitor-info-module-title">内存使用情况</h4>
+        <h4 class="monitor-info-module-title">{{ t('dashboard.memoryUsage') }}</h4>
         <data-container :is-empty="memoryData.dataCount === null">
           <div class="chart-container-box">
             <the-chart :option="memoryDataOptions" key="memoryData" />
@@ -42,7 +42,7 @@
     </div>
     <div class="monitor-chart-box-4" v-loading="ioLoading">
       <div class="monitor-chart-container">
-        <h4 class="monitor-info-module-title">磁盘 I/O 繁忙速率</h4>
+        <h4 class="monitor-info-module-title">{{ t('dashboard.diskIO') }}</h4>
         <data-container :is-empty="diskIOCategory.length === 0">
           <div class="chart-container-box">
             <the-chart :option="diskIODataOptions" key="diskIOData" />
@@ -77,6 +77,7 @@ interface GaugeChartData {
   valueUnit?: string;
 }
 
+const { t } = useI18n();
 const cpuCount = ref();
 const cpuData = reactive<GaugeChartData>({
   themeColor: '#495AD4',

@@ -5,9 +5,9 @@
         <div style="display: flex; flex-direction: column; height: 100%;" v-loading="loading">
           <div class="module-box-wrapper m-b-16">
             <div class="module-title-wrapper">
-              <h4 class="module-title">{{slaveData ? '主集群系统信息' : '系统信息'}}</h4>
+              <h4 class="module-title">{{slaveData ? t('dashboard.masterSystemInfo') : t('dashboard.systemInfo')}}</h4>
               <p class="module-details">
-                <span class="module-label-text">数据截止：</span>
+                <span class="module-label-text">{{`${t('dashboard.deadTime')}：`}}</span>
                 <span class="module-content-text m-r-16">{{ systemTime }}</span>
                 <el-button link @click="() => handleRefreshSystem()" id="dashboard-system-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
               </p>
@@ -15,33 +15,33 @@
             <ul class="system-info-list">
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-system-status /></el-icon>
-                <span class="module-label-text">服务器状态(Running)：</span>
+                <span class="module-label-text">{{`${t('dashboard.serverStatus')}(Running)：`}}</span>
                 <span class="module-content-text" v-if="!systemData.dataNodeRatio && !systemData.configNodeRatio">-</span>
                 <span class="module-content-text" v-else>ConfigNode {{ systemData.configNodeRatio ? `${systemData.configNodeRatio}个` : '-'}} DataNode {{systemData.dataNodeRatio ? `${systemData.dataNodeRatio}个` : '-'}}</span>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-active-status /></el-icon>
-                <span class="module-label-text">是否激活：</span>
-                <span class="module-content-text" :style="{ color: systemData.active ? '#44C795' : '#D43030' }">{{ systemData.active ? '是' : '否' }}</span>
+                <span class="module-label-text">{{t('dashboard.isActive')}}：</span>
+                <span class="module-content-text" :style="{ color: systemData.active ? '#44C795' : '#D43030' }">{{ systemData.active ? t('common.yes') : t('common.no') }}</span>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-time /></el-icon>
-                <span class="module-label-text">激活到期：</span>
+                <span class="module-label-text">{{t('dashboard.expirationTime')}}：</span>
                 <span class="module-content-text">{{ systemData.expirationTime || '-' }}</span>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-storage-num /></el-icon>
-                <span class="module-label-text">数据库数量：</span>
+                <span class="module-label-text">{{t('measurement.databaseNum')}}：</span>
                 <span class="module-content-text">{{ toThousands(systemNumberData.databaseNum, '-') }}</span>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-device-num /></el-icon>
-                <span class="module-label-text">设备数量：</span>
+                <span class="module-label-text">{{t('measurement.deviceNum')}}：</span>
                 <span class="module-content-text">{{ toThousands(systemNumberData.deviceNum, '-') }}</span>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-measure-num /></el-icon>
-                <span class="module-label-text">测点数量：</span>
+                <span class="module-label-text">{{t('measurement.measurementNum')}}：</span>
                 <span class="module-content-text">{{ toThousands(systemNumberData.measurementNum, '-') }}</span>
               </li>
             </ul>
@@ -57,11 +57,11 @@
                 :default-sort="{ prop: 'type', order: 'ascending' }"
                 @sort-change="({ column, prop, order }) => handleSortChange({ column, prop, order }, 'master')"
               >
-                <el-table-column label="节点" prop="address" min-width="200" align="center" show-overflow-tooltip />
-                <el-table-column label="类型" prop="type" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
-                <el-table-column label="状态" prop="status" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
-                <el-table-column label="版本" prop="version" v-if="showVersionCol" min-width="90" align="center" show-overflow-tooltip />
-                <el-table-column label="物理机" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('dashboard.node')" prop="address" min-width="200" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('dashboard.type')" prop="type" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('dashboard.status')" prop="status" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('dashboard.version')" prop="version" v-if="showVersionCol" min-width="90" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('dashboard.physicalMachine')" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
                 <template #empty>
                   <div class="table-empty-wrapper">
                     <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
@@ -74,9 +74,9 @@
 
           <div class="module-box-wrapper m-b-16" v-if="slaveData">
             <div class="module-title-wrapper">
-              <h4 class="module-title">备集群系统信息</h4>
+              <h4 class="module-title">{{ t('dashboard.slaveSystemInfo') }}</h4>
               <p class="module-details">
-                <span class="module-label-text">数据截止：</span>
+                <span class="module-label-text">{{`${t('dashboard.deadTime')}：`}}</span>
                 <span class="module-content-text m-r-16">{{ systemTime }}</span>
                 <el-button link @click="() => handleRefreshSystem()" id="dashboard-system-slave-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
               </p>
@@ -84,33 +84,33 @@
             <ul class="system-info-list">
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-system-status /></el-icon>
-                <span class="module-label-text">服务器状态(Running)：</span>
+                <span class="module-label-text">{{`${t('dashboard.serverStatus')}(Running)：`}}</span>
                 <span class="module-content-text" v-if="!slaveData.dataNodeRatio && !slaveData.configNodeRatio">-</span>
                 <span class="module-content-text" v-else>ConfigNode {{ slaveData.configNodeRatio ? `${slaveData.configNodeRatio}个` : '-'}} DataNode {{slaveData.dataNodeRatio ? `${slaveData.dataNodeRatio}个` : '-'}}</span>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-active-status /></el-icon>
-                <span class="module-label-text">是否激活：</span>
-                <span class="module-content-text" :style="{ color: slaveData.active ? '#44C795' : '#D43030' }">{{ slaveData.active ? '是' : '否' }}</span>
+                <span class="module-label-text">{{t('dashboard.isActive')}}：</span>
+                <span class="module-content-text" :style="{ color: slaveData.active ? '#44C795' : '#D43030' }">{{ slaveData.active ? t('common.yes') : t('common.no') }}</span>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-time /></el-icon>
-                <span class="module-label-text">激活到期：</span>
+                <span class="module-label-text">{{t('dashboard.expirationTime')}}：</span>
                 <span class="module-content-text">{{ slaveData.expirationTime || '-' }}</span>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-storage-num /></el-icon>
-                <span class="module-label-text">数据库数量：</span>
+                <span class="module-label-text">{{t('measurement.databaseNum')}}：</span>
                 <span class="module-content-text">{{ toThousands(systemNumberData.databaseNum, '-') }}</span>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-device-num /></el-icon>
-                <span class="module-label-text">设备数量：</span>
+                <span class="module-label-text">{{t('measurement.deviceNum')}}：</span>
                 <span class="module-content-text">{{ toThousands(systemNumberData.deviceNum, '-') }}</span>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-measure-num /></el-icon>
-                <span class="module-label-text">测点数量：</span>
+                <span class="module-label-text">{{t('measurement.measurementNum')}}：</span>
                 <span class="module-content-text">{{ toThousands(systemNumberData.measurementNum, '-') }}</span>
               </li>
             </ul>
@@ -126,11 +126,11 @@
                 :default-sort="{ prop: 'type', order: 'ascending' }"
                 @sort-change="({ column, prop, order }) => handleSortChange({ column, prop, order }, 'slave')"
               >
-                <el-table-column label="节点" prop="address" min-width="200" align="center" show-overflow-tooltip />
-                <el-table-column label="类型" prop="type" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
-                <el-table-column label="状态" prop="status" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
-                <el-table-column label="版本" prop="version" v-if="showVersionCol" min-width="90" align="center" show-overflow-tooltip />
-                <el-table-column label="物理机" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('dashboard.node')" prop="address" min-width="200" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('dashboard.type')" prop="type" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('dashboard.status')" prop="status" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('dashboard.version')" prop="version" v-if="showVersionCol" min-width="90" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('dashboard.physicalMachine')" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
                 <template #empty>
                   <div class="table-empty-wrapper">
                     <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
@@ -143,9 +143,9 @@
 
           <div class="module-box-wrapper monitor-info-wrapper">
             <div class="module-title-wrapper">
-              <h4 class="module-title">监控信息</h4>
+              <h4 class="module-title">{{ t('dashboard.monitorInfo') }}</h4>
               <p class="module-details" v-if="showPrometheus">
-                <span class="module-label-text">数据截止：</span>
+                <span class="module-label-text">{{`${t('dashboard.deadTime')}：`}}</span>
                 <span class="module-content-text m-r-16">{{ monitorTime }}</span>
                 <el-button link @click="handleRefreshMonitor" id="dashboard-monitor-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
               </p>
@@ -154,12 +154,12 @@
             <div v-if="showPrometheus">
               <div class="search-form-box">
                 <ul class="search-cluster-list" v-if="slaveData">
-                  <li :class="['search-cluster-type', { 'search-cluster-active': clusterType === 'master' }]" id="search-cluster-type-master" @click="handleChangeCluster('master')">主集群</li>
-                  <li :class="['search-cluster-type', { 'search-cluster-active': clusterType === 'slave' }]" id="search-cluster-type-slave" @click="handleChangeCluster('slave')">备集群</li>
+                  <li :class="['search-cluster-type', { 'search-cluster-active': clusterType === 'master' }]" id="search-cluster-type-master" @click="handleChangeCluster('master')">{{ t('dashboard.masterCluster') }}</li>
+                  <li :class="['search-cluster-type', { 'search-cluster-active': clusterType === 'slave' }]" id="search-cluster-type-slave" @click="handleChangeCluster('slave')">{{ t('dashboard.slaveCluster') }}</li>
                 </ul>
-                <span class="search-from-label">节点：</span>
-                <el-select v-model="monitorNode" placeholder="全部" style="width: 256px;" @change="handleChangeNode" id="dashboard-monitor-select-node">
-                  <el-option v-for="(item, index) in nodeList" :key="`${item.address}(${item.type})_${index}`" :value="item.nodeID" :id="`dashboard-monitor-select-node-select-${item.nodeID}`" :label="item.address ? `${item.address}(${item.type})` : '全部'" />
+                <span class="search-from-label">{{t('dashboard.node')}}：</span>
+                <el-select v-model="monitorNode" :placeholder="t('common.all')" style="width: 256px;" @change="handleChangeNode" id="dashboard-monitor-select-node">
+                  <el-option v-for="(item, index) in nodeList" :key="`${item.address}(${item.type})_${index}`" :value="item.nodeID" :id="`dashboard-monitor-select-node-select-${item.nodeID}`" :label="item.address ? `${item.address}(${item.type})` : t('common.all')" />
                 </el-select>
               </div>
 
@@ -189,12 +189,12 @@
 
             <div v-if="!configurePrometheus" class="table-empty-wrapper monitor-empty-box">
               <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-              <span class="data-empty-text">未配置Prometheus，请配置后查看</span>
+              <span class="data-empty-text">{{ t('dashboard.unconfigPrometheus') }}</span>
             </div>
 
             <div v-if="configurePrometheus && !enablePrometheus" class="table-empty-wrapper monitor-empty-box">
               <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
-              <span class="data-empty-text">Prometheus配置有误，请修改后查看</span>
+              <span class="data-empty-text">{{ t('dashboard.configPrometheusError') }}</span>
             </div>
           </div>
         </div>

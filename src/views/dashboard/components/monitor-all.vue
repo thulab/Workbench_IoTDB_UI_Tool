@@ -2,7 +2,7 @@
   <div class="monitor-chart-wrapper">
     <div class="monitor-chart-box-3" v-loading="cpuLoading">
       <div class="monitor-chart-container">
-        <h4 class="monitor-info-module-title">CPU 核数</h4>
+        <h4 class="monitor-info-module-title">{{t('dashboard.cpuNum')}}</h4>
         <div class="monitor-module-title-box">
           <h6 class="monitor-info-title">DataNode</h6>
           <h6 class="monitor-info-title">ConfigNode</h6>
@@ -19,13 +19,13 @@
     </div>
     <div class="monitor-chart-box-3" v-loading="diskLoading">
       <div class="monitor-chart-container">
-        <h4 class="monitor-info-module-title">磁盘空间</h4>
+        <h4 class="monitor-info-module-title">{{ t('dashboard.diskMemory') }}</h4>
         <div class="monitor-module-legend-box">
           <p class="monitor-info-legend" style="margin-right: 32px;">
-            <i class="legeng-icon" style="background-color: #495AD4;"></i>已用空间
+            <i class="legeng-icon" style="background-color: #495AD4;"></i>{{ t('dashboard.useMemory') }}
           </p>
           <p class="monitor-info-legend">
-            <i class="legeng-icon" style="background-color: #DFE1ED;"></i>剩余空间
+            <i class="legeng-icon" style="background-color: #DFE1ED;"></i>{{ t('dashboard.residueMemory') }}
           </p>
         </div>
         <data-container :is-empty="diskMemoryData.diskTotal === null">
@@ -37,7 +37,7 @@
     </div>
     <div class="monitor-chart-box-3" v-loading="systemLoading">
       <div class="monitor-chart-container">
-        <h4 class="monitor-info-module-title">系统内存</h4>
+        <h4 class="monitor-info-module-title">{{ t('dashboard.systemMemory') }}</h4>
         <div class="monitor-module-title-box">
           <h6 class="monitor-info-title">DataNode</h6>
           <h6 class="monitor-info-title">ConfigNode</h6>
@@ -51,7 +51,7 @@
   <div class="monitor-chart-wrapper">
     <div class="monitor-chart-box-2" v-loading="speedLoading">
       <div class="monitor-chart-container">
-        <h4 class="monitor-info-module-title">每秒写入点数</h4>
+        <h4 class="monitor-info-module-title">{{ t('dashboard.writeSpeed') }}</h4>
         <data-container :is-empty="writeSpeed === null">
           <div class="monitor-info-module-box">
             <p class="monitor-info-module-text">{{toThousands(writeSpeed)}}</p>
@@ -61,7 +61,7 @@
     </div>
     <div class="monitor-chart-box-2" v-loading="fileLoading">
       <div class="monitor-chart-container">
-        <h4 class="monitor-info-module-title">文件总数</h4>
+        <h4 class="monitor-info-module-title">{{ t('dashboard.fileTotal') }}</h4>
         <data-container :is-empty="fileTotal === null">
           <div class="monitor-info-module-box">
             <p class="monitor-info-module-text">{{toThousands(fileTotal)}}</p>
@@ -94,6 +94,7 @@ interface PieChartData {
   percent: number;
 }
 
+const { t } = useI18n();
 const cpuData = reactive<{
   dataCpu: number | string,
   configCpu: number | string,
@@ -174,7 +175,7 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData, to
       data: [
         {
           value: 0,
-          name: '磁盘空间',
+          name: t('dashboard.diskMemory'),
           itemStyle: {
             color: '#DFE1ED',
           },
@@ -208,7 +209,7 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData, to
         },
         {
           value: 1 - Number(dataNode.percent),
-          name: '磁盘空间',
+          name: t('dashboard.diskMemory'),
           itemStyle: {
             opacity: 0,
           },
@@ -326,7 +327,7 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData, to
       data: [
         {
           value: 0,
-          name: '磁盘空间',
+          name: t('dashboard.diskMemory'),
           itemStyle: {
             color: '#DFE1ED',
           },
@@ -360,7 +361,7 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData, to
         },
         {
           value: 1 - Number(configNode.percent),
-          name: '磁盘空间',
+          name: t('dashboard.diskMemory'),
           itemStyle: {
             opacity: 0,
           },
@@ -474,8 +475,8 @@ const diskChartOptions = (diskMemoryChartData: Dashboard.MetricDiskRes): ECOptio
       const circle = '<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:';
       paramsData.forEach((item) => {
         // eslint-disable-next-line no-nested-ternary
-        res += `<div style="margin: 10px 0 0;">${circle}${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;margin-left:2px">${item.seriesName}</span><span style="float:right;margin-left:20px;font-size:14px;color:#666;font-weight:900">${item.axisValueLabel === '磁盘空间' ? (item.seriesName === '已用空间'
-          ? `${diskMemoryChartData.diskUse} ${diskMemoryChartData.useUnit}` : `${diskMemoryChartData.diskRemain} ${diskMemoryChartData.diskRemainUnit}`) : (item.seriesName === '已用空间' ? `${diskMemoryChartData.ioTDBUse} ${diskMemoryChartData.ioTDBUnit}` : '-')}</span></div>`;
+        res += `<div style="margin: 10px 0 0;">${circle}${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;margin-left:2px">${item.seriesName}</span><span style="float:right;margin-left:20px;font-size:14px;color:#666;font-weight:900">${item.axisValueLabel === t('dashboard.diskMemory') ? (item.seriesName === t('dashboard.useMemory')
+          ? `${diskMemoryChartData.diskUse} ${diskMemoryChartData.useUnit}` : `${diskMemoryChartData.diskRemain} ${diskMemoryChartData.diskRemainUnit}`) : (item.seriesName === t('dashboard.useMemory') ? `${diskMemoryChartData.ioTDBUse} ${diskMemoryChartData.ioTDBUnit}` : '-')}</span></div>`;
       });
       return `<div style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0].axisValueLabel}</div>${res}`;
     },
@@ -490,7 +491,7 @@ const diskChartOptions = (diskMemoryChartData: Dashboard.MetricDiskRes): ECOptio
   barWidth: 30,
   yAxis: {
     type: 'category',
-    data: ['IoTDB 空间', '磁盘空间'],
+    data: [t('dashboard.iotdbMemory'), t('dashboard.diskMemory')],
     axisTick: {
       show: false,
     },
@@ -526,7 +527,7 @@ const diskChartOptions = (diskMemoryChartData: Dashboard.MetricDiskRes): ECOptio
   },
   series: [
     {
-      name: '已用空间',
+      name: t('dashboard.useMemory'),
       type: 'bar',
       stack: 'total',
       data: [
@@ -540,7 +541,7 @@ const diskChartOptions = (diskMemoryChartData: Dashboard.MetricDiskRes): ECOptio
         show: true,
         position: 'top',
         formatter: (params: any) => {
-          if (params.name === 'IoTDB 空间') {
+          if (params.name === t('dashboard.iotdbMemory')) {
             return `${diskMemoryChartData.ioTDBUse} ${diskMemoryChartData.ioTDBUnit}`;
           }
           return `${diskMemoryChartData.diskUse} ${diskMemoryChartData.useUnit}`;
@@ -554,7 +555,7 @@ const diskChartOptions = (diskMemoryChartData: Dashboard.MetricDiskRes): ECOptio
       },
     },
     {
-      name: '剩余空间',
+      name: t('dashboard.residueMemory'),
       type: 'bar',
       stack: 'total',
       // eslint-disable-next-line no-sparse-arrays
@@ -569,7 +570,7 @@ const diskChartOptions = (diskMemoryChartData: Dashboard.MetricDiskRes): ECOptio
         show: true,
         position: 'top',
         formatter: (params: any) => {
-          if (params.name === '磁盘空间') {
+          if (params.name === t('dashboard.diskMemory')) {
             return `${diskMemoryChartData.diskRemain} ${diskMemoryChartData.diskRemainUnit}`;
           }
           return '';
