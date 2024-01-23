@@ -2,18 +2,18 @@
   <div class="page-container">
     <div class="search-form-wrapper">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-        <base-form-item label="告警名称：" prop="alarmName">
-          <el-input v-model="searchFormData.alarmName" placeholder="请输入告警名称" style="width: 172px;" id="alarm-config-search-name" />
+        <base-form-item :label="`${t('alarm.alarmName')}：`" prop="alarmName">
+          <el-input v-model="searchFormData.alarmName" :placeholder="t('alarm.alarmNamePlaceholder')" style="width: 172px;" id="alarm-config-search-name" />
         </base-form-item>
-        <base-form-item label="告警测点：" prop="measurements">
+        <base-form-item prop="measurements">
           <template #label>
-            告警测点：<el-tooltip effect="light" :content="t('common.searchAllTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+            {{t('alarm.alarmMeasurement')}}：<el-tooltip effect="light" :content="t('common.searchAllTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
-          <timeseries-select v-model="searchFormData.measurements" filter-system :is-show-view-btn="true" :placeholder="'请输入告警测点'" :viewText="'已选测点'" id="alarm-config-search-measurements" />
+          <timeseries-select v-model="searchFormData.measurements" filter-system :is-show-view-btn="true" :placeholder="t('alarm.alarmMeasurementPlaceholder')" :viewText="t('dataTrend.choosedMeasurement')" id="alarm-config-search-measurements" />
         </base-form-item>
-        <base-form-item label="告警级别：" prop="alarmLevel">
+        <base-form-item prop="alarmLevel">
           <template #label>
-            告警级别：<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减。" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+            {{t('alarm.alarmLevel')}}：<el-tooltip effect="light" :content="t('alarm.alarmLevelTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
           <el-select v-model="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" class="level-select-box" style="width: 80px;" id="alarm-config-search-level">
             <template #prefix>
@@ -28,13 +28,13 @@
             </el-option>
           </el-select>
         </base-form-item>
-        <base-form-item label="状态：" prop="status" class="m-r-0">
+        <base-form-item :label="`${t('common.status')}：`" prop="status" class="m-r-0">
           <el-select v-model="searchFormData.status" style="width: 80px;" id="alarm-config-search-status">
             <el-option v-for="item in statusOptions" :key="item.value" :value="item.value" :label="item.label" :id="`alarm-config-search-status-select-${item.value}`" />
           </el-select>
         </base-form-item>
         <el-row>
-          <base-form-item label="创建时间：" prop="createtimerange">
+          <base-form-item :label="`${t('common.createTime')}：`" prop="createtimerange">
             <el-date-picker
               v-model="searchFormData.createtimerange"
               type="datetimerange"
@@ -46,7 +46,7 @@
               id="alarm-config-search-datetimerange-create"
             />
           </base-form-item>
-          <base-form-item label="更新时间：" prop="updatetimerange">
+          <base-form-item :label="`${t('common.updateTime')}：`" prop="updatetimerange">
             <el-date-picker
               v-model="searchFormData.updatetimerange"
               type="datetimerange"
@@ -72,10 +72,10 @@
 
     <div class="page-table-details">
       <div class="page-table-title-box">
-        <h4 class="page-table-title">告警配置</h4>
+        <h4 class="page-table-title">{{ t('alarm.alarmConfig') }}</h4>
         <div class="operate-buttons">
           <auth-tooltip :is-disabled="canUsePipe">
-            <el-button type="primary" :disabled="!canUsePipe" @click="handleAdd" id="alarm-config-add">新建告警</el-button>
+            <el-button type="primary" :disabled="!canUsePipe" @click="handleAdd" id="alarm-config-add">{{ t('alarm.newAlarm') }}</el-button>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canUsePipe">
             <el-button :disabled="!multipleSelection.length || !canUsePipe" type="primary" @click="handleDel('batch', null)" id="alarm-config-batch-del">{{ t('common.batchDelete') }}</el-button>
@@ -98,9 +98,9 @@
             @sort-change="handleSortChange"
           >
             <el-table-column type="selection" width="55" />
-            <el-table-column label="告警测点" prop="measurement" min-width="200" align="center" show-overflow-tooltip />
-            <el-table-column label="告警名称" prop="alarmName" min-width="160" align="center" show-overflow-tooltip />
-            <el-table-column label="告警级别" prop="alarmLevel" sortable="custom" width="120" align="center">
+            <el-table-column :label="t('alarm.alarmMeasurement')" prop="measurement" min-width="200" align="center" show-overflow-tooltip />
+            <el-table-column :label="t('alarm.alarmName')" prop="alarmName" min-width="160" align="center" show-overflow-tooltip />
+            <el-table-column :label="t('alarm.alarmLevel')" prop="alarmLevel" sortable="custom" width="120" align="center">
               <template #default="{ row }">
                 <span v-if="row.alarmLevel" style="display: flex; align-items: center; justify-content: center; margin-left: -20px;">
                   <el-icon size="20" :style="{ color: getLevelColor(row) }"><i-custom-alarm-level /></el-icon>
@@ -108,11 +108,11 @@
                 </span>
               </template>
             </el-table-column>
-            <el-table-column label="创建时间" prop="createTime" sortable="custom" min-width="180" align="center" show-overflow-tooltip />
-            <el-table-column label="更新时间" prop="updateTime" sortable="custom" min-width="180" align="center" show-overflow-tooltip />
-            <el-table-column label="告警描述" prop="alarmDesc" min-width="140" align="center" show-overflow-tooltip />
-            <el-table-column label="告警规则" prop="alarmRules" min-width="160" align="center" show-overflow-tooltip />
-            <el-table-column label="状态" prop="status" min-width="90" align="center" show-overflow-tooltip>
+            <el-table-column :label="t('common.createTime')" prop="createTime" sortable="custom" min-width="180" align="center" show-overflow-tooltip />
+            <el-table-column :label="t('common.updateTime')" prop="updateTime" sortable="custom" min-width="180" align="center" show-overflow-tooltip />
+            <el-table-column :label="t('alarm.alarmDesc')" prop="alarmDesc" min-width="140" align="center" show-overflow-tooltip />
+            <el-table-column :label="t('alarm.alarmRules')" prop="alarmRules" min-width="160" align="center" show-overflow-tooltip />
+            <el-table-column :label="t('common.status')" prop="status" min-width="90" align="center" show-overflow-tooltip>
               <template #default="{ row }">
                 {{ getOptionField(row.status, statusOptions, 'value', 'label') }}
               </template>
@@ -120,7 +120,7 @@
             <el-table-column :label="t('common.operation')" width="140" align="center" fixed="right">
               <template #default="{ row }">
                 <div>
-                  <el-button v-if="row.status !== 3" type="primary" link size="small" @click="handleStatus(row)" :id="`alarm-config-table-${row.measurement}-status`">{{ row.status === 1 ? '禁用' : '启用' }}</el-button>
+                  <el-button v-if="row.status !== 3" type="primary" link size="small" @click="handleStatus(row)" :id="`alarm-config-table-${row.measurement}-status`">{{ row.status === 1 ? t('common.disabled') : t('common.enable') }}</el-button>
                   <el-button :disabled="row.status === 3" type="primary" :style="{ 'margin-left': row.status !== 3 ? '12px' : '40px' }" link size="small" @click="handleEdit(row)" :id="`alarm-config-table-${row.measurement}-edit`">{{ t('common.edit') }}</el-button>
                   <el-button type="primary" link size="small" @click="handleDel('row', row)" :id="`alarm-config-table-${row.measurement}-del`">{{ t('common.delete') }}</el-button>
                 </div>
@@ -187,12 +187,12 @@ const {
 const { maxTableHeight } = useTableHeight(320);
 const searchFormRef = ref<FormInstance>();
 const tableRef = ref<InstanceType<typeof ElTable>>();
-const levelOptions = [{ name: '全部', value: '', paramMap: { color: '#424561', icon: '' } }, ...enumStore.alarmLevelEnum];
+const levelOptions = [{ name: t('common.all'), value: '', paramMap: { color: '#424561', icon: '' } }, ...enumStore.alarmLevelEnum];
 const statusOptions = [
-  { label: '全部', value: '' },
-  { label: '启用', value: 1 },
-  { label: '禁用', value: 2 },
-  { label: '失效', value: 3 },
+  { label: t('common.all'), value: '' },
+  { label: t('common.enable'), value: 1 },
+  { label: t('common.disabled'), value: 2 },
+  { label: t('common.expire'), value: 3 },
 ];
 const searchFormData = reactive({
   orderBy: '',
@@ -210,15 +210,15 @@ const searchFormData = reactive({
 });
 const shortcutsDaterange = [
   {
-    text: '今天',
+    text: t('common.today'),
     value: () => getStartAndEnd(0),
   },
   {
-    text: '昨天',
+    text: t('common.yesterday'),
     value: () => getOneInterval(1),
   },
   {
-    text: '最近7天',
+    text: t('common.7dayRecend'),
     value: () => getOneIntervalNow(7),
   },
 ];
@@ -311,7 +311,7 @@ function handleSortChange({ column, prop, order }:SortMethod<Alarm.QueryConfigRe
 function handleStatus(row: Alarm.QueryConfigResult) {
   const { status } = row;
   updateAlarmConfigStatus(row.alarmConfigId, status === 1 ? 2 : 1).then(() => {
-    ElMessage.success('状态更新成功');
+    ElMessage.success(t('common.statusSuccess'));
     row.status = status === 1 ? 2 : 1;
   });
 }
@@ -329,7 +329,7 @@ function handleEdit(row: Alarm.QueryConfigResult) {
 }
 
 function handleDel(type: string, data: Alarm.QueryConfigResult | null) {
-  ElMessageBox.confirm(type === 'batch' ? '确认删除这些告警配置吗？' : '确认删除该条告警配置吗？', t('common.notice'), {
+  ElMessageBox.confirm(type === 'batch' ? t('alarm.batchDelete') : t('alarm.singleDelete'), t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'alarm-config-del-confirm',

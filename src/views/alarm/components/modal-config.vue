@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="editType === 'add' ? '新建告警' : '编辑告警'"
+    :title="editType === 'add' ? t('alarm.newAlarm') : t('alarm.editAlarm')"
     v-model="dialogVisible"
     width="718px"
     class="new-storage-container"
@@ -11,13 +11,13 @@
     <el-form ref="formRef" :model="formData" class="source-form" label-position="right" label-width="90px">
       <el-row>
         <el-col :span="12">
-          <base-form-item label="告警测点：" prop="measurement" :rules="editType === 'add' ? requiredRules : []">
+          <base-form-item prop="measurement" :rules="editType === 'add' ? requiredRules : []">
             <template #label>
-              告警测点：<el-tooltip v-if="editType === 'add'" effect="light" :content="t('common.searchAllTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+              {{t('alarm.alarmMeasurement')}}：<el-tooltip v-if="editType === 'add'" effect="light" :content="t('common.searchAllTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
             <el-select
               v-model="formData.measurement"
-              placeholder="请选择测点"
+              :placeholder="t('measurement.measurementNameSelectPlaceholder')"
               filterable
               remote
               remote-show-suffix
@@ -38,28 +38,28 @@
           </base-form-item>
         </el-col>
         <el-col :span="12">
-          <base-form-item label="数据类型：" prop="measurementType" class="m-l-45 type-input-disabled">
+          <base-form-item :label="`${t('measurement.dataType')}：`" prop="measurementType" class="m-l-45 type-input-disabled">
             <el-input v-model="formData.measurementType" disabled style="width: 80px;" id="alarm-config-modal-measurementType" />
           </base-form-item>
         </el-col>
       </el-row>
       <el-row>
         <el-col :span="24">
-          <base-form-item label="告警名称：" prop="alarmName" :rules="requiredRules">
-            <el-input v-model="formData.alarmName" show-word-limit maxlength="20" placeholder="请输入告警名称" id="alarm-config-modal-name" />
+          <base-form-item :label="`${t('alarm.alarmName')}：`" prop="alarmName" :rules="requiredRules">
+            <el-input v-model="formData.alarmName" show-word-limit maxlength="20" :placeholder="t('alarm.alarmNamePlaceholder')" id="alarm-config-modal-name" />
           </base-form-item>
         </el-col>
       </el-row>
       <el-row>
         <el-col :span="12">
-          <base-form-item label="告警规则：" prop="alarmRulesType" :rules="requiredRulesRules" class="alarm-rule-error">
+          <base-form-item :label="`${t('alarm.alarmRules')}：`" prop="alarmRulesType" :rules="requiredRulesRules" class="alarm-rule-error">
             <el-select
               v-if="formData.measurementType === 'BOOLEAN' || !formData.measurementType"
               v-model="formData.alarmRulesType"
               :disabled="!formData.measurementType"
               @change="handleChangeBooleanRule"
               style="width: 235px;"
-              placeholder="请选择"
+              :placeholder="t('common.selectPlaceholder')"
               id="alarm-config-modal-rule-BOOLEAN"
             >
               <el-option
@@ -80,16 +80,16 @@
                   :id="`alarm-config-modal-rule-select-${item.value}`"
                 />
               </el-select>
-              <el-input v-model="formData.alarmRulesTypeVal" :disabled="!formData.measurementType" placeholder="请输入" style="width: 114px;" id="alarm-config-modal-rule-val" />
+              <el-input v-model="formData.alarmRulesTypeVal" :disabled="!formData.measurementType" :placeholder="t('common.placeHolder')" style="width: 114px;" id="alarm-config-modal-rule-val" />
             </div>
           </base-form-item>
         </el-col>
         <el-col :span="12">
-          <base-form-item label="持续时间：" prop="alarmDuration" :rules="requiredDurationRules" class="m-l-45">
+          <base-form-item :label="`${t('alarm.duration')}：`" prop="alarmDuration" :rules="requiredDurationRules" class="m-l-45">
             <el-input
               v-model.number="formData.alarmDuration"
               :disabled="changeBoolean"
-              placeholder="请输入持续时间"
+              :placeholder="t('alarm.durationPlaceholder')"
               style="width: 235px;"
               id="alarm-config-modal-duration"
             >
@@ -115,7 +115,7 @@
         <el-col :span="12">
           <base-form-item prop="alarmLevel" :rules="requiredRules" :style="{ color: getLevelColor }">
             <template #label>
-              告警级别：<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+              {{t('alarm.alarmLevel')}}：<el-tooltip effect="light" :content="t('alarm.alarmLevelTip')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
             <el-select v-model="formData.alarmLevel" style="width: 235px;" class="level-select-box" id="alarm-config-modal-level">
               <template #prefix>
@@ -137,7 +137,7 @@
           </base-form-item>
         </el-col>
         <el-col :span="12">
-          <base-form-item label="告警频率：" prop="alarmFrequency" :rules="requiredRules" class="m-l-45">
+          <base-form-item :label="`${t('alarm.frequency')}：`" prop="alarmFrequency" :rules="requiredRules" class="m-l-45">
             <el-select
               v-model="formData.alarmFrequency"
               :disabled="changeBoolean"
@@ -157,8 +157,8 @@
       </el-row>
       <el-row class="m-b-12">
         <el-col :span="24">
-          <base-form-item label="告警说明：" prop="alarmDesc">
-            <el-input type="textarea" v-model="formData.alarmDesc" show-word-limit maxlength="100" placeholder="请输入告警说明" :resize="'none'" class="alarm-desc-textarea" id="alarm-config-modal-desc" />
+          <base-form-item :label="`${t('alarm.alarmIntro')}：`" prop="alarmDesc">
+            <el-input type="textarea" v-model="formData.alarmDesc" show-word-limit maxlength="100" :placeholder="t('alarm.alarmIntroPlaceholder')" :resize="'none'" class="alarm-desc-textarea" id="alarm-config-modal-desc" />
           </base-form-item>
         </el-col>
       </el-row>
@@ -232,13 +232,13 @@ const checkRules = (rule: any, value: any, callback: any) => {
   }
   if (formData.measurementType !== 'BOOLEAN') {
     if (!formData.alarmRulesTypeVal) {
-      return callback(new Error('请输入告警规则值'));
+      return callback(new Error(t('alarm.booleanRule')));
     }
     if (!/^(-?\d+)(\.\d+)?$/.test(formData.alarmRulesTypeVal)) {
-      return callback(new Error('告警规则值只能为数字'));
+      return callback(new Error(t('alarm.numberRule')));
     }
     if (+formData.alarmRulesTypeVal > Number.MAX_SAFE_INTEGER || +formData.alarmRulesTypeVal < Number.MIN_SAFE_INTEGER) {
-      return callback(new Error('告警规则值超过最大值范围，请修改'));
+      return callback(new Error(t('alarm.numberOverRule')));
     }
 
     return callback();
@@ -263,14 +263,14 @@ const checkDuration = (rule: any, value: any, callback: any) => {
     return callback(new Error(t('common.formRuleEmpty')));
   }
   if (!/^\d+$/.test(`${value}`)) {
-    return callback(new Error('只能输入正整数或0'));
+    return callback(new Error(t('alarm.intRule')));
   }
   if (typeof value === 'number' && value > 100000000) {
     formData.alarmDuration = 100000000;
     // return callback(new Error(`最大值为${100000000}`));
   }
   if ((formData.measurementType === 'BOOLEAN' && formData.alarmRulesType !== 'change' && !formData.alarmDurationType) || (formData.measurementType !== 'BOOLEAN' && !formData.alarmDurationType)) {
-    return callback(new Error('请选择持续时间单位'));
+    return callback(new Error(t('alarm.durationRule')));
   }
   return callback();
 };
@@ -362,7 +362,7 @@ const handleConfirm = () => {
           measurementType: formData.measurementType,
         }).then((res) => {
           if (res.code === 0) {
-            ElMessage.success('新建告警成功');
+            ElMessage.success(t('alarm.newSuccess'));
             dialogVisible.value = false;
             emit('handleSave');
           }
@@ -373,14 +373,14 @@ const handleConfirm = () => {
           alarmConfigId: props.alarmConfigId,
         }).then((res) => {
           if (res.code === 0) {
-            ElMessage.success('编辑告警成功');
+            ElMessage.success(t('alarm.editSuccess'));
             dialogVisible.value = false;
             emit('handleSave');
           }
         });
       }
     } else {
-      ElMessage.error('存在必填项未编辑或必填项输入规则有误');
+      ElMessage.error(t('common.errorEmptyTip'));
     }
   });
 };

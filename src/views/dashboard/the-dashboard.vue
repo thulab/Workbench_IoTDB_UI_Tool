@@ -59,7 +59,7 @@
               >
                 <el-table-column :label="t('dashboard.node')" prop="address" min-width="200" align="center" show-overflow-tooltip />
                 <el-table-column :label="t('dashboard.type')" prop="type" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
-                <el-table-column :label="t('dashboard.status')" prop="status" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('common.status')" prop="status" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
                 <el-table-column :label="t('dashboard.version')" prop="version" v-if="showVersionCol" min-width="90" align="center" show-overflow-tooltip />
                 <el-table-column :label="t('dashboard.physicalMachine')" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
                 <template #empty>
@@ -128,7 +128,7 @@
               >
                 <el-table-column :label="t('dashboard.node')" prop="address" min-width="200" align="center" show-overflow-tooltip />
                 <el-table-column :label="t('dashboard.type')" prop="type" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
-                <el-table-column :label="t('dashboard.status')" prop="status" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('common.status')" prop="status" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
                 <el-table-column :label="t('dashboard.version')" prop="version" v-if="showVersionCol" min-width="90" align="center" show-overflow-tooltip />
                 <el-table-column :label="t('dashboard.physicalMachine')" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
                 <template #empty>

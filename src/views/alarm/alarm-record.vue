@@ -2,18 +2,18 @@
   <div class="page-container">
     <div class="search-form-wrapper">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-        <base-form-item label="告警名称：" prop="alarmName">
-          <el-input v-model="searchFormData.alarmName" placeholder="请输入告警名称" style="width: 172px;" id="alarm-record-search-name" />
+        <base-form-item :label="`${t('alarm.alarmName')}：`" prop="alarmName">
+          <el-input v-model="searchFormData.alarmName" :placeholder="t('alarm.alarmNamePlaceholder')" style="width: 172px;" id="alarm-record-search-name" />
         </base-form-item>
-        <base-form-item label="告警测点：" prop="measurements">
+        <base-form-item prop="measurements">
           <template #label>
-            告警测点：<el-tooltip effect="light" :content="t('common.searchAllTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+            {{t('alarm.alarmMeasurement')}}：<el-tooltip effect="light" :content="t('common.searchAllTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
-          <timeseries-select v-model="searchFormData.measurements" filter-system :is-show-view-btn="true" :placeholder="'请输入告警测点'" :viewText="'已选测点'" id="alarm-record-search-measurements" />
+          <timeseries-select v-model="searchFormData.measurements" filter-system :is-show-view-btn="true" :placeholder="t('alarm.alarmMeasurementPlaceholder')" :viewText="t('dataTrend.choosedMeasurement')" id="alarm-record-search-measurements" />
         </base-form-item>
-        <base-form-item label="告警级别：" prop="alarmLevel" class="m-r-0">
+        <base-form-item prop="alarmLevel" class="m-r-0">
           <template #label>
-            告警级别：<el-tooltip effect="light" content="一级为最高级别告警，二级次之，依次递减。" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+            {{t('alarm.alarmLevel')}}：<el-tooltip effect="light" :content="t('alarm.alarmLevelTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
           <el-select v-model="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" class="level-select-box" style="width: 80px;" id="alarm-record-search-level">
             <template #prefix>
@@ -29,7 +29,7 @@
           </el-select>
         </base-form-item>
         <el-row>
-          <base-form-item label="告警时间：" prop="createtimerange">
+          <base-form-item :label="`${t('alarm.alarmTime')}：`" prop="createtimerange">
             <el-date-picker
               v-model="searchFormData.createtimerange"
               type="datetimerange"
@@ -41,7 +41,7 @@
               id="alarm-record-search-time"
             />
           </base-form-item>
-          <base-form-item label="仅查看最新状态：" prop="status">
+          <base-form-item :label="`${t('alarm.newStatus')}：`" prop="status">
             <el-switch
               v-model="searchFormData.status"
               :active-value="1"
@@ -63,10 +63,10 @@
 
     <div class="page-table-details">
       <div class="page-table-title-box">
-        <h4 class="page-table-title">告警记录</h4>
+        <h4 class="page-table-title">{{ t('alarm.alarmRecord') }}</h4>
         <div class="operate-buttons">
           <el-dropdown class="m-r-12" :disabled="!totalCount" @command="val => handleCommandDown(val)" id="alarm-record-download-dropdown">
-            <el-button type="primary" class="export-btn" :disabled="!totalCount" id="alarm-record-download">{{ t('common.export') }}<el-tooltip effect="light" content="此导出操作为搜索结果导出。excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出" placement="top" popper-class="tooltip-box-width"><i-custom-question-white /></el-tooltip></el-button>
+            <el-button type="primary" class="export-btn" :disabled="!totalCount" id="alarm-record-download">{{ t('common.export') }}<el-tooltip effect="light" :content="t('common.exportTipAll')" placement="top" popper-class="tooltip-box-width"><i-custom-question-white /></el-tooltip></el-button>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="csv" id="alarm-record-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
@@ -92,8 +92,8 @@
           @sort-change="handleSortChange"
         >
           <!-- <el-table-column type="selection" width="55" /> -->
-          <el-table-column label="告警名称" prop="alarmName" min-width="160" align="center" show-overflow-tooltip />
-          <el-table-column label="告警级别" prop="alarmLevel" sortable="custom" min-width="120" align="center">
+          <el-table-column :label="t('alarm.alarmName')" prop="alarmName" min-width="160" align="center" show-overflow-tooltip />
+          <el-table-column :label="t('alarm.alarmLevel')" prop="alarmLevel" sortable="custom" min-width="120" align="center">
             <template #default="{ row }">
               <span v-if="row.alarmLevel" style="display: flex; align-items: center; justify-content: center; margin-left: -20px;">
                 <el-icon size="20" :style="{ color: getLevelColor(row) }"><i-custom-alarm-level /></el-icon>
@@ -101,16 +101,16 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column label="告警测点" prop="measurement" min-width="200" align="center" show-overflow-tooltip />
-          <el-table-column label="告警值" prop="alarmValue" min-width="160" align="center" show-overflow-tooltip />
-          <el-table-column label="告警时间" prop="createTime" sortable="custom" min-width="180" align="center" show-overflow-tooltip />
-          <el-table-column label="告警描述" prop="alarmDesc" min-width="140" align="center" show-overflow-tooltip />
-          <el-table-column label="是否确认" width="100" align="center" fixed="right">
+          <el-table-column :label="t('alarm.alarmMeasurement')" prop="measurement" min-width="200" align="center" show-overflow-tooltip />
+          <el-table-column :label="t('alarm.alarmValue')" prop="alarmValue" min-width="160" align="center" show-overflow-tooltip />
+          <el-table-column :label="t('alarm.alarmTime')" prop="createTime" sortable="custom" min-width="180" align="center" show-overflow-tooltip />
+          <el-table-column :label="t('alarm.alarmDesc')" prop="alarmDesc" min-width="140" align="center" show-overflow-tooltip />
+          <el-table-column :label="t('alarm.whetherConfirm')" width="100" align="center" fixed="right">
             <template #default="{ row }">
-              <el-button v-if="!row.hasRead" type="primary" link size="small" @click="handleStatus(row)" :id="`alarm-record-table-${row.measurement}-confirm`">确认</el-button>
+              <el-button v-if="!row.hasRead" type="primary" link size="small" @click="handleStatus(row)" :id="`alarm-record-table-${row.measurement}-confirm`">{{ t('common.ack') }}</el-button>
               <div v-else class="operate-confirm-box">
                 <el-icon size="16" class="p-x-5"><i-custom-success-green /></el-icon>
-                已确认
+                {{ t('common.acked') }}
               </div>
               <!-- <el-button type="primary" link size="small" @click="handleDel('row', row)">{{ t('common.delete') }}</el-button> -->
             </template>
@@ -160,7 +160,7 @@ const { t } = useI18n();
 const { maxTableHeight } = useTableHeight(320);
 const searchFormRef = ref<FormInstance>();
 const tableRef = ref<InstanceType<typeof ElTable>>();
-const levelOptions = [{ name: '全部', value: '', paramMap: { color: '#424561', icon: '' } }, ...enumStore.alarmLevelEnum];
+const levelOptions = [{ name: t('common.all'), value: '', paramMap: { color: '#424561', icon: '' } }, ...enumStore.alarmLevelEnum];
 const searchFormData = reactive({
   orderBy: '',
   asc: '',
@@ -175,15 +175,15 @@ const searchFormData = reactive({
 let copySearchFormData = cloneDeep(searchFormData);
 const shortcutsDaterange = [
   {
-    text: '今天',
+    text: t('common.today'),
     value: () => getStartAndEnd(0),
   },
   {
-    text: '昨天',
+    text: t('common.yesterday'),
     value: () => getOneInterval(1),
   },
   {
-    text: '最近7天',
+    text: t('common.7dayRecend'),
     value: () => getOneIntervalNow(7),
   },
 ];
@@ -294,7 +294,7 @@ function handleCommandDown(val: string) {
 
 function handleStatus(row: Alarm.QueryRecordResult) {
   updateAlarmRecordStatus(row.alarmTraceId).then(() => {
-    ElMessage.success('已阅');
+    ElMessage.success(t('alarm.read'));
     // handleSearch();
     copySearchFormData = cloneDeep(searchFormData);
     getListData();
@@ -303,7 +303,7 @@ function handleStatus(row: Alarm.QueryRecordResult) {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleDel(type: string, data: Alarm.QueryRecordResult | null) {
-  ElMessageBox.confirm(type === 'batch' ? '确认删除这些告警记录吗？' : '确认删除该条告警记录吗？', t('common.notice'), {
+  ElMessageBox.confirm(type === 'batch' ? t('alarm.batchDeleteRecord') : t('alarm.singleDeleteRecord'), t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'alarm-record-del-confirm',

@@ -95,7 +95,7 @@
                     </div>
                   </template>
                 </el-table-column>
-                <el-table-column :label="t('dataSync.createTime')" prop="creationTime" min-width="200" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('common.createTime')" prop="creationTime" min-width="200" align="center" show-overflow-tooltip />
                 <el-table-column :label="t('common.operation')" width="180" align="center" fixed="right">
                   <template #default="{ row }">
                     <div>

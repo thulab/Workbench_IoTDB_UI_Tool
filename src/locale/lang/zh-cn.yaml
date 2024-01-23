@@ -28,6 +28,7 @@ common:
   import: 导入
   export: 导出
   exportTip: excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出
+  exportTipAll: 此导出操作为搜索结果导出。excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出
   exportCSV: 以.csv格式导出
   exportXLSX: 以.xlsx格式导出
   placeHolder: 请输入
@@ -71,6 +72,7 @@ common:
   saveSuccess: 保存成功
   changeSuccess: 编辑成功
   deleteSuccess: 删除成功
+  statusSuccess: 状态更新成功
   formRuleEmpty: 请输入相应内容后进行操作
   formRuleEmptyShort: 请输入相应内容
   formRuleEmptyOperate: 请输入内容后操作
@@ -100,6 +102,14 @@ common:
   color: 颜色
   lineWidth: 线宽
   doc: 文档
+  status: 状态
+  createTime: 创建时间
+  updateTime: 更新时间
+  enable: 启用
+  disabled: 禁用
+  expire: 失效
+  ack: 确认
+  acked: 已确认
 page:
   data: 数据
   alarm: 告警
@@ -282,7 +292,6 @@ dashboard:
   isActive: 是否激活
   node: 节点
   type: 类型
-  status: 状态
   version: 版本
   physicalMachine: 物理机
   monitorInfo: 监控信息
@@ -312,7 +321,6 @@ dataSync:
   syncRange: 同步范围
   address: 目标地址
   status: 任务状态
-  createTime: 创建时间
   stop: 停止
   run: 启动
   runTip: 当前没有需要启动的任务
@@ -417,5 +425,38 @@ calculate:
   calculateExpression: 计算表达式
   viewExpression: 视图表达式
   expressionTip: "支持使用运算符及函数(除聚合函数), 如: root.sgcc.wf03.wt01.temperature + 1，详细规则见"
-
+alarm:
+  alarmName: 告警名称
+  alarmNamePlaceholder: 请输入告警名称
+  alarmMeasurement: 告警测点
+  alarmMeasurementPlaceholder: 请输入告警测点
+  alarmLevel: 告警级别
+  alarmLevelTip: 一级为最高级别告警，二级次之，依次递减。
+  alarmConfig: 告警配置
+  newAlarm: 新建告警
+  editAlarm: 编辑告警
+  alarmDesc: 告警描述
+  alarmRules: 告警规则
+  batchDelete: 确认删除这些告警配置吗？
+  singleDelete: 确认删除该条告警配置吗？
+  alarmTime: 告警时间
+  newStatus: 仅查看最新状态
+  alarmRecord: 告警记录
+  alarmValue: 告警值
+  whetherConfirm: 是否确认
+  batchDeleteRecord: 确认删除这些告警记录吗？
+  singleDeleteRecord: 确认删除该条告警记录吗？
+  read: 已阅
+  duration: 持续时间
+  durationPlaceholder: 请输入持续时间
+  frequency: 告警频率
+  alarmIntro: 告警说明
+  alarmIntroPlaceholder: 请输入告警说明
+  booleanRule: 请输入告警规则值
+  numberRule: 告警规则值只能为数字
+  numberOverRule: 告警规则值超过最大值范围，请修改
+  intRule: 只能输入正整数或0
+  durationRule: 请选择持续时间单位
+  newSuccess: 新建告警成功
+  editSuccess: 编辑告警成功
 
