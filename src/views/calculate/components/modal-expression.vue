@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="表达式"
+    :title="t('calculate.expression')"
     v-model="dialogVisible"
     width="480px"
     align-center
@@ -23,6 +23,7 @@ const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
 }>();
 
+const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 </script>
 

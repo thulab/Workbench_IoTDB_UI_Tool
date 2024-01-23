@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="editType === 'add' ? `新建${pageText}` : `编辑${pageText}`"
+    :title="editType === 'add' ? `${appType === 1 ? t('calculate.newCalculate') : t('calculate.newView')}` : `${appType === 1 ? t('calculate.editCalculate') : t('calculate.editView')}`"
     v-model="dialogVisible"
     width="780px"
     align-center
@@ -8,33 +8,33 @@
     id="calculate-modal"
   >
     <el-form ref="formRef" :model="formData" class="source-form" label-position="left">
-      <base-form-item :label="`${pageText}名称：`" prop="name" :rules="requiredRules" class="form-label-width">
-        <el-input v-model="formData.name" show-word-limit maxlength="20" :placeholder="`请输入${pageText}名称`" id="calculate-modal-name" />
+      <base-form-item :label="`${appType === 1 ? t('calculate.calculateName') : t('calculate.viewName')}：`" prop="name" :rules="requiredRules" class="form-label-width">
+        <el-input v-model="formData.name" show-word-limit maxlength="20" :placeholder="appType === 1 ? t('calculate.calculateNamePlaceholder') : t('calculate.viewNamePlaceholder')" id="calculate-modal-name" />
       </base-form-item>
-      <base-form-item :label="`${pageText}描述：`" prop="desc" class="form-label-width form-label-normal">
-        <el-input type="textarea" v-model="formData.desc" show-word-limit maxlength="100" :placeholder="`请输入${pageText}描述`" :resize="'none'" class="desc-textarea" id="calculate-modal-desc" />
+      <base-form-item :label="`${appType === 1 ? t('calculate.calculateDesc') : t('calculate.viewDesc')}：`" prop="desc" class="form-label-width form-label-normal">
+        <el-input type="textarea" v-model="formData.desc" show-word-limit maxlength="100" :placeholder="appType === 1 ? t('calculate.calculateDescPlaceholder') : t('calculate.viewDescPlaceholder')" :resize="'none'" class="desc-textarea" id="calculate-modal-desc" />
       </base-form-item>
-      <base-form-item label="结果测点：" prop="measurement" :rules="requiredRules" class="form-label-width">
+      <base-form-item prop="measurement" :rules="requiredRules" class="form-label-width">
         <template #label>
-          结果测点：<el-tooltip effect="light" content="数据类型根据表达式计算逻辑推断生成，编码方式及压缩方式为null" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+          {{t('calculate.resultMeasurement')}}：<el-tooltip effect="light" :content="t('calculate.descTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
         </template>
-        <el-input v-model="formData.measurement" placeholder="请输入结果测点名称" v-if="editType === 'add'" id="calculate-modal-measurement">
+        <el-input v-model="formData.measurement" :placeholder="t('calculate.resultMeasurementPlaceholder')" v-if="editType === 'add'" id="calculate-modal-measurement">
           <template #prepend>root.</template>
         </el-input>
         <el-input v-model="formData.measurement" v-else disabled class="input-disabled" id="calculate-modal-measurement-disabled" />
       </base-form-item>
-      <base-form-item :label="`${pageText}表达式：`" prop="expression" :rules="requiredExpressionRules" class="form-expression-box">
+      <base-form-item prop="expression" :rules="requiredExpressionRules" class="form-expression-box">
         <template #label>
-          {{pageText}}表达式：<el-tooltip effect="light" placement="top">
+          {{appType === 1 ? t('calculate.calculateExpression') : t('calculate.viewExpression')}}：<el-tooltip effect="light" placement="top">
             <i-custom-question />
             <template #content>
-              <p style="color: #131926;font-weight: 300;width: 230px;">支持使用运算符及函数(除聚合函数), 如: root.sgcc.wf03.wt01.temperature + 1，详细规则见
+              <p style="color: #131926;font-weight: 300;width: 230px;">{{ t('calculate.expressionTip') }}
                 <a
                   href="https://www.timecho.com/docs/zh/UserGuide/V1.1.x/Operators-Functions/Overview.html#%E8%BF%90%E7%AE%97%E7%AC%A6%E5%92%8C%E5%87%BD%E6%95%B0"
                   target="_blank"
                   rel="noopener noreferrer"
                   style="color: #495ad4;"
-                >文档</a></p>
+                >{{ t('common.doc') }}</a></p>
             </template>
           </el-tooltip>
         </template>
@@ -53,10 +53,10 @@
             <div class="quick-box-container">
               <div class="quick-box">
                 <el-tabs v-model="activeNameSide" class="tabs-nav-aside">
-                  <el-tab-pane label="测点" name="data">
+                  <el-tab-pane :label="t('measurement.measurement')" name="data">
                     <side-data @get-function="getFunction" ref="sideDataRef" />
                   </el-tab-pane>
-                  <el-tab-pane label="函数" name="function">
+                  <el-tab-pane :label="t('search.function')" name="function">
                     <side-function @get-function="getFunction" />
                   </el-tab-pane>
                 </el-tabs>
@@ -95,7 +95,6 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 const appType = Number(import.meta.env.VITE_APP_TYPE);
-const pageText = appType === 1 ? '计算' : '视图';
 const dialogVisible = useVModel(props, 'visible', emit);
 const formRef = ref<FormInstance>();
 const codeEditorRef = ref<InstanceType<typeof CodeEditor>>();
@@ -149,7 +148,7 @@ const handleConfirm = () => {
           ...formData,
           measurement: `root.${formData.measurement}`,
         }).then(() => {
-          ElMessage.success('创建成功');
+          ElMessage.success(t('common.createSuccess'));
           dialogVisible.value = false;
           emit('handleSave');
         }).finally(() => {
@@ -160,7 +159,7 @@ const handleConfirm = () => {
           ...formData,
           measurement: `${formData.measurement}`,
         }).then(() => {
-          ElMessage.success('编辑成功');
+          ElMessage.success(t('common.changeSuccess'));
           dialogVisible.value = false;
           emit('handleSave');
         }).finally(() => {

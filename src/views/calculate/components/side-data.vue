@@ -1,6 +1,6 @@
 <template>
   <div class="search_div maxheight">
-    <el-input class="m-b-8 filter-input" v-model="filterMeasurementText" placeholder="请输入测点名称" @input="getMeasurementList" id="calculate-modal-input-measurement">
+    <el-input class="m-b-8 filter-input" v-model="filterMeasurementText" :placeholder="t('measurement.measurementNamePlaceholder')" @input="getMeasurementList" id="calculate-modal-input-measurement">
       <!-- <template #suffix><i-ep-search /></template> -->
     </el-input>
 
@@ -13,8 +13,8 @@
       tooltip-effect="light"
       cell-class-name="p-y-0"
       :tooltip-options="{ placement: 'left', popperClass: 'table-tooltip-max-width' }"
-      @row-dblclick="(row, column, event)=>handleAdd(row)">
-      <el-table-column align="center" label="测点" v-slot="{ row }" show-overflow-tooltip>
+      @row-dblclick="(row, column, event) => handleAdd(row)">
+      <el-table-column align="center" :label="t('measurement.measurement')" v-slot="{ row }" show-overflow-tooltip>
         {{ row.timeseries }}
       </el-table-column>
     </el-table>
@@ -28,6 +28,7 @@ import { StorageApi } from '@/api';
 
 const emit = defineEmits(['get-function']);
 
+const { t } = useI18n();
 const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementAllObjList);
 
 const filterMeasurementText = ref('');

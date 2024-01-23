@@ -5,15 +5,15 @@
         <div class="search-form-wrapper">
           <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline @submit.prevent>
             <base-form-item label="" prop="name" style="margin-left: -8px;">
-              <el-input v-model="searchFormData.name" placeholder="请输入名称" style="width: 346px;" id="calculate-search-name">
+              <el-input v-model="searchFormData.name" :placeholder="t('calculate.namePlaceholder')" style="width: 346px;" id="calculate-search-name">
                 <template #prefix>
                   <i-custom-search-icon class="remote-select-search-icon" />
                 </template>
                 <template #prepend>
                   <el-select v-model="searchFormData.type" style="width: 88px;" placeholder="" id="calculate-search-type">
-                    <el-option :label="`${pageText}名称`" value="name" id="calculate-search-type-name" />
-                    <el-option label="结果测点" value="measurement" id="calculate-search-type-measurement" />
-                    <el-option :label="`${pageText}描述`" value="desc" id="calculate-search-type-desc" />
+                    <el-option :label="appType === 1 ? t('calculate.calculateName') : t('calculate.viewName')" value="name" id="calculate-search-type-name" />
+                    <el-option :label="t('calculate.resultMeasurement')" value="measurement" id="calculate-search-type-measurement" />
+                    <el-option :label="appType === 1 ? t('calculate.calculateDesc') : t('calculate.viewDesc')" value="desc" id="calculate-search-type-desc" />
                   </el-select>
                 </template>
               </el-input>
@@ -32,10 +32,10 @@
       <el-main class="p-0">
         <div class="page-table-details">
           <div class="page-table-title-box">
-            <h4 class="page-table-title">{{pageText}}列表</h4>
+            <h4 class="page-table-title">{{appType === 1 ? t('calculate.calculateList') : t('calculate.viewList')}}</h4>
             <div class="operate-buttons">
               <auth-tooltip :is-disabled="canAllWriteSchema">
-                <el-button type="primary" :disabled="!canAllWriteSchema" @click="handleAdd" id="calculate-add">新建{{pageText}}</el-button>
+                <el-button type="primary" :disabled="!canAllWriteSchema" @click="handleAdd" id="calculate-add">{{appType === 1 ? t('calculate.newCalculate') : t('calculate.newView')}}</el-button>
               </auth-tooltip>
               <auth-tooltip :is-disabled="canWriteSchema">
                 <el-button :disabled="!multipleSelection.length || !canWriteSchema" type="primary" @click="handleDel('batch', null)" id="calculate-batch-del">{{ t('common.batchDelete') }}</el-button>
@@ -59,24 +59,24 @@
                 @selection-change="handleSelectionChange"
               >
                 <el-table-column type="selection" width="55" />
-                <el-table-column :label="`${pageText}名称`" prop="name" min-width="120" align="center" show-overflow-tooltip />
-                <el-table-column :label="`${pageText}描述`" prop="desc" min-width="160" align="center" show-overflow-tooltip />
-                <el-table-column label="结果测点" prop="measurement" width="160" align="center" show-overflow-tooltip>
+                <el-table-column :label="appType === 1 ? t('calculate.calculateName') : t('calculate.viewName')" prop="name" min-width="120" align="center" show-overflow-tooltip />
+                <el-table-column :label="appType === 1 ? t('calculate.calculateDesc') : t('calculate.viewDesc')" prop="desc" min-width="160" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('calculate.resultMeasurement')" prop="measurement" width="160" align="center" show-overflow-tooltip>
                   <template #default="{ row }">
                     <span class="measurement-text-button" @click="handleView(row)">{{ row.measurement }}</span>
                   </template>
                 </el-table-column>
-                <el-table-column label="表达式" prop="expression" min-width="80" align="center" show-overflow-tooltip>
+                <el-table-column :label="t('calculate.expression')" prop="expression" min-width="80" align="center" show-overflow-tooltip>
                   <template #default="{ row }">
                     <el-button type="primary" link size="small" @click="handleExpression(row)">{{ t('common.detail') }}</el-button>
                   </template>
                 </el-table-column>
-                <el-table-column label="最新结果" prop="value" min-width="140" align="center" show-overflow-tooltip />
-                <el-table-column label="最新结果时间" prop="valueTime" min-width="200" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('calculate.lastValue')" prop="value" min-width="140" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('calculate.lastValueTime')" prop="valueTime" min-width="200" align="center" show-overflow-tooltip />
                 <el-table-column :label="t('common.operation')" width="180" align="center" fixed="right">
                   <template #default="{ row }">
                     <div>
-                      <el-button type="primary" link size="small" @click="handleQuery(row)" :id="`calculate-table-${row.measurement}-data`">查看数据</el-button>
+                      <el-button type="primary" link size="small" @click="handleQuery(row)" :id="`calculate-table-${row.measurement}-data`">{{ t('calculate.view') }}</el-button>
                       <el-button type="primary" link size="small" @click="handleEdit(row)" :id="`calculate-table-${row.measurement}-edit`">{{ t('common.edit') }}</el-button>
                       <auth-tooltip :is-disabled="rowCanWriteSchemaByPath(row.measurement)">
                         <el-button type="primary" :disabled="!rowCanWriteSchemaByPath(row.measurement)" link size="small" @click="handleDel('row', row)" :id="`calculate-table-${row.measurement}-del`">{{ t('common.delete') }}</el-button>
@@ -137,7 +137,6 @@ import ModalExpression from './components/modal-expression.vue';
 
 const { t } = useI18n();
 const appType = Number(import.meta.env.VITE_APP_TYPE);
-const pageText = appType === 1 ? '计算' : '视图';
 const router = useRouter();
 const userStore = useUserStore();
 const {
@@ -302,7 +301,7 @@ function handleEdit(row: Calculate.CalculateItem) {
 }
 
 function handleDel(type: string, data: Calculate.CalculateItem | null) {
-  ElMessageBox.confirm(type === 'batch' ? `是否确认删除这些${pageText}？` : `是否删除该${pageText}？`, t('common.notice'), {
+  ElMessageBox.confirm(type === 'batch' ? `${appType === 1 ? t('calculate.batchDeleteCalculate') : t('calculate.batchDeleteView')}？` : `${appType === 1 ? t('calculate.singleDeleteCalculate') : t('calculate.singleDeleteView')}？`, t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'del-calculate-confirm',

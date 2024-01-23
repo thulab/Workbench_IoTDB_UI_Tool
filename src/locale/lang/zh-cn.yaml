@@ -69,6 +69,7 @@ common:
   editSuccess: 修改成功
   updateSuccess: 更新成功
   saveSuccess: 保存成功
+  changeSuccess: 编辑成功
   deleteSuccess: 删除成功
   formRuleEmpty: 请输入相应内容后进行操作
   formRuleEmptyShort: 请输入相应内容
@@ -98,6 +99,7 @@ common:
   origin: 原始值
   color: 颜色
   lineWidth: 线宽
+  doc: 文档
 page:
   data: 数据
   alarm: 告警
@@ -385,5 +387,35 @@ dataTrend:
   choosedMeasurement: 已选测点
   overMeasurementTip: 最多同时展示10条测点趋势
   number10Tip: 只支持输入1-10范围内的正整数
+calculate:
+  namePlaceholder: 请输入名称
+  resultMeasurement: 结果测点
+  calculateName: 计算名称
+  viewName: 视图名称
+  calculateDesc: 计算描述
+  viewDesc: 视图描述
+  calculateList: 计算列表
+  viewList: 视图列表
+  newCalculate: 新建计算
+  newView: 新建视图
+  editCalculate: 编辑计算
+  editView: 编辑视图
+  expression: 表达式
+  lastValue: 最新结果
+  lastValueTime: 最新结果时间
+  view: 查看数据
+  batchDeleteCalculate: 是否确认删除这些计算？
+  batchDeleteView: 是否确认删除这些视图？
+  singleDeleteCalculate: 是否删除该计算？
+  singleDeleteView: 是否删除该视图？
+  calculateNamePlaceholder: 请输入计算名称
+  viewNamePlaceholder: 请输入视图名称
+  calculateDescPlaceholder: 请输入计算描述
+  viewDescPlaceholder: 请输入视图描述
+  descTip: 数据类型根据表达式计算逻辑推断生成，编码方式及压缩方式为null
+  resultMeasurementPlaceholder: 请输入结果测点名称
+  calculateExpression: 计算表达式
+  viewExpression: 视图表达式
+  expressionTip: "支持使用运算符及函数(除聚合函数), 如: root.sgcc.wf03.wt01.temperature + 1，详细规则见"
 
 
