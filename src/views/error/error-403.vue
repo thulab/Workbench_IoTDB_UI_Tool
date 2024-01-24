@@ -3,11 +3,11 @@
     <!-- <img src="@/assets/images/403.png" class="error-img" alt="403" /> -->
     <div class="error-detail">
       <h2>403</h2>
-      <h4>抱歉，您无权访问该页面~🙅‍♂️🙅‍♀️</h4>
+      <h4>{{ t('error.403Tip') }}~🙅‍♂️🙅‍♀️</h4>
       <el-button
         type="primary"
         @click="tabStore.goHome()">
-        返回首页
+        {{ t('error.goHome') }}
       </el-button>
     </div>
   </div>
@@ -16,6 +16,7 @@
 <script setup lang="ts">
 import useTabsStore from '@/stores/tabs';
 
+const { t } = useI18n();
 const tabStore = useTabsStore();
 </script>
 

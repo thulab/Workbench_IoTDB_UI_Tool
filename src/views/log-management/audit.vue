@@ -4,29 +4,29 @@
       <el-header class="p-x-0" style="height: auto;">
         <div class="search-form-wrapper">
           <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-            <base-form-item label="操作用户：" prop="username">
-              <el-input v-model="searchFormData.username" placeholder="请输入用户名称" style="width: 172px;" id="audit-search-name">
+            <base-form-item :label="`${t('log.operateUser')}：`" prop="username">
+              <el-input v-model="searchFormData.username" :placeholder="t('auth.userPlaceholder')" style="width: 172px;" id="audit-search-name">
                 <template #prefix>
                   <i-custom-search-icon class="remote-select-search-icon" />
                 </template>
               </el-input>
             </base-form-item>
-            <base-form-item label="IP来源：" prop="address">
-              <el-input v-model="searchFormData.address" placeholder="请输入 IP 来源" style="width: 172px;" id="audit-search-ip">
+            <base-form-item :label="`${t('log.ip')}：`" prop="address">
+              <el-input v-model="searchFormData.address" :placeholder="t('log.ipPlaceholder')" style="width: 172px;" id="audit-search-ip">
                 <template #prefix>
                   <i-custom-search-icon class="remote-select-search-icon" />
                 </template>
               </el-input>
             </base-form-item>
             <base-form-item :label="`${t('common.operationDetail')}：`" prop="log">
-              <el-input v-model="searchFormData.log" placeholder="请输入操作详情" style="width: 172px;" id="audit-search-log">
+              <el-input v-model="searchFormData.log" :placeholder="t('log.operationDetailPlaceholder')" style="width: 172px;" id="audit-search-log">
                 <template #prefix>
                   <i-custom-search-icon class="remote-select-search-icon" />
                 </template>
               </el-input>
             </base-form-item>
             <el-row>
-              <base-form-item label="时间范围：" prop="time">
+              <base-form-item :label="`${t('log.timeRange')}：`" prop="time">
                 <el-date-picker
                   v-model="searchFormData.time"
                   type="datetimerange"
@@ -49,7 +49,7 @@
       </el-header>
       <el-main class="p-0">
         <div class="page-table-details">
-          <h4 class="page-table-title">日志列表</h4>
+          <h4 class="page-table-title">{{ t('log.auditList') }}</h4>
           <div class="page-table-box">
             <el-table
               :data="tableData.list"
@@ -61,9 +61,9 @@
               :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
               ref="tableRef"
             >
-              <el-table-column label="操作时间" prop="time" width="180" align="center" show-overflow-tooltip />
-              <el-table-column label="IP来源" prop="address" width="160" align="center" show-overflow-tooltip />
-              <el-table-column label="操作用户" prop="username" width="140" align="center" show-overflow-tooltip />
+              <el-table-column :label="t('log.operateTime')" prop="time" width="180" align="center" show-overflow-tooltip />
+              <el-table-column :label="t('log.ip')" prop="address" width="160" align="center" show-overflow-tooltip />
+              <el-table-column :label="t('log.operateUser')" prop="username" width="140" align="center" show-overflow-tooltip />
               <el-table-column :label="t('common.operationDetail')" prop="log" min-width="280" align="left">
                 <template #default="{ row, $index }">
                   <overflow-click
@@ -134,15 +134,15 @@ const timestamp = ref(0);
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 const shortcutsDaterange = [
   {
-    text: '今天',
+    text: t('common.today'),
     value: () => getStartAndEnd(0),
   },
   {
-    text: '昨天',
+    text: t('common.yesterday'),
     value: () => getOneInterval(1),
   },
   {
-    text: '最近7天',
+    text: t('common.7dayRecend'),
     value: () => getOneIntervalNow(7),
   },
 ];

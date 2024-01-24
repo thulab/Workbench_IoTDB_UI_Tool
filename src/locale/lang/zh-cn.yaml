@@ -89,8 +89,8 @@ common:
   importTip: 为避免格式错误，推荐使用文本编辑器查看
   searchTipLimit100: 仅展示100条搜索结果，如有需要请精确搜索
   searchAllTipLimit100: 关键字搜索仅展示100条搜索结果，如有需要请精确搜索
-  yes: 是
-  no: 否
+  'yes': 是
+  'no': 否
   errorDetail: 错误详情
   errorTip: 输入有误
   errorEmptyTip: 存在必填项未编辑或必填项输入规则有误
@@ -519,3 +519,16 @@ auth:
   userList: 用户列表
   deleteUserTip: 是否删除该用户？
   editUser: 编辑用户
+error:
+  403Tip: 抱歉，您无权访问该页面
+  goHome: 返回首页
+  404Tip: 抱歉，您访问的页面不存在
+  500Tip: 抱歉，您的网络不见了
+log:
+  operateUser: 操作用户
+  ip: IP来源
+  ipPlaceholder: 请输入 IP 来源
+  operationDetailPlaceholder: 请输入操作详情
+  timeRange: 时间范围
+  auditList: 日志列表
+  operateTime: 操作时间
