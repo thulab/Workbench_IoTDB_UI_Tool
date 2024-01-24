@@ -2,7 +2,7 @@
   <div>
     <div v-if="isAuth === false" class="auth-tip-container">
       <img src="@/assets/auth-tip.png" alt="" class="auth-tip-img">
-      <span class="auth-tip-text">暂无权限</span>
+      <span class="auth-tip-text">{{ t('common.noAuth') }}</span>
     </div>
     <slot v-if="isAuth"></slot>
   </div>
@@ -13,6 +13,7 @@ defineProps<{
   isAuth: boolean;
 }>();
 
+const { t } = useI18n();
 </script>
 
 <style lang="scss" scoped>

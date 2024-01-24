@@ -2,11 +2,11 @@
   <div class="ip-port-list">
     <div class="ip-port-item" v-for="(item, index) in hostAndPortList" :key="`${formKey}-${index}`">
       <base-form-item label="" :prop="`${formKey}[${index}].host`" :rules="requiredRules">
-        <el-input v-model.trim="item.host" placeholder="请输入数据库Host或IP" style="width: 169px" :id="`${formKey}-${index}-host`" :disabled="!isDisabled" />
+        <el-input v-model.trim="item.host" :placeholder="t('connection.ipTip')" style="width: 169px" :id="`${formKey}-${index}-host`" :disabled="!isDisabled" />
       </base-form-item>
       <span class="ip-port-divider">:</span>
       <base-form-item label="" :prop="`${formKey}[${index}].port`" :rules="requiredPortRules">
-        <el-input v-model.number="item.port" placeholder="请输入端口号" style="width: 100px" :id="`${formKey}-${index}-port`" :disabled="!isDisabled" />
+        <el-input v-model.number="item.port" :placeholder="t('connection.portTip')" style="width: 100px" :id="`${formKey}-${index}-port`" :disabled="!isDisabled" />
       </base-form-item>
       <template v-if="showOperate">
         <el-button link v-if="index === 0" @click="handleAddHost" :id="`${formKey}-add`" class="m-l-6" :disabled="isDisabledAddHosts || !isDisabled"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
@@ -45,10 +45,10 @@ const requiredPortRules = ref([
   {
     validator: (rule: any, value: any, callback: any) => {
       if (!/^\+?[1-9][0-9]*$/.test(`${value}`)) {
-        return callback(new Error('输入有误'));
+        return callback(new Error(t('common.errorTip')));
       }
       if (value > 65535) {
-        return callback(new Error('输入有误'));
+        return callback(new Error(t('common.errorTip')));
       }
       return callback();
     },

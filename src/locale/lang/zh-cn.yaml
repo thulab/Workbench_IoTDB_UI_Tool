@@ -91,6 +91,8 @@ common:
   searchAllTipLimit100: 关键字搜索仅展示100条搜索结果，如有需要请精确搜索
   'yes': 是
   'no': 否
+  master: 主
+  slave: 备
   errorDetail: 错误详情
   errorTip: 输入有误
   errorEmptyTip: 存在必填项未编辑或必填项输入规则有误
@@ -120,6 +122,21 @@ common:
   fileTypeError: 文件类型错误
   fileSizeError: 文件大小不能超过%{size}MB!
   websockerVersionTip: 您的浏览器不支持webSocket,请使用更高版本浏览器！
+  test: 测试
+  continueTip: 当前内容未填写完整，是否继续填写？
+  unsaveTip: 当前内容未进行保存，是否继续填写？
+  continue: 继续
+  giveup: 放弃
+  example: 例如
+  errorExg: 格式不符，请重新输入
+  copy: 复制
+  paste: 粘贴
+  undo: 撤销
+  redo: 恢复
+  deleteNode: 删除节点
+  deleteEdge: 删除边
+  warmTip: 温馨提示
+  versionTip: 请升级至IoTDB V%{version}及以上版本使用
 page:
   '403': 403页面
   '404': 404页面
@@ -544,6 +561,13 @@ auth:
   userList: 用户列表
   deleteUserTip: 是否删除该用户？
   editUser: 编辑用户
+  resetPwd: 重置密码
+  layout: 退出登录
+  enterpriseTip: 该功能为企业版所有，如有需要请联系商务
+  oldPwd: 原始密码
+  oldPwdTip: 请输入原始密码
+  inputPwd: 输入密码
+  oldPwdReg: 格式不符，请输入大小写字母、数字、特殊字符（!{'@'}#$%^&*()_+-=）
 error:
   403Tip: 抱歉，您无权访问该页面
   goHome: 返回首页
@@ -581,6 +605,8 @@ login:
   connectionEmptyTip: 请选择连接实例
   loginExpire: 登录已失效，请重新登录
   serverError: 内部服务异常，请联系管理员
+  layoutTip: 您是否确认退出登录?
+  resetPwdLogin: 密码已修改，请重新登录
 alarmEnum:
   change0: 变0告警
   change1: 变1告警
@@ -603,3 +629,69 @@ alarmEnum:
   level3: 三级
   level4: 四级
   level5: 五级
+connection:
+  detail: 实例详情
+  type: 连接类型
+  name: 实例名称
+  namePlaceholder: 请输入实例名称
+  info: 实例信息
+  masterInfo: 主集群信息
+  slaveInfo: 备集群信息
+  connection: 连接实例
+  iotdbSuccess: IoTDB连接成功
+  allSuccess: IoTDB、主、备集群Prometheus连接成功
+  masterSuccess: IoTDB、主集群Prometheus连接成功
+  slaveSuccess: IoTDB、备集群Prometheus连接成功
+  singleSuccess: IoTDB、Prometheus连接成功
+  pwdEmptyTip: 请填写密码后进行操作
+  prometheusSuccess: Prometheus连接成功
+  allPrometheusSuccess: 主、备集群Prometheus连接成功
+  masterPrometheusSuccess: 主集群Prometheus连接成功
+  slavePrometheusSuccess: 备集群Prometheus连接成功
+  ipTip: 请输入数据库Host或IP
+  portTip: 请输入端口号
+  prometheus: Prometheus 信息
+  prometheusTip: 配置prometheus可在界面查看部分监控信息，推荐您进行配置使用
+  slaveError: 备集群状态异常，请检查后重试
+  deleteTip: 是否删除该实例？
+  addConnection: 新建实例
+  connectionManagement: 实例管理
+  connectionList: 实例列表
+flow:
+  flowManagement: 流程图管理
+  topologyMap: 拓扑图
+  flowChart: 流程图
+  style: 样式
+  fontSize: 文字大小
+  fontColor: 文字颜色
+  position: 位置
+  posx: x轴位置
+  posy: y轴位置
+  angle: 旋转度数
+  line: 连线
+  lineType: 连线类型
+  lineColor: 连线颜色
+  arrow: 箭头
+  arrowType: 箭头样式
+  arrowWidth: 箭头宽度
+  arrowHeight: 箭头长度
+  lineNormal: 直线连接
+  lineRounded: 圆弧连接
+  lineDashed: 流动连接
+  arrowBlock: 实心箭头
+  arrowClassic: 经典箭头
+  arrowDiamond: 菱形箭头
+  basicGraphics: 基础图形
+  standAlone: 单机实例
+  cluster: 集群实例
+  doubleLive: 双活实例
+  copySuccess: 复制成功
+  copyTip: 请先选中节点再复制
+  pasteSuccess: 粘贴成功
+  pasteTip: 剪切板为空，不可粘贴
+  undoTip: 没有需要撤销的操作
+  redoTip: 没有需要恢复的操作
+  deleteTip: 请先选中节点/边再删除
+  input: 文字输入
+  deleteNodeTip: 请先选中节点再删除
+  deleteEdgeTip: 请先选中边再删除

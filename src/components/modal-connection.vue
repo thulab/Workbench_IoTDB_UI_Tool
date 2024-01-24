@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="实例管理"
+    :title="t('connection.connectionManagement')"
     v-model="dialogVisible"
     width="780px"
     align-center
@@ -12,14 +12,14 @@
     <el-container class="connection-wrapper" v-loading="listLoading">
       <el-aside width="240px" class="connection-list-wrapper">
         <div class="connection-list-title">
-          <h4>实例列表</h4>
+          <h4>{{ t('connection.connectionList') }}</h4>
           <div>
             <el-button link class="m-r-8" @click="handleRefresh" id="connection-side-refresh"><i-custom-border-refresh /></el-button>
             <el-button link class="m-r-8 m-l-0" @click="handleGraph" id="connection-side-graph"><i-custom-graph /></el-button>
             <el-button link style="margin: 0;" @click="handleAddConnection" id="connection-side-add"><i-custom-new-connection /></el-button>
           </div>
         </div>
-        <el-input placeholder="请输入实例名称" v-model="filterText" id="connection-list-input" @keyup.enter="handleFilter" class="connection-search-input">
+        <el-input :placeholder="t('connection.namePlaceholder')" v-model="filterText" id="connection-list-input" @keyup.enter="handleFilter" class="connection-search-input">
           <template #prefix>
             <i-custom-search-icon class="remote-select-search-icon" />
           </template>
@@ -42,7 +42,7 @@
               <popconfirm
                 :confirm-button-text="t('common.confirm')"
                 :cancel-button-text="t('common.cancel')"
-                title="是否删除该实例？"
+                :title="t('connection.deleteTip')"
                 v-if="item.id !== connectionStore.connectionInfo.data.id || route.name === 'Login'"
                 :icon="ICustomError"
                 width="200"
@@ -129,7 +129,7 @@ async function handleAddConnection() {
   }
   current.value = '';
   filterList.value.unshift({
-    id: '', type: 0, name: '新建实例', username: '',
+    id: '', type: 0, name: t('connection.addConnection'), username: '',
   });
   editType.value = 'add';
   connectionFormRef.value?.handleChangeType(0);

@@ -3,7 +3,7 @@
     placement="top-start"
     effect="light"
     trigger="hover"
-    content="暂无权限"
+    :content="t('common.noAuth')"
     :disabled="isDisabled"
     popper-class="tooltip-box-width"
   >
@@ -16,4 +16,5 @@ defineProps<{
   isDisabled: boolean;
 }>();
 
+const { t } = useI18n();
 </script>

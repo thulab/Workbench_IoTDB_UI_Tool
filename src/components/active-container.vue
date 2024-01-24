@@ -2,7 +2,7 @@
   <el-container>
     <div v-if="isShow === false" class="auth-tip-container">
       <img src="@/assets/auth-tip.png" alt="" class="auth-tip-img">
-      <span class="auth-tip-text">该功能为企业版所有，如有需要请联系商务<a :href="`mailto:${email}`">{{ email }}</a></span>
+      <span class="auth-tip-text">{{ t('auth.enterpriseTip') }}<a :href="`mailto:${email}`">{{ email }}</a></span>
     </div>
     <slot v-if="isShow"></slot>
   </el-container>
@@ -13,6 +13,7 @@ defineProps<{
   isShow: boolean;
 }>();
 
+const { t } = useI18n();
 const email = computed(() => import.meta.env.VITE_APP_BUSSINESS_EMAIL);
 </script>
 

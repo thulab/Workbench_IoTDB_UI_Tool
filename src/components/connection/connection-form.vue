@@ -1,25 +1,25 @@
 <template>
   <el-main class="connection-detail-wrapper">
     <div class="connection-operate-buttons">
-      <h4 class="connection-detail-title">实例详情</h4>
+      <h4 class="connection-detail-title">{{ t('connection.detail') }}</h4>
     </div>
     <el-scrollbar v-loading="detailLoading">
       <el-form ref="formRef" :model="formData" label-position="left" label-width="140px" :key="formKey">
         <label><input type="password" autocomplete="new-password" hidden></label>
-        <base-form-item label="连接类型：" prop="type" :rules="requiredRules" class="base-form-box">
+        <base-form-item :label="`${t('connection.type')}：`" prop="type" :rules="requiredRules" class="base-form-box">
           <el-radio-group v-model="formData.type" @change="val => handleChangeType(val as 0 | 1 | 2)" :disabled="editType !== 'add' || !isShowSave" id="connection-modal-type">
-            <el-radio :label="0">单机</el-radio>
-            <el-radio :label="1">集群</el-radio>
-            <el-radio :label="2">双活</el-radio>
+            <el-radio :label="0">{{ t('common.standAlone') }}</el-radio>
+            <el-radio :label="1">{{ t('common.cluster') }}</el-radio>
+            <el-radio :label="2">{{ t('common.doubleLive') }}</el-radio>
           </el-radio-group>
         </base-form-item>
-        <base-form-item label="实例名称：" prop="name" :rules="requiredRules" class="base-form-box">
-          <el-input v-model="formData.name" placeholder="请输入实例名称" maxlength="50" show-word-limit id="connection-modal-name" :disabled="!isShowSave" />
+        <base-form-item :label="`${t('connection.name')}：`" prop="name" :rules="requiredRules" class="base-form-box">
+          <el-input v-model="formData.name" :placeholder="t('connection.namePlaceholder')" maxlength="50" show-word-limit id="connection-modal-name" :disabled="!isShowSave" />
         </base-form-item>
         <!-- 单机版 -->
         <template v-if="formData.type === 0">
           <div class="ip-port-box base-form-box">
-            <span class="form-label">实例信息：</span>
+            <span class="form-label">{{ t('connection.info') }}：</span>
             <host-port
               v-model="formData.masterCluster.hostAndPortVOS"
               :form-key="'masterCluster.hostAndPortVOS'"
@@ -41,7 +41,7 @@
         <!-- 集群版 -->
         <template v-if="formData.type === 1">
           <div class="ip-port-box base-form-box">
-            <span class="form-label">实例信息：</span>
+            <span class="form-label">{{ t('connection.info') }}：</span>
             <host-port
               v-model="formData.masterCluster.hostAndPortVOS"
               :form-key="'masterCluster.hostAndPortVOS'"
@@ -70,12 +70,12 @@
             :is-disabled="isShowSave"
           />
           <el-collapse v-model="activeNames" class="connection-cluster-box">
-            <el-collapse-item title="主集群信息" name="masterCluster">
+            <el-collapse-item :title="t('connection.masterInfo')" name="masterCluster">
               <template #title>
-                <h4 class="connection-cluster-title">主集群信息</h4>
+                <h4 class="connection-cluster-title">{{ t('connection.masterInfo') }}</h4>
               </template>
               <div class="ip-port-box">
-                <span class="form-label">实例信息：</span>
+                <span class="form-label">{{ t('connection.info') }}：</span>
                 <host-port
                   v-model="formData.masterCluster.hostAndPortVOS"
                   :form-key="'masterCluster.hostAndPortVOS'"
@@ -89,12 +89,12 @@
                 :class-name="'optional-form-item m-b-0 p-r-28'"
               />
             </el-collapse-item>
-            <el-collapse-item title="备集群信息" name="slaveCluster" v-if="formData.slaveCluster">
+            <el-collapse-item :title="t('connection.slaveInfo')" name="slaveCluster" v-if="formData.slaveCluster">
               <template #title>
-                <h4 class="connection-cluster-title">备集群信息</h4>
+                <h4 class="connection-cluster-title">t('connection.slaveInfo')</h4>
               </template>
               <div class="ip-port-box">
-                <span class="form-label">实例信息：</span>
+                <span class="form-label">{{ t('connection.info') }}：</span>
                 <host-port
                   v-model="formData.slaveCluster.hostAndPortVOS"
                   :form-key="'slaveCluster.hostAndPortVOS'"
@@ -113,11 +113,11 @@
       </el-form>
     </el-scrollbar>
     <div class="connection-form-buttons">
-      <el-button plain @click="handleTest" id="connection-modal-test" :loading="testLoading">测试</el-button>
+      <el-button plain @click="handleTest" id="connection-modal-test" :loading="testLoading">{{ t('common.test') }}</el-button>
       <div>
         <el-button plain v-if="isShowSave" @click="handleReset" id="connection-modal-reset">{{ t('common.reset') }}</el-button>
         <el-button type="primary" :disabled="!isCanSave" :loading="saveLoading" @click="handleSave" id="connection-modal-save">{{ t('common.save') }}</el-button>
-        <el-button type="primary" v-if="isToggle && current !== connectionStore.connectionInfo.data.id" :loading="connectLoading" id="connection-modal-login" @click="handleTestLogin">连接实例</el-button>
+        <el-button type="primary" v-if="isToggle && current !== connectionStore.connectionInfo.data.id" :loading="connectLoading" id="connection-modal-login" @click="handleTestLogin">{{ t('connection.connection') }}</el-button>
       </div>
     </div>
   </el-main>
@@ -229,9 +229,9 @@ function handleChangeType(type: 0 | 1 | 2) {
 function handleChangeConnection() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return new Promise((resolve, reject) => {
-    ElMessageBox.confirm(editType.value === 'add' ? '当前内容未填写完整，是否继续填写？' : '当前内容未进行保存，是否继续填写？', t('common.notice'), {
-      confirmButtonText: '继续',
-      cancelButtonText: '放弃',
+    ElMessageBox.confirm(editType.value === 'add' ? t('common.continueTip') : t('common.unsaveTip'), t('common.notice'), {
+      confirmButtonText: t('common.continue'),
+      cancelButtonText: t('common.giveup'),
       confirmButtonClass: 'connection-form-continue-confirm',
       cancelButtonClass: 'connection-form-continue-cancel',
       type: 'warning',
@@ -284,17 +284,17 @@ function handleReset() {
 function handleTestConnnection() {
   testLoading.value = true;
   testConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id }).then(() => {
-    let successMsg = 'IoTDB连接成功';
+    let successMsg = t('connection.iotdbSuccess');
     if (formData.type === 2) {
       if (formData.masterCluster.prometheusUrl && formData.slaveCluster?.prometheusUrl) {
-        successMsg = 'IoTDB、主、备集群Prometheus连接成功';
+        successMsg = t('connection.allSuccess');
       } else if (formData.masterCluster.prometheusUrl) {
-        successMsg = 'IoTDB、主集群Prometheus连接成功';
+        successMsg = t('connection.masterSuccess');
       } else if (formData.slaveCluster?.prometheusUrl) {
-        successMsg = 'IoTDB、备集群Prometheus连接成功';
+        successMsg = t('connection.slaveSuccess');
       }
     } else if (formData.masterCluster.prometheusUrl) {
-      successMsg = 'IoTDB、Prometheus连接成功';
+      successMsg = t('connection.singleSuccess');
     }
     ElMessage.success({
       message: successMsg,
@@ -309,7 +309,7 @@ function handleTestLogin() {
   formRef.value?.validate((valid) => {
     if (valid) {
       if (!formData.password) {
-        errorPwd.value = '请填写密码后进行操作';
+        errorPwd.value = t('connection.pwdEmptyTip');
         return;
       }
       errorPwd.value = '';
@@ -343,14 +343,14 @@ function handleTestLogin() {
 }
 
 function handleTestPrometheus() {
-  let successMsg = 'Prometheus连接成功';
+  let successMsg = t('connection.prometheusSuccess');
   if (formData.type === 2) {
     if (formData.masterCluster.prometheusUrl && formData.slaveCluster?.prometheusUrl) {
-      successMsg = '主、备集群Prometheus连接成功';
+      successMsg = t('connection.allPrometheusSuccess');
     } else if (formData.masterCluster.prometheusUrl) {
-      successMsg = '主集群Prometheus连接成功';
+      successMsg = t('connection.masterPrometheusSuccess');
     } else if (formData.slaveCluster?.prometheusUrl) {
-      successMsg = '备集群Prometheus连接成功';
+      successMsg = t('connection.slavePrometheusSuccess');
     } else {
       successMsg = '';
     }
@@ -382,7 +382,7 @@ function handleTest() {
         return;
       }
       if (!formData.password) {
-        errorPwd.value = '请填写密码后进行操作';
+        errorPwd.value = t('connection.pwdEmptyTip');
       } else {
         errorPwd.value = '';
         // 测试连接

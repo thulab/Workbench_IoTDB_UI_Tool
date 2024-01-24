@@ -9,17 +9,17 @@
   >
     <el-form label-width="90px" ref="formRef" :rules="rules" :model="formData" label-position="left" :key="formKey">
       <label><input type="password" autocomplete="new-password" hidden></label>
-      <base-form-item label="用户名：" required>
+      <base-form-item :label="`${t('auth.userName')}：`" required>
         <el-text>{{ userName }}</el-text>
       </base-form-item>
-      <base-form-item label="原始密码：" prop="rawPassword">
-        <el-input v-model="formData.rawPassword" maxlength="32" autocomplete="off" placeholder="请输入原始密码" show-password id="modal-reset-pwd-input-raw-pwd" />
+      <base-form-item :label="`${t('auth.oldPwd')}：`" prop="rawPassword">
+        <el-input v-model="formData.rawPassword" maxlength="32" autocomplete="off" :placeholder="t('auth.oldPwdTip')" show-password id="modal-reset-pwd-input-raw-pwd" />
       </base-form-item>
-      <base-form-item label="输入密码：" prop="password">
-        <el-input v-model="formData.password" maxlength="32" autocomplete="off" placeholder="请输入密码" show-password id="modal-reset-pwd-input-pwd" />
+      <base-form-item :label="`${t('auth.inputPwd')}：`" prop="password">
+        <el-input v-model="formData.password" maxlength="32" autocomplete="off" :placeholder="t('auth.pwdPlaceholder')" show-password id="modal-reset-pwd-input-pwd" />
       </base-form-item>
-      <base-form-item label="确认密码：" prop="confirmPassword">
-        <el-input v-model="formData.confirmPassword" maxlength="32" autocomplete="off" placeholder="请再次输入密码" show-password id="modal-reset-pwd-input-pwd-again" />
+      <base-form-item :label="`${t('auth.confirmPwd')}：`" prop="confirmPassword">
+        <el-input v-model="formData.confirmPassword" maxlength="32" autocomplete="off" :placeholder="t('auth.confirmPwdAgain')" show-password id="modal-reset-pwd-input-pwd-again" />
       </base-form-item>
     </el-form>
     <template #footer>
@@ -70,12 +70,12 @@ const rules = reactive<FormRules>({
     {
       min: 4,
       max: 32,
-      message: '字符长度不小于4，请重新输入',
+      message: t('auth.pwdLength'),
       trigger: ['blur', 'change'],
     },
     {
       pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
-      message: '格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
+      message: t('auth.oldPwdReg'),
       trigger: ['blur', 'change'],
     },
   ],
@@ -88,12 +88,12 @@ const rules = reactive<FormRules>({
     {
       min: 4,
       max: 32,
-      message: '字符长度不小于4，请重新输入',
+      message: t('auth.pwdLength'),
       trigger: ['blur', 'change'],
     },
     {
       pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
-      message: '格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
+      message: t('auth.oldPwdReg'),
       trigger: ['blur', 'change'],
     },
   ],
@@ -106,18 +106,18 @@ const rules = reactive<FormRules>({
     {
       min: 4,
       max: 32,
-      message: '字符长度不小于4，请重新输入',
+      message: t('auth.pwdLength'),
       trigger: ['blur', 'change'],
     },
     {
       pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
-      message: '格式不符，请输入大小写字母、数字、特殊字符（!@#$%^&*()_+-=）',
+      message: t('auth.oldPwdReg'),
       trigger: ['blur', 'change'],
     },
     {
       validator: (rule: any, value: any, callback: any) => {
         if (value !== formData.password) {
-          callback(new Error('密码不一致，请重新输入'));
+          callback(new Error(t('auth.pwdUnSame')));
         } else {
           callback();
         }
@@ -132,10 +132,10 @@ const handleConfirm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
       updateUser(props.userName, formData.rawPassword, formData.password).then(() => {
-        ElMessage.success(`${props.title}成功`);
+        ElMessage.success(`${props.title}${t('common.success')}`);
         dialogVisible.value = false;
         if (userStore.userInfo.name === props.userName) {
-          ElMessageBox.alert('密码已修改，请重新登录', t('common.tip'), {
+          ElMessageBox.alert(t('login.resetPwdLogin'), t('common.tip'), {
             confirmButtonText: t('common.confirm'),
             customClass: 'reset-password-message-box',
             confirmButtonClass: 'reset-password-confirm',

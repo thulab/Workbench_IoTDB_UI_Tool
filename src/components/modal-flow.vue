@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="流程图管理"
+    :title="t('flow.flowManagement')"
     v-model="dialogVisible"
     width="1024px"
     align-center
@@ -17,7 +17,7 @@
       <div class="flow-graph-operate-header">
         <div class="flow-graph-operate-left">
           <el-button link class="flow-graph-close-btn" id="flow-graph-close-btn" @click="handleClose"><el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>{{ t('common.goback') }}</el-button>
-          <span class="flow-graph-header-title">拓扑图</span>
+          <span class="flow-graph-header-title">{{ t('flow.topologyMap') }}</span>
         </div>
         <div class="operate-buttons" v-if="editType === 'edit'">
           <el-button link @click="handleSaveView" id="flow-graph-view" :loading="saveLoading"><el-icon size="24" class="m-r-6"><i-custom-circle-close-half /></el-icon>{{ t('common.exitEdit') }}</el-button>
@@ -39,9 +39,9 @@
           <div class="flow-operate-wrapper" v-show="isEdit && (isShowTextStyle || isShowNodeStyle || isShowEdgeStyle)">
             <!-- 文本 -->
             <div v-show="isShowTextStyle" class="text-style-box">
-              <h4 class="operate-style-title">样式</h4>
+              <h4 class="operate-style-title">{{ t('flow.style') }}</h4>
               <div class="text-style-detail-item">
-                <span class="detail-label">文字大小：</span>
+                <span class="detail-label">{{t('flow.fontSize')}}：</span>
                 <el-input-number
                   v-model.number="textStyle.fontSize"
                   :min="1"
@@ -54,16 +54,16 @@
                 />
               </div>
               <div class="text-style-detail-item">
-                <span class="detail-label">文字颜色：</span>
+                <span class="detail-label">{{t('flow.fontColor')}}：</span>
                 <el-color-picker v-model="textStyle.color" color-format="hex" @change="val => handleChangeTextColor(val as string)" id="text-style-color" />
               </div>
             </div>
             <!-- 节点 -->
             <div v-show="isShowNodeStyle" class="node-style-box">
-              <h4 class="operate-style-title">样式</h4>
-              <h5 class="operate-style-module-title">位置</h5>
+              <h4 class="operate-style-title">{{ t('flow.style') }}</h4>
+              <h5 class="operate-style-module-title">{{ t('flow.position') }}</h5>
               <div class="node-style-detail-item">
-                <span class="detail-label">x轴位置：</span>
+                <span class="detail-label">{{t('flow.posx')}}：</span>
                 <el-input-number
                   v-model.number="nodeStyle.x"
                   step-strictly
@@ -76,7 +76,7 @@
                 />
               </div>
               <div class="node-style-detail-item">
-                <span class="detail-label">y轴位置：</span>
+                <span class="detail-label">{{t('flow.posy')}}：</span>
                 <el-input-number
                   v-model.number="nodeStyle.y"
                   step-strictly
@@ -89,7 +89,7 @@
                 />
               </div>
               <div class="node-style-detail-item">
-                <span class="detail-label">旋转度数：</span>
+                <span class="detail-label">{{t('flow.angle')}}：</span>
                 <el-input-number
                   v-model.number="nodeStyle.angle"
                   step-strictly
@@ -102,10 +102,10 @@
             </div>
             <!-- 边 箭头 -->
             <div v-show="isShowEdgeStyle" class="edge-style-box">
-              <h4 class="operate-style-title">样式</h4>
-              <h5 class="operate-style-module-title">连线</h5>
+              <h4 class="operate-style-title">{{ t('flow.style') }}</h4>
+              <h5 class="operate-style-module-title">{{ t('flow.line') }}</h5>
               <div class="edge-style-detail-item">
-                <span class="detail-label">连线类型：</span>
+                <span class="detail-label">{{t('flow.lineType')}}：</span>
                 <el-select v-model="edgeStyle.lineType" @change="handleChangeLineType" popper-class="center-select" id="line-style-type">
                   <el-option
                     v-for="item in lineTypeList"
@@ -117,12 +117,12 @@
                 </el-select>
               </div>
               <div class="edge-style-detail-item">
-                <span class="detail-label">连线颜色：</span>
+                <span class="detail-label">{{t('flow.lineColor')}}：</span>
                 <el-color-picker v-model="edgeStyle.color" color-format="hex" @change="val => handleChangeLineColor(val as string)" id="line-style-color" />
               </div>
-              <h5 class="operate-style-module-title">箭头</h5>
+              <h5 class="operate-style-module-title">{{ t('flow.箭头') }}</h5>
               <div class="edge-style-detail-item">
-                <span class="detail-label">箭头样式：</span>
+                <span class="detail-label">{{t('flow.arrowType')}}：</span>
                 <el-select v-model="edgeStyle.arrowType" @change="handleChangeArrowType" popper-class="center-select" id="line-style-arrow">
                   <el-option
                     v-for="item in arrowTypeList"
@@ -134,11 +134,11 @@
                 </el-select>
               </div>
               <div class="edge-style-detail-item">
-                <span class="detail-label">箭头宽度：</span>
+                <span class="detail-label">{{t('flow.arrowWidth')}}：</span>
                 <el-slider v-model="edgeStyle.arrowWidth" :min="1" :max="50" @change="val => handleChangeArrowWidth(val as number)" id="arrow-style-width" />
               </div>
               <div class="edge-style-detail-item">
-                <span class="detail-label">箭头长度：</span>
+                <span class="detail-label">{{t('flow.arrowHeight')}}：</span>
                 <el-slider v-model="edgeStyle.arrowHeight" :min="1" :max="50" @change="val => handleChangeArrowHeight(val as number)" id="arrow-style-height" />
               </div>
             </div>
@@ -191,19 +191,20 @@ const emit = defineEmits<{
   (event: 'handleClose', id?: number): void;
 }>();
 
+const { t } = useI18n();
+
 const lineTypeList = [
-  { name: '直线连接', value: 'normal' },
-  { name: '圆弧连接', value: 'rounded' },
-  { name: '流动连接', value: 'dashed' },
+  { name: t('flow.lineNormal'), value: 'normal' },
+  { name: t('flow.lineRounded'), value: 'rounded' },
+  { name: t('flow.lineDashed'), value: 'dashed' },
 ];
 
 const arrowTypeList = [
-  { name: '实心箭头', value: 'block' },
-  { name: '经典箭头', value: 'classic' },
-  { name: '菱形箭头', value: 'diamond' },
+  { name: t('flow.arrowBlock'), value: 'block' },
+  { name: t('flow.arrowClassic'), value: 'classic' },
+  { name: t('flow.arrowDiamond'), value: 'diamond' },
 ];
 
-const { t } = useI18n();
 const TeleportContainer = getTeleport();
 const dialogVisible = useVModel(props, 'visible', emit);
 const stencilContainerRef = ref<HTMLElement | null>(null);
@@ -588,7 +589,7 @@ function initialGraph(isDisabled?: boolean) {
   // #region 初始化 stencil
   if (!isDisabled) {
     stencil.value = new Stencil({
-      title: '流程图',
+      title: t('flow.flowChart'),
       target: graph.value,
       stencilGraphWidth: 268,
       stencilGraphHeight: 0,
@@ -596,7 +597,7 @@ function initialGraph(isDisabled?: boolean) {
       collapsable: false,
       groups: [
         {
-          title: '基础图形',
+          title: t('flow.basicGraphics'),
           name: 'group1',
           collapsed: false,
           layoutOptions: {
@@ -612,17 +613,17 @@ function initialGraph(isDisabled?: boolean) {
           },
         },
         {
-          title: '单机实例',
+          title: t('flow.standAlone'),
           name: 'group2',
           collapsed: false,
         },
         {
-          title: '集群实例',
+          title: t('flow.cluster'),
           name: 'group3',
           collapsed: false,
         },
         {
-          title: '双活实例',
+          title: t('flow.doubleLive'),
           name: 'group4',
           collapsed: false,
         },
@@ -861,9 +862,9 @@ function handleCopy() {
   const cells = graph.value?.getSelectedCells() || [];
   if (cells.length) {
     graph.value?.copy(cells, { deep: false, useLocalStorage: false });
-    ElMessage.success({ message: '复制成功', grouping: true });
+    ElMessage.success({ message: t('flow.copySuccess'), grouping: true });
   } else {
-    ElMessage.info({ message: '请先选中节点再复制', grouping: true });
+    ElMessage.info({ message: t('flow.copyTip'), grouping: true });
   }
 }
 
@@ -872,9 +873,9 @@ function handlePaste() {
   if (!graph.value?.isClipboardEmpty()) {
     graph.value?.paste({ offset: 32 });
     // graph.value?.cleanClipboard();
-    ElMessage.success({ message: '粘贴成功', grouping: true });
+    ElMessage.success({ message: t('flow.pasteSuccess'), grouping: true });
   } else {
-    ElMessage.info({ message: '剪切板为空，不可粘贴', grouping: true });
+    ElMessage.info({ message: t('flow.pasteTip'), grouping: true });
   }
 }
 
@@ -883,7 +884,7 @@ function handleUndo() {
   if (graph.value?.canUndo()) {
     graph.value?.undo();
   } else {
-    ElMessage.info({ message: '没有需要撤销的操作', grouping: true });
+    ElMessage.info({ message: t('flow.undoTip'), grouping: true });
   }
 }
 
@@ -892,7 +893,7 @@ function handleRedo() {
   if (graph.value?.canRedo()) {
     graph.value?.redo();
   } else {
-    ElMessage.info({ message: '没有需要恢复的操作', grouping: true });
+    ElMessage.info({ message: t('flow.redoTip'), grouping: true });
   }
 }
 
@@ -925,7 +926,7 @@ function graphBindEvent() {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
       contextMenuType.value = '';
     } else {
-      ElMessage.info({ message: '请先选中节点/边再删除', grouping: true });
+      ElMessage.info({ message: t('flow.deleteTip'), grouping: true });
     }
     return false;
   });
@@ -953,7 +954,7 @@ function getList() {
 function loadStencil() {
   const baseNode = graph.value!.createNode({
     shape: 'custom-rect',
-    label: '文字输入',
+    label: t('flow.input'),
   });
   const standAloneNodes = standAloneList.value.map((item) => graph.value!.createNode({
     shape: 'custom-vue-node',
@@ -1192,7 +1193,7 @@ function handleClickOperate(key: string) {
   // 删除节点
   if (key === 'del') {
     if (!operateNode.value) {
-      ElMessage.info({ message: '请先选中节点再删除', grouping: true });
+      ElMessage.info({ message: t('flow.deleteNodeTip'), grouping: true });
     } else {
       operateNode.value.remove();
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
@@ -1202,7 +1203,7 @@ function handleClickOperate(key: string) {
   // 删除边
   if (key === 'delEdge') {
     if (!operateEdge.value) {
-      ElMessage.info({ message: '请先选中边再删除', grouping: true });
+      ElMessage.info({ message: t('flow.deleteEdgeTip'), grouping: true });
     } else {
       operateEdge.value.remove();
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });

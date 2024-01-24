@@ -23,8 +23,8 @@
             <i-custom-menu-connection-cluster v-if="connectionStore.connectionInfo.data.type === 1" />
           </el-icon>
           <ul class="cluster-list" v-else>
-            <li :class="['cluster-type', { 'cluster-active': clusterType === 'master' }]" id="layout-menu-connection-master" @click="handleChangeCluster('master')">主</li>
-            <li :class="['cluster-type', { 'cluster-active': clusterType === 'slave' }]" id="layout-menu-connection-slave" @click="handleChangeCluster('slave')">备</li>
+            <li :class="['cluster-type', { 'cluster-active': clusterType === 'master' }]" id="layout-menu-connection-master" @click="handleChangeCluster('master')">{{ t('common.master') }}</li>
+            <li :class="['cluster-type', { 'cluster-active': clusterType === 'slave' }]" id="layout-menu-connection-slave" @click="handleChangeCluster('slave')">{{ t('common.slave') }}</li>
           </ul>
           <span class="connection-host-port">{{ connectionHost }}</span>
         </div>
@@ -78,7 +78,7 @@ const clusterType = computed(() => {
   }
   return 'master';
 });
-const connectionName = computed(() => connectionStore.connectionInfo.data.name || '连接实例');
+const connectionName = computed(() => connectionStore.connectionInfo.data.name || t('connection.connection'));
 const slaveConnectionStatus = computed(() => connectionStore.slaveConnectionStatus);
 const connectionHost = computed(() => {
   const { type, masterCluster, slaveCluster } = connectionStore.connectionInfo.data;
@@ -129,7 +129,7 @@ const routesToMenu = (routeItem: RouteRecordRaw, parentPath: string) => {
 
 function handleChangeCluster(type: 'master' | 'slave') {
   if (!slaveConnectionStatus.value) {
-    ElMessageBox.alert('备集群状态异常，请检查后重试', t('common.tip'), {
+    ElMessageBox.alert(t('connection.slaveError'), t('common.tip'), {
       confirmButtonText: t('common.confirm'),
       confirmButtonClass: 'change-slave-error-confirm',
       type: 'warning',

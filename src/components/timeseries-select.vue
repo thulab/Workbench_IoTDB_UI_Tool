@@ -3,7 +3,7 @@
     <el-select
       class="remote-select-box"
       v-model="model"
-      :placeholder="'请选择测点'"
+      :placeholder="t('measurement.measurementNameSelectPlaceholder')"
       filterable
       remote
       clearable
@@ -24,8 +24,8 @@
         </div>
       </el-option>
     </el-select>
-    <el-button v-if="isShowViewBtn" type="primary" :disabled="!model.length" class="m-l-12" @click="() => dialogVisible = true">{{viewText || '已选测点' }}</el-button>
-    <el-dialog :title="viewText || '已选测点'" v-model="dialogVisible" class="select-modal" align-center>
+    <el-button v-if="isShowViewBtn" type="primary" :disabled="!model.length" class="m-l-12" @click="() => dialogVisible = true">{{viewText || t('dataTrend.choosedMeasurement') }}</el-button>
+    <el-dialog :title="viewText || t('dataTrend.choosedMeasurement')" v-model="dialogVisible" class="select-modal" align-center>
       <el-scrollbar :max-height="400">
         <ul class="select-list">
           <li v-for="(item, index) in model" :key="item" class="select-item">
@@ -54,6 +54,7 @@ const props = defineProps<{
   isBooleanTextDisabled?: boolean;
   disabled?: boolean;
 }>();
+const { t } = useI18n();
 const model = useVModel(props, 'modelValue');
 const dialogVisible = ref(false);
 const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);

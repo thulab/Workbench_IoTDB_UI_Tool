@@ -3,7 +3,7 @@
     <div v-if="isShow === false" class="auth-tip-container">
       <slot name="otherTip"></slot>
       <img src="@/assets/auth-tip.png" alt="" class="auth-tip-img">
-      <span class="auth-tip-text">请升级至IoTDB V{{versitonTip || '1.3.0'}}及以上版本使用</span>
+      <span class="auth-tip-text">{{ t('common.versionTip', { version: versitonTip || '1.3.0' }) }}</span>
     </div>
     <slot v-if="isShow"></slot>
   </el-container>
@@ -14,7 +14,7 @@ defineProps<{
   isShow: boolean;
   versitonTip?: string;
 }>();
-
+const { t } = useI18n();
 </script>
 
 <style lang="scss" scoped>

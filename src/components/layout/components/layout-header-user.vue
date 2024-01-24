@@ -4,15 +4,15 @@
     <template #dropdown>
       <el-dropdown-menu>
         <el-dropdown-item command="reset" id="layout-header-reset">
-          重置密码
+          {{ t('auth.resetPwd') }}
         </el-dropdown-item>
         <el-dropdown-item command="logout" id="layout-header-logout">
-          退出登录
+          {{ t('auth.layout') }}
         </el-dropdown-item>
       </el-dropdown-menu>
     </template>
   </el-dropdown>
-  <modal-reset-password title="重置密码" :user-name="userName" v-model:visible="modalVisible" />
+  <modal-reset-password :title="t('auth.resetPwd')" :user-name="userName" v-model:visible="modalVisible" />
 </template>
 
 <script setup lang="ts">
@@ -30,7 +30,7 @@ const modalVisible = ref(false);
 const { requestFn: logout } = useRequest(UserApi.logout);
 
 const handleLogout = () => {
-  ElMessageBox.confirm('您是否确认退出登录?', '温馨提示', {
+  ElMessageBox.confirm(t('login.layoutTip'), t('common.warmTip'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'logout-confirm',

@@ -20,13 +20,15 @@ const emit = defineEmits<{
   (evnet: 'handleClickOperate', key: string):void;
 }>();
 
+const { t } = useI18n();
+
 const contextMenuList = [
-  { label: '复制', key: 'copy' },
-  { label: '粘贴', key: 'paste' },
-  { label: '撤销', key: 'undo' },
-  { label: '恢复', key: 'redo' },
-  { label: '删除节点', key: 'del' },
-  { label: '删除边', key: 'delEdge' },
+  { label: t('common.copy'), key: 'copy' },
+  { label: t('common.paste'), key: 'paste' },
+  { label: t('common.undo'), key: 'undo' },
+  { label: t('common.redo'), key: 'redo' },
+  { label: t('common.deleteNode'), key: 'del' },
+  { label: t('common.deleteEdge'), key: 'delEdge' },
 ];
 
 const disabledKey = (key: string) => {
