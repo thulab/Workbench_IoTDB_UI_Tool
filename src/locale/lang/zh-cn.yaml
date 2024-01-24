@@ -111,6 +111,9 @@ common:
   ack: 确认
   acked: 已确认
   allSituation: 全局
+  standAlone: 单机
+  cluster: 集群
+  doubleLive: 双活
 page:
   data: 数据
   alarm: 告警
@@ -532,3 +535,25 @@ log:
   timeRange: 时间范围
   auditList: 日志列表
   operateTime: 操作时间
+white:
+  config: 白名单配置
+  switch: 白名单开关
+  list: 白名单列表
+  ipTip: 当前状态所有 IP 均可连接，请谨慎操作
+  ip: IP地址
+  ipPlaceholder: 请输入IP地址
+  addIp: 添加白名单
+  deleteTip: 是否确认删除
+login:
+  title: 账号密码登录
+  connectionTip: 请选择所要连接的实例
+  userName: 用户名
+  captchaTip: 请输入验证码
+  login: 登录
+  userNameTip: 用户名不能为空
+  userNameLengthTip: 用户名必须大于等于4位
+  pwdTip: 密码不能为空
+  pwdLengthTip: 密码必须大于等于4位
+  captchaEmptyTip: 验证码不能为空
+  captchaErrorTip: 验证码输入错误
+  connectionEmptyTip: 请选择连接实例

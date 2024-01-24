@@ -9,14 +9,14 @@
           <i-custom-timecho-logo class="title-logo" />
           <!-- <i-custom-logo-title class="title-logo" /> -->
         </div>
-        <h5 class="login-title">账号密码登录</h5>
+        <h5 class="login-title">{{ t('login.title') }}</h5>
         <el-form :hide-required-asterisk="true" :model="loginForm" :rules="rules" ref="formRef" class="login-form-box">
           <label><input type="password" autocomplete="new-password" hidden></label>
           <div class="connection-box">
             <el-form-item prop="connection">
               <el-select
                 v-model="loginForm.connection"
-                placeholder="请选择所要连接的实例"
+                :placeholder="t('login.connectionTip')"
                 id="login-connection"
                 style="width: 292px;"
                 fit-input-width
@@ -35,12 +35,12 @@
                   <el-option
                     v-for="item in group.options"
                     :key="item.id"
-                    :label="`${item.name}(用户名:${item.username})`"
+                    :label="`${item.name}(${t('login.userName')}:${item.username})`"
                     :value="item.id"
                     :id="`login-connection-select-${item.id}`"
                   >
                     <div style="display: flex; width: 240px;">
-                      <text-tooltip :content="`${item.name}(用户名:${item.username})`" />
+                      <text-tooltip :content="`${item.name}(${t('login.userName')}:${item.username})`" />
                     </div>
                   </el-option>
                 </el-option-group>
@@ -52,7 +52,7 @@
             <el-input
               v-model="loginForm.user"
               autocomplete="off"
-              placeholder="请输入用户名"
+              :placeholder="t('auth.userNamePlaceholder')"
               maxlength="32"
               @keyup.enter="submitForm"
               id="login-user"
@@ -68,7 +68,7 @@
               v-model="loginForm.password"
               show-password
               autocomplete="off"
-              placeholder="请输入密码"
+              :placeholder="t('auth.pwdPlaceholder')"
               @keyup.enter="submitForm"
               id="login-pwd"
             >
@@ -87,7 +87,7 @@
             <el-input
               v-model="loginForm.captcha"
               autocomplete="off"
-              placeholder="请输入验证码"
+              :placeholder="t('login.captchaTip')"
               @keyup.enter="submitForm"
               id="login-captcha"
             >
@@ -100,7 +100,7 @@
             </el-input>
           </el-form-item>
           <el-form-item class="m-b-0">
-            <el-button class="login-button" type="primary" :loading="loading" @click="submitForm" id="login-submit">登录</el-button>
+            <el-button class="login-button" type="primary" :loading="loading" @click="submitForm" id="login-submit">{{ t('login.login') }}</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -155,30 +155,30 @@ const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionL
 
 const validateuser = (rule: any, value: any, callback: any) => {
   if (value === '') {
-    return callback(new Error('用户名不能为空'));
+    return callback(new Error(t('login.userNameTip')));
   }
   if (value.length < 3) {
-    return callback(new Error('用户名必须大于等于4位'));
+    return callback(new Error(t('login.userNameLengthTip')));
   }
   return callback();
 };
 
 const validatepassword = (rule: any, value: any, callback: any) => {
   if (value === '') {
-    return callback(new Error('密码不能为空'));
+    return callback(new Error(t('login.pwdTip')));
   }
   if (value.length < 3) {
-    return callback(new Error('密码必须大于等于4位'));
+    return callback(new Error(t('login.pwdLengthTip')));
   }
   return callback();
 };
 
 const validateCaptcha = (rule: any, value: string, callback: any) => {
   if (value === '') {
-    return callback(new Error('验证码不能为空'));
+    return callback(new Error(t('login.captchaEmptyTip')));
   }
   if (value.toLowerCase() !== captcha.value.toLowerCase()) {
-    return callback(new Error('验证码输入错误'));
+    return callback(new Error(t('login.captchaErrorTip')));
   }
   return callback();
 };
@@ -187,7 +187,7 @@ const rules = reactive<FormRules>({
   connection: [
     {
       required: true,
-      message: '请选择连接实例',
+      message: t('login.connectionEmptyTip'),
       trigger: 'blur',
     },
   ],
@@ -243,9 +243,9 @@ function getList() {
       }
     });
     connectionOptions.value = [
-      { label: '单机', options: standAloneList },
-      { label: '集群', options: clusterList },
-      { label: '双活', options: doubleLiveList },
+      { label: t('common.standAlone'), options: standAloneList },
+      { label: t('common.cluster'), options: clusterList },
+      { label: t('common.doubleLive'), options: doubleLiveList },
     ];
     // 默认选中第一个
     // if (connectionList.value.length) {

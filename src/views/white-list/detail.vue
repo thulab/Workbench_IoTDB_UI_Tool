@@ -2,9 +2,9 @@
   <active-container :is-show="connectionIsActive">
     <el-container class="details-wrapper">
       <el-main class="p-0">
-        <h4 class="detail-title-text">白名单配置</h4>
+        <h4 class="detail-title-text">{{ t('white.config') }}</h4>
         <div class="config-switch-box">
-          <span class="config-label">白名单开关：</span>
+          <span class="config-label">{{ t('white.switch') }}：</span>
           <el-switch
             v-model="configStatus"
             :active-value="1"
@@ -16,16 +16,16 @@
           />
         </div>
 
-        <h4 class="detail-title-text">白名单列表</h4>
+        <h4 class="detail-title-text">t('white.list')</h4>
         <div class="detail-no-config-box" v-if="!configStatus">
           <img src="@/assets/white-list-empty.png" alt="" class="data-empty-img">
-          <span class="data-empty-text">当前状态所有 IP 均可连接，请谨慎操作</span>
+          <span class="data-empty-text">{{ t('white.ipTip') }}</span>
         </div>
         <div class="list-container" v-else>
           <div class="search-form-wrapper">
             <div class="search-form-box">
-              <span class="search-from-label">IP地址：</span>
-              <el-input v-model="searchKeyword" placeholder="请输入IP地址" @keyup.enter="handleRefresh" id="white-list-search-ip">
+              <span class="search-from-label">{{ t('white.ip') }}：</span>
+              <el-input v-model="searchKeyword" :placeholder="t('white.ipPlaceholder')" @keyup.enter="handleRefresh" id="white-list-search-ip">
                 <template #prefix>
                   <i-custom-search-icon class="remote-select-search-icon" @click="handleRefresh" id="white-list-search-icon" />
                 </template>
@@ -35,7 +35,7 @@
             <div class="search-form-buttons">
               <el-button type="primary" @click="handleAdd" class="handle-add-button" id="white-list-add">
                 <el-icon size="24" class="m-r-4"><i-custom-new-white-list /></el-icon>
-                添加白名单
+                {{ t('white.addIp') }}
               </el-button>
             </div>
           </div>
@@ -51,7 +51,7 @@
               :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
               ref="tableRef"
             >
-              <el-table-column label="IP地址" prop="ip" align="center" />
+              <el-table-column :label="t('white.ip')" prop="ip" align="center" />
               <el-table-column :label="t('common.operation')" width="120" align="center">
                 <template #default="{ row, $index }">
                   <el-button type="primary" link size="small" :disabled="row === '127.0.0.1'" @click="handleEditRow(row)" :id="`white-list-table-${$index}-edit`">{{ t('common.edit') }}</el-button>
@@ -145,7 +145,7 @@ function handleEditRow(data: any) {
 
 function handleDelRow(data: any) {
   console.log(data);
-  ElMessageBox.confirm('是否确认删除', t('common.notice'), {
+  ElMessageBox.confirm(t('white.deleteTip'), t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'del-white-list-confirm',
