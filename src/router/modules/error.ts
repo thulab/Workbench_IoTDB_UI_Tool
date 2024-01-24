@@ -1,4 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router';
+import i18n from '@/locale/index';
+
+const { t } = i18n.global;
 
 // 错误页面模块
 const errorRouter: Array<RouteRecordRaw> = [
@@ -9,7 +12,7 @@ const errorRouter: Array<RouteRecordRaw> = [
     meta: {
       requiresAuth: false,
       hiddenMenu: true,
-      title: '403页面',
+      title: t('page.403'),
       key: '403',
     },
   },
@@ -20,7 +23,7 @@ const errorRouter: Array<RouteRecordRaw> = [
     meta: {
       requiresAuth: false,
       hiddenMenu: true,
-      title: '404页面',
+      title: t('page.404'),
       key: '404',
     },
   },
@@ -31,7 +34,7 @@ const errorRouter: Array<RouteRecordRaw> = [
     meta: {
       requiresAuth: false,
       hiddenMenu: true,
-      title: '500页面',
+      title: t('page.500'),
       key: '500',
     },
   },

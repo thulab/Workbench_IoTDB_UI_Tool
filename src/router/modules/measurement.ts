@@ -4,6 +4,9 @@ import ICustomMeasurement from '@/assets/icons/measurement.svg?raw';
 import ICustomMeasurementActive from '@/assets/icons/measurement-active.svg?raw';
 import ICustomMeasurementList from '@/assets/icons/measurement-list.svg?raw';
 import ICustomDataModel from '@/assets/icons/data-model.svg?raw';
+import i18n from '@/locale/index';
+
+const { t } = i18n.global;
 
 const route = [
   {
@@ -11,7 +14,7 @@ const route = [
     component: Layout,
     redirect: { name: 'MeasurementManagement' },
     meta: {
-      title: '测点管理',
+      title: t('page.measurement'),
       icon: ICustomMeasurement,
       activeIcon: ICustomMeasurementActive,
       order: 10,
@@ -21,13 +24,13 @@ const route = [
         path: 'list',
         name: 'MeasurementManagement',
         component: () => import('@/views/measurement-management/measurement-management.vue'),
-        meta: { keepAlive: true, title: '测点列表', icon: ICustomMeasurementList },
+        meta: { keepAlive: true, title: t('measurement.measurementList'), icon: ICustomMeasurementList },
       },
       {
         path: 'model',
         name: 'MeasurementModel',
         component: () => import('@/views/measurement-management/measurement-model.vue'),
-        meta: { keepAlive: true, title: '数据模型', icon: ICustomDataModel },
+        meta: { keepAlive: true, title: t('measurement.databaseModel'), icon: ICustomDataModel },
       },
     ],
   },

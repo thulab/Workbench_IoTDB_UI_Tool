@@ -114,10 +114,32 @@ common:
   standAlone: 单机
   cluster: 集群
   doubleLive: 双活
+  fileDownError: 文件下载失败
+  uploadSuccess: 上传成功
+  uploadError: 上传失败
+  fileTypeError: 文件类型错误
+  fileSizeError: 文件大小不能超过%{size}MB!
+  websockerVersionTip: 您的浏览器不支持webSocket,请使用更高版本浏览器！
 page:
+  '403': 403页面
+  '404': 404页面
+  '500': 500页面
   data: 数据
   alarm: 告警
   trend: 趋势
+  dashboard: 首页
+  dataSync: 数据同步
+  measurement: 测点管理
+  dataSearch: 数据查询
+  statisticSearch: 统计查询
+  sql: SQL操作
+  system: 系统管理
+  auth: 权限管理
+  user: 用户管理
+  role: 角色管理
+  auditLog: 审计日志
+  calculate: 计算
+  view: 视图
 measurement:
   databaseTitle: 数据库
   deleteDatabaseTip: 此操作会删除数据库下全部测点和数据，是否删除？
@@ -557,3 +579,27 @@ login:
   captchaEmptyTip: 验证码不能为空
   captchaErrorTip: 验证码输入错误
   connectionEmptyTip: 请选择连接实例
+  loginExpire: 登录已失效，请重新登录
+  serverError: 内部服务异常，请联系管理员
+alarmEnum:
+  change0: 变0告警
+  change1: 变1告警
+  change: 变化告警
+  gt: 大于
+  lt: 小于
+  gtq: 大于等于
+  ltq: 小于等于
+  eq: 等于
+  uq: 不等于
+  once: 只告警一次
+  one: 1分钟/次
+  five: 5分钟/次
+  ten: 10分钟/次
+  fifteen: 15分钟/次
+  thirty: 30分钟/次
+  sixty: 1小时/次
+  level1: 一级
+  level2: 二级
+  level3: 三级
+  level4: 四级
+  level5: 五级

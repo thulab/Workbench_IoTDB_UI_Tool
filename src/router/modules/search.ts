@@ -5,6 +5,9 @@ import ICustomQuerySQL from '@/assets/icons/query-sql.svg?raw';
 import ICustomQuery from '@/assets/icons/query.svg?raw';
 import ICustomQueryActive from '@/assets/icons/query-active.svg?raw';
 import ICustomQueryStatistic from '@/assets/icons/query-statistic.svg?raw';
+import i18n from '@/locale/index';
+
+const { t } = i18n.global;
 
 const route = [
   {
@@ -12,7 +15,7 @@ const route = [
     component: Layout,
     redirect: { name: 'DataSearch' },
     meta: {
-      title: '查询',
+      title: t('common.query'),
       icon: ICustomQuery,
       activeIcon: ICustomQueryActive,
       order: 20,
@@ -22,19 +25,19 @@ const route = [
         path: 'data-search',
         name: 'DataSearch',
         component: () => import('@/views/search/data-search.vue'),
-        meta: { keepAlive: true, title: '数据查询', icon: ICustomQueryData },
+        meta: { keepAlive: true, title: t('page.dataSearch'), icon: ICustomQueryData },
       },
       {
         path: 'statistic-search',
         name: 'StatisticSearch',
         component: () => import('@/views/search/statistic-search.vue'),
-        meta: { keepAlive: true, title: '统计查询', icon: ICustomQueryStatistic },
+        meta: { keepAlive: true, title: t('page.statisticSearch'), icon: ICustomQueryStatistic },
       },
       {
         path: 'sql-search',
         name: 'SqlSearch',
         component: () => import('@/views/search/sql-search-container.vue'),
-        meta: { keepAlive: true, title: 'SQL操作', icon: ICustomQuerySQL },
+        meta: { keepAlive: true, title: t('page.sql'), icon: ICustomQuerySQL },
       },
     ],
   },

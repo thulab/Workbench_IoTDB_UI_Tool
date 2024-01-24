@@ -11,7 +11,10 @@ import ICustomCalculateActive from '@/assets/icons/calculate-active.svg?raw';
 import ICustomAuthRole from '@/assets/icons/auth-role.svg?raw';
 // import ICustomLogManagement from '@/assets/icons/log-management.svg?raw';
 import ICustomAuditLog from '@/assets/icons/audit-log.svg?raw';
-import ICustomWhiteList from '@/assets/icons/white-list.svg?raw';
+// import ICustomWhiteList from '@/assets/icons/white-list.svg?raw';
+import i18n from '@/locale/index';
+
+const { t } = i18n.global;
 
 const route = [
   {
@@ -19,7 +22,7 @@ const route = [
     component: Layout,
     redirect: { name: 'UserManagement' },
     meta: {
-      title: '系统管理',
+      title: t('page.system'),
       icon: ICustomSystemConfig,
       activeIcon: ICustomSystemConfigActive,
       order: 40,
@@ -29,7 +32,7 @@ const route = [
         path: 'auth',
         redirect: { name: 'UserManagement' },
         meta: {
-          title: '权限管理',
+          title: t('page.auth'),
           hideLine: true,
           icon: ICustomAuth,
           isAuthMenu: true,
@@ -40,7 +43,7 @@ const route = [
             name: 'UserManagement',
             component: () => import('@/views/auth/user-detail.vue'),
             meta: {
-              keepAlive: true, title: '用户管理', icon: ICustomAuthUser, isAuthMenu: true,
+              keepAlive: true, title: t('page.user'), icon: ICustomAuthUser, isAuthMenu: true,
             },
           },
           {
@@ -48,7 +51,7 @@ const route = [
             name: 'RoleManagement',
             component: () => import('@/views/auth/role-detail.vue'),
             meta: {
-              keepAlive: true, title: '角色管理', icon: ICustomAuthRole, isAuthMenu: true,
+              keepAlive: true, title: t('page.role'), icon: ICustomAuthRole, isAuthMenu: true,
             },
           },
         ],
@@ -77,7 +80,7 @@ const route = [
         component: () => import('@/views/log-management/audit.vue'),
         meta: {
           keepAlive: true,
-          title: '审计日志',
+          title: t('page.auditLog'),
           icon: ICustomAuditLog,
         },
       },
@@ -98,7 +101,7 @@ const route = [
     component: Layout,
     redirect: { name: 'TrendDetail' },
     meta: {
-      title: '趋势',
+      title: t('page.trend'),
       icon: ICustomTrend,
       activeIcon: ICustomTrendActive,
       showTopLine: true,
@@ -119,7 +122,7 @@ const route = [
     component: Layout,
     redirect: { name: 'CalculateDetail' },
     meta: {
-      title: '计算',
+      title: t('page.calculate'),
       icon: ICustomCalculate,
       activeIcon: ICustomCalculateActive,
       showTopLine: true,
@@ -140,7 +143,7 @@ const route = [
     component: Layout,
     redirect: { name: 'CalculateDetail' },
     meta: {
-      title: '视图',
+      title: t('page.view'),
       icon: ICustomCalculate,
       activeIcon: ICustomCalculateActive,
       showTopLine: true,

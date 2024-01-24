@@ -22,7 +22,7 @@ const showError = (message: string, code?: number) => {
   // 有code 并且在toastErrorCode中 或者 code不包含-的
   if (code && alertErrorCode.includes(code) && !window.__errBoxShowing__) {
     window.__errBoxShowing__ = true;
-    ElMessageBox.confirm(message, '错误', {
+    ElMessageBox.confirm(message, t('common.error'), {
       confirmButtonText: t('common.confirm'),
       cancelButtonText: t('common.cancel'),
       confirmButtonClass: `request-error-confirm-${message}`,
@@ -48,7 +48,7 @@ const showError = (message: string, code?: number) => {
 
 export const showErrorFn = (err: HttpError, defaultErrMessage?: string | boolean) => {
   if ((err.status && err.status !== 200 && (err.status !== 401 || err.status !== 403))) {
-    ElMessage.error({ message: '内部服务异常，请联系管理员', grouping: true });
+    ElMessage.error({ message: t('login.serverError'), grouping: true });
   } else if (typeof defaultErrMessage === 'string') {
     showError(defaultErrMessage, err.code);
   } else if (defaultErrMessage && err.message) {
@@ -56,7 +56,7 @@ export const showErrorFn = (err: HttpError, defaultErrMessage?: string | boolean
   } else if (err.error) {
     showError(err.error, err.code);
   } else if (!err) {
-    ElMessage.error({ message: '内部服务异常，请联系管理员', grouping: true });
+    ElMessage.error({ message: t('login.serverError'), grouping: true });
   }
 };
 
@@ -87,7 +87,7 @@ export default function useRequest<Requests extends Array<any>, Resp>(apiFn: (..
         if (err.type === 'application/json') {
           return err.text().then((str: string) => {
             const formatErr = JSON.parse(str);
-            showErrorFn(formatErr, '文件下载失败');
+            showErrorFn(formatErr, t('common.fileDownError'));
             return Promise.reject(data);
           });
         }

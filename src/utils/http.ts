@@ -57,7 +57,7 @@ async function responseInterceptor(response: HttpResponse<object>): Promise<Http
   }
   const logined = sessionStorage.getItem('nologin') === '0';
   if (response.status === 403 || (response.status === 401 && logined)) {
-    return ElMessageBox.alert('登录已失效，请重新登录', t('common.tip'), {
+    return ElMessageBox.alert(t('login.loginExpire'), t('common.tip'), {
       confirmButtonText: t('common.confirm'),
       customClass: 'login-expire-message-box',
       confirmButtonClass: 'login-expire-confirm',

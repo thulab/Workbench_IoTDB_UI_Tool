@@ -2,6 +2,9 @@ import { ref } from 'vue';
 import CommonApi from '@/api/common.api';
 import { ElMessage } from 'element-plus';
 import type { UploadProps } from 'element-plus';
+import i18n from '@/locale/index';
+
+const { t } = i18n.global;
 // 上传图片
 export default function useUpload(fileType: string[], fileSize: number) {
   const fileUrl = ref('');
@@ -10,10 +13,10 @@ export default function useUpload(fileType: string[], fileSize: number) {
     const formData = new FormData();
     formData.append('file', file);
     return CommonApi.uploadImage(formData).then((res) => {
-      ElMessage.success('上传成功');
+      ElMessage.success(t('common.updateSuccess'));
       return res.data;
     }).catch(() => {
-      ElMessage.error('上传失败');
+      ElMessage.error(t('common.uploadError'));
       return Promise.reject();
     });
   }
@@ -21,10 +24,10 @@ export default function useUpload(fileType: string[], fileSize: number) {
 
   const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
     if (fileType.indexOf(rawFile.type) === -1) {
-      ElMessage.error('文件类型错误!');
+      ElMessage.error(t('common.fileTypeError')!);
       return false;
     } if (rawFile.size / 1024 / 1024 > fileSize) {
-      ElMessage.error(`文件大小不能超过 ${fileSize}MB!`);
+      ElMessage.error(t('common.fileSizeError', { size: fileSize }));
       return false;
     }
     return true;

@@ -1,5 +1,8 @@
 import { defineStore } from 'pinia';
 import { AlarmApi } from '@/api';
+import i18n from '@/locale/index';
+
+const { t } = i18n.global;
 
 const { requestFn: getConfigEnum } = useRequest(AlarmApi.getConfigEnum);
 
@@ -9,17 +12,17 @@ export const useEnumStore = defineStore('EnumStore', () => {
   const alarmBooleanRuleEnum = computed(() => allEnum.value?.ALARM_BOOLEAN_RULE || [
     {
       value: 'change0',
-      name: '变0告警',
+      name: t('alarmEnum.change0'),
       paramMap: null,
     },
     {
       value: 'change1',
-      name: '变1告警',
+      name: t('alarmEnum.change1'),
       paramMap: null,
     },
     {
       value: 'change',
-      name: '变化告警',
+      name: t('alarmEnum.change'),
       paramMap: null,
     },
   ]);
@@ -27,32 +30,32 @@ export const useEnumStore = defineStore('EnumStore', () => {
   const alarmNumberRuleEnum = computed(() => allEnum.value?.ALARM_NUMERICAL_RULE || [
     {
       value: 'GREATER_THAN',
-      name: '大于',
+      name: t('alarmEnum.gt'),
       paramMap: null,
     },
     {
       value: 'LESS_THAN',
-      name: '小于',
+      name: t('alarmEnum.lt'),
       paramMap: null,
     },
     {
       value: 'GREATER_THAN_OR_EQUAL',
-      name: '大于等于',
+      name: t('alarmEnum.gtq'),
       paramMap: null,
     },
     {
       value: 'LESS_THAN_OR_EQUAL',
-      name: '小于等于',
+      name: t('alarmEnum.ltq'),
       paramMap: null,
     },
     {
       value: 'EQUAL',
-      name: '等于',
+      name: t('alarmEnum.eq'),
       paramMap: null,
     },
     {
       value: 'NOT_EQUAL',
-      name: '不等于',
+      name: t('alarmEnum.uq'),
       paramMap: null,
     },
   ]);
@@ -60,37 +63,37 @@ export const useEnumStore = defineStore('EnumStore', () => {
   const alarmFrequencyEnum = computed(() => allEnum.value?.ALARM_FREQUENCY || [
     {
       value: 'ONCE',
-      name: '只告警一次',
+      name: t('alarmEnum.once'),
       paramMap: null,
     },
     {
       value: 'ONE',
-      name: '1分钟/次',
+      name: t('alarmEnum.one'),
       paramMap: null,
     },
     {
       value: 'FIVE',
-      name: '5分钟/次',
+      name: t('alarmEnum.five'),
       paramMap: null,
     },
     {
       value: 'TEN',
-      name: '10分钟/次',
+      name: t('alarmEnum.ten'),
       paramMap: null,
     },
     {
       value: 'FIFTEEN',
-      name: '15分钟/次',
+      name: t('alarmEnum.fifteen'),
       paramMap: null,
     },
     {
       value: 'THIRTY',
-      name: '30分钟/次',
+      name: t('alarmEnum.thirty'),
       paramMap: null,
     },
     {
       value: 'SIXTY',
-      name: '1小时/次',
+      name: t('alarmEnum.sixty'),
       paramMap: null,
     },
   ]);
@@ -98,7 +101,7 @@ export const useEnumStore = defineStore('EnumStore', () => {
   const alarmLevelEnum = computed(() => allEnum.value?.ALARM_LEVEL || [
     {
       value: 'ONE',
-      name: '一级',
+      name: t('alarmEnum.level1'),
       paramMap: {
         color: '#D43030',
         icon: 'icon1',
@@ -106,7 +109,7 @@ export const useEnumStore = defineStore('EnumStore', () => {
     },
     {
       value: 'TWO',
-      name: '二级',
+      name: t('alarmEnum.level2'),
       paramMap: {
         color: '#FF8D1A',
         icon: 'icon2',
@@ -114,7 +117,7 @@ export const useEnumStore = defineStore('EnumStore', () => {
     },
     {
       value: 'THREE',
-      name: '三级',
+      name: t('alarmEnum.level3'),
       paramMap: {
         color: '#6738BD',
         icon: 'icon3',
@@ -122,7 +125,7 @@ export const useEnumStore = defineStore('EnumStore', () => {
     },
     {
       value: 'FOUR',
-      name: '四级',
+      name: t('alarmEnum.level4'),
       paramMap: {
         color: '#009DEA',
         icon: 'icon4',
@@ -130,7 +133,7 @@ export const useEnumStore = defineStore('EnumStore', () => {
     },
     {
       value: 'FIVE',
-      name: '五级',
+      name: t('alarmEnum.level5'),
       paramMap: {
         color: '#28D5CB',
         icon: 'icon5',

@@ -1,4 +1,7 @@
 import { ref } from 'vue';
+import i18n from '@/locale/index';
+
+const { t } = i18n.global;
 
 export default function useWebsocket(url: string, receiveData: Function, isInit: boolean = true) {
   const socketInstance = ref<WebSocket | null>();
@@ -13,7 +16,7 @@ export default function useWebsocket(url: string, receiveData: Function, isInit:
 
   function initWebsocket(handleOpen?: Function) {
     if (!('WebSocket' in window)) {
-      ElMessage.warning('您的浏览器不支持webSocket,请使用更高版本浏览器！');
+      ElMessage.warning(t('common.websockerVersionTip'));
     } else {
       if (socketInstance.value) {
         socketInstance.value.close();
