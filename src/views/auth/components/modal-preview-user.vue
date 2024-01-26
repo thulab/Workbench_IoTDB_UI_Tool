@@ -87,7 +87,7 @@ const {
 
 const dialogVisible = useVModel(props, 'visible', emit);
 
-const title = computed(() => `${props.name}${t('auth.detail')}`);
+const title = computed(() => `${props.name} ${t('auth.detail')}`);
 
 const { requestFn: getUserAuth, data: authData, loading } = useRequest(AuthApi.getUserAuth, {
   initData: {

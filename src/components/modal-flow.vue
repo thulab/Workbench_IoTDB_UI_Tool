@@ -120,7 +120,7 @@
                 <span class="detail-label">{{t('flow.lineColor')}}：</span>
                 <el-color-picker v-model="edgeStyle.color" color-format="hex" @change="val => handleChangeLineColor(val as string)" id="line-style-color" />
               </div>
-              <h5 class="operate-style-module-title">{{ t('flow.箭头') }}</h5>
+              <h5 class="operate-style-module-title">{{ t('flow.arrow') }}</h5>
               <div class="edge-style-detail-item">
                 <span class="detail-label">{{t('flow.arrowType')}}：</span>
                 <el-select v-model="edgeStyle.arrowType" @change="handleChangeArrowType" popper-class="center-select" id="line-style-arrow">

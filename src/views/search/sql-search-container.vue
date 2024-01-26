@@ -93,7 +93,7 @@ const { maxTableHeight: tabHeight } = useTableHeight(125);
 const activiteSql = ref<string>(`_${dayjs().format('YYYY-MM-DD HH:mm:ss:SSS')}`);
 
 // eslint-disable-next-line no-useless-escape
-const sqlList = ref<Search.SqlList[]>([{ id: activiteSql.value, queryName: `${t('common.query')}${dayjs().format('YYYY-MM-DD HH:mm:ss').replace(/\-|\:| /g, '')}` }]);
+const sqlList = ref<Search.SqlList[]>([{ id: activiteSql.value, queryName: `${t('common.query')} ${dayjs().format('YYYY-MM-DD HH:mm:ss').replace(/\-|\:| /g, '')}` }]);
 const activeNameSide = ref('function');
 
 const code = reactive<Record<string, string>>({});
@@ -192,7 +192,7 @@ function handleSqlOperate(val: string, data: Search.SqlList) {
       const currentSqlId = `_${dayjs().unix()}`;
       sqlList.value.splice(index, 1, {
         // eslint-disable-next-line no-useless-escape
-        queryName: `${t('common.query')}${dayjs().format('YYYYMMDDHHmmss')}`,
+        queryName: `${t('common.query')} ${dayjs().format('YYYYMMDDHHmmss')}`,
         id: currentSqlId,
       });
       activiteSql.value = currentSqlId;
@@ -206,7 +206,7 @@ const handleTabAdd = throttle(() => {
   const currentSqlId = `_${dayjs().unix()}`;
   sqlList.value.push({
     // eslint-disable-next-line no-useless-escape
-    queryName: `${t('common.query')}${dayjs().format('YYYYMMDDHHmmss')}`,
+    queryName: `${t('common.query')} ${dayjs().format('YYYYMMDDHHmmss')}`,
     id: currentSqlId,
   });
   activiteSql.value = currentSqlId;
