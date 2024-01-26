@@ -355,7 +355,7 @@ const diskChartOptions = (diskMemoryChartData: Dashboard.MetricDiskRes): ECOptio
       type: 'bar',
       stack: 'total',
       data: [
-        (diskMemoryChartData.ioTDBUse === 0 || diskMemoryChartData.ioTDBUseRatio === 0) ? 0.1 : transformDecimal(diskMemoryChartData.diskTotal! * diskMemoryChartData.ioTDBUseRatio, 3),
+        (diskMemoryChartData.ioTDBUse === 0 || diskMemoryChartData.ioTDBUseRatio === 0) ? transformDecimal(diskMemoryChartData.diskTotal! * 0.001, 3) : transformDecimal(diskMemoryChartData.diskTotal! * diskMemoryChartData.ioTDBUseRatio, 3),
         transformDecimal(diskMemoryChartData.diskTotal! * diskMemoryChartData.diskUseRatio, 3),
       ],
       itemStyle: {
@@ -426,12 +426,17 @@ const { requestFn: getMetricDiskIOUsedRate, loading: ioLoading } = useRequest(Da
 function getCpu() {
   return getMetricCPU(props.node, props.nodeType, isMaster.value).then((res) => {
     cpuCount.value = (res.data?.cpu || res.data?.cpu === 0) ? res.data?.cpu : null;
+  }).catch(() => {
+    cpuCount.value = null;
   });
 }
 
 function getCpuLoad() {
   return getMetricCPULoad(props.node, props.nodeType, isMaster.value).then((res) => {
     cpuData.dataVal = (res.data.cpuLoad || res.data.cpuLoad === 0) ? transformDecimal(res.data.cpuLoad * 100, 1) : null;
+  }).catch(() => {
+    cpuData.dataVal = null;
+    cpuData.dataCount = null;
   });
 }
 
@@ -448,6 +453,18 @@ function getDisk() {
     diskMemoryData.diskRemain = res.data.diskRemain || 0;
     diskMemoryData.diskRemainUnit = res.data.diskRemainUnit || '';
     diskData.dataVal = transformDecimal(diskMemoryData.diskUseRatio * 100, 1);
+  }).catch(() => {
+    diskData.dataVal = 0;
+    diskMemoryData.diskTotal = null;
+    diskMemoryData.totalUnit = '';
+    diskMemoryData.diskUse = 0;
+    diskMemoryData.useUnit = '';
+    diskMemoryData.diskUseRatio = 0;
+    diskMemoryData.ioTDBUse = 0;
+    diskMemoryData.ioTDBUnit = '';
+    diskMemoryData.ioTDBUseRatio = 0;
+    diskMemoryData.diskRemain = 0;
+    diskMemoryData.diskRemainUnit = '';
   });
 }
 
@@ -458,12 +475,17 @@ function getMemory() {
       memoryData.valueUnit = res.data.unit;
       memoryData.dataVal = transformDecimal(res.data.memoryRatio * 100, 1);
     }
+  }).catch(() => {
+    memoryData.dataVal = 0;
+    memoryData.dataCount = null;
   });
 }
 
 function getFile() {
   return getMetricFileCount(props.node, props.nodeType, isMaster.value).then((res) => {
     fileTotal.value = res.data;
+  }).catch(() => {
+    fileTotal.value = null;
   });
 }
 
@@ -471,6 +493,9 @@ function getIo() {
   return getMetricDiskIOUsedRate(props.node, isMaster.value).then((res) => {
     diskIOCategory.value = res.data.map((item) => item.diskName);
     diskIOData.value = res.data.map((item) => transformDecimal(item.nodeRate, 6));
+  }).catch(() => {
+    diskIOCategory.value = [];
+    diskIOData.value = [];
   });
 }
 

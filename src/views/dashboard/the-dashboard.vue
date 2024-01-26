@@ -275,17 +275,17 @@ function getMonitorData() {
   monitorTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
   if (currentNodeType.value === 'DataNode') {
     nextTick(() => {
-      monitorDatanodeRef.value?.initialAssign();
+      // monitorDatanodeRef.value?.initialAssign();
       monitorDatanodeRef.value?.getInitial();
     });
   } else if (currentNodeType.value === 'ConfigNode') {
     nextTick(() => {
-      monitorConfignodeRef.value?.initialAssign();
+      // monitorConfignodeRef.value?.initialAssign();
       monitorConfignodeRef.value?.getInitial();
     });
   } else {
     nextTick(() => {
-      monitorAllRef.value?.initialAssign();
+      // monitorAllRef.value?.initialAssign();
       monitorAllRef.value?.getInitial();
     });
   }

@@ -237,12 +237,17 @@ const { requestFn: getMetricDiskIOUsedRate, loading: ioLoading } = useRequest(Da
 function getCpu() {
   return getMetricCPU(props.node, props.nodeType, isMaster.value).then((res) => {
     cpuCount.value = (res.data?.cpu || res.data?.cpu === 0) ? res.data?.cpu : null;
+  }).catch(() => {
+    cpuCount.value = null;
   });
 }
 
 function getCpuLoad() {
   return getMetricCPULoad(props.node, props.nodeType, isMaster.value).then((res) => {
     cpuData.dataVal = (res.data.cpuLoad || res.data.cpuLoad === 0) ? transformDecimal(res.data.cpuLoad * 100, 1) : null;
+  }).catch(() => {
+    cpuData.dataVal = null;
+    cpuData.dataCount = null;
   });
 }
 
@@ -253,6 +258,9 @@ function getMemory() {
       memoryData.valueUnit = res.data.unit;
       memoryData.dataVal = transformDecimal(res.data.memoryRatio * 100, 1);
     }
+  }).catch(() => {
+    memoryData.dataVal = 0;
+    memoryData.dataCount = null;
   });
 }
 
@@ -260,6 +268,9 @@ function getIo() {
   return getMetricDiskIOUsedRate(props.node, isMaster.value).then((res) => {
     diskIOCategory.value = res.data.map((item) => item.diskName);
     diskIOData.value = res.data.map((item) => transformDecimal(item.nodeRate, 6));
+  }).catch(() => {
+    diskIOCategory.value = [];
+    diskIOData.value = [];
   });
 }
 
