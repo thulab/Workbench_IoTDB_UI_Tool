@@ -76,6 +76,7 @@
 import { type ECOption } from '@/plugins/echarts-plugin';
 import { toThousands, transformDecimal } from '@/utils/format';
 import { DashboardApi } from '@/api';
+import { min } from 'lodash-es';
 import DataContainer from './data-container.vue';
 
 const props = defineProps<{
@@ -530,7 +531,8 @@ const diskChartOptions = (diskMemoryChartData: Dashboard.MetricDiskRes): ECOptio
       type: 'bar',
       stack: 'total',
       data: [
-        (diskMemoryChartData.ioTDBUse === 0 || diskMemoryChartData.ioTDBUseRatio === 0) ? 0.1 : transformDecimal(diskMemoryChartData.diskTotal! * diskMemoryChartData.ioTDBUseRatio, 3),
+        min([(diskMemoryChartData.ioTDBUse === 0 || diskMemoryChartData.ioTDBUseRatio === 0) ? 0.1 : transformDecimal(diskMemoryChartData.diskTotal! * diskMemoryChartData.ioTDBUseRatio, 3),
+          transformDecimal(diskMemoryChartData.diskTotal! * diskMemoryChartData.diskUseRatio, 3)]),
         transformDecimal(diskMemoryChartData.diskTotal! * diskMemoryChartData.diskUseRatio, 3),
       ],
       itemStyle: {
