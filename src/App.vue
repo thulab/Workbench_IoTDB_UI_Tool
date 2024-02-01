@@ -2,7 +2,7 @@
 import { ElConfigProvider } from 'element-plus';
 import zhLocale from 'element-plus/es/locale/lang/zh-cn';
 import enLocale from 'element-plus/es/locale/lang/en';
-import deLocale from 'element-plus/es/locale/lang/de';
+// import deLocale from 'element-plus/es/locale/lang/de';
 import { useI18n } from 'vue-i18n';
 import useAppStore from '@/stores/app';
 import { useLangSwitched } from '@/composition-api';
@@ -15,7 +15,7 @@ zhLocale.el.select.noMatch = '暂无数据';
 const map = {
   [zhLocale.name]: zhLocale,
   [enLocale.name]: enLocale,
-  [deLocale.name]: deLocale,
+  // [deLocale.name]: deLocale,
 };
 
 const { locale } = useI18n();

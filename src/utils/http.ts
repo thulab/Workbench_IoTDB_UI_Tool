@@ -22,7 +22,7 @@ function requestInterceptor(config: InternalAxiosRequestConfig): InternalAxiosRe
     NProgress.start();
     requestCount += 1;
   }
-  const langKey = (localStorage.getItem('lang') || 'cn') as 'cn' | 'en' | 'de';
+  const langKey = (localStorage.getItem('lang') || 'cn') as 'cn' | 'en';
   if (config && config.headers) {
     // config.headers.Authorization = localStorage.getItem('authorization') || '';
     config.headers.lang = langNameMap[langKey];
