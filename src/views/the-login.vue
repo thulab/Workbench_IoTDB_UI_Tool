@@ -245,7 +245,7 @@ function getList() {
     connectionOptions.value = [
       { label: t('common.standAlone'), options: standAloneList },
       { label: t('common.cluster'), options: clusterList },
-      { label: t('common.doubleLive'), options: doubleLiveList },
+      { label: t('common.doubleAlive'), options: doubleLiveList },
     ];
     // 默认选中第一个
     // if (connectionList.value.length) {

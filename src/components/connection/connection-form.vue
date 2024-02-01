@@ -10,7 +10,7 @@
           <el-radio-group v-model="formData.type" @change="val => handleChangeType(val as 0 | 1 | 2)" :disabled="editType !== 'add' || !isShowSave" id="connection-modal-type">
             <el-radio :label="0">{{ t('common.standAlone') }}</el-radio>
             <el-radio :label="1">{{ t('common.cluster') }}</el-radio>
-            <el-radio :label="2">{{ t('common.doubleLive') }}</el-radio>
+            <el-radio :label="2">{{ t('common.doubleAlive') }}</el-radio>
           </el-radio-group>
         </base-form-item>
         <base-form-item :label="`${t('connection.name')}：`" prop="name" :rules="requiredRules" class="base-form-box">

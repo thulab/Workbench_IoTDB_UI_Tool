@@ -623,7 +623,7 @@ function initialGraph(isDisabled?: boolean) {
           collapsed: false,
         },
         {
-          title: t('flow.doubleLive'),
+          title: t('flow.doubleAlive'),
           name: 'group4',
           collapsed: false,
         },
