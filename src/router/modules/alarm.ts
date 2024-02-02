@@ -4,9 +4,6 @@ import ICustomAlarmConfig from '@/assets/icons/alarm-config.svg?raw';
 import ICustomAlarmRecord from '@/assets/icons/alarm-record.svg?raw';
 import ICustomAlarm from '@/assets/icons/alarm.svg?raw';
 import ICustomAlarmActive from '@/assets/icons/alarm-active.svg?raw';
-import i18n from '@/locale/index';
-
-const { t } = i18n.global;
 
 const route = [
   {
@@ -14,7 +11,7 @@ const route = [
     component: Layout,
     redirect: { name: 'AlarmConfig' },
     meta: {
-      title: t('page.alarm'),
+      title: 'page.alarm',
       icon: ICustomAlarm,
       activeIcon: ICustomAlarmActive,
       order: 30,
@@ -25,13 +22,13 @@ const route = [
         path: 'config',
         name: 'AlarmConfig',
         component: () => import('@/views/alarm/alarm-config.vue'),
-        meta: { keepAlive: true, title: t('alarm.alarmConfig'), icon: ICustomAlarmConfig },
+        meta: { keepAlive: true, title: 'alarm.alarmConfig', icon: ICustomAlarmConfig },
       },
       {
         path: 'record',
         name: 'AlarmRecord',
         component: () => import('@/views/alarm/alarm-record.vue'),
-        meta: { keepAlive: true, title: t('alarm.alarmRecord'), icon: ICustomAlarmRecord },
+        meta: { keepAlive: true, title: 'alarm.alarmRecord', icon: ICustomAlarmRecord },
       },
     ],
   },

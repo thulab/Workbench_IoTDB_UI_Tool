@@ -1362,8 +1362,9 @@ watch(
     box-sizing: border-box;
 
     .flow-graph-close-btn, .flow-graph-header-title{
-      width: 75px;
+      min-width: 70px;
       text-align: center;
+      padding: 0 2px;
     }
 
     .flow-graph-header-title{

@@ -27,7 +27,7 @@
     </div>
     <div class="header-ri flex-center">
 
-      <el-dropdown v-if="false" @command="handleLangCommand">
+      <el-dropdown @command="handleLangCommand">
         <span class="lang-icon m-r-20">
           <i-custom-lang-switch />
         </span>
@@ -35,7 +35,7 @@
           <el-dropdown-menu class="operate-dropdown">
             <el-dropdown-item :disabled="langIndex === 0" command="0">中文</el-dropdown-item>
             <el-dropdown-item :disabled="langIndex === 1" command="1">English</el-dropdown-item>
-            <el-dropdown-item :disabled="langIndex === 2" command="2">Deutsch</el-dropdown-item>
+            <!-- <el-dropdown-item :disabled="langIndex === 2" command="2">Deutsch</el-dropdown-item> -->
           </el-dropdown-menu>
         </template>
       </el-dropdown>

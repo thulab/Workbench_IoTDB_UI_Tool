@@ -101,7 +101,7 @@ const routesToMenu = (routeItem: RouteRecordRaw, parentPath: string) => {
   const path = getRoutePath(routeItem, parentPath);
   const menu = {
     path,
-    title: routeItem.meta?.title,
+    title: t(routeItem.meta?.title as string),
     icon: routeItem.meta?.icon,
     activeIcon: routeItem.meta?.activeIcon,
     isLink: routeItem.meta?.isLink,

@@ -104,47 +104,6 @@ const menus = computed<MenuOptions[]>(() => {
   // }
 }
 
-.el-menu--popup {
-  .el-menu-item {
-    background-color: #fff;
-
-    i {
-      margin-right: 5px;
-    }
-
-    i,
-    span {
-      color: #131926;
-    }
-
-    &:hover {
-      i,
-      span {
-        color: #131926 !important;
-      }
-    }
-
-    &.is-active {
-      background-color: #f7f8fc !important;
-
-      &::before {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        width: 4px;
-        content: "";
-        background: var(--el-color-primary);
-      }
-
-      i,
-      span {
-        color: #131926 !important;
-      }
-    }
-  }
-}
-
 .active {
   display: none;
 }
@@ -195,6 +154,47 @@ const menus = computed<MenuOptions[]>(() => {
         .el-icon{
           margin: 0 auto;
         }
+      }
+    }
+  }
+}
+
+.el-menu--popup {
+  .el-menu-item {
+    background-color: #fff;
+
+    i {
+      margin-right: 5px;
+    }
+
+    i,
+    span {
+      color: #131926;
+    }
+
+    &:hover {
+      i,
+      span {
+        color: #131926 !important;
+      }
+    }
+
+    &.is-active {
+      background-color: #f7f8fc !important;
+
+      &::before {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 4px;
+        content: "";
+        background: var(--el-color-primary);
+      }
+
+      i,
+      span {
+        color: #131926 !important;
       }
     }
   }

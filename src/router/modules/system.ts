@@ -12,9 +12,6 @@ import ICustomAuthRole from '@/assets/icons/auth-role.svg?raw';
 // import ICustomLogManagement from '@/assets/icons/log-management.svg?raw';
 import ICustomAuditLog from '@/assets/icons/audit-log.svg?raw';
 // import ICustomWhiteList from '@/assets/icons/white-list.svg?raw';
-import i18n from '@/locale/index';
-
-const { t } = i18n.global;
 
 const route = [
   {
@@ -22,7 +19,7 @@ const route = [
     component: Layout,
     redirect: { name: 'UserManagement' },
     meta: {
-      title: t('page.system'),
+      title: 'page.system',
       icon: ICustomSystemConfig,
       activeIcon: ICustomSystemConfigActive,
       order: 40,
@@ -32,7 +29,7 @@ const route = [
         path: 'auth',
         redirect: { name: 'UserManagement' },
         meta: {
-          title: t('page.auth'),
+          title: 'page.auth',
           hideLine: true,
           icon: ICustomAuth,
           isAuthMenu: true,
@@ -43,7 +40,7 @@ const route = [
             name: 'UserManagement',
             component: () => import('@/views/auth/user-detail.vue'),
             meta: {
-              keepAlive: true, title: t('page.user'), icon: ICustomAuthUser, isAuthMenu: true,
+              keepAlive: true, title: 'page.user', icon: ICustomAuthUser, isAuthMenu: true,
             },
           },
           {
@@ -51,7 +48,7 @@ const route = [
             name: 'RoleManagement',
             component: () => import('@/views/auth/role-detail.vue'),
             meta: {
-              keepAlive: true, title: t('page.role'), icon: ICustomAuthRole, isAuthMenu: true,
+              keepAlive: true, title: 'page.role', icon: ICustomAuthRole, isAuthMenu: true,
             },
           },
         ],
@@ -80,7 +77,7 @@ const route = [
         component: () => import('@/views/log-management/audit.vue'),
         meta: {
           keepAlive: true,
-          title: t('page.auditLog'),
+          title: 'page.auditLog',
           icon: ICustomAuditLog,
         },
       },
@@ -101,7 +98,7 @@ const route = [
     component: Layout,
     redirect: { name: 'TrendDetail' },
     meta: {
-      title: t('page.trend'),
+      title: 'page.trend',
       icon: ICustomTrend,
       activeIcon: ICustomTrendActive,
       showTopLine: true,
@@ -122,7 +119,7 @@ const route = [
     component: Layout,
     redirect: { name: 'CalculateDetail' },
     meta: {
-      title: t('page.calculate'),
+      title: 'page.calculate',
       icon: ICustomCalculate,
       activeIcon: ICustomCalculateActive,
       showTopLine: true,
@@ -143,7 +140,7 @@ const route = [
     component: Layout,
     redirect: { name: 'CalculateDetail' },
     meta: {
-      title: t('page.view'),
+      title: 'page.view',
       icon: ICustomCalculate,
       activeIcon: ICustomCalculateActive,
       showTopLine: true,
