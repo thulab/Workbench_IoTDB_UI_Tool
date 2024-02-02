@@ -272,7 +272,7 @@ searchIotdb:
   cosh: 双曲余弦函数
   tanh: 双曲正切函数
   degrees: 转角度
-  padins: 转弧度
+  radians: 转弧度
   abs: 求绝对值
   sign: 符号函数
   ceil: 向上取整
@@ -287,11 +287,11 @@ searchIotdb:
   inRange: 返回ts_value >= lower && ts_value <= upper的bool值
   logical: 字符串处理函数
   stringContains: 判断字符串中是否存在s
-  stringMathes: 判断字符串是否能够被正则表达式regex匹配
+  stringMatches: 判断字符串是否能够被正则表达式regex匹配
   length: 返回字符串的长度
   locate: 获取target子串第一次出现在输入序列的位置，如果输入序列中不包含target则返回 -1
-  startSwith: 判断字符串是否有指定前缀
-  endSwitch: 判断字符串是否有指定后缀
+  startsWith: 判断字符串是否有指定前缀
+  endsWith: 判断字符串是否有指定后缀
   concat: 拼接字符串和target字串
   substr: 获取下标从start到end - 1的子串
   upper: 将字符串转化为大写

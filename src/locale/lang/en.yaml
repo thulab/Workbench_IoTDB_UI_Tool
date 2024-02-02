@@ -85,7 +85,7 @@ common:
   clickReupload: Click to Re-upload
   uploading: Uploading File
   importSuccessTip: Import successful! A total of %{total} data
-  importResultTip: %{successNum} data imported successfully, %{errorNum} data failed to import
+  importResultTip: '%{successNum} data imported successfully, %{errorNum} data failed to import'
   importTip: To avoid format errors, it is recommended to use a text editor to view
   searchTipLimit100: Only 100 search results are displayed, please search precisely if needed
   searchAllTipLimit100: Keyword search only displays 100 search results, please search precisely if needed
@@ -302,8 +302,8 @@ searchIotdb:
   cast: Convert data to the type specified by the type parameter
   constant: Constant Sequence Generation Function
   const: Output a user-specified constant sequence based on input attributes value and type
-  pi: Value of the constant sequence: the double value of π, the ratio of the circumference of a circle to its diameter, equivalent to Math.PI in the Java standard library
-  e: Value of the constant sequence: the double value of e, the base of natural logarithms, equivalent to Math.E in the Java standard library
+  pi: 'Value of the constant sequence: the double value of π, the ratio of the circumference of a circle to its diameter, equivalent to Math.PI in the Java standard library'
+  e: 'Value of the constant sequence: the double value of e, the base of natural logarithms, equivalent to Math.E in the Java standard library'
   selection: Selection Function
   topK: Return the k data points with the highest values in a time series. If there are more than k data points with equal maximum values, return the one with the smallest timestamp
   bottomK: Return the k data points with the lowest values in a time series. If there are more than k data points with equal minimum values, return the one with the smallest timestamp
@@ -388,8 +388,8 @@ dataSync:
   realTime: Real-Time Data
   realTimeTip: Data written to the database after creating the task is called real-time data. Please note that real-time data and historical data cannot be both closed!
   triggerMode: Sending Mode
-  triggerModeReal: Real-Time Mode: In this mode, the task only uses real-time mode for data sending.
-  triggerModeBatch: Batch Mode: In this mode, the task only uses batch mode for data sending.
+  triggerModeReal: 'Real-Time Mode: In this mode, the task only uses real-time mode for data sending.'
+  triggerModeBatch: 'Batch Mode: In this mode, the task only uses batch mode for data sending.'
   realMode: Real-Time Mode
   batchMode: Batch Mode
   dataSend: Data Sending
@@ -573,7 +573,7 @@ log:
   timeRange: Time Range
   auditList: Log List
   operateTime: Operation Time
-  white:
+white:
   config: Whitelist Configuration
   switch: Whitelist Switch
   list: Whitelist
@@ -582,7 +582,7 @@ log:
   ipPlaceholder: Enter IP address
   addIp: Add to Whitelist
   deleteTip: Are you sure you want to delete?
-  login:
+login:
   title: Login with User Name and Password
   connectionTip: Please select the instance you want to connect to
   userName: User Name
@@ -599,7 +599,6 @@ log:
   serverError: Internal server error. Please contact the administrator
   layoutTip: Are you sure you want to log out?
   resetPwdLogin: Password has been changed. Please log in again
-
 alarmEnum:
   change0: Alarm on Transition to 0
   change1: Alarm on Transition to 1
