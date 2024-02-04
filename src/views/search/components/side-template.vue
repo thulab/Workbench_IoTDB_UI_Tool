@@ -13,7 +13,7 @@
             <i-custom-template />
             <text-tooltip :content="item.queryName" class-name="sql-item-text" />
           </div>
-          <i-ep-more-filled @click="item.focused = true" v-if="!item.focused" class="more-icon" />
+          <i-ep-more-filled @click="item.focused = true" v-if="!item.focused" :id="`sql-template-dropdown-${item.id}`" class="more-icon" />
           <el-dropdown v-else :id="`sql-template-dropdown-${item.id}`" class="more-icon" @command="val => handleSqlCommand(val, item)">
             <i-ep-more-filled />
             <template #dropdown>
