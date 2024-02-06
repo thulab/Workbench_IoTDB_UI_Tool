@@ -4,9 +4,9 @@
       <div class="sql-search-wrapper">
         <div class="sql-tab-box">
           <el-tabs v-model="activiteSql" editable type="card" closable class="sql-tab-list" @tab-click="handleTabClick" @tab-remove="handleTabRemove" @tab-add="handleTabAdd" id="sql-search-top-tabs">
-            <el-tab-pane v-for="item in sqlList" :key="item.id" :label="item.queryName" :name="item.id">
+            <el-tab-pane v-for="(item, index) in sqlList" :key="item.id" :label="item.queryName" :name="item.id">
               <template #label>
-                <span style="font-size: 12px; line-height: 1.2;display: flex; width: 118px;"><text-tooltip :content="item.queryName" /></span>
+                <span style="font-size: 12px; line-height: 1.2;display: flex; width: 118px;" :id="`sql_tab_${index}`"><text-tooltip :content="item.queryName" /></span>
               </template>
               <el-scrollbar :height="tabHeight">
                 <sql-search v-model:code="code[activiteSql]" @save="handleSave" ref="sqlSearchRef" />
@@ -31,7 +31,7 @@
               <side-template ref="sqlListRef" @handle-sql-operate="handleSqlOperate" />
             </el-tab-pane>
           </el-tabs>
-          <a href="https://www.timecho.com/docs/zh/UserGuide/V1.0.x/Reference/SQL-Reference.html" rel="noopener noreferrer" target="_blank" class="operate-link"><i-custom-question />操作说明</a>
+          <a href="https://www.timecho.com/docs/zh/UserGuide/latest/QuickStart/QuickStart.html" rel="noopener noreferrer" target="_blank" class="operate-link"><i-custom-question />操作说明</a>
         </div>
       </div>
     </div>
