@@ -301,7 +301,7 @@ function handleEdit(row: Calculate.CalculateItem) {
 }
 
 function handleDel(type: string, data: Calculate.CalculateItem | null) {
-  ElMessageBox.confirm(type === 'batch' ? `${appType === 1 ? t('calculate.batchDeleteCalculate') : t('calculate.batchDeleteView')}？` : `${appType === 1 ? t('calculate.singleDeleteCalculate') : t('calculate.singleDeleteView')}？`, t('common.notice'), {
+  ElMessageBox.confirm(type === 'batch' ? `${appType === 1 ? t('calculate.batchDeleteCalculate') : t('calculate.batchDeleteView')}` : `${appType === 1 ? t('calculate.singleDeleteCalculate') : t('calculate.singleDeleteView')}`, t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'del-calculate-confirm',
