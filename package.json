@@ -59,6 +59,7 @@
     "nprogress": "^0.2.0",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.1",
+    "prettier": "^3.2.5",
     "unocss": "^0.58.3",
     "vue": "^3.4.3",
     "vue-i18n": "^9.8.0",
