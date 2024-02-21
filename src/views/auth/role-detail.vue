@@ -71,8 +71,8 @@
                     </el-icon>
                     <template v-else-if="row.path">
                       <!-- eslint-disable-next-line vue/max-len -->
-                      <el-checkbox :checked="true" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" @change="val => handleCheckedPath(val, $index)" :id="`rolw-auth-path-all-${$index}`" />
-                      <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index)" :id="`rolw-auth-path-all-${$index}`" />
+                      <el-checkbox :checked="true" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" @change="val => handleCheckedPath(val, $index)" :id="`role-auth-path-all-${$index}`" />
+                      <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index)" :id="`role-auth-path-all-${$index}`" />
                     </template>
                   </template>
                 </el-table-column>
