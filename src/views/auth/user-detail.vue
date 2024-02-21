@@ -93,7 +93,7 @@
               <el-table :data="tableData" style="width: 100%" tooltip-effect="light" :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
                 <el-table-column label="路径名称" align="center" min-width="193" prop="path" show-overflow-tooltip />
                 <el-table-column label="全选" align="center" width="193">
-                  <template #default="{ row }">
+                  <template #default="{ row, $index }">
                     <el-icon v-if="!isEdit || !row.path" class="moveDown3" size="21">
                       <i-custom-correct v-if="row.allChecked" />
                     </el-icon>
@@ -102,13 +102,13 @@
                         v-if="row.privileges.length >= pathPrivilegesEnumKeys.length"
                         :checked="true"
                         :disabled="row.rolePrivileges.length >= pathPrivilegesEnumKeys.length"
-                        id="user-auth-path-all"
+                        :id="`user-auth-path-all-${$index}`"
                         @change="e => handleAllCheckedPath(row, false)"
                       />
                       <el-checkbox
                         v-else
                         :checked="false"
-                        id="user-auth-path-all"
+                        :id="`user-auth-path-all-${$index}`"
                         @change="e => handleAllCheckedPath(row, true)"
                       />
                     </template>
@@ -116,7 +116,7 @@
                 </el-table-column>
                 <el-table-column v-for="(group, index) in pathPrivilegesEnumGroup" :label="group.group" :key="`${group.group}_${index}_column`" align="center">
                   <el-table-column v-for="(child, childIndex) in group.children" :label="child.desc" :key="`${child.privileges}_${childIndex}_col`" :prop="child.privileges" align="center" :width="calcColumnWidth(child)">
-                    <template #default="{ row }">
+                    <template #default="{ row, $index }">
                       <el-icon v-if="!isEdit || !row.path" class="move-down3" size="21">
                         <i-custom-correct v-if="row.privileges.includes(child.privileges)" />
                       </el-icon>
@@ -133,10 +133,10 @@
                           <el-checkbox
                             :checked="true"
                             :disabled="row.rolePrivileges.includes(child.privileges)"
-                            :id="`user-auth-path-${child.privileges}`"
+                            :id="`user-auth-path-${child.privileges}-${$index}`"
                             @change="handleCheckedPath(row, child.privileges, false)" />
                         </el-tooltip>
-                        <el-checkbox :checked="false" v-else @change="handleCheckedPath(row, child.privileges, true)" :id="`user-auth-path-${child.privileges}`" />
+                        <el-checkbox :checked="false" v-else @change="handleCheckedPath(row, child.privileges, true)" :id="`user-auth-path-${child.privileges}-${$index}`" />
                       </template>
                     </template>
                   </el-table-column>

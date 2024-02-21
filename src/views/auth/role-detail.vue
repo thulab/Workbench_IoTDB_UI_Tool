@@ -71,8 +71,8 @@
                     </el-icon>
                     <template v-else-if="row.path">
                       <!-- eslint-disable-next-line vue/max-len -->
-                      <el-checkbox :checked="true" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" @change="val => handleCheckedPath(val, $index)" id="role-auth-path-all" />
-                      <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index)" id="role-auth-path-all" />
+                      <el-checkbox :checked="true" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" @change="val => handleCheckedPath(val, $index)" :id="`rolw-auth-path-all-${$index}`" />
+                      <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index)" :id="`rolw-auth-path-all-${$index}`" />
                     </template>
                   </template>
                 </el-table-column>
@@ -83,8 +83,8 @@
                         <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.includes(col.privileges)" />
                       </el-icon>
                       <template v-else-if="row.path">
-                        <el-checkbox :checked="true" v-if="row.privileges.includes(col.privileges)" @change="val => handleCheckedPath(val, $index, col.privileges)" :id="`role-auth-path-${col.privileges}`" />
-                        <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index, col.privileges)" :id="`role-auth-path-${col.privileges}`" />
+                        <el-checkbox :checked="true" v-if="row.privileges.includes(col.privileges)" @change="val => handleCheckedPath(val, $index, col.privileges)" :id="`role-auth-path-${col.privileges}-${$index}`" />
+                        <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index, col.privileges)" :id="`role-auth-path-${col.privileges}-${$index}`" />
                       </template>
                     </template>
                   </el-table-column>
