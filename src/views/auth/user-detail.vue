@@ -48,11 +48,13 @@
                         :checked="true"
                         :disabled="row.rolePrivileges.length >= entityPrivilegesEnumKeys.length"
                         @change="e => handleAllCheckedEntity(row, false)"
+                        id="user-auth-entity-all"
                       />
                       <el-checkbox
                         v-else
                         :checked="false"
                         @change="e => handleAllCheckedEntity(row, true)"
+                        id="user-auth-entity-all"
                       />
                     </template>
                   </template>
@@ -75,10 +77,11 @@
                         >
                           <el-checkbox
                             :checked="true"
+                            :id="`user-auth-entity-${child.privileges}`"
                             :disabled="row.rolePrivileges.includes(child.privileges)"
                             @change="handleCheckedEntity(row, child.privileges, false)" />
                         </el-tooltip>
-                        <el-checkbox :checked="false" v-else @change="handleCheckedEntity(row, child.privileges, true)" />
+                        <el-checkbox :checked="false" v-else @change="handleCheckedEntity(row, child.privileges, true)" :id="`user-auth-entity-${child.privileges}`" />
                       </template>
                     </template>
                   </el-table-column>
@@ -99,11 +102,13 @@
                         v-if="row.privileges.length >= pathPrivilegesEnumKeys.length"
                         :checked="true"
                         :disabled="row.rolePrivileges.length >= pathPrivilegesEnumKeys.length"
+                        id="user-auth-path-all"
                         @change="e => handleAllCheckedPath(row, false)"
                       />
                       <el-checkbox
                         v-else
                         :checked="false"
+                        id="user-auth-path-all"
                         @change="e => handleAllCheckedPath(row, true)"
                       />
                     </template>
@@ -128,9 +133,10 @@
                           <el-checkbox
                             :checked="true"
                             :disabled="row.rolePrivileges.includes(child.privileges)"
+                            :id="`user-auth-path-${child.privileges}`"
                             @change="handleCheckedPath(row, child.privileges, false)" />
                         </el-tooltip>
-                        <el-checkbox :checked="false" v-else @change="handleCheckedPath(row, child.privileges, true)" />
+                        <el-checkbox :checked="false" v-else @change="handleCheckedPath(row, child.privileges, true)" :id="`user-auth-path-${child.privileges}`" />
                       </template>
                     </template>
                   </el-table-column>

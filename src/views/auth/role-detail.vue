@@ -40,8 +40,8 @@
                       <i-custom-correct style="transform: translateY(3px);" v-if="row.length >= entityPrivilegesEnumKeys.length" />
                     </el-icon>
                     <template v-else>
-                      <el-checkbox :checked="true" v-if="row.length >= entityPrivilegesEnumKeys.length" @change="val => handleCheckedEntity(val)" />
-                      <el-checkbox :checked="false" v-else @change="val => handleCheckedEntity(val)" />
+                      <el-checkbox :checked="true" v-if="row.length >= entityPrivilegesEnumKeys.length" @change="val => handleCheckedEntity(val)" id="role-auth-entity-all" />
+                      <el-checkbox :checked="false" v-else @change="val => handleCheckedEntity(val)" id="role-auth-entity-all" />
                     </template>
                   </template>
                 </el-table-column>
@@ -52,8 +52,8 @@
                         <i-custom-correct style="transform: translateY(3px);" v-if="row.includes(col.privileges)" />
                       </el-icon>
                       <template v-else>
-                        <el-checkbox :checked="true" v-if="row.includes(col.privileges)" @change="val => handleCheckedEntity(val, col.privileges)" />
-                        <el-checkbox :checked="false" v-else @change="val => handleCheckedEntity(val, col.privileges)" />
+                        <el-checkbox :checked="true" v-if="row.includes(col.privileges)" @change="val => handleCheckedEntity(val, col.privileges)" :id="`role-auth-entity-${col.privileges}`" />
+                        <el-checkbox :checked="false" v-else @change="val => handleCheckedEntity(val, col.privileges)" :id="`role-auth-entity-${col.privileges}`" />
                       </template>
                     </template>
                   </el-table-column>
@@ -71,8 +71,8 @@
                     </el-icon>
                     <template v-else-if="row.path">
                       <!-- eslint-disable-next-line vue/max-len -->
-                      <el-checkbox :checked="true" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" @change="val => handleCheckedPath(val, $index)" />
-                      <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index)" />
+                      <el-checkbox :checked="true" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" @change="val => handleCheckedPath(val, $index)" id="role-auth-path-all" />
+                      <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index)" id="role-auth-path-all" />
                     </template>
                   </template>
                 </el-table-column>
@@ -83,8 +83,8 @@
                         <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.includes(col.privileges)" />
                       </el-icon>
                       <template v-else-if="row.path">
-                        <el-checkbox :checked="true" v-if="row.privileges.includes(col.privileges)" @change="val => handleCheckedPath(val, $index, col.privileges)" />
-                        <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index, col.privileges)" />
+                        <el-checkbox :checked="true" v-if="row.privileges.includes(col.privileges)" @change="val => handleCheckedPath(val, $index, col.privileges)" :id="`role-auth-path-${col.privileges}`" />
+                        <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index, col.privileges)" :id="`role-auth-path-${col.privileges}`" />
                       </template>
                     </template>
                   </el-table-column>
