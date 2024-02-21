@@ -8,9 +8,9 @@
         <label><input type="password" autocomplete="new-password" hidden></label>
         <base-form-item label="连接类型：" prop="type" :rules="requiredRules" class="base-form-box">
           <el-radio-group v-model="formData.type" @change="val => handleChangeType(val as 0 | 1 | 2)" :disabled="editType !== 'add' || !isShowSave" id="connection-modal-type">
-            <el-radio :label="0">单机</el-radio>
-            <el-radio :label="1">集群</el-radio>
-            <el-radio :label="2">双活</el-radio>
+            <el-radio :label="0" id="connection-modal-type-0">单机</el-radio>
+            <el-radio :label="1" id="connection-modal-type-1">集群</el-radio>
+            <el-radio :label="2" id="connection-modal-type-2">双活</el-radio>
           </el-radio-group>
         </base-form-item>
         <base-form-item label="实例名称：" prop="name" :rules="requiredRules" class="base-form-box">
