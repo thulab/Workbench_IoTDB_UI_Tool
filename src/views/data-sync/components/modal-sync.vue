@@ -66,6 +66,7 @@
 
       --el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;"
                 id="data-sync-modal-history-switch"
+                class="data-sync-modal-history-switch"
               />
             </base-form-item>
             <base-form-item v-if="formData.isSynchronHistory" label="时间范围：" prop="datetimerange" :rules="requiredRules" class="m-l-24">
@@ -95,6 +96,7 @@
 
       --el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;"
                 id="data-sync-modal-running-switch"
+                class="data-sync-modal-running-switch"
                 @change="val => handleChangeRunningSwitch(val as boolean)"
               />
             </base-form-item>
@@ -188,6 +190,7 @@
 
       --el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;"
                   id="data-sync-modal-send-switch"
+                  class="data-sync-modal-send-switch"
                 />
               </base-form-item>
               <template v-if="formData.isLogSendBatch">
