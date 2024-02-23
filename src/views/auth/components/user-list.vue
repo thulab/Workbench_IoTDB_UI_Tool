@@ -19,7 +19,7 @@
         <text-tooltip :content="item.name" />
       </span>
       <auth-tooltip :is-disabled="(canManageUser && canAlterPwd) || userName === item.name">
-        <div class="item-edit-box" :style="{ cursor: !((canManageUser && canAlterPwd) || userName === item.name) ? 'not-allowed' : 'pointer' }" :id="`auth-role-${i}-edit`" @click="handleEdit(item.name)">
+        <div class="item-edit-box" :style="{ cursor: !((canManageUser && canAlterPwd) || userName === item.name) ? 'not-allowed' : 'pointer' }" :id="`auth-user-${i}-edit`" @click="handleEdit(item.name)">
           <i-custom-edit class="item-edit" />
           <i-custom-edit class="item-edit-active" />
         </div>

@@ -24,8 +24,8 @@
                 {{ t('dataSync.syncMeasurement') }}:<el-tooltip effect="light" :content="t('dataSync.syncMeasurementPlaceholder')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
               </template>
               <el-radio-group v-model="formData.whole" id="data-sync-modal-aync-type">
-                <el-radio :label="true">{{ t('dataSync.all') }}</el-radio>
-                <el-radio :label="false" class="radio-tip">{{ t('dataSync.prefix') }}<el-tooltip
+                <el-radio :label="true" id="data-sync-modal-aync-type-all">{{ t('dataSync.all') }}</el-radio>
+                <el-radio :label="false" class="radio-tip" id="data-sync-modal-aync-type-path">{{ t('dataSync.prefix') }}<el-tooltip
                   effect="light"
                   :content="t('dataSync.pathTip')"
                   placement="top"
@@ -47,8 +47,8 @@
                 popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
             </template>
             <el-radio-group v-model="formData.reforward" id="data-sync-modal-reforward">
-              <el-radio :label="true">{{ t('common.yes') }}</el-radio>
-              <el-radio :label="false">{{ t('common.no') }}</el-radio>
+              <el-radio :label="true" id="data-sync-modal-reforward-yes">{{ t('common.yes') }}</el-radio>
+              <el-radio :label="false" id="data-sync-modal-reforward-no">{{ t('common.no') }}</el-radio>
             </el-radio-group>
           </base-form-item>
           <div class="flex-align-center">
@@ -64,6 +64,7 @@
 
       --el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;"
                 id="data-sync-modal-history-switch"
+                class="data-sync-modal-history-switch"
               />
             </base-form-item>
             <base-form-item v-if="formData.isSynchronHistory" :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules" class="m-l-24">
@@ -93,6 +94,7 @@
 
       --el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;"
                 id="data-sync-modal-running-switch"
+                class="data-sync-modal-running-switch"
                 @change="val => handleChangeRunningSwitch(val as boolean)"
               />
             </base-form-item>
@@ -105,8 +107,8 @@
                   <template #content>{{ t('dataSync.triggerModeReal') }}<br>{{ t('dataSync.triggerModeBatch') }}</template><i-custom-question /></el-tooltip>
               </template>
               <el-radio-group v-model="formData.triggerMode" @change="val => handleChangeTriggerMode(val as string as 'stream' | 'batch')" id="data-sync-modal-triggerMode">
-                <el-radio :label="'stream'">{{ t('dataSync.realMode') }}</el-radio>
-                <el-radio :label="'batch'">{{ t('dataSync.batchMode') }}</el-radio>
+                <el-radio :label="'stream'" id="data-sync-modal-triggerMode-stream">{{ t('dataSync.realMode') }}</el-radio>
+                <el-radio :label="'batch'" id="data-sync-modal-triggerMode-batch">{{ t('dataSync.batchMode') }}</el-radio>
               </el-radio-group>
             </base-form-item>
           </div>
@@ -186,6 +188,7 @@
 
       --el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;"
                   id="data-sync-modal-send-switch"
+                  class="data-sync-modal-send-switch"
                 />
               </base-form-item>
               <template v-if="formData.isLogSendBatch">
