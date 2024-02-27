@@ -9,7 +9,7 @@
   >
     <el-form ref="formRef" :model="formData" label-position="left" @submit.prevent>
       <base-form-item label="测点描述:" prop="description">
-        <el-input v-model="formData.description" placeholder="请输入测点描述" maxlength="50" show-word-limit id="description-modal-description" type="textarea" :resize="'none'" />
+        <el-input v-model="formData.description" placeholder="请输入测点描述" maxlength="100" show-word-limit id="description-modal-description" type="textarea" :resize="'none'" />
       </base-form-item>
     </el-form>
     <template #footer>
