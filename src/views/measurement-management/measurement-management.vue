@@ -58,9 +58,15 @@
       <div class="search-form-wrapper">
         <div class="search-form-box">
           <span class="search-from-label">测点选择：</span>
-          <el-input v-model="searchKeyword" placeholder="请输入测点名称" @keyup.enter="handleRefresh" id="mesaurement-search">
+          <el-input v-model="searchKeyword" :placeholder="searchPlaceholder" @keyup.enter="handleRefresh" id="mesaurement-search">
             <template #prefix>
               <i-custom-search-icon class="remote-select-search-icon" @click="handleRefresh" />
+            </template>
+            <template #prepend>
+              <el-select v-model="searchType" style="width: 88px;" placeholder="" id="measurement-search-type">
+                <el-option label="测点名称" value="name" id="measurement-search-type-name" />
+                <el-option label="测点描述" value="description" id="measurement-search-type-description" />
+              </el-select>
             </template>
           </el-input>
         </div>
@@ -107,13 +113,13 @@
             <el-table-column type="selection" width="55" :selectable="isSelectabled" />
             <el-table-column label="设备名称" prop="deviceName" min-width="200" align="center" show-overflow-tooltip />
             <el-table-column label="测点名称" prop="timeseries" width="160" align="center" show-overflow-tooltip />
-            <el-table-column label="测点描述" prop="alias" width="160" align="center">
+            <el-table-column label="测点描述" prop="description" width="160" align="center">
               <template #default="{ row }">
-                <div class="row-alias-box">
-                  <div class="row-alias-text">
-                    <text-tooltip :content="row.alias || ''" />
+                <div class="row-description-box">
+                  <div class="row-description-text">
+                    <text-tooltip :content="row.description || ''" />
                   </div>
-                  <div v-if="row.viewType !== 'VIEW'" class="edit-box flex-align-center" @click="handleEditAlias(row)">
+                  <div v-if="row.viewType !== 'VIEW'" class="edit-box flex-align-center" @click="handleEditDescription(row)">
                     <i-custom-edit-normal class="edit-icon" />
                     <i-custom-edit-active class="edit-icon-active" />
                   </div>
@@ -182,10 +188,10 @@
       @handle-close="handleImportClose"
     />
 
-    <modal-alias
-      v-model:visible="aliasVisible"
+    <modal-description
+      v-model:visible="descriptionVisible"
       :measurement="editMeasurement"
-      :alias="editAlias"
+      :description="editDescription"
       @handleSave="getListData"
     />
   </div>
@@ -203,7 +209,7 @@ import StorageSide from './components/storage-side.vue';
 import ModalStorage from './components/modal-storage.vue';
 import ModalMeasurement from './components/modal-measurement.vue';
 import ModalImport from './components/modal-import.vue';
-import ModalAlias from './components/modal-alias.vue';
+import ModalDescription from './components/modal-description.vue';
 
 const appType = Number(import.meta.env.VITE_APP_TYPE);
 const pageText = appType === 1 ? '计算' : '视图';
@@ -250,9 +256,11 @@ const editTTLUnitModel = ref('day');
 const storageVisible = ref(false);
 const measurementVisible = ref(false);
 const importVisible = ref(false);
-const aliasVisible = ref(false);
+const descriptionVisible = ref(false);
 const editMeasurement = ref('');
-const editAlias = ref('');
+const editDescription = ref('');
+const searchType = ref('name');
+const searchPlaceholder = computed(() => (searchType.value === 'name' ? '请输入名称' : '请输入描述'));
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const canReadWriteSchemaByPath = computed(() => {
@@ -327,6 +335,7 @@ function getListData() {
     dataBaseOrDevice: 'database',
     pathName: currentStorage.value,
     keyword: searchKeyword.value,
+    type: searchType.value,
     ...pagination,
   }).then((res) => {
     totalCount.value = res.data.totalCount;
@@ -406,6 +415,7 @@ function handleExportData(exportType: string) {
   exportMeasurementData({
     pathName: currentStorage.value,
     keyword: searchKeyword.value,
+    type: searchType.value,
     ...pagination,
   }).then((res) => {
     let url = `/api/file/exportExcelMeasurementData?exportId=${res.data}`;
@@ -535,10 +545,10 @@ function handleConfirmEditTTL() {
   });
 }
 
-function handleEditAlias(row: StorageDevice.MeasurementItem) {
+function handleEditDescription(row: StorageDevice.MeasurementItem) {
   editMeasurement.value = `${row.deviceName}.${row.timeseries}`;
-  editAlias.value = row.alias || '';
-  aliasVisible.value = true;
+  editDescription.value = row.description || '';
+  descriptionVisible.value = true;
 }
 
 onMounted(() => {
@@ -549,6 +559,7 @@ watch(
   () => currentStorage.value,
   (val, old) => {
     if (val !== old) {
+      searchType.value = 'name';
       if (!val) {
         storageInfos.value = {
           groupName: '',
@@ -718,12 +729,12 @@ watch(
   align-items: center;
 }
 
-.row-alias-box{
+.row-description-box{
   display: flex;
   align-items: center;
   justify-content: center;
 
-  .row-alias-text{
+  .row-description-text{
     max-width: 120px;
     display: flex;
   }

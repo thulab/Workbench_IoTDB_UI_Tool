@@ -70,12 +70,12 @@
                 </el-form-item>
               </el-col>
               <el-col :span="16">
-                <el-form-item label="别名：" :prop="`measurementList[${index}].alias`" label-width="83px">
+                <el-form-item label="测点描述：" :prop="`measurementList[${index}].description`" label-width="83px">
                   <template #label>
-                    别名：<el-tooltip effect="light" content="仅支持输入字母大小写、数字、下划线、UNICODE 中文字符，除“!@#$%^&*()_+-=”外的特殊字符以及实数需要用反引号进行引用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+                    测点描述：<el-tooltip effect="light" content="仅支持输入字母大小写、数字、下划线、UNICODE 中文字符，除“!@#$%^&*()_+-=”外的特殊字符以及实数需要用反引号进行引用" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                   </template>
                   <el-input type="hidden" />
-                  <el-input v-model="item.alias" placeholder="请输入别名" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-alias`" maxlength="50" show-word-limit />
+                  <el-input v-model="item.description" placeholder="请输入测点描述" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-description`" maxlength="50" show-word-limit />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -240,7 +240,7 @@ function handleChangeAdd(val: CheckboxValueType) {
   formData.measurementList.push({
     deviceName: !val ? '' : `${props.groupName}`,
     timeseries: '',
-    alias: '',
+    description: '',
     dataType: 'BOOLEAN',
     encoding: 'PLAIN',
     compression: 'SNAPPY',
@@ -260,7 +260,7 @@ function handleCopyRow(data: Partial<StorageDevice.MeasurementItem>, e: MouseEve
   formData.measurementList.push({
     deviceName: data.deviceName,
     timeseries: `${data.timeseries}_copy`,
-    alias: '',
+    description: '',
     dataType: data.dataType,
     encoding: data.encoding,
     compression: data.compression,
@@ -317,7 +317,7 @@ function handleChangeDevice(val: string) {
   formData.measurementList.push({
     deviceName: !addDevice.value ? formData.deviceName : `${props.groupName}.${formData.deviceName}`,
     timeseries: '',
-    alias: '',
+    description: '',
     dataType: 'BOOLEAN',
     encoding: 'PLAIN',
     compression: 'SNAPPY',
@@ -338,7 +338,7 @@ function handleAddRow() {
   formData.measurementList.push({
     deviceName: !addDevice.value ? formData.deviceName : `${props.groupName}.${formData.deviceName}`,
     timeseries: '',
-    alias: '',
+    description: '',
     dataType: 'BOOLEAN',
     encoding: 'PLAIN',
     compression: 'SNAPPY',
@@ -354,10 +354,10 @@ const handleConfirm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
       const deviceName = !addDevice.value ? formData.deviceName : `${props.groupName}.${formData.deviceName}`;
-      const measurementDTOList = formData.measurementList.filter((f) => f.isEditable).map((item) => ({ ...item, deviceName }));
+      const measurementVOList = formData.measurementList.filter((f) => f.isEditable).map((item) => ({ ...item, deviceName }));
       saveMeasurementList({
         deviceName,
-        measurementDTOList,
+        measurementVOList,
         isAligned: isAligned.value,
       }).then((res) => {
         if (res.code === 0) {
@@ -400,7 +400,7 @@ watch(
       formData.measurementList.push({
         deviceName: formData.deviceName,
         timeseries: '',
-        alias: '',
+        description: '',
         dataType: 'BOOLEAN',
         encoding: 'PLAIN',
         compression: 'SNAPPY',
