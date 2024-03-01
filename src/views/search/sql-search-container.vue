@@ -223,7 +223,7 @@ function handleTabClick(tab: TabsPaneContext) {
 // 删除tab
 function handleTabRemove(targetName: TabPaneName) {
   if (sqlList.value.length === 1) {
-    ElMessage.info('只有一个页签不允许删除');
+    ElMessage.info({ message: '只有一个页签不允许删除', grouping: true });
     return;
   }
   const index = sqlList.value.findIndex((f) => `${f.id}` === `${targetName}`);
