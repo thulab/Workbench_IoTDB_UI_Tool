@@ -508,7 +508,7 @@ function handleSaveMeasurement() {
 // 导入物理量
 function handleImportClose(reload: boolean) {
   if (reload) {
-    handleSaveMeasurement();
+    storageSideRef.value?.getStorageList(false, currentStorage.value);
   }
 }
 
