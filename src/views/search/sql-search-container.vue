@@ -224,7 +224,7 @@ function handleTabClick(tab: TabsPaneContext) {
 // 删除tab
 function handleTabRemove(targetName: TabPaneName) {
   if (sqlList.value.length === 1) {
-    ElMessage.info(t('search.deleteTabTip'));
+    ElMessage.info({ message: t('search.deleteTabTip'), grouping: true });
     return;
   }
   const index = sqlList.value.findIndex((f) => `${f.id}` === `${targetName}`);
