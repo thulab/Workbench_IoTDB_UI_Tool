@@ -180,7 +180,7 @@ measurement:
   measurementNamePlaceholder: 请输入测点名称
   measurementNameSelectPlaceholder: 请选择测点
   alias: 别名
-  aliasTip: 仅支持输入字母大小写、数字、下划线、UNICODE 中文字符，除“!{'@'}#$%^&*()_+-=”外的特殊字符以及实数需要用反引号进行引用
+  aliasTip: 仅支持输入字母大小写、数字、下划线、UNICODE 中文字符，特殊字符以及实数需要用反引号进行引用
   aliasPlaceholder: 请输入别名
   dataType: 数据类型
   encoding: 编码方式
