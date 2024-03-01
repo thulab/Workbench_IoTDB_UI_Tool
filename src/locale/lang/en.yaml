@@ -440,6 +440,7 @@ dataTrend:
   number10Tip: Only input positive integers in the range of 1-10
 calculate:
   namePlaceholder: Please enter a name
+  descPlaceholder: Please enter a description
   resultMeasurement: Result measurement
   calculateName: Calculation name
   viewName: View name

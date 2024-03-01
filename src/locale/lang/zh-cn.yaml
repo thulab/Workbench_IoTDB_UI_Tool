@@ -448,6 +448,7 @@ dataTrend:
   number10Tip: 只支持输入1-10范围内的正整数
 calculate:
   namePlaceholder: 请输入名称
+  descPlaceholder: 请输入描述
   resultMeasurement: 结果测点
   calculateName: 计算名称
   viewName: 视图名称

@@ -17,9 +17,9 @@ class StorageApi {
     return http.post('/schema/saveDatabase', data);
   }
 
-  // 修改别名
-  static saveAlias(measurement: string, alias: string): HttpResponseP {
-    return http.post('/schema/alterAlias', { measurement, alias });
+  // 修改描述
+  static saveDescription(measurement: string, description: string): HttpResponseP {
+    return http.post('/schema/alterDescription', { measurement, description });
   }
 
   // 更新存储组TTL
@@ -45,12 +45,6 @@ class StorageApi {
   // 根据设备和关键词查物理量
   static getMeasurementList(params: SearchPageQuery & { deviceName: string }):HttpResponseP<StorageDevice.GetPathListResponse> {
     return http.get('/schema/getMeasurementsByDeviceName', { params });
-  }
-
-  // 模糊匹配物理量
-  static getMeasurementAllList(keyword: string):HttpResponseP<{ measurements
-  :string[] }> {
-    return http.post('/schema/getMeasurementsByFuzzy', { keyword });
   }
 
   // 模糊匹配物理量

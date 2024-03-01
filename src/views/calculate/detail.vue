@@ -5,7 +5,7 @@
         <div class="search-form-wrapper">
           <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline @submit.prevent>
             <base-form-item label="" prop="name" style="margin-left: -8px;">
-              <el-input v-model="searchFormData.name" :placeholder="t('calculate.namePlaceholder')" style="width: 346px;" id="calculate-search-name">
+              <el-input v-model="searchFormData.name" :placeholder="searchPlaceholder" style="width: 346px;" id="calculate-search-name">
                 <template #prefix>
                   <i-custom-search-icon class="remote-select-search-icon" />
                 </template>
@@ -165,7 +165,7 @@ const editVisible = ref(false);
 const editData = ref();
 const expressionVisible = ref(false);
 const editExpression = ref('');
-
+const searchPlaceholder = computed(() => (searchFormData.type === 'name' ? t('calculate.namePlaceholder') : t('calculate.descPlaceholder')));
 const canAllWriteSchema = computed(() => userAllPrivileges.value.includes('WRITE_SCHEMA'));
 
 function rowCanWriteSchemaByPath(path: string) {
