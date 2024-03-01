@@ -51,7 +51,7 @@ const { requestFn: getGroup, loading: storageLoading } = useRequest(StorageApi.g
 const { requestFn: deleteStorageGroups } = useRequest(StorageApi.deleteStorageGroups);
 
 // 获取数据库
-function getStorageList(isInitial?: boolean) {
+function getStorageList(isInitial?: boolean, current?: string) {
   getGroup({}).then((res) => {
     let data = res.data?.pathNames || [];
     if (data.some((s) => s === 'root.__system')) {
@@ -61,6 +61,8 @@ function getStorageList(isInitial?: boolean) {
     storageList.value = data;
     if (route.query.databse && isInitial) {
       currentStorage.value = route.query.databse as string;
+    } else if (current && storageList.value.some((database) => database === current)) {
+      currentStorage.value = current;
     } else {
       currentStorage.value = storageList.value[0] || '';
     }
