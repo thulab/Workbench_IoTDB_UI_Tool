@@ -8,8 +8,8 @@
     id="description-modal-database"
   >
     <el-form ref="formRef" :model="formData" label-position="left" @submit.prevent>
-      <base-form-item :label="`${t('measurement.measurementAlias')}:`" prop="description">
-        <el-input v-model="formData.description" :placeholder="t('measurement.measurementAliasPlaceholder')" maxlength="100" show-word-limit id="description-modal-alias" type="textarea" :resize="'none'" />
+      <base-form-item :label="`${t('measurement.measurementDescription')}:`" prop="description">
+        <el-input v-model="formData.description" :placeholder="t('measurement.measurementDescriptionPlaceholder')" maxlength="100" show-word-limit id="description-modal-alias" type="textarea" :resize="'none'" />
       </base-form-item>
     </el-form>
     <template #footer>

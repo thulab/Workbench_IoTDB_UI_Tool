@@ -180,7 +180,7 @@ measurement:
   measurementNamePlaceholder: 请输入测点名称
   measurementNameSelectPlaceholder: 请选择测点
   alias: 别名
-  aliasTip: 仅支持输入字母大小写、数字、下划线、UNICODE 中文字符，特殊字符以及实数需要用反引号进行引用
+  descriptionTip: 仅支持输入字母大小写、数字、下划线、UNICODE 中文字符，特殊字符以及实数需要用反引号进行引用
   aliasPlaceholder: 请输入别名
   dataType: 数据类型
   encoding: 编码方式
@@ -190,8 +190,8 @@ measurement:
   deviceRuleTip: 请输入正确格式，只能由字母、数字、下划线以及UNICODE 中文字符组成
   deleteMeasurementSingle: 是否删除测点
   deleteMeasurementBatch: 确认删除这些测点吗
-  measurementAlias: 测点描述
-  measurementAliasPlaceholder: 请输入测点描述
+  measurementDescription: 测点描述
+  measurementDescriptionPlaceholder: 请输入测点描述
   batchImportMeasurement: 批量导入测点
   importMeasurementTip: 仅支持上传 csv 和 xlsx 文件，将文件拖到此处，或
   importMeasurementRule: 文件格式不正确，目前仅支持上传.csv和.xlsx文件

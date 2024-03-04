@@ -64,7 +64,7 @@
             <template #prepend>
               <el-select v-model="searchType" style="width: 88px;" placeholder="" id="measurement-search-type">
                 <el-option :label="t('measurement.measurementName')" value="name" id="measurement-search-type-name" />
-                <el-option :label="t('measurement.measurementAlias')" value="description" id="measurement-search-type-description" />
+                <el-option :label="t('measurement.measurementDescription')" value="description" id="measurement-search-type-description" />
               </el-select>
             </template>
           </el-input>
@@ -112,7 +112,7 @@
             <el-table-column type="selection" width="55" :selectable="isSelectabled" />
             <el-table-column :label="t('measurement.deviceName')" prop="deviceName" min-width="200" align="center" show-overflow-tooltip />
             <el-table-column :label="t('measurement.measurementName')" prop="timeseries" width="160" align="center" show-overflow-tooltip />
-            <el-table-column :label="t('measurement.measurementAlias')" prop="alias" width="160" align="center">
+            <el-table-column :label="t('measurement.measurementDescription')" prop="alias" width="160" align="center">
               <template #default="{ row }">
                 <div class="row-description-box">
                   <div class="row-description-text">

@@ -72,10 +72,10 @@
               <el-col :span="16">
                 <el-form-item :prop="`measurementList[${index}].description`" label-width="83px">
                   <template #label>
-                    {{ t('measurement.measurementAlias') }}：<el-tooltip effect="light" :content="t('measurement.aliasTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+                    {{ t('measurement.measurementDescription') }}：<el-tooltip effect="light" :content="t('measurement.descriptionTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                   </template>
                   <el-input type="hidden" />
-                  <el-input v-model="item.description" :placeholder="t('measurement.measurementAliasPlaceholder')" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-description`" maxlength="100" show-word-limit />
+                  <el-input v-model="item.description" :placeholder="t('measurement.measurementDescriptionPlaceholder')" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-description`" maxlength="100" show-word-limit />
                 </el-form-item>
               </el-col>
             </el-row>
