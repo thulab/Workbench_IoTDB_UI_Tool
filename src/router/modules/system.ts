@@ -98,19 +98,32 @@ const route = [
     component: Layout,
     redirect: { name: 'TrendDetail' },
     meta: {
-      title: 'page.trend',
+      title: 'page.visualization',
       icon: ICustomTrend,
       activeIcon: ICustomTrendActive,
       showTopLine: true,
       order: 25,
-      // appType: 1,
     },
     children: [
       {
         path: 'detail',
         name: 'TrendDetail',
         component: () => import('@/views/data-trend/trend-detail.vue'),
-        meta: { keepAlive: true },
+        meta: {
+          keepAlive: true,
+          title: 'page.trend',
+          icon: ICustomTrend,
+        },
+      },
+      {
+        path: 'spectrum',
+        name: 'SpectrumDetail',
+        component: () => import('@/views/data-spectrum/detail.vue'),
+        meta: {
+          keepAlive: true,
+          title: 'page.visualization',
+          icon: ICustomTrend,
+        },
       },
     ],
   },

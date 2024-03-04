@@ -144,6 +144,8 @@ page:
   data: 数据
   alarm: 告警
   trend: 趋势
+  spectrum: 频谱
+  visualization: 可视化
   dashboard: 首页
   dataSync: 数据同步
   measurement: 测点管理
