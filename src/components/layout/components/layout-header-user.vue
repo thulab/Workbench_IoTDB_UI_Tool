@@ -6,6 +6,9 @@
         <el-dropdown-item command="reset" id="layout-header-reset">
           {{ t('auth.resetPwd') }}
         </el-dropdown-item>
+        <el-dropdown-item command="system" id="layout-header-system">
+          {{ t('auth.systemInfo') }}
+        </el-dropdown-item>
         <el-dropdown-item command="logout" id="layout-header-logout">
           {{ t('auth.layout') }}
         </el-dropdown-item>
@@ -13,6 +16,10 @@
     </template>
   </el-dropdown>
   <modal-reset-password :title="t('auth.resetPwd')" :user-name="userName" v-model:visible="modalVisible" />
+
+  <modal-system
+    v-model:visible="systemVisible"
+  />
 </template>
 
 <script setup lang="ts">
@@ -20,12 +27,14 @@ import { computed } from 'vue';
 import { useUserStore } from '@/stores';
 import { UserApi } from '@/api';
 import ModalResetPassword from '@/components/modal-reset-password.vue';
+import ModalSystem from '@/components/modal-system.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
 const { t } = useI18n();
 const userStore = useUserStore();
 const userName = computed(() => userStore.userInfo.name);
 const modalVisible = ref(false);
+const systemVisible = ref(false);
 
 const { requestFn: logout } = useRequest(UserApi.logout);
 
@@ -49,6 +58,10 @@ const handleLoginCommand = (val: string) => {
   switch (val) {
     case 'logout': {
       handleLogout();
+      break;
+    }
+    case 'system': {
+      systemVisible.value = true;
       break;
     }
     case 'reset': {

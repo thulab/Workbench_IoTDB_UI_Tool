@@ -23,6 +23,7 @@
                 <el-icon size="24"><i-custom-active-status /></el-icon>
                 <span class="module-label-text">{{t('dashboard.isActive')}}：</span>
                 <span class="module-content-text" :style="{ color: systemData.active ? '#44C795' : '#D43030' }">{{ systemData.active ? t('common.yes') : t('common.no') }}</span>
+                <el-button v-if="connectionIsActive && showVersionCol1312" type="primary" link class="m-l-8" @click="handleClickActive" id="master-active-button">{{ t('dashboard.activeDetail') }}</el-button>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-time /></el-icon>
@@ -92,6 +93,7 @@
                 <el-icon size="24"><i-custom-active-status /></el-icon>
                 <span class="module-label-text">{{t('dashboard.isActive')}}：</span>
                 <span class="module-content-text" :style="{ color: slaveData.active ? '#44C795' : '#D43030' }">{{ slaveData.active ? t('common.yes') : t('common.no') }}</span>
+                <el-button v-if="connectionIsActive && showVersionCol1312" type="primary" link class="m-l-8" @click="handleClickActive" id="slave-active-button">{{ t('dashboard.activeDetail') }}</el-button>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-time /></el-icon>
@@ -198,6 +200,10 @@
             </div>
           </div>
         </div>
+
+        <modal-active
+          v-model:visible="activeVisible"
+        />
       </el-main>
     </el-container>
   </el-scrollbar>
@@ -215,6 +221,7 @@ import { iotdbShowAuth } from '@/utils/auth';
 import MonitorAll from './components/monitor-all.vue';
 import MonitorDatanode from './components/monitor-datanode.vue';
 import MonitorConfignode from './components/monitor-confignode.vue';
+import ModalActive from './components/modal-active.vue';
 
 const { t } = useI18n();
 const userStore = useUserStore();
@@ -247,6 +254,7 @@ const searchFormData = reactive({
   orderBy: ['type', 'type'],
   asc: ['asc', 'asc'],
 });
+const activeVisible = ref(false);
 const clusterType = ref<'master' | 'slave'>('master');
 const tableData = ref<Dashboard.NodeItem[]>([]);
 const slaveTableData = ref<Dashboard.NodeItem[]>([]);
@@ -268,6 +276,8 @@ const nodeList = computed(() => {
 });
 
 const showVersionCol = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.2.1'));
+const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
+const showVersionCol1312 = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.1.2'));
 
 const { requestFn: getSystemInfo, loading } = useRequest(DashboardApi.getSystemInfo);
 
@@ -390,6 +400,10 @@ function handleChangeCluster(type: 'master' | 'slave') {
   monitorNode.value = '';
   currentNodeType.value = '';
   handleRefreshMonitor();
+}
+
+function handleClickActive() {
+  activeVisible.value = true;
 }
 
 onMounted(() => {

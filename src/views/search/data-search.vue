@@ -144,6 +144,8 @@
               v-model:page-size="pagination.pageSize"
               :total="tableData.length"
               :show-pagination="true"
+              :default-sort="{ prop: 't0', order: 'descending' }"
+              @handleSortChange="handleSortChange"
             />
           <!-- <div class="pagination-container" v-if="tableData.length > 0">
             <el-button plain class="btn-page btn-first" @click="handleClickPage('first')" :disabled="pagination.pageNum === 1">第一页</el-button>
@@ -338,6 +340,7 @@ function getListData() {
         prop: `t${index}`,
         defaultValue: '-',
         fixed: index === 0 ? 'left' : undefined,
+        sortable: index === 0 ? 'custom' : false,
         // formatHeader: formatTimeseries,
       });
     });
@@ -356,6 +359,10 @@ function getListData() {
   }).finally(() => {
     getListLoading.value = false;
   });
+}
+
+function handleSortChange(data: { column: any, prop: string, order: any }) {
+  console.log(data);
 }
 
 // 重置

@@ -19,7 +19,7 @@
         <!-- 单机版 -->
         <template v-if="formData.type === 0">
           <div class="ip-port-box base-form-box">
-            <span class="form-label">{{ t('connection.info') }}：</span>
+            <span class="form-label">{{ t('connection.info') }}：<el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
             <host-port
               v-model="formData.masterCluster.hostAndPortVOS"
               :form-key="'masterCluster.hostAndPortVOS'"
@@ -41,7 +41,7 @@
         <!-- 集群版 -->
         <template v-if="formData.type === 1">
           <div class="ip-port-box base-form-box">
-            <span class="form-label">{{ t('connection.info') }}：</span>
+            <span class="form-label">{{ t('connection.info') }}：<el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
             <host-port
               v-model="formData.masterCluster.hostAndPortVOS"
               :form-key="'masterCluster.hostAndPortVOS'"
@@ -75,7 +75,7 @@
                 <h4 class="connection-cluster-title">{{ t('connection.masterInfo') }}</h4>
               </template>
               <div class="ip-port-box">
-                <span class="form-label">{{ t('connection.info') }}：</span>
+                <span class="form-label">{{ t('connection.info') }}：<el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
                 <host-port
                   v-model="formData.masterCluster.hostAndPortVOS"
                   :form-key="'masterCluster.hostAndPortVOS'"
@@ -91,10 +91,10 @@
             </el-collapse-item>
             <el-collapse-item :title="t('connection.slaveInfo')" name="slaveCluster" v-if="formData.slaveCluster">
               <template #title>
-                <h4 class="connection-cluster-title">t('connection.slaveInfo')</h4>
+                <h4 class="connection-cluster-title">{{t('connection.slaveInfo')}}</h4>
               </template>
               <div class="ip-port-box">
-                <span class="form-label">{{ t('connection.info') }}：</span>
+                <span class="form-label">{{ t('connection.info') }}：<el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
                 <host-port
                   v-model="formData.slaveCluster.hostAndPortVOS"
                   :form-key="'slaveCluster.hostAndPortVOS'"
@@ -497,6 +497,10 @@ defineExpose({
       content: "*";
       color: var(--el-color-danger);
       margin-right: 4px;
+    }
+
+    svg{
+      transform: translate(-60%, -80%);
     }
   }
 }

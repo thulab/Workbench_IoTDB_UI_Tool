@@ -104,7 +104,7 @@
           </el-form-item>
         </el-form>
       </div>
-      <p class="right-text">copyrightⒸ Timecho</p>
+      <p class="right-text">copyrightⒸ Timecho {{ appVersion }}</p>
     </div>
 
     <modal-connection
@@ -119,12 +119,14 @@ import { useRouter } from 'vue-router';
 import type { FormInstance, FormRules } from 'element-plus';
 import { UserApi, ConnectionApi } from '@/api';
 import { useUserStore } from '@/stores';
+import useAppStore from '@/stores/app';
 import ModalConnection from '@/components/modal-connection.vue';
 import TheCaptcha from '@/components/the-captcha.vue';
 
 const { t } = useI18n();
 const router = useRouter();
 const userStore = useUserStore();
+const appStore = useAppStore();
 const formRef = ref<FormInstance>();
 const captchaRef = ref<InstanceType<typeof TheCaptcha> | null>(null);
 const loginForm = reactive<{
@@ -149,6 +151,7 @@ const connectionLoading = ref(false);
 
 const captcha = ref('');
 const realConnectionOptions = computed(() => connectionOptions.value.filter((item) => item.options.length > 0));
+const appVersion = computed(() => appStore.AppVersion);
 
 const { requestFn: login } = useRequest(UserApi.login);
 const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);

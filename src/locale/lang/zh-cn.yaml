@@ -335,7 +335,9 @@ dashboard:
   deadTime: 数据截止
   serverStatus: 服务器状态
   expirationTime: 激活到期
+  activationExpirationTime: 激活到期时间
   isActive: 是否激活
+  activeDetail: 激活详情
   node: 节点
   type: 类型
   version: 版本
@@ -357,6 +359,11 @@ dashboard:
   memoryUsage: 内存使用情况
   diskUsage: 磁盘使用情况
   diskIO: 磁盘 I/O 繁忙速率
+  activeDataNodeNum: Datanode节点数（已用/授权）
+  activeAlNodeNum: AInode节点数（已用/授权）
+  activeCpuNum: CPU(已用/授权)
+  activeDeviceNum: 设备数（已用/授权）
+  activeMeasurementNum: 序列数（已用/授权）
 dataSync:
   taskName: 任务名称
   taskNamePlaceholder: 请输入任务名称
@@ -563,6 +570,7 @@ auth:
   deleteUserTip: 是否删除该用户？
   editUser: 编辑用户
   resetPwd: 重置密码
+  systemInfo: 系统信息
   layout: 退出登录
   enterpriseTip: 该功能为企业版所有，如有需要请联系商务
   oldPwd: 原始密码
@@ -650,6 +658,7 @@ connection:
   masterPrometheusSuccess: 主集群Prometheus连接成功
   slavePrometheusSuccess: 备集群Prometheus连接成功
   ipTip: 请输入数据库Host或IP
+  connectionIpTip: 此地址为IoTDB-conf文件夹下iotdb-datanode.properties文件中dn_rpc_address字段内容
   portTip: 请输入端口号
   prometheus: Prometheus 信息
   prometheusTip: 配置prometheus可在界面查看部分监控信息，推荐您进行配置使用

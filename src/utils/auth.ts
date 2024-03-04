@@ -40,14 +40,20 @@ export const iotdbShowAuth = (version?: string, controlVersion: string = '1.2.3'
   const versionArr = splitVersion(iotdbVersion) || [];
   const controlVersionArr = splitVersion(controlVersion) || [];
   if (versionArr.length && controlVersionArr.length) {
-    const [majorStr, minorStr, releaseStr] = versionArr;
-    const [majorControlStr, minorControlStr, releaseControlStr] = controlVersionArr;
+    const [majorStr, minorStr, releaseStr, minorReleaseStr] = versionArr;
+    const [majorControlStr, minorControlStr, releaseControlStr, minorReleaseControlStr] = controlVersionArr;
     const major = +majorStr; // 主版本
     const minor = +minorStr; // 次版本
     const release = +releaseStr; // 修订版本
     if (major > +majorControlStr) return true;
     if (major === +majorControlStr && minor > +minorControlStr) return true;
-    if (major === +majorControlStr && minor === +minorControlStr && release >= +releaseControlStr) return true;
+    if (minorReleaseControlStr) {
+      if (minorReleaseStr) {
+        if (major === +majorControlStr && minor === +minorControlStr && release === +releaseControlStr && +minorReleaseStr >= +minorReleaseControlStr) return true;
+      } else if (major === +majorControlStr && minor === +minorControlStr && release > +releaseControlStr) {
+        return true;
+      }
+    } else if (major === +majorControlStr && minor === +minorControlStr && release >= +releaseControlStr) return true;
     return false;
   }
   return false;

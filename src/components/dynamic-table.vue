@@ -9,12 +9,14 @@
           :max-height="tableMaxHeight"
           tooltip-effect="light"
           :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
+          :default-sort="defaultSort"
+          @sort-change="handleSortChange"
           @selection-change="handleSelectionChange"
         >
           <el-table-column fixed="left" v-if="showSelect" type="selection" width="50" align="center" />
-          <el-table-column :key="item.prop" v-for="item of columnsByPage" min-width="180px" :width="`${item.width}px`" :align="item.align" :fixed="item.fixed" show-overflow-tooltip>
+          <el-table-column :key="item.prop" :prop="item.prop" v-for="item of columnsByPage" min-width="180px" :width="`${item.width}px`" :align="item.align" :fixed="item.fixed" :sortable="item.sortable" :sort-orders="['ascending', 'descending']" show-overflow-tooltip>
             <template #header>
-              <span style="display: flex; max-width: 100%;"><text-tooltip :content="item.label" /></span>
+              <span :class="item.sortable ? '' : 'flex-header'"><text-tooltip :content="item.label" /></span>
             </template>
             <template #default="scope">
               <span>{{ item.formatContent ? item.formatContent(scope.row[item.prop] || item.defaultValue) : scope.row[item.prop] || item.defaultValue }}</span>
@@ -53,9 +55,12 @@
 </template>
 
 <script lang="ts" setup>
+import type { Sort } from 'element-plus';
+
 const props = defineProps<{
   columns: Array<DynamicTableColumn>,
   tableData: Array<Record<string, any>>,
+  defaultSort?: Sort,
   maxHeight: number,
   height?: number,
   showPagination?: boolean,
@@ -69,6 +74,7 @@ const emit = defineEmits<{
   (event: 'batchDelete'): Promise<void>;
   (event: 'loadData'): Promise<void>;
   (event: 'selectedChange', payload: Record<string, any>[]): Promise<void>;
+  (event: 'handleSortChange', data: { column: any, prop: string, order: any }): void;
   (event: 'update:currentPage', payload: number): void;
   (event: 'update:pageSize', payload: number): void;
 }>();
@@ -116,6 +122,10 @@ function handleSelectionChange(val: Record<string, any>[]) {
   emit('selectedChange', val);
 }
 
+function handleSortChange(data: { column: any, prop: string, order: any }) {
+  emit('handleSortChange', data);
+}
+
 function handleCurrentChange() {
   emit('loadData');
 }
@@ -133,6 +143,11 @@ function handleSizeChange() {
   .icon-time {
     color: #4eb5ff;
   }
+}
+
+.flex-header{
+  display: flex;
+  max-width: 100%;
 }
 
 .border_table {

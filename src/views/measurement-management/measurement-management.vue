@@ -44,7 +44,8 @@
           <br>
           <li class="storage-info-item" id="device-total-li"><el-icon size="24"><i-custom-device-num /></el-icon><span class="storage-info-item-label" id="device-total-span">{{ t('measurement.deviceNum') }}：</span>{{ canReadWriteSchema ? (storageInfos?.deviceCount || 0) : '-' }}</li>
           <li class="storage-info-item" id="measurement-total-li"><el-icon size="24"><i-custom-measure-num /></el-icon><span class="storage-info-item-label" id="measurement-total-span">{{ t('measurement.measurementNum') }}：</span>{{ canReadWriteSchema ? (storageInfos?.measurementCount || 0) : '-' }}</li>
-          <li class="storage-info-item" id="data-total-li"><el-icon size="24"><i-custom-total-num /></el-icon><span class="storage-info-item-label" id="data-total-span">{{ t('measurement.totalNum') }}：</span>{{ canReadWriteSchema ? (!storageInfos?.dataCount || storageInfos?.dataCount < 0 ? 0 : storageInfos?.dataCount) : '-'}}</li>
+          <!-- eslint-disable-next-line vue/max-len -->
+          <!-- <li class="storage-info-item" id="data-total-li"><el-icon size="24"><i-custom-total-num /></el-icon><span class="storage-info-item-label" id="data-total-span">{{ t('measurement.totalNum') }}：</span>{{ canReadWriteSchema ? (!storageInfos?.dataCount || storageInfos?.dataCount < 0 ? 0 : storageInfos?.dataCount) : '-'}}</li> -->
         </ul>
 
         <div class="page-detail-buttons">
