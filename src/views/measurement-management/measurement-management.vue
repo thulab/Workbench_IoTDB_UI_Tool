@@ -57,7 +57,6 @@
       <h4 class="storage-info-title">测点列表</h4>
       <div class="search-form-wrapper">
         <div class="search-form-box">
-          <span class="search-from-label">测点选择：</span>
           <el-input v-model="searchKeyword" :placeholder="searchPlaceholder" @keyup.enter="handleRefresh" id="mesaurement-search">
             <template #prefix>
               <i-custom-search-icon class="remote-select-search-icon" @click="handleRefresh" />
