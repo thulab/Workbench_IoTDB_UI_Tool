@@ -55,7 +55,7 @@ function getFunction(node: Node) {
 .search_div {
   font-size: 14px;
   background: #fff;
-  height: 166px;
+  height: 238px;
 
   &.maxheight {
     overflow: auto;
@@ -74,5 +74,6 @@ function getFunction(node: Node) {
 .custom-tree-node{
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 12px;
 }
 </style>
