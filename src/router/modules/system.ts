@@ -121,7 +121,7 @@ const route = [
         component: () => import('@/views/data-spectrum/detail.vue'),
         meta: {
           keepAlive: true,
-          title: 'page.visualization',
+          title: 'page.spectrum',
           icon: ICustomTrend,
         },
       },

@@ -707,3 +707,5 @@ flow:
   input: 文字输入
   deleteNodeTip: 请先选中节点再删除
   deleteEdgeTip: 请先选中边再删除
+spectrum:
+  analysisMethod: 分析方式
