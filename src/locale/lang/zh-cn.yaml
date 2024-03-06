@@ -579,9 +579,11 @@ auth:
   oldPwdTip: 请输入原始密码
   inputPwd: 输入密码
   oldPwdReg: 格式不符，请输入大小写字母、数字、特殊字符（!{'@'}#$%^&*()_+-=）
-  systemTitle: IoTDB可视化控制台—Workbench
+  systemTitle: IoTDB实时扩展组件
+  systemTitleWorkbench: IoTDB可视化控制台—Workbench
   versionTitle: 版本号：%{version}
-  systemDetail: Workbench涵盖了测点管理、查询、可视化、权限等功能，旨在帮助用户更直观的进行跨实例管理，更简单的完成数据库操作，更高效的进行运维操作
+  systemDetail: 实时库涵盖了测点管理、查询、可视化、告警、权限等功能，旨在帮助用户更直观的进行跨实例管理，更简单的完成数据库操作，更高效的进行运维操作
+  systemDetailWorkbench: Workbench涵盖了测点管理、查询、可视化、权限等功能，旨在帮助用户更直观的进行跨实例管理，更简单的完成数据库操作，更高效的进行运维操作
 error:
   403Tip: 抱歉，您无权访问该页面
   goHome: 返回首页

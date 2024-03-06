@@ -10,9 +10,9 @@
   >
     <div class="system-info-box">
       <img src="@/assets/timecho-logo.svg" alt="" class="system-logo">
-      <p class="system-title">{{ t('auth.systemTitle') }}</p>
+      <p class="system-title">{{ systemTitle }}</p>
       <p class="system-version">{{ t('auth.versionTitle', { version: appVersion }) }}</p>
-      <p class="system-detail">{{ t('auth.systemDetail') }}</p>
+      <p class="system-detail">{{ systemDetail }}</p>
     </div>
   </el-dialog>
 </template>
@@ -29,9 +29,12 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
+const appType = Number(import.meta.env.VITE_APP_TYPE);
 const appStore = useAppStore();
 const dialogVisible = useVModel(props, 'visible', emit);
 const appVersion = computed(() => appStore.AppVersion);
+const systemTitle = computed(() => (appType === 1 ? t('auth.systemTitle') : t('auth.systemTitleWorkbench')));
+const systemDetail = computed(() => (appType === 1 ? t('auth.systemDetail') : t('auth.systemDetailWorkbench')));
 
 </script>
 
