@@ -30,7 +30,7 @@
   <h4 v-if="!isExpand" class="collapse-title">{{ t('dataTrend.choosedMeasurement') }}</h4>
 
   <div class="path-list-box" v-if="isExpand">
-    <auth-container :is-auth="canReadWriteSchemaData" style="height: calc(100% - 82px);">
+    <auth-container :is-auth="canReadWriteSchemaData" style="height: 100%">
       <div class="list-empty-wrapper" v-if="!pathList.length">
         <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
         <span class="data-empty-text">{{ t('common.noData') }}</span>
@@ -234,8 +234,8 @@ watch(
 .path-list-box{
   border-radius: 2px;
   background: #FFF;
-  height: calc(100% - 82px);
   overflow-y: auto;
+  flex: 1;
 
   .list-empty-wrapper{
     width: 100%;

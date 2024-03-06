@@ -140,6 +140,7 @@ declare module 'vue' {
     IEpArrowDown: typeof import('~icons/ep/arrow-down')['default']
     IEpArrowLeftBold: typeof import('~icons/ep/arrow-left-bold')['default']
     IEpArrowRightBold: typeof import('~icons/ep/arrow-right-bold')['default']
+    IEpBrush: typeof import('~icons/ep/brush')['default']
     IEpFullScreen: typeof import('~icons/ep/full-screen')['default']
     IEpMoreFilled: typeof import('~icons/ep/more-filled')['default']
     IEpSearch: typeof import('~icons/ep/search')['default']

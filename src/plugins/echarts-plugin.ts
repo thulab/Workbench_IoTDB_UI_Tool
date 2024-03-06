@@ -30,6 +30,10 @@ import {
   type DataZoomComponentOption,
   // 内置数据转换器组件 (filter, sort)
   TransformComponent,
+  MarkPointComponent,
+  type MarkPointComponentOption,
+  MarkLineComponent,
+  type MarkLineComponentOption,
 } from 'echarts/components';
 import { LabelLayout, UniversalTransition } from 'echarts/features';
 import { SVGRenderer, CanvasRenderer } from 'echarts/renderers';
@@ -48,6 +52,8 @@ type ECOption = echarts.ComposeOption<
 | ToolboxComponentOption
 | TreeSeriesOption
 | DataZoomComponentOption
+| MarkPointComponentOption
+| MarkLineComponentOption
 >;
 
 // 注册必须的组件
@@ -60,6 +66,8 @@ echarts.use([
   TransformComponent,
   ToolboxComponent,
   DataZoomComponent,
+  MarkPointComponent,
+  MarkLineComponent,
   GaugeChart,
   LineChart,
   BarChart,
