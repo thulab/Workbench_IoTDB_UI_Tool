@@ -716,3 +716,4 @@ spectrum:
   analysisMethod: 分析方式
   overTip: 最多支持标注10个点，请清空后重新操作
   cursorTitle: 光标数值
+  cursor: 光标
