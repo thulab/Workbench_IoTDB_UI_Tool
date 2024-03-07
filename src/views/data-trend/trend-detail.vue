@@ -329,12 +329,18 @@ const chartOptions = computed<ECOption>(() => ({
           zoom: '',
           back: '',
         },
+        icon: {
+          zoom: 'path://M15 9L23 9L23 23L9 23L9 15M13 9L9 9M9 9L5 9M9 13L9 9M9 9L9 5',
+          back: 'path://M9,9h14v14H9v-8 M12,12L9,9l3-3',
+        },
       },
       restore: {
         title: '',
+        icon: 'path://M13 21L15 24C10.0294 24 6 19.9706 6 15C6 12.7036 6.86006 10.6081 8.27564 9.01797M17 9L15 6C19.9706 6 24 10.0294 24 15C24 17.3063 23.1325 19.4101 21.7059 21.0026',
       },
       saveAsImage: {
         title: '',
+        icon: 'path://M18,12V7H7v16h11v-5 M24,15H13 M21,18l3-3l-3-3',
       },
     },
   },
@@ -406,6 +412,20 @@ const setOption = (option:ECOption, noMerge: boolean = false) => {
       if (isRunningTab.value || !clickedCursor.value) return;
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       handleClickChart(params);
+    });
+    // 若存在restore事件，执行
+    chartInstance.on('restore', () => {
+      if (isRunningTab.value) return;
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      handleEmptyPoint();
+      const start = dayjs(searchFormData.datetimerange[0]).valueOf();
+      const end = dayjs(searchFormData.datetimerange[1]).valueOf();
+      setOption({
+        xAxis: {
+          min: start,
+          max: end,
+        },
+      });
     });
     // 初次加载，设置notMerge为true
     chartInstance.setOption(option, true);
