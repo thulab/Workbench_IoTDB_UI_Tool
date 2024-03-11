@@ -64,7 +64,7 @@ import LayoutMenuSubItem from './components/layout-menu-sub-item.vue';
 // const appStore = useAppStore();
 
 // const { systemTitle } = storeToRefs(appStore);
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const connectionStore = useConnectionStore();
 const route = useRoute();
 const menuStore = useMenuStore();
@@ -180,6 +180,12 @@ const listeningWindow = () => {
   })();
 };
 listeningWindow();
+
+watch(locale, () => {
+  nextTick(() => {
+    menuStore.setMenuList(getMenuList());
+  });
+});
 
 </script>
 

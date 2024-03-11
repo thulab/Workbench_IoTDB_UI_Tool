@@ -104,6 +104,10 @@ const isDark = useDark();
       display: flex;
       align-items: center;
       justify-content: center;
+
+      &:focus-visible {
+        outline: none;
+      }
     }
 
     .switch-dark {

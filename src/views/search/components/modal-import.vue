@@ -44,7 +44,7 @@
             <el-icon size="80" v-else><i-custom-file-info /></el-icon>
             <div class="file-info-box" v-if="uploadFileInfo">{{ uploadFileInfo.name }}</div>
             <div class="el-upload__text">
-              {{ t('measurement.importMeasurementTip') }}<em>{{!uploadFileInfo ? t('common.clickUpload') : t('common.clickReupload') }}</em>
+              {{ t('measurement.importMeasurementTip') }} <em>{{!uploadFileInfo ? t('common.clickUpload') : t('common.clickReupload') }}</em>
             </div>
             <template #tip>
               <div class="el-upload__tip">
