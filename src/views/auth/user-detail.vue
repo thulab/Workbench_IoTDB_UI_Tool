@@ -189,7 +189,7 @@ import ModalAddRole from './components/modal-add-role.vue';
 import ModalPreviewRole from './components/modal-preview-role.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const connectionStore = useConnectionStore();
 const userStore = useUserStore();
 const {
@@ -541,6 +541,12 @@ watch(
     immediate: true,
   },
 );
+
+watch(locale, () => {
+  nextTick(() => {
+    userStore.loadPrivilegesEnum(true);
+  });
+});
 </script>
 
 <style lang="scss" scoped>

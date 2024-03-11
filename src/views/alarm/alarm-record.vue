@@ -156,7 +156,7 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ICustomCalender from '~icons/custom/calender.svg';
 
 const enumStore = useEnumStore();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { maxTableHeight } = useTableHeight(320);
 const searchFormRef = ref<FormInstance>();
 const tableRef = ref<InstanceType<typeof ElTable>>();
@@ -334,6 +334,11 @@ onMounted(() => {
   handleSearch();
 });
 
+watch(locale, () => {
+  nextTick(() => {
+    enumStore.loadAllEnum();
+  });
+});
 </script>
 
 <style lang="scss" scoped>

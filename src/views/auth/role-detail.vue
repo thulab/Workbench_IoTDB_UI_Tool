@@ -144,7 +144,7 @@ import ModalPath from './components/modal-path.vue';
 import ModalAddUser from './components/modal-add-user.vue';
 import ModalPreviewUser from './components/modal-preview-user.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const currentRole = ref('');
 const pathVisible = ref(false);
 const editPathList = ref<string[]>([]);
@@ -410,6 +410,12 @@ watch(
     immediate: true,
   },
 );
+
+watch(locale, () => {
+  nextTick(() => {
+    userStore.loadPrivilegesEnum(true);
+  });
+});
 </script>
 
 <style lang="scss" scoped>

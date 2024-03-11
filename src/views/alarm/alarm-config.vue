@@ -176,7 +176,7 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalConfig from './components/modal-config.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const enumStore = useEnumStore();
 const route = useRoute();
 const userStore = useUserStore();
@@ -187,13 +187,13 @@ const {
 const { maxTableHeight } = useTableHeight(320);
 const searchFormRef = ref<FormInstance>();
 const tableRef = ref<InstanceType<typeof ElTable>>();
-const levelOptions = [{ name: t('common.all'), value: '', paramMap: { color: '#424561', icon: '' } }, ...enumStore.alarmLevelEnum];
-const statusOptions = [
+const levelOptions = computed(() => [{ name: t('common.all'), value: '', paramMap: { color: '#424561', icon: '' } }, ...enumStore.alarmLevelEnum]);
+const statusOptions = computed(() => [
   { label: t('common.all'), value: '' },
   { label: t('common.enable'), value: 1 },
   { label: t('common.disabled'), value: 2 },
   { label: t('common.expire'), value: 3 },
-];
+]);
 const searchFormData = reactive({
   orderBy: '',
   asc: '',
@@ -378,6 +378,12 @@ watch(
     immediate: true,
   },
 );
+
+watch(locale, () => {
+  nextTick(() => {
+    enumStore.loadAllEnum();
+  });
+});
 
 </script>
 
