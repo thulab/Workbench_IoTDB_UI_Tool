@@ -61,12 +61,6 @@ watch(
 
 </script>
 
-<style lang="scss">
-.active-modal{
-  border-radius: 4px !important;
-}
-</style>
-
 <style lang="scss" scoped>
 .active-info-item{
   display: flex;

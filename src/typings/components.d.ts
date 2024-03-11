@@ -93,6 +93,8 @@ declare module 'vue' {
     ICustomGraph: typeof import('~icons/custom/graph')['default']
     ICustomInfoWarning: typeof import('~icons/custom/info-warning')['default']
     ICustomLangSwitch: typeof import('~icons/custom/lang-switch')['default']
+    ICustomLanguage: typeof import('~icons/custom/language')['default']
+    ICustomLanguageBorder: typeof import('~icons/custom/language-border')['default']
     ICustomLogo: typeof import('~icons/custom/logo')['default']
     ICustomMeasureNum: typeof import('~icons/custom/measure-num')['default']
     ICustomMenuConnectionCluster: typeof import('~icons/custom/menu-connection-cluster')['default']

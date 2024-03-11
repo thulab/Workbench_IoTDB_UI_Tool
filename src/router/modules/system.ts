@@ -5,13 +5,16 @@ import ICustomSystemConfigActive from '@/assets/icons/system-config-active.svg?r
 import ICustomAuth from '@/assets/icons/auth.svg?raw';
 import ICustomAuthUser from '@/assets/icons/auth-user.svg?raw';
 import ICustomTrend from '@/assets/icons/trend.svg?raw';
-import ICustomTrendActive from '@/assets/icons/trend-active.svg?raw';
+// import ICustomTrendActive from '@/assets/icons/trend-active.svg?raw';
 import ICustomCalculate from '@/assets/icons/calculate.svg?raw';
 import ICustomCalculateActive from '@/assets/icons/calculate-active.svg?raw';
 import ICustomAuthRole from '@/assets/icons/auth-role.svg?raw';
 // import ICustomLogManagement from '@/assets/icons/log-management.svg?raw';
 import ICustomAuditLog from '@/assets/icons/audit-log.svg?raw';
 // import ICustomWhiteList from '@/assets/icons/white-list.svg?raw';
+import ICustomVisualization from '@/assets/icons/visualization.svg?raw';
+import ICustomVisualizationActive from '@/assets/icons/visualization-active.svg?raw';
+import ICustomSpectrum from '@/assets/icons/spectrum.svg?raw';
 
 const route = [
   {
@@ -99,8 +102,8 @@ const route = [
     redirect: { name: 'TrendDetail' },
     meta: {
       title: 'page.visualization',
-      icon: ICustomTrend,
-      activeIcon: ICustomTrendActive,
+      icon: ICustomVisualization,
+      activeIcon: ICustomVisualizationActive,
       showTopLine: true,
       order: 25,
     },
@@ -122,7 +125,7 @@ const route = [
         meta: {
           keepAlive: true,
           title: 'page.spectrum',
-          icon: ICustomTrend,
+          icon: ICustomSpectrum,
         },
       },
     ],

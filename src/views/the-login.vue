@@ -5,6 +5,7 @@
     </div>
     <div class="login-form-wrapper">
       <div class="login-form-container">
+        <el-icon id="login-language" class="login-language-icon" size="30" @click="handleChangeLang"><i-custom-language-border /></el-icon>
         <div class="login-logo-box">
           <i-custom-timecho-logo class="title-logo" />
           <!-- <i-custom-logo-title class="title-logo" /> -->
@@ -122,6 +123,7 @@ import { useUserStore } from '@/stores';
 import useAppStore from '@/stores/app';
 import ModalConnection from '@/components/modal-connection.vue';
 import TheCaptcha from '@/components/the-captcha.vue';
+import { useLangSwitch } from '@/composition-api';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -152,6 +154,7 @@ const connectionLoading = ref(false);
 const captcha = ref('');
 const realConnectionOptions = computed(() => connectionOptions.value.filter((item) => item.options.length > 0));
 const appVersion = computed(() => appStore.AppVersion);
+const { handleLangCommand } = useLangSwitch(useI18n());
 
 const { requestFn: login } = useRequest(UserApi.login);
 const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
@@ -274,6 +277,15 @@ function handleSelectConnection() {
   connectionVisible.value = true;
 }
 
+function handleChangeLang() {
+  const lang = localStorage.getItem('lang');
+  if (lang && lang === 'cn') {
+    handleLangCommand('1');
+  } else {
+    handleLangCommand('0');
+  }
+}
+
 const submitForm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
@@ -346,6 +358,13 @@ onUnmounted(() => {
   background: #FFF;
   padding: 40px 60px;
   box-sizing: border-box;
+  position: relative;
+}
+
+.login-language-icon{
+  position: absolute;
+  top: 20px;
+  right: 20px;
 }
 
 .login-logo-box{

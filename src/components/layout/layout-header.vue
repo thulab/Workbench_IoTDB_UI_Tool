@@ -29,7 +29,7 @@
 
       <el-dropdown @command="handleLangCommand">
         <span class="lang-icon m-r-20">
-          <i-custom-lang-switch />
+          <i-custom-language />
         </span>
         <template #dropdown>
           <el-dropdown-menu class="operate-dropdown">

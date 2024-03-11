@@ -38,12 +38,6 @@ const systemDetail = computed(() => (appType === 1 ? t('auth.systemDetail') : t(
 
 </script>
 
-<style lang="scss">
-.system-dialog{
-  border-radius: 4px !important;
-}
-</style>
-
 <style lang="scss" scoped>
 .system-info-box{
   display: flex;

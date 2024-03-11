@@ -56,9 +56,3 @@ const handleConfirm = () => {
   dialogVisible.value = false;
 };
 </script>
-
-<style lang="scss">
-.sql-dialog{
-  border-radius: 4px !important;
-}
-</style>

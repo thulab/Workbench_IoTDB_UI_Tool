@@ -4,7 +4,7 @@
       <div class="search-form-wrapper">
         <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" class="m-b-18" inline>
           <div class="m-b-28 flex">
-            <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method" :rules="requiredRules">
+            <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method">
               <template #label>
                 {{t('spectrum.analysisMethod')}}：<el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
                   <template #content>
@@ -63,7 +63,7 @@
           </div>
           <div class="flex-justify-between">
             <div>
-              <base-form-item :label="`${t('measurement.measurementChoose')}：`" prop="path" :rules="requiredRules">
+              <base-form-item :label="`${t('measurement.measurementChoose')}：`" prop="path">
                 <timeseries-select-single
                   id="spectrum-search-path"
                   v-model="searchFormData.path"
@@ -72,7 +72,7 @@
                   show-suffix
                 />
               </base-form-item>
-              <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules">
+              <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange">
                 <el-date-picker
                   v-model="searchFormData.datetimerange"
                   type="datetimerange"
@@ -87,8 +87,8 @@
               </base-form-item>
             </div>
             <div>
-              <base-form-item :label="`${t('spectrum.sqlInput')}：`" prop="path" :rules="requiredRules">
-                <el-button type="primary" link id="spectrum-search-sql" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
+              <base-form-item :label="`${t('spectrum.sqlInput')}：`" prop="path">
+                <el-button type="primary" link id="spectrum-search-sql" style="text-decoration: underline;" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
               </base-form-item>
             </div>
             <div class="search-form-buttons">
@@ -243,13 +243,6 @@ const shortcutsDaterange = [
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 const methodList = ref<Array<{ name: string, value: string }>>([]);
 const resultList = ref<Array<{ name: string, value: string }>>([]);
-const requiredRules = ref([
-  {
-    required: true,
-    message: t('common.formRuleEmpty'),
-    trigger: ['change'],
-  },
-]);
 let inited = false;
 const chartData = ref<Search.TrendData[]>([]);
 const cursorData = ref<Array<{ path: string, markPoint: Array<TrendMarkPoint>, markLine: Array<TrendMarkLine> }>>([]);

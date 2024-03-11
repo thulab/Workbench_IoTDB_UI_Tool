@@ -23,7 +23,7 @@
                 <el-icon size="24"><i-custom-active-status /></el-icon>
                 <span class="module-label-text">{{t('dashboard.isActive')}}：</span>
                 <span class="module-content-text" :style="{ color: systemData.active ? '#44C795' : '#D43030' }">{{ systemData.active ? t('common.yes') : t('common.no') }}</span>
-                <el-button v-if="connectionIsActive && showVersionCol1312" type="primary" link class="m-l-8" @click="handleClickActive" id="master-active-button">{{ t('dashboard.activeDetail') }}</el-button>
+                <el-button v-if="connectionIsActive && showVersionCol1312" type="primary" link class="m-l-8" style="text-decoration: underline;" @click="handleClickActive" id="master-active-button">{{ t('dashboard.activeDetail') }}</el-button>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-time /></el-icon>
@@ -93,7 +93,7 @@
                 <el-icon size="24"><i-custom-active-status /></el-icon>
                 <span class="module-label-text">{{t('dashboard.isActive')}}：</span>
                 <span class="module-content-text" :style="{ color: slaveData.active ? '#44C795' : '#D43030' }">{{ slaveData.active ? t('common.yes') : t('common.no') }}</span>
-                <el-button v-if="connectionIsActive && showVersionCol1312" type="primary" link class="m-l-8" @click="handleClickActive" id="slave-active-button">{{ t('dashboard.activeDetail') }}</el-button>
+                <el-button v-if="connectionIsActive && showVersionCol1312" type="primary" link class="m-l-8" style="text-decoration: underline;" @click="handleClickActive" id="slave-active-button">{{ t('dashboard.activeDetail') }}</el-button>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-time /></el-icon>
