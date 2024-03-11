@@ -16,7 +16,7 @@
         <el-input v-model="formData.password" type="password" maxlength="32" autocomplete="off" :placeholder="t('auth.pwdPlaceholder')" show-password id="auth-user-modal-pwd" />
       </base-form-item>
       <base-form-item :label="`${t('auth.confirmPwd')}：`" prop="confirmPassword" required>
-        <el-input v-model="formData.confirmPassword" type="password" maxlength="32" autocomplete="off" placeholder="t('auth.confirmPwdAgain')" show-password id="auth-user-modal-pwd-again" />
+        <el-input v-model="formData.confirmPassword" type="password" maxlength="32" autocomplete="off" :placeholder="t('auth.confirmPwdAgain')" show-password id="auth-user-modal-pwd-again" />
       </base-form-item>
     </el-form>
     <template #footer>

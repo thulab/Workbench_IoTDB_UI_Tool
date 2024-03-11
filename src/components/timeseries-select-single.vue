@@ -67,9 +67,5 @@ onMounted(() => {
 
 .remote-select-box{
   position: relative;
-
-  :deep(.el-input__suffix) {
-    background-color: transparent;
-  }
 }
 </style>
