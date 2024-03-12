@@ -6,6 +6,7 @@ declare namespace Search{
     unitInterval?: string;
     timeInterval?: number;
     aggregation?: string;
+    asc: string;
     spage?: number;
     ssize?: number;
     size: number;

@@ -144,7 +144,7 @@
               v-model:page-size="pagination.pageSize"
               :total="tableData.length"
               :show-pagination="true"
-              :default-sort="{ prop: 't0', order: 'descending' }"
+              :default-sort="defaultSort"
               @handleSortChange="handleSortChange"
             />
           <!-- <div class="pagination-container" v-if="tableData.length > 0">
@@ -176,7 +176,9 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
+import type {
+  FormInstance, SingleOrRange, DateModelType, Sort,
+} from 'element-plus';
 import dayjs from 'dayjs';
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
@@ -225,6 +227,7 @@ const searchFormData = reactive({
   timeInterval: undefined as number | undefined,
   unitInterval: 's',
   aggregation: '',
+  asc: 'asc',
 });
 let copySearchFormData = cloneDeep(searchFormData);
 const shortcutsDate = [
@@ -273,6 +276,7 @@ const importVisible = ref(false);
 // const tableHeight = computed(() => (tableData.value.length > 0 ? maxTableHeight.value : maxTableHeight.value ));
 
 const getListLoading = ref(false);
+const defaultSort = ref<Sort>({ prop: 't0', order: 'descending' });
 
 // // 查询结果
 // const formatSqlInfo = computed(() => function (filed: string) {
@@ -327,6 +331,7 @@ function getListData() {
     aggregation: copySearchFormData.aggregation,
     timeInterval: copySearchFormData.timeInterval || undefined,
     unitInterval: copySearchFormData.unitInterval,
+    asc: copySearchFormData.asc,
     spage: pagination.columnNum,
     ssize: pagination.columnSize,
     size: 1000,
@@ -356,13 +361,16 @@ function getListData() {
     pagination.totalColumnPage = res.data?.totalColumnPage;
     pagination.totalColumnCount = res.data?.totalColumnCount;
     searchDetailInfos.value = res.data || {};
+    defaultSort.value = { prop: 't0', order: copySearchFormData.asc === 'asc' ? 'ascending' : 'descending' };
   }).finally(() => {
     getListLoading.value = false;
   });
 }
 
 function handleSortChange(data: { column: any, prop: string, order: any }) {
-  console.log(data);
+  searchFormData.asc = data.order === 'ascending' ? 'asc' : 'desc';
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  handleSearch();
 }
 
 // 重置
@@ -371,6 +379,7 @@ function handleReset() {
   searchFormData.time = todayNow();
   searchFormData.unitInterval = 's';
   searchFormData.datetimerange = ['1970-01-01 00:00:00', todayNow()] as [DateModelType, DateModelType];
+  searchFormData.asc = 'desc';
 }
 
 // 查询
@@ -458,6 +467,7 @@ function handleExportData(exportType: string) {
     aggregation: copySearchFormData.aggregation,
     timeInterval: copySearchFormData.timeInterval || undefined,
     unitInterval: copySearchFormData.unitInterval,
+    asc: copySearchFormData.asc,
     spage: pagination.columnNum,
     ssize: pagination.columnSize,
     size: pagination.pageSize,
@@ -638,6 +648,7 @@ watch(
   .export-btn{
     position: relative;
 
+    /* stylelint-disable-next-line no-descending-specificity */
     svg{
       position: absolute;
       right: 2px;
