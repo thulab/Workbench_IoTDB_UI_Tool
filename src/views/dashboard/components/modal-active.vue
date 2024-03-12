@@ -2,38 +2,30 @@
   <el-dialog
     :title="t('dashboard.activeDetail')"
     v-model="dialogVisible"
-    width="370px"
+    width="624px"
     align-center
     :close-on-click-modal="false"
     id="active-modal"
     class="active-modal"
   >
-    <ul v-loading="loading">
-      <li class="active-info-item">
-        <span class="active-info-label">{{ t('dashboard.activationExpirationTime') }}:</span>
-        <span class="active-info-content">{{ activeData.activationTime }}</span>
-      </li>
-      <li class="active-info-item">
-        <span class="active-info-label">{{ t('dashboard.activeDataNodeNum') }}:</span>
-        <span class="active-info-content">{{ activeData.datanodeNum }}</span>
-      </li>
-      <li class="active-info-item">
-        <span class="active-info-label">{{ t('dashboard.activeAlNodeNum') }}:</span>
-        <span class="active-info-content">{{ activeData.ainodeNum }}</span>
-      </li>
-      <li class="active-info-item">
-        <span class="active-info-label">{{ t('dashboard.activeCpuNum') }}:</span>
-        <span class="active-info-content">{{ activeData.cpuNum }}</span>
-      </li>
-      <li class="active-info-item">
-        <span class="active-info-label">{{ t('dashboard.activeDeviceNum') }}:</span>
-        <span class="active-info-content">{{ activeData.deviceNum }}</span>
-      </li>
-      <li class="active-info-item">
-        <span class="active-info-label">{{ t('dashboard.activeMeasurementNum') }}:</span>
-        <span class="active-info-content">{{ activeData.measurementNum }}</span>
-      </li>
-    </ul>
+    <div class="page-table-box">
+      <el-table
+        :data="tableData"
+        v-loading="loading"
+        style="width: 100%;"
+        tooltip-effect="light"
+        ref="tableRef"
+        border
+        :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
+      >
+        <el-table-column prop="name" min-width="200" align="center" show-overflow-tooltip>
+          <template #header></template>
+          <template #default="{ row }">{{ t(row.name) }}</template>
+        </el-table-column>
+        <el-table-column :label="t('dashboard.used')" prop="used" min-width="180" align="center" show-overflow-tooltip />
+        <el-table-column :label="t('dashboard.allocated')" prop="allocated" min-width="180" align="center" show-overflow-tooltip />
+      </el-table>
+    </div>
   </el-dialog>
 </template>
 
@@ -51,29 +43,30 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
-const activeData = reactive<Dashboard.ActiveData>({
-  activationTime: '',
-  datanodeNum: '',
-  cpuNum: '',
-  deviceNum: '',
-  measurementNum: '',
-  ainodeNum: '',
-});
+const tableData = ref<Array<{ name: string, used: string, allocated: string }>>([]);
 
 const { requestFn: getActiveInfo, loading } = useRequest(DashboardApi.getActiveInfo);
+
+function getDetail() {
+  getActiveInfo(props.isMaster).then((res) => {
+    const {
+      activationTime, datanodeNum, ainodeNum, cpuNum, deviceNum, measurementNum,
+    } = res.data;
+    tableData.value.push({ name: 'dashboard.activationExpirationTime', used: '', allocated: activationTime });
+    tableData.value.push({ name: 'dashboard.activeDataNodeNum', used: datanodeNum.split('/')[0], allocated: datanodeNum.split('/')[1] });
+    tableData.value.push({ name: 'dashboard.activeAlNodeNum', used: ainodeNum.split('/')[0], allocated: ainodeNum.split('/')[1] });
+    tableData.value.push({ name: 'dashboard.activeCpuNum', used: cpuNum.split('/')[0], allocated: cpuNum.split('/')[1] });
+    tableData.value.push({ name: 'dashboard.activeDeviceNum', used: deviceNum.split('/')[0], allocated: deviceNum.split('/')[1] });
+    tableData.value.push({ name: 'dashboard.activeMeasurementNum', used: measurementNum.split('/')[0], allocated: measurementNum.split('/')[1] });
+  });
+}
 
 watch(
   () => props.visible,
   (newVal) => {
     if (newVal) {
-      getActiveInfo(props.isMaster).then((res) => {
-        activeData.activationTime = res.data.activationTime || '-';
-        activeData.datanodeNum = res.data.datanodeNum || '-';
-        activeData.cpuNum = res.data.cpuNum || '-';
-        activeData.deviceNum = res.data.deviceNum || '-';
-        activeData.measurementNum = res.data.measurementNum || '-';
-        activeData.ainodeNum = res.data.ainodeNum || '-';
-      });
+      tableData.value = [];
+      getDetail();
     }
   },
 );
@@ -81,6 +74,28 @@ watch(
 </script>
 
 <style lang="scss" scoped>
+.page-table-box{
+  padding: 16px;
+  background-color: #F7F8FC;
+  border-radius: 2px;
+  min-height: 240px;
+
+  :deep(.el-table th.el-table__cell) {
+    background-color: #fff !important;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    color: #424561;
+  }
+
+  :deep(.el-table .cell) {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    color: #424561;
+  }
+}
+
 .active-info-item{
   display: flex;
   min-height: 32px;

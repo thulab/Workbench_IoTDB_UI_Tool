@@ -449,12 +449,14 @@ dashboard:
   diskUsage: Disk Usage
   diskIO: Disk I/O Busy Rate
   activationExpirationTime: Expiration Time
-  activeAlNodeNum: AInode Nodes (Used/Allocated)
-  activeCpuNum: CPU (Used/Allocated)
-  activeDataNodeNum: Datanode Nodes (Used/Allocated)
+  activeAlNodeNum: AInode Nodes
+  activeCpuNum: CPU
+  activeDataNodeNum: Datanode Nodes
   activeDetail: Activation Details
-  activeDeviceNum: Devices (Used/Allocated)
-  activeMeasurementNum: Time Series (Used/Allocated)
+  activeDeviceNum: Devices
+  activeMeasurementNum: Time Series
+  used: Used
+  allocated: Allocated
 dataSync:
   taskName: Task Name
   taskNamePlaceholder: Please enter the task name
