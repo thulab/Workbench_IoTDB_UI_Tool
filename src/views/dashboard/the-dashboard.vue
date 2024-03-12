@@ -224,7 +224,7 @@ import MonitorDatanode from './components/monitor-datanode.vue';
 import MonitorConfignode from './components/monitor-confignode.vue';
 import ModalActive from './components/modal-active.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const userStore = useUserStore();
 const connectionStore = useConnectionStore();
 const {
@@ -438,6 +438,12 @@ watch(
     immediate: true,
   },
 );
+
+watch(locale, () => {
+  nextTick(() => {
+    handleRefreshSystem();
+  });
+});
 
 onUnmounted(() => {
   clearTimeout(refreshInterval.value);
