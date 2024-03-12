@@ -104,14 +104,14 @@
         <el-main class="p-0" style="position: relative;">
           <div ref="chartContainer" class="chart-container" :style="`height: ${'calc(100% - 28px);'}`" v-element-size="onResize"></div>
           <div class="flex-align-center">
-            <el-button type="primary" id="spectrum-cursor" style="height: 24px !important;" :disabled="!chartData.length" @click="clickedCursor = true;">{{ t('spectrum.cursor') }}</el-button>
+            <el-button type="primary" id="spectrum-cursor" style="height: 24px !important;" :disabled="!chartData.length" @click="handleClickOperate('cursor')">{{ t('spectrum.cursor') }}</el-button>
             <div class="chart-operate-box">
-              <span>{{ t('spectrum.harmonicFrequency') }}</span>
-              <el-input v-model.number="harmonicFrequency" @input="handleInputHarmonicFrequency" id="spectrum-harmonicFrequency-input" style="width: 40px;height: 24px !important;" />
+              <el-button type="primary" id="spectrum-harmonicFrequency" style="height: 24px !important;" :disabled="!chartData.length" @click="handleClickOperate('harmonicFrequency')">{{ t('spectrum.harmonicFrequency') }}</el-button>
+              <el-input v-model.number="harmonicFrequency" :min="1" step-strictly @input="handleInputHarmonicFrequency" id="spectrum-harmonicFrequency-input" :disabled="!chartData.length" style="width: 40px;height: 24px !important;" />
             </div>
             <div class="chart-operate-box">
-              <span>{{ t('spectrum.sideband') }}</span>
-              <el-input v-model.number="sideband" @input="handleInputSideband" id="spectrum-sideband-input" style="width: 40px;height: 24px !important;" />
+              <el-button type="primary" id="spectrum-sideband" style="height: 24px !important;" :disabled="!chartData.length" @click="handleClickOperate('sideband')">{{ t('spectrum.sideband') }}</el-button>
+              <el-input v-model.number="sideband" :min="1" step-strictly @input="handleInputSideband" id="spectrum-sideband-input" :disabled="!chartData.length" style="width: 40px;height: 24px !important;" />
             </div>
             <el-button link class="cursor-button m-l-8" id="spectrum-cursor-clear" :disabled="!chartData.length || !pointList.length" @click="handleEmptyPoint"><el-icon size="18" color="#fff"><i-custom-delete /></el-icon></el-button>
           </div>
@@ -168,7 +168,7 @@ import {
   debounce,
 } from 'lodash-es';
 import { vElementSize } from '@vueuse/components';
-// import { SearchApi } from '@/api';
+import { SearchApi } from '@/api';
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
 import {
   getStartAndEnd, today, getOneInterval, getOneIntervalNow,
@@ -243,10 +243,10 @@ const shortcutsDaterange = [
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 const methodList = ref<Array<{ name: string, value: string }>>([]);
 const resultList = ref<Array<{ name: string, value: string }>>([]);
-let inited = false;
+// let inited = false;
 const chartData = ref<Search.TrendData[]>([]);
 const cursorData = ref<Array<{ path: string, markPoint: Array<TrendMarkPoint>, markLine: Array<TrendMarkLine> }>>([]);
-const clickedCursor = ref(false);
+const clickedOperate = ref<'cursor' | 'harmonicFrequency' | 'sideband' | ''>('');
 const markPointCount = ref(0);
 const pointList = ref<Array<PointData>>([]);
 const pointDvalueList = ref<Array<{ x: number, y: number }>>([]);
@@ -341,7 +341,7 @@ const chartOptions = computed<ECOption>(() => ({
   xAxis: {
     type: 'time',
     boundaryGap: false,
-    show: !inited,
+    // show: !inited,
   },
   yAxis: {
     type: 'value',
@@ -350,7 +350,7 @@ const chartOptions = computed<ECOption>(() => ({
   series: seriesData.value.series,
 }));
 
-// const { requestFn: getHistoryTrend } = useRequest(SearchApi.getHistoryTrend);
+const { requestFn: getHistoryTrend } = useRequest(SearchApi.getHistoryTrend);
 
 function pointTitle(i: number) {
   if (pointList.value.length === 1) {
@@ -375,23 +375,19 @@ function handleInputFrequency(val: string) {
 }
 
 function handleInputHarmonicFrequency(val: string) {
-  if (val) {
-    if (!/^\+?[1-9][0-9]*$/.test(`${val}`)) {
-      harmonicFrequency.value = 1;
-    }
-  } else {
+  if (val && !/^\d+$/.test(`${val}`)) {
     harmonicFrequency.value = 1;
   }
 }
 
 function handleInputSideband(val: string) {
-  if (val) {
-    if (!/^\+?[1-9][0-9]*$/.test(`${val}`)) {
-      sideband.value = 1;
-    }
-  } else {
+  if (val && !/^\d+$/.test(`${val}`)) {
     sideband.value = 1;
   }
+}
+
+function handleClickOperate(type: 'cursor' | 'harmonicFrequency' | 'sideband') {
+  clickedOperate.value = type;
 }
 
 const setOption = (option:ECOption, noMerge: boolean = false) => {
@@ -399,12 +395,12 @@ const setOption = (option:ECOption, noMerge: boolean = false) => {
     // 实例存在直接设置
     chartInstance.setOption(option, noMerge);
   } else if (chartContainer.value && chartContainer.value.clientHeight) {
-    inited = true;
+    // inited = true;
     // 实例不存在，容器存在，容器高度存在
     chartInstance = echarts.init(chartContainer.value, 'dark');
     // 若存在click事件，执行
     chartInstance.on('click', (params) => {
-      if (!clickedCursor.value) return;
+      if (!clickedOperate.value) return;
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       handleClickChart(params);
     });
@@ -439,50 +435,34 @@ const setOption = (option:ECOption, noMerge: boolean = false) => {
 function handleClickChart(params: echarts.ECElementEvent) {
   const { seriesName, value, componentType } = params as { seriesName: string, value: number[], componentType: string };
   if (componentType !== 'series') return;
-  if (markPointCount.value > 9) {
-    ElMessage.warning({
-      message: t('spectrum.overTip'),
-      grouping: true,
-    });
-    return;
-  }
-  const index = cursorData.value.findIndex((item) => item.path === seriesName);
-  markPointCount.value++;
-  const num = markPointCount.value;
-  if (index === -1) {
-    cursorData.value.push({
-      path: seriesName,
-      markPoint: [{
-        name: `${seriesName}_${value[0]}_${value[1]}`,
-        value: value[1],
-        xAxis: value[0],
-        yAxis: value[1],
-      }],
-      markLine: [{
-        name: `${seriesName}_${value[0]}`,
-        xAxis: value[0],
-        label: {
-          formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
-          position: 'insideEndBottom',
-        },
-      }],
-    });
-    pointList.value.push({
-      name: `${seriesName}_${value[0]}_${value[1]}`,
-      x: value[0],
-      y: value[1],
-      disabled: false,
-      checked: false,
-    });
-  } else {
-    const { markPoint, markLine } = cursorData.value[index];
-    const pointIndex = markPoint.findIndex((point) => point.name === `${seriesName}_${value[0]}_${value[1]}`);
-    if (pointIndex === -1) {
-      markPoint.push({
-        name: `${seriesName}_${value[0]}_${value[1]}`,
-        value: value[1],
-        xAxis: value[0],
-        yAxis: value[1],
+  if (clickedOperate.value === 'cursor') {
+    if (markPointCount.value > 9) {
+      ElMessage.warning({
+        message: t('spectrum.overTip'),
+        grouping: true,
+      });
+      return;
+    }
+    const index = cursorData.value.findIndex((item) => item.path === seriesName);
+    markPointCount.value++;
+    const num = markPointCount.value;
+    if (index === -1) {
+      cursorData.value.push({
+        path: seriesName,
+        markPoint: [{
+          name: `${seriesName}_${value[0]}_${value[1]}`,
+          value: value[1],
+          xAxis: value[0],
+          yAxis: value[1],
+        }],
+        markLine: [{
+          name: `${seriesName}_${value[0]}`,
+          xAxis: value[0],
+          label: {
+            formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
+            position: 'insideEndBottom',
+          },
+        }],
       });
       pointList.value.push({
         name: `${seriesName}_${value[0]}_${value[1]}`,
@@ -491,20 +471,44 @@ function handleClickChart(params: echarts.ECElementEvent) {
         disabled: false,
         checked: false,
       });
+    } else {
+      const { markPoint, markLine } = cursorData.value[index];
+      const pointIndex = markPoint.findIndex((point) => point.name === `${seriesName}_${value[0]}_${value[1]}`);
+      if (pointIndex === -1) {
+        markPoint.push({
+          name: `${seriesName}_${value[0]}_${value[1]}`,
+          value: value[1],
+          xAxis: value[0],
+          yAxis: value[1],
+        });
+        pointList.value.push({
+          name: `${seriesName}_${value[0]}_${value[1]}`,
+          x: value[0],
+          y: value[1],
+          disabled: false,
+          checked: false,
+        });
+      }
+      const lineIndex = markLine.findIndex((line) => line.name === `${seriesName}_${value[0]}`);
+      if (lineIndex === -1) {
+        markLine.push({
+          name: `${seriesName}_${value[0]}`,
+          xAxis: value[0],
+          label: {
+            formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
+            position: 'insideEndBottom',
+          },
+        });
+      }
     }
-    const lineIndex = markLine.findIndex((line) => line.name === `${seriesName}_${value[0]}`);
-    if (lineIndex === -1) {
-      markLine.push({
-        name: `${seriesName}_${value[0]}`,
-        xAxis: value[0],
-        label: {
-          formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
-          position: 'insideEndBottom',
-        },
-      });
-    }
+    setOption(chartOptions.value);
+  } else if (clickedOperate.value === 'harmonicFrequency') {
+    if (!harmonicFrequency.value) return;
+    console.log('harmonicFrequency');
+  } else {
+    if (!sideband.value) return;
+    console.log('sideband');
   }
-  setOption(chartOptions.value);
 }
 
 function handleCheckDvalue(val: CheckboxValueType, data: PointData) {
@@ -512,6 +516,7 @@ function handleCheckDvalue(val: CheckboxValueType, data: PointData) {
 }
 
 function handleEmptyPoint() {
+  clickedOperate.value = '';
   markPointCount.value = 0;
   cursorData.value = [];
   pointList.value = [];
@@ -534,24 +539,24 @@ function handleReset() {
 // 查询
 function handleSearch() {
   if (!canReadWriteSchemaData.value) return;
-  const start = dayjs(searchFormData.datetimerange[0]).valueOf();
-  const end = dayjs(searchFormData.datetimerange[1]).valueOf();
-  // getHistoryTrend({
-  //   paths: searchFormData.path,
-  //   startTime: start,
-  //   endTime: end,
-  //   groupBy: searchFormData.unitInterval,
-  //   aggregateFun: searchFormData.aggregation,
-  // }).then((res) => {
-  chartData.value = [];
-  setOption(chartOptions.value, true);
-  setOption({
-    xAxis: {
-      min: start,
-      max: end,
-    },
+  // const start = dayjs(searchFormData.datetimerange[0]).valueOf();
+  // const end = dayjs(searchFormData.datetimerange[1]).valueOf();
+  getHistoryTrend({
+    paths: ['root.stock.Legacy.0700HK.L1_BuyNo'],
+    startTime: 1710212400000,
+    endTime: 1710216000000,
+    groupBy: 'auto',
+    aggregateFun: 'last_value',
+  }).then((res) => {
+    chartData.value = res.data.normal || [];
+    setOption(chartOptions.value, true);
+    // setOption({
+    //   xAxis: {
+    //     min: start,
+    //     max: end,
+    //   },
+    // });
   });
-  // });
 }
 
 function handleSql() {
