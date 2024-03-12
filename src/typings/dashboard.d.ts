@@ -72,4 +72,13 @@ declare namespace Dashboard{
     memoryRatio: number;
     unit: string;
   }
+
+  export interface ActiveData {
+    activationTime: string,
+    datanodeNum: string,
+    cpuNum: string,
+    deviceNum: string,
+    measurementNum: string,
+    ainodeNum: string,
+  }
 }

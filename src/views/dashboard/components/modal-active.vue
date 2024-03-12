@@ -8,39 +8,41 @@
     id="active-modal"
     class="active-modal"
   >
-    <ul>
+    <ul v-loading="loading">
       <li class="active-info-item">
         <span class="active-info-label">{{ t('dashboard.activationExpirationTime') }}:</span>
-        <span class="active-info-content"></span>
+        <span class="active-info-content">{{ activeData.activationTime }}</span>
       </li>
       <li class="active-info-item">
         <span class="active-info-label">{{ t('dashboard.activeDataNodeNum') }}:</span>
-        <span class="active-info-content"></span>
+        <span class="active-info-content">{{ activeData.datanodeNum }}</span>
       </li>
       <li class="active-info-item">
         <span class="active-info-label">{{ t('dashboard.activeAlNodeNum') }}:</span>
-        <span class="active-info-content">-</span>
+        <span class="active-info-content">{{ activeData.ainodeNum }}</span>
       </li>
       <li class="active-info-item">
         <span class="active-info-label">{{ t('dashboard.activeCpuNum') }}:</span>
-        <span class="active-info-content"></span>
+        <span class="active-info-content">{{ activeData.cpuNum }}</span>
       </li>
       <li class="active-info-item">
         <span class="active-info-label">{{ t('dashboard.activeDeviceNum') }}:</span>
-        <span class="active-info-content"></span>
+        <span class="active-info-content">{{ activeData.deviceNum }}</span>
       </li>
       <li class="active-info-item">
         <span class="active-info-label">{{ t('dashboard.activeMeasurementNum') }}:</span>
-        <span class="active-info-content">50000/25000</span>
+        <span class="active-info-content">{{ activeData.measurementNum }}</span>
       </li>
     </ul>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
+import { DashboardApi } from '@/api';
 
 const props = defineProps<{
   visible: boolean;
+  isMaster: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -49,12 +51,29 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
+const activeData = reactive<Dashboard.ActiveData>({
+  activationTime: '',
+  datanodeNum: '',
+  cpuNum: '',
+  deviceNum: '',
+  measurementNum: '',
+  ainodeNum: '',
+});
+
+const { requestFn: getActiveInfo, loading } = useRequest(DashboardApi.getActiveInfo);
 
 watch(
   () => props.visible,
   (newVal) => {
     if (newVal) {
-      console.log(newVal);
+      getActiveInfo(props.isMaster).then((res) => {
+        activeData.activationTime = res.data.activationTime || '-';
+        activeData.datanodeNum = res.data.datanodeNum || '-';
+        activeData.cpuNum = res.data.cpuNum || '-';
+        activeData.deviceNum = res.data.deviceNum || '-';
+        activeData.measurementNum = res.data.measurementNum || '-';
+        activeData.ainodeNum = res.data.ainodeNum || '-';
+      });
     }
   },
 );

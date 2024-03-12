@@ -61,5 +61,9 @@ class DashboardApi {
   static getMetricCPULoad(nodeID: string, nodeType: string, isMaster: boolean): HttpResponseP<Dashboard.MetricCPULoadRes> {
     return http.get('/home/getMetricCPULoad', { params: { nodeID, nodeType, isMaster } });
   }
+
+  static getActiveInfo(isMaster: boolean): HttpResponseP<Dashboard.ActiveData> {
+    return http.get('/home/getActivationInfo', { params: { isMaster } });
+  }
 }
 export default DashboardApi;
