@@ -236,12 +236,12 @@ const alarmConfigId = ref();
 const getLevelColor = computed(() => function (data?: Alarm.QueryConfigResult) {
   if (!data) {
     if (searchFormData.alarmLevel) {
-      const res = levelOptions.find((f) => f.value === searchFormData.alarmLevel);
+      const res = levelOptions.value.find((f) => f.value === searchFormData.alarmLevel);
       return res?.paramMap?.color;
     }
     return '#424561';
   }
-  const res = levelOptions.find((f) => f.value === data.alarmLevel);
+  const res = levelOptions.value.find((f) => f.value === data.alarmLevel);
   return res?.paramMap?.color;
 });
 
