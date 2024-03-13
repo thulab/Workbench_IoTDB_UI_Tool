@@ -110,11 +110,23 @@ declare namespace Search{
     enable: boolean;
   }
 
-  export interface SpectrumParams {
+  export interface SpectrumFFTParams {
     resultType: string,
-    compression: number,
+    compression: number | string,
     measurement: string,
     startTime: DateModelType,
-    endTime: DateModelType
+    endTime: DateModelType,
+  }
+
+  export interface SpectrumENVELOPEParams {
+    frequency: number | string,
+    measurement: string,
+    startTime: DateModelType,
+    endTime: DateModelType,
+  }
+
+  export interface SpectrumData {
+    timestamps: number[],
+    values: string[],
   }
 }

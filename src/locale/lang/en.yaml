@@ -889,3 +889,7 @@ spectrum:
   analysisMethodTip: >-
     If not available, please load the prefered analysis pattern before use. For
     detailed instructions, refer to the %{doc}
+  real: Real Part
+  imag: Imaginary Part
+  abs: Magnitude
+  angle: Phase Angle

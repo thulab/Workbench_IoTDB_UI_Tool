@@ -732,3 +732,8 @@ spectrum:
   modulationFrequency: 调制频率
   harmonicFrequency: 谐频
   sideband: 边带
+  real: 实部
+  imag: 虚部
+  abs: 模
+  angle: 幅角
+

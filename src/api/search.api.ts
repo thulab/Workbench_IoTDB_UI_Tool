@@ -77,9 +77,19 @@ class SearchApi {
     return http.get('/visualization/getFunctions');
   }
 
-  // 频谱
-  static getFFTData(data: Search.SpectrumParams): HttpResponseP<{ timestamps: number[], values: string[] }> {
+  // 频谱 fft
+  static getFFTData(data: Search.SpectrumFFTParams): HttpResponseP<Search.SpectrumData> {
     return http.post('/visualization/getFFTData', data);
+  }
+
+  // 频谱 envelope
+  static getEnvelopeDemodulationData(data: Search.SpectrumENVELOPEParams): HttpResponseP<Search.SpectrumData> {
+    return http.post('/visualization/getEnvelopeDemodulationData', data);
+  }
+
+  // 频谱 custom
+  static getCustomData(sql: string): HttpResponseP<Search.SpectrumData> {
+    return http.post('/visualization/getCustomAlgorithmData', { sql });
   }
 }
 export default SearchApi;
