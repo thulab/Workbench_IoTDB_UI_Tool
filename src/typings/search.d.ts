@@ -103,4 +103,18 @@ declare namespace Search{
     avgValue: string;
     sumValue: string;
   }
+
+  export interface FunctionData {
+    functionName: string;
+    name: string;
+    enable: boolean;
+  }
+
+  export interface SpectrumParams {
+    resultType: string,
+    compression: number,
+    measurement: string,
+    startTime: DateModelType,
+    endTime: DateModelType
+  }
 }

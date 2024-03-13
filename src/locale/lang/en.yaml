@@ -870,6 +870,7 @@ flow:
   deleteEdgeTip: Please select an edge before deleting
 spectrum:
   analysisMethod: Analysis Pattern
+  customAnalysis: Custom Analysis
   analysisMethodNoneTip: Please load this pattern
   compressParams: Compression
   compressParamsPlaceholder: Please enter a compression ratio

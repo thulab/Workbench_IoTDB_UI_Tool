@@ -242,7 +242,6 @@ const historyCursorData = ref<Array<{ path: string, markPoint: Array<TrendMarkPo
 const clickedCursor = ref(false);
 const markPointCount = ref(0);
 const pointList = ref<Array<PointData>>([]);
-const pointDvalueList = ref<Array<{ x: number, y: number }>>([]);
 const pointCheckedData = computed(() => pointList.value.filter((item) => item.checked));
 
 const legendSelected = computed(() => ({
@@ -521,7 +520,6 @@ function handleEmptyPoint() {
   markPointCount.value = 0;
   historyCursorData.value = [];
   pointList.value = [];
-  pointDvalueList.value = [];
   setOption(chartOptions.value);
 }
 
@@ -696,7 +694,6 @@ function handleTrendTab(type: 'running' | 'history') {
       markPointCount.value = 0;
       historyCursorData.value = [];
       pointList.value = [];
-      pointDvalueList.value = [];
       clickedCursor.value = false;
       chartHistoryData.value.length = 0;
       setOption(chartOptions.value, true);

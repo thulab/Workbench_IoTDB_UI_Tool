@@ -71,5 +71,15 @@ class SearchApi {
   static exportStatisticData(data: Search.StatisticSearch): HttpResponseP {
     return http.post('/file/statisticsGetExportId', data);
   }
+
+  // 频谱 udf 函数
+  static getUDFFunction(): HttpResponseP<Array<Search.FunctionData>> {
+    return http.get('/visualization/getFunctions');
+  }
+
+  // 频谱
+  static getFFTData(data: Search.SpectrumParams): HttpResponseP<{ timestamps: number[], values: string[] }> {
+    return http.post('/visualization/getFFTData', data);
+  }
 }
 export default SearchApi;
