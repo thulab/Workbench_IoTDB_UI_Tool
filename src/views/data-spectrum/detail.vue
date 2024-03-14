@@ -53,12 +53,12 @@
                   <template #label>
                     {{t('spectrum.compressParams')}}：<el-tooltip effect="light" placement="top" popper-class="tooltip-box-width" :content="t('spectrum.compressParamsTip')"><i-custom-question /></el-tooltip>
                   </template>
-                  <el-input v-model="searchFormData.compression" style="width: 120px;" :placeholder="t('spectrum.compressParamsPlaceholder')" id="spectrum-search-compression" />
+                  <el-input v-model="searchFormData.compression" style="width: 120px;" :placeholder="t('spectrum.compressParamsPlaceholder')" id="spectrum-search-compression" @change="handleInputCompression" />
                 </base-form-item>
               </template>
               <template v-if="searchFormData.method === 'ENVELOPE'">
                 <base-form-item :label="`${t('spectrum.modulationFrequency')}：`" prop="frequency" class="m-r-0">
-                  <el-input v-model.number="searchFormData.frequency" style="width: 120px;" id="spectrum-search-frequency" @input="handleInputFrequency" />
+                  <el-input v-model.number="searchFormData.frequency" style="width: 120px;" id="spectrum-search-frequency" @change="handleInputFrequency" />
                 </base-form-item>
               </template>
             </div>
@@ -167,6 +167,7 @@ import { storeToRefs } from 'pinia';
 import type {
   FormInstance, SingleOrRange, DateModelType, CheckboxValueType,
 } from 'element-plus';
+import dayjs from 'dayjs';
 import {
   debounce,
 } from 'lodash-es';
@@ -220,13 +221,13 @@ const searchFormData = reactive<{
   measurement: string,
   method: string,
   resultType: string,
-  compression: string,
+  compression: string | number | undefined,
   frequency: string | number | undefined,
   datetimerange: [DateModelType, DateModelType],
 }>({
   measurement: '',
   method: '',
-  resultType: '',
+  resultType: 'abs',
   compression: '',
   frequency: '',
   datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
@@ -392,6 +393,16 @@ function pointTitle(i: number) {
 function pointDisabled(item: PointData) {
   const flag = pointCheckedData.value.some((data) => data.name === item.name);
   return pointCheckedData.value.length === 2 && !flag;
+}
+
+function handleInputCompression(val: string) {
+  if (val) {
+    if (!/^[1]$|^0.\d+$/.test(`${val}`)) {
+      searchFormData.compression = undefined;
+    }
+  } else {
+    searchFormData.compression = undefined;
+  }
 }
 
 function handleInputFrequency(val: string) {
@@ -663,7 +674,7 @@ function getUdfList() {
 function handleReset() {
   searchFormData.measurement = '';
   searchFormData.method = '';
-  searchFormData.resultType = '';
+  searchFormData.resultType = 'abs';
   searchFormData.compression = '';
   searchFormData.frequency = '';
   sqlValue.value = '';
@@ -671,28 +682,40 @@ function handleReset() {
 }
 
 function getFFT() {
+  const start = dayjs(searchFormData.datetimerange[0]).valueOf();
+  const end = dayjs(searchFormData.datetimerange[1]).valueOf();
   getFFTData({
-    resultType: 'real',
-    compression: 1,
-    measurement: 'root.stock.Legacy.0700HK.L1_BidSize',
-    startTime: 1710216061081,
-    endTime: 1710217891081,
+    resultType: searchFormData.resultType,
+    compression: searchFormData.compression!,
+    measurement: searchFormData.measurement,
+    startTime: start,
+    endTime: end,
   }).then((res) => {
     chartData.timestamps = res.data.timestamps || [];
     chartData.values = res.data.values || [];
+    setOption(chartOptions.value, true);
+  }).catch(() => {
+    chartData.timestamps = [];
+    chartData.values = [];
     setOption(chartOptions.value, true);
   });
 }
 
 function getEnvelope() {
+  const start = dayjs(searchFormData.datetimerange[0]).valueOf();
+  const end = dayjs(searchFormData.datetimerange[1]).valueOf();
   getEnvelopeDemodulationData({
-    frequency: 1,
-    measurement: 'root.stock.Legacy.0700HK.L1_BidSize',
-    startTime: 1710216061081,
-    endTime: 1710217891081,
+    frequency: searchFormData.frequency!,
+    measurement: searchFormData.measurement,
+    startTime: start,
+    endTime: end,
   }).then((res) => {
     chartData.timestamps = res.data.timestamps || [];
     chartData.values = res.data.values || [];
+    setOption(chartOptions.value, true);
+  }).catch(() => {
+    chartData.timestamps = [];
+    chartData.values = [];
     setOption(chartOptions.value, true);
   });
 }
@@ -702,19 +725,50 @@ function getCustom() {
     chartData.timestamps = res.data.timestamps || [];
     chartData.values = res.data.values || [];
     setOption(chartOptions.value, true);
+  }).catch(() => {
+    chartData.timestamps = [];
+    chartData.values = [];
+    setOption(chartOptions.value, true);
   });
 }
 
 // 查询
 function handleSearch() {
   if (!canReadWriteSchemaData.value) return;
-  // const start = dayjs(searchFormData.datetimerange[0]).valueOf();
-  // const end = dayjs(searchFormData.datetimerange[1]).valueOf();
+  handleEmptyOperate();
+  if (!searchFormData.method) {
+    ElMessage.warning({
+      message: t('common.searchFormEmpty'),
+      grouping: true,
+    });
+    return;
+  }
   if (searchFormData.method === 'ENVELOPE') {
+    if (!searchFormData.measurement) {
+      ElMessage.warning({
+        message: t('common.searchFormEmpty'),
+        grouping: true,
+      });
+      return;
+    }
     getEnvelope();
   } else if (searchFormData.method === 'custom') {
+    if (!sqlValue.value) {
+      ElMessage.warning({
+        message: t('common.searchFormEmpty'),
+        grouping: true,
+      });
+      return;
+    }
     getCustom();
   } else {
+    if (!searchFormData.resultType || !searchFormData.compression || !searchFormData.measurement) {
+      ElMessage.warning({
+        message: t('common.searchFormEmpty'),
+        grouping: true,
+      });
+      return;
+    }
     getFFT();
   }
 }

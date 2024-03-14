@@ -74,6 +74,7 @@ common:
   deleteSuccess: 删除成功
   statusSuccess: 状态更新成功
   formRuleEmpty: 请输入相应内容后进行操作
+  searchFormEmpty: 请选择相应内容后进行查看
   formRuleEmptyShort: 请输入相应内容
   formRuleEmptyOperate: 请输入内容后操作
   chooseFile: 选择文件

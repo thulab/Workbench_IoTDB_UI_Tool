@@ -79,6 +79,7 @@ common:
   deleteSuccess: Deletion Successful
   statusSuccess: Status Update Successful
   formRuleEmpty: Please enter the required content before proceeding
+  searchFormEmpty: Please select the corresponding content before viewing
   formRuleEmptyShort: Please enter the required content
   formRuleEmptyOperate: Please enter content before operating
   chooseFile: Choose File
@@ -146,6 +147,7 @@ common:
   deleteEdge: Delete Edge
   warmTip: Tip
   versionTip: Please upgrade to IoTDB V%{version} or a higher version to use
+  userManual: user manual
 page:
   '403': 403 Page
   '404': 404 Page
@@ -167,7 +169,7 @@ page:
   calculate: Calculation
   view: View
   spectrum: Spectrum
-  userManual: user manual
+  visualization: Visualization
 measurement:
   databaseTitle: Database
   deleteDatabaseTip: >-
@@ -893,3 +895,4 @@ spectrum:
   imag: Imaginary Part
   abs: Magnitude
   angle: Phase Angle
+  modulationFrequency: Modulation frequency
