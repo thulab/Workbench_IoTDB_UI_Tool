@@ -59,6 +59,7 @@ const handleEmpty = () => {
 
 const handleConfirm = () => {
   dialogVisible.value = false;
+  ElMessage.success(t('common.saveSuccess'));
   emit('handleConfirm', sqlInput.value);
 };
 

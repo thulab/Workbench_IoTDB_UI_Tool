@@ -106,16 +106,16 @@
         <el-main class="p-0" style="position: relative;">
           <div ref="chartContainer" class="chart-container" :style="`height: ${'calc(100% - 28px);'}`" v-element-size="onResize"></div>
           <div class="flex-align-center">
-            <el-button type="primary" id="spectrum-cursor" style="height: 24px !important;" :disabled="dataEmpty" @click="handleClickOperate('cursor')">{{ t('spectrum.cursor') }}</el-button>
+            <el-button type="primary" class="cursor-button" id="spectrum-cursor" style="height: 24px !important;" :disabled="disableCursor" @click="handleClickOperate('cursor')">{{ t('spectrum.cursor') }}</el-button>
             <div class="chart-operate-box">
-              <el-button type="primary" id="spectrum-harmonicFrequency" style="height: 24px !important;" :disabled="dataEmpty" @click="handleClickOperate('harmonicFrequency')">{{ t('spectrum.harmonicFrequency') }}</el-button>
-              <el-input v-model.number="harmonicFrequency" :min="1" step-strictly @input="handleInputHarmonicFrequency" id="spectrum-harmonicFrequency-input" :disabled="dataEmpty" style="width: 40px;height: 24px !important;" />
+              <el-button type="primary" id="spectrum-harmonicFrequency" :disabled="disableFrequency" :class="disableFrequency ? 'disable-frequency' : 'enable-frequency'" @click="handleClickOperate('harmonicFrequency')">{{ t('spectrum.harmonicFrequency') }}</el-button>
+              <el-input v-model.number="harmonicFrequency" :min="1" step-strictly @input="handleInputHarmonicFrequency" id="spectrum-harmonicFrequency-input" :disabled="disableFrequency" />
             </div>
             <div class="chart-operate-box">
-              <el-button type="primary" id="spectrum-sideband" style="height: 24px !important;" :disabled="dataEmpty" @click="handleClickOperate('sideband')">{{ t('spectrum.sideband') }}</el-button>
-              <el-input v-model.number="sideband" :min="1" step-strictly @input="handleInputSideband" id="spectrum-sideband-input" :disabled="dataEmpty" style="width: 40px;height: 24px !important;" />
+              <el-button type="primary" id="spectrum-sideband" :disabled="disableSideband" :class="disableSideband ? 'disable-sideband' : 'enable-sideband'" @click="handleClickOperate('sideband')">{{ t('spectrum.sideband') }}</el-button>
+              <el-input v-model.number="sideband" :min="1" step-strictly @input="handleInputSideband" id="spectrum-sideband-input" :disabled="disableSideband" />
             </div>
-            <el-button link class="cursor-button m-l-8" id="spectrum-cursor-clear" :disabled="dataEmpty || !pointList.length" @click="handleEmptyOperate"><el-icon size="18" color="#fff"><i-custom-delete /></el-icon></el-button>
+            <el-button link class="cursor-button-clear m-l-8" id="spectrum-cursor-clear" :disabled="disableClear" @click="() => handleEmptyOperate()"><el-icon size="18" color="#fff"><i-custom-delete /></el-icon></el-button>
           </div>
         </el-main>
         <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand ? 'p-0' : '']" style="display: flex; flex-direction: column;">
@@ -141,7 +141,7 @@
                 </ul>
                 <div v-if="pointCheckedData.length === 2" class="point-dvalue-box">
                   <p style="display: inline-flex; width: 190px;"><text-tooltip :content="`ΔX：${Math.abs(pointCheckedData[0].x - pointCheckedData[1].x)}`" /></p>
-                  <p style="display: inline-flex; width: 190px;"><text-tooltip :content="`Δf：${Math.abs(pointCheckedData[0].y - pointCheckedData[1].y)}`" /></p>
+                  <p style="display: inline-flex; width: 190px;"><text-tooltip :content="`Δf：${Math.abs(Number(pointCheckedData[0].y) - Number(pointCheckedData[1].y))}`" /></p>
                 </div>
               </div>
             </auth-container>
@@ -182,9 +182,9 @@ import ModalSql from './components/modal-sql.vue';
 
 interface SpectrumMarkPoint {
   name: string,
-  value: number,
+  value: number | string,
   xAxis: number,
-  yAxis: number,
+  yAxis: number | string,
 }
 
 interface SpectrumMarkLine {
@@ -193,20 +193,16 @@ interface SpectrumMarkLine {
   label: {
     formatter: string | Function,
     position: string,
+    color: string,
   };
 }
 
 interface PointData {
   name: string,
   x: number,
-  y: number,
+  y: number | string,
   disabled: boolean,
   checked: boolean,
-}
-
-interface FrequencyData {
-  x: number,
-  y: number,
 }
 
 const { t, locale } = useI18n();
@@ -268,12 +264,19 @@ const markLineData = ref<Array<SpectrumMarkLine>>([]);
 const pointList = ref<Array<PointData>>([]);
 const pointCheckedData = computed(() => pointList.value.filter((item) => item.checked));
 const harmonicFrequency = ref<number | undefined>(1);
-const harmonicFrequencyData = ref<FrequencyData>();
+const frequencyInterval = ref<number | undefined>();
 const sideband = ref<number | undefined>(1);
+const sidebandData = ref<number[]>([]);
 const sqlVisible = ref(false);
 const sqlValue = ref('');
 
 const dataEmpty = computed(() => chartData.timestamps.length === 0);
+const disableCursor = computed(() => chartData.timestamps.length === 0 || (!!clickedOperate.value && clickedOperate.value !== 'cursor'));
+const disableFrequency = computed(() => chartData.timestamps.length === 0 || (!!clickedOperate.value && clickedOperate.value !== 'harmonicFrequency'));
+const disableSideband = computed(() => chartData.timestamps.length === 0 || (!!clickedOperate.value && clickedOperate.value !== 'sideband'));
+const disableClear = computed(() => chartData.timestamps.length === 0 || (clickedOperate.value === 'cursor' && pointList.value.length === 0) || (clickedOperate.value === 'harmonicFrequency' && !frequencyInterval.value) || (clickedOperate.value === 'sideband' && sidebandData.value.length === 0) || !clickedOperate.value);
+
+const xMax = computed(() => chartData.timestamps[chartData.timestamps.length - 1]);
 
 const methodOptions = computed(() => [...methodList.value, { functionName: 'custom', name: t('spectrum.customAnalysis'), enable: true }]);
 
@@ -292,7 +295,8 @@ const seriesData = computed<ECOption>(() => ({
       symbolSize: 8,
       itemStyle: {
         color: 'transparent',
-        borderColor: '#fff',
+        // eslint-disable-next-line no-nested-ternary
+        borderColor: clickedOperate.value === 'harmonicFrequency' ? '#28D5CB' : (clickedOperate.value === 'sideband' ? '#AA82F5' : '#fff'),
         borderWidth: 1,
       },
       label: {
@@ -303,13 +307,9 @@ const seriesData = computed<ECOption>(() => ({
     markLine: {
       symbol: 'none',
       lineStyle: {
-        type: [16, 10],
-        color: '#DFE1ED',
-      },
-      emphasis: {
-        lineStyle: {
-          type: [16, 10],
-        },
+        type: clickedOperate.value === 'cursor' ? [16, 10] : 'solid',
+        // eslint-disable-next-line no-nested-ternary
+        color: clickedOperate.value === 'harmonicFrequency' ? '#28D5CB' : (clickedOperate.value === 'sideband' ? '#AA82F5' : '#DFE1ED'),
       },
       data: markLineData.value.length ? markLineData.value : [],
       animation: false,
@@ -325,7 +325,6 @@ const seriesData = computed<ECOption>(() => ({
 }) as unknown as ECOption);
 
 const chartOptions = computed<ECOption>(() => ({
-  useUTC: false,
   tooltip: {
     trigger: 'axis',
     // appendToBody: true,
@@ -363,7 +362,12 @@ const chartOptions = computed<ECOption>(() => ({
   xAxis: {
     type: 'value',
     boundaryGap: false,
-    // show: !inited,
+    show: !dataEmpty.value,
+    splitLine: {
+      show: false,
+    },
+    min: 0,
+    max: xMax.value,
   },
   yAxis: {
     type: 'value',
@@ -412,10 +416,6 @@ function handleInputSideband(val: string) {
   }
 }
 
-function handleClickOperate(type: 'cursor' | 'harmonicFrequency' | 'sideband') {
-  clickedOperate.value = type;
-}
-
 const setOption = (option:ECOption, noMerge: boolean = false) => {
   if (chartInstance) {
     // 实例存在直接设置
@@ -450,54 +450,176 @@ const setOption = (option:ECOption, noMerge: boolean = false) => {
   }
 };
 
-function handleClickChart(params: echarts.ECElementEvent) {
-  const { seriesName, value, componentType } = params as { seriesName: string, value: number[], componentType: string };
-  if (componentType !== 'series') return;
-  if (clickedOperate.value === 'cursor') {
-    if (markPointCount.value > 9) {
-      ElMessage.warning({
-        message: t('spectrum.overTip'),
-        grouping: true,
-      });
-      return;
-    }
-    markPointCount.value++;
-    const num = markPointCount.value;
-    const pointIndex = markPointData.value.findIndex((point) => point.name === `${seriesName}_${value[0]}_${value[1]}`);
-    if (pointIndex === -1) {
+function handleDealCursor(params: echarts.ECElementEvent) {
+  const { seriesName, value } = params as { seriesName: string, value: number[] };
+  if (markPointCount.value > 9) {
+    ElMessage.warning({
+      message: t('spectrum.overTip'),
+      grouping: true,
+    });
+    return;
+  }
+  markPointCount.value++;
+  const num = markPointCount.value;
+  const pointIndex = markPointData.value.findIndex((point) => point.name === `${seriesName}_${value[0]}_${value[1]}`);
+  if (pointIndex === -1) {
+    markPointData.value.push({
+      name: `${seriesName}_${value[0]}_${value[1]}`,
+      value: value[1],
+      xAxis: value[0],
+      yAxis: value[1],
+    });
+    pointList.value.push({
+      name: `${seriesName}_${value[0]}_${value[1]}`,
+      x: value[0],
+      y: value[1],
+      disabled: false,
+      checked: false,
+    });
+  }
+  const lineIndex = markLineData.value.findIndex((line) => line.name === `${seriesName}_${value[0]}`);
+  if (lineIndex === -1) {
+    markLineData.value.push({
+      name: `${seriesName}_${value[0]}`,
+      xAxis: value[0],
+      label: {
+        formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
+        position: 'insideEndBottom',
+        color: '#fff',
+      },
+    });
+  }
+  setOption(chartOptions.value);
+}
+
+function handleDealFrequency(params: echarts.ECElementEvent) {
+  const { seriesName, value } = params as { seriesName: string, value: number[] };
+  frequencyInterval.value = value[0] as number;
+  if (!frequencyInterval.value) return;
+  for (let i = 1; i <= harmonicFrequency.value!; i++) {
+    if (i * frequencyInterval.value <= xMax.value) {
+      const x = i * frequencyInterval.value;
+      let y = '';
+      const index = chartData.timestamps.findIndex((num) => num === x);
+      if (index !== -1) {
+        y = chartData.values[index];
+      }
       markPointData.value.push({
-        name: `${seriesName}_${value[0]}_${value[1]}`,
-        value: value[1],
-        xAxis: value[0],
-        yAxis: value[1],
+        name: `${seriesName}_${x}_${y}`,
+        value: y,
+        xAxis: x,
+        yAxis: y,
       });
-      pointList.value.push({
-        name: `${seriesName}_${value[0]}_${value[1]}`,
-        x: value[0],
-        y: value[1],
-        disabled: false,
-        checked: false,
-      });
-    }
-    const lineIndex = markLineData.value.findIndex((line) => line.name === `${seriesName}_${value[0]}`);
-    if (lineIndex === -1) {
       markLineData.value.push({
-        name: `${seriesName}_${value[0]}`,
-        xAxis: value[0],
+        name: `${seriesName}_${x}`,
+        xAxis: x,
         label: {
-          formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
+          formatter: `H${i === 1 ? '' : i}`,
           position: 'insideEndBottom',
+          color: '#28D5CB',
         },
       });
     }
+  }
+  setOption(chartOptions.value);
+}
+
+function handleDealSideband(params: echarts.ECElementEvent) {
+  const { seriesName, value } = params as { seriesName: string, value: number[] };
+  if (sidebandData.value.includes(value[0])) return;
+  sidebandData.value.push(value[0]);
+  if (sidebandData.value.length === 2) {
+    const interval = Math.abs(sidebandData.value[0] - sidebandData.value[1]);
+    // 左侧
+    for (let i = 1; i <= sideband.value!; i++) {
+      if (sidebandData.value[0] - i * interval > 0) {
+        const leftX = sidebandData.value[0] - i * interval;
+        let leftY = '';
+        const leftI = chartData.timestamps.findIndex((num) => num === leftX);
+        if (leftI !== -1) {
+          leftY = chartData.values[leftI];
+        }
+        markPointData.value.push({
+          name: `${seriesName}_${leftX}_${leftY}`,
+          value: leftY,
+          xAxis: leftX,
+          yAxis: leftY,
+        });
+        markLineData.value.push({
+          name: `${seriesName}_${leftX}`,
+          xAxis: leftX,
+          label: {
+            formatter: `SL${i}`,
+            position: 'insideEndBottom',
+            color: '#AA82F5',
+          },
+        });
+      }
+    }
+    // 当前
+    const currentX = sidebandData.value[0];
+    let currentY = '';
+    const currentI = chartData.timestamps.findIndex((num) => num === currentX);
+    if (currentI !== -1) {
+      currentY = chartData.values[currentI];
+    }
+    markPointData.value.push({
+      name: `${seriesName}_${currentX}_${currentY}`,
+      value: currentY,
+      xAxis: currentX,
+      yAxis: currentY,
+    });
+    markLineData.value.push({
+      name: `${seriesName}_${currentX}`,
+      xAxis: currentX,
+      label: {
+        formatter: 'S',
+        position: 'insideEndBottom',
+        color: '#AA82F5',
+      },
+    });
+    // 右侧
+    for (let i = 1; i <= sideband.value!; i++) {
+      if (sidebandData.value[0] + i * interval <= xMax.value) {
+        const rightX = sidebandData.value[0] + i * interval;
+        let rightY = '';
+        const rightI = chartData.timestamps.findIndex((num) => num === rightX);
+        if (rightI !== -1) {
+          rightY = chartData.values[rightI];
+        }
+        markPointData.value.push({
+          name: `${seriesName}_${rightX}_${rightY}`,
+          value: rightY,
+          xAxis: rightX,
+          yAxis: rightY,
+        });
+        markLineData.value.push({
+          name: `${seriesName}_${rightX}`,
+          xAxis: rightX,
+          label: {
+            formatter: `SR${i}`,
+            position: 'insideEndBottom',
+            color: '#AA82F5',
+          },
+        });
+      }
+    }
     setOption(chartOptions.value);
+  }
+}
+
+function handleClickChart(params: echarts.ECElementEvent) {
+  if (params.componentType !== 'series') return;
+  if (clickedOperate.value === 'cursor') {
+    handleDealCursor(params);
   } else if (clickedOperate.value === 'harmonicFrequency') {
     if (!harmonicFrequency.value) return;
-    if (harmonicFrequencyData.value) return;
-    console.log('harmonicFrequency');
+    if (frequencyInterval.value) return;
+    handleDealFrequency(params);
   } else {
     if (!sideband.value) return;
-    console.log('sideband');
+    if (sidebandData.value.length === 2) return;
+    handleDealSideband(params);
   }
 }
 
@@ -505,13 +627,24 @@ function handleCheckDvalue(val: CheckboxValueType, data: PointData) {
   data.checked = val as boolean;
 }
 
-function handleEmptyOperate() {
-  clickedOperate.value = '';
+function handleEmptyOperate(type?: 'cursor' | 'harmonicFrequency' | 'sideband') {
+  clickedOperate.value = type || '';
   markPointCount.value = 0;
   pointList.value = [];
   markPointData.value = [];
   markLineData.value = [];
+  if (!type) {
+    harmonicFrequency.value = 1;
+    sideband.value = 1;
+  }
+  frequencyInterval.value = undefined;
+  sidebandData.value = [];
   setOption(chartOptions.value);
+}
+
+function handleClickOperate(type: 'cursor' | 'harmonicFrequency' | 'sideband') {
+  if (clickedOperate.value === type) return;
+  handleEmptyOperate(type);
 }
 
 const onResize = debounce(() => {
@@ -668,6 +801,10 @@ watch(locale, () => {
   overflow: hidden;
 }
 
+.cursor-button{
+  border: none;
+}
+
 .chart-operate-box{
   font-size: 12px;
   font-weight: 400;
@@ -676,9 +813,58 @@ watch(locale, () => {
   display: flex;
   align-items: center;
   margin: 0 0 0 12px;
+  border: 1px solid #DFE1ED;
+  height: 24px;
+  box-sizing: border-box;
 
-  span{
-    margin: 0 4px 0 0;
+  .el-button{
+    padding: 0 !important;
+    min-width: 40px;
+    height: 22px !important;
+    border-radius: 0;
+    border: none;
+  }
+
+  .el-input{
+    width: 38px;
+    height: 22px;
+
+    :deep(.el-input__wrapper){
+      box-shadow: none !important;
+      border-radius: 0;
+
+      &:focus-visible, &:hover {
+        box-shadow: none !important;
+      }
+    }
+
+    :deep(.el-input__wrapper.is-focus){
+      box-shadow: none !important;
+    }
+  }
+
+  :deep(.el-input.is-disabled .el-input__wrapper){
+    background-color: #fff;
+  }
+
+  .disable-frequency{
+    background: #F0F1FA;
+    color: #00B3AA;
+  }
+
+  .enable-frequency{
+    background-color: #00B3AA !important;
+    color: #fff !important;
+  }
+
+  .disable-sideband{
+    background: #F0F1FA;
+    color: #6738BD;
+  }
+
+  .enable-sideband{
+    background-color: #6738BD !important;
+    color: #fff !important;
   }
 }
 
@@ -713,6 +899,7 @@ watch(locale, () => {
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow-y: hidden;
 
   .cursor-list-title{
     font-size: 14px;
