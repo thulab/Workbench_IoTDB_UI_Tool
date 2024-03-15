@@ -112,11 +112,11 @@
             <el-button type="primary" class="cursor-button" id="spectrum-cursor" style="height: 24px !important;" :disabled="dataEmpty" @click="handleClickOperate('cursor')">{{ t('spectrum.cursor') }}</el-button>
             <div class="chart-operate-box">
               <el-button type="primary" id="spectrum-harmonicFrequency" :disabled="disableFrequency" :class="disableFrequency ? 'disable-frequency' : 'enable-frequency'" @click="handleClickOperate('frequency')">{{ t('spectrum.harmonicFrequency') }}</el-button>
-              <el-input v-model.number="harmonicFrequency" :min="1" step-strictly @input="handleInputHarmonicFrequency" id="spectrum-harmonicFrequency-input" :disabled="dataEmpty || clickedStatus.frequency" />
+              <el-input v-model.number="harmonicFrequency" :min="1" step-strictly @input="handleInputHarmonicFrequency" id="spectrum-harmonicFrequency-input" :disabled="dataEmpty || drawedStatus.frequency" />
             </div>
             <div class="chart-operate-box">
               <el-button type="primary" id="spectrum-sideband" :disabled="disableSideband" :class="disableSideband ? 'disable-sideband' : 'enable-sideband'" @click="handleClickOperate('sideband')">{{ t('spectrum.sideband') }}</el-button>
-              <el-input v-model.number="sideband" :min="1" step-strictly @input="handleInputSideband" id="spectrum-sideband-input" :disabled="dataEmpty || clickedStatus.sideband" />
+              <el-input v-model.number="sideband" :min="1" step-strictly @input="handleInputSideband" id="spectrum-sideband-input" :disabled="dataEmpty || drawedStatus.sideband" />
             </div>
             <el-button link class="cursor-button-clear m-l-8" id="spectrum-cursor-clear" :disabled="dataEmpty" @click="() => handleEmptyOperate()"><el-icon size="18" color="#fff"><i-custom-delete /></el-icon></el-button>
           </div>
