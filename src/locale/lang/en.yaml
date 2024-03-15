@@ -79,7 +79,7 @@ common:
   deleteSuccess: Deletion Successful
   statusSuccess: Status Update Successful
   formRuleEmpty: Please enter the required content before proceeding
-  searchFormEmpty: Please select the corresponding content before viewing
+  searchFormEmpty: This field is required
   formRuleEmptyShort: Please enter the required content
   formRuleEmptyOperate: Please enter content before operating
   chooseFile: Choose File
@@ -895,5 +895,5 @@ spectrum:
   imag: Imaginary Part
   abs: Magnitude
   angle: Phase Angle
-  modulationFrequency: Modulation frequency
-  expandingFold: Expanding Fold
+  modulationFrequency: Modulation Frequency
+  expandingFold: Amplification Factor
