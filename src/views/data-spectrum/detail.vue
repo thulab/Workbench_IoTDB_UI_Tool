@@ -1,9 +1,9 @@
 <template>
   <el-container class="data-spectrum-wrapper">
     <el-header class="p-0" style="height: auto;">
-      <div class="search-form-wrapper">
-        <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" class="m-b-18" inline>
-          <div class="m-b-28 flex">
+      <div class="search-form-wrapper" style="margin-bottom: 18px;">
+        <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
+          <div class="m-b-28 flex" style="height: 36px;">
             <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method">
               <template #label>
                 {{t('spectrum.analysisMethod')}}：<el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
@@ -57,8 +57,11 @@
                 </base-form-item>
               </template>
               <template v-if="searchFormData.method === 'ENVELOPE'">
-                <base-form-item :label="`${t('spectrum.modulationFrequency')}：`" prop="frequency" class="m-r-0">
+                <base-form-item :label="`${t('spectrum.modulationFrequency')}：`" prop="frequency">
                   <el-input v-model.number="searchFormData.frequency" style="width: 120px;" id="spectrum-search-frequency" @change="handleInputFrequency" />
+                </base-form-item>
+                <base-form-item :label="`${t('spectrum.expandingFold')}：`" prop="amplification" class="m-r-0">
+                  <el-input v-model.number="searchFormData.amplification" style="width: 120px;" id="spectrum-search-expandingFold" @change="handleInputAmplification" />
                 </base-form-item>
               </template>
             </div>
@@ -223,6 +226,7 @@ const searchFormData = reactive<{
   resultType: string,
   compression: string | number | undefined,
   frequency: string | number | undefined,
+  amplification: string | number | undefined,
   datetimerange: [DateModelType, DateModelType],
 }>({
   measurement: '',
@@ -230,6 +234,7 @@ const searchFormData = reactive<{
   resultType: 'abs',
   compression: '',
   frequency: '',
+  amplification: 1,
   datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
 });
 const shortcutsDaterange = [
@@ -412,6 +417,16 @@ function handleInputFrequency(val: string) {
     }
   } else {
     searchFormData.frequency = undefined;
+  }
+}
+
+function handleInputAmplification(val: string) {
+  if (val) {
+    if (!/^\+?[1-9][0-9]*$/.test(`${val}`)) {
+      searchFormData.amplification = undefined;
+    }
+  } else {
+    searchFormData.amplification = undefined;
   }
 }
 
@@ -677,6 +692,7 @@ function handleReset() {
   searchFormData.resultType = 'abs';
   searchFormData.compression = '';
   searchFormData.frequency = '';
+  searchFormData.amplification = 1;
   sqlValue.value = '';
   searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
 }
@@ -705,7 +721,8 @@ function getEnvelope() {
   const start = dayjs(searchFormData.datetimerange[0]).valueOf();
   const end = dayjs(searchFormData.datetimerange[1]).valueOf();
   getEnvelopeDemodulationData({
-    frequency: searchFormData.frequency!,
+    frequency: searchFormData.frequency || '',
+    amplification: searchFormData.amplification || '',
     measurement: searchFormData.measurement,
     startTime: start,
     endTime: end,

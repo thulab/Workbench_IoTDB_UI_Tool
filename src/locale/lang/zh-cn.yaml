@@ -737,4 +737,5 @@ spectrum:
   imag: 虚部
   abs: 模
   angle: 幅角
+  expandingFold: 扩增倍数
 

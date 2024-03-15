@@ -896,3 +896,4 @@ spectrum:
   abs: Magnitude
   angle: Phase Angle
   modulationFrequency: Modulation frequency
+  expandingFold: Expanding Fold

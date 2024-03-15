@@ -120,6 +120,7 @@ declare namespace Search{
 
   export interface SpectrumENVELOPEParams {
     frequency: number | string,
+    amplification: number | string,
     measurement: string,
     startTime: DateModelType,
     endTime: DateModelType,
