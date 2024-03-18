@@ -89,6 +89,7 @@
     "lint-staged": "^15.2.0",
     "npm-run-all2": "^6.1.1",
     "prettier": "^3.2.5",
+    "prettier-stylelint": "^0.4.2",
     "sass": "^1.69.7",
     "stylelint": "^16.1.0",
     "stylelint-config-recommended-vue": "^1.5.0",
