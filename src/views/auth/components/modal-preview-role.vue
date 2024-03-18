@@ -1,21 +1,13 @@
 <template>
-  <el-dialog
-    :title="title"
-    v-model="dialogVisible"
-    width="1024px"
-    class="preview-role-modal"
-    align-center
-    :close-on-click-modal="true"
-    id="auth-preview-modal"
-  >
+  <el-dialog :title="title" v-model="dialogVisible" width="1024px" class="preview-role-modal" align-center :close-on-click-modal="true" id="auth-preview-modal">
     <el-scrollbar :max-height="maxHeight">
       <div class="table-list-box m-t-8">
         <h4 class="table-box-title">{{ t('common.allSituation') }}</h4>
-        <el-table :data="entityTableData" style="width: 100%;" border>
+        <el-table :data="entityTableData" style="width: 100%" border>
           <el-table-column :label="t('common.allChoose')" align="center" width="58" fixed="left">
             <template #default="{ row }">
               <el-icon size="21">
-                <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.length >= entityPrivilegesEnumKeys.length" />
+                <i-custom-correct style="transform: translateY(3px)" v-if="row.privileges.length >= entityPrivilegesEnumKeys.length" />
               </el-icon>
             </template>
           </el-table-column>
@@ -23,7 +15,7 @@
             <el-table-column :label="child.desc" v-for="child in group.children" :key="child.privileges" align="center" :width="calcColumnWidth(child)">
               <template #default="{ row }">
                 <el-icon size="21">
-                  <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.includes(child.privileges)" />
+                  <i-custom-correct style="transform: translateY(3px)" v-if="row.privileges.includes(child.privileges)" />
                 </el-icon>
               </template>
             </el-table-column>
@@ -38,7 +30,7 @@
           <el-table-column :label="t('common.allChoose')" align="center" width="193">
             <template #default="{ row }">
               <el-icon size="21">
-                <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" />
+                <i-custom-correct style="transform: translateY(3px)" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" />
               </el-icon>
             </template>
           </el-table-column>
@@ -46,7 +38,7 @@
             <el-table-column v-for="(col, ci) in column.children" :label="col.desc" :key="`${col.privileges}_${ci}_col`" :prop="col.privileges" align="center" :min-width="col.width || 180">
               <template #default="{ row }">
                 <el-icon size="21">
-                  <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.includes(col.privileges)" />
+                  <i-custom-correct style="transform: translateY(3px)" v-if="row.privileges.includes(col.privileges)" />
                 </el-icon>
               </template>
             </el-table-column>
@@ -54,8 +46,7 @@
         </el-table>
       </div>
     </el-scrollbar>
-    <template #footer>
-    </template>
+    <template #footer></template>
   </el-dialog>
 </template>
 
@@ -67,7 +58,7 @@ const props = defineProps<{
   visible: boolean;
   name: string;
   entityPrivileges: string[];
-  pathPrivileges: Array<{ path: string, privileges: string[] }>;
+  pathPrivileges: Array<{ path: string; privileges: string[] }>;
 }>();
 
 const emit = defineEmits<{
@@ -78,12 +69,7 @@ const { t } = useI18n();
 const maxHeight = computed(() => window.innerHeight - 100);
 
 const userStore = useUserStore();
-const {
-  entityPrivilegesEnumGroup,
-  entityPrivilegesEnumKeys,
-  pathPrivilegesEnumGroup,
-  pathPrivilegesEnumKeys,
-} = storeToRefs(userStore);
+const { entityPrivilegesEnumGroup, entityPrivilegesEnumKeys, pathPrivilegesEnumGroup, pathPrivilegesEnumKeys } = storeToRefs(userStore);
 
 const dialogVisible = useVModel(props, 'visible', emit);
 
@@ -101,10 +87,12 @@ const entityTableData = computed(() => {
 
 const tableData = computed(() => {
   if (props.pathPrivileges.length === 0) {
-    return [{
-      path: '',
-      privileges: [],
-    }];
+    return [
+      {
+        path: '',
+        privileges: [],
+      },
+    ];
   }
   return props.pathPrivileges;
 });
@@ -115,7 +103,6 @@ function calcColumnWidth(child: Auth.PrivilegeEnum) {
   }
   return child.width;
 }
-
 </script>
 <style lang="scss">
 .preview-role-modal {
@@ -132,20 +119,20 @@ function calcColumnWidth(child: Auth.PrivilegeEnum) {
 
   .table-list-box {
     margin-top: 32px;
-    background-color: #F7F8FC;
+    background-color: #f7f8fc;
     padding: 8px 16px 16px;
 
-    .table-box-title{
+    .table-box-title {
       font-size: 14px;
       font-weight: 700;
       line-height: 21px;
-      color: #495AD4;
+      color: #495ad4;
       margin-bottom: 8px;
     }
 
     :deep(.el-table) {
-      --el-table-border: 1px solid #DFE1ED;
-      --el-table-border-color: #DFE1ED;
+      --el-table-border: 1px solid #dfe1ed;
+      --el-table-border-color: #dfe1ed;
     }
 
     :deep(.el-table th.el-table__cell) {

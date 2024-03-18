@@ -1,16 +1,19 @@
 <template>
-  <el-dialog
-    :title="t('auth.relateRole')"
-    v-model="dialogVisible"
-    width="480px"
-    class="add-role-modal"
-    align-center
-    :close-on-click-modal="false"
-    id="auth-user-add-role-modal"
-  >
+  <el-dialog :title="t('auth.relateRole')" v-model="dialogVisible" width="480px" class="add-role-modal" align-center :close-on-click-modal="false" id="auth-user-add-role-modal">
     <el-form ref="formRef" :model="formData" @submit.prevent>
       <base-form-item :label="`${t('auth.relateRole')}：`" prop="name" class="m-t-12 m-b-0">
-        <el-select v-model="formData.name" style="width:100%" :placeholder="t('auth.rolePlaceholder')" collapse-tags multiple filterable :loading="loading" id="auth-user-add-role-modal-select-name" @change="handleChangeSelect" ref="roleSelectRef">
+        <el-select
+          v-model="formData.name"
+          style="width: 100%"
+          :placeholder="t('auth.rolePlaceholder')"
+          collapse-tags
+          multiple
+          filterable
+          :loading="loading"
+          id="auth-user-add-role-modal-select-name"
+          @change="handleChangeSelect"
+          ref="roleSelectRef"
+        >
           <template #prefix>
             <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
           </template>
@@ -73,7 +76,7 @@ function handleChangeSelect(vals: string[]) {
 
 function isCanSelect(item: string) {
   if (item === t('common.all')) {
-    return roleList.value.length === (props.selected.length + 1);
+    return roleList.value.length === props.selected.length + 1;
   }
   return props.selected.includes(item);
 }
@@ -90,17 +93,16 @@ watch(
       formData.name = [];
       getRoleList();
     }
-  },
+  }
 );
-
 </script>
 <style lang="scss">
-.add-role-modal{
+.add-role-modal {
   .el-dialog__body {
     padding-bottom: 0 !important;
   }
 
-  .remote-select-search-text{
+  .remote-select-search-text {
     display: flex;
     width: 200px;
   }

@@ -1,5 +1,4 @@
 declare namespace DataSync {
-
   export interface SynchronListData {
     name: string;
     measurement: string;
@@ -16,7 +15,7 @@ declare namespace DataSync {
     path: string;
     reforward: boolean;
     isSynchronHistory: boolean;
-    datetimerange: [DateModelType, DateModelType],
+    datetimerange: [DateModelType, DateModelType];
     startTime: DateModelType;
     endTime: DateModelType;
     isSynchronRealTime: boolean;
@@ -27,7 +26,7 @@ declare namespace DataSync {
     connectorPluginType: string;
     connectorPluginName: string;
     connectorPluginParam: string;
-    targetInfos: Array<{ host: string, port: number | string }>;
+    targetInfos: Array<{ host: string; port: number | string }>;
     isLogSendBatch: boolean;
     logSendBatchWaitTime: string | number;
     logSendBatchSize: string | number;
@@ -53,7 +52,7 @@ declare namespace DataSync {
     isCustomConnectorPlugin: boolean;
     connectorPlugin: string;
     connectorPluginParam: string;
-    targetInfos: Array<{ host: string, port: number | string }>;
+    targetInfos: Array<{ host: string; port: number | string }>;
     isLogSendBatch: boolean;
     logSendBatchWaitTime: string | number;
     logSendBatchSize: string | number;
@@ -86,7 +85,7 @@ declare namespace DataSync {
     nodeID: string;
     nodeName: string;
     unit: string;
-    total: { timestamp: number[], memoryCost: string[] };
-    used: { timestamp: number[], memoryCost: string[] };
+    total: { timestamp: number[]; memoryCost: string[] };
+    used: { timestamp: number[]; memoryCost: string[] };
   }
 }

@@ -13,7 +13,8 @@
         <el-col :span="12">
           <base-form-item prop="measurement" :rules="editType === 'add' ? requiredRules : []">
             <template #label>
-              {{t('alarm.alarmMeasurement')}}：<el-tooltip v-if="editType === 'add'" effect="light" :content="t('common.searchAllTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+              {{ t('alarm.alarmMeasurement') }}：
+              <el-tooltip v-if="editType === 'add'" effect="light" :content="t('common.searchAllTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
             <timeseries-select-single
               id="alarm-config-modal-measurement"
@@ -32,7 +33,7 @@
         </el-col>
         <el-col :span="12">
           <base-form-item :label="`${t('measurement.dataType')}：`" prop="measurementType" class="m-l-45 type-input-disabled">
-            <el-input v-model="formData.measurementType" disabled style="width: 80px;" id="alarm-config-modal-measurementType" />
+            <el-input v-model="formData.measurementType" disabled style="width: 80px" id="alarm-config-modal-measurementType" />
           </base-form-item>
         </el-col>
       </el-row>
@@ -51,49 +52,25 @@
               v-model="formData.alarmRulesType"
               :disabled="!formData.measurementType"
               @change="handleChangeBooleanRule"
-              style="width: 235px;"
+              style="width: 235px"
               :placeholder="t('common.selectPlaceholder')"
               id="alarm-config-modal-rule-BOOLEAN"
             >
-              <el-option
-                v-for="item in booleanRuleEnum"
-                :key="item.value"
-                :label="item.name"
-                :value="item.value"
-                :id="`alarm-config-modal-rule-BOOLEAN-select-${item.value}`"
-              />
+              <el-option v-for="item in booleanRuleEnum" :key="item.value" :label="item.name" :value="item.value" :id="`alarm-config-modal-rule-BOOLEAN-select-${item.value}`" />
             </el-select>
             <div v-else class="number-rule-box">
-              <el-select v-model="formData.alarmRulesType" :disabled="!formData.measurementType" style="width: 114px;" class="m-r-8" id="alarm-config-modal-rule">
-                <el-option
-                  v-for="item in numberRuleEnum"
-                  :key="item.value"
-                  :label="item.name"
-                  :value="item.value"
-                  :id="`alarm-config-modal-rule-select-${item.value}`"
-                />
+              <el-select v-model="formData.alarmRulesType" :disabled="!formData.measurementType" style="width: 114px" class="m-r-8" id="alarm-config-modal-rule">
+                <el-option v-for="item in numberRuleEnum" :key="item.value" :label="item.name" :value="item.value" :id="`alarm-config-modal-rule-select-${item.value}`" />
               </el-select>
-              <el-input v-model="formData.alarmRulesTypeVal" :disabled="!formData.measurementType" :placeholder="t('common.placeHolder')" style="width: 114px;" id="alarm-config-modal-rule-val" />
+              <el-input v-model="formData.alarmRulesTypeVal" :disabled="!formData.measurementType" :placeholder="t('common.placeHolder')" style="width: 114px" id="alarm-config-modal-rule-val" />
             </div>
           </base-form-item>
         </el-col>
         <el-col :span="12">
           <base-form-item :label="`${t('alarm.duration')}：`" prop="alarmDuration" :rules="requiredDurationRules" class="m-l-45">
-            <el-input
-              v-model.number="formData.alarmDuration"
-              :disabled="changeBoolean"
-              :placeholder="t('alarm.durationPlaceholder')"
-              style="width: 235px;"
-              id="alarm-config-modal-duration"
-            >
+            <el-input v-model.number="formData.alarmDuration" :disabled="changeBoolean" :placeholder="t('alarm.durationPlaceholder')" style="width: 235px" id="alarm-config-modal-duration">
               <template #append>
-                <el-select
-                  v-model="formData.alarmDurationType"
-                  :disabled="changeBoolean"
-                  style="width: 56px;"
-                  placeholder=" "
-                  id="alarm-config-modal-duration-unit"
-                >
+                <el-select v-model="formData.alarmDurationType" :disabled="changeBoolean" style="width: 56px" placeholder=" " id="alarm-config-modal-duration-unit">
                   <el-option label="ms" value="ms" id="alarm-config-modal-duration-unit-ms" />
                   <el-option label="s" value="s" id="alarm-config-modal-duration-unit-s" />
                   <el-option label="min" value="min" id="alarm-config-modal-duration-unit-min" />
@@ -108,20 +85,15 @@
         <el-col :span="12">
           <base-form-item prop="alarmLevel" :rules="requiredRules" :style="{ color: getLevelColor }">
             <template #label>
-              {{t('alarm.alarmLevel')}}：<el-tooltip effect="light" :content="t('alarm.alarmLevelTip')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+              {{ t('alarm.alarmLevel') }}：
+              <el-tooltip effect="light" :content="t('alarm.alarmLevelTip')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
-            <el-select v-model="formData.alarmLevel" style="width: 235px;" class="level-select-box" id="alarm-config-modal-level">
+            <el-select v-model="formData.alarmLevel" style="width: 235px" class="level-select-box" id="alarm-config-modal-level">
               <template #prefix>
                 <el-icon v-if="formData.alarmLevel" :style="{ color: getLevelColor }" size="20"><i-custom-alarm-level /></el-icon>
               </template>
-              <el-option
-                v-for="item in levelEnum"
-                :key="item.value"
-                :label="item.name"
-                :value="item.value"
-                :id="`alarm-config-modal-level-select-${item.value}`"
-              >
-                <span style="display: flex; align-items: center;">
+              <el-option v-for="item in levelEnum" :key="item.value" :label="item.name" :value="item.value" :id="`alarm-config-modal-level-select-${item.value}`">
+                <span style="display: flex; align-items: center">
                   <el-icon size="20" :style="{ color: item.paramMap?.color }"><i-custom-alarm-level /></el-icon>
                   <span :style="{ color: item.paramMap?.color }">{{ item.name }}</span>
                 </span>
@@ -131,19 +103,8 @@
         </el-col>
         <el-col :span="12">
           <base-form-item :label="`${t('alarm.frequency')}：`" prop="alarmFrequency" :rules="requiredRules" class="m-l-45">
-            <el-select
-              v-model="formData.alarmFrequency"
-              :disabled="changeBoolean"
-              style="width: 235px;"
-              id="alarm-config-modal-frequency"
-            >
-              <el-option
-                v-for="item in frequencyEnum"
-                :key="item.value"
-                :label="item.name"
-                :value="item.value"
-                :id="`alarm-config-modal-frequency-select-${item.value}`"
-              />
+            <el-select v-model="formData.alarmFrequency" :disabled="changeBoolean" style="width: 235px" id="alarm-config-modal-frequency">
+              <el-option v-for="item in frequencyEnum" :key="item.value" :label="item.name" :value="item.value" :id="`alarm-config-modal-frequency-select-${item.value}`" />
             </el-select>
           </base-form-item>
         </el-col>
@@ -151,7 +112,16 @@
       <el-row class="m-b-12">
         <el-col :span="24">
           <base-form-item :label="`${t('alarm.alarmIntro')}：`" prop="alarmDesc">
-            <el-input type="textarea" v-model="formData.alarmDesc" show-word-limit maxlength="100" :placeholder="t('alarm.alarmIntroPlaceholder')" :resize="'none'" class="alarm-desc-textarea" id="alarm-config-modal-desc" />
+            <el-input
+              type="textarea"
+              v-model="formData.alarmDesc"
+              show-word-limit
+              maxlength="100"
+              :placeholder="t('alarm.alarmIntroPlaceholder')"
+              :resize="'none'"
+              class="alarm-desc-textarea"
+              id="alarm-config-modal-desc"
+            />
           </base-form-item>
         </el-col>
       </el-row>
@@ -181,19 +151,14 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
-  (event: 'handleSave',): void;
+  (event: 'handleSave'): void;
 }>();
 
 const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const timeseriesSelectSingleRef = ref<InstanceType<typeof TimeseriesSelectSingle>>();
 const enumStore = useEnumStore();
-const {
-  alarmBooleanRuleEnum: booleanRuleEnum,
-  alarmNumberRuleEnum: numberRuleEnum,
-  alarmLevelEnum: levelEnum,
-  alarmFrequencyEnum: frequencyEnum,
-} = storeToRefs(enumStore);
+const { alarmBooleanRuleEnum: booleanRuleEnum, alarmNumberRuleEnum: numberRuleEnum, alarmLevelEnum: levelEnum, alarmFrequencyEnum: frequencyEnum } = storeToRefs(enumStore);
 const formRef = ref<FormInstance>();
 
 const requiredRules = ref([
@@ -389,52 +354,50 @@ watch(
         measurementList.value = timeseriesSelectSingleRef.value?.measurementList || [];
       }
     }
-  },
+  }
 );
-
 </script>
 
 <style scoped lang="scss">
-
-.new-storage-container{
+.new-storage-container {
   position: relative;
 }
 
-.number-rule-box{
+.number-rule-box {
   display: flex;
 }
 
-.level-select-box{
+.level-select-box {
   :deep(.el-input__inner) {
     color: unset;
   }
 }
 
-.type-input-disabled{
-  :deep(.el-input__inner){
+.type-input-disabled {
+  :deep(.el-input__inner) {
     color: #131926;
     -webkit-text-fill-color: #131926;
   }
 
-  :deep(.el-input__wrapper){
+  :deep(.el-input__wrapper) {
     box-shadow: none;
   }
 
-  :deep(.el-form-item__label::before){
-    content: "*";
+  :deep(.el-form-item__label::before) {
+    content: '*';
     color: var(--el-color-danger);
     margin-right: 4px;
   }
 }
 
-.alarm-desc-textarea{
+.alarm-desc-textarea {
   :deep(.el-textarea__inner) {
     height: 72px;
   }
 }
 
-.alarm-rule-error.is-error{
-  :deep(.el-input__wrapper){
+.alarm-rule-error.is-error {
+  :deep(.el-input__wrapper) {
     box-shadow: 0 0 0 1px var(--el-color-danger) inset !important;
   }
 }

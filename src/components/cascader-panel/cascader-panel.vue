@@ -1,15 +1,6 @@
 <template>
-  <div
-    class="el-cascader-panel"
-    @keydown="handleKeyDown"
-  >
-    <cascader-menu
-      v-for="(menu, index) in menus"
-      :key="index"
-      :ref="(item) => (menuList[index] = item)"
-      :index="index"
-      :nodes="[...menu]"
-    />
+  <div class="el-cascader-panel" @keydown="handleKeyDown">
+    <cascader-menu v-for="(menu, index) in menus" :key="index" :ref="(item) => (menuList[index] = item)" :index="index" :nodes="[...menu]" />
   </div>
 </template>
 
@@ -21,44 +12,16 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-underscore-dangle */
-import {
-  computed,
-  defineComponent,
-  nextTick,
-  onBeforeUpdate,
-  onMounted,
-  provide,
-  reactive,
-  ref,
-  watch,
-} from 'vue';
+import { computed, defineComponent, nextTick, onBeforeUpdate, onMounted, provide, reactive, ref, watch } from 'vue';
 import { cloneDeep, flattenDeep, isEqual } from 'lodash-unified';
-import {
-  castArray,
-  focusNode,
-  getSibling,
-  isClient,
-  isEmpty,
-  scrollIntoView,
-  unique,
-} from 'element-plus/es/utils/index';
-import {
-  CHANGE_EVENT,
-  EVENT_CODE,
-  UPDATE_MODEL_EVENT,
-} from 'element-plus/es/constants/index';
+import { castArray, focusNode, getSibling, isClient, isEmpty, scrollIntoView, unique } from 'element-plus/es/utils/index';
+import { CHANGE_EVENT, EVENT_CODE, UPDATE_MODEL_EVENT } from 'element-plus/es/constants/index';
 import { useNamespace } from 'element-plus/es/hooks/index';
 
 import type { PropType } from 'vue';
 import type { Nullable } from 'element-plus/es/utils';
 import Node from 'element-plus/es/components/cascader-panel/src/node';
-import type {
-  default as CascaderNode,
-  CascaderNodeValue,
-  CascaderOption,
-  CascaderValue,
-  RenderLabel,
-} from 'element-plus/es/components/cascader-panel/src/node';
+import type { default as CascaderNode, CascaderNodeValue, CascaderOption, CascaderValue, RenderLabel } from 'element-plus/es/components/cascader-panel/src/node';
 import CascaderMenu from 'element-plus/es/components/cascader-panel/src/menu';
 import { CASCADER_PANEL_INJECTION_KEY } from 'element-plus/es/components/cascader-panel/src/types';
 import type { ElCascaderPanelContext } from 'element-plus/es/components/cascader-panel/src/types';
@@ -180,11 +143,7 @@ export default defineComponent({
       }
     };
 
-    const handleCheckChange: ElCascaderPanelContext['handleCheckChange'] = (
-      node,
-      checked,
-      emitClose = true,
-    ) => {
+    const handleCheckChange: ElCascaderPanelContext['handleCheckChange'] = (node, checked, emitClose = true) => {
       const { checkStrictly, multiple } = config.value;
       const oldNode = checkedNodes.value[0];
       manualChecked = true;
@@ -231,19 +190,13 @@ export default defineComponent({
       const { lazy, multiple, checkStrictly } = config.value;
       const leafOnly = !checkStrictly;
 
-      if (
-        !initialLoaded.value
-        || manualChecked
-        || (!forced && isEqual(modelValue, checkedValue.value))
-      ) { return; }
+      if (!initialLoaded.value || manualChecked || (!forced && isEqual(modelValue, checkedValue.value))) {
+        return;
+      }
 
       if (lazy && !loaded) {
-        const values: CascaderNodeValue[] = unique(
-          flattenDeep(castArray(modelValue)),
-        );
-        const nodes = values
-          .map((val) => store?.getNodeByValue(val))
-          .filter((node) => !!node && !node.loaded && !node.loading) as Node[];
+        const values: CascaderNodeValue[] = unique(flattenDeep(castArray(modelValue)));
+        const nodes = values.map((val) => store?.getNodeByValue(val)).filter((node) => !!node && !node.loaded && !node.loading) as Node[];
 
         if (nodes.length) {
           nodes.forEach((node) => {
@@ -254,23 +207,16 @@ export default defineComponent({
         }
       } else {
         const values = multiple ? castArray(modelValue) : [modelValue];
-        const nodes = unique(
-          values.map((val) => store?.getNodeByValue(val, leafOnly)),
-        ) as Node[];
+        const nodes = unique(values.map((val) => store?.getNodeByValue(val, leafOnly))) as Node[];
         syncMenuState(nodes, forced);
         checkedValue.value = cloneDeep(modelValue);
       }
     };
 
-    const syncMenuState = (
-      newCheckedNodes: CascaderNode[],
-      reserveExpandingState = true,
-    ) => {
+    const syncMenuState = (newCheckedNodes: CascaderNode[], reserveExpandingState = true) => {
       const { checkStrictly } = config.value;
       const oldNodes = checkedNodes.value;
-      const newNodes = newCheckedNodes.filter(
-        (node) => !!node && (checkStrictly || node.isLeaf),
-      );
+      const newNodes = newCheckedNodes.filter((node) => !!node && (checkStrictly || node.isLeaf));
       const oldExpandingNode = store?.getSameNode(expandingNode.value!);
       const newExpandingNode = (reserveExpandingState && oldExpandingNode) || newNodes[0];
 
@@ -296,11 +242,8 @@ export default defineComponent({
       menuList.value.forEach((menu) => {
         const menuElement = menu?.$el;
         if (menuElement) {
-          const container = menuElement.querySelector(
-            `.${ns.namespace.value}-scrollbar__wrap`,
-          );
-          const activeNode = menuElement.querySelector(`.${ns.b('node')}.${ns.is('active')}`)
-            || menuElement.querySelector(`.${ns.b('node')}.in-active-path`);
+          const container = menuElement.querySelector(`.${ns.namespace.value}-scrollbar__wrap`);
+          const activeNode = menuElement.querySelector(`.${ns.b('node')}.${ns.is('active')}`) || menuElement.querySelector(`.${ns.b('node')}.in-active-path`);
           scrollIntoView(container, activeNode);
         }
       });
@@ -315,26 +258,20 @@ export default defineComponent({
         case EVENT_CODE.down: {
           e.preventDefault();
           const distance = code === EVENT_CODE.up ? -1 : 1;
-          focusNode(
-            getSibling(target, distance, `.${ns.b('node')}[tabindex="-1"]`),
-          );
+          focusNode(getSibling(target, distance, `.${ns.b('node')}[tabindex="-1"]`));
           break;
         }
         case EVENT_CODE.left: {
           e.preventDefault();
           const preMenu = menuList.value[getMenuIndex(target) - 1];
-          const expandedNode = preMenu?.$el.querySelector(
-            `.${ns.b('node')}[aria-expanded="true"]`,
-          );
+          const expandedNode = preMenu?.$el.querySelector(`.${ns.b('node')}[aria-expanded="true"]`);
           focusNode(expandedNode);
           break;
         }
         case EVENT_CODE.right: {
           e.preventDefault();
           const nextMenu = menuList.value[getMenuIndex(target) + 1];
-          const firstNode = nextMenu?.$el.querySelector(
-            `.${ns.b('node')}[tabindex="-1"]`,
-          );
+          const firstNode = nextMenu?.$el.querySelector(`.${ns.b('node')}[tabindex="-1"]`);
           focusNode(firstNode);
           break;
         }
@@ -356,7 +293,7 @@ export default defineComponent({
         lazyLoad,
         expandNode,
         handleCheckChange,
-      }),
+      })
     );
 
     watch([config, () => props.options], initStore, {
@@ -372,7 +309,7 @@ export default defineComponent({
       },
       {
         deep: true,
-      },
+      }
     );
 
     watch(
@@ -382,7 +319,7 @@ export default defineComponent({
           emit(UPDATE_MODEL_EVENT, val);
           emit(CHANGE_EVENT, val);
         }
-      },
+      }
     );
 
     // eslint-disable-next-line no-return-assign

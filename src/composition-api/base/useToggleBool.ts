@@ -11,6 +11,7 @@ export default function useToggleBool(initVal = false) {
   }
 
   return {
-    bool, toggle,
+    bool,
+    toggle,
   };
 }

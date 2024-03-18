@@ -46,7 +46,8 @@ export default defineConfig(({ mode }) => {
         // Auto import functions from Vue, e.g. ref, reactive, toRef...
         // 自动导入 Vue 相关函数，如：ref, reactive, toRef 等
         // , '@vueuse/core'
-        imports: ['vue',
+        imports: [
+          'vue',
           {
             '@vueuse/core': [
               // named imports
@@ -54,15 +55,10 @@ export default defineConfig(({ mode }) => {
               'useDark',
               'useSessionStorage',
             ],
-            'vue-i18n': [
-              'useI18n',
-            ],
+            'vue-i18n': ['useI18n'],
           },
-
         ],
-        dirs: [
-          resolve(srcPath, './composition-api'),
-        ],
+        dirs: [resolve(srcPath, './composition-api')],
         resolvers: [
           // Auto import functions from Element Plus, e.g. ElMessage, ElMessageBox... (with style)
           // 自动导入 Element Plus 相关函数，如：ElMessage, ElMessageBox... (带样式)

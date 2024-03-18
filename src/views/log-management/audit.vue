@@ -1,25 +1,25 @@
 <template>
   <active-container :is-show="connectionIsActive">
     <el-container class="audit-detail-wrapper">
-      <el-header class="p-x-0" style="height: auto;">
+      <el-header class="p-x-0" style="height: auto">
         <div class="search-form-wrapper">
           <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
             <base-form-item :label="`${t('log.operateUser')}：`" prop="username">
-              <el-input v-model="searchFormData.username" :placeholder="t('auth.userPlaceholder')" style="width: 172px;" id="audit-search-name">
+              <el-input v-model="searchFormData.username" :placeholder="t('auth.userPlaceholder')" style="width: 172px" id="audit-search-name">
                 <template #prefix>
                   <i-custom-search-icon class="remote-select-search-icon" />
                 </template>
               </el-input>
             </base-form-item>
             <base-form-item :label="`${t('log.ip')}：`" prop="address">
-              <el-input v-model="searchFormData.address" :placeholder="t('log.ipPlaceholder')" style="width: 172px;" id="audit-search-ip">
+              <el-input v-model="searchFormData.address" :placeholder="t('log.ipPlaceholder')" style="width: 172px" id="audit-search-ip">
                 <template #prefix>
                   <i-custom-search-icon class="remote-select-search-icon" />
                 </template>
               </el-input>
             </base-form-item>
             <base-form-item :label="`${t('common.operationDetail')}：`" prop="log">
-              <el-input v-model="searchFormData.log" :placeholder="t('log.operationDetailPlaceholder')" style="width: 172px;" id="audit-search-log">
+              <el-input v-model="searchFormData.log" :placeholder="t('log.operationDetailPlaceholder')" style="width: 172px" id="audit-search-log">
                 <template #prefix>
                   <i-custom-search-icon class="remote-select-search-icon" />
                 </template>
@@ -54,7 +54,7 @@
             <el-table
               :data="tableData.list"
               v-loading="loading"
-              style="width: 100%;"
+              style="width: 100%"
               :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
               :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
               tooltip-effect="light"
@@ -78,7 +78,7 @@
               </el-table-column>
               <template #empty>
                 <div class="table-empty-wrapper">
-                  <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+                  <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
                   <span class="data-empty-text">{{ t('common.noData') }}</span>
                 </div>
               </template>
@@ -112,9 +112,7 @@ import type { FormInstance } from 'element-plus';
 import { cloneDeep } from 'lodash-es';
 import { LogApi } from '@/api';
 import { useConnectionStore } from '@/stores';
-import {
-  getStartAndEnd, today, formatDate, getOneInterval, getOneIntervalNow,
-} from '@/utils/date';
+import { getStartAndEnd, today, formatDate, getOneInterval, getOneIntervalNow } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
 import OverflowClick from './components/overflow-click.vue';
 
@@ -154,7 +152,11 @@ const totalCount = ref(0);
 const dialogVisible = ref(false);
 const editDetail = ref('');
 
-const { requestFn: getAuditLogList, data: tableData, loading } = useRequest(LogApi.getAuditLogList, {
+const {
+  requestFn: getAuditLogList,
+  data: tableData,
+  loading,
+} = useRequest(LogApi.getAuditLogList, {
   initData: {
     totalCount: 0,
     totalPage: 1,
@@ -220,38 +222,38 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
 </script>
 
 <style lang="scss" scoped>
-.audit-detail-wrapper{
+.audit-detail-wrapper {
   border-radius: 6px;
-  background: #FFF;
+  background: #fff;
   box-sizing: border-box;
   padding: 26px 16px 16px 14px;
 }
 
-.search-form-buttons{
+.search-form-buttons {
   display: inline-flex;
   flex-wrap: nowrap;
   flex: 1;
   justify-content: end;
 }
 
-.page-table-details{
+.page-table-details {
   padding: 20px 16px 10px;
 
-  .page-table-title{
+  .page-table-title {
     font-size: 14px;
     font-weight: 700;
     line-height: 21px;
-    color: #495AD4;
+    color: #495ad4;
     margin-bottom: 15px;
   }
 }
 
-.detail-text-button{
+.detail-text-button {
   // overflow: hidden;
   // text-overflow: ellipsis;
   // white-space: nowrap;
@@ -259,7 +261,7 @@ watch(
   white-space: pre;
 }
 
-.detail-text{
+.detail-text {
   font-size: 14px;
   line-height: 21px;
   font-weight: 300;

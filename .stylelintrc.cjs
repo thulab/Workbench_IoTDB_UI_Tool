@@ -1,8 +1,5 @@
 module.exports = {
-  extends: [
-    'stylelint-config-standard-scss',
-    'stylelint-config-recommended-vue/scss',
-  ],
+  extends: ['stylelint-config-standard-scss', 'stylelint-config-recommended-vue/scss'],
   rules: {
     'selector-pseudo-element-no-unknown': null,
     'selector-pseudo-class-no-unknown': [
@@ -13,10 +10,10 @@ module.exports = {
     ],
     'font-family-no-missing-generic-family-keyword': null,
     'selector-class-pattern': [
-			'^([a-z][a-z0-9]*)(((-|--|__|_)[a-z0-9]+)*)$',
-			{
-				message: 'Expected class selector to be kebab-case',
-			},
-		],
+      '^([a-z][a-z0-9]*)(((-|--|__|_)[a-z0-9]+)*)$',
+      {
+        message: 'Expected class selector to be kebab-case',
+      },
+    ],
   },
 };

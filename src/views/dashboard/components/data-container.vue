@@ -1,6 +1,6 @@
 <template>
   <div class="data-empty-wrapper" v-if="isEmpty">
-    <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+    <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
     <span class="data-empty-text">{{ t('common.noData') }}</span>
   </div>
   <slot v-else></slot>
@@ -8,14 +8,14 @@
 
 <script setup lang="ts">
 defineProps<{
-  isEmpty: boolean,
+  isEmpty: boolean;
 }>();
 
 const { t } = useI18n();
 </script>
 
 <style lang="scss" scoped>
-.data-empty-wrapper{
+.data-empty-wrapper {
   width: 100%;
   height: 100%;
   display: flex;
@@ -23,7 +23,7 @@ const { t } = useI18n();
   align-items: center;
   justify-content: center;
 
-  .data-empty-img{
+  .data-empty-img {
     width: 120px;
     height: 120px;
     margin-bottom: 16px;

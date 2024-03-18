@@ -6,15 +6,17 @@
 
 <script setup lang="ts">
 const { proxy }: any = getCurrentInstance();
-const props = withDefaults(defineProps<{
-  content: string;
-  className?: string;
-  spanClassName?: string;
-  offset?: number;
-}>(), {
-});
+const props = withDefaults(
+  defineProps<{
+    content: string;
+    className?: string;
+    spanClassName?: string;
+    offset?: number;
+  }>(),
+  {}
+);
 const emit = defineEmits<{
-  (event: 'handleClick',): void;
+  (event: 'handleClick'): void;
 }>();
 
 const handleVisible = (str: string) => {
@@ -36,5 +38,4 @@ const handleVisible = (str: string) => {
   text-overflow: ellipsis;
   display: inline;
 }
-
 </style>

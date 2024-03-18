@@ -1,4 +1,4 @@
-declare namespace Alarm{
+declare namespace Alarm {
   export interface QueryConfigParams {
     alarmName: string | null;
     measurements: string[] | null;
@@ -39,7 +39,7 @@ declare namespace Alarm{
     alarmDesc: string;
     alarmRulesType?: string;
     alarmRulesTypeVal?: string;
-    alarmRules?: Array<{ operator?: string, value?: string }>;
+    alarmRules?: Array<{ operator?: string; value?: string }>;
     alarmFrequency: string;
     alarmDuration?: number;
     alarmDurationType: string;

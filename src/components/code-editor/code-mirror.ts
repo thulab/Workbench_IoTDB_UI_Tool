@@ -1,42 +1,41 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { CSSProperties } from 'vue';
-import {
-  EditorState, type EditorStateConfig, Compartment, type Extension, StateEffect,
-} from '@codemirror/state';
-import {
-  EditorView, type EditorViewConfig, ViewUpdate, keymap, placeholder,
-} from '@codemirror/view';
+import { EditorState, type EditorStateConfig, Compartment, type Extension, StateEffect } from '@codemirror/state';
+import { EditorView, type EditorViewConfig, ViewUpdate, keymap, placeholder } from '@codemirror/view';
 import { indentWithTab } from '@codemirror/commands';
 import { indentUnit } from '@codemirror/language';
 
 export interface CreateStateOptions extends EditorStateConfig {
-  onChange(doc: string, viewUpdate: ViewUpdate): void
-  onUpdate(viewUpdate: ViewUpdate): void
-  onFocus(viewUpdate: ViewUpdate): void
-  onBlur(viewUpdate: ViewUpdate): void
+  onChange(doc: string, viewUpdate: ViewUpdate): void;
+  onUpdate(viewUpdate: ViewUpdate): void;
+  onFocus(viewUpdate: ViewUpdate): void;
+  onBlur(viewUpdate: ViewUpdate): void;
 }
 
-export const createEditorState = ({
-  onUpdate, onChange, onFocus, onBlur, ...config
-}: CreateStateOptions) => EditorState.create({
-  doc: config.doc,
-  selection: config.selection,
-  extensions: [
-    ...(Array.isArray(config.extensions) ? config.extensions : [config.extensions]),
-    EditorView.updateListener.of((viewUpdate) => {
-      // https://discuss.codemirror.net/t/codemirror-6-proper-way-to-listen-for-changes/2395/11
-      onUpdate(viewUpdate);
-      // doc changed
-      if (viewUpdate.docChanged) {
-        onChange(viewUpdate.state.doc.toString(), viewUpdate);
-      }
-      // focus state change
-      if (viewUpdate.focusChanged) {
-        if (viewUpdate.view.hasFocus) { onFocus(viewUpdate); } else { onBlur(viewUpdate); }
-      }
-    }),
-  ],
-});
+export const createEditorState = ({ onUpdate, onChange, onFocus, onBlur, ...config }: CreateStateOptions) =>
+  EditorState.create({
+    doc: config.doc,
+    selection: config.selection,
+    extensions: [
+      ...(Array.isArray(config.extensions) ? config.extensions : [config.extensions]),
+      EditorView.updateListener.of((viewUpdate) => {
+        // https://discuss.codemirror.net/t/codemirror-6-proper-way-to-listen-for-changes/2395/11
+        onUpdate(viewUpdate);
+        // doc changed
+        if (viewUpdate.docChanged) {
+          onChange(viewUpdate.state.doc.toString(), viewUpdate);
+        }
+        // focus state change
+        if (viewUpdate.focusChanged) {
+          if (viewUpdate.view.hasFocus) {
+            onFocus(viewUpdate);
+          } else {
+            onBlur(viewUpdate);
+          }
+        }
+      }),
+    ],
+  });
 
 export const createEditorView = (config: EditorViewConfig) => new EditorView({ ...config });
 export const destroyEditorView = (view: EditorView) => view.destroy();
@@ -88,10 +87,7 @@ export const getEditorTools = (view: EditorView) => {
   const { run: reExtensions } = createEditorCompartment(view);
 
   // disabled editor
-  const toggleDisabled = createEditorExtensionToggler(view, [
-    EditorView.editable.of(false),
-    EditorState.readOnly.of(true),
-  ]);
+  const toggleDisabled = createEditorExtensionToggler(view, [EditorView.editable.of(false), EditorState.readOnly.of(true)]);
 
   // https://codemirror.net/examples/tab/
   const toggleIndentWithTab = createEditorExtensionToggler(view, keymap.of([indentWithTab]));
@@ -125,30 +121,32 @@ export const getEditorTools = (view: EditorView) => {
 
   const { run: reTheme } = createEditorCompartment(view);
   const setTheme = () => {
-    reTheme(EditorView.baseTheme({
-      '&': {
-        color: '#424561',
-        backgroundColor: '#f7f8fc !important',
-      },
-      '&.cm-focused': {
-        outline: 'none',
-      },
-      '.cm-content': {
-        color: '#424561',
-        caretColor: 'transparent', // 隐藏光标，因为外面设置了 .ͼ4 .cm-line
-      },
-      '&.cm-focused .cm-cursor': {
-        borderLeftColor: 'transparent', // 隐藏光标，因为外面设置了 .ͼ4 .cm-line
-      },
-      '&.cm-focused .cm-selectionBackground, ::selection': {
-        backgroundColor: '#074',
-      },
-      '.cm-gutters': {
-        backgroundColor: '#f0f1fa',
-        color: '#495ad4',
-        border: 'none',
-      },
-    }));
+    reTheme(
+      EditorView.baseTheme({
+        '&': {
+          color: '#424561',
+          backgroundColor: '#f7f8fc !important',
+        },
+        '&.cm-focused': {
+          outline: 'none',
+        },
+        '.cm-content': {
+          color: '#424561',
+          caretColor: 'transparent', // 隐藏光标，因为外面设置了 .ͼ4 .cm-line
+        },
+        '&.cm-focused .cm-cursor': {
+          borderLeftColor: 'transparent', // 隐藏光标，因为外面设置了 .ͼ4 .cm-line
+        },
+        '&.cm-focused .cm-selectionBackground, ::selection': {
+          backgroundColor: '#074',
+        },
+        '.cm-gutters': {
+          backgroundColor: '#f0f1fa',
+          color: '#495ad4',
+          border: 'none',
+        },
+      })
+    );
   };
 
   return {

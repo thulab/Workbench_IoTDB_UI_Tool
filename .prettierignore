@@ -2,3 +2,8 @@ dist/
 node_modules/
 .vscode/
 .idea/
+.env*
+*ignore
+.eslintrc-auto-import.json
+.eslintrc.cjs
+.husky

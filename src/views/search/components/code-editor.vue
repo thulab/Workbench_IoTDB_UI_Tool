@@ -1,25 +1,22 @@
 <template>
-  <div class="font_fmiy" ref="codeContainerRef">
-  </div>
+  <div class="font_fmiy" ref="codeContainerRef"></div>
 </template>
 
 <script lang="ts" setup>
 import type { EditorState } from '@codemirror/state';
 import type { EditorView } from '@codemirror/view';
 import type { CSSProperties } from 'vue';
-import {
-  createEditorState, createEditorView, destroyEditorView, getEditorTools, events, EventKey,
-} from '@/components/code-editor/code-mirror';
+import { createEditorState, createEditorView, destroyEditorView, getEditorTools, events, EventKey } from '@/components/code-editor/code-mirror';
 import { IOTDB_EXTENSIONS } from '@/components/code-editor/lang-iotdb';
 
 const props = defineProps<{
-  modelValue: string,
-  style: CSSProperties,
+  modelValue: string;
+  style: CSSProperties;
 }>();
 
 const emit = defineEmits(events);
 
-const config = shallowRef(({
+const config = shallowRef({
   autofocus: true,
   disabled: false,
   indentWithTab: true,
@@ -27,7 +24,7 @@ const config = shallowRef(({
   placeholder: '',
   autoDestroy: true,
   extensions: IOTDB_EXTENSIONS,
-}));
+});
 
 const codeContainerRef = shallowRef<HTMLDivElement>();
 const state = shallowRef<EditorState>();
@@ -107,7 +104,7 @@ onMounted(() => {
       if (newValue !== editorTools.getDoc()) {
         editorTools.setDoc(newValue);
       }
-    },
+    }
   );
   if (config.value.disabled) {
     editorTools.toggleDisabled(config.value.disabled);
@@ -123,7 +120,7 @@ onMounted(() => {
   watch(
     () => props.style,
     (style) => editorTools.setStyle(style),
-    { immediate: true },
+    { immediate: true }
   );
   if (config.value.autofocus) {
     editorTools.focus();
@@ -140,10 +137,8 @@ onBeforeUnmount(() => {
     destroyEditorView(view.value);
   }
 });
-
 </script>
 <style lang="scss">
-
 /* stylelint-disable-next-line selector-class-pattern */
 .ͼ4 .cm-line {
   caret-color: black !important;

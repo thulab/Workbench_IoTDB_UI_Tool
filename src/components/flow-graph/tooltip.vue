@@ -1,12 +1,5 @@
 <template>
-  <el-tooltip
-    placement="top-start"
-    effect="light"
-    trigger="hover"
-    :content="content"
-    popper-class="tooltip-box-width"
-    :visible="visible"
-  >
+  <el-tooltip placement="top-start" effect="light" trigger="hover" :content="content" popper-class="tooltip-box-width" :visible="visible">
     <div></div>
   </el-tooltip>
 </template>

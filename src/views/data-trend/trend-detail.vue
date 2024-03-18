@@ -1,6 +1,6 @@
 <template>
   <el-container class="data-trend-wrapper">
-    <el-header class="p-0" style="height: auto;">
+    <el-header class="p-0" style="height: auto">
       <div class="search-form-wrapper">
         <el-form :model="searchFormData" ref="searchFormRef" label-position="left" label-width="88px" size="default" inline class="m-b-22">
           <ul class="search-data-list">
@@ -22,17 +22,23 @@
             />
           </base-form-item>
           <base-form-item v-show="!isRunningTab" :label="`${t('search.timeInterval')}：`" prop="unitInterval" :rules="requiredRules">
-            <el-select v-model="searchFormData.unitInterval" :disabled="isRunningTab" style="width: 80px;" id="trend-search-unitInterval">
+            <el-select v-model="searchFormData.unitInterval" :disabled="isRunningTab" style="width: 80px" id="trend-search-unitInterval">
               <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" :id="`trend-search-unitInterval-select-${item.value}`" />
             </el-select>
           </base-form-item>
           <base-form-item v-show="!isRunningTab" :label="`${t('search.aggregation')}：`" prop="aggregation" :rules="requiredRules" class="m-r-0">
-            <el-select v-model="searchFormData.aggregation" :disabled="isRunningTab || searchFormData.unitInterval === 'origin'" style="width: 80px;" @change="handleChangeAggregation" id="trend-search-aggregation">
+            <el-select
+              v-model="searchFormData.aggregation"
+              :disabled="isRunningTab || searchFormData.unitInterval === 'origin'"
+              style="width: 80px"
+              @change="handleChangeAggregation"
+              id="trend-search-aggregation"
+            >
               <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" :id="`trend-search-aggregation-select-${item.value}`" />
             </el-select>
           </base-form-item>
           <div class="play-pause-buttons" v-show="isRunningTab">
-            <el-icon size="30" v-if="!isRunningTab" style="cursor: not-allowed;"><i-custom-play-disabled /></el-icon>
+            <el-icon size="30" v-if="!isRunningTab" style="cursor: not-allowed"><i-custom-play-disabled /></el-icon>
             <template v-else>
               <auth-tooltip :is-disabled="canReadWriteSchemaData">
                 <el-button link v-if="!loading" :disabled="!canReadWriteSchemaData" @click="handlePlay(true)" id="trend-search-run">
@@ -57,22 +63,27 @@
             :disabled="canReadWriteSchemaData ? searchAbled : false"
             popper-class="tooltip-box-width"
           >
-            <el-button :class="[(!searchAbled || !canReadWriteSchemaData) ? 'hover-btn-disabled' : '']" type="primary" @click="handleSearch" id="trend-search-search">{{ t('common.apply') }}</el-button>
+            <el-button :class="[!searchAbled || !canReadWriteSchemaData ? 'hover-btn-disabled' : '']" type="primary" @click="handleSearch" id="trend-search-search">{{ t('common.apply') }}</el-button>
           </el-tooltip>
         </div>
       </div>
-      <p class="trend-tip" :style="{ visibility: !isRunningTab ? 'visible' : 'hidden' }"><el-icon size="16" style="margin-right: 6px;"><i-custom-info-warning /></el-icon><span v-html="t('dataTrend.trendTip', { tip })"></span></p>
+      <p class="trend-tip" :style="{ visibility: !isRunningTab ? 'visible' : 'hidden' }">
+        <el-icon size="16" style="margin-right: 6px"><i-custom-info-warning /></el-icon>
+        <span v-html="t('dataTrend.trendTip', { tip })"></span>
+      </p>
     </el-header>
     <el-main class="p-0">
       <el-container class="chart-detail-wrapper">
-        <el-main class="p-0" style="position: relative;">
+        <el-main class="p-0" style="position: relative">
           <div ref="chartContainer" class="chart-container" :style="`height: ${isRunningTab ? '100%;' : 'calc(100% - 28px);'}`" v-element-size="onResize"></div>
           <div v-if="!isRunningTab">
-            <el-button type="primary" id="trend-cursor" style="height: 24px !important;" :disabled="!chartHistoryData.length" @click="clickedCursor = true;">{{ t('spectrum.cursor') }}</el-button>
-            <el-button link class="cursor-button" id="trend-cursor-clear" :disabled="!chartHistoryData.length || !pointList.length" @click="handleEmptyPoint"><el-icon size="18" color="#fff"><i-custom-delete /></el-icon></el-button>
+            <el-button type="primary" id="trend-cursor" style="height: 24px !important" :disabled="!chartHistoryData.length" @click="clickedCursor = true">{{ t('spectrum.cursor') }}</el-button>
+            <el-button link class="cursor-button" id="trend-cursor-clear" :disabled="!chartHistoryData.length || !pointList.length" @click="handleEmptyPoint">
+              <el-icon size="18" color="#fff"><i-custom-delete /></el-icon>
+            </el-button>
           </div>
         </el-main>
-        <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand ? 'p-0' : '']" style="display: flex; flex-direction: column;">
+        <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand ? 'p-0' : '']" style="display: flex; flex-direction: column">
           <trend-list
             v-model="pathList"
             v-model:is-expand="isExpand"
@@ -84,27 +95,34 @@
           />
           <div class="cursor-list-box" v-if="isExpand && !isRunningTab">
             <h4 class="cursor-list-title">{{ t('spectrum.cursorTitle') }}</h4>
-            <auth-container :is-auth="canReadWriteSchemaData" style="flex: 1; background-color: #fff; overflow-y: hidden; display: flex; padding: 12px 0 10px;">
+            <auth-container :is-auth="canReadWriteSchemaData" style="flex: 1; background-color: #fff; overflow-y: hidden; display: flex; padding: 12px 0 10px">
               <div class="list-empty-wrapper" v-if="!historyCursorData.length">
-                <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+                <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
                 <span class="data-empty-text">{{ t('common.noData') }}</span>
               </div>
               <div class="cursor-list-wrapper" v-else>
                 <ul class="cursor-list">
                   <li v-for="(item, index) in pointList" :key="item.name" :class="['cursor-item-box']">
                     <div class="cursor-text-box">
-                      <el-checkbox v-if="pointList.length !== 1" :checked="item.checked" class="m-r-4" :id="`trend-cursor-checkbox-${index}`" :disabled="pointDisabled(item)" @change="val => handleCheckDvalue(val, item)" />
+                      <el-checkbox
+                        v-if="pointList.length !== 1"
+                        :checked="item.checked"
+                        class="m-r-4"
+                        :id="`trend-cursor-checkbox-${index}`"
+                        :disabled="pointDisabled(item)"
+                        @change="(val) => handleCheckDvalue(val, item)"
+                      />
                       {{ pointTitle(index) }}
                     </div>
                     <div class="cursor-point-data" :style="{ marginLeft: pointList.length !== 1 ? '45px' : '25px' }">
-                      <p style="display: inline-flex; width: 140px;"><text-tooltip :content="`X: ${item.x}`" /></p>
-                      <p style="display: inline-flex; width: 140px;"><text-tooltip :content="`Y: ${item.y}`" /></p>
+                      <p style="display: inline-flex; width: 140px"><text-tooltip :content="`X: ${item.x}`" /></p>
+                      <p style="display: inline-flex; width: 140px"><text-tooltip :content="`Y: ${item.y}`" /></p>
                     </div>
                   </li>
                 </ul>
                 <div v-if="pointCheckedData.length === 2" class="point-dvalue-box">
-                  <p style="display: inline-flex; width: 190px;"><text-tooltip :content="`ΔX：${Math.abs(pointCheckedData[0].x - pointCheckedData[1].x)}`" /></p>
-                  <p style="display: inline-flex; width: 190px;"><text-tooltip :content="`Δf：${Math.abs(pointCheckedData[0].y - pointCheckedData[1].y)}`" /></p>
+                  <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔX：${Math.abs(pointCheckedData[0].x - pointCheckedData[1].x)}`" /></p>
+                  <p style="display: inline-flex; width: 190px"><text-tooltip :content="`Δf：${Math.abs(pointCheckedData[0].y - pointCheckedData[1].y)}`" /></p>
                 </div>
               </div>
             </auth-container>
@@ -112,62 +130,53 @@
         </el-aside>
       </el-container>
     </el-main>
-
   </el-container>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
-import type {
-  FormInstance, SingleOrRange, DateModelType, CheckboxValueType,
-} from 'element-plus';
+import type { FormInstance, SingleOrRange, DateModelType, CheckboxValueType } from 'element-plus';
 import dayjs from 'dayjs';
-import {
-  debounce, cloneDeep, difference,
-} from 'lodash-es';
+import { debounce, cloneDeep, difference } from 'lodash-es';
 import { vElementSize } from '@vueuse/components';
 import { SearchApi } from '@/api';
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
-import {
-  getStartAndEnd, today, getOneInterval, getOneIntervalNow,
-} from '@/utils/date';
+import { getStartAndEnd, today, getOneInterval, getOneIntervalNow } from '@/utils/date';
 import { useUserStore, useConnectionStore } from '@/stores';
 import { useWebsocket } from '@/composition-api';
 import ICustomCalender from '~icons/custom/calender.svg';
 import TrendList from './components/trend-list.vue';
 
 interface TrendMarkPoint {
-  name: string,
-  value: number,
-  xAxis: number,
-  yAxis: number,
+  name: string;
+  value: number;
+  xAxis: number;
+  yAxis: number;
 }
 
 interface TrendMarkLine {
-  name: string,
-  xAxis: number,
+  name: string;
+  xAxis: number;
   label: {
-    formatter: string | Function,
-    position: string,
+    formatter: string | Function;
+    position: string;
   };
 }
 
 interface PointData {
-  name: string,
-  x: number,
-  y: number,
-  disabled: boolean,
-  checked: boolean,
+  name: string;
+  x: number;
+  y: number;
+  disabled: boolean;
+  checked: boolean;
 }
 
 const { t } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
 const userName = computed(() => userStore.userInfo.name);
-const {
-  canReadWriteSchemaData,
-} = storeToRefs(userStore);
+const { canReadWriteSchemaData } = storeToRefs(userStore);
 const connectionStore = useConnectionStore();
 const connectionId = computed(() => connectionStore.connectionInfo.data.id);
 const connectionType = computed(() => (connectionStore.connectionIsMaster ? 0 : 1));
@@ -238,7 +247,7 @@ const chartHistoryData = ref<Search.TrendData[]>([]);
 const copyCheckData = ref<Trend.LineObj[]>([]);
 // 当前数据
 const currentData = computed(() => (isRunningTab.value ? chartData.value : chartHistoryData.value));
-const historyCursorData = ref<Array<{ path: string, markPoint: Array<TrendMarkPoint>, markLine: Array<TrendMarkLine> }>>([]);
+const historyCursorData = ref<Array<{ path: string; markPoint: Array<TrendMarkPoint>; markLine: Array<TrendMarkLine> }>>([]);
 const clickedCursor = ref(false);
 const markPointCount = ref(0);
 const pointList = ref<Array<PointData>>([]);
@@ -246,61 +255,67 @@ const pointCheckedData = computed(() => pointList.value.filter((item) => item.ch
 
 const legendSelected = computed(() => ({
   show: false,
-  selected: pathList.value.reduce((pre, cur) => {
-    pre[cur.path] = cur.checked || false;
-    return pre;
-  }, {} as Record<string, boolean>),
+  selected: pathList.value.reduce(
+    (pre, cur) => {
+      pre[cur.path] = cur.checked || false;
+      return pre;
+    },
+    {} as Record<string, boolean>
+  ),
 }));
 
-const seriesData = computed<ECOption>(() => ({
-  series: currentData.value.map((item) => ({
-    type: 'line',
-    symbol: 'circle',
-    showSymbol: false,
-    showAllSymbol: 'auto',
-    connectNulls: false,
-    symbolSize: (pathList.value.find((data) => data.path === item.path)?.width || 2) + 2,
-    name: item.path,
-    data: item.values.map((dataItem, index) => [item.timestamps[index], dataItem]),
-    // emphasis: {
-    //   focus: 'series',
-    // },
-    markPoint: {
-      symbol: 'rect',
-      symbolSize: 8,
-      itemStyle: {
-        color: 'transparent',
-        borderColor: '#fff',
-        borderWidth: 1,
-      },
-      label: {
-        show: false,
-      },
-      data: isRunningTab.value || (!isRunningTab.value && !historyCursorData.value.length) ? [] : historyCursorData.value.find((data) => data.path === item.path)?.markPoint,
-    },
-    markLine: {
-      symbol: 'none',
-      lineStyle: {
-        type: [16, 10],
-        color: '#DFE1ED',
-      },
-      emphasis: {
-        lineStyle: {
-          type: [16, 10],
+const seriesData = computed<ECOption>(
+  () =>
+    ({
+      series: currentData.value.map((item) => ({
+        type: 'line',
+        symbol: 'circle',
+        showSymbol: false,
+        showAllSymbol: 'auto',
+        connectNulls: false,
+        symbolSize: (pathList.value.find((data) => data.path === item.path)?.width || 2) + 2,
+        name: item.path,
+        data: item.values.map((dataItem, index) => [item.timestamps[index], dataItem]),
+        // emphasis: {
+        //   focus: 'series',
+        // },
+        markPoint: {
+          symbol: 'rect',
+          symbolSize: 8,
+          itemStyle: {
+            color: 'transparent',
+            borderColor: '#fff',
+            borderWidth: 1,
+          },
+          label: {
+            show: false,
+          },
+          data: isRunningTab.value || (!isRunningTab.value && !historyCursorData.value.length) ? [] : historyCursorData.value.find((data) => data.path === item.path)?.markPoint,
         },
-      },
-      data: isRunningTab.value || (!isRunningTab.value && !historyCursorData.value.length) ? [] : historyCursorData.value.find((data) => data.path === item.path)?.markLine,
-      animation: false,
-    },
-    lineStyle: {
-      width: pathList.value.find((data) => data.path === item.path)?.width || 2,
-      color: pathList.value.find((data) => data.path === item.path)?.color,
-    },
-    itemStyle: {
-      color: pathList.value.find((data) => data.path === item.path)?.color,
-    },
-  })),
-}) as unknown as ECOption);
+        markLine: {
+          symbol: 'none',
+          lineStyle: {
+            type: [16, 10],
+            color: '#DFE1ED',
+          },
+          emphasis: {
+            lineStyle: {
+              type: [16, 10],
+            },
+          },
+          data: isRunningTab.value || (!isRunningTab.value && !historyCursorData.value.length) ? [] : historyCursorData.value.find((data) => data.path === item.path)?.markLine,
+          animation: false,
+        },
+        lineStyle: {
+          width: pathList.value.find((data) => data.path === item.path)?.width || 2,
+          color: pathList.value.find((data) => data.path === item.path)?.color,
+        },
+        itemStyle: {
+          color: pathList.value.find((data) => data.path === item.path)?.color,
+        },
+      })),
+    }) as unknown as ECOption
+);
 const isShowZoom = computed(() => pathList.value.length > 0);
 
 const chartOptions = computed<ECOption>(() => ({
@@ -398,7 +413,7 @@ function pointDisabled(item: PointData) {
   return pointCheckedData.value.length === 2 && !flag;
 }
 
-const setOption = (option:ECOption, noMerge: boolean = false) => {
+const setOption = (option: ECOption, noMerge: boolean = false) => {
   if (chartInstance) {
     // 实例存在直接设置
     chartInstance.setOption(option, noMerge);
@@ -442,7 +457,7 @@ const setOption = (option:ECOption, noMerge: boolean = false) => {
 };
 
 function handleClickChart(params: echarts.ECElementEvent) {
-  const { seriesName, value, componentType } = params as { seriesName: string, value: number[], componentType: string };
+  const { seriesName, value, componentType } = params as { seriesName: string; value: number[]; componentType: string };
   if (componentType !== 'series') return;
   if (markPointCount.value > 9) {
     ElMessage.warning({
@@ -457,20 +472,24 @@ function handleClickChart(params: echarts.ECElementEvent) {
   if (index === -1) {
     historyCursorData.value.push({
       path: seriesName,
-      markPoint: [{
-        name: `${seriesName}_${value[0]}_${value[1]}`,
-        value: value[1],
-        xAxis: value[0],
-        yAxis: value[1],
-      }],
-      markLine: [{
-        name: `${seriesName}_${value[0]}`,
-        xAxis: value[0],
-        label: {
-          formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
-          position: 'insideEndBottom',
+      markPoint: [
+        {
+          name: `${seriesName}_${value[0]}_${value[1]}`,
+          value: value[1],
+          xAxis: value[0],
+          yAxis: value[1],
         },
-      }],
+      ],
+      markLine: [
+        {
+          name: `${seriesName}_${value[0]}`,
+          xAxis: value[0],
+          label: {
+            formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
+            position: 'insideEndBottom',
+          },
+        },
+      ],
     });
     pointList.value.push({
       name: `${seriesName}_${value[0]}_${value[1]}`,
@@ -598,8 +617,8 @@ function handleSearch() {
 
 function handleData(data: any) {
   const jsonData: {
-    data: Search.TrendData[],
-    operate: string,
+    data: Search.TrendData[];
+    operate: string;
   } = JSON.parse(data) || [];
   if (loading.value && jsonData.operate === 'get') {
     const minTime = dayjs().subtract(10, 'minute').valueOf();
@@ -776,17 +795,27 @@ function init() {
     });
   }
   if (socketInstance.value && socketInstance.value.readyState === 1) {
-    socketInstance.value?.send(JSON.stringify({
-      operate: 'SET_CONNECT', connectionId: connectionId.value, user: userName.value, type: connectionType.value,
-    }));
+    socketInstance.value?.send(
+      JSON.stringify({
+        operate: 'SET_CONNECT',
+        connectionId: connectionId.value,
+        user: userName.value,
+        type: connectionType.value,
+      })
+    );
     if (route.query.measurement) {
       socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [route.query.measurement as string] }));
     }
   } else {
     socketInstance.value?.addEventListener('open', () => {
-      socketInstance.value?.send(JSON.stringify({
-        operate: 'SET_CONNECT', connectionId: connectionId.value, user: userName.value, type: connectionType.value,
-      }));
+      socketInstance.value?.send(
+        JSON.stringify({
+          operate: 'SET_CONNECT',
+          connectionId: connectionId.value,
+          user: userName.value,
+          type: connectionType.value,
+        })
+      );
       if (route.query.measurement) {
         socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [route.query.measurement as string] }));
       }
@@ -822,7 +851,7 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
 
 onUnmounted(() => {
@@ -838,14 +867,14 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.data-trend-wrapper{
+.data-trend-wrapper {
   border-radius: 6px;
-  background: #FFF;
+  background: #fff;
   box-sizing: border-box;
   padding: 26px 16px 16px 30px;
 }
 
-.search-form-wrapper{
+.search-form-wrapper {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -887,11 +916,11 @@ onUnmounted(() => {
   }
 }
 
-.play-pause-buttons{
+.play-pause-buttons {
   height: 30px;
 }
 
-.search-form-buttons{
+.search-form-buttons {
   display: inline-flex;
   flex-wrap: nowrap;
   flex: 1;
@@ -899,24 +928,25 @@ onUnmounted(() => {
   margin-bottom: 16px;
 }
 
-.hover-btn-disabled, .hover-btn-disabled:focus{
+.hover-btn-disabled,
+.hover-btn-disabled:focus {
   color: var(--el-button-disabled-text-color) !important;
   cursor: not-allowed !important;
   background-color: var(--el-button-disabled-bg-color) !important;
   border-color: var(--el-button-disabled-border-color) !important;
 }
 
-.trend-tip{
+.trend-tip {
   display: flex;
   align-items: center;
   margin-bottom: 8px;
   font-size: 12px;
   line-height: 12px;
-  color: #656A85;
+  color: #656a85;
   font-weight: 300;
 }
 
-.chart-detail-wrapper{
+.chart-detail-wrapper {
   width: 100%;
   height: 100%;
 }
@@ -927,9 +957,9 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.path-list-wrapper{
+.path-list-wrapper {
   margin-left: 16px;
-  background-color: #F7F8FC;
+  background-color: #f7f8fc;
   border-radius: 2px;
   box-sizing: border-box;
   padding: 12px 12px 28px;
@@ -937,21 +967,21 @@ onUnmounted(() => {
   transition: all 0.3s ease;
 }
 
-.cursor-list-box{
+.cursor-list-box {
   margin: 16px 0 0;
   height: 244px;
   display: flex;
   flex-direction: column;
 
-  .cursor-list-title{
+  .cursor-list-title {
     font-size: 14px;
     font-weight: 700;
     line-height: 21px;
-    color: #495AD4;
+    color: #495ad4;
     margin: 0 0 6px;
   }
 
-  .list-empty-wrapper{
+  .list-empty-wrapper {
     width: 100%;
     height: 100%;
     display: flex;
@@ -959,32 +989,32 @@ onUnmounted(() => {
     justify-content: center;
     flex-direction: column;
 
-    .data-empty-img{
+    .data-empty-img {
       width: 150px;
       height: 150px;
       margin-bottom: 16px;
     }
 
-    .data-empty-text{
+    .data-empty-text {
       font-size: 14px;
       color: #131926;
       line-height: 21px;
     }
   }
 
-  .cursor-list-wrapper{
+  .cursor-list-wrapper {
     display: flex;
     flex-direction: column;
     flex: 1;
 
-    .cursor-list{
+    .cursor-list {
       flex: 1;
       overflow-y: auto;
     }
   }
 }
 
-.cursor-text-box{
+.cursor-text-box {
   display: flex;
   align-items: center;
   margin: 0 0 4px 8px;
@@ -994,15 +1024,15 @@ onUnmounted(() => {
   color: #131926;
 }
 
-.cursor-point-data{
+.cursor-point-data {
   font-size: 12px;
   font-weight: 400;
   line-height: 26px;
   color: #131926;
 }
 
-.point-dvalue-box{
-  border-top: 1px dashed #DFE1ED;
+.point-dvalue-box {
+  border-top: 1px dashed #dfe1ed;
   font-size: 12px;
   font-weight: 400;
   line-height: 26px;

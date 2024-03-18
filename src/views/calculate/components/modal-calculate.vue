@@ -9,14 +9,30 @@
   >
     <el-form ref="formRef" :model="formData" class="source-form" label-position="left">
       <base-form-item :label="`${appType === 1 ? t('calculate.calculateName') : t('calculate.viewName')}：`" prop="name" :rules="requiredRules" class="form-label-width">
-        <el-input v-model="formData.name" show-word-limit maxlength="20" :placeholder="appType === 1 ? t('calculate.calculateNamePlaceholder') : t('calculate.viewNamePlaceholder')" id="calculate-modal-name" />
+        <el-input
+          v-model="formData.name"
+          show-word-limit
+          maxlength="20"
+          :placeholder="appType === 1 ? t('calculate.calculateNamePlaceholder') : t('calculate.viewNamePlaceholder')"
+          id="calculate-modal-name"
+        />
       </base-form-item>
       <base-form-item :label="`${appType === 1 ? t('calculate.calculateDesc') : t('calculate.viewDesc')}：`" prop="desc" class="form-label-width form-label-normal">
-        <el-input type="textarea" v-model="formData.desc" show-word-limit maxlength="100" :placeholder="appType === 1 ? t('calculate.calculateDescPlaceholder') : t('calculate.viewDescPlaceholder')" :resize="'none'" class="desc-textarea" id="calculate-modal-desc" />
+        <el-input
+          type="textarea"
+          v-model="formData.desc"
+          show-word-limit
+          maxlength="100"
+          :placeholder="appType === 1 ? t('calculate.calculateDescPlaceholder') : t('calculate.viewDescPlaceholder')"
+          :resize="'none'"
+          class="desc-textarea"
+          id="calculate-modal-desc"
+        />
       </base-form-item>
       <base-form-item prop="measurement" :rules="requiredRules" class="form-label-width">
         <template #label>
-          {{t('calculate.resultMeasurement')}}：<el-tooltip effect="light" :content="t('calculate.descTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+          {{ t('calculate.resultMeasurement') }}：
+          <el-tooltip effect="light" :content="t('calculate.descTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
         </template>
         <el-input v-model="formData.measurement" :placeholder="t('calculate.resultMeasurementPlaceholder')" v-if="editType === 'add'" id="calculate-modal-measurement">
           <template #prepend>root.</template>
@@ -25,16 +41,21 @@
       </base-form-item>
       <base-form-item prop="expression" :rules="requiredExpressionRules" class="form-expression-box">
         <template #label>
-          {{appType === 1 ? t('calculate.calculateExpression') : t('calculate.viewExpression')}}：<el-tooltip effect="light" placement="top">
+          {{ appType === 1 ? t('calculate.calculateExpression') : t('calculate.viewExpression') }}：
+          <el-tooltip effect="light" placement="top">
             <i-custom-question />
             <template #content>
-              <p style="color: #131926;font-weight: 300;width: 230px;">{{ t('calculate.expressionTip') }}
+              <p style="color: #131926; font-weight: 300; width: 230px">
+                {{ t('calculate.expressionTip') }}
                 <a
                   href="https://www.timecho.com/docs/zh/UserGuide/V1.1.x/Operators-Functions/Overview.html#%E8%BF%90%E7%AE%97%E7%AC%A6%E5%92%8C%E5%87%BD%E6%95%B0"
                   target="_blank"
                   rel="noopener noreferrer"
-                  style="color: #495ad4;"
-                >{{ t('common.doc') }}</a></p>
+                  style="color: #495ad4"
+                >
+                  {{ t('common.doc') }}
+                </a>
+              </p>
             </template>
           </el-tooltip>
         </template>
@@ -43,7 +64,7 @@
             <code-editor
               v-show="codeMirrorReady"
               v-model:model-value="formData.expression"
-              @ready="() => codeMirrorReady = true"
+              @ready="() => (codeMirrorReady = true)"
               :style="{
                 height: `288px`,
                 backgroundColor: '#F7F8FC',
@@ -90,7 +111,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
-  (event: 'handleSave',): void;
+  (event: 'handleSave'): void;
 }>();
 
 const { t } = useI18n();
@@ -147,24 +168,28 @@ const handleConfirm = () => {
         saveCalculate({
           ...formData,
           measurement: `root.${formData.measurement}`,
-        }).then(() => {
-          ElMessage.success(t('common.createSuccess'));
-          dialogVisible.value = false;
-          emit('handleSave');
-        }).finally(() => {
-          saveLoading.value = false;
-        });
+        })
+          .then(() => {
+            ElMessage.success(t('common.createSuccess'));
+            dialogVisible.value = false;
+            emit('handleSave');
+          })
+          .finally(() => {
+            saveLoading.value = false;
+          });
       } else {
         updateCalculate({
           ...formData,
           measurement: `${formData.measurement}`,
-        }).then(() => {
-          ElMessage.success(t('common.changeSuccess'));
-          dialogVisible.value = false;
-          emit('handleSave');
-        }).finally(() => {
-          saveLoading.value = false;
-        });
+        })
+          .then(() => {
+            ElMessage.success(t('common.changeSuccess'));
+            dialogVisible.value = false;
+            emit('handleSave');
+          })
+          .finally(() => {
+            saveLoading.value = false;
+          });
       }
     }
   });
@@ -182,7 +207,7 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
 
 watch(
@@ -205,80 +230,78 @@ watch(
         formData.expression = '';
       }
     }
-  },
+  }
 );
-
 </script>
 
 <style lang="scss" scoped>
-
-.form-label-width{
+.form-label-width {
   :deep(.el-form-item__label) {
     width: 90px;
 
-    svg{
+    svg {
       right: 10px;
     }
   }
 }
 
-.form-label-normal{
+.form-label-normal {
   :deep(.el-form-item__label) {
     padding-left: 9px;
   }
 }
 
-.desc-textarea{
+.desc-textarea {
   :deep(.el-textarea__inner) {
     // height: 44px;
   }
 }
 
-.input-disabled{
-  :deep(.el-input__inner){
+.input-disabled {
+  :deep(.el-input__inner) {
     color: #131926;
     -webkit-text-fill-color: #131926;
   }
 
-  :deep(.el-input__wrapper){
+  :deep(.el-input__wrapper) {
     box-shadow: none;
   }
 }
 
-.form-expression-box{
+.form-expression-box {
   flex-direction: column;
 
   :deep(.el-form-item__label) {
     justify-content: flex-start;
     width: fit-content;
 
-    svg{
+    svg {
       right: 10px;
     }
   }
 }
 
-.calculate-expression-box{
+.calculate-expression-box {
   width: 100%;
   height: 288px;
   box-sizing: border-box;
   position: relative;
 
-  .code-box{
+  .code-box {
     width: calc(100% - 238px);
 
-    :deep(.cm-scroller::-webkit-scrollbar-track){
-      background-color: #F7F8FC !important;
+    :deep(.cm-scroller::-webkit-scrollbar-track) {
+      background-color: #f7f8fc !important;
     }
 
-    :deep(.cm-scroller::-webkit-scrollbar-corner){
-      background-color: #F7F8FC !important;
+    :deep(.cm-scroller::-webkit-scrollbar-corner) {
+      background-color: #f7f8fc !important;
     }
   }
 
-  .quick-box-container{
+  .quick-box-container {
     width: 238px;
-    background-color: #F7F8FC;
+    background-color: #f7f8fc;
     padding: 5px 4px 5px 8px;
     height: 100%;
     box-sizing: border-box;
@@ -287,7 +310,7 @@ watch(
     right: 0;
   }
 
-  .quick-box{
+  .quick-box {
     padding: 0 8px;
     background: #fff;
     box-sizing: border-box;
@@ -307,18 +330,18 @@ watch(
       color: #131926;
     }
 
-    :deep(.el-tabs__item.is-active){
+    :deep(.el-tabs__item.is-active) {
       color: #495ad4;
     }
 
-    :deep(.el-tabs__nav-wrap::after){
+    :deep(.el-tabs__nav-wrap::after) {
       height: 1px;
-      background-color: #DFE1ED;
+      background-color: #dfe1ed;
     }
   }
 }
 
-.dialog-footer{
+.dialog-footer {
   margin-top: -24px;
 }
 </style>

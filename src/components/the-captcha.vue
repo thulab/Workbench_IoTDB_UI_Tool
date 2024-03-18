@@ -1,16 +1,10 @@
 <template>
-  <div
-    id="captcha"
-    @click="onRefresh()"
-    style="display: inline-block; overflow: hidden;"
-    :style="{ width: width + 'px', height: height + 'px' }"
-  >
+  <div id="captcha" @click="onRefresh()" style="display: inline-block; overflow: hidden" :style="{ width: width + 'px', height: height + 'px' }">
     <canvas ref="captchaContainer"></canvas>
   </div>
 </template>
 
 <script setup lang="ts">
-
 const captchaContainer = ref<HTMLCanvasElement | null>(null);
 
 const props = defineProps({
@@ -96,5 +90,4 @@ onMounted(() => {
 });
 
 defineExpose({ onRefresh });
-
 </script>

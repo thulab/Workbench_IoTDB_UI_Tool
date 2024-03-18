@@ -1,8 +1,6 @@
 import { syntaxHighlighting, defaultHighlightStyle } from '@codemirror/language';
 import { autocompletion } from '@codemirror/autocomplete';
-import {
-  schemaCompletionSource, keywordCompletionSource, sql, SQLDialect,
-} from '@codemirror/lang-sql';
+import { schemaCompletionSource, keywordCompletionSource, sql, SQLDialect } from '@codemirror/lang-sql';
 import { basicSetup } from 'codemirror';
 import { keymap } from '@codemirror/view';
 import { defaultKeymap } from '@codemirror/commands';

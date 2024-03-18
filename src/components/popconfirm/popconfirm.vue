@@ -14,32 +14,16 @@
     <template #content>
       <div :class="ns.b()">
         <div :class="ns.e('main')">
-          <el-icon
-            v-if="!hideIcon && icon"
-            :class="ns.e('icon')"
-            :style="{ color: iconColor }"
-          >
+          <el-icon v-if="!hideIcon && icon" :class="ns.e('icon')" :style="{ color: iconColor }">
             <component :is="icon" />
           </el-icon>
           {{ title }}
         </div>
         <div :class="ns.e('action')">
-          <el-button
-            size="small"
-            :type="cancelButtonType === 'text' ? '' : cancelButtonType"
-            :text="cancelButtonType === 'text'"
-            @click="cancel"
-            :id="cancelButtonId"
-          >
+          <el-button size="small" :type="cancelButtonType === 'text' ? '' : cancelButtonType" :text="cancelButtonType === 'text'" @click="cancel" :id="cancelButtonId">
             {{ finalCancelButtonText }}
           </el-button>
-          <el-button
-            size="small"
-            :type="confirmButtonType === 'text' ? '' : confirmButtonType"
-            :text="confirmButtonType === 'text'"
-            @click="confirm"
-            :id="confirmButtonId"
-          >
+          <el-button size="small" :type="confirmButtonType === 'text' ? '' : confirmButtonType" :text="confirmButtonType === 'text'" @click="confirm" :id="confirmButtonId">
             {{ finalConfirmButtonText }}
           </el-button>
         </div>
@@ -88,10 +72,6 @@ const cancel = (e: MouseEvent) => {
   hidePopper();
 };
 
-const finalConfirmButtonText = computed(
-  () => props.confirmButtonText || t('common.confirm'),
-);
-const finalCancelButtonText = computed(
-  () => props.cancelButtonText || t('common.cancel'),
-);
+const finalConfirmButtonText = computed(() => props.confirmButtonText || t('common.confirm'));
+const finalCancelButtonText = computed(() => props.cancelButtonText || t('common.cancel'));
 </script>

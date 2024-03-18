@@ -1,11 +1,5 @@
 <template>
-  <el-tooltip
-    :disabled="tooltipDisabled"
-    :content="props.content"
-    :placement="placement"
-    effect="light"
-    popper-class="tooltip-max-width"
-  >
+  <el-tooltip :disabled="tooltipDisabled" :content="props.content" :placement="placement" effect="light" popper-class="tooltip-max-width">
     <div class="over-flow" :class="props.className" @mouseover="onMouseOver('contentRef')" @focus="onMouseOver('contentRef')">
       <span ref="contentRef" :class="props.spanClassName">{{ content || '-' }}</span>
     </div>
@@ -16,14 +10,17 @@ import type { Placement } from 'element-plus';
 import { getCurrentInstance, ref } from 'vue';
 
 const { proxy }: any = getCurrentInstance();
-const props = withDefaults(defineProps<{
-  content: string;
-  className?: string;
-  spanClassName?: string;
-  placement?: Placement;
-}>(), {
-  placement: 'top',
-});
+const props = withDefaults(
+  defineProps<{
+    content: string;
+    className?: string;
+    spanClassName?: string;
+    placement?: Placement;
+  }>(),
+  {
+    placement: 'top',
+  }
+);
 const tooltipDisabled = ref(true);
 const onMouseOver = (str: string) => {
   const parentWidth: number = proxy.$refs[str].parentNode.offsetWidth;
@@ -48,6 +45,7 @@ const onMouseOver = (str: string) => {
 }
 </style>
 <style lang="scss">
-.tooltip-max-width{
+.tooltip-max-width {
   max-width: 500px;
-}</style>
+}
+</style>

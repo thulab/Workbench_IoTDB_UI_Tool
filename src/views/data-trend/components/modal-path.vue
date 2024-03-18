@@ -1,16 +1,10 @@
 <template>
-  <el-dialog
-    :title="t('measurement.addMeasurement')"
-    v-model="dialogVisible"
-    width="480px"
-    align-center
-    :close-on-click-modal="false"
-    id="trend-modal-path"
-  >
+  <el-dialog :title="t('measurement.addMeasurement')" v-model="dialogVisible" width="480px" align-center :close-on-click-modal="false" id="trend-modal-path">
     <el-form ref="formRef" :model="formData">
       <base-form-item prop="path" :rules="requiredRules">
         <template #label>
-          {{t('measurement.measurementName')}}：<el-tooltip effect="light" :content="t('common.searchAllTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+          {{ t('measurement.measurementName') }}：
+          <el-tooltip effect="light" :content="t('common.searchAllTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
         </template>
         <timeseries-select-single
           id="trend-modal-select-path"
@@ -28,7 +22,7 @@
           <el-color-picker v-model="formData.color" color-format="hex" :predefine="predefineColors" id="trend-modal-color" />
         </base-form-item>
         <base-form-item class="chart-width-box" :label="`${t('common.lineWidth')}：`" prop="width" :rules="requiredNumberRules">
-          <el-input-number v-model.number="formData.width" :min="1" :max="10" step-strictly controls-position="right" style="width: 40px;" id="trend-modal-input" />
+          <el-input-number v-model.number="formData.width" :min="1" :max="10" step-strictly controls-position="right" style="width: 40px" id="trend-modal-input" />
         </base-form-item>
       </div>
     </el-form>
@@ -111,24 +105,23 @@ watch(
       formData.color = props.defaultColor;
       dialogKey.value++;
     }
-  },
+  }
 );
-
 </script>
 
 <style lang="scss" scoped>
-  .chart-detail-box{
-    display: flex;
-    margin-top: 24px;
+.chart-detail-box {
+  display: flex;
+  margin-top: 24px;
 
-    .chart-width-box{
-      margin-left: 36px;
-    }
+  .chart-width-box {
+    margin-left: 36px;
   }
+}
 
-  .path-select{
-    :deep(.el-input__suffix) {
-      background-color: transparent;
-    }
+.path-select {
+  :deep(.el-input__suffix) {
+    background-color: transparent;
   }
+}
 </style>

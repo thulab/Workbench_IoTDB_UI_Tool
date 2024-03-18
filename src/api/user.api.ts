@@ -14,12 +14,14 @@ class UserApi {
   }
 
   // 当前登录用户权限
-  static getLoginUserPrivileges(): HttpResponseP<Auth.UserPrivileges & {
-    connection: Connection.ConnectionDetail,
-    isMaster: boolean,
-    isActive: boolean | null,
-    slaveIsConnection: boolean
-  } & { version: string }> {
+  static getLoginUserPrivileges(): HttpResponseP<
+    Auth.UserPrivileges & {
+      connection: Connection.ConnectionDetail;
+      isMaster: boolean;
+      isActive: boolean | null;
+      slaveIsConnection: boolean;
+    } & { version: string }
+  > {
     return http.get('/privileges/getLoginUserPrivileges');
   }
 

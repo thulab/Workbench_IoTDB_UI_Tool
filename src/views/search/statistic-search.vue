@@ -4,11 +4,12 @@
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" label-width="78px" size="default" inline :disabled="getListLoading">
         <base-form-item prop="path" class="m-r-40">
           <template #label>
-            {{ t('measurement.measurementChoose') }}：<el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+            {{ t('measurement.measurementChoose') }}：
+            <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
           <timeseries-select v-model="searchFormData.path" :is-show-view-btn="true" :is-boolean-text-disabled="true" id="statistic-search-path" />
         </base-form-item>
-        <base-form-item :label="`${t('search.searchTime')}：`" prop="datetimerange" style="margin-right: 0;">
+        <base-form-item :label="`${t('search.searchTime')}：`" prop="datetimerange" style="margin-right: 0">
           <el-date-picker
             v-model="searchFormData.datetimerange"
             type="datetimerange"
@@ -27,7 +28,9 @@
           <el-button @click="handleReset" :disabled="getListLoading || !canReadWriteData" id="statistic-search-reset">{{ t('common.reset') }}</el-button>
         </auth-tooltip>
         <auth-tooltip :is-disabled="canReadWriteData">
-          <el-button :disabled="searchFormData.path.length === 0 || !canReadWriteData" type="primary" @click="handleSearch" id="statistic-search-search">{{getListLoading ? '取消查询' : t('common.query') }}</el-button>
+          <el-button :disabled="searchFormData.path.length === 0 || !canReadWriteData" type="primary" @click="handleSearch" id="statistic-search-search">
+            {{ getListLoading ? '取消查询' : t('common.query') }}
+          </el-button>
         </auth-tooltip>
       </div>
     </div>
@@ -37,8 +40,11 @@
         <h4 class="page-info-title">{{ t('common.searchDetail') }}</h4>
         <div class="page-detail-buttons">
           <auth-tooltip :is-disabled="canReadWriteData">
-            <el-dropdown class="m-r-16" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData" @command="val => handleCommandDown(val)" id="statistic-search-download-dropdown">
-              <el-button class="export-btn" id="statistic-search-download" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData">{{ t('common.export') }}<el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
+            <el-dropdown class="m-r-16" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData" @command="(val) => handleCommandDown(val)" id="statistic-search-download-dropdown">
+              <el-button class="export-btn" id="statistic-search-download" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData">
+                {{ t('common.export') }}
+                <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+              </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item command="csv" id="statistic-search-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
@@ -48,16 +54,18 @@
             </el-dropdown>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canReadWriteData">
-            <el-button link @click="handleSearch" :disabled="getListLoading || searchFormData.path.length === 0 || !canReadWriteData" id="statistic-search-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+            <el-button link @click="handleSearch" :disabled="getListLoading || searchFormData.path.length === 0 || !canReadWriteData" id="statistic-search-refresh">
+              <i-custom-refresh style="width: 24px; height: 24px" />
+            </el-button>
           </auth-tooltip>
         </div>
       </div>
 
-      <auth-container :is-auth="canReadWriteData" style="height: 100%;">
+      <auth-container :is-auth="canReadWriteData" style="height: 100%">
         <el-table
           :data="tableData"
           v-loading="getListLoading"
-          style="width: 100%;"
+          style="width: 100%"
           :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
           :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
           tooltip-effect="light"
@@ -73,7 +81,7 @@
           <el-table-column :label="t('common.total')" prop="sumValue" min-width="160" align="center" show-overflow-tooltip />
           <template #empty>
             <div class="table-empty-wrapper">
-              <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+              <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
               <span class="data-empty-text">{{ t('common.noData') }}</span>
             </div>
           </template>
@@ -101,17 +109,13 @@ import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import { storeToRefs } from 'pinia';
 import { SearchApi } from '@/api';
 import { useTableHeight } from '@/composition-api';
-import {
-  getStartAndEnd, today, getOneInterval, getOneIntervalNow, formatDate,
-} from '@/utils/date';
+import { getStartAndEnd, today, getOneInterval, getOneIntervalNow, formatDate } from '@/utils/date';
 import { useUserStore } from '@/stores';
 import ICustomCalender from '~icons/custom/calender.svg';
 
 const { t } = useI18n();
 const userStore = useUserStore();
-const {
-  canReadWriteData,
-} = storeToRefs(userStore);
+const { canReadWriteData } = storeToRefs(userStore);
 const { maxTableHeight } = useTableHeight(280);
 
 const searchFormRef = ref<FormInstance>();
@@ -150,10 +154,7 @@ const avgSumList = ref<Search.StatisticSearchAvgSumObj[]>([]);
 const tableErrorMessage = ref<string[]>([]);
 const totalCount = computed(() => copySearchFormData.path.length);
 
-const searchPaginationPath = computed(() => copySearchFormData.path.slice(
-  ((pagination.pageNum || 1) - 1) * pagination.pageSize,
-  (pagination.pageNum || 1) * pagination.pageSize,
-) as string[]);
+const searchPaginationPath = computed(() => copySearchFormData.path.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as string[]);
 
 const { requestFn: getMinMax } = useRequest(SearchApi.getStatisticSearchMinMax);
 const { requestFn: getAvgSum } = useRequest(SearchApi.getStatisticSearchAvgSum);
@@ -194,10 +195,7 @@ function getListData() {
   avgSumList.value = [];
   tableErrorMessage.value = [];
   getListLoading.value = true;
-  Promise.allSettled([
-    getMinMaxData(),
-    getAvgSumData(),
-  ]).then(() => {
+  Promise.allSettled([getMinMaxData(), getAvgSumData()]).then(() => {
     tableData.value = minMaxList.value.map((item, index) => ({
       measurement: item.measurement,
       minValue: item.minValue || '-',
@@ -286,7 +284,6 @@ function handleCommandDown(val: string) {
 onMounted(() => {
   handleReset();
 });
-
 </script>
 
 <style lang="scss" scoped>
@@ -330,10 +327,10 @@ onMounted(() => {
     margin-bottom: 16px;
   }
 
-  .export-btn{
+  .export-btn {
     position: relative;
 
-    svg{
+    svg {
       position: absolute;
       right: 4px;
       top: 2px;

@@ -1,13 +1,5 @@
 <template>
-  <el-dialog
-    :title="t('search.batchImportData')"
-    v-model="dialogVisible"
-    width="748px"
-    class="new-storage-container"
-    align-center
-    :close-on-click-modal="false"
-    id="data-search-modal-import"
-  >
+  <el-dialog :title="t('search.batchImportData')" v-model="dialogVisible" width="748px" class="new-storage-container" align-center :close-on-click-modal="false" id="data-search-modal-import">
     <div class="import-box">
       <el-steps :active="activeStep" align-center finish-status="success" class="import-step-box" id="data-search-import-steps">
         <el-step :title="t('common.chooseFile')">
@@ -18,7 +10,7 @@
       </el-steps>
 
       <div class="select-file-box" v-if="activeStep === 0">
-        <div class="select-item-box" style="align-items: center;">
+        <div class="select-item-box" style="align-items: center">
           <span class="select-item-label">{{ t('common.downloadTemplate') }}：</span>
           <a href="/api/file/importDataTemplate" class="template-button" target="_blank">data _template.csv</a>
         </div>
@@ -44,11 +36,11 @@
             <el-icon size="80" v-else><i-custom-file-info /></el-icon>
             <div class="file-info-box" v-if="uploadFileInfo">{{ uploadFileInfo.name }}</div>
             <div class="el-upload__text">
-              {{ t('measurement.importMeasurementTip') }} <em>{{!uploadFileInfo ? t('common.clickUpload') : t('common.clickReupload') }}</em>
+              {{ t('measurement.importMeasurementTip') }}
+              <em>{{ !uploadFileInfo ? t('common.clickUpload') : t('common.clickReupload') }}</em>
             </div>
             <template #tip>
-              <div class="el-upload__tip">
-              </div>
+              <div class="el-upload__tip"></div>
             </template>
           </el-upload>
         </div>
@@ -62,32 +54,36 @@
       <div class="select-result-box" v-if="activeStep === 2">
         <div class="success-box" v-if="uploadStatus === 'success'">
           <el-icon size="44"><i-custom-success-green /></el-icon>
-          <span class="success-tip">{{t('common.importSuccessTip', { total: uploadResult.successNum })}}</span>
+          <span class="success-tip">{{ t('common.importSuccessTip', { total: uploadResult.successNum }) }}</span>
         </div>
 
         <div class="error-box" v-if="uploadStatus === 'error'">
           <el-icon size="44"><i-custom-error /></el-icon>
-          <span class="error-tip" style="color: #D43030;">{{uploadResult.errMsg}}</span>
-          <a v-if="uploadResult.filePath" :href="`/api/file/downloadErrorInfo?fileName=${uploadResult.filePath}`" class="error-link" target="_self" rel="noopener noreferrer">{{ t('common.detail') }}</a>
+          <span class="error-tip" style="color: #d43030">{{ uploadResult.errMsg }}</span>
+          <a v-if="uploadResult.filePath" :href="`/api/file/downloadErrorInfo?fileName=${uploadResult.filePath}`" class="error-link" target="_self" rel="noopener noreferrer">
+            {{ t('common.detail') }}
+          </a>
         </div>
 
         <div class="partial-box" v-if="uploadStatus === 'partial'">
           <el-icon size="44"><i-custom-message-warning /></el-icon>
           <span class="error-tip">{{ t('common.importResultTip', { successNum: uploadResult.successNum, errorNum: uploadResult.failNum }) }}</span>
-          <a v-if="uploadResult.filePath" :href="`/api/file/downloadErrorInfo?fileName=${uploadResult.filePath}`" class="error-link" target="_self" rel="noopener noreferrer">{{ t('common.detail') }}</a>
+          <a v-if="uploadResult.filePath" :href="`/api/file/downloadErrorInfo?fileName=${uploadResult.filePath}`" class="error-link" target="_self" rel="noopener noreferrer">
+            {{ t('common.detail') }}
+          </a>
         </div>
       </div>
 
       <p class="error-info-tip" v-if="activeStep === 2 && (uploadStatus === 'error' || uploadStatus === 'partial')">{{ t('common.importTip') }}</p>
     </div>
 
-    <div class="m-t-12" style="text-align: right;" v-if="activeStep === 0">
+    <div class="m-t-12" style="text-align: right" v-if="activeStep === 0">
       <el-button plain :disabled="!uploadFileInfo" @click="handleNext" id="data-search-import-next">{{ t('common.next') }}</el-button>
     </div>
 
-    <div class="m-t-12" style="height: 28px;" v-if="activeStep === 1"></div>
+    <div class="m-t-12" style="height: 28px" v-if="activeStep === 1"></div>
 
-    <div class="m-t-12" style="text-align: center;" v-if="activeStep === 2">
+    <div class="m-t-12" style="text-align: center" v-if="activeStep === 2">
       <el-button type="primary" @click="handleClose" id="data-search-import-close">{{ t('common.finish') }}</el-button>
     </div>
   </el-dialog>
@@ -95,9 +91,7 @@
 
 <script lang="ts" setup>
 import { genFileId } from 'element-plus';
-import type {
-  UploadInstance, UploadProps, UploadRawFile,
-} from 'element-plus';
+import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
 import { SearchApi } from '@/api';
 
 const props = defineProps<{
@@ -162,25 +156,27 @@ const handleRemove: UploadProps['onRemove'] = () => {
 const customUpload: UploadProps['httpRequest'] = (options) => {
   const formData = new FormData();
   formData.append('file', options.file);
-  return importQueryData(formData, isCSV.value ? 'csv' : 'xlsx').then(((res) => {
-    if (res.code === 0) {
-      uploadResult.successNum = res.data.successNum;
-      uploadResult.failNum = res.data.failNum;
-      uploadResult.filePath = res.data.filePath;
-      uploadResult.errMsg = res.data.errMsg;
-      const { status } = res.data;
-      if (!status || (!res.data.successNum && res.data.failNum > 0)) {
-        uploadStatus.value = 'error';
-      } else if (res.data.failNum > 0) {
-        uploadStatus.value = 'partial';
-      } else {
-        uploadStatus.value = 'success';
+  return importQueryData(formData, isCSV.value ? 'csv' : 'xlsx')
+    .then((res) => {
+      if (res.code === 0) {
+        uploadResult.successNum = res.data.successNum;
+        uploadResult.failNum = res.data.failNum;
+        uploadResult.filePath = res.data.filePath;
+        uploadResult.errMsg = res.data.errMsg;
+        const { status } = res.data;
+        if (!status || (!res.data.successNum && res.data.failNum > 0)) {
+          uploadStatus.value = 'error';
+        } else if (res.data.failNum > 0) {
+          uploadStatus.value = 'partial';
+        } else {
+          uploadStatus.value = 'success';
+        }
       }
-    }
-    return res.data;
-  })).finally(() => {
-    activeStep.value = 2;
-  });
+      return res.data;
+    })
+    .finally(() => {
+      activeStep.value = 2;
+    });
 };
 
 function handleNext() {
@@ -207,65 +203,63 @@ watch(
       uploadFileInfo.value = undefined;
       uploadStatus.value = '';
     }
-  },
+  }
 );
-
 </script>
 
 <style scoped lang="scss">
-
-.new-storage-container{
+.new-storage-container {
   position: relative;
 
-  .import-box{
-    background-color: #F7F8FC;
+  .import-box {
+    background-color: #f7f8fc;
     padding: 24px 16px;
     height: 332px;
     box-sizing: border-box;
 
-    .file-info-box{
+    .file-info-box {
       font-size: 12px;
       font-weight: 400;
       line-height: 18px;
-      color: #495AD4;
+      color: #495ad4;
       margin-bottom: 20px;
       text-align: center;
     }
   }
 }
 
-.import-step-box{
+.import-step-box {
   margin: 0 50px 18px;
 }
 
-.select-item-box{
+.select-item-box {
   display: flex;
   margin: 20px 0;
 
-  .select-item-label{
+  .select-item-label {
     font-size: 14px;
     font-weight: 400;
     line-height: 21px;
     color: #424561;
   }
 
-  .template-button{
-    color: #495AD4;
+  .template-button {
+    color: #495ad4;
     text-decoration: underline;
   }
 
-  .import-upload{
+  .import-upload {
     flex: 1;
 
     :deep(.el-upload-dragger) {
       height: 180px;
       padding-top: 32px;
 
-      .el-upload__text{
+      .el-upload__text {
         font-size: 12px;
         font-weight: 400;
         line-height: 18px;
-        color: #656A85;
+        color: #656a85;
       }
     }
 
@@ -273,26 +267,26 @@ watch(
       font-size: 12px;
       font-weight: 400;
       line-height: 18px;
-      color: #656A85;
+      color: #656a85;
       margin-top: 4px;
     }
   }
 }
 
-.error-info-tip{
+.error-info-tip {
   font-size: 12px;
   font-weight: 400;
   line-height: 18px;
-  color: #D43030;
+  color: #d43030;
   margin: 4px 74px 0;
 }
 
-.select-result-box{
+.select-result-box {
   width: 536px;
   height: 180px;
   border-radius: 2px;
-  background: #FFF;
-  border: 1px dashed #DFE1ED;
+  background: #fff;
+  border: 1px dashed #dfe1ed;
   margin: 58px auto 0;
   display: flex;
   flex-direction: column;
@@ -301,26 +295,28 @@ watch(
   font-size: 12px;
   font-weight: 400;
   line-height: 18px;
-  color: #656A85;
+  color: #656a85;
 }
 
-.success-box, .error-box, .partial-box{
+.success-box,
+.error-box,
+.partial-box {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.success-tip{
+.success-tip {
   margin: 18px 0 0;
 }
 
-.error-tip{
+.error-tip {
   margin: 18px 0 28px;
 }
 
-.error-link{
-  color: #495AD4;
+.error-link {
+  color: #495ad4;
   text-decoration: underline;
 }
 </style>

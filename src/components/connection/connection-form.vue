@@ -5,9 +5,9 @@
     </div>
     <el-scrollbar v-loading="detailLoading">
       <el-form ref="formRef" :model="formData" label-position="left" label-width="140px" :key="formKey">
-        <label><input type="password" autocomplete="new-password" hidden></label>
+        <label><input type="password" autocomplete="new-password" hidden /></label>
         <base-form-item :label="`${t('connection.type')}：`" prop="type" :rules="requiredRules" class="base-form-box">
-          <el-radio-group v-model="formData.type" @change="val => handleChangeType(val as 0 | 1 | 2)" :disabled="editType !== 'add' || !isShowSave" id="connection-modal-type">
+          <el-radio-group v-model="formData.type" @change="(val) => handleChangeType(val as 0 | 1 | 2)" :disabled="editType !== 'add' || !isShowSave" id="connection-modal-type">
             <el-radio :label="0" id="connection-modal-type-0">{{ t('common.standAlone') }}</el-radio>
             <el-radio :label="1" id="connection-modal-type-1">{{ t('common.cluster') }}</el-radio>
             <el-radio :label="2" id="connection-modal-type-2">{{ t('common.doubleAlive') }}</el-radio>
@@ -19,94 +19,56 @@
         <!-- 单机版 -->
         <template v-if="formData.type === 0">
           <div class="ip-port-box base-form-box">
-            <span class="form-label">{{ t('connection.info') }}：<el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
-            <host-port
-              v-model="formData.masterCluster.hostAndPortVOS"
-              :form-key="'masterCluster.hostAndPortVOS'"
-              :is-disabled="isShowSave"
-            />
+            <span class="form-label">
+              {{ t('connection.info') }}：
+              <el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+            </span>
+            <host-port v-model="formData.masterCluster.hostAndPortVOS" :form-key="'masterCluster.hostAndPortVOS'" :is-disabled="isShowSave" />
           </div>
-          <prometheus
-            v-model="formData.masterCluster.prometheusUrl"
-            :form-key="'masterCluster.prometheusUrl'"
-            :class-name="'optional-form-item base-form-box'"
-          />
-          <user-pwd
-            v-model:username.local="formData.username"
-            v-model:password.local="formData.password"
-            v-model:errorPwd.local="errorPwd"
-            :is-disabled="isShowSave"
-          />
+          <prometheus v-model="formData.masterCluster.prometheusUrl" :form-key="'masterCluster.prometheusUrl'" :class-name="'optional-form-item base-form-box'" />
+          <user-pwd v-model:username.local="formData.username" v-model:password.local="formData.password" v-model:errorPwd.local="errorPwd" :is-disabled="isShowSave" />
         </template>
         <!-- 集群版 -->
         <template v-if="formData.type === 1">
           <div class="ip-port-box base-form-box">
-            <span class="form-label">{{ t('connection.info') }}：<el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
-            <host-port
-              v-model="formData.masterCluster.hostAndPortVOS"
-              :form-key="'masterCluster.hostAndPortVOS'"
-              :is-disabled="isShowSave"
-              :show-operate="true"
-            />
+            <span class="form-label">
+              {{ t('connection.info') }}：
+              <el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+            </span>
+            <host-port v-model="formData.masterCluster.hostAndPortVOS" :form-key="'masterCluster.hostAndPortVOS'" :is-disabled="isShowSave" :show-operate="true" />
           </div>
-          <prometheus
-            v-model="formData.masterCluster.prometheusUrl"
-            :form-key="'masterCluster.prometheusUrl'"
-            :class-name="'optional-form-item base-form-box'"
-          />
-          <user-pwd
-            v-model:username.local="formData.username"
-            v-model:password.local="formData.password"
-            v-model:errorPwd.local="errorPwd"
-            :is-disabled="isShowSave"
-          />
+          <prometheus v-model="formData.masterCluster.prometheusUrl" :form-key="'masterCluster.prometheusUrl'" :class-name="'optional-form-item base-form-box'" />
+          <user-pwd v-model:username.local="formData.username" v-model:password.local="formData.password" v-model:errorPwd.local="errorPwd" :is-disabled="isShowSave" />
         </template>
         <!-- 双活版 -->
         <template v-if="formData.type === 2">
-          <user-pwd
-            v-model:username.local="formData.username"
-            v-model:password.local="formData.password"
-            v-model:errorPwd.local="errorPwd"
-            :is-disabled="isShowSave"
-          />
+          <user-pwd v-model:username.local="formData.username" v-model:password.local="formData.password" v-model:errorPwd.local="errorPwd" :is-disabled="isShowSave" />
           <el-collapse v-model="activeNames" class="connection-cluster-box">
             <el-collapse-item :title="t('connection.masterInfo')" name="masterCluster">
               <template #title>
                 <h4 class="connection-cluster-title">{{ t('connection.masterInfo') }}</h4>
               </template>
               <div class="ip-port-box">
-                <span class="form-label">{{ t('connection.info') }}：<el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
-                <host-port
-                  v-model="formData.masterCluster.hostAndPortVOS"
-                  :form-key="'masterCluster.hostAndPortVOS'"
-                  :is-disabled="isShowSave"
-                  :show-operate="true"
-                />
+                <span class="form-label">
+                  {{ t('connection.info') }}：
+                  <el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+                </span>
+                <host-port v-model="formData.masterCluster.hostAndPortVOS" :form-key="'masterCluster.hostAndPortVOS'" :is-disabled="isShowSave" :show-operate="true" />
               </div>
-              <prometheus
-                v-model="formData.masterCluster.prometheusUrl"
-                :form-key="'masterCluster.prometheusUrl'"
-                :class-name="'optional-form-item m-b-0 p-r-28'"
-              />
+              <prometheus v-model="formData.masterCluster.prometheusUrl" :form-key="'masterCluster.prometheusUrl'" :class-name="'optional-form-item m-b-0 p-r-28'" />
             </el-collapse-item>
             <el-collapse-item :title="t('connection.slaveInfo')" name="slaveCluster" v-if="formData.slaveCluster">
               <template #title>
-                <h4 class="connection-cluster-title">{{t('connection.slaveInfo')}}</h4>
+                <h4 class="connection-cluster-title">{{ t('connection.slaveInfo') }}</h4>
               </template>
               <div class="ip-port-box">
-                <span class="form-label">{{ t('connection.info') }}：<el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
-                <host-port
-                  v-model="formData.slaveCluster.hostAndPortVOS"
-                  :form-key="'slaveCluster.hostAndPortVOS'"
-                  :is-disabled="isShowSave"
-                  :show-operate="true"
-                />
+                <span class="form-label">
+                  {{ t('connection.info') }}：
+                  <el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+                </span>
+                <host-port v-model="formData.slaveCluster.hostAndPortVOS" :form-key="'slaveCluster.hostAndPortVOS'" :is-disabled="isShowSave" :show-operate="true" />
               </div>
-              <prometheus
-                v-model="formData.slaveCluster.prometheusUrl"
-                :form-key="'slaveCluster.prometheusUrl'"
-                :class-name="'optional-form-item m-b-0 p-r-28'"
-              />
+              <prometheus v-model="formData.slaveCluster.prometheusUrl" :form-key="'slaveCluster.prometheusUrl'" :class-name="'optional-form-item m-b-0 p-r-28'" />
             </el-collapse-item>
           </el-collapse>
         </template>
@@ -117,7 +79,9 @@
       <div>
         <el-button plain v-if="isShowSave" @click="handleReset" id="connection-modal-reset">{{ t('common.reset') }}</el-button>
         <el-button type="primary" :disabled="!isCanSave" :loading="saveLoading" @click="handleSave" id="connection-modal-save">{{ t('common.save') }}</el-button>
-        <el-button type="primary" v-if="isToggle && current !== connectionStore.connectionInfo.data.id" :loading="connectLoading" id="connection-modal-login" @click="handleTestLogin">{{ t('connection.connection') }}</el-button>
+        <el-button type="primary" v-if="isToggle && current !== connectionStore.connectionInfo.data.id" :loading="connectLoading" id="connection-modal-login" @click="handleTestLogin">
+          {{ t('connection.connection') }}
+        </el-button>
       </div>
     </div>
   </el-main>
@@ -168,15 +132,11 @@ const formData = reactive<Connection.ConnectionDetail>({
   username: '',
   password: '',
   masterCluster: {
-    hostAndPortVOS: [
-      { host: '', port: '' },
-    ],
+    hostAndPortVOS: [{ host: '', port: '' }],
     prometheusUrl: '',
   },
   slaveCluster: {
-    hostAndPortVOS: [
-      { host: '', port: '' },
-    ],
+    hostAndPortVOS: [{ host: '', port: '' }],
     prometheusUrl: '',
   },
 });
@@ -213,17 +173,16 @@ function handleChangeType(type: 0 | 1 | 2) {
   formData.username = '';
   formData.password = '';
   formData.masterCluster = {
-    hostAndPortVOS: [
-      { host: '', port: '' },
-    ],
+    hostAndPortVOS: [{ host: '', port: '' }],
     prometheusUrl: '',
   };
-  formData.slaveCluster = type === 0 ? null : {
-    hostAndPortVOS: [
-      { host: '', port: '' },
-    ],
-    prometheusUrl: '',
-  };
+  formData.slaveCluster =
+    type === 0
+      ? null
+      : {
+          hostAndPortVOS: [{ host: '', port: '' }],
+          prometheusUrl: '',
+        };
 }
 
 function handleChangeConnection() {
@@ -238,7 +197,9 @@ function handleChangeConnection() {
       icon: ICustomMessageWarning,
       closeOnClickModal: false,
       closeOnPressEscape: false,
-    }).then(() => resolve(false)).catch(() => resolve(true));
+    })
+      .then(() => resolve(false))
+      .catch(() => resolve(true));
   });
 }
 
@@ -254,13 +215,15 @@ function getDetail(id: number) {
   errorPwd.value = '';
   detailLoading.value = true;
   // handleChangeType(0);
-  getConnectionDetail(id).then((res) => {
-    assign(formData, res.data);
-    formData.password = '';
-    sourceData = cloneDeep(formData);
-  }).finally(() => {
-    detailLoading.value = false;
-  });
+  getConnectionDetail(id)
+    .then((res) => {
+      assign(formData, res.data);
+      formData.password = '';
+      sourceData = cloneDeep(formData);
+    })
+    .finally(() => {
+      detailLoading.value = false;
+    });
 }
 
 function handleReset() {
@@ -283,26 +246,28 @@ function handleReset() {
 
 function handleTestConnnection() {
   testLoading.value = true;
-  testConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id }).then(() => {
-    let successMsg = t('connection.iotdbSuccess');
-    if (formData.type === 2) {
-      if (formData.masterCluster.prometheusUrl && formData.slaveCluster?.prometheusUrl) {
-        successMsg = t('connection.allSuccess');
+  testConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id })
+    .then(() => {
+      let successMsg = t('connection.iotdbSuccess');
+      if (formData.type === 2) {
+        if (formData.masterCluster.prometheusUrl && formData.slaveCluster?.prometheusUrl) {
+          successMsg = t('connection.allSuccess');
+        } else if (formData.masterCluster.prometheusUrl) {
+          successMsg = t('connection.masterSuccess');
+        } else if (formData.slaveCluster?.prometheusUrl) {
+          successMsg = t('connection.slaveSuccess');
+        }
       } else if (formData.masterCluster.prometheusUrl) {
-        successMsg = t('connection.masterSuccess');
-      } else if (formData.slaveCluster?.prometheusUrl) {
-        successMsg = t('connection.slaveSuccess');
+        successMsg = t('connection.singleSuccess');
       }
-    } else if (formData.masterCluster.prometheusUrl) {
-      successMsg = t('connection.singleSuccess');
-    }
-    ElMessage.success({
-      message: successMsg,
-      grouping: true,
+      ElMessage.success({
+        message: successMsg,
+        grouping: true,
+      });
+    })
+    .finally(() => {
+      testLoading.value = false;
     });
-  }).finally(() => {
-    testLoading.value = false;
-  });
 }
 
 function handleTestLogin() {
@@ -315,29 +280,32 @@ function handleTestLogin() {
       errorPwd.value = '';
 
       connectLoading.value = true;
-      loginByConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id }).then((res) => {
-        formData.id = res.data;
-        userStore.setUser(formData.username);
-        sessionStorage.setItem('nologin', '0');
-        connectionStore.setConnection({
-          ...formData,
-          password: '',
-        });
-        if (route.name === 'Login') {
-          router.push({ path: '/' });
-        } else {
-          window.location.reload();
-        }
-      }).finally(() => {
-        connectLoading.value = false;
-      }).catch((err) => {
-        if (editType.value === 'add') {
-          if (err.data) {
-            editType.value = 'edit';
-            emit('handleRefreshList', +err.data);
+      loginByConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id })
+        .then((res) => {
+          formData.id = res.data;
+          userStore.setUser(formData.username);
+          sessionStorage.setItem('nologin', '0');
+          connectionStore.setConnection({
+            ...formData,
+            password: '',
+          });
+          if (route.name === 'Login') {
+            router.push({ path: '/' });
+          } else {
+            window.location.reload();
           }
-        }
-      });
+        })
+        .finally(() => {
+          connectLoading.value = false;
+        })
+        .catch((err) => {
+          if (editType.value === 'add') {
+            if (err.data) {
+              editType.value = 'edit';
+              emit('handleRefreshList', +err.data);
+            }
+          }
+        });
     }
   });
 }
@@ -363,14 +331,16 @@ function handleTestPrometheus() {
     prometheusUrlMaster: formData.masterCluster.prometheusUrl,
     prometheusUrlSlave: formData.slaveCluster?.prometheusUrl || '',
     doubleAlive: formData.type === 2,
-  }).then(() => {
-    ElMessage.success({
-      message: successMsg,
-      grouping: true,
+  })
+    .then(() => {
+      ElMessage.success({
+        message: successMsg,
+        grouping: true,
+      });
+    })
+    .finally(() => {
+      testLoading.value = false;
     });
-  }).finally(() => {
-    testLoading.value = false;
-  });
 }
 
 function handleTest() {
@@ -394,12 +364,14 @@ function handleTest() {
 
 function handleSaveConnection() {
   saveLoading.value = true;
-  saveConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id }).then((res) => {
-    ElMessage.success(t('common.saveSuccess'));
-    emit('handleRefreshList', +res.data);
-  }).finally(() => {
-    saveLoading.value = false;
-  });
+  saveConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id })
+    .then((res) => {
+      ElMessage.success(t('common.saveSuccess'));
+      emit('handleRefreshList', +res.data);
+    })
+    .finally(() => {
+      saveLoading.value = false;
+    });
 }
 
 // 保存prometheus 直接生效
@@ -409,12 +381,14 @@ function handleSavePrometheus() {
     id: formData.id,
     prometheusUrlMaster: formData.masterCluster.prometheusUrl,
     prometheusUrlSlave: formData.slaveCluster?.prometheusUrl || '',
-  }).then(() => {
-    ElMessage.success(t('common.saveSuccess'));
-    window.location.reload();
-  }).finally(() => {
-    saveLoading.value = false;
-  });
+  })
+    .then(() => {
+      ElMessage.success(t('common.saveSuccess'));
+      window.location.reload();
+    })
+    .finally(() => {
+      saveLoading.value = false;
+    });
 }
 
 function handleSave() {
@@ -442,17 +416,20 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
 
 defineExpose({
-  getDetail, isCanSave, handleChangeType, resetOperateLoading, handleChangeConnection,
+  getDetail,
+  isCanSave,
+  handleChangeType,
+  resetOperateLoading,
+  handleChangeConnection,
 });
 </script>
 
 <style scoped lang="scss">
-
-.connection-operate-buttons{
+.connection-operate-buttons {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -460,25 +437,25 @@ defineExpose({
   flex: 0 0 28px;
 }
 
-.connection-detail-title{
+.connection-detail-title {
   font-size: 14px;
   font-weight: 700;
   line-height: 21px;
-  color: #495AD4;
+  color: #495ad4;
 }
 
-.el-scrollbar{
+.el-scrollbar {
   padding: 0 9px;
 }
 
-.base-form-box{
+.base-form-box {
   padding: 0 36px 0 7px;
 }
 
-.ip-port-box{
+.ip-port-box {
   display: flex;
 
-  .form-label{
+  .form-label {
     height: 28px !important;
     color: #424561 !important;
     font-size: 14px !important;
@@ -493,31 +470,31 @@ defineExpose({
     width: 140px;
     box-sizing: border-box;
 
-    &::before{
-      content: "*";
+    &::before {
+      content: '*';
       color: var(--el-color-danger);
       margin-right: 4px;
     }
 
-    svg{
+    svg {
       transform: translate(-60%, -80%);
     }
   }
 }
 
-.optional-form-item{
-  :deep(.el-form-item__label){
+.optional-form-item {
+  :deep(.el-form-item__label) {
     padding-left: 9px;
   }
 }
 
-.el-collapse{
+.el-collapse {
   border-top: none;
   border-bottom: none;
 }
 
-.connection-cluster-box{
-  .connection-cluster-title{
+.connection-cluster-box {
+  .connection-cluster-title {
     width: calc(100% - 40px);
     font-size: 14px;
     line-height: 21px;
@@ -530,21 +507,21 @@ defineExpose({
     border-bottom: none;
   }
 
-  .el-collapse-item{
+  .el-collapse-item {
     margin-bottom: 8px;
   }
 
   :deep(.el-collapse-item__wrap) {
     border-bottom: none;
 
-    .el-collapse-item__content{
+    .el-collapse-item__content {
       padding: 10px 8px !important;
-      background-color: #F7F8FC;
+      background-color: #f7f8fc;
     }
   }
 }
 
-.connection-form-buttons{
+.connection-form-buttons {
   display: flex;
   justify-content: space-between;
   margin-top: 24px;

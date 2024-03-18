@@ -1,19 +1,10 @@
 {
   "extends": "@tsconfig/node18/tsconfig.json",
-  "include": [
-    "vite.config.*",
-    "uno.config.*",
-    "vitest.config.*",
-    "cypress.config.*",
-    "playwright.config.*"
-  ],
+  "include": ["vite.config.*", "uno.config.*", "vitest.config.*", "cypress.config.*", "playwright.config.*"],
   "compilerOptions": {
     "composite": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "types": [
-      "node",
-      "element-plus/global"
-    ]
+    "types": ["node", "element-plus/global"]
   }
 }

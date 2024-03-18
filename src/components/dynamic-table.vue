@@ -4,7 +4,7 @@
       <div class="border_table flex-1" :style="{ maxWidth: totalColumnPage > 1 ? 'calc(100% - 70px)' : '100%' }">
         <el-table
           :data="tableData"
-          style="width: 100%;"
+          style="width: 100%"
           :height="tableHeight"
           :max-height="tableMaxHeight"
           tooltip-effect="light"
@@ -14,7 +14,18 @@
           @selection-change="handleSelectionChange"
         >
           <el-table-column fixed="left" v-if="showSelect" type="selection" width="50" align="center" />
-          <el-table-column :key="item.prop" :prop="item.prop" v-for="item of columnsByPage" min-width="180px" :width="`${item.width}px`" :align="item.align" :fixed="item.fixed" :sortable="item.sortable" :sort-orders="['ascending', 'descending']" show-overflow-tooltip>
+          <el-table-column
+            :key="item.prop"
+            :prop="item.prop"
+            v-for="item of columnsByPage"
+            min-width="180px"
+            :width="`${item.width}px`"
+            :align="item.align"
+            :fixed="item.fixed"
+            :sortable="item.sortable"
+            :sort-orders="['ascending', 'descending']"
+            show-overflow-tooltip
+          >
             <template #header>
               <span :class="item.sortable ? '' : 'flex-header'"><text-tooltip :content="item.label" /></span>
             </template>
@@ -25,18 +36,18 @@
           <slot name="append-column"></slot>
           <template #empty>
             <div class="table-empty-wrapper">
-              <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+              <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
               <span class="data-empty-text">{{ t('common.noData') }}</span>
             </div>
           </template>
         </el-table>
       </div>
-      <div style="width:60px" class="m-l-4" v-if="totalColumnPage > 1">
+      <div style="width: 60px" class="m-l-4" v-if="totalColumnPage > 1">
         <el-button size="small" @click="columnPageNum--" :disabled="columnPageNum < 2" circle><i-ep-arrow-left-bold /></el-button>
         <el-button class="m-l-4" @click="columnPageNum++" :disabled="columnPageNum >= totalColumnPage" size="small" circle><i-ep-arrow-right-bold /></el-button>
       </div>
     </div>
-    <div class="paination" v-if="(showPagination && total && total > 0)">
+    <div class="paination" v-if="showPagination && total && total > 0">
       <div></div>
       <el-pagination
         v-if="showPagination"
@@ -58,23 +69,23 @@
 import type { Sort } from 'element-plus';
 
 const props = defineProps<{
-  columns: Array<DynamicTableColumn>,
-  tableData: Array<Record<string, any>>,
-  defaultSort?: Sort,
-  maxHeight: number,
-  height?: number,
-  showPagination?: boolean,
-  currentPage?: number,
-  pageSize?: number,
-  total?: number,
-  batchDeleting?: boolean,
-  showSelect?: boolean,
+  columns: Array<DynamicTableColumn>;
+  tableData: Array<Record<string, any>>;
+  defaultSort?: Sort;
+  maxHeight: number;
+  height?: number;
+  showPagination?: boolean;
+  currentPage?: number;
+  pageSize?: number;
+  total?: number;
+  batchDeleting?: boolean;
+  showSelect?: boolean;
 }>();
 const emit = defineEmits<{
   (event: 'batchDelete'): Promise<void>;
   (event: 'loadData'): Promise<void>;
   (event: 'selectedChange', payload: Record<string, any>[]): Promise<void>;
-  (event: 'handleSortChange', data: { column: any, prop: string, order: any }): void;
+  (event: 'handleSortChange', data: { column: any; prop: string; order: any }): void;
   (event: 'update:currentPage', payload: number): void;
   (event: 'update:pageSize', payload: number): void;
 }>();
@@ -122,7 +133,7 @@ function handleSelectionChange(val: Record<string, any>[]) {
   emit('selectedChange', val);
 }
 
-function handleSortChange(data: { column: any, prop: string, order: any }) {
+function handleSortChange(data: { column: any; prop: string; order: any }) {
   emit('handleSortChange', data);
 }
 
@@ -145,7 +156,7 @@ function handleSizeChange() {
   }
 }
 
-.flex-header{
+.flex-header {
   display: flex;
   max-width: 100%;
 }
@@ -187,7 +198,7 @@ function handleSizeChange() {
 }
 
 .spanbox::before {
-  content: "*";
+  content: '*';
   color: #f56c6c;
   margin-right: 4px;
 }
@@ -222,7 +233,7 @@ function handleSizeChange() {
   }
 }
 
-.table-empty-wrapper{
+.table-empty-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -230,13 +241,13 @@ function handleSizeChange() {
   width: 100%;
   padding: 16px 0;
 
-  .data-empty-img{
+  .data-empty-img {
     width: 150px;
     height: 150px;
     margin-bottom: 16px;
   }
 
-  .data-empty-text{
+  .data-empty-text {
     font-size: 14px;
     color: #131926;
     line-height: 21px;

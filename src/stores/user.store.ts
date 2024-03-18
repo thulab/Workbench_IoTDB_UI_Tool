@@ -8,206 +8,216 @@ import { useConnectionStore } from './connection.store';
 const { requestFn: getLoginUserPrivileges } = useRequest(UserApi.getLoginUserPrivileges);
 const { requestFn: getPrivilegesEnum } = useRequest(UserApi.getPrivilegesEnum);
 
-export const useUserStore = defineStore('UserStore', () => {
-  const connectionStore = useConnectionStore();
-  const router = useRouter();
+export const useUserStore = defineStore(
+  'UserStore',
+  () => {
+    const connectionStore = useConnectionStore();
+    const router = useRouter();
 
-  const userInfo = ref({
-    name: '',
-  } as {
-    name: string;
-  });
-
-  const allPrivileges = ref<Auth.UserPrivileges>();
-  const privilegesEnum = ref<Auth.PrivilegesEnum>();
-
-  // 权限配置
-  // 全局
-  const entityPrivilegesEnumGroup = computed(() => privilegesEnum.value?.entityPrivileges || []);
-  const entityPrivilegesEnumList = computed(() => entityPrivilegesEnumGroup.value.flatMap((item) => item.children));
-  const entityPrivilegesEnumKeys = computed(() => entityPrivilegesEnumList.value.map((item) => item.privileges));
-
-  // 路径
-  const pathPrivilegesEnumGroup = computed(() => privilegesEnum.value?.pathPrivileges || []);
-  const pathPrivilegesEnumList = computed(() => pathPrivilegesEnumGroup.value.flatMap((item) => item.children));
-  const pathPrivilegesEnumKeys = computed(() => pathPrivilegesEnumList.value.map((item) => item.privileges));
-
-  // 当前登录用户权限
-  // 全局
-  const entityPrivilegesVals = computed(() => allPrivileges.value?.entityPrivileges || []);
-  // 路径
-  const pathPrivilegesVals = computed(() => allPrivileges.value?.pathPrivileges || []);
-  // 角色
-  const rolesToPrivilegesVals = computed(() => allPrivileges.value?.rolesToPrivileges || []);
-  // 是否开启监控
-  const enablePrometheus = computed(() => allPrivileges.value?.enablePrometheus);
-  // 是否配置监控
-  const configurePrometheus = computed(() => allPrivileges.value?.configurePrometheus);
-
-  // 用户+角色 全局权限
-  const userAllEntityPrivileges = computed(() => {
-    const roleEntityPrivileges: string[] = (allPrivileges.value?.rolesToPrivileges || []).flatMap((item) => item.entityPrivileges);
-    const result = union(allPrivileges.value?.entityPrivileges, roleEntityPrivileges);
-    return result;
-  });
-
-  /**
- * 角色路径权限，合并到一起。独立计算属性（计算属性有缓存，角色不变，这里就不变）
- */
-  const rolePathPrivileges = computed(() => {
-    const result: Array<{ path: string, privileges: string[] }> = [];
-    allPrivileges.value?.rolesToPrivileges?.forEach((role) => {
-      role.pathPrivileges.forEach((item) => {
-        const pathData = result.find((pathItem) => pathItem.path === item.path);
-        if (!pathData) {
-          result.push({
-            path: item.path,
-            privileges: item.privileges,
-          });
-        } else {
-          pathData.privileges = union(pathData.privileges, item.privileges);
-        }
-      });
-    });
-    return result;
-  });
-
-  // 用户+角色 路径权限
-  const userAllPathPrivileges = computed(() => {
-    const rolePaths = rolePathPrivileges.value.map((item) => item.path);
-    const userPrivileges = allPrivileges.value?.pathPrivileges || [];
-    difference(rolePaths, userPrivileges.map((item) => item.path)).forEach((path) => {
-      userPrivileges.push({ path, privileges: [] });
+    const userInfo = ref({
+      name: '',
+    } as {
+      name: string;
     });
 
-    const result: Array<{ path: string, privileges: string[] }> = userPrivileges.map((item) => ({
-      path: item.path,
-      privileges: item.privileges,
-    }));
+    const allPrivileges = ref<Auth.UserPrivileges>();
+    const privilegesEnum = ref<Auth.PrivilegesEnum>();
 
-    rolePathPrivileges.value?.forEach((item) => {
-      const pathData = result.find((pathItem) => pathItem.path === item.path);
-      if (pathData) {
-        pathData.privileges = union(pathData.privileges || [], item.privileges);
-      }
+    // 权限配置
+    // 全局
+    const entityPrivilegesEnumGroup = computed(() => privilegesEnum.value?.entityPrivileges || []);
+    const entityPrivilegesEnumList = computed(() => entityPrivilegesEnumGroup.value.flatMap((item) => item.children));
+    const entityPrivilegesEnumKeys = computed(() => entityPrivilegesEnumList.value.map((item) => item.privileges));
+
+    // 路径
+    const pathPrivilegesEnumGroup = computed(() => privilegesEnum.value?.pathPrivileges || []);
+    const pathPrivilegesEnumList = computed(() => pathPrivilegesEnumGroup.value.flatMap((item) => item.children));
+    const pathPrivilegesEnumKeys = computed(() => pathPrivilegesEnumList.value.map((item) => item.privileges));
+
+    // 当前登录用户权限
+    // 全局
+    const entityPrivilegesVals = computed(() => allPrivileges.value?.entityPrivileges || []);
+    // 路径
+    const pathPrivilegesVals = computed(() => allPrivileges.value?.pathPrivileges || []);
+    // 角色
+    const rolesToPrivilegesVals = computed(() => allPrivileges.value?.rolesToPrivileges || []);
+    // 是否开启监控
+    const enablePrometheus = computed(() => allPrivileges.value?.enablePrometheus);
+    // 是否配置监控
+    const configurePrometheus = computed(() => allPrivileges.value?.configurePrometheus);
+
+    // 用户+角色 全局权限
+    const userAllEntityPrivileges = computed(() => {
+      const roleEntityPrivileges: string[] = (allPrivileges.value?.rolesToPrivileges || []).flatMap((item) => item.entityPrivileges);
+      const result = union(allPrivileges.value?.entityPrivileges, roleEntityPrivileges);
+      return result;
     });
-    return result;
-  });
 
-  // 用户+角色 所有权限
-  const userAllPrivileges = computed(() => {
-    const allPathPrivileges: string[] = (userAllPathPrivileges.value || []).flatMap((item) => item.privileges);
-    const result = union(userAllEntityPrivileges.value, allPathPrivileges);
-    return result;
-  });
-
-  const canManageDatabase = computed(() => userAllEntityPrivileges.value.includes('MANAGE_DATABASE'));
-  const canWriteSchema = computed(() => userAllEntityPrivileges.value.includes('WRITE_SCHEMA'));
-  const canReadWriteSchema = computed(() => userAllPrivileges.value.includes('READ_SCHEMA')
-          || userAllPrivileges.value.includes('WRITE_SCHEMA'));
-  const canReadWriteData = computed(() => userAllPrivileges.value.includes('READ_DATA')
-          || userAllPrivileges.value.includes('WRITE_DATA'));
-  const canReadWriteSchemaData = computed(() => userAllPrivileges.value.includes('READ_SCHEMA')
-          || userAllPrivileges.value.includes('WRITE_SCHEMA')
-          || userAllPrivileges.value.includes('READ_DATA')
-          || userAllPrivileges.value.includes('WRITE_DATA'));
-  const canUsePipe = computed(() => userAllEntityPrivileges.value.includes('USE_PIPE'));
-  const canManageUser = computed(() => userAllEntityPrivileges.value.includes('MANAGE_USER'));
-  const canManageRole = computed(() => userAllEntityPrivileges.value.includes('MANAGE_ROLE'));
-  const canAlterPwd = computed(() => userAllEntityPrivileges.value.includes('MANAGE_USER'));
-
-  function clearUserStore() {
-    userInfo.value.name = '';
-    allPrivileges.value = undefined;
-    privilegesEnum.value = undefined;
-  }
-
-  function loadPrivilegesEnum(forceReload?: boolean) {
-    if (!userInfo.value.name) return;
-    if (forceReload || !entityPrivilegesEnumGroup.value.length) {
-      getPrivilegesEnum().then((res) => {
-        privilegesEnum.value = res.data;
-      });
-    }
-  }
-
-  // 加载用户权限
-  function loadPrivileges(forceReload?: boolean) {
-    if (!forceReload && !userInfo.value.name) return;
-    if (forceReload) {
-      getLoginUserPrivileges().then((res) => {
-        userInfo.value.name = res.data.userName;
-        allPrivileges.value = res.data;
-        sessionStorage.setItem('iotdbVersion', res.data.version);
-        connectionStore.connectionInfo.currentVersion = res.data.version;
-        connectionStore.setConnection(res.data.connection);
-        connectionStore.setConnectionMasterType(res.data.isMaster);
-        connectionStore.setConnectionActive(res.data.isActive);
-        connectionStore.setSlaveConnectionStatus(res.data.slaveIsConnection);
-        loadPrivilegesEnum(false);
-      }).catch((err) => {
-        console.log(err, 'err');
-        clearUserStore();
-        sessionStorage.setItem('UserStore', '');
-        sessionStorage.setItem('nologin', '1');
-        router.push({
-          path: '/login',
-          query: {
-            timestamp: new Date().getTime(),
-          },
+    /**
+     * 角色路径权限，合并到一起。独立计算属性（计算属性有缓存，角色不变，这里就不变）
+     */
+    const rolePathPrivileges = computed(() => {
+      const result: Array<{ path: string; privileges: string[] }> = [];
+      allPrivileges.value?.rolesToPrivileges?.forEach((role) => {
+        role.pathPrivileges.forEach((item) => {
+          const pathData = result.find((pathItem) => pathItem.path === item.path);
+          if (!pathData) {
+            result.push({
+              path: item.path,
+              privileges: item.privileges,
+            });
+          } else {
+            pathData.privileges = union(pathData.privileges, item.privileges);
+          }
         });
       });
-    }
-  }
+      return result;
+    });
 
-  loadPrivileges(false);
-  function setUser(name: string) {
-    userInfo.value.name = name;
-    if (name) {
-      loadPrivileges(true);
-      loadPrivilegesEnum(true);
-    }
-  }
+    // 用户+角色 路径权限
+    const userAllPathPrivileges = computed(() => {
+      const rolePaths = rolePathPrivileges.value.map((item) => item.path);
+      const userPrivileges = allPrivileges.value?.pathPrivileges || [];
+      difference(
+        rolePaths,
+        userPrivileges.map((item) => item.path)
+      ).forEach((path) => {
+        userPrivileges.push({ path, privileges: [] });
+      });
 
-  return {
-    userInfo,
-    enablePrometheus,
-    configurePrometheus,
-    loadPrivileges,
-    loadPrivilegesEnum,
-    privilegesEnum,
-    entityPrivilegesEnumGroup,
-    entityPrivilegesEnumList,
-    entityPrivilegesEnumKeys,
-    pathPrivilegesEnumGroup,
-    pathPrivilegesEnumList,
-    pathPrivilegesEnumKeys,
-    entityPrivilegesVals,
-    pathPrivilegesVals,
-    rolesToPrivilegesVals,
-    userAllEntityPrivileges,
-    userAllPathPrivileges,
-    userAllPrivileges,
-    canManageDatabase,
-    canWriteSchema,
-    canReadWriteSchema,
-    canReadWriteData,
-    canReadWriteSchemaData,
-    canUsePipe,
-    canManageUser,
-    canManageRole,
-    canAlterPwd,
-    setUser,
-    clearUserStore,
-  };
-}, {
-  persist: {
-    storage: sessionStorage,
-    paths: ['privilegesEnum', 'userInfo'],
-    afterRestore: (context) => {
-      context.store.loadPrivilegesEnum();
-    },
+      const result: Array<{ path: string; privileges: string[] }> = userPrivileges.map((item) => ({
+        path: item.path,
+        privileges: item.privileges,
+      }));
+
+      rolePathPrivileges.value?.forEach((item) => {
+        const pathData = result.find((pathItem) => pathItem.path === item.path);
+        if (pathData) {
+          pathData.privileges = union(pathData.privileges || [], item.privileges);
+        }
+      });
+      return result;
+    });
+
+    // 用户+角色 所有权限
+    const userAllPrivileges = computed(() => {
+      const allPathPrivileges: string[] = (userAllPathPrivileges.value || []).flatMap((item) => item.privileges);
+      const result = union(userAllEntityPrivileges.value, allPathPrivileges);
+      return result;
+    });
+
+    const canManageDatabase = computed(() => userAllEntityPrivileges.value.includes('MANAGE_DATABASE'));
+    const canWriteSchema = computed(() => userAllEntityPrivileges.value.includes('WRITE_SCHEMA'));
+    const canReadWriteSchema = computed(() => userAllPrivileges.value.includes('READ_SCHEMA') || userAllPrivileges.value.includes('WRITE_SCHEMA'));
+    const canReadWriteData = computed(() => userAllPrivileges.value.includes('READ_DATA') || userAllPrivileges.value.includes('WRITE_DATA'));
+    const canReadWriteSchemaData = computed(
+      () =>
+        userAllPrivileges.value.includes('READ_SCHEMA') ||
+        userAllPrivileges.value.includes('WRITE_SCHEMA') ||
+        userAllPrivileges.value.includes('READ_DATA') ||
+        userAllPrivileges.value.includes('WRITE_DATA')
+    );
+    const canUsePipe = computed(() => userAllEntityPrivileges.value.includes('USE_PIPE'));
+    const canManageUser = computed(() => userAllEntityPrivileges.value.includes('MANAGE_USER'));
+    const canManageRole = computed(() => userAllEntityPrivileges.value.includes('MANAGE_ROLE'));
+    const canAlterPwd = computed(() => userAllEntityPrivileges.value.includes('MANAGE_USER'));
+
+    function clearUserStore() {
+      userInfo.value.name = '';
+      allPrivileges.value = undefined;
+      privilegesEnum.value = undefined;
+    }
+
+    function loadPrivilegesEnum(forceReload?: boolean) {
+      if (!userInfo.value.name) return;
+      if (forceReload || !entityPrivilegesEnumGroup.value.length) {
+        getPrivilegesEnum().then((res) => {
+          privilegesEnum.value = res.data;
+        });
+      }
+    }
+
+    // 加载用户权限
+    function loadPrivileges(forceReload?: boolean) {
+      if (!forceReload && !userInfo.value.name) return;
+      if (forceReload) {
+        getLoginUserPrivileges()
+          .then((res) => {
+            userInfo.value.name = res.data.userName;
+            allPrivileges.value = res.data;
+            sessionStorage.setItem('iotdbVersion', res.data.version);
+            connectionStore.connectionInfo.currentVersion = res.data.version;
+            connectionStore.setConnection(res.data.connection);
+            connectionStore.setConnectionMasterType(res.data.isMaster);
+            connectionStore.setConnectionActive(res.data.isActive);
+            connectionStore.setSlaveConnectionStatus(res.data.slaveIsConnection);
+            loadPrivilegesEnum(false);
+          })
+          .catch((err) => {
+            console.log(err, 'err');
+            clearUserStore();
+            sessionStorage.setItem('UserStore', '');
+            sessionStorage.setItem('nologin', '1');
+            router.push({
+              path: '/login',
+              query: {
+                timestamp: new Date().getTime(),
+              },
+            });
+          });
+      }
+    }
+
+    loadPrivileges(false);
+    function setUser(name: string) {
+      userInfo.value.name = name;
+      if (name) {
+        loadPrivileges(true);
+        loadPrivilegesEnum(true);
+      }
+    }
+
+    return {
+      userInfo,
+      enablePrometheus,
+      configurePrometheus,
+      loadPrivileges,
+      loadPrivilegesEnum,
+      privilegesEnum,
+      entityPrivilegesEnumGroup,
+      entityPrivilegesEnumList,
+      entityPrivilegesEnumKeys,
+      pathPrivilegesEnumGroup,
+      pathPrivilegesEnumList,
+      pathPrivilegesEnumKeys,
+      entityPrivilegesVals,
+      pathPrivilegesVals,
+      rolesToPrivilegesVals,
+      userAllEntityPrivileges,
+      userAllPathPrivileges,
+      userAllPrivileges,
+      canManageDatabase,
+      canWriteSchema,
+      canReadWriteSchema,
+      canReadWriteData,
+      canReadWriteSchemaData,
+      canUsePipe,
+      canManageUser,
+      canManageRole,
+      canAlterPwd,
+      setUser,
+      clearUserStore,
+    };
   },
-});
+  {
+    persist: {
+      storage: sessionStorage,
+      paths: ['privilegesEnum', 'userInfo'],
+      afterRestore: (context) => {
+        context.store.loadPrivilegesEnum();
+      },
+    },
+  }
+);
 
 export default useUserStore;

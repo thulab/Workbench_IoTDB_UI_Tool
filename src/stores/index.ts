@@ -9,8 +9,4 @@ pinia.use(piniaPluginPersistedstate);
 
 export default pinia;
 
-export {
-  useUserStore,
-  useEnumStore,
-  useConnectionStore,
-};
+export { useUserStore, useEnumStore, useConnectionStore };

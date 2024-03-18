@@ -1,50 +1,50 @@
 <template>
-  <el-dialog
-    :title="editType === 'add' ? t('dataSync.newTask') : t('dataSync.taskDetail')"
-    v-model="dialogVisible"
-    width="760px"
-    align-center
-    :close-on-click-modal="false"
-    id="data-sync-modal"
-  >
+  <el-dialog :title="editType === 'add' ? t('dataSync.newTask') : t('dataSync.taskDetail')" v-model="dialogVisible" width="760px" align-center :close-on-click-modal="false" id="data-sync-modal">
     <div class="form-wrapper" v-loading="loading">
       <!-- <span class="tabs-tip"><el-icon size="14" style="margin-right: 2px;"><i-custom-info-warning /></el-icon>最终提交信息为您提交时所在的页签内容</span> -->
       <!-- <el-tabs type="card" v-model="activeTab" @tab-click="handleTabClick">
         <el-tab-pane label="界面选择" name="select"> -->
-      <el-scrollbar class="p-4" style="height: 470px;">
+      <el-scrollbar class="p-4" style="height: 470px">
         <el-form ref="formRef" :model="formData" label-position="left" class="form-wrapper" :disabled="editType === 'view'">
-          <label><input type="password" autocomplete="new-password" hidden></label>
+          <label><input type="password" autocomplete="new-password" hidden /></label>
           <base-form-item :label="`${t('dataSync.taskName')}:`" prop="name" :rules="requiredNameRules" class="form-label-width" :error="errorName">
-            <el-input v-model="formData.name" :placeholder="t('dataSync.taskNameContentPlaceholder')" type="textarea" :rows="2" id="data-sync-modal-name" :resize="'none'" style="width: 360px;" maxlength="100" show-word-limit />
+            <el-input
+              v-model="formData.name"
+              :placeholder="t('dataSync.taskNameContentPlaceholder')"
+              type="textarea"
+              :rows="2"
+              id="data-sync-modal-name"
+              :resize="'none'"
+              style="width: 360px"
+              maxlength="100"
+              show-word-limit
+            />
           </base-form-item>
           <h4 class="form-module-title">{{ t('dataSync.dataExtraction') }}</h4>
           <div class="flex-align-center">
             <base-form-item prop="whole" :rules="requiredRules" class="form-label-width">
               <template #label>
-                {{ t('dataSync.syncMeasurement') }}:<el-tooltip effect="light" :content="t('dataSync.syncMeasurementPlaceholder')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                {{ t('dataSync.syncMeasurement') }}:
+                <el-tooltip effect="light" :content="t('dataSync.syncMeasurementPlaceholder')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
               </template>
               <el-radio-group v-model="formData.whole" id="data-sync-modal-aync-type">
                 <el-radio :label="true" id="data-sync-modal-aync-type-all">{{ t('dataSync.all') }}</el-radio>
-                <el-radio :label="false" class="radio-tip" id="data-sync-modal-aync-type-path">{{ t('dataSync.prefix') }}<el-tooltip
-                  effect="light"
-                  :content="t('dataSync.pathTip')"
-                  placement="top"
-                  popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip></el-radio>
+                <el-radio :label="false" class="radio-tip" id="data-sync-modal-aync-type-path">
+                  {{ t('dataSync.prefix') }}
+                  <el-tooltip effect="light" :content="t('dataSync.pathTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                </el-radio>
               </el-radio-group>
             </base-form-item>
             <base-form-item v-if="!formData.whole" label="" prop="path" :rules="formData.whole ? [] : requiredRules" class="form-item-no-label m-l-24">
-              <el-input v-model="formData.path" :placeholder="t('dataSync.pathPlaceholder')" style="width:335px;" id="data-sync-modal-path">
+              <el-input v-model="formData.path" :placeholder="t('dataSync.pathPlaceholder')" style="width: 335px" id="data-sync-modal-path">
                 <template #prepend>root.</template>
               </el-input>
             </base-form-item>
           </div>
           <base-form-item prop="reforward" :rules="requiredRules" class="form-label-width">
             <template #label>
-              {{ t('dataSync.reforward') }}:<el-tooltip
-                effect="light"
-                :content="t('dataSync.reforwardTip')"
-                placement="top"
-                popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+              {{ t('dataSync.reforward') }}:
+              <el-tooltip effect="light" :content="t('dataSync.reforwardTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
             </template>
             <el-radio-group v-model="formData.reforward" id="data-sync-modal-reforward">
               <el-radio :label="true" id="data-sync-modal-reforward-yes">{{ t('common.yes') }}</el-radio>
@@ -54,15 +54,14 @@
           <div class="flex-align-center">
             <base-form-item prop="isSynchronHistory" :rules="requiredRules" class="form-label-width">
               <template #label>
-                {{ t('dataSync.historyData') }}:<el-tooltip effect="light" :content="t('dataSync.historyDataTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                {{ t('dataSync.historyData') }}:
+                <el-tooltip effect="light" :content="t('dataSync.historyDataTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
               </template>
               <el-switch
                 v-model="formData.isSynchronHistory"
                 :active-value="true"
                 :inactive-value="false"
-                style="
-
-      --el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;"
+                style="--el-switch-on-color: #44c795; --el-switch-off-color: #dfe1ed"
                 id="data-sync-modal-history-switch"
                 class="data-sync-modal-history-switch"
               />
@@ -84,29 +83,32 @@
           <div class="flex-align-center">
             <base-form-item prop="isSynchronRealTime" :rules="requiredRules" class="form-label-width">
               <template #label>
-                {{ t('dataSync.realTime') }}:<el-tooltip effect="light" :content="t('dataSync.realTimeTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                {{ t('dataSync.realTime') }}:
+                <el-tooltip effect="light" :content="t('dataSync.realTimeTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
               </template>
               <el-switch
                 v-model="formData.isSynchronRealTime"
                 :active-value="true"
                 :inactive-value="false"
-                style="
-
-      --el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;"
+                style="--el-switch-on-color: #44c795; --el-switch-off-color: #dfe1ed"
                 id="data-sync-modal-running-switch"
                 class="data-sync-modal-running-switch"
-                @change="val => handleChangeRunningSwitch(val as boolean)"
+                @change="(val) => handleChangeRunningSwitch(val as boolean)"
               />
             </base-form-item>
             <base-form-item v-if="formData.isSynchronRealTime" prop="triggerMode" :rules="requiredRules" class="form-item-label-short m-l-24">
               <template #label>
-                {{ t('dataSync.triggerMode') }}:<el-tooltip
-                  effect="light"
-                  placement="top"
-                  popper-class="table-tooltip-max-width">
-                  <template #content>{{ t('dataSync.triggerModeReal') }}<br>{{ t('dataSync.triggerModeBatch') }}</template><i-custom-question /></el-tooltip>
+                {{ t('dataSync.triggerMode') }}:
+                <el-tooltip effect="light" placement="top" popper-class="table-tooltip-max-width">
+                  <template #content>
+                    {{ t('dataSync.triggerModeReal') }}
+                    <br />
+                    {{ t('dataSync.triggerModeBatch') }}
+                  </template>
+                  <i-custom-question />
+                </el-tooltip>
               </template>
-              <el-radio-group v-model="formData.triggerMode" @change="val => handleChangeTriggerMode(val as string as 'stream' | 'batch')" id="data-sync-modal-triggerMode">
+              <el-radio-group v-model="formData.triggerMode" @change="(val) => handleChangeTriggerMode(val as string as 'stream' | 'batch')" id="data-sync-modal-triggerMode">
                 <el-radio :label="'stream'" id="data-sync-modal-triggerMode-stream">{{ t('dataSync.realMode') }}</el-radio>
                 <el-radio :label="'batch'" id="data-sync-modal-triggerMode-batch">{{ t('dataSync.batchMode') }}</el-radio>
               </el-radio-group>
@@ -146,7 +148,7 @@
               </el-select>
             </base-form-item>
             <base-form-item v-if="formData.connectorPluginType === 'custom'" label="" prop="connectorPluginName" :rules="requiredRules" class="form-item-no-label m-l-8">
-              <el-input v-model="formData.connectorPluginName" :placeholder="t('dataSync.sendPluginNamePlaceholder')" style="width:200px;" id="data-sync-modal-send-name" />
+              <el-input v-model="formData.connectorPluginName" :placeholder="t('dataSync.sendPluginNamePlaceholder')" style="width: 200px" id="data-sync-modal-send-name" />
             </base-form-item>
           </div>
           <base-form-item v-if="formData.connectorPluginType === 'custom'" :label="`${t('dataSync.sendPluginParams')}：`" prop="connectorPluginParam" class="form-label-width">
@@ -154,14 +156,18 @@
               v-model="formData.connectorPluginParam"
               type="textarea"
               :placeholder="t('dataSync.sendPluginParamsTip')"
-              style="width:360px;"
+              style="width: 360px"
               :resize="'none'"
               :rows="4"
-              id="data-sync-modal-send-params" />
+              id="data-sync-modal-send-params"
+            />
           </base-form-item>
           <template v-if="formData.connectorPluginType !== 'custom' && formData.connectorPluginType !== 'do-nothing-connector'">
             <div class="ip-port-box">
-              <span class="form-label">{{ t('dataSync.targetInfo') }}：<el-tooltip effect="light" :content="t('dataSync.targetInfoTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip></span>
+              <span class="form-label">
+                {{ t('dataSync.targetInfo') }}：
+                <el-tooltip effect="light" :content="t('dataSync.targetInfoTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+              </span>
               <div class="ip-port-list">
                 <div class="ip-port-item" v-for="(item, index) in formData.targetInfos" :key="`${index}_host_port`">
                   <base-form-item label="" :prop="`targetInfos[${index}].host`" :rules="requiredRules">
@@ -171,22 +177,32 @@
                   <base-form-item label="" :prop="`targetInfos[${index}].port`" :rules="requiredPortRules">
                     <el-input v-model.number="item.port" :placeholder="t('dataSync.targetInfoHost')" style="width: 132px" :id="`data-sync-modal-${index}-port`" />
                   </base-form-item>
-                  <el-button link v-if="index === 0 && editType !== 'view'" @click="handleAddHost" id="target-ip-add" class="m-l-6" :disabled="isDisabledHosts"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
-                  <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost(index)" :id="`target-ip-del${index}`" class="m-l-6"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
+                  <el-button link v-if="index === 0 && editType !== 'view'" @click="handleAddHost" id="target-ip-add" class="m-l-6" :disabled="isDisabledHosts">
+                    <el-icon size="26"><i-custom-add-border /></el-icon>
+                  </el-button>
+                  <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost(index)" :id="`target-ip-del${index}`" class="m-l-6">
+                    <el-icon size="26"><i-custom-delete /></el-icon>
+                  </el-button>
                 </div>
               </div>
             </div>
             <!-- 单线程数据传输/多线程数据传输 -->
-            <div class="flex-align-center" v-if="formData.connectorPluginType === 'iotdb-thrift-sync-connector' || formData.connectorPluginType === 'iotdb-thrift-async-connector' || formData.connectorPluginType === 'iotdb-thrift-connector' || formData.connectorPluginType === 'iotdb-thrift-connector'">
+            <div
+              class="flex-align-center"
+              v-if="
+                formData.connectorPluginType === 'iotdb-thrift-sync-connector' ||
+                formData.connectorPluginType === 'iotdb-thrift-async-connector' ||
+                formData.connectorPluginType === 'iotdb-thrift-connector' ||
+                formData.connectorPluginType === 'iotdb-thrift-connector'
+              "
+            >
               <base-form-item :label="`${t('dataSync.logSendBatch')}:`" prop="isLogSendBatch" :rules="requiredRules" class="form-label-width">
                 <el-switch
                   v-model="formData.isLogSendBatch"
                   :disabled="logSendBatchDisabled"
                   :active-value="true"
                   :inactive-value="false"
-                  style="
-
-      --el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;"
+                  style="--el-switch-on-color: #44c795; --el-switch-off-color: #dfe1ed"
                   id="data-sync-modal-send-switch"
                   class="data-sync-modal-send-switch"
                 />
@@ -195,18 +211,20 @@
                 <div class="flex-align-center m-l-36">
                   <base-form-item prop="logSendBatchWaitTime" :rules="requiredNumberRules" class="form-item-label-short">
                     <template #label>
-                      {{ t('dataSync.waitTime') }}:<el-tooltip effect="light" :content="t('dataSync.waitTimeTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                      {{ t('dataSync.waitTime') }}:
+                      <el-tooltip effect="light" :content="t('dataSync.waitTimeTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                     </template>
-                    <el-input v-model.number="formData.logSendBatchWaitTime" :placeholder="t('dataSync.waitTimePlaceholder')" id="data-sync-modal-time" style="width: 100px;" />
+                    <el-input v-model.number="formData.logSendBatchWaitTime" :placeholder="t('dataSync.waitTimePlaceholder')" id="data-sync-modal-time" style="width: 100px" />
                     <span class="m-l-8 form-item-unit">s</span>
                   </base-form-item>
                 </div>
                 <div class="flex-align-center m-l-24">
                   <base-form-item prop="logSendBatchSize" :rules="requiredNumberRules" class="form-item-label-short">
                     <template #label>
-                      {{ t('dataSync.batchSize') }}:<el-tooltip effect="light" :content="t('dataSync.batchSizeTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                      {{ t('dataSync.batchSize') }}:
+                      <el-tooltip effect="light" :content="t('dataSync.batchSizeTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                     </template>
-                    <el-input v-model.number="formData.logSendBatchSize" :placeholder="t('dataSync.batchSizePlaceholder')" id="data-sync-modal-size" style="width: 100px;" />
+                    <el-input v-model.number="formData.logSendBatchSize" :placeholder="t('dataSync.batchSizePlaceholder')" id="data-sync-modal-size" style="width: 100px" />
                     <span class="m-l-8 form-item-unit">byte</span>
                   </base-form-item>
                 </div>
@@ -216,27 +234,30 @@
             <template v-if="formData.connectorPluginType === 'iotdb-legacy-pipe-connector'">
               <base-form-item prop="targetUserName" :rules="requiredRules" class="form-label-width">
                 <template #label>
-                  {{ t('dataSync.targetUser') }}:<el-tooltip effect="light" :content="t('dataSync.targetUserTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                  {{ t('dataSync.targetUser') }}:
+                  <el-tooltip effect="light" :content="t('dataSync.targetUserTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                 </template>
-                <el-input v-model="formData.targetUserName" :placeholder="t('dataSync.targetUserPlaceholder')" id="data-sync-modal-targetUserName" style="width: 200px;" />
+                <el-input v-model="formData.targetUserName" :placeholder="t('dataSync.targetUserPlaceholder')" id="data-sync-modal-targetUserName" style="width: 200px" />
               </base-form-item>
               <base-form-item :label="`${t('dataSync.targetPwd')}:`" prop="targetPassword" :rules="requiredRules" class="form-label-width">
-                <el-input v-model="formData.targetPassword" :placeholder="t('dataSync.targetPwdPlaceholder')" id="data-sync-modal-password" style="width: 200px;" show-password autocomplete="off" />
+                <el-input v-model="formData.targetPassword" :placeholder="t('dataSync.targetPwdPlaceholder')" id="data-sync-modal-password" style="width: 200px" show-password autocomplete="off" />
               </base-form-item>
               <base-form-item prop="targetVersion" :rules="requiredRules" class="form-label-width">
                 <template #label>
-                  {{ t('dataSync.targetVersion') }}:<el-tooltip effect="light" :content="t('dataSync.targetVersionTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                  {{ t('dataSync.targetVersion') }}:
+                  <el-tooltip effect="light" :content="t('dataSync.targetVersionTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                 </template>
-                <el-input v-model="formData.targetVersion" :placeholder="t('dataSync.targetVersionPlaceholder')" id="data-sync-modal-targetVersion" style="width: 200px;" />
+                <el-input v-model="formData.targetVersion" :placeholder="t('dataSync.targetVersionPlaceholder')" id="data-sync-modal-targetVersion" style="width: 200px" />
               </base-form-item>
             </template>
             <!-- 跨网闸传输 -->
             <div class="flex-align-center" v-if="formData.connectorPluginType === 'iotdb-air-gap-connector'">
               <base-form-item prop="targetOverTime" :rules="requiredNumberRules" class="form-label-width">
                 <template #label>
-                  {{ t('dataSync.overTime') }}:<el-tooltip effect="light" :content="t('dataSync.overTimeTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                  {{ t('dataSync.overTime') }}:
+                  <el-tooltip effect="light" :content="t('dataSync.overTimeTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                 </template>
-                <el-input v-model.number="formData.targetOverTime" :placeholder="t('dataSync.overTimePlaceholder')" id="data-sync-modal-time-over" style="width: 200px;" />
+                <el-input v-model.number="formData.targetOverTime" :placeholder="t('dataSync.overTimePlaceholder')" id="data-sync-modal-time-over" style="width: 200px" />
                 <span class="m-l-8 form-item-unit">ms</span>
               </base-form-item>
             </div>
@@ -261,7 +282,10 @@
           </el-scrollbar>
         </el-tab-pane> -->
       <!-- </el-tabs> -->
-      <a v-show="activeTab === 'input'" href="https://www.timecho.com/docs/zh/UserGuide/V1.2.x/User-Manual/Data-Sync_timecho.html" rel="noopener noreferrer" target="_blank" class="operate-link"><i-custom-question-new />{{ t('search.operatingInstructions') }}</a>
+      <a v-show="activeTab === 'input'" href="https://www.timecho.com/docs/zh/UserGuide/V1.2.x/User-Manual/Data-Sync_timecho.html" rel="noopener noreferrer" target="_blank" class="operate-link">
+        <i-custom-question-new />
+        {{ t('search.operatingInstructions') }}
+      </a>
     </div>
     <template #footer>
       <div class="dialog-footer" v-if="editType !== 'view'">
@@ -273,14 +297,10 @@
 </template>
 
 <script lang="ts" setup>
-import type {
-  FormInstance, SingleOrRange, DateModelType, TabsPaneContext,
-} from 'element-plus';
+import type { FormInstance, SingleOrRange, DateModelType, TabsPaneContext } from 'element-plus';
 import { DataSyncApi } from '@/api';
 import CodeEditor from '@/views/search/components/code-editor.vue';
-import {
-  getStartAndEnd, today, todayNow, getOneInterval, getOneIntervalNow, formatDate,
-} from '@/utils/date';
+import { getStartAndEnd, today, todayNow, getOneInterval, getOneIntervalNow, formatDate } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
 
 const props = defineProps<{
@@ -292,7 +312,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
-  (event: 'handleSave',): void;
+  (event: 'handleSave'): void;
 }>();
 
 const { t } = useI18n();
@@ -586,17 +606,20 @@ const handleConfirm = () => {
           targetVersion: formData.value.connectorPluginType === 'iotdb-legacy-pipe-connector' ? formData.value.targetVersion : '',
           targetOverTime: formData.value.connectorPluginType === 'iotdb-air-gap-connector' ? formData.value.targetOverTime : '',
         };
-        saveSynchronTask(params).then(() => {
-          ElMessage.success(t('common.createSuccess'));
-          dialogVisible.value = false;
-          emit('handleSave');
-        }).finally(() => {
-          saveLoading.value = false;
-        }).catch((err) => {
-          if (err.code === 1370) {
-            errorName.value = err.message;
-          }
-        });
+        saveSynchronTask(params)
+          .then(() => {
+            ElMessage.success(t('common.createSuccess'));
+            dialogVisible.value = false;
+            emit('handleSave');
+          })
+          .finally(() => {
+            saveLoading.value = false;
+          })
+          .catch((err) => {
+            if (err.code === 1370) {
+              errorName.value = err.message;
+            }
+          });
       } else {
         ElMessage.error(t('common.errorEmptyTip'));
       }
@@ -606,13 +629,15 @@ const handleConfirm = () => {
       ElMessage.error(t('common.formRuleEmpty'));
       return;
     }
-    saveAdvancedTask(taskInputVal.value).then(() => {
-      ElMessage.success(t('common.createSuccess'));
-      dialogVisible.value = false;
-      emit('handleSave');
-    }).finally(() => {
-      saveLoading.value = false;
-    });
+    saveAdvancedTask(taskInputVal.value)
+      .then(() => {
+        ElMessage.success(t('common.createSuccess'));
+        dialogVisible.value = false;
+        emit('handleSave');
+      })
+      .finally(() => {
+        saveLoading.value = false;
+      });
   }
 };
 
@@ -644,39 +669,38 @@ watch(
         });
       }
     }
-  },
+  }
 );
-
 </script>
 
 <style lang="scss" scoped>
-.form-wrapper{
+.form-wrapper {
   position: relative;
 
-  .tabs-tip{
+  .tabs-tip {
     display: flex;
     align-items: center;
     font-size: 12px;
     line-height: 12px;
-    color: #656A85;
+    color: #656a85;
     font-weight: 300;
     position: absolute;
     left: 184px;
     top: 6px;
   }
 
-  .operate-link{
+  .operate-link {
     position: absolute;
     left: 0;
     bottom: -28px;
     font-size: 12px;
     font-weight: 300;
     line-height: 12px;
-    color: #495AD4;
+    color: #495ad4;
     display: flex;
     align-items: center;
 
-    svg{
+    svg {
       width: 16px;
       height: 16px;
       margin-right: 4px;
@@ -684,11 +708,11 @@ watch(
   }
 }
 
-.form-label-width{
+.form-label-width {
   :deep(.el-form-item__label) {
     width: 120px;
 
-    svg{
+    svg {
       position: relative;
       top: 0;
       right: 0;
@@ -697,37 +721,37 @@ watch(
   }
 }
 
-.form-item-label-short{
+.form-item-label-short {
   :deep(.el-form-item__label) {
     width: 84px;
   }
 }
 
-.form-item-no-label{
-  :deep(.el-form-item__label::before){
+.form-item-no-label {
+  :deep(.el-form-item__label::before) {
     display: none !important;
   }
 
-  :deep(.el-input-group__prepend){
+  :deep(.el-input-group__prepend) {
     width: 40px !important;
     padding: 0;
   }
 }
 
-.form-item-unit{
+.form-item-unit {
   font-size: 12px;
   font-weight: 300;
   line-height: 18px;
   color: #424561;
 }
 
-.input-disabled{
-  :deep(.el-input__inner){
+.input-disabled {
+  :deep(.el-input__inner) {
     color: #131926;
     -webkit-text-fill-color: #131926;
   }
 
-  :deep(.el-input__wrapper){
+  :deep(.el-input__wrapper) {
     box-shadow: none;
   }
 }
@@ -737,36 +761,36 @@ watch(
   height: auto;
   border-bottom: none;
 
-  .el-tabs__nav{
+  .el-tabs__nav {
     border: none;
   }
 
-  .el-tabs__item{
+  .el-tabs__item {
     padding: 8px 15px !important;
     font-size: 12px;
     font-weight: 300;
-    color: #656A85;
+    color: #656a85;
     height: 27px;
     border-radius: 6px 6px 0 0;
-    background: #FFF;
-    border: 1px solid #DFE1ED;
+    background: #fff;
+    border: 1px solid #dfe1ed;
 
-    &:first-child{
-      border-left: 1px solid #DFE1ED;
+    &:first-child {
+      border-left: 1px solid #dfe1ed;
       margin-right: -1px;
     }
 
-    &.is-active{
+    &.is-active {
       border-bottom-color: transparent;
-      background-color: #F7F8FC;
-      color: #495AD4;
+      background-color: #f7f8fc;
+      color: #495ad4;
     }
   }
 }
 
-:deep(.el-tabs__content){
-  background: #F7F8FC;
-  border: 1px solid #DFE1ED;
+:deep(.el-tabs__content) {
+  background: #f7f8fc;
+  border: 1px solid #dfe1ed;
   height: 576px;
 
   .el-tab-pane {
@@ -774,23 +798,23 @@ watch(
   }
 }
 
-.form-module-title{
+.form-module-title {
   font-size: 14px;
   font-weight: 700;
   line-height: 21px;
-  color: #495AD4;
+  color: #495ad4;
   padding-bottom: 2px;
-  border-bottom: 1px solid #DFE1ED;
+  border-bottom: 1px solid #dfe1ed;
   margin-bottom: 12px;
 }
 
-.radio-tip{
+.radio-tip {
   padding-right: 9px;
 
-  .el-radio__label{
+  .el-radio__label {
     position: relative;
 
-    svg{
+    svg {
       position: absolute;
       top: 2px;
       right: 0;
@@ -802,7 +826,7 @@ watch(
   height: 28px;
 }
 
-:deep(.el-switch__core){
+:deep(.el-switch__core) {
   width: 64px;
   height: 28px;
   border-radius: 14px;
@@ -821,10 +845,10 @@ watch(
   box-sizing: border-box;
 }
 
-.ip-port-box{
+.ip-port-box {
   display: flex;
 
-  .form-label{
+  .form-label {
     height: 28px !important;
     color: #424561 !important;
     font-size: 14px !important;
@@ -839,20 +863,20 @@ watch(
     width: 120px;
     box-sizing: border-box;
 
-    &::before{
-      content: "*";
+    &::before {
+      content: '*';
       color: var(--el-color-danger);
       margin-right: 4px;
     }
 
-    svg{
+    svg {
       position: absolute;
       right: 28px;
       top: 0;
     }
   }
 
-  .ip-port-list{
+  .ip-port-list {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -864,10 +888,10 @@ watch(
     }
   }
 
-  .ip-port-item{
+  .ip-port-item {
     display: flex;
 
-    .ip-port-divider{
+    .ip-port-divider {
       width: 28px;
       text-align: center;
       margin-top: 5px;

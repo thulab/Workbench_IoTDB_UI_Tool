@@ -9,15 +9,4 @@ import DashboardApi from './dashboard.api';
 import ConnectionApi from './connection.api';
 import DataSyncApi from './data-sync.api';
 
-export {
-  SearchApi,
-  StorageApi,
-  AlarmApi,
-  UserApi,
-  AuthApi,
-  CalculateApi,
-  LogApi,
-  DashboardApi,
-  ConnectionApi,
-  DataSyncApi,
-};
+export { SearchApi, StorageApi, AlarmApi, UserApi, AuthApi, CalculateApi, LogApi, DashboardApi, ConnectionApi, DataSyncApi };

@@ -28,14 +28,16 @@ const showError = (message: string, code?: number) => {
       confirmButtonClass: `request-error-confirm-${message}`,
       cancelButtonClass: `request-error-cancel-${message}`,
       type: 'error',
-    }).then(() => {
-      if (code && code === 1008) {
-        localStorage.setItem('authorization', '');
-        window.location.reload();
-      }
-    }).finally(() => {
-      window.__errBoxShowing__ = false;
-    });
+    })
+      .then(() => {
+        if (code && code === 1008) {
+          localStorage.setItem('authorization', '');
+          window.location.reload();
+        }
+      })
+      .finally(() => {
+        window.__errBoxShowing__ = false;
+      });
   } else if (code && !alertErrorCode.includes(code) && code !== 1320 && code !== 9999) {
     ElMessage.error({
       message,
@@ -47,7 +49,7 @@ const showError = (message: string, code?: number) => {
 };
 
 export const showErrorFn = (err: HttpError, defaultErrMessage?: string | boolean) => {
-  if ((err.status && err.status !== 200 && (err.status !== 401 || err.status !== 403))) {
+  if (err.status && err.status !== 200 && (err.status !== 401 || err.status !== 403)) {
     ElMessage.error({ message: t('login.serverError'), grouping: true });
   } else if (typeof defaultErrMessage === 'string') {
     showError(defaultErrMessage, err.code);

@@ -3,28 +3,37 @@
     <div class="search-form-wrapper">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
         <base-form-item :label="`${t('alarm.alarmName')}：`" prop="alarmName">
-          <el-input v-model="searchFormData.alarmName" :placeholder="t('alarm.alarmNamePlaceholder')" style="width: 172px;" id="alarm-record-search-name" />
+          <el-input v-model="searchFormData.alarmName" :placeholder="t('alarm.alarmNamePlaceholder')" style="width: 172px" id="alarm-record-search-name" />
         </base-form-item>
         <base-form-item prop="measurements">
           <template #label>
-            {{t('alarm.alarmMeasurement')}}：<el-tooltip effect="light" :content="t('common.searchAllTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+            {{ t('alarm.alarmMeasurement') }}：
+            <el-tooltip effect="light" :content="t('common.searchAllTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
-          <timeseries-select v-model="searchFormData.measurements" filter-system :is-show-view-btn="true" :placeholder="t('alarm.alarmMeasurementPlaceholder')" :viewText="t('dataTrend.choosedMeasurement')" id="alarm-record-search-measurements" />
+          <timeseries-select
+            v-model="searchFormData.measurements"
+            filter-system
+            :is-show-view-btn="true"
+            :placeholder="t('alarm.alarmMeasurementPlaceholder')"
+            :viewText="t('dataTrend.choosedMeasurement')"
+            id="alarm-record-search-measurements"
+          />
         </base-form-item>
         <base-form-item prop="alarmLevel" class="m-r-0">
           <template #label>
-            {{t('alarm.alarmLevel')}}：<el-tooltip effect="light" :content="t('alarm.alarmLevelTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+            {{ t('alarm.alarmLevel') }}：
+            <el-tooltip effect="light" :content="t('alarm.alarmLevelTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
-          <el-select v-model="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" class="level-select-box" style="width: 80px;" id="alarm-record-search-level">
+          <el-select v-model="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" class="level-select-box" style="width: 80px" id="alarm-record-search-level">
             <template #prefix>
               <el-icon v-if="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" size="20"><i-custom-alarm-level /></el-icon>
             </template>
             <el-option v-for="item in levelOptions" :key="item.value" :value="item.value" :label="item.name" :id="`alarm-record-search-level-select-${item.value}`">
-              <span v-if="item.value" style="display: flex; align-items: center;">
+              <span v-if="item.value" style="display: flex; align-items: center">
                 <el-icon size="20" :style="{ color: item?.paramMap?.color }"><i-custom-alarm-level /></el-icon>
                 <span :style="{ color: item?.paramMap?.color }">{{ item.name }}</span>
               </span>
-              <span v-else style="margin-left: 18px;">{{ item.name }}</span>
+              <span v-else style="margin-left: 18px">{{ item.name }}</span>
             </el-option>
           </el-select>
         </base-form-item>
@@ -42,15 +51,7 @@
             />
           </base-form-item>
           <base-form-item :label="`${t('alarm.newStatus')}：`" prop="status">
-            <el-switch
-              v-model="searchFormData.status"
-              :active-value="1"
-              :inactive-value="0"
-              style="
-
---el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;"
-              id="alarm-record-search-status"
-            />
+            <el-switch v-model="searchFormData.status" :active-value="1" :inactive-value="0" style="--el-switch-on-color: #44c795; --el-switch-off-color: #dfe1ed" id="alarm-record-search-status" />
           </base-form-item>
           <div class="search-form-buttons">
             <el-button @click="handleReset" id="alarm-record-search-reset">{{ t('common.reset') }}</el-button>
@@ -58,15 +59,17 @@
           </div>
         </el-row>
       </el-form>
-
     </div>
 
     <div class="page-table-details">
       <div class="page-table-title-box">
         <h4 class="page-table-title">{{ t('alarm.alarmRecord') }}</h4>
         <div class="operate-buttons">
-          <el-dropdown class="m-r-12" :disabled="!totalCount" @command="val => handleCommandDown(val)" id="alarm-record-download-dropdown">
-            <el-button type="primary" class="export-btn" :disabled="!totalCount" id="alarm-record-download">{{ t('common.export') }}<el-tooltip effect="light" :content="t('common.exportTipAll')" placement="top" popper-class="tooltip-box-width"><i-custom-question-white /></el-tooltip></el-button>
+          <el-dropdown class="m-r-12" :disabled="!totalCount" @command="(val) => handleCommandDown(val)" id="alarm-record-download-dropdown">
+            <el-button type="primary" class="export-btn" :disabled="!totalCount" id="alarm-record-download">
+              {{ t('common.export') }}
+              <el-tooltip effect="light" :content="t('common.exportTipAll')" placement="top" popper-class="tooltip-box-width"><i-custom-question-white /></el-tooltip>
+            </el-button>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="csv" id="alarm-record-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
@@ -81,7 +84,7 @@
         <el-table
           :data="tableData.list"
           v-loading="loading"
-          style="width: 100%;"
+          style="width: 100%"
           :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
           :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
           tooltip-effect="light"
@@ -95,7 +98,7 @@
           <el-table-column :label="t('alarm.alarmName')" prop="alarmName" min-width="160" align="center" show-overflow-tooltip />
           <el-table-column :label="t('alarm.alarmLevel')" prop="alarmLevel" sortable="custom" min-width="120" align="center">
             <template #default="{ row }">
-              <span v-if="row.alarmLevel" style="display: flex; align-items: center; justify-content: center; margin-left: -20px;">
+              <span v-if="row.alarmLevel" style="display: flex; align-items: center; justify-content: center; margin-left: -20px">
                 <el-icon size="20" :style="{ color: getLevelColor(row) }"><i-custom-alarm-level /></el-icon>
                 {{ getOptionField(row.alarmLevel, enumStore.alarmLevelEnum) }}
               </span>
@@ -117,7 +120,7 @@
           </el-table-column>
           <template #empty>
             <div class="table-empty-wrapper">
-              <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+              <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
               <span class="data-empty-text">{{ t('common.noData') }}</span>
             </div>
           </template>
@@ -141,14 +144,10 @@
 </template>
 
 <script setup lang="ts">
-import type {
-  FormInstance, DateModelType, ElTable,
-} from 'element-plus';
+import type { FormInstance, DateModelType, ElTable } from 'element-plus';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash-es';
-import {
-  getStartAndEnd, today, getOneInterval, getOneIntervalNow,
-} from '@/utils/date';
+import { getStartAndEnd, today, getOneInterval, getOneIntervalNow } from '@/utils/date';
 import { getOptionField } from '@/utils/format';
 import { AlarmApi } from '@/api';
 import { useEnumStore } from '@/stores';
@@ -195,19 +194,26 @@ const pagination = reactive({
 const totalCount = ref(0);
 const multipleSelection = ref<Alarm.QueryRecordResult[]>([]);
 
-const getLevelColor = computed(() => function (data?: Alarm.QueryRecordResult) {
-  if (!data) {
-    if (searchFormData.alarmLevel) {
-      const res = levelOptions.find((f) => f.value === searchFormData.alarmLevel);
+const getLevelColor = computed(
+  () =>
+    function (data?: Alarm.QueryRecordResult) {
+      if (!data) {
+        if (searchFormData.alarmLevel) {
+          const res = levelOptions.find((f) => f.value === searchFormData.alarmLevel);
+          return res?.paramMap?.color;
+        }
+        return '#424561';
+      }
+      const res = levelOptions.find((f) => f.value === data.alarmLevel);
       return res?.paramMap?.color;
     }
-    return '#424561';
-  }
-  const res = levelOptions.find((f) => f.value === data.alarmLevel);
-  return res?.paramMap?.color;
-});
+);
 
-const { requestFn: getAlarmRecordList, data: tableData, loading } = useRequest(AlarmApi.getAlarmRecordList, {
+const {
+  requestFn: getAlarmRecordList,
+  data: tableData,
+  loading,
+} = useRequest(AlarmApi.getAlarmRecordList, {
   initData: {
     totalCount: 0,
     totalPage: 1,
@@ -261,7 +267,7 @@ function handleSelectionChange(vals: Alarm.QueryRecordResult[]) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function handleSortChange({ column, prop, order }:SortMethod<Alarm.QueryRecordResult>) {
+function handleSortChange({ column, prop, order }: SortMethod<Alarm.QueryRecordResult>) {
   const lastOrderBy = searchFormData.orderBy;
   const lastAsc = searchFormData.asc;
   searchFormData.asc = order === 'ascending' ? 'asc' : 'desc';
@@ -310,21 +316,20 @@ function handleDel(type: string, data: Alarm.QueryRecordResult | null) {
     cancelButtonClass: 'alarm-record-del-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
-  })
-    .then(() => {
-      let alarmRecordIds = [];
-      if (type === 'batch') {
-        alarmRecordIds = multipleSelection.value?.map((i) => i.alarmRecordId);
-      } else {
-        alarmRecordIds = data?.alarmRecordId ? [data.alarmRecordId] : [];
+  }).then(() => {
+    let alarmRecordIds = [];
+    if (type === 'batch') {
+      alarmRecordIds = multipleSelection.value?.map((i) => i.alarmRecordId);
+    } else {
+      alarmRecordIds = data?.alarmRecordId ? [data.alarmRecordId] : [];
+    }
+    deleteAlarmRecord(alarmRecordIds).then((res) => {
+      if (res.code === 0) {
+        ElMessage.success(t('common.deleteSuccess'));
+        handleSearch();
       }
-      deleteAlarmRecord(alarmRecordIds).then((res) => {
-        if (res.code === 0) {
-          ElMessage.success(t('common.deleteSuccess'));
-          handleSearch();
-        }
-      });
     });
+  });
 }
 
 onMounted(() => {
@@ -342,10 +347,10 @@ watch(locale, () => {
 </script>
 
 <style lang="scss" scoped>
-.search-form-wrapper{
+.search-form-wrapper {
   width: 100%;
 
-  .search-form-buttons{
+  .search-form-buttons {
     margin-bottom: 18px;
     display: inline-flex;
     flex-wrap: nowrap;
@@ -361,7 +366,7 @@ watch(locale, () => {
     height: 28px;
   }
 
-  :deep(.el-switch__core){
+  :deep(.el-switch__core) {
     width: 64px;
     height: 28px;
     border-radius: 14px;
@@ -377,40 +382,40 @@ watch(locale, () => {
   }
 }
 
-:deep(.el-select-v2__selection){
+:deep(.el-select-v2__selection) {
   flex-wrap: nowrap;
 }
 
-.level-select-box{
+.level-select-box {
   :deep(.el-input__inner) {
     color: unset;
   }
 }
 
-.page-table-title-box{
+.page-table-title-box {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin: 12px 0;
 
-  .page-table-title{
+  .page-table-title {
     font-size: 14px;
     font-weight: 700;
     line-height: 21px;
-    color: #495AD4;
+    color: #495ad4;
   }
 }
 
-.export-btn svg{
+.export-btn svg {
   position: absolute;
   right: 6px;
   top: 3px;
 }
 
-.operate-confirm-box{
+.operate-confirm-box {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #44C795;
+  color: #44c795;
 }
 </style>

@@ -5,20 +5,28 @@
         <span>{{ t('search.sqlInput') }}</span>
       </div>
       <div class="sql-right-icon-box">
-        <el-button link @click="handleSave" id="sql-search-operate-save"><i-custom-sql-save />{{ t('common.save') }}</el-button>
-        <el-button link :disabled="!runFlag" @click="querySqlRun()" id="sql-search-operate-run"><i-custom-run-all />{{ t('search.runAll') }}</el-button>
-        <el-tooltip
-          placement="top-start"
-          effect="light"
-          trigger="hover"
-          :content="t('search.selectRunTip')"
-          :disabled="!!selectionCode"
-          popper-class="tooltip-max-width"
-        >
-          <el-button link :disabled="!runFlag || !selectionCode" @click="querySqlRun('part')" id="sql-search-operate-run-part"><i-custom-run-part />{{ t('search.runPart') }}</el-button>
+        <el-button link @click="handleSave" id="sql-search-operate-save">
+          <i-custom-sql-save />
+          {{ t('common.save') }}
+        </el-button>
+        <el-button link :disabled="!runFlag" @click="querySqlRun()" id="sql-search-operate-run">
+          <i-custom-run-all />
+          {{ t('search.runAll') }}
+        </el-button>
+        <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('search.selectRunTip')" :disabled="!!selectionCode" popper-class="tooltip-max-width">
+          <el-button link :disabled="!runFlag || !selectionCode" @click="querySqlRun('part')" id="sql-search-operate-run-part">
+            <i-custom-run-part />
+            {{ t('search.runPart') }}
+          </el-button>
         </el-tooltip>
-        <el-button link :disabled="runFlag" @click="stopquery" id="sql-search-operate-stop"><i-custom-sql-abort />{{ t('common.cancel') }}</el-button>
-        <el-button link @click="emptyQuery" id="sql-search-operate-empty"><i-custom-sql-empty />{{ t('common.clear') }}</el-button>
+        <el-button link :disabled="runFlag" @click="stopquery" id="sql-search-operate-stop">
+          <i-custom-sql-abort />
+          {{ t('common.cancel') }}
+        </el-button>
+        <el-button link @click="emptyQuery" id="sql-search-operate-empty">
+          <i-custom-sql-empty />
+          {{ t('common.clear') }}
+        </el-button>
       </div>
     </div>
 
@@ -26,7 +34,7 @@
       <code-editor
         v-show="codeMirrorReady"
         v-model:model-value="codeVal"
-        @ready="() => codeMirrorReady = true"
+        @ready="() => (codeMirrorReady = true)"
         :style="{
           height: `${codeEditorHeight}px`,
           backgroundColor: '#f9fbfc',
@@ -38,8 +46,11 @@
   </div>
   <div>
     <div class="run-result-title-box">
-      <h4 style="font-size: 14px;font-weight: 700;line-height: 20px;color:#495AD4;">{{ t('search.runResult') }}</h4>
-      <span class="run-result-tip"><i-custom-info-warning />{{ t('search.export1000Tip') }}</span>
+      <h4 style="font-size: 14px; font-weight: 700; line-height: 20px; color: #495ad4">{{ t('search.runResult') }}</h4>
+      <span class="run-result-tip">
+        <i-custom-info-warning />
+        {{ t('search.export1000Tip') }}
+      </span>
     </div>
     <div class="tabs" v-if="tableData.list && tableData.list.length > 0">
       <el-tabs v-model="activeName" type="card" class="tabs-nav-list" id="sql-search-result-tabs">
@@ -61,10 +72,21 @@
             </ul> -->
             <div></div>
             <div class="run-result-buttons">
-              <el-button link @click="handleCommandDown('refresh', index)" id="sql-search-refresh"><i-custom-refresh />{{ t('common.refresh') }}</el-button>
-              <el-dropdown :disabled="!sqlResult[index].status" class="more-icon m-l-12" @command="val => handleCommandDown(val, index)" v-show="sqlResult[index].status && tableDataPagination[index]?.list?.length > 0" id="sql-search-download-dropdown">
+              <el-button link @click="handleCommandDown('refresh', index)" id="sql-search-refresh">
+                <i-custom-refresh />
+                {{ t('common.refresh') }}
+              </el-button>
+              <el-dropdown
+                :disabled="!sqlResult[index].status"
+                class="more-icon m-l-12"
+                @command="(val) => handleCommandDown(val, index)"
+                v-show="sqlResult[index].status && tableDataPagination[index]?.list?.length > 0"
+                id="sql-search-download-dropdown"
+              >
                 <el-button link class="export-btn" :disabled="!sqlResult[index].status" id="sql-search-download">
-                  <i-custom-download />{{ t('common.export') }}<el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
+                  <i-custom-download />
+                  {{ t('common.export') }}
+                  <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
                 </el-button>
                 <template #dropdown>
                   <el-dropdown-menu>
@@ -90,9 +112,7 @@
               show-pagination
             />
           </div>
-          <div class="tab_table" v-if="sqlResult[index].errMsg">
-            Msg: {{ sqlResult[index].errMsg }}
-          </div>
+          <div class="tab_table" v-if="sqlResult[index].errMsg">Msg: {{ sqlResult[index].errMsg }}</div>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -119,7 +139,7 @@ const standTable = ref(null);
 
 const pageNums = reactive<number[]>([]);
 
-const columnList = ref <Array<Array<DynamicTableColumn> | null>>([]);
+const columnList = ref<Array<Array<DynamicTableColumn> | null>>([]);
 
 const tableData = reactive<{ list: Array<Record<string, any> | null> }>({
   list: [] || null,
@@ -154,15 +174,17 @@ function getList(index: number) {
     pageNums[index] = value;
   };
 }
-const tableDataPagination = computed(() => tableData.list.map((item, index) => {
-  nextTick(() => {
-    key.value = `${Math.random() + Date.now()}`;
-  });
-  return {
-    ...item,
-    list: item?.list?.slice(((pageNums[index] || 1) - 1) * pagination.pageSize, (pageNums[index] || 1) * pagination.pageSize) as Record<string, any>[],
-  };
-}));
+const tableDataPagination = computed(() =>
+  tableData.list.map((item, index) => {
+    nextTick(() => {
+      key.value = `${Math.random() + Date.now()}`;
+    });
+    return {
+      ...item,
+      list: item?.list?.slice(((pageNums[index] || 1) - 1) * pagination.pageSize, (pageNums[index] || 1) * pagination.pageSize) as Record<string, any>[],
+    };
+  })
+);
 
 let controller = new AbortController();
 
@@ -202,19 +224,21 @@ function querySqlRun(type?: string) {
         data.forEach((item) => {
           const length = <number[]>[];
           if (item.metaDataList) {
-            columnList.value.push(item.metaDataList.map((eleitem, index) => ({
-              label: eleitem,
-              prop: `t${index}`,
-              width: 'auto',
-              fixed: index === 0 ? 'left' : false,
-            })));
+            columnList.value.push(
+              item.metaDataList.map((eleitem, index) => ({
+                label: eleitem,
+                prop: `t${index}`,
+                width: 'auto',
+                fixed: index === 0 ? 'left' : false,
+              }))
+            );
           } else {
             columnList.value.push(null);
           }
           if (item.valueList) {
             tableData.list.push({
               list: item.valueList.map((eleitem) => {
-                const obj = <Record<string, string>>({});
+                const obj = <Record<string, string>>{};
                 for (let i = 0; i < eleitem.length; i++) {
                   if (eleitem[i].length > length[i] || !length[i]) {
                     length[i] = eleitem[i].length;
@@ -283,40 +307,43 @@ function handleCommandDown(val: string, index: number) {
     sqlResult.value[index].startQueryTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
     columnList.value.splice(index, 1, []);
     tableData.list.splice(index, 1, {});
-    querySql({ sqls: [sql], timestamp: dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).valueOf() })
-      .then((res) => {
-        const { data } = res;
-        sqlResult.value[index] = Object.assign(sqlResult.value[index], data[0]);
-        data.forEach((item) => {
-          const length = <number[]>[];
-          if (item.metaDataList) {
-            columnList.value.splice(index, 1, item.metaDataList.map((eleitem, i) => ({
+    querySql({ sqls: [sql], timestamp: dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).valueOf() }).then((res) => {
+      const { data } = res;
+      sqlResult.value[index] = Object.assign(sqlResult.value[index], data[0]);
+      data.forEach((item) => {
+        const length = <number[]>[];
+        if (item.metaDataList) {
+          columnList.value.splice(
+            index,
+            1,
+            item.metaDataList.map((eleitem, i) => ({
               label: eleitem,
               prop: `t${i}`,
               width: 'auto',
               fixed: i === 0 ? 'left' : false,
-            })));
-          } else {
-            columnList.value.splice(index, 1, null);
-          }
-          if (item.valueList) {
-            tableData.list.splice(index, 1, {
-              list: item.valueList.map((eleitem) => {
-                const obj = <Record<string, string>>({});
-                for (let i = 0; i < eleitem.length; i++) {
-                  if (eleitem[i].length > length[i] || !length[i]) {
-                    length[i] = eleitem[i].length;
-                  }
-                  obj[`t${i}`] = eleitem[i];
+            }))
+          );
+        } else {
+          columnList.value.splice(index, 1, null);
+        }
+        if (item.valueList) {
+          tableData.list.splice(index, 1, {
+            list: item.valueList.map((eleitem) => {
+              const obj = <Record<string, string>>{};
+              for (let i = 0; i < eleitem.length; i++) {
+                if (eleitem[i].length > length[i] || !length[i]) {
+                  length[i] = eleitem[i].length;
                 }
-                return obj;
-              }),
-            });
-          } else {
-            tableData.list.splice(index, 1, null);
-          }
-        });
+                obj[`t${i}`] = eleitem[i];
+              }
+              return obj;
+            }),
+          });
+        } else {
+          tableData.list.splice(index, 1, null);
+        }
       });
+    });
   } else if (val === 'csv' || val === 'xlsx') {
     exportSql(sql, val);
   }
@@ -331,15 +358,14 @@ function emptyQuery() {
     cancelButtonClass: 'empty-sql-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
-  })
-    .then(() => {
-      codeVal.value = '';
-      selectionCode.value = '';
-      tableData.list = [];
-      columnList.value = [];
-      sqlResult.value = [];
-      pageNums.length = 0;
-    });
+  }).then(() => {
+    codeVal.value = '';
+    selectionCode.value = '';
+    tableData.list = [];
+    columnList.value = [];
+    sqlResult.value = [];
+    pageNums.length = 0;
+  });
 }
 
 function insertContent(val: string) {
@@ -359,7 +385,7 @@ defineExpose({ insertContent });
 .sql-title-box {
   display: flex;
   justify-content: space-between;
-  padding: 12px 0  15px ;
+  padding: 12px 0 15px;
 }
 
 .sql-title-text {
@@ -370,7 +396,7 @@ defineExpose({ insertContent });
     font-size: 14px;
     font-weight: 700;
     line-height: 20px;
-    color:#495AD4;
+    color: #495ad4;
   }
 
   a {
@@ -389,13 +415,13 @@ defineExpose({ insertContent });
   }
 
   /* stylelint-disable-next-line no-descending-specificity */
-  .el-button{
+  .el-button {
     font-size: 12px;
     font-weight: 300;
     line-height: 12px;
-    color: #656A85;
+    color: #656a85;
 
-    svg{
+    svg {
       width: 16px;
       height: 16px;
       margin-right: 4px;
@@ -408,7 +434,7 @@ defineExpose({ insertContent });
   align-items: center;
   padding: 12px 0 12px 16px;
   margin-bottom: 12px;
-  border-bottom: 1px solid #DFE1ED;
+  border-bottom: 1px solid #dfe1ed;
 
   .run-result-tip {
     // align-self: flex-end;
@@ -434,7 +460,7 @@ defineExpose({ insertContent });
 
   :deep(.el-tabs__content) {
     padding: 16px;
-    background-color: #F7F8FC;
+    background-color: #f7f8fc;
     box-sizing: border-box;
   }
 
@@ -477,28 +503,28 @@ defineExpose({ insertContent });
     }
   }
 
-  .run-result-buttons{
-    .el-button{
+  .run-result-buttons {
+    .el-button {
       font-size: 12px;
       font-weight: 300;
       line-height: 12px;
-      color: #656A85;
+      color: #656a85;
     }
   }
 
-  .export-btn{
+  .export-btn {
     position: relative;
     padding: 2px 12px;
     display: flex !important;
     align-items: center !important;
 
-    .export-tip{
+    .export-tip {
       align-self: flex-start;
     }
   }
 
-  .export-btn.el-button:focus{
-    color: #656A85 !important;
+  .export-btn.el-button:focus {
+    color: #656a85 !important;
   }
 }
 </style>

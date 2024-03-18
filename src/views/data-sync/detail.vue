@@ -1,7 +1,7 @@
 <template>
   <version-container :is-show="showAuthMenu" :versiton-tip="'1.2.1'">
     <el-container class="data-sync-detail-wrapper" v-if="showMain">
-      <el-header class="p-x-0" style="height: auto;">
+      <el-header class="p-x-0" style="height: auto">
         <div class="search-form-wrapper">
           <el-form :model="searchFormData" label-position="left" size="default" inline @submit.prevent>
             <base-form-item :label="`${t('dataSync.taskName')}：`" prop="name">
@@ -31,9 +31,10 @@
                 <el-button type="primary" @click="handleAdd" :disabled="!canUsePipe" id="data-sync-add">{{ t('dataSync.newTask') }}</el-button>
               </auth-tooltip>
               <auth-tooltip :is-disabled="canUsePipe">
-                <el-dropdown :disabled="!multipleSelection.length || !canUsePipe" @command="val => handleCommandDown(val)" class="m-x-16" id="data-sync-batch-dropdown">
+                <el-dropdown :disabled="!multipleSelection.length || !canUsePipe" @command="(val) => handleCommandDown(val)" class="m-x-16" id="data-sync-batch-dropdown">
                   <el-button type="primary" class="export-btn" :disabled="!multipleSelection.length || !canUsePipe" id="data-sync-batch">
-                    {{ t('common.batchOperation') }}<el-icon class="el-icon--right"><i-ep-arrow-down /></el-icon>
+                    {{ t('common.batchOperation') }}
+                    <el-icon class="el-icon--right"><i-ep-arrow-down /></el-icon>
                   </el-button>
                   <template #dropdown>
                     <el-dropdown-menu>
@@ -44,27 +45,20 @@
                   </template>
                 </el-dropdown>
               </auth-tooltip>
-              <el-tooltip
-                placement="top-start"
-                effect="light"
-                trigger="hover"
-                :content="t('common.noData')"
-                :disabled="showPrometheus"
-                popper-class="tooltip-box-width"
-              >
+              <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('common.noData')" :disabled="showPrometheus" popper-class="tooltip-box-width">
                 <el-button type="primary" @click="handleMonitor" :disabled="!showPrometheus" id="data-sync-add">{{ t('dataSync.monitorDashboard') }}</el-button>
               </el-tooltip>
               <auth-tooltip :is-disabled="canUsePipe">
-                <el-button link @click="handleSearch" :disabled="!canUsePipe" id="data-sync-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+                <el-button link @click="handleSearch" :disabled="!canUsePipe" id="data-sync-refresh"><i-custom-refresh style="width: 24px; height: 24px" /></el-button>
               </auth-tooltip>
             </div>
           </div>
-          <auth-container :is-auth="canUsePipe" style="height: 100%;">
+          <auth-container :is-auth="canUsePipe" style="height: 100%">
             <div class="page-table-box">
               <el-table
                 :data="tableDataPagination"
                 v-loading="loading"
-                style="width: 100%;"
+                style="width: 100%"
                 :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
                 :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
                 tooltip-effect="light"
@@ -82,14 +76,7 @@
                     <div class="flex-center">
                       <el-icon v-if="row.state === 'stopped'" size="16" class="m-t-4"><i-custom-sync-stopped /></el-icon>
                       <el-icon v-else size="16" class="m-t-4"><i-custom-sync-running /></el-icon>
-                      <el-tooltip
-                        placement="top-start"
-                        effect="light"
-                        trigger="hover"
-                        :content="t('common.errorDetail')"
-                        :disabled="!row.exceptionMessage"
-                        popper-class="tooltip-box-width"
-                      >
+                      <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('common.errorDetail')" :disabled="!row.exceptionMessage" popper-class="tooltip-box-width">
                         <span :class="[row.exceptionMessage ? 'stop-error-button' : '', 'm-l-4']" @click="handleStatusInfo(row)">{{ row.state }}</span>
                       </el-tooltip>
                     </div>
@@ -100,14 +87,16 @@
                   <template #default="{ row }">
                     <div>
                       <el-button type="primary" link size="small" @click="handleEdit(row)" :id="`data-sync-table-${row.name}-view`">{{ t('common.detail') }}</el-button>
-                      <el-button type="primary" link size="small" @click="handleStatus('row', row, row.state === 'running' ? 'stopped' : 'running')" :id="`data-sync-table-${row.name}-state`">{{row.state === 'running' ? t('dataSync.stop') : t('dataSync.run')}}</el-button>
+                      <el-button type="primary" link size="small" @click="handleStatus('row', row, row.state === 'running' ? 'stopped' : 'running')" :id="`data-sync-table-${row.name}-state`">
+                        {{ row.state === 'running' ? t('dataSync.stop') : t('dataSync.run') }}
+                      </el-button>
                       <el-button type="primary" link size="small" @click="handleDel('row', row)" :id="`data-sync-table-${row.name}-del`">{{ t('common.delete') }}</el-button>
                     </div>
                   </template>
                 </el-table-column>
                 <template #empty>
                   <div class="table-empty-wrapper">
-                    <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+                    <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
                     <span class="data-empty-text">{{ t('common.noData') }}</span>
                   </div>
                 </template>
@@ -130,18 +119,9 @@
         </div>
       </el-main>
 
-      <modal-sync
-        v-model:visible="editVisible"
-        :edit-type="editType"
-        :edit-data="editData"
-        :edit-time="editTime"
-        @handleSave="handleSearch"
-      />
+      <modal-sync v-model:visible="editVisible" :edit-type="editType" :edit-data="editData" :edit-time="editTime" @handleSave="handleSearch" />
 
-      <modal-error-message
-        v-model:visible="errorMessageVisible"
-        :content="editErrorMessage"
-      />
+      <modal-error-message v-model:visible="errorMessageVisible" :content="editErrorMessage" />
     </el-container>
     <monitor-dashboard v-else @handleClose="handleCloseMonitor" />
   </version-container>
@@ -162,11 +142,7 @@ import MonitorDashboard from './components/monitor-dashboard.vue';
 const { t } = useI18n();
 const connectionStore = useConnectionStore();
 const userStore = useUserStore();
-const {
-  canUsePipe,
-  enablePrometheus,
-  configurePrometheus,
-} = storeToRefs(userStore);
+const { canUsePipe, enablePrometheus, configurePrometheus } = storeToRefs(userStore);
 const showPrometheus = computed(() => enablePrometheus.value && configurePrometheus.value);
 const { maxTableHeight } = useTableHeight(300);
 const searchFormData = reactive({
@@ -282,19 +258,18 @@ function handleDel(type: string, data: DataSync.SynchronListData | null) {
     cancelButtonClass: 'del-data-sync-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
-  })
-    .then(() => {
-      let arr = [];
-      if (type === 'batch') {
-        arr = multipleSelection.value?.map((i) => i.name);
-      } else {
-        arr = [data!.name];
-      }
-      deleteDataSynchronByNames(arr).then(() => {
-        ElMessage.success(t('common.deleteSuccess'));
-        handleSearch();
-      });
+  }).then(() => {
+    let arr = [];
+    if (type === 'batch') {
+      arr = multipleSelection.value?.map((i) => i.name);
+    } else {
+      arr = [data!.name];
+    }
+    deleteDataSynchronByNames(arr).then(() => {
+      ElMessage.success(t('common.deleteSuccess'));
+      handleSearch();
     });
+  });
 }
 
 function handleCommandDown(val: 'del' | 'running' | 'stopped') {
@@ -330,26 +305,26 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
 </script>
 
 <style lang="scss" scoped>
-.data-sync-detail-wrapper{
+.data-sync-detail-wrapper {
   border-radius: 6px;
-  background: #FFF;
+  background: #fff;
   box-sizing: border-box;
   padding: 26px 16px 16px 14px;
 }
 
-.search-form-wrapper{
+.search-form-wrapper {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 4px;
 }
 
-.page-table-details{
+.page-table-details {
   padding: 16px 16px 10px;
   height: 100%;
   box-sizing: border-box;
@@ -357,21 +332,21 @@ watch(
   flex-direction: column;
 }
 
-.page-table-title-box{
+.page-table-title-box {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin: 0 0 12px;
 
-  .page-table-title{
+  .page-table-title {
     font-size: 14px;
     font-weight: 700;
     line-height: 21px;
-    color: #495AD4;
+    color: #495ad4;
   }
 }
 
-.stop-error-button{
+.stop-error-button {
   cursor: pointer;
   text-decoration: underline;
 }

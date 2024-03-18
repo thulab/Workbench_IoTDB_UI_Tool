@@ -1,4 +1,4 @@
-declare namespace StorageDevice{
+declare namespace StorageDevice {
   export interface MeasurementItem {
     deviceName: string;
     timeseries: string;
@@ -79,7 +79,7 @@ declare namespace StorageDevice{
     value?: string;
     nodePath: string;
     nodeType: string; // database, database_device, device, timeseries, interna
-    leaf?: boolean,
+    leaf?: boolean;
     deviceCount?: number;
     timeseriesCount?: number;
     timeseriesType?: string; // BASE，VIEW

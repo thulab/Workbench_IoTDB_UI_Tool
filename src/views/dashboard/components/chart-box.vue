@@ -11,11 +11,13 @@
 import * as echarts from 'echarts';
 import type { ECOption } from '@/plugins/echarts-plugin';
 
-const props = defineProps<{ data:{
-  type: Object,
-  title: String,
-  options: ECOption,
-} }>();
+const props = defineProps<{
+  data: {
+    type: Object;
+    title: String;
+    options: ECOption;
+  };
+}>();
 
 const chartDom = ref();
 let Chart: echarts.ECharts;
@@ -62,9 +64,8 @@ watch(
   },
   {
     deep: true,
-  },
+  }
 );
-
 </script>
 
 <style lang="scss" scoped>

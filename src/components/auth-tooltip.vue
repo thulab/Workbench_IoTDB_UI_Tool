@@ -1,12 +1,5 @@
 <template>
-  <el-tooltip
-    placement="top-start"
-    effect="light"
-    trigger="hover"
-    :content="t('common.noAuth')"
-    :disabled="isDisabled"
-    popper-class="tooltip-box-width"
-  >
+  <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('common.noAuth')" :disabled="isDisabled" popper-class="tooltip-box-width">
     <slot></slot>
   </el-tooltip>
 </template>

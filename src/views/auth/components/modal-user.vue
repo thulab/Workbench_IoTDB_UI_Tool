@@ -1,14 +1,7 @@
 <template>
-  <el-dialog
-    v-model="dialogVisible"
-    :title="t('auth.addUser')"
-    width="490px"
-    align-center
-    :close-on-click-modal="false"
-    id="auth-user-modal"
-  >
+  <el-dialog v-model="dialogVisible" :title="t('auth.addUser')" width="490px" align-center :close-on-click-modal="false" id="auth-user-modal">
     <el-form label-width="90px" ref="formRef" :rules="rules" :model="formData" label-position="left" :key="formKey">
-      <label><input type="password" autocomplete="new-password" hidden></label>
+      <label><input type="password" autocomplete="new-password" hidden /></label>
       <base-form-item :label="`${t('auth.userName')}：`" prop="userName" :error="errorName">
         <el-input v-model.trim="formData.userName" maxlength="32" :placeholder="t('auth.userNamePlaceholder')" show-word-limit id="auth-user-modal-name" />
       </base-form-item>
@@ -35,13 +28,13 @@ defineOptions({ name: 'ModalResetPassword' });
 const formRef = ref<FormInstance>();
 
 const props = defineProps<{
-  visible: boolean,
-  userList: Auth.DBUser[],
+  visible: boolean;
+  userList: Auth.DBUser[];
 }>();
 
 const emit = defineEmits<{
-  'update:visible': [visible: boolean],
-  'handleSave':[],
+  'update:visible': [visible: boolean];
+  handleSave: [];
 }>();
 
 const { t } = useI18n();
@@ -137,15 +130,17 @@ const handleConfirm = () => {
   errorName.value = '';
   formRef.value?.validate((valid) => {
     if (valid) {
-      addUser(formData.userName, formData.password).then(() => {
-        ElMessage.success(t('auth.userSuccess'));
-        dialogVisible.value = false;
-        emit('handleSave');
-      }).catch((err) => {
-        if (err.code === 1360) {
-          errorName.value = err.message;
-        }
-      });
+      addUser(formData.userName, formData.password)
+        .then(() => {
+          ElMessage.success(t('auth.userSuccess'));
+          dialogVisible.value = false;
+          emit('handleSave');
+        })
+        .catch((err) => {
+          if (err.code === 1360) {
+            errorName.value = err.message;
+          }
+        });
     }
   });
 };
@@ -158,6 +153,6 @@ watch(
       formRef.value?.resetFields();
       formKey.value++;
     }
-  },
+  }
 );
 </script>

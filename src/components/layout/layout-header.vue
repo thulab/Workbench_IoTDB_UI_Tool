@@ -1,32 +1,20 @@
 <template>
   <div class="header">
     <div class="header-lf flex-center">
-      <el-icon
-        class="collapse-icon"
-        id="layout-header-collapse"
-        @click="menuStore.setCollapse()">
+      <el-icon class="collapse-icon" id="layout-header-collapse" @click="menuStore.setCollapse()">
         <i-custom-nav-open v-if="isCollapse" />
         <i-custom-nav-close v-else />
       </el-icon>
       <el-breadcrumb :separator-icon="IconEpArrowRight" v-if="false">
-        <transition-group
-          name="breadcrumb"
-          mode="out-in">
-          <el-breadcrumb-item
-            :key="HOME_URL"
-            :to="{ path: HOME_URL }">
-            Home
-          </el-breadcrumb-item>
-          <el-breadcrumb-item
-            v-for="item in matched"
-            :key="item.path">
+        <transition-group name="breadcrumb" mode="out-in">
+          <el-breadcrumb-item :key="HOME_URL" :to="{ path: HOME_URL }">Home</el-breadcrumb-item>
+          <el-breadcrumb-item v-for="item in matched" :key="item.path">
             {{ item.meta.title }}
           </el-breadcrumb-item>
         </transition-group>
       </el-breadcrumb>
     </div>
     <div class="header-ri flex-center">
-
       <el-dropdown @command="handleLangCommand">
         <span class="lang-icon m-r-20">
           <i-custom-language />
@@ -40,13 +28,7 @@
         </template>
       </el-dropdown>
 
-      <el-switch
-        v-if="false"
-        v-model="isDark"
-        class="switch-dark"
-        inline-prompt
-        :active-icon="IconEpMoon"
-        :inactive-icon="IconEpSunny" />
+      <el-switch v-if="false" v-model="isDark" class="switch-dark" inline-prompt :active-icon="IconEpMoon" :inactive-icon="IconEpSunny" />
 
       <user-header />
     </div>

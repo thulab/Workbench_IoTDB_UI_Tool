@@ -30,7 +30,7 @@ class DataSyncApi {
     return http.get('/synchron/getTaskDetail', { params: { taskName } });
   }
 
-  static getAdvancedTaskDetail(taskName: string): HttpResponseP<{ name: string, advancedInput: string }> {
+  static getAdvancedTaskDetail(taskName: string): HttpResponseP<{ name: string; advancedInput: string }> {
     return http.get('/synchron/getAdvancedTaskDetail', { params: { taskName } });
   }
 
@@ -46,7 +46,7 @@ class DataSyncApi {
     return http.post('/synchron/getPipeDelayTrend', data);
   }
 
-  static getPipeEstimateRemainingTime(data: DataSync.PipeMonitorParams): HttpResponseP<{ remainTime: string, timeUnit: string }> {
+  static getPipeEstimateRemainingTime(data: DataSync.PipeMonitorParams): HttpResponseP<{ remainTime: string; timeUnit: string }> {
     return http.post('/synchron/getPipeEstimateRemainingTime', data);
   }
 }

@@ -6,7 +6,7 @@ class SearchApi {
     return http.post('/data/getDataByMeasurements', data, { signal: controller?.signal });
   }
 
-  static getQuery(keyword: string): HttpResponseP<Array<{ id: number, queryName: string }>> {
+  static getQuery(keyword: string): HttpResponseP<Array<{ id: number; queryName: string }>> {
     return http.get('/query/query', { params: { keyword } });
   }
 
@@ -53,12 +53,12 @@ class SearchApi {
   }
 
   // 统计查询-最大最小值
-  static getStatisticSearchMinMax(data: Search.StatisticSearch): HttpResponseP<{ data: Search.StatisticSearchMinMaxObj[], code: number, message: string }> {
+  static getStatisticSearchMinMax(data: Search.StatisticSearch): HttpResponseP<{ data: Search.StatisticSearchMinMaxObj[]; code: number; message: string }> {
     return http.post('/data/getStatisticalMaxMinValue', data);
   }
 
   // 统计查询-平均总和
-  static getStatisticSearchAvgSum(data: Search.StatisticSearch): HttpResponseP<{ data: Search.StatisticSearchAvgSumObj[], code: number, message: string }> {
+  static getStatisticSearchAvgSum(data: Search.StatisticSearch): HttpResponseP<{ data: Search.StatisticSearchAvgSumObj[]; code: number; message: string }> {
     return http.post('/data/getStatisticalAvgSumValue', data);
   }
 

@@ -6,21 +6,21 @@
 
 .el-step.is-horizontal .el-step__line {
   height: 1px !important;
-  background-color: #DFE1ED !important;
+  background-color: #dfe1ed !important;
 
   // margin: 0 10px !important;
 }
 
 .el-step__title.is-process {
-  color: #495AD4 !important;
+  color: #495ad4 !important;
 }
 
 .el-step__icon.is-text {
-  border: 1px solid #DFE1ED !important;
+  border: 1px solid #dfe1ed !important;
 }
 
 .el-step__head.is-process .el-step__icon {
-  background: #495AD4;
+  background: #495ad4;
   color: #fff;
   border-color: transparent !important;
 }
@@ -34,20 +34,20 @@
 }
 
 .el-step__head.is-success {
-  color: #495AD4 !important;
-  border-color: #495AD4 !important;
+  color: #495ad4 !important;
+  border-color: #495ad4 !important;
 
-  .el-step__icon{
-    background: #495AD4;
+  .el-step__icon {
+    background: #495ad4;
     color: #fff;
-    border-color: #495AD4 !important;
+    border-color: #495ad4 !important;
   }
 
-  .el-step__line{
-    background-color: #495AD4 !important;
+  .el-step__line {
+    background-color: #495ad4 !important;
   }
 
-  .el-step__line-inner{
+  .el-step__line-inner {
     display: none !important;
   }
 }

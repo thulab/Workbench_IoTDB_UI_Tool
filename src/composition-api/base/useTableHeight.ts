@@ -1,7 +1,5 @@
 import Calculator from '@/utils/calc';
-import {
-  computed, ref, onMounted, onUnmounted,
-} from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 
 /**
  * 计算表格高度
@@ -14,7 +12,7 @@ export default function useTableHeight(overflowMinHeight: number, overflowOtherH
   const innerHeight = ref(window.innerHeight);
   const maxTableHeightOverflowMin = computed(() => (overflowMinHeight ? Calculator.subtract(innerHeight.value, overflowMinHeight) : innerHeight.value));
   const maxTableHeight = computed(() => {
-    const calcMinHeight = (overflowOtherHeight && innerHeight.value > 900 ? Calculator.subtract(maxTableHeightOverflowMin.value, overflowOtherHeight) : maxTableHeightOverflowMin.value);
+    const calcMinHeight = overflowOtherHeight && innerHeight.value > 900 ? Calculator.subtract(maxTableHeightOverflowMin.value, overflowOtherHeight) : maxTableHeightOverflowMin.value;
     if (minHeight && calcMinHeight < minHeight) {
       return minHeight;
     }

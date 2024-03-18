@@ -5,7 +5,7 @@
  * @returns
  */
 
-export const getPathAuthList = (path: string, dataPrivilegeLMap: Array<{ path: string, privileges: string[] }> | null | undefined, level: number = 0): string[] => {
+export const getPathAuthList = (path: string, dataPrivilegeLMap: Array<{ path: string; privileges: string[] }> | null | undefined, level: number = 0): string[] => {
   if (!dataPrivilegeLMap) return [];
   const pathData = dataPrivilegeLMap.find((item) => level === 0 && item.path === path);
   if (pathData) return pathData.privileges;
@@ -16,7 +16,7 @@ export const getPathAuthList = (path: string, dataPrivilegeLMap: Array<{ path: s
   return getPathAuthList(path, dataPrivilegeLMap, level + 1);
 };
 
-export const getParentPathAuthList = (path: string, dataPrivilegeLMap: Array<{ path: string, privileges: string[] }> | null | undefined, level: number = 0): string[] => {
+export const getParentPathAuthList = (path: string, dataPrivilegeLMap: Array<{ path: string; privileges: string[] }> | null | undefined, level: number = 0): string[] => {
   if (!dataPrivilegeLMap) return [];
   const pathData = dataPrivilegeLMap.find((item) => level === 0 && (item.path === path || item.path === `${path}.**`));
   if (pathData) return pathData.privileges;

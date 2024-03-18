@@ -1,4 +1,4 @@
-declare namespace Calculate{
+declare namespace Calculate {
   export interface CalculateItem {
     name: string;
     desc: string;

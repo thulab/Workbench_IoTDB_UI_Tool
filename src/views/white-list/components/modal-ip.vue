@@ -1,13 +1,5 @@
 <template>
-  <el-dialog
-    :title="editData ? '编辑白名单' : '添加白名单'"
-    v-model="dialogVisible"
-    width="480px"
-    class="new-storage-container"
-    align-center
-    :close-on-click-modal="false"
-    id="white-list-modal"
-  >
+  <el-dialog :title="editData ? '编辑白名单' : '添加白名单'" v-model="dialogVisible" width="480px" class="new-storage-container" align-center :close-on-click-modal="false" id="white-list-modal">
     <el-form ref="formRef" :model="formData" :rules="rules" class="m-t-14" label-position="left" @submit.prevent>
       <base-form-item label="IP地址:" prop="ip">
         <el-input v-model.trim="formData.ip" placeholder="请输入IP地址" id="white-list-modal-ip" />
@@ -32,7 +24,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
-  (event: 'handleSave',): void;
+  (event: 'handleSave'): void;
 }>();
 
 const { t } = useI18n();
@@ -52,7 +44,8 @@ const rules = reactive({
       validator: (rule: any, value: any, callback: any) => {
         if (!value) {
           return callback(t('common.formRuleEmpty'));
-        } if (!ipRegExp.test(value)) {
+        }
+        if (!ipRegExp.test(value)) {
           return callback('IP地址输入规则有误，请重新输入');
         }
         return callback();
@@ -78,14 +71,12 @@ watch(
       formRef.value?.resetFields();
       formData.ip = props.editData ? props.editData : '';
     }
-  },
+  }
 );
-
 </script>
 
 <style scoped lang="scss">
-
-.new-storage-container{
+.new-storage-container {
   position: relative;
 }
 </style>

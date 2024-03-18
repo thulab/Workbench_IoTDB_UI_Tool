@@ -1,11 +1,5 @@
 <template>
-  <el-dialog
-    :title="t('measurement.newMeasurement')"
-    v-model="dialogVisible"
-    width="748px"
-    :close-on-click-modal="false"
-    id="measurement-modal-measurement"
-  >
+  <el-dialog :title="t('measurement.newMeasurement')" v-model="dialogVisible" width="748px" :close-on-click-modal="false" id="measurement-modal-measurement">
     <el-form ref="formRef" :model="formData" label-position="right">
       <h4 class="module-title">{{ t('measurement.device') }}</h4>
       <el-form-item :label="`${t('measurement.deviceName')}：`" prop="deviceName" class="p-t-8" :rules="!addDevice ? requiredRules : deviceRules">
@@ -20,19 +14,19 @@
             remote-show-suffix
             :remote-method="remoteMethod"
             :loading="deviceLoading"
-            style="width: 400px;"
+            style="width: 400px"
             @change="handleChangeDevice"
             id="measurement-modal-select-device"
           >
             <el-option v-for="item in deviceList" :key="item" :label="item" :value="item" :id="`measurement-modal-select-device-select-${item}`">
-              <div style="display: flex; width: 360px;">
+              <div style="display: flex; width: 360px">
                 <text-tooltip :content="item" />
               </div>
             </el-option>
           </el-select>
           <div v-else class="device-input-group">
-            <el-input :value="`${groupName}.`" disabled class="device-input-prepend" style="width: 144px;" id="measurement-modal-input-groupName" />
-            <el-input v-model="formData.deviceName" :placeholder="t('measurement.deviceNameInputPlaceholder')" class="device-input-box" style="width: 256px;" id="measurement-modal-input-deviceName" />
+            <el-input :value="`${groupName}.`" disabled class="device-input-prepend" style="width: 144px" id="measurement-modal-input-groupName" />
+            <el-input v-model="formData.deviceName" :placeholder="t('measurement.deviceNameInputPlaceholder')" class="device-input-box" style="width: 256px" id="measurement-modal-input-deviceName" />
           </div>
 
           <div class="device-operate m-l-12">
@@ -41,13 +35,15 @@
           </div>
         </div>
       </el-form-item>
-      <h4 class="module-title" style="border: none;">{{ t('measurement.measurement') }}</h4>
+      <h4 class="module-title" style="border: none">{{ t('measurement.measurement') }}</h4>
       <el-scrollbar :max-height="400" :min-height="152" class="measurement-list-box">
         <el-collapse accordion v-model="activeName">
           <el-collapse-item v-for="(item, index) in formData.measurementList" :key="index" :name="`measurement_${index}`">
             <template #title>
               <el-row class="collapse-title-box">
-                <el-col :span="12"><div v-if="formData.deviceName" class="all-path-name">{{!addDevice ? `${formData.deviceName}.${item.timeseries}` : `${groupName}.${formData.deviceName}.${item.timeseries}`}}</div></el-col>
+                <el-col :span="12">
+                  <div v-if="formData.deviceName" class="all-path-name">{{ !addDevice ? `${formData.deviceName}.${item.timeseries}` : `${groupName}.${formData.deviceName}.${item.timeseries}` }}</div>
+                </el-col>
                 <el-col :span="8">
                   <div class="collapse-data-type-box">
                     <span class="data-type-label">{{ t('measurement.dataType') }}</span>
@@ -66,16 +62,30 @@
               <el-col :span="8">
                 <el-form-item :label="`${t('measurement.measurementName')}：`" :prop="`measurementList[${index}].timeseries`" :rules="requiredRules" class="m-r-0">
                   <el-input type="hidden" />
-                  <el-input v-model="item.timeseries" :placeholder="t('measurement.measurementNamePlaceholder')" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-timeseries`" style="width: 144px;" />
+                  <el-input
+                    v-model="item.timeseries"
+                    :placeholder="t('measurement.measurementNamePlaceholder')"
+                    :disabled="!item.isEditable || !formData.deviceName"
+                    :id="`measurement-modal-collapse-${index}-timeseries`"
+                    style="width: 144px"
+                  />
                 </el-form-item>
               </el-col>
               <el-col :span="16">
                 <el-form-item :prop="`measurementList[${index}].description`" label-width="83px">
                   <template #label>
-                    {{ t('measurement.measurementDescription') }}：<el-tooltip effect="light" :content="t('measurement.descriptionTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+                    {{ t('measurement.measurementDescription') }}：
+                    <el-tooltip effect="light" :content="t('measurement.descriptionTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                   </template>
                   <el-input type="hidden" />
-                  <el-input v-model="item.description" :placeholder="t('measurement.measurementDescriptionPlaceholder')" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-description`" maxlength="100" show-word-limit />
+                  <el-input
+                    v-model="item.description"
+                    :placeholder="t('measurement.measurementDescriptionPlaceholder')"
+                    :disabled="!item.isEditable || !formData.deviceName"
+                    :id="`measurement-modal-collapse-${index}-description`"
+                    maxlength="100"
+                    show-word-limit
+                  />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -83,7 +93,12 @@
               <el-col :span="8">
                 <el-form-item :label="`${t('measurement.dataType')}：`" :prop="`measurementList[${index}].dataType`" :rules="requiredRules">
                   <el-input type="hidden" />
-                  <el-select v-model="item.dataType" @change="val => handleChangeRowDataType(val, item, index)" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-dataType`">
+                  <el-select
+                    v-model="item.dataType"
+                    @change="(val) => handleChangeRowDataType(val, item, index)"
+                    :disabled="!item.isEditable || !formData.deviceName"
+                    :id="`measurement-modal-collapse-${index}-dataType`"
+                  >
                     <el-option v-for="dtype in dataTypeOptions" :key="dtype" :label="dtype" :value="dtype" :id="`measurement-modal-collapse-${index}-dataType-select-${dtype}`" />
                   </el-select>
                 </el-form-item>
@@ -97,7 +112,7 @@
                 </el-form-item>
               </el-col>
               <el-col :span="8">
-                <el-form-item :label="`${t('measurement.compression')}：`" :prop="`measurementList[${index}].compression`" :rules="requiredRules" style="margin-right: 0;">
+                <el-form-item :label="`${t('measurement.compression')}：`" :prop="`measurementList[${index}].compression`" :rules="requiredRules" style="margin-right: 0">
                   <el-input type="hidden" />
                   <el-select v-model="item.compression" :disabled="!item.isEditable || !formData.deviceName" :id="`measurement-modal-collapse-${index}-compression`">
                     <el-option v-for="com in compressionOptions" :key="com" :label="com" :value="com" :id="`measurement-modal-collapse-${index}-compression-select-${com}`" />
@@ -109,7 +124,10 @@
         </el-collapse>
       </el-scrollbar>
 
-      <el-button style="width: 100%;" class="m-t-16" :disabled="addControl" @click="handleAddRow" id="measurement-modal-collapse-add"><i-custom-add class="m-r-4" />{{ t('measurement.addMeasurement') }}</el-button>
+      <el-button style="width: 100%" class="m-t-16" :disabled="addControl" @click="handleAddRow" id="measurement-modal-collapse-add">
+        <i-custom-add class="m-r-4" />
+        {{ t('measurement.addMeasurement') }}
+      </el-button>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
@@ -133,7 +151,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
-  (event: 'handleSave',): void;
+  (event: 'handleSave'): void;
 }>();
 
 const dialogVisible = useVModel(props, 'visible', emit);
@@ -282,20 +300,19 @@ function handleDelRow(i: number, e: MouseEvent) {
     cancelButtonClass: 'measurement-modal-collapse-del-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
-  })
-    .then(() => {
-      if (formData.measurementList[i].isEditable) {
-        formData.measurementList.splice(i, 1);
-      } else {
-        const deviceName = !addDevice.value ? formData.deviceName : `${props.groupName}.${formData.deviceName}`;
-        deleteMeasurements([`${deviceName}.${formData.measurementList[i].timeseries}`]).then((res) => {
-          if (res.code === 0) {
-            ElMessage.success(t('common.deleteSuccess'));
-            formData.measurementList.splice(i, 1);
-          }
-        });
-      }
-    });
+  }).then(() => {
+    if (formData.measurementList[i].isEditable) {
+      formData.measurementList.splice(i, 1);
+    } else {
+      const deviceName = !addDevice.value ? formData.deviceName : `${props.groupName}.${formData.deviceName}`;
+      deleteMeasurements([`${deviceName}.${formData.measurementList[i].timeseries}`]).then((res) => {
+        if (res.code === 0) {
+          ElMessage.success(t('common.deleteSuccess'));
+          formData.measurementList.splice(i, 1);
+        }
+      });
+    }
+  });
 }
 
 // 设备是否对齐
@@ -359,29 +376,30 @@ const handleConfirm = () => {
         deviceName,
         measurementVOList,
         isAligned: isAligned.value,
-      }).then((res) => {
-        if (res.code === 0) {
-          ElMessage.success(`${t('common.createSuccess')}！`);
-          dialogVisible.value = false;
-          emit('handleSave');
-        }
-      }).catch((err) => {
-        if (err.code === 9999 || err.code === 1380) {
-          ElMessageBox.confirm(err.message, t('common.error'), {
-            confirmButtonText: t('common.confirm'),
-            cancelButtonText: t('common.cancel'),
-            confirmButtonClass: 'save-measurement-error-confirm',
-            cancelButtonClass: 'save-measurement-error-cancel',
-            type: 'error',
-          })
-            .finally(() => {
+      })
+        .then((res) => {
+          if (res.code === 0) {
+            ElMessage.success(`${t('common.createSuccess')}！`);
+            dialogVisible.value = false;
+            emit('handleSave');
+          }
+        })
+        .catch((err) => {
+          if (err.code === 9999 || err.code === 1380) {
+            ElMessageBox.confirm(err.message, t('common.error'), {
+              confirmButtonText: t('common.confirm'),
+              cancelButtonText: t('common.cancel'),
+              confirmButtonClass: 'save-measurement-error-confirm',
+              cancelButtonClass: 'save-measurement-error-cancel',
+              type: 'error',
+            }).finally(() => {
               if (err.code === 9999) {
                 dialogVisible.value = false;
                 emit('handleSave');
               }
             });
-        }
-      });
+          }
+        });
     } else {
       ElMessage.error(t('common.formRuleEmptyShort'));
     }
@@ -408,32 +426,31 @@ watch(
       });
       remoteMethod('');
     }
-  },
+  }
 );
-
 </script>
 
 <style scoped lang="scss">
-.module-title{
+.module-title {
   font-size: 14px;
   font-weight: 700;
   line-height: 20px;
-  color: #495AD4;
+  color: #495ad4;
   padding: 0 0 4px;
-  border-bottom: 1px solid #F0F1FA;
+  border-bottom: 1px solid #f0f1fa;
 }
 
-.device-box{
+.device-box {
   display: flex;
   align-items: center;
 
-  .device-input-group{
+  .device-input-group {
     display: inline-flex;
 
-    .device-input-prepend{
+    .device-input-prepend {
       cursor: default;
 
-      :deep(.el-input__wrapper){
+      :deep(.el-input__wrapper) {
         border-radius: 2px 0 0 2px;
         margin-right: -1px;
       }
@@ -446,15 +463,15 @@ watch(
       }
     }
 
-    .device-input-box{
-      :deep(.el-input__wrapper){
+    .device-input-box {
+      :deep(.el-input__wrapper) {
         border-radius: 0 2px 2px 0;
       }
     }
   }
 }
 
-.measurement-list-box{
+.measurement-list-box {
   // min-height: 152px;
   // max-height: 500px;
   // overflow-y: auto;
@@ -469,11 +486,11 @@ watch(
   }
 }
 
-.collapse-title-box{
+.collapse-title-box {
   height: 100%;
   width: calc(100% - 40px);
 
-  .all-path-name{
+  .all-path-name {
     font-size: 14px;
     font-weight: 400;
     color: #424561;
@@ -486,11 +503,11 @@ watch(
   }
 }
 
-.device-operate{
+.device-operate {
   display: inline-flex;
 }
 
-.collapse-data-type-box{
+.collapse-data-type-box {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -501,19 +518,19 @@ watch(
   line-height: 18px;
   color: #424561;
 
-  .data-type-label{
+  .data-type-label {
     font-size: 12px;
     font-weight: 300;
     line-height: 12px;
-    color: #656A85;
+    color: #656a85;
     margin-bottom: 2px;
   }
 }
 
-.operate-box{
+.operate-box {
   text-align: right;
 
-  .el-button{
+  .el-button {
     min-width: 28px !important;
     padding: 0 !important;
   }

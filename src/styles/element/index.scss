@@ -1,45 +1,46 @@
-@import "./pagination";
-@import "./date";
-@import "./modal";
-@import "./button";
-@import "./input";
-@import "./table";
-@import "./collapse";
-@import "./step";
+@import './pagination';
+@import './date';
+@import './modal';
+@import './button';
+@import './input';
+@import './table';
+@import './collapse';
+@import './step';
 
 :root {
-  --el-text-color-regular: #656A85;
+  --el-text-color-regular: #656a85;
   --el-font-weight-primary: 400;
   --el-text-color-primary: #424561;
   --el-component-size: 28px;
   --el-border-radius-base: 2px;
-  --el-border-color: #DFE1ED;
-  --el-text-color-placeholder: #656A85;
-  --el-disabled-bg-color: #F7F8FC;
+  --el-border-color: #dfe1ed;
+  --el-text-color-placeholder: #656a85;
+  --el-disabled-bg-color: #f7f8fc;
 
   // --el-disabled-text-color: #131926;
   // --el-disabled-border-color: #F7F8FC;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #F0F1FA;
+  background: #f0f1fa;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #DFE1ED;
+  background: #dfe1ed;
 }
 
-.el-scrollbar{
-  --el-scrollbar-bg-color: #F0F1FA !important;
-  --el-scrollbar-hover-bg-color: #DFE1ED !important;
+.el-scrollbar {
+  --el-scrollbar-bg-color: #f0f1fa !important;
+  --el-scrollbar-hover-bg-color: #dfe1ed !important;
   --el-scrollbar-opacity: 1 !important;
   --el-scrollbar-hover-opacity: 1 !important;
 }
 
-.el-slider{
+.el-slider {
   --el-slider-button-size: 10px;
 }
 
-.el-tabs__nav-next, .el-tabs__nav-prev{
+.el-tabs__nav-next,
+.el-tabs__nav-prev {
   line-height: 28px !important;
 }

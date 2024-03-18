@@ -16,7 +16,14 @@
       id="select-path-single"
       @change="handleChangePath"
     >
-      <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :id="`select-path-single-${item.timeseries}`" :disabled="disabledPath ? disabledPath(item) : false">
+      <el-option
+        v-for="item in measurementList"
+        :key="item.timeseries"
+        :label="item.timeseries"
+        :value="item.timeseries"
+        :id="`select-path-single-${item.timeseries}`"
+        :disabled="disabledPath ? disabledPath(item) : false"
+      >
         <div :style="`display: flex; width: ${itemWidth}px;`">
           <text-tooltip :content="item.timeseries" />
         </div>
@@ -79,8 +86,7 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-
-.remote-select-box{
+.remote-select-box {
   position: relative;
 }
 </style>

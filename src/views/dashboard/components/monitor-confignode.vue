@@ -2,7 +2,7 @@
   <div class="monitor-chart-wrapper">
     <div class="monitor-chart-box-4" v-loading="cpuLoading">
       <div class="monitor-chart-container">
-        <h4 class="monitor-info-module-title">{{t('dashboard.cpuNum')}}</h4>
+        <h4 class="monitor-info-module-title">{{ t('dashboard.cpuNum') }}</h4>
         <data-container :is-empty="cpuCount === null">
           <div class="monitor-info-module-box">
             <p class="monitor-info-module-text">{{ cpuCount }}</p>
@@ -25,7 +25,10 @@
         <h4 class="monitor-info-module-title">{{ t('dashboard.systemMemory') }}</h4>
         <data-container :is-empty="memoryData.dataCount === null">
           <div class="monitor-info-module-box">
-            <p class="monitor-info-module-text">{{ memoryData.dataCount }}<span class="monitor-info-module-unit">{{ memoryData.valueUnit }}</span></p>
+            <p class="monitor-info-module-text">
+              {{ memoryData.dataCount }}
+              <span class="monitor-info-module-unit">{{ memoryData.valueUnit }}</span>
+            </p>
           </div>
         </data-container>
       </div>
@@ -66,7 +69,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (event: 'handleFetch',): void;
+  (event: 'handleFetch'): void;
 }>();
 
 interface GaugeChartData {
@@ -99,131 +102,133 @@ const diskIOData = ref<number[]>([]);
 
 const isMaster = computed(() => props.clusterType === 'master');
 
-const gaugeChartOptions = (optionData: GaugeChartData) => ({
-  series: [
-    {
-      type: 'gauge',
-      center: ['50%', '60%'],
-      startAngle: 200,
-      endAngle: -20,
-      itemStyle: {
-        color: optionData.themeColor,
-      },
-      progress: {
-        show: true,
-        width: 16,
-      },
-      pointer: {
-        show: false,
-      },
-      axisLine: {
-        lineStyle: {
+const gaugeChartOptions = (optionData: GaugeChartData) =>
+  ({
+    series: [
+      {
+        type: 'gauge',
+        center: ['50%', '60%'],
+        startAngle: 200,
+        endAngle: -20,
+        itemStyle: {
+          color: optionData.themeColor,
+        },
+        progress: {
+          show: true,
           width: 16,
         },
-      },
-      axisTick: {
-        show: false,
-      },
-      splitLine: {
-        show: false,
-      },
-      axisLabel: {
-        show: false,
-      },
-      anchor: {
-        show: false,
-      },
-      title: {
-        show: false,
-      },
-      detail: {
-        offsetCenter: [0, '-8%'],
-        fontSize: 18,
-        fontWeight: 'bolder',
-        formatter: '{value} %',
-        color: 'inherit',
-      },
-      data: [
-        {
-          value: optionData.dataVal,
+        pointer: {
+          show: false,
         },
-      ],
-    },
-    {
-      type: 'gauge',
-      center: ['50%', '60%'],
-      startAngle: 200,
-      endAngle: -20,
-      itemStyle: {
-        color: optionData.opacityColor,
-      },
-      progress: {
-        show: true,
-        width: 4,
-      },
-      pointer: {
-        show: false,
-      },
-      axisLine: {
-        show: false,
-      },
-      axisTick: {
-        show: false,
-      },
-      splitLine: {
-        show: false,
-      },
-      axisLabel: {
-        show: false,
-      },
-      detail: {
-        show: false,
-      },
-      data: [
-        {
-          value: optionData.dataVal,
+        axisLine: {
+          lineStyle: {
+            width: 16,
+          },
         },
-      ],
-    },
-  ],
-} as ECOption);
+        axisTick: {
+          show: false,
+        },
+        splitLine: {
+          show: false,
+        },
+        axisLabel: {
+          show: false,
+        },
+        anchor: {
+          show: false,
+        },
+        title: {
+          show: false,
+        },
+        detail: {
+          offsetCenter: [0, '-8%'],
+          fontSize: 18,
+          fontWeight: 'bolder',
+          formatter: '{value} %',
+          color: 'inherit',
+        },
+        data: [
+          {
+            value: optionData.dataVal,
+          },
+        ],
+      },
+      {
+        type: 'gauge',
+        center: ['50%', '60%'],
+        startAngle: 200,
+        endAngle: -20,
+        itemStyle: {
+          color: optionData.opacityColor,
+        },
+        progress: {
+          show: true,
+          width: 4,
+        },
+        pointer: {
+          show: false,
+        },
+        axisLine: {
+          show: false,
+        },
+        axisTick: {
+          show: false,
+        },
+        splitLine: {
+          show: false,
+        },
+        axisLabel: {
+          show: false,
+        },
+        detail: {
+          show: false,
+        },
+        data: [
+          {
+            value: optionData.dataVal,
+          },
+        ],
+      },
+    ],
+  }) as ECOption;
 
-const diskIOChartOptions = (categoryList: string[], valueList: number[]) => ({
-  tooltip: {
-    show: false,
-  },
-  legend: {
-    show: false,
-  },
-  grid: {
-    left: 20,
-    right: 40,
-    bottom: 20,
-    containLabel: true,
-  },
-  xAxis: {
-    type: 'category',
-    data: categoryList,
-    show: categoryList.length > 0,
-  },
-  yAxis: {
-    type: 'value',
-  },
-  series: [
-    {
-      type: 'bar',
-      data: valueList,
-      itemStyle: {
-        color: '#495AD4',
-      },
-      label: {
-        show: true,
-        position: 'top',
-        formatter: '{c}%',
-      },
+const diskIOChartOptions = (categoryList: string[], valueList: number[]) =>
+  ({
+    tooltip: {
+      show: false,
     },
-  ],
-} as ECOption);
+    legend: {
+      show: false,
+    },
+    grid: {
+      left: 20,
+      right: 40,
+      bottom: 20,
+      containLabel: true,
+    },
+    xAxis: {
+      type: 'category',
+      data: categoryList,
+      show: categoryList.length > 0,
+    },
+    yAxis: {
+      type: 'value',
+    },
+    series: [
+      {
+        type: 'bar',
+        data: valueList,
+        itemStyle: {
+          color: '#495AD4',
+        },
+        label: {
+          show: true,
+          position: 'top',
+          formatter: '{c}%',
+        },
+      },
+    ],
+  }) as ECOption;
 
 const cpuDataOptions = computed(() => gaugeChartOptions(cpuData));
 const memoryDataOptions = computed(() => gaugeChartOptions(memoryData));
@@ -235,43 +240,51 @@ const { requestFn: getMetricMemory, loading: memoryLoading } = useRequest(Dashbo
 const { requestFn: getMetricDiskIOUsedRate, loading: ioLoading } = useRequest(DashboardApi.getMetricDiskIOUsedRate);
 
 function getCpu() {
-  return getMetricCPU(props.node, props.nodeType, isMaster.value).then((res) => {
-    cpuCount.value = (res.data?.cpu || res.data?.cpu === 0) ? res.data?.cpu : null;
-  }).catch(() => {
-    cpuCount.value = null;
-  });
+  return getMetricCPU(props.node, props.nodeType, isMaster.value)
+    .then((res) => {
+      cpuCount.value = res.data?.cpu || res.data?.cpu === 0 ? res.data?.cpu : null;
+    })
+    .catch(() => {
+      cpuCount.value = null;
+    });
 }
 
 function getCpuLoad() {
-  return getMetricCPULoad(props.node, props.nodeType, isMaster.value).then((res) => {
-    cpuData.dataVal = (res.data.cpuLoad || res.data.cpuLoad === 0) ? transformDecimal(res.data.cpuLoad * 100, 1) : null;
-  }).catch(() => {
-    cpuData.dataVal = null;
-    cpuData.dataCount = null;
-  });
+  return getMetricCPULoad(props.node, props.nodeType, isMaster.value)
+    .then((res) => {
+      cpuData.dataVal = res.data.cpuLoad || res.data.cpuLoad === 0 ? transformDecimal(res.data.cpuLoad * 100, 1) : null;
+    })
+    .catch(() => {
+      cpuData.dataVal = null;
+      cpuData.dataCount = null;
+    });
 }
 
 function getMemory() {
-  return getMetricMemory(props.node, props.nodeType, isMaster.value).then((res) => {
-    if (res.data) {
-      memoryData.dataCount = res.data.memoryTotal;
-      memoryData.valueUnit = res.data.unit;
-      memoryData.dataVal = transformDecimal(res.data.memoryRatio * 100, 1);
-    }
-  }).catch(() => {
-    memoryData.dataVal = 0;
-    memoryData.dataCount = null;
-  });
+  return getMetricMemory(props.node, props.nodeType, isMaster.value)
+    .then((res) => {
+      if (res.data) {
+        memoryData.dataCount = res.data.memoryTotal;
+        memoryData.valueUnit = res.data.unit;
+        memoryData.dataVal = transformDecimal(res.data.memoryRatio * 100, 1);
+      }
+    })
+    .catch(() => {
+      memoryData.dataVal = 0;
+      memoryData.dataCount = null;
+    });
 }
 
 function getIo() {
-  return getMetricDiskIOUsedRate(props.node, isMaster.value).then((res) => {
-    diskIOCategory.value = res.data.map((item) => item.diskName);
-    diskIOData.value = res.data.map((item) => transformDecimal(item.nodeRate, 6));
-  }).catch(() => {
-    diskIOCategory.value = [];
-    diskIOData.value = [];
-  });
+  return getMetricDiskIOUsedRate(props.node, isMaster.value)
+    .then((res) => {
+      diskIOCategory.value = res.data.map((item) => item.diskName);
+      diskIOData.value = res.data.map((item) => transformDecimal(item.nodeRate, 6));
+    })
+    .catch(() => {
+      diskIOCategory.value = [];
+      diskIOData.value = [];
+    });
 }
 
 function initialAssign() {
@@ -285,12 +298,7 @@ function initialAssign() {
 }
 
 function getInitial() {
-  Promise.allSettled([
-    getCpu(),
-    getCpuLoad(),
-    getMemory(),
-    getIo(),
-  ]).then(() => {
+  Promise.allSettled([getCpu(), getCpuLoad(), getMemory(), getIo()]).then(() => {
     emit('handleFetch');
   });
 }

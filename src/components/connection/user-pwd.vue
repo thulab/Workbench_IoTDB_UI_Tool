@@ -38,12 +38,12 @@ const requiredUserRules = ref([
 </script>
 
 <style lang="scss" scoped>
-.base-form-box{
+.base-form-box {
   padding: 0 36px 0 7px;
 }
 
-.optional-form-item{
-  :deep(.el-form-item__label){
+.optional-form-item {
+  :deep(.el-form-item__label) {
     padding-left: 9px;
   }
 }

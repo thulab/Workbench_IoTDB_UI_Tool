@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  computed, reactive, type Ref, ref,
-} from 'vue';
+import { computed, reactive, type Ref, ref } from 'vue';
 import Validator from '@/utils/validator';
 import { hasOwn } from '@/utils/index';
 import useRequest from '@/composition-api/base/useRequest';
@@ -37,9 +35,7 @@ interface Opt<P extends Array<any>, T> {
 }
 
 export default function useTable<P extends Array<any>, T>(getList: (...params: P) => HttpResponseP<T[] | TableResponse<T>>, options?: Partial<Opt<P, T>>) {
-  const {
-    loading, data, error, requestFn,
-  } = useRequest(getList, {
+  const { loading, data, error, requestFn } = useRequest(getList, {
     initData: options?.initData,
   });
 

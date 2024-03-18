@@ -5,15 +5,18 @@
         <el-row>
           <base-form-item prop="path" class="m-r-20">
             <template #label>
-              {{ t('measurement.measurementChoose') }}：<el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+              {{ t('measurement.measurementChoose') }}：
+              <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
             <timeseries-select v-model="searchFormData.path" :is-show-view-btn="true" :disabled="getListLoading" id="data-search-path" />
           </base-form-item>
-          <el-form-item label="查询时间：" prop="time" style="margin-right: 0;">
+          <el-form-item label="查询时间：" prop="time" style="margin-right: 0">
             <div class="search-time-wrapper">
               <ul class="search-time-list">
                 <li :class="['search-time-type', { 'search-time-active': timeType === 'datetime' }]" id="data-search-type-datetime" @click="handleTimeType('datetime')">{{ t('search.datetime') }}</li>
-                <li :class="['search-time-type', { 'search-time-active': timeType === 'datetimerange' }]" id="data-search-type-datetimerange" @click="handleTimeType('datetimerange')">{{ t('search.datetimerange') }}</li>
+                <li :class="['search-time-type', { 'search-time-active': timeType === 'datetimerange' }]" id="data-search-type-datetimerange" @click="handleTimeType('datetimerange')">
+                  {{ t('search.datetimerange') }}
+                </li>
               </ul>
               <el-input type="hidden" />
               <el-date-picker
@@ -48,21 +51,21 @@
           <div>
             <el-form-item prop="timeInterval" class="m-r-20">
               <template #label>
-                {{ t('search.timeInterval') }}：<el-tooltip effect="light" :content="t('search.inputNumberPlaceholder')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+                {{ t('search.timeInterval') }}：
+                <el-tooltip effect="light" :content="t('search.inputNumberPlaceholder')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
               </template>
               <el-input type="hidden" />
-              <el-input v-model.number="searchFormData.timeInterval" style="width: 100px;" placeholder="" @input="handleInputInterval" id="data-search-timeInterval" :disabled="getListLoading">
+              <el-input v-model.number="searchFormData.timeInterval" style="width: 100px" placeholder="" @input="handleInputInterval" id="data-search-timeInterval" :disabled="getListLoading">
                 <template #append>
-                  <el-select v-model="searchFormData.unitInterval" style="width: 50px;" placeholder="" id="data-search-unitInterval" :disabled="getListLoading">
+                  <el-select v-model="searchFormData.unitInterval" style="width: 50px" placeholder="" id="data-search-unitInterval" :disabled="getListLoading">
                     <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-unitInterval-select-${item.value}`" />
                   </el-select>
                 </template>
               </el-input>
-
             </el-form-item>
             <el-form-item :label="`${t('search.aggregation')}：`" prop="aggregation">
               <el-input type="hidden" />
-              <el-select v-model="searchFormData.aggregation" style="width: 80px;" clearable id="data-search-aggregation" :disabled="getListLoading">
+              <el-select v-model="searchFormData.aggregation" style="width: 80px" clearable id="data-search-aggregation" :disabled="getListLoading">
                 <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-aggregation-select-${item.value}`" />
               </el-select>
             </el-form-item>
@@ -72,16 +75,14 @@
               <el-button @click="handleReset" :disabled="getListLoading || !canReadWriteData" id="data-search-reset">{{ t('common.reset') }}</el-button>
             </auth-tooltip>
             <auth-tooltip :is-disabled="canReadWriteData">
-              <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="data-search-search">{{getListLoading ? '取消查询' : t('common.query') }}</el-button>
+              <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="data-search-search">{{ getListLoading ? '取消查询' : t('common.query') }}</el-button>
             </auth-tooltip>
           </el-form-item>
         </el-row>
       </el-form>
-
     </div>
 
     <div class="page-table-details">
-
       <div class="page-info-box">
         <!-- <ul class="run-result-list">
           <li class="run-result-item">
@@ -95,8 +96,12 @@
           <li class="run-result-item"><i-custom-query-start-time />开始时间：{{ formatSqlInfo('startQueryTime') }}</li>
           <li class="run-result-item"><i-custom-query-time />查询耗时：{{ formatSqlInfo('queryTime') }}</li>
         </ul> -->
-        <h4 class="page-info-title">{{ t('common.searchDetail') }}
-          <span class="run-result-tip"><i-custom-info-warning />{{ t('search.export1000Tip') }}</span>
+        <h4 class="page-info-title">
+          {{ t('common.searchDetail') }}
+          <span class="run-result-tip">
+            <i-custom-info-warning />
+            {{ t('search.export1000Tip') }}
+          </span>
         </h4>
         <div class="page-detail-buttons">
           <auth-tooltip :is-disabled="canReadWriteData">
@@ -106,8 +111,17 @@
             <el-button class="m-l-12" :disabled="!canReadWriteData || getListLoading" @click="handleImport" id="data-search-import">{{ t('common.import') }}</el-button>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canReadWriteData">
-            <el-dropdown class="more-icon m-l-12" :disabled="getListLoading || !canReadWriteData" v-show="searchDetailInfos.status" @command="val => handleCommandDown(val)" id="data-search-download-dropdown">
-              <el-button class="export-btn" id="data-search-download" :disabled="!canReadWriteData">{{ t('common.export') }}<el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></el-button>
+            <el-dropdown
+              class="more-icon m-l-12"
+              :disabled="getListLoading || !canReadWriteData"
+              v-show="searchDetailInfos.status"
+              @command="(val) => handleCommandDown(val)"
+              id="data-search-download-dropdown"
+            >
+              <el-button class="export-btn" id="data-search-download" :disabled="!canReadWriteData">
+                {{ t('common.export') }}
+                <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+              </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item command="csv" id="data-search-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
@@ -132,7 +146,7 @@
         <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
         <span class="data-empty-text">{{ t('common.noData') }}</span>
       </div> -->
-      <auth-container :is-auth="canReadWriteData" style="height: 100%;">
+      <auth-container :is-auth="canReadWriteData" style="height: 100%">
         <div v-loading="getListLoading">
           <div v-if="searchDetailInfos.status">
             <dynamic-table
@@ -147,7 +161,7 @@
               :default-sort="defaultSort"
               @handleSortChange="handleSortChange"
             />
-          <!-- <div class="pagination-container" v-if="tableData.length > 0">
+            <!-- <div class="pagination-container" v-if="tableData.length > 0">
             <el-button plain class="btn-page btn-first" @click="handleClickPage('first')" :disabled="pagination.pageNum === 1">第一页</el-button>
             <el-button type="primary" class="btn-page btn-prev" @click="handleClickPage('prev')" :disabled="pagination.pageNum === 1">上一页</el-button>
             <el-button type="primary" class="btn-page btn-next" @click="handleClickPage('next')" :disabled="!hasNext">下一页</el-button>
@@ -161,33 +175,24 @@
             </el-select>
           </div> -->
           </div>
-          <div class="table-error-wrapper" v-if="searchDetailInfos.errMsg">
-            Msg: {{ searchDetailInfos.errMsg }}
-          </div>
+          <div class="table-error-wrapper" v-if="searchDetailInfos.errMsg">Msg: {{ searchDetailInfos.errMsg }}</div>
         </div>
       </auth-container>
     </div>
 
-    <modal-import
-      v-model:visible="importVisible"
-      @handle-close="handleImportClose"
-    />
+    <modal-import v-model:visible="importVisible" @handle-close="handleImportClose" />
   </div>
 </template>
 
 <script setup lang="ts">
-import type {
-  FormInstance, SingleOrRange, DateModelType, Sort,
-} from 'element-plus';
+import type { FormInstance, SingleOrRange, DateModelType, Sort } from 'element-plus';
 import dayjs from 'dayjs';
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import { cloneDeep } from 'lodash-es';
 import { useTableHeight } from '@/composition-api';
 import { SearchApi } from '@/api';
-import {
-  getStartAndEnd, today, getOneDay, getOneInterval, todayNow, getOneIntervalNow,
-} from '@/utils/date';
+import { getStartAndEnd, today, getOneDay, getOneInterval, todayNow, getOneIntervalNow } from '@/utils/date';
 import { useUserStore } from '@/stores';
 import DynamicTable from '@/components/dynamic-table.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
@@ -196,9 +201,7 @@ import ModalImport from './components/modal-import.vue';
 const { t } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
-const {
-  canReadWriteData,
-} = storeToRefs(userStore);
+const { canReadWriteData } = storeToRefs(userStore);
 const { maxTableHeight } = useTableHeight(330);
 
 const searchFormRef = ref<FormInstance>();
@@ -324,50 +327,55 @@ function getListData() {
   currentQueryTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
   getListLoading.value = true;
   controller = new AbortController();
-  getList({
-    measurements: copySearchFormData.path,
-    startTime,
-    endTime,
-    aggregation: copySearchFormData.aggregation,
-    timeInterval: copySearchFormData.timeInterval || undefined,
-    unitInterval: copySearchFormData.unitInterval,
-    asc: copySearchFormData.asc,
-    spage: pagination.columnNum,
-    ssize: pagination.columnSize,
-    size: 1000,
-    page: pagination.pageNum,
-  }, controller).then((res) => {
-    // eslint-disable-next-line no-undef
-    const list: DynamicTableColumn[] = [];
-    res.data?.metaDataList?.forEach((item: string, index: number) => {
-      list.push({
-        label: item,
-        prop: `t${index}`,
-        defaultValue: '-',
-        fixed: index === 0 ? 'left' : undefined,
-        sortable: index === 0 ? 'custom' : false,
-        // formatHeader: formatTimeseries,
+  getList(
+    {
+      measurements: copySearchFormData.path,
+      startTime,
+      endTime,
+      aggregation: copySearchFormData.aggregation,
+      timeInterval: copySearchFormData.timeInterval || undefined,
+      unitInterval: copySearchFormData.unitInterval,
+      asc: copySearchFormData.asc,
+      spage: pagination.columnNum,
+      ssize: pagination.columnSize,
+      size: 1000,
+      page: pagination.pageNum,
+    },
+    controller
+  )
+    .then((res) => {
+      // eslint-disable-next-line no-undef
+      const list: DynamicTableColumn[] = [];
+      res.data?.metaDataList?.forEach((item: string, index: number) => {
+        list.push({
+          label: item,
+          prop: `t${index}`,
+          defaultValue: '-',
+          fixed: index === 0 ? 'left' : undefined,
+          sortable: index === 0 ? 'custom' : false,
+          // formatHeader: formatTimeseries,
+        });
       });
-    });
-    columns.value = list;
-    tableData.value = res.data?.valueList?.map((item: any[]) => {
-      const obj = {} as Record<string, string>;
-      item.forEach((childItem, index) => {
-        obj[`t${index}`] = childItem;
+      columns.value = list;
+      tableData.value = res.data?.valueList?.map((item: any[]) => {
+        const obj = {} as Record<string, string>;
+        item.forEach((childItem, index) => {
+          obj[`t${index}`] = childItem;
+        });
+        return obj;
       });
-      return obj;
+      hasNext.value = res.data?.hasNext;
+      pagination.totalColumnPage = res.data?.totalColumnPage;
+      pagination.totalColumnCount = res.data?.totalColumnCount;
+      searchDetailInfos.value = res.data || {};
+      defaultSort.value = { prop: 't0', order: copySearchFormData.asc === 'asc' ? 'ascending' : 'descending' };
+    })
+    .finally(() => {
+      getListLoading.value = false;
     });
-    hasNext.value = res.data?.hasNext;
-    pagination.totalColumnPage = res.data?.totalColumnPage;
-    pagination.totalColumnCount = res.data?.totalColumnCount;
-    searchDetailInfos.value = res.data || {};
-    defaultSort.value = { prop: 't0', order: copySearchFormData.asc === 'asc' ? 'ascending' : 'descending' };
-  }).finally(() => {
-    getListLoading.value = false;
-  });
 }
 
-function handleSortChange(data: { column: any, prop: string, order: any }) {
+function handleSortChange(data: { column: any; prop: string; order: any }) {
   searchFormData.asc = data.order === 'ascending' ? 'asc' : 'desc';
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   handleSearch();
@@ -525,9 +533,8 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
-
 </script>
 
 <style lang="scss" scoped>
@@ -590,7 +597,7 @@ watch(
   flex: 1;
 }
 
-:deep(.el-select-v2__selection){
+:deep(.el-select-v2__selection) {
   flex-wrap: nowrap;
 }
 
@@ -645,11 +652,11 @@ watch(
     }
   }
 
-  .export-btn{
+  .export-btn {
     position: relative;
 
     /* stylelint-disable-next-line no-descending-specificity */
-    svg{
+    svg {
       position: absolute;
       right: 2px;
       top: 2px;
@@ -657,14 +664,16 @@ watch(
   }
 }
 
-.pagination-container{
+.pagination-container {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   margin-top: 24px;
 
-  .btn-prev, .btn-next, .btn-first{
+  .btn-prev,
+  .btn-next,
+  .btn-first {
     margin: 0 8px 0 0;
     padding: 6px 4px;
     min-width: 56px;
@@ -679,5 +688,4 @@ watch(
   line-height: 24px;
   color: #424561;
 }
-
 </style>

@@ -24,10 +24,11 @@ class TooltipTool extends ToolsView.ToolItem<EdgeView, TooltipToolOptions> {
     if (visible) {
       app.value = createApp({
         setup() {
-          return () => h(Tooltip, {
-            visible,
-            content: tooltip,
-          });
+          return () =>
+            h(Tooltip, {
+              visible,
+              content: tooltip,
+            });
         },
       });
       app.value.mount(this.knob);

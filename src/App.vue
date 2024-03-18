@@ -27,10 +27,7 @@ useLangSwitched(() => {
 </script>
 
 <template>
-  <el-config-provider
-    :locale="language"
-    :size="appStore.elementSize"
-    :button="{ autoInsertSpace: true }">
+  <el-config-provider :locale="language" :size="appStore.elementSize" :button="{ autoInsertSpace: true }">
     <router-view />
   </el-config-provider>
 </template>

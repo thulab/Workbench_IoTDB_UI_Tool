@@ -9,7 +9,7 @@
       :disabled="canReadWriteSchemaData ? pathList.length !== 10 : false"
       popper-class="tooltip-box-width"
     >
-      <el-button link :class="[(pathList.length === 10 || !canReadWriteSchemaData) ? 'hover-btn-disabled' : '', 'p-0']" @click="handleAdd" id="trend-add-path"><i-custom-new-trend /></el-button>
+      <el-button link :class="[pathList.length === 10 || !canReadWriteSchemaData ? 'hover-btn-disabled' : '', 'p-0']" @click="handleAdd" id="trend-add-path"><i-custom-new-trend /></el-button>
     </el-tooltip>
   </div>
 
@@ -32,23 +32,30 @@
   <div class="path-list-box" v-if="isExpand">
     <auth-container :is-auth="canReadWriteSchemaData" style="height: 100%">
       <div class="list-empty-wrapper" v-if="!pathList.length">
-        <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+        <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
         <span class="data-empty-text">{{ t('common.noData') }}</span>
       </div>
       <ul class="list-box" v-else :key="listKey">
         <li v-for="(item, index) in pathList" :key="item.path" :class="['path-item-box']">
           <div class="path-text-box">
             <el-checkbox v-if="item.disabled" :checked="false" :disabled="true" class="m-r-8" :id="`trend-path-checkbox-${index}-false`" />
-            <el-checkbox v-else :checked="item.checked" @change="val => handleChecked(val, item, index)" class="m-r-8" :id="`trend-path-checkbox-${index}-true`" />
+            <el-checkbox v-else :checked="item.checked" @change="(val) => handleChecked(val, item, index)" class="m-r-8" :id="`trend-path-checkbox-${index}-true`" />
             <div class="path-text"><text-tooltip :content="item.path" /></div>
           </div>
           <div class="path-detail-box">
             <div class="path-detail-item">
-              <span class="detail-label">{{t('common.color')}}：</span>
-              <el-color-picker v-model="item.color" :disabled="item.disabled" color-format="hex" :predefine="predefineColors" @change="val => handleChangeColor(val, item, index)" :id="`trend-path-color-${index}`" />
+              <span class="detail-label">{{ t('common.color') }}：</span>
+              <el-color-picker
+                v-model="item.color"
+                :disabled="item.disabled"
+                color-format="hex"
+                :predefine="predefineColors"
+                @change="(val) => handleChangeColor(val, item, index)"
+                :id="`trend-path-color-${index}`"
+              />
             </div>
             <div class="path-detail-item">
-              <span class="detail-label">{{t('common.lineWidth')}}：</span>
+              <span class="detail-label">{{ t('common.lineWidth') }}：</span>
               <el-input-number
                 v-model.number="item.width"
                 :disabled="item.disabled"
@@ -56,9 +63,9 @@
                 :max="10"
                 step-strictly
                 controls-position="right"
-                style="width: 40px;"
-                @change="val => handleChangeWidth(val, item, index)"
-                @blur="ev => handleBlurWidth(ev, item, index)"
+                style="width: 40px"
+                @change="(val) => handleChangeWidth(val, item, index)"
+                @blur="(ev) => handleBlurWidth(ev, item, index)"
                 :id="`trend-path-input-${index}`"
               />
             </div>
@@ -73,13 +80,7 @@
     <i-custom-arrow-right-expand />
   </el-icon>
 
-  <modal-path
-    v-model:visible="pathVisible"
-    :path-list="editPathList"
-    :predefine-colors="predefineColors"
-    :default-color="defaultColor"
-    @handleSave="handleSavePath"
-  />
+  <modal-path v-model:visible="pathVisible" :path-list="editPathList" :predefine-colors="predefineColors" :default-color="defaultColor" @handleSave="handleSavePath" />
 </template>
 
 <script setup lang="ts">
@@ -198,46 +199,46 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
-
 </script>
 
 <style lang="scss" scoped>
-.path-title-box{
+.path-title-box {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
 
-  .path-list-title{
+  .path-list-title {
     font-size: 14px;
     font-weight: 700;
     line-height: 21px;
-    color: #495AD4;
+    color: #495ad4;
   }
 }
 
-.collapse-title{
+.collapse-title {
   font-size: 14px;
   font-weight: 400;
   line-height: 17px;
-  color: #495AD4;
+  color: #495ad4;
   margin: 14px 5px 0;
 }
 
-.hover-btn-disabled, .hover-btn-disabled:focus{
+.hover-btn-disabled,
+.hover-btn-disabled:focus {
   cursor: not-allowed !important;
   opacity: 0.8;
 }
 
-.path-list-box{
+.path-list-box {
   border-radius: 2px;
-  background: #FFF;
+  background: #fff;
   overflow-y: auto;
   flex: 1;
 
-  .list-empty-wrapper{
+  .list-empty-wrapper {
     width: 100%;
     height: 100%;
     display: flex;
@@ -245,13 +246,13 @@ watch(
     justify-content: center;
     flex-direction: column;
 
-    .data-empty-img{
+    .data-empty-img {
       width: 150px;
       height: 150px;
       margin-bottom: 16px;
     }
 
-    .data-empty-text{
+    .data-empty-text {
       font-size: 14px;
       color: #131926;
       line-height: 21px;
@@ -259,10 +260,10 @@ watch(
   }
 }
 
-.path-item-box{
+.path-item-box {
   border-radius: 2px;
-  background: #FFF;
-  border: 1px solid #DFE1ED;
+  background: #fff;
+  border: 1px solid #dfe1ed;
   margin-top: -1px;
   padding-top: 10px;
   height: 84px;
@@ -270,11 +271,11 @@ watch(
   position: relative;
   cursor: pointer;
 
-  &:first-child{
+  &:first-child {
     margin-top: 0;
   }
 
-  .delete-icon{
+  .delete-icon {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -282,18 +283,18 @@ watch(
     display: none;
   }
 
-  &:hover .delete-icon{
+  &:hover .delete-icon {
     display: block;
   }
 }
 
-.path-text-box{
+.path-text-box {
   display: flex;
   align-items: center;
   margin-left: 8px;
   margin-bottom: 8px;
 
-  .path-text{
+  .path-text {
     font-size: 12px;
     font-weight: 400;
     line-height: 18px;
@@ -303,17 +304,17 @@ watch(
   }
 }
 
-.path-detail-box{
+.path-detail-box {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin: 0 32px;
 
-  .path-detail-item{
+  .path-detail-item {
     display: flex;
     align-items: center;
 
-    .detail-label{
+    .detail-label {
       font-size: 12px;
       font-weight: 400;
       line-height: 12px;
@@ -324,24 +325,24 @@ watch(
       height: 22px !important;
     }
 
-    :deep(.el-input-number.is-controls-right .el-input-number__increase, .el-input-number.is-controls-right .el-input-number__decrease){
+    :deep(.el-input-number.is-controls-right .el-input-number__increase, .el-input-number.is-controls-right .el-input-number__decrease) {
       --el-input-number-controls-height: 11px !important;
     }
   }
 }
 
-.expand-icon{
+.expand-icon {
   position: absolute;
   bottom: 0;
   left: 16px;
   cursor: pointer;
-  color: #A0A3B8;
+  color: #a0a3b8;
 
-  &:hover{
-    color: #495AD4;
+  &:hover {
+    color: #495ad4;
   }
 
-  &.collapse-icon{
+  &.collapse-icon {
     left: 0;
     transform: rotate(-180deg);
   }

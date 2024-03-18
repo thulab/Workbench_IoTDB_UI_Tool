@@ -4,13 +4,13 @@
       <template #default="{ node, data }">
         <span class="custom-tree-node">
           <el-tooltip class="item" effect="light" :disabled="node.level === 1" :content="data.label" placement="top" trigger="hover" :show-after="300">
-            <span style="color: #131926;font-weight: 300;" @dblclick="getFunction(node)">{{ node.level === 1 ? node.label : data.value }}</span>
+            <span style="color: #131926; font-weight: 300" @dblclick="getFunction(node)">{{ node.level === 1 ? node.label : data.value }}</span>
             <template #content>
-              <div style="width: 200px;">
-                <p style="color: #131926;font-weight: 300;">
+              <div style="width: 200px">
+                <p style="color: #131926; font-weight: 300">
                   {{ data.value }}
                 </p>
-                <p style="color: #131926;font-weight: 300;">
+                <p style="color: #131926; font-weight: 300">
                   {{ data.label }}
                 </p>
               </div>
@@ -25,9 +25,7 @@
 <script lang="ts" setup>
 import type Node from 'element-plus/es/components/tree/src/model/node';
 import type { ElTree } from 'element-plus';
-import {
-  functionTreeData,
-} from '@/constants';
+import { functionTreeData } from '@/constants';
 
 const treeRef = ref<InstanceType<typeof ElTree> | null>(null);
 const emit = defineEmits(['get-function']);
@@ -48,7 +46,6 @@ function getFunction(node: Node) {
     emit('get-function', node.data.value);
   }
 }
-
 </script>
 
 <style lang="scss" scoped>
@@ -63,11 +60,11 @@ function getFunction(node: Node) {
   }
 }
 
-:deep(.el-tree-node__expand-icon){
-  color: #495AD4;
+:deep(.el-tree-node__expand-icon) {
+  color: #495ad4;
 }
 
-:deep(.el-tree-node__expand-icon.is-leaf){
+:deep(.el-tree-node__expand-icon.is-leaf) {
   color: transparent;
   cursor: default;
 }
@@ -77,7 +74,7 @@ function getFunction(node: Node) {
   line-height: 30px;
 }
 
-.custom-tree-node{
+.custom-tree-node {
   overflow: hidden;
   text-overflow: ellipsis;
 }

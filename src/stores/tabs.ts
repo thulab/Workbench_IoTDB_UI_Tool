@@ -7,9 +7,14 @@ const useTabsStore = defineStore({
   id: 'useTabsState',
   state: () => ({
     tabsMenuValue: HOME_URL,
-    tabsMenuList: [{
-      title: 'Home', path: HOME_URL, icon: 'home-filled', close: false,
-    }] as Array<MenuOptions>,
+    tabsMenuList: [
+      {
+        title: 'Home',
+        path: HOME_URL,
+        icon: 'home-filled',
+        close: false,
+      },
+    ] as Array<MenuOptions>,
   }),
   getters: {},
   actions: {

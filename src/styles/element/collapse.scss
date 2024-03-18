@@ -1,18 +1,18 @@
-.el-collapse{
+.el-collapse {
   --el-collapse-header-height: 40px !important;
-  --el-collapse-border-color: #F0F1FA !important;
+  --el-collapse-border-color: #f0f1fa !important;
 }
 
-.el-collapse-item__header{
+.el-collapse-item__header {
   flex-direction: row-reverse;
 }
 
-.el-collapse-item__content{
-  background: #F7F8FC;
+.el-collapse-item__content {
+  background: #f7f8fc;
   padding: 18px 4px 0 !important;
 }
 
-.el-collapse-item__arrow{
+.el-collapse-item__arrow {
   margin: 0 16px 0 0 !important;
   font-size: 20px !important;
 }

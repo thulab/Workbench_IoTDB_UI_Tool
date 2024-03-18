@@ -6,7 +6,7 @@
           <el-tabs v-model="activiteSql" editable type="card" closable class="sql-tab-list" @tab-click="handleTabClick" @tab-remove="handleTabRemove" @tab-add="handleTabAdd" id="sql-search-top-tabs">
             <el-tab-pane v-for="(item, index) in sqlList" :key="item.id" :label="item.queryName" :name="item.id">
               <template #label>
-                <span style="font-size: 12px; line-height: 1.2;display: flex; width: 118px;" :id="`sql_tab_${index}`"><text-tooltip :content="item.queryName" /></span>
+                <span style="font-size: 12px; line-height: 1.2; display: flex; width: 118px" :id="`sql_tab_${index}`"><text-tooltip :content="item.queryName" /></span>
               </template>
               <el-scrollbar :height="tabHeight">
                 <sql-search v-model:code="code[activiteSql]" @save="handleSave" ref="sqlSearchRef" />
@@ -19,7 +19,7 @@
 
       <div class="sql-search-aside">
         <div v-if="codeMirrorReady">
-          <h4 style="font-size: 14px;font-weight: 700;color: #495AD4;margin: 0 0 12px;">{{ t('search.quickActions') }}</h4>
+          <h4 style="font-size: 14px; font-weight: 700; color: #495ad4; margin: 0 0 12px">{{ t('search.quickActions') }}</h4>
           <el-tabs v-model="activeNameSide" class="tabs-nav-aside">
             <el-tab-pane :label="t('measurement.measurement')" name="data">
               <side-data @get-function="getFunction" />
@@ -31,7 +31,10 @@
               <side-template ref="sqlListRef" @handle-sql-operate="handleSqlOperate" />
             </el-tab-pane>
           </el-tabs>
-          <a href="https://www.timecho.com/docs/zh/UserGuide/latest/Reference/SQL-Reference.html" rel="noopener noreferrer" target="_blank" class="operate-link"><i-custom-question />{{ t('search.operatingInstructions') }}</a>
+          <a href="https://www.timecho.com/docs/zh/UserGuide/latest/Reference/SQL-Reference.html" rel="noopener noreferrer" target="_blank" class="operate-link">
+            <i-custom-question />
+            {{ t('search.operatingInstructions') }}
+          </a>
         </div>
       </div>
     </div>
@@ -93,7 +96,14 @@ const { maxTableHeight: tabHeight } = useTableHeight(125);
 const activiteSql = ref<string>(`_${dayjs().format('YYYY-MM-DD HH:mm:ss:SSS')}`);
 
 // eslint-disable-next-line no-useless-escape
-const sqlList = ref<Search.SqlList[]>([{ id: activiteSql.value, queryName: `${t('common.query')} ${dayjs().format('YYYY-MM-DD HH:mm:ss').replace(/\-|\:| /g, '')}` }]);
+const sqlList = ref<Search.SqlList[]>([
+  {
+    id: activiteSql.value,
+    queryName: `${t('common.query')} ${dayjs()
+      .format('YYYY-MM-DD HH:mm:ss')
+      .replace(/\-|\:| /g, '')}`,
+  },
+]);
 const activeNameSide = ref('function');
 
 const code = reactive<Record<string, string>>({});
@@ -102,9 +112,7 @@ const sqlListRef = ref<InstanceType<typeof SideTemplate>>();
 const saveFormRef = ref<FormInstance>();
 const resaveFormRef = ref<FormInstance>();
 const saveFormRules = reactive({
-  sqlName: [
-    { required: true, message: t('search.nameRuleTip'), trigger: 'blur' },
-  ],
+  sqlName: [{ required: true, message: t('search.nameRuleTip'), trigger: 'blur' }],
 });
 const saveForm = reactive<{
   sqlName: string;
@@ -129,7 +137,8 @@ const resaveFormRules = reactive({
       validator: (rule: any, value: any, callback: any) => {
         if (!value || !value.trim()) {
           return callback(new Error(t('search.newNameTip')));
-        } if (value === resaveForm.oldSqlName) {
+        }
+        if (value === resaveForm.oldSqlName) {
           return callback(new Error(t('search.nameRepeatTip')));
         }
         return callback();
@@ -352,19 +361,15 @@ function handleSave() {
   }
 }
 
-watch(
-  activiteSql,
-  (newVal, oldVal) => {
-    if (newVal !== oldVal) {
-      getSqlCode();
-    }
-  },
-);
-
+watch(activiteSql, (newVal, oldVal) => {
+  if (newVal !== oldVal) {
+    getSqlCode();
+  }
+});
 </script>
 
 <style lang="scss" scoped>
-.sql-container{
+.sql-container {
   width: 100%;
   position: relative;
   height: 100%;
@@ -432,13 +437,13 @@ watch(
   }
 }
 
-.type-input-disabled{
-  :deep(.el-input__inner){
+.type-input-disabled {
+  :deep(.el-input__inner) {
     color: #131926;
     -webkit-text-fill-color: #131926;
   }
 
-  :deep(.el-input__wrapper){
+  :deep(.el-input__wrapper) {
     box-shadow: none;
   }
 }
@@ -454,18 +459,18 @@ watch(
   padding: 10px 16px;
   box-sizing: border-box;
 
-  .operate-link{
+  .operate-link {
     position: absolute;
     left: 8px;
     bottom: 12px;
     font-size: 12px;
     font-weight: 300;
     line-height: 12px;
-    color: #495AD4;
+    color: #495ad4;
     display: flex;
     align-items: center;
 
-    svg{
+    svg {
       width: 16px;
       height: 16px;
       margin-right: 4px;
@@ -490,5 +495,4 @@ watch(
     border-radius: 2px 2px 0 0;
   }
 }
-
 </style>

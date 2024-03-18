@@ -4,9 +4,7 @@
     <div class="error-detail">
       <h2>500</h2>
       <h4>{{ t('error.500Tip') }}~🤦‍♂️🤦‍♀️</h4>
-      <el-button
-        type="primary"
-        @click="tabStore.goHome()">
+      <el-button type="primary" @click="tabStore.goHome()">
         {{ t('error.goHome') }}
       </el-button>
     </div>
@@ -21,5 +19,5 @@ const tabStore = useTabsStore();
 </script>
 
 <style scoped lang="scss">
-@import "./error";
+@import './error';
 </style>

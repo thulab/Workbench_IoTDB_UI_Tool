@@ -2,10 +2,7 @@
   <version-container :is-show="showAuthMenu">
     <el-container>
       <el-aside width="240px" class="role-list-wrapper">
-        <role-list
-          :can-manage-role="canManageRole"
-          @handleSelect="val => currentRole = val"
-        />
+        <role-list :can-manage-role="canManageRole" @handleSelect="(val) => (currentRole = val)" />
       </el-aside>
       <el-container class="role-details-wrapper">
         <el-main class="p-0" v-loading="loading">
@@ -18,9 +15,11 @@
               <el-button type="primary" v-else @click="handleReset('view')" id="auth-role-view">{{ t('common.exitEdit') }}</el-button>
             </div>
             <div class="detail-user-list">
-              <span class="p-t-4">{{t('auth.havingUser')}}：</span>
+              <span class="p-t-4">{{ t('auth.havingUser') }}：</span>
               <div class="detail-user-box">
-                <el-tag :closable="!isView" type="info" v-for="(item, index) in userList" :key="item" @close="handleDeleteUser(index)" @click="showAuthDetail(item)" :id="`auth-user-${item}-${index}`">{{ item }}</el-tag>
+                <el-tag :closable="!isView" type="info" v-for="(item, index) in userList" :key="item" @close="handleDeleteUser(index)" @click="showAuthDetail(item)" :id="`auth-user-${item}-${index}`">
+                  {{ item }}
+                </el-tag>
                 <auth-tooltip :is-disabled="canManageUser">
                   <el-button link :disabled="!canManageUser" @click="handleAddUser" v-if="!isView" id="auth-user-add-role" class="m-l-8 p-0">
                     <el-icon size="24px"><i-custom-user-role-add /></el-icon>
@@ -29,19 +28,25 @@
               </div>
             </div>
             <div class="detail-title-box">
-              <h4 class="detail-title-text">{{ t('auth.detail') }}<span class="tip-text"><i-custom-info-warning />{{ t('auth.removeAuthTip') }}</span></h4>
+              <h4 class="detail-title-text">
+                {{ t('auth.detail') }}
+                <span class="tip-text">
+                  <i-custom-info-warning />
+                  {{ t('auth.removeAuthTip') }}
+                </span>
+              </h4>
             </div>
             <div class="table-list-box">
               <h4 class="table-box-title">{{ t('common.allSituation') }}</h4>
-              <el-table :data="[authData.entityPrivileges]" style="width: 100%;" border>
+              <el-table :data="[authData.entityPrivileges]" style="width: 100%" border>
                 <el-table-column :label="t('common.allChoose')" align="center" width="58" fixed="left">
                   <template #default="{ row }">
                     <el-icon v-if="isView" size="21">
-                      <i-custom-correct style="transform: translateY(3px);" v-if="row.length >= entityPrivilegesEnumKeys.length" />
+                      <i-custom-correct style="transform: translateY(3px)" v-if="row.length >= entityPrivilegesEnumKeys.length" />
                     </el-icon>
                     <template v-else>
-                      <el-checkbox :checked="true" v-if="row.length >= entityPrivilegesEnumKeys.length" @change="val => handleCheckedEntity(val)" id="role-auth-entity-all" />
-                      <el-checkbox :checked="false" v-else @change="val => handleCheckedEntity(val)" id="role-auth-entity-all" />
+                      <el-checkbox :checked="true" v-if="row.length >= entityPrivilegesEnumKeys.length" @change="(val) => handleCheckedEntity(val)" id="role-auth-entity-all" />
+                      <el-checkbox :checked="false" v-else @change="(val) => handleCheckedEntity(val)" id="role-auth-entity-all" />
                     </template>
                   </template>
                 </el-table-column>
@@ -49,11 +54,11 @@
                   <el-table-column v-for="(col, ci) in column.children" :label="col.desc" :key="`${col.privileges}_${ci}_col`" :prop="col.privileges" align="center" :width="calcColumnWidth(col)">
                     <template #default="{ row }">
                       <el-icon v-if="isView" size="21">
-                        <i-custom-correct style="transform: translateY(3px);" v-if="row.includes(col.privileges)" />
+                        <i-custom-correct style="transform: translateY(3px)" v-if="row.includes(col.privileges)" />
                       </el-icon>
                       <template v-else>
-                        <el-checkbox :checked="true" v-if="row.includes(col.privileges)" @change="val => handleCheckedEntity(val, col.privileges)" :id="`role-auth-entity-${col.privileges}`" />
-                        <el-checkbox :checked="false" v-else @change="val => handleCheckedEntity(val, col.privileges)" :id="`role-auth-entity-${col.privileges}`" />
+                        <el-checkbox :checked="true" v-if="row.includes(col.privileges)" @change="(val) => handleCheckedEntity(val, col.privileges)" :id="`role-auth-entity-${col.privileges}`" />
+                        <el-checkbox :checked="false" v-else @change="(val) => handleCheckedEntity(val, col.privileges)" :id="`role-auth-entity-${col.privileges}`" />
                       </template>
                     </template>
                   </el-table-column>
@@ -67,12 +72,17 @@
                 <el-table-column :label="t('common.allChoose')" align="center" width="193">
                   <template #default="{ row, $index }">
                     <el-icon v-if="isView || !row.path" size="21">
-                      <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" />
+                      <i-custom-correct style="transform: translateY(3px)" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" />
                     </el-icon>
                     <template v-else-if="row.path">
                       <!-- eslint-disable-next-line vue/max-len -->
-                      <el-checkbox :checked="true" v-if="row.privileges.length >= pathPrivilegesEnumKeys.length" @change="val => handleCheckedPath(val, $index)" :id="`role-auth-path-all-${$index}`" />
-                      <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index)" :id="`role-auth-path-all-${$index}`" />
+                      <el-checkbox
+                        :checked="true"
+                        v-if="row.privileges.length >= pathPrivilegesEnumKeys.length"
+                        @change="(val) => handleCheckedPath(val, $index)"
+                        :id="`role-auth-path-all-${$index}`"
+                      />
+                      <el-checkbox :checked="false" v-else @change="(val) => handleCheckedPath(val, $index)" :id="`role-auth-path-all-${$index}`" />
                     </template>
                   </template>
                 </el-table-column>
@@ -80,11 +90,16 @@
                   <el-table-column v-for="(col, ci) in column.children" :label="col.desc" :key="`${col.privileges}_${ci}_col`" :prop="col.privileges" align="center" :width="calcColumnWidth(col)">
                     <template #default="{ row, $index }">
                       <el-icon v-if="isView" size="21">
-                        <i-custom-correct style="transform: translateY(3px);" v-if="row.privileges.includes(col.privileges)" />
+                        <i-custom-correct style="transform: translateY(3px)" v-if="row.privileges.includes(col.privileges)" />
                       </el-icon>
                       <template v-else-if="row.path">
-                        <el-checkbox :checked="true" v-if="row.privileges.includes(col.privileges)" @change="val => handleCheckedPath(val, $index, col.privileges)" :id="`role-auth-path-${col.privileges}-${$index}`" />
-                        <el-checkbox :checked="false" v-else @change="val => handleCheckedPath(val, $index, col.privileges)" :id="`role-auth-path-${col.privileges}-${$index}`" />
+                        <el-checkbox
+                          :checked="true"
+                          v-if="row.privileges.includes(col.privileges)"
+                          @change="(val) => handleCheckedPath(val, $index, col.privileges)"
+                          :id="`role-auth-path-${col.privileges}-${$index}`"
+                        />
+                        <el-checkbox :checked="false" v-else @change="(val) => handleCheckedPath(val, $index, col.privileges)" :id="`role-auth-path-${col.privileges}-${$index}`" />
                       </template>
                     </template>
                   </el-table-column>
@@ -98,7 +113,10 @@
                 </el-table-column>
               </el-table>
 
-              <el-button v-if="!isView" style="width: 100%;" class="m-t-24" @click="handleAddRow" id="auth-role-path"><i-custom-add class="m-r-4" />{{ t('auth.addPath') }}</el-button>
+              <el-button v-if="!isView" style="width: 100%" class="m-t-24" @click="handleAddRow" id="auth-role-path">
+                <i-custom-add class="m-r-4" />
+                {{ t('auth.addPath') }}
+              </el-button>
             </div>
           </el-scrollbar>
         </el-main>
@@ -111,22 +129,11 @@
         </el-footer>
       </el-container>
 
-      <modal-path
-        v-model:visible="pathVisible"
-        :path-list="editPathList"
-        @handleSave="handleSavePath"
-      />
+      <modal-path v-model:visible="pathVisible" :path-list="editPathList" @handleSave="handleSavePath" />
 
-      <modal-add-user
-        v-model:visible="userVisible"
-        :selected="userList"
-        @add-user="addUserConfirm"
-      />
+      <modal-add-user v-model:visible="userVisible" :selected="userList" @add-user="addUserConfirm" />
 
-      <modal-preview-user
-        v-model:visible="previewVisible"
-        :name="previewUser"
-      />
+      <modal-preview-user v-model:visible="previewVisible" :name="previewUser" />
     </el-container>
   </version-container>
 </template>
@@ -149,7 +156,7 @@ const currentRole = ref('');
 const pathVisible = ref(false);
 const editPathList = ref<string[]>([]);
 const intitalEntityVals = ref<string[]>([]);
-const intitalPathVals = ref<Array<{ path: string, privileges: string[] }>>([]);
+const intitalPathVals = ref<Array<{ path: string; privileges: string[] }>>([]);
 const pageType = ref<'edit' | 'view'>('view');
 const userList = ref<string[]>([]);
 let sourceUsers: string[] = [];
@@ -162,14 +169,7 @@ const isView = computed(() => pageType.value === 'view');
 
 const connectionStore = useConnectionStore();
 const userStore = useUserStore();
-const {
-  entityPrivilegesEnumGroup,
-  entityPrivilegesEnumKeys,
-  pathPrivilegesEnumGroup,
-  pathPrivilegesEnumKeys,
-  canManageUser,
-  canManageRole,
-} = storeToRefs(userStore);
+const { entityPrivilegesEnumGroup, entityPrivilegesEnumKeys, pathPrivilegesEnumGroup, pathPrivilegesEnumKeys, canManageUser, canManageRole } = storeToRefs(userStore);
 
 const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion));
 
@@ -203,10 +203,7 @@ function getRoleAuth() {
 
 function getDetail() {
   loading.value = true;
-  Promise.allSettled([
-    getRoleUserList(),
-    getRoleAuth(),
-  ]).finally(() => {
+  Promise.allSettled([getRoleUserList(), getRoleAuth()]).finally(() => {
     loading.value = false;
   });
 }
@@ -235,7 +232,7 @@ function handleDelRow(index: number) {
 }
 
 // 全局
-function handleCheckedEntity(val: CheckboxValueType, auth?:string) {
+function handleCheckedEntity(val: CheckboxValueType, auth?: string) {
   if (!auth) {
     if (val) {
       authData.value.entityPrivileges = entityPrivilegesEnumKeys.value.map((item) => item);
@@ -251,11 +248,11 @@ function handleCheckedEntity(val: CheckboxValueType, auth?:string) {
 }
 
 // 路径
-function handleCheckedPath(val: CheckboxValueType, index: number, auth?:string) {
+function handleCheckedPath(val: CheckboxValueType, index: number, auth?: string) {
   if (!auth) {
     authData.value.pathPrivileges.splice(index, 1, { path: authData.value.pathPrivileges[index].path, privileges: val ? [...pathPrivilegesEnumKeys.value] : [] });
   } else {
-    const data: { path: string, privileges: string[] } = { ...authData.value.pathPrivileges[index] };
+    const data: { path: string; privileges: string[] } = { ...authData.value.pathPrivileges[index] };
     if (val) {
       data.privileges.push(auth);
     } else {
@@ -291,8 +288,8 @@ function updateUsers() {
 
 function updateAuth() {
   const pathPrivileges = authData.value.pathPrivileges.filter((item) => item.path);
-  const cancelPathPrivileges: Array<{ path: string, privileges: string[] }> = [];
-  const addPathPrivileges: Array<{ path: string, privileges: string[] }> = [];
+  const cancelPathPrivileges: Array<{ path: string; privileges: string[] }> = [];
+  const addPathPrivileges: Array<{ path: string; privileges: string[] }> = [];
   const initialPathKeys = intitalPathVals.value.map((data) => data.path) || [];
   const pathVals = pathPrivileges.map((data) => data.path) || [];
   const delArr = difference(initialPathKeys, pathVals);
@@ -340,21 +337,20 @@ function handleSave() {
     return;
   }
   saveLoading.value = true;
-  Promise.allSettled([
-    updateUsers(),
-    updateAuth(),
-  ]).then((results) => {
-    if (results.some((res) => res.status === 'rejected')) {
-      pageType.value = 'edit';
-      getDetail();
-    } else {
-      ElMessage.success(t('common.saveSuccess'));
-      pageType.value = 'view';
-      getDetail();
-    }
-  }).finally(() => {
-    saveLoading.value = false;
-  });
+  Promise.allSettled([updateUsers(), updateAuth()])
+    .then((results) => {
+      if (results.some((res) => res.status === 'rejected')) {
+        pageType.value = 'edit';
+        getDetail();
+      } else {
+        ElMessage.success(t('common.saveSuccess'));
+        pageType.value = 'view';
+        getDetail();
+      }
+    })
+    .finally(() => {
+      saveLoading.value = false;
+    });
 }
 
 // 关联用户
@@ -371,10 +367,9 @@ function handleDeleteUser(i: number) {
     cancelButtonClass: 'del-user-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
-  })
-    .then(() => {
-      userList.value.splice(i, 1);
-    });
+  }).then(() => {
+    userList.value.splice(i, 1);
+  });
 }
 
 function addUserConfirm(vals: string[]) {
@@ -408,7 +403,7 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
 
 watch(locale, () => {
@@ -428,33 +423,33 @@ watch(locale, () => {
   flex-direction: column;
 }
 
-.role-list-wrapper{
+.role-list-wrapper {
   background-color: #fff;
   border-radius: 6px;
   box-sizing: border-box;
 }
 
-.role-details-wrapper{
+.role-details-wrapper {
   margin-left: 16px;
   background-color: #fff;
   border-radius: 6px;
 }
 
-.detail-title-box{
+.detail-title-box {
   height: 48px;
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #DFE1ED;
+  border-bottom: 1px solid #dfe1ed;
   padding: 0 16px;
   box-sizing: border-box;
 
-  .detail-title-text{
+  .detail-title-text {
     font-size: 14px;
     font-weight: 700;
     line-height: 21px;
-    color: #495AD4;
+    color: #495ad4;
     display: flex;
 
     .tip-text {
@@ -474,22 +469,22 @@ watch(locale, () => {
   }
 }
 
-.table-list-box{
+.table-list-box {
   margin: 32px 16px 0;
-  background-color: #F7F8FC;
+  background-color: #f7f8fc;
   padding: 8px 16px 16px;
 
-  .table-box-title{
+  .table-box-title {
     font-size: 14px;
     font-weight: 700;
     line-height: 21px;
-    color: #495AD4;
+    color: #495ad4;
     margin-bottom: 8px;
   }
 
   :deep(.el-table) {
-    --el-table-border: 1px solid #DFE1ED;
-    --el-table-border-color: #DFE1ED;
+    --el-table-border: 1px solid #dfe1ed;
+    --el-table-border-color: #dfe1ed;
   }
 
   :deep(.el-table th.el-table__cell) {
@@ -501,31 +496,31 @@ watch(locale, () => {
   }
 }
 
-.operate-buttons{
+.operate-buttons {
   text-align: right;
   margin-top: 24px;
 }
 
-.detail-user-list{
+.detail-user-list {
   margin: 18px 16px 32px;
   font-size: 14px;
   color: #131926;
   display: flex;
 
-  .el-tag{
+  .el-tag {
     cursor: pointer;
     margin: 0 8px 8px 0;
   }
 
-  .detail-user-box{
+  .detail-user-box {
     flex: 1;
     display: flex;
     flex-wrap: wrap;
   }
 
   .el-tag--info {
-    background-color: #F7F8FC;
-    color:#656A85;
+    background-color: #f7f8fc;
+    color: #656a85;
     border: 0;
     border-radius: 2px;
     font-size: 12px;

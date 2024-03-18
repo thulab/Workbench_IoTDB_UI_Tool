@@ -1,5 +1,4 @@
-declare namespace Dashboard{
-
+declare namespace Dashboard {
   export interface NodeItem {
     nodeID: string;
     address: string;
@@ -74,11 +73,11 @@ declare namespace Dashboard{
   }
 
   export interface ActiveData {
-    activationTime: string,
-    datanodeNum: string,
-    cpuNum: string,
-    deviceNum: string,
-    measurementNum: string,
-    ainodeNum: string,
+    activationTime: string;
+    datanodeNum: string;
+    cpuNum: string;
+    deviceNum: string;
+    measurementNum: string;
+    ainodeNum: string;
   }
 }

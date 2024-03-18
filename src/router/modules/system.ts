@@ -43,7 +43,10 @@ const route = [
             name: 'UserManagement',
             component: () => import('@/views/auth/user-detail.vue'),
             meta: {
-              keepAlive: true, title: 'page.user', icon: ICustomAuthUser, isAuthMenu: true,
+              keepAlive: true,
+              title: 'page.user',
+              icon: ICustomAuthUser,
+              isAuthMenu: true,
             },
           },
           {
@@ -51,7 +54,10 @@ const route = [
             name: 'RoleManagement',
             component: () => import('@/views/auth/role-detail.vue'),
             meta: {
-              keepAlive: true, title: 'page.role', icon: ICustomAuthRole, isAuthMenu: true,
+              keepAlive: true,
+              title: 'page.role',
+              icon: ICustomAuthRole,
+              isAuthMenu: true,
             },
           },
         ],

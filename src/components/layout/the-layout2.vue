@@ -11,10 +11,7 @@
       <el-main class="p-0">
         <section class="main-box">
           <router-view v-slot="{ Component, route }">
-            <transition
-              appear
-              :name="route.meta.transition as string || 'fade-transform'"
-              mode="out-in">
+            <transition appear :name="(route.meta.transition as string) || 'fade-transform'" mode="out-in">
               <keep-alive :include="cacheRouter">
                 <component :is="Component" :key="route.path" v-loading="routerViewLoading" />
               </keep-alive>
@@ -45,19 +42,13 @@ import LayoutFooter from './layout-footer.vue';
 
 const appStore = useAppStore();
 
-const {
-  contentFullScreen,
-  showTabs,
-  routerViewLoading,
-} = storeToRefs(appStore);
+const { contentFullScreen, showTabs, routerViewLoading } = storeToRefs(appStore);
 
-onMounted(() => {
-});
+onMounted(() => {});
 </script>
 
 <style scoped lang="scss">
-
-.layout-wrapper{
+.layout-wrapper {
   min-width: 1300px;
   min-height: 600px;
 }

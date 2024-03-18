@@ -17,9 +17,7 @@
   </el-dropdown>
   <modal-reset-password :title="t('auth.resetPwd')" :user-name="userName" v-model:visible="modalVisible" />
 
-  <modal-system
-    v-model:visible="systemVisible"
-  />
+  <modal-system v-model:visible="systemVisible" />
 </template>
 
 <script setup lang="ts">

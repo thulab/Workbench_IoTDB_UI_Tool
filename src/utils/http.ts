@@ -49,10 +49,7 @@ async function responseInterceptor(response: HttpResponse<object>): Promise<Http
     return Promise.resolve(response);
   }
   // 如果是下载文件，并且返回类型是正确的blob 直接返回
-  if (response.headers['content-disposition']
-      && response.headers['content-disposition'].indexOf('attachment') > -1
-      && data instanceof Blob
-      && data.type !== 'application/json') {
+  if (response.headers['content-disposition'] && response.headers['content-disposition'].indexOf('attachment') > -1 && data instanceof Blob && data.type !== 'application/json') {
     return Promise.resolve(response);
   }
   const logined = sessionStorage.getItem('nologin') === '0';

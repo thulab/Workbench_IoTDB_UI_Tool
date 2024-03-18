@@ -194,7 +194,7 @@ const keywords = [
   'VIEW',
 ];
 
-const sqlExamples: { [key: string]: string [] } = {
+const sqlExamples: { [key: string]: string[] } = {
   SET: ['SET STORAGE GROUP TO <FullPath>', 'SET TTL TO <StorageGroupPath> <Integer>'],
   CREATE: [
     'CREATE TIMESERIES <FullPath> WITH <AttributeClauses>',

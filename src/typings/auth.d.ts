@@ -1,5 +1,4 @@
-declare namespace Auth{
-
+declare namespace Auth {
   export interface DBUser {
     name: string;
     password: string;
@@ -12,16 +11,16 @@ declare namespace Auth{
   }
 
   export interface PrivilegesEnum {
-    entityPrivileges: Array<{ group: string, children: Auth.PrivilegeEnum[] }>;
-    pathPrivileges: Array<{ group: string, children: Auth.PrivilegeEnum[] }>;
+    entityPrivileges: Array<{ group: string; children: Auth.PrivilegeEnum[] }>;
+    pathPrivileges: Array<{ group: string; children: Auth.PrivilegeEnum[] }>;
   }
 
   export interface UpdateAuthByRole {
     roleName: string;
     cancelEntityPrivileges: string[];
     addEntityPrivileges: string[];
-    cancelPathPrivileges: Array<{ path: string, privileges: string[] }>;
-    addPathPrivileges: Array<{ path: string, privileges: string[] }>;
+    cancelPathPrivileges: Array<{ path: string; privileges: string[] }>;
+    addPathPrivileges: Array<{ path: string; privileges: string[] }>;
   }
 
   export interface UpdateRoleUsers {
@@ -33,7 +32,7 @@ declare namespace Auth{
   export interface AuthByRoleRes {
     roleName: string;
     entityPrivileges: string[];
-    pathPrivileges: Array<{ path: string, privileges: string[] }>;
+    pathPrivileges: Array<{ path: string; privileges: string[] }>;
   }
 
   export interface UserPrivileges {
@@ -41,8 +40,8 @@ declare namespace Auth{
     enablePrometheus?: boolean;
     configurePrometheus?: boolean;
     entityPrivileges: string[];
-    pathPrivileges: Array<{ path: string, privileges: string[] }>;
-    rolesToPrivileges: Array<AuthByRoleRes>
+    pathPrivileges: Array<{ path: string; privileges: string[] }>;
+    rolesToPrivileges: Array<AuthByRoleRes>;
   }
   export interface UserAuthInfo extends UpdateAuthByRole {
     roleName?: string;
@@ -58,7 +57,7 @@ declare namespace Auth{
   }
   export interface UserEditPathAuthInfo extends UserEditAuthInfo {
     userPrivileges?: string[];
-    userSourceData: { path: string, privileges: string[] },
+    userSourceData: { path: string; privileges: string[] };
     path: string;
   }
 }

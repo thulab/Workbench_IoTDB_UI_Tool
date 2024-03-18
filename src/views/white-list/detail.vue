@@ -5,20 +5,12 @@
         <h4 class="detail-title-text">{{ t('white.config') }}</h4>
         <div class="config-switch-box">
           <span class="config-label">{{ t('white.switch') }}：</span>
-          <el-switch
-            v-model="configStatus"
-            :active-value="1"
-            :inactive-value="0"
-            style="
-
---el-switch-on-color: #44C795; --el-switch-off-color: #DFE1ED;"
-            id="white-list-status"
-          />
+          <el-switch v-model="configStatus" :active-value="1" :inactive-value="0" style="--el-switch-on-color: #44c795; --el-switch-off-color: #dfe1ed" id="white-list-status" />
         </div>
 
         <h4 class="detail-title-text">t('white.list')</h4>
         <div class="detail-no-config-box" v-if="!configStatus">
-          <img src="@/assets/white-list-empty.png" alt="" class="data-empty-img">
+          <img src="@/assets/white-list-empty.png" alt="" class="data-empty-img" />
           <span class="data-empty-text">{{ t('white.ipTip') }}</span>
         </div>
         <div class="list-container" v-else>
@@ -44,7 +36,7 @@
             <el-table
               :data="tableData"
               v-loading="loading"
-              style="width: 100%;"
+              style="width: 100%"
               :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
               :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
               tooltip-effect="light"
@@ -60,7 +52,7 @@
               </el-table-column>
               <template #empty>
                 <div class="table-empty-wrapper">
-                  <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+                  <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
                   <span class="data-empty-text">{{ t('common.noData') }}</span>
                 </div>
               </template>
@@ -81,10 +73,7 @@
           </div>
         </div>
       </el-main>
-      <modal-ip
-        v-model:visible="dialogVisible"
-        :edit-data="editData"
-      />
+      <modal-ip v-model:visible="dialogVisible" :edit-data="editData" />
     </el-container>
   </active-container>
 </template>
@@ -152,11 +141,10 @@ function handleDelRow(data: any) {
     cancelButtonClass: 'del-white-list-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
-  })
-    .then(() => {
-      ElMessage.success(t('common.deleteSuccess'));
-      handleRefresh();
-    });
+  }).then(() => {
+    ElMessage.success(t('common.deleteSuccess'));
+    handleRefresh();
+  });
 }
 
 onMounted(() => {
@@ -173,28 +161,28 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
 </script>
 
 <style lang="scss" scoped>
-.details-wrapper{
+.details-wrapper {
   background-color: #fff;
   border-radius: 6px;
 }
 
-.detail-title-text{
+.detail-title-text {
   width: 100%;
-  border-bottom: 1px solid #DFE1ED;
+  border-bottom: 1px solid #dfe1ed;
   padding: 14px 16px 6px;
   box-sizing: border-box;
   font-size: 14px;
   font-weight: 700;
   line-height: 21px;
-  color: #495AD4;
+  color: #495ad4;
 }
 
-.config-switch-box{
+.config-switch-box {
   padding: 18px 16px 16px;
   width: 100%;
   display: flex;
@@ -205,7 +193,7 @@ watch(
     height: 28px;
   }
 
-  :deep(.el-switch__core){
+  :deep(.el-switch__core) {
     width: 64px;
     height: 28px;
     border-radius: 14px;
@@ -220,7 +208,7 @@ watch(
     left: calc(100% - 24px);
   }
 
-  .config-label{
+  .config-label {
     font-size: 14px;
     font-weight: 400;
     line-height: 21px;
@@ -229,21 +217,21 @@ watch(
   }
 }
 
-.list-container{
+.list-container {
   padding: 16px;
   box-sizing: border-box;
 }
 
-.search-form-wrapper{
+.search-form-wrapper {
   display: flex;
   justify-content: space-between;
   padding: 2px 0 18px;
 
-  .search-form-box{
+  .search-form-box {
     display: flex;
     align-items: center;
 
-    .search-from-label{
+    .search-from-label {
       font-size: 14px;
       font-weight: 400;
       line-height: 21px;
@@ -252,18 +240,18 @@ watch(
     }
   }
 
-  .handle-add-button{
+  .handle-add-button {
     padding-left: 2px;
     padding-right: 4px;
   }
 }
 
-.table-box{
+.table-box {
   padding: 16px;
-  background-color: #F7F8FC;
+  background-color: #f7f8fc;
 }
 
-.detail-no-config-box{
+.detail-no-config-box {
   width: 100%;
   height: calc(100% - 146px);
   display: flex;
@@ -271,13 +259,13 @@ watch(
   align-items: center;
   justify-content: center;
 
-  .data-empty-img{
+  .data-empty-img {
     width: 150px;
     height: 150px;
     margin-bottom: 16px;
   }
 
-  .data-empty-text{
+  .data-empty-text {
     font-size: 14px;
     font-weight: 400;
     line-height: 21px;

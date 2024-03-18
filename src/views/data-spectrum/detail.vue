@@ -1,19 +1,20 @@
 <template>
   <el-container class="data-spectrum-wrapper">
-    <el-header class="p-0" style="height: auto;">
-      <div class="search-form-wrapper" style="margin-bottom: 18px;">
+    <el-header class="p-0" style="height: auto">
+      <div class="search-form-wrapper" style="margin-bottom: 18px">
         <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-          <div class="m-b-28 flex" style="height: 36px;">
+          <div class="m-b-28 flex" style="height: 36px">
             <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method">
               <template #label>
-                {{t('spectrum.analysisMethod')}}：<el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
+                {{ t('spectrum.analysisMethod') }}：
+                <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
                   <template #content>
-                    <p style="color: #131926;font-weight: 300;" v-html="t('spectrum.analysisMethodTip', { doc: methodDocLink })"></p>
+                    <p style="color: #131926; font-weight: 300" v-html="t('spectrum.analysisMethodTip', { doc: methodDocLink })"></p>
                   </template>
                   <i-custom-question />
                 </el-tooltip>
               </template>
-              <el-select v-model="searchFormData.method" id="spectrum-search-method" style="width: 200px;">
+              <el-select v-model="searchFormData.method" id="spectrum-search-method" style="width: 200px">
                 <el-option
                   v-for="item in methodOptions"
                   :key="item.functionName"
@@ -22,14 +23,7 @@
                   :id="`spectrum-search-method-${item.functionName}`"
                   :disabled="!item.enable"
                 >
-                  <el-tooltip
-                    placement="top-start"
-                    effect="light"
-                    trigger="hover"
-                    :content="t('spectrum.analysisMethodNoneTip')"
-                    popper-class="tooltip-box-width"
-                    :disabled="item.enable"
-                  >
+                  <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('spectrum.analysisMethodNoneTip')" popper-class="tooltip-box-width" :disabled="item.enable">
                     {{ item.name }}
                   </el-tooltip>
                 </el-option>
@@ -39,29 +33,30 @@
               <span class="params-title">{{ t('spectrum.paramsTitle') }}</span>
               <template v-if="searchFormData.method === 'FFT'">
                 <base-form-item :label="`${t('spectrum.returnResult')}：`" prop="resultType">
-                  <el-select v-model="searchFormData.resultType" style="width: 80px;" id="spectrum-search-resultType">
-                    <el-option
-                      v-for="item in resultList"
-                      :key="item.value"
-                      :label="item.name"
-                      :value="item.value"
-                      :id="`spectrum-search-resultType-${item.value}`"
-                    />
+                  <el-select v-model="searchFormData.resultType" style="width: 80px" id="spectrum-search-resultType">
+                    <el-option v-for="item in resultList" :key="item.value" :label="item.name" :value="item.value" :id="`spectrum-search-resultType-${item.value}`" />
                   </el-select>
                 </base-form-item>
                 <base-form-item :label="`${t('spectrum.compressParams')}：`" prop="compression" class="m-r-0">
                   <template #label>
-                    {{t('spectrum.compressParams')}}：<el-tooltip effect="light" placement="top" popper-class="tooltip-box-width" :content="t('spectrum.compressParamsTip')"><i-custom-question /></el-tooltip>
+                    {{ t('spectrum.compressParams') }}：
+                    <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width" :content="t('spectrum.compressParamsTip')"><i-custom-question /></el-tooltip>
                   </template>
-                  <el-input v-model="searchFormData.compression" style="width: 120px;" :placeholder="t('spectrum.compressParamsPlaceholder')" id="spectrum-search-compression" @change="handleInputCompression" />
+                  <el-input
+                    v-model="searchFormData.compression"
+                    style="width: 120px"
+                    :placeholder="t('spectrum.compressParamsPlaceholder')"
+                    id="spectrum-search-compression"
+                    @change="handleInputCompression"
+                  />
                 </base-form-item>
               </template>
               <template v-if="searchFormData.method === 'ENVELOPE'">
                 <base-form-item :label="`${t('spectrum.modulationFrequency')}：`" prop="frequency">
-                  <el-input v-model.number="searchFormData.frequency" style="width: 120px;" id="spectrum-search-frequency" @change="handleInputFrequency" />
+                  <el-input v-model.number="searchFormData.frequency" style="width: 120px" id="spectrum-search-frequency" @change="handleInputFrequency" />
                 </base-form-item>
                 <base-form-item :label="`${t('spectrum.expandingFold')}：`" prop="amplification" class="m-r-0">
-                  <el-input v-model.number="searchFormData.amplification" style="width: 120px;" id="spectrum-search-expandingFold" @change="handleInputAmplification" />
+                  <el-input v-model.number="searchFormData.amplification" style="width: 120px" id="spectrum-search-expandingFold" @change="handleInputAmplification" />
                 </base-form-item>
               </template>
             </div>
@@ -69,14 +64,7 @@
           <div class="flex-justify-between">
             <div v-if="searchFormData.method !== 'custom'">
               <base-form-item :label="`${t('measurement.measurementChoose')}：`" prop="measurement">
-                <timeseries-select-single
-                  id="spectrum-search-path"
-                  v-model="searchFormData.measurement"
-                  :selectWidth="200"
-                  :itemWidth="160"
-                  show-suffix
-                  :disabled-path="disabledPath"
-                />
+                <timeseries-select-single id="spectrum-search-path" v-model="searchFormData.measurement" :selectWidth="200" :itemWidth="160" show-suffix :disabled-path="disabledPath" />
               </base-form-item>
               <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange">
                 <el-date-picker
@@ -94,7 +82,7 @@
             </div>
             <div v-if="searchFormData.method === 'custom'">
               <base-form-item :label="`${t('spectrum.sqlInput')}：`" prop="sql">
-                <el-button type="primary" link id="spectrum-search-sql" style="text-decoration: underline;" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
+                <el-button type="primary" link id="spectrum-search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
               </base-form-item>
             </div>
             <div class="search-form-buttons">
@@ -107,138 +95,158 @@
     </el-header>
     <el-main class="p-0">
       <el-container class="chart-detail-wrapper">
-        <el-main class="p-0" style="position: relative;">
+        <el-main class="p-0" style="position: relative">
           <div ref="chartContainer" class="chart-container" :style="`height: ${'calc(100% - 28px);'}`" v-element-size="onResize"></div>
           <div class="flex-align-center">
-            <el-button type="primary" class="cursor-button" id="spectrum-cursor" style="height: 24px !important;" :disabled="dataEmpty" @click="handleClickOperate('cursor')">{{ t('spectrum.cursor') }}</el-button>
+            <el-button type="primary" class="cursor-button" id="spectrum-cursor" style="height: 24px !important" :disabled="dataEmpty" @click="handleClickOperate('cursor')">
+              {{ t('spectrum.cursor') }}
+            </el-button>
             <div class="chart-operate-box">
-              <el-button type="primary" id="spectrum-harmonicFrequency" color="#00B3AA" :disabled="disableFrequency" :class="disableFrequency ? 'disable-frequency' : ''" @click="handleClickOperate('frequency')">{{ t('spectrum.harmonicFrequency') }}</el-button>
-              <el-input v-model.number="harmonicFrequency" :min="1" step-strictly @input="handleInputHarmonicFrequency" id="spectrum-harmonicFrequency-input" :disabled="dataEmpty || drawedStatus.frequency" />
+              <el-button
+                type="primary"
+                id="spectrum-harmonicFrequency"
+                color="#00B3AA"
+                :disabled="disableFrequency"
+                :class="disableFrequency ? 'disable-frequency' : ''"
+                @click="handleClickOperate('frequency')"
+              >
+                {{ t('spectrum.harmonicFrequency') }}
+              </el-button>
+              <el-input
+                v-model.number="harmonicFrequency"
+                :min="1"
+                step-strictly
+                @input="handleInputHarmonicFrequency"
+                id="spectrum-harmonicFrequency-input"
+                :disabled="dataEmpty || drawedStatus.frequency"
+              />
             </div>
             <div class="chart-operate-box">
-              <el-button type="primary" id="spectrum-sideband" color="#6738BD" :disabled="disableSideband" :class="disableSideband ? 'disable-sideband' : ''" @click="handleClickOperate('sideband')">{{ t('spectrum.sideband') }}</el-button>
+              <el-button type="primary" id="spectrum-sideband" color="#6738BD" :disabled="disableSideband" :class="disableSideband ? 'disable-sideband' : ''" @click="handleClickOperate('sideband')">
+                {{ t('spectrum.sideband') }}
+              </el-button>
               <el-input v-model.number="sideband" :min="1" step-strictly @input="handleInputSideband" id="spectrum-sideband-input" :disabled="dataEmpty || drawedStatus.sideband" />
             </div>
-            <el-button link class="cursor-button-clear m-l-8" id="spectrum-cursor-clear" :disabled="dataEmpty" @click="() => handleEmptyOperate()"><el-icon size="18" color="#fff"><i-custom-delete /></el-icon></el-button>
+            <el-button link class="cursor-button-clear m-l-8" id="spectrum-cursor-clear" :disabled="dataEmpty" @click="() => handleEmptyOperate()">
+              <el-icon size="18" color="#fff"><i-custom-delete /></el-icon>
+            </el-button>
           </div>
         </el-main>
-        <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand ? 'p-0' : '']" style="display: flex; flex-direction: column;">
+        <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand ? 'p-0' : '']" style="display: flex; flex-direction: column">
           <div class="cursor-list-box" v-if="isExpand">
             <h4 class="cursor-list-title">{{ t('spectrum.cursorTitle') }}</h4>
-            <auth-container :is-auth="canReadWriteSchemaData" style="flex: 1; background-color: #fff; overflow-y: hidden; display: flex; padding: 12px 0 10px;">
+            <auth-container :is-auth="canReadWriteSchemaData" style="flex: 1; background-color: #fff; overflow-y: hidden; display: flex; padding: 12px 0 10px">
               <div class="list-empty-wrapper" v-if="!pointList.length">
-                <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+                <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
                 <span class="data-empty-text">{{ t('common.noData') }}</span>
               </div>
               <div class="cursor-list-wrapper" v-else>
                 <ul class="cursor-list">
                   <li v-for="(item, index) in pointList" :key="item.name" :class="['cursor-item-box']">
                     <div class="cursor-text-box">
-                      <el-checkbox v-if="pointList.length !== 1" :checked="item.checked" class="m-r-4" :id="`spectrum-cursor-checkbox-${index}`" :disabled="pointDisabled(item)" @change="val => handleCheckDvalue(val, item)" />
+                      <el-checkbox
+                        v-if="pointList.length !== 1"
+                        :checked="item.checked"
+                        class="m-r-4"
+                        :id="`spectrum-cursor-checkbox-${index}`"
+                        :disabled="pointDisabled(item)"
+                        @change="(val) => handleCheckDvalue(val, item)"
+                      />
                       {{ pointTitle(index) }}
                     </div>
                     <div class="cursor-point-data" :style="{ marginLeft: pointList.length !== 1 ? '45px' : '25px' }">
-                      <p style="display: inline-flex; width: 140px;"><text-tooltip :content="`X: ${item.x}`" /></p>
-                      <p style="display: inline-flex; width: 140px;"><text-tooltip :content="`Y: ${item.y}`" /></p>
+                      <p style="display: inline-flex; width: 140px"><text-tooltip :content="`X: ${item.x}`" /></p>
+                      <p style="display: inline-flex; width: 140px"><text-tooltip :content="`Y: ${item.y}`" /></p>
                     </div>
                   </li>
                 </ul>
                 <div v-if="pointCheckedData.length === 2" class="point-dvalue-box">
-                  <p style="display: inline-flex; width: 190px;"><text-tooltip :content="`ΔX：${Math.abs(pointCheckedData[0].x - pointCheckedData[1].x)}`" /></p>
-                  <p style="display: inline-flex; width: 190px;"><text-tooltip :content="`Δf：${Math.abs(Number(pointCheckedData[0].y) - Number(pointCheckedData[1].y))}`" /></p>
+                  <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔX：${Math.abs(pointCheckedData[0].x - pointCheckedData[1].x)}`" /></p>
+                  <p style="display: inline-flex; width: 190px"><text-tooltip :content="`Δf：${Math.abs(Number(pointCheckedData[0].y) - Number(pointCheckedData[1].y))}`" /></p>
                 </div>
               </div>
             </auth-container>
           </div>
           <h4 v-if="!isExpand" class="cursor-collapse-title">{{ t('spectrum.cursorTitle') }}</h4>
-          <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="isExpand = !isExpand;" id="spectrum-point-expand">
+          <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="isExpand = !isExpand" id="spectrum-point-expand">
             <i-custom-arrow-right-expand />
           </el-icon>
         </el-aside>
       </el-container>
     </el-main>
 
-    <modal-sql
-      v-model:visible="sqlVisible"
-      :sql-value="sqlValue"
-      @handleConfirm="handleConfirmSql"
-    />
+    <modal-sql v-model:visible="sqlVisible" :sql-value="sqlValue" @handleConfirm="handleConfirmSql" />
   </el-container>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import type {
-  FormInstance, SingleOrRange, DateModelType, CheckboxValueType,
-} from 'element-plus';
+import type { FormInstance, SingleOrRange, DateModelType, CheckboxValueType } from 'element-plus';
 import dayjs from 'dayjs';
-import {
-  debounce,
-} from 'lodash-es';
+import { debounce } from 'lodash-es';
 import { vElementSize } from '@vueuse/components';
 import { SearchApi } from '@/api';
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
-import {
-  getStartAndEnd, today, getOneInterval, getOneIntervalNow,
-} from '@/utils/date';
+import { getStartAndEnd, today, getOneInterval, getOneIntervalNow } from '@/utils/date';
 import { useUserStore } from '@/stores';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalSql from './components/modal-sql.vue';
 
 interface SpectrumMarkPoint {
-  name: string,
-  value: number | string,
-  xAxis: number,
-  yAxis: number | string,
+  name: string;
+  value: number | string;
+  xAxis: number;
+  yAxis: number | string;
   itemStyle: {
-    color: string,
+    color: string;
     // eslint-disable-next-line no-nested-ternary
-    borderColor: string,
-    borderWidth: number,
-  },
+    borderColor: string;
+    borderWidth: number;
+  };
 }
 
 interface SpectrumMarkLine {
-  name: string,
-  xAxis: number,
+  name: string;
+  xAxis: number;
   label: {
-    formatter: string | Function,
-    position: string,
-    color: string,
+    formatter: string | Function;
+    position: string;
+    color: string;
   };
   lineStyle: {
-    type: string | number[],
-    color: string,
-  }
+    type: string | number[];
+    color: string;
+  };
 }
 
 interface PointData {
-  name: string,
-  x: number,
-  y: number | string,
-  disabled: boolean,
-  checked: boolean,
+  name: string;
+  x: number;
+  y: number | string;
+  disabled: boolean;
+  checked: boolean;
 }
 
 const { t, locale } = useI18n();
-const methodDocLink = computed(() => `<a href="https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/Database-Programming.html#udtf-user-defined-timeseries-generating-function" target="_blank" rel="noopener noreferrer" style="color: #495ad4;"> ${t('common.userManual')}</a>`);
+const methodDocLink = computed(
+  () =>
+    `<a href="https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/Database-Programming.html#udtf-user-defined-timeseries-generating-function" target="_blank" rel="noopener noreferrer" style="color: #495ad4;"> ${t('common.userManual')}</a>`
+);
 const userStore = useUserStore();
-const {
-  canReadWriteSchemaData,
-} = storeToRefs(userStore);
+const { canReadWriteSchemaData } = storeToRefs(userStore);
 const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
 const isExpand = ref(true);
 const methodList = ref<Array<Search.FunctionData>>([]);
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive<{
-  measurement: string,
-  method: string,
-  resultType: string,
-  compression: string | number | undefined,
-  frequency: string | number | undefined,
-  amplification: string | number | undefined,
-  datetimerange: [DateModelType, DateModelType],
+  measurement: string;
+  method: string;
+  resultType: string;
+  compression: string | number | undefined;
+  frequency: string | number | undefined;
+  amplification: string | number | undefined;
+  datetimerange: [DateModelType, DateModelType];
 }>({
   measurement: '',
   method: '',
@@ -263,7 +271,7 @@ const shortcutsDaterange = [
   },
 ];
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
-const resultList = computed<Array<{ name: string, value: string }>>(() => [
+const resultList = computed<Array<{ name: string; value: string }>>(() => [
   { name: t('spectrum.real'), value: 'real' },
   { name: t('spectrum.imag'), value: 'imag' },
   { name: t('spectrum.abs'), value: 'abs' },
@@ -307,38 +315,43 @@ function disabledPath(item: StorageDevice.MeasurementDataItem) {
   return item.dataType === 'BOOLEAN' || item.dataType === 'TEXT';
 }
 
-const seriesData = computed<ECOption>(() => ({
-  series: [{
-    type: 'line',
-    symbol: 'circle',
-    showSymbol: false,
-    showAllSymbol: 'auto',
-    connectNulls: false,
-    symbolSize: 4,
-    name: searchFormData.measurement,
-    data: chartData.values.map((dataItem, index) => [chartData.timestamps[index], dataItem]),
-    markPoint: {
-      symbol: 'rect',
-      symbolSize: 8,
-      label: {
-        show: false,
-      },
-      data: markPointData.value.length ? markPointData.value : [],
-    },
-    markLine: {
-      symbol: 'none',
-      data: markLineData.value.length ? markLineData.value : [],
-      animation: false,
-    },
-    lineStyle: {
-      width: 2,
-      color: '#4992ff',
-    },
-    itemStyle: {
-      color: '#4992ff',
-    },
-  }],
-}) as unknown as ECOption);
+const seriesData = computed<ECOption>(
+  () =>
+    ({
+      series: [
+        {
+          type: 'line',
+          symbol: 'circle',
+          showSymbol: false,
+          showAllSymbol: 'auto',
+          connectNulls: false,
+          symbolSize: 4,
+          name: searchFormData.measurement,
+          data: chartData.values.map((dataItem, index) => [chartData.timestamps[index], dataItem]),
+          markPoint: {
+            symbol: 'rect',
+            symbolSize: 8,
+            label: {
+              show: false,
+            },
+            data: markPointData.value.length ? markPointData.value : [],
+          },
+          markLine: {
+            symbol: 'none',
+            data: markLineData.value.length ? markLineData.value : [],
+            animation: false,
+          },
+          lineStyle: {
+            width: 2,
+            color: '#4992ff',
+          },
+          itemStyle: {
+            color: '#4992ff',
+          },
+        },
+      ],
+    }) as unknown as ECOption
+);
 
 const chartOptions = computed<ECOption>(() => ({
   tooltip: {
@@ -452,7 +465,7 @@ function handleInputSideband(val: string) {
   }
 }
 
-const setOption = (option:ECOption, noMerge: boolean = false) => {
+const setOption = (option: ECOption, noMerge: boolean = false) => {
   if (chartInstance) {
     // 实例存在直接设置
     chartInstance.setOption(option, noMerge);
@@ -486,7 +499,7 @@ const setOption = (option:ECOption, noMerge: boolean = false) => {
 };
 
 function handleDealCursor(params: echarts.ECElementEvent) {
-  const { seriesName, value } = params as { seriesName: string, value: number[] };
+  const { seriesName, value } = params as { seriesName: string; value: number[] };
   if (markPointCount.value > 9) {
     ElMessage.warning({
       message: t('spectrum.overTip'),
@@ -537,7 +550,7 @@ function handleDealCursor(params: echarts.ECElementEvent) {
 }
 
 function handleDealFrequency(params: echarts.ECElementEvent) {
-  const { seriesName, value } = params as { seriesName: string, value: number[] };
+  const { seriesName, value } = params as { seriesName: string; value: number[] };
   frequencyInterval.value = value[0] as number;
   if (!frequencyInterval.value) return;
   drawedStatus.frequency = true;
@@ -579,7 +592,7 @@ function handleDealFrequency(params: echarts.ECElementEvent) {
 }
 
 function handleDealSideband(params: echarts.ECElementEvent) {
-  const { seriesName, value } = params as { seriesName: string, value: number[] };
+  const { seriesName, value } = params as { seriesName: string; value: number[] };
   if (sidebandData.value.includes(value[0])) return;
   sidebandData.value.push(value[0]);
   drawedStatus.sideband = true;
@@ -769,15 +782,17 @@ function getFFT() {
     measurement: searchFormData.measurement,
     startTime: start,
     endTime: end,
-  }).then((res) => {
-    chartData.timestamps = res.data.timestamps || [];
-    chartData.values = res.data.values || [];
-    setOption(chartOptions.value, true);
-  }).catch(() => {
-    chartData.timestamps = [];
-    chartData.values = [];
-    setOption(chartOptions.value, true);
-  });
+  })
+    .then((res) => {
+      chartData.timestamps = res.data.timestamps || [];
+      chartData.values = res.data.values || [];
+      setOption(chartOptions.value, true);
+    })
+    .catch(() => {
+      chartData.timestamps = [];
+      chartData.values = [];
+      setOption(chartOptions.value, true);
+    });
 }
 
 function getEnvelope() {
@@ -789,27 +804,31 @@ function getEnvelope() {
     measurement: searchFormData.measurement,
     startTime: start,
     endTime: end,
-  }).then((res) => {
-    chartData.timestamps = res.data.timestamps || [];
-    chartData.values = res.data.values || [];
-    setOption(chartOptions.value, true);
-  }).catch(() => {
-    chartData.timestamps = [];
-    chartData.values = [];
-    setOption(chartOptions.value, true);
-  });
+  })
+    .then((res) => {
+      chartData.timestamps = res.data.timestamps || [];
+      chartData.values = res.data.values || [];
+      setOption(chartOptions.value, true);
+    })
+    .catch(() => {
+      chartData.timestamps = [];
+      chartData.values = [];
+      setOption(chartOptions.value, true);
+    });
 }
 
 function getCustom() {
-  getCustomData(sqlValue.value).then((res) => {
-    chartData.timestamps = res.data.timestamps || [];
-    chartData.values = res.data.values || [];
-    setOption(chartOptions.value, true);
-  }).catch(() => {
-    chartData.timestamps = [];
-    chartData.values = [];
-    setOption(chartOptions.value, true);
-  });
+  getCustomData(sqlValue.value)
+    .then((res) => {
+      chartData.timestamps = res.data.timestamps || [];
+      chartData.values = res.data.values || [];
+      setOption(chartOptions.value, true);
+    })
+    .catch(() => {
+      chartData.timestamps = [];
+      chartData.values = [];
+      setOption(chartOptions.value, true);
+    });
 }
 
 // 查询
@@ -889,14 +908,14 @@ watch(locale, () => {
 </script>
 
 <style lang="scss" scoped>
-.data-spectrum-wrapper{
+.data-spectrum-wrapper {
   border-radius: 6px;
-  background: #FFF;
+  background: #fff;
   box-sizing: border-box;
   padding: 26px 16px 16px 30px;
 }
 
-.search-form-wrapper{
+.search-form-wrapper {
   display: flex;
 
   :deep(.el-form) {
@@ -908,23 +927,23 @@ watch(locale, () => {
   }
 }
 
-.search-method-params-box{
+.search-method-params-box {
   padding: 4px;
   border-radius: 2px;
-  background: #F7F8FC;
+  background: #f7f8fc;
   display: flex;
   align-items: center;
 
-  .params-title{
+  .params-title {
     margin: 0 24px 0 12px;
     font-size: 14px;
     font-weight: 400;
     line-height: 21px;
-    color: #495AD4;
+    color: #495ad4;
   }
 }
 
-.chart-detail-wrapper{
+.chart-detail-wrapper {
   width: 100%;
   height: 100%;
 }
@@ -935,11 +954,11 @@ watch(locale, () => {
   overflow: hidden;
 }
 
-.cursor-button{
+.cursor-button {
   border: none;
 }
 
-.chart-operate-box{
+.chart-operate-box {
   font-size: 12px;
   font-weight: 400;
   line-height: 12px;
@@ -947,11 +966,11 @@ watch(locale, () => {
   display: flex;
   align-items: center;
   margin: 0 0 0 12px;
-  border: 1px solid #DFE1ED;
+  border: 1px solid #dfe1ed;
   height: 24px;
   box-sizing: border-box;
 
-  .el-button{
+  .el-button {
     padding: 0 !important;
     min-width: 40px;
     height: 22px !important;
@@ -959,52 +978,53 @@ watch(locale, () => {
     border: none;
   }
 
-  .el-input{
+  .el-input {
     width: 38px;
     height: 22px;
 
-    :deep(.el-input__wrapper){
+    :deep(.el-input__wrapper) {
       box-shadow: none !important;
       border-radius: 0;
 
-      &:focus-visible, &:hover {
+      &:focus-visible,
+      &:hover {
         box-shadow: none !important;
       }
     }
 
-    :deep(.el-input__wrapper.is-focus){
+    :deep(.el-input__wrapper.is-focus) {
       box-shadow: none !important;
     }
   }
 
-  :deep(.el-input.is-disabled .el-input__wrapper){
+  :deep(.el-input.is-disabled .el-input__wrapper) {
     background-color: #fff;
   }
 
-  .disable-frequency{
-    background: #F0F1FA;
-    color: #00B3AA;
+  .disable-frequency {
+    background: #f0f1fa;
+    color: #00b3aa;
   }
 
-  .enable-frequency{
-    background-color: #00B3AA !important;
+  .enable-frequency {
+    background-color: #00b3aa !important;
     color: #fff !important;
   }
 
-  .disable-sideband{
-    background: #F0F1FA;
-    color: #6738BD;
+  .disable-sideband {
+    background: #f0f1fa;
+    color: #6738bd;
   }
 
-  .enable-sideband{
-    background-color: #6738BD !important;
+  .enable-sideband {
+    background-color: #6738bd !important;
     color: #fff !important;
   }
 }
 
-.path-list-wrapper{
+.path-list-wrapper {
   margin-left: 16px;
-  background-color: #F7F8FC;
+  background-color: #f7f8fc;
   border-radius: 2px;
   box-sizing: border-box;
   padding: 12px 12px 28px;
@@ -1012,38 +1032,38 @@ watch(locale, () => {
   transition: all 0.3s ease;
 }
 
-.expand-icon{
+.expand-icon {
   position: absolute;
   bottom: 0;
   left: 16px;
   cursor: pointer;
-  color: #A0A3B8;
+  color: #a0a3b8;
 
-  &:hover{
-    color: #495AD4;
+  &:hover {
+    color: #495ad4;
   }
 
-  &.collapse-icon{
+  &.collapse-icon {
     left: 0;
     transform: rotate(-180deg);
   }
 }
 
-.cursor-list-box{
+.cursor-list-box {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow-y: hidden;
 
-  .cursor-list-title{
+  .cursor-list-title {
     font-size: 14px;
     font-weight: 700;
     line-height: 21px;
-    color: #495AD4;
+    color: #495ad4;
     margin: 0 0 6px;
   }
 
-  .list-empty-wrapper{
+  .list-empty-wrapper {
     width: 100%;
     height: 100%;
     display: flex;
@@ -1051,40 +1071,40 @@ watch(locale, () => {
     justify-content: center;
     flex-direction: column;
 
-    .data-empty-img{
+    .data-empty-img {
       width: 150px;
       height: 150px;
       margin-bottom: 16px;
     }
 
-    .data-empty-text{
+    .data-empty-text {
       font-size: 14px;
       color: #131926;
       line-height: 21px;
     }
   }
 
-  .cursor-list-wrapper{
+  .cursor-list-wrapper {
     display: flex;
     flex-direction: column;
     flex: 1;
 
-    .cursor-list{
+    .cursor-list {
       flex: 1;
       overflow-y: auto;
     }
   }
 }
 
-.cursor-collapse-title{
+.cursor-collapse-title {
   font-size: 14px;
   font-weight: 400;
   line-height: 17px;
-  color: #495AD4;
+  color: #495ad4;
   margin: 14px 5px 0;
 }
 
-.cursor-text-box{
+.cursor-text-box {
   display: flex;
   align-items: center;
   margin: 0 0 4px 8px;
@@ -1094,15 +1114,15 @@ watch(locale, () => {
   color: #131926;
 }
 
-.cursor-point-data{
+.cursor-point-data {
   font-size: 12px;
   font-weight: 400;
   line-height: 26px;
   color: #131926;
 }
 
-.point-dvalue-box{
-  border-top: 1px dashed #DFE1ED;
+.point-dvalue-box {
+  border-top: 1px dashed #dfe1ed;
   font-size: 12px;
   font-weight: 400;
   line-height: 26px;

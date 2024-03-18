@@ -2,7 +2,10 @@
   <version-container :is-show="showAuthMenu" :versiton-tip="'1.3.0'">
     <template #otherTip>
       <div class="monitor-dashboard-operate-left">
-        <el-button link class="monitor-dashboard-close-btn" id="monitor-dashboard-close-btn" @click="handleClose"><el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>{{ t('common.goback') }}</el-button>
+        <el-button link class="monitor-dashboard-close-btn" id="monitor-dashboard-close-btn" @click="handleClose">
+          <el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>
+          {{ t('common.goback') }}
+        </el-button>
         <span class="monitor-dashboard-header-title">{{ t('dataSync.monitorDashboard') }}</span>
       </div>
     </template>
@@ -10,20 +13,31 @@
       <el-header class="monitor-dashboard-operate-header p-0">
         <div class="flex-align-center">
           <div class="monitor-dashboard-operate-left">
-            <el-button link class="monitor-dashboard-close-btn" id="monitor-dashboard-close-btn" @click="handleClose"><el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>{{ t('common.goback') }}</el-button>
+            <el-button link class="monitor-dashboard-close-btn" id="monitor-dashboard-close-btn" @click="handleClose">
+              <el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>
+              {{ t('common.goback') }}
+            </el-button>
             <span class="monitor-dashboard-header-title">{{ t('dataSync.monitorDashboard') }}</span>
           </div>
           <div class="monitor-dashboard-node-box">
-            <span class="search-from-label">{{t('dashboard.node')}}：</span>
-            <el-select v-model="monitorNode" :placeholder="t('common.all')" style="width: 256px;" @change="handleChangeNode" id="monitor-dashboard-select-node">
-              <el-option v-for="(item, index) in nodeList" :key="`${item.address}(${item.type})_${index}`" :value="item.nodeID" :id="`monitor-dashboard-select-node-select-${item.nodeID}`" :label="item.address ? `${item.address}(${item.type})` : t('common.all')" />
+            <span class="search-from-label">{{ t('dashboard.node') }}：</span>
+            <el-select v-model="monitorNode" :placeholder="t('common.all')" style="width: 256px" @change="handleChangeNode" id="monitor-dashboard-select-node">
+              <el-option
+                v-for="(item, index) in nodeList"
+                :key="`${item.address}(${item.type})_${index}`"
+                :value="item.nodeID"
+                :id="`monitor-dashboard-select-node-select-${item.nodeID}`"
+                :label="item.address ? `${item.address}(${item.type})` : t('common.all')"
+              />
             </el-select>
           </div>
         </div>
         <p class="monitor-dashboard-module-details">
-          <span class="module-label-text">{{`${t('dashboard.deadTime')}：`}}</span>
+          <span class="module-label-text">{{ `${t('dashboard.deadTime')}：` }}</span>
           <span class="module-content-text m-r-16">{{ monitorTime }}</span>
-          <el-button link @click="handleRefreshMonitor" id="monitor-dashboard-refresh"><el-icon size="24"><i-custom-refresh /></el-icon></el-button>
+          <el-button link @click="handleRefreshMonitor" id="monitor-dashboard-refresh">
+            <el-icon size="24"><i-custom-refresh /></el-icon>
+          </el-button>
         </p>
       </el-header>
       <el-main class="p-0">
@@ -61,10 +75,16 @@
             </div>
             <div class="monitor-chart-box-2" v-loading="remainingTimeLoading">
               <div class="monitor-chart-container">
-                <h4 class="monitor-info-module-title">{{ t('dataSync.remainingTime') }}<el-tooltip effect="light" :content="t('dataSync.remainingTimeTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></h4>
+                <h4 class="monitor-info-module-title">
+                  {{ t('dataSync.remainingTime') }}
+                  <el-tooltip effect="light" :content="t('dataSync.remainingTimeTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+                </h4>
                 <data-container :is-empty="remainingTime.remainTime === null">
                   <div class="monitor-info-module-box">
-                    <p class="monitor-info-module-text">{{ remainingTime.remainTime }}<span class="monitor-info-module-unit">{{ remainingTime.timeUnit }}</span></p>
+                    <p class="monitor-info-module-text">
+                      {{ remainingTime.remainTime }}
+                      <span class="monitor-info-module-unit">{{ remainingTime.timeUnit }}</span>
+                    </p>
                   </div>
                 </data-container>
               </div>
@@ -161,102 +181,105 @@ function getLegendSelected(optionData: DataSync.PipeMonitorData[], chartName: st
         obj = p99ChartRef.value!.legendSelected;
       }
     } else {
-      nodeList.value.filter((f, fi) => fi !== 0).forEach((node) => {
-        if (item.nodeID === node.nodeID) {
-          obj[item.nodeName] = true;
-        } else {
-          obj[`${node.address}(DataNode)`] = false;
-        }
-      });
+      nodeList.value
+        .filter((f, fi) => fi !== 0)
+        .forEach((node) => {
+          if (item.nodeID === node.nodeID) {
+            obj[item.nodeName] = true;
+          } else {
+            obj[`${node.address}(DataNode)`] = false;
+          }
+        });
     }
   });
   return obj;
 }
 
-const lineChartOptions = (optionData: DataSync.PipeMonitorData[], dataUnit: string, chartName: string) => ({
-  color: lineColor.value,
-  useUTC: false,
-  tooltip: {
-    trigger: 'axis',
-    axisPointer: {
-      type: 'cross',
+const lineChartOptions = (optionData: DataSync.PipeMonitorData[], dataUnit: string, chartName: string) =>
+  ({
+    color: lineColor.value,
+    useUTC: false,
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'cross',
+      },
+      confine: true,
+      valueFormatter: (value: number | string) => `${value} ${dataUnit}`,
     },
-    confine: true,
-    valueFormatter: (value: number | string) => `${value} ${dataUnit}`,
-  },
-  grid: {
-    left: '3%',
-    right: 40,
-    bottom: 20,
-    containLabel: true,
-  },
-  legend: {
-    type: 'scroll',
-    orient: 'horizontal',
-    pageIconColor: '#A0A3B8',
-    pageIconInactiveColor: '#DFE1ED',
-    pageTextStyle: {
-      fontSize: 12,
-      fontWeight: 300,
-      color: '#424561',
+    grid: {
+      left: '3%',
+      right: 40,
+      bottom: 20,
+      containLabel: true,
     },
-    icon: 'roundRect',
-    itemWidth: 12,
-    itemHeight: 12,
-    inactiveColor: '#DFE1ED',
-    textStyle: {
-      color: '#424561',
-      fontSize: 12,
-      fontWeight: 300,
+    legend: {
+      type: 'scroll',
+      orient: 'horizontal',
+      pageIconColor: '#A0A3B8',
+      pageIconInactiveColor: '#DFE1ED',
+      pageTextStyle: {
+        fontSize: 12,
+        fontWeight: 300,
+        color: '#424561',
+      },
+      icon: 'roundRect',
+      itemWidth: 12,
+      itemHeight: 12,
+      inactiveColor: '#DFE1ED',
+      textStyle: {
+        color: '#424561',
+        fontSize: 12,
+        fontWeight: 300,
+      },
+      left: monitorNode.value === '' && nodeIds.value.length > 1 ? 20 : 'center',
+      data: optionData.map((item) => item.nodeName) || [],
+      selected: getLegendSelected(optionData, chartName),
+      selectedMode: monitorNode.value === '' && nodeIds.value.length > 1,
     },
-    left: monitorNode.value === '' && nodeIds.value.length > 1 ? 20 : 'center',
-    data: optionData.map((item) => item.nodeName) || [],
-    selected: getLegendSelected(optionData, chartName),
-    selectedMode: monitorNode.value === '' && nodeIds.value.length > 1,
-  },
-  connectNulls: false,
-  xAxis: {
-    type: 'time',
-    boundaryGap: false,
-    axisTick: {
-      show: true,
+    connectNulls: false,
+    xAxis: {
+      type: 'time',
+      boundaryGap: false,
+      axisTick: {
+        show: true,
+      },
+      axisLabel: {
+        color: '#424561',
+        fontSize: 12,
+        fontWeight: 300,
+      },
+      minInterval: 1000 * 60 * 60,
+      show: optionData.length > 0,
     },
-    axisLabel: {
-      color: '#424561',
-      fontSize: 12,
-      fontWeight: 300,
-    },
-    minInterval: 1000 * 60 * 60,
-    show: optionData.length > 0,
-  },
-  yAxis: {
-    type: 'value',
-    axisLabel: {
-      formatter: `{value} ${dataUnit}`,
-      color: '#424561',
-      fontSize: 12,
-      fontWeight: 300,
-    },
-    axisPointer: {
-      snap: true,
-    },
-    splitLine: {
-      lineStyle: {
-        color: '#DFE1ED',
-        width: 1,
+    yAxis: {
+      type: 'value',
+      axisLabel: {
+        formatter: `{value} ${dataUnit}`,
+        color: '#424561',
+        fontSize: 12,
+        fontWeight: 300,
+      },
+      axisPointer: {
+        snap: true,
+      },
+      splitLine: {
+        lineStyle: {
+          color: '#DFE1ED',
+          width: 1,
+        },
       },
     },
-  },
-  series: optionData.map((item) => ({
-    type: 'line',
-    name: item.nodeName,
-    lineStyle: {
-      width: 2,
-    },
-    showSymbol: false,
-    data: item.used.memoryCost.map((dataItem, index) => [item.used.timestamp[index], dataItem]),
-  })),
-} as ECOption);
+    series: optionData.map((item) => ({
+      type: 'line',
+      name: item.nodeName,
+      lineStyle: {
+        width: 2,
+      },
+      showSymbol: false,
+      data: item.used.memoryCost.map((dataItem, index) => [item.used.timestamp[index], dataItem]),
+    })),
+  }) as ECOption;
 
 const memoryDataOptions = reactive({
   data: lineChartOptions(memoryData.value, memoryData.value[0]?.unit || '', 'memory'),
@@ -286,23 +309,33 @@ function handleClose() {
 
 function getSystemData() {
   return getSystemInfo(searchFormData.orderBy, searchFormData.asc).then((res) => {
-    masterNodes.value = concat([{
-      nodeID: '',
-      address: '',
-      type: '',
-      status: '',
-      version: '',
-      physicalMachine: '',
-    }], res.data.masterNodeInfo.nodes ? res.data.masterNodeInfo.nodes.filter((item) => item.type === 'DataNode') : []);
+    masterNodes.value = concat(
+      [
+        {
+          nodeID: '',
+          address: '',
+          type: '',
+          status: '',
+          version: '',
+          physicalMachine: '',
+        },
+      ],
+      res.data.masterNodeInfo.nodes ? res.data.masterNodeInfo.nodes.filter((item) => item.type === 'DataNode') : []
+    );
     if (res.data.slaveNodeInfo) {
-      slaveNodes.value = concat([{
-        nodeID: '',
-        address: '',
-        type: '',
-        status: '',
-        version: '',
-        physicalMachine: '',
-      }], res.data.slaveNodeInfo.nodes ? res.data.slaveNodeInfo.nodes.filter((item) => item.type === 'DataNode') : []);
+      slaveNodes.value = concat(
+        [
+          {
+            nodeID: '',
+            address: '',
+            type: '',
+            status: '',
+            version: '',
+            physicalMachine: '',
+          },
+        ],
+        res.data.slaveNodeInfo.nodes ? res.data.slaveNodeInfo.nodes.filter((item) => item.type === 'DataNode') : []
+      );
     } else {
       slaveNodes.value = [];
     }
@@ -316,16 +349,18 @@ function getMemory() {
     endTime: dayjs(monitorTime.value).valueOf(),
     step: 180,
     isMaster: clusterType.value === 'master',
-  }).then((res) => {
-    const data = res.data || [];
-    memoryData.value = data.map((item) => {
-      const nodeData = nodeList.value.find((node) => node.nodeID === item.nodeID);
-      return { ...item, nodeName: nodeData ? `${nodeData.address}(${nodeData.type})` : `${item.nodeID}(DataNode)` };
+  })
+    .then((res) => {
+      const data = res.data || [];
+      memoryData.value = data.map((item) => {
+        const nodeData = nodeList.value.find((node) => node.nodeID === item.nodeID);
+        return { ...item, nodeName: nodeData ? `${nodeData.address}(${nodeData.type})` : `${item.nodeID}(DataNode)` };
+      });
+      memoryDataOptions.data = lineChartOptions(memoryData.value, memoryData.value[0]?.unit || '', 'memory');
+    })
+    .catch(() => {
+      memoryData.value = [];
     });
-    memoryDataOptions.data = lineChartOptions(memoryData.value, memoryData.value[0]?.unit || '', 'memory');
-  }).catch(() => {
-    memoryData.value = [];
-  });
 }
 
 function getP50() {
@@ -336,16 +371,18 @@ function getP50() {
     step: 180,
     isMaster: clusterType.value === 'master',
     quantile: '0.5',
-  }).then((res) => {
-    const data = res.data || [];
-    p50Data.value = data.map((item) => {
-      const nodeData = nodeList.value.find((node) => node.nodeID === item.nodeID);
-      return { ...item, nodeName: nodeData ? `${nodeData.address}(${nodeData.type})` : `${item.nodeID}(DataNode)` };
+  })
+    .then((res) => {
+      const data = res.data || [];
+      p50Data.value = data.map((item) => {
+        const nodeData = nodeList.value.find((node) => node.nodeID === item.nodeID);
+        return { ...item, nodeName: nodeData ? `${nodeData.address}(${nodeData.type})` : `${item.nodeID}(DataNode)` };
+      });
+      p50DataOptions.data = lineChartOptions(p50Data.value, p50Data.value[0]?.unit || '', 'p50');
+    })
+    .catch(() => {
+      p50Data.value = [];
     });
-    p50DataOptions.data = lineChartOptions(p50Data.value, p50Data.value[0]?.unit || '', 'p50');
-  }).catch(() => {
-    p50Data.value = [];
-  });
 }
 
 function getP99() {
@@ -356,16 +393,18 @@ function getP99() {
     step: 180,
     isMaster: clusterType.value === 'master',
     quantile: '0.99',
-  }).then((res) => {
-    const data = res.data || [];
-    p99Data.value = data.map((item) => {
-      const nodeData = nodeList.value.find((node) => node.nodeID === item.nodeID);
-      return { ...item, nodeName: nodeData ? `${nodeData.address}(${nodeData.type})` : `${item.nodeID}(DataNode)` };
+  })
+    .then((res) => {
+      const data = res.data || [];
+      p99Data.value = data.map((item) => {
+        const nodeData = nodeList.value.find((node) => node.nodeID === item.nodeID);
+        return { ...item, nodeName: nodeData ? `${nodeData.address}(${nodeData.type})` : `${item.nodeID}(DataNode)` };
+      });
+      p99DataOptions.data = lineChartOptions(p99Data.value, p99Data.value[0]?.unit || '', 'p99');
+    })
+    .catch(() => {
+      p99Data.value = [];
     });
-    p99DataOptions.data = lineChartOptions(p99Data.value, p99Data.value[0]?.unit || '', 'p99');
-  }).catch(() => {
-    p99Data.value = [];
-  });
 }
 
 function getRemainingTime() {
@@ -375,23 +414,20 @@ function getRemainingTime() {
     endTime: dayjs(monitorTime.value).valueOf(),
     step: 180,
     isMaster: clusterType.value === 'master',
-  }).then((res) => {
-    remainingTime.remainTime = res.data.remainTime || null;
-    remainingTime.timeUnit = res.data.timeUnit;
-  }).catch(() => {
-    remainingTime.remainTime = null;
-    remainingTime.timeUnit = '';
-  });
+  })
+    .then((res) => {
+      remainingTime.remainTime = res.data.remainTime || null;
+      remainingTime.timeUnit = res.data.timeUnit;
+    })
+    .catch(() => {
+      remainingTime.remainTime = null;
+      remainingTime.timeUnit = '';
+    });
 }
 
 // 获取图表详情
 function getInitial() {
-  Promise.allSettled([
-    getMemory(),
-    getP50(),
-    getP99(),
-    getRemainingTime(),
-  ]).then(() => {
+  Promise.allSettled([getMemory(), getP50(), getP99(), getRemainingTime()]).then(() => {
     // 重置定时器
     clearTimeout(refreshInterval.value);
     isInit.value = false;
@@ -437,7 +473,7 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
 
 onUnmounted(() => {
@@ -446,32 +482,33 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss">
-.monitor-dashboard-operate-left{
+.monitor-dashboard-operate-left {
   display: flex;
   height: 36px;
   align-items: center;
-  border-radius:2px;
-  border: 1px solid #DFE1ED;
+  border-radius: 2px;
+  border: 1px solid #dfe1ed;
   font-size: 12px;
   font-weight: 400;
   line-height: 18px;
-  color: #656A85;
+  color: #656a85;
   box-sizing: border-box;
   margin-right: 36px;
 
-  .monitor-dashboard-close-btn, .monitor-dashboard-header-title{
+  .monitor-dashboard-close-btn,
+  .monitor-dashboard-header-title {
     width: 75px;
     text-align: center;
   }
 
-  .monitor-dashboard-header-title{
+  .monitor-dashboard-header-title {
     position: relative;
     height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
 
-    &::before{
+    &::before {
       position: absolute;
       content: '';
       display: block;
@@ -479,7 +516,7 @@ onUnmounted(() => {
       height: 26px;
       top: 5px;
       left: 0;
-      background-color: #DFE1ED;
+      background-color: #dfe1ed;
     }
   }
 }
@@ -487,29 +524,29 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 @import '@/views/dashboard/components/monitor-module';
 
-.data-sync-detail-wrapper{
+.data-sync-detail-wrapper {
   border-radius: 6px;
-  background: #FFF;
+  background: #fff;
   box-sizing: border-box;
   padding: 26px 16px 16px 14px;
 
-  :deep(.el-scrollbar__view){
+  :deep(.el-scrollbar__view) {
     height: 100%;
   }
 }
 
-.monitor-dashboard-operate-header{
+.monitor-dashboard-operate-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: auto;
   margin-bottom: 16px;
 
-  .monitor-dashboard-node-box{
+  .monitor-dashboard-node-box {
     display: flex;
     align-items: center;
 
-    .search-from-label{
+    .search-from-label {
       font-size: 14px;
       font-weight: 400;
       line-height: 21px;
@@ -518,8 +555,8 @@ onUnmounted(() => {
     }
   }
 
-  .monitor-dashboard-module-details{
-    .module-label-text{
+  .monitor-dashboard-module-details {
+    .module-label-text {
       font-size: 12px;
       font-weight: 400;
       line-height: 12px;
@@ -527,33 +564,33 @@ onUnmounted(() => {
       margin-right: 4px;
     }
 
-    .module-content-text{
+    .module-content-text {
       font-size: 12px;
       font-weight: 400;
       line-height: 12px;
-      color: #656A85;
+      color: #656a85;
     }
   }
 }
 
-.auth-tip-container{
-  .monitor-dashboard-operate-left{
+.auth-tip-container {
+  .monitor-dashboard-operate-left {
     position: absolute;
     top: 26px;
     left: 14px;
   }
 }
 
-.monitor-chart-wrapper{
+.monitor-chart-wrapper {
   height: calc(100% - 24px);
 }
 
-.monitor-chart-box-2{
+.monitor-chart-box-2 {
   min-height: 300px;
   height: 50%;
 }
 
-.monitor-info-module-title svg{
+.monitor-info-module-title svg {
   vertical-align: top;
 }
 </style>

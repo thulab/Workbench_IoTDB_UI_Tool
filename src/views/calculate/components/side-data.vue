@@ -13,13 +13,13 @@
       tooltip-effect="light"
       cell-class-name="p-y-0"
       :tooltip-options="{ placement: 'left', popperClass: 'table-tooltip-max-width' }"
-      @row-dblclick="(row, column, event) => handleAdd(row)">
+      @row-dblclick="(row, column, event) => handleAdd(row)"
+    >
       <el-table-column align="center" :label="t('measurement.measurement')" v-slot="{ row }" show-overflow-tooltip>
         {{ row.timeseries }}
       </el-table-column>
     </el-table>
   </div>
-
 </template>
 
 <script lang="ts" setup>
@@ -70,7 +70,7 @@ defineExpose({ init });
   }
 }
 
-.filter-input{
+.filter-input {
   :deep(.el-input__wrapper) {
     box-shadow: 0 0 0 1px var(--el-input-border-color, var(--el-border-color)) inset;
   }

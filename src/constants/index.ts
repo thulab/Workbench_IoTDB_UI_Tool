@@ -86,9 +86,7 @@ export const functionTreeData = [
   {
     label: t('searchIotdb.conversion'),
     value: 'sqlSearch.Conversion',
-    children: [
-      { label: t('searchIotdb.cast'), value: 'CAST' },
-    ],
+    children: [{ label: t('searchIotdb.cast'), value: 'CAST' }],
   },
   {
     label: t('searchIotdb.constant'),

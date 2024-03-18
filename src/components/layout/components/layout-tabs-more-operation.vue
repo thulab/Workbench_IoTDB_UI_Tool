@@ -1,9 +1,7 @@
 <template>
   <div class="more-operation">
     <el-dropdown trigger="click">
-      <el-button
-        size="small"
-        type="primary">
+      <el-button size="small" type="primary">
         <span>{{ $t('common.more') }}</span>
         <el-icon class="el-icon--right">
           <i-ep-arrow-down />
@@ -11,31 +9,19 @@
       </el-button>
       <template #dropdown>
         <el-dropdown-menu>
-          <el-dropdown-item
-            :icon="IconEpCircleClose"
-            :disabled="currentDisabled"
-            @click="closeCurrentTab">
+          <el-dropdown-item :icon="IconEpCircleClose" :disabled="currentDisabled" @click="closeCurrentTab">
             {{ $t('common.closeCurrent') }}
           </el-dropdown-item>
-          <el-dropdown-item
-            :icon="IconEpClose"
-            :disabled="tabsMenuList.length < 3"
-            @click="closeOtherTab">
+          <el-dropdown-item :icon="IconEpClose" :disabled="tabsMenuList.length < 3" @click="closeOtherTab">
             {{ $t('common.closeOther') }}
           </el-dropdown-item>
-          <el-dropdown-item
-            :icon="IconEpCloseBold"
-            :disabled="tabsMenuList.length <= 1"
-            @click="closeAllTab">
+          <el-dropdown-item :icon="IconEpCloseBold" :disabled="tabsMenuList.length <= 1" @click="closeAllTab">
             {{ $t('common.closeAll') }}
           </el-dropdown-item>
         </el-dropdown-menu>
       </template>
     </el-dropdown>
-    <el-button
-      size="small"
-      text
-      @click="switchFullscreen">
+    <el-button size="small" text @click="switchFullscreen">
       <el-icon><i-ep-full-screen /></el-icon>
     </el-button>
   </div>

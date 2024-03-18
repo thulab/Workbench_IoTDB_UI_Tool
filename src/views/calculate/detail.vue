@@ -1,16 +1,16 @@
 <template>
   <active-container :is-show="connectionIsActive">
     <el-container class="calculate-detail-wrapper">
-      <el-header class="p-x-0" style="height: auto;">
+      <el-header class="p-x-0" style="height: auto">
         <div class="search-form-wrapper">
           <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline @submit.prevent>
-            <base-form-item label="" prop="name" style="margin-left: -8px;">
-              <el-input v-model="searchFormData.name" :placeholder="searchPlaceholder" style="width: 346px;" id="calculate-search-name">
+            <base-form-item label="" prop="name" style="margin-left: -8px">
+              <el-input v-model="searchFormData.name" :placeholder="searchPlaceholder" style="width: 346px" id="calculate-search-name">
                 <template #prefix>
                   <i-custom-search-icon class="remote-select-search-icon" />
                 </template>
                 <template #prepend>
-                  <el-select v-model="searchFormData.type" style="width: 88px;" placeholder="" id="calculate-search-type">
+                  <el-select v-model="searchFormData.type" style="width: 88px" placeholder="" id="calculate-search-type">
                     <el-option :label="appType === 1 ? t('calculate.calculateName') : t('calculate.viewName')" value="name" id="calculate-search-type-name" />
                     <el-option :label="t('calculate.resultMeasurement')" value="measurement" id="calculate-search-type-measurement" />
                     <el-option :label="appType === 1 ? t('calculate.calculateDesc') : t('calculate.viewDesc')" value="desc" id="calculate-search-type-desc" />
@@ -32,25 +32,25 @@
       <el-main class="p-0">
         <div class="page-table-details">
           <div class="page-table-title-box">
-            <h4 class="page-table-title">{{appType === 1 ? t('calculate.calculateList') : t('calculate.viewList')}}</h4>
+            <h4 class="page-table-title">{{ appType === 1 ? t('calculate.calculateList') : t('calculate.viewList') }}</h4>
             <div class="operate-buttons">
               <auth-tooltip :is-disabled="canAllWriteSchema">
-                <el-button type="primary" :disabled="!canAllWriteSchema" @click="handleAdd" id="calculate-add">{{appType === 1 ? t('calculate.newCalculate') : t('calculate.newView')}}</el-button>
+                <el-button type="primary" :disabled="!canAllWriteSchema" @click="handleAdd" id="calculate-add">{{ appType === 1 ? t('calculate.newCalculate') : t('calculate.newView') }}</el-button>
               </auth-tooltip>
               <auth-tooltip :is-disabled="canWriteSchema">
                 <el-button :disabled="!multipleSelection.length || !canWriteSchema" type="primary" @click="handleDel('batch', null)" id="calculate-batch-del">{{ t('common.batchDelete') }}</el-button>
               </auth-tooltip>
               <auth-tooltip :is-disabled="canReadWriteSchema">
-                <el-button link :disabled="!canReadWriteSchema" @click="getNewVal" id="calculate-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+                <el-button link :disabled="!canReadWriteSchema" @click="getNewVal" id="calculate-refresh"><i-custom-refresh style="width: 24px; height: 24px" /></el-button>
               </auth-tooltip>
             </div>
           </div>
-          <auth-container :is-auth="canReadWriteSchema" style="height: 100%;">
+          <auth-container :is-auth="canReadWriteSchema" style="height: 100%">
             <div class="page-table-box">
               <el-table
                 :data="tableDataPagination"
                 v-loading="loading"
-                style="width: 100%;"
+                style="width: 100%"
                 :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
                 :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
                 tooltip-effect="light"
@@ -79,14 +79,16 @@
                       <el-button type="primary" link size="small" @click="handleQuery(row)" :id="`calculate-table-${row.measurement}-data`">{{ t('calculate.view') }}</el-button>
                       <el-button type="primary" link size="small" @click="handleEdit(row)" :id="`calculate-table-${row.measurement}-edit`">{{ t('common.edit') }}</el-button>
                       <auth-tooltip :is-disabled="rowCanWriteSchemaByPath(row.measurement)">
-                        <el-button type="primary" :disabled="!rowCanWriteSchemaByPath(row.measurement)" link size="small" @click="handleDel('row', row)" :id="`calculate-table-${row.measurement}-del`">{{ t('common.delete') }}</el-button>
+                        <el-button type="primary" :disabled="!rowCanWriteSchemaByPath(row.measurement)" link size="small" @click="handleDel('row', row)" :id="`calculate-table-${row.measurement}-del`">
+                          {{ t('common.delete') }}
+                        </el-button>
                       </auth-tooltip>
                     </div>
                   </template>
                 </el-table-column>
                 <template #empty>
                   <div class="table-empty-wrapper">
-                    <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+                    <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
                     <span class="data-empty-text">{{ t('common.noData') }}</span>
                   </div>
                 </template>
@@ -109,17 +111,9 @@
         </div>
       </el-main>
 
-      <modal-calculate
-        v-model:visible="editVisible"
-        :edit-type="editType"
-        :edit-data="editData"
-        @handleSave="handleSearch"
-      />
+      <modal-calculate v-model:visible="editVisible" :edit-type="editType" :edit-data="editData" @handleSave="handleSearch" />
 
-      <modal-expression
-        v-model:visible="expressionVisible"
-        :content="editExpression"
-      />
+      <modal-expression v-model:visible="expressionVisible" :content="editExpression" />
     </el-container>
   </active-container>
 </template>
@@ -139,13 +133,7 @@ const { t } = useI18n();
 const appType = Number(import.meta.env.VITE_APP_TYPE);
 const router = useRouter();
 const userStore = useUserStore();
-const {
-  canWriteSchema,
-  canReadWriteSchema,
-  userAllPrivileges,
-  userAllEntityPrivileges,
-  userAllPathPrivileges,
-} = storeToRefs(userStore);
+const { canWriteSchema, canReadWriteSchema, userAllPrivileges, userAllEntityPrivileges, userAllPathPrivileges } = storeToRefs(userStore);
 const connectionStore = useConnectionStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
 const { maxTableHeight } = useTableHeight(300);
@@ -177,7 +165,11 @@ function rowCanWriteSchemaByPath(path: string) {
   return false;
 }
 
-const { requestFn: getCalculateList, data: tableData, loading } = useRequest(CalculateApi.getCalculateList, {
+const {
+  requestFn: getCalculateList,
+  data: tableData,
+  loading,
+} = useRequest(CalculateApi.getCalculateList, {
   initData: {
     totalCount: 0,
     totalPage: 1,
@@ -301,26 +293,31 @@ function handleEdit(row: Calculate.CalculateItem) {
 }
 
 function handleDel(type: string, data: Calculate.CalculateItem | null) {
-  ElMessageBox.confirm(type === 'batch' ? `${appType === 1 ? t('calculate.batchDeleteCalculate') : t('calculate.batchDeleteView')}` : `${appType === 1 ? t('calculate.singleDeleteCalculate') : t('calculate.singleDeleteView')}`, t('common.notice'), {
-    confirmButtonText: t('common.confirm'),
-    cancelButtonText: t('common.cancel'),
-    confirmButtonClass: 'del-calculate-confirm',
-    cancelButtonClass: 'del-calculate-cancel',
-    type: 'warning',
-    icon: ICustomMessageWarning,
-  })
-    .then(() => {
-      let arr = [];
-      if (type === 'batch') {
-        arr = multipleSelection.value?.map((i) => i.measurement);
-      } else {
-        arr = data?.measurement ? [data.measurement] : [];
-      }
-      deleteCalculate(arr).then(() => {
-        ElMessage.success(t('common.deleteSuccess'));
-        handleSearch();
-      });
+  ElMessageBox.confirm(
+    type === 'batch'
+      ? `${appType === 1 ? t('calculate.batchDeleteCalculate') : t('calculate.batchDeleteView')}`
+      : `${appType === 1 ? t('calculate.singleDeleteCalculate') : t('calculate.singleDeleteView')}`,
+    t('common.notice'),
+    {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
+      confirmButtonClass: 'del-calculate-confirm',
+      cancelButtonClass: 'del-calculate-cancel',
+      type: 'warning',
+      icon: ICustomMessageWarning,
+    }
+  ).then(() => {
+    let arr = [];
+    if (type === 'batch') {
+      arr = multipleSelection.value?.map((i) => i.measurement);
+    } else {
+      arr = data?.measurement ? [data.measurement] : [];
+    }
+    deleteCalculate(arr).then(() => {
+      ElMessage.success(t('common.deleteSuccess'));
+      handleSearch();
     });
+  });
 }
 
 onMounted(() => {
@@ -340,7 +337,7 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
 
 watch(
@@ -353,26 +350,26 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
 </script>
 
 <style lang="scss" scoped>
-.calculate-detail-wrapper{
+.calculate-detail-wrapper {
   border-radius: 6px;
-  background: #FFF;
+  background: #fff;
   box-sizing: border-box;
   padding: 26px 16px 16px 14px;
 }
 
-.search-form-wrapper{
+.search-form-wrapper {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 4px;
 }
 
-.page-table-details{
+.page-table-details {
   padding: 16px 16px 10px;
   height: 100%;
   box-sizing: border-box;
@@ -380,25 +377,25 @@ watch(
   flex-direction: column;
 }
 
-.page-table-title-box{
+.page-table-title-box {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin: 0 0 12px;
 
-  .page-table-title{
+  .page-table-title {
     font-size: 14px;
     font-weight: 700;
     line-height: 21px;
-    color: #495AD4;
+    color: #495ad4;
   }
 }
 
-.measurement-text-button{
-  color: #495AD4;
+.measurement-text-button {
+  color: #495ad4;
   cursor: pointer;
 
-  &:hover{
+  &:hover {
     text-decoration: underline;
   }
 }

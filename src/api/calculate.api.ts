@@ -6,7 +6,7 @@ class CalculateApi {
     return http.post('/calculate/getCalculateList', data);
   }
 
-  static getLastValue(measurement: string):HttpResponseP<Calculate.GetLastValueRes> {
+  static getLastValue(measurement: string): HttpResponseP<Calculate.GetLastValueRes> {
     return http.get('/calculate/getLastValue', { params: { measurement } });
   }
 

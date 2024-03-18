@@ -12,13 +12,15 @@ export default function useUpload(fileType: string[], fileSize: number) {
   function uploadFile(file: File) {
     const formData = new FormData();
     formData.append('file', file);
-    return CommonApi.uploadImage(formData).then((res) => {
-      ElMessage.success(t('common.updateSuccess'));
-      return res.data;
-    }).catch(() => {
-      ElMessage.error(t('common.uploadError'));
-      return Promise.reject();
-    });
+    return CommonApi.uploadImage(formData)
+      .then((res) => {
+        ElMessage.success(t('common.updateSuccess'));
+        return res.data;
+      })
+      .catch(() => {
+        ElMessage.error(t('common.uploadError'));
+        return Promise.reject();
+      });
   }
   const httpRequest: UploadProps['httpRequest'] = (options) => uploadFile(options.file);
 
@@ -26,7 +28,8 @@ export default function useUpload(fileType: string[], fileSize: number) {
     if (fileType.indexOf(rawFile.type) === -1) {
       ElMessage.error(t('common.fileTypeError')!);
       return false;
-    } if (rawFile.size / 1024 / 1024 > fileSize) {
+    }
+    if (rawFile.size / 1024 / 1024 > fileSize) {
       ElMessage.error(t('common.fileSizeError', { size: fileSize }));
       return false;
     }

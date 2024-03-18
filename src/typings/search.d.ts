@@ -1,4 +1,4 @@
-declare namespace Search{
+declare namespace Search {
   export interface QueryDataParams {
     measurements: string[];
     startTime?: number;
@@ -52,8 +52,8 @@ declare namespace Search{
   }
 
   export interface QuerySqlResponse {
-    metaDataList: string [];
-    valueList: string [][];
+    metaDataList: string[];
+    valueList: string[][];
     queryTime: string;
     status?: boolean;
     errMsg: string;
@@ -111,23 +111,23 @@ declare namespace Search{
   }
 
   export interface SpectrumFFTParams {
-    resultType: string,
-    compression: number | string,
-    measurement: string,
-    startTime: DateModelType,
-    endTime: DateModelType,
+    resultType: string;
+    compression: number | string;
+    measurement: string;
+    startTime: DateModelType;
+    endTime: DateModelType;
   }
 
   export interface SpectrumENVELOPEParams {
-    frequency: number | string,
-    amplification: number | string,
-    measurement: string,
-    startTime: DateModelType,
-    endTime: DateModelType,
+    frequency: number | string;
+    amplification: number | string;
+    measurement: string;
+    startTime: DateModelType;
+    endTime: DateModelType;
   }
 
   export interface SpectrumData {
-    timestamps: number[],
-    values: string[],
+    timestamps: number[];
+    values: string[];
   }
 }

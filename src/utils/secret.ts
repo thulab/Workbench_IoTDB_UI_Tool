@@ -1,6 +1,4 @@
-import {
-  AES, mode, pad, enc, MD5,
-} from 'crypto-js';
+import { AES, mode, pad, enc, MD5 } from 'crypto-js';
 
 export const encodeAES = (data?: string, key = 'a=cd;fg.ijklmnop8rstu5wx*z12==56') => {
   if (!data) return '';

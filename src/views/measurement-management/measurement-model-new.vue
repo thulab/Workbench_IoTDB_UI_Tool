@@ -3,29 +3,24 @@
     <el-header class="detail-title-box">
       <h4 class="detail-title-text">{{ t('measurement.databaseModel') }}</h4>
       <div class="operate-buttons">
-        <el-tooltip
-          placement="top-start"
-          effect="light"
-          trigger="hover"
-          :content="t('measurement.databaseModelDoc')"
-          popper-class="tooltip-box-width"
-        >
-          <el-button link class="m-r-4" @click="handleDoc" id="measurement-tree-doc"><el-icon size="24"><i-custom-model-doc /></el-icon></el-button>
+        <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('measurement.databaseModelDoc')" popper-class="tooltip-box-width">
+          <el-button link class="m-r-4" @click="handleDoc" id="measurement-tree-doc">
+            <el-icon size="24"><i-custom-model-doc /></el-icon>
+          </el-button>
         </el-tooltip>
         <auth-tooltip :is-disabled="canReadWriteSchema">
-          <el-button :disabled="!canReadWriteSchema" link @click="handleRefresh" id="measurement-tree-refresh"><el-icon size="24"><i-custom-refresh /></el-icon></el-button>
+          <el-button :disabled="!canReadWriteSchema" link @click="handleRefresh" id="measurement-tree-refresh">
+            <el-icon size="24"><i-custom-refresh /></el-icon>
+          </el-button>
         </auth-tooltip>
       </div>
     </el-header>
     <el-main class="p-0">
       <el-scrollbar>
-        <auth-container :is-auth="canReadWriteSchema" style="height: 100%;">
+        <auth-container :is-auth="canReadWriteSchema" style="height: 100%">
           <div class="model-container" v-loading="initialLoading">
             <div class="chart-container-box">
-              <cascader-panel
-                ref="modelCascaderPanelRef"
-                :props="modelCascaderProps"
-              >
+              <cascader-panel ref="modelCascaderPanelRef" :props="modelCascaderProps">
                 <template #default="{ node, data }">
                   <div class="flex-align-center cascader-node-box" :id="`cascader-node-box-${data.lebel}`" @click="handleClickNode(node, data)">
                     <el-icon v-if="listLoading && (data.nodeType === 'next' || data.nodeType === 'pre')" class="el-icon is-loading"><i-ep-loading /></el-icon>
@@ -54,9 +49,7 @@ const listLoading = ref(false);
 const modelCascaderPanelRef = ref<InstanceType<typeof CascaderPanel>>();
 const { t } = useI18n();
 const userStore = useUserStore();
-const {
-  canReadWriteSchema,
-} = storeToRefs(userStore);
+const { canReadWriteSchema } = storeToRefs(userStore);
 
 const { requestFn: getDataModelTree } = useRequest(StorageApi.getDataModelTree);
 const { requestFn: getBatchLastValue } = useRequest(StorageApi.getBatchLastValue);
@@ -105,7 +98,7 @@ function getDataPagination(data: StorageDevice.GetModelRes) {
         value: `${data.nodePath!}.pre`,
         nodePath: data.nodePath!,
         nodeType: 'pre',
-        pageNum: (data.pageNum - 1) || 1,
+        pageNum: data.pageNum - 1 || 1,
         leaf: true,
       });
     }
@@ -119,15 +112,17 @@ const modelCascaderProps: CascaderProps = {
   lazyLoad(node, resolve) {
     const { level, data } = node;
     if (level === 0) {
-      const nodeList = [{
-        label: 'root',
-        node: 'root',
-        value: 'root',
-        nodePath: 'root',
-        nodeType: 'root',
-        leaf: false,
-        pageNum: 1,
-      }];
+      const nodeList = [
+        {
+          label: 'root',
+          node: 'root',
+          value: 'root',
+          nodePath: 'root',
+          nodeType: 'root',
+          leaf: false,
+          pageNum: 1,
+        },
+      ];
       resolve(nodeList);
     } else {
       getDataModelTree({
@@ -156,24 +151,25 @@ function handleClickNode(node: CascaderPanelNode, data: StorageDevice.ModelData)
       pageNum: data.pageNum,
       pageSize: 10,
       nodePath: data!.nodePath,
-    }).then((res) => {
-      const resData = {
-        ...res.data,
-        nodePath: data!.nodePath,
-        pageNum: data.pageNum,
-      };
+    })
+      .then((res) => {
+        const resData = {
+          ...res.data,
+          nodePath: data!.nodePath,
+          pageNum: data.pageNum,
+        };
 
-      const nodeList = getDataPagination(resData).list;
-      cb(nodeList as unknown as CascaderOption[]);
-    }).finally(() => {
-      listLoading.value = false;
-    });
+        const nodeList = getDataPagination(resData).list;
+        cb(nodeList as unknown as CascaderOption[]);
+      })
+      .finally(() => {
+        listLoading.value = false;
+      });
   }
 }
 
 // 刷新
-function handleRefresh() {
-}
+function handleRefresh() {}
 
 onMounted(() => {
   if (!canReadWriteSchema.value) return;
@@ -189,39 +185,39 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
 </script>
 
 <style lang="scss" scoped>
-.detail-title-box{
+.detail-title-box {
   height: 41px;
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #DFE1ED;
+  border-bottom: 1px solid #dfe1ed;
   padding: 0 16px;
   box-sizing: border-box;
 
-  .detail-title-text{
+  .detail-title-text {
     font-size: 14px;
     font-weight: 700;
     line-height: 21px;
-    color: #495AD4;
+    color: #495ad4;
   }
 }
 
-:deep(.el-scrollbar__view){
+:deep(.el-scrollbar__view) {
   height: 100%;
 }
 
-.model-container{
+.model-container {
   width: 100%;
   height: 100%;
 }
 
-.chart-container-box{
+.chart-container-box {
   width: 100%;
   height: 100%;
   overflow: auto;
@@ -231,7 +227,7 @@ watch(
     box-sizing: border-box;
   }
 
-  :deep(.el-cascader-menu__wrap.el-scrollbar__wrap){
+  :deep(.el-cascader-menu__wrap.el-scrollbar__wrap) {
     height: 100%;
   }
 

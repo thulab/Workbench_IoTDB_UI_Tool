@@ -1,8 +1,11 @@
 <template>
   <el-container>
     <div v-if="isShow === false" class="auth-tip-container">
-      <img src="@/assets/auth-tip.png" alt="" class="auth-tip-img">
-      <span class="auth-tip-text">{{ t('auth.enterpriseTip') }}<a :href="`mailto:${email}`">{{ email }}</a></span>
+      <img src="@/assets/auth-tip.png" alt="" class="auth-tip-img" />
+      <span class="auth-tip-text">
+        {{ t('auth.enterpriseTip') }}
+        <a :href="`mailto:${email}`">{{ email }}</a>
+      </span>
     </div>
     <slot v-if="isShow"></slot>
   </el-container>
@@ -29,19 +32,19 @@ const email = computed(() => import.meta.env.VITE_APP_BUSSINESS_EMAIL);
   box-sizing: border-box;
   background-color: #fff;
 
-  .auth-tip-img{
+  .auth-tip-img {
     width: 150px;
     height: 150px;
     margin-bottom: 16px;
   }
 
-  .auth-tip-text{
+  .auth-tip-text {
     font-size: 14px;
     color: #131926;
     line-height: 21px;
 
-    a{
-      color: #495AD4;
+    a {
+      color: #495ad4;
     }
   }
 }

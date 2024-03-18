@@ -2,13 +2,7 @@
   <version-container :is-show="showAuthMenu">
     <el-container>
       <el-aside width="240px" class="list-wrapper">
-        <list
-          ref="listRef"
-          :can-manage-user="canManageUser"
-          :can-alter-pwd="canAlterPwd"
-          :user-name="userName"
-          @handle-select="val => currentUser = val"
-        />
+        <list ref="listRef" :can-manage-user="canManageUser" :can-alter-pwd="canAlterPwd" :user-name="userName" @handle-select="(val) => (currentUser = val)" />
       </el-aside>
       <el-container class="details-wrapper">
         <el-main class="p-0" v-loading="loading || roleLoading">
@@ -21,9 +15,19 @@
               <el-button type="primary" v-else-if="isEdit" @click="handleReset('view')" id="auth-user-view">{{ t('common.exitEdit') }}</el-button>
             </div>
             <div class="detail-role-list" v-if="!isManager">
-              <span class="p-t-4">{{t('auth.havingRole')}}：</span>
+              <span class="p-t-4">{{ t('auth.havingRole') }}：</span>
               <div class="detail-role-box">
-                <el-tag :closable="isEdit" type="info" v-for="(item, index,) in authData.rolesToPrivileges" :key="item.roleName" @close="handleDeleteRole(index)" @click="showRoleDetail(item)" :id="`auth-user-role-${item.roleName}-${index}`">{{ item.roleName }}</el-tag>
+                <el-tag
+                  :closable="isEdit"
+                  type="info"
+                  v-for="(item, index) in authData.rolesToPrivileges"
+                  :key="item.roleName"
+                  @close="handleDeleteRole(index)"
+                  @click="showRoleDetail(item)"
+                  :id="`auth-user-role-${item.roleName}-${index}`"
+                >
+                  {{ item.roleName }}
+                </el-tag>
                 <auth-tooltip :is-disabled="canManageRole">
                   <el-button link :disabled="!canManageRole" @click="addRole()" v-if="isEdit" id="auth-user-add-role" class="m-l-8 p-0">
                     <el-icon size="24px"><i-custom-user-role-add /></el-icon>
@@ -32,7 +36,13 @@
               </div>
             </div>
             <div class="detail-title-box">
-              <h4 class="detail-title-text">{{ t('auth.detail') }}<span class="tip-text"><i-custom-info-warning />{{ t('auth.removeAuthTip') }}</span></h4>
+              <h4 class="detail-title-text">
+                {{ t('auth.detail') }}
+                <span class="tip-text">
+                  <i-custom-info-warning />
+                  {{ t('auth.removeAuthTip') }}
+                </span>
+              </h4>
             </div>
             <div class="table-list-box m-x-16">
               <h4 class="table-box-title">{{ t('common.allSituation') }}</h4>
@@ -47,15 +57,10 @@
                         v-if="row.privileges.length >= entityPrivilegesEnumKeys.length"
                         :checked="true"
                         :disabled="row.rolePrivileges.length >= entityPrivilegesEnumKeys.length"
-                        @change="e => handleAllCheckedEntity(row, false)"
+                        @change="(e) => handleAllCheckedEntity(row, false)"
                         id="user-auth-entity-all"
                       />
-                      <el-checkbox
-                        v-else
-                        :checked="false"
-                        @change="e => handleAllCheckedEntity(row, true)"
-                        id="user-auth-entity-all"
-                      />
+                      <el-checkbox v-else :checked="false" @change="(e) => handleAllCheckedEntity(row, true)" id="user-auth-entity-all" />
                     </template>
                   </template>
                 </el-table-column>
@@ -79,7 +84,8 @@
                             :checked="true"
                             :id="`user-auth-entity-${child.privileges}`"
                             :disabled="row.rolePrivileges.includes(child.privileges)"
-                            @change="handleCheckedEntity(row, child.privileges, false)" />
+                            @change="handleCheckedEntity(row, child.privileges, false)"
+                          />
                         </el-tooltip>
                         <el-checkbox :checked="false" v-else @change="handleCheckedEntity(row, child.privileges, true)" :id="`user-auth-entity-${child.privileges}`" />
                       </template>
@@ -88,7 +94,7 @@
                 </el-table-column>
               </el-table>
             </div>
-            <div class="table-list-box  m-x-16 m-b-16" v-if="canEdit">
+            <div class="table-list-box m-x-16 m-b-16" v-if="canEdit">
               <h4 class="table-box-title">{{ t('auth.path') }}</h4>
               <el-table :data="tableData" style="width: 100%" tooltip-effect="light" :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
                 <el-table-column :label="t('auth.pathName')" align="center" min-width="193" prop="path" show-overflow-tooltip />
@@ -103,19 +109,21 @@
                         :checked="true"
                         :disabled="row.rolePrivileges.length >= pathPrivilegesEnumKeys.length"
                         :id="`user-auth-path-all-${$index}`"
-                        @change="e => handleAllCheckedPath(row, false)"
+                        @change="(e) => handleAllCheckedPath(row, false)"
                       />
-                      <el-checkbox
-                        v-else
-                        :checked="false"
-                        :id="`user-auth-path-all-${$index}`"
-                        @change="e => handleAllCheckedPath(row, true)"
-                      />
+                      <el-checkbox v-else :checked="false" :id="`user-auth-path-all-${$index}`" @change="(e) => handleAllCheckedPath(row, true)" />
                     </template>
                   </template>
                 </el-table-column>
                 <el-table-column v-for="(group, index) in pathPrivilegesEnumGroup" :label="group.group" :key="`${group.group}_${index}_column`" align="center">
-                  <el-table-column v-for="(child, childIndex) in group.children" :label="child.desc" :key="`${child.privileges}_${childIndex}_col`" :prop="child.privileges" align="center" :width="calcColumnWidth(child)">
+                  <el-table-column
+                    v-for="(child, childIndex) in group.children"
+                    :label="child.desc"
+                    :key="`${child.privileges}_${childIndex}_col`"
+                    :prop="child.privileges"
+                    align="center"
+                    :width="calcColumnWidth(child)"
+                  >
                     <template #default="{ row, $index }">
                       <el-icon v-if="!isEdit || !row.path" class="move-down3" size="21">
                         <i-custom-correct v-if="row.privileges.includes(child.privileges)" />
@@ -134,7 +142,8 @@
                             :checked="true"
                             :disabled="row.rolePrivileges.includes(child.privileges)"
                             :id="`user-auth-path-${child.privileges}-${$index}`"
-                            @change="handleCheckedPath(row, child.privileges, false)" />
+                            @change="handleCheckedPath(row, child.privileges, false)"
+                          />
                         </el-tooltip>
                         <el-checkbox :checked="false" v-else @change="handleCheckedPath(row, child.privileges, true)" :id="`user-auth-path-${child.privileges}-${$index}`" />
                       </template>
@@ -149,7 +158,10 @@
                   </template>
                 </el-table-column>
               </el-table>
-              <el-button style="width: 100%;" class="m-t-24" @click="handleAddRow" v-if="canEdit && isEdit" id="auth-user-path"><i-custom-add class="m-r-4" />{{ t('auth.addPath') }}</el-button>
+              <el-button style="width: 100%" class="m-t-24" @click="handleAddRow" v-if="canEdit && isEdit" id="auth-user-path">
+                <i-custom-add class="m-r-4" />
+                {{ t('auth.addPath') }}
+              </el-button>
             </div>
           </el-scrollbar>
         </el-main>
@@ -161,18 +173,15 @@
         </el-footer>
       </el-container>
 
-      <modal-path
-        v-model:visible="pathVisible"
-        :path-list="editPathList"
-        @handle-save="handleSavePath"
-      />
+      <modal-path v-model:visible="pathVisible" :path-list="editPathList" @handle-save="handleSavePath" />
       <modal-add-role v-model:visible="addRoleVisible" :selected="selectRoleList" @add-role="handleAddRole" />
       <modal-preview-role
         v-if="currentRole"
         v-model:visible="previewRoleVisible"
         :name="currentRole.roleName"
         :entity-privileges="currentRole.entityPrivileges || []"
-        :path-privileges="currentRole.pathPrivileges || []" />
+        :path-privileges="currentRole.pathPrivileges || []"
+      />
     </el-container>
   </version-container>
 </template>
@@ -192,15 +201,7 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 const { t, locale } = useI18n();
 const connectionStore = useConnectionStore();
 const userStore = useUserStore();
-const {
-  entityPrivilegesEnumGroup,
-  entityPrivilegesEnumKeys,
-  pathPrivilegesEnumGroup,
-  pathPrivilegesEnumKeys,
-  canManageUser,
-  canManageRole,
-  canAlterPwd,
-} = storeToRefs(userStore);
+const { entityPrivilegesEnumGroup, entityPrivilegesEnumKeys, pathPrivilegesEnumGroup, pathPrivilegesEnumKeys, canManageUser, canManageRole, canAlterPwd } = storeToRefs(userStore);
 const userName = computed(() => userStore.userInfo.name);
 
 const listRef = ref<InstanceType<typeof List>>();
@@ -222,7 +223,11 @@ const isEdit = computed(() => pageType.value === 'edit');
 
 const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion));
 
-const { requestFn: getUserAuth, data: authData, loading } = useRequest(AuthApi.getUserAuth, {
+const {
+  requestFn: getUserAuth,
+  data: authData,
+  loading,
+} = useRequest(AuthApi.getUserAuth, {
   initData: {
     userName: '',
     entityPrivileges: [],
@@ -244,7 +249,7 @@ const { requestFn: getRoleAuth, loading: roleLoading } = useRequest(AuthApi.getA
 const sourceData: {
   role: string[];
   entityPrivileges: string[];
-  pathPrivileges: Array<{ path: string, privileges: string[] }>
+  pathPrivileges: Array<{ path: string; privileges: string[] }>;
 } = {
   role: [],
   entityPrivileges: [],
@@ -252,7 +257,7 @@ const sourceData: {
 };
 
 const entityUserPrivileges = ref<string[]>([]);
-const pathUserPrivileges = ref<{ path: string, privileges: string[] }[]>([]);
+const pathUserPrivileges = ref<{ path: string; privileges: string[] }[]>([]);
 
 /**
  * 全局权限表格数据，包含用户和用户所有角色的权限
@@ -276,7 +281,7 @@ const entityTableData = computed(() => {
  * @param data 合并完的结果
  * @param role 要合并的角色
  */
-function mergeRolePathPrivileges(data: Array<{ path: string, privileges: string[] }>, role: Auth.AuthByRoleRes) {
+function mergeRolePathPrivileges(data: Array<{ path: string; privileges: string[] }>, role: Auth.AuthByRoleRes) {
   role.pathPrivileges.forEach((item) => {
     const path = data.find((pathItem) => pathItem.path === item.path);
     if (!path) {
@@ -294,26 +299,26 @@ function mergeRolePathPrivileges(data: Array<{ path: string, privileges: string[
  * 角色路径权限，合并到一起。独立计算属性（计算属性有缓存，角色不变，这里就不变）
  */
 const rolePathPrivileges = computed(() => {
-  const result: Array<{ path: string, privileges: string[] }> = [];
+  const result: Array<{ path: string; privileges: string[] }> = [];
   authData.value.rolesToPrivileges?.forEach((role) => {
     mergeRolePathPrivileges(result, role);
   });
   return result;
 });
-function joinRolePathPrivileges(data: Auth.UserEditPathAuthInfo[], rolePathAuth: { path: string, privileges: string[] }) {
+function joinRolePathPrivileges(data: Auth.UserEditPathAuthInfo[], rolePathAuth: { path: string; privileges: string[] }) {
   const path = data.find((pathItem) => pathItem.path === rolePathAuth.path);
   if (path) {
-  //   data.push({
-  //     path: rolePathAuth.path,
-  //     userSourceData: {
-  //       path: rolePathAuth.path,
-  //       privileges: [],
-  //     },
-  //     allChecked: rolePathAuth.privileges.length >= pathPrivilegesEnumKeys.value.length,
-  //     rolePrivileges: rolePathAuth.privileges,
-  //     privileges: rolePathAuth.privileges,
-  //   });
-  // } else {
+    //   data.push({
+    //     path: rolePathAuth.path,
+    //     userSourceData: {
+    //       path: rolePathAuth.path,
+    //       privileges: [],
+    //     },
+    //     allChecked: rolePathAuth.privileges.length >= pathPrivilegesEnumKeys.value.length,
+    //     rolePrivileges: rolePathAuth.privileges,
+    //     privileges: rolePathAuth.privileges,
+    //   });
+    // } else {
     path.rolePrivileges = union(path.rolePrivileges, rolePathAuth.privileges);
     path.privileges = union(path.userSourceData?.privileges || [], path.rolePrivileges);
     if (path.privileges.length >= pathPrivilegesEnumKeys.value.length) {
@@ -325,13 +330,16 @@ function joinRolePathPrivileges(data: Auth.UserEditPathAuthInfo[], rolePathAuth:
  * 路径权限表格数据，没有数据时，添加一行空数据
  */
 const tableData = computed<Auth.UserEditPathAuthInfo[]>(() => {
-  const result = pathUserPrivileges.value.map((item) => ({
-    path: item.path,
-    userSourceData: item,
-    rolePrivileges: [],
-    allChecked: item.privileges.length >= pathPrivilegesEnumKeys.value.length,
-    privileges: union(item.privileges, []),
-  } as Auth.UserEditPathAuthInfo));
+  const result = pathUserPrivileges.value.map(
+    (item) =>
+      ({
+        path: item.path,
+        userSourceData: item,
+        rolePrivileges: [],
+        allChecked: item.privileges.length >= pathPrivilegesEnumKeys.value.length,
+        privileges: union(item.privileges, []),
+      }) as Auth.UserEditPathAuthInfo
+  );
   rolePathPrivileges.value?.forEach((item) => {
     joinRolePathPrivileges(result, item);
   });
@@ -391,7 +399,7 @@ function handleSavePath(path: string) {
   authData.value.pathPrivileges.push({ path, privileges: [] });
 }
 function handleDelRow(row: Auth.UserEditPathAuthInfo) {
-  const index = pathUserPrivileges.value.findIndex((item) => (item.path === row.path));
+  const index = pathUserPrivileges.value.findIndex((item) => item.path === row.path);
   pathUserPrivileges.value.splice(index, 1);
 }
 
@@ -404,7 +412,10 @@ function getDetail() {
       entityUserPrivileges.value = authData.value.entityPrivileges || [];
       const rolePaths = rolePathPrivileges.value.map((item) => item.path);
       const userPrivileges = authData.value.pathPrivileges || [];
-      difference(rolePaths, userPrivileges.map((item) => item.path)).forEach((path) => {
+      difference(
+        rolePaths,
+        userPrivileges.map((item) => item.path)
+      ).forEach((path) => {
         userPrivileges.push({ path, privileges: [] });
       });
       pathUserPrivileges.value = userPrivileges;
@@ -419,7 +430,10 @@ function handleAddRole(roleNames: string[]) {
   roleNames.forEach((roleName) => {
     getRoleAuth(roleName).then((res) => {
       const rolePaths = res.data.pathPrivileges.map((item) => item.path);
-      difference(rolePaths, pathUserPrivileges.value.map((item) => item.path)).forEach((path) => {
+      difference(
+        rolePaths,
+        pathUserPrivileges.value.map((item) => item.path)
+      ).forEach((path) => {
         pathUserPrivileges.value.push({ path, privileges: [] });
       });
       authData.value.rolesToPrivileges.push(res.data);
@@ -434,10 +448,9 @@ function handleDeleteRole(index: number) {
     cancelButtonClass: 'del-role-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
-  })
-    .then(() => {
-      authData.value.rolesToPrivileges.splice(index, 1);
-    });
+  }).then(() => {
+    authData.value.rolesToPrivileges.splice(index, 1);
+  });
 }
 function showRoleDetail(role: Auth.AuthByRoleRes) {
   currentRole.value = role;
@@ -445,7 +458,7 @@ function showRoleDetail(role: Auth.AuthByRoleRes) {
 }
 
 // 重置
-function handleReset(type:'view' | 'edit') {
+function handleReset(type: 'view' | 'edit') {
   pageType.value = type;
   getDetail();
 }
@@ -459,7 +472,7 @@ function calcColumnWidth(child: Auth.PrivilegeEnum) {
 
 // 更新权限
 function handleSave() {
-  const flag = tableData.value.filter((item) => item.path).some((data) => (!data.privileges.length));
+  const flag = tableData.value.filter((item) => item.path).some((data) => !data.privileges.length);
   if (flag) {
     ElMessage.error(t('auth.pathEmptyTip'));
     return;
@@ -468,8 +481,8 @@ function handleSave() {
   const addRoles = difference(currentRoleNames, sourceData.role);
   const cancelRoles = difference(sourceData.role, currentRoleNames);
 
-  const cancelPathPrivileges: Array<{ path: string, privileges: string[] }> = [];
-  const addPathPrivileges: Array<{ path: string, privileges: string[] }> = [];
+  const cancelPathPrivileges: Array<{ path: string; privileges: string[] }> = [];
+  const addPathPrivileges: Array<{ path: string; privileges: string[] }> = [];
 
   const sourcePaths = sourceData.pathPrivileges.map((data) => data.path) || [];
   const currentPaths = pathUserPrivileges.value.map((data) => data.path) || [];
@@ -509,17 +522,19 @@ function handleSave() {
     cancelPathPrivileges: cancelPathPrivileges.filter((item) => item.privileges.length > 0),
     addPathPrivileges: addPathPrivileges.filter((item) => item.privileges.length > 0),
   };
-  updateUserAuth(data).then(() => {
-    ElMessage.success(t('common.saveSuccess'));
-    pageType.value = 'view';
-    if (userName.value === currentUser.value?.name) {
-      userStore.loadPrivileges(true);
-    }
-    getDetail();
-  }).catch(() => {
-    pageType.value = 'edit';
-    getDetail();
-  });
+  updateUserAuth(data)
+    .then(() => {
+      ElMessage.success(t('common.saveSuccess'));
+      pageType.value = 'view';
+      if (userName.value === currentUser.value?.name) {
+        userStore.loadPrivileges(true);
+      }
+      getDetail();
+    })
+    .catch(() => {
+      pageType.value = 'edit';
+      getDetail();
+    });
 }
 
 watch(
@@ -539,7 +554,7 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
 
 watch(locale, () => {
@@ -550,27 +565,27 @@ watch(locale, () => {
 </script>
 
 <style lang="scss" scoped>
-.list-wrapper{
+.list-wrapper {
   background-color: #fff;
   border-radius: 6px;
   box-sizing: border-box;
 }
 
-.detail-title-box{
+.detail-title-box {
   height: 48px;
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #DFE1ED;
+  border-bottom: 1px solid #dfe1ed;
   padding: 0 16px;
   box-sizing: border-box;
 
-  .detail-title-text{
+  .detail-title-text {
     font-size: 14px;
     font-weight: 700;
     line-height: 21px;
-    color: #495AD4;
+    color: #495ad4;
     display: flex;
 
     .tip-text {
@@ -590,25 +605,25 @@ watch(locale, () => {
   }
 }
 
-.detail-role-list{
+.detail-role-list {
   margin: 12px 16px;
   display: flex;
   font-size: 14px;
 
-  .el-tag{
+  .el-tag {
     cursor: pointer;
     margin: 0 8px 8px 0;
   }
 
-  .detail-role-box{
+  .detail-role-box {
     flex: 1;
     display: flex;
     flex-wrap: wrap;
   }
 
   .el-tag--info {
-    background-color: #F7F8FC;
-    color:#656A85;
+    background-color: #f7f8fc;
+    color: #656a85;
     border: 0;
     border-radius: 2px;
     font-size: 12px;
@@ -616,7 +631,7 @@ watch(locale, () => {
   }
 }
 
-.details-wrapper{
+.details-wrapper {
   margin-left: 16px;
   background-color: #fff;
   border-radius: 6px;
@@ -630,25 +645,25 @@ watch(locale, () => {
   }
 }
 
-.table-list-box{
+.table-list-box {
   margin-top: 32px;
-  background-color: #F7F8FC;
+  background-color: #f7f8fc;
   padding: 8px 16px 16px;
 
-  .table-box-title{
+  .table-box-title {
     font-size: 14px;
     font-weight: 700;
     line-height: 21px;
-    color: #495AD4;
+    color: #495ad4;
     margin-bottom: 8px;
   }
 }
 
-.move-down3{
+.move-down3 {
   transform: translateY(3px);
 }
 
-.operate-buttons{
+.operate-buttons {
   text-align: right;
   margin-top: 24px;
 }

@@ -1,18 +1,10 @@
 <template>
-  <el-dialog
-    :title="t('auth.relateUser')"
-    v-model="dialogVisible"
-    width="480px"
-    class="add-user-modal"
-    align-center
-    :close-on-click-modal="false"
-    id="auth-role-add-user-modal"
-  >
+  <el-dialog :title="t('auth.relateUser')" v-model="dialogVisible" width="480px" class="add-user-modal" align-center :close-on-click-modal="false" id="auth-role-add-user-modal">
     <el-form ref="formRef" :model="formData" @submit.prevent>
       <base-form-item :label="`${t('auth.relateUser')}：`" prop="name" class="m-t-12 m-b-0">
         <el-select
           v-model="formData.name"
-          style="width:100%"
+          style="width: 100%"
           :placeholder="t('auth.userPlaceholder')"
           collapse-tags
           multiple
@@ -88,7 +80,7 @@ function handleChangeSelect(vals: string[]) {
 
 function isCanSelect(item: string) {
   if (item === t('common.all')) {
-    return userList.value.length === (props.selected.length + 1);
+    return userList.value.length === props.selected.length + 1;
   }
   return props.selected.includes(item);
 }
@@ -100,17 +92,16 @@ watch(
       formData.name = [];
       getUserList();
     }
-  },
+  }
 );
-
 </script>
 <style lang="scss">
-.add-user-modal{
+.add-user-modal {
   .el-dialog__body {
     padding-bottom: 0 !important;
   }
 
-  .remote-select-search-text{
+  .remote-select-search-text {
     display: flex;
     width: 200px;
   }

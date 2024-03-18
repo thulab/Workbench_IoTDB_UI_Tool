@@ -43,39 +43,37 @@ class StorageApi {
   }
 
   // 根据设备和关键词查物理量
-  static getMeasurementList(params: SearchPageQuery & { deviceName: string }):HttpResponseP<StorageDevice.GetPathListResponse> {
+  static getMeasurementList(params: SearchPageQuery & { deviceName: string }): HttpResponseP<StorageDevice.GetPathListResponse> {
     return http.get('/schema/getMeasurementsByDeviceName', { params });
   }
 
   // 模糊匹配物理量
-  static getMeasurementAllObjList(keyword: string):HttpResponseP<{ measurements
-  :StorageDevice.MeasurementDataItem[] }> {
+  static getMeasurementAllObjList(keyword: string): HttpResponseP<{ measurements: StorageDevice.MeasurementDataItem[] }> {
     return http.post('/schema/getMeasurementsByFuzzyV2', { keyword, size: 100 });
   }
 
   // 根据路径和关键词查物理量
-  static getMeasurementsInfosByFuzzy(data: Record<string, string | number | Date | null> & PageQuery):HttpResponseP<StorageDevice.GetMeasurementsInfosByFuzzyRes> {
+  static getMeasurementsInfosByFuzzy(data: Record<string, string | number | Date | null> & PageQuery): HttpResponseP<StorageDevice.GetMeasurementsInfosByFuzzyRes> {
     return http.post('/schema/getMeasurementsInfosByFuzzy', data);
   }
 
   // 查询物理量的最新值和时间
-  static getLastValue(deviceName: string, measurementName: string, viewType: string):HttpResponseP<StorageDevice.GetLastValueRes> {
+  static getLastValue(deviceName: string, measurementName: string, viewType: string): HttpResponseP<StorageDevice.GetLastValueRes> {
     return http.get('/data/getLastValue', { params: { deviceName, measurementName, viewType } });
   }
 
   // 批量查询物理量的最新值和时间
-  static getBatchLastValue(paths: string[], viewTypeList: string[]):HttpResponseP<StorageDevice.GetBatchLastValueRes> {
+  static getBatchLastValue(paths: string[], viewTypeList: string[]): HttpResponseP<StorageDevice.GetBatchLastValueRes> {
     return http.post('/data/getBatchLastValue', { paths, viewTypeList });
   }
 
   // 保存物理量
-  static saveMeasurementList(data: StorageDevice.SaveMeasurementListRequest):HttpResponseP<{ measurements
-  :string[] }> {
+  static saveMeasurementList(data: StorageDevice.SaveMeasurementListRequest): HttpResponseP<{ measurements: string[] }> {
     return http.post('/schema/upsertDevices', data);
   }
 
   // 删除物理量
-  static deleteMeasurements(measurementList: string[]):HttpResponseP {
+  static deleteMeasurements(measurementList: string[]): HttpResponseP {
     return http.post('/schema/deleteMeasurements', { measurementList });
   }
 

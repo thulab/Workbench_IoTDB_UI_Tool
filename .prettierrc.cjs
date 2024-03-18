@@ -13,19 +13,19 @@ module.exports = {
   endOfLine: 'auto', // 行结尾形式 mac和linux是\n  windows是\r\n
   singleAttributePerLine: false, // 组件或者标签的属性是否控制一行只显示一个属性
   overrides: [
-      {
-          files: '*.vue', // 适用于 .vue 文件
-          options: {
-              printWidth: 200, // 自定义 .vue 文件的 printWidth
-              tabWidth: 2, // 自定义 .vue 文件的 tabWidth
-          },
+    {
+      files: '*.vue', // 适用于 .vue 文件
+      options: {
+        printWidth: 200, // 自定义 .vue 文件的 printWidth
+        tabWidth: 2, // 自定义 .vue 文件的 tabWidth
       },
-      {
-          files: ['*.ts', '*.js', '*.json'],
-          options: {
-              tabWidth: 2, // 自定义 .json 文件的 tabWidth
-          },
+    },
+    {
+      files: ['*.ts', '*.js', '*.json'],
+      options: {
+        tabWidth: 2, // 自定义 .json 文件的 tabWidth
       },
-  // 可以添加更多 overrides 配置
+    },
+    // 可以添加更多 overrides 配置
   ],
-}
+};

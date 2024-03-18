@@ -1,12 +1,5 @@
 <template>
-  <el-dialog
-    :title="t('auth.addRole')"
-    v-model="dialogVisible"
-    width="490px"
-    align-center
-    :close-on-click-modal="false"
-    id="auth-role-modal"
-  >
+  <el-dialog :title="t('auth.addRole')" v-model="dialogVisible" width="490px" align-center :close-on-click-modal="false" id="auth-role-modal">
     <el-form ref="formRef" :model="formData" class="m-t-14 m-b-34" @submit.prevent>
       <base-form-item :label="`${t('auth.roleName')}：`" prop="name" :rules="requiredRules" :error="errorName">
         <el-input v-model.trim="formData.name" :placeholder="t('auth.roleNamePlaceholder')" maxlength="32" show-word-limit id="auth-role-modal-name" />
@@ -32,7 +25,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
-  (event: 'handleSave',): void;
+  (event: 'handleSave'): void;
 }>();
 
 const { t } = useI18n();
@@ -79,15 +72,17 @@ const handleConfirm = () => {
   errorName.value = '';
   formRef.value?.validate((valid) => {
     if (valid) {
-      saveRole(formData.name).then(() => {
-        ElMessage.success(t('common.createSuccess'));
-        dialogVisible.value = false;
-        emit('handleSave');
-      }).catch((err) => {
-        if (err.code === 1360) {
-          errorName.value = err.message;
-        }
-      });
+      saveRole(formData.name)
+        .then(() => {
+          ElMessage.success(t('common.createSuccess'));
+          dialogVisible.value = false;
+          emit('handleSave');
+        })
+        .catch((err) => {
+          if (err.code === 1360) {
+            errorName.value = err.message;
+          }
+        });
     }
   });
 };
@@ -99,7 +94,6 @@ watch(
       errorName.value = '';
       formRef.value?.resetFields();
     }
-  },
+  }
 );
-
 </script>

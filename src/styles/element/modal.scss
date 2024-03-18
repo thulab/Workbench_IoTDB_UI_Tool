@@ -1,10 +1,10 @@
 .el-dialog__header {
-  border-bottom: 1px solid #DFE1ED;
+  border-bottom: 1px solid #dfe1ed;
   padding: 12px 0 6px !important;
   margin: 0 16px !important;
 }
 
-.el-dialog__title{
+.el-dialog__title {
   font-size: 14px !important;
   font-weight: 400 !important;
   line-height: 21px !important;
@@ -12,39 +12,39 @@
   display: inline-block;
 }
 
-.el-dialog__headerbtn{
+.el-dialog__headerbtn {
   width: 24px !important;
   height: 24px !important;
   top: 12px !important;
   right: 16px !important;
 
-  .el-dialog__close{
+  .el-dialog__close {
     font-size: 20px !important;
   }
 }
 
-.el-dialog__body{
+.el-dialog__body {
   padding: 16px 16px 24px !important;
 }
 
-.el-dialog__footer{
+.el-dialog__footer {
   padding: 0 16px 16px !important;
 }
 
-.el-message-box__header{
-  border-bottom: 1px solid #DFE1ED;
+.el-message-box__header {
+  border-bottom: 1px solid #dfe1ed;
   padding: 12px 0 6px !important;
   margin: 0 16px;
 }
 
-.el-message-box__title{
+.el-message-box__title {
   font-size: 14px !important;
   font-weight: 400 !important;
   line-height: 21px !important;
   color: #424561 !important;
 }
 
-.el-message-box__headerbtn{
+.el-message-box__headerbtn {
   width: 24px !important;
   height: 24px !important;
   top: 12px !important;
@@ -52,11 +52,11 @@
   font-size: 20px !important;
 }
 
-.el-message-box__message{
+.el-message-box__message {
   max-height: 200px;
   overflow-y: scroll;
 
-  p{
+  p {
     white-space: pre-wrap;
   }
 }
@@ -71,22 +71,22 @@
   }
 }
 
-.el-message-box__content{
+.el-message-box__content {
   padding: 24px 16px 54px !important;
 }
 
-.el-popper.is-light{
+.el-popper.is-light {
   color: #424561 !important;
 }
 
-.el-message{
+.el-message {
   align-items: start;
 
   p {
     line-height: 1.5;
   }
 
-  svg{
+  svg {
     margin-top: 4px;
   }
 }

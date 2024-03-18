@@ -3,16 +3,16 @@
 
 /** abstracts **/
 
-@import "abstracts/variables";
+@import 'abstracts/variables';
 
 /** base **/
 
-@import "base/base";
-@import "base/reset";
+@import 'base/base';
+@import 'base/reset';
 
 /** el-fix **/
 
-@import "element/index";
+@import 'element/index';
 
 #app {
   width: 100%;
@@ -48,7 +48,7 @@
   justify-content: space-between;
 }
 
-.table-empty-wrapper{
+.table-empty-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -56,23 +56,23 @@
   width: 100%;
   padding: 16px 0;
 
-  .data-empty-img{
+  .data-empty-img {
     width: 150px;
     height: 150px;
     margin-bottom: 16px;
   }
 
-  .data-empty-text{
+  .data-empty-text {
     font-size: 14px;
     color: #131926;
     line-height: 21px;
   }
 }
 
-.tooltip-box-width{
+.tooltip-box-width {
   max-width: 100px;
 }
 
-.table-tooltip-max-width{
+.table-tooltip-max-width {
   max-width: 500px;
 }

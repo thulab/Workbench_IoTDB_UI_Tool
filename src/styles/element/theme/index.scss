@@ -1,22 +1,22 @@
 /* stylelint-disable-next-line scss/dollar-variable-pattern */
 $--colors: (
-  "primary": (
-    "base": #495ad4,
+  'primary': (
+    'base': #495ad4,
   ),
-  "success": (
-    "base": #28d5cb,
+  'success': (
+    'base': #28d5cb,
   ),
-  "warning": (
-    "base": #FF8D1A,
+  'warning': (
+    'base': #ff8d1a,
   ),
-  "danger": (
-    "base": #d43030,
+  'danger': (
+    'base': #d43030,
   ),
-  "error": (
-    "base": #d43030,
+  'error': (
+    'base': #d43030,
   ),
-  "info": (
-    "base": #909399,
+  'info': (
+    'base': #909399,
   ),
 );
 
@@ -27,16 +27,15 @@ $--colors: (
 
 // You should use them in scss, because we calculate it by sass.
 // comment next lines to use default color
-@forward "element-plus/theme-chalk/src/common/var.scss" with (
-  /* do not use same name, it will override.*/
-  $colors: $--colors,
+@forward 'element-plus/theme-chalk/src/common/var.scss' with (
+  /* do not use same name, it will override.*/ $colors: $--colors
 );
 
 // if you want to import all
 // @use "element-plus/theme-chalk/src/index.scss" as *;
 
 // custom dark variables
-@use "./dark.scss";
+@use './dark.scss';
 
 // You can comment it to hide debug info.
 // @debug $--colors;

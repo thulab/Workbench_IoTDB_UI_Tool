@@ -5,12 +5,4 @@ import { useDataTypeIcon } from './base/useDataTypeIcon';
 import useWebsocket from './business/useWebsocket';
 import { useLangSwitched, useLangSwitch } from './base/useLangSwitched';
 
-export {
-  useRequest,
-  useTable,
-  useTableHeight,
-  useDataTypeIcon,
-  useWebsocket,
-  useLangSwitched,
-  useLangSwitch,
-};
+export { useRequest, useTable, useTableHeight, useDataTypeIcon, useWebsocket, useLangSwitched, useLangSwitch };

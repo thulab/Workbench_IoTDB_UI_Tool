@@ -1,8 +1,17 @@
 <template>
   <div class="search_div maxheight">
-    <el-select v-model="storageName" style="width: 100%;" :placeholder="t('search.databaseSelectPlaceholder')" @change="handleSelectDatabase" :loading="storageLoading" :placement="'bottom-start'" fit-input-width id="sql-search-data-select-databse">
+    <el-select
+      v-model="storageName"
+      style="width: 100%"
+      :placeholder="t('search.databaseSelectPlaceholder')"
+      @change="handleSelectDatabase"
+      :loading="storageLoading"
+      :placement="'bottom-start'"
+      fit-input-width
+      id="sql-search-data-select-databse"
+    >
       <el-option v-for="item in storageList" :key="item" :value="item" :label="item" :id="`sql-search-data-select-databse-${item}`">
-        <div style="display: flex; width: 160px;">
+        <div style="display: flex; width: 160px">
           <text-tooltip :content="item" />
         </div>
       </el-option>
@@ -10,7 +19,7 @@
 
     <el-select
       class="m-t-10"
-      style="width: 100%;"
+      style="width: 100%"
       :disabled="!storageName"
       v-model="deviceName"
       :placeholder="t('search.deviceSelectPlaceholder')"
@@ -26,13 +35,20 @@
       id="sql-search-data-select-device"
     >
       <el-option v-for="item in deviceList" :key="item" :label="item" :value="item" :id="`sql-search-data-select-device-${item}`">
-        <div style="display: flex; width: 160px;">
+        <div style="display: flex; width: 160px">
           <text-tooltip :content="item" />
         </div>
       </el-option>
     </el-select>
 
-    <el-input class="m-y-10" :disabled="!deviceName" v-model="filterMeasurementText" :placeholder="t('measurement.measurementNamePlaceholder')" @input="handleInput('measurement')" id="sql-search-data-input-measurement">
+    <el-input
+      class="m-y-10"
+      :disabled="!deviceName"
+      v-model="filterMeasurementText"
+      :placeholder="t('measurement.measurementNamePlaceholder')"
+      @input="handleInput('measurement')"
+      id="sql-search-data-input-measurement"
+    >
       <template #suffix><i-ep-search /></template>
     </el-input>
 
@@ -48,13 +64,13 @@
       v-loading="measurementLoading"
       tooltip-effect="light"
       :tooltip-options="{ placement: 'left', popperClass: 'table-tooltip-max-width' }"
-      @row-dblclick="(row, column, event) => handleAdd(row)">
+      @row-dblclick="(row, column, event) => handleAdd(row)"
+    >
       <el-table-column align="center" :label="t('measurement.measurement')" v-slot="{ row }" show-overflow-tooltip>
         {{ row }}
       </el-table-column>
     </el-table>
   </div>
-
 </template>
 
 <script lang="ts" setup>
@@ -79,8 +95,7 @@ const measurementList = ref<string[]>([]);
 
 // 获取数据库
 function getStorageList() {
-  getGroup({
-  }).then((res) => {
+  getGroup({}).then((res) => {
     const dataArr = res.data?.pathNames.map((item) => item);
     storageList.value = dataArr;
   });
@@ -162,7 +177,6 @@ function handleReset() {
 onMounted(() => {
   getStorageList();
 });
-
 </script>
 
 <style lang="scss" scoped>
@@ -231,5 +245,4 @@ onMounted(() => {
   text-align: right;
   margin-bottom: 16px;
 }
-
 </style>

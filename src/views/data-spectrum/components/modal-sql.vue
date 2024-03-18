@@ -1,19 +1,10 @@
 <template>
-  <el-dialog
-    :title="t('spectrum.sqlInput')"
-    v-model="dialogVisible"
-    width="748px"
-    align-center
-    :close-on-click-modal="false"
-    :before-close="beforeClose"
-    id="sql-modal"
-    class="sql-dialog"
-  >
+  <el-dialog :title="t('spectrum.sqlInput')" v-model="dialogVisible" width="748px" align-center :close-on-click-modal="false" :before-close="beforeClose" id="sql-modal" class="sql-dialog">
     <div class="code-box">
       <code-editor
         v-show="codeMirrorReady"
         v-model:model-value="sqlInput"
-        @ready="() => codeMirrorReady = true"
+        @ready="() => (codeMirrorReady = true)"
         :style="{
           height: `410px`,
           backgroundColor: '#F7F8FC',
@@ -69,6 +60,6 @@ watch(
     if (newVal) {
       sqlInput.value = props.sqlValue;
     }
-  },
+  }
 );
 </script>

@@ -6,15 +6,15 @@
         <el-button link class="m-r-8 border-refresh-icon" :disabled="!canManageRole" @click="getList" id="auth-role-refresh"><i-custom-refresh /></el-button>
       </auth-tooltip>
       <auth-tooltip :is-disabled="canManageRole">
-        <el-button link :disabled="!canManageRole" style="margin: 0;" @click="handleAdd" id="auth-role-add"><i-custom-new-role /></el-button>
+        <el-button link :disabled="!canManageRole" style="margin: 0" @click="handleAdd" id="auth-role-add"><i-custom-new-role /></el-button>
       </auth-tooltip>
     </div>
   </div>
 
-  <auth-container :is-auth="canManageRole" style="height: calc(100% - 70px);">
+  <auth-container :is-auth="canManageRole" style="height: calc(100% - 70px)">
     <ul class="list-box" v-loading="loading">
       <template v-if="list.length">
-        <li v-for="(item, i) in list" :key="item" :class="['item-box', current === item ? 'item-box-active' : '']" :id="`auth-role-${i}`" @click="e => handleSelect(item, e)">
+        <li v-for="(item, i) in list" :key="item" :class="['item-box', current === item ? 'item-box-active' : '']" :id="`auth-role-${i}`" @click="(e) => handleSelect(item, e)">
           <span class="item-text"><text-tooltip :content="item" /></span>
           <popconfirm
             :confirm-button-text="t('common.confirm')"
@@ -39,11 +39,7 @@
     </ul>
   </auth-container>
 
-  <modal-role
-    v-model:visible="dialogVisible"
-    :list="list"
-    @handle-save="getList"
-  />
+  <modal-role v-model:visible="dialogVisible" :list="list" @handle-save="getList" />
 </template>
 
 <script setup lang="ts">
@@ -91,12 +87,10 @@ function handleDelete(item: string) {
   });
 }
 
-const canStopPropagation = (e: HTMLElement):boolean => {
+const canStopPropagation = (e: HTMLElement): boolean => {
   const { classList } = e;
 
-  if (classList.contains('item-delete-box')
-      || classList.contains('item-delete')
-      || classList.contains('item-delete-active')) {
+  if (classList.contains('item-delete-box') || classList.contains('item-delete') || classList.contains('item-delete-active')) {
     return true;
   }
   if ((e.tagName === 'path' || e.tagName === 'g') && e.parentElement) {
@@ -123,7 +117,7 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
 
 watch(
@@ -135,49 +129,50 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
 
 defineExpose({ getList });
 </script>
 
 <style lang="scss" scoped>
-.list-title{
+.list-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 14px 16px 26px;
 
-  h4{
+  h4 {
     font-size: 14px;
     font-weight: 700;
     line-height: 20px;
-    color: #495AD4;
+    color: #495ad4;
   }
 }
 
-.el-button.border-refresh-icon{
+.el-button.border-refresh-icon {
   border-radius: 4px;
-  border: 1px solid #DFE1ED !important;
+  border: 1px solid #dfe1ed !important;
   width: 24px;
   height: 24px !important;
 
-  &:hover, &:focus{
-    border-color: #DFE1ED !important;
+  &:hover,
+  &:focus {
+    border-color: #dfe1ed !important;
   }
 
-  svg{
+  svg {
     width: 18px;
     height: 18px;
   }
 }
 
-.list-box{
+.list-box {
   height: calc(100% - 70px);
   overflow-y: auto;
 }
 
-.item-box{
+.item-box {
   width: 100%;
   height: 36px;
   display: flex;
@@ -190,49 +185,49 @@ defineExpose({ getList });
   cursor: pointer;
   position: relative;
 
-  .item-text{
+  .item-text {
     width: 200px;
     display: inline-flex;
     line-height: 1.2;
   }
 
-  .item-delete-box{
+  .item-delete-box {
     position: absolute;
     top: 10px;
     right: 4px;
     display: none;
 
-    svg{
+    svg {
       width: 16px;
       height: 16px;
     }
 
-    .item-delete-active{
+    .item-delete-active {
       display: none;
     }
 
     &:hover {
-      .item-delete{
+      .item-delete {
         display: none;
       }
 
-      .item-delete-active{
+      .item-delete-active {
         display: block;
       }
     }
   }
 
-  &:hover{
-    background-color: #F7F8FC;
-    color: #495AD4;
+  &:hover {
+    background-color: #f7f8fc;
+    color: #495ad4;
 
-    .item-delete-box{
+    .item-delete-box {
       display: block;
     }
   }
 }
 
-.item-box-empty{
+.item-box-empty {
   padding: 0 8px;
   position: relative;
   display: flex;
@@ -242,12 +237,12 @@ defineExpose({ getList });
   font-size: 12px;
   font-weight: 300;
   line-height: 12px;
-  color: #656A85;
+  color: #656a85;
   margin-top: 174px;
 }
 
-.item-box-active{
-  background-color: #F7F8FC;
-  color: #495AD4;
+.item-box-active {
+  background-color: #f7f8fc;
+  color: #495ad4;
 }
 </style>

@@ -1,4 +1,4 @@
-declare namespace Log{
+declare namespace Log {
   export interface QueryAuditList {
     username: string;
     address: string;

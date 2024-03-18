@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="menu"
-    :style="{ width: isCollapse ? '40px' : '216px' }">
+  <div class="menu" :style="{ width: isCollapse ? '40px' : '216px' }">
     <div class="logo flex-align-center" :style="{ paddingLeft: isCollapse ? '6px' : '14px' }" id="layout-menu-logo" @click="handleDashboard">
       <el-icon alt="logo" v-if="isCollapse"><i-custom-logo /></el-icon>
       <el-icon class="title" v-if="!isCollapse"><i-custom-timecho-logo-white /></el-icon>
@@ -9,16 +7,16 @@
     </div>
     <div class="connection-box" :style="{ padding: isCollapse ? '0 0 0 5px' : '0 16px 0 10px' }">
       <div class="connection-divider"></div>
-      <div class="flex-align-center" style="height: 40px;">
+      <div class="flex-align-center" style="height: 40px">
         <el-icon size="30" :style="{ marginLeft: isCollapse ? '0' : '-4px' }"><i-custom-connection /></el-icon>
         <div v-if="!isCollapse" class="connection-info flex-align-center">
           <span class="connection-name">{{ connectionName }}</span>
-          <el-icon size="20" style="cursor: pointer;" id="layout-menu-connection" @click="handleToggleConnection"><i-custom-toggle /></el-icon>
+          <el-icon size="20" style="cursor: pointer" id="layout-menu-connection" @click="handleToggleConnection"><i-custom-toggle /></el-icon>
         </div>
       </div>
-      <div v-if="!isCollapse" class="flex-align-center" style="height: 36px;">
+      <div v-if="!isCollapse" class="flex-align-center" style="height: 36px">
         <div class="connection-host-box flex-align-center">
-          <el-icon size="30" style="margin-right: 4px;" v-if="connectionStore.connectionInfo.data.type !== 2">
+          <el-icon size="30" style="margin-right: 4px" v-if="connectionStore.connectionInfo.data.type !== 2">
             <i-custom-menu-connection-stand-alone v-if="connectionStore.connectionInfo.data.type === 0" />
             <i-custom-menu-connection-cluster v-if="connectionStore.connectionInfo.data.type === 1" />
           </el-icon>
@@ -31,21 +29,12 @@
       </div>
     </div>
     <el-scrollbar :style="{ height: !isCollapse ? 'calc(100% - 124px)' : 'calc(100% - 88px)' }">
-      <el-menu
-        :default-active="activeMenu"
-        :router="true"
-        :collapse="isCollapse"
-        :collapse-transition="false"
-        :default-openeds="['/system/auth']"
-        :unique-opened="false">
+      <el-menu :default-active="activeMenu" :router="true" :collapse="isCollapse" :collapse-transition="false" :default-openeds="['/system/auth']" :unique-opened="false">
         <layout-menu-sub-item :menu-list="menuList" :show-auth-menu="true" />
       </el-menu>
     </el-scrollbar>
 
-    <modal-connection
-      v-model:visible="connectionVisible"
-      :is-toggle="true"
-    />
+    <modal-connection v-model:visible="connectionVisible" :is-toggle="true" />
   </div>
 </template>
 
@@ -120,7 +109,8 @@ const routesToMenu = (routeItem: RouteRecordRaw, parentPath: string) => {
       routesHasTitle.forEach((item) => {
         if (!menu.children) {
           menu.children = [];
-        } menu.children.push(routesToMenu(item, menu.path));
+        }
+        menu.children.push(routesToMenu(item, menu.path));
       });
     }
   }
@@ -172,12 +162,13 @@ const screenWidth = ref<number>(0);
 const screenHeight = ref<number>(0);
 // 监听窗口大小
 const listeningWindow = () => {
-  window.onresize = () => (() => {
-    screenWidth.value = document.body.clientWidth;
-    screenHeight.value = document.body.clientHeight;
-    if (isCollapse.value === false && screenWidth.value < 1200) menuStore.setCollapse();
-    if (isCollapse.value === true && screenWidth.value > 1200) menuStore.setCollapse();
-  })();
+  window.onresize = () =>
+    (() => {
+      screenWidth.value = document.body.clientWidth;
+      screenHeight.value = document.body.clientHeight;
+      if (isCollapse.value === false && screenWidth.value < 1200) menuStore.setCollapse();
+      if (isCollapse.value === true && screenWidth.value > 1200) menuStore.setCollapse();
+    })();
 };
 listeningWindow();
 
@@ -186,7 +177,6 @@ watch(locale, () => {
     menuStore.setMenuList(getMenuList());
   });
 });
-
 </script>
 
 <style scoped lang="scss">
@@ -261,22 +251,22 @@ watch(locale, () => {
     }
   }
 
-  .connection-box{
+  .connection-box {
     box-sizing: border-box;
     background-color: #fff;
     position: relative;
 
-    .connection-divider{
+    .connection-divider {
       width: 100%;
       margin: 0;
       position: absolute;
       left: 0;
       bottom: 0;
       height: 1px;
-      background-color: #A0A3B8;
+      background-color: #a0a3b8;
     }
 
-    .connection-info{
+    .connection-info {
       margin: 0 0 0 8px;
       font-size: 14px;
       line-height: 21px;
@@ -284,7 +274,7 @@ watch(locale, () => {
       flex: 1;
       justify-content: space-between;
 
-      .connection-name{
+      .connection-name {
         max-width: 120px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -316,7 +306,7 @@ watch(locale, () => {
       }
     }
 
-    .connection-host-port{
+    .connection-host-port {
       font-size: 12px;
       line-height: 18px;
       color: #424561;

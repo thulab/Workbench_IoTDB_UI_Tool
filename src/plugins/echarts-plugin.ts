@@ -40,20 +40,20 @@ import { SVGRenderer, CanvasRenderer } from 'echarts/renderers';
 
 // 通过 ComposeOption 来组合出一个只有必须组件和图表的 Option 类型
 type ECOption = echarts.ComposeOption<
-| LineSeriesOption
-| BarSeriesOption
-| PieSeriesOption
-| GaugeSeriesOption
-| TitleComponentOption
-| TooltipComponentOption
-| GridComponentOption
-| DatasetComponentOption
-| LegendComponentOption
-| ToolboxComponentOption
-| TreeSeriesOption
-| DataZoomComponentOption
-| MarkPointComponentOption
-| MarkLineComponentOption
+  | LineSeriesOption
+  | BarSeriesOption
+  | PieSeriesOption
+  | GaugeSeriesOption
+  | TitleComponentOption
+  | TooltipComponentOption
+  | GridComponentOption
+  | DatasetComponentOption
+  | LegendComponentOption
+  | ToolboxComponentOption
+  | TreeSeriesOption
+  | DataZoomComponentOption
+  | MarkPointComponentOption
+  | MarkLineComponentOption
 >;
 
 // 注册必须的组件

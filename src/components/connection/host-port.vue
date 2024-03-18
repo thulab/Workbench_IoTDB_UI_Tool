@@ -9,8 +9,12 @@
         <el-input v-model.number="item.port" :placeholder="t('connection.portTip')" style="width: 100px" :id="`${formKey}-${index}-port`" :disabled="!isDisabled" />
       </base-form-item>
       <template v-if="showOperate">
-        <el-button link v-if="index === 0" @click="handleAddHost" :id="`${formKey}-add`" class="m-l-6" :disabled="isDisabledAddHosts || !isDisabled"><el-icon size="26"><i-custom-add-border /></el-icon></el-button>
-        <el-button link v-if="index !== 0" @click="handleDelHost(index)" :id="`${formKey}-del`" class="m-l-6" :disabled="!isDisabled"><el-icon size="26"><i-custom-delete /></el-icon></el-button>
+        <el-button link v-if="index === 0" @click="handleAddHost" :id="`${formKey}-add`" class="m-l-6" :disabled="isDisabledAddHosts || !isDisabled">
+          <el-icon size="26"><i-custom-add-border /></el-icon>
+        </el-button>
+        <el-button link v-if="index !== 0" @click="handleDelHost(index)" :id="`${formKey}-del`" class="m-l-6" :disabled="!isDisabled">
+          <el-icon size="26"><i-custom-delete /></el-icon>
+        </el-button>
       </template>
     </div>
   </div>
@@ -18,7 +22,7 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  modelValue: Array<{ host: string, port: number | string }>;
+  modelValue: Array<{ host: string; port: number | string }>;
   formKey: string;
   className?: string[] | string;
   isDisabled: boolean;
@@ -72,25 +76,25 @@ function handleDelHost(index: number) {
 </script>
 
 <style lang="scss" scoped>
-.ip-port-list{
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    flex: 1;
+.ip-port-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  flex: 1;
 
-    :deep(.el-form-item__label) {
-      width: 0 !important;
-      padding: 0 !important;
-    }
+  :deep(.el-form-item__label) {
+    width: 0 !important;
+    padding: 0 !important;
   }
+}
 
-  .ip-port-item{
-    display: flex;
+.ip-port-item {
+  display: flex;
 
-    .ip-port-divider{
-      width: 28px;
-      text-align: center;
-      margin-top: 5px;
-    }
+  .ip-port-divider {
+    width: 28px;
+    text-align: center;
+    margin-top: 5px;
   }
+}
 </style>

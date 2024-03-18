@@ -12,19 +12,26 @@
       :collapse-tags-tooltip="false"
       :remote-method="remoteMethod"
       :loading="measurementLoading"
-      style="width: 256px;"
+      style="width: 256px"
       :disabled="disabled"
     >
       <template #prefix>
         <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
       </template>
-      <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :id="`timeseries-select-${item.timeseries}`" :disabled="isBooleanTextDisabled ? (item.dataType === 'BOOLEAN' || item.dataType === 'TEXT') : false">
+      <el-option
+        v-for="item in measurementList"
+        :key="item.timeseries"
+        :label="item.timeseries"
+        :value="item.timeseries"
+        :id="`timeseries-select-${item.timeseries}`"
+        :disabled="isBooleanTextDisabled ? item.dataType === 'BOOLEAN' || item.dataType === 'TEXT' : false"
+      >
         <div class="remote-select-search-text">
           <text-tooltip :content="item.timeseries" />
         </div>
       </el-option>
     </el-select>
-    <el-button v-if="isShowViewBtn" type="primary" :disabled="!model.length" class="m-l-12" @click="() => dialogVisible = true">{{viewText || t('dataTrend.choosedMeasurement') }}</el-button>
+    <el-button v-if="isShowViewBtn" type="primary" :disabled="!model.length" class="m-l-12" @click="() => (dialogVisible = true)">{{ viewText || t('dataTrend.choosedMeasurement') }}</el-button>
     <el-dialog :title="viewText || t('dataTrend.choosedMeasurement')" v-model="dialogVisible" class="select-modal" align-center>
       <el-scrollbar :max-height="400">
         <ul class="select-list">
@@ -84,11 +91,10 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-
-.remote-select-box{
+.remote-select-box {
   position: relative;
 
-  :deep(.el-select-v2__wrapper){
+  :deep(.el-select-v2__wrapper) {
     padding-left: 20px;
   }
 
@@ -114,65 +120,65 @@ onMounted(() => {
     max-width: 120px !important;
   }
 
-  :deep(.el-input__suffix){
+  :deep(.el-input__suffix) {
     background: transparent;
   }
 }
 
-.select-list{
-  .select-item{
+.select-list {
+  .select-item {
     font-size: 12px;
     font-weight: 300;
     line-height: 24px;
-    color: #656A85;
+    color: #656a85;
     display: flex;
     align-items: center;
     cursor: pointer;
     position: relative;
 
-    .select-item-text{
+    .select-item-text {
       display: inline-flex;
       width: 460px;
     }
 
-    .select-item-delete-box{
+    .select-item-delete-box {
       position: absolute;
       top: 3px;
       right: 4px;
       display: none;
 
-      svg{
+      svg {
         width: 16px;
         height: 16px;
       }
 
-      .select-item-delete-active{
+      .select-item-delete-active {
         display: none;
       }
 
       &:hover {
-        .select-item-delete{
+        .select-item-delete {
           display: none;
         }
 
-        .select-item-delete-active{
+        .select-item-delete-active {
           display: block;
         }
       }
     }
 
-    &:hover{
-      background-color: #F7F8FC;
-      color: #495AD4;
+    &:hover {
+      background-color: #f7f8fc;
+      color: #495ad4;
 
-      .select-item-delete-box{
+      .select-item-delete-box {
         display: block;
       }
     }
   }
 }
 
-.remote-select-search-text{
+.remote-select-search-text {
   display: flex;
   width: 200px;
 }

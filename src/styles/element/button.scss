@@ -12,38 +12,41 @@
   --el-font-size-base: 12px;
   --el-border-radius-base: 2px;
 
-  &.is-link{
+  &.is-link {
     padding-left: 0 !important;
     padding-right: 0 !important;
     min-width: auto;
 
     &:focus {
-      color: #495AD4 !important;
+      color: #495ad4 !important;
     }
 
-    &:not(.is-disabled):hover{
+    &:not(.is-disabled):hover {
       text-decoration: underline;
     }
 
-    &:not(.is-disabled):hover, &:not(.is-disabled):focus{
+    &:not(.is-disabled):hover,
+    &:not(.is-disabled):focus {
       border-color: transparent !important;
       background-color: transparent !important;
     }
 
-    &.is-disabled, &.is-disabled:hover, &.is-disabled:focus{
+    &.is-disabled,
+    &.is-disabled:hover,
+    &.is-disabled:focus {
       opacity: 0.8;
     }
 
-    .el-button__text--expand{
+    .el-button__text--expand {
       letter-spacing: 0 !important;
       margin-right: 0 !important;
     }
   }
 }
 
-.el-button--default { 
+.el-button--default {
   &:focus {
-    color:  var(--el-button-text-color) !important;
+    color: var(--el-button-text-color) !important;
     border-color: var(--el-button-border-color) !important;
     background-color: var(--el-button-bg-color) !important;
     outline: none;
@@ -55,11 +58,11 @@
     outline: none;
   }
 
-  &.is-link{
+  &.is-link {
     min-width: auto !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
   }
 
-  --el-button-hover-link-text-color: #495AD4 !important;
+  --el-button-hover-link-text-color: #495ad4 !important;
 }

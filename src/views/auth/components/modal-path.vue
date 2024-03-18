@@ -1,16 +1,11 @@
 <template>
-  <el-dialog
-    :title="t('auth.addPath')"
-    v-model="dialogVisible"
-    width="600px"
-    align-center
-    :close-on-click-modal="false"
-    id="auth-path-modal"
-  >
-
+  <el-dialog :title="t('auth.addPath')" v-model="dialogVisible" width="600px" align-center :close-on-click-modal="false" id="auth-path-modal">
     <el-radio-group v-model="pathType" class="path-radio-group m-y-6">
       <el-radio label="select" id="auth-path-modal-select-radio">
-        <span class="radio-label">{{t('auth.exactPath')}}：<el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
+        <span class="radio-label">
+          {{ t('auth.exactPath') }}：
+          <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+        </span>
         <div class="search-path-box">
           <timeseries-select-single
             id="auth-path-modal-select-path"
@@ -27,8 +22,11 @@
         </div>
       </el-radio>
       <el-radio label="input" id="auth-path-modal-input-radio">
-        <span class="radio-label">{{t('auth.pathMode')}}：<el-tooltip effect="light" :content="t('auth.pathModeTip')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
-        <el-input v-model="inputPath" :placeholder="t('auth.pathModePlaceholder')" style="width: 466px;" class="path-input" id="auth-path-modal-input-path">
+        <span class="radio-label">
+          {{ t('auth.pathMode') }}：
+          <el-tooltip effect="light" :content="t('auth.pathModeTip')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+        </span>
+        <el-input v-model="inputPath" :placeholder="t('auth.pathModePlaceholder')" style="width: 466px" class="path-input" id="auth-path-modal-input-path">
           <!-- <template #prepend>root.</template> -->
         </el-input>
       </el-radio>
@@ -102,30 +100,29 @@ watch(
       dialogKey.value++;
       options.value = timeseriesSelectSingleRef.value?.measurementList || [];
     }
-  },
+  }
 );
-
 </script>
 
 <style lang="scss" scoped>
-.radio-label{
+.radio-label {
   position: relative;
   width: 80px;
   display: inline-flex;
   text-align: left;
 
-  svg{
+  svg {
     position: absolute;
     top: -6px;
     right: 12px;
   }
 }
 
-.search-path-box{
+.search-path-box {
   display: inline-flex;
 }
 
-.path-radio-group{
+.path-radio-group {
   :deep(.el-radio) {
     margin: 0 0 20px;
   }
@@ -140,9 +137,9 @@ watch(
   }
 }
 
-.path-type-select{
+.path-type-select {
   :deep(.el-input__wrapper) {
-    background-color: #F0F1FA;
+    background-color: #f0f1fa;
   }
 
   :deep(.el-input__inner) {
@@ -150,7 +147,7 @@ watch(
   }
 
   :deep(.el-select-v2__wrapper) {
-    background-color: #F0F1FA;
+    background-color: #f0f1fa;
   }
 
   :deep(.el-select-v2__placeholder) {
@@ -158,13 +155,13 @@ watch(
   }
 }
 
-.path-select{
+.path-select {
   :deep(.el-input__suffix) {
     background-color: transparent;
   }
 }
 
-.path-input{
+.path-input {
   :deep(.el-input-group__prepend) {
     width: 40px;
     padding: 0;

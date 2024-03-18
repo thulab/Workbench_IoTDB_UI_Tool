@@ -1,15 +1,16 @@
 <template>
-  <el-dialog
-    :title="t('common.edit')"
-    v-model="dialogVisible"
-    width="480px"
-    align-center
-    :close-on-click-modal="false"
-    id="description-modal-database"
-  >
+  <el-dialog :title="t('common.edit')" v-model="dialogVisible" width="480px" align-center :close-on-click-modal="false" id="description-modal-database">
     <el-form ref="formRef" :model="formData" label-position="left" @submit.prevent>
       <base-form-item :label="`${t('measurement.measurementDescription')}:`" prop="description">
-        <el-input v-model="formData.description" :placeholder="t('measurement.measurementDescriptionPlaceholder')" maxlength="100" show-word-limit id="description-modal-alias" type="textarea" :resize="'none'" />
+        <el-input
+          v-model="formData.description"
+          :placeholder="t('measurement.measurementDescriptionPlaceholder')"
+          maxlength="100"
+          show-word-limit
+          id="description-modal-alias"
+          type="textarea"
+          :resize="'none'"
+        />
       </base-form-item>
     </el-form>
     <template #footer>
@@ -49,13 +50,15 @@ const { requestFn: saveDescription } = useRequest(StorageApi.saveDescription);
 
 const handleConfirm = () => {
   saveloading.value = true;
-  saveDescription(props.measurement, formData.description).then(() => {
-    ElMessage.success(`${t('common.editSuccess')}！`);
-    dialogVisible.value = false;
-    emit('handleSave');
-  }).finally(() => {
-    saveloading.value = false;
-  });
+  saveDescription(props.measurement, formData.description)
+    .then(() => {
+      ElMessage.success(`${t('common.editSuccess')}！`);
+      dialogVisible.value = false;
+      emit('handleSave');
+    })
+    .finally(() => {
+      saveloading.value = false;
+    });
 };
 
 watch(
@@ -66,7 +69,6 @@ watch(
       formRef.value?.resetFields();
       formData.description = props.description || '';
     }
-  },
+  }
 );
-
 </script>

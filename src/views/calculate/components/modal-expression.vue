@@ -1,12 +1,5 @@
 <template>
-  <el-dialog
-    :title="t('calculate.expression')"
-    v-model="dialogVisible"
-    width="480px"
-    align-center
-    :close-on-click-modal="false"
-    id="calculate-modal-expression"
-  >
+  <el-dialog :title="t('calculate.expression')" v-model="dialogVisible" width="480px" align-center :close-on-click-modal="false" id="calculate-modal-expression">
     <el-scrollbar :max-height="300">
       <pre class="expression-text">{{ content }}</pre>
     </el-scrollbar>
@@ -28,7 +21,7 @@ const dialogVisible = useVModel(props, 'visible', emit);
 </script>
 
 <style lang="scss" scoped>
-.expression-text{
+.expression-text {
   // white-space: pre-line;
   font-size: 14px;
   line-height: 21px;

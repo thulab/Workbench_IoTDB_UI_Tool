@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="isAuth === false" class="auth-tip-container">
-      <img src="@/assets/auth-tip.png" alt="" class="auth-tip-img">
+      <img src="@/assets/auth-tip.png" alt="" class="auth-tip-img" />
       <span class="auth-tip-text">{{ t('common.noAuth') }}</span>
     </div>
     <slot v-if="isAuth"></slot>
@@ -28,13 +28,13 @@ const { t } = useI18n();
   box-sizing: border-box;
   background-color: #fff;
 
-  .auth-tip-img{
+  .auth-tip-img {
     width: 150px;
     height: 150px;
     margin-bottom: 16px;
   }
 
-  .auth-tip-text{
+  .auth-tip-text {
     font-size: 14px;
     color: #131926;
     line-height: 21px;

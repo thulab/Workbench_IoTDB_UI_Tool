@@ -1,23 +1,7 @@
 <template>
-  <el-dialog
-    :title="t('dashboard.activeDetail')"
-    v-model="dialogVisible"
-    width="624px"
-    align-center
-    :close-on-click-modal="false"
-    id="active-modal"
-    class="active-modal"
-  >
+  <el-dialog :title="t('dashboard.activeDetail')" v-model="dialogVisible" width="624px" align-center :close-on-click-modal="false" id="active-modal" class="active-modal">
     <div class="page-table-box">
-      <el-table
-        :data="tableData"
-        v-loading="loading"
-        style="width: 100%;"
-        tooltip-effect="light"
-        ref="tableRef"
-        border
-        :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
-      >
+      <el-table :data="tableData" v-loading="loading" style="width: 100%" tooltip-effect="light" ref="tableRef" border :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
         <el-table-column prop="name" min-width="200" align="center" show-overflow-tooltip>
           <template #header></template>
           <template #default="{ row }">{{ t(row.name) }}</template>
@@ -43,15 +27,13 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
-const tableData = ref<Array<{ name: string, used: string, allocated: string }>>([]);
+const tableData = ref<Array<{ name: string; used: string; allocated: string }>>([]);
 
 const { requestFn: getActiveInfo, loading } = useRequest(DashboardApi.getActiveInfo);
 
 function getDetail() {
   getActiveInfo(props.isMaster).then((res) => {
-    const {
-      activationTime, datanodeNum, ainodeNum, cpuNum, deviceNum, measurementNum,
-    } = res.data;
+    const { activationTime, datanodeNum, ainodeNum, cpuNum, deviceNum, measurementNum } = res.data;
     tableData.value.push({ name: 'dashboard.activationExpirationTime', used: '', allocated: activationTime });
     tableData.value.push({ name: 'dashboard.activeDataNodeNum', used: datanodeNum.split('/')[0], allocated: datanodeNum.split('/')[1] });
     tableData.value.push({ name: 'dashboard.activeAlNodeNum', used: ainodeNum.split('/')[0], allocated: ainodeNum.split('/')[1] });
@@ -68,15 +50,14 @@ watch(
       tableData.value = [];
       getDetail();
     }
-  },
+  }
 );
-
 </script>
 
 <style lang="scss" scoped>
-.page-table-box{
+.page-table-box {
   padding: 16px;
-  background-color: #F7F8FC;
+  background-color: #f7f8fc;
   border-radius: 2px;
   min-height: 240px;
 
@@ -96,12 +77,12 @@ watch(
   }
 }
 
-.active-info-item{
+.active-info-item {
   display: flex;
   min-height: 32px;
   align-items: center;
 
-  .active-info-label{
+  .active-info-label {
     flex: 60%;
     text-align: right;
     font-size: 14px;
@@ -110,11 +91,11 @@ watch(
     color: #424561;
   }
 
-  .active-info-content{
+  .active-info-content {
     font-size: 12px;
     font-weight: 300;
     line-height: 18px;
-    color: #656A85;
+    color: #656a85;
     flex: 40%;
     text-align: center;
   }

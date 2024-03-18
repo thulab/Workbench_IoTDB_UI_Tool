@@ -16,15 +16,27 @@
     <template #header>
       <div class="flow-graph-operate-header">
         <div class="flow-graph-operate-left">
-          <el-button link class="flow-graph-close-btn" id="flow-graph-close-btn" @click="handleClose"><el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>{{ t('common.goback') }}</el-button>
+          <el-button link class="flow-graph-close-btn" id="flow-graph-close-btn" @click="handleClose">
+            <el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>
+            {{ t('common.goback') }}
+          </el-button>
           <span class="flow-graph-header-title">{{ t('flow.topologyMap') }}</span>
         </div>
         <div class="operate-buttons" v-if="editType === 'edit'">
-          <el-button link @click="handleSaveView" id="flow-graph-view" :loading="saveLoading"><el-icon size="24" class="m-r-6"><i-custom-circle-close-half /></el-icon>{{ t('common.exitEdit') }}</el-button>
-          <el-button link @click="handleEmpty" id="flow-graph-empty"><el-icon size="24" class="m-r-6"><i-custom-delete /></el-icon>{{ t('common.clear') }}</el-button>
+          <el-button link @click="handleSaveView" id="flow-graph-view" :loading="saveLoading">
+            <el-icon size="24" class="m-r-6"><i-custom-circle-close-half /></el-icon>
+            {{ t('common.exitEdit') }}
+          </el-button>
+          <el-button link @click="handleEmpty" id="flow-graph-empty">
+            <el-icon size="24" class="m-r-6"><i-custom-delete /></el-icon>
+            {{ t('common.clear') }}
+          </el-button>
         </div>
         <div class="operate-buttons" v-if="editType === 'view'">
-          <el-button link @click="handleEdit" id="flow-graph-edit"><el-icon size="24" class="m-r-6"><i-custom-edit /></el-icon>{{ t('common.edit') }}</el-button>
+          <el-button link @click="handleEdit" id="flow-graph-edit">
+            <el-icon size="24" class="m-r-6"><i-custom-edit /></el-icon>
+            {{ t('common.edit') }}
+          </el-button>
           <!-- <el-button link @click="handleExport"><el-icon size="24" class="m-r-6"><i-custom-export /></el-icon>{{ t('common.export') }}</el-button> -->
         </div>
       </div>
@@ -41,21 +53,21 @@
             <div v-show="isShowTextStyle" class="text-style-box">
               <h4 class="operate-style-title">{{ t('flow.style') }}</h4>
               <div class="text-style-detail-item">
-                <span class="detail-label">{{t('flow.fontSize')}}：</span>
+                <span class="detail-label">{{ t('flow.fontSize') }}：</span>
                 <el-input-number
                   v-model.number="textStyle.fontSize"
                   :min="1"
                   :max="100"
                   step-strictly
                   :controls="false"
-                  @change="val => handleChangeTextFontSize(val as number)"
-                  @blur="ev => handleBlurTextStyle(ev)"
+                  @change="(val) => handleChangeTextFontSize(val as number)"
+                  @blur="(ev) => handleBlurTextStyle(ev)"
                   id="text-style-fontSize"
                 />
               </div>
               <div class="text-style-detail-item">
-                <span class="detail-label">{{t('flow.fontColor')}}：</span>
-                <el-color-picker v-model="textStyle.color" color-format="hex" @change="val => handleChangeTextColor(val as string)" id="text-style-color" />
+                <span class="detail-label">{{ t('flow.fontColor') }}：</span>
+                <el-color-picker v-model="textStyle.color" color-format="hex" @change="(val) => handleChangeTextColor(val as string)" id="text-style-color" />
               </div>
             </div>
             <!-- 节点 -->
@@ -63,39 +75,39 @@
               <h4 class="operate-style-title">{{ t('flow.style') }}</h4>
               <h5 class="operate-style-module-title">{{ t('flow.position') }}</h5>
               <div class="node-style-detail-item">
-                <span class="detail-label">{{t('flow.posx')}}：</span>
+                <span class="detail-label">{{ t('flow.posx') }}：</span>
                 <el-input-number
                   v-model.number="nodeStyle.x"
                   step-strictly
                   :min="-7000"
                   :max="7000"
                   :controls="false"
-                  @change="val => handleChangeNodeX(val as number)"
-                  @blur="ev => handleBlurNodeStyle(ev, 'x')"
+                  @change="(val) => handleChangeNodeX(val as number)"
+                  @blur="(ev) => handleBlurNodeStyle(ev, 'x')"
                   id="node-style-x"
                 />
               </div>
               <div class="node-style-detail-item">
-                <span class="detail-label">{{t('flow.posy')}}：</span>
+                <span class="detail-label">{{ t('flow.posy') }}：</span>
                 <el-input-number
                   v-model.number="nodeStyle.y"
                   step-strictly
                   :min="-7000"
                   :max="7000"
                   :controls="false"
-                  @change="val => handleChangeNodeY(val as number)"
-                  @blur="ev => handleBlurNodeStyle(ev, 'y')"
+                  @change="(val) => handleChangeNodeY(val as number)"
+                  @blur="(ev) => handleBlurNodeStyle(ev, 'y')"
                   id="node-style-y"
                 />
               </div>
               <div class="node-style-detail-item">
-                <span class="detail-label">{{t('flow.angle')}}：</span>
+                <span class="detail-label">{{ t('flow.angle') }}：</span>
                 <el-input-number
                   v-model.number="nodeStyle.angle"
                   step-strictly
                   :controls="false"
-                  @change="val => handleChangeNodeAngle(val as number)"
-                  @blur="ev => handleBlurNodeStyle(ev, 'angle')"
+                  @change="(val) => handleChangeNodeAngle(val as number)"
+                  @blur="(ev) => handleBlurNodeStyle(ev, 'angle')"
                   id="node-style-angle"
                 />
               </div>
@@ -105,41 +117,29 @@
               <h4 class="operate-style-title">{{ t('flow.style') }}</h4>
               <h5 class="operate-style-module-title">{{ t('flow.line') }}</h5>
               <div class="edge-style-detail-item">
-                <span class="detail-label">{{t('flow.lineType')}}：</span>
+                <span class="detail-label">{{ t('flow.lineType') }}：</span>
                 <el-select v-model="edgeStyle.lineType" @change="handleChangeLineType" popper-class="center-select" id="line-style-type">
-                  <el-option
-                    v-for="item in lineTypeList"
-                    :key="item.value"
-                    :label="item.name"
-                    :value="item.value"
-                    :id="`line-style-type-select-${item.value}`"
-                  />
+                  <el-option v-for="item in lineTypeList" :key="item.value" :label="item.name" :value="item.value" :id="`line-style-type-select-${item.value}`" />
                 </el-select>
               </div>
               <div class="edge-style-detail-item">
-                <span class="detail-label">{{t('flow.lineColor')}}：</span>
-                <el-color-picker v-model="edgeStyle.color" color-format="hex" @change="val => handleChangeLineColor(val as string)" id="line-style-color" />
+                <span class="detail-label">{{ t('flow.lineColor') }}：</span>
+                <el-color-picker v-model="edgeStyle.color" color-format="hex" @change="(val) => handleChangeLineColor(val as string)" id="line-style-color" />
               </div>
               <h5 class="operate-style-module-title">{{ t('flow.arrow') }}</h5>
               <div class="edge-style-detail-item">
-                <span class="detail-label">{{t('flow.arrowType')}}：</span>
+                <span class="detail-label">{{ t('flow.arrowType') }}：</span>
                 <el-select v-model="edgeStyle.arrowType" @change="handleChangeArrowType" popper-class="center-select" id="line-style-arrow">
-                  <el-option
-                    v-for="item in arrowTypeList"
-                    :key="item.value"
-                    :label="item.name"
-                    :value="item.value"
-                    :id="`line-style-arrow-select-${item.value}`"
-                  />
+                  <el-option v-for="item in arrowTypeList" :key="item.value" :label="item.name" :value="item.value" :id="`line-style-arrow-select-${item.value}`" />
                 </el-select>
               </div>
               <div class="edge-style-detail-item">
-                <span class="detail-label">{{t('flow.arrowWidth')}}：</span>
-                <el-slider v-model="edgeStyle.arrowWidth" :min="1" :max="50" @change="val => handleChangeArrowWidth(val as number)" id="arrow-style-width" />
+                <span class="detail-label">{{ t('flow.arrowWidth') }}：</span>
+                <el-slider v-model="edgeStyle.arrowWidth" :min="1" :max="50" @change="(val) => handleChangeArrowWidth(val as number)" id="arrow-style-width" />
               </div>
               <div class="edge-style-detail-item">
-                <span class="detail-label">{{t('flow.arrowHeight')}}：</span>
-                <el-slider v-model="edgeStyle.arrowHeight" :min="1" :max="50" @change="val => handleChangeArrowHeight(val as number)" id="arrow-style-height" />
+                <span class="detail-label">{{ t('flow.arrowHeight') }}：</span>
+                <el-slider v-model="edgeStyle.arrowHeight" :min="1" :max="50" @change="(val) => handleChangeArrowHeight(val as number)" id="arrow-style-height" />
               </div>
             </div>
           </div>
@@ -160,9 +160,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  Graph, Shape, Edge, Node, type JSONObject,
-} from '@antv/x6';
+import { Graph, Shape, Edge, Node, type JSONObject } from '@antv/x6';
 import { Stencil } from '@antv/x6-plugin-stencil';
 import { Snapline } from '@antv/x6-plugin-snapline';
 import { Clipboard } from '@antv/x6-plugin-clipboard';
@@ -408,7 +406,7 @@ Graph.registerNode(
       },
     ],
   },
-  true,
+  true
 );
 
 Graph.registerNode(
@@ -459,7 +457,7 @@ Graph.registerNode(
       },
     ],
   },
-  true,
+  true
 );
 
 // 状态变更重置节点操作
@@ -559,29 +557,41 @@ function initialGraph(isDisabled?: boolean) {
   // #region 使用插件
   graph.value
     .use(new Snapline())
-    .use(new Clipboard({
-      enabled: !isDisabled,
-    }))
-    .use(new History({
-      enabled: !isDisabled,
-    }))
-    .use(new Keyboard({
-      enabled: !isDisabled,
-    }))
-    .use(new Selection({
-      enabled: !isDisabled,
-    }))
-    .use(new Transform({
-      resizing: {
+    .use(
+      new Clipboard({
         enabled: !isDisabled,
-        preserveAspectRatio: true,
-      },
-      rotating: false,
-    }))
-    .use(new Scroller({
-      enabled: true,
-      pannable: true,
-    }))
+      })
+    )
+    .use(
+      new History({
+        enabled: !isDisabled,
+      })
+    )
+    .use(
+      new Keyboard({
+        enabled: !isDisabled,
+      })
+    )
+    .use(
+      new Selection({
+        enabled: !isDisabled,
+      })
+    )
+    .use(
+      new Transform({
+        resizing: {
+          enabled: !isDisabled,
+          preserveAspectRatio: true,
+        },
+        rotating: false,
+      })
+    )
+    .use(
+      new Scroller({
+        enabled: true,
+        pannable: true,
+      })
+    )
     .use(new Export());
 
   // graph.value.centerContent();
@@ -676,10 +686,10 @@ function getEdgeStyle(edge: Edge) {
   } else {
     edgeStyle.lineType = 'normal';
   }
-  edgeStyle.color = edge.attr().line.stroke as string || '#495AD4';
-  edgeStyle.arrowType = targetMarker.name as string || 'block';
-  edgeStyle.arrowWidth = targetMarker.height as number || 12;
-  edgeStyle.arrowHeight = targetMarker.width as number || 8;
+  edgeStyle.color = (edge.attr().line.stroke as string) || '#495AD4';
+  edgeStyle.arrowType = (targetMarker.name as string) || 'block';
+  edgeStyle.arrowWidth = (targetMarker.height as number) || 12;
+  edgeStyle.arrowHeight = (targetMarker.width as number) || 8;
 }
 
 function getNodeStyle(node: Node) {
@@ -689,8 +699,8 @@ function getNodeStyle(node: Node) {
     // 文本输入
     isShowTextStyle.value = true;
     isShowNodeStyle.value = false;
-    textStyle.fontSize = node.attrs!.text.fontSize as number || 14;
-    textStyle.color = node.attrs!.text.fill as string || '#495AD4';
+    textStyle.fontSize = (node.attrs!.text.fontSize as number) || 14;
+    textStyle.color = (node.attrs!.text.fill as string) || '#495AD4';
   } else {
     isShowTextStyle.value = false;
     isShowNodeStyle.value = true;
@@ -705,17 +715,13 @@ function graphWatchEvent() {
   graph.value?.on('node:mouseenter', () => {
     if (!isEdit.value) return;
     const container = document.getElementById('graph-container')!;
-    const allPorts = container.querySelectorAll(
-      '.x6-port-body',
-    ) as NodeListOf<SVGElement>;
+    const allPorts = container.querySelectorAll('.x6-port-body') as NodeListOf<SVGElement>;
     showPorts(allPorts, true);
   });
   graph.value?.on('node:mouseleave', () => {
     if (!isEdit.value) return;
     const container = document.getElementById('graph-container')!;
-    const allPorts = container.querySelectorAll(
-      '.x6-port-body',
-    ) as NodeListOf<SVGElement>;
+    const allPorts = container.querySelectorAll('.x6-port-body') as NodeListOf<SVGElement>;
     showPorts(allPorts, false);
   });
   // 添加边
@@ -764,7 +770,8 @@ function graphWatchEvent() {
   graph.value?.on('node:click', async ({ node }) => {
     if (isEdit.value) {
       getNodeStyle(node);
-    } else if (node.prop().shape === 'custom-rect') { // view 状态事件监听
+    } else if (node.prop().shape === 'custom-rect') {
+      // view 状态事件监听
       // 文本输入不做处理
     } else if (!viewNode.value) {
       viewNode.value = node;
@@ -826,35 +833,49 @@ function graphWatchEvent() {
     contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
   });
   // 节点右击
-  graph.value?.on('node:contextmenu', ({
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    e, x, y, node, view,
-  }) => {
-    if (!isEdit.value) return;
-    if (contextMenuTimer.value) {
-      clearTimeout(contextMenuTimer.value);
-      contextMenuTimer.value = undefined;
+  graph.value?.on(
+    'node:contextmenu',
+    ({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      e,
+      x,
+      y,
+      node,
+      view,
+    }) => {
+      if (!isEdit.value) return;
+      if (contextMenuTimer.value) {
+        clearTimeout(contextMenuTimer.value);
+        contextMenuTimer.value = undefined;
+      }
+      isShowContextMenu.value = true;
+      operateNode.value = node;
+      contextMenuType.value = 'node';
+      contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
     }
-    isShowContextMenu.value = true;
-    operateNode.value = node;
-    contextMenuType.value = 'node';
-    contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
-  });
+  );
   // 边右击
-  graph.value?.on('edge:contextmenu', ({
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    e, x, y, view, edge,
-  }) => {
-    if (!isEdit.value) return;
-    if (contextMenuTimer.value) {
-      clearTimeout(contextMenuTimer.value);
-      contextMenuTimer.value = undefined;
+  graph.value?.on(
+    'edge:contextmenu',
+    ({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      e,
+      x,
+      y,
+      view,
+      edge,
+    }) => {
+      if (!isEdit.value) return;
+      if (contextMenuTimer.value) {
+        clearTimeout(contextMenuTimer.value);
+        contextMenuTimer.value = undefined;
+      }
+      isShowContextMenu.value = true;
+      operateEdge.value = edge;
+      contextMenuType.value = 'edge';
+      contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
     }
-    isShowContextMenu.value = true;
-    operateEdge.value = edge;
-    contextMenuType.value = 'edge';
-    contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
-  });
+  );
 }
 
 // 复制
@@ -935,20 +956,22 @@ function graphBindEvent() {
 function getList() {
   // 获取实例列表
   listLoading.value = true;
-  return getConnectionList().then((res) => {
-    const data = res.data || [];
-    data.forEach((item) => {
-      if (item.type === 1) {
-        clusterList.value.push(item);
-      } else if (item.type === 2) {
-        doubleLiveList.value.push(item);
-      } else {
-        standAloneList.value.push(item);
-      }
+  return getConnectionList()
+    .then((res) => {
+      const data = res.data || [];
+      data.forEach((item) => {
+        if (item.type === 1) {
+          clusterList.value.push(item);
+        } else if (item.type === 2) {
+          doubleLiveList.value.push(item);
+        } else {
+          standAloneList.value.push(item);
+        }
+      });
+    })
+    .finally(() => {
+      listLoading.value = false;
     });
-  }).finally(() => {
-    listLoading.value = false;
-  });
 }
 
 function loadStencil() {
@@ -956,81 +979,87 @@ function loadStencil() {
     shape: 'custom-rect',
     label: t('flow.input'),
   });
-  const standAloneNodes = standAloneList.value.map((item) => graph.value!.createNode({
-    shape: 'custom-vue-node',
-    label: item.name,
-    id: `${item.id}`,
-    data: {
-      text: item.name,
+  const standAloneNodes = standAloneList.value.map((item) =>
+    graph.value!.createNode({
+      shape: 'custom-vue-node',
+      label: item.name,
       id: `${item.id}`,
-    },
-    attrs: {
-      image: {
-        'xlink:href': graphStandAloneIcon,
-      },
-      text: {
+      data: {
         text: item.name,
+        id: `${item.id}`,
       },
-    },
-    tools: [
-      {
-        name: 'tooltip',
-        args: {
-          tooltip: item.name,
+      attrs: {
+        image: {
+          'xlink:href': graphStandAloneIcon,
+        },
+        text: {
+          text: item.name,
         },
       },
-    ],
-  }));
-  const clusterNodes = clusterList.value.map((item) => graph.value!.createNode({
-    shape: 'custom-vue-node',
-    label: item.name,
-    id: `${item.id}`,
-    data: {
-      text: item.name,
+      tools: [
+        {
+          name: 'tooltip',
+          args: {
+            tooltip: item.name,
+          },
+        },
+      ],
+    })
+  );
+  const clusterNodes = clusterList.value.map((item) =>
+    graph.value!.createNode({
+      shape: 'custom-vue-node',
+      label: item.name,
       id: `${item.id}`,
-    },
-    attrs: {
-      image: {
-        'xlink:href': graphClusterIcon,
-      },
-      text: {
+      data: {
         text: item.name,
+        id: `${item.id}`,
       },
-    },
-    tools: [
-      {
-        name: 'tooltip',
-        args: {
-          tooltip: item.name,
+      attrs: {
+        image: {
+          'xlink:href': graphClusterIcon,
+        },
+        text: {
+          text: item.name,
         },
       },
-    ],
-  }));
-  const doubleLiveNodes = doubleLiveList.value.map((item) => graph.value!.createNode({
-    shape: 'custom-vue-node',
-    label: item.name,
-    id: `${item.id}`,
-    data: {
-      text: item.name,
+      tools: [
+        {
+          name: 'tooltip',
+          args: {
+            tooltip: item.name,
+          },
+        },
+      ],
+    })
+  );
+  const doubleLiveNodes = doubleLiveList.value.map((item) =>
+    graph.value!.createNode({
+      shape: 'custom-vue-node',
+      label: item.name,
       id: `${item.id}`,
-    },
-    attrs: {
-      image: {
-        'xlink:href': graphDoubleLiveIcon,
-      },
-      text: {
+      data: {
         text: item.name,
+        id: `${item.id}`,
       },
-    },
-    tools: [
-      {
-        name: 'tooltip',
-        args: {
-          tooltip: item.name,
+      attrs: {
+        image: {
+          'xlink:href': graphDoubleLiveIcon,
+        },
+        text: {
+          text: item.name,
         },
       },
-    ],
-  }));
+      tools: [
+        {
+          name: 'tooltip',
+          args: {
+            tooltip: item.name,
+          },
+        },
+      ],
+    })
+  );
   stencil.value?.load([baseNode], 'group1');
   stencil.value?.load(standAloneNodes, 'group2');
   stencil.value?.load(clusterNodes, 'group3');
@@ -1215,33 +1244,37 @@ function handleClickOperate(key: string) {
 // 获取画布数据
 function getGraphData() {
   graphLoading.value = true;
-  getRelationalGraph().then((res) => {
-    if (res.data.detail) {
-      const data = JSON.parse(res.data.detail);
-      graph.value?.fromJSON(data);
-      graph.value?.zoomToFit({ padding: 20, maxScale: 1 });
-    }
-  }).finally(() => {
-    graphLoading.value = false;
-  });
+  getRelationalGraph()
+    .then((res) => {
+      if (res.data.detail) {
+        const data = JSON.parse(res.data.detail);
+        graph.value?.fromJSON(data);
+        graph.value?.zoomToFit({ padding: 20, maxScale: 1 });
+      }
+    })
+    .finally(() => {
+      graphLoading.value = false;
+    });
 }
 
 // 保存至查看状态
 function handleSaveView() {
   const data = graph.value!.toJSON();
   saveLoading.value = true;
-  saveRelationalGraph(JSON.stringify(data)).then(() => {
-    ElMessage.success({ message: t('common.saveSuccess'), duration: 1500 });
-    initialGraph(true);
-    graphWatchEvent();
-    graphBindEvent();
-    resetState();
-    viewNode.value = undefined;
-    editType.value = 'view';
-    getGraphData();
-  }).finally(() => {
-    saveLoading.value = false;
-  });
+  saveRelationalGraph(JSON.stringify(data))
+    .then(() => {
+      ElMessage.success({ message: t('common.saveSuccess'), duration: 1500 });
+      initialGraph(true);
+      graphWatchEvent();
+      graphBindEvent();
+      resetState();
+      viewNode.value = undefined;
+      editType.value = 'view';
+      getGraphData();
+    })
+    .finally(() => {
+      saveLoading.value = false;
+    });
 }
 
 // 清空
@@ -1303,7 +1336,7 @@ watch(
     } else {
       document.removeEventListener('mousedown', onMouseDown);
     }
-  },
+  }
 );
 
 watch(
@@ -1334,47 +1367,48 @@ watch(
       graph.value?.dispose();
       graph.value?.off();
     }
-  },
+  }
 );
 </script>
 
 <style lang="scss" scoped>
-.flow-graph-modal{
+.flow-graph-modal {
   background-color: #fff;
   border-radius: 6px;
 }
 
-.flow-graph-operate-header{
+.flow-graph-operate-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  .flow-graph-operate-left{
+  .flow-graph-operate-left {
     display: flex;
     height: 36px;
     align-items: center;
-    border-radius:2px;
-    border: 1px solid #DFE1ED;
+    border-radius: 2px;
+    border: 1px solid #dfe1ed;
     font-size: 12px;
     font-weight: 400;
     line-height: 18px;
-    color: #656A85;
+    color: #656a85;
     box-sizing: border-box;
 
-    .flow-graph-close-btn, .flow-graph-header-title{
+    .flow-graph-close-btn,
+    .flow-graph-header-title {
       min-width: 70px;
       text-align: center;
       padding: 0 2px;
     }
 
-    .flow-graph-header-title{
+    .flow-graph-header-title {
       position: relative;
       height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
 
-      &::before{
+      &::before {
         position: absolute;
         content: '';
         display: block;
@@ -1382,16 +1416,16 @@ watch(
         height: 26px;
         top: 5px;
         left: 0;
-        background-color: #DFE1ED;
+        background-color: #dfe1ed;
       }
     }
   }
 
-  .operate-buttons{
+  .operate-buttons {
     font-size: 12px;
     font-weight: 400;
     line-height: 18px;
-    color: #656A85;
+    color: #656a85;
 
     .el-button + .el-button {
       margin-left: 24px;
@@ -1399,24 +1433,24 @@ watch(
   }
 }
 
-.flow-graph-container{
+.flow-graph-container {
   height: 100%;
-  border: 1px solid #DFE1ED;
+  border: 1px solid #dfe1ed;
   box-sizing: border-box;
 }
 
-.flow-container{
+.flow-container {
   width: 100%;
   height: 100%;
   display: flex;
   position: relative;
 }
 
-.flow-stencil-wrapper{
+.flow-stencil-wrapper {
   width: 268px;
   height: 100%;
   position: relative;
-  border-right: 1px solid #DFE1ED;
+  border-right: 1px solid #dfe1ed;
   box-sizing: content-box;
 }
 
@@ -1426,47 +1460,51 @@ watch(
   margin-top: 1px;
 }
 
-.flow-graph-wrapper{
+.flow-graph-wrapper {
   flex: 1;
   height: 100% !important;
   position: relative;
 }
 
-.flow-operate-wrapper{
+.flow-operate-wrapper {
   width: 292px;
   padding: 16px;
   box-sizing: border-box;
-  border-left: 1px solid #DFE1ED;
+  border-left: 1px solid #dfe1ed;
 
-  .operate-style-title{
+  .operate-style-title {
     font-size: 14px;
     font-weight: 700;
     line-height: 21px;
-    color: #495AD4;
+    color: #495ad4;
     margin: 0 0 24px;
   }
 
-  .operate-style-module-title{
+  .operate-style-module-title {
     font-size: 14px;
     font-weight: 400;
     line-height: 21px;
     color: #424561;
     padding: 0 0 6px;
-    border-bottom: 1px solid #DFE1ED;
+    border-bottom: 1px solid #dfe1ed;
     margin: 0 0 8px;
   }
 }
 
-.text-style-box, .node-style-box, .edge-style-box{
+.text-style-box,
+.node-style-box,
+.edge-style-box {
   // padding: 10px 10px 10px 0;
 }
 
-.text-style-detail-item, .node-style-detail-item, .edge-style-detail-item{
+.text-style-detail-item,
+.node-style-detail-item,
+.edge-style-detail-item {
   display: flex;
   align-items: center;
   margin-bottom: 12px;
 
-  .detail-label{
+  .detail-label {
     font-size: 14px;
     font-weight: 400;
     line-height: 21px;
@@ -1474,16 +1512,18 @@ watch(
     width: 84px;
   }
 
-  :deep(.el-input-number), :deep(.el-select), :deep(.el-slider) {
+  :deep(.el-input-number),
+  :deep(.el-select),
+  :deep(.el-slider) {
     flex: 1;
   }
 }
 
-.connection-detail-wrapper{
+.connection-detail-wrapper {
   width: 500px;
   height: 100%;
   border-radius: 6px;
-  border-left: 1px solid #DFE1ED;
+  border-left: 1px solid #dfe1ed;
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -1491,20 +1531,20 @@ watch(
 </style>
 
 <style lang="scss">
-.flow-graph-modal{
-  .el-dialog__header{
+.flow-graph-modal {
+  .el-dialog__header {
     border-bottom: none !important;
     padding: 20px 0 0 !important;
   }
 
-  .el-dialog__body{
+  .el-dialog__body {
     padding: 8px 16px 16px !important;
     height: calc(100% - 80px);
   }
 }
 
-.center-select{
-  .el-select-dropdown__item{
+.center-select {
+  .el-select-dropdown__item {
     text-align: center;
   }
 }
@@ -1516,43 +1556,46 @@ watch(
   position: relative;
 }
 
-.x6-widget-stencil{
+.x6-widget-stencil {
   background-color: #fff;
 }
 
-.x6-widget-stencil-content{
+.x6-widget-stencil-content {
   padding-top: 12px;
 }
 
-.x6-widget-stencil-group.collapsed{
+.x6-widget-stencil-group.collapsed {
   max-height: 19px;
   margin-bottom: 12px;
 }
 
-.x6-widget-stencil-group > .x6-widget-stencil-group-title{
+.x6-widget-stencil-group > .x6-widget-stencil-group-title {
   background-color: #fff;
   font-size: 14px;
   line-height: 14px;
   font-weight: 700;
-  color: #495AD4;
+  color: #495ad4;
   height: 18px;
   display: flex;
   align-items: center;
 }
 
-.x6-widget-stencil-title{
+.x6-widget-stencil-title {
   display: none;
 }
 
-.x6-widget-stencil-title:hover, .x6-widget-stencil-group > .x6-widget-stencil-group-title:hover{
-  color: #495AD4;
+.x6-widget-stencil-title:hover,
+.x6-widget-stencil-group > .x6-widget-stencil-group-title:hover {
+  color: #495ad4;
 }
 
-.x6-widget-stencil.collapsable > .x6-widget-stencil-title, .x6-widget-stencil-group.collapsable > .x6-widget-stencil-group-title{
+.x6-widget-stencil.collapsable > .x6-widget-stencil-title,
+.x6-widget-stencil-group.collapsable > .x6-widget-stencil-group-title {
   padding-left: 24px;
 }
 
-.x6-widget-stencil.collapsable > .x6-widget-stencil-title::before, .x6-widget-stencil-group.collapsable > .x6-widget-stencil-group-title::before{
+.x6-widget-stencil.collapsable > .x6-widget-stencil-title::before,
+.x6-widget-stencil-group.collapsable > .x6-widget-stencil-group-title::before {
   background-image: url('@/assets/icons/arrow.svg');
   background-repeat: no-repeat;
   background-size: contain;
@@ -1563,28 +1606,29 @@ watch(
   top: 0;
 }
 
-.x6-widget-stencil.collapsable.collapsed > .x6-widget-stencil-title::before, .x6-widget-stencil-group.collapsable.collapsed > .x6-widget-stencil-group-title::before{
+.x6-widget-stencil.collapsable.collapsed > .x6-widget-stencil-title::before,
+.x6-widget-stencil-group.collapsable.collapsed > .x6-widget-stencil-group-title::before {
   background-image: url('@/assets/icons/arrow-right.svg');
 }
 
 .x6-widget-transform {
   margin: -1px 0 0 -1px;
   padding: 0;
-  border: 1px solid #495AD4;
+  border: 1px solid #495ad4;
 }
 
-.over-flow>span{
+.over-flow > span {
   text-align: center;
   width: 100%;
 }
 
-.x6-graph-svg-stage{
+.x6-graph-svg-stage {
   position: relative;
 }
 
 @keyframes ant-line {
   to {
-      stroke-dashoffset: -1000
+    stroke-dashoffset: -1000;
   }
 }
 </style>

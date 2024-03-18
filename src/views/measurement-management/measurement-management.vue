@@ -6,7 +6,7 @@
         :can-read-write-schema="canReadWriteSchema"
         :can-manage-database="canManageDatabase"
         @handleAddStorage="storageVisible = true"
-        @handleSelectStorage="val => currentStorage = val"
+        @handleSelectStorage="(val) => (currentStorage = val)"
       />
     </div>
 
@@ -14,17 +14,24 @@
       <h4 class="storage-info-title">{{ t('measurement.databaseInfo') }}</h4>
       <div class="page-info-box">
         <ul class="storage-info-list">
-          <li class="storage-info-item" id="database-name-li"><el-icon size="24"><i-custom-storage-num /></el-icon><span class="storage-info-item-label" id="database-name-span">{{ t('measurement.databaseName') }}：</span><text-tooltip :content="canReadWriteSchema ? currentStorage : '-'" /></li>
+          <li class="storage-info-item" id="database-name-li">
+            <el-icon size="24"><i-custom-storage-num /></el-icon>
+            <span class="storage-info-item-label" id="database-name-span">{{ t('measurement.databaseName') }}：</span>
+            <text-tooltip :content="canReadWriteSchema ? currentStorage : '-'" />
+          </li>
           <li class="storage-info-item storage-info-item-ttl" id="ttl-li">
             <el-icon size="24"><i-custom-time /></el-icon>
-            <span class="storage-info-item-label" id="ttl-span">{{ t('measurement.databaseTTL') }}：<el-tooltip effect="light" :content="t('measurement.databaseTTLTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="ttl-tip" /></el-tooltip></span>
+            <span class="storage-info-item-label" id="ttl-span">
+              {{ t('measurement.databaseTTL') }}：
+              <el-tooltip effect="light" :content="t('measurement.databaseTTLTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="ttl-tip" /></el-tooltip>
+            </span>
             <template v-if="!canReadWriteSchema">-</template>
             <template v-else>
-              <span v-if="!editTTL">{{ storageInfos?.ttl ? (storageInfos.ttl + getTtlTimeUnit(storageInfos.ttlUnit, ttlUnitOptions)) : '∞'}}</span>
+              <span v-if="!editTTL">{{ storageInfos?.ttl ? storageInfos.ttl + getTtlTimeUnit(storageInfos.ttlUnit, ttlUnitOptions) : '∞' }}</span>
               <div v-if="currentStorage && editTTL" class="edit-ttl-box">
-                <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" style="width:120px;" id="mesaurement-edit-ttl">
+                <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" style="width: 120px" id="mesaurement-edit-ttl">
                   <template #append>
-                    <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder=" " style="width:50px;" id="mesaurement-edit-ttlunit">
+                    <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder=" " style="width: 50px" id="mesaurement-edit-ttlunit">
                       <el-option :label="t('common.milliSecond')" value="millisecond" id="mesaurement-ttl-ms" />
                       <el-option :label="t('common.second')" value="second" id="mesaurement-ttl-s" />
                       <el-option :label="t('common.minute')" value="minute" id="mesaurement-ttl-m" />
@@ -41,16 +48,32 @@
               </auth-tooltip>
             </template>
           </li>
-          <br>
-          <li class="storage-info-item" id="device-total-li"><el-icon size="24"><i-custom-device-num /></el-icon><span class="storage-info-item-label" id="device-total-span">{{ t('measurement.deviceNum') }}：</span>{{ canReadWriteSchema ? (storageInfos?.deviceCount || 0) : '-' }}</li>
-          <li class="storage-info-item" id="measurement-total-li"><el-icon size="24"><i-custom-measure-num /></el-icon><span class="storage-info-item-label" id="measurement-total-span">{{ t('measurement.measurementNum') }}：</span>{{ canReadWriteSchema ? (storageInfos?.measurementCount || 0) : '-' }}</li>
+          <br />
+          <li class="storage-info-item" id="device-total-li">
+            <el-icon size="24"><i-custom-device-num /></el-icon>
+            <span class="storage-info-item-label" id="device-total-span">{{ t('measurement.deviceNum') }}：</span>
+            {{ canReadWriteSchema ? storageInfos?.deviceCount || 0 : '-' }}
+          </li>
+          <li class="storage-info-item" id="measurement-total-li">
+            <el-icon size="24"><i-custom-measure-num /></el-icon>
+            <span class="storage-info-item-label" id="measurement-total-span">{{ t('measurement.measurementNum') }}：</span>
+            {{ canReadWriteSchema ? storageInfos?.measurementCount || 0 : '-' }}
+          </li>
           <!-- eslint-disable-next-line vue/max-len -->
           <!-- <li class="storage-info-item" id="data-total-li"><el-icon size="24"><i-custom-total-num /></el-icon><span class="storage-info-item-label" id="data-total-span">{{ t('measurement.totalNum') }}：</span>{{ canReadWriteSchema ? (!storageInfos?.dataCount || storageInfos?.dataCount < 0 ? 0 : storageInfos?.dataCount) : '-'}}</li> -->
         </ul>
 
         <div class="page-detail-buttons">
           <auth-tooltip :is-disabled="canManageDatabase">
-            <el-button plain class="el-button-delete" :disabled="!currentStorage || currentStorage === 'root.__system' || !canManageDatabase" @click="handleDelStorage" id="mesaurement-top-delete-databse">{{ t('common.delete') }}</el-button>
+            <el-button
+              plain
+              class="el-button-delete"
+              :disabled="!currentStorage || currentStorage === 'root.__system' || !canManageDatabase"
+              @click="handleDelStorage"
+              id="mesaurement-top-delete-databse"
+            >
+              {{ t('common.delete') }}
+            </el-button>
           </auth-tooltip>
         </div>
       </div>
@@ -63,7 +86,7 @@
               <i-custom-search-icon class="remote-select-search-icon" @click="handleRefresh" />
             </template>
             <template #prepend>
-              <el-select v-model="searchType" style="width: 88px;" placeholder="" id="measurement-search-type">
+              <el-select v-model="searchType" style="width: 88px" placeholder="" id="measurement-search-type">
                 <el-option :label="t('measurement.measurementName')" value="name" id="measurement-search-type-name" />
                 <el-option :label="t('measurement.measurementDescription')" value="description" id="measurement-search-type-description" />
               </el-select>
@@ -73,14 +96,21 @@
 
         <div class="search-form-buttons">
           <auth-tooltip :is-disabled="canWriteSchemaByParentPath">
-            <el-button type="primary" :disabled="!currentStorage || currentStorage === 'root.__system' || !canWriteSchemaByParentPath" @click="handleAddMeasure" id="mesaurement-add">{{ t('common.create') }}</el-button>
+            <el-button type="primary" :disabled="!currentStorage || currentStorage === 'root.__system' || !canWriteSchemaByParentPath" @click="handleAddMeasure" id="mesaurement-add">
+              {{ t('common.create') }}
+            </el-button>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canWriteSchemaByParentPath">
-            <el-button class="m-l-16" :disabled="!currentStorage || currentStorage === 'root.__system' || !canWriteSchemaByParentPath" @click="handleImport" id="mesaurement-import">{{ t('common.import') }}</el-button>
+            <el-button class="m-l-16" :disabled="!currentStorage || currentStorage === 'root.__system' || !canWriteSchemaByParentPath" @click="handleImport" id="mesaurement-import">
+              {{ t('common.import') }}
+            </el-button>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canReadWriteSchema">
-            <el-dropdown class="m-x-16" :disabled="!currentStorage || !(totalCount > 0) || !canReadWriteSchema" @command="val => handleCommandDown(val)" id="mesaurement-download-dropdown">
-              <el-button class="export-btn" :disabled="!currentStorage || !(totalCount > 0) || !canReadWriteSchema" id="mesaurement-download">{{ t('common.export') }}<el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip></el-button>
+            <el-dropdown class="m-x-16" :disabled="!currentStorage || !(totalCount > 0) || !canReadWriteSchema" @command="(val) => handleCommandDown(val)" id="mesaurement-download-dropdown">
+              <el-button class="export-btn" :disabled="!currentStorage || !(totalCount > 0) || !canReadWriteSchema" id="mesaurement-download">
+                {{ t('common.export') }}
+                <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
+              </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item command="csv" id="mesaurement-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
@@ -90,19 +120,21 @@
             </el-dropdown>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canWriteSchema">
-            <el-button :disabled="!currentStorage || multipleSelection.length === 0 || !canWriteSchema" type="primary" @click="handleDelRow('batch', null)" id="mesaurement-batch-del">{{ t('common.batchDelete') }}</el-button>
+            <el-button :disabled="!currentStorage || multipleSelection.length === 0 || !canWriteSchema" type="primary" @click="handleDelRow('batch', null)" id="mesaurement-batch-del">
+              {{ t('common.batchDelete') }}
+            </el-button>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canReadWriteSchema">
-            <el-button :disabled="!currentStorage || !canReadWriteSchema" link @click="handleRefresh" id="mesaurement-refresh"><i-custom-refresh style="width: 24px;height: 24px;" /></el-button>
+            <el-button :disabled="!currentStorage || !canReadWriteSchema" link @click="handleRefresh" id="mesaurement-refresh"><i-custom-refresh style="width: 24px; height: 24px" /></el-button>
           </auth-tooltip>
         </div>
       </div>
-      <auth-container :is-auth="canReadWriteSchema" style="height: calc(100% - 222px);">
+      <auth-container :is-auth="canReadWriteSchema" style="height: calc(100% - 222px)">
         <div class="storage-table-box">
           <el-table
             :data="tableData.measurements"
             v-loading="loading"
-            style="width: 100%;"
+            style="width: 100%"
             :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
             :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
             tooltip-effect="light"
@@ -139,16 +171,44 @@
             <el-table-column :label="t('common.operation')" width="180" align="center" fixed="right">
               <template #default="{ row }">
                 <el-button type="primary" link size="small" @click="handleRowData(row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-data`">{{ t('page.data') }}</el-button>
-                <el-button type="primary" v-if="appType === 1" link size="small" :disabled="currentStorage === 'root.__system'" @click="handleRowAlarm(row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-alarm`">{{ t('page.alarm') }}</el-button>
-                <el-button type="primary" link size="small" :disabled="currentStorage === 'root.__system' || row.dataType === 'TEXT'" @click="handleRowTrend(row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-trend`">{{ t('page.trend') }}</el-button>
+                <el-button
+                  type="primary"
+                  v-if="appType === 1"
+                  link
+                  size="small"
+                  :disabled="currentStorage === 'root.__system'"
+                  @click="handleRowAlarm(row)"
+                  :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-alarm`"
+                >
+                  {{ t('page.alarm') }}
+                </el-button>
+                <el-button
+                  type="primary"
+                  link
+                  size="small"
+                  :disabled="currentStorage === 'root.__system' || row.dataType === 'TEXT'"
+                  @click="handleRowTrend(row)"
+                  :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-trend`"
+                >
+                  {{ t('page.trend') }}
+                </el-button>
                 <auth-tooltip :is-disabled="rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)">
-                  <el-button type="primary" link size="small" :disabled="currentStorage === 'root.__system' || !rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)" @click="handleDelRow('row', row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-del`">{{ t('common.delete') }}</el-button>
+                  <el-button
+                    type="primary"
+                    link
+                    size="small"
+                    :disabled="currentStorage === 'root.__system' || !rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)"
+                    @click="handleDelRow('row', row)"
+                    :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-del`"
+                  >
+                    {{ t('common.delete') }}
+                  </el-button>
                 </auth-tooltip>
               </template>
             </el-table-column>
             <template #empty>
               <div class="table-empty-wrapper">
-                <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+                <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
                 <span class="data-empty-text">{{ t('common.noData') }}</span>
               </div>
             </template>
@@ -171,29 +231,13 @@
       </auth-container>
     </div>
 
-    <modal-storage
-      v-model:visible="storageVisible"
-      :can-write-schema="canWriteSchema"
-      @handleSave="handleSaveStorage"
-    />
+    <modal-storage v-model:visible="storageVisible" :can-write-schema="canWriteSchema" @handleSave="handleSaveStorage" />
 
-    <modal-measurement
-      v-model:visible="measurementVisible"
-      :group-name="currentStorage"
-      @handleSave="handleSaveMeasurement"
-    />
+    <modal-measurement v-model:visible="measurementVisible" :group-name="currentStorage" @handleSave="handleSaveMeasurement" />
 
-    <modal-import
-      v-model:visible="importVisible"
-      @handle-close="handleImportClose"
-    />
+    <modal-import v-model:visible="importVisible" @handle-close="handleImportClose" />
 
-    <modal-description
-      v-model:visible="descriptionVisible"
-      :measurement="editMeasurement"
-      :description="editDescription"
-      @handleSave="getListData"
-    />
+    <modal-description v-model:visible="descriptionVisible" :measurement="editMeasurement" :description="editDescription" @handleSave="getListData" />
   </div>
 </template>
 
@@ -217,13 +261,7 @@ const pageText = appType === 1 ? t('measurement.calculateMeasurement') : t('meas
 const router = useRouter();
 const route = useRoute();
 const userStore = useUserStore();
-const {
-  canManageDatabase,
-  canWriteSchema,
-  canReadWriteSchema,
-  userAllEntityPrivileges,
-  userAllPathPrivileges,
-} = storeToRefs(userStore);
+const { canManageDatabase, canWriteSchema, canReadWriteSchema, userAllEntityPrivileges, userAllPathPrivileges } = storeToRefs(userStore);
 
 const ttlUnitOptions = [
   { label: t('common.milliSecond'), value: 'millisecond' },
@@ -236,7 +274,7 @@ const ttlUnitOptions = [
 const { maxTableHeight } = useTableHeight(400);
 const storageSideRef = ref<InstanceType<typeof StorageSide>>();
 const currentStorage = ref('');
-const searchKeyword = ref(route.query.measurement as string || '');
+const searchKeyword = ref((route.query.measurement as string) || '');
 const storageInfos = ref<StorageDevice.GetStorageGroupsInfoResponse>({
   groupName: '',
   ttl: undefined,
@@ -306,7 +344,11 @@ function rowCanWriteSchemaByPath(path: string) {
 const { requestFn: deleteStorageGroups } = useRequest(StorageApi.deleteStorageGroups);
 const { requestFn: getStorageGroupsInfo } = useRequest(StorageApi.getStorageGroupsInfo);
 const { requestFn: upsertDatabaseTTL } = useRequest(StorageApi.upsertDatabaseTTL);
-const { requestFn: getMeasurementsInfosByFuzzy, data: tableData, loading } = useRequest(StorageApi.getMeasurementsInfosByFuzzy, {
+const {
+  requestFn: getMeasurementsInfosByFuzzy,
+  data: tableData,
+  loading,
+} = useRequest(StorageApi.getMeasurementsInfosByFuzzy, {
   initData: {
     totalCount: 0,
     totalPage: 1,
@@ -317,7 +359,7 @@ const { requestFn: getBatchLastValue } = useRequest(StorageApi.getBatchLastValue
 const { requestFn: deleteMeasurements } = useRequest(StorageApi.deleteMeasurements);
 const { requestFn: exportMeasurementData } = useRequest(StorageApi.exportMeasurementData);
 
-const getTtlTimeUnit = (val: string | undefined, options: Array<{ label: string, value: string }>) => {
+const getTtlTimeUnit = (val: string | undefined, options: Array<{ label: string; value: string }>) => {
   if (!val) return '';
   const data = options.find((f) => f.value === val);
   return data ? data.label : '';
@@ -377,15 +419,14 @@ function handleDelStorage() {
     cancelButtonClass: 'del-databse-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
-  })
-    .then(() => {
-      deleteStorageGroups(currentStorage.value).then((res) => {
-        if (res.code === 0) {
-          ElMessage.success(t('common.deleteSuccess'));
-          storageSideRef.value?.getStorageList();
-        }
-      });
+  }).then(() => {
+    deleteStorageGroups(currentStorage.value).then((res) => {
+      if (res.code === 0) {
+        ElMessage.success(t('common.deleteSuccess'));
+        storageSideRef.value?.getStorageList();
+      }
     });
+  });
 }
 
 // 保存数据库
@@ -451,22 +492,21 @@ function handleDelRow(type: string, row: StorageDevice.MeasurementItem | null) {
     cancelButtonClass: 'mesaurement-table-del-cancel',
     type: 'warning',
     icon: ICustomMessageWarning,
-  })
-    .then(() => {
-      let measurementList = [];
-      if (type === 'batch') {
-        measurementList = multipleSelection.value?.map((i) => `${i.deviceName}.${i.timeseries}`);
-      } else {
-        measurementList = row?.timeseries ? [`${row.deviceName}.${row.timeseries}`] : [];
+  }).then(() => {
+    let measurementList = [];
+    if (type === 'batch') {
+      measurementList = multipleSelection.value?.map((i) => `${i.deviceName}.${i.timeseries}`);
+    } else {
+      measurementList = row?.timeseries ? [`${row.deviceName}.${row.timeseries}`] : [];
+    }
+    deleteMeasurements(measurementList).then((res) => {
+      if (res.code === 0) {
+        ElMessage.success(t('common.deleteSuccess'));
+        getStorageInfo(currentStorage.value);
+        handleRefresh();
       }
-      deleteMeasurements(measurementList).then((res) => {
-        if (res.code === 0) {
-          ElMessage.success(t('common.deleteSuccess'));
-          getStorageInfo(currentStorage.value);
-          handleRefresh();
-        }
-      });
     });
+  });
 }
 
 function handleRowData(row: StorageDevice.MeasurementItem) {
@@ -583,9 +623,8 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
-
 </script>
 
 <style lang="scss" scoped>
@@ -598,7 +637,7 @@ watch(
   flex-direction: column;
 }
 
-.storage-list-wrapper{
+.storage-list-wrapper {
   width: 240px;
   position: absolute;
   top: 0;
@@ -607,17 +646,16 @@ watch(
   background-color: #fff;
   border-radius: 6px;
   box-sizing: border-box;
-
 }
 
-.storage-details-wrapper{
+.storage-details-wrapper {
   width: calc(100% - 256px);
   margin-left: 256px;
   height: 100%;
   background-color: #fff;
   border-radius: 6px;
 
-  :deep(.el-scrollbar__view){
+  :deep(.el-scrollbar__view) {
     height: 100%;
   }
 
@@ -634,19 +672,19 @@ watch(
   .storage-info-item {
     font-size: 12px;
     line-height: 1.2;
-    color: #656A85;
+    color: #656a85;
     margin: 0 20px 6px 0;
     display: inline-flex;
     align-items: center;
     width: 160px;
 
-    .storage-info-item-label{
+    .storage-info-item-label {
       color: #131926;
       position: relative;
       margin-right: 4px;
       white-space: nowrap;
 
-      .ttl-tip{
+      .ttl-tip {
         position: absolute;
         right: -2px;
         top: -4px;
@@ -654,30 +692,30 @@ watch(
     }
   }
 
-  .storage-info-item-ttl{
+  .storage-info-item-ttl {
     width: 380px;
   }
 }
 
-.storage-info-title{
+.storage-info-title {
   font-size: 14px;
   font-weight: 700;
   line-height: 20px;
-  color: #495AD4;
+  color: #495ad4;
   padding: 14px 0 6px 16px;
-  border-bottom: 1px solid #DFE1ED;
+  border-bottom: 1px solid #dfe1ed;
 }
 
-.search-form-wrapper{
+.search-form-wrapper {
   display: flex;
   justify-content: space-between;
   padding: 16px;
 
-  .search-form-box{
+  .search-form-box {
     display: flex;
     align-items: center;
 
-    .search-from-label{
+    .search-from-label {
       font-size: 14px;
       font-weight: 400;
       line-height: 22px;
@@ -686,15 +724,15 @@ watch(
     }
   }
 
-  .search-form-buttons{
+  .search-form-buttons {
     // align-self: flex-end;
     // margin-bottom: 18px;
     // flex: 0 0 180px;
 
-    .export-btn{
+    .export-btn {
       position: relative;
 
-      .export-tip{
+      .export-tip {
         position: absolute;
         right: 6px;
         top: 2px;
@@ -703,18 +741,18 @@ watch(
   }
 }
 
-.storage-table-box{
+.storage-table-box {
   margin: 0 16px 16px;
   padding: 16px;
-  background-color: #F7F8FC;
+  background-color: #f7f8fc;
 }
 
-:deep(.el-select-v2__selection){
+:deep(.el-select-v2__selection) {
   flex-wrap: nowrap;
 }
 
-.batch-operate{
-  background: #F0F1FA;
+.batch-operate {
+  background: #f0f1fa;
   padding: 6px 16px;
   margin: 0 16px 10px;
   display: flex;
@@ -725,40 +763,40 @@ watch(
   line-height: 18px;
 }
 
-.select-tip-box{
+.select-tip-box {
   display: flex;
   align-items: center;
 }
 
-.row-description-box{
+.row-description-box {
   display: flex;
   align-items: center;
   justify-content: center;
 
-  .row-description-text{
+  .row-description-text {
     max-width: 120px;
     display: flex;
   }
 
-  .edit-box{
+  .edit-box {
     flex: 0 0 16px;
     cursor: pointer;
 
-    svg{
+    svg {
       width: 16px;
       height: 16px;
     }
 
-    .edit-icon-active{
+    .edit-icon-active {
       display: none;
     }
 
     &:hover {
-      .edit-icon{
+      .edit-icon {
         display: none;
       }
 
-      .edit-icon-active{
+      .edit-icon-active {
         display: block;
       }
     }

@@ -6,18 +6,19 @@
       :id="`context-menu-item-${item.key}`"
       :class="['context-menu-item', { 'disabled-menu': disabledKey(item.key) }]"
       @click="handleClickOperate(item.key)"
-    >{{ item.label }}</li>
+    >
+      {{ item.label }}
+    </li>
   </ul>
 </template>
 
 <script setup lang="ts">
-
 const props = defineProps<{
   contextMenuType: string;
 }>();
 
 const emit = defineEmits<{
-  (evnet: 'handleClickOperate', key: string):void;
+  (evnet: 'handleClickOperate', key: string): void;
 }>();
 
 const { t } = useI18n();
@@ -51,11 +52,11 @@ function handleClickOperate(key: string) {
 }
 </script>
 <style lang="scss" scoped>
-.context-menu-box{
+.context-menu-box {
   position: absolute;
   z-index: 10;
   width: 72px;
-  border: 1px solid #DFE1ED;
+  border: 1px solid #dfe1ed;
   background-color: #fff;
   border-radius: 2px;
   padding: 11px 0;
@@ -66,7 +67,7 @@ function handleClickOperate(key: string) {
   box-shadow: 0 4.26px 14.2px 0 rgb(32 37 71 / 6%);
   overflow: hidden;
 
-  .context-menu-item{
+  .context-menu-item {
     width: 100%;
     height: 24px;
     display: flex;
@@ -76,17 +77,17 @@ function handleClickOperate(key: string) {
     color: #424561;
     cursor: pointer;
 
-    &:hover{
-      background-color: #F7F8FC;
-      color: #495AD4;
+    &:hover {
+      background-color: #f7f8fc;
+      color: #495ad4;
     }
   }
 
-  .disabled-menu{
+  .disabled-menu {
     opacity: 0.7;
     cursor: not-allowed;
 
-    &:hover{
+    &:hover {
       background-color: #fff;
       color: #424561;
       opacity: 0.7;

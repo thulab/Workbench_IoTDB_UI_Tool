@@ -1,4 +1,4 @@
-declare namespace Connection{
+declare namespace Connection {
   export interface ConnectionItem {
     id: number | string;
     type: number;
@@ -7,7 +7,7 @@ declare namespace Connection{
   }
 
   export interface ConnectionClusterData {
-    hostAndPortVOS: Array<{ host: string, port: number | string }>;
+    hostAndPortVOS: Array<{ host: string; port: number | string }>;
     prometheusUrl: string;
   }
 

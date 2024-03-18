@@ -1,11 +1,8 @@
 <template>
-  <template
-    v-for="subItem in menus"
-    :key="subItem.path">
+  <template v-for="subItem in menus" :key="subItem.path">
     <template v-if="subItem.children && subItem.children.length > 0">
       <el-divider v-if="!subItem.hideLine" />
-      <el-sub-menu
-        :index="subItem.path">
+      <el-sub-menu :index="subItem.path">
         <template #title>
           <el-icon v-if="subItem.icon">
             <i v-if="isCollapse && subItem.activeIcon && rootMenu?.activeIndex?.indexOf(subItem.path) == 0" v-html="subItem.activeIcon"></i>
@@ -18,26 +15,16 @@
     </template>
     <template v-else>
       <el-divider v-if="subItem.showTopLine" />
-      <el-menu-item
-        :id="subItem.path"
-        :index="subItem.path">
+      <el-menu-item :id="subItem.path" :index="subItem.path">
         <el-icon v-if="subItem.icon">
           <i v-if="isCollapse && subItem.activeIcon && subItem.path === rootMenu?.activeIndex" v-html="subItem.activeIcon"></i>
           <i v-else v-html="subItem.icon"></i>
         </el-icon>
-        <template
-          v-if="!subItem.isLink"
-          #title>
+        <template v-if="!subItem.isLink" #title>
           <span>{{ subItem.title }}</span>
         </template>
-        <template
-          v-else
-          #title>
-          <a
-            class="href"
-            :href="subItem.isLink"
-            rel="noopener noreferrer"
-            target="_blank">{{ subItem.title }}</a>
+        <template v-else #title>
+          <a class="href" :href="subItem.isLink" rel="noopener noreferrer" target="_blank">{{ subItem.title }}</a>
         </template>
       </el-menu-item>
     </template>
@@ -54,13 +41,13 @@ const isCollapse = computed((): boolean => menuStore.isCollapse);
 const rootMenu = inject<MenuProvider>('rootMenu');
 
 const props = defineProps<{
-  menuList: MenuOptions[],
-  showAuthMenu?: boolean,
+  menuList: MenuOptions[];
+  showAuthMenu?: boolean;
 }>();
 
 const menus = computed<MenuOptions[]>(() => {
   const { menuList } = props;
-  menuList.sort((a, b) => ((a.order || 0) - (b.order || 0)));
+  menuList.sort((a, b) => (a.order || 0) - (b.order || 0));
   return menuList.filter((item) => {
     if (item.isAuthMenu) {
       return props.showAuthMenu;
@@ -68,7 +55,6 @@ const menus = computed<MenuOptions[]>(() => {
     return true;
   });
 });
-
 </script>
 
 <style scoped lang="scss">
@@ -93,7 +79,7 @@ const menus = computed<MenuOptions[]>(() => {
     bottom: 0;
     left: 0;
     width: 4px;
-    content: "";
+    content: '';
     border-radius: 0 4px 4px 0;
     background: var(--el-color-primary);
   }
@@ -118,40 +104,40 @@ const menus = computed<MenuOptions[]>(() => {
     &.is-active {
       background-color: var(--el-color-primary) !important;
 
-      .active{
+      .active {
         display: block;
       }
 
-      .normal{
+      .normal {
         display: none;
       }
 
-      &::before{
-        display: none
+      &::before {
+        display: none;
       }
     }
   }
 
-  .el-sub-menu  {
-    &.is-active{
+  .el-sub-menu {
+    &.is-active {
       padding: 5px;
 
-      .active{
+      .active {
         display: block;
       }
 
-      .normal{
+      .normal {
         display: none;
       }
 
-      :deep(.el-sub-menu__title){
+      :deep(.el-sub-menu__title) {
         width: 30px;
         height: 30px;
         padding: 0;
         background: var(--el-color-primary);
         border-radius: 4px;
 
-        .el-icon{
+        .el-icon {
           margin: 0 auto;
         }
       }
@@ -188,7 +174,7 @@ const menus = computed<MenuOptions[]>(() => {
         bottom: 0;
         left: 0;
         width: 4px;
-        content: "";
+        content: '';
         background: var(--el-color-primary);
       }
 

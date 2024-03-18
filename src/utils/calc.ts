@@ -73,11 +73,7 @@ export default class Calculator {
     return 0;
   }
 
-  static movePoint(
-    num: string | number,
-    direction: 'left' | 'right',
-    digits: number,
-  ) {
+  static movePoint(num: string | number, direction: 'left' | 'right', digits: number) {
     let str = String(num);
     let prefix = str[0];
     if (prefix === '-') {
@@ -85,16 +81,11 @@ export default class Calculator {
     } else {
       prefix = '';
     }
-    const n = direction === 'left'
-      ? this.movePoint2Left(str, digits)
-      : this.movePoint2Right(str, digits);
+    const n = direction === 'left' ? this.movePoint2Left(str, digits) : this.movePoint2Right(str, digits);
     return Number(`${prefix}${n}`);
   }
 
-  static movePoint2Left(
-    num: string | number,
-    digits: number,
-  ) {
+  static movePoint2Left(num: string | number, digits: number) {
     const arr = String(num).split('');
     let index = arr.indexOf('.');
     if (index === -1) {
@@ -117,10 +108,7 @@ export default class Calculator {
     return Number(arr.join(''));
   }
 
-  static movePoint2Right(
-    num: string | number,
-    digits: number,
-  ) {
+  static movePoint2Right(num: string | number, digits: number) {
     const arr = String(num).split('');
     const index = arr.indexOf('.');
     if (index === -1) {

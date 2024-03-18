@@ -16,7 +16,7 @@
           <div>
             <el-button link class="m-r-8" @click="handleRefresh" id="connection-side-refresh"><i-custom-border-refresh /></el-button>
             <el-button link class="m-r-8 m-l-0" @click="handleGraph" id="connection-side-graph"><i-custom-graph /></el-button>
-            <el-button link style="margin: 0;" @click="handleAddConnection" id="connection-side-add"><i-custom-new-connection /></el-button>
+            <el-button link style="margin: 0" @click="handleAddConnection" id="connection-side-add"><i-custom-new-connection /></el-button>
           </div>
         </div>
         <el-input :placeholder="t('connection.namePlaceholder')" v-model="filterText" id="connection-list-input" @keyup.enter="handleFilter" class="connection-search-input">
@@ -26,13 +26,19 @@
         </el-input>
         <div class="connection-list-box">
           <div class="list-empty-wrapper" v-if="!filterList.length">
-            <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
+            <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
             <span class="data-empty-text">{{ t('common.noData') }}</span>
           </div>
           <ul class="list-box" v-else>
-            <li v-for="item in filterList" :key="item.id" :class="['connection-item-box', current === item.id ? 'connection-item-box-active' : '']" :id="`connection-item-${item.id === '' ? 'new' : item.id}`" @click="e => handleSelect(item, e)">
+            <li
+              v-for="item in filterList"
+              :key="item.id"
+              :class="['connection-item-box', current === item.id ? 'connection-item-box-active' : '']"
+              :id="`connection-item-${item.id === '' ? 'new' : item.id}`"
+              @click="(e) => handleSelect(item, e)"
+            >
               <span class="connection-item-text" :style="{ paddingLeft: item.id !== '' ? '' : '7px' }">
-                <el-icon size="30" style="margin-right: 4px;" v-if="item.id !== ''">
+                <el-icon size="30" style="margin-right: 4px" v-if="item.id !== ''">
                   <i-custom-connection-cluster v-if="item.type === 1" />
                   <i-custom-connection-double-live v-else-if="item.type === 2" />
                   <i-custom-connection-stand-alone v-else />
@@ -73,11 +79,7 @@
       />
     </el-container>
 
-    <modal-flow
-      v-model:visible="flowVisible"
-      :is-toggle="isToggle"
-      @handleClose="getList"
-    />
+    <modal-flow v-model:visible="flowVisible" :is-toggle="isToggle" @handleClose="getList" />
   </el-dialog>
 </template>
 
@@ -129,7 +131,10 @@ async function handleAddConnection() {
   }
   current.value = '';
   filterList.value.unshift({
-    id: '', type: 0, name: t('connection.addConnection'), username: '',
+    id: '',
+    type: 0,
+    name: t('connection.addConnection'),
+    username: '',
   });
   editType.value = 'add';
   connectionFormRef.value?.handleChangeType(0);
@@ -140,32 +145,34 @@ async function handleAddConnection() {
 function getList(id?: number) {
   listLoading.value = true;
   detailLoading.value = true;
-  getConnectionList().then((res) => {
-    const data = res.data || [];
-    const standAloneList: Connection.ConnectionItem[] = [];
-    const doubleLiveList: Connection.ConnectionItem[] = [];
-    const clusterList: Connection.ConnectionItem[] = [];
-    data.forEach((item) => {
-      if (item.type === 1) {
-        clusterList.push(item);
-      } else if (item.type === 2) {
-        doubleLiveList.push(item);
+  getConnectionList()
+    .then((res) => {
+      const data = res.data || [];
+      const standAloneList: Connection.ConnectionItem[] = [];
+      const doubleLiveList: Connection.ConnectionItem[] = [];
+      const clusterList: Connection.ConnectionItem[] = [];
+      data.forEach((item) => {
+        if (item.type === 1) {
+          clusterList.push(item);
+        } else if (item.type === 2) {
+          doubleLiveList.push(item);
+        } else {
+          standAloneList.push(item);
+        }
+      });
+      connectionList.value = [...standAloneList, ...clusterList, ...doubleLiveList];
+      filterList.value = connectionList.value.filter((item) => item.name.includes(filterText.value));
+      if (filterList.value.length) {
+        const flag = !id && id !== 0 ? false : filterList.value.some((item) => +item.id === +id);
+        current.value = flag ? id! : +filterList.value[0].id;
+        connectionFormRef.value?.getDetail(current.value);
       } else {
-        standAloneList.push(item);
+        detailLoading.value = false;
       }
+    })
+    .finally(() => {
+      listLoading.value = false;
     });
-    connectionList.value = [...standAloneList, ...clusterList, ...doubleLiveList];
-    filterList.value = connectionList.value.filter((item) => item.name.includes(filterText.value));
-    if (filterList.value.length) {
-      const flag = (!id && id !== 0) ? false : filterList.value.some((item) => +item.id === +id);
-      current.value = flag ? id! : +filterList.value[0].id;
-      connectionFormRef.value?.getDetail(current.value);
-    } else {
-      detailLoading.value = false;
-    }
-  }).finally(() => {
-    listLoading.value = false;
-  });
 }
 
 async function handleRefresh() {
@@ -199,12 +206,10 @@ async function handleFilter() {
   }
 }
 
-const canStopPropagation = (e: HTMLElement):boolean => {
+const canStopPropagation = (e: HTMLElement): boolean => {
   const { classList } = e;
 
-  if (classList.contains('connection-item-delete-box')
-      || classList.contains('connection-item-delete')
-      || classList.contains('connection-item-delete-active')) {
+  if (classList.contains('connection-item-delete-box') || classList.contains('connection-item-delete') || classList.contains('connection-item-delete-active')) {
     return true;
   }
   if ((e.tagName === 'path' || e.tagName === 'g') && e.parentElement) {
@@ -268,44 +273,43 @@ watch(
         getList();
       }
     }
-  },
+  }
 );
-
 </script>
 
 <style scoped lang="scss">
-.connection-list-wrapper{
+.connection-list-wrapper {
   height: 510px;
   border-radius: 6px;
-  border: 1px solid #DFE1ED;
+  border: 1px solid #dfe1ed;
   margin-right: 8px;
 }
 
-.connection-list-title{
+.connection-list-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px 0;
 
-  h4{
+  h4 {
     font-size: 14px;
     font-weight: 700;
     line-height: 21px;
-    color: #495AD4;
+    color: #495ad4;
   }
 }
 
-.connection-search-input{
+.connection-search-input {
   padding: 20px 16px 16px;
 }
 
-.connection-list-box{
+.connection-list-box {
   border-radius: 2px;
-  background: #FFF;
+  background: #fff;
   height: calc(100% - 104px);
   overflow-y: auto;
 
-  .list-empty-wrapper{
+  .list-empty-wrapper {
     width: 100%;
     height: 100%;
     display: flex;
@@ -313,13 +317,13 @@ watch(
     justify-content: center;
     flex-direction: column;
 
-    .data-empty-img{
+    .data-empty-img {
       width: 150px;
       height: 150px;
       margin-bottom: 16px;
     }
 
-    .data-empty-text{
+    .data-empty-text {
       font-size: 14px;
       color: #131926;
       line-height: 21px;
@@ -327,7 +331,7 @@ watch(
   }
 }
 
-.connection-item-box{
+.connection-item-box {
   width: 100%;
   height: 36px;
   display: flex;
@@ -340,64 +344,64 @@ watch(
   cursor: pointer;
   position: relative;
 
-  .connection-item-text{
+  .connection-item-text {
     width: 200px;
     display: inline-flex;
     align-items: center;
     line-height: 1.2;
   }
 
-  .connection-item-delete-box{
+  .connection-item-delete-box {
     position: absolute;
     top: 10px;
     right: 4px;
     display: none;
 
-    svg{
+    svg {
       width: 16px;
       height: 16px;
     }
 
-    .connection-item-delete-active{
+    .connection-item-delete-active {
       display: none;
     }
 
     &:hover {
-      .connection-item-delete{
+      .connection-item-delete {
         display: none;
       }
 
-      .connection-item-delete-active{
+      .connection-item-delete-active {
         display: block;
       }
     }
   }
 
-  &:hover{
-    background-color: #F7F8FC;
-    color: #495AD4;
+  &:hover {
+    background-color: #f7f8fc;
+    color: #495ad4;
 
-    .connection-item-delete-box{
+    .connection-item-delete-box {
       display: block;
     }
   }
 }
 
-.connection-item-box-active{
-  background-color: #F7F8FC;
-  color: #495AD4;
+.connection-item-box-active {
+  background-color: #f7f8fc;
+  color: #495ad4;
 }
 
-.connection-detail-wrapper{
+.connection-detail-wrapper {
   width: 500px;
   height: 510px;
   border-radius: 6px;
-  border: 1px solid #DFE1ED;
+  border: 1px solid #dfe1ed;
   padding: 0;
   display: flex;
   flex-direction: column;
 
-  .connection-operate-buttons{
+  .connection-operate-buttons {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -405,18 +409,17 @@ watch(
     flex: 0 0 28px;
   }
 
-  .connection-detail-title{
+  .connection-detail-title {
     font-size: 14px;
     font-weight: 700;
     line-height: 21px;
-    color: #495AD4;
+    color: #495ad4;
   }
 
-  .el-scrollbar{
+  .el-scrollbar {
     padding: 0 9px;
   }
 }
-
 </style>
 <style lang="scss">
 .is-message-box {

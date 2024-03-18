@@ -1,5 +1,5 @@
 <template>
-  <div ref="chartContainer" style="height: 100%;" v-element-size="onResize"></div>
+  <div ref="chartContainer" style="height: 100%" v-element-size="onResize"></div>
 </template>
 
 <script lang="ts" setup>
@@ -10,15 +10,14 @@ import { debounce } from 'lodash-es';
 const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
 
-const props = defineProps<
-{
-  option: ECOption,
-  clickFunc?: Function,
+const props = defineProps<{
+  option: ECOption;
+  clickFunc?: Function;
 }>();
 
 const legendSelected = ref<{ [key: string]: boolean }>({});
 
-const setOption = (option:ECOption) => {
+const setOption = (option: ECOption) => {
   if (chartInstance) {
     // 实例存在直接设置
     chartInstance.setOption(option);
@@ -34,7 +33,7 @@ const setOption = (option:ECOption) => {
     // 监听图例选择状态变化的事件
     // { name: string, selected: { [name: string]: boolean } }
     chartInstance.on('legendselectchanged', (params: any) => {
-    // 当图例选择状态发生变化时，可以在这里处理逻辑
+      // 当图例选择状态发生变化时，可以在这里处理逻辑
       legendSelected.value = params.selected;
     });
     // 初次加载，设置notMerge为true
@@ -58,7 +57,7 @@ watch(
   (newOption) => {
     setOption(newOption);
   },
-  { deep: true },
+  { deep: true }
 );
 
 onMounted(() => {
@@ -77,5 +76,4 @@ onUnmounted(() => {
 defineExpose({
   legendSelected,
 });
-
 </script>

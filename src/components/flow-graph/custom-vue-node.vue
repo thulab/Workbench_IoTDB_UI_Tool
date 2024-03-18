@@ -38,14 +38,14 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.custom-node-box{
+.custom-node-box {
   position: relative;
   width: 100%;
   height: 100%;
   text-align: center;
 }
 
-.custom-node-label-box{
+.custom-node-label-box {
   display: flex;
   justify-content: center;
   text-align: center;

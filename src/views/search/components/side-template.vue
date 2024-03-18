@@ -14,7 +14,7 @@
             <text-tooltip :content="item.queryName" class-name="sql-item-text" />
           </div>
           <i-ep-more-filled @click="item.focused = true" v-if="!item.focused" :id="`sql-template-dropdown-${item.id}`" class="more-icon" />
-          <el-dropdown v-else :id="`sql-template-dropdown-${item.id}`" class="more-icon" @command="val => handleSqlCommand(val, item)">
+          <el-dropdown v-else :id="`sql-template-dropdown-${item.id}`" class="more-icon" @command="(val) => handleSqlCommand(val, item)">
             <i-ep-more-filled />
             <template #dropdown>
               <el-dropdown-menu>
@@ -112,13 +112,13 @@ defineExpose({ getQueryList });
     font-size: 12px;
     font-weight: 300;
     line-height: 1.2;
-    color: #656A85;
+    color: #656a85;
 
     &:hover {
       background-color: #f7fafc;
     }
 
-    .sql-item-text-box{
+    .sql-item-text-box {
       display: flex;
       align-items: center;
       width: 160px;
@@ -146,7 +146,7 @@ defineExpose({ getQueryList });
     }
   }
 
-  .sql-item-box-empty{
+  .sql-item-box-empty {
     padding: 0 8px;
     position: relative;
     display: flex;
@@ -156,7 +156,7 @@ defineExpose({ getQueryList });
     font-size: 12px;
     font-weight: 300;
     line-height: 12px;
-    color: #656A85;
+    color: #656a85;
   }
 
   .sql-menu-list {

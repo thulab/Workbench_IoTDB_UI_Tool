@@ -1,12 +1,5 @@
 <template>
-  <el-dialog
-    :title="t('common.errorDetail')"
-    v-model="dialogVisible"
-    width="480px"
-    align-center
-    :close-on-click-modal="false"
-    id="error-message-modal"
-  >
+  <el-dialog :title="t('common.errorDetail')" v-model="dialogVisible" width="480px" align-center :close-on-click-modal="false" id="error-message-modal">
     <div class="error-message-box">
       <el-icon size="16"><i-custom-error /></el-icon>
       <el-scrollbar :height="100" ref="scrollRef">
@@ -52,17 +45,16 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
 </script>
 
 <style lang="scss" scoped>
-
-.error-message-box{
+.error-message-box {
   display: flex;
 }
 
-.expression-text{
+.expression-text {
   padding: 0 12px;
   margin-top: -3px;
   font-size: 14px;

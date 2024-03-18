@@ -1,15 +1,7 @@
 <template>
-  <el-dialog
-    :title="t('auth.systemInfo')"
-    v-model="dialogVisible"
-    width="265px"
-    align-center
-    :close-on-click-modal="false"
-    id="system-modal"
-    class="system-dialog"
-  >
+  <el-dialog :title="t('auth.systemInfo')" v-model="dialogVisible" width="265px" align-center :close-on-click-modal="false" id="system-modal" class="system-dialog">
     <div class="system-info-box">
-      <img src="@/assets/timecho-logo.svg" alt="" class="system-logo">
+      <img src="@/assets/timecho-logo.svg" alt="" class="system-logo" />
       <p class="system-title">{{ systemTitle }}</p>
       <p class="system-version">{{ t('auth.versionTitle', { version: appVersion }) }}</p>
       <p class="system-detail">{{ systemDetail }}</p>
@@ -35,21 +27,20 @@ const dialogVisible = useVModel(props, 'visible', emit);
 const appVersion = computed(() => appStore.AppVersion);
 const systemTitle = computed(() => (appType === 1 ? t('auth.systemTitle') : t('auth.systemTitleWorkbench')));
 const systemDetail = computed(() => (appType === 1 ? t('auth.systemDetail') : t('auth.systemDetailWorkbench')));
-
 </script>
 
 <style lang="scss" scoped>
-.system-info-box{
+.system-info-box {
   display: flex;
   flex-direction: column;
   align-items: center;
 
-  .system-logo{
+  .system-logo {
     width: 120px;
     height: 32px;
   }
 
-  .system-title{
+  .system-title {
     font-size: 14px;
     font-weight: 400;
     line-height: 21px;
@@ -61,14 +52,14 @@ const systemDetail = computed(() => (appType === 1 ? t('auth.systemDetail') : t(
     font-size: 12px;
     font-weight: 300;
     line-height: 18px;
-    color: #656A85;
+    color: #656a85;
   }
 
   .system-detail {
     font-size: 12px;
     font-weight: 400;
     line-height: 18px;
-    color: #656A85;
+    color: #656a85;
     margin: 24px 0 0;
   }
 }
