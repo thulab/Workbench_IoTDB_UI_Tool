@@ -7,7 +7,7 @@ module.exports = {
     './.eslintrc-auto-import.json', // auto-import rules
     'plugin:vue/vue3-essential',
     '@vue/eslint-config-airbnb-with-typescript',
-    '@vue/eslint-config-prettier',
+    '@vue/eslint-config-prettier/skip-formatting',
   ],
   parserOptions: {
     ecmaVersion: 'latest',
