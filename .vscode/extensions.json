@@ -3,7 +3,6 @@
     "dbaeumer.vscode-eslint",
     "lokalise.i18n-ally",
     "stylelint.vscode-stylelint",
-    "vue.vscode-typescript-vue-plugin",
     "vue.volar",
     "redjue.git-commit-plugin",
     "antfu.iconify"
