@@ -2,7 +2,7 @@
   <div>
     <el-select
       v-model="model"
-      :placeholder="t('measurement.measurementNameSelectPlaceholder')"
+      :placeholder="placeholder ? placeholder : t('measurement.measurementNameSelectPlaceholder')"
       filterable
       remote
       :clearable="isClearable"
@@ -14,6 +14,7 @@
       :style="`width: ${selectWidth}px;`"
       class="remote-select-box"
       id="select-path-single"
+      @change="handleChangePath"
     >
       <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :id="`select-path-single-${item.timeseries}`" :disabled="disabledPath ? disabledPath(item) : false">
         <div :style="`display: flex; width: ${itemWidth}px;`">
@@ -29,7 +30,7 @@ import { debounce } from 'lodash-es';
 import { StorageApi } from '@/api';
 
 const props = defineProps<{
-  modelValue: string;
+  modelValue: string | undefined;
   disabledSelect?: boolean;
   showSuffix?: boolean;
   isClearable?: boolean;
@@ -37,7 +38,13 @@ const props = defineProps<{
   selectWidth: number;
   itemWidth: number;
   filterSystem?: boolean;
+  placeholder?: string;
 }>();
+
+const emit = defineEmits<{
+  (event: 'handleChangePath', val: string): void;
+}>();
+
 const { t } = useI18n();
 const model = useVModel(props, 'modelValue');
 const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);
@@ -58,8 +65,16 @@ const remoteMethod = debounce((query: string) => {
   });
 }, 500);
 
+function handleChangePath(val: string) {
+  emit('handleChangePath', val);
+}
+
 onMounted(() => {
   remoteMethod('');
+});
+
+defineExpose({
+  measurementList,
 });
 </script>
 

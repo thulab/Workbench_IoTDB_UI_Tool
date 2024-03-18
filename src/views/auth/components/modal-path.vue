@@ -12,29 +12,18 @@
       <el-radio label="select" id="auth-path-modal-select-radio">
         <span class="radio-label">{{t('auth.exactPath')}}：<el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip></span>
         <div class="search-path-box">
-          <el-select
-            v-model="selectPath"
-            :placeholder="t('auth.exactPathPlaceholder')"
-            filterable
-            remote
-            clearable
-            collapse-tags
-            :remote-show-suffix="false"
-            :remote-method="remoteMethod"
-            :loading="measurementLoading"
-            style="width: 466px;"
-            class="path-select"
+          <timeseries-select-single
             id="auth-path-modal-select-path"
-          >
-            <template #prefix>
-              <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
-            </template>
-            <el-option v-for="item in options" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :id="`auth-path-modal-select-path-select-${item.timeseries}`">
-              <div style="display: flex; width: 400px;">
-                <text-tooltip :content="item.timeseries" />
-              </div>
-            </el-option>
-          </el-select>
+            ref="timeseriesSelectSingleRef"
+            v-model="selectPath"
+            :selectWidth="466"
+            :itemWidth="400"
+            :is-clearable="true"
+            class="path-select"
+            :filter-system="true"
+            :placeholder="t('auth.exactPathPlaceholder')"
+            :key="dialogKey"
+          />
         </div>
       </el-radio>
       <el-radio label="input" id="auth-path-modal-input-radio">
@@ -55,8 +44,7 @@
 </template>
 
 <script lang="ts" setup>
-import { debounce } from 'lodash-es';
-import { StorageApi } from '@/api';
+import TimeseriesSelectSingle from '@/components/timeseries-select-single.vue';
 
 const props = defineProps<{
   visible: boolean;
@@ -73,20 +61,9 @@ const { t } = useI18n();
 const pathType = ref('select');
 const inputPath = ref('');
 const selectPath = ref('');
+const timeseriesSelectSingleRef = ref<InstanceType<typeof TimeseriesSelectSingle>>();
 const options = ref<StorageDevice.MeasurementDataItem[]>([]);
-
-const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementAllObjList);
-
-let lastQuery = '';
-// 查询数据
-const remoteMethod = debounce((query: string) => {
-  lastQuery = query;
-  getMeasurement(lastQuery).then((res) => {
-    if (lastQuery === query) {
-      options.value = res.data?.measurements?.filter((item) => !item.timeseries.startsWith('root.__system')) || [];
-    }
-  });
-}, 500);
+const dialogKey = ref(0);
 
 const handleConfirm = () => {
   let res = selectPath.value;
@@ -122,8 +99,8 @@ watch(
       pathType.value = 'select';
       inputPath.value = '';
       selectPath.value = '';
-      options.value = [];
-      remoteMethod('');
+      dialogKey.value++;
+      options.value = timeseriesSelectSingleRef.value?.measurementList || [];
     }
   },
 );

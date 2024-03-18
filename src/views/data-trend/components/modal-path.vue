@@ -12,25 +12,16 @@
         <template #label>
           {{t('measurement.measurementName')}}：<el-tooltip effect="light" :content="t('common.searchAllTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
         </template>
-        <el-select
-          v-model="formData.path"
-          :placeholder="t('measurement.measurementNameSelectPlaceholder')"
-          filterable
-          remote
-          :remote-show-suffix="false"
-          fit-input-width
-          :remote-method="remoteMethod"
-          :loading="measurementLoading"
-          style="width: 363px;"
-          class="path-select"
+        <timeseries-select-single
           id="trend-modal-select-path"
-        >
-          <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :id="`trend-modal-select-path-select-${item.timeseries}`" :disabled="item.dataType === 'TEXT' || pathList.includes(item.timeseries)">
-            <div style="display: flex; width: 320px;">
-              <text-tooltip :content="item.timeseries" />
-            </div>
-          </el-option>
-        </el-select>
+          ref="timeseriesSelectSingleRef"
+          v-model="formData.path"
+          :selectWidth="363"
+          :itemWidth="320"
+          class="path-select"
+          :key="dialogKey"
+          :disabled-path="(item) => item.dataType === 'TEXT' || pathList.includes(item.timeseries)"
+        />
       </base-form-item>
       <div class="chart-detail-box">
         <base-form-item :label="`${t('common.color')}：`" prop="color" :rules="requiredRules">
@@ -51,9 +42,7 @@
 </template>
 
 <script lang="ts" setup>
-import { debounce } from 'lodash-es';
 import type { FormInstance } from 'element-plus';
-import { StorageApi } from '@/api';
 
 const props = defineProps<{
   visible: boolean;
@@ -67,6 +56,7 @@ const emit = defineEmits<{
   (event: 'handleSave', payload: Trend.LineObj): void;
 }>();
 
+const dialogKey = ref(0);
 const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const formRef = ref<FormInstance>();
@@ -102,19 +92,6 @@ const requiredNumberRules = ref([
     trigger: ['blur'],
   },
 ]);
-const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);
-
-const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementAllObjList);
-
-let lastMeasurementQuery = '';
-const remoteMethod = debounce((query: string) => {
-  lastMeasurementQuery = query;
-  getMeasurement(lastMeasurementQuery).then((res) => {
-    if (lastMeasurementQuery === query) {
-      measurementList.value = res.data?.measurements?.map((item) => item) || [];
-    }
-  });
-}, 500);
 
 const handleConfirm = () => {
   formRef.value?.validate((valid) => {
@@ -132,7 +109,7 @@ watch(
       formRef.value?.resetFields();
       formData.width = 2;
       formData.color = props.defaultColor;
-      remoteMethod('');
+      dialogKey.value++;
     }
   },
 );

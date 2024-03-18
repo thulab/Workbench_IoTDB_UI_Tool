@@ -15,26 +15,19 @@
             <template #label>
               {{t('alarm.alarmMeasurement')}}：<el-tooltip v-if="editType === 'add'" effect="light" :content="t('common.searchAllTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
-            <el-select
-              v-model="formData.measurement"
-              :placeholder="t('measurement.measurementNameSelectPlaceholder')"
-              filterable
-              remote
-              remote-show-suffix
-              fit-input-width
-              :remote-method="remoteMethod"
-              :loading="measurementLoading"
-              :disabled="editType === 'edit'"
-              @change="handleChangePath"
-              style="width: 235px;"
+            <timeseries-select-single
               id="alarm-config-modal-measurement"
-            >
-              <el-option v-for="item in measurementList" :key="item.timeseries" :label="item.timeseries" :value="item.timeseries" :id="`alarm-config-modal-measurement-select-${item.timeseries}`" :disabled="item.dataType === 'TEXT' || item.viewType === 'VIEW'">
-                <div style="display: flex; width: 200px;">
-                  <text-tooltip :content="item.timeseries" />
-                </div>
-              </el-option>
-            </el-select>
+              ref="timeseriesSelectSingleRef"
+              v-model="formData.measurement"
+              :selectWidth="235"
+              :itemWidth="200"
+              show-suffix
+              :key="dialogKey"
+              :filter-system="true"
+              :disabled-select="editType === 'edit'"
+              :disabled-path="(item) => item.dataType === 'TEXT' || item.viewType === 'VIEW'"
+              @handleChangePath="handleChangePath"
+            />
           </base-form-item>
         </el-col>
         <el-col :span="12">
@@ -173,11 +166,12 @@
 </template>
 
 <script lang="ts" setup>
-import { debounce, assign } from 'lodash-es';
+import { assign } from 'lodash-es';
 import type { FormInstance } from 'element-plus';
 import { storeToRefs } from 'pinia';
-import { AlarmApi, StorageApi } from '@/api';
+import { AlarmApi } from '@/api';
 import { useEnumStore } from '@/stores';
+import TimeseriesSelectSingle from '@/components/timeseries-select-single.vue';
 
 const props = defineProps<{
   visible: boolean;
@@ -192,6 +186,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
+const timeseriesSelectSingleRef = ref<InstanceType<typeof TimeseriesSelectSingle>>();
 const enumStore = useEnumStore();
 const {
   alarmBooleanRuleEnum: booleanRuleEnum,
@@ -222,7 +217,8 @@ const formData = reactive<Alarm.ConfigData>({
   alarmDuration: 0,
   alarmDurationType: 'ms',
 });
-const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);
+const measurementList = ref<StorageDevice.MeasurementDataItem[]>(timeseriesSelectSingleRef.value?.measurementList || []);
+const dialogKey = ref(0);
 
 const changeBoolean = computed(() => formData.measurementType === 'BOOLEAN' && formData.alarmRulesType === 'change');
 
@@ -298,17 +294,6 @@ const getLevelColor = computed(() => {
 const { requestFn: saveAlarmConfig } = useRequest(AlarmApi.saveAlarmConfig);
 const { requestFn: updateAlarmConfig } = useRequest(AlarmApi.updateAlarmConfig);
 const { requestFn: getAlarmConfigDetail } = useRequest(AlarmApi.getAlarmConfigDetail);
-const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementAllObjList);
-
-let lastMeasurementQuery = '';
-const remoteMethod = debounce((query: string) => {
-  lastMeasurementQuery = query;
-  getMeasurement(lastMeasurementQuery).then((res) => {
-    if (lastMeasurementQuery === query) {
-      measurementList.value = (res.data?.measurements || []).filter((f) => !f.timeseries.startsWith('root.__system'));
-    }
-  });
-}, 500);
 
 function getDetail() {
   if (!props.alarmConfigId) return;
@@ -389,6 +374,7 @@ watch(
   () => props.visible,
   (newVal) => {
     if (newVal) {
+      dialogKey.value++;
       formRef.value?.resetFields();
       formData.alarmRulesType = '';
       formData.alarmRulesTypeVal = undefined;
@@ -400,7 +386,7 @@ watch(
         getDetail();
       } else {
         formData.alarmConfigId = undefined;
-        remoteMethod('');
+        measurementList.value = timeseriesSelectSingleRef.value?.measurementList || [];
       }
     }
   },
