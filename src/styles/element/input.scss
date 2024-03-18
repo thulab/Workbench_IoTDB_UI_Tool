@@ -21,6 +21,14 @@
   height: 26px !important;
 }
 
+.el-input.is-disabled {
+  outline: none;
+}
+
+.el-input.is-disabled .el-input__wrapper{
+  outline: none;
+}
+
 .el-input-group__prepend, .el-input-group__append{
   background: #F0F1FA !important;
   color: #131926 !important;
@@ -152,7 +160,6 @@ svg:focus{
   padding: 0 8px 0 0;
 
   svg{
-    // align-self: flex-start;
     position: absolute;
     top: 0;
     right: 8px;
