@@ -75,6 +75,7 @@
                   :selectWidth="200"
                   :itemWidth="160"
                   show-suffix
+                  :disabled-path="disabledPath"
                 />
               </base-form-item>
               <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange">
@@ -301,6 +302,10 @@ const disableSideband = computed(() => chartData.timestamps.length === 0 || draw
 const xMax = computed(() => chartData.timestamps[chartData.timestamps.length - 1]);
 
 const methodOptions = computed(() => [...methodList.value, { functionName: 'custom', name: t('spectrum.customAnalysis'), enable: true }]);
+
+function disabledPath(item: StorageDevice.MeasurementDataItem) {
+  return item.dataType === 'BOOLEAN' || item.dataType === 'TEXT';
+}
 
 const seriesData = computed<ECOption>(() => ({
   series: [{
