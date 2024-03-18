@@ -46,6 +46,7 @@
 .el-select {
   line-height: 28px !important;
 
+  /* stylelint-disable-next-line no-descending-specificity */
   .el-input__wrapper{
     padding-right: 1px !important;
   }
