@@ -40,18 +40,18 @@ const formData = reactive({
 const requiredRules = ref([
   {
     required: true,
-    message: t('common.formRuleEmpty'),
+    message: () => t('common.formRuleEmpty'),
     trigger: 'blur',
   },
   {
     min: 4,
     max: 32,
-    message: t('auth.roleNameLength'),
+    message: () => t('auth.roleNameLength'),
     trigger: 'blur',
   },
   {
     pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
-    message: t('auth.roleNameExg'),
+    message: () => t('auth.roleNameExg'),
     trigger: 'blur',
   },
   {

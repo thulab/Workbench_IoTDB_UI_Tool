@@ -1,6 +1,6 @@
 <template>
   <el-dialog v-model="dialogVisible" :title="t('auth.addUser')" width="490px" align-center :close-on-click-modal="false" id="auth-user-modal">
-    <el-form label-width="90px" ref="formRef" :rules="rules" :model="formData" label-position="left" :key="formKey">
+    <el-form :label-width="locale === 'en' ? '150px' : '90px'" ref="formRef" :rules="rules" :model="formData" label-position="left" :key="formKey">
       <label><input type="password" autocomplete="new-password" hidden /></label>
       <base-form-item :label="`${t('auth.userName')}：`" prop="userName" :error="errorName">
         <el-input v-model.trim="formData.userName" maxlength="32" :placeholder="t('auth.userNamePlaceholder')" show-word-limit id="auth-user-modal-name" />
@@ -37,7 +37,7 @@ const emit = defineEmits<{
   handleSave: [];
 }>();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const errorName = ref('');
 const formKey = ref(0);
@@ -52,18 +52,18 @@ const rules = reactive<FormRules>({
   userName: [
     {
       required: true,
-      message: t('common.formRuleEmpty'),
+      message: () => t('common.formRuleEmpty'),
       trigger: ['blur', 'change'],
     },
     {
       min: 4,
       max: 32,
-      message: t('auth.userNameLength'),
+      message: () => t('auth.userNameLength'),
       trigger: ['blur', 'change'],
     },
     {
       pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
-      message: t('auth.userNameExg'),
+      message: () => t('auth.userNameExg'),
       trigger: ['blur', 'change'],
     },
     {
@@ -80,36 +80,36 @@ const rules = reactive<FormRules>({
   password: [
     {
       required: true,
-      message: t('common.formRuleEmpty'),
+      message: () => t('common.formRuleEmpty'),
       trigger: ['blur', 'change'],
     },
     {
       min: 4,
       max: 32,
-      message: t('auth.pwdLength'),
+      message: () => t('auth.pwdLength'),
       trigger: ['blur', 'change'],
     },
     {
       pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
-      message: t('auth.pwdExg'),
+      message: () => t('auth.pwdExg'),
       trigger: ['blur', 'change'],
     },
   ],
   confirmPassword: [
     {
       required: true,
-      message: t('common.formRuleEmpty'),
+      message: () => t('common.formRuleEmpty'),
       trigger: ['blur', 'change'],
     },
     {
       min: 4,
       max: 32,
-      message: t('auth.pwdLength'),
+      message: () => t('auth.pwdLength'),
       trigger: ['blur', 'change'],
     },
     {
       pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
-      message: t('auth.pwdExg'),
+      message: () => t('auth.pwdExg'),
       trigger: ['blur', 'change'],
     },
     {

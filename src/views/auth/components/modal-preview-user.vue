@@ -4,7 +4,7 @@
       <div class="table-list-box m-t-8">
         <h4 class="table-box-title">{{ t('common.allSituation') }}</h4>
         <el-table :data="entityTableData" style="width: 100%" border>
-          <el-table-column :label="t('common.allChoose')" align="center" width="58" fixed="left">
+          <el-table-column :label="t('common.allChoose')" align="center" width="60" fixed="left">
             <template #default="{ row }">
               <el-icon size="21">
                 <i-custom-correct style="transform: translateY(3px)" v-if="row.privileges.length >= entityPrivilegesEnumKeys.length" />

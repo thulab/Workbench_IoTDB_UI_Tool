@@ -4,7 +4,7 @@
       <div class="search-form-wrapper" style="margin-bottom: 18px">
         <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
           <div class="m-b-28 flex" style="height: 36px">
-            <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method">
+            <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method" :label-width="locale === 'en' ? '132px' : '88px'">
               <template #label>
                 {{ t('spectrum.analysisMethod') }}：
                 <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
@@ -63,7 +63,7 @@
           </div>
           <div class="flex-justify-between">
             <div v-if="searchFormData.method !== 'custom'">
-              <base-form-item :label="`${t('measurement.measurementChoose')}：`" prop="measurement">
+              <base-form-item :label="`${t('measurement.measurementChoose')}：`" prop="measurement" :label-width="locale === 'en' ? '132px' : '88px'">
                 <timeseries-select-single id="spectrum-search-path" v-model="searchFormData.measurement" :selectWidth="200" :itemWidth="160" show-suffix :disabled-path="disabledPath" />
               </base-form-item>
               <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange">
@@ -971,7 +971,7 @@ watch(locale, () => {
   box-sizing: border-box;
 
   .el-button {
-    padding: 0 !important;
+    padding: 0 6px !important;
     min-width: 40px;
     height: 22px !important;
     border-radius: 0;

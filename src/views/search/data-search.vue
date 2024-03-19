@@ -1,7 +1,7 @@
 <template>
   <div class="page-container">
     <div class="search-form-wrapper">
-      <el-form :model="searchFormData" style="flex: 1" ref="searchFormRef" label-position="left" label-width="80px" size="default" inline>
+      <el-form :model="searchFormData" style="flex: 1" ref="searchFormRef" label-position="left" :label-width="locale === 'en' ? '156px' : '88px'" size="default" inline>
         <el-row>
           <base-form-item prop="path" class="m-r-20">
             <template #label>
@@ -10,7 +10,7 @@
             </template>
             <timeseries-select v-model="searchFormData.path" :is-show-view-btn="true" :disabled="getListLoading" id="data-search-path" />
           </base-form-item>
-          <el-form-item label="查询时间：" prop="time" style="margin-right: 0">
+          <el-form-item :label="`${t('search.searchTime')}：`" prop="time" style="margin-right: 0">
             <div class="search-time-wrapper">
               <ul class="search-time-list">
                 <li :class="['search-time-type', { 'search-time-active': timeType === 'datetime' }]" id="data-search-type-datetime" @click="handleTimeType('datetime')">{{ t('search.datetime') }}</li>
@@ -55,9 +55,9 @@
                 <el-tooltip effect="light" :content="t('search.inputNumberPlaceholder')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
               </template>
               <el-input type="hidden" />
-              <el-input v-model.number="searchFormData.timeInterval" style="width: 100px" placeholder="" @input="handleInputInterval" id="data-search-timeInterval" :disabled="getListLoading">
+              <el-input v-model.number="searchFormData.timeInterval" style="width: 160px" placeholder="" @input="handleInputInterval" id="data-search-timeInterval" :disabled="getListLoading">
                 <template #append>
-                  <el-select v-model="searchFormData.unitInterval" style="width: 50px" placeholder="" id="data-search-unitInterval" :disabled="getListLoading">
+                  <el-select v-model="searchFormData.unitInterval" style="width: 80px" placeholder="" id="data-search-unitInterval" :disabled="getListLoading">
                     <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-unitInterval-select-${item.value}`" />
                   </el-select>
                 </template>
@@ -65,7 +65,7 @@
             </el-form-item>
             <el-form-item :label="`${t('search.aggregation')}：`" prop="aggregation">
               <el-input type="hidden" />
-              <el-select v-model="searchFormData.aggregation" style="width: 80px" clearable id="data-search-aggregation" :disabled="getListLoading">
+              <el-select v-model="searchFormData.aggregation" style="width: 120px" clearable id="data-search-aggregation" :disabled="getListLoading">
                 <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-aggregation-select-${item.value}`" />
               </el-select>
             </el-form-item>
@@ -118,7 +118,7 @@
               @command="(val) => handleCommandDown(val)"
               id="data-search-download-dropdown"
             >
-              <el-button class="export-btn" id="data-search-download" :disabled="!canReadWriteData">
+              <el-button class="export-button" id="data-search-download" :disabled="!canReadWriteData">
                 {{ t('common.export') }}
                 <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
               </el-button>
@@ -198,7 +198,7 @@ import DynamicTable from '@/components/dynamic-table.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalImport from './components/modal-import.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
 const { canReadWriteData } = storeToRefs(userStore);
@@ -649,17 +649,6 @@ watch(
       margin-right: 30px;
       display: flex;
       align-items: center;
-    }
-  }
-
-  .export-btn {
-    position: relative;
-
-    /* stylelint-disable-next-line no-descending-specificity */
-    svg {
-      position: absolute;
-      right: 2px;
-      top: 2px;
     }
   }
 }

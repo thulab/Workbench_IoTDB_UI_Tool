@@ -1,8 +1,8 @@
 <template>
   <div class="page-container">
     <div class="search-form-wrapper">
-      <el-form :model="searchFormData" ref="searchFormRef" label-position="left" label-width="78px" size="default" inline :disabled="getListLoading">
-        <base-form-item prop="path" class="m-r-40">
+      <el-form :model="searchFormData" ref="searchFormRef" label-position="left" :label-width="locale === 'en' ? '116px' : '88px'" size="default" inline :disabled="getListLoading">
+        <base-form-item prop="path" class="m-r-30">
           <template #label>
             {{ t('measurement.measurementChoose') }}：
             <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
@@ -29,7 +29,7 @@
         </auth-tooltip>
         <auth-tooltip :is-disabled="canReadWriteData">
           <el-button :disabled="searchFormData.path.length === 0 || !canReadWriteData" type="primary" @click="handleSearch" id="statistic-search-search">
-            {{ getListLoading ? '取消查询' : t('common.query') }}
+            {{ getListLoading ? t('common.cancel') : t('common.query') }}
           </el-button>
         </auth-tooltip>
       </div>
@@ -41,7 +41,7 @@
         <div class="page-detail-buttons">
           <auth-tooltip :is-disabled="canReadWriteData">
             <el-dropdown class="m-r-16" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData" @command="(val) => handleCommandDown(val)" id="statistic-search-download-dropdown">
-              <el-button class="export-btn" id="statistic-search-download" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData">
+              <el-button class="export-button" id="statistic-search-download" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData">
                 {{ t('common.export') }}
                 <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
               </el-button>
@@ -76,7 +76,7 @@
           <el-table-column :label="t('common.minValue')" prop="minValue" min-width="160" align="center" show-overflow-tooltip />
           <el-table-column :label="t('common.minValueTime')" prop="minTime" min-width="180" align="center" show-overflow-tooltip />
           <el-table-column :label="t('common.maxValue')" prop="maxValue" min-width="160" align="center" show-overflow-tooltip />
-          <el-table-column :label="t('common.maxValueTime')" prop="maxTime" min-width="180" align="center" show-overflow-tooltip />
+          <el-table-column :label="t('common.maxValueTime')" prop="maxTime" min-width="190" align="center" show-overflow-tooltip />
           <el-table-column :label="t('common.avg')" prop="avgValue" min-width="160" align="center" show-overflow-tooltip />
           <el-table-column :label="t('common.total')" prop="sumValue" min-width="160" align="center" show-overflow-tooltip />
           <template #empty>
@@ -113,7 +113,7 @@ import { getStartAndEnd, today, getOneInterval, getOneIntervalNow, formatDate } 
 import { useUserStore } from '@/stores';
 import ICustomCalender from '~icons/custom/calender.svg';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const userStore = useUserStore();
 const { canReadWriteData } = storeToRefs(userStore);
 const { maxTableHeight } = useTableHeight(280);
@@ -299,9 +299,14 @@ onMounted(() => {
 .search-form-wrapper {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
   width: 100%;
   padding: 0;
-  height: 50px;
+
+  .search-form-buttons {
+    display: flex;
+    flex-wrap: nowrap;
+  }
 }
 
 .page-table-details {
@@ -325,16 +330,6 @@ onMounted(() => {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
-  }
-
-  .export-btn {
-    position: relative;
-
-    svg {
-      position: absolute;
-      right: 4px;
-      top: 2px;
-    }
   }
 }
 </style>

@@ -8,7 +8,7 @@
     :close-on-click-modal="false"
     id="alarm-config-modal"
   >
-    <el-form ref="formRef" :model="formData" class="source-form" label-position="right" label-width="90px">
+    <el-form ref="formRef" :model="formData" class="source-form" label-position="right" :label-width="locale === 'en' ? '166px' : '98px'">
       <el-row>
         <el-col :span="12">
           <base-form-item prop="measurement" :rules="editType === 'add' ? requiredRules : []">
@@ -154,7 +154,7 @@ const emit = defineEmits<{
   (event: 'handleSave'): void;
 }>();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const timeseriesSelectSingleRef = ref<InstanceType<typeof TimeseriesSelectSingle>>();
 const enumStore = useEnumStore();
@@ -164,7 +164,7 @@ const formRef = ref<FormInstance>();
 const requiredRules = ref([
   {
     required: true,
-    message: t('common.formRuleEmpty'),
+    message: () => t('common.formRuleEmpty'),
     trigger: ['blur', 'change'],
   },
 ]);
@@ -210,7 +210,7 @@ const checkRules = (rule: any, value: any, callback: any) => {
 const requiredRulesRules = ref([
   {
     required: true,
-    message: t('common.formRuleEmpty'),
+    message: () => t('common.formRuleEmpty'),
     trigger: ['blur', 'change'],
   },
   {
@@ -239,7 +239,7 @@ const checkDuration = (rule: any, value: any, callback: any) => {
 const requiredDurationRules = ref([
   {
     required: true,
-    message: t('common.formRuleEmpty'),
+    message: () => t('common.formRuleEmpty'),
     trigger: ['blur', 'change'],
   },
   {

@@ -91,7 +91,7 @@ import ModalConnection from '@/components/modal-connection.vue';
 import TheCaptcha from '@/components/the-captcha.vue';
 import { useLangSwitch } from '@/composition-api';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const router = useRouter();
 const userStore = useUserStore();
 const appStore = useAppStore();
@@ -158,7 +158,7 @@ const rules = reactive<FormRules>({
   connection: [
     {
       required: true,
-      message: t('login.connectionEmptyTip'),
+      message: () => t('login.connectionEmptyTip'),
       trigger: 'blur',
     },
   ],
@@ -286,6 +286,12 @@ onUnmounted(() => {
   loading.value = false;
   connectionOptions.value = [];
   connectionLoading.value = false;
+});
+
+watch(locale, () => {
+  nextTick(() => {
+    formRef.value?.clearValidate();
+  });
 });
 </script>
 

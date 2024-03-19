@@ -57,54 +57,54 @@ const rules = reactive<FormRules>({
   rawPassword: [
     {
       required: true,
-      message: t('common.formRuleEmpty'),
+      message: () => t('common.formRuleEmpty'),
       trigger: ['blur', 'change'],
     },
     {
       min: 4,
       max: 32,
-      message: t('auth.pwdLength'),
+      message: () => t('auth.pwdLength'),
       trigger: ['blur', 'change'],
     },
     {
       pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
-      message: t('auth.oldPwdReg'),
+      message: () => t('auth.oldPwdReg'),
       trigger: ['blur', 'change'],
     },
   ],
   password: [
     {
       required: true,
-      message: t('common.formRuleEmpty'),
+      message: () => t('common.formRuleEmpty'),
       trigger: ['blur', 'change'],
     },
     {
       min: 4,
       max: 32,
-      message: t('auth.pwdLength'),
+      message: () => t('auth.pwdLength'),
       trigger: ['blur', 'change'],
     },
     {
       pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
-      message: t('auth.oldPwdReg'),
+      message: () => t('auth.oldPwdReg'),
       trigger: ['blur', 'change'],
     },
   ],
   confirmPassword: [
     {
       required: true,
-      message: t('common.formRuleEmpty'),
+      message: () => t('common.formRuleEmpty'),
       trigger: ['blur', 'change'],
     },
     {
       min: 4,
       max: 32,
-      message: t('auth.pwdLength'),
+      message: () => t('auth.pwdLength'),
       trigger: ['blur', 'change'],
     },
     {
       pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
-      message: t('auth.oldPwdReg'),
+      message: () => t('auth.oldPwdReg'),
       trigger: ['blur', 'change'],
     },
     {

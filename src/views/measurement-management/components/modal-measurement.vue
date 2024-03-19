@@ -14,19 +14,19 @@
             remote-show-suffix
             :remote-method="remoteMethod"
             :loading="deviceLoading"
-            style="width: 400px"
+            style="width: 300px"
             @change="handleChangeDevice"
             id="measurement-modal-select-device"
           >
             <el-option v-for="item in deviceList" :key="item" :label="item" :value="item" :id="`measurement-modal-select-device-select-${item}`">
-              <div style="display: flex; width: 360px">
+              <div style="display: flex; width: 260px">
                 <text-tooltip :content="item" />
               </div>
             </el-option>
           </el-select>
           <div v-else class="device-input-group">
-            <el-input :value="`${groupName}.`" disabled class="device-input-prepend" style="width: 144px" id="measurement-modal-input-groupName" />
-            <el-input v-model="formData.deviceName" :placeholder="t('measurement.deviceNameInputPlaceholder')" class="device-input-box" style="width: 256px" id="measurement-modal-input-deviceName" />
+            <el-input :value="`${groupName}.`" disabled class="device-input-prepend" style="width: 130px" id="measurement-modal-input-groupName" />
+            <el-input v-model="formData.deviceName" :placeholder="t('measurement.deviceNameInputPlaceholder')" class="device-input-box" style="width: 170px" id="measurement-modal-input-deviceName" />
           </div>
 
           <div class="device-operate m-l-12">
@@ -59,20 +59,25 @@
               </el-row>
             </template>
             <el-row>
-              <el-col :span="8">
-                <el-form-item :label="`${t('measurement.measurementName')}：`" :prop="`measurementList[${index}].timeseries`" :rules="requiredRules" class="m-r-0">
+              <el-col :span="24">
+                <el-form-item
+                  :label="`${t('measurement.measurementName')}：`"
+                  :prop="`measurementList[${index}].timeseries`"
+                  :rules="requiredRules"
+                  class="m-r-0"
+                  :label-width="locale === 'en' ? '188px' : '83px'"
+                >
                   <el-input type="hidden" />
                   <el-input
                     v-model="item.timeseries"
                     :placeholder="t('measurement.measurementNamePlaceholder')"
                     :disabled="!item.isEditable || !formData.deviceName"
                     :id="`measurement-modal-collapse-${index}-timeseries`"
-                    style="width: 144px"
                   />
                 </el-form-item>
               </el-col>
-              <el-col :span="16">
-                <el-form-item :prop="`measurementList[${index}].description`" label-width="83px">
+              <el-col :span="24">
+                <el-form-item :prop="`measurementList[${index}].description`" class="m-r-0" :label-width="locale === 'en' ? '188px' : '83px'">
                   <template #label>
                     {{ t('measurement.measurementDescription') }}：
                     <el-tooltip effect="light" :content="t('measurement.descriptionTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
@@ -156,7 +161,7 @@ const emit = defineEmits<{
 
 const dialogVisible = useVModel(props, 'visible', emit);
 const activeName = ref('measurement_0');
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { requestFn: getDevice, loading: deviceLoading } = useRequest(StorageApi.getDeviceByGroup);
 const { requestFn: getMeasurementsInfosByFuzzy } = useRequest(StorageApi.getMeasurementsInfosByFuzzy);
 const { requestFn: getIsAlignedDevice } = useRequest(StorageApi.getIsAlignedDevice);
@@ -180,19 +185,19 @@ const formRef = ref<FormInstance>();
 const deviceRules = ref([
   {
     required: true,
-    message: t('measurement.deviceRuleEmptyTip'),
+    message: () => t('measurement.deviceRuleEmptyTip'),
     trigger: ['blur', 'change'],
   },
   {
     pattern: /^`.*`$|^(["'.a-zA-Z0-9_\u4e00-\u9fa5]*)$/,
-    message: t('measurement.deviceRuleTip'),
+    message: () => t('measurement.deviceRuleTip'),
     trigger: 'blur',
   },
 ]);
 const requiredRules = ref([
   {
     required: true,
-    message: t('common.formRuleEmpty'),
+    message: () => t('common.formRuleEmpty'),
     trigger: ['blur', 'change'],
   },
 ]);

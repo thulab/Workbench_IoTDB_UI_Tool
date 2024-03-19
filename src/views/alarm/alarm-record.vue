@@ -2,7 +2,7 @@
   <div class="page-container">
     <div class="search-form-wrapper">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-        <base-form-item :label="`${t('alarm.alarmName')}：`" prop="alarmName">
+        <base-form-item :label="`${t('alarm.alarmName')}：`" prop="alarmName" :label-width="locale === 'en' ? '100px' : '80px'">
           <el-input v-model="searchFormData.alarmName" :placeholder="t('alarm.alarmNamePlaceholder')" style="width: 172px" id="alarm-record-search-name" />
         </base-form-item>
         <base-form-item prop="measurements">
@@ -38,7 +38,7 @@
           </el-select>
         </base-form-item>
         <el-row>
-          <base-form-item :label="`${t('alarm.alarmTime')}：`" prop="createtimerange">
+          <base-form-item :label="`${t('alarm.alarmTime')}：`" prop="createtimerange" :label-width="locale === 'en' ? '100px' : '80px'">
             <el-date-picker
               v-model="searchFormData.createtimerange"
               type="datetimerange"
@@ -66,7 +66,7 @@
         <h4 class="page-table-title">{{ t('alarm.alarmRecord') }}</h4>
         <div class="operate-buttons">
           <el-dropdown class="m-r-12" :disabled="!totalCount" @command="(val) => handleCommandDown(val)" id="alarm-record-download-dropdown">
-            <el-button type="primary" class="export-btn" :disabled="!totalCount" id="alarm-record-download">
+            <el-button type="primary" class="export-button" :disabled="!totalCount" id="alarm-record-download">
               {{ t('common.export') }}
               <el-tooltip effect="light" :content="t('common.exportTipAll')" placement="top" popper-class="tooltip-box-width"><i-custom-question-white /></el-tooltip>
             </el-button>
@@ -108,7 +108,7 @@
           <el-table-column :label="t('alarm.alarmValue')" prop="alarmValue" min-width="160" align="center" show-overflow-tooltip />
           <el-table-column :label="t('alarm.alarmTime')" prop="createTime" sortable="custom" min-width="180" align="center" show-overflow-tooltip />
           <el-table-column :label="t('alarm.alarmDesc')" prop="alarmDesc" min-width="140" align="center" show-overflow-tooltip />
-          <el-table-column :label="t('alarm.whetherConfirm')" width="100" align="center" fixed="right">
+          <el-table-column :label="t('alarm.whetherConfirm')" width="160" align="center" fixed="right">
             <template #default="{ row }">
               <el-button v-if="!row.hasRead" type="primary" link size="small" @click="handleStatus(row)" :id="`alarm-record-table-${row.measurement}-confirm`">{{ t('common.ack') }}</el-button>
               <div v-else class="operate-confirm-box">
@@ -404,12 +404,6 @@ watch(locale, () => {
     line-height: 21px;
     color: #495ad4;
   }
-}
-
-.export-btn svg {
-  position: absolute;
-  right: 6px;
-  top: 3px;
 }
 
 .operate-confirm-box {

@@ -77,6 +77,7 @@ function getFunction(node: Node) {
 .custom-tree-node {
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.5;
 }
 </style>
 <style lang="scss">

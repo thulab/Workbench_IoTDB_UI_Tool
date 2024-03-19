@@ -20,18 +20,18 @@ const errorPwd = defineModel<string>('errorPwd');
 const requiredUserRules = ref([
   {
     required: true,
-    message: t('common.formRuleEmptyOperate'),
+    message: () => t('common.formRuleEmptyOperateShort'),
     trigger: ['blur', 'change'],
   },
   {
     min: 4,
     max: 32,
-    message: t('auth.pwdLength'),
+    message: () => t('auth.pwdLength'),
     trigger: ['blur', 'change'],
   },
   {
     pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
-    message: t('common.errorExg'),
+    message: () => t('common.errorExg'),
     trigger: ['blur', 'change'],
   },
 ]);

@@ -4,8 +4,8 @@
       <h4 class="connection-detail-title">{{ t('connection.detail') }}</h4>
     </div>
     <el-scrollbar v-loading="detailLoading">
-      <el-form ref="formRef" :model="formData" label-position="left" label-width="140px" :key="formKey">
-        <label><input type="password" autocomplete="new-password" hidden ></label>
+      <el-form ref="formRef" :model="formData" label-position="left" :label-width="locale === 'en' ? '190px' : '150px'" :key="formKey">
+        <label><input type="password" autocomplete="new-password" hidden /></label>
         <base-form-item :label="`${t('connection.type')}：`" prop="type" :rules="requiredRules" class="base-form-box">
           <el-radio-group v-model="formData.type" @change="(val) => handleChangeType(val as 0 | 1 | 2)" :disabled="editType !== 'add' || !isShowSave" id="connection-modal-type">
             <el-radio :label="0" id="connection-modal-type-0">{{ t('common.standAlone') }}</el-radio>
@@ -19,7 +19,7 @@
         <!-- 单机版 -->
         <template v-if="formData.type === 0">
           <div class="ip-port-box base-form-box">
-            <span class="form-label">
+            <span class="form-label" :style="{ width: locale === 'en' ? '190px' : '150px' }">
               {{ t('connection.info') }}：
               <el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </span>
@@ -31,7 +31,7 @@
         <!-- 集群版 -->
         <template v-if="formData.type === 1">
           <div class="ip-port-box base-form-box">
-            <span class="form-label">
+            <span class="form-label" :style="{ width: locale === 'en' ? '190px' : '150px' }">
               {{ t('connection.info') }}：
               <el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </span>
@@ -49,7 +49,7 @@
                 <h4 class="connection-cluster-title">{{ t('connection.masterInfo') }}</h4>
               </template>
               <div class="ip-port-box">
-                <span class="form-label">
+                <span class="form-label" :style="{ width: locale === 'en' ? '190px' : '150px' }">
                   {{ t('connection.info') }}：
                   <el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                 </span>
@@ -62,7 +62,7 @@
                 <h4 class="connection-cluster-title">{{ t('connection.slaveInfo') }}</h4>
               </template>
               <div class="ip-port-box">
-                <span class="form-label">
+                <span class="form-label" :style="{ width: locale === 'en' ? '190px' : '150px' }">
                   {{ t('connection.info') }}：
                   <el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                 </span>
@@ -108,7 +108,7 @@ const emit = defineEmits<{
   (event: 'handleRefreshList', val: number): void;
 }>();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
@@ -121,7 +121,7 @@ const formKey = ref(0);
 const requiredRules = ref([
   {
     required: true,
-    message: t('common.formRuleEmptyOperate'),
+    message: () => t('common.formRuleEmptyOperateShort'),
     trigger: ['blur', 'change'],
   },
 ]);
@@ -419,6 +419,12 @@ watch(
   }
 );
 
+watch(locale, () => {
+  nextTick(() => {
+    formRef.value?.clearValidate();
+  });
+});
+
 defineExpose({
   getDetail,
   isCanSave,
@@ -467,7 +473,6 @@ defineExpose({
     flex: 0 0 auto;
     position: relative;
     padding: 0 8px 0 0;
-    width: 140px;
     box-sizing: border-box;
 
     &::before {
@@ -477,7 +482,7 @@ defineExpose({
     }
 
     svg {
-      transform: translate(-60%, -80%);
+      transform: translate(-4px, -80%);
     }
   }
 }

@@ -2,11 +2,11 @@
   <div class="ip-port-list">
     <div class="ip-port-item" v-for="(item, index) in hostAndPortList" :key="`${formKey}-${index}`">
       <base-form-item label="" :prop="`${formKey}[${index}].host`" :rules="requiredRules">
-        <el-input v-model.trim="item.host" :placeholder="t('connection.ipTip')" style="width: 169px" :id="`${formKey}-${index}-host`" :disabled="!isDisabled" />
+        <el-input v-model.trim="item.host" :placeholder="t('connection.ipTip')" style="width: 200px" :id="`${formKey}-${index}-host`" :disabled="!isDisabled" />
       </base-form-item>
       <span class="ip-port-divider">:</span>
       <base-form-item label="" :prop="`${formKey}[${index}].port`" :rules="requiredPortRules">
-        <el-input v-model.number="item.port" :placeholder="t('connection.portTip')" style="width: 100px" :id="`${formKey}-${index}-port`" :disabled="!isDisabled" />
+        <el-input v-model.number="item.port" :placeholder="t('connection.portTip')" :style="{ width: locale === 'en' ? '108px' : '148px' }" :id="`${formKey}-${index}-port`" :disabled="!isDisabled" />
       </base-form-item>
       <template v-if="showOperate">
         <el-button link v-if="index === 0" @click="handleAddHost" :id="`${formKey}-add`" class="m-l-6" :disabled="isDisabledAddHosts || !isDisabled">
@@ -29,13 +29,13 @@ const props = defineProps<{
   showOperate?: boolean;
 }>();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const hostAndPortList = useVModel(props, 'modelValue');
 
 const requiredRules = ref([
   {
     required: true,
-    message: t('common.formRuleEmptyOperate'),
+    message: () => t('common.formRuleEmptyOperateShort'),
     trigger: ['blur', 'change'],
   },
 ]);
@@ -43,7 +43,7 @@ const requiredRules = ref([
 const requiredPortRules = ref([
   {
     required: true,
-    message: t('common.formRuleEmptyOperate'),
+    message: () => t('common.formRuleEmptyOperateShort'),
     trigger: ['blur', 'change'],
   },
   {
@@ -92,7 +92,7 @@ function handleDelHost(index: number) {
   display: flex;
 
   .ip-port-divider {
-    width: 28px;
+    width: 20px;
     text-align: center;
     margin-top: 5px;
   }

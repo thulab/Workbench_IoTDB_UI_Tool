@@ -66,3 +66,9 @@
 
   --el-button-hover-link-text-color: #495ad4 !important;
 }
+
+.export-button {
+  svg {
+    transform: translate(2px, -60%);
+  }
+}

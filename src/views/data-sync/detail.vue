@@ -5,7 +5,7 @@
         <div class="search-form-wrapper">
           <el-form :model="searchFormData" label-position="left" size="default" inline @submit.prevent>
             <base-form-item :label="`${t('dataSync.taskName')}：`" prop="name">
-              <el-input v-model="searchFormData.name" :placeholder="t('dataSync.taskNamePlaceholder')" id="data-sync-search-name">
+              <el-input v-model="searchFormData.name" :placeholder="t('dataSync.taskNamePlaceholder')" id="data-sync-search-name" style="width: 200px">
                 <template #prefix>
                   <i-custom-search-icon class="remote-select-search-icon" />
                 </template>
@@ -32,7 +32,7 @@
               </auth-tooltip>
               <auth-tooltip :is-disabled="canUsePipe">
                 <el-dropdown :disabled="!multipleSelection.length || !canUsePipe" @command="(val) => handleCommandDown(val)" class="m-x-16" id="data-sync-batch-dropdown">
-                  <el-button type="primary" class="export-btn" :disabled="!multipleSelection.length || !canUsePipe" id="data-sync-batch">
+                  <el-button type="primary" class="batch-button" :disabled="!multipleSelection.length || !canUsePipe" id="data-sync-batch">
                     {{ t('common.batchOperation') }}
                     <el-icon class="el-icon--right"><i-ep-arrow-down /></el-icon>
                   </el-button>

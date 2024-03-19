@@ -82,6 +82,7 @@ common:
   searchFormEmpty: This field is required
   formRuleEmptyShort: Please enter the required content
   formRuleEmptyOperate: Please enter content before operating
+  formRuleEmptyOperateShort: This field is required
   chooseFile: Choose File
   fileImport: File Import
   importFile: Import File
@@ -223,7 +224,7 @@ measurement:
   measurementNum: Number of Measurements
   totalNum: Total Data
   measurementList: Measurement List
-  measurementChoose: Choose Measurement
+  measurementChoose: Measurement
   measurementType: Measurement Type
   lastValue: Latest Value
   lastValueTime: Time of Latest Value
@@ -668,7 +669,7 @@ auth:
   relateRole: Related Roles
   rolePlaceholder: Enter role name
   relateUser: Relate Users
-  userPlaceholder: Enter user name
+  userPlaceholder: Enter username
   exactPath: Exact Path
   exactPathPlaceholder: Enter an exact path
   pathMode: Path Mode
@@ -688,8 +689,8 @@ auth:
     special characters (!{'@'}#$%^&*()_+-=)
   roleExist: This role already exists. Please enter another role name
   addUser: Add User
-  userName: User Name
-  userNamePlaceholder: Please enter user name
+  userName: Username
+  userNamePlaceholder: Please enter username
   pwd: Enter password
   pwdPlaceholder: Please enter password
   confirmPwd: Confirm Password
@@ -761,13 +762,13 @@ white:
   addIp: Add to Whitelist
   deleteTip: Are you sure you want to delete?
 login:
-  title: Login with User Name and Password
-  connectionTip: Please select the instance you want to connect to
-  userName: User Name
+  title: Log in
+  connectionTip: Please choose an instance
+  userName: Username
   captchaTip: Enter the verification code
-  login: Login
-  userNameTip: User name cannot be empty
-  userNameLengthTip: User name must be at least 4 characters
+  login: Log in
+  userNameTip: Username cannot be empty
+  userNameLengthTip: Username must be at least 4 characters
   pwdTip: Password cannot be empty
   pwdLengthTip: Password must be at least 4 characters
   captchaEmptyTip: Verification code cannot be empty

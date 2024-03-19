@@ -166,9 +166,7 @@ svg:focus {
   padding: 0 8px 0 0;
 
   svg {
-    position: absolute;
-    top: 0;
-    right: 8px;
+    transform: translate(-4px, -80%);
   }
 }
 

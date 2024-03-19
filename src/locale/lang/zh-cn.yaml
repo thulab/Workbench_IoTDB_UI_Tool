@@ -77,6 +77,7 @@ common:
   searchFormEmpty: 请选择相应内容后进行查看
   formRuleEmptyShort: 请输入相应内容
   formRuleEmptyOperate: 请输入内容后操作
+  formRuleEmptyOperateShort: 请输入内容后操作
   chooseFile: 选择文件
   fileImport: 文件导入
   importFile: 导入文件

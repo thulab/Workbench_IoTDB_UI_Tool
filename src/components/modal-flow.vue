@@ -1398,7 +1398,7 @@ watch(
     .flow-graph-header-title {
       min-width: 70px;
       text-align: center;
-      padding: 0 2px;
+      padding: 0 8px !important;
     }
 
     .flow-graph-header-title {
@@ -1509,7 +1509,7 @@ watch(
     font-weight: 400;
     line-height: 21px;
     color: #424561;
-    width: 84px;
+    width: 110px;
   }
 
   :deep(.el-input-number),
@@ -1520,7 +1520,7 @@ watch(
 }
 
 .connection-detail-wrapper {
-  width: 500px;
+  width: 580px;
   height: 100%;
   border-radius: 6px;
   border-left: 1px solid #dfe1ed;

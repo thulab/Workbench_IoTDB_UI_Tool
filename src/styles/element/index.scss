@@ -16,9 +16,10 @@
   --el-border-color: #dfe1ed;
   --el-text-color-placeholder: #656a85;
   --el-disabled-bg-color: #f7f8fc;
+}
 
-  // --el-disabled-text-color: #131926;
-  // --el-disabled-border-color: #F7F8FC;
+.menu{
+  --el-menu-item-font-size: 12px !important;
 }
 
 ::-webkit-scrollbar-thumb {

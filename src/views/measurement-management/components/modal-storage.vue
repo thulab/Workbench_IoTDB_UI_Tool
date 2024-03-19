@@ -1,7 +1,7 @@
 <template>
   <el-dialog :title="t('measurement.newDataBase')" v-model="dialogVisible" width="480px" class="new-database-container" align-center :close-on-click-modal="false" id="new-database-modal-database">
-    <el-form ref="formRef" :model="formData" :rules="rules" class="source-form m-t-8" label-position="left" label-width="112px">
-      <el-form-item :label="`${t('measurement.databaseName')}:`" prop="groupName">
+    <el-form ref="formRef" :model="formData" :rules="rules" class="source-form m-t-8" label-position="left" :label-width="locale === 'en' ? '170px' : '130px'">
+      <el-form-item :label="`${t('measurement.databaseName')}：`" prop="groupName">
         <el-input type="hidden" />
         <el-input v-model="formData.groupName" :placeholder="t('measurement.databaseNamePlaceholder')" maxlength="59" show-word-limit id="new-database-modal-groupName">
           <template #prepend>root.</template>
@@ -9,14 +9,14 @@
       </el-form-item>
       <el-form-item prop="ttl" class="m-b-6">
         <template #label>
-          <span style="margin-left: 9px">{{ t('measurement.databaseTTL') }}:</span>
+          <span style="margin-left: 9px">{{ t('measurement.databaseTTL') }}：</span>
           <el-tooltip effect="light" :content="t('measurement.databaseTTLTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
         </template>
         <el-input type="hidden" />
         <auth-tooltip :is-disabled="canWriteSchema">
           <el-input v-model="formData.ttl" min="0" max="9007199254740992" :disabled="!canWriteSchema" class="ttl-input" id="new-database-modal-ttl">
             <template #append>
-              <el-select v-model="formData.ttlUnit" style="width: 56px" placeholder="" id="new-database-modal-ttlunit" :disabled="!canWriteSchema">
+              <el-select v-model="formData.ttlUnit" style="width: 80px" placeholder="" id="new-database-modal-ttlunit" :disabled="!canWriteSchema">
                 <el-option :label="t('common.milliSecond')" value="millisecond" id="new-database-modal-ttl-ms" />
                 <el-option :label="t('common.second')" value="second" id="new-database-modal-ttl-s" />
                 <el-option :label="t('common.minute')" value="minute" id="new-database-modal-ttl-m" />
@@ -52,13 +52,13 @@ const emit = defineEmits<{
 }>();
 
 const dialogVisible = useVModel(props, 'visible', emit);
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const formRef = ref<FormInstance>();
 const rules = reactive({
   groupName: [
     {
       required: true,
-      message: t('measurement.databaseNamePlaceholder'),
+      message: () => t('measurement.databaseNamePlaceholder'),
       trigger: 'blur',
     },
     // {
@@ -71,7 +71,7 @@ const rules = reactive({
     {
       required: false,
       pattern: /^[1-9]\d*$/,
-      message: t('measurement.databaseTTLRule'),
+      message: () => t('measurement.databaseTTLRule'),
       trigger: 'blur',
     },
   ],
@@ -127,9 +127,3 @@ watch(
   }
 );
 </script>
-
-<style scoped lang="scss">
-.new-database-container {
-  position: relative;
-}
-</style>

@@ -5,12 +5,12 @@
         <div class="search-form-wrapper">
           <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline @submit.prevent>
             <base-form-item label="" prop="name" style="margin-left: -8px">
-              <el-input v-model="searchFormData.name" :placeholder="searchPlaceholder" style="width: 346px" id="calculate-search-name">
+              <el-input v-model="searchFormData.name" :placeholder="searchPlaceholder()" style="width: 380px" id="calculate-search-name">
                 <template #prefix>
                   <i-custom-search-icon class="remote-select-search-icon" />
                 </template>
                 <template #prepend>
-                  <el-select v-model="searchFormData.type" style="width: 88px" placeholder="" id="calculate-search-type">
+                  <el-select v-model="searchFormData.type" style="width: 150px" placeholder="" id="calculate-search-type">
                     <el-option :label="appType === 1 ? t('calculate.calculateName') : t('calculate.viewName')" value="name" id="calculate-search-type-name" />
                     <el-option :label="t('calculate.resultMeasurement')" value="measurement" id="calculate-search-type-measurement" />
                     <el-option :label="appType === 1 ? t('calculate.calculateDesc') : t('calculate.viewDesc')" value="desc" id="calculate-search-type-desc" />
@@ -59,14 +59,14 @@
                 @selection-change="handleSelectionChange"
               >
                 <el-table-column type="selection" width="55" />
-                <el-table-column :label="appType === 1 ? t('calculate.calculateName') : t('calculate.viewName')" prop="name" min-width="120" align="center" show-overflow-tooltip />
-                <el-table-column :label="appType === 1 ? t('calculate.calculateDesc') : t('calculate.viewDesc')" prop="desc" min-width="160" align="center" show-overflow-tooltip />
-                <el-table-column :label="t('calculate.resultMeasurement')" prop="measurement" width="160" align="center" show-overflow-tooltip>
+                <el-table-column :label="appType === 1 ? t('calculate.calculateName') : t('calculate.viewName')" prop="name" width="160" align="center" show-overflow-tooltip />
+                <el-table-column :label="appType === 1 ? t('calculate.calculateDesc') : t('calculate.viewDesc')" prop="desc" width="180" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('calculate.resultMeasurement')" prop="measurement" width="180" align="center" show-overflow-tooltip>
                   <template #default="{ row }">
                     <span class="measurement-text-button" @click="handleView(row)">{{ row.measurement }}</span>
                   </template>
                 </el-table-column>
-                <el-table-column :label="t('calculate.expression')" prop="expression" min-width="80" align="center" show-overflow-tooltip>
+                <el-table-column :label="t('calculate.expression')" prop="expression" min-width="120" align="center" show-overflow-tooltip>
                   <template #default="{ row }">
                     <el-button type="primary" link size="small" @click="handleExpression(row)">{{ t('common.detail') }}</el-button>
                   </template>
@@ -153,8 +153,17 @@ const editVisible = ref(false);
 const editData = ref();
 const expressionVisible = ref(false);
 const editExpression = ref('');
-const searchPlaceholder = computed(() => (searchFormData.type === 'name' ? t('calculate.namePlaceholder') : t('calculate.descPlaceholder')));
 const canAllWriteSchema = computed(() => userAllPrivileges.value.includes('WRITE_SCHEMA'));
+
+function searchPlaceholder() {
+  if (searchFormData.type === 'name') {
+    return t('calculate.namePlaceholder');
+  }
+  if (searchFormData.type === 'measurement') {
+    return t('measurement.measurementNamePlaceholder');
+  }
+  return t('calculate.descPlaceholder');
+}
 
 function rowCanWriteSchemaByPath(path: string) {
   if (userAllEntityPrivileges.value.includes('WRITE_SCHEMA')) return true;

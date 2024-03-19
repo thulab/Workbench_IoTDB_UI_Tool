@@ -10,8 +10,8 @@
           id="trend-modal-select-path"
           ref="timeseriesSelectSingleRef"
           v-model="formData.path"
-          :selectWidth="363"
-          :itemWidth="320"
+          :selectWidth="280"
+          :itemWidth="240"
           class="path-select"
           :key="dialogKey"
           :disabled-path="(item) => item.dataType === 'TEXT' || pathList.includes(item.timeseries)"
@@ -62,7 +62,7 @@ const formData = reactive<Trend.LineObj>({
 const requiredRules = ref([
   {
     required: true,
-    message: t('common.formRuleEmpty'),
+    message: () => t('common.formRuleEmpty'),
     trigger: ['blur', 'change'],
   },
 ]);

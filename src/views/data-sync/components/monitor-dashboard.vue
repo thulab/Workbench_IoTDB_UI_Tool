@@ -497,8 +497,9 @@ onUnmounted(() => {
 
   .monitor-dashboard-close-btn,
   .monitor-dashboard-header-title {
-    width: 75px;
+    min-width: 75px;
     text-align: center;
+    padding: 0 6px !important;
   }
 
   .monitor-dashboard-header-title {

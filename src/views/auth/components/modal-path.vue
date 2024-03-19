@@ -11,8 +11,8 @@
             id="auth-path-modal-select-path"
             ref="timeseriesSelectSingleRef"
             v-model="selectPath"
-            :selectWidth="466"
-            :itemWidth="400"
+            :selectWidth="400"
+            :itemWidth="360"
             :is-clearable="true"
             class="path-select"
             :filter-system="true"
@@ -26,7 +26,7 @@
           {{ t('auth.pathMode') }}：
           <el-tooltip effect="light" :content="t('auth.pathModeTip')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
         </span>
-        <el-input v-model="inputPath" :placeholder="t('auth.pathModePlaceholder')" style="width: 466px" class="path-input" id="auth-path-modal-input-path">
+        <el-input v-model="inputPath" :placeholder="t('auth.pathModePlaceholder')" style="width: 400px" class="path-input" id="auth-path-modal-input-path">
           <!-- <template #prepend>root.</template> -->
         </el-input>
       </el-radio>
@@ -107,15 +107,9 @@ watch(
 <style lang="scss" scoped>
 .radio-label {
   position: relative;
-  width: 80px;
+  width: 96px;
   display: inline-flex;
   text-align: left;
-
-  svg {
-    position: absolute;
-    top: -6px;
-    right: 12px;
-  }
 }
 
 .search-path-box {

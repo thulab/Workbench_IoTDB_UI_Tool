@@ -2,7 +2,7 @@
   <el-container class="data-trend-wrapper">
     <el-header class="p-0" style="height: auto">
       <div class="search-form-wrapper">
-        <el-form :model="searchFormData" ref="searchFormRef" label-position="left" label-width="88px" size="default" inline class="m-b-22">
+        <el-form :model="searchFormData" ref="searchFormRef" label-position="left" :label-width="locale === 'en' ? '' : '88px'" size="default" inline>
           <ul class="search-data-list">
             <li :class="['search-data-type', { 'search-data-active': dataTab === 'running' }]" id="search-data-type-running" @click="handleTrendTab('running')">{{ t('dataTrend.realTrend') }}</li>
             <li :class="['search-data-type', { 'search-data-active': dataTab === 'history' }]" id="search-data-type-history" @click="handleTrendTab('history')">{{ t('dataTrend.historyTrend') }}</li>
@@ -22,7 +22,7 @@
             />
           </base-form-item>
           <base-form-item v-show="!isRunningTab" :label="`${t('search.timeInterval')}：`" prop="unitInterval" :rules="requiredRules">
-            <el-select v-model="searchFormData.unitInterval" :disabled="isRunningTab" style="width: 80px" id="trend-search-unitInterval">
+            <el-select v-model="searchFormData.unitInterval" :disabled="isRunningTab" style="width: 100px" id="trend-search-unitInterval">
               <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" :id="`trend-search-unitInterval-select-${item.value}`" />
             </el-select>
           </base-form-item>
@@ -30,7 +30,7 @@
             <el-select
               v-model="searchFormData.aggregation"
               :disabled="isRunningTab || searchFormData.unitInterval === 'origin'"
-              style="width: 80px"
+              style="width: 120px"
               @change="handleChangeAggregation"
               id="trend-search-aggregation"
             >
@@ -172,7 +172,7 @@ interface PointData {
   checked: boolean;
 }
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
 const userName = computed(() => userStore.userInfo.name);
@@ -206,7 +206,7 @@ const shortcutsDaterange = [
   },
 ];
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
-const timeUnits = [
+const timeUnits = computed(() => [
   { label: t('common.auto'), value: 'auto', timestamp: 1000 },
   { label: t('common.origin'), value: 'origin', timestamp: 1000 },
   { label: '1s', value: '1s', timestamp: 1000 },
@@ -219,17 +219,17 @@ const timeUnits = [
   { label: '1d', value: '1d', timestamp: 86400000 },
   { label: '1w', value: '1w', timestamp: 604800000 },
   { label: '1m', value: '1mo', timestamp: 2592000000 },
-];
-const aggregateFunctions = [
+]);
+const aggregateFunctions = computed(() => [
   { label: t('common.lastValue'), value: 'last_value' },
   { label: t('common.maxValue'), value: 'max_value' },
   { label: t('common.minValue'), value: 'min_value' },
   { label: t('common.avg'), value: 'avg' },
-];
+]);
 const requiredRules = ref([
   {
     required: true,
-    message: t('common.formRuleEmpty'),
+    message: () => t('common.formRuleEmpty'),
     trigger: ['change'],
   },
 ]);
@@ -882,17 +882,18 @@ onUnmounted(() => {
   :deep(.el-form) {
     display: flex;
     align-items: center;
-    height: 30px;
+    // height: 30px;
+    flex-wrap: wrap;
   }
 
   :deep(.el-form-item--default) {
-    margin: 0 24px 0 0;
+    margin: 0 24px 18px 0;
   }
 }
 
 .search-data-list {
   display: inline-flex;
-  margin-right: 24px;
+  margin: 0 24px 18px 0;
   border-radius: 12px;
   background-color: #f0f1fa;
   padding: 4px;

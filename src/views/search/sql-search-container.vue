@@ -112,7 +112,7 @@ const sqlListRef = ref<InstanceType<typeof SideTemplate>>();
 const saveFormRef = ref<FormInstance>();
 const resaveFormRef = ref<FormInstance>();
 const saveFormRules = reactive({
-  sqlName: [{ required: true, message: t('search.nameRuleTip'), trigger: 'blur' }],
+  sqlName: [{ required: true, message: () => t('search.nameRuleTip'), trigger: 'blur' }],
 });
 const saveForm = reactive<{
   sqlName: string;
@@ -387,7 +387,7 @@ watch(activiteSql, (newVal, oldVal) => {
 }
 
 .sql-search-wrapper {
-  width: calc(100% - 256px);
+  width: calc(100% - 316px);
   height: 100%;
   background-color: #fff;
   border-radius: 6px;
@@ -449,7 +449,7 @@ watch(activiteSql, (newVal, oldVal) => {
 }
 
 .sql-search-aside {
-  width: 240px;
+  width: 300px;
   position: absolute;
   top: 0;
   right: 0;
@@ -479,7 +479,7 @@ watch(activiteSql, (newVal, oldVal) => {
 }
 
 .tabs-nav-aside {
-  width: 207px;
+  // width: 207px;
 
   :deep(.el-tabs__header) {
     background: #fff;
@@ -488,7 +488,7 @@ watch(activiteSql, (newVal, oldVal) => {
 
   :deep(.el-tabs__item) {
     padding: 0 !important;
-    width: 69px;
+    width: 89px;
   }
 
   :deep(.el-tabs__active-bar) {

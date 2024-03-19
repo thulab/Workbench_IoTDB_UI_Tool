@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ['stylelint-config-standard-scss', 'stylelint-config-recommended-vue/scss', './node_modules/prettier-stylelint/config.js'],
+  extends: ['stylelint-config-standard-scss', 'stylelint-config-recommended-vue/scss'],
   rules: {
     'selector-pseudo-element-no-unknown': null,
     'selector-pseudo-class-no-unknown': [

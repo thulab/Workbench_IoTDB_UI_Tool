@@ -1,5 +1,5 @@
 <template>
-  <div class="menu" :style="{ width: isCollapse ? '40px' : '216px' }">
+  <div class="menu" :style="{ width: isCollapse ? '40px' : '260px' }">
     <div class="logo flex-align-center" :style="{ paddingLeft: isCollapse ? '6px' : '14px' }" id="layout-menu-logo" @click="handleDashboard">
       <el-icon alt="logo" v-if="isCollapse"><i-custom-logo /></el-icon>
       <el-icon class="title" v-if="!isCollapse"><i-custom-timecho-logo-white /></el-icon>
@@ -268,7 +268,7 @@ watch(locale, () => {
 
     .connection-info {
       margin: 0 0 0 8px;
-      font-size: 14px;
+      font-size: 12px;
       line-height: 21px;
       color: #131926;
       flex: 1;

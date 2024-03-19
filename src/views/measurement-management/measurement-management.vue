@@ -29,9 +29,9 @@
             <template v-else>
               <span v-if="!editTTL">{{ storageInfos?.ttl ? storageInfos.ttl + getTtlTimeUnit(storageInfos.ttlUnit, ttlUnitOptions) : '∞' }}</span>
               <div v-if="currentStorage && editTTL" class="edit-ttl-box">
-                <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" style="width: 120px" id="mesaurement-edit-ttl">
+                <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" style="width: 160px" id="mesaurement-edit-ttl">
                   <template #append>
-                    <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder=" " style="width: 50px" id="mesaurement-edit-ttlunit">
+                    <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder=" " style="width: 80px" id="mesaurement-edit-ttlunit">
                       <el-option :label="t('common.milliSecond')" value="millisecond" id="mesaurement-ttl-ms" />
                       <el-option :label="t('common.second')" value="second" id="mesaurement-ttl-s" />
                       <el-option :label="t('common.minute')" value="minute" id="mesaurement-ttl-m" />
@@ -81,12 +81,12 @@
       <h4 class="storage-info-title">{{ t('measurement.measurementList') }}</h4>
       <div class="search-form-wrapper">
         <div class="search-form-box">
-          <el-input v-model="searchKeyword" :placeholder="searchPlaceholder" @keyup.enter="handleRefresh" id="mesaurement-search">
+          <el-input v-model="searchKeyword" :placeholder="searchPlaceholder" @keyup.enter="handleRefresh" id="mesaurement-search" style="width: 340px">
             <template #prefix>
               <i-custom-search-icon class="remote-select-search-icon" @click="handleRefresh" />
             </template>
             <template #prepend>
-              <el-select v-model="searchType" style="width: 88px" placeholder="" id="measurement-search-type">
+              <el-select v-model="searchType" style="width: 160px" placeholder="" id="measurement-search-type">
                 <el-option :label="t('measurement.measurementName')" value="name" id="measurement-search-type-name" />
                 <el-option :label="t('measurement.measurementDescription')" value="description" id="measurement-search-type-description" />
               </el-select>
@@ -107,7 +107,7 @@
           </auth-tooltip>
           <auth-tooltip :is-disabled="canReadWriteSchema">
             <el-dropdown class="m-x-16" :disabled="!currentStorage || !(totalCount > 0) || !canReadWriteSchema" @command="(val) => handleCommandDown(val)" id="mesaurement-download-dropdown">
-              <el-button class="export-btn" :disabled="!currentStorage || !(totalCount > 0) || !canReadWriteSchema" id="mesaurement-download">
+              <el-button class="export-button" :disabled="!currentStorage || !(totalCount > 0) || !canReadWriteSchema" id="mesaurement-download">
                 {{ t('common.export') }}
                 <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
               </el-button>
@@ -145,7 +145,7 @@
             <el-table-column type="selection" width="55" :selectable="isSelectabled" />
             <el-table-column :label="t('measurement.deviceName')" prop="deviceName" min-width="200" align="center" show-overflow-tooltip />
             <el-table-column :label="t('measurement.measurementName')" prop="timeseries" width="160" align="center" show-overflow-tooltip />
-            <el-table-column :label="t('measurement.measurementDescription')" prop="alias" width="160" align="center">
+            <el-table-column :label="t('measurement.measurementDescription')" prop="alias" width="200" align="center">
               <template #default="{ row }">
                 <div class="row-description-box">
                   <div class="row-description-text">
@@ -159,7 +159,7 @@
               </template>
             </el-table-column>
             <el-table-column :label="t('measurement.dataType')" prop="dataType" width="140" align="center" show-overflow-tooltip />
-            <el-table-column :label="t('measurement.measurementType')" prop="viewType" width="140" align="center" show-overflow-tooltip>
+            <el-table-column :label="t('measurement.measurementType')" prop="viewType" width="200" align="center" show-overflow-tooltip>
               <template #default="{ row }">
                 {{ row.viewType === 'VIEW' ? `${pageText}` : t('measurement.baseMeasurement') }}
               </template>
@@ -168,7 +168,7 @@
             <el-table-column :label="t('measurement.compression')" prop="compression" min-width="140" align="center" show-overflow-tooltip />
             <el-table-column :label="t('measurement.lastValue')" prop="value" min-width="140" align="center" show-overflow-tooltip />
             <el-table-column :label="t('measurement.lastValueTime')" prop="valueTime" min-width="200" align="center" show-overflow-tooltip />
-            <el-table-column :label="t('common.operation')" width="180" align="center" fixed="right">
+            <el-table-column :label="t('common.operation')" width="240" align="center" fixed="right">
               <template #default="{ row }">
                 <el-button type="primary" link size="small" @click="handleRowData(row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-data`">{{ t('page.data') }}</el-button>
                 <el-button
@@ -693,7 +693,7 @@ watch(
   }
 
   .storage-info-item-ttl {
-    width: 380px;
+    width: 480px;
   }
 }
 
@@ -714,30 +714,6 @@ watch(
   .search-form-box {
     display: flex;
     align-items: center;
-
-    .search-from-label {
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 22px;
-      color: #131926;
-      flex: 0 0 80px;
-    }
-  }
-
-  .search-form-buttons {
-    // align-self: flex-end;
-    // margin-bottom: 18px;
-    // flex: 0 0 180px;
-
-    .export-btn {
-      position: relative;
-
-      .export-tip {
-        position: absolute;
-        right: 6px;
-        top: 2px;
-      }
-    }
   }
 }
 

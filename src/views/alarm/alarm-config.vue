@@ -2,7 +2,7 @@
   <div class="page-container">
     <div class="search-form-wrapper">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-        <base-form-item :label="`${t('alarm.alarmName')}：`" prop="alarmName">
+        <base-form-item :label="`${t('alarm.alarmName')}：`" prop="alarmName" :label-width="locale === 'en' ? '110px' : '80px'">
           <el-input v-model="searchFormData.alarmName" :placeholder="t('alarm.alarmNamePlaceholder')" style="width: 172px" id="alarm-config-search-name" />
         </base-form-item>
         <base-form-item prop="measurements">
@@ -43,7 +43,7 @@
           </el-select>
         </base-form-item>
         <el-row>
-          <base-form-item :label="`${t('common.createTime')}：`" prop="createtimerange">
+          <base-form-item :label="`${t('common.createTime')}：`" prop="createtimerange" :label-width="locale === 'en' ? '110px' : '80px'">
             <el-date-picker
               v-model="searchFormData.createtimerange"
               type="datetimerange"
@@ -109,7 +109,7 @@
             <el-table-column type="selection" width="55" />
             <el-table-column :label="t('alarm.alarmMeasurement')" prop="measurement" min-width="200" align="center" show-overflow-tooltip />
             <el-table-column :label="t('alarm.alarmName')" prop="alarmName" min-width="160" align="center" show-overflow-tooltip />
-            <el-table-column :label="t('alarm.alarmLevel')" prop="alarmLevel" sortable="custom" width="120" align="center">
+            <el-table-column :label="t('alarm.alarmLevel')" prop="alarmLevel" sortable="custom" width="150" align="center">
               <template #default="{ row }">
                 <span v-if="row.alarmLevel" style="display: flex; align-items: center; justify-content: center; margin-left: -20px">
                   <el-icon size="20" :style="{ color: getLevelColor(row) }"><i-custom-alarm-level /></el-icon>
@@ -119,7 +119,7 @@
             </el-table-column>
             <el-table-column :label="t('common.createTime')" prop="createTime" sortable="custom" min-width="180" align="center" show-overflow-tooltip />
             <el-table-column :label="t('common.updateTime')" prop="updateTime" sortable="custom" min-width="180" align="center" show-overflow-tooltip />
-            <el-table-column :label="t('alarm.alarmDesc')" prop="alarmDesc" min-width="140" align="center" show-overflow-tooltip />
+            <el-table-column :label="t('alarm.alarmDesc')" prop="alarmDesc" min-width="160" align="center" show-overflow-tooltip />
             <el-table-column :label="t('alarm.alarmRules')" prop="alarmRules" min-width="160" align="center" show-overflow-tooltip />
             <el-table-column :label="t('common.status')" prop="status" min-width="90" align="center" show-overflow-tooltip>
               <template #default="{ row }">

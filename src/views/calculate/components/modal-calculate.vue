@@ -7,7 +7,7 @@
     :close-on-click-modal="false"
     id="calculate-modal"
   >
-    <el-form ref="formRef" :model="formData" class="source-form" label-position="left">
+    <el-form ref="formRef" :model="formData" class="source-form" label-position="left" :label-width="locale === 'en' ? '184px' : '110px'">
       <base-form-item :label="`${appType === 1 ? t('calculate.calculateName') : t('calculate.viewName')}：`" prop="name" :rules="requiredRules" class="form-label-width">
         <el-input
           v-model="formData.name"
@@ -114,7 +114,7 @@ const emit = defineEmits<{
   (event: 'handleSave'): void;
 }>();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const appType = Number(import.meta.env.VITE_APP_TYPE);
 const dialogVisible = useVModel(props, 'visible', emit);
 const formRef = ref<FormInstance>();
@@ -126,7 +126,7 @@ const activeNameSide = ref('data');
 const requiredRules = ref([
   {
     required: true,
-    message: t('common.formRuleEmpty'),
+    message: () => t('common.formRuleEmpty'),
     trigger: ['blur', 'change'],
   },
 ]);
@@ -235,16 +235,6 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-.form-label-width {
-  :deep(.el-form-item__label) {
-    width: 90px;
-
-    svg {
-      right: 10px;
-    }
-  }
-}
-
 .form-label-normal {
   :deep(.el-form-item__label) {
     padding-left: 9px;
@@ -274,10 +264,6 @@ watch(
   :deep(.el-form-item__label) {
     justify-content: flex-start;
     width: fit-content;
-
-    svg {
-      right: 10px;
-    }
   }
 }
 

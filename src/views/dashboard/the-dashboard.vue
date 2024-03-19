@@ -26,7 +26,7 @@
                 <span class="module-label-text">{{ t('dashboard.isActive') }}：</span>
                 <span class="module-content-text" :style="{ color: systemData.active ? '#44C795' : '#D43030' }">{{ systemData.active ? t('common.yes') : t('common.no') }}</span>
                 <el-button
-                  v-if="connectionIsActive && showVersionCol1312"
+                  v-if="systemData.active && showVersionCol1312"
                   type="primary"
                   link
                   class="m-l-8"
@@ -108,7 +108,7 @@
                 <span class="module-label-text">{{ t('dashboard.isActive') }}：</span>
                 <span class="module-content-text" :style="{ color: slaveData.active ? '#44C795' : '#D43030' }">{{ slaveData.active ? t('common.yes') : t('common.no') }}</span>
                 <el-button
-                  v-if="connectionIsActive && showVersionCol1312"
+                  v-if="slaveData.active && showVersionCol1312"
                   type="primary"
                   link
                   class="m-l-8"
@@ -301,7 +301,6 @@ const nodeList = computed(() => {
 });
 
 const showVersionCol = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.2.1'));
-const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
 const showVersionCol1312 = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.1.2'));
 
 const { requestFn: getSystemInfo, loading } = useRequest(DashboardApi.getSystemInfo);
@@ -526,7 +525,7 @@ onUnmounted(() => {
   .system-info-item {
     display: flex;
     align-items: center;
-    margin: 12px 24px 12px 0;
+    margin: 6px 24px 6px 0;
 
     &:last-child {
       margin: 8px 0;
