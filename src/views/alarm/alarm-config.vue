@@ -1,6 +1,6 @@
 <template>
-  <div class="page-container">
-    <div class="search-form-wrapper">
+  <el-container class="page-container">
+    <el-header class="search-form-wrapper p-0" style="height: auto">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
         <base-form-item :label="`${t('alarm.alarmName')}：`" prop="alarmName" :label-width="locale === 'en' ? '110px' : '80px'">
           <el-input v-model="searchFormData.alarmName" :placeholder="t('alarm.alarmNamePlaceholder')" style="width: 172px" id="alarm-config-search-name" />
@@ -77,9 +77,9 @@
           </div>
         </el-row>
       </el-form>
-    </div>
+    </el-header>
 
-    <div class="page-table-details">
+    <el-main class="page-table-details">
       <div class="page-table-title-box">
         <h4 class="page-table-title">{{ t('alarm.alarmConfig') }}</h4>
         <div class="operate-buttons">
@@ -169,10 +169,10 @@
           />
         </div>
       </auth-container>
-    </div>
+    </el-main>
 
     <modal-config v-model:visible="editVisible" :alarm-config-id="alarmConfigId" :edit-type="editType" @handleSave="handleSaveConfig" />
-  </div>
+  </el-container>
 </template>
 
 <script setup lang="ts">

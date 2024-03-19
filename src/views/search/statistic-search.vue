@@ -1,6 +1,6 @@
 <template>
-  <div class="page-container">
-    <div class="search-form-wrapper">
+  <el-container class="page-container">
+    <el-header class="search-form-wrapper p-0" style="height: auto">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" :label-width="locale === 'en' ? '116px' : '88px'" size="default" inline :disabled="getListLoading">
         <base-form-item prop="path" class="m-r-30">
           <template #label>
@@ -33,9 +33,9 @@
           </el-button>
         </auth-tooltip>
       </div>
-    </div>
+    </el-header>
 
-    <div class="page-table-details">
+    <el-main class="page-table-details">
       <div class="page-info-box">
         <h4 class="page-info-title">{{ t('common.searchDetail') }}</h4>
         <div class="page-detail-buttons">
@@ -100,8 +100,8 @@
           @current-change="onChangePage"
         />
       </auth-container>
-    </div>
-  </div>
+    </el-main>
+  </el-container>
 </template>
 
 <script setup lang="ts">
@@ -287,21 +287,9 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.page-container {
-  display: flex;
-  flex-direction: column;
-
-  .el-button:focus-visible {
-    outline: none;
-  }
-}
-
 .search-form-wrapper {
   display: flex;
   justify-content: space-between;
-  flex-wrap: wrap;
-  width: 100%;
-  padding: 0;
 
   .search-form-buttons {
     display: flex;

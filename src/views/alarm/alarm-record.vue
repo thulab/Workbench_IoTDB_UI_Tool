@@ -1,6 +1,6 @@
 <template>
-  <div class="page-container">
-    <div class="search-form-wrapper">
+  <el-container class="page-container">
+    <el-header class="search-form-wrapper p-0" style="height: auto">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
         <base-form-item :label="`${t('alarm.alarmName')}：`" prop="alarmName" :label-width="locale === 'en' ? '100px' : '80px'">
           <el-input v-model="searchFormData.alarmName" :placeholder="t('alarm.alarmNamePlaceholder')" style="width: 172px" id="alarm-record-search-name" />
@@ -59,9 +59,9 @@
           </div>
         </el-row>
       </el-form>
-    </div>
+    </el-header>
 
-    <div class="page-table-details">
+    <el-main class="page-table-details">
       <div class="page-table-title-box">
         <h4 class="page-table-title">{{ t('alarm.alarmRecord') }}</h4>
         <div class="operate-buttons">
@@ -139,8 +139,8 @@
           @current-change="onChangePage"
         />
       </div>
-    </div>
-  </div>
+    </el-main>
+  </el-container>
 </template>
 
 <script setup lang="ts">
@@ -159,7 +159,7 @@ const { t, locale } = useI18n();
 const { maxTableHeight } = useTableHeight(320);
 const searchFormRef = ref<FormInstance>();
 const tableRef = ref<InstanceType<typeof ElTable>>();
-const levelOptions = [{ name: t('common.all'), value: '', paramMap: { color: '#424561', icon: '' } }, ...enumStore.alarmLevelEnum];
+const levelOptions = computed(() => [{ name: t('common.all'), value: '', paramMap: { color: '#424561', icon: '' } }, ...enumStore.alarmLevelEnum]);
 const searchFormData = reactive({
   orderBy: '',
   asc: '',

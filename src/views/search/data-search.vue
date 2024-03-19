@@ -1,6 +1,6 @@
 <template>
-  <div class="page-container">
-    <div class="search-form-wrapper">
+  <el-container class="page-container">
+    <el-header class="search-form-wrapper p-0" style="height: auto">
       <el-form :model="searchFormData" style="flex: 1" ref="searchFormRef" label-position="left" :label-width="locale === 'en' ? '156px' : '88px'" size="default" inline>
         <el-row>
           <base-form-item prop="path" class="m-r-20">
@@ -80,9 +80,9 @@
           </el-form-item>
         </el-row>
       </el-form>
-    </div>
+    </el-header>
 
-    <div class="page-table-details">
+    <el-main class="page-table-details">
       <div class="page-info-box">
         <!-- <ul class="run-result-list">
           <li class="run-result-item">
@@ -178,10 +178,10 @@
           <div class="table-error-wrapper" v-if="searchDetailInfos.errMsg">Msg: {{ searchDetailInfos.errMsg }}</div>
         </div>
       </auth-container>
-    </div>
+    </el-main>
 
     <modal-import v-model:visible="importVisible" @handle-close="handleImportClose" />
-  </div>
+  </el-container>
 </template>
 
 <script setup lang="ts">
@@ -206,19 +206,19 @@ const { maxTableHeight } = useTableHeight(330);
 
 const searchFormRef = ref<FormInstance>();
 const firstLoad = ref(true);
-const timeUnits = [
+const timeUnits = computed(() => [
   { label: t('common.milliSecond'), value: 'ms' },
   { label: t('common.second'), value: 's' },
   { label: t('common.minuteAll'), value: 'm' },
   { label: t('common.hour'), value: 'h' },
   { label: t('common.day'), value: 'd' },
-];
-const aggregateFunctions = [
+]);
+const aggregateFunctions = computed(() => [
   { label: t('common.lastValue'), value: 'last_value' },
   { label: t('common.avg'), value: 'avg' },
   { label: t('common.maxValue'), value: 'max_value' },
   { label: t('common.minValue'), value: 'min_value' },
-];
+]);
 
 const currentQueryTime = ref('');
 const timeType = ref('datetimerange');

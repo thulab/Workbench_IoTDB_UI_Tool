@@ -191,17 +191,17 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 
-const lineTypeList = [
+const lineTypeList = computed(() => [
   { name: t('flow.lineNormal'), value: 'normal' },
   { name: t('flow.lineRounded'), value: 'rounded' },
   { name: t('flow.lineDashed'), value: 'dashed' },
-];
+]);
 
-const arrowTypeList = [
+const arrowTypeList = computed(() => [
   { name: t('flow.arrowBlock'), value: 'block' },
   { name: t('flow.arrowClassic'), value: 'classic' },
   { name: t('flow.arrowDiamond'), value: 'diamond' },
-];
+]);
 
 const TeleportContainer = getTeleport();
 const dialogVisible = useVModel(props, 'visible', emit);

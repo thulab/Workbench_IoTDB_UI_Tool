@@ -4,14 +4,14 @@
       <template #default="{ node, data }">
         <span class="custom-tree-node">
           <el-tooltip class="item" effect="light" :disabled="node.level === 1" :content="data.label" placement="top" trigger="hover" :show-after="300">
-            <span style="color: #131926; font-weight: 300" @dblclick="getFunction(node)">{{ node.level === 1 ? node.label : data.value }}</span>
+            <span style="color: #131926; font-weight: 300" @dblclick="getFunction(node)">{{ node.level === 1 ? t(node.label) : data.value }}</span>
             <template #content>
               <div style="width: 200px">
                 <p style="color: #131926; font-weight: 300">
                   {{ data.value }}
                 </p>
                 <p style="color: #131926; font-weight: 300">
-                  {{ data.label }}
+                  {{ t(data.label) }}
                 </p>
               </div>
             </template>
@@ -29,7 +29,7 @@ import { functionTreeData } from '@/constants';
 
 const treeRef = ref<InstanceType<typeof ElTree> | null>(null);
 const emit = defineEmits(['get-function']);
-
+const { t } = useI18n();
 const data = functionTreeData;
 const filterText = ref('');
 const tree = ref();
