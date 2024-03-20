@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="editType === 'add' ? t('dataSync.newTask') : t('dataSync.taskDetail')" v-model="dialogVisible" width="800px" align-center :close-on-click-modal="false" id="data-sync-modal">
+  <el-dialog :title="editType === 'add' ? t('dataSync.newTask') : t('dataSync.taskDetail')" v-model="dialogVisible" width="830px" align-center :close-on-click-modal="false" id="data-sync-modal">
     <div class="form-wrapper" v-loading="loading">
       <!-- <span class="tabs-tip"><el-icon size="14" style="margin-right: 2px;"><i-custom-info-warning /></el-icon>最终提交信息为您提交时所在的页签内容</span> -->
       <!-- <el-tabs type="card" v-model="activeTab" @tab-click="handleTabClick">
@@ -626,7 +626,7 @@ const handleConfirm = () => {
     });
   } else {
     if (!taskInputVal.value || !taskInputVal.value.trim()) {
-      ElMessage.error(t('common.formRuleEmpty'));
+      ElMessage.error(t('common.formRuleEmptyOperateShort'));
       return;
     }
     saveAdvancedTask(taskInputVal.value)

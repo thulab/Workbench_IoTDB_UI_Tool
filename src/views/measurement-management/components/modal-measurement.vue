@@ -197,7 +197,7 @@ const deviceRules = ref([
 const requiredRules = ref([
   {
     required: true,
-    message: () => t('common.formRuleEmpty'),
+    message: () => t('common.formRuleEmptyOperateShort'),
     trigger: ['blur', 'change'],
   },
 ]);
@@ -406,7 +406,7 @@ const handleConfirm = () => {
           }
         });
     } else {
-      ElMessage.error(t('common.formRuleEmptyShort'));
+      ElMessage.error(t('common.formRuleEmptyOperateShort'));
     }
   });
 };

@@ -126,7 +126,7 @@ const activeNameSide = ref('data');
 const requiredRules = ref([
   {
     required: true,
-    message: () => t('common.formRuleEmpty'),
+    message: () => t('common.formRuleEmptyOperateShort'),
     trigger: ['blur', 'change'],
   },
 ]);
@@ -136,7 +136,7 @@ const requiredExpressionRules = ref([
     required: true,
     validator: (rule: any, value: any, callback: any) => {
       if (!value || !value.trim()) {
-        return callback(new Error(t('common.formRuleEmpty')));
+        return callback(new Error(t('common.formRuleEmptyOperateShort')));
       }
       return callback();
     },

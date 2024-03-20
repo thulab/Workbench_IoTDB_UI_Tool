@@ -78,10 +78,7 @@ common:
   changeSuccess: Change Successful
   deleteSuccess: Deletion Successful
   statusSuccess: Status Update Successful
-  formRuleEmpty: Please enter the required content before proceeding
   searchFormEmpty: This field is required
-  formRuleEmptyShort: Please enter the required content
-  formRuleEmptyOperate: Please enter content before operating
   formRuleEmptyOperateShort: This field is required
   chooseFile: Choose File
   fileImport: File Import
@@ -643,7 +640,7 @@ alarm:
   frequency: Alarm frequency
   alarmIntro: Alarm description
   alarmIntroPlaceholder: Please enter the alarm description
-  booleanRule: Please Please enter the alarm rule value
+  booleanRule: Please enter the alarm rule value
   numberRule: Alarm rule value must be numeric
   numberOverRule: Alarm rule value exceeds the maximum range, please modify it
   intRule: Only positive integers or 0 are allowed
@@ -759,6 +756,7 @@ white:
   ipTip: All IPs are allowed to connect in the current state. Please be careful
   ip: IP Address
   ipPlaceholder: Enter IP address
+  ipRuleTip: The IP address input rule is incorrect, please re-enter
   addIp: Add to Whitelist
   deleteTip: Are you sure you want to delete?
 login:

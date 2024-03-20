@@ -592,14 +592,13 @@ watch(locale, () => {
       align-self: flex-end;
       margin: 0 0 0 12px;
       display: flex;
-      align-items: center;
       font-size: 12px;
       color: #808080;
       font-weight: 400;
 
       svg {
         color: #ccc;
-        margin-right: 4px;
+        margin: 2px 4px 0 0;
       }
     }
   }

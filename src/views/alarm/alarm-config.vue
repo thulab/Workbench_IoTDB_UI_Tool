@@ -37,12 +37,12 @@
             </el-option>
           </el-select>
         </base-form-item>
-        <base-form-item :label="`${t('common.status')}：`" prop="status" class="m-r-0">
-          <el-select v-model="searchFormData.status" style="width: 80px" id="alarm-config-search-status">
-            <el-option v-for="item in statusOptions" :key="item.value" :value="item.value" :label="item.label" :id="`alarm-config-search-status-select-${item.value}`" />
-          </el-select>
-        </base-form-item>
         <el-row>
+          <base-form-item :label="`${t('common.status')}：`" prop="status">
+            <el-select v-model="searchFormData.status" style="width: 80px" id="alarm-config-search-status">
+              <el-option v-for="item in statusOptions" :key="item.value" :value="item.value" :label="item.label" :id="`alarm-config-search-status-select-${item.value}`" />
+            </el-select>
+          </base-form-item>
           <base-form-item :label="`${t('common.createTime')}：`" prop="createtimerange" :label-width="locale === 'en' ? '110px' : '80px'">
             <el-date-picker
               v-model="searchFormData.createtimerange"

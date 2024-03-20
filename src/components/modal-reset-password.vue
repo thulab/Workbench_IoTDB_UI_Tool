@@ -57,7 +57,7 @@ const rules = reactive<FormRules>({
   rawPassword: [
     {
       required: true,
-      message: () => t('common.formRuleEmpty'),
+      message: () => t('common.formRuleEmptyOperateShort'),
       trigger: ['blur', 'change'],
     },
     {
@@ -75,7 +75,7 @@ const rules = reactive<FormRules>({
   password: [
     {
       required: true,
-      message: () => t('common.formRuleEmpty'),
+      message: () => t('common.formRuleEmptyOperateShort'),
       trigger: ['blur', 'change'],
     },
     {
@@ -93,7 +93,7 @@ const rules = reactive<FormRules>({
   confirmPassword: [
     {
       required: true,
-      message: () => t('common.formRuleEmpty'),
+      message: () => t('common.formRuleEmptyOperateShort'),
       trigger: ['blur', 'change'],
     },
     {

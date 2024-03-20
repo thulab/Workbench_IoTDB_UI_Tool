@@ -62,7 +62,7 @@ const formData = reactive<Trend.LineObj>({
 const requiredRules = ref([
   {
     required: true,
-    message: () => t('common.formRuleEmpty'),
+    message: () => t('common.formRuleEmptyOperateShort'),
     trigger: ['blur', 'change'],
   },
 ]);

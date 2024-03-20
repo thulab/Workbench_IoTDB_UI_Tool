@@ -43,10 +43,10 @@ const rules = reactive({
       trigger: ['blur'],
       validator: (rule: any, value: any, callback: any) => {
         if (!value) {
-          return callback(t('common.formRuleEmpty'));
+          return callback(t('common.formRuleEmptyOperateShort'));
         }
         if (!ipRegExp.test(value)) {
-          return callback('IP地址输入规则有误，请重新输入');
+          return callback(t('white.ipRuleTip'));
         }
         return callback();
       },

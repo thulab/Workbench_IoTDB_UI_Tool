@@ -73,10 +73,7 @@ common:
   changeSuccess: 编辑成功
   deleteSuccess: 删除成功
   statusSuccess: 状态更新成功
-  formRuleEmpty: 请输入相应内容后进行操作
   searchFormEmpty: 请选择相应内容后进行查看
-  formRuleEmptyShort: 请输入相应内容
-  formRuleEmptyOperate: 请输入内容后操作
   formRuleEmptyOperateShort: 请输入内容后操作
   chooseFile: 选择文件
   fileImport: 文件导入
@@ -609,6 +606,7 @@ white:
   ipTip: 当前状态所有 IP 均可连接，请谨慎操作
   ip: IP地址
   ipPlaceholder: 请输入IP地址
+  ipRuleTip: IP地址输入规则有误，请重新输入
   addIp: 添加白名单
   deleteTip: 是否确认删除
 login:

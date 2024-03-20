@@ -49,7 +49,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (event: 'handleChangePath', val: string): void;
+  (event: 'handleChangePath', val: string, data: StorageDevice.MeasurementDataItem[]): void;
 }>();
 
 const { t } = useI18n();
@@ -73,7 +73,7 @@ const remoteMethod = debounce((query: string) => {
 }, 500);
 
 function handleChangePath(val: string) {
-  emit('handleChangePath', val);
+  emit('handleChangePath', val, measurementList.value);
 }
 
 onMounted(() => {
