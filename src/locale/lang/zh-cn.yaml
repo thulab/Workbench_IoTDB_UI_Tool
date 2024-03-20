@@ -660,9 +660,9 @@ connection:
   slaveInfo: 备集群信息
   connection: 连接实例
   iotdbSuccess: IoTDB连接成功
-  allSuccess: IoTDB、主、备集群Prometheus连接成功
-  masterSuccess: IoTDB、主集群Prometheus连接成功
-  slaveSuccess: IoTDB、备集群Prometheus连接成功
+  allSuccess: 主备集群IoTDB、Prometheus连接成功
+  masterSuccess: 主备集群IoTDB、主集群Prometheus连接成功
+  slaveSuccess: 主备集群IoTDB、备集群Prometheus连接成功
   singleSuccess: IoTDB、Prometheus连接成功
   pwdEmptyTip: 请填写密码后进行操作
   prometheusSuccess: Prometheus连接成功

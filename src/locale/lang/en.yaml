@@ -810,9 +810,9 @@ connection:
   slaveInfo: Slave Cluster Information
   connection: Connect Instance
   iotdbSuccess: IoTDB Connection Successful
-  allSuccess: IoTDB, Master, and Slave Cluster Prometheus Connection Successful
-  masterSuccess: IoTDB and Master Cluster Prometheus Connection Successful
-  slaveSuccess: IoTDB and Slave Cluster Prometheus Connection Successful
+  allSuccess: Master and backup IoTDB clusters connected successfully. Master and backup clusters' Prometheus connected successfully.
+  masterSuccess: Master and backup IoTDB clusters connected successfully. Master clusters' Prometheus connected successfully.
+  slaveSuccess: Master and backup IoTDB clusters connected successfully. Backup clusters' Prometheus connected successfully.
   singleSuccess: IoTDB and Prometheus Connection Successful
   pwdEmptyTip: Please enter password
   prometheusSuccess: Prometheus Connection Successful
