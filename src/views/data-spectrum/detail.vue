@@ -98,7 +98,15 @@
         <el-main class="p-0" style="position: relative">
           <div ref="chartContainer" class="chart-container" :style="`height: ${'calc(100% - 28px);'}`" v-element-size="onResize"></div>
           <div class="flex-align-center">
-            <el-button type="primary" class="cursor-button" id="spectrum-cursor" style="height: 24px !important" :disabled="dataEmpty" @click="handleClickOperate('cursor')">
+            <el-button
+              type="primary"
+              :plain="clickedOperate !== 'cursor'"
+              class="cursor-button"
+              id="spectrum-cursor"
+              style="height: 24px !important"
+              :disabled="dataEmpty"
+              @click="handleClickOperate('cursor')"
+            >
               {{ t('spectrum.cursor') }}
             </el-button>
             <div class="chart-operate-box">
@@ -107,6 +115,7 @@
                 id="spectrum-harmonicFrequency"
                 color="#00B3AA"
                 :disabled="disableFrequency"
+                :plain="clickedOperate !== 'frequency'"
                 :class="disableFrequency ? 'disable-frequency' : ''"
                 @click="handleClickOperate('frequency')"
               >
@@ -122,7 +131,15 @@
               />
             </div>
             <div class="chart-operate-box">
-              <el-button type="primary" id="spectrum-sideband" color="#6738BD" :disabled="disableSideband" :class="disableSideband ? 'disable-sideband' : ''" @click="handleClickOperate('sideband')">
+              <el-button
+                type="primary"
+                :plain="clickedOperate !== 'sideband'"
+                id="spectrum-sideband"
+                color="#6738BD"
+                :disabled="disableSideband"
+                :class="disableSideband ? 'disable-sideband' : ''"
+                @click="handleClickOperate('sideband')"
+              >
                 {{ t('spectrum.sideband') }}
               </el-button>
               <el-input v-model.number="sideband" :min="1" step-strictly @input="handleInputSideband" id="spectrum-sideband-input" :disabled="dataEmpty || drawedStatus.sideband" />
