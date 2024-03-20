@@ -920,6 +920,7 @@ onUnmounted(() => {
 
 .play-pause-buttons {
   height: 30px;
+  margin-top: -18px;
 }
 
 .search-form-buttons {
