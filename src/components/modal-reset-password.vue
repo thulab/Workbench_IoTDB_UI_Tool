@@ -1,6 +1,6 @@
 <template>
-  <el-dialog v-model="dialogVisible" :title="title" width="490px" align-center :close-on-click-modal="false" id="modal-reset-pwd">
-    <el-form label-width="90px" ref="formRef" :rules="rules" :model="formData" label-position="left" :key="formKey">
+  <el-dialog v-model="dialogVisible" :title="title" width="540px" align-center :close-on-click-modal="false" id="modal-reset-pwd">
+    <el-form :label-width="locale === 'en' ? '148px' : '90px'" ref="formRef" :rules="rules" :model="formData" label-position="left" :key="formKey">
       <label><input type="password" autocomplete="new-password" hidden /></label>
       <base-form-item :label="`${t('auth.userName')}：`" required>
         <el-text>{{ userName }}</el-text>
@@ -42,7 +42,7 @@ const emit = defineEmits<{
   handleSave: [];
 }>();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const userStore = useUserStore();
 const formKey = ref(0);

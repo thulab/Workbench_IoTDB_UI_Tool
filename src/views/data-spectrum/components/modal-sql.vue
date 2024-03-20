@@ -1,5 +1,16 @@
 <template>
-  <el-dialog :title="t('spectrum.sqlInput')" v-model="dialogVisible" width="748px" align-center :close-on-click-modal="false" :before-close="beforeClose" id="sql-modal" class="sql-dialog">
+  <el-dialog
+    :title="t('spectrum.sqlInput')"
+    v-model="dialogVisible"
+    width="748px"
+    align-center
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+    :before-close="beforeClose"
+    :show-close="false"
+    id="sql-modal"
+    class="sql-dialog"
+  >
     <div class="code-box">
       <code-editor
         v-show="codeMirrorReady"
