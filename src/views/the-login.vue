@@ -26,7 +26,7 @@
                 @change="handleChangeConnection"
               >
                 <template #prefix>
-                  <el-icon size="30"><i-custom-connection /></el-icon>
+                  <el-icon size="30" style="margin-left: -6px"><i-custom-connection /></el-icon>
                 </template>
                 <el-option-group v-for="group in realConnectionOptions" :key="group.label" :label="group.label">
                   <el-option v-for="item in group.options" :key="item.id" :label="`${item.name}(${t('login.userName')}:${item.username})`" :value="item.id" :id="`login-connection-select-${item.id}`">
