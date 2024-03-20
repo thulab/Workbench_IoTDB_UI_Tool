@@ -14,7 +14,7 @@
                   <i-custom-question />
                 </el-tooltip>
               </template>
-              <el-select v-model="searchFormData.method" id="spectrum-search-method" style="width: 200px">
+              <el-select v-model="searchFormData.method" id="spectrum-search-method" style="width: 230px">
                 <el-option
                   v-for="item in methodOptions"
                   :key="item.functionName"
@@ -33,7 +33,7 @@
               <span class="params-title">{{ t('spectrum.paramsTitle') }}</span>
               <template v-if="searchFormData.method === 'FFT'">
                 <base-form-item :label="`${t('spectrum.returnResult')}：`" prop="resultType">
-                  <el-select v-model="searchFormData.resultType" style="width: 80px" id="spectrum-search-resultType">
+                  <el-select v-model="searchFormData.resultType" style="width: 140px" id="spectrum-search-resultType">
                     <el-option v-for="item in resultList" :key="item.value" :label="item.name" :value="item.value" :id="`spectrum-search-resultType-${item.value}`" />
                   </el-select>
                 </base-form-item>
@@ -44,7 +44,7 @@
                   </template>
                   <el-input
                     v-model="searchFormData.compression"
-                    style="width: 120px"
+                    style="width: 190px"
                     :placeholder="t('spectrum.compressParamsPlaceholder')"
                     id="spectrum-search-compression"
                     @change="handleInputCompression"
@@ -64,7 +64,7 @@
           <div class="flex-justify-between">
             <div v-if="searchFormData.method !== 'custom'">
               <base-form-item :label="`${t('measurement.measurementChoose')}：`" prop="measurement" :label-width="locale === 'en' ? '132px' : '88px'">
-                <timeseries-select-single id="spectrum-search-path" v-model="searchFormData.measurement" :selectWidth="200" :itemWidth="160" show-suffix :disabled-path="disabledPath" />
+                <timeseries-select-single id="spectrum-search-path" v-model="searchFormData.measurement" :selectWidth="230" :itemWidth="200" show-suffix :disabled-path="disabledPath" />
               </base-form-item>
               <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange">
                 <el-date-picker
@@ -81,7 +81,7 @@
               </base-form-item>
             </div>
             <div v-if="searchFormData.method === 'custom'">
-              <base-form-item :label="`${t('spectrum.sqlInput')}：`" prop="sql">
+              <base-form-item :label="`${t('spectrum.sqlInput')}：`" prop="sql" :label-width="locale === 'en' ? '132px' : '88px'">
                 <el-button type="primary" link id="spectrum-search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
               </base-form-item>
             </div>
