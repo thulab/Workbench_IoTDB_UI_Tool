@@ -1,5 +1,6 @@
+/** @type {import('stylelint').Config} */
 module.exports = {
-  extends: ['stylelint-config-standard-scss', 'stylelint-config-recommended-vue/scss'],
+  extends: ['stylelint-config-standard-scss', 'stylelint-config-recommended-vue/scss', 'stylelint-prettier/recommended'],
   rules: {
     'selector-pseudo-element-no-unknown': null,
     'selector-pseudo-class-no-unknown': [
@@ -16,4 +17,5 @@ module.exports = {
       },
     ],
   },
+  overrides: [{ files: ['*.vue'], rules: { 'custom-property-empty-line-before': null } }],
 };
