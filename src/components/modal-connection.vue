@@ -2,7 +2,7 @@
   <el-dialog
     :title="t('connection.connectionManagement')"
     v-model="dialogVisible"
-    width="862px"
+    width="893px"
     align-center
     :close-on-click-modal="false"
     :close-on-press-escape="false"
