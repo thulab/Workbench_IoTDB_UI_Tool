@@ -47,7 +47,7 @@
             <div class="table-list-box m-x-16">
               <h4 class="table-box-title">{{ t('common.allSituation') }}</h4>
               <el-table :data="entityTableData" style="width: 100%">
-                <el-table-column :label="t('common.allChoose')" align="center" width="60">
+                <el-table-column :label="t('common.allChoose')" align="center" width="90">
                   <template #default="{ row }">
                     <el-icon v-if="!isEdit" class="moveDown3" size="21">
                       <i-custom-correct v-if="row.allChecked" />
