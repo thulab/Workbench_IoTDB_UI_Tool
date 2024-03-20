@@ -569,7 +569,7 @@ function handleSearch() {
   if (!checkedData.value.length) return;
   const timerange = dayjs(searchFormData.datetimerange[1]).valueOf() - dayjs(searchFormData.datetimerange[0]).valueOf();
   if (searchFormData.unitInterval !== 'auto' && searchFormData.unitInterval !== 'origin') {
-    const timeinterval = timeUnits.find((time) => time.value === searchFormData.unitInterval)?.timestamp;
+    const timeinterval = timeUnits.value.find((time) => time.value === searchFormData.unitInterval)?.timestamp;
     const point = timeinterval ? Math.ceil(timerange / timeinterval) : 0;
     if (point > 2000) {
       ElMessage.warning(t('dataTrend.overTip'));
@@ -882,6 +882,7 @@ onUnmounted(() => {
   :deep(.el-form) {
     display: flex;
     align-items: center;
+
     // height: 30px;
     flex-wrap: wrap;
   }
