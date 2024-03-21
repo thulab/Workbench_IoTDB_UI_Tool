@@ -394,12 +394,6 @@ watch(
     immediate: true,
   }
 );
-
-watch(locale, () => {
-  nextTick(() => {
-    enumStore.loadAllEnum();
-  });
-});
 </script>
 
 <style lang="scss" scoped>
