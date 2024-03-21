@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="t('auth.systemInfo')" v-model="dialogVisible" width="265px" align-center :close-on-click-modal="false" id="system-modal" class="system-dialog">
+  <el-dialog :title="t('auth.systemInfo')" v-model="dialogVisible" width="320px" align-center :close-on-click-modal="false" id="system-modal" class="system-dialog">
     <div class="system-info-box">
       <img src="@/assets/timecho-logo.svg" alt="" class="system-logo" />
       <p class="system-title">{{ systemTitle }}</p>
