@@ -1003,7 +1003,7 @@ onUnmounted(() => {
 }
 
 .disable-cursor {
-  color: #656a85 !important;
+  color: #495ad4 !important;
   background-color: #f0f1fa !important;
 }
 
