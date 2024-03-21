@@ -13,7 +13,6 @@
             remote
             remote-show-suffix
             :remote-method="remoteMethod"
-            :loading="deviceLoading"
             style="width: 300px"
             @change="handleChangeDevice"
             id="measurement-modal-select-device"
@@ -162,7 +161,7 @@ const emit = defineEmits<{
 const dialogVisible = useVModel(props, 'visible', emit);
 const activeName = ref('measurement_0');
 const { t, locale } = useI18n();
-const { requestFn: getDevice, loading: deviceLoading } = useRequest(StorageApi.getDeviceByGroup);
+const { requestFn: getDevice } = useRequest(StorageApi.getDeviceByGroup);
 const { requestFn: getMeasurementsInfosByFuzzy } = useRequest(StorageApi.getMeasurementsInfosByFuzzy);
 const { requestFn: getIsAlignedDevice } = useRequest(StorageApi.getIsAlignedDevice);
 const { requestFn: saveMeasurementList, loading: saveLoading } = useRequest(StorageApi.saveMeasurementList);
@@ -429,7 +428,6 @@ watch(
         compression: 'SNAPPY',
         isEditable: true,
       });
-      remoteMethod('');
     }
   }
 );
