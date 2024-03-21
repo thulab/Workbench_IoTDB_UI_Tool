@@ -5,17 +5,18 @@
       <el-sub-menu :index="subItem.path">
         <template #title>
           <el-icon v-if="subItem.icon">
+            <!--  eslint-disable-next-line vue/eqeqeq -->
             <i v-if="isCollapse && subItem.activeIcon && rootMenu?.activeIndex?.indexOf(subItem.path) == 0" v-html="subItem.activeIcon"></i>
             <i v-else v-html="subItem.icon"></i>
           </el-icon>
-          <span :id="subItem.path">{{ subItem.title }}</span>
+          <span :id="subItem.path" :style="{ 'font-size': locale === 'en' ? '12px' : '14px' }">{{ subItem.title }}</span>
         </template>
         <layout-menu-sub-item :menu-list="subItem.children" :show-auth-menu="showAuthMenu" />
       </el-sub-menu>
     </template>
     <template v-else>
       <el-divider v-if="subItem.showTopLine" />
-      <el-menu-item :id="subItem.path" :index="subItem.path">
+      <el-menu-item :id="subItem.path" :index="subItem.path" :style="{ 'font-size': locale === 'en' ? '12px' : '14px' }">
         <el-icon v-if="subItem.icon">
           <i v-if="isCollapse && subItem.activeIcon && subItem.path === rootMenu?.activeIndex" v-html="subItem.activeIcon"></i>
           <i v-else v-html="subItem.icon"></i>
@@ -44,6 +45,8 @@ const props = defineProps<{
   menuList: MenuOptions[];
   showAuthMenu?: boolean;
 }>();
+
+const { locale } = useI18n();
 
 const menus = computed<MenuOptions[]>(() => {
   const { menuList } = props;

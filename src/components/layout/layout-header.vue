@@ -15,7 +15,7 @@
       </el-breadcrumb>
     </div>
     <div class="header-ri flex-center">
-      <el-dropdown @command="handleLangCommand">
+      <el-dropdown @command="handleChangeLang">
         <span class="lang-icon m-r-20">
           <i-custom-language />
         </span>
@@ -42,17 +42,28 @@ import { HOME_URL } from '@/config/app-config';
 import useMenuStore from '@/stores/menu';
 import { useI18n } from 'vue-i18n';
 import { useLangSwitch } from '@/composition-api';
+import { useEnumStore, useUserStore } from '@/stores';
 import UserHeader from './components/layout-header-user.vue';
 import IconEpArrowRight from '~icons/ep/arrow-right.svg';
 import IconEpMoon from '~icons/ep/moon.svg';
 import IconEpSunny from '~icons/ep/sunny.svg';
 
 const route = useRoute();
+const userStore = useUserStore();
+const enumStore = useEnumStore();
 const { langIndex, handleLangCommand } = useLangSwitch(useI18n());
 const matched = computed(() => route.matched.filter((item) => item.meta && item.meta.title && item.meta.title !== 'Home'));
 const menuStore = useMenuStore();
 const isCollapse = computed((): boolean => menuStore.isCollapse);
 const isDark = useDark();
+
+function handleChangeLang(val: '0' | '1') {
+  handleLangCommand(val);
+  nextTick(() => {
+    enumStore.loadAllEnum();
+    userStore.loadPrivilegesEnum(true);
+  });
+}
 </script>
 
 <style scoped lang="scss">
