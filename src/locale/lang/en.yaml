@@ -756,7 +756,7 @@ white:
   ipTip: All IPs are allowed to connect in the current state. Please be careful
   ip: IP Address
   ipPlaceholder: Enter IP address
-  ipRuleTip: The IP address input rule is incorrect, please re-enter
+  ipRuleTip: The IP address input rule is incorrect. Please enter it again
   addIp: Add to Whitelist
   deleteTip: Are you sure you want to delete?
 login:

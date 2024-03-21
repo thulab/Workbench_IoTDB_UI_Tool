@@ -12,10 +12,6 @@
   line-height: 18px !important;
 }
 
-.el-select__wrapper {
-  padding-left: 11px !important;
-}
-
 .el-input__prefix-inner {
   margin-left: -5px !important;
 
@@ -53,7 +49,13 @@
 }
 
 .el-select {
-  line-height: 28px !important;
+  height: 28px !important;
+
+  .el-select__wrapper {
+    padding: 1px 11px !important;
+    line-height: 26px;
+    min-height: 28px;
+  }
 
   /* stylelint-disable-next-line no-descending-specificity */
   .el-input__wrapper {

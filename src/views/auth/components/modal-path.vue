@@ -1,11 +1,13 @@
 <template>
   <el-dialog :title="t('auth.addPath')" v-model="dialogVisible" width="600px" align-center :close-on-click-modal="false" id="auth-path-modal">
     <el-radio-group v-model="pathType" class="path-radio-group m-y-6">
-      <el-radio :value="'select'" id="auth-path-modal-select-radio">
-        <span class="radio-label">
-          {{ t('auth.exactPath') }}：
-          <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
-        </span>
+      <div class="flex">
+        <el-radio :value="'select'" id="auth-path-modal-select-radio">
+          <span class="radio-label">
+            {{ t('auth.exactPath') }}：
+            <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+          </span>
+        </el-radio>
         <div class="search-path-box">
           <timeseries-select-single
             id="auth-path-modal-select-path"
@@ -21,7 +23,7 @@
             :key="dialogKey"
           />
         </div>
-      </el-radio>
+      </div>
       <el-radio :value="'input'" id="auth-path-modal-input-radio">
         <span class="radio-label">
           {{ t('auth.pathMode') }}：

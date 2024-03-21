@@ -375,7 +375,6 @@ function handleSaveConfig() {
 }
 
 onMounted(() => {
-  enumStore.loadAllEnum();
   handleReset();
   searchFormData.asc = 'desc';
   searchFormData.orderBy = 'createTime';
