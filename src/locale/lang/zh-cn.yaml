@@ -387,7 +387,7 @@ dataSync:
   batchDelete: 确认删除这些任务吗？
   singleDelete: 是否删除该任务？
   taskDetail: 任务详情
-  taskNameContentPlaceholder: 请输入字母、数字、汉字、下划线，其他字符需用反引号进行整体修饰，例如：`数据同步-1`
+  taskNameContentPlaceholder: 请输入字母、数字、汉字、下划线，其他字符需用反引号进行整体修饰，例如:`数据同步-1`，不使用反引号括起的内容不能全部为数字
   dataExtraction: 数据抽取
   syncMeasurement: 同步测点
   syncMeasurementPlaceholder: 需用反引号修饰不合法字符或者是不合法路径节点，例如：root.`a{'@'}b`
