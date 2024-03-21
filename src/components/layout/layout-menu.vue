@@ -1,5 +1,5 @@
 <template>
-  <div class="menu" :style="{ width: isCollapse ? '40px' : '260px' }">
+  <div class="menu" :style="{ width: isCollapse ? '40px' : locale === 'en' ? '260px' : '216px' }">
     <div class="logo flex-align-center" :style="{ paddingLeft: isCollapse ? '6px' : '14px' }" id="layout-menu-logo" @click="handleDashboard">
       <el-icon alt="logo" v-if="isCollapse"><i-custom-logo /></el-icon>
       <el-icon class="title" v-if="!isCollapse"><i-custom-timecho-logo-white /></el-icon>
@@ -9,7 +9,7 @@
       <div class="connection-divider"></div>
       <div class="flex-align-center" style="height: 40px">
         <el-icon size="30" :style="{ marginLeft: isCollapse ? '0' : '-4px' }"><i-custom-connection /></el-icon>
-        <div v-if="!isCollapse" class="connection-info flex-align-center">
+        <div v-if="!isCollapse" class="connection-info flex-align-center" :style="{ 'font-size': locale === 'en' ? '12px' : '14px' }">
           <span class="connection-name">{{ connectionName }}</span>
           <el-icon size="20" style="cursor: pointer" id="layout-menu-connection" @click="handleToggleConnection"><i-custom-toggle /></el-icon>
         </div>
@@ -268,7 +268,8 @@ watch(locale, () => {
 
     .connection-info {
       margin: 0 0 0 8px;
-      font-size: 12px;
+
+      // font-size: 12px;
       line-height: 21px;
       color: #131926;
       flex: 1;
