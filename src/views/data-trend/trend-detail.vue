@@ -77,8 +77,18 @@
         <el-main class="p-0" style="position: relative">
           <div ref="chartContainer" class="chart-container" :style="`height: ${isRunningTab ? '100%;' : 'calc(100% - 28px);'}`" v-element-size="onResize"></div>
           <div v-if="!isRunningTab">
-            <el-button type="primary" id="trend-cursor" style="height: 24px !important" :disabled="!chartHistoryData.length" @click="clickedCursor = true">{{ t('spectrum.cursor') }}</el-button>
-            <el-button link class="cursor-button" id="trend-cursor-clear" :disabled="!chartHistoryData.length || !pointList.length" @click="handleEmptyPoint">
+            <el-button
+              type="primary"
+              id="trend-cursor"
+              class="cursor-button"
+              style="height: 24px !important"
+              :disabled="!chartHistoryData.length"
+              :plain="!clickedCursor"
+              @click="clickedCursor = true"
+            >
+              {{ t('spectrum.cursor') }}
+            </el-button>
+            <el-button link class="cursor-button-clear" id="trend-cursor-clear" :disabled="!chartHistoryData.length || !pointList.length" @click="handleEmptyPoint">
               <el-icon size="18" color="#fff"><i-custom-delete /></el-icon>
             </el-button>
           </div>
@@ -958,6 +968,10 @@ onUnmounted(() => {
   width: 100%;
   min-height: 300px;
   overflow: hidden;
+}
+
+.cursor-button {
+  border: none;
 }
 
 .path-list-wrapper {
