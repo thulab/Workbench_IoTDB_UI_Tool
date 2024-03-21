@@ -1,9 +1,9 @@
 <template>
   <el-container class="page-container">
     <el-header class="search-form-wrapper p-0" style="height: auto">
-      <el-form :model="searchFormData" style="flex: 1" ref="searchFormRef" label-position="left" :label-width="locale === 'en' ? '156px' : '88px'" size="default" inline>
+      <el-form :model="searchFormData" style="flex: 1" ref="searchFormRef" label-position="left" size="default" inline>
         <el-row>
-          <base-form-item prop="path" class="m-r-20">
+          <base-form-item prop="path" class="m-r-20" :label-width="locale === 'en' ? '136px' : '88px'">
             <template #label>
               {{ t('measurement.measurementChoose') }}：
               <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
@@ -49,15 +49,15 @@
         </el-row>
         <el-row class="flex-justify-between">
           <div>
-            <el-form-item prop="timeInterval" class="m-r-20">
+            <el-form-item prop="timeInterval" class="m-r-20" :label-width="locale === 'en' ? '136px' : '88px'">
               <template #label>
                 {{ t('search.timeInterval') }}：
                 <el-tooltip effect="light" :content="t('search.inputNumberPlaceholder')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
               </template>
               <el-input type="hidden" />
-              <el-input v-model.number="searchFormData.timeInterval" style="width: 160px" placeholder="" @input="handleInputInterval" id="data-search-timeInterval" :disabled="getListLoading">
+              <el-input v-model.number="searchFormData.timeInterval" style="width: 180px" placeholder="" @input="handleInputInterval" id="data-search-timeInterval" :disabled="getListLoading">
                 <template #append>
-                  <el-select v-model="searchFormData.unitInterval" style="width: 80px" placeholder="" id="data-search-unitInterval" :disabled="getListLoading">
+                  <el-select v-model="searchFormData.unitInterval" style="width: 100px" placeholder="" id="data-search-unitInterval" :disabled="getListLoading">
                     <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-unitInterval-select-${item.value}`" />
                   </el-select>
                 </template>

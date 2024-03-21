@@ -2,7 +2,7 @@
   <el-container class="page-container">
     <el-header class="search-form-wrapper p-0" style="height: auto">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-        <base-form-item :label="`${t('alarm.alarmName')}：`" prop="alarmName" :label-width="locale === 'en' ? '110px' : '80px'">
+        <base-form-item :label="`${t('alarm.alarmName')}：`" prop="alarmName" :label-width="locale === 'en' ? '100px' : '80px'">
           <el-input v-model="searchFormData.alarmName" :placeholder="t('alarm.alarmNamePlaceholder')" style="width: 172px" id="alarm-config-search-name" />
         </base-form-item>
         <base-form-item prop="measurements">
@@ -24,7 +24,7 @@
             {{ t('alarm.alarmLevel') }}：
             <el-tooltip effect="light" :content="t('alarm.alarmLevelTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
-          <el-select v-model="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" class="level-select-box" style="width: 80px" id="alarm-config-search-level">
+          <el-select v-model="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" class="level-select-box" style="width: 120px" id="alarm-config-search-level">
             <template #prefix>
               <el-icon v-if="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" size="20"><i-custom-alarm-level /></el-icon>
             </template>
@@ -38,12 +38,12 @@
           </el-select>
         </base-form-item>
         <el-row>
-          <base-form-item :label="`${t('common.status')}：`" prop="status">
-            <el-select v-model="searchFormData.status" style="width: 80px" id="alarm-config-search-status">
+          <base-form-item :label="`${t('common.status')}：`" prop="status" :label-width="locale === 'en' ? '100px' : '80px'">
+            <el-select v-model="searchFormData.status" style="width: 90px" id="alarm-config-search-status">
               <el-option v-for="item in statusOptions" :key="item.value" :value="item.value" :label="item.label" :id="`alarm-config-search-status-select-${item.value}`" />
             </el-select>
           </base-form-item>
-          <base-form-item :label="`${t('common.createTime')}：`" prop="createtimerange" :label-width="locale === 'en' ? '110px' : '80px'">
+          <base-form-item :label="`${t('common.createTime')}：`" prop="createtimerange">
             <el-date-picker
               v-model="searchFormData.createtimerange"
               type="datetimerange"
@@ -375,6 +375,7 @@ function handleSaveConfig() {
 }
 
 onMounted(() => {
+  enumStore.loadAllEnum();
   handleReset();
   searchFormData.asc = 'desc';
   searchFormData.orderBy = 'createTime';

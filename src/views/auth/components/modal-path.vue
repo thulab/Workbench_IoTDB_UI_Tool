@@ -1,7 +1,7 @@
 <template>
   <el-dialog :title="t('auth.addPath')" v-model="dialogVisible" width="600px" align-center :close-on-click-modal="false" id="auth-path-modal">
     <el-radio-group v-model="pathType" class="path-radio-group m-y-6">
-      <el-radio label="select" id="auth-path-modal-select-radio">
+      <el-radio :value="'select'" id="auth-path-modal-select-radio">
         <span class="radio-label">
           {{ t('auth.exactPath') }}：
           <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
@@ -17,11 +17,12 @@
             class="path-select"
             :filter-system="true"
             :placeholder="t('auth.exactPathPlaceholder')"
+            :disabled-path="() => false"
             :key="dialogKey"
           />
         </div>
       </el-radio>
-      <el-radio label="input" id="auth-path-modal-input-radio">
+      <el-radio :value="'input'" id="auth-path-modal-input-radio">
         <span class="radio-label">
           {{ t('auth.pathMode') }}：
           <el-tooltip effect="light" :content="t('auth.pathModeTip')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
@@ -60,7 +61,6 @@ const pathType = ref('select');
 const inputPath = ref('');
 const selectPath = ref('');
 const timeseriesSelectSingleRef = ref<InstanceType<typeof TimeseriesSelectSingle>>();
-const options = ref<StorageDevice.MeasurementDataItem[]>([]);
 const dialogKey = ref(0);
 
 const handleConfirm = () => {
@@ -98,7 +98,6 @@ watch(
       inputPath.value = '';
       selectPath.value = '';
       dialogKey.value++;
-      options.value = timeseriesSelectSingleRef.value?.measurementList || [];
     }
   }
 );

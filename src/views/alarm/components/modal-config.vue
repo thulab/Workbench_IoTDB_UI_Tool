@@ -70,7 +70,7 @@
           <base-form-item :label="`${t('alarm.duration')}：`" prop="alarmDuration" :rules="requiredDurationRules" class="m-l-45">
             <el-input v-model.number="formData.alarmDuration" :disabled="changeBoolean" :placeholder="t('alarm.durationPlaceholder')" id="alarm-config-modal-duration">
               <template #append>
-                <el-select v-model="formData.alarmDurationType" :disabled="changeBoolean" style="width: 56px" placeholder=" " id="alarm-config-modal-duration-unit">
+                <el-select v-model="formData.alarmDurationType" :disabled="changeBoolean" style="width: 70px" placeholder=" " id="alarm-config-modal-duration-unit">
                   <el-option label="ms" value="ms" id="alarm-config-modal-duration-unit-ms" />
                   <el-option label="s" value="s" id="alarm-config-modal-duration-unit-s" />
                   <el-option label="min" value="min" id="alarm-config-modal-duration-unit-min" />

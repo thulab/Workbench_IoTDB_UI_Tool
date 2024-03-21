@@ -2,11 +2,11 @@
   <el-dialog :title="t('dashboard.activeDetail')" v-model="dialogVisible" width="624px" align-center :close-on-click-modal="false" id="active-modal" class="active-modal">
     <div class="page-table-box">
       <el-table :data="tableData" v-loading="loading" style="width: 100%" tooltip-effect="light" ref="tableRef" border :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
-        <el-table-column prop="name" min-width="200" align="center" show-overflow-tooltip>
+        <el-table-column prop="name" min-width="170" align="center" show-overflow-tooltip>
           <template #header></template>
           <template #default="{ row }">{{ t(row.name) }}</template>
         </el-table-column>
-        <el-table-column :label="t('dashboard.used')" prop="used" min-width="180" align="center" show-overflow-tooltip />
+        <el-table-column :label="t('dashboard.used')" prop="used" min-width="170" align="center" show-overflow-tooltip />
         <el-table-column :label="t('dashboard.allocated')" prop="allocated" min-width="180" align="center" show-overflow-tooltip />
       </el-table>
     </div>

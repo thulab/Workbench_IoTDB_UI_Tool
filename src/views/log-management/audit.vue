@@ -4,7 +4,7 @@
       <el-header class="p-x-0" style="height: auto">
         <div class="search-form-wrapper">
           <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-            <base-form-item :label="`${t('log.operateUser')}：`" prop="username">
+            <base-form-item :label="`${t('log.operateUser')}：`" prop="username" :label-width="locale === 'en' ? '100px' : '80px'">
               <el-input v-model="searchFormData.username" :placeholder="t('auth.userPlaceholder')" style="width: 172px" id="audit-search-name">
                 <template #prefix>
                   <i-custom-search-icon class="remote-select-search-icon" />
@@ -26,7 +26,7 @@
               </el-input>
             </base-form-item>
             <el-row>
-              <base-form-item :label="`${t('log.timeRange')}：`" prop="time">
+              <base-form-item :label="`${t('log.timeRange')}：`" prop="time" :label-width="locale === 'en' ? '100px' : '80px'">
                 <el-date-picker
                   v-model="searchFormData.time"
                   type="datetimerange"
@@ -116,7 +116,7 @@ import { getStartAndEnd, today, formatDate, getOneInterval, getOneIntervalNow } 
 import ICustomCalender from '~icons/custom/calender.svg';
 import OverflowClick from './components/overflow-click.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const connectionStore = useConnectionStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
 const { maxTableHeight } = useTableHeight(340);

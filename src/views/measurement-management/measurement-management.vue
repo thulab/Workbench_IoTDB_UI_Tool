@@ -21,7 +21,7 @@
           </li>
           <li class="storage-info-item storage-info-item-ttl" id="ttl-li">
             <el-icon size="24"><i-custom-time /></el-icon>
-            <span class="storage-info-item-label" id="ttl-span">
+            <span class="storage-info-item-label m-r-8" id="ttl-span">
               {{ t('measurement.databaseTTL') }}：
               <el-tooltip effect="light" :content="t('measurement.databaseTTLTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="ttl-tip" /></el-tooltip>
             </span>
@@ -29,9 +29,9 @@
             <template v-else>
               <span v-if="!editTTL">{{ storageInfos?.ttl ? storageInfos.ttl + getTtlTimeUnit(storageInfos.ttlUnit, ttlUnitOptions) : '∞' }}</span>
               <div v-if="currentStorage && editTTL" class="edit-ttl-box">
-                <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" style="width: 160px" id="mesaurement-edit-ttl">
+                <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" style="width: 180px" id="mesaurement-edit-ttl">
                   <template #append>
-                    <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder=" " style="width: 80px" id="mesaurement-edit-ttlunit">
+                    <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder=" " style="width: 100px" id="mesaurement-edit-ttlunit">
                       <el-option :label="t('common.milliSecond')" value="millisecond" id="mesaurement-ttl-ms" />
                       <el-option :label="t('common.second')" value="second" id="mesaurement-ttl-s" />
                       <el-option :label="t('common.minute')" value="minute" id="mesaurement-ttl-m" />

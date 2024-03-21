@@ -24,7 +24,7 @@
             {{ t('alarm.alarmLevel') }}：
             <el-tooltip effect="light" :content="t('alarm.alarmLevelTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
-          <el-select v-model="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" class="level-select-box" style="width: 80px" id="alarm-record-search-level">
+          <el-select v-model="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" class="level-select-box" style="width: 120px" id="alarm-record-search-level">
             <template #prefix>
               <el-icon v-if="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" size="20"><i-custom-alarm-level /></el-icon>
             </template>
@@ -333,6 +333,7 @@ function handleDel(type: string, data: Alarm.QueryRecordResult | null) {
 }
 
 onMounted(() => {
+  enumStore.loadAllEnum();
   handleReset();
   searchFormData.asc = 'desc';
   searchFormData.orderBy = 'createTime';

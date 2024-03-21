@@ -35,8 +35,8 @@
                 </el-radio>
               </el-radio-group>
             </base-form-item>
-            <base-form-item v-if="!formData.whole" label="" prop="path" :rules="formData.whole ? [] : requiredRules" class="form-item-no-label m-l-24">
-              <el-input v-model="formData.path" :placeholder="t('dataSync.pathPlaceholder')" style="width: 335px" id="data-sync-modal-path">
+            <base-form-item v-if="!formData.whole" label="" prop="path" :rules="formData.whole ? [] : requiredRules" class="form-item-no-label m-l-24" label-width="0">
+              <el-input v-model="formData.path" :placeholder="t('dataSync.pathPlaceholder')" style="width: 304px" id="data-sync-modal-path">
                 <template #prepend>root.</template>
               </el-input>
             </base-form-item>
