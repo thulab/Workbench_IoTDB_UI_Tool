@@ -338,6 +338,12 @@ onMounted(() => {
   searchFormData.orderBy = 'createTime';
   handleSearch();
 });
+
+watch(locale, () => {
+  nextTick(() => {
+    handleSearch();
+  });
+});
 </script>
 
 <style lang="scss" scoped>

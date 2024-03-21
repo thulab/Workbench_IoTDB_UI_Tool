@@ -394,6 +394,13 @@ watch(
     immediate: true,
   }
 );
+
+watch(locale, () => {
+  nextTick(() => {
+    if (!canUsePipe.value) return;
+    handleSearch();
+  });
+});
 </script>
 
 <style lang="scss" scoped>
