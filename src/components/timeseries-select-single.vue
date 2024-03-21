@@ -9,7 +9,6 @@
       :remote-show-suffix="showSuffix"
       fit-input-width
       :remote-method="remoteMethod"
-      :loading="measurementLoading"
       :disabled="disabledSelect"
       :style="`width: ${selectWidth}px;`"
       class="remote-select-box"
@@ -56,7 +55,7 @@ const { t } = useI18n();
 const model = useVModel(props, 'modelValue');
 const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);
 
-const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementAllObjList);
+const { requestFn: getMeasurement } = useRequest(StorageApi.getMeasurementAllObjList);
 
 let lastMeasurementQuery = '';
 const remoteMethod = debounce((query: string) => {
@@ -75,10 +74,6 @@ const remoteMethod = debounce((query: string) => {
 function handleChangePath(val: string) {
   emit('handleChangePath', val, measurementList.value);
 }
-
-onMounted(() => {
-  remoteMethod('');
-});
 
 defineExpose({
   measurementList,

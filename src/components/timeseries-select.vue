@@ -11,7 +11,6 @@
       collapse-tags
       :collapse-tags-tooltip="false"
       :remote-method="remoteMethod"
-      :loading="measurementLoading"
       style="width: 256px"
       :disabled="disabled"
     >
@@ -66,7 +65,7 @@ const model = useVModel(props, 'modelValue');
 const dialogVisible = ref(false);
 const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);
 
-const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementAllObjList);
+const { requestFn: getMeasurement } = useRequest(StorageApi.getMeasurementAllObjList);
 
 let lastMeasurementQuery = '';
 const remoteMethod = debounce((query: string) => {
@@ -85,9 +84,6 @@ const remoteMethod = debounce((query: string) => {
 function handleDelete(index: number) {
   model.value?.splice(index, 1);
 }
-onMounted(() => {
-  remoteMethod('');
-});
 </script>
 
 <style scoped lang="scss">
@@ -180,6 +176,6 @@ onMounted(() => {
 
 .remote-select-search-text {
   display: flex;
-  width: 200px;
+  width: 220px;
 }
 </style>

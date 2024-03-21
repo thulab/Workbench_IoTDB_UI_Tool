@@ -57,6 +57,10 @@
     min-height: 28px;
   }
 
+  .el-select__selection {
+    flex-wrap: nowrap;
+  }
+
   /* stylelint-disable-next-line no-descending-specificity */
   .el-input__wrapper {
     padding-right: 1px !important;
