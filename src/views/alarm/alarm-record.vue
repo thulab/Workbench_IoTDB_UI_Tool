@@ -338,12 +338,6 @@ onMounted(() => {
   searchFormData.orderBy = 'createTime';
   handleSearch();
 });
-
-watch(locale, () => {
-  nextTick(() => {
-    enumStore.loadAllEnum();
-  });
-});
 </script>
 
 <style lang="scss" scoped>
