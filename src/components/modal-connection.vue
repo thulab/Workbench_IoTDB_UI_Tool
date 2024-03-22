@@ -318,8 +318,8 @@ watch(
     flex-direction: column;
 
     .data-empty-img {
-      width: 150px;
-      height: 150px;
+      width: 80px;
+      height: 80px;
       margin-bottom: 16px;
     }
 
