@@ -113,12 +113,15 @@ const isIndeterminate = computed(() => {
   const allLength = pathList.value.length;
   const checkedLength = pathList.value.filter((item) => item.checked).length;
   if (allLength === 0 || checkedLength === 0) {
+    // eslint-disable-next-line vue/no-side-effects-in-computed-properties
     isCheckAll.value = false;
     return false;
   }
   if (checkedLength === allLength) {
+    // eslint-disable-next-line vue/no-side-effects-in-computed-properties
     isCheckAll.value = true;
   } else {
+    // eslint-disable-next-line vue/no-side-effects-in-computed-properties
     isCheckAll.value = false;
   }
   return checkedLength > 0 && checkedLength < allLength;
@@ -247,8 +250,8 @@ watch(
     flex-direction: column;
 
     .data-empty-img {
-      width: 150px;
-      height: 150px;
+      width: 80px;
+      height: 80px;
       margin-bottom: 16px;
     }
 
