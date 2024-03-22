@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" :title="title" width="540px" align-center :close-on-click-modal="false" id="modal-reset-pwd">
+  <el-dialog v-model="dialogVisible" :title="title" width="480px" align-center :close-on-click-modal="false" id="modal-reset-pwd">
     <el-form :label-width="locale === 'en' ? '148px' : '90px'" ref="formRef" :rules="rules" :model="formData" label-position="left" :key="formKey">
       <label><input type="password" autocomplete="new-password" hidden /></label>
       <base-form-item :label="`${t('auth.userName')}：`" required>

@@ -833,49 +833,31 @@ function graphWatchEvent() {
     contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
   });
   // 节点右击
-  graph.value?.on(
-    'node:contextmenu',
-    ({
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      e,
-      x,
-      y,
-      node,
-      view,
-    }) => {
-      if (!isEdit.value) return;
-      if (contextMenuTimer.value) {
-        clearTimeout(contextMenuTimer.value);
-        contextMenuTimer.value = undefined;
-      }
-      isShowContextMenu.value = true;
-      operateNode.value = node;
-      contextMenuType.value = 'node';
-      contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  graph.value?.on('node:contextmenu', ({ e, x, y, node, view }) => {
+    if (!isEdit.value) return;
+    if (contextMenuTimer.value) {
+      clearTimeout(contextMenuTimer.value);
+      contextMenuTimer.value = undefined;
     }
-  );
+    isShowContextMenu.value = true;
+    operateNode.value = node;
+    contextMenuType.value = 'node';
+    contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
+  });
   // 边右击
-  graph.value?.on(
-    'edge:contextmenu',
-    ({
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      e,
-      x,
-      y,
-      view,
-      edge,
-    }) => {
-      if (!isEdit.value) return;
-      if (contextMenuTimer.value) {
-        clearTimeout(contextMenuTimer.value);
-        contextMenuTimer.value = undefined;
-      }
-      isShowContextMenu.value = true;
-      operateEdge.value = edge;
-      contextMenuType.value = 'edge';
-      contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  graph.value?.on('edge:contextmenu', ({ e, x, y, view, edge }) => {
+    if (!isEdit.value) return;
+    if (contextMenuTimer.value) {
+      clearTimeout(contextMenuTimer.value);
+      contextMenuTimer.value = undefined;
     }
-  );
+    isShowContextMenu.value = true;
+    operateEdge.value = edge;
+    contextMenuType.value = 'edge';
+    contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
+  });
 }
 
 // 复制
@@ -1538,7 +1520,7 @@ watch(
   }
 
   .el-dialog__body {
-    padding: 8px 16px 16px !important;
+    padding: 8px 0 16px !important;
     height: calc(100% - 80px);
   }
 }

@@ -10,8 +10,8 @@
           id="trend-modal-select-path"
           ref="timeseriesSelectSingleRef"
           v-model="formData.path"
-          :selectWidth="280"
-          :itemWidth="240"
+          :selectWidth="locale === 'en' ? 280 : 350"
+          :itemWidth="locale === 'en' ? 250 : 320"
           class="path-select"
           :key="dialogKey"
           :disabled-path="(item) => item.dataType === 'TEXT' || pathList.includes(item.timeseries)"
@@ -51,7 +51,7 @@ const emit = defineEmits<{
 }>();
 
 const dialogKey = ref(0);
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const formRef = ref<FormInstance>();
 const formData = reactive<Trend.LineObj>({

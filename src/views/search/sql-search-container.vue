@@ -55,7 +55,7 @@
     </el-dialog>
 
     <el-dialog :title="t('search.rename')" v-model="renameDialogVisible" width="480px" align-center>
-      <el-form ref="resaveFormRef" :model="resaveForm" :rules="resaveFormRules" label-width="80px" label-position="right">
+      <el-form ref="resaveFormRef" :model="resaveForm" :rules="resaveFormRules" :label-width="locale === 'en' ? '104px' : '80px'" label-position="right">
         <el-form-item :label="`${t('search.oldName')}：`" prop="oldSqlName" class="type-input-disabled">
           <el-input type="hidden" />
           <el-input v-model="resaveForm.oldSqlName" disabled id="sql-search-modal-resave-old" />
@@ -85,7 +85,7 @@ import SideData from './components/side-data.vue';
 import SideTemplate from './components/side-template.vue';
 import SqlSearch from './components/sql-search.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const sqlSearchRef = ref<Array<InstanceType<typeof SqlSearch>>>([]);
 const codeMirrorReady = ref(true);
 const nameDialogVisible = ref(false);
@@ -101,6 +101,7 @@ const sqlList = ref<Search.SqlList[]>([
     id: activiteSql.value,
     queryName: `${t('common.query')} ${dayjs()
       .format('YYYY-MM-DD HH:mm:ss')
+      // eslint-disable-next-line no-useless-escape
       .replace(/\-|\:| /g, '')}`,
   },
 ]);
