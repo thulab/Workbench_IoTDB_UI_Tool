@@ -2,7 +2,7 @@
   <el-dialog
     :title="editType === 'add' ? t('alarm.newAlarm') : t('alarm.editAlarm')"
     v-model="dialogVisible"
-    width="900px"
+    width="860px"
     class="new-storage-container"
     align-center
     :close-on-click-modal="false"

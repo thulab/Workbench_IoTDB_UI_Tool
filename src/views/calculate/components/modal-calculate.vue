@@ -2,7 +2,7 @@
   <el-dialog
     :title="editType === 'add' ? `${appType === 1 ? t('calculate.newCalculate') : t('calculate.newView')}` : `${appType === 1 ? t('calculate.editCalculate') : t('calculate.editView')}`"
     v-model="dialogVisible"
-    width="780px"
+    width="748px"
     align-center
     :close-on-click-modal="false"
     id="calculate-modal"
