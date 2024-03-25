@@ -475,11 +475,15 @@ function handleInputAmplification(val: string) {
 function handleInputHarmonicFrequency(val: string) {
   if (val && !/^\d+$/.test(`${val}`)) {
     harmonicFrequency.value = 1;
+  } else if (`${val}` === '0') {
+    harmonicFrequency.value = 1;
   }
 }
 
 function handleInputSideband(val: string) {
   if (val && !/^\d+$/.test(`${val}`)) {
+    sideband.value = 1;
+  } else if (`${val}` === '0') {
     sideband.value = 1;
   }
 }

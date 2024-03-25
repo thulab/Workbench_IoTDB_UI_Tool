@@ -549,6 +549,7 @@ function handleEmptyPoint() {
   markPointCount.value = 0;
   historyCursorData.value = [];
   pointList.value = [];
+  clickedCursor.value = false;
   setOption(chartOptions.value);
 }
 
