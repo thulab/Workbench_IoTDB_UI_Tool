@@ -106,7 +106,7 @@
           <div class="cursor-list-box" v-if="isExpand && !isRunningTab">
             <h4 class="cursor-list-title">{{ t('spectrum.cursorTitle') }}</h4>
             <auth-container :is-auth="canReadWriteSchemaData" style="flex: 1; background-color: #fff; overflow-y: hidden; display: flex; padding: 12px 0 10px">
-              <div class="list-empty-wrapper" v-if="!historyCursorData.length">
+              <div class="list-empty-wrapper" v-if="!historyCursorData.length || !pathList.length">
                 <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
                 <span class="data-empty-text">{{ t('common.noData') }}</span>
               </div>
@@ -779,6 +779,12 @@ function handleOperatePath(type: 'add' | 'del' | 'detail', path: string) {
     }
   } else {
     if (type === 'del') {
+      if (pathList.value.length === 0) {
+        pointList.value = [];
+        markPointCount.value = 0;
+        clickedCursor.value = false;
+        historyCursorData.value = [];
+      }
       const historyIndex = chartHistoryData.value.findIndex((data) => data.path === path);
       if (historyIndex !== -1) {
         chartHistoryData.value.splice(historyIndex, 1);
