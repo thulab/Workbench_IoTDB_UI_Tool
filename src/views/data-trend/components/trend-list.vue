@@ -189,6 +189,9 @@ function handleChangeWidth(val: number | undefined, data: Trend.LineObj, index: 
 function handleDel(data: Trend.LineObj, index: number) {
   pathList.value.splice(index, 1);
   emit('handleOperate', 'del', data.path);
+  if (pathList.value.length === 0) {
+    isCheckAll.value = false;
+  }
 }
 
 function handleExpand() {
