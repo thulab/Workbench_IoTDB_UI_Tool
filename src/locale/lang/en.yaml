@@ -871,6 +871,7 @@ flow:
   deleteEdgeTip: Please select an edge before deleting
 spectrum:
   analysisMethod: Analysis Pattern
+  analysisMethodPlaceholder: 请选择分析方式
   customAnalysis: Custom Analysis
   analysisMethodNoneTip: Please load this pattern
   compressParams: Compression
