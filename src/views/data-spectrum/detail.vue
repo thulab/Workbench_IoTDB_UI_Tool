@@ -346,6 +346,7 @@ const seriesData = computed<ECOption>(
           name: searchFormData.measurement,
           data: chartData.values.map((dataItem, index) => [chartData.timestamps[index], dataItem]),
           markPoint: {
+            silent: true,
             symbol: 'rect',
             symbolSize: 8,
             label: {
@@ -354,6 +355,7 @@ const seriesData = computed<ECOption>(
             data: markPointData.value.length ? markPointData.value : [],
           },
           markLine: {
+            silent: true,
             symbol: 'none',
             data: markLineData.value.length ? markLineData.value : [],
             animation: false,
