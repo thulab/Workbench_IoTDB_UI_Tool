@@ -717,6 +717,7 @@ flow:
   deleteEdgeTip: 请先选中边再删除
 spectrum:
   analysisMethod: 分析方式
+  analysisMethodPlaceholder: 请选择分析方式
   customAnalysis: 自定义分析
   analysisMethodTip: 若没有以下分析方式请加载后进行使用，详细加载方式请查看%{doc}
   analysisMethodNoneTip: 请加载该方法

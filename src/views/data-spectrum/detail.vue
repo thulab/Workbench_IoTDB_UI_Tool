@@ -14,7 +14,7 @@
                   <i-custom-question />
                 </el-tooltip>
               </template>
-              <el-select v-model="searchFormData.method" id="spectrum-search-method" style="width: 230px">
+              <el-select v-model="searchFormData.method" id="spectrum-search-method" style="width: 230px" :placeholder="t('spectrum.analysisMethodPlaceholder')">
                 <el-option
                   v-for="item in methodOptions"
                   :key="item.functionName"
