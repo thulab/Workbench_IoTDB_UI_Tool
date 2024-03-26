@@ -535,7 +535,7 @@ function handleDealCursor(params: echarts.ECElementEvent) {
   const pointIndex = markPointData.value.findIndex((point) => point.name === `${seriesName}_${value[0]}_${value[1]}`);
   if (pointIndex === -1) {
     markPointData.value.push({
-      name: `${seriesName}_${value[0]}_${value[1]}_cursor`,
+      name: `${seriesName}_${value[0]}_${value[1]}`,
       value: value[1],
       xAxis: value[0],
       yAxis: value[1],
@@ -556,7 +556,7 @@ function handleDealCursor(params: echarts.ECElementEvent) {
   const lineIndex = markLineData.value.findIndex((line) => line.name === `${seriesName}_${value[0]}`);
   if (lineIndex === -1) {
     markLineData.value.push({
-      name: `${seriesName}_${value[0]}_cursor`,
+      name: `${seriesName}_${value[0]}`,
       xAxis: value[0],
       label: {
         formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
