@@ -483,6 +483,7 @@ function handleInputHarmonicFrequency(val: string) {
     harmonicFrequency.value = 1;
   } else if (`${val}` === '0') {
     harmonicFrequency.value = 1;
+    // eslint-disable-next-line no-dupe-else-if
   } else if (`${val}` === '0') {
     harmonicFrequency.value = 1;
   }
@@ -494,6 +495,7 @@ function handleInputSideband(val: string) {
     sideband.value = 1;
   } else if (`${val}` === '0') {
     sideband.value = 1;
+    // eslint-disable-next-line no-dupe-else-if
   } else if (`${val}` === '0') {
     sideband.value = 1;
   }
