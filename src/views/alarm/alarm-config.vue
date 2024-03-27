@@ -126,7 +126,7 @@
                 {{ getOptionField(row.status, statusOptions, 'value', 'label') }}
               </template>
             </el-table-column>
-            <el-table-column :label="t('common.operation')" width="140" align="center" fixed="right">
+            <el-table-column :label="t('common.operation')" width="160" align="center" fixed="right">
               <template #default="{ row }">
                 <div>
                   <el-button v-if="row.status !== 3" type="primary" link size="small" @click="handleStatus(row)" :id="`alarm-config-table-${row.measurement}-status`">
