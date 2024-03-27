@@ -7,7 +7,8 @@
       <div class="login-form-container">
         <el-icon id="login-language" class="login-language-icon" size="30" @click="handleChangeLang"><i-custom-language-border /></el-icon>
         <div class="login-logo-box">
-          <i-custom-timecho-logo class="title-logo" />
+          <i-custom-timecho-logo-en v-if="locale === 'en'" class="title-logo" />
+          <i-custom-timecho-logo v-else class="title-logo" />
           <!-- <i-custom-logo-title class="title-logo" /> -->
         </div>
         <h5 class="login-title">{{ t('login.title') }}</h5>

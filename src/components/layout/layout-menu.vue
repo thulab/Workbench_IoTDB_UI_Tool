@@ -2,8 +2,10 @@
   <div class="menu" :style="{ width: isCollapse ? '40px' : locale === 'en' ? '260px' : '216px' }">
     <div class="logo flex-align-center" :style="{ paddingLeft: isCollapse ? '6px' : '14px' }" id="layout-menu-logo" @click="handleDashboard">
       <el-icon alt="logo" v-if="isCollapse"><i-custom-logo /></el-icon>
-      <el-icon class="title" v-if="!isCollapse"><i-custom-timecho-logo-white /></el-icon>
-      <!-- <span v-show="!isCollapse">{{ systemTitle }}</span> -->
+      <el-icon class="title" v-if="!isCollapse">
+        <i-custom-timecho-logo-white-en v-if="locale === 'en'" />
+        <i-custom-timecho-logo-white v-else />
+      </el-icon>
     </div>
     <div class="connection-box" :style="{ padding: isCollapse ? '0 0 0 5px' : '0 16px 0 10px' }">
       <div class="connection-divider"></div>

@@ -32,8 +32,12 @@
 
 .el-message-box__header {
   border-bottom: 1px solid #dfe1ed;
-  padding: 12px 0 6px !important;
-  margin: 0 16px;
+  padding: 0 0 6px !important;
+  margin: 0;
+}
+
+.el-message-box__close {
+  right: 12px;
 }
 
 .el-message-box__title {

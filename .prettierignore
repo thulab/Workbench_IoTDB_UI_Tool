@@ -1,5 +1,5 @@
 dist/
-node_modules/
+node_modules/*
 .vscode/
 .idea/
 .env*
@@ -7,3 +7,4 @@ node_modules/
 .eslintrc-auto-import.json
 .eslintrc.cjs
 .husky
+*.svg
