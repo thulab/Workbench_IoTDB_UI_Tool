@@ -175,6 +175,6 @@ declare module 'vue' {
     VersionContainer: typeof import('./../components/version-container.vue')['default']
   }
   export interface ComponentCustomProperties {
-    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
+    vLoading: (typeof import('element-plus/es'))['ElLoadingDirective'];
   }
 }
