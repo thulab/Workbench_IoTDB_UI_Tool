@@ -52,9 +52,19 @@
   height: 28px !important;
 
   .el-select__wrapper {
-    padding: 1px 11px !important;
+    padding: 1px 1px 1px 11px !important;
     line-height: 26px;
     min-height: 28px;
+  }
+
+  .el-select__suffix {
+    background-color: #f0f1fa;
+    height: 26px;
+  }
+
+  .el-select__wrapper.is-filterable .el-select__suffix {
+    background-color: transparent;
+    opacity: 0;
   }
 
   .el-select__selection {
