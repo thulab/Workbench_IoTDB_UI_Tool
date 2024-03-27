@@ -34,7 +34,7 @@ const { requestFn: getActiveInfo, loading } = useRequest(DashboardApi.getActiveI
 function getDetail() {
   getActiveInfo(props.isMaster).then((res) => {
     const { activationTime, datanodeNum, ainodeNum, cpuNum, deviceNum, measurementNum } = res.data;
-    tableData.value.push({ name: 'dashboard.activationExpirationTime', used: '', allocated: activationTime });
+    tableData.value.push({ name: 'dashboard.activationExpirationTime', used: '-', allocated: activationTime });
     tableData.value.push({ name: 'dashboard.activeDataNodeNum', used: datanodeNum.split('/')[0], allocated: datanodeNum.split('/')[1] });
     tableData.value.push({ name: 'dashboard.activeAlNodeNum', used: ainodeNum.split('/')[0], allocated: ainodeNum.split('/')[1] });
     tableData.value.push({ name: 'dashboard.activeCpuNum', used: cpuNum.split('/')[0], allocated: cpuNum.split('/')[1] });
