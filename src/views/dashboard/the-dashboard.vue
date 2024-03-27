@@ -26,7 +26,7 @@
                 <span class="module-label-text">{{ t('dashboard.isActive') }}：</span>
                 <span class="module-content-text" :style="{ color: systemData.active ? '#44C795' : '#D43030' }">{{ systemData.active ? t('common.yes') : t('common.no') }}</span>
                 <el-button
-                  v-if="systemData.active && showVersionCol1312"
+                  v-if="systemData.active && showVersionCol1312((tableData.length && tableData[0].version) || '')"
                   type="primary"
                   link
                   class="m-l-8"
@@ -108,7 +108,7 @@
                 <span class="module-label-text">{{ t('dashboard.isActive') }}：</span>
                 <span class="module-content-text" :style="{ color: slaveData.active ? '#44C795' : '#D43030' }">{{ slaveData.active ? t('common.yes') : t('common.no') }}</span>
                 <el-button
-                  v-if="slaveData.active && showVersionCol1312"
+                  v-if="slaveData.active && showVersionCol1312((slaveTableData.length && slaveTableData[0].version) || '')"
                   type="primary"
                   link
                   class="m-l-8"
@@ -301,7 +301,12 @@ const nodeList = computed(() => {
 });
 
 const showVersionCol = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.2.1'));
-const showVersionCol1312 = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.1.2'));
+// const showVersionCol1312 = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.1.2'));
+
+function showVersionCol1312(version: string) {
+  if (!version) return false;
+  return iotdbShowAuth(version, '1.3.1.2');
+}
 
 const { requestFn: getSystemInfo, loading } = useRequest(DashboardApi.getSystemInfo);
 
