@@ -83,6 +83,7 @@
               class="cursor-button"
               style="height: 24px !important"
               :disabled="!chartHistoryData.length"
+              :class="!chartHistoryData.length ? 'disable-cursor' : ''"
               :plain="!clickedCursor"
               @click="clickedCursor = true"
             >
@@ -979,6 +980,11 @@ onUnmounted(() => {
 
 .cursor-button {
   border: none;
+}
+
+.disable-cursor {
+  color: #656a85 !important;
+  background-color: #f0f1fa !important;
 }
 
 .path-list-wrapper {

@@ -105,6 +105,7 @@
               id="spectrum-cursor"
               style="height: 24px !important"
               :disabled="dataEmpty"
+              :class="dataEmpty ? 'disable-cursor' : ''"
               @click="handleClickOperate('cursor')"
             >
               {{ t('spectrum.cursor') }}
@@ -979,6 +980,11 @@ watch(locale, () => {
 
 .cursor-button {
   border: none;
+}
+
+.disable-cursor {
+  color: #656a85 !important;
+  background-color: #f0f1fa !important;
 }
 
 .chart-operate-box {
