@@ -569,6 +569,7 @@ dataTrend:
   overTip: >-
     Exceeding the maximum number of plotted measurements, it has been
     automatically adjusted for display
+  timeTip: 结束时间须大于开始时间，请重新操作
   booleanTip: >-
     Boolean type supports only the latest value calculation; please modify the
     sampling strategy to view the trend

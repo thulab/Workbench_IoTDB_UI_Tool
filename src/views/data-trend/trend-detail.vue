@@ -20,6 +20,7 @@
               :disabled="isRunningTab"
               :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
               id="trend-search-datetimerange"
+              @change="handleChangeTime"
             />
           </base-form-item>
           <base-form-item v-show="!isRunningTab" :label="`${t('search.timeInterval')}：`" prop="unitInterval" :rules="requiredRules">
@@ -576,6 +577,17 @@ function handleChangeAggregation(val: string) {
   }
 }
 
+function handleChangeTime(value: [DateModelType, DateModelType]) {
+  const start = dayjs(value[0]).valueOf();
+  const end = dayjs(value[1]).valueOf();
+  if (start >= end) {
+    ElMessage.warning({
+      message: t('dataTrend.timeTip'),
+      grouping: true,
+    });
+  }
+}
+
 // 查询
 function handleSearch() {
   if (!canReadWriteSchemaData.value) return;
@@ -591,6 +603,13 @@ function handleSearch() {
   }
   const start = dayjs(searchFormData.datetimerange[0]).valueOf();
   const end = dayjs(searchFormData.datetimerange[1]).valueOf();
+  if (start >= end) {
+    ElMessage.warning({
+      message: t('dataTrend.timeTip'),
+      grouping: true,
+    });
+    return;
+  }
   getHistoryTrend({
     paths: pathList.value.map((item) => item.path),
     startTime: start,
