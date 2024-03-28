@@ -252,6 +252,7 @@ function handleChangeLang() {
   } else {
     handleLangCommand('0');
   }
+  getList();
 }
 
 const submitForm = () => {
