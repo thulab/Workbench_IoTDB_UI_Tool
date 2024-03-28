@@ -597,7 +597,7 @@ function handleSearch() {
     const timeinterval = timeUnits.value.find((time) => time.value === searchFormData.unitInterval)?.timestamp;
     const point = timeinterval ? Math.ceil(timerange / timeinterval) : 0;
     if (point > 2000) {
-      ElMessage.warning(t('dataTrend.overTip'));
+      ElMessage.warning({ message: t('dataTrend.overTip'), grouping: true });
       searchFormData.unitInterval = 'auto';
     }
   }
@@ -622,7 +622,7 @@ function handleSearch() {
     const currentAll = pathList.value.filter((f) => f.disabled).map((item) => item.path);
     const differents = difference(abnormals, currentAll);
     if (differents.length) {
-      ElMessage.warning(t('dataTrend.booleanTip'));
+      ElMessage.warning({ message: t('dataTrend.booleanTip'), grouping: true });
     }
     pathList.value.forEach((item) => {
       if (res.data.abnormal.includes(item.path)) {
@@ -635,7 +635,7 @@ function handleSearch() {
     const overPath = res.data?.changeAuto || [];
     if (overPath.length) {
       const paths = overPath.join(',');
-      ElMessage.warning(t('dataTrend.measurementTip', { measurement: paths }));
+      ElMessage.warning({ message: t('dataTrend.measurementTip', { measurement: paths }), grouping: true });
     }
     setOption(chartOptions.value, true);
     setOption({

@@ -52,7 +52,7 @@ const handleConfirm = () => {
   saveloading.value = true;
   saveDescription(props.measurement, formData.description)
     .then(() => {
-      ElMessage.success(`${t('common.editSuccess')}！`);
+      ElMessage.success({ message: `${t('common.editSuccess')}！`, grouping: true });
       dialogVisible.value = false;
       emit('handleSave');
     })

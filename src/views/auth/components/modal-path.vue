@@ -70,14 +70,14 @@ const handleConfirm = () => {
   if (pathType.value === 'input') {
     const validInputRes = inputPath.value.replace(/(\s*$)/g, '');
     if (validInputRes.endsWith('.') || (validInputRes.endsWith('*') && !validInputRes.endsWith('**'))) {
-      ElMessage.warning(t('auth.pathEndTip'));
+      ElMessage.warning({ message: t('auth.pathEndTip'), grouping: true });
       return;
     }
     inputPath.value = validInputRes;
     res = inputPath.value;
   }
   if (!res) {
-    ElMessage.error(t('auth.pathEmptyRule'));
+    ElMessage.error({ message: t('auth.pathEmptyRule'), grouping: true });
     return;
   }
   // if (pathType.value === 'input') {
@@ -85,7 +85,7 @@ const handleConfirm = () => {
   // }
   const flag = props.pathList.some((item) => item === res);
   if (flag) {
-    ElMessage.error(t('auth.pathExistTip'));
+    ElMessage.error({ message: t('auth.pathExistTip'), grouping: true });
     return;
   }
   dialogVisible.value = false;

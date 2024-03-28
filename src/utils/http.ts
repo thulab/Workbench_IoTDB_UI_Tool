@@ -32,7 +32,7 @@ function requestInterceptor(config: InternalAxiosRequestConfig): InternalAxiosRe
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function requestErrorInterceptor(error: any) {
-  ElMessage.error(error);
+  ElMessage.error({ message: error, grouping: true });
   requestCount -= 1;
   return Promise.reject(error);
 }

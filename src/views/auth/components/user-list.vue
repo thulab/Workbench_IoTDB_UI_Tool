@@ -86,7 +86,7 @@ function handleAdd() {
 // 删除角色
 function handleDelete(item: string) {
   deleteUser(item).then(() => {
-    ElMessage.success(t('common.deleteSuccess'));
+    ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
     // 动画出现两遍，nexttick不好用
     setTimeout(() => {
       getList();

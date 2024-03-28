@@ -139,7 +139,7 @@ const checkValid = (name: string) => {
 const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
   const isExcel = checkValid(rawFile.name);
   if (!isExcel) {
-    ElMessage.error(t('measurement.importMeasurementRule'));
+    ElMessage.error({ message: t('measurement.importMeasurementRule'), grouping: true });
     return false;
   }
   uploadFileInfo.value = rawFile;

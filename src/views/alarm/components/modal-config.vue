@@ -311,7 +311,7 @@ const handleConfirm = () => {
           measurementType: formData.measurementType,
         }).then((res) => {
           if (res.code === 0) {
-            ElMessage.success(t('alarm.newSuccess'));
+            ElMessage.success({ message: t('alarm.newSuccess'), grouping: true });
             dialogVisible.value = false;
             emit('handleSave');
           }
@@ -322,14 +322,14 @@ const handleConfirm = () => {
           alarmConfigId: props.alarmConfigId,
         }).then((res) => {
           if (res.code === 0) {
-            ElMessage.success(t('alarm.editSuccess'));
+            ElMessage.success({ message: t('alarm.editSuccess'), grouping: true });
             dialogVisible.value = false;
             emit('handleSave');
           }
         });
       }
     } else {
-      ElMessage.error(t('common.errorEmptyTip'));
+      ElMessage.error({ message: t('common.errorEmptyTip'), grouping: true });
     }
   });
 };

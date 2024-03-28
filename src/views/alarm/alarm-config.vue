@@ -330,7 +330,7 @@ function handleSortChange({ column, prop, order }: SortMethod<Alarm.QueryConfigR
 function handleStatus(row: Alarm.QueryConfigResult) {
   const { status } = row;
   updateAlarmConfigStatus(row.alarmConfigId, status === 1 ? 2 : 1).then(() => {
-    ElMessage.success(t('common.statusSuccess'));
+    ElMessage.success({ message: t('common.statusSuccess'), grouping: true });
     row.status = status === 1 ? 2 : 1;
   });
 }
@@ -364,7 +364,7 @@ function handleDel(type: string, data: Alarm.QueryConfigResult | null) {
     }
     deleteAlarmConfig(alarmConfigIds).then((res) => {
       if (res.code === 0) {
-        ElMessage.success(t('common.deleteSuccess'));
+        ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
         handleSearch();
       }
     });

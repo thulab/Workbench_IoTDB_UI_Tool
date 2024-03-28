@@ -255,7 +255,7 @@ function handleTabRemove(targetName: TabPaneName) {
       sqls: code[targetName],
     }).then((res) => {
       if (res.code === 0) {
-        ElMessage.success(t('common.saveSuccess'));
+        ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
         // code[targetName] = '';
         delete code[targetName];
         const nextTab = sqlList.value[index + 1] || sqlList.value[index - 1];
@@ -279,7 +279,7 @@ function handleNameConfirm() {
       };
       saveQuery(data).then((res) => {
         if (res.code === 0) {
-          ElMessage.success(t('common.saveSuccess'));
+          ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
           nameDialogVisible.value = false;
           if (saveSource.value === 'save') {
             const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
@@ -326,7 +326,7 @@ function handleRenameConfirm() {
       };
       saveQuery(data).then((res) => {
         if (res.code === 0) {
-          ElMessage.success(t('common.saveSuccess'));
+          ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
           renameDialogVisible.value = false;
           const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
           sqlList.value.splice(index, 1, { id: `${id}`, queryName: resaveForm.sqlName });
@@ -356,7 +356,7 @@ function handleSave() {
       sqls: code[activiteSql.value],
     }).then((res) => {
       if (res.code === 0) {
-        ElMessage.success(t('common.saveSuccess'));
+        ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
       }
     });
   }

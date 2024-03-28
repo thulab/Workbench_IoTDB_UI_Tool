@@ -142,7 +142,7 @@ function handleDelRow(data: any) {
     type: 'warning',
     icon: ICustomMessageWarning,
   }).then(() => {
-    ElMessage.success(t('common.deleteSuccess'));
+    ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
     handleRefresh();
   });
 }

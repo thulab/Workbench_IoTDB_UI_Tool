@@ -105,7 +105,7 @@ function handleDeleteStorage(item: string) {
   }).then(() => {
     deleteStorageGroups(item).then((res) => {
       if (res.code === 0) {
-        ElMessage.success(t('common.deleteSuccess'));
+        ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
         getStorageList();
       }
     });
