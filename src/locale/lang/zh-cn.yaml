@@ -452,6 +452,7 @@ dataTrend:
   measurementEmptyTip: 请先添加测点并选中
   trendTip: 最大绘制%{tip}个点，超出后系统将自动调整
   overTip: 超过最大画图点数，已为您自动调整后展示
+  timeTip: 结束时间须大于开始时间，请重新操作
   booleanTip: boolean类型仅支持最新值计算，请修改采样策略后查看趋势
   measurementTip: '%{measurement}测点超过最大画图点数，已为您自动调整后展示'
   choosedMeasurement: 已选测点
