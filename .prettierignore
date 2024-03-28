@@ -8,3 +8,5 @@ node_modules/*
 .eslintrc.cjs
 .husky
 *.svg
+/src/typings/auto-imports.d.ts
+/src/typings/components.d.ts

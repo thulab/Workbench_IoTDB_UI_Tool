@@ -52,6 +52,7 @@
               :disabled-date="disabledDate"
               :shortcuts="shortcutsDaterange"
               :prefix-icon="ICustomCalender"
+              :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
               id="alarm-config-search-datetimerange-create"
             />
           </base-form-item>
@@ -64,6 +65,7 @@
               :disabled-date="disabledDate"
               :shortcuts="shortcutsDaterange"
               :prefix-icon="ICustomCalender"
+              :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
               id="alarm-config-search-datetimerange-update"
             />
           </base-form-item>

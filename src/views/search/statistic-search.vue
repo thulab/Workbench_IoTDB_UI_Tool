@@ -19,6 +19,7 @@
             :shortcuts="shortcutsDaterange"
             :clearable="false"
             :prefix-icon="ICustomCalender"
+            :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
             id="statistic-search-datetimerange"
           />
         </base-form-item>

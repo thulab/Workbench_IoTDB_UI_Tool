@@ -43,6 +43,7 @@
                 :prefix-icon="ICustomCalender"
                 id="data-search-datetimerange"
                 :disabled="getListLoading"
+                :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
               />
             </div>
           </el-form-item>
