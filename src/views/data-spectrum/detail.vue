@@ -459,7 +459,7 @@ function handleInputCompression(val: string) {
 
 function handleInputFrequency(val: string) {
   if (val) {
-    if (!/^\+?[1-9][0-9]*$/.test(`${val}`)) {
+    if (!/^\+?[1-9][0-9]{0,1}$/.test(`${val}`)) {
       searchFormData.frequency = undefined;
     }
   } else {
@@ -469,7 +469,7 @@ function handleInputFrequency(val: string) {
 
 function handleInputAmplification(val: string) {
   if (val) {
-    if (!/^\+?[1-9][0-9]*$/.test(`${val}`)) {
+    if (!/^\+?[1-9][0-9]{0,1}$/.test(`${val}`)) {
       searchFormData.amplification = undefined;
     }
   } else {
