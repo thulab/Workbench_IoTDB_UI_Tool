@@ -403,7 +403,7 @@ watch(locale, () => {
     height: 36px !important;
   }
 
-  :deep(.el-select .el-input__suffix) {
+  :deep(.el-select .el-select__suffix) {
     background-color: #fff;
     width: 20px;
   }
