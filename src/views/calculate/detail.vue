@@ -323,7 +323,7 @@ function handleDel(type: string, data: Calculate.CalculateItem | null) {
       arr = data?.measurement ? [data.measurement] : [];
     }
     deleteCalculate(arr).then(() => {
-      ElMessage.success(t('common.deleteSuccess'));
+      ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
       handleSearch();
     });
   });

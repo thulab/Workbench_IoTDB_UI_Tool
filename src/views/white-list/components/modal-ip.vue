@@ -57,7 +57,7 @@ const rules = reactive({
 const handleConfirm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
-      ElMessage.success(`${t('common.saveSuccess')}！`);
+      ElMessage.success({ message: `${t('common.saveSuccess')}！`, grouping: true });
       dialogVisible.value = false;
       emit('handleSave');
     }

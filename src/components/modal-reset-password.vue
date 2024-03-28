@@ -125,7 +125,7 @@ const handleConfirm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
       updateUser(props.userName, formData.rawPassword, formData.password).then(() => {
-        ElMessage.success(`${props.title} ${t('common.success')}`);
+        ElMessage.success({ message: `${props.title} ${t('common.success')}`, grouping: true });
         dialogVisible.value = false;
         if (userStore.userInfo.name === props.userName) {
           ElMessageBox.alert(t('login.resetPwdLogin'), t('common.tip'), {

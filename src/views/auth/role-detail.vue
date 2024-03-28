@@ -333,7 +333,7 @@ function handleSave() {
   const pathPrivileges = authData.value.pathPrivileges.filter((item) => item.path);
   const flag = pathPrivileges.some((data) => !data.privileges.length);
   if (flag) {
-    ElMessage.error(t('auth.pathEmptyTip'));
+    ElMessage.error({ message: t('auth.pathEmptyTip'), grouping: true });
     return;
   }
   saveLoading.value = true;
@@ -343,7 +343,7 @@ function handleSave() {
         pageType.value = 'edit';
         getDetail();
       } else {
-        ElMessage.success(t('common.saveSuccess'));
+        ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
         pageType.value = 'view';
         getDetail();
       }

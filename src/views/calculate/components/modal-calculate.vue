@@ -170,7 +170,7 @@ const handleConfirm = () => {
           measurement: `root.${formData.measurement}`,
         })
           .then(() => {
-            ElMessage.success(t('common.createSuccess'));
+            ElMessage.success({ message: t('common.createSuccess'), grouping: true });
             dialogVisible.value = false;
             emit('handleSave');
           })
@@ -183,7 +183,7 @@ const handleConfirm = () => {
           measurement: `${formData.measurement}`,
         })
           .then(() => {
-            ElMessage.success(t('common.changeSuccess'));
+            ElMessage.success({ message: t('common.changeSuccess'), grouping: true });
             dialogVisible.value = false;
             emit('handleSave');
           })

@@ -94,11 +94,11 @@ const handleConfirm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
       if (formData.ttl && +formData.ttl > 9007199254740992) {
-        ElMessage.error(t('measurement.databaseTTLSaveMaxRule'));
+        ElMessage.error({ message: t('measurement.databaseTTLSaveMaxRule'), grouping: true });
         return;
       }
       if (formData.ttl && !formData.ttlUnit) {
-        ElMessage.error(t('measurement.databaseTTLSaveUnitRule'));
+        ElMessage.error({ message: t('measurement.databaseTTLSaveUnitRule'), grouping: true });
         return;
       }
       const reqObj = {
@@ -108,7 +108,7 @@ const handleConfirm = () => {
       };
       saveStorageGroups({ ...reqObj }).then((res) => {
         if (res.code === 0) {
-          ElMessage.success(`${t('common.createSuccess')}!`);
+          ElMessage.success({ message: `${t('common.createSuccess')}!`, grouping: true });
           dialogVisible.value = false;
           emit('handleSave');
         }

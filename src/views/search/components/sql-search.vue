@@ -195,13 +195,13 @@ function querySqlRun(type?: string) {
     codeStr = selectionCode.value;
   }
   if (!codeStr.length) {
-    ElMessage.error(t('search.runEmptyTip'));
+    ElMessage.error({ message: t('search.runEmptyTip'), grouping: true });
     return;
   }
   if (runFlag.value) {
     const sqlsArr = codeStr?.split(';\n');
     if (sqlsArr?.length > 50) {
-      ElMessage.warning(t('search.runOverTip'));
+      ElMessage.warning({ message: t('search.runOverTip'), grouping: true });
       return;
     }
     display.value = false;
@@ -262,7 +262,7 @@ function querySqlRun(type?: string) {
       runFlag.value = true;
     }, 5000);
   } else {
-    ElMessage.error(t('search.runRepeatTip'));
+    ElMessage.error({ message: t('search.runRepeatTip'), grouping: true });
   }
 }
 // // 查询结果

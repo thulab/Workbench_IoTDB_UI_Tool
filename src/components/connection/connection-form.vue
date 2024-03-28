@@ -366,7 +366,7 @@ function handleSaveConnection() {
   saveLoading.value = true;
   saveConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id })
     .then((res) => {
-      ElMessage.success(t('common.saveSuccess'));
+      ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
       emit('handleRefreshList', +res.data);
     })
     .finally(() => {
@@ -383,7 +383,7 @@ function handleSavePrometheus() {
     prometheusUrlSlave: formData.slaveCluster?.prometheusUrl || '',
   })
     .then(() => {
-      ElMessage.success(t('common.saveSuccess'));
+      ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
       window.location.reload();
     })
     .finally(() => {

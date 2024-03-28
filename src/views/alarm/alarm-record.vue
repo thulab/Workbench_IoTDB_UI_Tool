@@ -301,7 +301,7 @@ function handleCommandDown(val: string) {
 
 function handleStatus(row: Alarm.QueryRecordResult) {
   updateAlarmRecordStatus(row.alarmTraceId).then(() => {
-    ElMessage.success(t('alarm.read'));
+    ElMessage.success({ message: t('alarm.read'), grouping: true });
     // handleSearch();
     copySearchFormData = cloneDeep(searchFormData);
     getListData();
@@ -326,7 +326,7 @@ function handleDel(type: string, data: Alarm.QueryRecordResult | null) {
     }
     deleteAlarmRecord(alarmRecordIds).then((res) => {
       if (res.code === 0) {
-        ElMessage.success(t('common.deleteSuccess'));
+        ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
         handleSearch();
       }
     });

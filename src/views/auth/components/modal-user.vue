@@ -132,7 +132,7 @@ const handleConfirm = () => {
     if (valid) {
       addUser(formData.userName, formData.password)
         .then(() => {
-          ElMessage.success(t('auth.userSuccess'));
+          ElMessage.success({ message: t('auth.userSuccess'), grouping: true });
           dialogVisible.value = false;
           emit('handleSave');
         })

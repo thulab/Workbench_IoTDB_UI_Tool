@@ -422,7 +422,7 @@ function handleDelStorage() {
   }).then(() => {
     deleteStorageGroups(currentStorage.value).then((res) => {
       if (res.code === 0) {
-        ElMessage.success(t('common.deleteSuccess'));
+        ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
         storageSideRef.value?.getStorageList();
       }
     });
@@ -501,7 +501,7 @@ function handleDelRow(type: string, row: StorageDevice.MeasurementItem | null) {
     }
     deleteMeasurements(measurementList).then((res) => {
       if (res.code === 0) {
-        ElMessage.success(t('common.deleteSuccess'));
+        ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
         getStorageInfo(currentStorage.value);
         handleRefresh();
       }
@@ -561,15 +561,15 @@ function handleEditTTL() {
 
 function handleConfirmEditTTL() {
   if (editTTLModel.value && !/^[1-9]\d*$/.test(editTTLModel.value)) {
-    ElMessage.error(t('measurement.databaseTTLRule'));
+    ElMessage.error({ message: t('measurement.databaseTTLRule'), grouping: true });
     return;
   }
   if (editTTLModel.value && +editTTLModel.value > 9007199254740992) {
-    ElMessage.error(t('measurement.databaseTTLSaveMaxRule'));
+    ElMessage.error({ message: t('measurement.databaseTTLSaveMaxRule'), grouping: true });
     return;
   }
   if ((editTTLModel.value && !editTTLUnitModel.value) || (!editTTLModel.value && editTTLUnitModel.value)) {
-    ElMessage.error(t('measurement.databaseTTLSaveUnitRule'));
+    ElMessage.error({ message: t('measurement.databaseTTLSaveUnitRule'), grouping: true });
     return;
   }
   const reqObj = {
@@ -579,7 +579,7 @@ function handleConfirmEditTTL() {
   };
   upsertDatabaseTTL({ ...reqObj }).then((res) => {
     if (res.code === 0) {
-      ElMessage.success(`${t('common.updateSuccess')}！`);
+      ElMessage.success({ message: `${t('common.updateSuccess')}！`, grouping: true });
       editTTL.value = false;
       getStorageInfo(storageInfos.value.groupName);
     }

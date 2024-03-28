@@ -16,7 +16,7 @@ export default function useWebsocket(url: string, receiveData: Function, isInit:
 
   function initWebsocket(handleOpen?: Function) {
     if (!('WebSocket' in window)) {
-      ElMessage.warning(t('common.websockerVersionTip'));
+      ElMessage.warning({ message: t('common.websockerVersionTip'), grouping: true });
     } else {
       if (socketInstance.value) {
         socketInstance.value.close();

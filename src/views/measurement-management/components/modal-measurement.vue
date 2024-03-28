@@ -311,7 +311,7 @@ function handleDelRow(i: number, e: MouseEvent) {
       const deviceName = !addDevice.value ? formData.deviceName : `${props.groupName}.${formData.deviceName}`;
       deleteMeasurements([`${deviceName}.${formData.measurementList[i].timeseries}`]).then((res) => {
         if (res.code === 0) {
-          ElMessage.success(t('common.deleteSuccess'));
+          ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
           formData.measurementList.splice(i, 1);
         }
       });
@@ -383,7 +383,7 @@ const handleConfirm = () => {
       })
         .then((res) => {
           if (res.code === 0) {
-            ElMessage.success(`${t('common.createSuccess')}！`);
+            ElMessage.success({ message: `${t('common.createSuccess')}！`, grouping: true });
             dialogVisible.value = false;
             emit('handleSave');
           }
@@ -405,7 +405,7 @@ const handleConfirm = () => {
           }
         });
     } else {
-      ElMessage.error(t('common.formRuleEmptyOperateShort'));
+      ElMessage.error({ message: t('common.formRuleEmptyOperateShort'), grouping: true });
     }
   });
 };

@@ -207,7 +207,7 @@ function getListData() {
       sumValue: avgSumList.value[index].sumValue || '-',
     }));
     if (tableErrorMessage.value.length) {
-      ElMessage.error(tableErrorMessage.value[0]);
+      ElMessage.error({ message: tableErrorMessage.value[0], grouping: true });
     }
     getListLoading.value = false;
   });

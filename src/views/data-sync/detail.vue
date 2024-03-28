@@ -234,17 +234,17 @@ function handleStatus(type: string, data: DataSync.SynchronListData | null, stat
     statusData = [];
   }
   if (!statusData.length) {
-    ElMessage.warning(state === 'running' ? t('dataSync.runTip') : t('dataSync.stopTip'));
+    ElMessage.warning({ message: state === 'running' ? t('dataSync.runTip') : t('dataSync.stopTip'), grouping: true });
     return;
   }
   if (state === 'running') {
     startTaskByNames(statusData).then(() => {
-      ElMessage.success(t('dataSync.runSuccess'));
+      ElMessage.success({ message: t('dataSync.runSuccess'), grouping: true });
       handleSearch();
     });
   } else {
     stopTaskByNames(statusData).then(() => {
-      ElMessage.success(t('dataSync.stopSuccess'));
+      ElMessage.success({ message: t('dataSync.stopSuccess'), grouping: true });
       handleSearch();
     });
   }
@@ -266,7 +266,7 @@ function handleDel(type: string, data: DataSync.SynchronListData | null) {
       arr = [data!.name];
     }
     deleteDataSynchronByNames(arr).then(() => {
-      ElMessage.success(t('common.deleteSuccess'));
+      ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
       handleSearch();
     });
   });

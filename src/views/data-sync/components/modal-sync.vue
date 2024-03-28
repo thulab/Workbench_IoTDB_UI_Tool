@@ -570,15 +570,15 @@ const handleConfirm = () => {
     formRef.value?.validate((valid) => {
       if (valid) {
         if (!formData.value.isSynchronHistory && !formData.value.isSynchronRealTime) {
-          ElMessage.error(t('dataSync.modeTip'));
+          ElMessage.error({ message: t('dataSync.modeTip'), grouping: true });
           return;
         }
         if (formData.value.processorPluginType === 'custom' && formData.value.processorPluginParam.toLocaleLowerCase().includes("'processor'")) {
-          ElMessage.error(t('dataSync.processorPluginTip'));
+          ElMessage.error({ message: t('dataSync.processorPluginTip'), grouping: true });
           return;
         }
         if (formData.value.connectorPluginType === 'custom' && formData.value.connectorPluginParam.toLocaleLowerCase().includes("'connector'")) {
-          ElMessage.error(t('dataSync.connectorPluginTip'));
+          ElMessage.error({ message: t('dataSync.connectorPluginTip'), grouping: true });
           return;
         }
         saveLoading.value = true;
@@ -609,7 +609,7 @@ const handleConfirm = () => {
         };
         saveSynchronTask(params)
           .then(() => {
-            ElMessage.success(t('common.createSuccess'));
+            ElMessage.success({ message: t('common.createSuccess'), grouping: true });
             dialogVisible.value = false;
             emit('handleSave');
           })
@@ -622,17 +622,17 @@ const handleConfirm = () => {
             }
           });
       } else {
-        ElMessage.error(t('common.errorEmptyTip'));
+        ElMessage.error({ message: t('common.errorEmptyTip'), grouping: true });
       }
     });
   } else {
     if (!taskInputVal.value || !taskInputVal.value.trim()) {
-      ElMessage.error(t('common.formRuleEmptyOperateShort'));
+      ElMessage.error({ message: t('common.formRuleEmptyOperateShort'), grouping: true });
       return;
     }
     saveAdvancedTask(taskInputVal.value)
       .then(() => {
-        ElMessage.success(t('common.createSuccess'));
+        ElMessage.success({ message: t('common.createSuccess'), grouping: true });
         dialogVisible.value = false;
         emit('handleSave');
       })

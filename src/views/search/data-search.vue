@@ -306,7 +306,7 @@ let controller = new AbortController();
 
 function getListData() {
   if (copySearchFormData.timeInterval && !copySearchFormData.aggregation) {
-    ElMessage.error(t('search.aggregationPlaceholder'));
+    ElMessage.error({ message: t('search.aggregationPlaceholder'), grouping: true });
     return;
   }
   firstLoad.value = false;

@@ -474,7 +474,7 @@ function calcColumnWidth(child: Auth.PrivilegeEnum) {
 function handleSave() {
   const flag = tableData.value.filter((item) => item.path).some((data) => !data.privileges.length);
   if (flag) {
-    ElMessage.error(t('auth.pathEmptyTip'));
+    ElMessage.error({ message: t('auth.pathEmptyTip'), grouping: true });
     return;
   }
   const currentRoleNames = authData.value.rolesToPrivileges.map((item) => item.roleName);
@@ -524,7 +524,7 @@ function handleSave() {
   };
   updateUserAuth(data)
     .then(() => {
-      ElMessage.success(t('common.saveSuccess'));
+      ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
       pageType.value = 'view';
       if (userName.value === currentUser.value?.name) {
         userStore.loadPrivileges(true);
