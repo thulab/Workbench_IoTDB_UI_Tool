@@ -458,7 +458,7 @@ function handleInputCompression(val: string) {
 
 function handleInputFrequency(val: string) {
   if (val) {
-    if (!/^\+?[1-9][0-9]{0,1}$/.test(`${val}`)) {
+    if (!/^\+?[1-9][0-9]*$/.test(`${val}`)) {
       searchFormData.frequency = undefined;
     }
   } else {
@@ -468,7 +468,7 @@ function handleInputFrequency(val: string) {
 
 function handleInputAmplification(val: string) {
   if (val) {
-    if (!/^\+?[1-9][0-9]{0,1}$/.test(`${val}`)) {
+    if (!/^\+?[1-9][0-9]*$/.test(`${val}`)) {
       searchFormData.amplification = undefined;
     }
   } else {
@@ -482,16 +482,12 @@ function handleInputHarmonicFrequency(val: string) {
     harmonicFrequency.value = 1;
   } else if (`${val}` === '0') {
     harmonicFrequency.value = 1;
-  } else if (`${val}` === '0') {
-    harmonicFrequency.value = 1;
   }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleInputSideband(val: string) {
   if (val && !/^\+?[1-9][0-9]{0,1}$/.test(`${val}`)) {
-    sideband.value = 1;
-  } else if (`${val}` === '0') {
     sideband.value = 1;
   } else if (`${val}` === '0') {
     sideband.value = 1;
