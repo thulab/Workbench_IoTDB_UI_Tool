@@ -455,7 +455,7 @@ function handleInputCompression(val: string) {
 
 function handleInputFrequency(val: string) {
   if (val) {
-    if (!/^\+?[1-9][0-9]{0,1}$/.test(`${val}`)) {
+    if (!/^\+?[1-9][0-9]*$/.test(`${val}`)) {
       searchFormData.frequency = undefined;
     }
   } else {
@@ -465,7 +465,7 @@ function handleInputFrequency(val: string) {
 
 function handleInputAmplification(val: string) {
   if (val) {
-    if (!/^\+?[1-9][0-9]{0,1}$/.test(`${val}`)) {
+    if (!/^\+?[1-9][0-9]*$/.test(`${val}`)) {
       searchFormData.amplification = undefined;
     }
   } else {
@@ -474,7 +474,7 @@ function handleInputAmplification(val: string) {
 }
 
 function handleInputHarmonicFrequency(val: string) {
-  if (val && !/^\d+$/.test(`${val}`)) {
+  if (val && !/^\+?[1-9][0-9]{0,1}$/.test(`${val}`)) {
     harmonicFrequency.value = 1;
   } else if (`${val}` === '0') {
     harmonicFrequency.value = 1;
@@ -482,7 +482,7 @@ function handleInputHarmonicFrequency(val: string) {
 }
 
 function handleInputSideband(val: string) {
-  if (val && !/^\d+$/.test(`${val}`)) {
+  if (val && !/^\+?[1-9][0-9]{0,1}$/.test(`${val}`)) {
     sideband.value = 1;
   } else if (`${val}` === '0') {
     sideband.value = 1;
