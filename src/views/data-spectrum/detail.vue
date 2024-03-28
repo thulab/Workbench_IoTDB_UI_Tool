@@ -123,13 +123,15 @@
               >
                 {{ t('spectrum.harmonicFrequency') }}
               </el-button>
-              <el-input
-                v-model.number="harmonicFrequency"
+              <el-input-number
+                v-model="harmonicFrequency"
                 :min="1"
+                :max="99"
                 step-strictly
-                @input="handleInputHarmonicFrequency"
                 id="spectrum-harmonicFrequency-input"
                 :disabled="dataEmpty || drawedStatus.frequency"
+                :controls="false"
+                :value-on-clear="1"
               />
             </div>
             <div class="chart-operate-box">
@@ -144,7 +146,7 @@
               >
                 {{ t('spectrum.sideband') }}
               </el-button>
-              <el-input v-model.number="sideband" :min="1" step-strictly @input="handleInputSideband" id="spectrum-sideband-input" :disabled="dataEmpty || drawedStatus.sideband" />
+              <el-input-number v-model="sideband" :min="1" :max="99" step-strictly id="spectrum-sideband-input" :disabled="dataEmpty || drawedStatus.sideband" :controls="false" :value-on-clear="1" />
             </div>
             <el-button link class="cursor-button-clear m-l-8" id="spectrum-cursor-clear" :disabled="dataEmpty" @click="() => handleEmptyOperate()">
               <el-icon size="18" color="#fff"><i-custom-delete /></el-icon>
@@ -474,6 +476,7 @@ function handleInputAmplification(val: string) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleInputHarmonicFrequency(val: string) {
   if (val && !/^\+?[1-9][0-9]{0,1}$/.test(`${val}`)) {
     harmonicFrequency.value = 1;
@@ -482,6 +485,7 @@ function handleInputHarmonicFrequency(val: string) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleInputSideband(val: string) {
   if (val && !/^\+?[1-9][0-9]{0,1}$/.test(`${val}`)) {
     sideband.value = 1;
@@ -886,7 +890,7 @@ function handleSearch() {
     }
     getCustom();
   } else {
-    if (!searchFormData.resultType || !searchFormData.compression || !searchFormData.measurement) {
+    if (!searchFormData.measurement) {
       ElMessage.warning({
         message: t('common.searchFormEmpty'),
         grouping: true,
@@ -1008,13 +1012,15 @@ watch(locale, () => {
     border: none;
   }
 
-  .el-input {
+  .el-input-number {
     width: 38px;
     height: 22px;
 
     :deep(.el-input__wrapper) {
       box-shadow: none !important;
       border-radius: 0;
+      padding-left: 2px;
+      padding-right: 2px;
 
       &:focus-visible,
       &:hover {
