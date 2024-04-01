@@ -1,15 +1,15 @@
 <template>
   <el-container class="page-container">
     <el-header class="search-form-wrapper p-0" style="height: auto">
-      <el-form :model="searchFormData" ref="searchFormRef" label-position="left" :label-width="locale === 'en' ? '116px' : '88px'" size="default" inline :disabled="getListLoading">
-        <base-form-item prop="path" class="m-r-30">
+      <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline :disabled="getListLoading">
+        <base-form-item prop="path">
           <template #label>
             {{ t('measurement.measurementChoose') }}：
             <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
           <timeseries-select v-model="searchFormData.path" :is-show-view-btn="true" :is-boolean-text-disabled="true" id="statistic-search-path" />
         </base-form-item>
-        <base-form-item :label="`${t('search.searchTime')}：`" prop="datetimerange" style="margin-right: 0">
+        <base-form-item :label="`${t('search.searchTime')}：`" prop="datetimerange">
           <el-date-picker
             v-model="searchFormData.datetimerange"
             type="datetimerange"
@@ -120,7 +120,7 @@ import { getStartAndEnd, today, getOneInterval, getOneIntervalNow, formatDate } 
 import { useUserStore } from '@/stores';
 import ICustomCalender from '~icons/custom/calender.svg';
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
 const userStore = useUserStore();
 const { canReadWriteData } = storeToRefs(userStore);
 const { maxTableHeight } = useTableHeight(280);
@@ -294,16 +294,6 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.search-form-wrapper {
-  display: flex;
-  justify-content: space-between;
-
-  .search-form-buttons {
-    display: flex;
-    flex-wrap: nowrap;
-  }
-}
-
 .page-table-details {
   padding: 16px 16px 10px;
   border-radius: 2px;

@@ -1,32 +1,30 @@
 <template>
   <active-container :is-show="connectionIsActive">
     <el-container class="calculate-detail-wrapper">
-      <el-header class="p-x-0" style="height: auto">
-        <div class="search-form-wrapper">
-          <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline @submit.prevent>
-            <base-form-item label="" prop="name" style="margin-left: -8px">
-              <el-input v-model="searchFormData.name" :placeholder="searchPlaceholder()" style="width: 380px" id="calculate-search-name">
-                <template #prefix>
-                  <i-custom-search-icon class="remote-select-search-icon" />
-                </template>
-                <template #prepend>
-                  <el-select v-model="searchFormData.type" style="width: 160px" placeholder="" id="calculate-search-type">
-                    <el-option :label="appType === 1 ? t('calculate.calculateName') : t('calculate.viewName')" value="name" id="calculate-search-type-name" />
-                    <el-option :label="t('calculate.resultMeasurement')" value="measurement" id="calculate-search-type-measurement" />
-                    <el-option :label="appType === 1 ? t('calculate.calculateDesc') : t('calculate.viewDesc')" value="desc" id="calculate-search-type-desc" />
-                  </el-select>
-                </template>
-              </el-input>
-            </base-form-item>
-          </el-form>
-          <div class="search-form-buttons">
-            <auth-tooltip :is-disabled="canReadWriteSchema">
-              <el-button :disabled="!canReadWriteSchema" @click="handleReset" id="calculate-search-reset">{{ t('common.reset') }}</el-button>
-            </auth-tooltip>
-            <auth-tooltip :is-disabled="canReadWriteSchema">
-              <el-button type="primary" :disabled="!canReadWriteSchema" @click="handleSearch" id="calculate-search-search">{{ t('common.query') }}</el-button>
-            </auth-tooltip>
-          </div>
+      <el-header class="search-form-wrapper p-x-0" style="height: auto">
+        <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline @submit.prevent>
+          <base-form-item label="" prop="name" style="margin-left: -8px">
+            <el-input v-model="searchFormData.name" :placeholder="searchPlaceholder()" style="width: 380px" id="calculate-search-name">
+              <template #prefix>
+                <i-custom-search-icon class="remote-select-search-icon" />
+              </template>
+              <template #prepend>
+                <el-select v-model="searchFormData.type" style="width: 160px" placeholder="" id="calculate-search-type">
+                  <el-option :label="appType === 1 ? t('calculate.calculateName') : t('calculate.viewName')" value="name" id="calculate-search-type-name" />
+                  <el-option :label="t('calculate.resultMeasurement')" value="measurement" id="calculate-search-type-measurement" />
+                  <el-option :label="appType === 1 ? t('calculate.calculateDesc') : t('calculate.viewDesc')" value="desc" id="calculate-search-type-desc" />
+                </el-select>
+              </template>
+            </el-input>
+          </base-form-item>
+        </el-form>
+        <div class="search-form-buttons">
+          <auth-tooltip :is-disabled="canReadWriteSchema">
+            <el-button :disabled="!canReadWriteSchema" @click="handleReset" id="calculate-search-reset">{{ t('common.reset') }}</el-button>
+          </auth-tooltip>
+          <auth-tooltip :is-disabled="canReadWriteSchema">
+            <el-button type="primary" :disabled="!canReadWriteSchema" @click="handleSearch" id="calculate-search-search">{{ t('common.query') }}</el-button>
+          </auth-tooltip>
         </div>
       </el-header>
       <el-main class="p-0">
@@ -423,13 +421,6 @@ watch(
   background: #fff;
   box-sizing: border-box;
   padding: 26px 16px 16px 14px;
-}
-
-.search-form-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 4px;
 }
 
 .page-table-details {

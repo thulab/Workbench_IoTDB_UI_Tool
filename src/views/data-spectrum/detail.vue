@@ -1,7 +1,7 @@
 <template>
   <el-container class="data-spectrum-wrapper">
     <el-header class="p-0" style="height: auto">
-      <div class="search-form-wrapper" style="margin-bottom: 18px">
+      <div class="search-form-box" style="margin-bottom: 18px">
         <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
           <div class="m-b-16 flex-align-center" style="height: 36px">
             <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method" :label-width="locale === 'en' ? '132px' : '88px'">
@@ -965,7 +965,7 @@ watch(locale, () => {
   padding: 26px 16px 16px 30px;
 }
 
-.search-form-wrapper {
+.search-form-box {
   display: flex;
 
   :deep(.el-form) {

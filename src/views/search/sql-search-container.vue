@@ -55,8 +55,8 @@
     </el-dialog>
 
     <el-dialog :title="t('search.rename')" v-model="renameDialogVisible" width="480px" align-center>
-      <el-form ref="resaveFormRef" :model="resaveForm" :rules="resaveFormRules" :label-width="locale === 'en' ? '104px' : '80px'" label-position="right">
-        <el-form-item :label="`${t('search.oldName')}：`" prop="oldSqlName" class="type-input-disabled">
+      <el-form ref="resaveFormRef" :model="resaveForm" :rules="resaveFormRules" :label-width="locale === 'en' ? '104px' : '80px'" label-position="left">
+        <el-form-item :label="`${t('search.oldName')}：`" prop="oldSqlName" class="type-input-disabled el-form-item-not-mandatory">
           <el-input type="hidden" />
           <el-input v-model="resaveForm.oldSqlName" disabled id="sql-search-modal-resave-old" />
         </el-form-item>

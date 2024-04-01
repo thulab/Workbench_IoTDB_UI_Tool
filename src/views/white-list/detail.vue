@@ -14,7 +14,7 @@
           <span class="data-empty-text">{{ t('white.ipTip') }}</span>
         </div>
         <div class="list-container" v-else>
-          <div class="search-form-wrapper">
+          <div class="search-form-container">
             <div class="search-form-box">
               <span class="search-from-label">{{ t('white.ip') }}：</span>
               <el-input v-model="searchKeyword" :placeholder="t('white.ipPlaceholder')" @keyup.enter="handleRefresh" id="white-list-search-ip">
@@ -222,7 +222,7 @@ watch(
   box-sizing: border-box;
 }
 
-.search-form-wrapper {
+.search-form-container {
   display: flex;
   justify-content: space-between;
   padding: 2px 0 18px;

@@ -25,7 +25,7 @@
             </span>
             <host-port v-model="formData.masterCluster.hostAndPortVOS" :form-key="'masterCluster.hostAndPortVOS'" :is-disabled="isShowSave" />
           </div>
-          <prometheus v-model="formData.masterCluster.prometheusUrl" :form-key="'masterCluster.prometheusUrl'" :class-name="'optional-form-item base-form-box'" />
+          <prometheus v-model="formData.masterCluster.prometheusUrl" :form-key="'masterCluster.prometheusUrl'" :class-name="'el-form-item-not-mandatory base-form-box'" />
           <user-pwd v-model:username.local="formData.username" v-model:password.local="formData.password" v-model:errorPwd.local="errorPwd" :is-disabled="isShowSave" />
         </template>
         <!-- 集群版 -->
@@ -37,7 +37,7 @@
             </span>
             <host-port v-model="formData.masterCluster.hostAndPortVOS" :form-key="'masterCluster.hostAndPortVOS'" :is-disabled="isShowSave" :show-operate="true" />
           </div>
-          <prometheus v-model="formData.masterCluster.prometheusUrl" :form-key="'masterCluster.prometheusUrl'" :class-name="'optional-form-item base-form-box'" />
+          <prometheus v-model="formData.masterCluster.prometheusUrl" :form-key="'masterCluster.prometheusUrl'" :class-name="'el-form-item-not-mandatory base-form-box'" />
           <user-pwd v-model:username.local="formData.username" v-model:password.local="formData.password" v-model:errorPwd.local="errorPwd" :is-disabled="isShowSave" />
         </template>
         <!-- 双活版 -->
@@ -55,7 +55,7 @@
                 </span>
                 <host-port v-model="formData.masterCluster.hostAndPortVOS" :form-key="'masterCluster.hostAndPortVOS'" :is-disabled="isShowSave" :show-operate="true" />
               </div>
-              <prometheus v-model="formData.masterCluster.prometheusUrl" :form-key="'masterCluster.prometheusUrl'" :class-name="'optional-form-item m-b-0 p-r-28'" />
+              <prometheus v-model="formData.masterCluster.prometheusUrl" :form-key="'masterCluster.prometheusUrl'" :class-name="'el-form-item-not-mandatory m-b-0 p-r-28'" />
             </el-collapse-item>
             <el-collapse-item :title="t('connection.slaveInfo')" name="slaveCluster" v-if="formData.slaveCluster">
               <template #title>
@@ -68,7 +68,7 @@
                 </span>
                 <host-port v-model="formData.slaveCluster.hostAndPortVOS" :form-key="'slaveCluster.hostAndPortVOS'" :is-disabled="isShowSave" :show-operate="true" />
               </div>
-              <prometheus v-model="formData.slaveCluster.prometheusUrl" :form-key="'slaveCluster.prometheusUrl'" :class-name="'optional-form-item m-b-0 p-r-28'" />
+              <prometheus v-model="formData.slaveCluster.prometheusUrl" :form-key="'slaveCluster.prometheusUrl'" :class-name="'el-form-item-not-mandatory m-b-0 p-r-28'" />
             </el-collapse-item>
           </el-collapse>
         </template>
@@ -484,12 +484,6 @@ defineExpose({
     svg {
       transform: translate(-4px, -80%);
     }
-  }
-}
-
-.optional-form-item {
-  :deep(.el-form-item__label) {
-    padding-left: 9px;
   }
 }
 
