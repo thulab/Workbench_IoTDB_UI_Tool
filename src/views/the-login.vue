@@ -5,7 +5,7 @@
     </div>
     <div class="login-form-wrapper">
       <div class="login-form-container">
-        <el-icon id="login-language" class="login-language-icon" size="30" @click="handleChangeLang"><i-custom-language-border /></el-icon>
+        <el-icon v-show="false" id="login-language" class="login-language-icon" size="30" @click="handleChangeLang"><i-custom-language-border /></el-icon>
         <div class="login-logo-box">
           <i-custom-timecho-logo-en v-if="locale === 'en'" class="title-logo" />
           <i-custom-timecho-logo v-else class="title-logo" />
