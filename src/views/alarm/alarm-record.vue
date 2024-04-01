@@ -1,8 +1,8 @@
 <template>
   <el-container class="page-container">
-    <el-header class="search-form-wrapper p-0" style="height: auto">
+    <el-header class="search-form-wrapper search-form-box p-0" style="height: auto">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-        <base-form-item :label="`${t('alarm.alarmName')}：`" prop="alarmName" :label-width="locale === 'en' ? '100px' : '80px'">
+        <base-form-item :label="`${t('alarm.alarmName')}：`" prop="alarmName">
           <el-input v-model="searchFormData.alarmName" :placeholder="t('alarm.alarmNamePlaceholder')" style="width: 172px" id="alarm-record-search-name" />
         </base-form-item>
         <base-form-item prop="measurements">
@@ -19,7 +19,7 @@
             id="alarm-record-search-measurements"
           />
         </base-form-item>
-        <base-form-item prop="alarmLevel" class="m-r-0">
+        <base-form-item prop="alarmLevel">
           <template #label>
             {{ t('alarm.alarmLevel') }}：
             <el-tooltip effect="light" :content="t('alarm.alarmLevelTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
@@ -37,29 +37,27 @@
             </el-option>
           </el-select>
         </base-form-item>
-        <el-row>
-          <base-form-item :label="`${t('alarm.alarmTime')}：`" prop="createtimerange" :label-width="locale === 'en' ? '100px' : '80px'">
-            <el-date-picker
-              v-model="searchFormData.createtimerange"
-              type="datetimerange"
-              range-separator="～"
-              unlink-panels
-              :disabled-date="disabledDate"
-              :shortcuts="shortcutsDaterange"
-              :prefix-icon="ICustomCalender"
-              :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
-              id="alarm-record-search-time"
-            />
-          </base-form-item>
-          <base-form-item :label="`${t('alarm.newStatus')}：`" prop="status">
-            <el-switch v-model="searchFormData.status" :active-value="1" :inactive-value="0" style="--el-switch-on-color: #44c795; --el-switch-off-color: #dfe1ed" id="alarm-record-search-status" />
-          </base-form-item>
-          <div class="search-form-buttons">
-            <el-button @click="handleReset" id="alarm-record-search-reset">{{ t('common.reset') }}</el-button>
-            <el-button type="primary" @click="handleSearch" id="alarm-record-search-search">{{ t('common.query') }}</el-button>
-          </div>
-        </el-row>
+        <base-form-item :label="`${t('alarm.alarmTime')}：`" prop="createtimerange">
+          <el-date-picker
+            v-model="searchFormData.createtimerange"
+            type="datetimerange"
+            range-separator="～"
+            unlink-panels
+            :disabled-date="disabledDate"
+            :shortcuts="shortcutsDaterange"
+            :prefix-icon="ICustomCalender"
+            :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
+            id="alarm-record-search-time"
+          />
+        </base-form-item>
+        <base-form-item :label="`${t('alarm.newStatus')}：`" prop="status">
+          <el-switch v-model="searchFormData.status" :active-value="1" :inactive-value="0" style="--el-switch-on-color: #44c795; --el-switch-off-color: #dfe1ed" id="alarm-record-search-status" />
+        </base-form-item>
       </el-form>
+      <div class="search-form-buttons">
+        <el-button @click="handleReset" id="alarm-record-search-reset">{{ t('common.reset') }}</el-button>
+        <el-button type="primary" @click="handleSearch" id="alarm-record-search-search">{{ t('common.query') }}</el-button>
+      </div>
     </el-header>
 
     <el-main class="page-table-details">
@@ -195,20 +193,17 @@ const pagination = reactive({
 const totalCount = ref(0);
 const multipleSelection = ref<Alarm.QueryRecordResult[]>([]);
 
-const getLevelColor = computed(
-  () =>
-    function (data?: Alarm.QueryRecordResult) {
-      if (!data) {
-        if (searchFormData.alarmLevel) {
-          const res = levelOptions.value.find((f) => f.value === searchFormData.alarmLevel);
-          return res?.paramMap?.color;
-        }
-        return '#424561';
-      }
-      const res = levelOptions.value.find((f) => f.value === data.alarmLevel);
+const getLevelColor = (data?: Alarm.QueryRecordResult) => {
+  if (!data) {
+    if (searchFormData.alarmLevel) {
+      const res = levelOptions.value.find((f) => f.value === searchFormData.alarmLevel);
       return res?.paramMap?.color;
     }
-);
+    return '#424561';
+  }
+  const res = levelOptions.value.find((f) => f.value === data.alarmLevel);
+  return res?.paramMap?.color;
+};
 
 const {
   requestFn: getAlarmRecordList,
@@ -348,20 +343,12 @@ watch(locale, () => {
 </script>
 
 <style lang="scss" scoped>
-.search-form-wrapper {
+.search-form-box {
   width: 100%;
 
-  .search-form-buttons {
-    margin-bottom: 18px;
-    display: inline-flex;
-    flex-wrap: nowrap;
-    flex: 1;
-    justify-content: end;
-  }
-
-  :deep(.el-form-item) {
-    margin-right: 36px;
-  }
+  // :deep(.el-form-item) {
+  //   margin-right: 36px !important;
+  // }
 
   :deep(.el-switch) {
     height: 28px;

@@ -1,8 +1,8 @@
 <template>
   <el-container class="data-trend-wrapper">
     <el-header class="p-0" style="height: auto">
-      <div class="search-form-wrapper">
-        <el-form :model="searchFormData" ref="searchFormRef" label-position="left" :label-width="locale === 'en' ? '' : '88px'" size="default" inline>
+      <div class="search-form-wrapper search-form-box">
+        <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
           <ul class="search-data-list">
             <li :class="['search-data-type', { 'search-data-active': dataTab === 'running' }]" id="search-data-type-running" @click="handleTrendTab('running')">{{ t('dataTrend.realTrend') }}</li>
             <li :class="['search-data-type', { 'search-data-active': dataTab === 'history' }]" id="search-data-type-history" @click="handleTrendTab('history')">{{ t('dataTrend.historyTrend') }}</li>
@@ -28,7 +28,7 @@
               <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" :id="`trend-search-unitInterval-select-${item.value}`" />
             </el-select>
           </base-form-item>
-          <base-form-item v-show="!isRunningTab" :label="`${t('search.aggregation')}：`" prop="aggregation" :rules="requiredRules" class="m-r-0">
+          <base-form-item v-show="!isRunningTab" :label="`${t('search.aggregation')}：`" prop="aggregation" :rules="requiredRules">
             <el-select
               v-model="searchFormData.aggregation"
               :disabled="isRunningTab || searchFormData.unitInterval === 'origin'"
@@ -185,7 +185,7 @@ interface PointData {
   checked: boolean;
 }
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
 const userName = computed(() => userStore.userInfo.name);
@@ -912,21 +912,11 @@ onUnmounted(() => {
   padding: 26px 16px 16px 30px;
 }
 
-.search-form-wrapper {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-
+.search-form-box {
   :deep(.el-form) {
     display: flex;
     align-items: center;
-
-    // height: 30px;
     flex-wrap: wrap;
-  }
-
-  :deep(.el-form-item--default) {
-    margin: 0 24px 18px 0;
   }
 }
 
@@ -959,14 +949,6 @@ onUnmounted(() => {
 .play-pause-buttons {
   height: 30px;
   margin-top: -18px;
-}
-
-.search-form-buttons {
-  display: inline-flex;
-  flex-wrap: nowrap;
-  flex: 1;
-  justify-content: end;
-  margin-bottom: 16px;
 }
 
 .hover-btn-disabled,

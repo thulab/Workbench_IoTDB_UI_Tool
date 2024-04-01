@@ -8,10 +8,10 @@
     :close-on-click-modal="false"
     id="alarm-config-modal"
   >
-    <el-form ref="formRef" :model="formData" class="source-form" label-position="right" :label-width="locale === 'en' ? '166px' : '98px'">
+    <el-form ref="formRef" :model="formData" class="source-form" label-position="left" :label-width="locale === 'en' ? '166px' : '98px'">
       <el-row>
         <el-col :span="12">
-          <base-form-item prop="measurement" :rules="editType === 'add' ? requiredRules : []">
+          <base-form-item prop="measurement" :rules="editType === 'add' ? requiredRules : []" :class="editType === 'add' ? '' : 'el-form-item-not-mandatory'">
             <template #label>
               {{ t('alarm.alarmMeasurement') }}：
               <el-tooltip v-if="editType === 'add'" effect="light" :content="t('common.searchAllTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
@@ -111,7 +111,7 @@
       </el-row>
       <el-row class="m-b-12">
         <el-col :span="24">
-          <base-form-item :label="`${t('alarm.alarmIntro')}：`" prop="alarmDesc">
+          <base-form-item :label="`${t('alarm.alarmIntro')}：`" prop="alarmDesc" class="el-form-item-not-mandatory">
             <el-input
               type="textarea"
               v-model="formData.alarmDesc"

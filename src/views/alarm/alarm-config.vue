@@ -2,7 +2,7 @@
   <el-container class="page-container">
     <el-header class="search-form-wrapper p-0" style="height: auto">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-        <base-form-item :label="`${t('alarm.alarmName')}：`" prop="alarmName" :label-width="locale === 'en' ? '100px' : '80px'">
+        <base-form-item :label="`${t('alarm.alarmName')}：`" prop="alarmName">
           <el-input v-model="searchFormData.alarmName" :placeholder="t('alarm.alarmNamePlaceholder')" style="width: 172px" id="alarm-config-search-name" />
         </base-form-item>
         <base-form-item prop="measurements">
@@ -37,48 +37,46 @@
             </el-option>
           </el-select>
         </base-form-item>
-        <el-row>
-          <base-form-item :label="`${t('common.status')}：`" prop="status" :label-width="locale === 'en' ? '100px' : '80px'">
-            <el-select v-model="searchFormData.status" style="width: 90px" id="alarm-config-search-status">
-              <el-option v-for="item in statusOptions" :key="item.value" :value="item.value" :label="item.label" :id="`alarm-config-search-status-select-${item.value}`" />
-            </el-select>
-          </base-form-item>
-          <base-form-item :label="`${t('common.createTime')}：`" prop="createtimerange">
-            <el-date-picker
-              v-model="searchFormData.createtimerange"
-              type="datetimerange"
-              range-separator="～"
-              unlink-panels
-              :disabled-date="disabledDate"
-              :shortcuts="shortcutsDaterange"
-              :prefix-icon="ICustomCalender"
-              :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
-              id="alarm-config-search-datetimerange-create"
-            />
-          </base-form-item>
-          <base-form-item :label="`${t('common.updateTime')}：`" prop="updatetimerange">
-            <el-date-picker
-              v-model="searchFormData.updatetimerange"
-              type="datetimerange"
-              range-separator="～"
-              unlink-panels
-              :disabled-date="disabledDate"
-              :shortcuts="shortcutsDaterange"
-              :prefix-icon="ICustomCalender"
-              :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
-              id="alarm-config-search-datetimerange-update"
-            />
-          </base-form-item>
-          <div class="search-form-buttons">
-            <auth-tooltip :is-disabled="canUsePipe">
-              <el-button @click="handleReset" :disabled="!canUsePipe" id="alarm-config-search-reset">{{ t('common.reset') }}</el-button>
-            </auth-tooltip>
-            <auth-tooltip :is-disabled="canUsePipe">
-              <el-button type="primary" :disabled="!canUsePipe" @click="handleSearch" id="alarm-config-search-search">{{ t('common.query') }}</el-button>
-            </auth-tooltip>
-          </div>
-        </el-row>
+        <base-form-item :label="`${t('common.status')}：`" prop="status">
+          <el-select v-model="searchFormData.status" style="width: 90px" id="alarm-config-search-status">
+            <el-option v-for="item in statusOptions" :key="item.value" :value="item.value" :label="item.label" :id="`alarm-config-search-status-select-${item.value}`" />
+          </el-select>
+        </base-form-item>
+        <base-form-item :label="`${t('common.createTime')}：`" prop="createtimerange">
+          <el-date-picker
+            v-model="searchFormData.createtimerange"
+            type="datetimerange"
+            range-separator="～"
+            unlink-panels
+            :disabled-date="disabledDate"
+            :shortcuts="shortcutsDaterange"
+            :prefix-icon="ICustomCalender"
+            :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
+            id="alarm-config-search-datetimerange-create"
+          />
+        </base-form-item>
+        <base-form-item :label="`${t('common.updateTime')}：`" prop="updatetimerange">
+          <el-date-picker
+            v-model="searchFormData.updatetimerange"
+            type="datetimerange"
+            range-separator="～"
+            unlink-panels
+            :disabled-date="disabledDate"
+            :shortcuts="shortcutsDaterange"
+            :prefix-icon="ICustomCalender"
+            :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
+            id="alarm-config-search-datetimerange-update"
+          />
+        </base-form-item>
       </el-form>
+      <div class="search-form-buttons">
+        <auth-tooltip :is-disabled="canUsePipe">
+          <el-button @click="handleReset" :disabled="!canUsePipe" id="alarm-config-search-reset">{{ t('common.reset') }}</el-button>
+        </auth-tooltip>
+        <auth-tooltip :is-disabled="canUsePipe">
+          <el-button type="primary" :disabled="!canUsePipe" @click="handleSearch" id="alarm-config-search-search">{{ t('common.query') }}</el-button>
+        </auth-tooltip>
+      </div>
     </el-header>
 
     <el-main class="page-table-details">
@@ -245,20 +243,17 @@ const editVisible = ref(false);
 const editType = ref('add');
 const alarmConfigId = ref();
 
-const getLevelColor = computed(
-  () =>
-    function (data?: Alarm.QueryConfigResult) {
-      if (!data) {
-        if (searchFormData.alarmLevel) {
-          const res = levelOptions.value.find((f) => f.value === searchFormData.alarmLevel);
-          return res?.paramMap?.color;
-        }
-        return '#424561';
-      }
-      const res = levelOptions.value.find((f) => f.value === data.alarmLevel);
+const getLevelColor = (data?: Alarm.QueryConfigResult) => {
+  if (!data) {
+    if (searchFormData.alarmLevel) {
+      const res = levelOptions.value.find((f) => f.value === searchFormData.alarmLevel);
       return res?.paramMap?.color;
     }
-);
+    return '#424561';
+  }
+  const res = levelOptions.value.find((f) => f.value === data.alarmLevel);
+  return res?.paramMap?.color;
+};
 
 const {
   requestFn: getAlarmConfigList,
@@ -409,22 +404,6 @@ watch(locale, () => {
 .page-container {
   display: flex;
   flex-direction: column;
-}
-
-.search-form-wrapper {
-  width: 100%;
-
-  .search-form-buttons {
-    margin-bottom: 18px;
-    display: inline-flex;
-    flex-wrap: nowrap;
-    flex: 1;
-    justify-content: end;
-  }
-
-  :deep(.el-form-item) {
-    margin-right: 22px;
-  }
 }
 
 :deep(.el-select-v2__selection) {
