@@ -76,3 +76,25 @@
 .table-tooltip-max-width {
   max-width: 500px;
 }
+
+.search-form-wrapper {
+  width: 100%;
+  display: flex;
+
+  .el-form {
+    flex: 1;
+  }
+
+  .el-form--inline .el-form-item {
+    margin-right: 24px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .search-form-buttons {
+    margin-left: 12px;
+    margin-bottom: 16px;
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-self: end;
+  }
+}

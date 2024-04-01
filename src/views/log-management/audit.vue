@@ -1,51 +1,47 @@
 <template>
   <active-container :is-show="connectionIsActive">
     <el-container class="audit-detail-wrapper">
-      <el-header class="p-x-0" style="height: auto">
-        <div class="search-form-wrapper">
-          <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-            <base-form-item :label="`${t('log.operateUser')}：`" prop="username" :label-width="locale === 'en' ? '100px' : '80px'">
-              <el-input v-model="searchFormData.username" :placeholder="t('auth.userPlaceholder')" style="width: 172px" id="audit-search-name">
-                <template #prefix>
-                  <i-custom-search-icon class="remote-select-search-icon" />
-                </template>
-              </el-input>
-            </base-form-item>
-            <base-form-item :label="`${t('log.ip')}：`" prop="address">
-              <el-input v-model="searchFormData.address" :placeholder="t('log.ipPlaceholder')" style="width: 172px" id="audit-search-ip">
-                <template #prefix>
-                  <i-custom-search-icon class="remote-select-search-icon" />
-                </template>
-              </el-input>
-            </base-form-item>
-            <base-form-item :label="`${t('common.operationDetail')}：`" prop="log">
-              <el-input v-model="searchFormData.log" :placeholder="t('log.operationDetailPlaceholder')" style="width: 172px" id="audit-search-log">
-                <template #prefix>
-                  <i-custom-search-icon class="remote-select-search-icon" />
-                </template>
-              </el-input>
-            </base-form-item>
-            <el-row>
-              <base-form-item :label="`${t('log.timeRange')}：`" prop="time" :label-width="locale === 'en' ? '100px' : '80px'">
-                <el-date-picker
-                  v-model="searchFormData.time"
-                  type="datetimerange"
-                  range-separator="～"
-                  unlink-panels
-                  :clearable="false"
-                  :shortcuts="shortcutsDaterange"
-                  :disabled-date="disabledDate"
-                  :prefix-icon="ICustomCalender"
-                  :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
-                  id="audit-search-time"
-                />
-              </base-form-item>
-              <div class="search-form-buttons">
-                <el-button @click="handleReset" id="audit-search-reset">{{ t('common.reset') }}</el-button>
-                <el-button type="primary" @click="handleSearch" id="audit-search-search">{{ t('common.query') }}</el-button>
-              </div>
-            </el-row>
-          </el-form>
+      <el-header class="search-form-wrapper p-x-0" style="height: auto">
+        <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
+          <base-form-item :label="`${t('log.operateUser')}：`" prop="username">
+            <el-input v-model="searchFormData.username" :placeholder="t('auth.userPlaceholder')" style="width: 172px" id="audit-search-name">
+              <template #prefix>
+                <i-custom-search-icon class="remote-select-search-icon" />
+              </template>
+            </el-input>
+          </base-form-item>
+          <base-form-item :label="`${t('log.ip')}：`" prop="address">
+            <el-input v-model="searchFormData.address" :placeholder="t('log.ipPlaceholder')" style="width: 172px" id="audit-search-ip">
+              <template #prefix>
+                <i-custom-search-icon class="remote-select-search-icon" />
+              </template>
+            </el-input>
+          </base-form-item>
+          <base-form-item :label="`${t('common.operationDetail')}：`" prop="log">
+            <el-input v-model="searchFormData.log" :placeholder="t('log.operationDetailPlaceholder')" style="width: 172px" id="audit-search-log">
+              <template #prefix>
+                <i-custom-search-icon class="remote-select-search-icon" />
+              </template>
+            </el-input>
+          </base-form-item>
+          <base-form-item :label="`${t('log.timeRange')}：`" prop="time">
+            <el-date-picker
+              v-model="searchFormData.time"
+              type="datetimerange"
+              range-separator="～"
+              unlink-panels
+              :clearable="false"
+              :shortcuts="shortcutsDaterange"
+              :disabled-date="disabledDate"
+              :prefix-icon="ICustomCalender"
+              :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
+              id="audit-search-time"
+            />
+          </base-form-item>
+        </el-form>
+        <div class="search-form-buttons">
+          <el-button @click="handleReset" id="audit-search-reset">{{ t('common.reset') }}</el-button>
+          <el-button type="primary" @click="handleSearch" id="audit-search-search">{{ t('common.query') }}</el-button>
         </div>
       </el-header>
       <el-main class="p-0">
@@ -117,7 +113,7 @@ import { getStartAndEnd, today, formatDate, getOneInterval, getOneIntervalNow } 
 import ICustomCalender from '~icons/custom/calender.svg';
 import OverflowClick from './components/overflow-click.vue';
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
 const connectionStore = useConnectionStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
 const { maxTableHeight } = useTableHeight(340);
@@ -233,13 +229,6 @@ watch(
   background: #fff;
   box-sizing: border-box;
   padding: 26px 16px 16px 14px;
-}
-
-.search-form-buttons {
-  display: inline-flex;
-  flex-wrap: nowrap;
-  flex: 1;
-  justify-content: end;
 }
 
 .page-table-details {

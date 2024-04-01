@@ -79,7 +79,7 @@
       </div>
 
       <h4 class="storage-info-title">{{ t('measurement.measurementList') }}</h4>
-      <div class="search-form-wrapper">
+      <div class="search-form-container">
         <div class="search-form-box">
           <el-input v-model="searchKeyword" :placeholder="searchPlaceholder" @keyup.enter="handleRefresh" id="mesaurement-search" style="width: 340px">
             <template #prefix>
@@ -706,7 +706,7 @@ watch(
   border-bottom: 1px solid #dfe1ed;
 }
 
-.search-form-wrapper {
+.search-form-container {
   display: flex;
   justify-content: space-between;
   padding: 16px;

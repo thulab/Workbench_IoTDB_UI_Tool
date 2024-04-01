@@ -1,6 +1,6 @@
 <template>
   <el-dialog :title="t('measurement.newMeasurement')" v-model="dialogVisible" width="748px" :close-on-click-modal="false" id="measurement-modal-measurement">
-    <el-form ref="formRef" :model="formData" label-position="right">
+    <el-form ref="formRef" :model="formData" label-position="left">
       <h4 class="module-title">{{ t('measurement.device') }}</h4>
       <el-form-item :label="`${t('measurement.deviceName')}：`" prop="deviceName" class="p-t-8" :rules="!addDevice ? requiredRules : deviceRules">
         <el-input type="hidden" />

@@ -1,25 +1,23 @@
 <template>
   <version-container :is-show="showAuthMenu" :versiton-tip="'1.2.1'">
     <el-container class="data-sync-detail-wrapper" v-if="showMain">
-      <el-header class="p-x-0" style="height: auto">
-        <div class="search-form-wrapper">
-          <el-form :model="searchFormData" label-position="left" size="default" inline @submit.prevent>
-            <base-form-item :label="`${t('dataSync.taskName')}：`" prop="name">
-              <el-input v-model="searchFormData.name" :placeholder="t('dataSync.taskNamePlaceholder')" id="data-sync-search-name" style="width: 200px">
-                <template #prefix>
-                  <i-custom-search-icon class="remote-select-search-icon" />
-                </template>
-              </el-input>
-            </base-form-item>
-          </el-form>
-          <div class="search-form-buttons">
-            <auth-tooltip :is-disabled="canUsePipe">
-              <el-button @click="handleReset" :disabled="!canUsePipe" id="data-sync-search-reset">{{ t('common.reset') }}</el-button>
-            </auth-tooltip>
-            <auth-tooltip :is-disabled="canUsePipe">
-              <el-button type="primary" @click="handleSearch" :disabled="!canUsePipe" id="data-sync-search-search">{{ t('common.query') }}</el-button>
-            </auth-tooltip>
-          </div>
+      <el-header class="search-form-wrapper p-x-0" style="height: auto">
+        <el-form :model="searchFormData" label-position="left" size="default" inline @submit.prevent>
+          <base-form-item :label="`${t('dataSync.taskName')}：`" prop="name">
+            <el-input v-model="searchFormData.name" :placeholder="t('dataSync.taskNamePlaceholder')" id="data-sync-search-name" style="width: 200px">
+              <template #prefix>
+                <i-custom-search-icon class="remote-select-search-icon" />
+              </template>
+            </el-input>
+          </base-form-item>
+        </el-form>
+        <div class="search-form-buttons">
+          <auth-tooltip :is-disabled="canUsePipe">
+            <el-button @click="handleReset" :disabled="!canUsePipe" id="data-sync-search-reset">{{ t('common.reset') }}</el-button>
+          </auth-tooltip>
+          <auth-tooltip :is-disabled="canUsePipe">
+            <el-button type="primary" @click="handleSearch" :disabled="!canUsePipe" id="data-sync-search-search">{{ t('common.query') }}</el-button>
+          </auth-tooltip>
         </div>
       </el-header>
       <el-main class="p-0">
@@ -315,13 +313,6 @@ watch(
   background: #fff;
   box-sizing: border-box;
   padding: 26px 16px 16px 14px;
-}
-
-.search-form-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 4px;
 }
 
 .page-table-details {

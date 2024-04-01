@@ -5,6 +5,7 @@
         <i-custom-nav-open v-if="isCollapse" />
         <i-custom-nav-close v-else />
       </el-icon>
+      <!-- eslint-disable-next-line vue/no-constant-condition -->
       <el-breadcrumb :separator-icon="IconEpArrowRight" v-if="false">
         <transition-group name="breadcrumb" mode="out-in">
           <el-breadcrumb-item :key="HOME_URL" :to="{ path: HOME_URL }">Home</el-breadcrumb-item>
@@ -15,7 +16,7 @@
       </el-breadcrumb>
     </div>
     <div class="header-ri flex-center">
-      <el-dropdown @command="handleChangeLang" v-show="false">
+      <el-dropdown @command="handleChangeLang">
         <span class="lang-icon m-r-20">
           <i-custom-language />
         </span>
@@ -28,6 +29,7 @@
         </template>
       </el-dropdown>
 
+      <!-- eslint-disable-next-line vue/no-constant-condition -->
       <el-switch v-if="false" v-model="isDark" class="switch-dark" inline-prompt :active-icon="IconEpMoon" :inactive-icon="IconEpSunny" />
 
       <user-header />
