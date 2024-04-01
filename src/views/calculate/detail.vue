@@ -37,6 +37,25 @@
               <auth-tooltip :is-disabled="canAllWriteSchema">
                 <el-button type="primary" :disabled="!canAllWriteSchema" @click="handleAdd" id="calculate-add">{{ appType === 1 ? t('calculate.newCalculate') : t('calculate.newView') }}</el-button>
               </auth-tooltip>
+              <auth-tooltip :is-disabled="canAllWriteSchema">
+                <el-button class="m-l-16" @click="handleImport" id="calculate-import">
+                  {{ t('common.import') }}
+                </el-button>
+              </auth-tooltip>
+              <auth-tooltip :is-disabled="canReadWriteSchema">
+                <el-dropdown class="m-x-16" :disabled="!(totalCount > 0) || !canReadWriteSchema" @command="(val) => handleCommandDown(val)" id="calculate-download-dropdown">
+                  <el-button class="export-button" :disabled="!(totalCount > 0) || !canReadWriteSchema" id="calculate-download">
+                    {{ t('common.export') }}
+                    <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
+                  </el-button>
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item command="csv" id="calculate-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
+                      <el-dropdown-item command="xlsx" id="calculate-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </auth-tooltip>
               <auth-tooltip :is-disabled="canWriteSchema">
                 <el-button :disabled="!multipleSelection.length || !canWriteSchema" type="primary" @click="handleDel('batch', null)" id="calculate-batch-del">{{ t('common.batchDelete') }}</el-button>
               </auth-tooltip>
@@ -114,6 +133,8 @@
       <modal-calculate v-model:visible="editVisible" :edit-type="editType" :edit-data="editData" @handleSave="handleSearch" />
 
       <modal-expression v-model:visible="expressionVisible" :content="editExpression" />
+
+      <modal-import v-model:visible="importVisible" @handle-close="handleImportClose" />
     </el-container>
   </active-container>
 </template>
@@ -128,6 +149,7 @@ import { getPathAuthList } from '@/utils/auth';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalCalculate from './components/modal-calculate.vue';
 import ModalExpression from './components/modal-expression.vue';
+import ModalImport from './components/modal-import.vue';
 
 const { t } = useI18n();
 const appType = Number(import.meta.env.VITE_APP_TYPE);
@@ -153,6 +175,7 @@ const editVisible = ref(false);
 const editData = ref();
 const expressionVisible = ref(false);
 const editExpression = ref('');
+const importVisible = ref(false);
 const canAllWriteSchema = computed(() => userAllPrivileges.value.includes('WRITE_SCHEMA'));
 
 function searchPlaceholder() {
@@ -187,6 +210,7 @@ const {
 });
 const { requestFn: getBatchLastValue } = useRequest(StorageApi.getBatchLastValue);
 const { requestFn: deleteCalculate } = useRequest(CalculateApi.deleteCalculate);
+const { requestFn: exportCalculateData } = useRequest(CalculateApi.exportCalculateData);
 
 const tableDataPagination = computed(() => tableData.value.list.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
 
@@ -326,6 +350,34 @@ function handleDel(type: string, data: Calculate.CalculateItem | null) {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
       handleSearch();
     });
+  });
+}
+
+// 导入
+function handleImport() {
+  importVisible.value = true;
+}
+
+// 导入物理量
+function handleImportClose(reload: boolean) {
+  if (reload) {
+    handleSearch();
+  }
+}
+
+// 下载
+function handleCommandDown(val: string) {
+  exportCalculateData({
+    ...pagination,
+    name: searchFormData.type === 'name' ? searchFormData.name : '',
+    measurement: searchFormData.type === 'measurement' ? searchFormData.name : '',
+    desc: searchFormData.type === 'desc' ? searchFormData.name : '',
+  }).then((res) => {
+    let url = `/api/file/exportExcelCalculateData?exportId=${res.data}`;
+    if (val === 'csv') {
+      url = `/api/file/exportCsvCalculateData?exportId=${res.data}`;
+    }
+    window.open(url);
   });
 }
 

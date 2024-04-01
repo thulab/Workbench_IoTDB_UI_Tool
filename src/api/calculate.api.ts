@@ -21,5 +21,18 @@ class CalculateApi {
   static deleteCalculate(data: string[]): HttpResponseP {
     return http.post('/calculate/deleteCalculate', { measurements: data });
   }
+
+  // 导入
+  static importCalculateData(data: FormData, fileType: string = 'csv'): HttpResponseP<StorageDevice.ImportMeasurementDataRes> {
+    if (fileType === 'csv') {
+      return http.post('/file/importCalculateCsvData', data, { timeout: 60 * 30 * 1000 });
+    }
+    return http.post('/file/importCalculateExcelData', data, { timeout: 60 * 30 * 1000 });
+  }
+
+  // 导出
+  static exportCalculateData(data: Calculate.CalculateItem & PageQuery): HttpResponseP {
+    return http.post('/file/calculateExportId', data);
+  }
 }
 export default CalculateApi;

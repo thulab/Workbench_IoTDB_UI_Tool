@@ -176,7 +176,7 @@ measurement:
   deviceNameSelectPlaceholder: 请选择设备名称
   deviceNameInputPlaceholder: 请输入设备名称
   newDevice: 新建设备
-  deviceAlign: 按设备对齐
+  deviceAlign: 时间对齐
   measurement: 测点
   measurementName: 测点名称
   measurementNamePlaceholder: 请输入测点名称
@@ -489,6 +489,7 @@ calculate:
   calculateExpression: 计算表达式
   viewExpression: 视图表达式
   expressionTip: '支持使用运算符及函数(除聚合函数), 如: root.sgcc.wf03.wt01.temperature + 1，详细规则见'
+  batchImportTitle: 批量导入计算
 alarm:
   alarmName: 告警名称
   alarmNamePlaceholder: 请输入告警名称

@@ -73,7 +73,16 @@
                 <el-table-column :label="t('dashboard.node')" prop="address" min-width="200" align="center" show-overflow-tooltip />
                 <el-table-column :label="t('dashboard.type')" prop="type" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
                 <el-table-column :label="t('common.status')" prop="status" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
-                <el-table-column :label="t('dashboard.version')" prop="version" v-if="showVersionCol" min-width="90" align="center" show-overflow-tooltip />
+                <el-table-column
+                  :label="t('dashboard.version')"
+                  prop="version"
+                  v-if="showVersionCol((tableData.length && tableData[0].version) || '')"
+                  min-width="140"
+                  align="center"
+                  show-overflow-tooltip
+                >
+                  <template #default="{ row }">{{ row.version }} {{ systemData.active ? '企业版' : '开源版' }}</template>
+                </el-table-column>
                 <el-table-column :label="t('dashboard.physicalMachine')" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
                 <template #empty>
                   <div class="table-empty-wrapper">
@@ -155,7 +164,16 @@
                 <el-table-column :label="t('dashboard.node')" prop="address" min-width="200" align="center" show-overflow-tooltip />
                 <el-table-column :label="t('dashboard.type')" prop="type" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
                 <el-table-column :label="t('common.status')" prop="status" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
-                <el-table-column :label="t('dashboard.version')" prop="version" v-if="showVersionCol" min-width="90" align="center" show-overflow-tooltip />
+                <el-table-column
+                  :label="t('dashboard.version')"
+                  prop="version"
+                  v-if="showVersionCol((slaveTableData.length && slaveTableData[0].version) || '')"
+                  min-width="140"
+                  align="center"
+                  show-overflow-tooltip
+                >
+                  <template #default="{ row }">{{ row.version }} {{ slaveData.active ? '企业版' : '开源版' }}</template>
+                </el-table-column>
                 <el-table-column :label="t('dashboard.physicalMachine')" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
                 <template #empty>
                   <div class="table-empty-wrapper">
@@ -300,8 +318,10 @@ const nodeList = computed(() => {
   return masterNodes.value;
 });
 
-const showVersionCol = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.2.1'));
-// const showVersionCol1312 = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.1.2'));
+function showVersionCol(version: string) {
+  if (!version) return false;
+  return iotdbShowAuth(version, '1.2.1');
+}
 
 function showVersionCol1312(version: string) {
   if (!version) return false;
