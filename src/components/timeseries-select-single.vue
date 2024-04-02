@@ -1,34 +1,32 @@
 <template>
-  <div>
-    <el-select
-      v-model="model"
-      :placeholder="placeholder ? placeholder : t('measurement.measurementNameSelectPlaceholder')"
-      filterable
-      remote
-      :clearable="isClearable"
-      :remote-show-suffix="showSuffix"
-      fit-input-width
-      :remote-method="remoteMethod"
-      :disabled="disabledSelect"
-      :style="`width: ${selectWidth}px;`"
-      class="remote-select-box"
-      id="select-path-single"
-      @change="handleChangePath"
+  <el-select
+    v-model="model"
+    :placeholder="placeholder ? placeholder : t('measurement.measurementNameSelectPlaceholder')"
+    filterable
+    remote
+    :clearable="isClearable"
+    :remote-show-suffix="showSuffix"
+    fit-input-width
+    :remote-method="remoteMethod"
+    :disabled="disabledSelect"
+    :style="`width: ${selectWidth}px;`"
+    class="remote-select-box"
+    id="select-path-single"
+    @change="handleChangePath"
+  >
+    <el-option
+      v-for="item in measurementList"
+      :key="item.timeseries"
+      :label="item.timeseries"
+      :value="item.timeseries"
+      :id="`select-path-single-${item.timeseries}`"
+      :disabled="disabledPath ? disabledPath(item) : false"
     >
-      <el-option
-        v-for="item in measurementList"
-        :key="item.timeseries"
-        :label="item.timeseries"
-        :value="item.timeseries"
-        :id="`select-path-single-${item.timeseries}`"
-        :disabled="disabledPath ? disabledPath(item) : false"
-      >
-        <div :style="`display: flex; width: ${itemWidth}px;`">
-          <text-tooltip :content="item.timeseries" />
-        </div>
-      </el-option>
-    </el-select>
-  </div>
+      <div :style="`display: flex; width: ${itemWidth}px;`">
+        <text-tooltip :content="item.timeseries" />
+      </div>
+    </el-option>
+  </el-select>
 </template>
 
 <script setup lang="ts">

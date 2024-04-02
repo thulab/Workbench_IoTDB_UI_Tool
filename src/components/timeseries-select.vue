@@ -1,50 +1,48 @@
 <template>
-  <div>
-    <el-select
-      class="remote-select-box"
-      v-model="model"
-      :placeholder="t('measurement.measurementNameSelectPlaceholder')"
-      filterable
-      remote
-      clearable
-      multiple
-      collapse-tags
-      :collapse-tags-tooltip="false"
-      :remote-method="remoteMethod"
-      style="width: 256px"
-      :disabled="disabled"
+  <el-select
+    class="remote-select-box"
+    v-model="model"
+    :placeholder="t('measurement.measurementNameSelectPlaceholder')"
+    filterable
+    remote
+    clearable
+    multiple
+    collapse-tags
+    :collapse-tags-tooltip="false"
+    :remote-method="remoteMethod"
+    style="width: 256px"
+    :disabled="disabled"
+  >
+    <template #prefix>
+      <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
+    </template>
+    <el-option
+      v-for="item in measurementList"
+      :key="item.timeseries"
+      :label="item.timeseries"
+      :value="item.timeseries"
+      :id="`timeseries-select-${item.timeseries}`"
+      :disabled="isBooleanTextDisabled ? item.dataType === 'BOOLEAN' || item.dataType === 'TEXT' : false"
     >
-      <template #prefix>
-        <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
-      </template>
-      <el-option
-        v-for="item in measurementList"
-        :key="item.timeseries"
-        :label="item.timeseries"
-        :value="item.timeseries"
-        :id="`timeseries-select-${item.timeseries}`"
-        :disabled="isBooleanTextDisabled ? item.dataType === 'BOOLEAN' || item.dataType === 'TEXT' : false"
-      >
-        <div class="remote-select-search-text">
-          <text-tooltip :content="item.timeseries" />
-        </div>
-      </el-option>
-    </el-select>
-    <el-button v-if="isShowViewBtn" type="primary" :disabled="!model.length" class="m-l-12" @click="() => (dialogVisible = true)">{{ viewText || t('dataTrend.choosedMeasurement') }}</el-button>
-    <el-dialog :title="viewText || t('dataTrend.choosedMeasurement')" v-model="dialogVisible" class="select-modal" align-center>
-      <el-scrollbar :max-height="400">
-        <ul class="select-list">
-          <li v-for="(item, index) in model" :key="item" class="select-item">
-            <span class="select-item-text"><text-tooltip :content="item" /></span>
-            <div class="select-item-delete-box" @click="handleDelete(index)">
-              <i-custom-delete class="select-item-delete" />
-              <i-custom-delete-active class="select-item-delete-active" />
-            </div>
-          </li>
-        </ul>
-      </el-scrollbar>
-    </el-dialog>
-  </div>
+      <div class="remote-select-search-text">
+        <text-tooltip :content="item.timeseries" />
+      </div>
+    </el-option>
+  </el-select>
+  <el-button v-if="isShowViewBtn" type="primary" :disabled="!model.length" class="m-l-12" @click="() => (dialogVisible = true)">{{ viewText || t('dataTrend.choosedMeasurement') }}</el-button>
+  <el-dialog :title="viewText || t('dataTrend.choosedMeasurement')" v-model="dialogVisible" class="select-modal" align-center>
+    <el-scrollbar :max-height="400">
+      <ul class="select-list">
+        <li v-for="(item, index) in model" :key="item" class="select-item">
+          <span class="select-item-text"><text-tooltip :content="item" /></span>
+          <div class="select-item-delete-box" @click="handleDelete(index)">
+            <i-custom-delete class="select-item-delete" />
+            <i-custom-delete-active class="select-item-delete-active" />
+          </div>
+        </li>
+      </ul>
+    </el-scrollbar>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
