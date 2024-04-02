@@ -204,7 +204,7 @@
 import { storeToRefs } from 'pinia';
 import type { FormInstance, SingleOrRange, DateModelType, CheckboxValueType } from 'element-plus';
 import dayjs from 'dayjs';
-import { debounce } from 'lodash-es';
+import { debounce, cloneDeep } from 'lodash-es';
 import { vElementSize } from '@vueuse/components';
 import { SearchApi } from '@/api';
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
@@ -277,6 +277,7 @@ const searchFormData = reactive<{
   amplification: 1,
   datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
 });
+let copySearchFormData = cloneDeep(searchFormData);
 const shortcutsDaterange = [
   {
     text: t('common.today'),
@@ -347,7 +348,7 @@ const seriesData = computed<ECOption>(
           showAllSymbol: 'auto',
           connectNulls: false,
           symbolSize: 4,
-          name: searchFormData.measurement,
+          name: copySearchFormData.measurement,
           data: chartData.values.map((dataItem, index) => [chartData.timestamps[index], dataItem]),
           markPoint: {
             silent: true,
@@ -505,7 +506,6 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
     });
     // 若存在click事件，执行
     chartInstance.on('click', (params) => {
-      console.log(params);
       if (!clickedOperate.value) return;
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       handleClickChart(params);
@@ -518,11 +518,12 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       handleEmptyOperate();
     });
-    chartInstance.getZr().on('click', () => {
+    chartInstance.getZr().on('click', (params) => {
       if (!clickedOperate.value) return;
+      if (params.topTarget?.type !== 'Line') return;
       if (currentPoint && chartData.timestamps[currentPoint]) {
         const point = [chartData.timestamps[currentPoint], chartData.values[currentPoint]];
-        const param = { componentType: 'series', seriesName: 'test', value: point };
+        const param = { componentType: 'series', seriesName: copySearchFormData.measurement, value: point };
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         handleClickChart(param as echarts.ECElementEvent);
       }
@@ -816,12 +817,12 @@ function handleReset() {
 }
 
 function getFFT() {
-  const start = dayjs(searchFormData.datetimerange[0]).valueOf();
-  const end = dayjs(searchFormData.datetimerange[1]).valueOf();
+  const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
+  const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
   getFFTData({
-    resultType: searchFormData.resultType,
-    compression: searchFormData.compression!,
-    measurement: searchFormData.measurement,
+    resultType: copySearchFormData.resultType,
+    compression: copySearchFormData.compression!,
+    measurement: copySearchFormData.measurement,
     startTime: start,
     endTime: end,
   })
@@ -838,12 +839,12 @@ function getFFT() {
 }
 
 function getEnvelope() {
-  const start = dayjs(searchFormData.datetimerange[0]).valueOf();
-  const end = dayjs(searchFormData.datetimerange[1]).valueOf();
+  const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
+  const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
   getEnvelopeDemodulationData({
-    frequency: searchFormData.frequency || '',
-    amplification: searchFormData.amplification || '',
-    measurement: searchFormData.measurement,
+    frequency: copySearchFormData.frequency || '',
+    amplification: copySearchFormData.amplification || '',
+    measurement: copySearchFormData.measurement,
     startTime: start,
     endTime: end,
   })
@@ -876,16 +877,17 @@ function getCustom() {
 // 查询
 function handleSearch() {
   if (!canReadWriteSchemaData.value) return;
+  copySearchFormData = cloneDeep(searchFormData);
   handleEmptyOperate();
-  if (!searchFormData.method) {
+  if (!copySearchFormData.method) {
     ElMessage.warning({
       message: t('common.searchFormEmpty'),
       grouping: true,
     });
     return;
   }
-  if (searchFormData.method === 'ENVELOPE') {
-    if (!searchFormData.measurement) {
+  if (copySearchFormData.method === 'ENVELOPE') {
+    if (!copySearchFormData.measurement) {
       ElMessage.warning({
         message: t('common.searchFormEmpty'),
         grouping: true,
@@ -893,7 +895,7 @@ function handleSearch() {
       return;
     }
     getEnvelope();
-  } else if (searchFormData.method === 'custom') {
+  } else if (copySearchFormData.method === 'custom') {
     if (!sqlValue.value) {
       ElMessage.warning({
         message: t('common.searchFormEmpty'),
@@ -903,7 +905,7 @@ function handleSearch() {
     }
     getCustom();
   } else {
-    if (!searchFormData.measurement) {
+    if (!copySearchFormData.measurement) {
       ElMessage.warning({
         message: t('common.searchFormEmpty'),
         grouping: true,
