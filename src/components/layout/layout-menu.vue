@@ -13,7 +13,7 @@
         <el-icon size="30" :style="{ marginLeft: isCollapse ? '0' : '-4px' }"><i-custom-connection /></el-icon>
         <div v-if="!isCollapse" class="connection-info flex-align-center" :style="{ 'font-size': locale === 'en' ? '12px' : '14px' }">
           <span class="connection-name">{{ connectionName }}</span>
-          <el-icon size="20" style="cursor: pointer" id="layout-menu-connection" @click="handleToggleConnection"><i-custom-toggle /></el-icon>
+          <el-icon size="20" class="svg-button-hover-color" style="cursor: pointer" id="layout-menu-connection" @click="handleToggleConnection"><i-custom-toggle /></el-icon>
         </div>
       </div>
       <div v-if="!isCollapse" class="flex-align-center" style="height: 36px">

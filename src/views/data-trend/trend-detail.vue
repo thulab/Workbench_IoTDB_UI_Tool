@@ -91,7 +91,13 @@
             >
               {{ t('spectrum.cursor') }}
             </el-button>
-            <el-button link class="cursor-button-clear" id="trend-cursor-clear" :disabled="!chartHistoryData.length || !pointList.length" @click="handleEmptyPoint">
+            <el-button
+              link
+              :class="['cursor-button-clear', !chartHistoryData.length || !pointList.length ? '' : 'svg-button-hover-color']"
+              id="trend-cursor-clear"
+              :disabled="!chartHistoryData.length || !pointList.length"
+              @click="handleEmptyPoint"
+            >
               <el-icon size="18" color="#fff"><i-custom-delete /></el-icon>
             </el-button>
           </div>

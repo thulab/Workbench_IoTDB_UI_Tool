@@ -178,10 +178,17 @@
                   <base-form-item label="" :prop="`targetInfos[${index}].port`" :rules="requiredPortRules">
                     <el-input v-model.number="item.port" :placeholder="t('dataSync.targetInfoHost')" style="width: 210px" :id="`data-sync-modal-${index}-port`" />
                   </base-form-item>
-                  <el-button link v-if="index === 0 && editType !== 'view'" @click="handleAddHost" id="target-ip-add" class="m-l-6" :disabled="isDisabledHosts">
+                  <el-button
+                    link
+                    v-if="index === 0 && editType !== 'view'"
+                    @click="handleAddHost"
+                    id="target-ip-add"
+                    :class="['m-l-6', isDisabledHosts ? '' : 'svg-button-hover-color']"
+                    :disabled="isDisabledHosts"
+                  >
                     <el-icon size="26"><i-custom-add-border /></el-icon>
                   </el-button>
-                  <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost(index)" :id="`target-ip-del${index}`" class="m-l-6">
+                  <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost(index)" :id="`target-ip-del${index}`" class="m-l-6 svg-button-hover-color">
                     <el-icon size="26"><i-custom-delete /></el-icon>
                   </el-button>
                 </div>

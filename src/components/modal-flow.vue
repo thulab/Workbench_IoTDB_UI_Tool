@@ -16,24 +16,24 @@
     <template #header>
       <div class="flow-graph-operate-header">
         <div class="flow-graph-operate-left">
-          <el-button link class="flow-graph-close-btn" id="flow-graph-close-btn" @click="handleClose">
+          <el-button link class="flow-graph-close-btn svg-button-hover-color" id="flow-graph-close-btn" @click="handleClose">
             <el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>
             {{ t('common.goback') }}
           </el-button>
           <span class="flow-graph-header-title">{{ t('flow.topologyMap') }}</span>
         </div>
         <div class="operate-buttons" v-if="editType === 'edit'">
-          <el-button link @click="handleSaveView" id="flow-graph-view" :loading="saveLoading">
+          <el-button link class="svg-button-hover-color" @click="handleSaveView" id="flow-graph-view" :loading="saveLoading">
             <el-icon size="24" class="m-r-6"><i-custom-circle-close-half /></el-icon>
             {{ t('common.exitEdit') }}
           </el-button>
-          <el-button link @click="handleEmpty" id="flow-graph-empty">
+          <el-button link @click="handleEmpty" class="svg-button-hover-color" id="flow-graph-empty">
             <el-icon size="24" class="m-r-6"><i-custom-delete /></el-icon>
             {{ t('common.clear') }}
           </el-button>
         </div>
         <div class="operate-buttons" v-if="editType === 'view'">
-          <el-button link @click="handleEdit" id="flow-graph-edit">
+          <el-button link @click="handleEdit" class="svg-button-hover-color" id="flow-graph-edit">
             <el-icon size="24" class="m-r-6"><i-custom-edit /></el-icon>
             {{ t('common.edit') }}
           </el-button>

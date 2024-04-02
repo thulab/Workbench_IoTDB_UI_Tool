@@ -9,7 +9,7 @@
               <p class="module-details">
                 <span class="module-label-text">{{ `${t('dashboard.deadTime')}：` }}</span>
                 <span class="module-content-text m-r-16">{{ systemTime }}</span>
-                <el-button link @click="() => handleRefreshSystem()" id="dashboard-system-refresh"><i-custom-refresh style="width: 24px; height: 24px" /></el-button>
+                <el-button link @click="() => handleRefreshSystem()" id="dashboard-system-refresh" class="svg-button-hover-color"><i-custom-refresh style="width: 24px; height: 24px" /></el-button>
               </p>
             </div>
             <ul class="system-info-list">
@@ -100,7 +100,9 @@
               <p class="module-details">
                 <span class="module-label-text">{{ `${t('dashboard.deadTime')}：` }}</span>
                 <span class="module-content-text m-r-16">{{ systemTime }}</span>
-                <el-button link @click="() => handleRefreshSystem()" id="dashboard-system-slave-refresh"><i-custom-refresh style="width: 24px; height: 24px" /></el-button>
+                <el-button link @click="() => handleRefreshSystem()" id="dashboard-system-slave-refresh" class="svg-button-hover-color">
+                  <i-custom-refresh style="width: 24px; height: 24px" />
+                </el-button>
               </p>
             </div>
             <ul class="system-info-list">
@@ -191,7 +193,7 @@
               <p class="module-details" v-if="showPrometheus">
                 <span class="module-label-text">{{ `${t('dashboard.deadTime')}：` }}</span>
                 <span class="module-content-text m-r-16">{{ monitorTime }}</span>
-                <el-button link @click="handleRefreshMonitor" id="dashboard-monitor-refresh"><i-custom-refresh style="width: 24px; height: 24px" /></el-button>
+                <el-button link @click="handleRefreshMonitor" id="dashboard-monitor-refresh" class="svg-button-hover-color"><i-custom-refresh style="width: 24px; height: 24px" /></el-button>
               </p>
             </div>
 

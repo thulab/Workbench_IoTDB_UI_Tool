@@ -55,7 +55,13 @@
             </el-dropdown>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canReadWriteData">
-            <el-button link @click="handleSearch" :disabled="getListLoading || searchFormData.path.length === 0 || !canReadWriteData" id="statistic-search-refresh">
+            <el-button
+              link
+              @click="handleSearch"
+              :disabled="getListLoading || searchFormData.path.length === 0 || !canReadWriteData"
+              id="statistic-search-refresh"
+              :class="getListLoading || searchFormData.path.length === 0 || !canReadWriteData ? '' : 'svg-button-hover-color'"
+            >
               <i-custom-refresh style="width: 24px; height: 24px" />
             </el-button>
           </auth-tooltip>

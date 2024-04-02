@@ -9,10 +9,17 @@
         <el-input v-model.number="item.port" :placeholder="t('connection.portTip')" :style="{ width: locale === 'en' ? '108px' : '148px' }" :id="`${formKey}-${index}-port`" :disabled="!isDisabled" />
       </base-form-item>
       <template v-if="showOperate">
-        <el-button link v-if="index === 0" @click="handleAddHost" :id="`${formKey}-add`" class="m-l-6" :disabled="isDisabledAddHosts || !isDisabled">
+        <el-button
+          link
+          v-if="index === 0"
+          @click="handleAddHost"
+          :id="`${formKey}-add`"
+          :class="['m-l-6', isDisabledAddHosts || !isDisabled ? '' : 'svg-button-hover-color']"
+          :disabled="isDisabledAddHosts || !isDisabled"
+        >
           <el-icon size="26"><i-custom-add-border /></el-icon>
         </el-button>
-        <el-button link v-if="index !== 0" @click="handleDelHost(index)" :id="`${formKey}-del`" class="m-l-6" :disabled="!isDisabled">
+        <el-button link v-if="index !== 0" @click="handleDelHost(index)" :id="`${formKey}-del`" :class="['m-l-6', !isDisabled ? '' : 'svg-button-hover-color']" :disabled="!isDisabled">
           <el-icon size="26"><i-custom-delete /></el-icon>
         </el-button>
       </template>

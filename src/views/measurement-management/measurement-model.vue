@@ -9,7 +9,7 @@
           </el-button>
         </el-tooltip>
         <auth-tooltip :is-disabled="canReadWriteSchema">
-          <el-button :disabled="!canReadWriteSchema" link @click="handleRefresh" id="measurement-tree-refresh">
+          <el-button :disabled="!canReadWriteSchema" link @click="handleRefresh" id="measurement-tree-refresh" :class="!canReadWriteSchema ? '' : 'svg-button-hover-color'">
             <el-icon size="24"><i-custom-refresh /></el-icon>
           </el-button>
         </auth-tooltip>

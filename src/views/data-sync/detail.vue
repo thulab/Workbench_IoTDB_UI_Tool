@@ -49,7 +49,9 @@
                 <el-button type="primary" @click="handleMonitor" :disabled="!showPrometheus" id="data-sync-add">{{ t('dataSync.monitorDashboard') }}</el-button>
               </el-tooltip>
               <auth-tooltip :is-disabled="canUsePipe">
-                <el-button link @click="handleSearch" :disabled="!canUsePipe" id="data-sync-refresh"><i-custom-refresh style="width: 24px; height: 24px" /></el-button>
+                <el-button link @click="handleSearch" :disabled="!canUsePipe" id="data-sync-refresh" :class="!canUsePipe ? '' : 'svg-button-hover-color'">
+                  <i-custom-refresh style="width: 24px; height: 24px" />
+                </el-button>
               </auth-tooltip>
             </div>
           </div>

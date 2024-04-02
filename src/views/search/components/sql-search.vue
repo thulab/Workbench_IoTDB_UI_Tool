@@ -5,25 +5,25 @@
         <span>{{ t('search.sqlInput') }}</span>
       </div>
       <div class="sql-right-icon-box">
-        <el-button link @click="handleSave" id="sql-search-operate-save">
+        <el-button link @click="handleSave" id="sql-search-operate-save" class="svg-button-hover-color">
           <i-custom-sql-save />
           {{ t('common.save') }}
         </el-button>
-        <el-button link :disabled="!runFlag" @click="querySqlRun()" id="sql-search-operate-run">
+        <el-button link :disabled="!runFlag" @click="querySqlRun()" id="sql-search-operate-run" class="svg-button-hover-color">
           <i-custom-run-all />
           {{ t('search.runAll') }}
         </el-button>
         <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('search.selectRunTip')" :disabled="!!selectionCode" popper-class="tooltip-max-width">
-          <el-button link :disabled="!runFlag || !selectionCode" @click="querySqlRun('part')" id="sql-search-operate-run-part">
+          <el-button link :disabled="!runFlag || !selectionCode" @click="querySqlRun('part')" id="sql-search-operate-run-part" :class="!runFlag || !selectionCode ? '' : 'svg-button-hover-color'">
             <i-custom-run-part />
             {{ t('search.runPart') }}
           </el-button>
         </el-tooltip>
-        <el-button link :disabled="runFlag" @click="stopquery" id="sql-search-operate-stop">
+        <el-button link :disabled="runFlag" @click="stopquery" id="sql-search-operate-stop" :class="runFlag ? '' : 'svg-button-hover-color'">
           <i-custom-sql-abort />
           {{ t('common.cancel') }}
         </el-button>
-        <el-button link @click="emptyQuery" id="sql-search-operate-empty">
+        <el-button link @click="emptyQuery" id="sql-search-operate-empty" class="svg-button-hover-color">
           <i-custom-sql-empty />
           {{ t('common.clear') }}
         </el-button>
@@ -72,7 +72,7 @@
             </ul> -->
             <div></div>
             <div class="run-result-buttons">
-              <el-button link @click="handleCommandDown('refresh', index)" id="sql-search-refresh">
+              <el-button link @click="handleCommandDown('refresh', index)" id="sql-search-refresh" class="svg-button-hover-color">
                 <i-custom-refresh />
                 {{ t('common.refresh') }}
               </el-button>
@@ -83,7 +83,7 @@
                 v-show="sqlResult[index].status && tableDataPagination[index]?.list?.length > 0"
                 id="sql-search-download-dropdown"
               >
-                <el-button link class="export-button" :disabled="!sqlResult[index].status" id="sql-search-download">
+                <el-button link :class="['export-button', !sqlResult[index].status ? '' : 'svg-button-hover-color']" :disabled="!sqlResult[index].status" id="sql-search-download">
                   <i-custom-download style="transform: translate(0, 0)" />
                   {{ t('common.export') }}
                   <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
@@ -521,6 +521,12 @@ defineExpose({ insertContent });
 
     .export-tip {
       align-self: flex-start;
+    }
+
+    &:hover {
+      :deep(.export-tip path) {
+        fill: rgb(66 69 97) !important;
+      }
     }
   }
 

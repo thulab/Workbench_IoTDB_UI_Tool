@@ -72,3 +72,13 @@
     transform: translate(2px, -60%);
   }
 }
+
+.svg-button-hover-color:hover {
+  path {
+    fill: #495ad4 !important;
+  }
+
+  // rect {
+  //   stroke: #495ad4 !important;
+  // }
+}

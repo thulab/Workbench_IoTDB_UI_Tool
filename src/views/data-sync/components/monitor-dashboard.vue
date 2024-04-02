@@ -2,7 +2,7 @@
   <version-container :is-show="showAuthMenu" :versiton-tip="'1.3.0'">
     <template #otherTip>
       <div class="monitor-dashboard-operate-left">
-        <el-button link class="monitor-dashboard-close-btn" id="monitor-dashboard-close-btn" @click="handleClose">
+        <el-button link class="monitor-dashboard-close-btn svg-button-hover-color" id="monitor-dashboard-close-btn" @click="handleClose">
           <el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>
           {{ t('common.goback') }}
         </el-button>
@@ -13,7 +13,7 @@
       <el-header class="monitor-dashboard-operate-header p-0">
         <div class="flex-align-center">
           <div class="monitor-dashboard-operate-left">
-            <el-button link class="monitor-dashboard-close-btn" id="monitor-dashboard-close-btn" @click="handleClose">
+            <el-button link class="monitor-dashboard-close-btn svg-button-hover-color" id="monitor-dashboard-close-btn" @click="handleClose">
               <el-icon size="24" class="m-r-6"><i-custom-close /></el-icon>
               {{ t('common.goback') }}
             </el-button>
@@ -35,7 +35,7 @@
         <p class="monitor-dashboard-module-details">
           <span class="module-label-text">{{ `${t('dashboard.deadTime')}：` }}</span>
           <span class="module-content-text m-r-16">{{ monitorTime }}</span>
-          <el-button link @click="handleRefreshMonitor" id="monitor-dashboard-refresh">
+          <el-button link @click="handleRefreshMonitor" id="monitor-dashboard-refresh" class="svg-button-hover-color">
             <el-icon size="24"><i-custom-refresh /></el-icon>
           </el-button>
         </p>

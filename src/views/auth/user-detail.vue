@@ -29,7 +29,7 @@
                   {{ item.roleName }}
                 </el-tag>
                 <auth-tooltip :is-disabled="canManageRole">
-                  <el-button link :disabled="!canManageRole" @click="addRole()" v-if="isEdit" id="auth-user-add-role" class="m-l-8 p-0">
+                  <el-button link :disabled="!canManageRole" @click="addRole()" v-if="isEdit" id="auth-user-add-role" :class="['m-l-8', 'p-0', !canManageRole ? '' : 'svg-button-hover-color']">
                     <el-icon size="24px"><i-custom-user-role-add /></el-icon>
                   </el-button>
                 </auth-tooltip>
@@ -152,13 +152,19 @@
                 </el-table-column>
                 <el-table-column :label="t('common.operation')" align="center" width="194" fixed="right">
                   <template #default="{ row }">
-                    <el-button link @click="handleDelRow(row)" v-if="row.path" :disabled="pageType === 'view' || row.rolePrivileges.length > 0">
+                    <el-button
+                      link
+                      @click="handleDelRow(row)"
+                      v-if="row.path"
+                      :disabled="pageType === 'view' || row.rolePrivileges.length > 0"
+                      :class="pageType === 'view' || row.rolePrivileges.length > 0 ? '' : 'svg-button-hover-color'"
+                    >
                       <el-icon size="24"><i-custom-close /></el-icon>
                     </el-button>
                   </template>
                 </el-table-column>
               </el-table>
-              <el-button style="width: 100%" class="m-t-24" @click="handleAddRow" v-if="canEdit && isEdit" id="auth-user-path">
+              <el-button style="width: 100%" class="m-t-24 svg-button-hover-color" @click="handleAddRow" v-if="canEdit && isEdit" id="auth-user-path">
                 <i-custom-add class="m-r-4" />
                 {{ t('auth.addPath') }}
               </el-button>

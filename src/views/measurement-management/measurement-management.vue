@@ -44,7 +44,16 @@
                 <el-button type="primary" @click="handleConfirmEditTTL" id="mesaurement-ttl-confirm">{{ t('common.confirm') }}</el-button>
               </div>
               <auth-tooltip :is-disabled="canWriteSchemaByPath">
-                <el-button link v-if="currentStorage && !editTTL" :disabled="!canWriteSchemaByPath" class="m-l-12" @click="handleEditTTL" id="mesaurement-ttl-edit-button"><i-custom-edit /></el-button>
+                <el-button
+                  link
+                  v-if="currentStorage && !editTTL"
+                  :disabled="!canWriteSchemaByPath"
+                  :class="['m-l-12', !canWriteSchemaByPath ? '' : 'svg-button-hover-color']"
+                  @click="handleEditTTL"
+                  id="mesaurement-ttl-edit-button"
+                >
+                  <i-custom-edit />
+                </el-button>
               </auth-tooltip>
             </template>
           </li>
@@ -125,7 +134,15 @@
             </el-button>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canReadWriteSchema">
-            <el-button :disabled="!currentStorage || !canReadWriteSchema" link @click="handleRefresh" id="mesaurement-refresh"><i-custom-refresh style="width: 24px; height: 24px" /></el-button>
+            <el-button
+              :disabled="!currentStorage || !canReadWriteSchema"
+              link
+              @click="handleRefresh"
+              id="mesaurement-refresh"
+              :class="!currentStorage || !canReadWriteSchema ? '' : 'svg-button-hover-color'"
+            >
+              <i-custom-refresh style="width: 24px; height: 24px" />
+            </el-button>
           </auth-tooltip>
         </div>
       </div>

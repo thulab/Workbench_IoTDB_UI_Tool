@@ -60,7 +60,9 @@
                 <el-button :disabled="!multipleSelection.length || !canWriteSchema" type="primary" @click="handleDel('batch', null)" id="calculate-batch-del">{{ t('common.batchDelete') }}</el-button>
               </auth-tooltip>
               <auth-tooltip :is-disabled="canReadWriteSchema">
-                <el-button link :disabled="!canReadWriteSchema" @click="getNewVal" id="calculate-refresh"><i-custom-refresh style="width: 24px; height: 24px" /></el-button>
+                <el-button link :disabled="!canReadWriteSchema" :class="!canReadWriteSchema ? '' : 'svg-button-hover-color'" @click="getNewVal" id="calculate-refresh">
+                  <i-custom-refresh style="width: 24px; height: 24px" />
+                </el-button>
               </auth-tooltip>
             </div>
           </div>

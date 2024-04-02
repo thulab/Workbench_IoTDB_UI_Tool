@@ -148,7 +148,7 @@
               </el-button>
               <el-input-number v-model="sideband" :min="1" :max="99" step-strictly id="spectrum-sideband-input" :disabled="dataEmpty || drawedStatus.sideband" :controls="false" :value-on-clear="1" />
             </div>
-            <el-button link class="cursor-button-clear m-l-8" id="spectrum-cursor-clear" :disabled="dataEmpty" @click="() => handleEmptyOperate()">
+            <el-button link :class="['cursor-button-clear', 'm-l-8', dataEmpty ? '' : 'svg-button-hover-color']" id="spectrum-cursor-clear" :disabled="dataEmpty" @click="() => handleEmptyOperate()">
               <el-icon size="18" color="#fff"><i-custom-delete /></el-icon>
             </el-button>
           </div>

@@ -70,7 +70,7 @@
               />
             </div>
           </div>
-          <el-icon size="14" class="delete-icon" @click="handleDel(item, index)" :id="`trend-path-${index}-del`"><i-custom-close-circle /></el-icon>
+          <el-icon size="14" class="delete-icon svg-button-hover-color" @click="handleDel(item, index)" :id="`trend-path-${index}-del`"><i-custom-close-circle /></el-icon>
         </li>
       </ul>
     </auth-container>

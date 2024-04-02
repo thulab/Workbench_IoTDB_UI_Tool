@@ -51,8 +51,24 @@
                 </el-col>
                 <el-col :span="4">
                   <div class="operate-box">
-                    <el-button link @click="(e) => handleCopyRow(item, e)" :id="`measurement-modal-collapse-${index}-copy`"><i-custom-copy /></el-button>
-                    <el-button link class="m-x-12" @click="(e) => handleDelRow(index, e)" :id="`measurement-modal-collapse-${index}-del`"><i-custom-delete /></el-button>
+                    <el-button
+                      link
+                      :disabled="!formData.deviceName || addControl"
+                      @click="(e) => handleCopyRow(item, e)"
+                      :id="`measurement-modal-collapse-${index}-copy`"
+                      :class="!formData.deviceName || addControl ? '' : 'svg-button-hover-color'"
+                    >
+                      <i-custom-copy />
+                    </el-button>
+                    <el-button
+                      link
+                      :disabled="!formData.deviceName"
+                      :class="['m-x-12', !formData.deviceName ? '' : 'svg-button-hover-color']"
+                      @click="(e) => handleDelRow(index, e)"
+                      :id="`measurement-modal-collapse-${index}-del`"
+                    >
+                      <i-custom-delete />
+                    </el-button>
                   </div>
                 </el-col>
               </el-row>
@@ -128,7 +144,7 @@
         </el-collapse>
       </el-scrollbar>
 
-      <el-button style="width: 100%" class="m-t-16" :disabled="addControl" @click="handleAddRow" id="measurement-modal-collapse-add">
+      <el-button style="width: 100%" :class="['m-t-16', addControl ? '' : 'svg-button-hover-color']" :disabled="addControl" @click="handleAddRow" id="measurement-modal-collapse-add">
         <i-custom-add class="m-r-4" />
         {{ t('measurement.addMeasurement') }}
       </el-button>
