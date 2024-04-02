@@ -256,6 +256,7 @@ declare module 'vue' {
     ICustomEditNormal: typeof import('~icons/custom/edit-normal')['default']
     ICustomError: typeof import('~icons/custom/error')['default']
     ICustomFileInfo: typeof import('~icons/custom/file-info')['default']
+    ICustomFilter: typeof import('~icons/custom/filter')['default']
     ICustomGraph: typeof import('~icons/custom/graph')['default']
     ICustomInfoWarning: typeof import('~icons/custom/info-warning')['default']
     ICustomLanguage: typeof import('~icons/custom/language')['default']
