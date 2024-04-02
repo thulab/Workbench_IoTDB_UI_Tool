@@ -144,6 +144,17 @@
               <i-custom-refresh style="width: 24px; height: 24px" />
             </el-button>
           </auth-tooltip>
+          <el-popover placement="bottom" :width="116" trigger="click">
+            <template #reference>
+              <el-button link class="svg-button-hover-color"><i-custom-filter style="width: 24px; height: 24px" /></el-button>
+            </template>
+            <ul class="column-box">
+              <li v-for="item in columnList" :key="item.prop" class="column-item">
+                <el-checkbox :checked="item.checked" class="m-r-4" :id="`measurement-column-checkbox-${item.prop}`" />
+                {{ t(item.label) }}
+              </li>
+            </ul>
+          </el-popover>
         </div>
       </div>
       <auth-container :is-auth="canReadWriteSchema" style="height: calc(100% - 222px)">
@@ -317,6 +328,8 @@ const editMeasurement = ref('');
 const editDescription = ref('');
 const searchType = ref('name');
 const searchPlaceholder = computed(() => (searchType.value === 'name' ? t('calculate.namePlaceholder') : t('calculate.descPlaceholder')));
+
+const columnList = ref<Array<{ checked: boolean; label: string; prop: string }>>([]);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const canReadWriteSchemaByPath = computed(() => {
