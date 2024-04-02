@@ -323,7 +323,7 @@ const drawedStatus = reactive({
   frequency: false,
   sideband: false,
 });
-
+let currentPoint = 0;
 const dataEmpty = computed(() => chartData.timestamps.length === 0);
 const disableFrequency = computed(() => chartData.timestamps.length === 0 || drawedStatus.frequency);
 const disableSideband = computed(() => chartData.timestamps.length === 0 || drawedStatus.sideband);
@@ -500,17 +500,32 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
     chartInstance.setOption(option, noMerge);
   } else if (chartContainer.value && chartContainer.value.clientHeight) {
     // 实例不存在，容器存在，容器高度存在
-    chartInstance = echarts.init(chartContainer.value, 'dark');
+    chartInstance = echarts.init(chartContainer.value, 'dark', {
+      // useCoarsePointer: true,
+    });
     // 若存在click事件，执行
     chartInstance.on('click', (params) => {
+      console.log(params);
       if (!clickedOperate.value) return;
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       handleClickChart(params);
+    });
+    chartInstance.on('highlight', (params: any) => {
+      if (params.batch && params.batch.length > 0) currentPoint = params?.batch[0].dataIndex;
     });
     // 若存在restore事件，执行
     chartInstance.on('restore', () => {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       handleEmptyOperate();
+    });
+    chartInstance.getZr().on('click', () => {
+      if (!clickedOperate.value) return;
+      if (currentPoint && chartData.timestamps[currentPoint]) {
+        const point = [chartData.timestamps[currentPoint], chartData.values[currentPoint]];
+        const param = { componentType: 'series', seriesName: 'test', value: point };
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        handleClickChart(param as echarts.ECElementEvent);
+      }
     });
     // 初次加载，设置notMerge为true
     chartInstance.setOption(option, true);
@@ -536,45 +551,42 @@ function handleDealCursor(params: echarts.ECElementEvent) {
     });
     return;
   }
+  const pointIndex = markPointData.value.findIndex((point) => point.name === `${seriesName}_${value[0]}_${value[1]}`);
+  if (pointIndex !== -1) return;
+
   markPointCount.value++;
   const num = markPointCount.value;
-  const pointIndex = markPointData.value.findIndex((point) => point.name === `${seriesName}_${value[0]}_${value[1]}`);
-  if (pointIndex === -1) {
-    markPointData.value.push({
-      name: `${seriesName}_${value[0]}_${value[1]}`,
-      value: value[1],
-      xAxis: value[0],
-      yAxis: value[1],
-      itemStyle: {
-        color: 'transparent',
-        borderColor: '#fff',
-        borderWidth: 1,
-      },
-    });
-    pointList.value.push({
-      name: `${seriesName}_${value[0]}_${value[1]}`,
-      x: value[0],
-      y: value[1],
-      disabled: false,
-      checked: false,
-    });
-  }
-  const lineIndex = markLineData.value.findIndex((line) => line.name === `${seriesName}_${value[0]}`);
-  if (lineIndex === -1) {
-    markLineData.value.push({
-      name: `${seriesName}_${value[0]}`,
-      xAxis: value[0],
-      label: {
-        formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
-        position: 'insideEndBottom',
-        color: '#fff',
-      },
-      lineStyle: {
-        type: [16, 10],
-        color: '#DFE1ED',
-      },
-    });
-  }
+  markPointData.value.push({
+    name: `${seriesName}_${value[0]}_${value[1]}`,
+    value: value[1],
+    xAxis: value[0],
+    yAxis: value[1],
+    itemStyle: {
+      color: 'transparent',
+      borderColor: '#fff',
+      borderWidth: 1,
+    },
+  });
+  pointList.value.push({
+    name: `${seriesName}_${value[0]}_${value[1]}`,
+    x: value[0],
+    y: value[1],
+    disabled: false,
+    checked: false,
+  });
+  markLineData.value.push({
+    name: `${seriesName}_${value[0]}`,
+    xAxis: value[0],
+    label: {
+      formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
+      position: 'insideEndBottom',
+      color: '#fff',
+    },
+    lineStyle: {
+      type: [16, 10],
+      color: '#DFE1ED',
+    },
+  });
   setOption(chartOptions.value);
 }
 
