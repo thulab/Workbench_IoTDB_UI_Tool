@@ -52,9 +52,9 @@
             <el-tooltip effect="light" :content="t('search.inputNumberPlaceholder')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
           <el-input type="hidden" />
-          <el-input v-model.number="searchFormData.timeInterval" style="width: 180px" placeholder="" @input="handleInputInterval" id="data-search-timeInterval" :disabled="getListLoading">
+          <el-input v-model.number="searchFormData.timeInterval" style="width: 110px" placeholder="" @input="handleInputInterval" id="data-search-timeInterval" :disabled="getListLoading">
             <template #append>
-              <el-select v-model="searchFormData.unitInterval" style="width: 100px" placeholder="" id="data-search-unitInterval" :disabled="getListLoading">
+              <el-select v-model="searchFormData.unitInterval" style="width: 56px" placeholder="" id="data-search-unitInterval" :disabled="getListLoading">
                 <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-unitInterval-select-${item.value}`" />
               </el-select>
             </template>
@@ -62,7 +62,7 @@
         </el-form-item>
         <el-form-item :label="`${t('search.aggregation')}：`" prop="aggregation">
           <el-input type="hidden" />
-          <el-select v-model="searchFormData.aggregation" style="width: 120px" clearable id="data-search-aggregation" :disabled="getListLoading">
+          <el-select v-model="searchFormData.aggregation" style="width: 80px" clearable id="data-search-aggregation" :disabled="getListLoading">
             <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-aggregation-select-${item.value}`" />
           </el-select>
         </el-form-item>
