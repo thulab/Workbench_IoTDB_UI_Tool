@@ -87,7 +87,7 @@
               :disabled="!chartHistoryData.length"
               :class="!chartHistoryData.length ? 'disable-cursor' : ''"
               :plain="!clickedCursor"
-              @click="clickedCursor = true"
+              @click="clickedCursor = !clickedCursor"
             >
               {{ t('spectrum.cursor') }}
             </el-button>
@@ -127,7 +127,7 @@
                       />
                       {{ pointTitle(index) }}
                     </div>
-                    <div class="cursor-point-data" :style="{ marginLeft: pointList.length !== 1 ? '45px' : '25px' }">
+                    <div class="cursor-point-data">
                       <p style="display: inline-flex; width: 140px"><text-tooltip :content="`X: ${item.x}`" /></p>
                       <p style="display: inline-flex; width: 140px"><text-tooltip :content="`Y: ${item.y}`" /></p>
                     </div>
@@ -476,7 +476,7 @@ function handleClickChart(params: echarts.ECElementEvent) {
           xAxis: value[0],
           label: {
             formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
-            position: 'insideEndBottom',
+            position: 'insideEnd',
           },
         },
       ],
@@ -513,7 +513,7 @@ function handleClickChart(params: echarts.ECElementEvent) {
         xAxis: value[0],
         label: {
           formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
-          position: 'insideEndBottom',
+          position: 'insideEnd',
         },
       });
     }
@@ -978,7 +978,8 @@ onUnmounted(() => {
 
 .cursor-list-box {
   margin: 16px 0 0;
-  height: 244px;
+  min-height: 160px;
+  max-height: 244px;
   display: flex;
   flex-direction: column;
 
@@ -1023,13 +1024,18 @@ onUnmounted(() => {
   }
 }
 
+.cursor-item-box {
+  display: flex;
+  align-items: flex-start;
+}
+
 .cursor-text-box {
   display: flex;
   align-items: center;
   margin: 0 0 4px 8px;
   font-size: 12px;
   font-weight: 400;
-  line-height: 18px;
+  line-height: 26px;
   color: #131926;
 }
 
