@@ -29,9 +29,9 @@
             <template v-else>
               <span v-if="!editTTL">{{ storageInfos?.ttl ? storageInfos.ttl + getTtlTimeUnit(storageInfos.ttlUnit, ttlUnitOptions) : '∞' }}</span>
               <div v-if="currentStorage && editTTL" class="edit-ttl-box">
-                <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" style="width: 180px" id="mesaurement-edit-ttl">
+                <el-input v-model="editTTLModel" min="0" max="9007199254740992" class="ttl-input" style="width: 160px" id="mesaurement-edit-ttl">
                   <template #append>
-                    <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder=" " style="width: 100px" id="mesaurement-edit-ttlunit">
+                    <el-select v-model="editTTLUnitModel" class="ttl-input unit" clearable placeholder=" " style="width: 60px" id="mesaurement-edit-ttlunit">
                       <el-option :label="t('common.milliSecond')" value="millisecond" id="mesaurement-ttl-ms" />
                       <el-option :label="t('common.second')" value="second" id="mesaurement-ttl-s" />
                       <el-option :label="t('common.minute')" value="minute" id="mesaurement-ttl-m" />
