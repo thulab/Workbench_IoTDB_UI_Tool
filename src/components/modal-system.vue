@@ -1,7 +1,8 @@
 <template>
   <el-dialog :title="t('auth.systemInfo')" v-model="dialogVisible" width="320px" align-center :close-on-click-modal="false" id="system-modal" class="system-dialog">
     <div class="system-info-box">
-      <img src="@/assets/timecho-logo.svg" alt="" class="system-logo" />
+      <i-custom-timecho-logo-en v-if="locale === 'en'" class="system-logo" />
+      <i-custom-timecho-logo v-else class="system-logo" />
       <p class="system-title">{{ systemTitle }}</p>
       <p class="system-version">{{ t('auth.versionTitle', { version: appVersion }) }}</p>
       <p class="system-detail">{{ systemDetail }}</p>
@@ -20,7 +21,7 @@ const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
 }>();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const appType = Number(import.meta.env.VITE_APP_TYPE);
 const appStore = useAppStore();
 const dialogVisible = useVModel(props, 'visible', emit);

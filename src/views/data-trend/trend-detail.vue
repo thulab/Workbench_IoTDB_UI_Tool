@@ -24,7 +24,7 @@
             />
           </base-form-item>
           <base-form-item v-show="!isRunningTab" :label="`${t('search.timeInterval')}：`" prop="unitInterval" :rules="requiredRules">
-            <el-select v-model="searchFormData.unitInterval" :disabled="isRunningTab" style="width: 120px" id="trend-search-unitInterval">
+            <el-select v-model="searchFormData.unitInterval" :disabled="isRunningTab" style="width: 80px" id="trend-search-unitInterval">
               <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" :id="`trend-search-unitInterval-select-${item.value}`" />
             </el-select>
           </base-form-item>
@@ -32,7 +32,7 @@
             <el-select
               v-model="searchFormData.aggregation"
               :disabled="isRunningTab || searchFormData.unitInterval === 'origin'"
-              style="width: 130px"
+              style="width: 80px"
               @change="handleChangeAggregation"
               id="trend-search-aggregation"
             >
@@ -77,8 +77,8 @@
     <el-main class="p-0">
       <el-container class="chart-detail-wrapper">
         <el-main class="p-0" style="position: relative">
-          <div ref="chartContainer" class="chart-container" :style="`height: ${isRunningTab ? '100%;' : 'calc(100% - 28px);'}`" v-element-size="onResize"></div>
-          <div v-if="!isRunningTab">
+          <div ref="chartContainer" class="chart-container" :style="`height: ${isRunningTab ? '100%;' : 'calc(100% - 30px);'}`" v-element-size="onResize"></div>
+          <div v-if="!isRunningTab" style="margin-top: 2px">
             <el-button
               type="primary"
               id="trend-cursor"
@@ -135,7 +135,7 @@
                 </ul>
                 <div v-if="pointCheckedData.length === 2" class="point-dvalue-box">
                   <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔX：${Math.abs(pointCheckedData[0].x - pointCheckedData[1].x)}`" /></p>
-                  <p style="display: inline-flex; width: 190px"><text-tooltip :content="`Δf：${Math.abs(pointCheckedData[0].y - pointCheckedData[1].y)}`" /></p>
+                  <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔY：${Math.abs(pointCheckedData[0].y - pointCheckedData[1].y)}`" /></p>
                 </div>
               </div>
             </auth-container>
@@ -349,12 +349,11 @@ const chartOptions = computed<ECOption>(() => ({
     },
   },
   toolbox: {
-    show: !isRunningTab.value,
     feature: {
       dataZoom: {
         title: {
-          zoom: '',
-          back: '',
+          zoom: '放大',
+          back: '撤销',
         },
         icon: {
           zoom: 'path://M15 9L23 9L23 23L9 23L9 15M13 9L9 9M9 9L5 9M9 13L9 9M9 9L9 5',
@@ -362,41 +361,19 @@ const chartOptions = computed<ECOption>(() => ({
         },
       },
       restore: {
-        title: '',
+        title: '还原',
         icon: 'path://M13 21L15 24C10.0294 24 6 19.9706 6 15C6 12.7036 6.86006 10.6081 8.27564 9.01797M17 9L15 6C19.9706 6 24 10.0294 24 15C24 17.3063 23.1325 19.4101 21.7059 21.0026',
       },
       saveAsImage: {
-        title: '',
+        title: '导出',
         icon: 'path://M18,12V7H7v16h11v-5 M24,15H13 M21,18l3-3l-3-3',
       },
     },
   },
-  dataZoom: [
-    {
-      type: 'slider',
-      show: isShowZoom.value && isRunningTab.value,
-      xAxisIndex: 0,
-      height: 20,
-      handleSize: 8,
-      filterMode: 'none',
-      showDetail: false,
-      right: 20,
-    },
-    {
-      type: 'slider',
-      show: isShowZoom.value && isRunningTab.value,
-      yAxisIndex: 0,
-      width: 20,
-      handleSize: 8,
-      filterMode: 'none',
-      showDetail: false,
-      right: 28,
-    },
-  ],
   grid: {
     left: 20,
     right: 60,
-    bottom: 48,
+    bottom: 20,
     containLabel: true,
   },
   connectNulls: false,
@@ -985,7 +962,7 @@ onUnmounted(() => {
 }
 
 .disable-cursor {
-  color: #656a85 !important;
+  color: #495ad4 !important;
   background-color: #f0f1fa !important;
 }
 

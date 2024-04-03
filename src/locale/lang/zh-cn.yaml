@@ -144,7 +144,7 @@ page:
   data: 数据
   alarm: 告警
   trend: 趋势
-  spectrum: 频谱
+  spectrum: 分析
   visualization: 可视化
   dashboard: 首页
   dataSync: 数据同步
@@ -725,7 +725,7 @@ spectrum:
   overTip: 最多支持标注10个点，请清空后重新操作
   cursorTitle: 光标数值
   cursor: 光标
-  sqlInput: 数据选择
+  sqlInput: 数据分析
   paramsTitle: 参数设置
   returnResult: 返回结果
   compressParams: 压缩参数

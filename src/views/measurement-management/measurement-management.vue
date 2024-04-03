@@ -86,7 +86,7 @@
               <i-custom-search-icon class="remote-select-search-icon" @click="handleRefresh" />
             </template>
             <template #prepend>
-              <el-select v-model="searchType" style="width: 160px" placeholder="" id="measurement-search-type">
+              <el-select v-model="searchType" style="width: 88px" placeholder="" id="measurement-search-type" class="measurement-search-type-select">
                 <el-option :label="t('measurement.measurementName')" value="name" id="measurement-search-type-name" />
                 <el-option :label="t('measurement.measurementDescription')" value="description" id="measurement-search-type-description" />
               </el-select>
@@ -714,6 +714,12 @@ watch(
   .search-form-box {
     display: flex;
     align-items: center;
+  }
+
+  .measurement-search-type-select {
+    :deep(.el-select__wrapper) {
+      text-align: center;
+    }
   }
 }
 
