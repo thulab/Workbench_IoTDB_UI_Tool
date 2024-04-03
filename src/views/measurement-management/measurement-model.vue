@@ -203,9 +203,9 @@ const realTreeOptions = computed(() => treeDataOptions(treeData.value, chartWidt
 
 function handleDoc() {
   if (locale.value === 'en') {
-    window.open('https://www.timecho.com/docs/zh/UserGuide/latest/Basic-Concept/Data-Model-and-Terminology.html');
-  } else {
     window.open('https://www.timecho.com/docs/UserGuide/latest/Basic-Concept/Data-Model-and-Terminology.html');
+  } else {
+    window.open('https://www.timecho.com/docs/zh/UserGuide/latest/Basic-Concept/Data-Model-and-Terminology.html');
   }
 }
 // 获取数据模型树当前展开的最大层级, 如果大于 2 就直接返回 3，用于设定宽度
