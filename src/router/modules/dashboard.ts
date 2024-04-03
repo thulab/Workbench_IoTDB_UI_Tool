@@ -1,4 +1,4 @@
-import { Layout2 } from '@/router/constant-routes';
+import { Layout } from '@/router/constant-routes';
 // 采用raw加载svg文件，v-html渲染
 import ICustomDashboard from '@/assets/icons/dashboard.svg?raw';
 import ICustomDashboardActive from '@/assets/icons/dashboard-active.svg?raw';
@@ -6,7 +6,7 @@ import ICustomDashboardActive from '@/assets/icons/dashboard-active.svg?raw';
 const route = [
   {
     path: '/',
-    component: Layout2,
+    component: Layout,
     redirect: { name: 'Dashboard' },
     meta: {
       title: 'page.dashboard',
@@ -20,7 +20,7 @@ const route = [
         path: 'dashboard',
         name: 'Dashboard',
         component: () => import('@/views/dashboard/the-dashboard.vue'),
-        meta: { keepAlive: true, title: 'dashboard', icon: ICustomDashboard },
+        meta: { keepAlive: true },
       },
     ],
   },
