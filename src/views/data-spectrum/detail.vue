@@ -175,7 +175,7 @@
                       />
                       {{ pointTitle(index) }}
                     </div>
-                    <div class="cursor-point-data" :style="{ marginLeft: pointList.length !== 1 ? '45px' : '25px' }">
+                    <div class="cursor-point-data">
                       <p style="display: inline-flex; width: 140px"><text-tooltip :content="`X: ${item.x}`" /></p>
                       <p style="display: inline-flex; width: 140px"><text-tooltip :content="`Y: ${item.y}`" /></p>
                     </div>
@@ -586,7 +586,7 @@ function handleDealCursor(params: echarts.ECElementEvent) {
     xAxis: value[0],
     label: {
       formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
-      position: 'insideEndBottom',
+      position: 'insideEnd',
       color: '#fff',
     },
     lineStyle: {
@@ -626,7 +626,7 @@ function handleDealFrequency(params: echarts.ECElementEvent) {
         xAxis: x,
         label: {
           formatter: `H${i === 1 ? '' : i}`,
-          position: 'insideEndBottom',
+          position: 'insideEnd',
           color: '#28D5CB',
         },
         lineStyle: {
@@ -671,7 +671,7 @@ function handleDealSideband(params: echarts.ECElementEvent) {
           xAxis: leftX,
           label: {
             formatter: `SL${i}`,
-            position: 'insideEndBottom',
+            position: 'insideEnd',
             color: '#AA82F5',
           },
           lineStyle: {
@@ -704,7 +704,7 @@ function handleDealSideband(params: echarts.ECElementEvent) {
       xAxis: currentX,
       label: {
         formatter: 'S',
-        position: 'insideEndBottom',
+        position: 'insideEnd',
         color: '#AA82F5',
       },
       lineStyle: {
@@ -737,7 +737,7 @@ function handleDealSideband(params: echarts.ECElementEvent) {
           xAxis: rightX,
           label: {
             formatter: `SR${i}`,
-            position: 'insideEndBottom',
+            position: 'insideEnd',
             color: '#AA82F5',
           },
           lineStyle: {
@@ -792,7 +792,11 @@ function handleEmptyOperate(type?: 'cursor' | 'frequency' | 'sideband') {
 }
 
 function handleClickOperate(type: 'cursor' | 'frequency' | 'sideband') {
-  if (clickedOperate.value === type) return;
+  if (clickedOperate.value === type) {
+    clickedOperate.value = '';
+    clickedStatus[type] = false;
+    return;
+  }
   clickedOperate.value = type;
   clickedStatus[type] = true;
 }
@@ -1161,13 +1165,18 @@ watch(locale, () => {
   margin: 14px 5px 0;
 }
 
+.cursor-item-box {
+  display: flex;
+  align-items: flex-start;
+}
+
 .cursor-text-box {
   display: flex;
   align-items: center;
   margin: 0 0 4px 8px;
   font-size: 12px;
   font-weight: 400;
-  line-height: 18px;
+  line-height: 26px;
   color: #131926;
 }
 

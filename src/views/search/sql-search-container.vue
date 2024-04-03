@@ -31,7 +31,12 @@
               <side-template ref="sqlListRef" @handle-sql-operate="handleSqlOperate" />
             </el-tab-pane>
           </el-tabs>
-          <a href="https://www.timecho.com/docs/zh/UserGuide/latest/Reference/SQL-Reference.html" rel="noopener noreferrer" target="_blank" class="operate-link">
+          <a
+            :href="locale === 'en' ? 'https://www.timecho.com/docs/UserGuide/V1.0.x/Reference/SQL-Reference.html' : 'https://www.timecho.com/docs/zh/UserGuide/V1.0.x/Reference/SQL-Reference.html'"
+            rel="noopener noreferrer"
+            target="_blank"
+            class="operate-link"
+          >
             <i-custom-question />
             {{ t('search.operatingInstructions') }}
           </a>
