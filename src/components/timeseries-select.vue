@@ -10,7 +10,11 @@
     collapse-tags
     :collapse-tags-tooltip="false"
     :remote-method="remoteMethod"
-    style="width: 256px"
+    :class="{
+      'selected-1': model.length === 1,
+      'selected-more': model.length > 1,
+    }"
+    style="width: 336px"
     :disabled="disabled"
   >
     <template #prefix>
@@ -119,6 +123,18 @@ function handleDelete(index: number) {
   }
 }
 
+.selected-1 {
+  :deep(.el-select__input-wrapper) {
+    max-width: 100px !important;
+  }
+}
+
+.selected-more {
+  :deep(.el-select__input-wrapper) {
+    max-width: 60px !important;
+  }
+}
+
 .select-list {
   .select-item {
     font-size: 12px;
@@ -174,6 +190,6 @@ function handleDelete(index: number) {
 
 .remote-select-search-text {
   display: flex;
-  width: 220px;
+  width: 300px;
 }
 </style>
