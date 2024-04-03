@@ -4,7 +4,7 @@
       <div class="search-form-box" style="margin-bottom: 18px">
         <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
           <div class="m-b-16 flex-align-center" style="height: 36px">
-            <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method" :label-width="locale === 'en' ? '132px' : '88px'">
+            <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method" :label-width="locale === 'en' ? '140px' : '96px'" required>
               <template #label>
                 {{ t('spectrum.analysisMethod') }}：
                 <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
@@ -33,7 +33,7 @@
               <span class="params-title">{{ t('spectrum.paramsTitle') }}</span>
               <template v-if="searchFormData.method === 'FFT'">
                 <base-form-item :label="`${t('spectrum.returnResult')}：`" prop="resultType">
-                  <el-select v-model="searchFormData.resultType" style="width: 140px" id="spectrum-search-resultType">
+                  <el-select v-model="searchFormData.resultType" style="width: 80px" id="spectrum-search-resultType">
                     <el-option v-for="item in resultList" :key="item.value" :label="item.name" :value="item.value" :id="`spectrum-search-resultType-${item.value}`" />
                   </el-select>
                 </base-form-item>
@@ -44,7 +44,7 @@
                   </template>
                   <el-input
                     v-model="searchFormData.compression"
-                    style="width: 190px"
+                    style="width: 120px"
                     :placeholder="t('spectrum.compressParamsPlaceholder')"
                     id="spectrum-search-compression"
                     @change="handleInputCompression"
@@ -63,10 +63,10 @@
           </div>
           <div class="flex-justify-between">
             <div v-if="searchFormData.method !== 'custom'">
-              <base-form-item :label="`${t('measurement.measurementChoose')}：`" prop="measurement" :label-width="locale === 'en' ? '132px' : '88px'">
+              <base-form-item :label="`${t('measurement.measurementChoose')}：`" prop="measurement" :label-width="locale === 'en' ? '140px' : '96px'" required>
                 <timeseries-select-single id="spectrum-search-path" v-model="searchFormData.measurement" :selectWidth="230" :itemWidth="200" show-suffix :disabled-path="disabledPath" />
               </base-form-item>
-              <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange">
+              <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" required>
                 <el-date-picker
                   v-model="searchFormData.datetimerange"
                   type="datetimerange"
@@ -82,7 +82,7 @@
               </base-form-item>
             </div>
             <div v-if="searchFormData.method === 'custom'">
-              <base-form-item :label="`${t('spectrum.sqlInput')}：`" prop="sql" :label-width="locale === 'en' ? '132px' : '88px'">
+              <base-form-item :label="`${t('spectrum.sqlInput')}：`" prop="sql" :label-width="locale === 'en' ? '140px' : '96px'">
                 <el-button type="primary" link id="spectrum-search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
               </base-form-item>
             </div>
@@ -97,8 +97,8 @@
     <el-main class="p-0">
       <el-container class="chart-detail-wrapper">
         <el-main class="p-0" style="position: relative">
-          <div ref="chartContainer" class="chart-container" :style="`height: ${'calc(100% - 28px);'}`" v-element-size="onResize"></div>
-          <div class="flex-align-center">
+          <div ref="chartContainer" class="chart-container" :style="`height: ${'calc(100% - 30px);'}`" v-element-size="onResize"></div>
+          <div class="flex-align-center" style="margin-top: 2px">
             <el-button
               type="primary"
               :plain="clickedOperate !== 'cursor'"
@@ -183,7 +183,7 @@
                 </ul>
                 <div v-if="pointCheckedData.length === 2" class="point-dvalue-box">
                   <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔX：${Math.abs(pointCheckedData[0].x - pointCheckedData[1].x)}`" /></p>
-                  <p style="display: inline-flex; width: 190px"><text-tooltip :content="`Δf：${Math.abs(Number(pointCheckedData[0].y) - Number(pointCheckedData[1].y))}`" /></p>
+                  <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔY：${Math.abs(Number(pointCheckedData[0].y) - Number(pointCheckedData[1].y))}`" /></p>
                 </div>
               </div>
             </auth-container>
@@ -387,8 +387,8 @@ const chartOptions = computed<ECOption>(() => ({
     feature: {
       dataZoom: {
         title: {
-          zoom: '',
-          back: '',
+          zoom: '放大',
+          back: '撤销',
         },
         icon: {
           zoom: 'path://M15 9L23 9L23 23L9 23L9 15M13 9L9 9M9 9L5 9M9 13L9 9M9 9L9 5',
@@ -396,11 +396,11 @@ const chartOptions = computed<ECOption>(() => ({
         },
       },
       restore: {
-        title: '',
+        title: '还原',
         icon: 'path://M13 21L15 24C10.0294 24 6 19.9706 6 15C6 12.7036 6.86006 10.6081 8.27564 9.01797M17 9L15 6C19.9706 6 24 10.0294 24 15C24 17.3063 23.1325 19.4101 21.7059 21.0026',
       },
       saveAsImage: {
-        title: '',
+        title: '导出',
         icon: 'path://M18,12V7H7v16h11v-5 M24,15H13 M21,18l3-3l-3-3',
       },
     },
@@ -408,7 +408,7 @@ const chartOptions = computed<ECOption>(() => ({
   grid: {
     left: 20,
     right: 60,
-    bottom: 48,
+    bottom: 20,
     containLabel: true,
   },
   connectNulls: false,
@@ -1009,7 +1009,7 @@ watch(locale, () => {
 }
 
 .disable-cursor {
-  color: #656a85 !important;
+  color: #495ad4 !important;
   background-color: #f0f1fa !important;
 }
 

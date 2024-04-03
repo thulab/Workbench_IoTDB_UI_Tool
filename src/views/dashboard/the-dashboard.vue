@@ -37,11 +37,11 @@
                   {{ t('dashboard.activeDetail') }}
                 </el-button>
               </li>
-              <li class="system-info-item">
+              <!-- <li class="system-info-item">
                 <el-icon size="24"><i-custom-time /></el-icon>
                 <span class="module-label-text">{{ t('dashboard.expirationTime') }}：</span>
                 <span class="module-content-text">{{ systemData.expirationTime || '-' }}</span>
-              </li>
+              </li> -->
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-storage-num /></el-icon>
                 <span class="module-label-text">{{ t('measurement.databaseNum') }}：</span>
@@ -130,11 +130,11 @@
                   {{ t('dashboard.activeDetail') }}
                 </el-button>
               </li>
-              <li class="system-info-item">
+              <!-- <li class="system-info-item">
                 <el-icon size="24"><i-custom-time /></el-icon>
                 <span class="module-label-text">{{ t('dashboard.expirationTime') }}：</span>
                 <span class="module-content-text">{{ slaveData.expirationTime || '-' }}</span>
-              </li>
+              </li> -->
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-storage-num /></el-icon>
                 <span class="module-label-text">{{ t('measurement.databaseNum') }}：</span>

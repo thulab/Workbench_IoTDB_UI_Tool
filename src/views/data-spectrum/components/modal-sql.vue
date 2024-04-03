@@ -25,7 +25,8 @@
     </div>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="handleEmpty" id="sql-modal-cancel">{{ t('common.clear') }}</el-button>
+        <el-button @click="handleEmpty" id="sql-modal-empty">{{ t('common.clear') }}</el-button>
+        <el-button @click="dialogVisible = false" id="sql-modal-cancel">{{ t('common.cancel') }}</el-button>
         <el-button type="primary" @click="handleConfirm" id="sql-modal-confirm">{{ t('common.confirm') }}</el-button>
       </div>
     </template>

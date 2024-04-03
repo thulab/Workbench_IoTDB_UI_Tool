@@ -16,7 +16,7 @@
         <auth-tooltip :is-disabled="canWriteSchema">
           <el-input v-model="formData.ttl" min="0" max="9007199254740992" :disabled="!canWriteSchema" class="ttl-input" id="new-database-modal-ttl">
             <template #append>
-              <el-select v-model="formData.ttlUnit" style="width: 80px" placeholder="" id="new-database-modal-ttlunit" :disabled="!canWriteSchema">
+              <el-select v-model="formData.ttlUnit" style="width: 56px" placeholder="" id="new-database-modal-ttlunit" :disabled="!canWriteSchema" class="new-database-modal-ttl-select">
                 <el-option :label="t('common.milliSecond')" value="millisecond" id="new-database-modal-ttl-ms" />
                 <el-option :label="t('common.second')" value="second" id="new-database-modal-ttl-s" />
                 <el-option :label="t('common.minute')" value="minute" id="new-database-modal-ttl-m" />
@@ -127,3 +127,11 @@ watch(
   }
 );
 </script>
+
+<style lang="scss" scoped>
+.new-database-modal-ttl-select {
+  :deep(.el-select__wrapper) {
+    text-align: center;
+  }
+}
+</style>
