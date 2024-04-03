@@ -3,6 +3,7 @@ declare namespace StorageDevice {
     deviceName: string;
     timeseries: string;
     description?: string;
+    isAligned?: boolean;
     dataType: IotdbDataType;
     encoding: EncodingType;
     compression: CompressionType;

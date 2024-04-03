@@ -144,16 +144,36 @@
               <i-custom-refresh style="width: 24px; height: 24px" />
             </el-button>
           </auth-tooltip>
-          <el-popover placement="bottom" :width="116" trigger="click">
+          <el-popover placement="bottom" :width="156" :visible="colVisible" popper-class="col-filter-popover-box">
             <template #reference>
-              <el-button link class="svg-button-hover-color"><i-custom-filter style="width: 24px; height: 24px" /></el-button>
+              <el-button link class="svg-button-hover-color" @click="handleClickCol" id="measurement-column-filter"><i-custom-filter style="width: 24px; height: 24px" /></el-button>
             </template>
-            <ul class="column-box">
-              <li v-for="item in columnList" :key="item.prop" class="column-item">
-                <el-checkbox :checked="item.checked" class="m-r-4" :id="`measurement-column-checkbox-${item.prop}`" />
+            <el-checkbox-group v-model="checkedCols" @change="handleChangeCol" class="column-box">
+              <el-checkbox
+                v-for="item in allColumns"
+                :key="item.prop"
+                class="column-item flex-align-center"
+                :value="item.prop"
+                :id="`measurement-column-checkbox-${item.prop}`"
+                :disabled="item.prop === 'deviceName' || item.prop === 'timeseries'"
+              >
                 {{ t(item.label) }}
-              </li>
-            </ul>
+              </el-checkbox>
+            </el-checkbox-group>
+            <div class="filter-operate-box flex-justify-between">
+              <el-checkbox
+                v-model="isCheckAll"
+                :indeterminate="isIndeterminate"
+                :label="t('common.allChoose')"
+                @change="handleCheckedAll"
+                class="filter-operate-checkbox-all"
+                id="measurement-column-checkbox-all"
+              />
+              <div class="filter-operate-buttons">
+                <el-button @click="handleResetCol" id="measurement-column-checkbox-reset">{{ t('common.reset') }}</el-button>
+                <el-button @click="handleConfirmCol" type="primary" class="m-l-8" id="measurement-column-checkbox-confirm">{{ t('common.confirm') }}</el-button>
+              </div>
+            </div>
           </el-popover>
         </div>
       </div>
@@ -171,11 +191,17 @@
             @selection-change="handleSelectionChange"
           >
             <el-table-column type="selection" width="55" :selectable="isSelectabled" />
-            <el-table-column :label="t('measurement.deviceName')" prop="deviceName" min-width="200" align="center" show-overflow-tooltip />
-            <el-table-column :label="t('measurement.measurementName')" prop="timeseries" width="160" align="center" show-overflow-tooltip />
-            <el-table-column :label="t('measurement.measurementDescription')" prop="alias" width="200" align="center">
+            <el-table-column
+              v-for="(column, index) in columnList"
+              :label="t(column.label)"
+              :key="`${column.prop}_${index}_column`"
+              :prop="column.prop"
+              :min-width="column.width"
+              align="center"
+              show-overflow-tooltip
+            >
               <template #default="{ row }">
-                <div class="row-description-box">
+                <div class="row-description-box" v-if="column.prop === 'description'">
                   <div class="row-description-text">
                     <text-tooltip :content="row.description || ''" />
                   </div>
@@ -184,18 +210,17 @@
                     <i-custom-edit-active class="edit-icon-active" />
                   </div>
                 </div>
+                <template v-else-if="column.prop === 'viewType'">
+                  {{ row.viewType === 'VIEW' ? `${pageText}` : t('measurement.baseMeasurement') }}
+                </template>
+                <template v-else-if="column.prop === 'isAligned'">
+                  {{ row.isAligned ? t('measurement.deviceAlign') : t('measurement.undeviceAlign') }}
+                </template>
+                <template v-else>
+                  {{ row[column.prop] }}
+                </template>
               </template>
             </el-table-column>
-            <el-table-column :label="t('measurement.dataType')" prop="dataType" width="140" align="center" show-overflow-tooltip />
-            <el-table-column :label="t('measurement.measurementType')" prop="viewType" width="200" align="center" show-overflow-tooltip>
-              <template #default="{ row }">
-                {{ row.viewType === 'VIEW' ? `${pageText}` : t('measurement.baseMeasurement') }}
-              </template>
-            </el-table-column>
-            <el-table-column :label="t('measurement.encoding')" prop="encoding" min-width="140" align="center" show-overflow-tooltip />
-            <el-table-column :label="t('measurement.compression')" prop="compression" min-width="140" align="center" show-overflow-tooltip />
-            <el-table-column :label="t('measurement.lastValue')" prop="value" min-width="140" align="center" show-overflow-tooltip />
-            <el-table-column :label="t('measurement.lastValueTime')" prop="valueTime" min-width="200" align="center" show-overflow-tooltip />
             <el-table-column :label="t('common.operation')" width="240" align="center" fixed="right">
               <template #default="{ row }">
                 <el-button type="primary" link size="small" @click="handleRowData(row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-data`">{{ t('page.data') }}</el-button>
@@ -273,6 +298,7 @@
 import { useRouter, useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useTableHeight } from '@/composition-api';
+import type { CheckboxValueType } from 'element-plus';
 import { StorageApi } from '@/api';
 import { useUserStore } from '@/stores';
 import { getPathAuthList, getParentPathAuthList } from '@/utils/auth';
@@ -329,7 +355,26 @@ const editDescription = ref('');
 const searchType = ref('name');
 const searchPlaceholder = computed(() => (searchType.value === 'name' ? t('calculate.namePlaceholder') : t('calculate.descPlaceholder')));
 
-const columnList = ref<Array<{ checked: boolean; label: string; prop: string }>>([]);
+const colVisible = ref(false);
+const allColumns = ref<Array<{ label: string; prop: string; width: number }>>([
+  { label: 'measurement.deviceName', prop: 'deviceName', width: 200 },
+  { label: 'measurement.measurementName', prop: 'timeseries', width: 200 },
+  { label: 'measurement.measurementDescription', prop: 'description', width: 160 },
+  { label: 'measurement.dataType', prop: 'dataType', width: 140 },
+  { label: 'measurement.measurementType', prop: 'viewType', width: 200 },
+  { label: 'measurement.deviceAlign', prop: 'isAligned', width: 200 },
+  { label: 'measurement.encoding', prop: 'encoding', width: 140 },
+  { label: 'measurement.compression', prop: 'compression', width: 140 },
+  { label: 'measurement.lastValue', prop: 'value', width: 140 },
+  { label: 'measurement.lastValueTime', prop: 'valueTime', width: 200 },
+]);
+const isCheckAll = ref(false);
+const checkedCols = ref<string[]>(['deviceName', 'timeseries']);
+const isIndeterminate = ref(true);
+const columnList = ref<Array<{ label: string; prop: string; width: number }>>([
+  { label: 'measurement.deviceName', prop: 'deviceName', width: 200 },
+  { label: 'measurement.measurementName', prop: 'timeseries', width: 200 },
+]);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const canReadWriteSchemaByPath = computed(() => {
@@ -400,6 +445,33 @@ function isSelectabled() {
     return false;
   }
   return true;
+}
+
+function handleChangeCol(vals: CheckboxValueType[]) {
+  const checkedLength = vals.length;
+  isCheckAll.value = checkedLength === allColumns.value.length;
+  isIndeterminate.value = checkedLength > 0 && checkedLength < allColumns.value.length;
+}
+
+function handleCheckedAll(val: CheckboxValueType) {
+  checkedCols.value = val ? allColumns.value.map((item) => item.prop) : ['deviceName', 'timeseries'];
+  isIndeterminate.value = !val;
+}
+
+function handleClickCol() {
+  colVisible.value = true;
+}
+
+function handleResetCol() {
+  checkedCols.value = ['deviceName', 'timeseries'];
+  isIndeterminate.value = true;
+  isCheckAll.value = false;
+}
+
+function handleConfirmCol() {
+  columnList.value = allColumns.value.filter((item) => checkedCols.value.includes(item.prop));
+  colVisible.value = false;
+  localStorage.setItem('measurementCols', checkedCols.value.join(','));
 }
 
 // 列表接口
@@ -623,6 +695,23 @@ function handleEditDescription(row: StorageDevice.MeasurementItem) {
 }
 
 onMounted(() => {
+  const defaultCols = localStorage.getItem('measurementCols');
+  if (!defaultCols) {
+    isCheckAll.value = false;
+    checkedCols.value = ['deviceName', 'timeseries'];
+    isIndeterminate.value = true;
+    columnList.value = [
+      { label: 'measurement.deviceName', prop: 'deviceName', width: 200 },
+      { label: 'measurement.measurementName', prop: 'timeseries', width: 200 },
+    ];
+  } else {
+    const defaultColsArray = defaultCols.split(',');
+    checkedCols.value = defaultColsArray;
+    const checkedLength = defaultColsArray.length;
+    isCheckAll.value = checkedLength === allColumns.value.length;
+    isIndeterminate.value = checkedLength > 0 && checkedLength < allColumns.value.length;
+    columnList.value = allColumns.value.filter((item) => checkedCols.value.includes(item.prop));
+  }
   searchKeyword.value = (route.query.measurement || '') as string;
 });
 
@@ -813,5 +902,49 @@ watch(
       }
     }
   }
+}
+
+.column-box {
+  font-size: 12px;
+  line-height: 18px;
+  color: #424561;
+  font-weight: 400;
+  margin-left: 8px;
+
+  :deep(.el-checkbox__input.is-checked + .el-checkbox__label) {
+    font-weight: 700;
+  }
+}
+
+.filter-operate-box {
+  padding: 6px 0 0;
+  border-top: 1px dashed #dfe1ed;
+}
+
+.filter-operate-checkbox-all {
+  :deep(.el-checkbox__label) {
+    padding-left: 4px;
+    font-size: 12px !important;
+    line-height: 12px !important;
+    font-weight: 400;
+  }
+}
+
+.filter-operate-buttons {
+  :deep(.el-button) {
+    height: 20px !important;
+    min-width: 36px !important;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+    font-size: 12px !important;
+    line-height: 12px !important;
+    font-weight: 400;
+  }
+}
+</style>
+
+<style lang="scss">
+.col-filter-popover-box {
+  padding: 8px !important;
 }
 </style>

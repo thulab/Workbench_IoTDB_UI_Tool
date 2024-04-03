@@ -177,6 +177,7 @@ measurement:
   deviceNameInputPlaceholder: 请输入设备名称
   newDevice: 新建设备
   deviceAlign: 时间对齐
+  undeviceAlign: 非时间对齐
   measurement: 测点
   measurementName: 测点名称
   measurementNamePlaceholder: 请输入测点名称
