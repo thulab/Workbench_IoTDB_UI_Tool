@@ -475,7 +475,7 @@ function handleClickChart(params: echarts.ECElementEvent) {
           xAxis: value[0],
           label: {
             formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
-            position: 'insideEnd',
+            position: 'end',
           },
         },
       ],
@@ -512,7 +512,7 @@ function handleClickChart(params: echarts.ECElementEvent) {
         xAxis: value[0],
         label: {
           formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
-          position: 'insideEnd',
+          position: 'end',
         },
       });
     }
