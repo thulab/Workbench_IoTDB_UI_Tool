@@ -335,7 +335,6 @@ const seriesData = computed<ECOption>(
       })),
     }) as unknown as ECOption
 );
-const isShowZoom = computed(() => pathList.value.length > 0);
 
 const chartOptions = computed<ECOption>(() => ({
   legend: legendSelected.value,
@@ -667,28 +666,6 @@ function handleData(data: any) {
       legend: legendSelected.value,
       series: seriesData.value.series,
       xAxis: { min, show: true },
-      dataZoom: [
-        {
-          type: 'slider',
-          show: isShowZoom.value,
-          xAxisIndex: 0,
-          height: 20,
-          handleSize: 8,
-          filterMode: 'empty',
-          showDetail: false,
-          right: 20,
-        },
-        {
-          type: 'slider',
-          show: isShowZoom.value,
-          yAxisIndex: 0,
-          width: 20,
-          handleSize: 8,
-          filterMode: 'empty',
-          showDetail: false,
-          right: 28,
-        },
-      ],
     });
   }
 }
