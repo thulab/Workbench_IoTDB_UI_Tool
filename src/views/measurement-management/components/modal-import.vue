@@ -328,3 +328,9 @@ watch(
   text-decoration: underline;
 }
 </style>
+
+<style lang="scss">
+.el-dialog__body {
+  padding: 16px 0 0 !important;
+}
+</style>
