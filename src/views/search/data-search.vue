@@ -9,6 +9,7 @@
           </template>
           <timeseries-select v-model="searchFormData.path" :is-show-view-btn="true" :disabled="getListLoading" id="data-search-path" />
         </base-form-item>
+        <br />
         <el-form-item :label="`${t('search.searchTime')}：`" prop="time">
           <div class="search-time-wrapper">
             <ul class="search-time-list">
