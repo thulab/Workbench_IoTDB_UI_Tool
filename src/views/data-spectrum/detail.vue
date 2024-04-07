@@ -586,7 +586,7 @@ function handleDealCursor(params: echarts.ECElementEvent) {
     xAxis: value[0],
     label: {
       formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
-      position: 'insideEnd',
+      position: 'end',
       color: '#fff',
     },
     lineStyle: {
@@ -626,7 +626,7 @@ function handleDealFrequency(params: echarts.ECElementEvent) {
         xAxis: x,
         label: {
           formatter: `H${i === 1 ? '' : i}`,
-          position: 'insideEnd',
+          position: 'end',
           color: '#28D5CB',
         },
         lineStyle: {
@@ -671,7 +671,7 @@ function handleDealSideband(params: echarts.ECElementEvent) {
           xAxis: leftX,
           label: {
             formatter: `SL${i}`,
-            position: 'insideEnd',
+            position: 'end',
             color: '#AA82F5',
           },
           lineStyle: {
@@ -704,7 +704,7 @@ function handleDealSideband(params: echarts.ECElementEvent) {
       xAxis: currentX,
       label: {
         formatter: 'S',
-        position: 'insideEnd',
+        position: 'end',
         color: '#AA82F5',
       },
       lineStyle: {
@@ -737,7 +737,7 @@ function handleDealSideband(params: echarts.ECElementEvent) {
           xAxis: rightX,
           label: {
             formatter: `SR${i}`,
-            position: 'insideEnd',
+            position: 'end',
             color: '#AA82F5',
           },
           lineStyle: {
