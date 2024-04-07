@@ -491,6 +491,7 @@ calculate:
   viewExpression: 视图表达式
   expressionTip: '支持使用运算符及函数(除聚合函数), 如: root.sgcc.wf03.wt01.temperature + 1，详细规则见'
   batchImportTitle: 批量导入计算
+  batchImportViewTitle: 批量导入视图
 alarm:
   alarmName: 告警名称
   alarmNamePlaceholder: 请输入告警名称

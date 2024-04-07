@@ -1,5 +1,13 @@
 <template>
-  <el-dialog :title="t('calculate.batchImportTitle')" v-model="dialogVisible" width="748px" class="new-storage-container" align-center :close-on-click-modal="false" id="calculate-modal-import">
+  <el-dialog
+    :title="t(appType === 1 ? 'calculate.batchImportTitle' : 'calculate.batchImportViewTitle')"
+    v-model="dialogVisible"
+    width="748px"
+    class="new-storage-container"
+    align-center
+    :close-on-click-modal="false"
+    id="calculate-modal-import"
+  >
     <div class="import-box">
       <el-steps :active="activeStep" align-center finish-status="success" class="import-step-box" id="calculate-import-steps">
         <el-step :title="t('common.chooseFile')">
@@ -319,5 +327,11 @@ watch(
 .error-link {
   color: #495ad4;
   text-decoration: underline;
+}
+</style>
+
+<style lang="scss">
+.el-dialog__body {
+  padding: 16px 0 0 !important;
 }
 </style>
