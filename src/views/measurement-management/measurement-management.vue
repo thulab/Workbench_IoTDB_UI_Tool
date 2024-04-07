@@ -144,10 +144,19 @@
               <i-custom-refresh style="width: 24px; height: 24px" />
             </el-button>
           </auth-tooltip>
-          <el-popover placement="bottom" :width="156" :visible="colVisible" popper-class="col-filter-popover-box">
-            <template #reference>
-              <el-button link class="svg-button-hover-color" @click="handleClickCol" id="measurement-column-filter"><i-custom-filter style="width: 24px; height: 24px" /></el-button>
-            </template>
+          <el-button link class="svg-button-hover-color m-l-4" ref="colButtonRef" id="measurement-column-filter" v-click-outside="handleClickOutside">
+            <i-custom-filter style="width: 24px; height: 24px" />
+          </el-button>
+          <el-popover
+            placement="bottom"
+            :width="156"
+            popper-class="col-filter-popover-box"
+            ref="colPopoverRef"
+            :virtual-ref="colButtonRef"
+            trigger="click"
+            virtual-triggering
+            @before-enter="handleBeforeEnter"
+          >
             <el-checkbox-group v-model="checkedCols" @change="handleChangeCol" class="column-box">
               <el-checkbox
                 v-for="item in allColumns"
@@ -297,8 +306,9 @@
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
+import { cloneDeep } from 'lodash-es';
 import { useTableHeight } from '@/composition-api';
-import type { CheckboxValueType } from 'element-plus';
+import { type CheckboxValueType, ClickOutside as vClickOutside } from 'element-plus';
 import { StorageApi } from '@/api';
 import { useUserStore } from '@/stores';
 import { getPathAuthList, getParentPathAuthList } from '@/utils/auth';
@@ -355,7 +365,8 @@ const editDescription = ref('');
 const searchType = ref('name');
 const searchPlaceholder = computed(() => (searchType.value === 'name' ? t('calculate.namePlaceholder') : t('calculate.descPlaceholder')));
 
-const colVisible = ref(false);
+const colButtonRef = ref();
+const colPopoverRef = ref();
 const allColumns = ref<Array<{ label: string; prop: string; width: number }>>([
   { label: 'measurement.deviceName', prop: 'deviceName', width: 200 },
   { label: 'measurement.measurementName', prop: 'timeseries', width: 200 },
@@ -370,6 +381,7 @@ const allColumns = ref<Array<{ label: string; prop: string; width: number }>>([
 ]);
 const isCheckAll = ref(false);
 const checkedCols = ref<string[]>(['deviceName', 'timeseries']);
+let copyCheckedCols = cloneDeep(checkedCols.value);
 const isIndeterminate = ref(true);
 const columnList = ref<Array<{ label: string; prop: string; width: number }>>([
   { label: 'measurement.deviceName', prop: 'deviceName', width: 200 },
@@ -458,8 +470,15 @@ function handleCheckedAll(val: CheckboxValueType) {
   isIndeterminate.value = !val;
 }
 
-function handleClickCol() {
-  colVisible.value = true;
+function handleBeforeEnter() {
+  checkedCols.value = cloneDeep(copyCheckedCols);
+  const checkedLength = checkedCols.value.length;
+  isCheckAll.value = checkedLength === allColumns.value.length;
+  isIndeterminate.value = checkedLength > 0 && checkedLength < allColumns.value.length;
+}
+
+function handleClickOutside() {
+  unref(colPopoverRef).popperRef?.delayHide?.();
 }
 
 function handleResetCol() {
@@ -469,8 +488,9 @@ function handleResetCol() {
 }
 
 function handleConfirmCol() {
+  colPopoverRef.value.hide();
+  copyCheckedCols = cloneDeep(checkedCols.value);
   columnList.value = allColumns.value.filter((item) => checkedCols.value.includes(item.prop));
-  colVisible.value = false;
   localStorage.setItem('measurementCols', checkedCols.value.join(','));
 }
 
@@ -712,6 +732,7 @@ onMounted(() => {
     isIndeterminate.value = checkedLength > 0 && checkedLength < allColumns.value.length;
     columnList.value = allColumns.value.filter((item) => checkedCols.value.includes(item.prop));
   }
+  copyCheckedCols = cloneDeep(checkedCols.value);
   searchKeyword.value = (route.query.measurement || '') as string;
 });
 
