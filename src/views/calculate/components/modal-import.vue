@@ -85,13 +85,13 @@
       <p class="error-info-tip" v-if="activeStep === 2 && (uploadStatus === 'error' || uploadStatus === 'partial')">{{ t('common.importTip') }}</p>
     </div>
 
-    <div class="m-t-12" style="text-align: right" v-if="activeStep === 0">
+    <div class="m-t-12 operate-buttons" style="text-align: right" v-if="activeStep === 0">
       <el-button plain :disabled="!uploadFileInfo" @click="handleNext" id="calculate-import-next">{{ t('common.next') }}</el-button>
     </div>
 
-    <div class="m-t-12" style="height: 28px" v-if="activeStep === 1"></div>
+    <div class="m-t-12 operate-buttons" style="height: 28px" v-if="activeStep === 1"></div>
 
-    <div class="m-t-12" style="text-align: center" v-if="activeStep === 2">
+    <div class="m-t-12 operate-buttons" style="text-align: center" v-if="activeStep === 2">
       <el-button type="primary" @click="handleClose" id="calculate-import-close">{{ t('common.finish') }}</el-button>
     </div>
   </el-dialog>
@@ -235,6 +235,10 @@ watch(
       text-align: center;
     }
   }
+
+  .operate-buttons {
+    margin-bottom: -24px;
+  }
 }
 
 .import-step-box {
@@ -327,11 +331,5 @@ watch(
 .error-link {
   color: #495ad4;
   text-decoration: underline;
-}
-</style>
-
-<style lang="scss">
-.el-dialog__body {
-  padding: 16px 0 0 !important;
 }
 </style>
