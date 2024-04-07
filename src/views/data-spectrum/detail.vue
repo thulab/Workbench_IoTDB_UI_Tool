@@ -82,7 +82,7 @@
               </base-form-item>
             </div>
             <div v-if="searchFormData.method === 'custom'">
-              <base-form-item :label="`${t('spectrum.sqlInput')}：`" prop="sql" :label-width="locale === 'en' ? '140px' : '96px'">
+              <base-form-item :label="`${t('spectrum.sqlInput')}：`" prop="sql" :label-width="locale === 'en' ? '140px' : '96px'" class="el-form-item-not-mandatory">
                 <el-button type="primary" link id="spectrum-search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
               </base-form-item>
             </div>
