@@ -34,7 +34,7 @@
     </el-option>
   </el-select>
   <el-button v-if="isShowViewBtn" type="primary" :disabled="!model.length" class="m-l-12" @click="() => (dialogVisible = true)">{{ viewText || t('dataTrend.choosedMeasurement') }}</el-button>
-  <el-dialog :title="viewText || t('dataTrend.choosedMeasurement')" v-model="dialogVisible" class="select-modal" align-center>
+  <el-dialog :title="viewText || t('dataTrend.choosedMeasurement')" v-model="dialogVisible" class="select-modal" align-center width="520px">
     <el-scrollbar :max-height="400">
       <ul class="select-list">
         <li v-for="(item, index) in model" :key="item" class="select-item">
