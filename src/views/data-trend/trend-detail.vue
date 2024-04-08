@@ -77,7 +77,7 @@
     <el-main class="p-0">
       <el-container class="chart-detail-wrapper">
         <el-main class="p-0" style="position: relative">
-          <div ref="chartContainer" class="chart-container" :style="`height: ${isRunningTab ? '100%;' : 'calc(100% - 30px);'}`" v-element-size="onResize"></div>
+          <div ref="chartContainer" class="chart-container" style="height: calc(100% - 30px)" v-element-size="onResize"></div>
           <div v-if="!isRunningTab" style="margin-top: 2px">
             <el-button
               type="primary"
@@ -91,9 +91,11 @@
             >
               {{ t('spectrum.cursor') }}
             </el-button>
-            <el-button link class="cursor-button-clear" id="trend-cursor-clear" :disabled="!chartHistoryData.length || !pointList.length" @click="handleEmptyPoint">
-              <el-icon size="18" color="#fff"><i-custom-delete /></el-icon>
-            </el-button>
+            <el-tooltip effect="light" :content="t('common.clearAll')" placement="top" popper-class="tooltip-box-width">
+              <el-button link class="cursor-button-clear" id="trend-cursor-clear" :disabled="!chartHistoryData.length || !pointList.length" @click="handleEmptyPoint">
+                <el-icon size="18" color="#fff"><i-custom-delete /></el-icon>
+              </el-button>
+            </el-tooltip>
           </div>
         </el-main>
         <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand ? 'p-0' : '']" style="display: flex; flex-direction: column">
@@ -383,6 +385,7 @@ const chartOptions = computed<ECOption>(() => ({
   },
   yAxis: {
     type: 'value',
+    scale: true,
   },
   animation: !isRunningTab.value,
   series: seriesData.value.series,
@@ -418,17 +421,30 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
     });
     // 若存在restore事件，执行
     chartInstance.on('restore', () => {
-      if (isRunningTab.value) return;
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      handleEmptyPoint();
-      const start = dayjs(searchFormData.datetimerange[0]).valueOf();
-      const end = dayjs(searchFormData.datetimerange[1]).valueOf();
-      setOption({
-        xAxis: {
-          min: start,
-          max: end,
-        },
-      });
+      // handleEmptyPoint();
+      if (!isRunningTab.value) {
+        const start = dayjs(searchFormData.datetimerange[0]).valueOf();
+        const end = dayjs(searchFormData.datetimerange[1]).valueOf();
+        setOption({
+          xAxis: {
+            min: start,
+            max: end,
+          },
+        });
+      } else {
+        const minTime = dayjs().subtract(10, 'minute').valueOf();
+        if (chartData.value.length === 0) {
+          minDataTime.value = dayjs().valueOf();
+        }
+        const min = minTime > minDataTime.value ? minTime : minDataTime.value;
+        setOption({
+          xAxis: {
+            min,
+          },
+        });
+      }
+      setOption(chartOptions.value);
     });
     // 初次加载，设置notMerge为true
     chartInstance.setOption(option, true);

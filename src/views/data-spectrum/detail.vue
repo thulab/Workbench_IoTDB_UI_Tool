@@ -4,7 +4,7 @@
       <div class="search-form-box" style="margin-bottom: 18px">
         <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
           <div class="m-b-16 flex-align-center" style="height: 36px">
-            <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method" :label-width="locale === 'en' ? '140px' : '96px'" required>
+            <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method" :label-width="locale === 'en' ? '140px' : '96px'" :rules="requiredRules">
               <template #label>
                 {{ t('spectrum.analysisMethod') }}：
                 <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
@@ -63,10 +63,10 @@
           </div>
           <div class="flex-justify-between">
             <div v-if="searchFormData.method !== 'custom'">
-              <base-form-item :label="`${t('measurement.measurementChoose')}：`" prop="measurement" :label-width="locale === 'en' ? '140px' : '96px'" required>
+              <base-form-item :label="`${t('measurement.measurementChoose')}：`" prop="measurement" :label-width="locale === 'en' ? '140px' : '96px'" :rules="requiredRules">
                 <timeseries-select-single id="spectrum-search-path" v-model="searchFormData.measurement" :selectWidth="230" :itemWidth="200" show-suffix :disabled-path="disabledPath" />
               </base-form-item>
-              <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" required>
+              <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules">
                 <el-date-picker
                   v-model="searchFormData.datetimerange"
                   type="datetimerange"
@@ -148,9 +148,11 @@
               </el-button>
               <el-input-number v-model="sideband" :min="1" :max="99" step-strictly id="spectrum-sideband-input" :disabled="dataEmpty || drawedStatus.sideband" :controls="false" :value-on-clear="1" />
             </div>
-            <el-button link class="cursor-button-clear m-l-8" id="spectrum-cursor-clear" :disabled="dataEmpty" @click="() => handleEmptyOperate()">
-              <el-icon size="18" color="#fff"><i-custom-delete /></el-icon>
-            </el-button>
+            <el-tooltip effect="light" :content="t('common.clearAll')" placement="top" popper-class="tooltip-box-width">
+              <el-button link class="cursor-button-clear m-l-8" id="spectrum-cursor-clear" :disabled="dataEmpty" @click="() => handleEmptyOperate()">
+                <el-icon size="18" color="#fff"><i-custom-delete /></el-icon>
+              </el-button>
+            </el-tooltip>
           </div>
         </el-main>
         <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand ? 'p-0' : '']" style="display: flex; flex-direction: column">
@@ -272,7 +274,7 @@ const searchFormData = reactive<{
   measurement: '',
   method: '',
   resultType: 'abs',
-  compression: '',
+  compression: 1,
   frequency: '',
   amplification: 1,
   datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
@@ -324,6 +326,13 @@ const drawedStatus = reactive({
   frequency: false,
   sideband: false,
 });
+const requiredRules = ref([
+  {
+    required: true,
+    message: '',
+    trigger: ['change'],
+  },
+]);
 let currentPoint = 0;
 const dataEmpty = computed(() => chartData.timestamps.length === 0);
 const disableFrequency = computed(() => chartData.timestamps.length === 0 || drawedStatus.frequency);
@@ -425,6 +434,7 @@ const chartOptions = computed<ECOption>(() => ({
   yAxis: {
     type: 'value',
     show: !dataEmpty.value,
+    scale: true,
   },
   animation: true,
   series: seriesData.value.series,
@@ -522,7 +532,8 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
     // 若存在restore事件，执行
     chartInstance.on('restore', () => {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      handleEmptyOperate();
+      // handleEmptyOperate();
+      setOption(chartOptions.value);
     });
     chartInstance.getZr().on('click', (params) => {
       if (!clickedOperate.value) return;
@@ -819,7 +830,7 @@ function handleReset() {
   searchFormData.measurement = '';
   searchFormData.method = '';
   searchFormData.resultType = 'abs';
-  searchFormData.compression = '';
+  searchFormData.compression = 1;
   searchFormData.frequency = '';
   searchFormData.amplification = 1;
   sqlValue.value = '';

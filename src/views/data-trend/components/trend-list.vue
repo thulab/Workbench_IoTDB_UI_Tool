@@ -13,7 +13,7 @@
     </el-tooltip>
   </div>
 
-  <auth-tooltip :is-disabled="canReadWriteSchemaData">
+  <!-- <auth-tooltip :is-disabled="canReadWriteSchemaData">
     <el-checkbox
       v-if="isExpand"
       class="m-b-8"
@@ -25,7 +25,7 @@
       @change="handleCheckedAll"
       id="trend-path-checkbox"
     />
-  </auth-tooltip>
+  </auth-tooltip> -->
 
   <h4 v-if="!isExpand" class="collapse-title">{{ t('dataTrend.choosedMeasurement') }}</h4>
 
@@ -108,6 +108,7 @@ const listKey = ref(0);
 const pathList = useVModel(props, 'modelValue');
 const isExpand = useVModel(props, 'isExpand', emit);
 const isCheckAll = ref(false);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isIndeterminate = computed(() => {
   if (pathList.value.length === 0) return false;
   const allLength = pathList.value.length;
@@ -127,6 +128,7 @@ const isIndeterminate = computed(() => {
   return checkedLength > 0 && checkedLength < allLength;
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const allCheckAbled = computed(() => pathList.value.length > 0 && pathList.value.filter((item) => !item.disabled).length > 0);
 
 const predefineColors = ['#4992ff', '#7cffb2', '#fddd60', '#ff6e76', '#58d9f9', '#05c091', '#ff8a45', '#8d48e3', '#dd79ff', '#8AC211'];
@@ -146,6 +148,7 @@ function handleAdd() {
   pathVisible.value = true;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleCheckedAll(val: CheckboxValueType) {
   pathList.value.forEach((item) => {
     if (!item.disabled) {
