@@ -360,7 +360,7 @@ const seriesData = computed<ECOption>(
           name: copySearchFormData.measurement,
           data: chartData.values.map((dataItem, index) => [chartData.timestamps[index], dataItem]),
           markPoint: {
-            // silent: true,
+            silent: true,
             symbol: 'rect',
             symbolSize: 8,
             label: {
@@ -369,7 +369,7 @@ const seriesData = computed<ECOption>(
             data: markPointData.value.length ? markPointData.value : [],
           },
           markLine: {
-            // silent: true,
+            silent: true,
             symbol: 'none',
             data: markLineData.value.length ? markLineData.value : [],
             animation: false,
@@ -523,7 +523,6 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
     // 若存在click事件，执行
     chartInstance.on('click', (params) => {
       if (!clickedOperate.value) return;
-      console.log('click', params);
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       handleClickChart(params);
     });
@@ -538,17 +537,7 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
     });
     chartInstance.getZr().on('click', (params) => {
       if (!clickedOperate.value) return;
-      if (params.target && !params.topTarget) {
-        window.aaa = params;
-        console.log('has target', params, params.target.selected);
-        return;
-      }
-      // 点击到点上
-      if (params.target?.z === 3 || params.target?.z === 5) {
-        return;
-      }
-      console.log('getZr', params, params.target?.z, params.topTarget?.z);
-      if (params.topTarget && params.topTarget.type !== 'Line') return;
+      if (params.topTarget?.type !== 'Line') return;
       if (currentPoint && chartData.timestamps[currentPoint]) {
         const point = [chartData.timestamps[currentPoint], chartData.values[currentPoint]];
         const param = { componentType: 'series', seriesName: copySearchFormData.measurement, value: point };
@@ -572,35 +561,7 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
 };
 
 function handleDealCursor(params: echarts.ECElementEvent) {
-  // eslint-disable-next-line prefer-const
-  let { seriesName, value } = params as { seriesName: string; value: number[] };
-  if (!seriesName) seriesName = '';
-  const pointName = `${seriesName}_${value[0]}_${value[1]}`;
-  const lineName = `${seriesName}_${value}`;
-  const pointIndex = markPointData.value.findIndex((point) => point.name === pointName);
-  const lineIndex = markLineData.value.findIndex((line) => line.name === lineName);
-  debugger;
-  if (pointIndex !== -1 || lineIndex !== -1) {
-    const markIndex = pointIndex === -1 ? lineIndex : pointIndex;
-    console.log(markIndex, 'yes');
-    markPointCount.value--;
-    markPointData.value.splice(markIndex, 1);
-    pointList.value.splice(markIndex, 1);
-    markLineData.value.splice(markIndex, 1);
-    markLineData.value.forEach((item, index) => {
-      if (index >= markIndex) {
-        const label = item.label.formatter();
-        console.log(item, label, 'item');
-        item.label = {
-          formatter: () => (markPointCount.value === 1 ? 'D' : `D${label.substring(1) - 1}`),
-          position: 'end',
-          color: '#fff',
-        };
-      }
-    });
-    setOption(chartOptions.value);
-    return;
-  }
+  const { seriesName, value } = params as { seriesName: string; value: number[] };
   if (markPointCount.value > 9) {
     ElMessage.warning({
       message: t('spectrum.overTip'),
@@ -608,7 +569,9 @@ function handleDealCursor(params: echarts.ECElementEvent) {
     });
     return;
   }
-  console.log(pointIndex, 'no');
+  const pointIndex = markPointData.value.findIndex((point) => point.name === `${seriesName}_${value[0]}_${value[1]}`);
+  if (pointIndex !== -1) return;
+
   markPointCount.value++;
   const num = markPointCount.value;
   markPointData.value.push({
@@ -800,7 +763,7 @@ function handleDealSideband(params: echarts.ECElementEvent) {
 }
 
 function handleClickChart(params: echarts.ECElementEvent) {
-  if (params.componentType !== 'series' && params.componentType !== 'markLine') return;
+  if (params.componentType !== 'series') return;
   if (clickedOperate.value === 'cursor') {
     clickedStatus.cursor = true;
     handleDealCursor(params);
@@ -875,21 +838,14 @@ function handleReset() {
 }
 
 function getFFT() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
   getFFTData({
-    // resultType: copySearchFormData.resultType,
-    // compression: copySearchFormData.compression!,
-    // measurement: copySearchFormData.measurement,
-    // startTime: start,
-    // endTime: end,
-    resultType: 'abs',
-    compression: 1,
-    measurement: 'root.stock.Legacy.0700HK.L1_BidPrice',
-    startTime: 1712628000000,
-    endTime: 1712628314000,
+    resultType: copySearchFormData.resultType,
+    compression: copySearchFormData.compression!,
+    measurement: copySearchFormData.measurement,
+    startTime: start,
+    endTime: end,
   })
     .then((res) => {
       chartData.timestamps = res.data.timestamps || [];
@@ -944,8 +900,6 @@ function handleSearch() {
   if (!canReadWriteSchemaData.value) return;
   copySearchFormData = cloneDeep(searchFormData);
   handleEmptyOperate();
-  getFFT();
-  return;
   if (!copySearchFormData.method) {
     ElMessage.warning({
       message: t('common.searchFormEmpty'),
