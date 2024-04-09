@@ -76,10 +76,6 @@
     </auth-container>
   </div>
 
-  <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="handleExpand" id="trend-path-expand">
-    <i-custom-arrow-right-expand />
-  </el-icon>
-
   <modal-path v-model:visible="pathVisible" :path-list="editPathList" :predefine-colors="predefineColors" :default-color="defaultColor" @handleSave="handleSavePath" />
 </template>
 
@@ -97,7 +93,6 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (event: 'update:isExpand', isExpand: boolean): void;
   (event: 'handleSelect', payload: string): void;
   (event: 'handleOperate', payload: 'add' | 'del' | 'detail', data: string): void;
   (event: 'handleOperateAll'): void;
@@ -106,7 +101,6 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const listKey = ref(0);
 const pathList = useVModel(props, 'modelValue');
-const isExpand = useVModel(props, 'isExpand', emit);
 const isCheckAll = ref(false);
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isIndeterminate = computed(() => {
@@ -195,10 +189,6 @@ function handleDel(data: Trend.LineObj, index: number) {
   if (pathList.value.length === 0) {
     isCheckAll.value = false;
   }
-}
-
-function handleExpand() {
-  isExpand.value = !isExpand.value;
 }
 
 watch(
@@ -337,23 +327,6 @@ watch(
     :deep(.el-input-number.is-controls-right .el-input-number__increase, .el-input-number.is-controls-right .el-input-number__decrease) {
       --el-input-number-controls-height: 11px !important;
     }
-  }
-}
-
-.expand-icon {
-  position: absolute;
-  bottom: 0;
-  left: 16px;
-  cursor: pointer;
-  color: #a0a3b8;
-
-  &:hover {
-    color: #495ad4;
-  }
-
-  &.collapse-icon {
-    left: 0;
-    transform: rotate(-180deg);
   }
 }
 </style>

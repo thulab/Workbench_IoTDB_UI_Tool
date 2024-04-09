@@ -99,49 +99,56 @@
           </div>
         </el-main>
         <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand ? 'p-0' : '']" style="display: flex; flex-direction: column">
-          <trend-list
-            v-model="pathList"
-            v-model:is-expand="isExpand"
-            :data-tab="dataTab"
-            :aggregation="searchFormData.aggregation"
-            :can-read-write-schema-data="canReadWriteSchemaData"
-            @handleOperate="handleOperatePath"
-            @handleOperateAll="handleOperateAll"
-          />
-          <div class="cursor-list-box" v-if="isExpand && !isRunningTab">
-            <h4 class="cursor-list-title">{{ t('spectrum.cursorTitle') }}</h4>
-            <auth-container :is-auth="canReadWriteSchemaData" style="flex: 1; background-color: #fff; overflow-y: hidden; display: flex; padding: 12px 0 10px">
-              <div class="list-empty-wrapper" v-if="!historyCursorData.length || !pathList.length">
-                <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
-                <span class="data-empty-text">{{ t('common.noData') }}</span>
-              </div>
-              <div class="cursor-list-wrapper" v-else>
-                <ul class="cursor-list">
-                  <li v-for="(item, index) in pointList" :key="item.name" :class="['cursor-item-box']">
-                    <div class="cursor-text-box">
-                      <el-checkbox
-                        v-if="pointList.length !== 1"
-                        :checked="item.checked"
-                        class="m-r-4"
-                        :id="`trend-cursor-checkbox-${index}`"
-                        :disabled="pointDisabled(item)"
-                        @change="(val) => handleCheckDvalue(val, item)"
-                      />
-                      {{ pointTitle(index) }}
-                    </div>
-                    <div class="cursor-point-data">
-                      <p style="display: inline-flex; width: 140px"><text-tooltip :content="`X: ${item.x}`" /></p>
-                      <p style="display: inline-flex; width: 140px"><text-tooltip :content="`Y: ${item.y}`" /></p>
-                    </div>
-                  </li>
-                </ul>
-                <div v-if="pointCheckedData.length === 2" class="point-dvalue-box">
-                  <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔX：${Math.abs(pointCheckedData[0].x - pointCheckedData[1].x)}`" /></p>
-                  <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔY：${Math.abs(pointCheckedData[0].y - pointCheckedData[1].y)}`" /></p>
+          <div class="aside-data-box">
+            <div class="path-box">
+              <trend-list
+                v-model="pathList"
+                :is-expand="isExpand"
+                :data-tab="dataTab"
+                :aggregation="searchFormData.aggregation"
+                :can-read-write-schema-data="canReadWriteSchemaData"
+                @handleOperate="handleOperatePath"
+                @handleOperateAll="handleOperateAll"
+              />
+            </div>
+            <div class="cursor-list-box" v-if="isExpand && !isRunningTab">
+              <h4 class="cursor-list-title">{{ t('spectrum.cursorTitle') }}</h4>
+              <auth-container :is-auth="canReadWriteSchemaData" style="flex: 1; background-color: #fff; overflow-y: hidden; display: flex; padding: 12px 0 10px">
+                <div class="list-empty-wrapper" v-if="!historyCursorData.length || !pathList.length">
+                  <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
+                  <span class="data-empty-text">{{ t('common.noData') }}</span>
                 </div>
-              </div>
-            </auth-container>
+                <div class="cursor-list-wrapper" v-else>
+                  <ul class="cursor-list">
+                    <li v-for="(item, index) in pointList" :key="item.name" :class="['cursor-item-box']">
+                      <div class="cursor-text-box">
+                        <el-checkbox
+                          v-if="pointList.length !== 1"
+                          :checked="item.checked"
+                          class="m-r-4"
+                          :id="`trend-cursor-checkbox-${index}`"
+                          :disabled="pointDisabled(item)"
+                          @change="(val) => handleCheckDvalue(val, item)"
+                        />
+                        {{ pointTitle(index) }}
+                      </div>
+                      <div class="cursor-point-data">
+                        <p style="display: inline-flex; width: 140px"><text-tooltip :content="`X: ${item.x}`" /></p>
+                        <p style="display: inline-flex; width: 140px"><text-tooltip :content="`Y: ${item.y}`" /></p>
+                      </div>
+                    </li>
+                  </ul>
+                  <div v-if="pointCheckedData.length === 2" class="point-dvalue-box">
+                    <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔX：${Math.abs(pointCheckedData[0].x - pointCheckedData[1].x)}`" /></p>
+                    <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔY：${Math.abs(pointCheckedData[0].y - pointCheckedData[1].y)}`" /></p>
+                  </div>
+                </div>
+              </auth-container>
+            </div>
           </div>
+          <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="handleExpand" id="trend-path-expand">
+            <i-custom-arrow-right-expand />
+          </el-icon>
         </el-aside>
       </el-container>
     </el-main>
@@ -580,6 +587,10 @@ function handleChangeTime(value: [DateModelType, DateModelType]) {
   }
 }
 
+function handleExpand() {
+  isExpand.value = !isExpand.value;
+}
+
 // 查询
 function handleSearch() {
   if (!canReadWriteSchemaData.value) return;
@@ -964,17 +975,52 @@ onUnmounted(() => {
   background-color: #f7f8fc;
   border-radius: 2px;
   box-sizing: border-box;
-  padding: 12px 12px 28px;
+  padding: 12px 12px 0;
   position: relative;
   transition: all 0.3s ease;
+  display: flex;
+}
+
+.aside-data-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.path-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.expand-icon {
+  // position: absolute;
+  // bottom: 0;
+  // left: 16px;
+  cursor: pointer;
+  color: #a0a3b8;
+
+  &:hover {
+    color: #495ad4;
+  }
+
+  &.collapse-icon {
+    left: 0;
+    transform: rotate(-180deg);
+  }
 }
 
 .cursor-list-box {
   margin: 16px 0 0;
-  min-height: 160px;
-  max-height: 244px;
+
+  // min-height: 160px;
+  // max-height: 244px;
+  flex: 0 0 30%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 
   .cursor-list-title {
     font-size: 14px;
