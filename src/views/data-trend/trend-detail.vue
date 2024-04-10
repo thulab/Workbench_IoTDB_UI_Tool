@@ -470,12 +470,12 @@ function handleClickChart(params: echarts.ECElementEvent) {
   if (componentType !== 'series' && componentType !== 'markLine' && componentType !== 'markPoint') return;
   let index = -1;
   if (componentType === 'series') {
-    index = pointLineData.value.findIndex((data) => data.path === seriesName && data.xAxis === value[0]);
+    index = pointLineData.value.findIndex((data) => data.path === seriesName && data.xAxis === (value as number[])[0]);
   } else if (componentType === 'markPoint') {
-    index = pointLineData.value.findIndex((data) => data.path === params.data.path && data.value === value);
+    index = pointLineData.value.findIndex((data) => data.path === (params.data as unknown as any)?.path && data.value === (value as number));
   } else {
     // 'markLine'
-    index = pointLineData.value.findIndex((data) => data.path === params.data.path && data.xAxis === value);
+    index = pointLineData.value.findIndex((data) => data.path === (params.data as unknown as any)?.path && data.xAxis === (value as number));
   }
   if (index !== -1) {
     markPointCount.value--;
@@ -503,19 +503,19 @@ function handleClickChart(params: echarts.ECElementEvent) {
   const num = markPointCount.value;
   pointLineData.value.push({
     path: seriesName,
-    name: `${seriesName}_${value[0]}_point_line`,
-    value: value[1],
-    xAxis: value[0],
-    yAxis: value[1],
+    name: `${seriesName}_${(value as number[])[0]}_point_line`,
+    value: (value as number[])[1],
+    xAxis: (value as number[])[0],
+    yAxis: (value as number[])[1],
     label: {
       formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
       position: 'end',
     },
   });
   pointList.value.push({
-    name: `${seriesName}_${value[0]}_${value[1]}`,
-    x: value[0],
-    y: value[1],
+    name: `${seriesName}_${(value as number[])[0]}_${(value as number[])[1]}`,
+    x: (value as number[])[0],
+    y: (value as number[])[1],
     disabled: false,
     checked: false,
   });
