@@ -114,7 +114,7 @@
             <div class="cursor-list-box" v-if="isExpand && !isRunningTab">
               <h4 class="cursor-list-title">{{ t('spectrum.cursorTitle') }}</h4>
               <auth-container :is-auth="canReadWriteSchemaData" style="flex: 1; background-color: #fff; overflow-y: hidden; display: flex; padding: 12px 0 10px">
-                <div class="list-empty-wrapper" v-if="!historyCursorData.length || !pathList.length">
+                <div class="list-empty-wrapper" v-if="!pointLineData.length || !pathList.length">
                   <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
                   <span class="data-empty-text">{{ t('common.noData') }}</span>
                 </div>
@@ -170,28 +170,24 @@ import { useWebsocket } from '@/composition-api';
 import ICustomCalender from '~icons/custom/calender.svg';
 import TrendList from './components/trend-list.vue';
 
-interface TrendMarkPoint {
-  name: string;
-  value: number;
-  xAxis: number;
-  yAxis: number;
-}
-
-interface TrendMarkLine {
-  name: string;
-  xAxis: number;
-  label: {
-    formatter: string | Function;
-    position: string;
-  };
-}
-
 interface PointData {
   name: string;
   x: number;
   y: number;
   disabled: boolean;
   checked: boolean;
+}
+
+interface MarkPointLine {
+  path: string;
+  name: string;
+  value: number;
+  xAxis: number;
+  yAxis: number;
+  label: {
+    formatter: string | Function;
+    position: string;
+  };
 }
 
 const { t } = useI18n();
@@ -269,7 +265,7 @@ const chartHistoryData = ref<Search.TrendData[]>([]);
 const copyCheckData = ref<Trend.LineObj[]>([]);
 // 当前数据
 const currentData = computed(() => (isRunningTab.value ? chartData.value : chartHistoryData.value));
-const historyCursorData = ref<Array<{ path: string; markPoint: Array<TrendMarkPoint>; markLine: Array<TrendMarkLine> }>>([]);
+const pointLineData = ref<Array<MarkPointLine>>([]);
 const clickedCursor = ref(false);
 const markPointCount = ref(0);
 const pointList = ref<Array<PointData>>([]);
@@ -312,7 +308,10 @@ const seriesData = computed<ECOption>(
           label: {
             show: false,
           },
-          data: isRunningTab.value || (!isRunningTab.value && !historyCursorData.value.length) ? [] : historyCursorData.value.find((data) => data.path === item.path)?.markPoint,
+          data:
+            isRunningTab.value || (!isRunningTab.value && !pointLineData.value.length)
+              ? []
+              : pointLineData.value.filter((data) => data.path === item.path)?.map((point) => ({ path: point.path, name: point.name, value: point.value, xAxis: point.xAxis, yAxis: point.yAxis })),
         },
         markLine: {
           symbol: 'none',
@@ -320,12 +319,10 @@ const seriesData = computed<ECOption>(
             type: [16, 10],
             color: '#DFE1ED',
           },
-          emphasis: {
-            lineStyle: {
-              type: [16, 10],
-            },
-          },
-          data: isRunningTab.value || (!isRunningTab.value && !historyCursorData.value.length) ? [] : historyCursorData.value.find((data) => data.path === item.path)?.markLine,
+          data:
+            isRunningTab.value || (!isRunningTab.value && !pointLineData.value.length)
+              ? []
+              : pointLineData.value.filter((data) => data.path === item.path)?.map((line) => ({ path: line.path, name: line.name, xAxis: line.xAxis, label: line.label })),
           animation: false,
         },
         lineStyle: {
@@ -469,8 +466,32 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
 };
 
 function handleClickChart(params: echarts.ECElementEvent) {
-  const { seriesName, value, componentType } = params as { seriesName: string; value: number[]; componentType: string };
-  if (componentType !== 'series') return;
+  const { seriesName, value, componentType } = params as { seriesName: string; value: number[] | number; componentType: string };
+  if (componentType !== 'series' && componentType !== 'markLine' && componentType !== 'markPoint') return;
+  let index = -1;
+  if (componentType === 'series') {
+    index = pointLineData.value.findIndex((data) => data.path === seriesName && data.xAxis === value[0]);
+  } else if (componentType === 'markPoint') {
+    index = pointLineData.value.findIndex((data) => data.path === params.data.path && data.value === value);
+  } else {
+    // 'markLine'
+    index = pointLineData.value.findIndex((data) => data.path === params.data.path && data.xAxis === value);
+  }
+  if (index !== -1) {
+    markPointCount.value--;
+    pointList.value.splice(index, 1);
+    pointLineData.value.splice(index, 1);
+    pointLineData.value.forEach((item, i) => {
+      if (i >= index) {
+        item.label = {
+          formatter: () => (markPointCount.value === 1 ? 'D' : `D${i + 1}`),
+          position: 'end',
+        };
+      }
+    });
+    setOption(chartOptions.value);
+    return;
+  }
   if (markPointCount.value > 9) {
     ElMessage.warning({
       message: t('spectrum.overTip'),
@@ -478,68 +499,26 @@ function handleClickChart(params: echarts.ECElementEvent) {
     });
     return;
   }
-  const index = historyCursorData.value.findIndex((item) => item.path === seriesName);
   markPointCount.value++;
   const num = markPointCount.value;
-  if (index === -1) {
-    historyCursorData.value.push({
-      path: seriesName,
-      markPoint: [
-        {
-          name: `${seriesName}_${value[0]}_${value[1]}`,
-          value: value[1],
-          xAxis: value[0],
-          yAxis: value[1],
-        },
-      ],
-      markLine: [
-        {
-          name: `${seriesName}_${value[0]}`,
-          xAxis: value[0],
-          label: {
-            formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
-            position: 'end',
-          },
-        },
-      ],
-    });
-    pointList.value.push({
-      name: `${seriesName}_${value[0]}_${value[1]}`,
-      x: value[0],
-      y: value[1],
-      disabled: false,
-      checked: false,
-    });
-  } else {
-    const { markPoint, markLine } = historyCursorData.value[index];
-    const pointIndex = markPoint.findIndex((point) => point.name === `${seriesName}_${value[0]}_${value[1]}`);
-    if (pointIndex === -1) {
-      markPoint.push({
-        name: `${seriesName}_${value[0]}_${value[1]}`,
-        value: value[1],
-        xAxis: value[0],
-        yAxis: value[1],
-      });
-      pointList.value.push({
-        name: `${seriesName}_${value[0]}_${value[1]}`,
-        x: value[0],
-        y: value[1],
-        disabled: false,
-        checked: false,
-      });
-    }
-    const lineIndex = markLine.findIndex((line) => line.name === `${seriesName}_${value[0]}`);
-    if (lineIndex === -1) {
-      markLine.push({
-        name: `${seriesName}_${value[0]}`,
-        xAxis: value[0],
-        label: {
-          formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
-          position: 'end',
-        },
-      });
-    }
-  }
+  pointLineData.value.push({
+    path: seriesName,
+    name: `${seriesName}_${value[0]}_point_line`,
+    value: value[1],
+    xAxis: value[0],
+    yAxis: value[1],
+    label: {
+      formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
+      position: 'end',
+    },
+  });
+  pointList.value.push({
+    name: `${seriesName}_${value[0]}_${value[1]}`,
+    x: value[0],
+    y: value[1],
+    disabled: false,
+    checked: false,
+  });
   setOption(chartOptions.value);
 }
 
@@ -549,7 +528,7 @@ function handleCheckDvalue(val: CheckboxValueType, data: PointData) {
 
 function handleEmptyPoint() {
   markPointCount.value = 0;
-  historyCursorData.value = [];
+  pointLineData.value = [];
   pointList.value = [];
   clickedCursor.value = false;
   setOption(chartOptions.value);
@@ -724,7 +703,7 @@ function handleTrendTab(type: 'running' | 'history') {
         item.values = [];
       });
       markPointCount.value = 0;
-      historyCursorData.value = [];
+      pointLineData.value = [];
       pointList.value = [];
       clickedCursor.value = false;
       chartHistoryData.value.length = 0;
@@ -786,7 +765,7 @@ function handleOperatePath(type: 'add' | 'del' | 'detail', path: string) {
         pointList.value = [];
         markPointCount.value = 0;
         clickedCursor.value = false;
-        historyCursorData.value = [];
+        pointLineData.value = [];
       }
       const historyIndex = chartHistoryData.value.findIndex((data) => data.path === path);
       if (historyIndex !== -1) {
