@@ -13,7 +13,7 @@
     </el-tooltip>
   </div>
 
-  <auth-tooltip :is-disabled="canReadWriteSchemaData">
+  <!-- <auth-tooltip :is-disabled="canReadWriteSchemaData">
     <el-checkbox
       v-if="isExpand"
       class="m-b-8"
@@ -25,7 +25,7 @@
       @change="handleCheckedAll"
       id="trend-path-checkbox"
     />
-  </auth-tooltip>
+  </auth-tooltip> -->
 
   <h4 v-if="!isExpand" class="collapse-title">{{ t('dataTrend.choosedMeasurement') }}</h4>
 
@@ -76,10 +76,6 @@
     </auth-container>
   </div>
 
-  <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="handleExpand" id="trend-path-expand">
-    <i-custom-arrow-right-expand />
-  </el-icon>
-
   <modal-path v-model:visible="pathVisible" :path-list="editPathList" :predefine-colors="predefineColors" :default-color="defaultColor" @handleSave="handleSavePath" />
 </template>
 
@@ -97,7 +93,6 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (event: 'update:isExpand', isExpand: boolean): void;
   (event: 'handleSelect', payload: string): void;
   (event: 'handleOperate', payload: 'add' | 'del' | 'detail', data: string): void;
   (event: 'handleOperateAll'): void;
@@ -106,8 +101,8 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const listKey = ref(0);
 const pathList = useVModel(props, 'modelValue');
-const isExpand = useVModel(props, 'isExpand', emit);
 const isCheckAll = ref(false);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isIndeterminate = computed(() => {
   if (pathList.value.length === 0) return false;
   const allLength = pathList.value.length;
@@ -127,6 +122,7 @@ const isIndeterminate = computed(() => {
   return checkedLength > 0 && checkedLength < allLength;
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const allCheckAbled = computed(() => pathList.value.length > 0 && pathList.value.filter((item) => !item.disabled).length > 0);
 
 const predefineColors = ['#4992ff', '#7cffb2', '#fddd60', '#ff6e76', '#58d9f9', '#05c091', '#ff8a45', '#8d48e3', '#dd79ff', '#8AC211'];
@@ -146,6 +142,7 @@ function handleAdd() {
   pathVisible.value = true;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleCheckedAll(val: CheckboxValueType) {
   pathList.value.forEach((item) => {
     if (!item.disabled) {
@@ -192,10 +189,6 @@ function handleDel(data: Trend.LineObj, index: number) {
   if (pathList.value.length === 0) {
     isCheckAll.value = false;
   }
-}
-
-function handleExpand() {
-  isExpand.value = !isExpand.value;
 }
 
 watch(
@@ -334,23 +327,6 @@ watch(
     :deep(.el-input-number.is-controls-right .el-input-number__increase, .el-input-number.is-controls-right .el-input-number__decrease) {
       --el-input-number-controls-height: 11px !important;
     }
-  }
-}
-
-.expand-icon {
-  position: absolute;
-  bottom: 0;
-  left: 16px;
-  cursor: pointer;
-  color: #a0a3b8;
-
-  &:hover {
-    color: #495ad4;
-  }
-
-  &.collapse-icon {
-    left: 0;
-    transform: rotate(-180deg);
   }
 }
 </style>
