@@ -730,7 +730,7 @@ spectrum:
   paramsTitle: 参数设置
   returnResult: 结果取值
   compressParams: 压缩参数
-  compressParamsTip: 压缩参数的取值范围为(0,1]，是有损压缩时保留的能量比例。取值为1时不进行压缩
+  compressParamsTip: 压缩参数的取值范围为(0,1]，是有损压缩时保留的能量比例。在缺省情况下，不进行压缩。
   compressParamsPlaceholder: 请输入参数
   modulationFrequency: 调制频率
   harmonicFrequency: 谐频
