@@ -4,7 +4,7 @@
       <div class="search-form-box" style="margin-bottom: 18px">
         <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
           <div class="m-b-16 flex-align-center" style="height: 36px">
-            <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method" :label-width="locale === 'en' ? '140px' : '96px'" required>
+            <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method" :label-width="locale === 'en' ? '140px' : '96px'" :rules="requiredRules">
               <template #label>
                 {{ t('spectrum.analysisMethod') }}：
                 <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
@@ -63,10 +63,10 @@
           </div>
           <div class="flex-justify-between">
             <div v-if="searchFormData.method !== 'custom'">
-              <base-form-item :label="`${t('measurement.measurementChoose')}：`" prop="measurement" :label-width="locale === 'en' ? '140px' : '96px'" required>
+              <base-form-item :label="`${t('measurement.measurementChoose')}：`" prop="measurement" :label-width="locale === 'en' ? '140px' : '96px'" :rules="requiredRules">
                 <timeseries-select-single id="spectrum-search-path" v-model="searchFormData.measurement" :selectWidth="230" :itemWidth="200" show-suffix :disabled-path="disabledPath" />
               </base-form-item>
-              <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" required>
+              <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules">
                 <el-date-picker
                   v-model="searchFormData.datetimerange"
                   type="datetimerange"
@@ -148,9 +148,11 @@
               </el-button>
               <el-input-number v-model="sideband" :min="1" :max="99" step-strictly id="spectrum-sideband-input" :disabled="dataEmpty || drawedStatus.sideband" :controls="false" :value-on-clear="1" />
             </div>
-            <el-button link :class="['cursor-button-clear', 'm-l-8', dataEmpty ? '' : 'svg-button-hover-color']" id="spectrum-cursor-clear" :disabled="dataEmpty" @click="() => handleEmptyOperate()">
-              <el-icon size="18" color="#fff"><i-custom-delete /></el-icon>
-            </el-button>
+            <el-tooltip effect="light" :content="t('common.clearAll')" placement="top" popper-class="tooltip-box-width">
+              <el-button link :class="['cursor-button-clear', 'm-l-8', dataEmpty ? '' : 'svg-button-hover-color']" id="spectrum-cursor-clear" :disabled="dataEmpty" @click="() => handleEmptyOperate()">
+                <el-icon size="18" color="#fff"><i-custom-delete /></el-icon>
+              </el-button>
+            </el-tooltip>
           </div>
         </el-main>
         <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand ? 'p-0' : '']" style="display: flex; flex-direction: column">
@@ -213,22 +215,27 @@ import { useUserStore } from '@/stores';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalSql from './components/modal-sql.vue';
 
-interface SpectrumMarkPoint {
+interface PointData {
   name: string;
-  value: number | string;
+  x: number;
+  y: number | string;
+  disabled: boolean;
+  checked: boolean;
+}
+
+interface MarkPointLine {
+  path: string;
+  type: string;
+  name: string;
+  value: number;
   xAxis: number;
-  yAxis: number | string;
+  yAxis: number;
   itemStyle: {
     color: string;
     // eslint-disable-next-line no-nested-ternary
     borderColor: string;
     borderWidth: number;
   };
-}
-
-interface SpectrumMarkLine {
-  name: string;
-  xAxis: number;
   label: {
     formatter: string | Function;
     position: string;
@@ -238,14 +245,6 @@ interface SpectrumMarkLine {
     type: string | number[];
     color: string;
   };
-}
-
-interface PointData {
-  name: string;
-  x: number;
-  y: number | string;
-  disabled: boolean;
-  checked: boolean;
 }
 
 const { t, locale } = useI18n();
@@ -305,8 +304,7 @@ const chartData = reactive<Search.SpectrumData>({
 });
 const clickedOperate = ref<'cursor' | 'frequency' | 'sideband' | ''>('');
 const markPointCount = ref(0);
-const markPointData = ref<Array<SpectrumMarkPoint>>([]);
-const markLineData = ref<Array<SpectrumMarkLine>>([]);
+const pointLineData = ref<Array<MarkPointLine>>([]);
 const pointList = ref<Array<PointData>>([]);
 const pointCheckedData = computed(() => pointList.value.filter((item) => item.checked));
 const harmonicFrequency = ref<number | undefined>(1);
@@ -324,6 +322,13 @@ const drawedStatus = reactive({
   frequency: false,
   sideband: false,
 });
+const requiredRules = ref([
+  {
+    required: true,
+    message: '',
+    trigger: ['change'],
+  },
+]);
 let currentPoint = 0;
 const dataEmpty = computed(() => chartData.timestamps.length === 0);
 const disableFrequency = computed(() => chartData.timestamps.length === 0 || drawedStatus.frequency);
@@ -357,12 +362,16 @@ const seriesData = computed<ECOption>(
             label: {
               show: false,
             },
-            data: markPointData.value.length ? markPointData.value : [],
+            data: pointLineData.value.length
+              ? pointLineData.value.map((point) => ({ path: point.path, name: point.name, value: point.value, xAxis: point.xAxis, yAxis: point.yAxis, itemStyle: point.itemStyle, type: point.type }))
+              : [],
           },
           markLine: {
             silent: true,
             symbol: 'none',
-            data: markLineData.value.length ? markLineData.value : [],
+            data: pointLineData.value.length
+              ? pointLineData.value.map((line) => ({ path: line.path, name: line.name, xAxis: line.xAxis, label: line.label, lineStyle: line.lineStyle, type: line.type }))
+              : [],
             animation: false,
           },
           lineStyle: {
@@ -425,6 +434,7 @@ const chartOptions = computed<ECOption>(() => ({
   yAxis: {
     type: 'value',
     show: !dataEmpty.value,
+    scale: true,
   },
   animation: true,
   series: seriesData.value.series,
@@ -522,11 +532,19 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
     // 若存在restore事件，执行
     chartInstance.on('restore', () => {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      handleEmptyOperate();
+      // handleEmptyOperate();
+      setOption(chartOptions.value);
     });
     chartInstance.getZr().on('click', (params) => {
       if (!clickedOperate.value) return;
-      if (params.topTarget?.type !== 'Line') return;
+      if (params.target && !params.topTarget) {
+        return;
+      }
+      // 点击到点上
+      if ((params.target as unknown as any)?.z === 3 || (params.target as unknown as any)?.z === 5) {
+        return;
+      }
+      if (params.topTarget && params.topTarget.type !== 'Line') return;
       if (currentPoint && chartData.timestamps[currentPoint]) {
         const point = [chartData.timestamps[currentPoint], chartData.values[currentPoint]];
         const param = { componentType: 'series', seriesName: copySearchFormData.measurement, value: point };
@@ -550,7 +568,43 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
 };
 
 function handleDealCursor(params: echarts.ECElementEvent) {
-  const { seriesName, value } = params as { seriesName: string; value: number[] };
+  // eslint-disable-next-line prefer-const
+  const { seriesName, value, componentType } = params as { seriesName: string; value: number[] | number; componentType: string };
+  let index = -1;
+  let pointName = '';
+  if (componentType === 'series') {
+    index = pointLineData.value.findIndex((data) => data.path === seriesName && data.xAxis === (value as number[])[0] && data.type === 'cursor');
+    pointName = `${seriesName}_${(value as number[])[0]}`;
+  } else if (componentType === 'markPoint') {
+    index = pointLineData.value.findIndex((data) => data.path === (params.data as unknown as any).path && data.value === value && data.type === 'cursor');
+    pointName = `${(params.data as unknown as any).path}_${value}`;
+  } else {
+    // 'markLine'
+    index = pointLineData.value.findIndex((data) => data.path === (params.data as unknown as any).path && data.xAxis === value && data.type === 'cursor');
+    pointName = `${(params.data as unknown as any).path}_${value}`;
+  }
+
+  if (index !== -1) {
+    markPointCount.value--;
+    pointLineData.value.splice(index, 1);
+    pointLineData.value
+      .filter((f) => f.type === 'cursor')
+      .forEach((item, i) => {
+        if (i >= index) {
+          item.label = {
+            formatter: () => (markPointCount.value === 1 ? 'D' : `D${i + 1}`),
+            position: 'end',
+            color: '#fff',
+          };
+        }
+      });
+    const pointIndex = pointList.value.findIndex((point) => point.name === pointName);
+    if (pointIndex !== -1) {
+      pointList.value.splice(pointIndex, 1);
+    }
+    setOption(chartOptions.value);
+    return;
+  }
   if (markPointCount.value > 9) {
     ElMessage.warning({
       message: t('spectrum.overTip'),
@@ -558,32 +612,20 @@ function handleDealCursor(params: echarts.ECElementEvent) {
     });
     return;
   }
-  const pointIndex = markPointData.value.findIndex((point) => point.name === `${seriesName}_${value[0]}_${value[1]}`);
-  if (pointIndex !== -1) return;
-
   markPointCount.value++;
   const num = markPointCount.value;
-  markPointData.value.push({
-    name: `${seriesName}_${value[0]}_${value[1]}`,
-    value: value[1],
-    xAxis: value[0],
-    yAxis: value[1],
+  pointLineData.value.push({
+    path: seriesName,
+    type: 'cursor',
+    name: `${seriesName}_${(value as number[])[0]}_point_line`,
+    value: (value as number[])[1],
+    xAxis: (value as number[])[0],
+    yAxis: (value as number[])[1],
     itemStyle: {
       color: 'transparent',
       borderColor: '#fff',
       borderWidth: 1,
     },
-  });
-  pointList.value.push({
-    name: `${seriesName}_${value[0]}_${value[1]}`,
-    x: value[0],
-    y: value[1],
-    disabled: false,
-    checked: false,
-  });
-  markLineData.value.push({
-    name: `${seriesName}_${value[0]}`,
-    xAxis: value[0],
     label: {
       formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
       position: 'end',
@@ -593,6 +635,13 @@ function handleDealCursor(params: echarts.ECElementEvent) {
       type: [16, 10],
       color: '#DFE1ED',
     },
+  });
+  pointList.value.push({
+    name: `${seriesName}_${(value as number[])[0]}`,
+    x: (value as number[])[0],
+    y: (value as number[])[1],
+    disabled: false,
+    checked: false,
   });
   setOption(chartOptions.value);
 }
@@ -610,20 +659,18 @@ function handleDealFrequency(params: echarts.ECElementEvent) {
       if (index !== -1) {
         y = chartData.values[index];
       }
-      markPointData.value.push({
-        name: `${seriesName}_${x}_${y}_frequency`,
-        value: y,
+      pointLineData.value.push({
+        path: seriesName,
+        type: 'frequency',
+        name: `${seriesName}_${x}_frequency`,
+        value: y as unknown as number,
         xAxis: x,
-        yAxis: y,
+        yAxis: y as unknown as number,
         itemStyle: {
           color: 'transparent',
           borderColor: '#28D5CB',
           borderWidth: 1,
         },
-      });
-      markLineData.value.push({
-        name: `${seriesName}_${x}_frequency`,
-        xAxis: x,
         label: {
           formatter: `H${i === 1 ? '' : i}`,
           position: 'end',
@@ -655,20 +702,18 @@ function handleDealSideband(params: echarts.ECElementEvent) {
         if (leftI !== -1) {
           leftY = chartData.values[leftI];
         }
-        markPointData.value.push({
-          name: `${seriesName}_${leftX}_${leftY}_sideband`,
-          value: leftY,
+        pointLineData.value.push({
+          path: seriesName,
+          type: 'sideband',
+          name: `${seriesName}_${leftX}_sideband`,
+          value: leftY as unknown as number,
           xAxis: leftX,
-          yAxis: leftY,
+          yAxis: leftY as unknown as number,
           itemStyle: {
             color: 'transparent',
             borderColor: '#AA82F5',
             borderWidth: 1,
           },
-        });
-        markLineData.value.push({
-          name: `${seriesName}_${leftX}_sideband`,
-          xAxis: leftX,
           label: {
             formatter: `SL${i}`,
             position: 'end',
@@ -688,20 +733,18 @@ function handleDealSideband(params: echarts.ECElementEvent) {
     if (currentI !== -1) {
       currentY = chartData.values[currentI];
     }
-    markPointData.value.push({
-      name: `${seriesName}_${currentX}_${currentY}_sideband`,
-      value: currentY,
+    pointLineData.value.push({
+      path: seriesName,
+      type: 'sideband',
+      name: `${seriesName}_${currentX}_sideband`,
+      value: currentY as unknown as number,
       xAxis: currentX,
-      yAxis: currentY,
+      yAxis: currentY as unknown as number,
       itemStyle: {
         color: 'transparent',
         borderColor: '#AA82F5',
         borderWidth: 1,
       },
-    });
-    markLineData.value.push({
-      name: `${seriesName}_${currentX}_sideband`,
-      xAxis: currentX,
       label: {
         formatter: 'S',
         position: 'end',
@@ -721,20 +764,18 @@ function handleDealSideband(params: echarts.ECElementEvent) {
         if (rightI !== -1) {
           rightY = chartData.values[rightI];
         }
-        markPointData.value.push({
-          name: `${seriesName}_${rightX}_${rightY}_sideband`,
-          value: rightY,
+        pointLineData.value.push({
+          path: seriesName,
+          type: 'sideband',
+          name: `${seriesName}_${rightX}_sideband`,
+          value: rightY as unknown as number,
           xAxis: rightX,
-          yAxis: rightY,
+          yAxis: rightY as unknown as number,
           itemStyle: {
             color: 'transparent',
             borderColor: '#AA82F5',
             borderWidth: 1,
           },
-        });
-        markLineData.value.push({
-          name: `${seriesName}_${rightX}_sideband`,
-          xAxis: rightX,
           label: {
             formatter: `SR${i}`,
             position: 'end',
@@ -752,16 +793,18 @@ function handleDealSideband(params: echarts.ECElementEvent) {
 }
 
 function handleClickChart(params: echarts.ECElementEvent) {
-  if (params.componentType !== 'series') return;
   if (clickedOperate.value === 'cursor') {
+    if (params.componentType !== 'series' && params.componentType !== 'markLine' && params.componentType !== 'markPoint') return;
     clickedStatus.cursor = true;
     handleDealCursor(params);
   } else if (clickedOperate.value === 'frequency') {
+    if (params.componentType !== 'series') return;
     if (!harmonicFrequency.value) return;
     clickedStatus.frequency = true;
     if (frequencyInterval.value) return;
     handleDealFrequency(params);
   } else {
+    if (params.componentType !== 'series') return;
     if (!sideband.value) return;
     clickedStatus.sideband = true;
     if (sidebandData.value.length === 2) return;
@@ -777,8 +820,7 @@ function handleEmptyOperate(type?: 'cursor' | 'frequency' | 'sideband') {
   clickedOperate.value = type || '';
   markPointCount.value = 0;
   pointList.value = [];
-  markPointData.value = [];
-  markLineData.value = [];
+  pointLineData.value = [];
   clickedStatus.cursor = false;
   clickedStatus.frequency = false;
   clickedStatus.sideband = false;
