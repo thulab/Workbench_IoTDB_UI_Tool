@@ -142,6 +142,7 @@
                         <p style="display: inline-flex; width: 140px"><text-tooltip :content="`X: ${item.x}`" /></p>
                         <p style="display: inline-flex; width: 140px"><text-tooltip :content="`Y: ${item.y}`" /></p>
                       </div>
+                      <el-icon size="14" class="delete-icon" @click="handleDelPoint(item, index)" :id="`cursor-${index}-del`"><i-custom-close-circle /></el-icon>
                     </li>
                   </ul>
                   <div v-if="pointCheckedData.length === 2" class="point-dvalue-box">
@@ -314,6 +315,7 @@ const seriesData = computed<ECOption>(
           label: {
             show: false,
           },
+          animation: false,
           data:
             isRunningTab.value || (!isRunningTab.value && !pointLineData.value.length)
               ? []
@@ -484,18 +486,18 @@ function handleClickChart(params: echarts.ECElementEvent) {
     index = pointLineData.value.findIndex((data) => data.path === (params.data as unknown as any)?.path && data.xAxis === (value as number));
   }
   if (index !== -1) {
-    markPointCount.value--;
-    pointList.value.splice(index, 1);
-    pointLineData.value.splice(index, 1);
-    pointLineData.value.forEach((item, i) => {
-      if (i >= index) {
-        item.label = {
-          formatter: () => (markPointCount.value === 1 ? 'D' : `D${i + 1}`),
-          position: 'end',
-        };
-      }
-    });
-    setOption(chartOptions.value);
+    // markPointCount.value--;
+    // pointList.value.splice(index, 1);
+    // pointLineData.value.splice(index, 1);
+    // pointLineData.value.forEach((item, i) => {
+    //   if (i >= index) {
+    //     item.label = {
+    //       formatter: () => (markPointCount.value === 1 ? 'D' : `D${i + 1}`),
+    //       position: 'end',
+    //     };
+    //   }
+    // });
+    // setOption(chartOptions.value);
     return;
   }
   if (markPointCount.value > 9) {
@@ -524,6 +526,21 @@ function handleClickChart(params: echarts.ECElementEvent) {
     y: (value as number[])[1],
     disabled: false,
     checked: false,
+  });
+  setOption(chartOptions.value);
+}
+
+function handleDelPoint(data: PointData, index: number) {
+  markPointCount.value--;
+  pointList.value.splice(index, 1);
+  pointLineData.value.splice(index, 1);
+  pointLineData.value.forEach((item, i) => {
+    if (i >= index) {
+      item.label = {
+        formatter: () => (markPointCount.value === 1 ? 'D' : `D${i + 1}`),
+        position: 'end',
+      };
+    }
   });
   setOption(chartOptions.value);
 }
@@ -1051,6 +1068,20 @@ onUnmounted(() => {
 .cursor-item-box {
   display: flex;
   align-items: flex-start;
+  position: relative;
+
+  .delete-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 4px;
+    display: none;
+    cursor: pointer;
+  }
+
+  &:hover .delete-icon {
+    display: block;
+  }
 }
 
 .cursor-text-box {
