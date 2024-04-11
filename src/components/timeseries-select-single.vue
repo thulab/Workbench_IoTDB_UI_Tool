@@ -1,6 +1,7 @@
 <template>
   <el-select
     v-model="model"
+    :id="id"
     :placeholder="placeholder ? placeholder : t('measurement.measurementNameSelectPlaceholder')"
     filterable
     remote
@@ -11,7 +12,6 @@
     :disabled="disabledSelect"
     :style="`width: ${selectWidth}px;`"
     class="remote-select-box"
-    id="select-path-single"
     @change="handleChangePath"
   >
     <el-option
@@ -35,6 +35,7 @@ import { StorageApi } from '@/api';
 
 const props = defineProps<{
   modelValue: string | undefined;
+  id: string;
   disabledSelect?: boolean;
   showSuffix?: boolean;
   isClearable?: boolean;

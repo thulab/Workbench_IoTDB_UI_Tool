@@ -2,6 +2,7 @@
   <el-select
     class="remote-select-box"
     v-model="model"
+    :id="id"
     :placeholder="t('measurement.measurementNameSelectPlaceholder')"
     filterable
     remote
@@ -51,6 +52,7 @@ import { StorageApi } from '@/api';
 
 const props = defineProps<{
   modelValue: Array<string>;
+  id: string;
   isShowViewBtn?: boolean;
   placeholder?: string;
   viewText?: string;
