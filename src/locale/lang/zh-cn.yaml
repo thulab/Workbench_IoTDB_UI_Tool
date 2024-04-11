@@ -726,7 +726,7 @@ spectrum:
   customAnalysis: 自定义分析
   analysisMethodTip: 若没有以下分析方式请加载后进行使用，详细加载方式请查看%{doc}
   analysisMethodNoneTip: 请加载该方法
-  overTip: 最多支持标注10个点，请清空后重新操作
+  overTip: 最多支持标注10个点，请删除后重新操作
   cursorTitle: 光标数值
   cursor: 光标
   sqlInput: 数据分析
