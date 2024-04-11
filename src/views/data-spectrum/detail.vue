@@ -181,6 +181,7 @@
                       <p style="display: inline-flex; width: 140px"><text-tooltip :content="`X: ${item.x}`" /></p>
                       <p style="display: inline-flex; width: 140px"><text-tooltip :content="`Y: ${item.y}`" /></p>
                     </div>
+                    <el-icon size="14" class="delete-icon" @click="handleDelPoint(item, index)" :id="`cursor-${index}-del`"><i-custom-close-circle /></el-icon>
                   </li>
                 </ul>
                 <div v-if="pointCheckedData.length === 2" class="point-dvalue-box">
@@ -362,6 +363,7 @@ const seriesData = computed<ECOption>(
             label: {
               show: false,
             },
+            animation: false,
             data: pointLineData.value.length
               ? pointLineData.value.map((point) => ({ path: point.path, name: point.name, value: point.value, xAxis: point.xAxis, yAxis: point.yAxis, itemStyle: point.itemStyle, type: point.type }))
               : [],
@@ -571,38 +573,38 @@ function handleDealCursor(params: echarts.ECElementEvent) {
   // eslint-disable-next-line prefer-const
   const { seriesName, value, componentType } = params as { seriesName: string; value: number[] | number; componentType: string };
   let index = -1;
-  let pointName = '';
+  // let pointName = '';
   if (componentType === 'series') {
     index = pointLineData.value.findIndex((data) => data.path === seriesName && data.xAxis === (value as number[])[0] && data.type === 'cursor');
-    pointName = `${seriesName}_${(value as number[])[0]}`;
+    // pointName = `${seriesName}_${(value as number[])[0]}`;
   } else if (componentType === 'markPoint') {
     index = pointLineData.value.findIndex((data) => data.path === (params.data as unknown as any).path && data.value === value && data.type === 'cursor');
-    pointName = `${(params.data as unknown as any).path}_${value}`;
+    // pointName = `${(params.data as unknown as any).path}_${value}`;
   } else {
     // 'markLine'
     index = pointLineData.value.findIndex((data) => data.path === (params.data as unknown as any).path && data.xAxis === value && data.type === 'cursor');
-    pointName = `${(params.data as unknown as any).path}_${value}`;
+    // pointName = `${(params.data as unknown as any).path}_${value}`;
   }
 
   if (index !== -1) {
-    markPointCount.value--;
-    pointLineData.value.splice(index, 1);
-    pointLineData.value
-      .filter((f) => f.type === 'cursor')
-      .forEach((item, i) => {
-        if (i >= index) {
-          item.label = {
-            formatter: () => (markPointCount.value === 1 ? 'D' : `D${i + 1}`),
-            position: 'end',
-            color: '#fff',
-          };
-        }
-      });
-    const pointIndex = pointList.value.findIndex((point) => point.name === pointName);
-    if (pointIndex !== -1) {
-      pointList.value.splice(pointIndex, 1);
-    }
-    setOption(chartOptions.value);
+    // markPointCount.value--;
+    // pointLineData.value.splice(index, 1);
+    // pointLineData.value
+    //   .filter((f) => f.type === 'cursor')
+    //   .forEach((item, i) => {
+    //     if (i >= index) {
+    //       item.label = {
+    //         formatter: () => (markPointCount.value === 1 ? 'D' : `D${i + 1}`),
+    //         position: 'end',
+    //         color: '#fff',
+    //       };
+    //     }
+    //   });
+    // const pointIndex = pointList.value.findIndex((point) => point.name === pointName);
+    // if (pointIndex !== -1) {
+    //   pointList.value.splice(pointIndex, 1);
+    // }
+    // setOption(chartOptions.value);
     return;
   }
   if (markPointCount.value > 9) {
@@ -643,6 +645,27 @@ function handleDealCursor(params: echarts.ECElementEvent) {
     disabled: false,
     checked: false,
   });
+  setOption(chartOptions.value);
+}
+
+function handleDelPoint(data: PointData, index: number) {
+  pointList.value.splice(index, 1);
+  markPointCount.value--;
+  const pointIndex = pointLineData.value.findIndex((point) => point.name === `${data.name}_point_line` && point.type === 'cursor');
+  if (pointIndex !== -1) {
+    pointLineData.value.splice(pointIndex, 1);
+  }
+  pointLineData.value
+    .filter((f) => f.type === 'cursor')
+    .forEach((item, i) => {
+      if (i >= index) {
+        item.label = {
+          formatter: () => (markPointCount.value === 1 ? 'D' : `D${i + 1}`),
+          position: 'end',
+          color: '#fff',
+        };
+      }
+    });
   setOption(chartOptions.value);
 }
 
@@ -1210,6 +1233,20 @@ watch(locale, () => {
 .cursor-item-box {
   display: flex;
   align-items: flex-start;
+  position: relative;
+
+  .delete-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 4px;
+    display: none;
+    cursor: pointer;
+  }
+
+  &:hover .delete-icon {
+    display: block;
+  }
 }
 
 .cursor-text-box {
