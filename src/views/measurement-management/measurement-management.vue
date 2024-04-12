@@ -579,7 +579,7 @@ function handleConfirmEditTTL() {
   };
   upsertDatabaseTTL({ ...reqObj }).then((res) => {
     if (res.code === 0) {
-      ElMessage.success({ message: `${t('common.updateSuccess')}！`, grouping: true });
+      ElMessage.success({ message: `${t('common.updateSuccess')}`, grouping: true });
       editTTL.value = false;
       getStorageInfo(storageInfos.value.groupName);
     }

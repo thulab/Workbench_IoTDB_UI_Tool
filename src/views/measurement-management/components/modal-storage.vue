@@ -108,7 +108,7 @@ const handleConfirm = () => {
       };
       saveStorageGroups({ ...reqObj }).then((res) => {
         if (res.code === 0) {
-          ElMessage.success({ message: `${t('common.createSuccess')}!`, grouping: true });
+          ElMessage.success({ message: `${t('common.createSuccess')}`, grouping: true });
           dialogVisible.value = false;
           emit('handleSave');
         }
