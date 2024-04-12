@@ -81,7 +81,7 @@
                   align="center"
                   show-overflow-tooltip
                 >
-                  <template #default="{ row }">{{ row.version }} {{ systemData.active ? '企业版' : '开源版' }}</template>
+                  <template #default="{ row }">{{ row.version }} {{ systemData.active || row.version.split('.').length === 4 ? '企业版' : '开源版' }}</template>
                 </el-table-column>
                 <el-table-column :label="t('dashboard.physicalMachine')" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
                 <template #empty>
@@ -174,7 +174,7 @@
                   align="center"
                   show-overflow-tooltip
                 >
-                  <template #default="{ row }">{{ row.version }} {{ slaveData.active ? '企业版' : '开源版' }}</template>
+                  <template #default="{ row }">{{ row.version }} {{ slaveData.active || row.version.split('.').length === 4 ? '企业版' : '开源版' }}</template>
                 </el-table-column>
                 <el-table-column :label="t('dashboard.physicalMachine')" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
                 <template #empty>
