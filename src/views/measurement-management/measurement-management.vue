@@ -144,9 +144,18 @@
               <i-custom-refresh style="width: 24px; height: 24px" />
             </el-button>
           </auth-tooltip>
-          <el-button link class="svg-button-hover-color m-l-4" ref="colButtonRef" id="measurement-column-filter" v-click-outside="handleClickOutside">
-            <i-custom-filter style="width: 24px; height: 24px" />
-          </el-button>
+          <auth-tooltip :is-disabled="canReadWriteSchema">
+            <el-button
+              link
+              :class="[canReadWriteSchema ? 'svg-button-hover-color' : '', 'm-l-4']"
+              :disabled="!canReadWriteSchema"
+              ref="colButtonRef"
+              id="measurement-column-filter"
+              v-click-outside="handleClickOutside"
+            >
+              <i-custom-filter style="width: 24px; height: 24px" />
+            </el-button>
+          </auth-tooltip>
           <el-popover
             placement="bottom"
             :width="156"
@@ -672,6 +681,8 @@ function handleSaveMeasurement() {
 function handleImportClose(reload: boolean) {
   if (reload) {
     storageSideRef.value?.getStorageList(false, currentStorage.value);
+    getStorageInfo(currentStorage.value);
+    handleRefresh();
   }
 }
 
