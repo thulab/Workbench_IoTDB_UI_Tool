@@ -66,7 +66,7 @@ const handleSqlCommand = (val: string, data: Search.SqlList) => {
       deleteQueryS(`${data.id}`).then(() => {
         ElMessage({
           type: 'success',
-          message: `${t('common.deleteSuccess')}!`,
+          message: `${t('common.deleteSuccess')}`,
         });
         getQueryList();
         emit('handleSqlOperate', val, data);
