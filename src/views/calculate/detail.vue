@@ -36,7 +36,7 @@
                 <el-button type="primary" :disabled="!canAllWriteSchema" @click="handleAdd" id="calculate-add">{{ appType === 1 ? t('calculate.newCalculate') : t('calculate.newView') }}</el-button>
               </auth-tooltip>
               <auth-tooltip :is-disabled="canAllWriteSchema">
-                <el-button class="m-l-16" @click="handleImport" id="calculate-import">
+                <el-button class="m-l-16" :disabled="!canAllWriteSchema" @click="handleImport" id="calculate-import">
                   {{ t('common.import') }}
                 </el-button>
               </auth-tooltip>
