@@ -176,7 +176,7 @@ const editData = ref();
 const expressionVisible = ref(false);
 const editExpression = ref('');
 const importVisible = ref(false);
-const canAllWriteSchema = computed(() => userAllPrivileges.value.includes('WRITE_SCHEMA'));
+const canAllWriteSchema = computed(() => userAllPrivileges.value.includes('WRITE_SCHEMA') && (userAllPrivileges.value.includes('WRITE_DATA') || userAllPrivileges.value.includes('READ_DATA')));
 
 function searchPlaceholder() {
   if (searchFormData.type === 'name') {
