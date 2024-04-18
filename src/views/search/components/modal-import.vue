@@ -78,7 +78,7 @@
     </div>
 
     <div class="m-t-12 operate-buttons" style="text-align: right" v-if="activeStep === 0">
-      <el-button plain :disabled="!uploadFileInfo" @click="handleNext" id="data-search-import-next">{{ t('common.next') }}</el-button>
+      <el-button type="primary" :disabled="!uploadFileInfo" @click="handleNext" id="data-search-import-next">{{ t('common.next') }}</el-button>
     </div>
 
     <div class="m-t-12 operate-buttons" style="height: 28px" v-if="activeStep === 1"></div>
