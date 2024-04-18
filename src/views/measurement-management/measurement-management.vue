@@ -389,12 +389,14 @@ const allColumns = ref<Array<{ label: string; prop: string; width: number }>>([
   { label: 'measurement.lastValueTime', prop: 'valueTime', width: 200 },
 ]);
 const isCheckAll = ref(false);
-const checkedCols = ref<string[]>(['deviceName', 'timeseries']);
+const checkedCols = ref<string[]>(['deviceName', 'timeseries', 'description', 'dataType']);
 let copyCheckedCols = cloneDeep(checkedCols.value);
 const isIndeterminate = ref(true);
 const columnList = ref<Array<{ label: string; prop: string; width: number }>>([
   { label: 'measurement.deviceName', prop: 'deviceName', width: 200 },
   { label: 'measurement.measurementName', prop: 'timeseries', width: 200 },
+  { label: 'measurement.measurementDescription', prop: 'description', width: 160 },
+  { label: 'measurement.dataType', prop: 'dataType', width: 140 },
 ]);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -729,11 +731,13 @@ onMounted(() => {
   const defaultCols = localStorage.getItem('measurementCols');
   if (!defaultCols) {
     isCheckAll.value = false;
-    checkedCols.value = ['deviceName', 'timeseries'];
+    checkedCols.value = ['deviceName', 'timeseries', 'description', 'dataType'];
     isIndeterminate.value = true;
     columnList.value = [
       { label: 'measurement.deviceName', prop: 'deviceName', width: 200 },
       { label: 'measurement.measurementName', prop: 'timeseries', width: 200 },
+      { label: 'measurement.measurementDescription', prop: 'description', width: 160 },
+      { label: 'measurement.dataType', prop: 'dataType', width: 140 },
     ];
   } else {
     const defaultColsArray = defaultCols.split(',');
