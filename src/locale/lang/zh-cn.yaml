@@ -214,7 +214,7 @@ measurement:
   calculateMeasurement: 计算序列
   deleteMeasurementTip: 此操作会删除数据库下全部测点和数据，是否删除？
   databaseModel: 数据模型
-  databaseModelDoc: iotdb树形模型指导文档
+  databaseModelDoc: IoTDB树形模型指导文档
 search:
   datetime: 时间点
   datetimerange: 时间段
