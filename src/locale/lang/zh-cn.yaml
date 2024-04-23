@@ -578,7 +578,9 @@ auth:
   userList: 用户列表
   deleteUserTip: 是否删除该用户？
   editUser: 编辑用户
+  editUserSuccess: 编辑用户成功
   resetPwd: 重置密码
+  resetPwdSuccess: 重置密码成功
   systemInfo: 系统信息
   layout: 退出登录
   enterpriseTip: 该功能为企业版所有，如有需要请联系商务

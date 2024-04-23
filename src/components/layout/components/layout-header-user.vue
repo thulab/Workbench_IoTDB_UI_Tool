@@ -15,7 +15,7 @@
       </el-dropdown-menu>
     </template>
   </el-dropdown>
-  <modal-reset-password :title="t('auth.resetPwd')" :user-name="userName" v-model:visible="modalVisible" />
+  <modal-reset-password :title="t('auth.resetPwd')" :success-tip="t('auth.resetPwdSuccess')" :user-name="userName" v-model:visible="modalVisible" />
 
   <modal-system v-model:visible="systemVisible" />
 </template>

@@ -35,6 +35,7 @@ const props = defineProps<{
   visible: boolean;
   userName: string;
   title: string;
+  successTip: string;
 }>();
 
 const emit = defineEmits<{
@@ -125,7 +126,7 @@ const handleConfirm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
       updateUser(props.userName, formData.rawPassword, formData.password).then(() => {
-        ElMessage.success({ message: `${props.title} ${t('common.success')}`, grouping: true });
+        ElMessage.success({ message: `${props.successTip}`, grouping: true });
         dialogVisible.value = false;
         if (userStore.userInfo.name === props.userName) {
           ElMessageBox.alert(t('login.resetPwdLogin'), t('common.tip'), {

@@ -49,7 +49,7 @@
       </popconfirm>
     </li>
   </ul>
-  <modal-reset-password :title="t('auth.editUser')" :user-name="editUser" v-model:visible="modalVisible" />
+  <modal-reset-password :title="t('auth.editUser')" :success-tip="t('auth.editUserSuccess')" :user-name="editUser" v-model:visible="modalVisible" />
   <modal-user v-model:visible="modalUserVisible" :user-list="list" @handle-save="getList" />
 </template>
 
