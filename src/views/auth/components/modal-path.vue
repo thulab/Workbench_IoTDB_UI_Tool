@@ -96,10 +96,12 @@ watch(
   () => props.visible,
   (newVal) => {
     if (newVal) {
-      pathType.value = 'select';
-      inputPath.value = '';
-      selectPath.value = '';
-      dialogKey.value++;
+      nextTick(() => {
+        pathType.value = 'select';
+        inputPath.value = '';
+        selectPath.value = '';
+        dialogKey.value++;
+      });
     }
   }
 );
