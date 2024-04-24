@@ -75,7 +75,13 @@ const editUser = ref('');
 const modalVisible = ref(false);
 const modalUserVisible = ref(false);
 
-const { requestFn: getList, data: list, loading } = useRequest(AuthApi.getUserList);
+const {
+  requestFn: getList,
+  data: list,
+  loading,
+} = useRequest(AuthApi.getUserList, {
+  initData: [],
+});
 const { requestFn: deleteUser } = useRequest(AuthApi.deleteUser);
 
 // 新增角色

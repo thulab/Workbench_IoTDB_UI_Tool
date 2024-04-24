@@ -20,7 +20,6 @@
             :filter-system="true"
             :placeholder="t('auth.exactPathPlaceholder')"
             :disabled-path="() => false"
-            :key="dialogKey"
           />
         </div>
       </div>
@@ -63,7 +62,6 @@ const pathType = ref('select');
 const inputPath = ref('');
 const selectPath = ref('');
 const timeseriesSelectSingleRef = ref<InstanceType<typeof TimeseriesSelectSingle>>();
-const dialogKey = ref(0);
 
 const handleConfirm = () => {
   let res = selectPath.value;
@@ -100,7 +98,6 @@ watch(
         pathType.value = 'select';
         inputPath.value = '';
         selectPath.value = '';
-        dialogKey.value++;
       });
     }
   }
