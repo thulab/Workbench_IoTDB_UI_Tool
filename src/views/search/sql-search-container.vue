@@ -32,7 +32,7 @@
             </el-tab-pane>
           </el-tabs>
           <a
-            :href="locale === 'en' ? 'https://www.timecho.com/docs/UserGuide/V1.0.x/Reference/SQL-Reference.html' : 'https://www.timecho.com/docs/zh/UserGuide/V1.0.x/Reference/SQL-Reference.html'"
+            :href="locale === 'en' ? 'https://timecho.com/docs/UserGuide/latest/SQL-Manual/SQL-Manual.html' : 'https://timecho.com/docs/zh/UserGuide/latest/SQL-Manual/SQL-Manual.html'"
             rel="noopener noreferrer"
             target="_blank"
             class="operate-link"
