@@ -80,9 +80,10 @@ onMounted(() => {
   font-size: 15px;
   line-height: 1.2;
   color: var(--el-text-color-primary);
-  max-width: 54px;
+  max-width: 82px;
   overflow: hidden;
   text-overflow: ellipsis;
+  word-break: keep-all;
 
   &:focus-visible {
     outline: none;
