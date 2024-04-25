@@ -28,7 +28,7 @@
             <el-date-picker
               v-model="searchFormData.time"
               type="datetimerange"
-              range-separator="～"
+              range-separator="-"
               unlink-panels
               :clearable="false"
               :shortcuts="shortcutsDaterange"

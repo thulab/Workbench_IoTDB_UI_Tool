@@ -57,7 +57,7 @@
 
 .el-message-box__message {
   max-height: 200px;
-  overflow-y: scroll;
+  overflow-y: auto;
 
   p {
     white-space: pre-wrap;
