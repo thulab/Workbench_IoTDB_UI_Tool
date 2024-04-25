@@ -16,8 +16,7 @@
       </el-breadcrumb>
     </div>
     <div class="header-ri flex-center">
-      <!-- eslint-disable-next-line vue/no-constant-condition -->
-      <el-dropdown @command="handleChangeLang" v-show="false">
+      <el-dropdown @command="handleChangeLang">
         <span class="lang-icon m-r-20">
           <i-custom-language />
         </span>
