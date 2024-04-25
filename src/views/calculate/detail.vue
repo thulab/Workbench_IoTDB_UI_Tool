@@ -67,7 +67,7 @@
           <auth-container :is-auth="canReadWriteSchema" style="height: 100%">
             <div class="page-table-box">
               <el-table
-                :data="tableDataPagination"
+                :data="tableData.list"
                 v-loading="loading"
                 style="width: 100%"
                 :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
@@ -212,19 +212,17 @@ const { requestFn: getBatchLastValue } = useRequest(StorageApi.getBatchLastValue
 const { requestFn: deleteCalculate } = useRequest(CalculateApi.deleteCalculate);
 const { requestFn: exportCalculateData } = useRequest(CalculateApi.exportCalculateData);
 
-const tableDataPagination = computed(() => tableData.value.list.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
-
 function getNewVal() {
-  if (tableDataPagination.value.length) {
+  if (tableData.value.list.length) {
     const timeseriesList: string[] = [];
     const viewTypeList: string[] = [];
-    tableDataPagination.value.forEach((item) => {
+    tableData.value.list.forEach((item) => {
       timeseriesList.push(item.measurement);
       viewTypeList.push('VIEW');
     });
     getBatchLastValue(timeseriesList, viewTypeList).then((newRes) => {
       if (newRes.data.values.length || newRes.data.timestamps.length) {
-        tableDataPagination.value.forEach((item, index) => {
+        tableData.value.list.forEach((item, index) => {
           item.value = newRes.data.values[index] || '-';
           item.valueTime = newRes.data.timestamps[index] || '-';
         });
@@ -241,18 +239,6 @@ function getListData() {
     desc: searchFormData.type === 'desc' ? searchFormData.name : '',
   }).then((res) => {
     totalCount.value = res.data.totalCount;
-    // if (tableData.value.list?.length) {
-    //   tableData.value.list.forEach((item) => {
-    //     if (item && item.measurement) {
-    //       getLastValue(item.measurement).then((newRes) => {
-    //         if (newRes.code === 0) {
-    //           item.value = newRes.data.value || '-';
-    //           item.valueTime = newRes.data.time || '-';
-    //         }
-    //       });
-    //     }
-    //   });
-    // }
     getNewVal();
   });
 }
@@ -272,14 +258,12 @@ function handleSearch() {
 function onChangePageSize(val: number) {
   pagination.pageSize = val;
   pagination.pageNum = 1;
-  // getListData();
-  getNewVal();
+  getListData();
 }
 
 function onChangePage(page: number) {
   pagination.pageNum = page;
-  // getListData();
-  getNewVal();
+  getListData();
 }
 
 function handleSelectionChange(vals: Calculate.CalculateItem[]) {
@@ -383,9 +367,9 @@ function handleCommandDown(val: string) {
 
 onMounted(() => {
   handleReset();
-  if (!connectionIsActive.value) return;
-  if (!canReadWriteSchema.value) return;
-  handleSearch();
+  // if (!connectionIsActive.value) return;
+  // if (!canReadWriteSchema.value) return;
+  // handleSearch();
 });
 
 watch(
