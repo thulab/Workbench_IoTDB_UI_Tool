@@ -27,7 +27,7 @@
       </div>
     </el-form>
     <template #footer>
-      <div class="dialog-footer m-t-10">
+      <div class="dialog-footer">
         <el-button @click="dialogVisible = false" id="trend-modal-cancel">{{ t('common.cancel') }}</el-button>
         <el-button type="primary" @click="handleConfirm" id="trend-modal-confirm">{{ t('common.confirm') }}</el-button>
       </div>

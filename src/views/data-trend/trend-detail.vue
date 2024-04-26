@@ -3,12 +3,20 @@
     <el-header class="p-0" style="height: auto">
       <div class="search-form-wrapper search-form-box">
         <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-          <ul class="search-data-list">
-            <li :class="['search-data-type', { 'search-data-active': dataTab === 'running' }]" id="search-data-type-running" @click="handleTrendTab('running')">{{ t('dataTrend.realTrend') }}</li>
-            <li :class="['search-data-type', { 'search-data-active': dataTab === 'history' }]" id="search-data-type-history" @click="handleTrendTab('history')">{{ t('dataTrend.historyTrend') }}</li>
-          </ul>
-          <base-form-item v-show="!isRunningTab" :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules">
+          <base-form-item prop="path" :rules="requiredRules" style="width: 100%">
+            <template #label>
+              {{ t('measurement.measurementChoose') }}：
+              <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+            </template>
+            <timeseries-select v-model="searchFormData.path" :is-show-view-btn="true" id="trend-search-path" />
+          </base-form-item>
+          <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules">
+            <ul class="search-data-list">
+              <li :class="['search-data-type', { 'search-data-active': dataTab === 'running' }]" id="search-data-type-running" @click="handleTrendTab('running')">{{ t('dataTrend.realTrend') }}</li>
+              <li :class="['search-data-type', { 'search-data-active': dataTab === 'history' }]" id="search-data-type-history" @click="handleTrendTab('history')">{{ t('dataTrend.historyTrend') }}</li>
+            </ul>
             <el-date-picker
+              v-if="!isRunningTab"
               v-model="searchFormData.datetimerange"
               type="datetimerange"
               range-separator="-"
@@ -53,20 +61,16 @@
             </template>
           </div>
         </el-form>
-        <div class="search-form-buttons" :style="{ visibility: !isRunningTab ? 'visible' : 'hidden' }">
+        <div class="search-form-buttons">
           <auth-tooltip :is-disabled="canReadWriteSchemaData">
-            <el-button :disabled="!canReadWriteSchemaData" @click="handleReset" id="trend-search-reset">{{ t('common.reset') }}</el-button>
+            <el-button :disabled="!canReadWriteSchemaData" @click="handleReset(true)" id="trend-search-reset">{{ t('common.reset') }}</el-button>
           </auth-tooltip>
-          <el-tooltip
-            placement="top-start"
-            effect="light"
-            trigger="hover"
-            :content="canReadWriteSchemaData ? t('dataTrend.measurementEmptyTip') : t('common.noAuth')"
-            :disabled="canReadWriteSchemaData ? searchAbled : false"
-            popper-class="tooltip-box-width"
-          >
-            <el-button :class="[!searchAbled || !canReadWriteSchemaData ? 'hover-btn-disabled' : '']" type="primary" @click="handleSearch" id="trend-search-search">{{ t('common.apply') }}</el-button>
+          <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="applyTipDisabled" popper-class="tooltip-box-width">
+            <el-button :disabled="!applyTipDisabled" type="primary" @click="handleSearch" id="trend-search-search">
+              {{ t('common.apply') }}
+            </el-button>
           </el-tooltip>
+          <el-button :disabled="!searchFormData.path.length" @click="handleSaveTemplate" id="trend-search-save-template">{{ t('common.save') }}</el-button>
         </div>
       </div>
       <p class="trend-tip" :style="{ visibility: !isRunningTab ? 'visible' : 'hidden' }">
@@ -104,68 +108,48 @@
             </el-tooltip>
           </div>
         </el-main>
-        <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand ? 'p-0' : '']" style="display: flex; flex-direction: column">
-          <div class="aside-data-box">
-            <div class="path-box">
+        <el-aside width="340px" class="path-list-wrapper">
+          <el-tabs v-model="activeNameSide" stretch class="tabs-nav-aside">
+            <el-tab-pane :label="t('dataTrend.trendAttribute')" name="path">
               <trend-list
                 v-model="pathList"
-                :is-expand="isExpand"
                 :data-tab="dataTab"
                 :aggregation="searchFormData.aggregation"
                 :can-read-write-schema-data="canReadWriteSchemaData"
                 @handleOperate="handleOperatePath"
                 @handleOperateAll="handleOperateAll"
               />
-            </div>
-            <div class="cursor-list-box" v-if="isExpand && !isRunningTab">
-              <h4 class="cursor-list-title">{{ t('spectrum.cursorTitle') }}</h4>
-              <auth-container :is-auth="canReadWriteSchemaData" style="flex: 1; background-color: #fff; overflow-y: hidden; display: flex; padding: 12px 0 10px">
-                <div class="list-empty-wrapper" v-if="!pointLineData.length || !pathList.length">
-                  <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
-                  <span class="data-empty-text">{{ t('common.noData') }}</span>
-                </div>
-                <div class="cursor-list-wrapper" v-else>
-                  <ul class="cursor-list">
-                    <li v-for="(item, index) in pointList" :key="item.name" :class="['cursor-item-box']">
-                      <div class="cursor-text-box">
-                        <el-checkbox
-                          v-if="pointList.length !== 1"
-                          :checked="item.checked"
-                          class="m-r-4"
-                          :id="`trend-cursor-checkbox-${index}`"
-                          :disabled="pointDisabled(item)"
-                          @change="(val) => handleCheckDvalue(val, item)"
-                        />
-                        {{ pointTitle(index) }}
-                      </div>
-                      <div class="cursor-point-data">
-                        <p style="display: inline-flex; width: 140px"><text-tooltip :content="`X: ${item.x}`" /></p>
-                        <p style="display: inline-flex; width: 140px"><text-tooltip :content="`Y: ${item.y}`" /></p>
-                      </div>
-                      <el-icon size="14" class="delete-icon" @click="handleDelPoint(item, index)" :id="`cursor-${index}-del`"><i-custom-close-circle /></el-icon>
-                    </li>
-                  </ul>
-                  <div v-if="pointCheckedData.length === 2" class="point-dvalue-box">
-                    <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔX：${Math.abs(pointCheckedData[0].x - pointCheckedData[1].x)}`" /></p>
-                    <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔY：${Math.abs(pointCheckedData[0].y - pointCheckedData[1].y)}`" /></p>
-                  </div>
-                </div>
-              </auth-container>
-            </div>
-          </div>
-          <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="handleExpand" id="trend-path-expand">
+            </el-tab-pane>
+            <el-tab-pane :label="t('dataTrend.pointAttribute')" name="point" v-if="!isRunningTab">
+              <point-list-tab
+                :point-list="pointList"
+                :point-line-data="pointLineData"
+                :path-list="pathList"
+                :point-checked-data="pointCheckedData"
+                :can-read-write-schema-data="canReadWriteSchemaData"
+                @handleDelPoint="handleDelPoint"
+              />
+            </el-tab-pane>
+            <el-tab-pane :label="t('dataTrend.commonTemplates')" name="template">
+              <!-- <side-template ref="sqlListRef" @handle-sql-operate="handleSqlOperate" /> -->
+              {{ t('dataTrend.commonTemplates') }}
+            </el-tab-pane>
+          </el-tabs>
+          <!-- <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="handleExpand" id="trend-path-expand">
             <i-custom-arrow-right-expand />
-          </el-icon>
+          </el-icon> -->
         </el-aside>
       </el-container>
     </el-main>
+
+    <modal-template v-model:visible="templateVisible" />
   </el-container>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
-import type { FormInstance, SingleOrRange, DateModelType, CheckboxValueType } from 'element-plus';
+import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import dayjs from 'dayjs';
 import { debounce, cloneDeep, difference } from 'lodash-es';
 import { vElementSize } from '@vueuse/components';
@@ -176,6 +160,8 @@ import { useUserStore, useConnectionStore } from '@/stores';
 import { useWebsocket } from '@/composition-api';
 import ICustomCalender from '~icons/custom/calender.svg';
 import TrendList from './components/trend-list.vue';
+import PointListTab from './components/point-list-tab.vue';
+import ModalTemplate from './components/modal-template.vue';
 
 interface PointData {
   name: string;
@@ -196,6 +182,7 @@ interface MarkPointLine {
     position: string;
   };
 }
+const predefineColors = ['#4992ff', '#7cffb2', '#fddd60', '#ff6e76', '#58d9f9', '#05c091', '#ff8a45', '#8d48e3', '#dd79ff', '#8AC211'];
 
 const { t } = useI18n();
 const route = useRoute();
@@ -207,15 +194,22 @@ const connectionId = computed(() => connectionStore.connectionInfo.data.id);
 const connectionType = computed(() => (connectionStore.connectionIsMaster ? 0 : 1));
 const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
-const isExpand = ref(true);
+// const isExpand = ref(true);
 const searchFormRef = ref<FormInstance>();
 const tip = ref('<span style="font-weight: 700; color: #495AD4; margin: 0 4px;">2000</span>');
 const minDataTime = ref(-1);
-const searchFormData = reactive({
+const searchFormData = reactive<{
+  path: string[];
+  datetimerange: [DateModelType, DateModelType];
+  unitInterval: string;
+  aggregation: string;
+}>({
+  path: [],
   datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
   unitInterval: 'auto',
   aggregation: 'last_value',
 });
+let copySearchFormData = cloneDeep(searchFormData);
 const shortcutsDaterange = [
   {
     text: t('common.today'),
@@ -263,19 +257,20 @@ const dataTab = ref<'running' | 'history'>('running');
 const pathList = ref<Trend.LineObj[]>([]);
 const loading = ref(true);
 const isRunningTab = computed(() => dataTab.value === 'running');
-const searchAbled = computed(() => pathList.value.length > 0 && pathList.value.filter((item) => item.checked).length > 0);
 const checkedData = computed(() => pathList.value.filter((item) => item.checked));
 // 实时数据
 const chartData = ref<Search.TrendData[]>([]);
 // 历史数据
 const chartHistoryData = ref<Search.TrendData[]>([]);
-const copyCheckData = ref<Trend.LineObj[]>([]);
 // 当前数据
 const currentData = computed(() => (isRunningTab.value ? chartData.value : chartHistoryData.value));
 const pointLineData = ref<Array<MarkPointLine>>([]);
 const clickedCursor = ref(false);
 const markPointCount = ref(0);
 const pointList = ref<Array<PointData>>([]);
+const templateVisible = ref(false);
+const activeNameSide = ref('path');
+
 const pointCheckedData = computed(() => pointList.value.filter((item) => item.checked));
 
 const legendSelected = computed(() => ({
@@ -405,17 +400,25 @@ const chartOptions = computed<ECOption>(() => ({
 
 const { requestFn: getHistoryTrend } = useRequest(SearchApi.getHistoryTrend);
 
-function pointTitle(i: number) {
-  if (pointList.value.length === 1) {
-    return 'D：';
+const applyTip = computed(() => {
+  if (!canReadWriteSchemaData.value) {
+    return t('common.noAuth');
   }
-  return `D${i + 1}：`;
-}
+  if (searchFormData.path.length === 0) {
+    return t('dataTrend.measurementEmptyTip');
+  }
+  if (searchFormData.path.length > 10) {
+    return t('dataTrend.overMeasurementTip');
+  }
+  return '';
+});
 
-function pointDisabled(item: PointData) {
-  const flag = pointCheckedData.value.some((data) => data.name === item.name);
-  return pointCheckedData.value.length === 2 && !flag;
-}
+const applyTipDisabled = computed(() => {
+  if (canReadWriteSchemaData.value && searchFormData.path.length > 0 && searchFormData.path.length <= 10) {
+    return true;
+  }
+  return false;
+});
 
 const setOption = (option: ECOption, noMerge: boolean = false) => {
   if (chartInstance) {
@@ -436,8 +439,8 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       // handleEmptyPoint();
       if (!isRunningTab.value) {
-        const start = dayjs(searchFormData.datetimerange[0]).valueOf();
-        const end = dayjs(searchFormData.datetimerange[1]).valueOf();
+        const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
+        const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
         setOption({
           xAxis: {
             min: start,
@@ -530,7 +533,7 @@ function handleClickChart(params: echarts.ECElementEvent) {
   setOption(chartOptions.value);
 }
 
-function handleDelPoint(data: PointData, index: number) {
+function handleDelPoint(index: number) {
   markPointCount.value--;
   pointList.value.splice(index, 1);
   pointLineData.value.splice(index, 1);
@@ -543,10 +546,6 @@ function handleDelPoint(data: PointData, index: number) {
     }
   });
   setOption(chartOptions.value);
-}
-
-function handleCheckDvalue(val: CheckboxValueType, data: PointData) {
-  data.checked = val as boolean;
 }
 
 function handleEmptyPoint() {
@@ -564,7 +563,10 @@ const onResize = debounce(() => {
 }, 50);
 
 // 重置
-function handleReset() {
+function handleReset(force?: boolean) {
+  if (force) {
+    searchFormData.path = [];
+  }
   searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
   searchFormData.unitInterval = 'auto';
   searchFormData.aggregation = 'last_value';
@@ -589,14 +591,60 @@ function handleChangeTime(value: [DateModelType, DateModelType]) {
   }
 }
 
-function handleExpand() {
-  isExpand.value = !isExpand.value;
+// function handleExpand() {
+//   isExpand.value = !isExpand.value;
+// }
+
+function dealSearchPath() {
+  copySearchFormData = cloneDeep(searchFormData);
+  const allCurrentPaths = pathList.value.map((item) => item.path);
+  const addPaths = difference(copySearchFormData.path, allCurrentPaths);
+  const deletePaths = difference(allCurrentPaths, copySearchFormData.path);
+  deletePaths.forEach((item) => {
+    const index = pathList.value.findIndex((data) => data.path === item);
+    if (index !== -1) {
+      pathList.value.splice(index, 1);
+    }
+  });
+  if (deletePaths.length > 0) {
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    socketInstance.value?.send(JSON.stringify({ operate: 'del', paths: [...deletePaths] }));
+    deletePaths.forEach((deleteItem) => {
+      const index = chartData.value.findIndex((data) => data.path === deleteItem);
+      if (index !== -1) {
+        chartData.value.splice(index, 1);
+      }
+    });
+  }
+  const existedColor = pathList.value.map((item) => item.color);
+  const diffArr = difference(predefineColors, existedColor);
+  addPaths.forEach((item, index) => {
+    pathList.value.push({
+      path: item,
+      color: diffArr[index] || predefineColors[index],
+      width: 2,
+      checked: true,
+      disabled: false,
+    });
+  });
+
+  if (isRunningTab.value) {
+    loading.value = true;
+    if (addPaths.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [...addPaths] }));
+    }
+  }
 }
 
 // 查询
 function handleSearch() {
-  if (!canReadWriteSchemaData.value) return;
-  if (!checkedData.value.length) return;
+  if (!searchFormData.path.length) return;
+  if (isRunningTab.value) {
+    dealSearchPath();
+    setOption(chartOptions.value, true);
+    return;
+  }
   const timerange = dayjs(searchFormData.datetimerange[1]).valueOf() - dayjs(searchFormData.datetimerange[0]).valueOf();
   if (searchFormData.unitInterval !== 'auto' && searchFormData.unitInterval !== 'origin') {
     const timeinterval = timeUnits.value.find((time) => time.value === searchFormData.unitInterval)?.timestamp;
@@ -615,12 +663,13 @@ function handleSearch() {
     });
     return;
   }
+  dealSearchPath();
   getHistoryTrend({
-    paths: pathList.value.map((item) => item.path),
+    paths: copySearchFormData.path,
     startTime: start,
     endTime: end,
-    groupBy: searchFormData.unitInterval,
-    aggregateFun: searchFormData.aggregation,
+    groupBy: copySearchFormData.unitInterval,
+    aggregateFun: copySearchFormData.aggregation,
   }).then((res) => {
     chartHistoryData.value = res.data?.normal || [];
     const abnormals = res.data?.abnormal || [];
@@ -719,7 +768,6 @@ function handleTrendTab(type: 'running' | 'history') {
   dataTab.value = type;
   nextTick(() => {
     if (type === 'history') {
-      copyCheckData.value = cloneDeep(checkedData.value);
       loading.value = false;
       chartData.value.forEach((item) => {
         item.timestamps = [];
@@ -806,8 +854,13 @@ function handleOperateAll() {
   setOption({ legend: legendSelected.value, series: seriesData.value.series });
 }
 
+function handleSaveTemplate() {
+  templateVisible.value = true;
+}
+
 function init() {
   if (route.query.measurement) {
+    searchFormData.path = [route.query.measurement as string];
     pathList.value.push({
       path: route.query.measurement as string,
       color: '#4992ff',
@@ -905,7 +958,7 @@ onUnmounted(() => {
 
 .search-data-list {
   display: inline-flex;
-  margin: 0 24px 18px 0;
+  margin: 0 16px 0 0;
   border-radius: 12px;
   background-color: #f0f1fa;
   padding: 4px;
@@ -974,27 +1027,43 @@ onUnmounted(() => {
 
 .path-list-wrapper {
   margin-left: 16px;
-  background-color: #f7f8fc;
+  border: 1px solid #dfe1ed;
+  padding: 0 8px 8px;
+  background-color: #fff;
   border-radius: 2px;
   box-sizing: border-box;
-  padding: 12px 12px 0;
   position: relative;
   transition: all 0.3s ease;
   display: flex;
 }
 
-.aside-data-box {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
+.tabs-nav-aside {
+  width: 100%;
 
-.path-box {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  :deep(.el-tabs__header) {
+    background: #fff;
+    margin: 0;
+  }
+
+  :deep(.el-tabs__item) {
+    padding: 0 !important;
+    width: 89px;
+  }
+
+  :deep(.el-tabs__active-bar) {
+    border-radius: 2px 2px 0 0;
+  }
+
+  :deep(.el-tabs__content) {
+    width: 100%;
+    padding-top: 8px;
+    height: calc(100% - 68px);
+  }
+
+  .el-tab-pane {
+    height: 100%;
+    overflow-y: auto;
+  }
 }
 
 .expand-icon {
@@ -1013,24 +1082,14 @@ onUnmounted(() => {
     transform: rotate(-180deg);
   }
 }
+</style>
 
-.cursor-list-box {
-  margin: 16px 0 0;
-
-  // min-height: 160px;
-  // max-height: 244px;
-  flex: 0 0 30%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-
-  .cursor-list-title {
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 21px;
-    color: #495ad4;
-    margin: 0 0 6px;
-  }
+<style lang="scss">
+.side-list-box {
+  border-radius: 2px;
+  background: #fff;
+  overflow-y: auto;
+  height: 100%;
 
   .list-empty-wrapper {
     width: 100%;
@@ -1052,62 +1111,5 @@ onUnmounted(() => {
       line-height: 21px;
     }
   }
-
-  .cursor-list-wrapper {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-
-    .cursor-list {
-      flex: 1;
-      overflow-y: auto;
-    }
-  }
-}
-
-.cursor-item-box {
-  display: flex;
-  align-items: flex-start;
-  position: relative;
-
-  .delete-icon {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    right: 4px;
-    display: none;
-    cursor: pointer;
-  }
-
-  &:hover .delete-icon {
-    display: block;
-  }
-}
-
-.cursor-text-box {
-  display: flex;
-  align-items: center;
-  margin: 0 0 4px 8px;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 26px;
-  color: #131926;
-}
-
-.cursor-point-data {
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 26px;
-  color: #131926;
-}
-
-.point-dvalue-box {
-  border-top: 1px dashed #dfe1ed;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 26px;
-  color: #131926;
-  padding: 4px 0 0;
-  margin: 0 8px;
 }
 </style>

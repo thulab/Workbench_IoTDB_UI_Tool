@@ -1,5 +1,5 @@
 <template>
-  <div class="path-title-box" v-if="isExpand">
+  <!-- <div class="path-title-box" v-if="isExpand">
     <h4 class="path-list-title">{{ t('dataTrend.choosedMeasurement') }}</h4>
     <el-tooltip
       placement="top-start"
@@ -11,7 +11,7 @@
     >
       <el-button link :class="[pathList.length === 10 || !canReadWriteSchemaData ? 'hover-btn-disabled' : '', 'p-0']" @click="handleAdd" id="trend-add-path"><i-custom-new-trend /></el-button>
     </el-tooltip>
-  </div>
+  </div> -->
 
   <!-- <auth-tooltip :is-disabled="canReadWriteSchemaData">
     <el-checkbox
@@ -27,54 +27,54 @@
     />
   </auth-tooltip> -->
 
-  <h4 v-if="!isExpand" class="collapse-title">{{ t('dataTrend.choosedMeasurement') }}</h4>
+  <!-- <h4 v-if="!isExpand" class="collapse-title">{{ t('dataTrend.choosedMeasurement') }}</h4> -->
 
-  <div class="path-list-box" v-if="isExpand">
-    <auth-container :is-auth="canReadWriteSchemaData" style="height: 100%">
-      <div class="list-empty-wrapper" v-if="!pathList.length">
-        <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
-        <span class="data-empty-text">{{ t('common.noData') }}</span>
-      </div>
-      <ul class="list-box" v-else :key="listKey">
-        <li v-for="(item, index) in pathList" :key="item.path" :class="['path-item-box']">
-          <div class="path-text-box">
-            <el-checkbox v-if="item.disabled" :checked="false" :disabled="true" class="m-r-8" :id="`trend-path-checkbox-${index}-false`" />
-            <el-checkbox v-else :checked="item.checked" @change="(val) => handleChecked(val, item, index)" class="m-r-8" :id="`trend-path-checkbox-${index}-true`" />
-            <div class="path-text"><text-tooltip :content="item.path" /></div>
+  <!-- <div class="path-list-box" v-if="isExpand"> -->
+  <auth-container :is-auth="canReadWriteSchemaData" class="side-list-box">
+    <div class="list-empty-wrapper" v-if="!pathList.length">
+      <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
+      <span class="data-empty-text">{{ t('common.noData') }}</span>
+    </div>
+    <ul class="list-box" v-else :key="listKey">
+      <li v-for="(item, index) in pathList" :key="item.path" :class="['path-item-box']">
+        <div class="path-text-box">
+          <el-checkbox v-if="item.disabled" :checked="false" :disabled="true" class="m-r-8" :id="`trend-path-checkbox-${index}-false`" />
+          <el-checkbox v-else :checked="item.checked" @change="(val) => handleChecked(val, item, index)" class="m-r-8" :id="`trend-path-checkbox-${index}-true`" />
+          <div class="path-text"><text-tooltip :content="item.path" /></div>
+        </div>
+        <div class="path-detail-box">
+          <div class="path-detail-item">
+            <span class="detail-label">{{ t('common.color') }}：</span>
+            <el-color-picker
+              v-model="item.color"
+              :disabled="item.disabled"
+              color-format="hex"
+              :predefine="predefineColors"
+              @change="(val) => handleChangeColor(val, item, index)"
+              :id="`trend-path-color-${index}`"
+            />
           </div>
-          <div class="path-detail-box">
-            <div class="path-detail-item">
-              <span class="detail-label">{{ t('common.color') }}：</span>
-              <el-color-picker
-                v-model="item.color"
-                :disabled="item.disabled"
-                color-format="hex"
-                :predefine="predefineColors"
-                @change="(val) => handleChangeColor(val, item, index)"
-                :id="`trend-path-color-${index}`"
-              />
-            </div>
-            <div class="path-detail-item">
-              <span class="detail-label">{{ t('common.lineWidth') }}：</span>
-              <el-input-number
-                v-model.number="item.width"
-                :disabled="item.disabled"
-                :min="1"
-                :max="10"
-                step-strictly
-                controls-position="right"
-                style="width: 40px"
-                @change="(val) => handleChangeWidth(val, item, index)"
-                @blur="(ev) => handleBlurWidth(ev, item, index)"
-                :id="`trend-path-input-${index}`"
-              />
-            </div>
+          <div class="path-detail-item">
+            <span class="detail-label">{{ t('common.lineWidth') }}：</span>
+            <el-input-number
+              v-model.number="item.width"
+              :disabled="item.disabled"
+              :min="1"
+              :max="10"
+              step-strictly
+              controls-position="right"
+              style="width: 40px"
+              @change="(val) => handleChangeWidth(val, item, index)"
+              @blur="(ev) => handleBlurWidth(ev, item, index)"
+              :id="`trend-path-input-${index}`"
+            />
           </div>
-          <el-icon size="14" class="delete-icon svg-button-hover-color" @click="handleDel(item, index)" :id="`trend-path-${index}-del`"><i-custom-close-circle /></el-icon>
-        </li>
-      </ul>
-    </auth-container>
-  </div>
+        </div>
+        <!-- <el-icon size="14" class="delete-icon svg-button-hover-color" @click="handleDel(item, index)" :id="`trend-path-${index}-del`"><i-custom-close-circle /></el-icon> -->
+      </li>
+    </ul>
+  </auth-container>
+  <!-- </div> -->
 
   <modal-path v-model:visible="pathVisible" :path-list="editPathList" :predefine-colors="predefineColors" :default-color="defaultColor" @handleSave="handleSavePath" />
 </template>
@@ -86,7 +86,6 @@ import ModalPath from './modal-path.vue';
 
 const props = defineProps<{
   modelValue: Trend.LineObj[];
-  isExpand: boolean;
   dataTab: 'running' | 'history';
   aggregation: 'avg' | 'max_value' | 'min_value' | 'last_value' | string;
   canReadWriteSchemaData: boolean;
@@ -132,6 +131,7 @@ const pathVisible = ref(false);
 const editPathList = ref<string[]>([]);
 const defaultColor = ref('');
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleAdd() {
   if (!props.canReadWriteSchemaData) return;
   if (pathList.value.length === 10) return;
@@ -155,6 +155,7 @@ function handleCheckedAll(val: CheckboxValueType) {
   emit('handleOperateAll');
 }
 
+// 弃用
 function handleSavePath(data: Trend.LineObj) {
   pathList.value.push({ ...data, checked: true, disabled: false });
   emit('handleOperate', 'add', data.path);
@@ -183,6 +184,8 @@ function handleChangeWidth(val: number | undefined, data: Trend.LineObj, index: 
   emit('handleOperate', 'detail', data.path);
 }
 
+// 弃用
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleDel(data: Trend.LineObj, index: number) {
   pathList.value.splice(index, 1);
   emit('handleOperate', 'del', data.path);
@@ -229,34 +232,6 @@ watch(
 .hover-btn-disabled:focus {
   cursor: not-allowed !important;
   opacity: 0.8;
-}
-
-.path-list-box {
-  border-radius: 2px;
-  background: #fff;
-  overflow-y: auto;
-  flex: 1;
-
-  .list-empty-wrapper {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-
-    .data-empty-img {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 16px;
-    }
-
-    .data-empty-text {
-      font-size: 14px;
-      color: #131926;
-      line-height: 21px;
-    }
-  }
 }
 
 .path-item-box {

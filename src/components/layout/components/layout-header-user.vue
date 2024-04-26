@@ -1,6 +1,8 @@
 <template>
   <el-dropdown @command="handleLoginCommand" :id="`layout-header-user-${userName}`">
-    <span class="username">{{ userName }}</span>
+    <div class="username">
+      <text-tooltip :placement="'left'" :content="userName" />
+    </div>
     <template #dropdown>
       <el-dropdown-menu>
         <el-dropdown-item command="reset" id="layout-header-reset">
@@ -77,6 +79,7 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .username {
+  display: flex;
   font-size: 15px;
   line-height: 1.2;
   color: var(--el-text-color-primary);
