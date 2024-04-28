@@ -374,6 +374,23 @@ function handleSave() {
   }
 }
 
+onBeforeUnmount(() => {
+  sessionStorage.setItem('sqlSearchStorage', JSON.stringify({ activiteSql: activiteSql.value, sqlList: sqlList.value, activeNameSide: activeNameSide.value, code: { ...code } }));
+});
+
+onMounted(() => {
+  if (sessionStorage.getItem('sqlSearchStorage')) {
+    const storageData = JSON.parse(sessionStorage.getItem('sqlSearchStorage') as string);
+    activiteSql.value = storageData.activiteSql;
+    sqlList.value = storageData.sqlList;
+    activeNameSide.value = storageData.activeNameSide;
+    const allCodeKeys = Object.keys(storageData.code);
+    allCodeKeys.forEach((sql) => {
+      code[sql] = storageData.code[sql];
+    });
+  }
+});
+
 watch(activiteSql, (newVal, oldVal) => {
   if (newVal !== oldVal) {
     getSqlCode();
@@ -421,6 +438,10 @@ watch(activiteSql, (newVal, oldVal) => {
 
   :deep(.el-tabs__content) {
     width: 100%;
+  }
+
+  :deep(.el-tabs__nav-next, .el-tabs__nav-prev) {
+    line-height: 40px !important;
   }
 
   :deep(.el-tabs__nav-prev.is-disabled),

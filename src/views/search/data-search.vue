@@ -513,11 +513,31 @@ function handleCommandDown(val: string) {
 //   }
 // });
 
+onBeforeUnmount(() => {
+  sessionStorage.setItem('dataSearchStorage', JSON.stringify({ ...copySearchFormData, timeType: timeType.value }));
+});
+
 watch(
   () => canReadWriteData.value,
   (val) => {
     if (val) {
       firstLoad.value = true;
+      if (sessionStorage.getItem('dataSearchStorage')) {
+        const searchData = JSON.parse(sessionStorage.getItem('dataSearchStorage') as string);
+        searchFormData.path = searchData.path;
+        searchFormData.timeInterval = searchData.timeInterval;
+        searchFormData.unitInterval = searchData.unitInterval;
+        searchFormData.aggregation = searchData.aggregation;
+        searchFormData.asc = searchData.asc;
+        timeType.value = searchData.timeType;
+        if (timeType.value === 'datetime') {
+          searchFormData.time = searchData.time;
+        } else {
+          searchFormData.datetimerange = searchData.datetimerange;
+        }
+        handleSearch();
+        return;
+      }
       handleReset();
       if (route.query.measurement) {
         searchFormData.path = [route.query.measurement] as string[];

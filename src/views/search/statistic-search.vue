@@ -288,9 +288,31 @@ function handleCommandDown(val: string) {
   });
 }
 
-onMounted(() => {
-  handleReset();
+onBeforeUnmount(() => {
+  sessionStorage.setItem('statisticSearchStorage', JSON.stringify({ ...copySearchFormData }));
 });
+
+watch(
+  () => canReadWriteData.value,
+  (val) => {
+    if (val) {
+      if (sessionStorage.getItem('dataSearchStorage')) {
+        if (sessionStorage.getItem('statisticSearchStorage')) {
+          const searchData = JSON.parse(sessionStorage.getItem('statisticSearchStorage') as string);
+          searchFormData.path = searchData.path;
+          searchFormData.datetimerange = searchData.datetimerange;
+          if (searchFormData.path.length === 0) return;
+          handleSearch();
+          return;
+        }
+      }
+    }
+    handleReset();
+  },
+  {
+    immediate: true,
+  }
+);
 </script>
 
 <style lang="scss" scoped>
