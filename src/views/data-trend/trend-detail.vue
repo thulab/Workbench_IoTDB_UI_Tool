@@ -131,8 +131,8 @@
               />
             </el-tab-pane>
             <el-tab-pane :label="t('dataTrend.commonTemplates')" name="template">
-              <!-- <side-template ref="sqlListRef" @handle-sql-operate="handleSqlOperate" /> -->
-              {{ t('dataTrend.commonTemplates') }}
+              <!-- <side-template ref="sqlListRef" @handle-sql-operate="handleOperate" /> -->
+              <template-list-tab ref="templateListRef" @handle-operate="handleOperateTemplate" />
             </el-tab-pane>
           </el-tabs>
           <!-- <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="handleExpand" id="trend-path-expand">
@@ -161,6 +161,7 @@ import { useWebsocket } from '@/composition-api';
 import ICustomCalender from '~icons/custom/calender.svg';
 import TrendList from './components/trend-list.vue';
 import PointListTab from './components/point-list-tab.vue';
+import TemplateListTab from './components/template-list-tab.vue';
 import ModalTemplate from './components/modal-template.vue';
 
 interface PointData {
@@ -270,6 +271,7 @@ const markPointCount = ref(0);
 const pointList = ref<Array<PointData>>([]);
 const templateVisible = ref(false);
 const activeNameSide = ref('path');
+const templateListRef = ref<InstanceType<typeof TemplateListTab>>();
 
 const pointCheckedData = computed(() => pointList.value.filter((item) => item.checked));
 
@@ -857,6 +859,10 @@ function handleOperateAll() {
 function handleSaveTemplate() {
   templateVisible.value = true;
 }
+
+// 模板操作
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function handleOperateTemplate(val: string, data: Search.SqlList) {}
 
 function init() {
   if (route.query.measurement) {

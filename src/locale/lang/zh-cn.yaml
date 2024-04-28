@@ -241,6 +241,7 @@ search:
   databaseSelectPlaceholder: 请选择数据库
   deviceSelectPlaceholder: 请选择设备
   templatePlaceholder: 请输入模板名称
+  deleteTemplateTip: 是否删除模板
   open: 打开
   noTemplate: 暂无模板
   sqlInput: SQL输入
@@ -454,6 +455,7 @@ dataTrend:
   trendAttribute: 趋势属性
   pointAttribute: 光标属性
   commonTemplates: 常用模版
+  deleteTemplateTip: 是否删除常用趋势
   measurementEmptyTip: 请先添加测点并选中
   trendTip: 最大绘制%{tip}个点，超出后系统将自动调整
   overTip: 超过最大画图点数，已为您自动调整后展示

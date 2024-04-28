@@ -1,41 +1,30 @@
 <template>
-  <div class="search_div maxheight" v-loading="loading">
-    <el-input :placeholder="t('search.templatePlaceholder')" v-model="filterText" size="small" @input="getQueryList" id="sql-search-template-search">
+  <div class="side-list-box" v-loading="loading">
+    <el-input :placeholder="t('search.templatePlaceholder')" v-model="filterText" size="small" @input="getQueryList" id="trend-template-search">
       <template #suffix>
         <i-custom-search-icon />
       </template>
     </el-input>
 
-    <ul class="sql-list">
-      <template v-if="sqlList.length">
-        <li v-for="item in sqlList" :key="item.id" :id="`sql-template-${item.id}`" class="sql-item-box" @click="(e) => handleSelect(item, e)">
-          <div class="sql-item-text-box">
+    <ul class="template-list">
+      <template v-if="templateList.length">
+        <li v-for="item in templateList" :key="item.id" :id="`trend-template-${item.id}`" class="template-item-box" @click="(e) => handleSelect(item, e)">
+          <div class="template-item-text-box">
             <i-custom-template />
-            <text-tooltip :content="item.queryName" class-name="sql-item-text" />
+            <text-tooltip :content="item.queryName" class-name="template-item-text" />
           </div>
-          <div class="item-edit-box" :id="`sql-template-rename-${item.id}`" @click="handleSqlCommand('rename', item)">
+          <div class="item-edit-box" :id="`trend-template-rename-${item.id}`" @click="handleSqlCommand('rename', item)">
             <i-custom-edit class="item-edit" />
             <i-custom-edit class="item-edit-active" />
           </div>
 
-          <div class="item-delete-box" :id="`sql-template-delete-${item.id}`" @click="handleSqlCommand('delete', item)">
+          <div class="item-delete-box" :id="`trend-template-delete-${item.id}`" @click="handleSqlCommand('delete', item)">
             <i-custom-delete class="item-delete" />
             <i-custom-delete-active class="item-delete-active" />
           </div>
-          <!-- <i-ep-more-filled @click="item.focused = true" v-if="!item.focused" :id="`sql-template-dropdown-${item.id}`" class="more-icon" />
-          <el-dropdown v-else :id="`sql-template-dropdown-${item.id}`" class="more-icon" @command="(val) => handleSqlCommand(val, item)">
-            <i-ep-more-filled />
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="open" :id="`sql-template-dropdown-open-${item.id}`">{{ t('search.open') }}</el-dropdown-item>
-                <el-dropdown-item command="rename" :id="`sql-template-dropdown-rename-${item.id}`">{{ t('search.rename') }}</el-dropdown-item>
-                <el-dropdown-item command="delete" :id="`sql-template-dropdown-delete-${item.id}`">{{ t('common.delete') }}</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown> -->
         </li>
       </template>
-      <li v-else class="sql-item-box-empty">{{ t('search.noTemplate') }}</li>
+      <li v-else class="template-box-empty">{{ t('search.noTemplate') }}</li>
     </ul>
   </div>
 </template>
@@ -45,11 +34,11 @@ import { debounce } from 'lodash-es';
 import { SearchApi } from '@/api';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
-const emit = defineEmits(['handleSqlOperate']);
+const emit = defineEmits(['handleOperate']);
 
 const { t } = useI18n();
 const filterText = ref('');
-const sqlList = ref<Search.SqlList[]>([]);
+const templateList = ref<Search.SqlList[]>([]);
 const { requestFn: getQuery, loading } = useRequest(SearchApi.getQuery);
 const { requestFn: deleteQueryS } = useRequest(SearchApi.deleteQueryS);
 
@@ -57,7 +46,7 @@ const { requestFn: deleteQueryS } = useRequest(SearchApi.deleteQueryS);
 const getQueryList = debounce(() => {
   getQuery(filterText.value).then((res) => {
     if (res.code === 0) {
-      sqlList.value = res.data || [];
+      templateList.value = res.data || [];
     }
   });
 }, 500);
@@ -84,16 +73,16 @@ const canStopPropagation = (e: HTMLElement): boolean => {
 // 选择
 function handleSelect(data: Search.SqlList, e: MouseEvent) {
   if (canStopPropagation(e.target as HTMLElement)) return;
-  emit('handleSqlOperate', 'open', data);
+  emit('handleOperate', 'open', data);
 }
 
 const handleSqlCommand = (val: string, data: Search.SqlList) => {
   if (val === 'delete') {
-    ElMessageBox.confirm(t('search.deleteTemplateTip'), t('common.notice'), {
+    ElMessageBox.confirm(t('dataTrend.deleteTemplateTip'), t('common.notice'), {
       confirmButtonText: t('common.confirm'),
       cancelButtonText: t('common.cancel'),
-      confirmButtonClass: 'del-sql-template-confirm',
-      cancelButtonClass: 'del-sql-template-cancel',
+      confirmButtonClass: 'del-trend-template-confirm',
+      cancelButtonClass: 'del-trend-template-cancel',
       type: 'warning',
       icon: ICustomMessageWarning,
     }).then(() => {
@@ -103,11 +92,11 @@ const handleSqlCommand = (val: string, data: Search.SqlList) => {
           message: `${t('common.deleteSuccess')}`,
         });
         getQueryList();
-        emit('handleSqlOperate', val, data);
+        emit('handleOperate', val, data);
       });
     });
   } else {
-    emit('handleSqlOperate', val, data);
+    emit('handleOperate', val, data);
   }
 };
 
@@ -119,24 +108,13 @@ defineExpose({ getQueryList });
 </script>
 
 <style lang="scss" scoped>
-.search_div {
-  font-size: 14px;
-  padding: 20px 0 0;
-  background: #fff;
-
-  &.maxheight {
-    height: calc(100vh - 240px);
-    overflow: auto;
-  }
-}
-
-.sql-list {
+.template-list {
   display: flex;
   flex-direction: column;
   margin-top: 12px;
   min-height: 200px;
 
-  .sql-item-box {
+  .template-item-box {
     padding: 0 8px;
     position: relative;
     display: flex;
@@ -149,7 +127,7 @@ defineExpose({ getQueryList });
     color: #656a85;
     cursor: pointer;
 
-    .sql-item-text-box {
+    .template-item-text-box {
       display: flex;
       align-items: center;
       width: 200px;
@@ -246,7 +224,7 @@ defineExpose({ getQueryList });
     }
   }
 
-  .sql-item-box-empty {
+  .template-box-empty {
     padding: 0 8px;
     position: relative;
     display: flex;
@@ -257,10 +235,6 @@ defineExpose({ getQueryList });
     font-weight: 300;
     line-height: 12px;
     color: #656a85;
-  }
-
-  .sql-menu-list {
-    display: none;
   }
 }
 </style>
