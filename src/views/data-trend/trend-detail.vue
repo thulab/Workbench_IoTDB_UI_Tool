@@ -108,8 +108,8 @@
             </el-tooltip>
           </div>
         </el-main>
-        <el-aside width="340px" class="path-list-wrapper">
-          <el-tabs v-model="activeNameSide" stretch class="tabs-nav-aside">
+        <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand ? 'p-0' : '']">
+          <el-tabs v-model="activeNameSide" stretch class="tabs-nav-aside" v-if="isExpand">
             <el-tab-pane :label="t('dataTrend.trendAttribute')" name="path">
               <trend-list
                 v-model="pathList"
@@ -131,18 +131,20 @@
               />
             </el-tab-pane>
             <el-tab-pane :label="t('dataTrend.commonTemplates')" name="template">
-              <!-- <side-template ref="sqlListRef" @handle-sql-operate="handleOperate" /> -->
               <template-list-tab ref="templateListRef" @handle-operate="handleOperateTemplate" />
             </el-tab-pane>
           </el-tabs>
-          <!-- <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="handleExpand" id="trend-path-expand">
+          <h4 class="collapse-title" v-if="!isExpand">{{ t('dataTrend.trendAttribute') }}</h4>
+          <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="handleExpand" id="trend-path-expand">
             <i-custom-arrow-right-expand />
-          </el-icon> -->
+          </el-icon>
         </el-aside>
       </el-container>
     </el-main>
 
     <modal-template v-model:visible="templateVisible" />
+
+    <modal-template-rename v-model:visible="renameVisible" :id="renameData.id" :old-sql-name="renameData.name" :name-list="nameList" @handleSave="handleRenameSuccess" />
   </el-container>
 </template>
 
@@ -163,6 +165,7 @@ import TrendList from './components/trend-list.vue';
 import PointListTab from './components/point-list-tab.vue';
 import TemplateListTab from './components/template-list-tab.vue';
 import ModalTemplate from './components/modal-template.vue';
+import ModalTemplateRename from './components/modal-template-rename.vue';
 
 interface PointData {
   name: string;
@@ -195,7 +198,7 @@ const connectionId = computed(() => connectionStore.connectionInfo.data.id);
 const connectionType = computed(() => (connectionStore.connectionIsMaster ? 0 : 1));
 const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
-// const isExpand = ref(true);
+const isExpand = ref(true);
 const searchFormRef = ref<FormInstance>();
 const tip = ref('<span style="font-weight: 700; color: #495AD4; margin: 0 4px;">2000</span>');
 const minDataTime = ref(-1);
@@ -270,6 +273,15 @@ const clickedCursor = ref(false);
 const markPointCount = ref(0);
 const pointList = ref<Array<PointData>>([]);
 const templateVisible = ref(false);
+const renameVisible = ref(false);
+const nameList = ref<string[]>([]);
+const renameData = reactive<{
+  id: string;
+  name: string;
+}>({
+  id: '',
+  name: '',
+});
 const activeNameSide = ref('path');
 const templateListRef = ref<InstanceType<typeof TemplateListTab>>();
 
@@ -593,9 +605,9 @@ function handleChangeTime(value: [DateModelType, DateModelType]) {
   }
 }
 
-// function handleExpand() {
-//   isExpand.value = !isExpand.value;
-// }
+function handleExpand() {
+  isExpand.value = !isExpand.value;
+}
 
 function dealSearchPath() {
   copySearchFormData = cloneDeep(searchFormData);
@@ -861,8 +873,20 @@ function handleSaveTemplate() {
 }
 
 // 模板操作
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function handleOperateTemplate(val: string, data: Search.SqlList) {}
+function handleOperateTemplate(val: string, data: Search.SqlList) {
+  if (val === 'rename') {
+    renameData.id = `${data.id}`;
+    renameData.name = data.queryName;
+    nameList.value = templateListRef.value?.templateList.map((item) => item.queryName) || [];
+    renameVisible.value = true;
+  } else {
+    // TODO 打开
+  }
+}
+
+function handleRenameSuccess() {
+  templateListRef.value?.getQueryList();
+}
 
 function init() {
   if (route.query.measurement) {
@@ -1033,27 +1057,32 @@ onUnmounted(() => {
 
 .path-list-wrapper {
   margin-left: 16px;
-  border: 1px solid #dfe1ed;
-  padding: 0 8px 8px;
-  background-color: #fff;
+  padding: 14px 16px 0;
+  background-color: #f7f8fc;
   border-radius: 2px;
   box-sizing: border-box;
   position: relative;
   transition: all 0.3s ease;
   display: flex;
+  flex-direction: column;
 }
 
 .tabs-nav-aside {
+  flex: 1;
   width: 100%;
+  overflow-y: hidden;
+  height: calc(100% - 28px);
 
   :deep(.el-tabs__header) {
-    background: #fff;
     margin: 0;
+    font-size: 14px;
+    line-height: 21px;
+    font-weight: 400;
   }
 
   :deep(.el-tabs__item) {
     padding: 0 !important;
-    width: 89px;
+    height: 24px !important;
   }
 
   :deep(.el-tabs__active-bar) {
@@ -1062,14 +1091,23 @@ onUnmounted(() => {
 
   :deep(.el-tabs__content) {
     width: 100%;
-    padding-top: 8px;
-    height: calc(100% - 68px);
+    padding-top: 16px;
+    height: calc(100% - 40px);
   }
 
   .el-tab-pane {
     height: 100%;
     overflow-y: auto;
   }
+}
+
+.collapse-title {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 17px;
+  color: #495ad4;
+  margin: 14px 5px 0;
+  flex: 1;
 }
 
 .expand-icon {
@@ -1096,26 +1134,5 @@ onUnmounted(() => {
   background: #fff;
   overflow-y: auto;
   height: 100%;
-
-  .list-empty-wrapper {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-
-    .data-empty-img {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 16px;
-    }
-
-    .data-empty-text {
-      font-size: 14px;
-      color: #131926;
-      line-height: 21px;
-    }
-  }
 }
 </style>
