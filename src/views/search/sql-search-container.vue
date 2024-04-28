@@ -4,9 +4,11 @@
       <div class="sql-search-wrapper">
         <div class="sql-tab-box">
           <el-tabs v-model="activiteSql" editable type="card" closable class="sql-tab-list" @tab-click="handleTabClick" @tab-remove="handleTabRemove" @tab-add="handleTabAdd" id="sql-search-top-tabs">
-            <el-tab-pane v-for="(item, index) in sqlList" :key="item.id" :label="item.queryName" :name="item.id">
+            <el-tab-pane v-for="(item, index) in sqlList" :key="`${item.id}_${item.queryName}`" :label="item.queryName" :name="item.id">
               <template #label>
-                <span style="font-size: 12px; line-height: 1.2; display: flex; width: 118px" :id="`sql_tab_${index}`"><text-tooltip :content="item.queryName" /></span>
+                <span style="font-size: 12px; line-height: 1.2; display: flex; width: 118px" :id="`sql_tab_${index}`">
+                  <text-tooltip :content="item.queryName" />
+                </span>
               </template>
               <el-scrollbar :height="tabHeight">
                 <sql-search v-model:code="code[activiteSql]" @save="handleSave" ref="sqlSearchRef" />
@@ -104,10 +106,9 @@ const activiteSql = ref<string>(`_${dayjs().format('YYYY-MM-DD HH:mm:ss:SSS')}`)
 const sqlList = ref<Search.SqlList[]>([
   {
     id: activiteSql.value,
-    queryName: `${t('common.query')} ${dayjs()
-      .format('YYYY-MM-DD HH:mm:ss')
-      // eslint-disable-next-line no-useless-escape
-      .replace(/\-|\:| /g, '')}`,
+    queryName: t('search.queryTemplate', {
+      time: dayjs().format('YYYYMMDDHHmmss'),
+    }),
   },
 ]);
 const activeNameSide = ref('function');
@@ -206,8 +207,9 @@ function handleSqlOperate(val: string, data: Search.SqlList) {
     } else {
       const currentSqlId = `_${dayjs().unix()}`;
       sqlList.value.splice(index, 1, {
-        // eslint-disable-next-line no-useless-escape
-        queryName: `${t('common.query')} ${dayjs().format('YYYYMMDDHHmmss')}`,
+        queryName: t('search.queryTemplate', {
+          time: dayjs().format('YYYYMMDDHHmmss'),
+        }),
         id: currentSqlId,
       });
       activiteSql.value = currentSqlId;
@@ -220,8 +222,9 @@ function handleSqlOperate(val: string, data: Search.SqlList) {
 const handleTabAdd = throttle(() => {
   const currentSqlId = `_${dayjs().unix()}`;
   sqlList.value.push({
-    // eslint-disable-next-line no-useless-escape
-    queryName: `${t('common.query')} ${dayjs().format('YYYYMMDDHHmmss')}`,
+    queryName: t('search.queryTemplate', {
+      time: dayjs().format('YYYYMMDDHHmmss'),
+    }),
     id: currentSqlId,
   });
   activiteSql.value = currentSqlId;
@@ -288,7 +291,9 @@ function handleNameConfirm() {
           nameDialogVisible.value = false;
           if (saveSource.value === 'save') {
             const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
-            sqlList.value.splice(index, 1, { id: `${res.data}`, queryName: saveForm.sqlName });
+            if (index !== -1) {
+              sqlList.value.splice(index, 1, { id: `${res.data}`, queryName: saveForm.sqlName });
+            }
             activiteSql.value = `${res.data}`;
             sqlListRef.value?.getQueryList();
           } else {
@@ -327,16 +332,18 @@ function handleRenameConfirm() {
       const data = {
         id,
         queryName: resaveForm.sqlName,
-        sqls: code[activiteSql.value],
+        sqls: code[id],
       };
       saveQuery(data).then((res) => {
         if (res.code === 0) {
           ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
           renameDialogVisible.value = false;
-          const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
-          sqlList.value.splice(index, 1, { id: `${id}`, queryName: resaveForm.sqlName });
+          const index = sqlList.value.findIndex((f) => `${f.id}` === `${id}`);
+          if (index !== -1) {
+            sqlList.value.splice(index, 1, { id: `${id}`, queryName: resaveForm.sqlName });
+          }
           sqlListRef.value?.getQueryList();
-          activiteSql.value = `${id}`;
+          // activiteSql.value = `${id}`;
         }
       });
     }

@@ -249,6 +249,7 @@ search:
   template: Templates
   operatingInstructions: Operating Instructions
   saveTemplate: Save Template
+  queryTemplate: Query %{time}
   name: Name
   rename: Rename
   oldName: Old Name

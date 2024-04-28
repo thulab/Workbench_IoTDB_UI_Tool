@@ -229,6 +229,7 @@ search:
   template: 模板
   operatingInstructions: 操作说明
   saveTemplate: 保存模板
+  queryTemplate: 查询%{time}
   name: 名称
   rename: 重命名
   oldName: 原名称
