@@ -63,7 +63,13 @@
           </div>
           <div class="flex-justify-between">
             <div v-if="searchFormData.method !== 'custom'">
-              <base-form-item :label="`${t('measurement.measurementChoose')}：`" prop="measurement" :label-width="locale === 'en' ? '140px' : '96px'" :rules="requiredRules">
+              <base-form-item prop="measurement" :label-width="locale === 'en' ? '140px' : '96px'" :rules="requiredRules">
+                <template #label>
+                  {{ t('measurement.measurementChoose') }}：
+                  <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width">
+                    <i-custom-question />
+                  </el-tooltip>
+                </template>
                 <timeseries-select-single id="spectrum-search-path" v-model="searchFormData.measurement" :selectWidth="230" :itemWidth="200" show-suffix :disabled-path="disabledPath" />
               </base-form-item>
               <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules">
