@@ -290,15 +290,10 @@ function handleCloseMonitor() {
   handleSearch();
 }
 
-onMounted(() => {
-  handleReset();
-  if (!canUsePipe.value || !showAuthMenu.value) return;
-  handleSearch();
-});
-
 watch(
-  () => canUsePipe.value,
+  () => canUsePipe.value && showAuthMenu.value,
   (val) => {
+    handleReset();
     if (val) {
       handleSearch();
     }

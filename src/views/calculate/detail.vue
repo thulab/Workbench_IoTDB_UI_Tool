@@ -365,31 +365,11 @@ function handleCommandDown(val: string) {
   });
 }
 
-onMounted(() => {
-  handleReset();
-  // if (!connectionIsActive.value) return;
-  // if (!canReadWriteSchema.value) return;
-  // handleSearch();
-});
-
 watch(
-  () => connectionIsActive.value,
+  () => connectionIsActive.value && canReadWriteSchema.value,
   (val) => {
+    handleReset();
     if (val) {
-      if (!canReadWriteSchema.value) return;
-      handleSearch();
-    }
-  },
-  {
-    immediate: true,
-  }
-);
-
-watch(
-  () => canReadWriteSchema.value,
-  (val) => {
-    if (val) {
-      if (!connectionIsActive.value) return;
       handleSearch();
     }
   },

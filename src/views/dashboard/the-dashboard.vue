@@ -337,17 +337,29 @@ function getMonitorData() {
   if (currentNodeType.value === 'DataNode') {
     nextTick(() => {
       // monitorDatanodeRef.value?.initialAssign();
-      monitorDatanodeRef.value?.getInitial();
+      if (monitorDatanodeRef.value) {
+        monitorDatanodeRef.value?.getInitial();
+      } else {
+        getMonitorData();
+      }
     });
   } else if (currentNodeType.value === 'ConfigNode') {
     nextTick(() => {
       // monitorConfignodeRef.value?.initialAssign();
-      monitorConfignodeRef.value?.getInitial();
+      if (monitorConfignodeRef.value) {
+        monitorConfignodeRef.value?.getInitial();
+      } else {
+        getMonitorData();
+      }
     });
   } else {
     nextTick(() => {
       // monitorAllRef.value?.initialAssign();
-      monitorAllRef.value?.getInitial();
+      if (monitorAllRef.value) {
+        monitorAllRef.value?.getInitial();
+      } else {
+        getMonitorData();
+      }
     });
   }
 }
