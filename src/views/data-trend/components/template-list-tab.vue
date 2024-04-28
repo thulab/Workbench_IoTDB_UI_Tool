@@ -1,6 +1,6 @@
 <template>
   <div class="side-list-box" v-loading="loading">
-    <el-input :placeholder="t('search.templatePlaceholder')" v-model="filterText" size="small" @input="getQueryList" id="trend-template-search">
+    <el-input :placeholder="t('search.templatePlaceholder')" v-model="filterText" size="small" @input="getQueryList" id="trend-template-search" style="padding: 2px 2px 0">
       <template #suffix>
         <i-custom-search-icon />
       </template>
@@ -24,7 +24,10 @@
           </div>
         </li>
       </template>
-      <li v-else class="template-box-empty">{{ t('search.noTemplate') }}</li>
+      <div class="list-empty-wrapper" v-else>
+        <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
+        <span class="data-empty-text">{{ t('common.noData') }}</span>
+      </div>
     </ul>
   </div>
 </template>
@@ -92,7 +95,6 @@ const handleSqlCommand = (val: string, data: Search.SqlList) => {
           message: `${t('common.deleteSuccess')}`,
         });
         getQueryList();
-        emit('handleOperate', val, data);
       });
     });
   } else {
@@ -104,23 +106,21 @@ onMounted(() => {
   getQueryList();
 });
 
-defineExpose({ getQueryList });
+defineExpose({ templateList, getQueryList });
 </script>
 
 <style lang="scss" scoped>
 .template-list {
-  display: flex;
-  flex-direction: column;
-  margin-top: 12px;
-  min-height: 200px;
+  overflow-y: auto;
+  height: calc(100% - 46px);
+  margin: 16px 2px 0;
 
   .template-item-box {
-    padding: 0 8px;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 40px;
+    height: 24px;
     font-size: 12px;
     font-weight: 300;
     line-height: 1.2;
@@ -130,10 +130,10 @@ defineExpose({ getQueryList });
     .template-item-text-box {
       display: flex;
       align-items: center;
-      width: 200px;
+      width: 160px;
 
       svg {
-        margin-right: 4px;
+        margin-right: 8px;
         width: 24px;
         height: 24px;
         flex: 0 0 24px;
@@ -142,7 +142,7 @@ defineExpose({ getQueryList });
 
     .item-delete-box {
       position: absolute;
-      top: 10px;
+      top: 4px;
       right: 4px;
       display: none;
 
@@ -168,7 +168,7 @@ defineExpose({ getQueryList });
 
     .item-edit-box {
       position: absolute;
-      top: 10px;
+      top: 4px;
       right: 20px;
       display: none;
 

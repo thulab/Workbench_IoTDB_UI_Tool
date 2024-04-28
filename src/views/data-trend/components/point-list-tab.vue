@@ -94,31 +94,10 @@ function handleDelPoint(index: number) {
 </script>
 
 <style lang="scss" scoped>
-.list-empty-wrapper {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-
-  .data-empty-img {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 16px;
-  }
-
-  .data-empty-text {
-    font-size: 14px;
-    color: #131926;
-    line-height: 21px;
-  }
-}
-
 .cursor-list-wrapper {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  height: 100%;
 
   .cursor-list {
     flex: 1;

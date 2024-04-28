@@ -308,27 +308,6 @@ watch(
   background: #fff;
   height: calc(100% - 104px);
   overflow-y: auto;
-
-  .list-empty-wrapper {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-
-    .data-empty-img {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 16px;
-    }
-
-    .data-empty-text {
-      font-size: 14px;
-      color: #131926;
-      line-height: 21px;
-    }
-  }
 }
 
 .connection-item-box {

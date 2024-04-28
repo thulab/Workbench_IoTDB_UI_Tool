@@ -236,6 +236,7 @@ search:
   nameRuleTip: 请填写名称后确定
   newNameTip: 新名称为空，请重新输入
   nameRepeatTip: 与原名称相同，请重新输入
+  templateNameRepeatTip: 该模版名称已存在，请重新输入
   deleteTabTip: 只有一个页签不允许删除
   batchImportData: 批量导入数据
   databaseSelectPlaceholder: 请选择数据库

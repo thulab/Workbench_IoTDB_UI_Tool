@@ -35,7 +35,10 @@
           </el-dropdown> -->
         </li>
       </template>
-      <li v-else class="sql-item-box-empty">{{ t('search.noTemplate') }}</li>
+      <div class="list-empty-wrapper" v-else>
+        <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
+        <span class="data-empty-text">{{ t('common.noData') }}</span>
+      </div>
     </ul>
   </div>
 </template>
@@ -126,15 +129,13 @@ defineExpose({ getQueryList });
 
   &.maxheight {
     height: calc(100vh - 240px);
-    overflow: auto;
   }
 }
 
 .sql-list {
-  display: flex;
-  flex-direction: column;
   margin-top: 12px;
-  min-height: 200px;
+  overflow-y: auto;
+  height: calc(100% - 40px);
 
   .sql-item-box {
     padding: 0 8px;
