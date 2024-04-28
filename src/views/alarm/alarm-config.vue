@@ -132,17 +132,19 @@
                   <el-button v-if="row.status !== 3" type="primary" link size="small" @click="handleStatus(row)" :id="`alarm-config-table-${row.measurement}-status`">
                     {{ row.status === 1 ? t('common.disabled') : t('common.enable') }}
                   </el-button>
-                  <el-button
-                    :disabled="row.status === 3"
-                    type="primary"
-                    :style="{ 'margin-left': row.status !== 3 ? '12px' : '40px' }"
-                    link
-                    size="small"
-                    @click="handleEdit(row)"
-                    :id="`alarm-config-table-${row.measurement}-edit`"
-                  >
-                    {{ t('common.edit') }}
-                  </el-button>
+                  <auth-tooltip :is-disabled="row.status === 3 || !!rowCanPipeWriteOrReadSchemaByPath(row.measurement)" :content="'alarm.noAuthOperate'">
+                    <el-button
+                      :disabled="row.status === 3 || (row.status !== 3 && !rowCanPipeWriteOrReadSchemaByPath(row.measurement))"
+                      type="primary"
+                      :style="{ 'margin-left': row.status !== 3 ? '12px' : '40px' }"
+                      link
+                      size="small"
+                      @click="handleEdit(row)"
+                      :id="`alarm-config-table-${row.measurement}-edit`"
+                    >
+                      {{ t('common.edit') }}
+                    </el-button>
+                  </auth-tooltip>
                   <el-button type="primary" link size="small" @click="handleDel('row', row)" :id="`alarm-config-table-${row.measurement}-del`">{{ t('common.delete') }}</el-button>
                 </div>
               </template>
@@ -182,6 +184,7 @@ import { storeToRefs } from 'pinia';
 import dayjs from 'dayjs';
 import { getStartAndEnd, today, getOneInterval, getOneIntervalNow } from '@/utils/date';
 import { getOptionField } from '@/utils/format';
+import { getPathAuthList } from '@/utils/auth';
 import { AlarmApi } from '@/api';
 import { useEnumStore, useUserStore } from '@/stores';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
@@ -192,7 +195,7 @@ const { t, locale } = useI18n();
 const enumStore = useEnumStore();
 const route = useRoute();
 const userStore = useUserStore();
-const { canUsePipe } = storeToRefs(userStore);
+const { canUsePipe, userAllEntityPrivileges, userAllPathPrivileges } = storeToRefs(userStore);
 
 const { maxTableHeight } = useTableHeight(320);
 const searchFormRef = ref<FormInstance>();
@@ -254,6 +257,17 @@ const getLevelColor = (data?: Alarm.QueryConfigResult) => {
   const res = levelOptions.value.find((f) => f.value === data.alarmLevel);
   return res?.paramMap?.color;
 };
+
+function rowCanPipeWriteOrReadSchemaByPath(path: string) {
+  if (userAllEntityPrivileges.value.includes('USE_PIPE')) {
+    if (userAllEntityPrivileges.value.includes('WRITE_SCHEMA') || userAllEntityPrivileges.value.includes('READ_SCHEMA')) return true;
+    const authList = getPathAuthList(path, userAllPathPrivileges.value);
+    if (authList.length) {
+      return authList.includes('WRITE_SCHEMA') || authList.includes('READ_SCHEMA');
+    }
+  }
+  return false;
+}
 
 const {
   requestFn: getAlarmConfigList,
