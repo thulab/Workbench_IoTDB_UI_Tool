@@ -514,7 +514,13 @@ function handleCommandDown(val: string) {
 // });
 
 onBeforeUnmount(() => {
-  sessionStorage.setItem('dataSearchStorage', JSON.stringify({ ...copySearchFormData, timeType: timeType.value }));
+  sessionStorage.setItem(
+    'dataSearchStorage',
+    JSON.stringify({
+      ...copySearchFormData,
+      timeType: timeType.value,
+    })
+  );
 });
 
 watch(

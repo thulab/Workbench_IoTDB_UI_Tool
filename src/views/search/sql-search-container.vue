@@ -375,7 +375,15 @@ function handleSave() {
 }
 
 onBeforeUnmount(() => {
-  sessionStorage.setItem('sqlSearchStorage', JSON.stringify({ activiteSql: activiteSql.value, sqlList: sqlList.value, activeNameSide: activeNameSide.value, code: { ...code } }));
+  sessionStorage.setItem(
+    'sqlSearchStorage',
+    JSON.stringify({
+      activiteSql: activiteSql.value,
+      sqlList: sqlList.value,
+      activeNameSide: activeNameSide.value,
+      code: { ...code },
+    })
+  );
 });
 
 onMounted(() => {

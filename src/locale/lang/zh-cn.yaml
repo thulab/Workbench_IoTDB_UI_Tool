@@ -455,7 +455,7 @@ dataTrend:
   realTrend: 实时
   historyTrend: 历史
   trendAttribute: 趋势属性
-  pointAttribute: 光标属性
+  pointAttribute: 光标数值
   commonTemplates: 常用模版
   deleteTemplateTip: 是否删除常用趋势
   measurementEmptyTip: 请先添加测点并选中

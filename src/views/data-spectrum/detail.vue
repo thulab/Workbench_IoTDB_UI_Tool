@@ -94,7 +94,7 @@
             </div>
             <div class="search-form-buttons">
               <el-button @click="handleReset" id="spectrum-search-reset">{{ t('common.reset') }}</el-button>
-              <el-button type="primary" @click="handleSearch" id="spectrum-search-search">{{ t('common.apply') }}</el-button>
+              <el-button type="primary" @click="handleSearch()" id="spectrum-search-search">{{ t('common.apply') }}</el-button>
             </div>
           </div>
         </el-form>
@@ -956,10 +956,12 @@ function getCustom() {
 }
 
 // 查询
-function handleSearch() {
+function handleSearch(unforce?: boolean) {
   if (!canReadWriteSchemaData.value) return;
   copySearchFormData = cloneDeep(searchFormData);
-  handleEmptyOperate();
+  if (!unforce) {
+    handleEmptyOperate();
+  }
   if (!copySearchFormData.method) {
     ElMessage.warning({
       message: t('common.searchFormEmpty'),
@@ -1014,7 +1016,27 @@ onMounted(() => {
     }
   });
   getUdfList();
-  setOption(chartOptions.value);
+});
+
+onBeforeUnmount(() => {
+  sessionStorage.setItem(
+    'dataSpectrumStorage',
+    JSON.stringify({
+      ...copySearchFormData,
+      clickedOperate: clickedOperate.value,
+      markPointCount: markPointCount.value,
+      pointLineData: pointLineData.value,
+      pointList: pointList.value,
+      harmonicFrequency: harmonicFrequency.value,
+      frequencyInterval: frequencyInterval.value,
+      sideband: sideband.value,
+      sidebandData: sidebandData.value,
+      sqlValue: sqlValue.value,
+      clickedStatus: { ...clickedStatus },
+      drawedStatus: { ...drawedStatus },
+      currentPoint,
+    })
+  );
 });
 
 onUnmounted(() => {
@@ -1030,6 +1052,65 @@ watch(locale, () => {
     getUdfList();
   });
 });
+
+watch(
+  () => canReadWriteSchemaData.value,
+  (val) => {
+    setOption(chartOptions.value);
+    if (val) {
+      if (sessionStorage.getItem('dataSpectrumStorage')) {
+        const storageData = JSON.parse(sessionStorage.getItem('dataSpectrumStorage') as string);
+        searchFormData.measurement = storageData.measurement;
+        if (searchFormData.measurement) {
+          searchFormData.method = storageData.method;
+          searchFormData.resultType = storageData.resultType;
+          searchFormData.compression = storageData.compression;
+          searchFormData.frequency = storageData.frequency;
+          searchFormData.amplification = storageData.amplification;
+          searchFormData.datetimerange = storageData.datetimerange;
+          markPointCount.value = storageData.markPointCount;
+          const cursorData = storageData.pointLineData
+            .filter((f: MarkPointLine) => f.type === 'cursor')
+            .map((item: MarkPointLine, index: number) => {
+              return {
+                ...item,
+                label: {
+                  formatter: () => (markPointCount.value === 1 ? 'D' : `D${index + 1}`),
+                  position: 'end',
+                  color: '#fff',
+                },
+              };
+            });
+          const otherData = storageData.pointLineData.filter((f: MarkPointLine) => f.type !== 'cursor');
+          pointLineData.value = [...cursorData, ...otherData];
+          pointList.value = storageData.pointList;
+          harmonicFrequency.value = storageData.harmonicFrequency;
+          frequencyInterval.value = storageData.frequencyInterval;
+          sqlValue.value = storageData.sqlValue;
+          sideband.value = storageData.sideband;
+          clickedStatus.cursor = false;
+          clickedStatus.frequency = storageData.clickedStatus.frequency;
+          drawedStatus.frequency = storageData.drawedStatus.frequency;
+          clickedOperate.value = '';
+          if (storageData.sidebandData.length < 2) {
+            clickedStatus.sideband = false;
+            drawedStatus.sideband = false;
+            sidebandData.value = [];
+          } else {
+            clickedStatus.sideband = storageData.clickedStatus.sideband;
+            drawedStatus.sideband = storageData.drawedStatus.sideband;
+            sidebandData.value = storageData.sidebandData;
+          }
+          currentPoint = storageData.currentPoint;
+          handleSearch(true);
+        }
+      }
+    }
+  },
+  {
+    immediate: true,
+  }
+);
 </script>
 
 <style lang="scss" scoped>
@@ -1134,8 +1215,8 @@ watch(locale, () => {
   }
 
   .disable-frequency {
-    background: #f0f1fa;
-    color: #00b3aa;
+    background: #f0f1fa !important;
+    color: #00b3aa !important;
   }
 
   .enable-frequency {
@@ -1144,8 +1225,8 @@ watch(locale, () => {
   }
 
   .disable-sideband {
-    background: #f0f1fa;
-    color: #6738bd;
+    background: #f0f1fa !important;
+    color: #6738bd !important;
   }
 
   .enable-sideband {

@@ -289,14 +289,19 @@ function handleCommandDown(val: string) {
 }
 
 onBeforeUnmount(() => {
-  sessionStorage.setItem('statisticSearchStorage', JSON.stringify({ ...copySearchFormData }));
+  sessionStorage.setItem(
+    'statisticSearchStorage',
+    JSON.stringify({
+      ...copySearchFormData,
+    })
+  );
 });
 
 watch(
   () => canReadWriteData.value,
   (val) => {
     if (val) {
-      if (sessionStorage.getItem('dataSearchStorage')) {
+      if (sessionStorage.getItem('statisticSearchStorage')) {
         if (sessionStorage.getItem('statisticSearchStorage')) {
           const searchData = JSON.parse(sessionStorage.getItem('statisticSearchStorage') as string);
           searchFormData.path = searchData.path;

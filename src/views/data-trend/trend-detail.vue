@@ -66,7 +66,7 @@
             <el-button :disabled="!canReadWriteSchemaData" @click="handleReset(true)" id="trend-search-reset">{{ t('common.reset') }}</el-button>
           </auth-tooltip>
           <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="applyTipDisabled" popper-class="tooltip-box-width">
-            <el-button :disabled="!applyTipDisabled" type="primary" @click="handleSearch" id="trend-search-search">
+            <el-button :disabled="!applyTipDisabled" type="primary" @click="handleSearch()" id="trend-search-search">
               {{ t('common.apply') }}
             </el-button>
           </el-tooltip>
@@ -652,10 +652,14 @@ function dealSearchPath() {
 }
 
 // 查询
-function handleSearch() {
+function handleSearch(unforce?: boolean) {
   if (!searchFormData.path.length) return;
   if (isRunningTab.value) {
-    dealSearchPath();
+    if (!unforce) {
+      dealSearchPath();
+    } else {
+      copySearchFormData = cloneDeep(searchFormData);
+    }
     setOption(chartOptions.value, true);
     return;
   }
@@ -677,7 +681,11 @@ function handleSearch() {
     });
     return;
   }
-  dealSearchPath();
+  if (!unforce) {
+    dealSearchPath();
+  } else {
+    copySearchFormData = cloneDeep(searchFormData);
+  }
   getHistoryTrend({
     paths: copySearchFormData.path,
     startTime: start,
@@ -949,6 +957,57 @@ watch(
         socketInstance.value.close();
       }
       initWebsocket(() => {
+        if (sessionStorage.getItem('dataTrendStorage')) {
+          const storageData = JSON.parse(sessionStorage.getItem('dataTrendStorage') as string);
+          searchFormData.path = storageData.path;
+          if (searchFormData.path.length) {
+            searchFormData.datetimerange = storageData.datetimerange;
+            searchFormData.unitInterval = storageData.unitInterval;
+            searchFormData.aggregation = storageData.aggregation;
+            dataTab.value = storageData.dataTab;
+            pathList.value = storageData.pathList;
+            pointLineData.value = storageData.pointLineData.map((item: MarkPointLine, index: number) => ({
+              ...item,
+              label: {
+                formatter: () => (markPointCount.value === 1 ? 'D' : `D${index + 1}`),
+                position: 'end',
+              },
+            }));
+            markPointCount.value = storageData.markPointCount;
+            pointList.value = storageData.pointList;
+            activeNameSide.value = storageData.activeNameSide;
+            loading.value = dataTab.value === 'running';
+            if (socketInstance.value && socketInstance.value.readyState === 1) {
+              socketInstance.value?.send(
+                JSON.stringify({
+                  operate: 'SET_CONNECT',
+                  connectionId: connectionId.value,
+                  user: userName.value,
+                  type: connectionType.value,
+                })
+              );
+              if (dataTab.value === 'running') {
+                socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [...searchFormData.path] }));
+              }
+            } else {
+              socketInstance.value?.addEventListener('open', () => {
+                socketInstance.value?.send(
+                  JSON.stringify({
+                    operate: 'SET_CONNECT',
+                    connectionId: connectionId.value,
+                    user: userName.value,
+                    type: connectionType.value,
+                  })
+                );
+                if (dataTab.value === 'running') {
+                  socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [...searchFormData.path] }));
+                }
+              });
+            }
+            handleSearch(false);
+            return;
+          }
+        }
         init();
       });
     }
@@ -957,6 +1016,21 @@ watch(
     immediate: true,
   }
 );
+
+onBeforeUnmount(() => {
+  sessionStorage.setItem(
+    'dataTrendStorage',
+    JSON.stringify({
+      ...copySearchFormData,
+      dataTab: dataTab.value,
+      pathList: pathList.value,
+      pointLineData: pointLineData.value,
+      markPointCount: markPointCount.value,
+      pointList: pointList.value,
+      activeNameSide: activeNameSide.value,
+    })
+  );
+});
 
 onUnmounted(() => {
   chartContainer.value = null;
