@@ -289,6 +289,11 @@ function handleTestLogin() {
             ...formData,
             password: '',
           });
+          sessionStorage.setItem('dataSearchStorage', '');
+          sessionStorage.setItem('statisticSearchStorage', '');
+          sessionStorage.setItem('sqlSearchStorage', '');
+          sessionStorage.setItem('dataTrendStorage', '');
+          sessionStorage.setItem('dataSpectrumStorage', '');
           if (route.name === 'Login') {
             router.push({ path: '/' });
           } else {
