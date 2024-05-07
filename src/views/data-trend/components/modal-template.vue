@@ -16,14 +16,16 @@
 
 <script setup lang="ts">
 import type { FormInstance } from 'element-plus';
+import dayjs from 'dayjs';
 
 const props = defineProps<{
   visible: boolean;
+  saveLoading: boolean;
 }>();
 
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
-  (event: 'handleSave', payload: Trend.LineObj): void;
+  (event: 'handleSave', payload: string): void;
 }>();
 
 const { t } = useI18n();
@@ -34,12 +36,9 @@ const formRules = reactive({
 });
 const formData = reactive<{
   name: string;
-  id?: string;
 }>({
   name: '',
-  id: '',
 });
-const saveLoading = ref(false);
 
 function handleCancel() {
   dialogVisible.value = false;
@@ -48,10 +47,7 @@ function handleCancel() {
 function handleConfirm() {
   formRef.value?.validate((valid) => {
     if (valid) {
-      // TODO 保存的内容为用户输入的搜索条件、测点名称、趋势图及其操作
-      saveLoading.value = true;
-      saveLoading.value = false;
-      dialogVisible.value = false;
+      emit('handleSave', formData.name);
     }
   });
 }
@@ -61,7 +57,9 @@ watch(
   (newVal) => {
     if (newVal) {
       formRef.value?.resetFields();
-      saveLoading.value = false;
+      formData.name = t('dataTrend.trendTemplate', {
+        time: dayjs().format('YYYYMMDDHHmmss'),
+      });
     }
   }
 );

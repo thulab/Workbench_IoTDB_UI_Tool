@@ -52,6 +52,21 @@ class SearchApi {
     return http.post('/trend/history', data);
   }
 
+  // 新增/更新趋势模板
+  static upsertTrendTemplate(data: Search.TrendTemplate): HttpResponseP {
+    return http.post('/trend/upsertTemplate', data);
+  }
+
+  // 趋势模板列表
+  static getTrendTemplate(keyword: string): HttpResponseP {
+    return http.get('/trend/templates', { params: { keyword } });
+  }
+
+  // 趋势模板删除
+  static delTrendTemplate(id: number): HttpResponseP {
+    return http.delete('/trend/delTemplate', { params: { id } });
+  }
+
   // 统计查询-最大最小值
   static getStatisticSearchMinMax(data: Search.StatisticSearch): HttpResponseP<{ data: Search.StatisticSearchMinMaxObj[]; code: number; message: string }> {
     return http.post('/data/getStatisticalMaxMinValue', data);

@@ -467,6 +467,7 @@ dataTrend:
   choosedMeasurement: 已选测点
   overMeasurementTip: 最多同时展示10条测点趋势
   number10Tip: 只支持输入1-10范围内的正整数
+  trendTemplate: 趋势%{time}
 calculate:
   namePlaceholder: 请输入名称
   descPlaceholder: 请输入描述

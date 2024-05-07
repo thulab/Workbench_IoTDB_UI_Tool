@@ -142,9 +142,9 @@
       </el-container>
     </el-main>
 
-    <modal-template v-model:visible="templateVisible" />
+    <modal-template v-model:visible="templateVisible" :save-loading="saveTemplateLoading" @handleSave="handleSaveSuccess" />
 
-    <modal-template-rename v-model:visible="renameVisible" :id="renameData.id" :old-sql-name="renameData.name" :name-list="nameList" @handleSave="handleRenameSuccess" />
+    <modal-template-rename v-model:visible="renameVisible" :old-name="renameData.name" :name-list="nameList" :save-loading="saveTemplateLoading" @handleSave="handleRenameSuccess" />
   </el-container>
 </template>
 
@@ -276,12 +276,17 @@ const templateVisible = ref(false);
 const renameVisible = ref(false);
 const nameList = ref<string[]>([]);
 const renameData = reactive<{
-  id: string;
+  id: number | string;
   name: string;
+  type: string;
+  template: string;
 }>({
   id: '',
   name: '',
+  type: '',
+  template: '',
 });
+const saveTemplateLoading = ref(false);
 const activeNameSide = ref('path');
 const templateListRef = ref<InstanceType<typeof TemplateListTab>>();
 
@@ -413,6 +418,7 @@ const chartOptions = computed<ECOption>(() => ({
 }));
 
 const { requestFn: getHistoryTrend } = useRequest(SearchApi.getHistoryTrend);
+const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTemplate);
 
 const applyTip = computed(() => {
   if (!canReadWriteSchemaData.value) {
@@ -877,23 +883,75 @@ function handleOperateAll() {
 }
 
 function handleSaveTemplate() {
+  if (!searchFormData.path.length) return;
+  saveTemplateLoading.value = false;
   templateVisible.value = true;
 }
 
 // 模板操作
-function handleOperateTemplate(val: string, data: Search.SqlList) {
+function handleOperateTemplate(val: string, data: Search.TrendTemplate) {
   if (val === 'rename') {
-    renameData.id = `${data.id}`;
-    renameData.name = data.queryName;
-    nameList.value = templateListRef.value?.templateList.map((item) => item.queryName) || [];
+    renameData.id = +data.id!;
+    renameData.name = data.name;
+    renameData.type = data.type;
+    renameData.template = data.template;
+    nameList.value = templateListRef.value?.templateList.map((item) => item.name) || [];
+    saveTemplateLoading.value = false;
     renameVisible.value = true;
   } else {
-    // TODO 打开
+    const templateData = JSON.parse(data.template);
+    searchFormData.path = templateData.path;
+    searchFormData.aggregation = templateData.aggregation;
+    searchFormData.datetimerange = templateData.datetimerange;
+    searchFormData.unitInterval = templateData.unitInterval;
+    pathList.value = [];
+    // TODO 查询数据渲染到图表
+    nextTick(() => {
+      pathList.value = templateData.pathList.map((item: Trend.LineObj) => ({ ...item }));
+      handleTrendTab(templateData.type);
+    });
   }
 }
 
-function handleRenameSuccess() {
-  templateListRef.value?.getQueryList();
+function handleSaveSuccess(name: string) {
+  saveTemplateLoading.value = true;
+  const data = JSON.stringify({
+    ...searchFormData,
+    type: dataTab.value,
+    pathList: pathList.value,
+  });
+  upsertTrendTemplate({
+    id: '',
+    type: dataTab.value,
+    name,
+    template: data,
+  })
+    .then(() => {
+      ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
+      templateVisible.value = false;
+      templateListRef.value?.getQueryList();
+    })
+    .finally(() => {
+      saveTemplateLoading.value = false;
+    });
+}
+
+function handleRenameSuccess(name: string) {
+  saveTemplateLoading.value = true;
+  upsertTrendTemplate({
+    id: renameData.id,
+    type: renameData.type,
+    name,
+    template: renameData.template,
+  })
+    .then(() => {
+      ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
+      renameVisible.value = false;
+      templateListRef.value?.getQueryList();
+    })
+    .finally(() => {
+      saveTemplateLoading.value = false;
+    });
 }
 
 function init() {

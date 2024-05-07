@@ -11,7 +11,7 @@
         <li v-for="item in templateList" :key="item.id" :id="`trend-template-${item.id}`" class="template-item-box" @click="(e) => handleSelect(item, e)">
           <div class="template-item-text-box">
             <i-custom-template />
-            <text-tooltip :content="item.queryName" class-name="template-item-text" />
+            <text-tooltip :content="item.name" class-name="template-item-text" />
           </div>
           <div class="item-edit-box" :id="`trend-template-rename-${item.id}`" @click="handleSqlCommand('rename', item)">
             <i-custom-edit class="item-edit" />
@@ -41,16 +41,14 @@ const emit = defineEmits(['handleOperate']);
 
 const { t } = useI18n();
 const filterText = ref('');
-const templateList = ref<Search.SqlList[]>([]);
-const { requestFn: getQuery, loading } = useRequest(SearchApi.getQuery);
-const { requestFn: deleteQueryS } = useRequest(SearchApi.deleteQueryS);
+const templateList = ref<Search.TrendTemplate[]>([]);
+const { requestFn: getTrendTemplate, loading } = useRequest(SearchApi.getTrendTemplate);
+const { requestFn: delTrendTemplate } = useRequest(SearchApi.delTrendTemplate);
 
 // 获取列表数据
 const getQueryList = debounce(() => {
-  getQuery(filterText.value).then((res) => {
-    if (res.code === 0) {
-      templateList.value = res.data || [];
-    }
+  getTrendTemplate(filterText.value).then((res) => {
+    templateList.value = res.data || [];
   });
 }, 500);
 
@@ -74,12 +72,12 @@ const canStopPropagation = (e: HTMLElement): boolean => {
 };
 
 // 选择
-function handleSelect(data: Search.SqlList, e: MouseEvent) {
+function handleSelect(data: Search.TrendTemplate, e: MouseEvent) {
   if (canStopPropagation(e.target as HTMLElement)) return;
   emit('handleOperate', 'open', data);
 }
 
-const handleSqlCommand = (val: string, data: Search.SqlList) => {
+const handleSqlCommand = (val: string, data: Search.TrendTemplate) => {
   if (val === 'delete') {
     ElMessageBox.confirm(t('dataTrend.deleteTemplateTip'), t('common.notice'), {
       confirmButtonText: t('common.confirm'),
@@ -89,7 +87,7 @@ const handleSqlCommand = (val: string, data: Search.SqlList) => {
       type: 'warning',
       icon: ICustomMessageWarning,
     }).then(() => {
-      deleteQueryS(`${data.id}`).then(() => {
+      delTrendTemplate(+data.id!).then(() => {
         ElMessage({
           type: 'success',
           message: `${t('common.deleteSuccess')}`,

@@ -70,6 +70,13 @@ declare namespace Search {
     aggregateFun: string;
   }
 
+  export interface TrendTemplate {
+    id: string | number;
+    type: string;
+    name: string;
+    template: string;
+  }
+
   export interface TrendData {
     path: string;
     timestamps: number[];
