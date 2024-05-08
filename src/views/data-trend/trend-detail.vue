@@ -791,8 +791,8 @@ function handlePlay(val: boolean) {
 }
 
 // 切换数据类型
-function handleTrendTab(type: 'running' | 'history') {
-  if (dataTab.value === type) return;
+function handleTrendTab(type: 'running' | 'history', unforce?: boolean) {
+  if (dataTab.value === type && !unforce) return;
   dataTab.value = type;
   nextTick(() => {
     if (type === 'history') {
@@ -806,14 +806,20 @@ function handleTrendTab(type: 'running' | 'history') {
       pointList.value = [];
       clickedCursor.value = false;
       chartHistoryData.value.length = 0;
-      setOption(chartOptions.value, true);
-      handleReset();
+      if (!unforce) {
+        setOption(chartOptions.value, true);
+        handleReset();
+      }
       handleSearch();
     } else {
       minDataTime.value = dayjs().valueOf();
       pathList.value.forEach((item) => {
         item.disabled = false;
       });
+      if (!unforce) {
+        chartData.value = [];
+        setOption(chartOptions.value, true);
+      }
       const currentChecked = chartData.value.map((item) => item.path);
       const cloneChecked = pathList.value.map((item) => item.path);
       const del = difference(currentChecked, cloneChecked);
@@ -905,10 +911,9 @@ function handleOperateTemplate(val: string, data: Search.TrendTemplate) {
     searchFormData.datetimerange = templateData.datetimerange;
     searchFormData.unitInterval = templateData.unitInterval;
     pathList.value = [];
-    // TODO 查询数据渲染到图表
     nextTick(() => {
       pathList.value = templateData.pathList.map((item: Trend.LineObj) => ({ ...item }));
-      handleTrendTab(templateData.type);
+      handleTrendTab(templateData.type, true);
     });
   }
 }
@@ -917,6 +922,7 @@ function handleSaveSuccess(name: string) {
   saveTemplateLoading.value = true;
   const data = JSON.stringify({
     ...searchFormData,
+    datetimerange: [dayjs(searchFormData.datetimerange[0]).valueOf(), dayjs(searchFormData.datetimerange[1]).valueOf()],
     type: dataTab.value,
     pathList: pathList.value,
   });
