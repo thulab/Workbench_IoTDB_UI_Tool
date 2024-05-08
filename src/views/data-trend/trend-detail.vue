@@ -134,7 +134,7 @@
               <template-list-tab ref="templateListRef" @handle-operate="handleOperateTemplate" />
             </el-tab-pane>
           </el-tabs>
-          <h4 class="collapse-title" v-if="!isExpand">{{ t('dataTrend.trendAttribute') }}</h4>
+          <h4 class="collapse-title" v-if="!isExpand">{{ t(tabLabel) }}</h4>
           <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="handleExpand" id="trend-path-expand">
             <i-custom-arrow-right-expand />
           </el-icon>
@@ -187,6 +187,12 @@ interface MarkPointLine {
   };
 }
 const predefineColors = ['#4992ff', '#7cffb2', '#fddd60', '#ff6e76', '#58d9f9', '#05c091', '#ff8a45', '#8d48e3', '#dd79ff', '#8AC211'];
+
+const tabList = [
+  { name: 'path', label: 'dataTrend.trendAttribute' },
+  { name: 'point', label: 'dataTrend.pointAttribute' },
+  { name: 'template', label: 'dataTrend.commonTemplates' },
+];
 
 const { t } = useI18n();
 const route = useRoute();
@@ -288,6 +294,7 @@ const renameData = reactive<{
 });
 const saveTemplateLoading = ref(false);
 const activeNameSide = ref('path');
+const tabLabel = ref('dataTrend.trendAttribute');
 const templateListRef = ref<InstanceType<typeof TemplateListTab>>();
 
 const pointCheckedData = computed(() => pointList.value.filter((item) => item.checked));
@@ -613,6 +620,7 @@ function handleChangeTime(value: [DateModelType, DateModelType]) {
 
 function handleExpand() {
   isExpand.value = !isExpand.value;
+  tabLabel.value = tabList.find((item) => item.name === activeNameSide.value)?.label || 'dataTrend.trendAttribute';
 }
 
 function dealSearchPath() {
