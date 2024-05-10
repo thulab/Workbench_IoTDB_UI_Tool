@@ -4,7 +4,7 @@ import { reactive } from 'vue';
 export const useConnectionStore = defineStore(
   'ConnectionStore',
   () => {
-    const connectionInfo = reactive<{ data: Connection.ConnectionDetail; currentVersion?: string }>({
+    const connectionInfo = reactive<{ data: Connection.ConnectionDetail; currentVersion?: string; slaveVersion?: string }>({
       data: {
         id: '',
         type: 0,
@@ -21,6 +21,7 @@ export const useConnectionStore = defineStore(
         },
       },
       currentVersion: '',
+      slaveVersion: '',
     });
     const connectionIsMaster = ref();
     const connectionIsActive = ref<boolean | null>(null);

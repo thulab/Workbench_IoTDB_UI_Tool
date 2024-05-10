@@ -147,6 +147,7 @@ export const useUserStore = defineStore(
             allPrivileges.value = res.data;
             sessionStorage.setItem('iotdbVersion', res.data.version);
             connectionStore.connectionInfo.currentVersion = res.data.version;
+            connectionStore.connectionInfo.slaveVersion = res.data.slaveVersion;
             connectionStore.setConnection(res.data.connection);
             connectionStore.setConnectionMasterType(res.data.isMaster);
             connectionStore.setConnectionActive(res.data.isActive);

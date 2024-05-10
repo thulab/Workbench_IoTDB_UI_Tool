@@ -26,7 +26,7 @@
                 <span class="module-label-text">{{ t('dashboard.isActive') }}：</span>
                 <span class="module-content-text" :style="{ color: systemData.active ? '#44C795' : '#D43030' }">{{ systemData.active ? t('common.yes') : t('common.no') }}</span>
                 <el-button
-                  v-if="systemData.active && showVersionCol1312((tableData.length && tableData[0].version) || '')"
+                  v-if="systemData.active && showVersionCol1312(connectionStore.connectionInfo.currentVersion || '')"
                   type="primary"
                   link
                   class="m-l-8"
@@ -76,7 +76,7 @@
                 <el-table-column
                   :label="t('dashboard.version')"
                   prop="version"
-                  v-if="showVersionCol((tableData.length && tableData[0].version) || '')"
+                  v-if="showVersionCol(connectionStore.connectionInfo.currentVersion || '')"
                   min-width="140"
                   align="center"
                   show-overflow-tooltip
@@ -119,7 +119,7 @@
                 <span class="module-label-text">{{ t('dashboard.isActive') }}：</span>
                 <span class="module-content-text" :style="{ color: slaveData.active ? '#44C795' : '#D43030' }">{{ slaveData.active ? t('common.yes') : t('common.no') }}</span>
                 <el-button
-                  v-if="slaveData.active && showVersionCol1312((slaveTableData.length && slaveTableData[0].version) || '')"
+                  v-if="slaveData.active && showVersionCol1312(connectionStore.connectionInfo.slaveVersion || '')"
                   type="primary"
                   link
                   class="m-l-8"
@@ -169,7 +169,7 @@
                 <el-table-column
                   :label="t('dashboard.version')"
                   prop="version"
-                  v-if="showVersionCol((slaveTableData.length && slaveTableData[0].version) || '')"
+                  v-if="showVersionCol(connectionStore.connectionInfo.slaveVersion || '')"
                   min-width="140"
                   align="center"
                   show-overflow-tooltip

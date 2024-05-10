@@ -20,7 +20,7 @@ class UserApi {
       isMaster: boolean;
       isActive: boolean | null;
       slaveIsConnection: boolean;
-    } & { version: string }
+    } & { version: string; slaveVersion: string }
   > {
     return http.get('/privileges/getLoginUserPrivileges');
   }
