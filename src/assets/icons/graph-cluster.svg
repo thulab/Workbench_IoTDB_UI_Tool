@@ -3,7 +3,7 @@
   <g opacity="1" transform="translate(0 0)  rotate(0)">
     <rect fill="#495AD4" opacity="1" transform="translate(0 0)  rotate(0)" x="0" y="0" width="60" height="60" rx="4"
       ry="4" />
-    <g mask="url(#bg-mask-0)">
+    <g>
       <g opacity="1" transform="translate(9.993789672851562 5.99365234375)  rotate(0)">
         <path id="直线 1 (轮廓)" fill-rule="evenodd" style="fill:#FFFFFF" opacity="1"
           d="M19.3354 6.66478L11.3392 10.6629C10.5968 11.0341 10.2972 11.933 10.6684 12.6753C11.0396 13.4177 11.9385 13.7173 12.6808 13.3462L20.677 9.34807C21.4194 8.97688 21.719 8.07798 21.3478 7.33561C20.9767 6.59323 20.0778 6.2936 19.3354 6.66478Z">
