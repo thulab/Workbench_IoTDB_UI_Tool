@@ -8,7 +8,7 @@
             <el-icon size="24"><i-custom-model-doc /></el-icon>
           </el-button>
         </el-tooltip>
-        <auth-tooltip :is-disabled="canReadWriteSchema">
+        <auth-tooltip :is-disabled="canReadWriteSchema" :content="'common.schemaAuthAnother'">
           <el-button :disabled="!canReadWriteSchema" link @click="handleRefresh" id="measurement-tree-refresh" :class="!canReadWriteSchema ? '' : 'svg-button-hover-color'">
             <el-icon size="24"><i-custom-refresh /></el-icon>
           </el-button>
@@ -17,7 +17,7 @@
     </el-header>
     <el-main class="p-0">
       <el-scrollbar>
-        <auth-container :is-auth="canReadWriteSchema" style="height: 100%">
+        <auth-container :is-auth="canReadWriteSchema" style="height: 100%" :content="'common.schemaAuthAnother'">
           <div class="model-container" v-loading="initialLoading">
             <div v-if="treeData.children?.length === 0" class="table-empty-wrapper" style="height: 100%">
               <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
@@ -42,6 +42,7 @@ import baseMeasurementIcom from '@/assets/icons/base-measurement.svg';
 import viewMeasurementIcom from '@/assets/icons/view-measurement.svg';
 import { StorageApi } from '@/api';
 import { useUserStore } from '@/stores';
+import { getPathAuthList } from '@/utils/auth';
 
 const treeData = ref<StorageDevice.ModelData>({
   node: 'root',
@@ -55,7 +56,7 @@ const initialLoading = ref(true);
 const { t, locale } = useI18n();
 
 const userStore = useUserStore();
-const { canReadWriteSchema } = storeToRefs(userStore);
+const { canReadWriteSchema, userAllEntityPrivileges, userAllPathPrivileges } = storeToRefs(userStore);
 
 const { requestFn: getDataModelTree, loading: dataLoading } = useRequest(StorageApi.getDataModelTree);
 const { requestFn: getBatchLastValue } = useRequest(StorageApi.getBatchLastValue);
@@ -75,6 +76,15 @@ const chartWidth = computed(() => {
   }
   return 'auto';
 });
+
+function rowReadWriteDataByPath(path: string) {
+  if (userAllEntityPrivileges.value.includes('READ_DATA') || userAllEntityPrivileges.value.includes('WRITE_DATA')) return true;
+  const authList = getPathAuthList(path, userAllPathPrivileges.value);
+  if (authList.length) {
+    return authList.includes('READ_DATA') || authList.includes('WRITE_DATA');
+  }
+  return false;
+}
 
 const treeDataOptions = (detailData: StorageDevice.ModelData, width: number | 'auto') =>
   ({
@@ -382,13 +392,14 @@ function clickFunction(params: { data: StorageDevice.ModelData }) {
           viewTypeList.push(item.timeseriesType || 'BASE');
         }
       });
+      const authTimeseries = timeseriesList.filter((item) => rowReadWriteDataByPath(item));
       if (timeseriesList.length || viewTypeList.length) {
         getBatchLastValue(timeseriesList, viewTypeList).then((newRes) => {
           data.children = list.map((r, i) => ({
             ...r,
             leafDeep: data.leafDeep!,
-            value: newRes.data.values[i],
-            valueTime: newRes.data.timestamps[i],
+            value: authTimeseries.includes(r.nodePath) ? newRes.data.values[i] : t('common.noAuth'),
+            valueTime: authTimeseries.includes(r.nodePath) ? newRes.data.timestamps[i] : t('common.noAuth'),
           }));
           data.pageNum = res.data.pageNum;
           data.pageSize = res.data.pageSize;
@@ -432,11 +443,6 @@ function handleRefresh() {
   maxExpandLevel.value = 0;
   getModalTreeData();
 }
-
-onMounted(() => {
-  if (!canReadWriteSchema.value) return;
-  handleRefresh();
-});
 
 watch(
   () => canReadWriteSchema.value,
