@@ -492,7 +492,7 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
     chartInstance.setOption(option, true);
     chartInstance.setOption({
       xAxis: {
-        show: false,
+        show: inited ? pathList.value.length > 0 : true,
       },
     });
   } else {
