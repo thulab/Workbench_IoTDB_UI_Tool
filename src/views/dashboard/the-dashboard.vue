@@ -3,7 +3,14 @@
     <el-container class="details-wrapper" style="height: 100%">
       <el-main class="p-16">
         <div style="display: flex; flex-direction: column; height: 100%" v-loading="loading">
-          <div class="module-box-wrapper m-b-16">
+          <div class="module-box-wrapper m-b-16 monitor-info-wrapper" v-if="!canMaintain">
+            <div class="module-title-wrapper">
+              <h4 class="module-title">{{ t('dashboard.systemInfo') }}</h4>
+            </div>
+            <auth-container :is-auth="canMaintain" :content="'common.maintainAuth'" style="flex: 1" />
+          </div>
+
+          <div class="module-box-wrapper m-b-16" v-if="canMaintain">
             <div class="module-title-wrapper">
               <h4 class="module-title">{{ slaveData ? t('dashboard.masterSystemInfo') : t('dashboard.systemInfo') }}</h4>
               <p class="module-details">
@@ -38,24 +45,24 @@
                 </el-button>
               </li>
               <!-- <li class="system-info-item">
-                <el-icon size="24"><i-custom-time /></el-icon>
-                <span class="module-label-text">{{ t('dashboard.expirationTime') }}：</span>
-                <span class="module-content-text">{{ systemData.expirationTime || '-' }}</span>
-              </li> -->
+                  <el-icon size="24"><i-custom-time /></el-icon>
+                  <span class="module-label-text">{{ t('dashboard.expirationTime') }}：</span>
+                  <span class="module-content-text">{{ systemData.expirationTime || '-' }}</span>
+                </li> -->
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-storage-num /></el-icon>
                 <span class="module-label-text">{{ t('measurement.databaseNum') }}：</span>
-                <span class="module-content-text">{{ toThousands(systemNumberData.databaseNum, '-') }}</span>
+                <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.databaseNum, '-') : t('common.noAuth') }}</span>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-device-num /></el-icon>
                 <span class="module-label-text">{{ t('measurement.deviceNum') }}：</span>
-                <span class="module-content-text">{{ toThousands(systemNumberData.deviceNum, '-') }}</span>
+                <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.deviceNum, '-') : t('common.noAuth') }}</span>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-measure-num /></el-icon>
                 <span class="module-label-text">{{ t('measurement.measurementNum') }}：</span>
-                <span class="module-content-text">{{ toThousands(systemNumberData.measurementNum, '-') }}</span>
+                <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.measurementNum, '-') : t('common.noAuth') }}</span>
               </li>
             </ul>
 
@@ -94,7 +101,7 @@
             </div>
           </div>
 
-          <div class="module-box-wrapper m-b-16" v-if="slaveData">
+          <div class="module-box-wrapper m-b-16" v-if="canMaintain && slaveData">
             <div class="module-title-wrapper">
               <h4 class="module-title">{{ t('dashboard.slaveSystemInfo') }}</h4>
               <p class="module-details">
@@ -138,17 +145,17 @@
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-storage-num /></el-icon>
                 <span class="module-label-text">{{ t('measurement.databaseNum') }}：</span>
-                <span class="module-content-text">{{ toThousands(systemNumberData.databaseNum, '-') }}</span>
+                <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.databaseNum, '-') : t('common.noAuth') }}</span>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-device-num /></el-icon>
                 <span class="module-label-text">{{ t('measurement.deviceNum') }}：</span>
-                <span class="module-content-text">{{ toThousands(systemNumberData.deviceNum, '-') }}</span>
+                <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.deviceNum, '-') : t('common.noAuth') }}</span>
               </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-measure-num /></el-icon>
                 <span class="module-label-text">{{ t('measurement.measurementNum') }}：</span>
-                <span class="module-content-text">{{ toThousands(systemNumberData.measurementNum, '-') }}</span>
+                <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.measurementNum, '-') : t('common.noAuth') }}</span>
               </li>
             </ul>
 
@@ -190,63 +197,65 @@
           <div class="module-box-wrapper monitor-info-wrapper">
             <div class="module-title-wrapper">
               <h4 class="module-title">{{ t('dashboard.monitorInfo') }}</h4>
-              <p class="module-details" v-if="showPrometheus">
+              <p class="module-details" v-if="canMaintain && showPrometheus">
                 <span class="module-label-text">{{ `${t('dashboard.deadTime')}：` }}</span>
                 <span class="module-content-text m-r-16">{{ monitorTime }}</span>
                 <el-button link @click="handleRefreshMonitor" id="dashboard-monitor-refresh" class="svg-button-hover-color"><i-custom-refresh style="width: 24px; height: 24px" /></el-button>
               </p>
             </div>
 
-            <div v-if="showPrometheus">
-              <div class="search-form-box">
-                <ul class="search-cluster-list" v-if="slaveData">
-                  <li :class="['search-cluster-type', { 'search-cluster-active': clusterType === 'master' }]" id="search-cluster-type-master" @click="handleChangeCluster('master')">
-                    {{ t('dashboard.masterCluster') }}
-                  </li>
-                  <li :class="['search-cluster-type', { 'search-cluster-active': clusterType === 'slave' }]" id="search-cluster-type-slave" @click="handleChangeCluster('slave')">
-                    {{ t('dashboard.slaveCluster') }}
-                  </li>
-                </ul>
-                <span class="search-from-label">{{ t('dashboard.node') }}：</span>
-                <el-select v-model="monitorNode" :placeholder="t('common.all')" style="width: 256px" @change="handleChangeNode" id="dashboard-monitor-select-node">
-                  <el-option
-                    v-for="(item, index) in nodeList"
-                    :key="`${item.address}(${item.type})_${index}`"
-                    :value="item.nodeID"
-                    :id="`dashboard-monitor-select-node-select-${item.nodeID}`"
-                    :label="item.address ? `${item.address}(${item.type})` : t('common.all')"
-                  />
-                </el-select>
+            <auth-container :is-auth="canMaintain" :content="'common.maintainAuth'" style="flex: 1">
+              <div v-if="showPrometheus">
+                <div class="search-form-box">
+                  <ul class="search-cluster-list" v-if="slaveData">
+                    <li :class="['search-cluster-type', { 'search-cluster-active': clusterType === 'master' }]" id="search-cluster-type-master" @click="handleChangeCluster('master')">
+                      {{ t('dashboard.masterCluster') }}
+                    </li>
+                    <li :class="['search-cluster-type', { 'search-cluster-active': clusterType === 'slave' }]" id="search-cluster-type-slave" @click="handleChangeCluster('slave')">
+                      {{ t('dashboard.slaveCluster') }}
+                    </li>
+                  </ul>
+                  <span class="search-from-label">{{ t('dashboard.node') }}：</span>
+                  <el-select v-model="monitorNode" :placeholder="t('common.all')" style="width: 256px" @change="handleChangeNode" id="dashboard-monitor-select-node">
+                    <el-option
+                      v-for="(item, index) in nodeList"
+                      :key="`${item.address}(${item.type})_${index}`"
+                      :value="item.nodeID"
+                      :id="`dashboard-monitor-select-node-select-${item.nodeID}`"
+                      :label="item.address ? `${item.address}(${item.type})` : t('common.all')"
+                    />
+                  </el-select>
+                </div>
+
+                <monitor-datanode
+                  v-if="currentNodeType === 'DataNode'"
+                  ref="monitorDatanodeRef"
+                  :node="monitorNode"
+                  :node-type="currentNodeType"
+                  :cluster-type="clusterType"
+                  @handleFetch="handleFetch"
+                />
+                <monitor-confignode
+                  v-else-if="currentNodeType === 'ConfigNode'"
+                  ref="monitorConfignodeRef"
+                  :node="monitorNode"
+                  :node-type="currentNodeType"
+                  :cluster-type="clusterType"
+                  @handleFetch="handleFetch"
+                />
+                <monitor-all v-else ref="monitorAllRef" :cluster-type="clusterType" @handleFetch="handleFetch" />
               </div>
 
-              <monitor-datanode
-                v-if="currentNodeType === 'DataNode'"
-                ref="monitorDatanodeRef"
-                :node="monitorNode"
-                :node-type="currentNodeType"
-                :cluster-type="clusterType"
-                @handleFetch="handleFetch"
-              />
-              <monitor-confignode
-                v-else-if="currentNodeType === 'ConfigNode'"
-                ref="monitorConfignodeRef"
-                :node="monitorNode"
-                :node-type="currentNodeType"
-                :cluster-type="clusterType"
-                @handleFetch="handleFetch"
-              />
-              <monitor-all v-else ref="monitorAllRef" :cluster-type="clusterType" @handleFetch="handleFetch" />
-            </div>
+              <div v-if="!configurePrometheus" class="table-empty-wrapper monitor-empty-box">
+                <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
+                <span class="data-empty-text">{{ t('dashboard.unconfigPrometheus') }}</span>
+              </div>
 
-            <div v-if="!configurePrometheus" class="table-empty-wrapper monitor-empty-box">
-              <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
-              <span class="data-empty-text">{{ t('dashboard.unconfigPrometheus') }}</span>
-            </div>
-
-            <div v-if="configurePrometheus && !enablePrometheus" class="table-empty-wrapper monitor-empty-box">
-              <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
-              <span class="data-empty-text">{{ t('dashboard.configPrometheusError') }}</span>
-            </div>
+              <div v-if="configurePrometheus && !enablePrometheus" class="table-empty-wrapper monitor-empty-box">
+                <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
+                <span class="data-empty-text">{{ t('dashboard.configPrometheusError') }}</span>
+              </div>
+            </auth-container>
           </div>
         </div>
 
@@ -273,7 +282,7 @@ import ModalActive from './components/modal-active.vue';
 const { t, locale } = useI18n();
 const userStore = useUserStore();
 const connectionStore = useConnectionStore();
-const { enablePrometheus, configurePrometheus } = storeToRefs(userStore);
+const { enablePrometheus, configurePrometheus, canReadWriteSchema, canMaintain } = storeToRefs(userStore);
 const showPrometheus = computed(() => enablePrometheus.value && configurePrometheus.value);
 const tableRef = ref<InstanceType<typeof ElTable>>();
 const slaveTableRef = ref<InstanceType<typeof ElTable>>();
@@ -480,11 +489,14 @@ function handleClickActive(isMaster: boolean) {
   activeVisible.value = true;
 }
 
-onMounted(() => {
-  getSystemData().then(() => {
-    // getMonitorData();
-  });
-});
+watch(
+  () => canMaintain.value,
+  (val) => {
+    if (val) {
+      getSystemData();
+    }
+  }
+);
 
 watch(
   () => connectionStore.connectionIsMaster,
@@ -499,7 +511,7 @@ watch(
 );
 
 watch(
-  () => showPrometheus.value,
+  () => canMaintain.value && showPrometheus.value,
   (val, old) => {
     if (val !== old && val) {
       getMonitorData();
