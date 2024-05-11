@@ -18,13 +18,8 @@
         </el-icon>
         <text-tooltip :content="item.name" />
       </span>
-      <auth-tooltip :is-disabled="(canManageUser && canAlterPwd) || userName === item.name">
-        <div
-          class="item-edit-box"
-          :style="{ cursor: !((canManageUser && canAlterPwd) || userName === item.name) ? 'not-allowed' : 'pointer' }"
-          :id="`auth-user-${i}-edit`"
-          @click="handleEdit(item.name)"
-        >
+      <auth-tooltip :is-disabled="canManageUser || userName === item.name">
+        <div class="item-edit-box" :style="{ cursor: !(canManageUser || userName === item.name) ? 'not-allowed' : 'pointer' }" :id="`auth-user-${i}-edit`" @click="handleEdit(item.name)">
           <i-custom-edit class="item-edit" />
           <i-custom-edit class="item-edit-active" />
         </div>
@@ -61,7 +56,6 @@ import ICustomError from '~icons/custom/error.svg';
 
 const props = defineProps<{
   canManageUser: boolean;
-  canAlterPwd: boolean;
   userName: string;
 }>();
 
@@ -101,7 +95,7 @@ function handleDelete(item: string) {
 }
 
 function handleEdit(item: string) {
-  if (!((props.canManageUser && props.canAlterPwd) || props.userName === item)) return;
+  if (!(props.canManageUser || props.userName === item)) return;
   editUser.value = item;
   modalVisible.value = true;
 }

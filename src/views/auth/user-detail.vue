@@ -2,7 +2,7 @@
   <version-container :is-show="showAuthMenu">
     <el-container>
       <el-aside width="240px" class="list-wrapper">
-        <list ref="listRef" :can-manage-user="canManageUser" :can-alter-pwd="canAlterPwd" :user-name="userName" @handle-select="(val) => (currentUser = val)" />
+        <list ref="listRef" :can-manage-user="canManageUser" :user-name="userName" @handle-select="(val) => (currentUser = val)" />
       </el-aside>
       <el-container class="details-wrapper">
         <el-main class="p-0" v-loading="loading || roleLoading">
@@ -207,7 +207,7 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 const { t } = useI18n();
 const connectionStore = useConnectionStore();
 const userStore = useUserStore();
-const { entityPrivilegesEnumGroup, entityPrivilegesEnumKeys, pathPrivilegesEnumGroup, pathPrivilegesEnumKeys, canManageUser, canManageRole, canAlterPwd } = storeToRefs(userStore);
+const { entityPrivilegesEnumGroup, entityPrivilegesEnumKeys, pathPrivilegesEnumGroup, pathPrivilegesEnumKeys, canManageUser, canManageRole } = storeToRefs(userStore);
 const userName = computed(() => userStore.userInfo.name);
 
 const listRef = ref<InstanceType<typeof List>>();
