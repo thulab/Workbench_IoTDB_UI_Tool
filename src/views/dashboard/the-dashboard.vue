@@ -495,6 +495,9 @@ watch(
     if (val) {
       getSystemData();
     }
+  },
+  {
+    immediate: true,
   }
 );
 
