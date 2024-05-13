@@ -1,36 +1,5 @@
 <template>
-  <!-- <div class="path-title-box" v-if="isExpand">
-    <h4 class="path-list-title">{{ t('dataTrend.choosedMeasurement') }}</h4>
-    <el-tooltip
-      placement="top-start"
-      effect="light"
-      trigger="hover"
-      :content="canReadWriteSchemaData ? t('dataTrend.overMeasurementTip') : t('common.noAuth')"
-      :disabled="canReadWriteSchemaData ? pathList.length !== 10 : false"
-      popper-class="tooltip-box-width"
-    >
-      <el-button link :class="[pathList.length === 10 || !canReadWriteSchemaData ? 'hover-btn-disabled' : '', 'p-0']" @click="handleAdd" id="trend-add-path"><i-custom-new-trend /></el-button>
-    </el-tooltip>
-  </div> -->
-
-  <!-- <auth-tooltip :is-disabled="canReadWriteSchemaData">
-    <el-checkbox
-      v-if="isExpand"
-      class="m-b-8"
-      v-model="isCheckAll"
-      :indeterminate="isIndeterminate"
-      :label="t('common.allChoose')"
-      :key="listKey"
-      :disabled="!allCheckAbled || !canReadWriteSchemaData"
-      @change="handleCheckedAll"
-      id="trend-path-checkbox"
-    />
-  </auth-tooltip> -->
-
-  <!-- <h4 v-if="!isExpand" class="collapse-title">{{ t('dataTrend.choosedMeasurement') }}</h4> -->
-
-  <!-- <div class="path-list-box" v-if="isExpand"> -->
-  <auth-container :is-auth="canReadWriteSchemaData" class="side-list-box">
+  <div class="side-list-box">
     <div class="list-empty-wrapper" v-if="!pathList.length">
       <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
       <span class="data-empty-text">{{ t('common.noData') }}</span>
@@ -73,14 +42,12 @@
         <!-- <el-icon size="14" class="delete-icon svg-button-hover-color" @click="handleDel(item, index)" :id="`trend-path-${index}-del`"><i-custom-close-circle /></el-icon> -->
       </li>
     </ul>
-  </auth-container>
-  <!-- </div> -->
+  </div>
 
   <modal-path v-model:visible="pathVisible" :path-list="editPathList" :predefine-colors="predefineColors" :default-color="defaultColor" @handleSave="handleSavePath" />
 </template>
 
 <script setup lang="ts">
-import { difference } from 'lodash-es';
 import type { CheckboxValueType } from 'element-plus';
 import ModalPath from './modal-path.vue';
 
@@ -88,7 +55,6 @@ const props = defineProps<{
   modelValue: Trend.LineObj[];
   dataTab: 'running' | 'history';
   aggregation: 'avg' | 'max_value' | 'min_value' | 'last_value' | string;
-  canReadWriteSchemaData: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -100,29 +66,6 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const listKey = ref(0);
 const pathList = useVModel(props, 'modelValue');
-const isCheckAll = ref(false);
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const isIndeterminate = computed(() => {
-  if (pathList.value.length === 0) return false;
-  const allLength = pathList.value.length;
-  const checkedLength = pathList.value.filter((item) => item.checked).length;
-  if (allLength === 0 || checkedLength === 0) {
-    // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-    isCheckAll.value = false;
-    return false;
-  }
-  if (checkedLength === allLength) {
-    // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-    isCheckAll.value = true;
-  } else {
-    // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-    isCheckAll.value = false;
-  }
-  return checkedLength > 0 && checkedLength < allLength;
-});
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const allCheckAbled = computed(() => pathList.value.length > 0 && pathList.value.filter((item) => !item.disabled).length > 0);
 
 const predefineColors = ['#4992ff', '#7cffb2', '#fddd60', '#ff6e76', '#58d9f9', '#05c091', '#ff8a45', '#8d48e3', '#dd79ff', '#8AC211'];
 
@@ -130,30 +73,6 @@ const current = ref('');
 const pathVisible = ref(false);
 const editPathList = ref<string[]>([]);
 const defaultColor = ref('');
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function handleAdd() {
-  if (!props.canReadWriteSchemaData) return;
-  if (pathList.value.length === 10) return;
-  editPathList.value = pathList.value.map((item) => item.path);
-  const existedColor = pathList.value.map((item) => item.color);
-  const diffArr = difference(predefineColors, existedColor);
-  [defaultColor.value] = diffArr;
-  pathVisible.value = true;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function handleCheckedAll(val: CheckboxValueType) {
-  pathList.value.forEach((item) => {
-    if (!item.disabled) {
-      item.checked = !!val;
-    }
-  });
-  nextTick(() => {
-    listKey.value++;
-  });
-  emit('handleOperateAll');
-}
 
 // 弃用
 function handleSavePath(data: Trend.LineObj) {
@@ -182,16 +101,6 @@ function handleBlurWidth(ev: FocusEvent, data: Trend.LineObj, index: number) {
 function handleChangeWidth(val: number | undefined, data: Trend.LineObj, index: number) {
   pathList.value.splice(index, 1, { ...data, width: val as number });
   emit('handleOperate', 'detail', data.path);
-}
-
-// 弃用
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function handleDel(data: Trend.LineObj, index: number) {
-  pathList.value.splice(index, 1);
-  emit('handleOperate', 'del', data.path);
-  if (pathList.value.length === 0) {
-    isCheckAll.value = false;
-  }
 }
 
 watch(

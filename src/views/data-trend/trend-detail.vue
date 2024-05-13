@@ -50,21 +50,19 @@
           <div class="play-pause-buttons" v-show="isRunningTab">
             <el-icon size="30" v-if="!isRunningTab" style="cursor: not-allowed"><i-custom-play-disabled /></el-icon>
             <template v-else>
-              <auth-tooltip :is-disabled="canReadWriteSchemaData">
-                <el-button link v-if="!loading" :disabled="!canReadWriteSchemaData" @click="handlePlay(true)" id="trend-search-run">
-                  <el-icon size="30"><i-custom-play-active /></el-icon>
-                </el-button>
-                <el-button link v-else :disabled="!canReadWriteSchemaData" @click="handlePlay(false)" id="trend-search-pause">
-                  <el-icon size="30"><i-custom-pause /></el-icon>
-                </el-button>
-              </auth-tooltip>
+              <!-- <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'"> -->
+              <el-button link v-if="!loading" :disabled="!canReadWriteData" @click="handlePlay(true)" id="trend-search-run">
+                <el-icon size="30"><i-custom-play-active /></el-icon>
+              </el-button>
+              <el-button link v-else :disabled="!canReadWriteData" @click="handlePlay(false)" id="trend-search-pause">
+                <el-icon size="30"><i-custom-pause /></el-icon>
+              </el-button>
+              <!-- </auth-tooltip> -->
             </template>
           </div>
         </el-form>
         <div class="search-form-buttons">
-          <auth-tooltip :is-disabled="canReadWriteSchemaData">
-            <el-button :disabled="!canReadWriteSchemaData" @click="handleReset(true)" id="trend-search-reset">{{ t('common.reset') }}</el-button>
-          </auth-tooltip>
+          <el-button @click="handleReset(true)" id="trend-search-reset">{{ t('common.reset') }}</el-button>
           <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="applyTipDisabled" popper-class="tooltip-box-width">
             <el-button :disabled="!applyTipDisabled" type="primary" @click="handleSearch()" id="trend-search-search">
               {{ t('common.apply') }}
@@ -111,24 +109,10 @@
         <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand ? 'p-0' : '']">
           <el-tabs v-model="activeNameSide" stretch class="tabs-nav-aside" v-if="isExpand">
             <el-tab-pane :label="t('dataTrend.trendAttribute')" name="path">
-              <trend-list
-                v-model="pathList"
-                :data-tab="dataTab"
-                :aggregation="searchFormData.aggregation"
-                :can-read-write-schema-data="canReadWriteSchemaData"
-                @handleOperate="handleOperatePath"
-                @handleOperateAll="handleOperateAll"
-              />
+              <trend-list v-model="pathList" :data-tab="dataTab" :aggregation="searchFormData.aggregation" @handleOperate="handleOperatePath" @handleOperateAll="handleOperateAll" />
             </el-tab-pane>
             <el-tab-pane :label="t('dataTrend.pointAttribute')" name="point" v-if="!isRunningTab">
-              <point-list-tab
-                :point-list="pointList"
-                :point-line-data="pointLineData"
-                :path-list="pathList"
-                :point-checked-data="pointCheckedData"
-                :can-read-write-schema-data="canReadWriteSchemaData"
-                @handleDelPoint="handleDelPoint"
-              />
+              <point-list-tab :point-list="pointList" :point-line-data="pointLineData" :path-list="pathList" :point-checked-data="pointCheckedData" @handleDelPoint="handleDelPoint" />
             </el-tab-pane>
             <el-tab-pane :label="t('dataTrend.commonTemplates')" name="template">
               <template-list-tab ref="templateListRef" @handle-operate="handleOperateTemplate" />
@@ -198,7 +182,7 @@ const { t } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
 const userName = computed(() => userStore.userInfo.name);
-const { canReadWriteSchemaData } = storeToRefs(userStore);
+const { canReadWriteData } = storeToRefs(userStore);
 const connectionStore = useConnectionStore();
 const connectionId = computed(() => connectionStore.connectionInfo.data.id);
 const connectionType = computed(() => (connectionStore.connectionIsMaster ? 0 : 1));
@@ -428,8 +412,8 @@ const { requestFn: getHistoryTrend } = useRequest(SearchApi.getHistoryTrend);
 const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTemplate);
 
 const applyTip = computed(() => {
-  if (!canReadWriteSchemaData.value) {
-    return t('common.noAuth');
+  if (!canReadWriteData.value) {
+    return t('common.dataAuth');
   }
   if (searchFormData.path.length === 0) {
     return t('dataTrend.measurementEmptyTip');
@@ -441,7 +425,7 @@ const applyTip = computed(() => {
 });
 
 const applyTipDisabled = computed(() => {
-  if (canReadWriteSchemaData.value && searchFormData.path.length > 0 && searchFormData.path.length <= 10) {
+  if (canReadWriteData.value && searchFormData.path.length > 0 && searchFormData.path.length <= 10) {
     return true;
   }
   return false;

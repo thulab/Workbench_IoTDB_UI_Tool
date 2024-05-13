@@ -94,7 +94,9 @@
             </div>
             <div class="search-form-buttons">
               <el-button @click="handleReset" id="spectrum-search-reset">{{ t('common.reset') }}</el-button>
-              <el-button type="primary" @click="handleSearch()" id="spectrum-search-search">{{ t('common.apply') }}</el-button>
+              <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
+                <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch()" id="spectrum-search-search">{{ t('common.apply') }}</el-button>
+              </auth-tooltip>
             </div>
           </div>
         </el-form>
@@ -164,7 +166,7 @@
         <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand ? 'p-0' : '']" style="display: flex; flex-direction: column">
           <div class="cursor-list-box" v-if="isExpand">
             <h4 class="cursor-list-title">{{ t('spectrum.cursorTitle') }}</h4>
-            <auth-container :is-auth="canReadWriteSchemaData" style="flex: 1; background-color: #fff; overflow-y: hidden; display: flex; padding: 12px 0 10px">
+            <div style="flex: 1; background-color: #fff; overflow-y: hidden; display: flex; padding: 12px 0 10px">
               <div class="list-empty-wrapper" v-if="!pointList.length">
                 <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
                 <span class="data-empty-text">{{ t('common.noData') }}</span>
@@ -195,7 +197,7 @@
                   <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔY：${Math.abs(Number(pointCheckedData[0].y) - Number(pointCheckedData[1].y))}`" /></p>
                 </div>
               </div>
-            </auth-container>
+            </div>
           </div>
           <h4 v-if="!isExpand" class="cursor-collapse-title">{{ t('spectrum.cursorTitle') }}</h4>
           <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="isExpand = !isExpand" id="spectrum-point-expand">
@@ -260,7 +262,7 @@ const methodDocLink = computed(
     `<a href="https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/Database-Programming.html#udtf-user-defined-timeseries-generating-function" target="_blank" rel="noopener noreferrer" style="color: #495ad4;"> ${t('common.userManual')}</a>`
 );
 const userStore = useUserStore();
-const { canReadWriteSchemaData } = storeToRefs(userStore);
+const { canReadWriteData } = storeToRefs(userStore);
 const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
 const isExpand = ref(true);
@@ -957,7 +959,7 @@ function getCustom() {
 
 // 查询
 function handleSearch(unforce?: boolean) {
-  if (!canReadWriteSchemaData.value) return;
+  if (!canReadWriteData.value) return;
   copySearchFormData = cloneDeep(searchFormData);
   if (!unforce) {
     handleEmptyOperate();
@@ -1054,7 +1056,7 @@ watch(locale, () => {
 });
 
 watch(
-  () => canReadWriteSchemaData.value,
+  () => canReadWriteData.value,
   (val) => {
     setOption(chartOptions.value);
     if (val) {
