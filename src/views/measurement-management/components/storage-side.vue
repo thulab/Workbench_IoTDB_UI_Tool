@@ -3,7 +3,7 @@
     <h4>{{ t('measurement.databaseTitle') }}</h4>
     <div class="storage-operate-buttons">
       <el-button link class="m-r-8 border-refresh-icon svg-button-hover-color" @click="getStorageList()" id="mesaurement-side-refresh"><i-custom-refresh /></el-button>
-      <auth-tooltip :is-disabled="canManageDatabase">
+      <auth-tooltip :is-disabled="canManageDatabase" :content="'common.databaseAuth'">
         <el-button link style="margin: 0" :disabled="!canManageDatabase" @click="handleAddStorage" id="mesaurement-side-add">
           <i-custom-new-storage />
         </el-button>
@@ -16,7 +16,7 @@
       <template v-if="storageList.length">
         <li v-for="(item, i) in storageList" :key="item" :class="['storage-item-box', currentStorage === item ? 'storage-item-box-active' : '']" @click="(e) => handleSelectStorage(item, e)">
           <span class="storage-item-text"><text-tooltip :content="item" /></span>
-          <auth-tooltip :is-disabled="canManageDatabase">
+          <auth-tooltip :is-disabled="canManageDatabase" :content="'common.databaseAuth'">
             <div
               class="storage-item-delete-box"
               :style="{ cursor: item === 'root.__system' || !canManageDatabase ? 'not-allowed' : 'pointer' }"
@@ -119,11 +119,6 @@ function handleSelectStorage(item: string, e: MouseEvent) {
   if (canStopPropagation(e.target as HTMLElement)) return;
   currentStorage.value = item;
 }
-
-onMounted(() => {
-  if (!props.canReadWriteSchema) return;
-  getStorageList(true);
-});
 
 watch(
   () => currentStorage.value,
