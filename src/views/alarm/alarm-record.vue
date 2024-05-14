@@ -56,7 +56,9 @@
       </el-form>
       <div class="search-form-buttons">
         <el-button @click="handleReset" id="alarm-record-search-reset">{{ t('common.reset') }}</el-button>
-        <el-button type="primary" @click="handleSearch" id="alarm-record-search-search">{{ t('common.query') }}</el-button>
+        <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
+          <el-button type="primary" :disabled="!canUsePipe" @click="handleSearch" id="alarm-record-search-search">{{ t('common.query') }}</el-button>
+        </auth-tooltip>
       </div>
     </el-header>
 
@@ -64,80 +66,84 @@
       <div class="page-table-title-box">
         <h4 class="page-table-title">{{ t('alarm.alarmRecord') }}</h4>
         <div class="operate-buttons">
-          <el-dropdown class="m-r-12" :disabled="!totalCount" @command="(val) => handleCommandDown(val)" id="alarm-record-download-dropdown">
-            <el-button type="primary" class="export-button" :disabled="!totalCount" id="alarm-record-download">
-              {{ t('common.export') }}
-              <el-tooltip effect="light" :content="t('common.exportTipAll')" placement="top" popper-class="tooltip-box-width"><i-custom-question-white /></el-tooltip>
-            </el-button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="csv" id="alarm-record-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
-                <el-dropdown-item command="xlsx" id="alarm-record-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+          <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
+            <el-dropdown class="m-r-12" :disabled="!totalCount || !canUsePipe" @command="(val) => handleCommandDown(val)" id="alarm-record-download-dropdown">
+              <el-button type="primary" class="export-button" :disabled="!totalCount || !canUsePipe" id="alarm-record-download">
+                {{ t('common.export') }}
+                <el-tooltip effect="light" :content="t('common.exportTipAll')" placement="top" popper-class="tooltip-box-width"><i-custom-question-white /></el-tooltip>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="csv" id="alarm-record-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
+                  <el-dropdown-item command="xlsx" id="alarm-record-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </auth-tooltip>
           <!-- <el-button :disabled="!multipleSelection.length" type="primary" @click="handleDel('batch', null)">{{ t('common.batchDelete') }}</el-button> -->
         </div>
       </div>
-      <div class="page-table-box">
-        <el-table
-          :data="tableData.list"
-          v-loading="loading"
-          style="width: 100%"
-          :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
-          :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
-          tooltip-effect="light"
-          ref="tableRef"
-          :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
-          :default-sort="{ prop: 'createTime', order: 'descending' }"
-          @selection-change="handleSelectionChange"
-          @sort-change="handleSortChange"
-        >
-          <!-- <el-table-column type="selection" width="55" /> -->
-          <el-table-column :label="t('alarm.alarmName')" prop="alarmName" min-width="160" align="center" show-overflow-tooltip />
-          <el-table-column :label="t('alarm.alarmLevel')" prop="alarmLevel" sortable="custom" min-width="120" align="center">
-            <template #default="{ row }">
-              <span v-if="row.alarmLevel" style="display: flex; align-items: center; justify-content: center; margin-left: -20px">
-                <el-icon size="20" :style="{ color: getLevelColor(row) }"><i-custom-alarm-level /></el-icon>
-                {{ getOptionField(row.alarmLevel, enumStore.alarmLevelEnum) }}
-              </span>
-            </template>
-          </el-table-column>
-          <el-table-column :label="t('alarm.alarmMeasurement')" prop="measurement" min-width="200" align="center" show-overflow-tooltip />
-          <el-table-column :label="t('alarm.alarmValue')" prop="alarmValue" min-width="160" align="center" show-overflow-tooltip />
-          <el-table-column :label="t('alarm.alarmTime')" prop="createTime" sortable="custom" min-width="180" align="center" show-overflow-tooltip />
-          <el-table-column :label="t('alarm.alarmDesc')" prop="alarmDesc" min-width="140" align="center" show-overflow-tooltip />
-          <el-table-column :label="t('alarm.whetherConfirm')" width="160" align="center" fixed="right">
-            <template #default="{ row }">
-              <el-button v-if="!row.hasRead" type="primary" link size="small" @click="handleStatus(row)" :id="`alarm-record-table-${row.measurement}-confirm`">{{ t('common.ack') }}</el-button>
-              <div v-else class="operate-confirm-box">
-                <el-icon size="16" class="p-x-5"><i-custom-success-green /></el-icon>
-                {{ t('common.acked') }}
+      <auth-container :is-auth="canUsePipe" :content="'common.pipeAuth'" style="height: 100%">
+        <div class="page-table-box">
+          <el-table
+            :data="tableData.list"
+            v-loading="loading"
+            style="width: 100%"
+            :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+            :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+            tooltip-effect="light"
+            ref="tableRef"
+            :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
+            :default-sort="{ prop: 'createTime', order: 'descending' }"
+            @selection-change="handleSelectionChange"
+            @sort-change="handleSortChange"
+          >
+            <!-- <el-table-column type="selection" width="55" /> -->
+            <el-table-column :label="t('alarm.alarmName')" prop="alarmName" min-width="160" align="center" show-overflow-tooltip />
+            <el-table-column :label="t('alarm.alarmLevel')" prop="alarmLevel" sortable="custom" min-width="120" align="center">
+              <template #default="{ row }">
+                <span v-if="row.alarmLevel" style="display: flex; align-items: center; justify-content: center; margin-left: -20px">
+                  <el-icon size="20" :style="{ color: getLevelColor(row) }"><i-custom-alarm-level /></el-icon>
+                  {{ getOptionField(row.alarmLevel, enumStore.alarmLevelEnum) }}
+                </span>
+              </template>
+            </el-table-column>
+            <el-table-column :label="t('alarm.alarmMeasurement')" prop="measurement" min-width="200" align="center" show-overflow-tooltip />
+            <el-table-column :label="t('alarm.alarmValue')" prop="alarmValue" min-width="160" align="center" show-overflow-tooltip />
+            <el-table-column :label="t('alarm.alarmTime')" prop="createTime" sortable="custom" min-width="180" align="center" show-overflow-tooltip />
+            <el-table-column :label="t('alarm.alarmDesc')" prop="alarmDesc" min-width="140" align="center" show-overflow-tooltip />
+            <el-table-column :label="t('alarm.whetherConfirm')" width="160" align="center" fixed="right">
+              <template #default="{ row }">
+                <el-button v-if="!row.hasRead" type="primary" link size="small" @click="handleStatus(row)" :id="`alarm-record-table-${row.measurement}-confirm`">{{ t('common.ack') }}</el-button>
+                <div v-else class="operate-confirm-box">
+                  <el-icon size="16" class="p-x-5"><i-custom-success-green /></el-icon>
+                  {{ t('common.acked') }}
+                </div>
+                <!-- <el-button type="primary" link size="small" @click="handleDel('row', row)">{{ t('common.delete') }}</el-button> -->
+              </template>
+            </el-table-column>
+            <template #empty>
+              <div class="table-empty-wrapper">
+                <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
+                <span class="data-empty-text">{{ t('common.noData') }}</span>
               </div>
-              <!-- <el-button type="primary" link size="small" @click="handleDel('row', row)">{{ t('common.delete') }}</el-button> -->
             </template>
-          </el-table-column>
-          <template #empty>
-            <div class="table-empty-wrapper">
-              <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
-              <span class="data-empty-text">{{ t('common.noData') }}</span>
-            </div>
-          </template>
-        </el-table>
+          </el-table>
 
-        <el-pagination
-          v-if="totalCount > 0"
-          v-model:currentPage="pagination.pageNum"
-          v-model:page-size="pagination.pageSize"
-          class="m-t-20"
-          layout="prev, pager, next, sizes, jumper"
-          background
-          :page-sizes="[10, 20, 50, 100]"
-          :total="totalCount"
-          @size-change="onChangePageSize"
-          @current-change="onChangePage"
-        />
-      </div>
+          <el-pagination
+            v-if="totalCount > 0"
+            v-model:currentPage="pagination.pageNum"
+            v-model:page-size="pagination.pageSize"
+            class="m-t-20"
+            layout="prev, pager, next, sizes, jumper"
+            background
+            :page-sizes="[10, 20, 50, 100]"
+            :total="totalCount"
+            @size-change="onChangePageSize"
+            @current-change="onChangePage"
+          />
+        </div>
+      </auth-container>
     </el-main>
   </el-container>
 </template>
@@ -146,10 +152,11 @@
 import type { FormInstance, DateModelType, ElTable } from 'element-plus';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash-es';
+import { storeToRefs } from 'pinia';
 import { getStartAndEnd, today, getOneInterval, getOneIntervalNow } from '@/utils/date';
 import { getOptionField } from '@/utils/format';
 import { AlarmApi } from '@/api';
-import { useEnumStore } from '@/stores';
+import { useEnumStore, useUserStore } from '@/stores';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ICustomCalender from '~icons/custom/calender.svg';
 
@@ -159,6 +166,8 @@ const { maxTableHeight } = useTableHeight(320);
 const searchFormRef = ref<FormInstance>();
 const tableRef = ref<InstanceType<typeof ElTable>>();
 const levelOptions = computed(() => [{ name: t('common.all'), value: '', paramMap: { color: '#424561', icon: '' } }, ...enumStore.alarmLevelEnum]);
+const userStore = useUserStore();
+const { canUsePipe } = storeToRefs(userStore);
 const searchFormData = reactive({
   orderBy: '',
   asc: '',
@@ -328,15 +337,24 @@ function handleDel(type: string, data: Alarm.QueryRecordResult | null) {
   });
 }
 
-onMounted(() => {
-  handleReset();
-  searchFormData.asc = 'desc';
-  searchFormData.orderBy = 'createTime';
-  handleSearch();
-});
+watch(
+  () => canUsePipe.value,
+  (val) => {
+    handleReset();
+    searchFormData.asc = 'desc';
+    searchFormData.orderBy = 'createTime';
+    if (val) {
+      handleSearch();
+    }
+  },
+  {
+    immediate: true,
+  }
+);
 
 watch(locale, () => {
   nextTick(() => {
+    if (!canUsePipe.value) return;
     handleSearch();
   });
 });
@@ -392,6 +410,12 @@ watch(locale, () => {
     line-height: 21px;
     color: #495ad4;
   }
+}
+
+.page-table-details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .operate-confirm-box {
