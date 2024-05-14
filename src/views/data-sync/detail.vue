@@ -12,10 +12,8 @@
           </base-form-item>
         </el-form>
         <div class="search-form-buttons">
-          <auth-tooltip :is-disabled="canUsePipe">
-            <el-button @click="handleReset" :disabled="!canUsePipe" id="data-sync-search-reset">{{ t('common.reset') }}</el-button>
-          </auth-tooltip>
-          <auth-tooltip :is-disabled="canUsePipe">
+          <el-button @click="handleReset" id="data-sync-search-reset">{{ t('common.reset') }}</el-button>
+          <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
             <el-button type="primary" @click="handleSearch" :disabled="!canUsePipe" id="data-sync-search-search">{{ t('common.query') }}</el-button>
           </auth-tooltip>
         </div>
@@ -25,10 +23,10 @@
           <div class="page-table-title-box">
             <h4 class="page-table-title">{{ t('dataSync.taskList') }}</h4>
             <div class="operate-buttons">
-              <auth-tooltip :is-disabled="canUsePipe">
+              <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
                 <el-button type="primary" @click="handleAdd" :disabled="!canUsePipe" id="data-sync-add">{{ t('dataSync.newTask') }}</el-button>
               </auth-tooltip>
-              <auth-tooltip :is-disabled="canUsePipe">
+              <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
                 <el-dropdown :disabled="!multipleSelection.length || !canUsePipe" @command="(val) => handleCommandDown(val)" class="m-x-16" id="data-sync-batch-dropdown">
                   <el-button type="primary" class="batch-button" :disabled="!multipleSelection.length || !canUsePipe" id="data-sync-batch">
                     {{ t('common.batchOperation') }}
@@ -43,17 +41,17 @@
                   </template>
                 </el-dropdown>
               </auth-tooltip>
-              <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('common.noData')" :disabled="showPrometheus" popper-class="tooltip-box-width">
-                <el-button type="primary" @click="handleMonitor" :disabled="!showPrometheus" id="data-sync-add">{{ t('dataSync.monitorDashboard') }}</el-button>
+              <el-tooltip placement="top-start" effect="light" trigger="hover" :content="monitorTip" :disabled="monitorTipDisabled" popper-class="tooltip-box-width">
+                <el-button type="primary" @click="handleMonitor" :disabled="!monitorTipDisabled" id="data-sync-add">{{ t('dataSync.monitorDashboard') }}</el-button>
               </el-tooltip>
-              <auth-tooltip :is-disabled="canUsePipe">
+              <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
                 <el-button link @click="handleSearch" :disabled="!canUsePipe" id="data-sync-refresh" :class="!canUsePipe ? '' : 'svg-button-hover-color'">
                   <i-custom-refresh style="width: 24px; height: 24px" />
                 </el-button>
               </auth-tooltip>
             </div>
           </div>
-          <auth-container :is-auth="canUsePipe" style="height: 100%">
+          <auth-container :is-auth="canUsePipe" :content="'common.pipeAuth'" style="height: 100%">
             <div class="page-table-box">
               <el-table
                 :data="tableDataPagination"
@@ -144,6 +142,22 @@ const connectionStore = useConnectionStore();
 const userStore = useUserStore();
 const { canUsePipe, enablePrometheus, configurePrometheus } = storeToRefs(userStore);
 const showPrometheus = computed(() => enablePrometheus.value && configurePrometheus.value);
+const monitorTip = computed(() => {
+  if (!canUsePipe.value) {
+    return t('common.pipeAuth');
+  }
+  if (!showPrometheus.value) {
+    return t('common.noData');
+  }
+  return '';
+});
+
+const monitorTipDisabled = computed(() => {
+  if (canUsePipe.value && showPrometheus.value) {
+    return true;
+  }
+  return false;
+});
 const { maxTableHeight } = useTableHeight(300);
 const searchFormData = reactive({
   name: '',
