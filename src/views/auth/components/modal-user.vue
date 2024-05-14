@@ -34,7 +34,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:visible': [visible: boolean];
-  handleSave: [];
+  handleSave: [payload: string];
 }>();
 
 const { t, locale } = useI18n();
@@ -134,7 +134,7 @@ const handleConfirm = () => {
         .then(() => {
           ElMessage.success({ message: t('auth.userSuccess'), grouping: true });
           dialogVisible.value = false;
-          emit('handleSave');
+          emit('handleSave', formData.userName);
         })
         .catch((err) => {
           if (err.code === 1360) {

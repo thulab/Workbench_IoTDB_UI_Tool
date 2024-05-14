@@ -3,7 +3,7 @@
     <h4>{{ t('auth.userList') }}</h4>
     <div class="operate-buttons">
       <auth-tooltip :is-disabled="canManageUser" :content="'common.userAuth'">
-        <el-button link :disabled="!canManageUser" class="m-r-8 border-refresh-icon svg-button-hover-color" @click="getList" id="auth-user-refresh"><i-custom-refresh /></el-button>
+        <el-button link :disabled="!canManageUser" class="m-r-8 border-refresh-icon svg-button-hover-color" @click="getList()" id="auth-user-refresh"><i-custom-refresh /></el-button>
       </auth-tooltip>
       <auth-tooltip :is-disabled="canManageUser" :content="'common.userAuth'">
         <el-button link :disabled="!canManageUser" style="margin: 0" @click="handleAdd" id="auth-user-add"><i-custom-user-add /></el-button>
@@ -47,7 +47,7 @@
     </li>
   </ul>
   <modal-reset-password :title="t('auth.editUser')" :success-tip="t('auth.editUserSuccess')" :user-name="editUser" v-model:visible="modalVisible" />
-  <modal-user v-model:visible="modalUserVisible" :user-list="list" @handle-save="getList" />
+  <modal-user v-model:visible="modalUserVisible" :user-list="list" @handle-save="(name) => getList(name)" />
 </template>
 
 <script setup lang="ts">
@@ -72,13 +72,20 @@ const modalVisible = ref(false);
 const modalUserVisible = ref(false);
 
 const {
-  requestFn: getList,
+  requestFn: getUserList,
   data: list,
   loading,
 } = useRequest(AuthApi.getUserList, {
   initData: [],
 });
 const { requestFn: deleteUser } = useRequest(AuthApi.deleteUser);
+
+// 获取用户
+function getList(name?: string) {
+  getUserList().then(() => {
+    current.value = name && list.value.some((item) => item.name === name) ? name : list.value[0]?.name || '';
+  });
+}
 
 // 新增角色
 function handleAdd() {
@@ -127,9 +134,7 @@ function handleSelect(item: string, e: MouseEvent) {
 }
 
 onMounted(() => {
-  getList().then(() => {
-    current.value = list.value[0]?.name;
-  });
+  getList();
 });
 
 watch(

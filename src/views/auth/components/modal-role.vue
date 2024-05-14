@@ -25,7 +25,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
-  (event: 'handleSave'): void;
+  (event: 'handleSave', payload: string): void;
 }>();
 
 const { t } = useI18n();
@@ -76,7 +76,7 @@ const handleConfirm = () => {
         .then(() => {
           ElMessage.success({ message: t('common.createSuccess'), grouping: true });
           dialogVisible.value = false;
-          emit('handleSave');
+          emit('handleSave', formData.name);
         })
         .catch((err) => {
           if (err.code === 1360) {

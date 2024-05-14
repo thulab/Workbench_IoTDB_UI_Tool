@@ -3,7 +3,7 @@
     <h4>{{ t('auth.roleList') }}</h4>
     <div class="operate-buttons">
       <auth-tooltip :is-disabled="canManageRole" :content="'common.roleAuth'">
-        <el-button link :class="['m-r-8', 'border-refresh-icon', !canManageRole ? '' : 'svg-button-hover-color']" :disabled="!canManageRole" @click="getList" id="auth-role-refresh">
+        <el-button link :class="['m-r-8', 'border-refresh-icon', !canManageRole ? '' : 'svg-button-hover-color']" :disabled="!canManageRole" @click="getList()" id="auth-role-refresh">
           <i-custom-refresh />
         </el-button>
       </auth-tooltip>
@@ -41,7 +41,7 @@
     </ul>
   </auth-container>
 
-  <modal-role v-model:visible="dialogVisible" :list="list" @handle-save="getList" />
+  <modal-role v-model:visible="dialogVisible" :list="list" @handle-save="(name) => getList(name)" />
 </template>
 
 <script setup lang="ts">
@@ -66,10 +66,10 @@ const { requestFn: getRoleList, loading } = useRequest(AuthApi.getRoleList);
 const { requestFn: deleteRole } = useRequest(AuthApi.deleteRole);
 
 // 获取角色
-function getList() {
+function getList(name?: string) {
   getRoleList().then((res) => {
     list.value = res.data || [];
-    current.value = list.value[0] || '';
+    current.value = name && list.value.some((item) => item === name) ? name : list.value[0] || '';
   });
 }
 
