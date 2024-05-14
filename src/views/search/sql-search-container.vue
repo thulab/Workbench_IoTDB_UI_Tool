@@ -374,7 +374,7 @@ function handleSave() {
   }
 }
 
-onBeforeUnmount(() => {
+function setStorage() {
   sessionStorage.setItem(
     'sqlSearchStorage',
     JSON.stringify({
@@ -384,9 +384,16 @@ onBeforeUnmount(() => {
       code: { ...code },
     })
   );
+}
+
+onBeforeUnmount(() => {
+  setStorage();
 });
 
 onMounted(() => {
+  window.addEventListener('beforeunload', () => {
+    setStorage();
+  });
   if (sessionStorage.getItem('sqlSearchStorage')) {
     const storageData = JSON.parse(sessionStorage.getItem('sqlSearchStorage') as string);
     activiteSql.value = storageData.activiteSql;
