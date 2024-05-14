@@ -3,7 +3,7 @@
     <el-container class="details-wrapper" style="height: 100%">
       <el-main class="p-16">
         <div style="display: flex; flex-direction: column; height: 100%" v-loading="loading">
-          <div class="module-box-wrapper m-b-16 monitor-info-wrapper" v-if="!canMaintain">
+          <div class="module-box-wrapper m-b-16" v-if="!canMaintain">
             <div class="module-title-wrapper">
               <h4 class="module-title">{{ t('dashboard.systemInfo') }}</h4>
             </div>

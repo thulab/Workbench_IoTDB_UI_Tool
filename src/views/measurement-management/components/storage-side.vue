@@ -145,6 +145,12 @@ watch(
 defineExpose({ getStorageList });
 </script>
 
+<style lang="scss">
+.storage-list-wrapper .auth-tip-img {
+  width: 80px !important;
+  height: 80px !important;
+}
+</style>
 <style lang="scss" scoped>
 .storage-list-title {
   display: flex;
