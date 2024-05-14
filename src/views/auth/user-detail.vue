@@ -9,7 +9,7 @@
           <el-scrollbar>
             <div class="detail-title-box" v-if="!isManager">
               <h4 class="detail-title-text">{{ t('auth.roleDetail') }}</h4>
-              <auth-tooltip :is-disabled="canManageUser" v-if="canEdit && !isEdit">
+              <auth-tooltip :is-disabled="canManageUser" :content="'common.userAuth'" v-if="canEdit && !isEdit">
                 <el-button type="primary" :disabled="!canManageUser" @click="pageType = 'edit'" id="auth-user-edit">{{ t('common.edit') }}</el-button>
               </auth-tooltip>
               <el-button type="primary" v-else-if="isEdit" @click="handleReset('view')" id="auth-user-view">{{ t('common.exitEdit') }}</el-button>
@@ -28,7 +28,7 @@
                 >
                   {{ item.roleName }}
                 </el-tag>
-                <auth-tooltip :is-disabled="canManageRole">
+                <auth-tooltip :is-disabled="canManageRole" :content="'common.roleAuth'">
                   <el-button link :disabled="!canManageRole" @click="addRole()" v-if="isEdit" id="auth-user-add-role" :class="['m-l-8', 'p-0', !canManageRole ? '' : 'svg-button-hover-color']">
                     <el-icon size="24px"><i-custom-user-role-add /></el-icon>
                   </el-button>

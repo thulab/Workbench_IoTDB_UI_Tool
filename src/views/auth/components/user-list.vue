@@ -2,8 +2,10 @@
   <div class="list-title">
     <h4>{{ t('auth.userList') }}</h4>
     <div class="operate-buttons">
-      <el-button link class="m-r-8 border-refresh-icon svg-button-hover-color" @click="getList" id="auth-user-refresh"><i-custom-refresh /></el-button>
-      <auth-tooltip :is-disabled="canManageUser">
+      <auth-tooltip :is-disabled="canManageUser" :content="'common.userAuth'">
+        <el-button link :disabled="!canManageUser" class="m-r-8 border-refresh-icon svg-button-hover-color" @click="getList" id="auth-user-refresh"><i-custom-refresh /></el-button>
+      </auth-tooltip>
+      <auth-tooltip :is-disabled="canManageUser" :content="'common.userAuth'">
         <el-button link :disabled="!canManageUser" style="margin: 0" @click="handleAdd" id="auth-user-add"><i-custom-user-add /></el-button>
       </auth-tooltip>
     </div>
@@ -18,7 +20,7 @@
         </el-icon>
         <text-tooltip :content="item.name" />
       </span>
-      <auth-tooltip :is-disabled="canManageUser || userName === item.name">
+      <auth-tooltip :is-disabled="canManageUser || userName === item.name" :content="'common.userAuth'">
         <div class="item-edit-box" :style="{ cursor: !(canManageUser || userName === item.name) ? 'not-allowed' : 'pointer' }" :id="`auth-user-${i}-edit`" @click="handleEdit(item.name)">
           <i-custom-edit class="item-edit" />
           <i-custom-edit class="item-edit-active" />
