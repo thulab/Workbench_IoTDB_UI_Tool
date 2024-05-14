@@ -286,13 +286,23 @@ function handleCommandDown(val: string) {
   });
 }
 
-onBeforeUnmount(() => {
+function setStorage() {
   sessionStorage.setItem(
     'statisticSearchStorage',
     JSON.stringify({
       ...copySearchFormData,
     })
   );
+}
+
+onMounted(() => {
+  window.addEventListener('beforeunload', () => {
+    setStorage();
+  });
+});
+
+onBeforeUnmount(() => {
+  setStorage();
 });
 
 watch(

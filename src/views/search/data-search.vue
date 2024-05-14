@@ -499,19 +499,7 @@ function handleCommandDown(val: string) {
   handleExportData(val);
 }
 
-// onMounted(() => {
-//   if (!canReadWriteData.value) return;
-//   firstLoad.value = true;
-//   handleReset();
-//   if (route.query.measurement) {
-//     searchFormData.path = [route.query.measurement] as string[];
-//     handleSearch();
-//   } else {
-//     handleSearch();
-//   }
-// });
-
-onBeforeUnmount(() => {
+function setStorage() {
   sessionStorage.setItem(
     'dataSearchStorage',
     JSON.stringify({
@@ -519,6 +507,25 @@ onBeforeUnmount(() => {
       timeType: timeType.value,
     })
   );
+}
+
+onMounted(() => {
+  window.addEventListener('beforeunload', () => {
+    setStorage();
+  });
+  //   if (!canReadWriteData.value) return;
+  //   firstLoad.value = true;
+  //   handleReset();
+  //   if (route.query.measurement) {
+  //     searchFormData.path = [route.query.measurement] as string[];
+  //     handleSearch();
+  //   } else {
+  //     handleSearch();
+  //   }
+});
+
+onBeforeUnmount(() => {
+  setStorage();
 });
 
 watch(

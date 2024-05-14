@@ -1009,18 +1009,7 @@ function handleConfirmSql(val: string) {
   sqlValue.value = val;
 }
 
-onMounted(() => {
-  window.addEventListener('beforeunload', () => {
-    chartContainer.value = null;
-    if (chartInstance) {
-      chartInstance.clear();
-      chartInstance.dispose();
-    }
-  });
-  getUdfList();
-});
-
-onBeforeUnmount(() => {
+function setStorage() {
   sessionStorage.setItem(
     'dataSpectrumStorage',
     JSON.stringify({
@@ -1039,6 +1028,22 @@ onBeforeUnmount(() => {
       currentPoint,
     })
   );
+}
+
+onMounted(() => {
+  window.addEventListener('beforeunload', () => {
+    setStorage();
+    chartContainer.value = null;
+    if (chartInstance) {
+      chartInstance.clear();
+      chartInstance.dispose();
+    }
+  });
+  getUdfList();
+});
+
+onBeforeUnmount(() => {
+  setStorage();
 });
 
 onUnmounted(() => {

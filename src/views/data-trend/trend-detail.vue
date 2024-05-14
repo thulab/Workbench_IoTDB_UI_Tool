@@ -991,8 +991,24 @@ function init() {
   setOption(chartOptions.value);
 }
 
+function setStorage() {
+  sessionStorage.setItem(
+    'dataTrendStorage',
+    JSON.stringify({
+      ...copySearchFormData,
+      dataTab: dataTab.value,
+      pathList: pathList.value,
+      pointLineData: pointLineData.value,
+      markPointCount: markPointCount.value,
+      pointList: pointList.value,
+      activeNameSide: activeNameSide.value,
+    })
+  );
+}
+
 onMounted(() => {
   window.addEventListener('beforeunload', () => {
+    setStorage();
     chartContainer.value = null;
     if (chartInstance) {
       chartInstance.clear();
@@ -1073,18 +1089,7 @@ watch(
 );
 
 onBeforeUnmount(() => {
-  sessionStorage.setItem(
-    'dataTrendStorage',
-    JSON.stringify({
-      ...copySearchFormData,
-      dataTab: dataTab.value,
-      pathList: pathList.value,
-      pointLineData: pointLineData.value,
-      markPointCount: markPointCount.value,
-      pointList: pointList.value,
-      activeNameSide: activeNameSide.value,
-    })
-  );
+  setStorage();
 });
 
 onUnmounted(() => {
