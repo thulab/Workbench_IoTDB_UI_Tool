@@ -19,10 +19,8 @@
           </base-form-item>
         </el-form>
         <div class="search-form-buttons">
-          <auth-tooltip :is-disabled="canReadWriteSchema">
-            <el-button :disabled="!canReadWriteSchema" @click="handleReset" id="calculate-search-reset">{{ t('common.reset') }}</el-button>
-          </auth-tooltip>
-          <auth-tooltip :is-disabled="canReadWriteSchema">
+          <el-button @click="handleReset" id="calculate-search-reset">{{ t('common.reset') }}</el-button>
+          <auth-tooltip :is-disabled="canReadWriteSchema" :content="'common.schemaAuth'">
             <el-button type="primary" :disabled="!canReadWriteSchema" @click="handleSearch" id="calculate-search-search">{{ t('common.query') }}</el-button>
           </auth-tooltip>
         </div>
@@ -32,15 +30,15 @@
           <div class="page-table-title-box">
             <h4 class="page-table-title">{{ appType === 1 ? t('calculate.calculateList') : t('calculate.viewList') }}</h4>
             <div class="operate-buttons">
-              <auth-tooltip :is-disabled="canAllWriteSchema">
+              <auth-tooltip :is-disabled="canAllWriteSchema" :content="'common.schemaAuthAnother'">
                 <el-button type="primary" :disabled="!canAllWriteSchema" @click="handleAdd" id="calculate-add">{{ appType === 1 ? t('calculate.newCalculate') : t('calculate.newView') }}</el-button>
               </auth-tooltip>
-              <auth-tooltip :is-disabled="canAllWriteSchema">
+              <auth-tooltip :is-disabled="canAllWriteSchema" :content="'common.schemaAuthAnother'">
                 <el-button class="m-l-16" :disabled="!canAllWriteSchema" @click="handleImport" id="calculate-import">
                   {{ t('common.import') }}
                 </el-button>
               </auth-tooltip>
-              <auth-tooltip :is-disabled="canReadWriteSchema">
+              <auth-tooltip :is-disabled="canReadWriteSchema" :content="'common.schemaAuth'">
                 <el-dropdown class="m-x-16" :disabled="!(totalCount > 0) || !canReadWriteSchema" @command="(val) => handleCommandDown(val)" id="calculate-download-dropdown">
                   <el-button class="export-button" :disabled="!(totalCount > 0) || !canReadWriteSchema" id="calculate-download">
                     {{ t('common.export') }}
@@ -54,17 +52,17 @@
                   </template>
                 </el-dropdown>
               </auth-tooltip>
-              <auth-tooltip :is-disabled="canWriteSchema">
+              <auth-tooltip :is-disabled="canWriteSchema" :content="'common.schemaAuthAnother'">
                 <el-button :disabled="!multipleSelection.length || !canWriteSchema" type="primary" @click="handleDel('batch', null)" id="calculate-batch-del">{{ t('common.batchDelete') }}</el-button>
               </auth-tooltip>
-              <auth-tooltip :is-disabled="canReadWriteSchema">
-                <el-button link :disabled="!canReadWriteSchema" :class="!canReadWriteSchema ? '' : 'svg-button-hover-color'" @click="getNewVal" id="calculate-refresh">
+              <el-tooltip placement="top-start" effect="light" trigger="hover" :content="refreshTip" :disabled="refreshTipDisabled" popper-class="tooltip-box-width">
+                <el-button link :disabled="!refreshTipDisabled" :class="!refreshTipDisabled ? '' : 'svg-button-hover-color'" @click="getNewVal" id="calculate-refresh">
                   <i-custom-refresh style="width: 24px; height: 24px" />
                 </el-button>
-              </auth-tooltip>
+              </el-tooltip>
             </div>
           </div>
-          <auth-container :is-auth="canReadWriteSchema" style="height: 100%">
+          <auth-container :is-auth="canReadWriteSchema" :content="'common.schemaAuth'" style="height: 100%">
             <div class="page-table-box">
               <el-table
                 :data="tableData.list"
@@ -176,7 +174,25 @@ const editData = ref();
 const expressionVisible = ref(false);
 const editExpression = ref('');
 const importVisible = ref(false);
-const canAllWriteSchema = computed(() => userAllPrivileges.value.includes('WRITE_SCHEMA') && (userAllPrivileges.value.includes('WRITE_DATA') || userAllPrivileges.value.includes('READ_DATA')));
+const canAllWriteSchema = computed(() => userAllPrivileges.value.includes('WRITE_SCHEMA'));
+const canAllReadWriteData = computed(() => userAllPrivileges.value.includes('READ_DATA') || userAllPrivileges.value.includes('WRITE_DATA'));
+
+const refreshTip = computed(() => {
+  if (!canReadWriteSchema.value) {
+    return t('common.schemaAuth');
+  }
+  if (!canAllReadWriteData.value) {
+    return t('common.dataAuth');
+  }
+  return '';
+});
+
+const refreshTipDisabled = computed(() => {
+  if (canReadWriteSchema.value && canAllReadWriteData.value) {
+    return true;
+  }
+  return false;
+});
 
 function searchPlaceholder() {
   if (searchFormData.type === 'name') {
@@ -193,6 +209,15 @@ function rowCanWriteSchemaByPath(path: string) {
   const authList = getPathAuthList(path, userAllPathPrivileges.value);
   if (authList.length) {
     return authList.includes('WRITE_SCHEMA');
+  }
+  return false;
+}
+
+function rowReadWriteDataByPath(path: string) {
+  if (userAllEntityPrivileges.value.includes('READ_DATA') || userAllEntityPrivileges.value.includes('WRITE_DATA')) return true;
+  const authList = getPathAuthList(path, userAllPathPrivileges.value);
+  if (authList.length) {
+    return authList.includes('READ_DATA') || authList.includes('WRITE_DATA');
   }
   return false;
 }
@@ -220,11 +245,12 @@ function getNewVal() {
       timeseriesList.push(item.measurement);
       viewTypeList.push('VIEW');
     });
+    const authTimeseries = tableData.value.list.filter((f) => rowReadWriteDataByPath(f.measurement)).map((d) => d.measurement);
     getBatchLastValue(timeseriesList, viewTypeList).then((newRes) => {
       if (newRes.data.values.length || newRes.data.timestamps.length) {
         tableData.value.list.forEach((item, index) => {
-          item.value = newRes.data.values[index] || '-';
-          item.valueTime = newRes.data.timestamps[index] || '-';
+          item.value = authTimeseries.includes(item.measurement) ? newRes.data.values[index] || '-' : t('common.noAuth');
+          item.valueTime = authTimeseries.includes(item.measurement) ? newRes.data.timestamps[index] || '-' : t('common.noAuth');
         });
       }
     });
