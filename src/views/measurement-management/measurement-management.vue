@@ -43,7 +43,7 @@
                 <el-button class="m-l-12" plain @click="editTTL = false" id="mesaurement-ttl-cancel">{{ t('common.cancel') }}</el-button>
                 <el-button type="primary" @click="handleConfirmEditTTL" id="mesaurement-ttl-confirm">{{ t('common.confirm') }}</el-button>
               </div>
-              <auth-tooltip :is-disabled="canWriteSchemaByPath" :content="'common.schemaAuth'">
+              <auth-tooltip :is-disabled="canWriteSchemaByPath" :content="'common.schemaAuthAnother'">
                 <el-button
                   link
                   v-if="currentStorage && !editTTL"
@@ -104,17 +104,17 @@
         </div>
 
         <div class="search-form-buttons">
-          <auth-tooltip :is-disabled="canWriteSchemaByParentPath" :content="'common.schemaAuth'">
+          <auth-tooltip :is-disabled="canWriteSchemaByParentPath" :content="'common.schemaAuthAnother'">
             <el-button type="primary" :disabled="!currentStorage || currentStorage === 'root.__system' || !canWriteSchemaByParentPath" @click="handleAddMeasure" id="mesaurement-add">
               {{ t('common.create') }}
             </el-button>
           </auth-tooltip>
-          <auth-tooltip :is-disabled="canWriteSchemaByParentPath" :content="'common.schemaAuth'">
+          <auth-tooltip :is-disabled="canWriteSchemaByParentPath" :content="'common.schemaAuthAnother'">
             <el-button class="m-l-16" :disabled="!currentStorage || currentStorage === 'root.__system' || !canWriteSchemaByParentPath" @click="handleImport" id="mesaurement-import">
               {{ t('common.import') }}
             </el-button>
           </auth-tooltip>
-          <auth-tooltip :is-disabled="canReadWriteSchema">
+          <auth-tooltip :is-disabled="canReadWriteSchema" :content="'common.schemaAuth'">
             <el-dropdown class="m-x-16" :disabled="!currentStorage || !(totalCount > 0) || !canReadWriteSchema" @command="(val) => handleCommandDown(val)" id="mesaurement-download-dropdown">
               <el-button class="export-button" :disabled="!currentStorage || !(totalCount > 0) || !canReadWriteSchema" id="mesaurement-download">
                 {{ t('common.export') }}
@@ -128,7 +128,7 @@
               </template>
             </el-dropdown>
           </auth-tooltip>
-          <auth-tooltip :is-disabled="canWriteSchema" :content="'common.schemaAuth'">
+          <auth-tooltip :is-disabled="canWriteSchema" :content="'common.schemaAuthAnother'">
             <el-button :disabled="!currentStorage || multipleSelection.length === 0 || !canWriteSchema" type="primary" @click="handleDelRow('batch', null)" id="mesaurement-batch-del">
               {{ t('common.batchDelete') }}
             </el-button>
@@ -144,7 +144,7 @@
               <i-custom-refresh style="width: 24px; height: 24px" />
             </el-button>
           </auth-tooltip>
-          <auth-tooltip :is-disabled="canReadWriteSchema">
+          <auth-tooltip :is-disabled="canReadWriteSchema" :content="'common.schemaAuth'">
             <el-button
               link
               :class="[canReadWriteSchema ? 'svg-button-hover-color' : '', 'm-l-4']"
@@ -195,7 +195,7 @@
           </el-popover>
         </div>
       </div>
-      <auth-container :is-auth="canReadWriteSchema" style="height: calc(100% - 222px)">
+      <auth-container :is-auth="canReadWriteSchema" :content="'common.schemaAuth'" style="height: calc(100% - 222px)">
         <div class="storage-table-box">
           <el-table
             :data="tableData.measurements"
@@ -263,7 +263,7 @@
                 >
                   {{ t('page.trend') }}
                 </el-button>
-                <auth-tooltip :is-disabled="rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)" :content="'common.schemaAuth'">
+                <auth-tooltip :is-disabled="rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)" :content="'common.schemaAuthAnother'">
                   <el-button
                     type="primary"
                     link

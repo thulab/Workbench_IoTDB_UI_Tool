@@ -8,7 +8,7 @@
             <el-icon size="24"><i-custom-model-doc /></el-icon>
           </el-button>
         </el-tooltip>
-        <auth-tooltip :is-disabled="canReadWriteSchema" :content="'common.schemaAuthAnother'">
+        <auth-tooltip :is-disabled="canReadWriteSchema" :content="'common.schemaAuth'">
           <el-button :disabled="!canReadWriteSchema" link @click="handleRefresh" id="measurement-tree-refresh" :class="!canReadWriteSchema ? '' : 'svg-button-hover-color'">
             <el-icon size="24"><i-custom-refresh /></el-icon>
           </el-button>
@@ -17,7 +17,7 @@
     </el-header>
     <el-main class="p-0">
       <el-scrollbar>
-        <auth-container :is-auth="canReadWriteSchema" style="height: 100%" :content="'common.schemaAuthAnother'">
+        <auth-container :is-auth="canReadWriteSchema" style="height: 100%" :content="'common.schemaAuth'">
           <div class="model-container" v-loading="initialLoading">
             <div v-if="treeData.children?.length === 0" class="table-empty-wrapper" style="height: 100%">
               <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />

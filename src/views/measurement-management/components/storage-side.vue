@@ -11,7 +11,7 @@
     </div>
   </div>
 
-  <auth-container :is-auth="canReadWriteSchema" style="height: calc(100% - 70px)">
+  <auth-container :is-auth="canReadWriteSchema" :content="'common.schemaAuth'" style="height: calc(100% - 70px)">
     <ul class="storage-list-box" v-loading="storageLoading">
       <template v-if="storageList.length">
         <li v-for="(item, i) in storageList" :key="item" :class="['storage-item-box', currentStorage === item ? 'storage-item-box-active' : '']" @click="(e) => handleSelectStorage(item, e)">
@@ -149,6 +149,11 @@ defineExpose({ getStorageList });
 .storage-list-wrapper .auth-tip-img {
   width: 80px !important;
   height: 80px !important;
+}
+
+.storage-list-wrapper .auth-tip-text {
+  width: 110px !important;
+  text-align: center;
 }
 </style>
 <style lang="scss" scoped>
