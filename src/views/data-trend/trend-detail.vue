@@ -126,7 +126,7 @@
       </el-container>
     </el-main>
 
-    <modal-template v-model:visible="templateVisible" :save-loading="saveTemplateLoading" @handleSave="handleSaveSuccess" />
+    <modal-template v-model:visible="templateVisible" :name-list="nameList" :save-loading="saveTemplateLoading" @handleSave="handleSaveSuccess" />
 
     <modal-template-rename v-model:visible="renameVisible" :old-name="renameData.name" :name-list="nameList" :save-loading="saveTemplateLoading" @handleSave="handleRenameSuccess" />
   </el-container>
@@ -264,7 +264,6 @@ const markPointCount = ref(0);
 const pointList = ref<Array<PointData>>([]);
 const templateVisible = ref(false);
 const renameVisible = ref(false);
-const nameList = ref<string[]>([]);
 const renameData = reactive<{
   id: number | string;
   name: string;
@@ -280,6 +279,7 @@ const saveTemplateLoading = ref(false);
 const activeNameSide = ref('path');
 const tabLabel = ref('dataTrend.trendAttribute');
 const templateListRef = ref<InstanceType<typeof TemplateListTab>>();
+const nameList = computed(() => templateListRef.value?.templateList.map((item) => item.name) || []);
 
 const pointCheckedData = computed(() => pointList.value.filter((item) => item.checked));
 
@@ -893,7 +893,6 @@ function handleOperateTemplate(val: string, data: Search.TrendTemplate) {
     renameData.name = data.name;
     renameData.type = data.type;
     renameData.template = data.template;
-    nameList.value = templateListRef.value?.templateList.map((item) => item.name) || [];
     saveTemplateLoading.value = false;
     renameVisible.value = true;
   } else {
