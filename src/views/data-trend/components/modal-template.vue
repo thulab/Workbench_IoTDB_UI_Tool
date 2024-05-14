@@ -21,6 +21,7 @@ import dayjs from 'dayjs';
 const props = defineProps<{
   visible: boolean;
   saveLoading: boolean;
+  nameList: string[];
 }>();
 
 const emit = defineEmits<{
@@ -32,8 +33,23 @@ const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const formRef = ref<FormInstance>();
 const formRules = reactive({
-  name: [{ required: true, message: () => t('search.nameRuleTip'), trigger: 'blur' }],
+  name: [
+    {
+      required: true,
+      validator: (rule: any, value: any, callback: any) => {
+        if (!value || !value.trim()) {
+          return callback(new Error(t('search.nameRuleTip')));
+        }
+        if (value && props.nameList.some((item) => item === value)) {
+          return callback(new Error(t('search.templateNameRepeatTip')));
+        }
+        return callback();
+      },
+      trigger: ['blur', 'change'],
+    },
+  ],
 });
+
 const formData = reactive<{
   name: string;
 }>({
