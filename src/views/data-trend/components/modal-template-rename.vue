@@ -53,9 +53,9 @@ const formRules = reactive({
         if (value === formData.oldName) {
           return callback(new Error(t('search.nameRepeatTip')));
         }
-        if (value && props.nameList.some((item) => item === value)) {
-          return callback(new Error(t('search.templateNameRepeatTip')));
-        }
+        // if (value && props.nameList.some((item) => item === value)) {
+        //   return callback(new Error(t('search.templateNameRepeatTip')));
+        // }
         return callback();
       },
       trigger: ['blur', 'change'],
