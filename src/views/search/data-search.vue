@@ -377,10 +377,14 @@ function handleSortChange(data: { column: any; prop: string; order: any }) {
 
 // 重置
 function handleReset() {
-  searchFormRef.value?.resetFields();
+  //  不知道为啥不生效了
+  // searchFormRef.value?.resetFields();
+  searchFormData.path = [];
   searchFormData.time = todayNow();
+  searchFormData.timeInterval = undefined;
   searchFormData.unitInterval = 's';
   searchFormData.datetimerange = ['1970-01-01 00:00:00', todayNow()] as [DateModelType, DateModelType];
+  searchFormData.aggregation = '';
   searchFormData.asc = 'desc';
 }
 
