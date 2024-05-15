@@ -374,6 +374,12 @@ function insertContent(val: string) {
 
 defineExpose({ insertContent });
 </script>
+<style lang="scss">
+.tab_table .data-empty-img {
+  width: 80px !important;
+  height: 80px !important;
+}
+</style>
 <style lang="scss" scoped>
 .sql-input-area {
   padding: 0 16px;
