@@ -895,6 +895,11 @@ function handleReset() {
   searchFormData.amplification = 1;
   sqlValue.value = '';
   searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
+  copySearchFormData = cloneDeep(searchFormData);
+  chartData.timestamps = [];
+  chartData.values = [];
+  handleEmptyOperate();
+  setOption(chartOptions.value, true);
 }
 
 function getFFT() {

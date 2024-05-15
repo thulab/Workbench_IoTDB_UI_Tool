@@ -177,6 +177,10 @@ function getListData() {
 function handleReset() {
   searchFormRef.value?.resetFields();
   searchFormData.time = getStartAndEnd(0);
+  copySearchFormData = cloneDeep(searchFormData);
+  timestamp.value = Number(new Date());
+  tableData.value.list = [];
+  totalCount.value = 0;
 }
 
 // 查询

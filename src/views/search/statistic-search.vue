@@ -2,7 +2,7 @@
   <el-container class="page-container">
     <el-header class="search-form-wrapper p-0" style="height: auto">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline :disabled="getListLoading">
-        <base-form-item prop="path">
+        <base-form-item prop="path" :rules="requiredRules">
           <template #label>
             {{ t('measurement.measurementChoose') }}：
             <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
@@ -152,6 +152,13 @@ const shortcutsDaterange = [
     value: () => getOneIntervalNow(7),
   },
 ];
+const requiredRules = ref([
+  {
+    required: true,
+    message: () => t('common.formRuleEmptyOperateShort'),
+    trigger: ['change'],
+  },
+]);
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 const getListLoading = ref(false);
 const timestamp = ref(0);
@@ -246,6 +253,13 @@ function getListDataBatch() {
 function handleReset() {
   searchFormData.path = [];
   searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
+  copySearchFormData.path = searchFormData.path;
+  copySearchFormData.datetimerange = searchFormData.datetimerange;
+  timestamp.value = Number(new Date());
+  tableData.value = [];
+  minMaxList.value = [];
+  avgSumList.value = [];
+  tableErrorMessage.value = [];
 }
 
 // 查询

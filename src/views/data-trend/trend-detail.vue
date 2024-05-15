@@ -591,12 +591,23 @@ const onResize = debounce(() => {
 
 // 重置
 function handleReset(force?: boolean) {
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  socketInstance.value?.send(JSON.stringify({ operate: 'del', paths: [...searchFormData.path] }));
   if (force) {
     searchFormData.path = [];
   }
   searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
   searchFormData.unitInterval = 'auto';
   searchFormData.aggregation = 'last_value';
+  chartData.value = [];
+  markPointCount.value = 0;
+  pointLineData.value = [];
+  pointList.value = [];
+  clickedCursor.value = false;
+  chartHistoryData.value.length = 0;
+  pathList.value = [];
+  copySearchFormData = cloneDeep(searchFormData);
+  setOption(chartOptions.value, true);
 }
 
 function handleChangeAggregation(val: string) {
@@ -816,7 +827,7 @@ function handleTrendTab(type: 'running' | 'history', unforce?: boolean) {
       chartHistoryData.value.length = 0;
       if (!unforce) {
         setOption(chartOptions.value, true);
-        handleReset();
+        // handleReset();
       }
       handleSearch();
     } else {
@@ -1047,24 +1058,36 @@ watch(
         if (sessionStorage.getItem('dataTrendStorage')) {
           const storageData = JSON.parse(sessionStorage.getItem('dataTrendStorage') as string);
           searchFormData.path = storageData.path;
-          if (searchFormData.path.length) {
-            searchFormData.datetimerange = storageData.datetimerange;
-            searchFormData.unitInterval = storageData.unitInterval;
-            searchFormData.aggregation = storageData.aggregation;
-            dataTab.value = storageData.dataTab;
-            pathList.value = storageData.pathList;
-            pointLineData.value = storageData.pointLineData.map((item: MarkPointLine, index: number) => ({
-              ...item,
-              label: {
-                formatter: () => (markPointCount.value === 1 ? 'D' : `D${index + 1}`),
-                position: 'end',
-              },
-            }));
-            markPointCount.value = storageData.markPointCount;
-            pointList.value = storageData.pointList;
-            activeNameSide.value = storageData.activeNameSide;
-            loading.value = dataTab.value === 'running';
-            if (socketInstance.value && socketInstance.value.readyState === 1) {
+          searchFormData.datetimerange = storageData.datetimerange;
+          searchFormData.unitInterval = storageData.unitInterval;
+          searchFormData.aggregation = storageData.aggregation;
+          dataTab.value = storageData.dataTab;
+          pathList.value = storageData.pathList;
+          pointLineData.value = storageData.pointLineData.map((item: MarkPointLine, index: number) => ({
+            ...item,
+            label: {
+              formatter: () => (markPointCount.value === 1 ? 'D' : `D${index + 1}`),
+              position: 'end',
+            },
+          }));
+          markPointCount.value = storageData.markPointCount;
+          pointList.value = storageData.pointList;
+          activeNameSide.value = storageData.activeNameSide;
+          loading.value = dataTab.value === 'running';
+          if (socketInstance.value && socketInstance.value.readyState === 1) {
+            socketInstance.value?.send(
+              JSON.stringify({
+                operate: 'SET_CONNECT',
+                connectionId: connectionId.value,
+                user: userName.value,
+                type: connectionType.value,
+              })
+            );
+            if (dataTab.value === 'running' && searchFormData.path.length) {
+              socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [...searchFormData.path] }));
+            }
+          } else {
+            socketInstance.value?.addEventListener('open', () => {
               socketInstance.value?.send(
                 JSON.stringify({
                   operate: 'SET_CONNECT',
@@ -1073,27 +1096,14 @@ watch(
                   type: connectionType.value,
                 })
               );
-              if (dataTab.value === 'running') {
+              if (dataTab.value === 'running' && searchFormData.path.length) {
                 socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [...searchFormData.path] }));
               }
-            } else {
-              socketInstance.value?.addEventListener('open', () => {
-                socketInstance.value?.send(
-                  JSON.stringify({
-                    operate: 'SET_CONNECT',
-                    connectionId: connectionId.value,
-                    user: userName.value,
-                    type: connectionType.value,
-                  })
-                );
-                if (dataTab.value === 'running') {
-                  socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [...searchFormData.path] }));
-                }
-              });
-            }
-            handleSearch(false);
-            return;
+            });
           }
+          setOption(chartOptions.value, true);
+          handleSearch(false);
+          return;
         }
         init();
       });
