@@ -298,6 +298,8 @@ function getListData() {
 function handleReset() {
   searchFormRef.value?.resetFields();
   searchFormData.measurements = [];
+  tableData.value.list = [];
+  totalCount.value = 0;
 }
 
 // 查询

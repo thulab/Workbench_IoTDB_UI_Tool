@@ -273,6 +273,8 @@ function getListData() {
 function handleReset() {
   searchFormData.name = '';
   searchFormData.type = 'name';
+  tableData.value.list = [];
+  totalCount.value = 0;
 }
 
 // 查询

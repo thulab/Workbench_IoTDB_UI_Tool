@@ -68,8 +68,13 @@
 }
 
 .export-button {
+  span {
+    position: relative;
+    letter-spacing: 2px;
+  }
+
   svg {
-    transform: translate(2px, -60%);
+    transform: translate(0, -60%);
   }
 }
 

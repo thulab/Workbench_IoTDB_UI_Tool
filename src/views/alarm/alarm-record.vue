@@ -247,6 +247,9 @@ function handleReset() {
   searchFormRef.value?.resetFields();
   searchFormData.status = 0;
   searchFormData.measurements = [];
+  copySearchFormData = cloneDeep(searchFormData);
+  tableData.value.list = [];
+  totalCount.value = 0;
 }
 
 // 查询
