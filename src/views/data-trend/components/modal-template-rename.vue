@@ -85,3 +85,16 @@ watch(
   }
 );
 </script>
+
+<style lang="scss" scoped>
+.type-input-disabled {
+  :deep(.el-input__inner) {
+    color: #131926;
+    -webkit-text-fill-color: #131926;
+  }
+
+  :deep(.el-input__wrapper) {
+    box-shadow: none;
+  }
+}
+</style>
