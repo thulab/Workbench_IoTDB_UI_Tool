@@ -70,7 +70,7 @@
       </el-form>
       <div class="search-form-buttons">
         <auth-tooltip :is-disabled="canReadWriteData">
-          <el-button @click="handleReset" :disabled="getListLoading || !canReadWriteData" id="data-search-reset">{{ t('common.reset') }}</el-button>
+          <el-button @click="handleReset(true)" :disabled="getListLoading || !canReadWriteData" id="data-search-reset">{{ t('common.reset') }}</el-button>
         </auth-tooltip>
         <auth-tooltip :is-disabled="canReadWriteData">
           <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="data-search-search">{{ getListLoading ? '取消查询' : t('common.query') }}</el-button>
@@ -378,7 +378,7 @@ function handleSortChange(data: { column: any; prop: string; order: any }) {
 }
 
 // 重置
-function handleReset() {
+function handleReset(force?: boolean) {
   //  不知道为啥不生效了
   // searchFormRef.value?.resetFields();
   searchFormData.path = [];
@@ -388,10 +388,13 @@ function handleReset() {
   searchFormData.datetimerange = ['1970-01-01 00:00:00', todayNow()] as [DateModelType, DateModelType];
   searchFormData.aggregation = '';
   searchFormData.asc = 'desc';
+  timeType.value = 'datetimerange';
   pagination.pageNum = 1;
-  copySearchFormData = cloneDeep(searchFormData);
-  getListLoading.value = false;
-  getListData();
+  if (force) {
+    copySearchFormData = cloneDeep(searchFormData);
+    getListLoading.value = false;
+    getListData();
+  }
 }
 
 // 查询
@@ -543,6 +546,7 @@ watch(
   (val) => {
     if (val) {
       firstLoad.value = true;
+      getListLoading.value = false;
       if (sessionStorage.getItem('dataSearchStorage')) {
         const searchData = JSON.parse(sessionStorage.getItem('dataSearchStorage') as string);
         searchFormData.path = searchData.path;
