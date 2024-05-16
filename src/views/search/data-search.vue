@@ -386,13 +386,9 @@ function handleReset() {
   searchFormData.datetimerange = ['1970-01-01 00:00:00', todayNow()] as [DateModelType, DateModelType];
   searchFormData.aggregation = '';
   searchFormData.asc = 'desc';
+  pagination.pageNum = 1;
   copySearchFormData = cloneDeep(searchFormData);
-  firstLoad.value = false;
-  tableData.value = [];
-  columns.value = [];
-  searchDetailInfos.value.status = undefined;
-  searchDetailInfos.value.queryTime = '';
-  currentQueryTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
+  getListData();
 }
 
 // 查询
