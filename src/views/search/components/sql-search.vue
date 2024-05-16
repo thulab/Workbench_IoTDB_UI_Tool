@@ -83,7 +83,7 @@
                 v-show="sqlResult[index].status && tableDataPagination[index]?.list?.length > 0"
                 id="sql-search-download-dropdown"
               >
-                <el-button link :class="['export-button', !sqlResult[index].status ? '' : 'svg-button-hover-color']" :disabled="!sqlResult[index].status" id="sql-search-download">
+                <el-button link :class="['sql-export-button', !sqlResult[index].status ? '' : 'svg-button-hover-color']" :disabled="!sqlResult[index].status" id="sql-search-download">
                   <i-custom-download style="transform: translate(0, 0)" />
                   {{ t('common.export') }}
                   <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
@@ -519,7 +519,7 @@ defineExpose({ insertContent });
     }
   }
 
-  .export-button {
+  .sql-export-button {
     position: relative;
     padding: 2px 12px;
     display: flex !important;
@@ -536,7 +536,7 @@ defineExpose({ insertContent });
     }
   }
 
-  .export-button.el-button:focus {
+  .sql-export-button.el-button:focus {
     color: #656a85 !important;
   }
 }

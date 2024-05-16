@@ -70,11 +70,14 @@
 .export-button {
   span {
     position: relative;
-    letter-spacing: 2px;
+    letter-spacing: 0.3em;
+    margin-right: -0.3em;
   }
 
   svg {
-    transform: translate(0, -60%);
+    position: absolute;
+    left: calc(100% - 0.3em);
+    transform: translateY(-60%);
   }
 }
 
