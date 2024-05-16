@@ -156,7 +156,7 @@ const requiredRules = ref([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
-    trigger: ['change'],
+    trigger: 'blur',
   },
 ]);
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();

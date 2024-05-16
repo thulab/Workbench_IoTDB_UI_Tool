@@ -334,26 +334,26 @@ const requiredRules = ref([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
 ]);
 const requiredNameRules = ref([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
   {
     pattern: /^`.*`$|^(?!\d)[A-Za-z0-9_\u4e00-\u9fa5]+$/,
     message: () => t('common.errorExg'),
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
 ]);
 const requiredPortRules = ref([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
   {
     validator: (rule: any, value: any, callback: any) => {
@@ -365,14 +365,14 @@ const requiredPortRules = ref([
       }
       return callback();
     },
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
 ]);
 const requiredNumberRules = ref([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
   {
     validator: (rule: any, value: any, callback: any) => {
@@ -387,7 +387,7 @@ const requiredNumberRules = ref([
       }
       return callback();
     },
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
 ]);
 const shortcutsDaterange = [

@@ -201,7 +201,7 @@ const deviceRules = ref([
   {
     required: true,
     message: () => t('measurement.deviceRuleEmptyTip'),
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
   {
     pattern: /^`.*`$|^(["'.a-zA-Z0-9_\u4e00-\u9fa5]*)$/,
@@ -213,7 +213,7 @@ const requiredRules = ref([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
 ]);
 const formData = reactive<{

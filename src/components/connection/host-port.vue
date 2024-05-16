@@ -43,7 +43,7 @@ const requiredRules = ref([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
 ]);
 
@@ -51,7 +51,7 @@ const requiredPortRules = ref([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
   {
     validator: (rule: any, value: any, callback: any) => {
@@ -63,7 +63,7 @@ const requiredPortRules = ref([
       }
       return callback();
     },
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
 ]);
 
