@@ -388,6 +388,7 @@ function handleReset() {
   searchFormData.asc = 'desc';
   pagination.pageNum = 1;
   copySearchFormData = cloneDeep(searchFormData);
+  getListLoading.value = false;
   getListData();
 }
 
