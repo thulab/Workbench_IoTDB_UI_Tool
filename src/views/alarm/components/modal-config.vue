@@ -165,7 +165,7 @@ const requiredRules = ref([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
 ]);
 
@@ -210,11 +210,11 @@ const requiredRulesRules = ref([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
   {
     validator: checkRules,
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
 ]);
 
@@ -239,11 +239,11 @@ const requiredDurationRules = ref([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
   {
     validator: checkDuration,
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
 ]);
 

@@ -40,7 +40,7 @@ const rules = reactive({
   ip: [
     {
       required: true,
-      trigger: ['blur'],
+      trigger: 'blur',
       validator: (rule: any, value: any, callback: any) => {
         if (!value) {
           return callback(t('common.formRuleEmptyOperateShort'));

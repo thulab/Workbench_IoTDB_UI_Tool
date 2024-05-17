@@ -122,7 +122,7 @@ const requiredRules = ref([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
 ]);
 const formData = reactive<Connection.ConnectionDetail>({

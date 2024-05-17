@@ -335,7 +335,7 @@ const requiredRules = ref([
   {
     required: true,
     message: '',
-    trigger: ['change'],
+    trigger: 'blur',
   },
 ]);
 let currentPoint = 0;

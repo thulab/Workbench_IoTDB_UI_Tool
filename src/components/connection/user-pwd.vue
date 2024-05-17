@@ -21,18 +21,18 @@ const requiredUserRules = ref([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
   {
     min: 4,
     max: 32,
     message: () => t('auth.pwdLength'),
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
   {
     pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
     message: () => t('common.errorExg'),
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
 ]);
 </script>

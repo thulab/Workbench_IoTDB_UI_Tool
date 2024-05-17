@@ -243,7 +243,7 @@ const requiredRules = ref([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
-    trigger: ['change'],
+    trigger: 'blur',
   },
 ]);
 let inited = false;

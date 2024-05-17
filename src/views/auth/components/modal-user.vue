@@ -53,18 +53,18 @@ const rules = reactive<FormRules>({
     {
       required: true,
       message: () => t('common.formRuleEmptyOperateShort'),
-      trigger: ['blur', 'change'],
+      trigger: 'blur',
     },
     {
       min: 4,
       max: 32,
       message: () => t('auth.userNameLength'),
-      trigger: ['blur', 'change'],
+      trigger: 'blur',
     },
     {
       pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
       message: () => t('auth.userNameExg'),
-      trigger: ['blur', 'change'],
+      trigger: 'blur',
     },
     {
       validator: (rule: any, value: any, callback: any) => {
@@ -74,43 +74,43 @@ const rules = reactive<FormRules>({
           callback();
         }
       },
-      trigger: ['blur', 'change'],
+      trigger: 'blur',
     },
   ],
   password: [
     {
       required: true,
       message: () => t('common.formRuleEmptyOperateShort'),
-      trigger: ['blur', 'change'],
+      trigger: 'blur',
     },
     {
       min: 4,
       max: 32,
       message: () => t('auth.pwdLength'),
-      trigger: ['blur', 'change'],
+      trigger: 'blur',
     },
     {
       pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
       message: () => t('auth.pwdExg'),
-      trigger: ['blur', 'change'],
+      trigger: 'blur',
     },
   ],
   confirmPassword: [
     {
       required: true,
       message: () => t('common.formRuleEmptyOperateShort'),
-      trigger: ['blur', 'change'],
+      trigger: 'blur',
     },
     {
       min: 4,
       max: 32,
       message: () => t('auth.pwdLength'),
-      trigger: ['blur', 'change'],
+      trigger: 'blur',
     },
     {
       pattern: /^[A-Za-z0-9!@#$%^&*()_+\-=]+$/,
       message: () => t('auth.pwdExg'),
-      trigger: ['blur', 'change'],
+      trigger: 'blur',
     },
     {
       validator: (rule: any, value: any, callback: any) => {
@@ -120,7 +120,7 @@ const rules = reactive<FormRules>({
           callback();
         }
       },
-      trigger: ['blur', 'change'],
+      trigger: 'blur',
     },
   ],
 });

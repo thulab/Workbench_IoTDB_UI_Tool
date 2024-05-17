@@ -45,7 +45,7 @@ const formRules = reactive({
         // }
         return callback();
       },
-      trigger: ['blur', 'change'],
+      trigger: 'blur',
     },
   ],
 });

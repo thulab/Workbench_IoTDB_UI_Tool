@@ -63,7 +63,7 @@ const requiredRules = ref([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
-    trigger: ['blur', 'change'],
+    trigger: 'blur',
   },
 ]);
 const checkNumber = (rule: any, value: any, callback: any) => {
@@ -83,7 +83,7 @@ const requiredNumberRules = ref([
   {
     required: true,
     validator: checkNumber,
-    trigger: ['blur'],
+    trigger: 'blur',
   },
 ]);
 
