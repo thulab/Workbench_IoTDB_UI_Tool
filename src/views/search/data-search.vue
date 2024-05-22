@@ -393,6 +393,7 @@ function handleReset(force?: boolean) {
   if (force) {
     copySearchFormData = cloneDeep(searchFormData);
     getListLoading.value = false;
+    sessionStorage.setItem('dataSearchStorage', '');
     getListData();
   }
 }
@@ -547,6 +548,12 @@ watch(
     if (val) {
       firstLoad.value = true;
       getListLoading.value = false;
+      if (route.query.measurement) {
+        handleReset();
+        searchFormData.path = [route.query.measurement] as string[];
+        handleSearch();
+        return;
+      }
       if (sessionStorage.getItem('dataSearchStorage')) {
         const searchData = JSON.parse(sessionStorage.getItem('dataSearchStorage') as string);
         searchFormData.path = searchData.path;
@@ -564,12 +571,7 @@ watch(
         return;
       }
       handleReset();
-      if (route.query.measurement) {
-        searchFormData.path = [route.query.measurement] as string[];
-        handleSearch();
-      } else {
-        handleSearch();
-      }
+      handleSearch();
     }
   },
   {

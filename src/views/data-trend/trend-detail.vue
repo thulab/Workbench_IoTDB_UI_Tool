@@ -979,15 +979,6 @@ function handleRenameSuccess(name: string) {
 }
 
 function init() {
-  if (route.query.measurement) {
-    searchFormData.path = [route.query.measurement as string];
-    pathList.value.push({
-      path: route.query.measurement as string,
-      color: '#4992ff',
-      width: 2,
-      checked: true,
-    });
-  }
   if (socketInstance.value && socketInstance.value.readyState === 1) {
     socketInstance.value?.send(
       JSON.stringify({
@@ -997,9 +988,6 @@ function init() {
         type: connectionType.value,
       })
     );
-    if (route.query.measurement) {
-      socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [route.query.measurement as string] }));
-    }
   } else {
     socketInstance.value?.addEventListener('open', () => {
       socketInstance.value?.send(
@@ -1010,9 +998,6 @@ function init() {
           type: connectionType.value,
         })
       );
-      if (route.query.measurement) {
-        socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [route.query.measurement as string] }));
-      }
     });
   }
   setOption(chartOptions.value);
@@ -1055,6 +1040,40 @@ watch(
         socketInstance.value.close();
       }
       initWebsocket(() => {
+        if (route.query.measurement) {
+          searchFormData.path = [route.query.measurement as string];
+          pathList.value.push({
+            path: route.query.measurement as string,
+            color: '#4992ff',
+            width: 2,
+            checked: true,
+          });
+          if (socketInstance.value && socketInstance.value.readyState === 1) {
+            socketInstance.value?.send(
+              JSON.stringify({
+                operate: 'SET_CONNECT',
+                connectionId: connectionId.value,
+                user: userName.value,
+                type: connectionType.value,
+              })
+            );
+            socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [route.query.measurement as string] }));
+          } else {
+            socketInstance.value?.addEventListener('open', () => {
+              socketInstance.value?.send(
+                JSON.stringify({
+                  operate: 'SET_CONNECT',
+                  connectionId: connectionId.value,
+                  user: userName.value,
+                  type: connectionType.value,
+                })
+              );
+              socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [route.query.measurement as string] }));
+            });
+          }
+          setOption(chartOptions.value);
+          return;
+        }
         if (sessionStorage.getItem('dataTrendStorage')) {
           const storageData = JSON.parse(sessionStorage.getItem('dataTrendStorage') as string);
           searchFormData.path = storageData.path;
