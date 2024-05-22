@@ -55,7 +55,7 @@
         </base-form-item>
       </el-form>
       <div class="search-form-buttons">
-        <el-button @click="handleReset" id="alarm-record-search-reset">{{ t('common.reset') }}</el-button>
+        <el-button @click="handleReset(true)" id="alarm-record-search-reset">{{ t('common.reset') }}</el-button>
         <el-button type="primary" @click="handleSearch" id="alarm-record-search-search">{{ t('common.query') }}</el-button>
       </div>
     </el-header>
@@ -226,21 +226,28 @@ function getListData() {
     ...pagination,
     createStartTime: copySearchFormData.createtimerange ? dayjs(copySearchFormData.createtimerange[0]).valueOf() : null,
     createEndTime: copySearchFormData.createtimerange ? dayjs(copySearchFormData.createtimerange[1]).valueOf() : null,
-  }).then((res) => {
-    if (res.code === 0) {
-      totalCount.value = res.data.totalCount;
-    }
-  });
+  })
+    .then((res) => {
+      if (res.code === 0) {
+        totalCount.value = res.data.totalCount;
+      }
+    })
+    .catch(() => {
+      tableData.value.list = [];
+      totalCount.value = 0;
+    });
 }
 
 // 重置
-function handleReset() {
+function handleReset(force?: boolean) {
   searchFormRef.value?.resetFields();
   searchFormData.status = 0;
   searchFormData.measurements = [];
   copySearchFormData = cloneDeep(searchFormData);
-  tableData.value.list = [];
-  totalCount.value = 0;
+  if (force) {
+    pagination.pageNum = 1;
+    getListData();
+  }
 }
 
 // 查询
