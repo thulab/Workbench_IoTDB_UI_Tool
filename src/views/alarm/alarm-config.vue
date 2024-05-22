@@ -70,7 +70,9 @@
         </base-form-item>
       </el-form>
       <div class="search-form-buttons">
-        <el-button @click="handleReset" id="alarm-config-search-reset">{{ t('common.reset') }}</el-button>
+        <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
+          <el-button @click="handleReset(true)" :disabled="!canUsePipe" id="alarm-config-search-reset">{{ t('common.reset') }}</el-button>
+        </auth-tooltip>
         <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
           <el-button type="primary" :disabled="!canUsePipe" @click="handleSearch" id="alarm-config-search-search">{{ t('common.query') }}</el-button>
         </auth-tooltip>
@@ -289,17 +291,24 @@ function getListData() {
     createEndTime: searchFormData.createtimerange ? dayjs(searchFormData.createtimerange[1]).valueOf() : null,
     updateStartTime: searchFormData.updatetimerange ? dayjs(searchFormData.updatetimerange[0]).valueOf() : null,
     updateEndTime: searchFormData.updatetimerange ? dayjs(searchFormData.updatetimerange[1]).valueOf() : null,
-  }).then((res) => {
-    totalCount.value = res.data.totalCount;
-  });
+  })
+    .then((res) => {
+      totalCount.value = res.data.totalCount;
+    })
+    .catch(() => {
+      tableData.value.list = [];
+      totalCount.value = 0;
+    });
 }
 
 // 重置
-function handleReset() {
+function handleReset(force?: boolean) {
   searchFormRef.value?.resetFields();
   searchFormData.measurements = [];
-  tableData.value.list = [];
-  totalCount.value = 0;
+  if (force) {
+    pagination.pageNum = 1;
+    getListData();
+  }
 }
 
 // 查询

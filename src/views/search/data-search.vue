@@ -600,6 +600,10 @@ watch(
   display: flex;
   align-items: center;
 
+  :deep(.el-input__inner, .el-range-input, .el-select__input-wrapper, .el-select__placeholder) {
+    color: #656a85 !important;
+  }
+
   .search-time-list {
     display: flex;
     margin-right: 12px;
@@ -645,7 +649,6 @@ watch(
     font-size: 14px;
     line-height: 20px;
     color: #495ad4;
-    margin-bottom: 18px;
 
     .run-result-tip {
       align-self: flex-end;
@@ -667,7 +670,7 @@ watch(
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
 
   .run-result-list {
