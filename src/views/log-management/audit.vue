@@ -116,7 +116,7 @@ import OverflowClick from './components/overflow-click.vue';
 const { t } = useI18n();
 const connectionStore = useConnectionStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
-const { maxTableHeight } = useTableHeight(340);
+const { maxTableHeight } = useTableHeight(330);
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({
   username: '',
