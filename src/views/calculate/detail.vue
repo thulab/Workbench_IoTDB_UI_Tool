@@ -94,8 +94,12 @@
                   <template #default="{ row }">
                     <div>
                       <el-button type="primary" link size="small" @click="handleQuery(row)" :id="`calculate-table-${row.measurement}-data`">{{ t('calculate.view') }}</el-button>
-                      <el-button type="primary" link size="small" @click="handleEdit(row)" :id="`calculate-table-${row.measurement}-edit`">{{ t('common.edit') }}</el-button>
-                      <auth-tooltip :is-disabled="rowCanWriteSchemaByPath(row.measurement)">
+                      <auth-tooltip :is-disabled="rowCanWriteSchemaByPath(row.measurement)" :content="'common.schemaAuthAnother'">
+                        <el-button type="primary" :disabled="!rowCanWriteSchemaByPath(row.measurement)" link size="small" @click="handleEdit(row)" :id="`calculate-table-${row.measurement}-edit`">
+                          {{ t('common.edit') }}
+                        </el-button>
+                      </auth-tooltip>
+                      <auth-tooltip :is-disabled="rowCanWriteSchemaByPath(row.measurement)" :content="'common.schemaAuthAnother'">
                         <el-button type="primary" :disabled="!rowCanWriteSchemaByPath(row.measurement)" link size="small" @click="handleDel('row', row)" :id="`calculate-table-${row.measurement}-del`">
                           {{ t('common.delete') }}
                         </el-button>
