@@ -11,7 +11,7 @@
           </el-icon>
           <span :id="subItem.path" :style="{ 'font-size': locale === 'en' ? '12px' : '14px' }">{{ subItem.title }}</span>
         </template>
-        <layout-menu-sub-item :menu-list="subItem.children" :show-auth-menu="showAuthMenu" />
+        <layout-menu-sub-item :menu-list="subItem.children" :show-auth-menu="showAuthMenu" :show-config-menu="showConfigMenu" />
       </el-sub-menu>
     </template>
     <template v-else>
@@ -44,6 +44,7 @@ const rootMenu = inject<MenuProvider>('rootMenu');
 const props = defineProps<{
   menuList: MenuOptions[];
   showAuthMenu?: boolean;
+  showConfigMenu: boolean;
 }>();
 
 const { locale } = useI18n();
@@ -54,6 +55,9 @@ const menus = computed<MenuOptions[]>(() => {
   return menuList.filter((item) => {
     if (item.isAuthMenu) {
       return props.showAuthMenu;
+    }
+    if (item.isRoot) {
+      return props.showConfigMenu;
     }
     return true;
   });

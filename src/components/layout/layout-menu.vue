@@ -32,7 +32,7 @@
     </div>
     <el-scrollbar :style="{ height: !isCollapse ? 'calc(100% - 124px)' : 'calc(100% - 88px)' }">
       <el-menu :default-active="activeMenu" :router="true" :collapse="isCollapse" :collapse-transition="false" :default-openeds="['/system/auth']" :unique-opened="false">
-        <layout-menu-sub-item :menu-list="menuList" :show-auth-menu="true" />
+        <layout-menu-sub-item :menu-list="menuList" :show-auth-menu="true" :show-config-menu="showConfigMenu" />
       </el-menu>
     </el-scrollbar>
 
@@ -45,7 +45,7 @@ import { ref, computed, onMounted } from 'vue';
 import { type RouteRecordRaw, useRoute, useRouter } from 'vue-router';
 // import { storeToRefs } from 'pinia';
 import useMenuStore from '@/stores/menu';
-import { useConnectionStore } from '@/stores';
+import { useConnectionStore, useUserStore } from '@/stores';
 // import useAppStore from '@/stores/app';
 import { ConnectionApi } from '@/api';
 import ModalConnection from '@/components/modal-connection.vue';
@@ -57,10 +57,12 @@ import LayoutMenuSubItem from './components/layout-menu-sub-item.vue';
 // const { systemTitle } = storeToRefs(appStore);
 const { t, locale } = useI18n();
 const connectionStore = useConnectionStore();
+const userStore = useUserStore();
 const route = useRoute();
 const menuStore = useMenuStore();
 const router = useRouter();
 const allRoutes = computed(() => router.options.routes);
+const userName = computed(() => userStore.userInfo.name);
 const connectionVisible = ref(false);
 // 因趋势 监听主备集群 websocket 会调用两次，不设置默认值，菜单侧因主备集群其一未能正常使用，接口返回慢，此处设置默认为'master'。
 const clusterType = computed(() => {
@@ -80,6 +82,8 @@ const connectionHost = computed(() => {
 });
 
 // const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion));
+
+const showConfigMenu = computed(() => userName.value === 'root');
 
 const { requestFn: changeCluster } = useRequest(ConnectionApi.changeCluster);
 
@@ -102,6 +106,7 @@ const routesToMenu = (routeItem: RouteRecordRaw, parentPath: string) => {
     hideLine: routeItem.meta?.hideLine,
     showTopLine: routeItem.meta?.showTopLine,
     isAuthMenu: routeItem.meta?.isAuthMenu,
+    isRoot: routeItem.meta?.isRoot,
   } as MenuOptions;
   if (routeItem.children && routeItem.children.length > 0) {
     if (routeItem.children.length === 1 && !routeItem.meta?.alwayShow && (!routeItem.children[0].children?.length || routeItem.children[0].children?.length <= 1)) {

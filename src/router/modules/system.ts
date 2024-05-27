@@ -90,6 +90,17 @@ const route = [
           icon: ICustomAuditLog,
         },
       },
+      {
+        path: 'config',
+        name: 'IoTDBConfig',
+        component: () => import('@/views/iotdb-config/detail.vue'),
+        meta: {
+          keepAlive: true,
+          title: 'page.config',
+          icon: ICustomAuditLog,
+          isRoot: true,
+        },
+      },
       // {
       //   path: 'white-list',
       //   name: 'WhiteList',

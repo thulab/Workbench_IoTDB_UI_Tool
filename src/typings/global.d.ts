@@ -92,6 +92,7 @@ declare global {
     showTopLine?: boolean;
     children?: MenuOptions[];
     isAuthMenu?: boolean;
+    isRoot?: boolean;
   }
 
   type CallBackFunction = (success: boolean) => void;

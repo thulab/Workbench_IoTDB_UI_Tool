@@ -160,6 +160,7 @@ page:
   auditLog: 审计日志
   calculate: 计算
   view: 视图
+  config: 数据库配置
 measurement:
   databaseTitle: 数据库
   deleteDatabaseTip: 此操作会删除数据库下全部测点和数据，是否删除？
@@ -754,3 +755,11 @@ spectrum:
   abs: 模
   angle: 幅角
   expandingFold: 扩增倍数
+iotdbConfig:
+  searchPlaceholder: 请输入搜索内容
+  configList: 配置列表
+  configFile: 配置文件地址：
+  confitTitle: 配置名称
+  configDesc: 配置描述
+  cofigEffective: 生效方式
+  configContent: 配置内容
