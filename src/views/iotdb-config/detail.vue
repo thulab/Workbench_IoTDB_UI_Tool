@@ -30,6 +30,7 @@
           </div>
         </div>
         <div class="page-table-box">
+          <!-- @sort-change="({ column, prop, order }) => handleSortChange({ column, prop, order })" -->
           <el-table
             :data="tableDataPagination"
             v-loading="loading"
@@ -40,12 +41,11 @@
             :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
             ref="tableRef"
             :default-sort="{ prop: 'name', order: 'ascending' }"
-            @sort-change="({ column, prop, order }) => handleSortChange({ column, prop, order })"
           >
-            <el-table-column :label="t('iotdbConfig.confitTitle')" prop="name" sortable="custom" :sort-orders="['ascending', 'descending']" width="160" align="center" show-overflow-tooltip />
-            <el-table-column :label="t('iotdbConfig.configDesc')" prop="name1" width="320" align="center" />
-            <el-table-column :label="t('iotdbConfig.cofigEffective')" prop="name2" width="160" align="center" show-overflow-tooltip />
-            <el-table-column :label="t('iotdbConfig.configContent')" prop="name3" width="160" align="center" show-overflow-tooltip>
+            <el-table-column :label="t('iotdbConfig.confitTitle')" prop="name" sortable :sort-orders="['ascending', 'descending']" width="20%" align="center" />
+            <el-table-column :label="t('iotdbConfig.configDesc')" prop="name1" width="40%" align="center" />
+            <el-table-column :label="t('iotdbConfig.cofigEffective')" prop="name2" width="20%" align="center" />
+            <el-table-column :label="t('iotdbConfig.configContent')" prop="name3" width="20%" align="center">
               <template #default="{ row }">
                 <div class="view-config-box" v-if="!row.editable">
                   <span>{{ row.name3 }}</span>
@@ -54,7 +54,7 @@
                   </el-button>
                 </div>
                 <div class="edit-config-box" v-else>
-                  <el-input v-model="row.name3" style="width: 220px" :id="`iotdb-config-edit-${row.name}-input`" placeholder="" />
+                  <el-input v-model.trim="row.name3" style="width: 220px" :id="`iotdb-config-edit-${row.name}-input`" placeholder="" />
                   <el-button link :class="['m-l-16', 'svg-button-hover-color']" @click="handleEditConfirm(row)" :id="`iotdb-config-confirm-${row.name}`">
                     <i-custom-confirm />
                   </el-button>
@@ -113,7 +113,17 @@ const pagination = reactive({
 const totalCount = ref(0);
 const loading = ref(false);
 const tableData = ref({
-  list: [],
+  list: [
+    { name: 'cn_internal_address', name1: '用于集群内部RPC通信', name2: '重启生效', name3: '127.0.0.1' },
+    { name: 'cn_internal_port', name1: '用于集群内部RPC通信端口号', name2: '重启生效', name3: '10710' },
+    {
+      name: 'cn_seed_config_node2',
+      name1:
+        '对于启动的第一个 ConfigNode, cn_seed_config_node 指向它自己的内部地址：内部端口号。对于其他要加入集群的 ConfigNode, cn_seed_config_node 指向任何正在运行的 ConfigNode 的内部地址：内部端口号。',
+      name2: '首次启动后不可修改',
+      name3: '127.0.0.1',
+    },
+  ],
 });
 const userName = computed(() => userStore.userInfo.name);
 const showConfigMenu = computed(() => userName.value === 'root');
@@ -252,8 +262,11 @@ watch(
   }
 }
 
-.view-config-box {
+.view-config-box,
+.edit-config-box {
+  width: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 </style>
