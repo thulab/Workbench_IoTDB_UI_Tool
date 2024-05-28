@@ -763,3 +763,4 @@ iotdbConfig:
   configDesc: 配置描述
   cofigEffective: 生效方式
   configContent: 配置内容
+  continueTip: 当前配置内容未进行确认，是否继续操作？
