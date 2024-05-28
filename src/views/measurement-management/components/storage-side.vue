@@ -2,7 +2,17 @@
   <div class="storage-list-title">
     <h4>{{ t('measurement.databaseTitle') }}</h4>
     <div class="storage-operate-buttons">
-      <el-button link class="m-r-8 border-refresh-icon svg-button-hover-color" @click="getStorageList()" id="mesaurement-side-refresh"><i-custom-refresh /></el-button>
+      <auth-tooltip :is-disabled="canReadWriteSchema" :content="'common.schemaAuth'">
+        <el-button
+          link
+          :disabled="!canReadWriteSchema"
+          :class="['m-r-8', 'border-refresh-icon', !canReadWriteSchema ? '' : 'svg-button-hover-color']"
+          @click="getStorageList()"
+          id="mesaurement-side-refresh"
+        >
+          <i-custom-refresh />
+        </el-button>
+      </auth-tooltip>
       <auth-tooltip :is-disabled="canManageDatabase" :content="'common.databaseAuth'">
         <el-button link style="margin: 0" :disabled="!canManageDatabase" @click="handleAddStorage" id="mesaurement-side-add">
           <i-custom-new-storage />

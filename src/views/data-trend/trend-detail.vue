@@ -51,10 +51,10 @@
             <el-icon size="30" v-if="!isRunningTab" style="cursor: not-allowed"><i-custom-play-disabled /></el-icon>
             <template v-else>
               <!-- <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'"> -->
-              <el-button link v-if="!loading" :disabled="!canReadWriteData" @click="handlePlay(true)" id="trend-search-run">
+              <el-button link v-if="!loading" :disabled="!canReadWriteData || !pathList.length" @click="handlePlay(true)" id="trend-search-run">
                 <el-icon size="30"><i-custom-play-active /></el-icon>
               </el-button>
-              <el-button link v-else :disabled="!canReadWriteData" @click="handlePlay(false)" id="trend-search-pause">
+              <el-button link v-else :disabled="!canReadWriteData || !pathList.length" @click="handlePlay(false)" id="trend-search-pause">
                 <el-icon size="30"><i-custom-pause /></el-icon>
               </el-button>
               <!-- </auth-tooltip> -->
