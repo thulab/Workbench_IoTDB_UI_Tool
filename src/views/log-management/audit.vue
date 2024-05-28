@@ -41,59 +41,63 @@
         </el-form>
         <div class="search-form-buttons">
           <el-button @click="handleReset" id="audit-search-reset">{{ t('common.reset') }}</el-button>
-          <el-button type="primary" @click="handleSearch" id="audit-search-search">{{ t('common.query') }}</el-button>
+          <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
+            <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="audit-search-search">{{ t('common.query') }}</el-button>
+          </auth-tooltip>
         </div>
       </el-header>
       <el-main class="p-0">
         <div class="page-table-details">
           <h4 class="page-table-title">{{ t('log.auditList') }}</h4>
-          <div class="page-table-box">
-            <el-table
-              :data="tableData.list"
-              v-loading="loading"
-              style="width: 100%"
-              :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
-              :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
-              tooltip-effect="light"
-              :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
-              ref="tableRef"
-            >
-              <el-table-column :label="t('log.operateTime')" prop="time" width="180" align="center" show-overflow-tooltip />
-              <el-table-column :label="t('log.ip')" prop="address" width="160" align="center" show-overflow-tooltip />
-              <el-table-column :label="t('log.operateUser')" prop="username" width="140" align="center" show-overflow-tooltip />
-              <el-table-column :label="t('common.operationDetail')" prop="log" min-width="280" align="left">
-                <template #default="{ row, $index }">
-                  <overflow-click
-                    class="detail-text-button"
-                    :content="row.log"
-                    :key="`${row.time + $index}_${row.log}`"
-                    :id="`${row.time + $index}_${row.log}`"
-                    :offset="24"
-                    @handleClick="() => handleView(row)"
-                  />
+          <auth-container :is-auth="canReadWriteData" style="height: calc(100% - 36px)" :content="'common.dataAuth'">
+            <div class="page-table-box">
+              <el-table
+                :data="tableData.list"
+                v-loading="loading"
+                style="width: 100%"
+                :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+                :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+                tooltip-effect="light"
+                :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
+                ref="tableRef"
+              >
+                <el-table-column :label="t('log.operateTime')" prop="time" width="180" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('log.ip')" prop="address" width="160" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('log.operateUser')" prop="username" width="140" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('common.operationDetail')" prop="log" min-width="280" align="left">
+                  <template #default="{ row, $index }">
+                    <overflow-click
+                      class="detail-text-button"
+                      :content="row.log"
+                      :key="`${row.time + $index}_${row.log}`"
+                      :id="`${row.time + $index}_${row.log}`"
+                      :offset="24"
+                      @handleClick="() => handleView(row)"
+                    />
+                  </template>
+                </el-table-column>
+                <template #empty>
+                  <div class="table-empty-wrapper">
+                    <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
+                    <span class="data-empty-text">{{ t('common.noData') }}</span>
+                  </div>
                 </template>
-              </el-table-column>
-              <template #empty>
-                <div class="table-empty-wrapper">
-                  <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
-                  <span class="data-empty-text">{{ t('common.noData') }}</span>
-                </div>
-              </template>
-            </el-table>
+              </el-table>
 
-            <el-pagination
-              v-if="totalCount > 0"
-              v-model:currentPage="pagination.pageNum"
-              v-model:page-size="pagination.pageSize"
-              class="m-t-20"
-              layout="prev, pager, next, sizes, jumper"
-              background
-              :page-sizes="[10, 20, 50, 100]"
-              :total="totalCount"
-              @size-change="onChangePageSize"
-              @current-change="onChangePage"
-            />
-          </div>
+              <el-pagination
+                v-if="totalCount > 0"
+                v-model:currentPage="pagination.pageNum"
+                v-model:page-size="pagination.pageSize"
+                class="m-t-20"
+                layout="prev, pager, next, sizes, jumper"
+                background
+                :page-sizes="[10, 20, 50, 100]"
+                :total="totalCount"
+                @size-change="onChangePageSize"
+                @current-change="onChangePage"
+              />
+            </div>
+          </auth-container>
         </div>
       </el-main>
 
@@ -107,15 +111,18 @@
 <script setup lang="ts">
 import type { FormInstance } from 'element-plus';
 import { cloneDeep } from 'lodash-es';
+import { storeToRefs } from 'pinia';
 import { LogApi } from '@/api';
-import { useConnectionStore } from '@/stores';
+import { useConnectionStore, useUserStore } from '@/stores';
 import { getStartAndEnd, today, formatDate, getOneInterval, getOneIntervalNow } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
 import OverflowClick from './components/overflow-click.vue';
 
 const { t } = useI18n();
 const connectionStore = useConnectionStore();
+const userStore = useUserStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
+const { canReadWriteData } = storeToRefs(userStore);
 const { maxTableHeight } = useTableHeight(315);
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({
@@ -207,17 +214,11 @@ function handleView(row: Log.AuditData) {
   dialogVisible.value = true;
 }
 
-onMounted(() => {
-  if (!connectionIsActive.value) return;
-  handleReset();
-  handleSearch();
-});
-
 watch(
-  () => connectionIsActive.value,
+  () => connectionIsActive.value && canReadWriteData.value,
   (val) => {
+    handleReset();
     if (val) {
-      handleReset();
       handleSearch();
     }
   },
