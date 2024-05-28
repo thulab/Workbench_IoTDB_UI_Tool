@@ -140,11 +140,14 @@ import MonitorDashboard from './components/monitor-dashboard.vue';
 const { t } = useI18n();
 const connectionStore = useConnectionStore();
 const userStore = useUserStore();
-const { canUsePipe, enablePrometheus, configurePrometheus } = storeToRefs(userStore);
+const { canUsePipe, canMaintain, enablePrometheus, configurePrometheus } = storeToRefs(userStore);
 const showPrometheus = computed(() => enablePrometheus.value && configurePrometheus.value);
 const monitorTip = computed(() => {
-  if (!canUsePipe.value) {
+  if ((!canUsePipe.value && !canMaintain.value) || !canUsePipe.value) {
     return t('common.pipeAuth');
+  }
+  if (!canMaintain.value) {
+    return t('common.maintainAuth');
   }
   if (!showPrometheus.value) {
     return t('common.noData');
@@ -153,7 +156,7 @@ const monitorTip = computed(() => {
 });
 
 const monitorTipDisabled = computed(() => {
-  if (canUsePipe.value && showPrometheus.value) {
+  if (canUsePipe.value && canMaintain.value && showPrometheus.value) {
     return true;
   }
   return false;
