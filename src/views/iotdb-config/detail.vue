@@ -21,10 +21,10 @@
           <div class="operate-buttons">
             <span class="page-tip-text">{{ t('iotdbConfig.configFile') }}</span>
             <span class="page-content-text">{{ 'iotdb-1.3.1.2-bin/conf/iotdb-confignode.properties' }}</span>
-            <el-button link class="m-l-16" @click="handleDoc" id="iotdbConfig-doc">
+            <el-button link class="m-l-16 svg-button-hover-color" @click="handleDoc" id="iotdbConfig-doc">
               <el-icon size="24"><i-custom-model-doc /></el-icon>
             </el-button>
-            <el-button link @click="handleRefresh" id="iotdbConfig-refresh">
+            <el-button link class="svg-button-hover-color" @click="handleRefresh" id="iotdbConfig-refresh">
               <el-icon size="24"><i-custom-refresh /></el-icon>
             </el-button>
           </div>
@@ -35,6 +35,7 @@
             :data="tableDataPagination"
             v-loading="loading"
             style="width: 100%"
+            border
             :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
             :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
             tooltip-effect="light"
@@ -54,12 +55,12 @@
                   </el-button>
                 </div>
                 <div class="edit-config-box" v-else>
-                  <el-input v-model.trim="row.name3" style="width: 220px" :id="`iotdb-config-edit-${row.name}-input`" placeholder="" />
+                  <el-input v-model.trim="row.name3" style="flex: 1" :id="`iotdb-config-edit-${row.name}-input`" placeholder="" />
                   <el-button link :class="['m-l-16', 'svg-button-hover-color']" @click="handleEditConfirm(row)" :id="`iotdb-config-confirm-${row.name}`">
-                    <i-custom-confirm />
+                    <el-icon size="16"><i-custom-confirm /></el-icon>
                   </el-button>
                   <el-button link :class="['m-l-12', 'svg-button-hover-color']" @click="handleEditCancen(row)" :id="`iotdb-config-cancel-${row.name}`">
-                    <i-custom-close />
+                    <el-icon size="16"><i-custom-close-deep /></el-icon>
                   </el-button>
                 </div>
               </template>
@@ -175,8 +176,8 @@ function handleOtherConfirm() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return new Promise((resolve, reject) => {
     ElMessageBox.confirm(t('iotdbConfig.continueTip'), t('common.notice'), {
-      confirmButtonText: t('common.confirm'),
-      cancelButtonText: t('common.cancel'),
+      confirmButtonText: t('common.continue'),
+      cancelButtonText: t('common.giveup'),
       confirmButtonClass: 'iotdb-config-continue-confirm',
       cancelButtonClass: 'iotdb-config-continue-cancel',
       type: 'warning',

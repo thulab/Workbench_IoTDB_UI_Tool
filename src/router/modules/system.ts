@@ -11,6 +11,7 @@ import ICustomCalculateActive from '@/assets/icons/calculate-active.svg?raw';
 import ICustomAuthRole from '@/assets/icons/auth-role.svg?raw';
 // import ICustomLogManagement from '@/assets/icons/log-management.svg?raw';
 import ICustomAuditLog from '@/assets/icons/audit-log.svg?raw';
+import ICustomIotdbConfig from '@/assets/icons/iotdb-config.svg?raw';
 // import ICustomWhiteList from '@/assets/icons/white-list.svg?raw';
 import ICustomVisualization from '@/assets/icons/visualization.svg?raw';
 import ICustomVisualizationActive from '@/assets/icons/visualization-active.svg?raw';
@@ -97,7 +98,7 @@ const route = [
         meta: {
           keepAlive: true,
           title: 'page.config',
-          icon: ICustomAuditLog,
+          icon: ICustomIotdbConfig,
           isRoot: true,
         },
       },

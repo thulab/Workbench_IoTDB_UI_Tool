@@ -77,6 +77,7 @@ declare module 'vue' {
     ICustomCircleCloseHalf: typeof import('~icons/custom/circle-close-half')['default']
     ICustomClose: typeof import('~icons/custom/close')['default']
     ICustomCloseCircle: typeof import('~icons/custom/close-circle')['default']
+    ICustomCloseDeep: typeof import('~icons/custom/close-deep')['default']
     ICustomConfirm: typeof import('~icons/custom/confirm')['default']
     ICustomConnection: typeof import('~icons/custom/connection')['default']
     ICustomConnectionCluster: typeof import('~icons/custom/connection-cluster')['default']
