@@ -797,6 +797,7 @@ function handlePlay(val: boolean) {
 function handleTrendTab(type: 'running' | 'history', unforce?: boolean) {
   if (dataTab.value === type && !unforce) return;
   dataTab.value = type;
+  if (!canReadWriteData.value) return;
   nextTick(() => {
     if (type === 'history') {
       loading.value = false;
@@ -1022,6 +1023,10 @@ watch(
     if (val !== old && (val === true || val === false)) {
       if (socketInstance.value) {
         socketInstance.value.close();
+      }
+      if (!canReadWriteData.value) {
+        setOption(chartOptions.value);
+        return;
       }
       initWebsocket(() => {
         if (route.query.measurement) {
