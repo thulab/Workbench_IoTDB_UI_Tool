@@ -438,9 +438,9 @@ function rowCanWriteSchemaByPath(path: string) {
   return false;
 }
 
-function rowReadWriteDataByPath(path: string) {
+function rowReadWriteDataByParentPath(path: string) {
   if (userAllEntityPrivileges.value.includes('READ_DATA') || userAllEntityPrivileges.value.includes('WRITE_DATA')) return true;
-  const authList = getPathAuthList(path, userAllPathPrivileges.value);
+  const authList = getParentPathAuthList(path, userAllPathPrivileges.value);
   if (authList.length) {
     return authList.includes('READ_DATA') || authList.includes('WRITE_DATA');
   }
@@ -530,7 +530,7 @@ function getListData() {
         timeseriesList.push(`${item.deviceName}.${item.timeseries}`);
         viewTypeList.push(item.viewType || 'BASE');
       });
-      const authTimeseries = tableData.value.measurements.filter((f) => rowReadWriteDataByPath(`${f.deviceName}.${f.timeseries}`)).map((d) => `${d.deviceName}.${d.timeseries}`);
+      const authTimeseries = tableData.value.measurements.filter((f) => rowReadWriteDataByParentPath(`${f.deviceName}.${f.timeseries}`)).map((d) => `${d.deviceName}.${d.timeseries}`);
       getBatchLastValue(timeseriesList, viewTypeList).then((newRes) => {
         if (newRes.data.values.length || newRes.data.timestamps.length) {
           tableData.value.measurements.forEach((item, index) => {

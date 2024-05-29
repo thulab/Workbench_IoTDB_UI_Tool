@@ -147,7 +147,7 @@ import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { CalculateApi, StorageApi } from '@/api';
 import { useUserStore, useConnectionStore } from '@/stores';
-import { getPathAuthList } from '@/utils/auth';
+import { getPathAuthList, getParentPathAuthList } from '@/utils/auth';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalCalculate from './components/modal-calculate.vue';
 import ModalExpression from './components/modal-expression.vue';
@@ -217,9 +217,9 @@ function rowCanWriteSchemaByPath(path: string) {
   return false;
 }
 
-function rowReadWriteDataByPath(path: string) {
+function rowReadWriteDataByParentPath(path: string) {
   if (userAllEntityPrivileges.value.includes('READ_DATA') || userAllEntityPrivileges.value.includes('WRITE_DATA')) return true;
-  const authList = getPathAuthList(path, userAllPathPrivileges.value);
+  const authList = getParentPathAuthList(path, userAllPathPrivileges.value);
   if (authList.length) {
     return authList.includes('READ_DATA') || authList.includes('WRITE_DATA');
   }
@@ -249,7 +249,7 @@ function getNewVal() {
       timeseriesList.push(item.measurement);
       viewTypeList.push('VIEW');
     });
-    const authTimeseries = tableData.value.list.filter((f) => rowReadWriteDataByPath(f.measurement)).map((d) => d.measurement);
+    const authTimeseries = tableData.value.list.filter((f) => rowReadWriteDataByParentPath(f.measurement)).map((d) => d.measurement);
     getBatchLastValue(timeseriesList, viewTypeList).then((newRes) => {
       if (newRes.data.values.length || newRes.data.timestamps.length) {
         tableData.value.list.forEach((item, index) => {
