@@ -572,6 +572,9 @@ watch(
       }
       handleReset();
       handleSearch();
+    } else if (route.query.measurement) {
+      handleReset();
+      searchFormData.path = [route.query.measurement] as string[];
     }
   },
   {

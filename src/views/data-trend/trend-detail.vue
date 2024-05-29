@@ -1025,6 +1025,9 @@ watch(
         socketInstance.value.close();
       }
       if (!canReadWriteData.value) {
+        if (route.query.measurement) {
+          searchFormData.path = [route.query.measurement as string];
+        }
         setOption(chartOptions.value);
         return;
       }
