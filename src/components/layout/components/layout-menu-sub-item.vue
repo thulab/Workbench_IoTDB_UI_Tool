@@ -36,8 +36,11 @@
 import { computed } from 'vue';
 import { type MenuProvider } from 'element-plus';
 import useMenuStore from '@/stores/menu';
+import { useConnectionStore } from '@/stores';
+import { iotdbShowAuth } from '@/utils/auth';
 
 const menuStore = useMenuStore();
+const connectionStore = useConnectionStore();
 const isCollapse = computed((): boolean => menuStore.isCollapse);
 const rootMenu = inject<MenuProvider>('rootMenu');
 
@@ -49,6 +52,8 @@ const props = defineProps<{
 
 const { locale } = useI18n();
 
+const showVersionMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.3'));
+
 const menus = computed<MenuOptions[]>(() => {
   const { menuList } = props;
   menuList.sort((a, b) => (a.order || 0) - (b.order || 0));
@@ -57,7 +62,7 @@ const menus = computed<MenuOptions[]>(() => {
       return props.showAuthMenu;
     }
     if (item.isRoot) {
-      return props.showConfigMenu;
+      return props.showConfigMenu && showVersionMenu.value;
     }
     return true;
   });
