@@ -179,12 +179,16 @@ function getMinMaxData() {
     startTime: formatDate(copySearchFormData.datetimerange[0] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
     endTime: formatDate(copySearchFormData.datetimerange[1] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
     timestamp: timestamp.value,
-  }).then((res) => {
-    minMaxList.value = res.data.data || [];
-    if (res.data.message) {
-      tableErrorMessage.value.push(res.data.message);
-    }
-  });
+  })
+    .then((res) => {
+      minMaxList.value = res.data.data || [];
+      if (res.data.message) {
+        tableErrorMessage.value.push(res.data.message);
+      }
+    })
+    .catch(() => {
+      minMaxList.value = [];
+    });
 }
 
 function getAvgSumData() {
@@ -193,20 +197,21 @@ function getAvgSumData() {
     startTime: formatDate(copySearchFormData.datetimerange[0] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
     endTime: formatDate(copySearchFormData.datetimerange[1] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
     timestamp: timestamp.value,
-  }).then((res) => {
-    avgSumList.value = res.data.data || [];
-    if (res.data.message) {
-      tableErrorMessage.value.push(res.data.message);
-    }
-  });
+  })
+    .then((res) => {
+      avgSumList.value = res.data.data || [];
+      if (res.data.message) {
+        tableErrorMessage.value.push(res.data.message);
+      }
+    })
+    .catch(() => {
+      avgSumList.value = [];
+    });
 }
 
 function getListData() {
-  tableData.value = [];
-  minMaxList.value = [];
-  avgSumList.value = [];
-  tableErrorMessage.value = [];
   getListLoading.value = true;
+  tableErrorMessage.value = [];
   Promise.allSettled([getMinMaxData(), getAvgSumData()]).then(() => {
     tableData.value = minMaxList.value.map((item, index) => ({
       measurement: item.measurement,
