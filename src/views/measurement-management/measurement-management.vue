@@ -128,8 +128,8 @@
               </template>
             </el-dropdown>
           </auth-tooltip>
-          <auth-tooltip :is-disabled="canWriteSchema" :content="'common.schemaAuthAnother'">
-            <el-button :disabled="!currentStorage || multipleSelection.length === 0 || !canWriteSchema" type="primary" @click="handleDelRow('batch', null)" id="mesaurement-batch-del">
+          <auth-tooltip :is-disabled="canWriteSchemaByParentPath" :content="'common.schemaAuthAnother'">
+            <el-button :disabled="!currentStorage || multipleSelection.length === 0 || !canWriteSchemaByParentPath" type="primary" @click="handleDelRow('batch', null)" id="mesaurement-batch-del">
               {{ t('common.batchDelete') }}
             </el-button>
           </auth-tooltip>
