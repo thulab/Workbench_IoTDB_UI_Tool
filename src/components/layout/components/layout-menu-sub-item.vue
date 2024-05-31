@@ -11,7 +11,7 @@
           </el-icon>
           <span :id="subItem.path" :style="{ 'font-size': locale === 'en' ? '12px' : '14px' }">{{ subItem.title }}</span>
         </template>
-        <layout-menu-sub-item :menu-list="subItem.children" :show-auth-menu="showAuthMenu" :show-config-menu="showConfigMenu" />
+        <layout-menu-sub-item :menu-list="subItem.children" :show-auth-menu="showAuthMenu" />
       </el-sub-menu>
     </template>
     <template v-else>
@@ -47,12 +47,11 @@ const rootMenu = inject<MenuProvider>('rootMenu');
 const props = defineProps<{
   menuList: MenuOptions[];
   showAuthMenu?: boolean;
-  showConfigMenu: boolean;
 }>();
 
 const { locale } = useI18n();
 
-const showVersionMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.3'));
+const showVersionMenu = (version: string) => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, version);
 
 const menus = computed<MenuOptions[]>(() => {
   const { menuList } = props;
@@ -61,8 +60,8 @@ const menus = computed<MenuOptions[]>(() => {
     if (item.isAuthMenu) {
       return props.showAuthMenu;
     }
-    if (item.isRoot) {
-      return props.showConfigMenu && showVersionMenu.value;
+    if (item.needVersion) {
+      return showVersionMenu(item.needVersion);
     }
     return true;
   });

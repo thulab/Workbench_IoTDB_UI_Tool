@@ -121,6 +121,7 @@ export const useUserStore = defineStore(
     const canManageUser = computed(() => userAllEntityPrivileges.value.includes('MANAGE_USER'));
     const canManageRole = computed(() => userAllEntityPrivileges.value.includes('MANAGE_ROLE'));
     const canAlterPwd = computed(() => userAllEntityPrivileges.value.includes('MANAGE_USER'));
+    const canMaintain = computed(() => userAllEntityPrivileges.value.includes('MAINTAIN'));
 
     function clearUserStore() {
       userInfo.value.name = '';
@@ -206,6 +207,7 @@ export const useUserStore = defineStore(
       canManageUser,
       canManageRole,
       canAlterPwd,
+      canMaintain,
       setUser,
       clearUserStore,
     };

@@ -99,7 +99,7 @@ const route = [
           keepAlive: true,
           title: 'page.config',
           icon: ICustomIotdbConfig,
-          isRoot: true,
+          needVersion: '1.3.3',
         },
       },
       // {
