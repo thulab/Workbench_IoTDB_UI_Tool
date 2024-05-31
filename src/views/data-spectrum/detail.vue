@@ -882,8 +882,7 @@ const onResize = debounce(() => {
 
 function getUdfList() {
   getUDFFunction().then((res) => {
-    const data = res.data || [];
-    methodList.value = data.filter((item) => item.functionName !== 'ENVELOPE');
+    methodList.value = res.data || [];
   });
 }
 
