@@ -221,9 +221,9 @@ watch(
   (val) => {
     if (val) {
       getNodeList();
-      nextTick(() => {
+      setTimeout(() => {
         initEditor();
-      });
+      }, 300);
     }
   },
   {
