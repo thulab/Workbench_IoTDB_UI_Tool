@@ -9,40 +9,37 @@
       </div>
     </el-header>
     <auth-container :is-auth="canMaintain" style="flex: 1">
-      <el-main class="p-0" style="height: 100%">
-        <div class="editor-wrapper">
-          <div class="editor-header">
-            <el-select v-model="currentNode" :placeholder="t('common.all')" style="width: 256px" @change="handleChangeNode" id="iotdb-config-select-node">
-              <el-option
-                v-for="(item, index) in nodeList"
-                :key="`${item.address}(${item.type})_${index}`"
-                :value="item.nodeID"
-                :id="`iotdb-config-node-select-${item.nodeID}`"
-                :label="item.address ? `${item.address}(${item.type})` : t('common.all')"
-              />
-            </el-select>
-          </div>
-          <div style="flex: 1" class="flex">
-            <div class="editor-box">
-              <div class="flex-justify-between">
-                <h4 class="editor-title">{{ t('common.edit') }}</h4>
-                <el-button link @click="handleRefresh" id="iotdb-config-refresh" class="svg-button-hover-color">
-                  <el-icon size="24"><i-custom-refresh /></el-icon>
-                </el-button>
-              </div>
-              <div class="input-container" ref="inputContainer" id="inputContainer"></div>
-              <div class="editor-operate-box">
-                <el-button plain @click="handleEditCancel" id="iotdb-config-reset">{{ t('common.reset') }}</el-button>
-                <el-button type="primary" :loading="saveLoading" @click="handleEditConfirm" id="iotdb-config-save">{{ t('common.ack') }}</el-button>
-              </div>
-            </div>
-            <div class="preview-box m-l-16">
-              <div class="flex-justify-between">
-                <h4 class="editor-title">{{ t('search.template') }}</h4>
-              </div>
-              <div class="output-container" ref="outputContainer" id="outputContainer"></div>
+      <el-main class="editor-wrapper">
+        <div class="editor-box">
+          <div class="flex-justify-between m-b-6">
+            <h4 class="editor-title">{{ t('common.edit') }}</h4>
+            <div class="flex-justify-between node-select-box">
+              <span class="search-from-label">{{ t('dashboard.node') }}：</span>
+              <el-select v-model="currentNode" :placeholder="t('common.all')" style="width: 280px" @change="handleChangeNode" id="iotdb-config-select-node">
+                <el-option
+                  v-for="(item, index) in nodeList"
+                  :key="`${item.address}(${item.type})_${index}`"
+                  :value="item.nodeID"
+                  :id="`iotdb-config-node-select-${item.nodeID}`"
+                  :label="item.address ? `${item.address}(${item.type})` : t('common.all')"
+                />
+              </el-select>
+              <el-button link @click="handleRefresh" id="iotdb-config-refresh" class="svg-button-hover-color m-l-16 p-0" style="height: 24px !important">
+                <el-icon size="24"><i-custom-refresh /></el-icon>
+              </el-button>
             </div>
           </div>
+          <div class="input-container" ref="inputContainer" id="inputContainer"></div>
+          <div class="editor-operate-box">
+            <el-button plain @click="handleEditCancel" id="iotdb-config-reset">{{ t('common.reset') }}</el-button>
+            <el-button type="primary" :loading="saveLoading" @click="handleEditConfirm" id="iotdb-config-save">{{ t('common.ack') }}</el-button>
+          </div>
+        </div>
+        <div class="preview-box m-l-16">
+          <div class="flex-justify-between m-b-6">
+            <h4 class="editor-title">{{ t('search.template') }}</h4>
+          </div>
+          <div class="output-container" ref="outputContainer" id="outputContainer"></div>
         </div>
       </el-main>
     </auth-container>
@@ -170,10 +167,19 @@ const initEditor = () => {
     inputEditor.value = monaco.editor.create(inputContainer.value, {
       value: initValue,
       language: 'json',
-      theme: 'vs-dark',
+      theme: 'vs',
       formatOnPaste: true,
       automaticLayout: true,
-      fontSize: 16,
+      fontSize: 12,
+      lineHeight: 24,
+      contextmenu: false,
+      wordBreak: 'keepAll',
+      defaultColorDecorators: true,
+      scrollBeyondLastLine: false,
+      scrollbar: {
+        horizontalScrollbarSize: 4,
+        verticalScrollbarSize: 4,
+      },
       minimap: {
         enabled: false,
       },
@@ -193,13 +199,23 @@ const initEditor = () => {
     outputEditor.value = monaco.editor.create(outputContainer.value, {
       value: '',
       language: 'sql',
-      theme: 'vs-dark',
+      theme: 'vs',
       formatOnPaste: true,
       automaticLayout: true,
-      fontSize: 16,
+      fontSize: 12,
+      lineHeight: 24,
+      contextmenu: false,
+      wordBreak: 'keepAll',
+      defaultColorDecorators: true,
+      scrollBeyondLastLine: false,
+      scrollbar: {
+        horizontalScrollbarSize: 4,
+        verticalScrollbarSize: 4,
+      },
       minimap: {
         enabled: false,
       },
+      readOnly: true,
     });
   }
 };
@@ -253,22 +269,39 @@ watch(
 
 .editor-wrapper {
   display: flex;
-  flex-direction: column;
   width: 100%;
   height: 100%;
-  padding: 8px;
+  padding: 16px;
   box-sizing: border-box;
-}
-
-.editor-header {
-  margin: 8px 0;
 }
 
 .editor-title {
   font-size: 14px;
   font-weight: 700;
-  line-height: 28px;
+  line-height: 24px;
   color: #495ad4;
+}
+
+.search-from-label {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  color: #131926;
+}
+
+.node-select-box {
+  :deep(.el-select) {
+    height: 24px !important;
+  }
+
+  :deep(.el-select__suffix) {
+    height: 22px !important;
+  }
+
+  :deep(.el-select__wrapper) {
+    line-height: 22px !important;
+    min-height: 22px !important;
+  }
 }
 
 .editor-box,
@@ -276,9 +309,6 @@ watch(
   flex: 1;
   display: flex;
   flex-direction: column;
-  border: 1px solid #dfe1ed;
-  padding: 8px;
-  border-radius: 2px;
   box-sizing: border-box;
 }
 
@@ -287,6 +317,11 @@ watch(
   flex: 1;
   overflow: auto;
   box-sizing: border-box;
+}
+
+.output-container {
+  border: 1px solid #dfe1ed;
+  border-radius: 2px;
 }
 
 .editor-operate-box {
