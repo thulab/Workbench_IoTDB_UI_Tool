@@ -9,7 +9,7 @@
       </div>
     </el-header>
     <auth-container :is-auth="canMaintain" style="flex: 1">
-      <el-main class="p-0">
+      <el-main class="p-0" style="height: 100%">
         <div class="editor-wrapper">
           <div class="editor-header">
             <el-select v-model="currentNode" :placeholder="t('common.all')" style="width: 256px" @change="handleChangeNode" id="iotdb-config-select-node">
@@ -52,9 +52,35 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
+import * as monaco from 'monaco-editor';
+import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
+import CssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
+import HtmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
+import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 import { useConnectionStore, useUserStore } from '@/stores';
 import { iotdbShowAuth } from '@/utils/auth';
+// import IStandaloneCodeEditor = monaco.editor.IStandaloneCodeEditor;
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
+
+// eslint-disable-next-line no-restricted-globals
+(self as any).MonacoEnvironment = {
+  getWorker(_: any, label: any) {
+    if (label === 'json') {
+      return new JsonWorker();
+    }
+    if (label === 'css' || label === 'scss' || label === 'less') {
+      return new CssWorker();
+    }
+    if (label === 'html' || label === 'handlebars' || label === 'razor') {
+      return new HtmlWorker();
+    }
+    if (label === 'typescript' || label === 'javascript') {
+      return new TsWorker();
+    }
+    return new EditorWorker();
+  },
+};
 
 const { t, locale } = useI18n();
 const router = useRouter();
@@ -64,6 +90,13 @@ const { canMaintain } = storeToRefs(userStore);
 const currentNode = ref('');
 const nodeList = ref<Dashboard.NodeItem[]>([]);
 const saveLoading = ref(false);
+// const inputEditor = ref<IStandaloneCodeEditor>();
+// const outputEditor = ref<IStandaloneCodeEditor>();
+const inputEditor = ref();
+const outputEditor = ref();
+const inputContainer = ref<HTMLElement>();
+const outputContainer = ref<HTMLElement>();
+const initJSONValue = ref('');
 
 const showVersionMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.3'));
 
@@ -109,13 +142,88 @@ function handleEditCancel(row: any) {
   console.log(row, 'llll');
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getSQL = () => {
+  if (!inputEditor.value || !outputEditor.value) {
+    return;
+  }
+  const inputJSON = JSON.parse(toRaw(inputEditor.value).getValue());
+  if (!inputJSON) {
+    return;
+  }
+
+  toRaw(outputEditor.value).setValue(inputJSON);
+};
+
+// 调用执行
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const importAndCal = (val: string) => {
+  if (inputEditor.value) {
+    toRaw(inputEditor.value).setValue(val);
+    inputEditor.value!.getAction('editor.action.formatDocument')!.run();
+  }
+};
+
+const initEditor = () => {
+  if (inputContainer.value) {
+    const initValue = localStorage.getItem('draft') ?? initJSONValue.value;
+    inputEditor.value = monaco.editor.create(inputContainer.value, {
+      value: initValue,
+      language: 'json',
+      theme: 'vs-dark',
+      formatOnPaste: true,
+      automaticLayout: true,
+      fontSize: 16,
+      minimap: {
+        enabled: false,
+      },
+    });
+    setTimeout(() => {
+      if (inputEditor.value) {
+        inputEditor.value!.getAction('editor.action.formatDocument')!.run();
+      }
+    }, 500);
+    setInterval(() => {
+      if (inputEditor.value) {
+        localStorage.setItem('draft', toRaw(inputEditor.value).getValue());
+      }
+    }, 3000);
+  }
+  if (outputContainer.value) {
+    outputEditor.value = monaco.editor.create(outputContainer.value, {
+      value: '',
+      language: 'sql',
+      theme: 'vs-dark',
+      formatOnPaste: true,
+      automaticLayout: true,
+      fontSize: 16,
+      minimap: {
+        enabled: false,
+      },
+    });
+  }
+};
+
 watch(
   () => showVersionMenu.value,
   (val) => {
     if (!val) {
       router.push({ name: 'Dashboard' });
-    } else {
+    }
+  },
+  {
+    immediate: true,
+  }
+);
+
+watch(
+  () => showVersionMenu.value && canMaintain.value,
+  (val) => {
+    if (val) {
       getNodeList();
+      nextTick(() => {
+        initEditor();
+      });
     }
   },
   {
@@ -159,7 +267,7 @@ watch(
 .editor-title {
   font-size: 14px;
   font-weight: 700;
-  line-height: 21px;
+  line-height: 28px;
   color: #495ad4;
 }
 

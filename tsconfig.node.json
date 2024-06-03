@@ -4,6 +4,7 @@
   "compilerOptions": {
     "composite": true,
     "module": "ESNext",
+    "verbatimModuleSyntax": true,
     "moduleResolution": "Bundler",
     "types": ["node", "element-plus/global"]
   }
