@@ -365,8 +365,7 @@ watch(
 }
 
 .output-container {
-  border: 1px solid #dfe1ed;
-  border-radius: 2px;
+  margin-bottom: 36px;
 }
 
 .editor-operate-box {
