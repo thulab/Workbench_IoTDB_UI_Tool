@@ -22,7 +22,7 @@
                     :key="`${item.address}(${item.type})_${index}`"
                     :value="item.nodeID"
                     :id="`iotdb-config-node-select-${item.nodeID}`"
-                    :label="item.address"
+                    :label="`${item.address}(${item.type})`"
                   />
                 </el-select>
                 <el-button link @click="handleRefresh" id="iotdb-config-refresh" class="svg-button-hover-color m-l-16 p-0" style="height: 24px !important">
@@ -30,17 +30,18 @@
                 </el-button>
               </div>
             </div>
-            <div class="input-container" ref="inputContainer" id="inputContainer"></div>
+            <div class="input-container" v-loading="configLoading" ref="inputContainer" id="inputContainer"></div>
             <div class="editor-operate-box">
-              <el-button plain @click="handleEditCancel" id="iotdb-config-reset">{{ t('common.reset') }}</el-button>
-              <el-button type="primary" :loading="saveLoading" @click="handleEditConfirm" id="iotdb-config-save">{{ t('common.ack') }}</el-button>
+              <el-button plain @click="handleReset" id="iotdb-config-reset">{{ t('common.reset') }}</el-button>
+              <el-button type="primary" :loading="saveLoading" :disabled="disableConfirm" @click="handleConfirm" id="iotdb-config-save">{{ t('iotdbConfig.nodeEffect') }}</el-button>
+              <el-button type="primary" :loading="allSaveLoading" :disabled="disableConfirm" @click="handleAllConfirm" id="iotdb-config-all-save">{{ t('iotdbConfig.allEffect') }}</el-button>
             </div>
           </div>
           <div class="preview-box m-l-16">
             <div class="flex-justify-between m-b-6">
               <h4 class="editor-title">{{ t('search.template') }}</h4>
             </div>
-            <div class="output-container" ref="outputContainer" id="outputContainer"></div>
+            <div class="output-container" v-loading="templateLoading" ref="outputContainer" id="outputContainer"></div>
           </div>
         </el-main>
       </el-container>
@@ -57,9 +58,10 @@ import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import CssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
 import HtmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+import { isEqual } from 'lodash-es';
 import { useConnectionStore, useUserStore } from '@/stores';
 import { iotdbShowAuth } from '@/utils/auth';
-import { DashboardApi } from '@/api';
+import { DashboardApi, ConfigApi } from '@/api';
 // import IStandaloneCodeEditor = monaco.editor.IStandaloneCodeEditor;
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
@@ -96,13 +98,15 @@ const searchFormData = reactive({
   asc: ['asc', 'asc'],
 });
 const saveLoading = ref(false);
+const allSaveLoading = ref(false);
 // const inputEditor = ref<IStandaloneCodeEditor>();
 // const outputEditor = ref<IStandaloneCodeEditor>();
 const inputEditor = ref();
 const outputEditor = ref();
 const inputContainer = ref<HTMLElement>();
 const outputContainer = ref<HTMLElement>();
-const initJSONValue = ref('');
+const configData = ref('');
+const templateData = ref('');
 
 const showVersionMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.3'));
 
@@ -113,7 +117,18 @@ const nodeList = computed(() => {
   return masterNodes.value;
 });
 
+// TODO
+const disableConfirm = computed(() => !toRaw(inputEditor.value)?.getValue());
+
+// TODO
+const isEqualConfig = computed(() => {
+  return isEqual(configData.value, toRaw(inputEditor.value)?.getValue());
+});
+
 const { requestFn: getSystemInfo, loading } = useRequest(DashboardApi.getSystemInfo);
+const { requestFn: getConfigFile, loading: configLoading } = useRequest(ConfigApi.getConfigFile);
+const { requestFn: getConfigTemplate, loading: templateLoading } = useRequest(ConfigApi.getConfigTemplate);
+const { requestFn: updateConfigs } = useRequest(ConfigApi.updateConfigs);
 
 function handleDoc() {
   if (locale.value === 'en') {
@@ -123,6 +138,7 @@ function handleDoc() {
   }
 }
 
+// 获取节点
 function getNodeList() {
   return getSystemInfo(searchFormData.orderBy, searchFormData.asc).then((res) => {
     masterNodes.value = res.data.masterNodeInfo.nodes || [];
@@ -133,6 +149,32 @@ function getNodeList() {
     }
     currentNode.value = nodeList.value[0].nodeID;
   });
+}
+
+// 获取模板配置
+function getTemplate() {
+  getConfigTemplate()
+    .then((res) => {
+      templateData.value = res.data || '';
+      toRaw(outputEditor.value).setValue(templateData.value);
+      outputEditor.value!.getAction('editor.action.formatDocument')!.run();
+    })
+    .catch(() => {
+      templateData.value = '';
+    });
+}
+
+// 获取节点配置
+function getConfigDetail() {
+  getConfigFile(currentNode.value)
+    .then((res) => {
+      configData.value = res.data || '';
+      toRaw(inputEditor.value).setValue(configData.value);
+      inputEditor.value!.getAction('editor.action.formatDocument')!.run();
+    })
+    .catch(() => {
+      configData.value = '';
+    });
 }
 
 function handleChangeValid() {
@@ -155,62 +197,63 @@ function handleChangeValid() {
 
 // 刷新
 async function handleRefresh() {
+  if (!configData.value || isEqualConfig.value) {
+    getConfigDetail();
+    return;
+  }
   const flag = await handleChangeValid();
   if (!flag) return;
-  console.log('handleRefresh');
+  getConfigDetail();
 }
 
-function handleChangeNode(val: string) {
+// 切换节点
+function handleChangeNode() {
   // 获取节点对应的配置文件
-  console.log(val);
+  getConfigDetail();
 }
 
-function handleEditConfirm() {
+// 节点更新
+function handleConfirm() {
   saveLoading.value = true;
-  setTimeout(() => {
-    saveLoading.value = false;
-  }, 500);
+  updateConfigs(configData.value, currentNode.value)
+    .then(() => {
+      ElMessage.success({ message: t('common.updateSuccess'), grouping: true });
+      getConfigDetail();
+    })
+    .finally(() => {
+      saveLoading.value = false;
+    });
 }
 
-function handleEditCancel() {
+// 全部节点更新
+function handleAllConfirm() {
+  allSaveLoading.value = true;
+  updateConfigs(configData.value)
+    .then(() => {
+      ElMessage.success({ message: t('common.updateSuccess'), grouping: true });
+      getConfigDetail();
+    })
+    .finally(() => {
+      allSaveLoading.value = false;
+    });
+}
+
+function handleReset() {
   // 恢复至编辑文件最初状态
-  console.log('handleEditCancel');
+  getConfigDetail();
 }
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getSQL = () => {
-  if (!inputEditor.value || !outputEditor.value) {
-    return;
-  }
-  const inputJSON = JSON.parse(toRaw(inputEditor.value).getValue());
-  if (!inputJSON) {
-    return;
-  }
-
-  toRaw(outputEditor.value).setValue(inputJSON);
-};
-
-// 调用执行
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const importAndCal = (val: string) => {
-  if (inputEditor.value) {
-    toRaw(inputEditor.value).setValue(val);
-    inputEditor.value!.getAction('editor.action.formatDocument')!.run();
-  }
-};
 
 const initEditor = () => {
   if (inputContainer.value) {
-    const initValue = localStorage.getItem('draft') ?? initJSONValue.value;
     inputEditor.value = monaco.editor.create(inputContainer.value, {
-      value: initValue,
-      language: 'json',
+      value: '',
+      language: 'shell',
       theme: 'vs',
       formatOnPaste: true,
       automaticLayout: true,
       fontSize: 12,
       lineHeight: 24,
-      contextmenu: false,
+      contextmenu: true,
       wordBreak: 'keepAll',
       defaultColorDecorators: true,
       scrollBeyondLastLine: false,
@@ -224,27 +267,17 @@ const initEditor = () => {
         enabled: false,
       },
     });
-    setTimeout(() => {
-      if (inputEditor.value) {
-        inputEditor.value!.getAction('editor.action.formatDocument')!.run();
-      }
-    }, 500);
-    setInterval(() => {
-      if (inputEditor.value) {
-        localStorage.setItem('draft', toRaw(inputEditor.value).getValue());
-      }
-    }, 3000);
   }
   if (outputContainer.value) {
     outputEditor.value = monaco.editor.create(outputContainer.value, {
       value: '',
-      language: 'sql',
+      language: 'shell',
       theme: 'vs',
       formatOnPaste: true,
       automaticLayout: true,
       fontSize: 12,
       lineHeight: 24,
-      contextmenu: false,
+      contextmenu: true,
       wordBreak: 'keepAll',
       defaultColorDecorators: true,
       scrollBeyondLastLine: false,
@@ -278,13 +311,25 @@ watch(
   () => showVersionMenu.value && canMaintain.value,
   (val) => {
     if (val) {
-      getNodeList().then(() => {
-        console.log('getConfig');
-      });
-      setTimeout(() => {
-        console.log('initEditor');
+      nextTick(() => {
         initEditor();
-      }, 300);
+      });
+      getNodeList().then(() => {
+        getConfigDetail();
+      });
+      getTemplate();
+    }
+  },
+  {
+    immediate: true,
+  }
+);
+
+watch(
+  () => connectionStore.connectionIsMaster,
+  (val, old) => {
+    if (val !== old && (val === true || val === false)) {
+      clusterType.value = val ? 'master' : 'slave';
     }
   },
   {
@@ -365,7 +410,7 @@ watch(
 }
 
 .output-container {
-  margin-bottom: 36px;
+  // margin-bottom: 36px;
 }
 
 .editor-operate-box {

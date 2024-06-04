@@ -764,3 +764,5 @@ iotdbConfig:
   cofigEffective: 生效方式
   configContent: 配置内容
   continueTip: 当前配置内容未进行确认，刷新可能会进行覆盖，是否继续操作？
+  nodeEffect: 节点生效
+  allEffect: 全部生效
