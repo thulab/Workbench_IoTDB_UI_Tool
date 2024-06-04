@@ -3,6 +3,8 @@
 
 /** abstracts **/
 
+/* stylelint-disable selector-class-pattern */
+
 @import 'abstracts/variables';
 
 /** base **/
@@ -117,5 +119,27 @@
     font-size: 14px;
     color: #131926;
     line-height: 21px;
+  }
+}
+
+.monaco-editor {
+  --vscode-editorGutter-background: #f0f1fa !important;
+  --vscode-editorLineNumber-foreground: #676c99 !important;
+  --vscode-editorLineNumber-activeForeground: #495ad4 !important;
+  --vscode-editor-background: #f7f8fc !important;
+  --vscode-focusBorder: transparent !important;
+  --vscode-scrollbarSlider-background: #f0f1fa !important;
+  --vscode-scrollbarSlider-hoverBackground: #dfe1ed !important;
+  --vscode-scrollbarSlider-activeBackground: #dfe1ed !important;
+
+  .monaco-scrollable-element {
+    box-sizing: border-box;
+    margin: 5px;
+    width: calc(100% - 69px) !important;
+    height: calc(100% - 10px) !important;
+  }
+
+  .decorationsOverviewRuler {
+    display: none !important;
   }
 }

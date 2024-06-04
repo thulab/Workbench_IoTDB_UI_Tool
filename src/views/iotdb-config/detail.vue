@@ -374,22 +374,3 @@ watch(
   text-align: right;
 }
 </style>
-<style lang="scss">
-.monaco-editor {
-  // --vscode-editorGutter-background: #f0f1fa !important;
-  // --vscode-editorLineNumber-foreground: #676c99 !important;
-  // --vscode-editorLineNumber-activeForeground: #495ad4 !important;
-  --vscode-editor-background: #f7f8fc !important;
-
-  .monaco-scrollable-element {
-    box-sizing: border-box;
-    margin: 5px;
-    width: calc(100% - 69px) !important;
-    height: calc(100% - 10px) !important;
-  }
-
-  // .decorationsOverviewRuler {
-  //   display: none !important;
-  // }
-}
-</style>

@@ -17,5 +17,6 @@ module.exports = {
       },
     ],
   },
+  ignoreFiles: ['src/styles/main.scss'],
   overrides: [{ files: ['*.vue'], rules: { 'custom-property-empty-line-before': null } }],
 };
