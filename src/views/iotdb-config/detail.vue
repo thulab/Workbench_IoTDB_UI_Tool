@@ -9,7 +9,7 @@
       </div>
     </el-header>
     <auth-container :is-auth="canMaintain" style="flex: 1; overflow: hidden">
-      <el-container class="p-0" style="width: 100%; height: 100%">
+      <el-container class="p-0" style="width: 100%; height: 100%" v-loading="loading">
         <el-main class="editor-wrapper">
           <div class="editor-box">
             <div class="flex-justify-between m-b-6">
@@ -22,7 +22,7 @@
                     :key="`${item.address}(${item.type})_${index}`"
                     :value="item.nodeID"
                     :id="`iotdb-config-node-select-${item.nodeID}`"
-                    :label="item.address ? `${item.address}(${item.type})` : t('common.all')"
+                    :label="item.address"
                   />
                 </el-select>
                 <el-button link @click="handleRefresh" id="iotdb-config-refresh" class="svg-button-hover-color m-l-16 p-0" style="height: 24px !important">
@@ -59,6 +59,7 @@ import HtmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 import { useConnectionStore, useUserStore } from '@/stores';
 import { iotdbShowAuth } from '@/utils/auth';
+import { DashboardApi } from '@/api';
 // import IStandaloneCodeEditor = monaco.editor.IStandaloneCodeEditor;
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
@@ -87,7 +88,13 @@ const connectionStore = useConnectionStore();
 const userStore = useUserStore();
 const { canMaintain } = storeToRefs(userStore);
 const currentNode = ref('');
-const nodeList = ref<Dashboard.NodeItem[]>([]);
+const clusterType = ref<'master' | 'slave'>('master');
+const masterNodes = ref<Dashboard.NodeItem[]>([]);
+const slaveNodes = ref<Dashboard.NodeItem[]>([]);
+const searchFormData = reactive({
+  orderBy: ['type', 'type'],
+  asc: ['asc', 'asc'],
+});
 const saveLoading = ref(false);
 // const inputEditor = ref<IStandaloneCodeEditor>();
 // const outputEditor = ref<IStandaloneCodeEditor>();
@@ -99,6 +106,15 @@ const initJSONValue = ref('');
 
 const showVersionMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.3'));
 
+const nodeList = computed(() => {
+  if (clusterType.value === 'slave') {
+    return slaveNodes.value;
+  }
+  return masterNodes.value;
+});
+
+const { requestFn: getSystemInfo, loading } = useRequest(DashboardApi.getSystemInfo);
+
 function handleDoc() {
   if (locale.value === 'en') {
     window.open('https://timecho.com/docs/UserGuide/latest/Reference/Common-Config-Manual.html');
@@ -107,11 +123,19 @@ function handleDoc() {
   }
 }
 
-function getNodeList() {}
+function getNodeList() {
+  return getSystemInfo(searchFormData.orderBy, searchFormData.asc).then((res) => {
+    masterNodes.value = res.data.masterNodeInfo.nodes || [];
+    if (res.data.slaveNodeInfo) {
+      slaveNodes.value = res.data.slaveNodeInfo.nodes || [];
+    } else {
+      slaveNodes.value = [];
+    }
+    currentNode.value = nodeList.value[0].nodeID;
+  });
+}
 
-// 刷新
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function handleRefresh() {
+function handleChangeValid() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return new Promise((resolve, reject) => {
     ElMessageBox.confirm(t('iotdbConfig.continueTip'), t('common.notice'), {
@@ -124,21 +148,33 @@ function handleRefresh() {
       closeOnClickModal: false,
       closeOnPressEscape: false,
     })
-      .then(() => resolve(false))
-      .catch(() => resolve(true));
+      .then(() => resolve(true))
+      .catch(() => resolve(false));
   });
 }
 
+// 刷新
+async function handleRefresh() {
+  const flag = await handleChangeValid();
+  if (!flag) return;
+  console.log('handleRefresh');
+}
+
 function handleChangeNode(val: string) {
+  // 获取节点对应的配置文件
   console.log(val);
 }
 
-function handleEditConfirm(row: any) {
-  console.log(row, 'llll');
+function handleEditConfirm() {
+  saveLoading.value = true;
+  setTimeout(() => {
+    saveLoading.value = false;
+  }, 500);
 }
 
-function handleEditCancel(row: any) {
-  console.log(row, 'llll');
+function handleEditCancel() {
+  // 恢复至编辑文件最初状态
+  console.log('handleEditCancel');
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -210,7 +246,10 @@ const initEditor = () => {
       lineHeight: 24,
       contextmenu: false,
       wordBreak: 'keepAll',
+      defaultColorDecorators: true,
       scrollBeyondLastLine: false,
+      // 默认加载不聚焦，设置false 初次渲染第一行会有光标聚焦样式，即有一圈边框。
+      renderLineHighlightOnlyWhenFocus: true,
       scrollbar: {
         horizontalScrollbarSize: 4,
         verticalScrollbarSize: 4,
@@ -239,8 +278,11 @@ watch(
   () => showVersionMenu.value && canMaintain.value,
   (val) => {
     if (val) {
-      getNodeList();
+      getNodeList().then(() => {
+        console.log('getConfig');
+      });
       setTimeout(() => {
+        console.log('initEditor');
         initEditor();
       }, 300);
     }
@@ -330,5 +372,24 @@ watch(
 .editor-operate-box {
   margin-top: 8px;
   text-align: right;
+}
+</style>
+<style lang="scss">
+.monaco-editor {
+  // --vscode-editorGutter-background: #f0f1fa !important;
+  // --vscode-editorLineNumber-foreground: #676c99 !important;
+  // --vscode-editorLineNumber-activeForeground: #495ad4 !important;
+  --vscode-editor-background: #f7f8fc !important;
+
+  .monaco-scrollable-element {
+    box-sizing: border-box;
+    margin: 5px;
+    width: calc(100% - 69px) !important;
+    height: calc(100% - 10px) !important;
+  }
+
+  // .decorationsOverviewRuler {
+  //   display: none !important;
+  // }
 }
 </style>
