@@ -147,7 +147,6 @@ function getNodeList() {
     } else {
       slaveNodes.value = [];
     }
-    currentNode.value = nodeList.value[0].nodeID;
   });
 }
 
@@ -295,6 +294,26 @@ const initEditor = () => {
   }
 };
 
+function setStorage() {
+  sessionStorage.setItem(
+    'configStorage',
+    JSON.stringify({
+      configData: toRaw(inputEditor.value)?.getValue(),
+      node: currentNode.value,
+    })
+  );
+}
+
+onMounted(() => {
+  window.addEventListener('beforeunload', () => {
+    setStorage();
+  });
+});
+
+onBeforeUnmount(() => {
+  setStorage();
+});
+
 watch(
   () => showVersionMenu.value,
   (val) => {
@@ -314,10 +333,30 @@ watch(
       nextTick(() => {
         initEditor();
       });
-      getNodeList().then(() => {
-        getConfigDetail();
-      });
       getTemplate();
+      getNodeList().then(() => {
+        if (sessionStorage.getItem('configStorage')) {
+          const data = JSON.parse(sessionStorage.getItem('configStorage') as string);
+          if (data.node) {
+            const flag = nodeList.value.some((item) => `${item.nodeID}` === `${data.node}`);
+            if (flag) {
+              currentNode.value = data.node;
+              configData.value = data.configData || '';
+              toRaw(inputEditor.value).setValue(configData.value);
+              inputEditor.value!.getAction('editor.action.formatDocument')!.run();
+            } else {
+              currentNode.value = nodeList.value[0].nodeID;
+              getConfigDetail();
+            }
+          } else {
+            currentNode.value = nodeList.value[0].nodeID;
+            getConfigDetail();
+          }
+        } else {
+          currentNode.value = nodeList.value[0].nodeID;
+          getConfigDetail();
+        }
+      });
     }
   },
   {
