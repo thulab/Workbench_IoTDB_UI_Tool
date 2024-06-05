@@ -41,7 +41,7 @@
             <div class="flex-justify-between m-b-6">
               <h4 class="editor-title">{{ t('search.template') }}</h4>
             </div>
-            <div class="output-container" v-loading="templateLoading" ref="outputContainer" id="outputContainer"></div>
+            <div class="output-container" ref="outputContainer" id="outputContainer"></div>
           </div>
         </el-main>
       </el-container>
@@ -62,7 +62,6 @@ import { isEqual } from 'lodash-es';
 import { useConnectionStore, useUserStore } from '@/stores';
 import { iotdbShowAuth } from '@/utils/auth';
 import { DashboardApi, ConfigApi } from '@/api';
-// import IStandaloneCodeEditor = monaco.editor.IStandaloneCodeEditor;
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
 // eslint-disable-next-line no-restricted-globals
@@ -99,16 +98,14 @@ const searchFormData = reactive({
 });
 const saveLoading = ref(false);
 const allSaveLoading = ref(false);
-// const inputEditor = ref<IStandaloneCodeEditor>();
-// const outputEditor = ref<IStandaloneCodeEditor>();
-const inputEditor = ref();
-const outputEditor = ref();
+const inputEditor = ref<monaco.editor.IStandaloneCodeEditor>();
+const outputEditor = ref<monaco.editor.IStandaloneCodeEditor>();
 const inputContainer = ref<HTMLElement>();
 const outputContainer = ref<HTMLElement>();
 const configData = ref('');
 const templateData = ref('');
 
-const showVersionMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.3'));
+const showWithVersionMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.3'));
 
 const nodeList = computed(() => {
   if (clusterType.value === 'slave') {
@@ -117,17 +114,15 @@ const nodeList = computed(() => {
   return masterNodes.value;
 });
 
-// TODO
-const disableConfirm = computed(() => !toRaw(inputEditor.value)?.getValue());
+const disableConfirm = computed(() => !configData.value);
 
-// TODO
-const isEqualConfig = computed(() => {
+const isEqualConfig = () => {
   return isEqual(configData.value, toRaw(inputEditor.value)?.getValue());
-});
+};
 
 const { requestFn: getSystemInfo, loading } = useRequest(DashboardApi.getSystemInfo);
 const { requestFn: getConfigFile, loading: configLoading } = useRequest(ConfigApi.getConfigFile);
-const { requestFn: getConfigTemplate, loading: templateLoading } = useRequest(ConfigApi.getConfigTemplate);
+const { requestFn: getConfigTemplate } = useRequest(ConfigApi.getConfigTemplate);
 const { requestFn: updateConfigs } = useRequest(ConfigApi.updateConfigs);
 
 function handleDoc() {
@@ -152,28 +147,40 @@ function getNodeList() {
 
 // 获取模板配置
 function getTemplate() {
-  getConfigTemplate()
-    .then((res) => {
-      templateData.value = res.data || '';
-      toRaw(outputEditor.value).setValue(templateData.value);
-      outputEditor.value!.getAction('editor.action.formatDocument')!.run();
-    })
-    .catch(() => {
-      templateData.value = '';
+  if (outputEditor.value) {
+    getConfigTemplate()
+      .then((res) => {
+        templateData.value = res.data || '';
+        toRaw(outputEditor.value!).setValue(templateData.value);
+        outputEditor.value!.getAction('editor.action.formatDocument')!.run();
+      })
+      .catch(() => {
+        templateData.value = '';
+      });
+  } else {
+    nextTick(() => {
+      getTemplate();
     });
+  }
 }
 
 // 获取节点配置
 function getConfigDetail() {
-  getConfigFile(currentNode.value)
-    .then((res) => {
-      configData.value = res.data || '';
-      toRaw(inputEditor.value).setValue(configData.value);
-      inputEditor.value!.getAction('editor.action.formatDocument')!.run();
-    })
-    .catch(() => {
-      configData.value = '';
+  if (inputEditor.value) {
+    getConfigFile(currentNode.value)
+      .then((res) => {
+        configData.value = res.data || '';
+        toRaw(inputEditor.value!).setValue(configData.value);
+        inputEditor.value!.getAction('editor.action.formatDocument')!.run();
+      })
+      .catch(() => {
+        configData.value = '';
+      });
+  } else {
+    nextTick(() => {
+      getConfigDetail();
     });
+  }
 }
 
 function handleChangeValid() {
@@ -185,7 +192,7 @@ function handleChangeValid() {
       confirmButtonClass: 'iotdb-config-continue-confirm',
       cancelButtonClass: 'iotdb-config-continue-cancel',
       type: 'warning',
-      icon: ICustomMessageWarning,
+      icon: markRaw(ICustomMessageWarning),
       closeOnClickModal: false,
       closeOnPressEscape: false,
     })
@@ -196,7 +203,7 @@ function handleChangeValid() {
 
 // 刷新
 async function handleRefresh() {
-  if (!configData.value || isEqualConfig.value) {
+  if (!configData.value || isEqualConfig()) {
     getConfigDetail();
     return;
   }
@@ -243,7 +250,7 @@ function handleReset() {
 }
 
 const initEditor = () => {
-  if (inputContainer.value) {
+  if (inputContainer.value && outputContainer.value) {
     inputEditor.value = monaco.editor.create(inputContainer.value, {
       value: '',
       language: 'shell',
@@ -266,8 +273,6 @@ const initEditor = () => {
         enabled: false,
       },
     });
-  }
-  if (outputContainer.value) {
     outputEditor.value = monaco.editor.create(outputContainer.value, {
       value: '',
       language: 'shell',
@@ -291,8 +296,43 @@ const initEditor = () => {
       },
       readOnly: true,
     });
+    getTemplate();
+  } else {
+    nextTick(() => {
+      initEditor();
+    });
   }
 };
+
+function initDetail() {
+  if (inputEditor.value) {
+    if (sessionStorage.getItem('configStorage')) {
+      const data = JSON.parse(sessionStorage.getItem('configStorage') as string);
+      if (data.node) {
+        const flag = nodeList.value.some((item) => `${item.nodeID}` === `${data.node}`);
+        if (flag) {
+          currentNode.value = data.node;
+          configData.value = data.configData || '';
+          toRaw(inputEditor.value!).setValue(configData.value);
+          inputEditor.value!.getAction('editor.action.formatDocument')!.run();
+        } else {
+          currentNode.value = nodeList.value[0].nodeID;
+          getConfigDetail();
+        }
+      } else {
+        currentNode.value = nodeList.value[0].nodeID;
+        getConfigDetail();
+      }
+    } else {
+      currentNode.value = nodeList.value[0].nodeID;
+      getConfigDetail();
+    }
+  } else {
+    nextTick(() => {
+      initDetail();
+    });
+  }
+}
 
 function setStorage() {
   sessionStorage.setItem(
@@ -315,7 +355,7 @@ onBeforeUnmount(() => {
 });
 
 watch(
-  () => showVersionMenu.value,
+  () => showWithVersionMenu.value,
   (val) => {
     if (!val) {
       router.push({ name: 'Dashboard' });
@@ -327,35 +367,12 @@ watch(
 );
 
 watch(
-  () => showVersionMenu.value && canMaintain.value,
+  () => showWithVersionMenu.value && canMaintain.value,
   (val) => {
     if (val) {
-      nextTick(() => {
-        initEditor();
-      });
-      getTemplate();
+      initEditor();
       getNodeList().then(() => {
-        if (sessionStorage.getItem('configStorage')) {
-          const data = JSON.parse(sessionStorage.getItem('configStorage') as string);
-          if (data.node) {
-            const flag = nodeList.value.some((item) => `${item.nodeID}` === `${data.node}`);
-            if (flag) {
-              currentNode.value = data.node;
-              configData.value = data.configData || '';
-              toRaw(inputEditor.value).setValue(configData.value);
-              inputEditor.value!.getAction('editor.action.formatDocument')!.run();
-            } else {
-              currentNode.value = nodeList.value[0].nodeID;
-              getConfigDetail();
-            }
-          } else {
-            currentNode.value = nodeList.value[0].nodeID;
-            getConfigDetail();
-          }
-        } else {
-          currentNode.value = nodeList.value[0].nodeID;
-          getConfigDetail();
-        }
+        initDetail();
       });
     }
   },

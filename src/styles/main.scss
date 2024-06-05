@@ -127,6 +127,7 @@
   --vscode-editorLineNumber-foreground: #676c99 !important;
   --vscode-editorLineNumber-activeForeground: #495ad4 !important;
   --vscode-editor-background: #f7f8fc !important;
+  --vscode-editorStickyScroll-background: #f7f8fc !important;
   --vscode-focusBorder: transparent !important;
   --vscode-scrollbarSlider-background: #f0f1fa !important;
   --vscode-scrollbarSlider-hoverBackground: #dfe1ed !important;
@@ -141,5 +142,9 @@
 
   .decorationsOverviewRuler {
     display: none !important;
+  }
+
+  .sticky-widget-line-numbers {
+    background-color: #f0f1fa !important;
   }
 }
