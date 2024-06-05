@@ -83,7 +83,7 @@ function getContent() {
 
 function setContent(val: string) {
   if (monacoEditor.value) {
-    toRaw(monacoEditor.value!).setValue(val);
+    toRaw(monacoEditor.value!)?.setValue(val);
     monacoEditor.value!.getAction('editor.action.formatDocument')!.run();
   } else {
     nextTick(() => {

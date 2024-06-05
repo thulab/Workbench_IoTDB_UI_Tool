@@ -89,7 +89,7 @@ const nodeList = computed(() => {
 });
 
 const isEqualConfig = () => {
-  return isEqual(configData.value, toRaw(inputEditor.value)?.getContent());
+  return isEqual(configData.value, inputEditor.value?.getContent());
 };
 
 const { requestFn: getSystemInfo, loading } = useRequest(DashboardApi.getSystemInfo);
@@ -123,7 +123,7 @@ function getTemplate() {
     getConfigTemplate()
       .then((res) => {
         templateData.value = res.data || '';
-        toRaw(outputEditor.value!).setContent(templateData.value);
+        outputEditor.value?.setContent(templateData.value);
       })
       .catch(() => {
         templateData.value = '';
@@ -141,7 +141,7 @@ function getConfigDetail() {
     getConfigFile(currentNode.value)
       .then((res) => {
         configData.value = res.data || '';
-        toRaw(inputEditor.value!).setContent(configData.value);
+        inputEditor.value?.setContent(configData.value);
       })
       .catch(() => {
         configData.value = '';
@@ -240,7 +240,7 @@ function initDetail() {
         if (flag) {
           currentNode.value = data.node;
           configData.value = data.configData;
-          toRaw(inputEditor.value!).setContent(data.content);
+          inputEditor.value?.setContent(data.content);
         } else {
           currentNode.value = nodeList.value[0].nodeID;
           getConfigDetail();
@@ -264,7 +264,7 @@ function setStorage() {
   sessionStorage.setItem(
     'configStorage',
     JSON.stringify({
-      content: toRaw(inputEditor.value)?.getContent(),
+      content: inputEditor.value?.getContent(),
       configData: configData.value,
       node: currentNode.value,
     })
