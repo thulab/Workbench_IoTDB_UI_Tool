@@ -30,18 +30,18 @@
                 </el-button>
               </div>
             </div>
-            <div class="input-container" v-loading="configLoading" ref="inputContainer" id="inputContainer"></div>
+            <monaco-editor class="input-container" v-loading="configLoading" ref="inputEditor" />
             <div class="editor-operate-box">
               <el-button plain @click="handleReset" id="iotdb-config-reset">{{ t('common.reset') }}</el-button>
-              <el-button type="primary" :loading="saveLoading" :disabled="disableConfirm" @click="handleConfirm" id="iotdb-config-save">{{ t('iotdbConfig.nodeEffect') }}</el-button>
-              <el-button type="primary" :loading="allSaveLoading" :disabled="disableConfirm" @click="handleAllConfirm" id="iotdb-config-all-save">{{ t('iotdbConfig.allEffect') }}</el-button>
+              <el-button type="primary" :loading="saveLoading" :disabled="!configData" @click="handleConfirm" id="iotdb-config-save">{{ t('iotdbConfig.nodeEffect') }}</el-button>
+              <el-button type="primary" :loading="allSaveLoading" :disabled="!configData" @click="handleAllConfirm" id="iotdb-config-all-save">{{ t('iotdbConfig.allEffect') }}</el-button>
             </div>
           </div>
           <div class="preview-box m-l-16">
             <div class="flex-justify-between m-b-6">
               <h4 class="editor-title">{{ t('search.template') }}</h4>
             </div>
-            <div class="output-container" ref="outputContainer" id="outputContainer"></div>
+            <monaco-editor class="output-container" ref="outputEditor" :read-only="true" />
           </div>
         </el-main>
       </el-container>
@@ -52,36 +52,12 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
-import * as monaco from 'monaco-editor';
-import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
-import CssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
-import HtmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
-import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 import { isEqual } from 'lodash-es';
 import { useConnectionStore, useUserStore } from '@/stores';
 import { iotdbShowAuth } from '@/utils/auth';
 import { DashboardApi, ConfigApi } from '@/api';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
-
-// eslint-disable-next-line no-restricted-globals
-(self as any).MonacoEnvironment = {
-  getWorker(_: any, label: any) {
-    if (label === 'json') {
-      return new JsonWorker();
-    }
-    if (label === 'css' || label === 'scss' || label === 'less') {
-      return new CssWorker();
-    }
-    if (label === 'html' || label === 'handlebars' || label === 'razor') {
-      return new HtmlWorker();
-    }
-    if (label === 'typescript' || label === 'javascript') {
-      return new TsWorker();
-    }
-    return new EditorWorker();
-  },
-};
+import MonacoEditor from './components/monaco-editor.vue';
 
 const { t, locale } = useI18n();
 const router = useRouter();
@@ -98,10 +74,8 @@ const searchFormData = reactive({
 });
 const saveLoading = ref(false);
 const allSaveLoading = ref(false);
-const inputEditor = ref<monaco.editor.IStandaloneCodeEditor>();
-const outputEditor = ref<monaco.editor.IStandaloneCodeEditor>();
-const inputContainer = ref<HTMLElement>();
-const outputContainer = ref<HTMLElement>();
+const inputEditor = ref<InstanceType<typeof MonacoEditor>>();
+const outputEditor = ref<InstanceType<typeof MonacoEditor>>();
 const configData = ref('');
 const templateData = ref('');
 
@@ -114,10 +88,8 @@ const nodeList = computed(() => {
   return masterNodes.value;
 });
 
-const disableConfirm = computed(() => !configData.value);
-
 const isEqualConfig = () => {
-  return isEqual(configData.value, toRaw(inputEditor.value)?.getValue());
+  return isEqual(configData.value, toRaw(inputEditor.value)?.getContent());
 };
 
 const { requestFn: getSystemInfo, loading } = useRequest(DashboardApi.getSystemInfo);
@@ -151,8 +123,7 @@ function getTemplate() {
     getConfigTemplate()
       .then((res) => {
         templateData.value = res.data || '';
-        toRaw(outputEditor.value!).setValue(templateData.value);
-        outputEditor.value!.getAction('editor.action.formatDocument')!.run();
+        toRaw(outputEditor.value!).setContent(templateData.value);
       })
       .catch(() => {
         templateData.value = '';
@@ -170,8 +141,7 @@ function getConfigDetail() {
     getConfigFile(currentNode.value)
       .then((res) => {
         configData.value = res.data || '';
-        toRaw(inputEditor.value!).setValue(configData.value);
-        inputEditor.value!.getAction('editor.action.formatDocument')!.run();
+        toRaw(inputEditor.value!).setContent(configData.value);
       })
       .catch(() => {
         configData.value = '';
@@ -250,52 +220,9 @@ function handleReset() {
 }
 
 const initEditor = () => {
-  if (inputContainer.value && outputContainer.value) {
-    inputEditor.value = monaco.editor.create(inputContainer.value, {
-      value: '',
-      language: 'shell',
-      theme: 'vs',
-      formatOnPaste: true,
-      automaticLayout: true,
-      fontSize: 12,
-      lineHeight: 24,
-      contextmenu: true,
-      wordBreak: 'keepAll',
-      defaultColorDecorators: true,
-      scrollBeyondLastLine: false,
-      // 默认加载不聚焦，设置false 初次渲染第一行会有光标聚焦样式，即有一圈边框。
-      renderLineHighlightOnlyWhenFocus: true,
-      scrollbar: {
-        horizontalScrollbarSize: 4,
-        verticalScrollbarSize: 4,
-      },
-      minimap: {
-        enabled: false,
-      },
-    });
-    outputEditor.value = monaco.editor.create(outputContainer.value, {
-      value: '',
-      language: 'shell',
-      theme: 'vs',
-      formatOnPaste: true,
-      automaticLayout: true,
-      fontSize: 12,
-      lineHeight: 24,
-      contextmenu: true,
-      wordBreak: 'keepAll',
-      defaultColorDecorators: true,
-      scrollBeyondLastLine: false,
-      // 默认加载不聚焦，设置false 初次渲染第一行会有光标聚焦样式，即有一圈边框。
-      renderLineHighlightOnlyWhenFocus: true,
-      scrollbar: {
-        horizontalScrollbarSize: 4,
-        verticalScrollbarSize: 4,
-      },
-      minimap: {
-        enabled: false,
-      },
-      readOnly: true,
-    });
+  if (inputEditor.value && outputEditor.value) {
+    inputEditor.value!.initEditor();
+    outputEditor.value!.initEditor();
     getTemplate();
   } else {
     nextTick(() => {
@@ -312,9 +239,8 @@ function initDetail() {
         const flag = nodeList.value.some((item) => `${item.nodeID}` === `${data.node}`);
         if (flag) {
           currentNode.value = data.node;
-          configData.value = data.configData || '';
-          toRaw(inputEditor.value!).setValue(configData.value);
-          inputEditor.value!.getAction('editor.action.formatDocument')!.run();
+          configData.value = data.configData;
+          toRaw(inputEditor.value!).setContent(data.content);
         } else {
           currentNode.value = nodeList.value[0].nodeID;
           getConfigDetail();
@@ -338,7 +264,8 @@ function setStorage() {
   sessionStorage.setItem(
     'configStorage',
     JSON.stringify({
-      configData: toRaw(inputEditor.value)?.getValue(),
+      content: toRaw(inputEditor.value)?.getContent(),
+      configData: configData.value,
       node: currentNode.value,
     })
   );
