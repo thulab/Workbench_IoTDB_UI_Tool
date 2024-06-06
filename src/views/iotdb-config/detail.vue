@@ -219,18 +219,6 @@ function handleReset() {
   getConfigDetail();
 }
 
-const initEditor = () => {
-  if (inputEditor.value && outputEditor.value) {
-    inputEditor.value!.initEditor();
-    outputEditor.value!.initEditor();
-    getTemplate();
-  } else {
-    nextTick(() => {
-      initEditor();
-    });
-  }
-};
-
 function initDetail() {
   if (inputEditor.value) {
     if (sessionStorage.getItem('configStorage')) {
@@ -297,9 +285,11 @@ watch(
   () => showWithVersionMenu.value && canMaintain.value,
   (val) => {
     if (val) {
-      initEditor();
-      getNodeList().then(() => {
-        initDetail();
+      nextTick(() => {
+        getTemplate();
+        getNodeList().then(() => {
+          initDetail();
+        });
       });
     }
   },
@@ -319,6 +309,10 @@ watch(
     immediate: true,
   }
 );
+
+watch(locale, () => {
+  window.location.reload();
+});
 </script>
 
 <style lang="scss" scoped>
