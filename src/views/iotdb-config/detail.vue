@@ -240,7 +240,7 @@ function initDetail() {
         if (flag) {
           currentNode.value = data.node;
           configData.value = data.configData;
-          inputEditor.value?.setContent(data.content);
+          inputEditor.value?.setContent(data.content || '');
         } else {
           currentNode.value = nodeList.value[0].nodeID;
           getConfigDetail();
