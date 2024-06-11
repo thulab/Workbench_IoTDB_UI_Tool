@@ -116,7 +116,7 @@
           </auth-tooltip>
           <auth-tooltip :is-disabled="canReadWriteSchema" :content="'common.schemaAuth'">
             <el-dropdown class="m-x-16" :disabled="!currentStorage || !(totalCount > 0) || !canReadWriteSchema" @command="(val) => handleCommandDown(val)" id="mesaurement-download-dropdown">
-              <el-button class="export-button" :disabled="!currentStorage || !(totalCount > 0) || !canReadWriteSchema" id="mesaurement-download">
+              <el-button :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" :disabled="!currentStorage || !(totalCount > 0) || !canReadWriteSchema" id="mesaurement-download">
                 {{ t('common.export') }}
                 <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
               </el-button>
@@ -328,7 +328,7 @@ import ModalMeasurement from './components/modal-measurement.vue';
 import ModalImport from './components/modal-import.vue';
 import ModalDescription from './components/modal-description.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const appType = Number(import.meta.env.VITE_APP_TYPE);
 const pageText = appType === 1 ? t('measurement.calculateMeasurement') : t('measurement.viewMeasurement');
 const router = useRouter();

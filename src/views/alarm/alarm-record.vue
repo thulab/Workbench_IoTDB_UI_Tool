@@ -70,7 +70,7 @@
         <div class="operate-buttons">
           <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
             <el-dropdown class="m-r-12" :disabled="!totalCount || !canUsePipe" @command="(val) => handleCommandDown(val)" id="alarm-record-download-dropdown">
-              <el-button type="primary" class="export-button" :disabled="!totalCount || !canUsePipe" id="alarm-record-download">
+              <el-button type="primary" :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" :disabled="!totalCount || !canUsePipe" id="alarm-record-download">
                 {{ t('common.export') }}
                 <el-tooltip effect="light" :content="t('common.exportTipAll')" placement="top" popper-class="tooltip-box-width"><i-custom-question-white /></el-tooltip>
               </el-button>

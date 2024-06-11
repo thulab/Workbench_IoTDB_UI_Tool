@@ -40,7 +40,7 @@
               </auth-tooltip>
               <auth-tooltip :is-disabled="canReadWriteSchema" :content="'common.schemaAuth'">
                 <el-dropdown class="m-x-16" :disabled="!(totalCount > 0) || !canReadWriteSchema" @command="(val) => handleCommandDown(val)" id="calculate-download-dropdown">
-                  <el-button class="export-button" :disabled="!(totalCount > 0) || !canReadWriteSchema" id="calculate-download">
+                  <el-button :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" :disabled="!(totalCount > 0) || !canReadWriteSchema" id="calculate-download">
                     {{ t('common.export') }}
                     <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
                   </el-button>
@@ -153,7 +153,7 @@ import ModalCalculate from './components/modal-calculate.vue';
 import ModalExpression from './components/modal-expression.vue';
 import ModalImport from './components/modal-import.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const appType = Number(import.meta.env.VITE_APP_TYPE);
 const router = useRouter();
 const userStore = useUserStore();

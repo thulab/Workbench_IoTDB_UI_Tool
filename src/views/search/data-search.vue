@@ -114,7 +114,7 @@
               @command="(val) => handleCommandDown(val)"
               id="data-search-download-dropdown"
             >
-              <el-button class="export-button" id="data-search-download" :disabled="!canReadWriteData">
+              <el-button :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" id="data-search-download" :disabled="!canReadWriteData">
                 {{ t('common.export') }}
                 <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
               </el-button>
@@ -194,7 +194,7 @@ import DynamicTable from '@/components/dynamic-table.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalImport from './components/modal-import.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
 const { canReadWriteData, canWriteData } = storeToRefs(userStore);

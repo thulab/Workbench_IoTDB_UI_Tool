@@ -40,7 +40,11 @@
         <div class="page-detail-buttons">
           <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
             <el-dropdown class="m-r-16" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData" @command="(val) => handleCommandDown(val)" id="statistic-search-download-dropdown">
-              <el-button class="export-button" id="statistic-search-download" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData">
+              <el-button
+                :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']"
+                id="statistic-search-download"
+                :disabled="getListLoading || tableData.length === 0 || !canReadWriteData"
+              >
                 {{ t('common.export') }}
                 <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
               </el-button>
@@ -118,7 +122,7 @@ import { getStartAndEnd, today, getOneInterval, getOneIntervalNow, formatDate } 
 import { useUserStore } from '@/stores';
 import ICustomCalender from '~icons/custom/calender.svg';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const userStore = useUserStore();
 const { canReadWriteData } = storeToRefs(userStore);
 const { maxTableHeight } = useTableHeight(280);
