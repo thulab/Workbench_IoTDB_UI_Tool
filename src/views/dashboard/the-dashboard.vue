@@ -25,7 +25,8 @@
                 <span class="module-label-text">{{ `${t('dashboard.serverStatus')}(Running)：` }}</span>
                 <span class="module-content-text" v-if="!systemData.dataNodeRatio && !systemData.configNodeRatio">-</span>
                 <span class="module-content-text" v-else>
-                  ConfigNode {{ systemData.configNodeRatio ? `${systemData.configNodeRatio}个` : '-' }} DataNode {{ systemData.dataNodeRatio ? `${systemData.dataNodeRatio}个` : '-' }}
+                  ConfigNode {{ systemData.configNodeRatio ? `${systemData.configNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }} DataNode
+                  {{ systemData.dataNodeRatio ? `${systemData.dataNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }}
                 </span>
               </li>
               <li class="system-info-item">
@@ -78,17 +79,35 @@
                 @sort-change="({ column, prop, order }) => handleSortChange({ column, prop, order }, 'master')"
               >
                 <el-table-column :label="t('dashboard.node')" prop="address" min-width="200" align="center" show-overflow-tooltip />
-                <el-table-column :label="t('dashboard.type')" prop="type" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
-                <el-table-column :label="t('common.status')" prop="status" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
+                <el-table-column
+                  :label="t('dashboard.type')"
+                  prop="type"
+                  sortable="custom"
+                  :sort-orders="['ascending', 'descending']"
+                  min-width="120"
+                  align="center"
+                  show-overflow-tooltip
+                  label-class-name="table-sort-column-box"
+                />
+                <el-table-column
+                  :label="t('common.status')"
+                  prop="status"
+                  sortable="custom"
+                  :sort-orders="['ascending', 'descending']"
+                  width="120"
+                  align="left"
+                  show-overflow-tooltip
+                  label-class-name="table-sort-column-box"
+                />
                 <el-table-column
                   :label="t('dashboard.version')"
                   prop="version"
                   v-if="showVersionCol(connectionStore.connectionInfo.currentVersion || '')"
-                  min-width="140"
+                  min-width="160"
                   align="center"
                   show-overflow-tooltip
                 >
-                  <template #default="{ row }">{{ row.version }} {{ systemData.active || row.version.split('.').length === 4 ? '企业版' : '开源版' }}</template>
+                  <template #default="{ row }">{{ formatVersion(row, 'master') }}</template>
                 </el-table-column>
                 <el-table-column :label="t('dashboard.physicalMachine')" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
                 <template #empty>
@@ -118,7 +137,8 @@
                 <span class="module-label-text">{{ `${t('dashboard.serverStatus')}(Running)：` }}</span>
                 <span class="module-content-text" v-if="!slaveData.dataNodeRatio && !slaveData.configNodeRatio">-</span>
                 <span class="module-content-text" v-else>
-                  ConfigNode {{ slaveData.configNodeRatio ? `${slaveData.configNodeRatio}个` : '-' }} DataNode {{ slaveData.dataNodeRatio ? `${slaveData.dataNodeRatio}个` : '-' }}
+                  ConfigNode {{ slaveData.configNodeRatio ? `${slaveData.configNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }} DataNode
+                  {{ slaveData.dataNodeRatio ? `${slaveData.dataNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }}
                 </span>
               </li>
               <li class="system-info-item">
@@ -171,17 +191,35 @@
                 @sort-change="({ column, prop, order }) => handleSortChange({ column, prop, order }, 'slave')"
               >
                 <el-table-column :label="t('dashboard.node')" prop="address" min-width="200" align="center" show-overflow-tooltip />
-                <el-table-column :label="t('dashboard.type')" prop="type" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
-                <el-table-column :label="t('common.status')" prop="status" sortable="custom" :sort-orders="['ascending', 'descending']" min-width="120" align="center" show-overflow-tooltip />
+                <el-table-column
+                  :label="t('dashboard.type')"
+                  prop="type"
+                  sortable="custom"
+                  :sort-orders="['ascending', 'descending']"
+                  min-width="120"
+                  align="center"
+                  show-overflow-tooltip
+                  label-class-name="table-sort-column-box"
+                />
+                <el-table-column
+                  :label="t('common.status')"
+                  prop="status"
+                  sortable="custom"
+                  :sort-orders="['ascending', 'descending']"
+                  width="120"
+                  align="left"
+                  show-overflow-tooltip
+                  label-class-name="table-sort-column-box"
+                />
                 <el-table-column
                   :label="t('dashboard.version')"
                   prop="version"
                   v-if="showVersionCol(connectionStore.connectionInfo.slaveVersion || '')"
-                  min-width="140"
+                  min-width="160"
                   align="center"
                   show-overflow-tooltip
                 >
-                  <template #default="{ row }">{{ row.version }} {{ slaveData.active || row.version.split('.').length === 4 ? '企业版' : '开源版' }}</template>
+                  <template #default="{ row }">{{ formatVersion(row, 'slave') }}</template>
                 </el-table-column>
                 <el-table-column :label="t('dashboard.physicalMachine')" prop="physicalMachine" min-width="160" align="center" show-overflow-tooltip />
                 <template #empty>
@@ -337,6 +375,19 @@ function showVersionCol(version: string) {
 function showVersionCol1312(version: string) {
   if (!version) return false;
   return iotdbShowAuth(version, '1.3.1.2');
+}
+
+function formatVersion(row: Dashboard.NodeItem, type: 'slave' | 'master') {
+  if (type === 'slave') {
+    if (slaveData.value!.active || row.version.split('.').length === 4) {
+      return t('dashboard.versionEnterprise', { version: row.version });
+    }
+    return t('dashboard.versionOpenSource', { version: row.version });
+  }
+  if (systemData.active || row.version.split('.').length === 4) {
+    return t('dashboard.versionEnterprise', { version: row.version });
+  }
+  return t('dashboard.versionOpenSource', { version: row.version });
 }
 
 const { requestFn: getSystemInfo, loading } = useRequest(DashboardApi.getSystemInfo);
@@ -579,10 +630,11 @@ onUnmounted(() => {
   .system-info-item {
     display: flex;
     align-items: center;
-    margin: 6px 24px 6px 0;
+    margin: 0 24px 0 0;
+    height: 34px;
 
     &:last-child {
-      margin: 8px 0;
+      margin: 0;
     }
   }
 }

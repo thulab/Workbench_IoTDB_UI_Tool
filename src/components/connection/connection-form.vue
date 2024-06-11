@@ -4,7 +4,7 @@
       <h4 class="connection-detail-title">{{ t('connection.detail') }}</h4>
     </div>
     <el-scrollbar v-loading="detailLoading">
-      <el-form ref="formRef" :model="formData" label-position="left" :label-width="locale === 'en' ? '190px' : '150px'" :key="formKey">
+      <el-form ref="formRef" :model="formData" label-position="left" :label-width="locale === 'en' ? '150px' : '150px'" :key="formKey">
         <label><input type="password" autocomplete="new-password" hidden /></label>
         <base-form-item :label="`${t('connection.type')}：`" prop="type" :rules="requiredRules" class="base-form-box">
           <el-radio-group v-model="formData.type" @change="(val) => handleChangeType(val as 0 | 1 | 2)" :disabled="editType !== 'add' || !isShowSave" id="connection-modal-type">
@@ -19,7 +19,7 @@
         <!-- 单机版 -->
         <template v-if="formData.type === 0">
           <div class="ip-port-box base-form-box">
-            <span class="form-label" :style="{ width: locale === 'en' ? '190px' : '150px' }">
+            <span class="form-label" :style="{ width: locale === 'en' ? '150px' : '150px' }">
               {{ t('connection.info') }}：
               <el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </span>
@@ -31,7 +31,7 @@
         <!-- 集群版 -->
         <template v-if="formData.type === 1">
           <div class="ip-port-box base-form-box">
-            <span class="form-label" :style="{ width: locale === 'en' ? '190px' : '150px' }">
+            <span class="form-label" :style="{ width: locale === 'en' ? '150px' : '150px' }">
               {{ t('connection.info') }}：
               <el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </span>
@@ -49,7 +49,7 @@
                 <h4 class="connection-cluster-title">{{ t('connection.masterInfo') }}</h4>
               </template>
               <div class="ip-port-box">
-                <span class="form-label" :style="{ width: locale === 'en' ? '190px' : '150px' }">
+                <span class="form-label" :style="{ width: locale === 'en' ? '150px' : '150px' }">
                   {{ t('connection.info') }}：
                   <el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                 </span>
@@ -62,7 +62,7 @@
                 <h4 class="connection-cluster-title">{{ t('connection.slaveInfo') }}</h4>
               </template>
               <div class="ip-port-box">
-                <span class="form-label" :style="{ width: locale === 'en' ? '190px' : '150px' }">
+                <span class="form-label" :style="{ width: locale === 'en' ? '150px' : '150px' }">
                   {{ t('connection.info') }}：
                   <el-tooltip effect="light" :content="t('connection.connectionIpTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                 </span>

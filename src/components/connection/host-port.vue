@@ -6,7 +6,7 @@
       </base-form-item>
       <span class="ip-port-divider">:</span>
       <base-form-item label="" :prop="`${formKey}[${index}].port`" :rules="requiredPortRules">
-        <el-input v-model.number="item.port" :placeholder="t('connection.portTip')" :style="{ width: locale === 'en' ? '108px' : '148px' }" :id="`${formKey}-${index}-port`" :disabled="!isDisabled" />
+        <el-input v-model.number="item.port" :placeholder="t('connection.portTip')" :style="{ width: locale === 'en' ? '148px' : '148px' }" :id="`${formKey}-${index}-port`" :disabled="!isDisabled" />
       </base-form-item>
       <template v-if="showOperate">
         <el-button

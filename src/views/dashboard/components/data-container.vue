@@ -1,5 +1,5 @@
 <template>
-  <div class="data-empty-wrapper" v-if="isEmpty">
+  <div class="data-empty-wrapper" v-if="isEmpty" v-bind="$attrs">
     <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
     <span class="data-empty-text">{{ t('common.noData') }}</span>
   </div>
@@ -24,8 +24,8 @@ const { t } = useI18n();
   justify-content: center;
 
   .data-empty-img {
-    width: 120px;
-    height: 120px;
+    width: 80px;
+    height: 80px;
     margin-bottom: 16px;
   }
 

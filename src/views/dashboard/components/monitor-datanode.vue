@@ -23,7 +23,7 @@
             {{ t('dashboard.residueMemory') }}
           </p>
         </div>
-        <data-container :is-empty="diskMemoryData.diskTotal === null">
+        <data-container :is-empty="diskMemoryData.diskTotal === null" :style="{ transform: diskMemoryData.diskTotal === null ? 'translateY(-8px)' : '' }">
           <div class="chart-container-box">
             <the-chart :option="diskMemoryOptions" key="diskChart" />
           </div>
@@ -308,6 +308,7 @@ const diskChartOptions = (diskMemoryChartData: Dashboard.MetricDiskRes): ECOptio
         paramsData.forEach((item) => {
           // eslint-disable-next-line no-nested-ternary
           res += `<div style="margin: 10px 0 0;">${circle}${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;margin-left:2px">${item.seriesName}</span><span style="float:right;margin-left:20px;font-size:14px;color:#666;font-weight:900">${
+            // eslint-disable-next-line no-nested-ternary
             item.axisValueLabel === t('dashboard.diskMemory')
               ? item.seriesName === t('dashboard.useMemory')
                 ? `${diskMemoryChartData.diskUse} ${diskMemoryChartData.useUnit}`

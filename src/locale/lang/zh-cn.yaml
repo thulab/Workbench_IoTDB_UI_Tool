@@ -358,6 +358,8 @@ dashboard:
   node: 节点
   type: 类型
   version: 版本
+  versionEnterprise: '%{version} 企业版'
+  versionOpenSource: '%{version} 开源版'
   physicalMachine: 物理机
   monitorInfo: 监控信息
   masterCluster: 主集群
