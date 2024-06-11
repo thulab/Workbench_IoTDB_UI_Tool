@@ -8,7 +8,7 @@
         </el-button>
       </div>
     </el-header>
-    <auth-container :is-auth="canMaintain" style="flex: 1; overflow: hidden">
+    <auth-container :is-auth="canMaintain" :content="'common.maintainAuth'" style="flex: 1; overflow: hidden">
       <el-container class="p-0" style="width: 100%; height: 100%" v-loading="loading">
         <el-main class="editor-wrapper">
           <div class="editor-box">
