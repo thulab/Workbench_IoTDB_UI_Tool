@@ -69,10 +69,10 @@
         </el-form-item>
       </el-form>
       <div class="search-form-buttons">
-        <auth-tooltip :is-disabled="canReadWriteData">
+        <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
           <el-button @click="handleReset(true)" :disabled="getListLoading || !canReadWriteData" id="data-search-reset">{{ t('common.reset') }}</el-button>
         </auth-tooltip>
-        <auth-tooltip :is-disabled="canReadWriteData">
+        <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
           <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="data-search-search">{{ getListLoading ? '取消查询' : t('common.query') }}</el-button>
         </auth-tooltip>
       </div>
@@ -100,13 +100,13 @@
           </span>
         </h4>
         <div class="page-detail-buttons">
-          <auth-tooltip :is-disabled="canReadWriteData">
+          <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
             <el-button @click="handleSearch" :disabled="getListLoading || !canReadWriteData" id="data-search-refresh">{{ t('common.refresh') }}</el-button>
           </auth-tooltip>
-          <auth-tooltip :is-disabled="canReadWriteData">
-            <el-button class="m-l-12" :disabled="!canReadWriteData || getListLoading" @click="handleImport" id="data-search-import">{{ t('common.import') }}</el-button>
+          <auth-tooltip :is-disabled="canWriteData" :content="'common.dataAuthAnother'">
+            <el-button class="m-l-12" :disabled="!canWriteData || getListLoading" @click="handleImport" id="data-search-import">{{ t('common.import') }}</el-button>
           </auth-tooltip>
-          <auth-tooltip :is-disabled="canReadWriteData">
+          <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
             <el-dropdown
               class="more-icon m-l-12"
               :disabled="getListLoading || !canReadWriteData"
@@ -142,7 +142,7 @@
         <img src="@/assets/data-empty.png" alt="" class="data-empty-img">
         <span class="data-empty-text">{{ t('common.noData') }}</span>
       </div> -->
-      <auth-container :is-auth="canReadWriteData" style="height: 100%">
+      <auth-container :is-auth="canReadWriteData" style="height: 100%" :content="'common.dataAuth'">
         <div v-loading="getListLoading">
           <div v-if="searchDetailInfos.status">
             <dynamic-table
@@ -197,7 +197,7 @@ import ModalImport from './components/modal-import.vue';
 const { t } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
-const { canReadWriteData } = storeToRefs(userStore);
+const { canReadWriteData, canWriteData } = storeToRefs(userStore);
 const { maxTableHeight } = useTableHeight(330);
 
 const searchFormRef = ref<FormInstance>();
@@ -572,6 +572,9 @@ watch(
       }
       handleReset();
       handleSearch();
+    } else if (route.query.measurement) {
+      handleReset();
+      searchFormData.path = [route.query.measurement] as string[];
     }
   },
   {

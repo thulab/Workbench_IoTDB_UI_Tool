@@ -9,7 +9,7 @@
           <el-scrollbar>
             <div class="detail-title-box">
               <h4 class="detail-title-text">{{ t('auth.userDetail') }}</h4>
-              <auth-tooltip v-if="isView" :is-disabled="canManageRole">
+              <auth-tooltip v-if="isView" :is-disabled="canManageRole" :content="'common.roleAuth'">
                 <el-button type="primary" :disabled="!currentRole || !canManageRole" @click="pageType = 'edit'" id="auth-role-edit">{{ t('common.edit') }}</el-button>
               </auth-tooltip>
               <el-button type="primary" v-else @click="handleReset('view')" id="auth-role-view">{{ t('common.exitEdit') }}</el-button>
@@ -20,7 +20,7 @@
                 <el-tag :closable="!isView" type="info" v-for="(item, index) in userList" :key="item" @close="handleDeleteUser(index)" @click="showAuthDetail(item)" :id="`auth-user-${item}-${index}`">
                   {{ item }}
                 </el-tag>
-                <auth-tooltip :is-disabled="canManageUser">
+                <auth-tooltip :is-disabled="canManageUser" :content="'common.userAuth'">
                   <el-button link :disabled="!canManageUser" @click="handleAddUser" v-if="!isView" id="auth-user-add-role" :class="['m-l-8', 'p-0', !canManageUser ? '' : 'svg-button-hover-color']">
                     <el-icon size="24px"><i-custom-user-role-add /></el-icon>
                   </el-button>
@@ -185,6 +185,7 @@ const { requestFn: updateAuthByRole } = useRequest(AuthApi.updateAuthByRole);
 const { requestFn: updateRoleWithUsers } = useRequest(AuthApi.updateRoleWithUsers);
 
 function getRoleUserList() {
+  if (!canManageUser.value) return [];
   return getUserNamesByRoleName(currentRole.value).then((res) => {
     sourceUsers = cloneDeep(res.data || []);
     userList.value = res.data || [];

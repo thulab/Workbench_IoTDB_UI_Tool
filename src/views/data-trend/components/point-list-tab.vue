@@ -1,5 +1,5 @@
 <template>
-  <auth-container :is-auth="canReadWriteSchemaData" class="side-list-box">
+  <div class="side-list-box">
     <div class="list-empty-wrapper" v-if="!pointLineData.length || !pathList.length">
       <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
       <span class="data-empty-text">{{ t('common.noData') }}</span>
@@ -30,7 +30,7 @@
         <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔY：${Math.abs(pointCheckedData[0].y - pointCheckedData[1].y)}`" /></p>
       </div>
     </div>
-  </auth-container>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -61,7 +61,6 @@ const props = defineProps<{
   pointLineData: MarkPointLine[];
   pointCheckedData: PointData[];
   pathList: Trend.LineObj[];
-  canReadWriteSchemaData: boolean;
 }>();
 
 const emit = defineEmits<{

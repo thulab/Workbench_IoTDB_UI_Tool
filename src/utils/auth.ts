@@ -49,11 +49,11 @@ export const iotdbShowAuth = (version?: string, controlVersion: string = '1.2.3'
     if (major === +majorControlStr && minor > +minorControlStr) return true;
     if (minorReleaseControlStr) {
       if (minorReleaseStr) {
-        if (major === +majorControlStr && minor === +minorControlStr && release === +releaseControlStr && +minorReleaseStr >= +minorReleaseControlStr) return true;
+        if (major === +majorControlStr && minor === +minorControlStr && release >= +releaseControlStr && +minorReleaseStr >= +minorReleaseControlStr) return true;
       } else if (major === +majorControlStr && minor === +minorControlStr && release > +releaseControlStr) {
         return true;
       }
-    } else if (major === +majorControlStr && minor === +minorControlStr && release >= +releaseControlStr) return true;
+    } else if (major === +majorControlStr && minor >= +minorControlStr && release >= +releaseControlStr) return true;
     return false;
   }
   return false;

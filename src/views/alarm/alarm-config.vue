@@ -70,10 +70,10 @@
         </base-form-item>
       </el-form>
       <div class="search-form-buttons">
-        <auth-tooltip :is-disabled="canUsePipe">
+        <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
           <el-button @click="handleReset(true)" :disabled="!canUsePipe" id="alarm-config-search-reset">{{ t('common.reset') }}</el-button>
         </auth-tooltip>
-        <auth-tooltip :is-disabled="canUsePipe">
+        <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
           <el-button type="primary" :disabled="!canUsePipe" @click="handleSearch" id="alarm-config-search-search">{{ t('common.query') }}</el-button>
         </auth-tooltip>
       </div>
@@ -83,15 +83,15 @@
       <div class="page-table-title-box">
         <h4 class="page-table-title">{{ t('alarm.alarmConfig') }}</h4>
         <div class="operate-buttons">
-          <auth-tooltip :is-disabled="canUsePipe">
+          <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
             <el-button type="primary" :disabled="!canUsePipe" @click="handleAdd" id="alarm-config-add">{{ t('alarm.newAlarm') }}</el-button>
           </auth-tooltip>
-          <auth-tooltip :is-disabled="canUsePipe">
+          <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
             <el-button :disabled="!multipleSelection.length || !canUsePipe" type="primary" @click="handleDel('batch', null)" id="alarm-config-batch-del">{{ t('common.batchDelete') }}</el-button>
           </auth-tooltip>
         </div>
       </div>
-      <auth-container :is-auth="canUsePipe" style="height: 100%">
+      <auth-container :is-auth="canUsePipe" :content="'common.pipeAuth'" style="height: 100%">
         <div class="page-table-box">
           <el-table
             :data="tableData.list"

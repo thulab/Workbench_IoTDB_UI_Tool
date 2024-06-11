@@ -2,14 +2,14 @@
   <version-container :is-show="showAuthMenu">
     <el-container>
       <el-aside width="240px" class="list-wrapper">
-        <list ref="listRef" :can-manage-user="canManageUser" :can-alter-pwd="canAlterPwd" :user-name="userName" @handle-select="(val) => (currentUser = val)" />
+        <list ref="listRef" :can-manage-user="canManageUser" :user-name="userName" @handle-select="(val) => (currentUser = val)" />
       </el-aside>
       <el-container class="details-wrapper">
         <el-main class="p-0" v-loading="loading || roleLoading">
           <el-scrollbar>
             <div class="detail-title-box" v-if="!isManager">
               <h4 class="detail-title-text">{{ t('auth.roleDetail') }}</h4>
-              <auth-tooltip :is-disabled="canManageUser" v-if="canEdit && !isEdit">
+              <auth-tooltip :is-disabled="canManageUser" :content="'common.userAuth'" v-if="canEdit && !isEdit">
                 <el-button type="primary" :disabled="!canManageUser" @click="pageType = 'edit'" id="auth-user-edit">{{ t('common.edit') }}</el-button>
               </auth-tooltip>
               <el-button type="primary" v-else-if="isEdit" @click="handleReset('view')" id="auth-user-view">{{ t('common.exitEdit') }}</el-button>
@@ -28,7 +28,7 @@
                 >
                   {{ item.roleName }}
                 </el-tag>
-                <auth-tooltip :is-disabled="canManageRole">
+                <auth-tooltip :is-disabled="canManageRole" :content="'common.roleAuth'">
                   <el-button link :disabled="!canManageRole" @click="addRole()" v-if="isEdit" id="auth-user-add-role" :class="['m-l-8', 'p-0', !canManageRole ? '' : 'svg-button-hover-color']">
                     <el-icon size="24px"><i-custom-user-role-add /></el-icon>
                   </el-button>
@@ -207,7 +207,7 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 const { t } = useI18n();
 const connectionStore = useConnectionStore();
 const userStore = useUserStore();
-const { entityPrivilegesEnumGroup, entityPrivilegesEnumKeys, pathPrivilegesEnumGroup, pathPrivilegesEnumKeys, canManageUser, canManageRole, canAlterPwd } = storeToRefs(userStore);
+const { entityPrivilegesEnumGroup, entityPrivilegesEnumKeys, pathPrivilegesEnumGroup, pathPrivilegesEnumKeys, canManageUser, canManageRole } = storeToRefs(userStore);
 const userName = computed(() => userStore.userInfo.name);
 
 const listRef = ref<InstanceType<typeof List>>();

@@ -98,6 +98,15 @@ common:
   errorEmptyTip: 存在必填项未编辑或必填项输入规则有误
   datetimerange: 时间范围
   noAuth: 暂无权限
+  maintainAuth: 需“运维管理”权限
+  databaseAuth: 需“数据库管理”权限
+  schemaAuth: 需“读元数据”或“读写元数据”权限
+  schemaAuthAnother: 需“读写元数据”权限
+  dataAuth: 需“读数据”或“读写数据”权限
+  dataAuthAnother: 需“读写数据”权限
+  pipeAuth: 需“流处理使用”权限
+  userAuth: 需“用户管理”权限
+  roleAuth: 需“角色管理”权限
   apply: 应用
   auto: 自动
   origin: 原始值
@@ -525,7 +534,7 @@ alarm:
   singleDeleteRecord: 确认删除该条告警记录吗？
   read: 已阅
   duration: 持续时间
-  noAuthOperate: 暂无权限查看原始序列权限
+  noAuthOperate: 暂无查看原始序列权限
   durationPlaceholder: 请输入持续时间
   frequency: 告警频率
   alarmIntro: 告警说明

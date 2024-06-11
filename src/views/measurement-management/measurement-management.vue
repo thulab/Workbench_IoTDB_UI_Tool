@@ -17,7 +17,7 @@
           <li class="storage-info-item" id="database-name-li">
             <el-icon size="24"><i-custom-storage-num /></el-icon>
             <span class="storage-info-item-label" id="database-name-span">{{ t('measurement.databaseName') }}：</span>
-            <text-tooltip :content="canReadWriteSchema ? currentStorage : '-'" />
+            <text-tooltip :content="canReadWriteSchema ? currentStorage : t('common.noAuth')" />
           </li>
           <li class="storage-info-item storage-info-item-ttl" id="ttl-li">
             <el-icon size="24"><i-custom-time /></el-icon>
@@ -25,7 +25,7 @@
               {{ t('measurement.databaseTTL') }}：
               <el-tooltip effect="light" :content="t('measurement.databaseTTLTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="ttl-tip" /></el-tooltip>
             </span>
-            <template v-if="!canReadWriteSchema">-</template>
+            <template v-if="!canReadWriteSchema">{{ t('common.noAuth') }}</template>
             <template v-else>
               <span v-if="!editTTL">{{ storageInfos?.ttl ? storageInfos.ttl + getTtlTimeUnit(storageInfos.ttlUnit, ttlUnitOptions) : '∞' }}</span>
               <div v-if="currentStorage && editTTL" class="edit-ttl-box">
@@ -43,7 +43,7 @@
                 <el-button class="m-l-12" plain @click="editTTL = false" id="mesaurement-ttl-cancel">{{ t('common.cancel') }}</el-button>
                 <el-button type="primary" @click="handleConfirmEditTTL" id="mesaurement-ttl-confirm">{{ t('common.confirm') }}</el-button>
               </div>
-              <auth-tooltip :is-disabled="canWriteSchemaByPath">
+              <auth-tooltip :is-disabled="canWriteSchemaByPath" :content="'common.schemaAuthAnother'">
                 <el-button
                   link
                   v-if="currentStorage && !editTTL"
@@ -61,19 +61,19 @@
           <li class="storage-info-item" id="device-total-li">
             <el-icon size="24"><i-custom-device-num /></el-icon>
             <span class="storage-info-item-label" id="device-total-span">{{ t('measurement.deviceNum') }}：</span>
-            {{ canReadWriteSchema ? storageInfos?.deviceCount || 0 : '-' }}
+            {{ canReadWriteSchema ? storageInfos?.deviceCount || 0 : t('common.noAuth') }}
           </li>
           <li class="storage-info-item" id="measurement-total-li">
             <el-icon size="24"><i-custom-measure-num /></el-icon>
             <span class="storage-info-item-label" id="measurement-total-span">{{ t('measurement.measurementNum') }}：</span>
-            {{ canReadWriteSchema ? storageInfos?.measurementCount || 0 : '-' }}
+            {{ canReadWriteSchema ? storageInfos?.measurementCount || 0 : t('common.noAuth') }}
           </li>
           <!-- eslint-disable-next-line vue/max-len -->
           <!-- <li class="storage-info-item" id="data-total-li"><el-icon size="24"><i-custom-total-num /></el-icon><span class="storage-info-item-label" id="data-total-span">{{ t('measurement.totalNum') }}：</span>{{ canReadWriteSchema ? (!storageInfos?.dataCount || storageInfos?.dataCount < 0 ? 0 : storageInfos?.dataCount) : '-'}}</li> -->
         </ul>
 
         <div class="page-detail-buttons">
-          <auth-tooltip :is-disabled="canManageDatabase">
+          <auth-tooltip :is-disabled="canManageDatabase" :content="'common.databaseAuth'">
             <el-button
               plain
               class="el-button-delete"
@@ -104,17 +104,17 @@
         </div>
 
         <div class="search-form-buttons">
-          <auth-tooltip :is-disabled="canWriteSchemaByParentPath">
+          <auth-tooltip :is-disabled="canWriteSchemaByParentPath" :content="'common.schemaAuthAnother'">
             <el-button type="primary" :disabled="!currentStorage || currentStorage === 'root.__system' || !canWriteSchemaByParentPath" @click="handleAddMeasure" id="mesaurement-add">
               {{ t('common.create') }}
             </el-button>
           </auth-tooltip>
-          <auth-tooltip :is-disabled="canWriteSchemaByParentPath">
+          <auth-tooltip :is-disabled="canWriteSchemaByParentPath" :content="'common.schemaAuthAnother'">
             <el-button class="m-l-16" :disabled="!currentStorage || currentStorage === 'root.__system' || !canWriteSchemaByParentPath" @click="handleImport" id="mesaurement-import">
               {{ t('common.import') }}
             </el-button>
           </auth-tooltip>
-          <auth-tooltip :is-disabled="canReadWriteSchema">
+          <auth-tooltip :is-disabled="canReadWriteSchema" :content="'common.schemaAuth'">
             <el-dropdown class="m-x-16" :disabled="!currentStorage || !(totalCount > 0) || !canReadWriteSchema" @command="(val) => handleCommandDown(val)" id="mesaurement-download-dropdown">
               <el-button class="export-button" :disabled="!currentStorage || !(totalCount > 0) || !canReadWriteSchema" id="mesaurement-download">
                 {{ t('common.export') }}
@@ -128,23 +128,23 @@
               </template>
             </el-dropdown>
           </auth-tooltip>
-          <auth-tooltip :is-disabled="canWriteSchema">
-            <el-button :disabled="!currentStorage || multipleSelection.length === 0 || !canWriteSchema" type="primary" @click="handleDelRow('batch', null)" id="mesaurement-batch-del">
+          <auth-tooltip :is-disabled="canWriteSchemaByParentPath" :content="'common.schemaAuthAnother'">
+            <el-button :disabled="!currentStorage || multipleSelection.length === 0 || !canWriteSchemaByParentPath" type="primary" @click="handleDelRow('batch', null)" id="mesaurement-batch-del">
               {{ t('common.batchDelete') }}
             </el-button>
           </auth-tooltip>
-          <auth-tooltip :is-disabled="canReadWriteSchema">
+          <auth-tooltip :is-disabled="canReadWriteDataByParentPath" :content="'common.dataAuth'">
             <el-button
-              :disabled="!currentStorage || !canReadWriteSchema"
+              :disabled="!currentStorage || !canReadWriteDataByParentPath"
               link
               @click="handleRefresh"
               id="mesaurement-refresh"
-              :class="!currentStorage || !canReadWriteSchema ? '' : 'svg-button-hover-color'"
+              :class="!currentStorage || !canReadWriteDataByParentPath ? '' : 'svg-button-hover-color'"
             >
               <i-custom-refresh style="width: 24px; height: 24px" />
             </el-button>
           </auth-tooltip>
-          <auth-tooltip :is-disabled="canReadWriteSchema">
+          <auth-tooltip :is-disabled="canReadWriteSchema" :content="'common.schemaAuth'">
             <el-button
               link
               :class="[canReadWriteSchema ? 'svg-button-hover-color' : '', 'm-l-4']"
@@ -195,7 +195,7 @@
           </el-popover>
         </div>
       </div>
-      <auth-container :is-auth="canReadWriteSchema" style="height: calc(100% - 222px)">
+      <auth-container :is-auth="canReadWriteSchema" :content="'common.schemaAuth'" style="height: calc(100% - 222px)">
         <div class="storage-table-box">
           <el-table
             :data="tableData.measurements"
@@ -263,7 +263,7 @@
                 >
                   {{ t('page.trend') }}
                 </el-button>
-                <auth-tooltip :is-disabled="rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)">
+                <auth-tooltip :is-disabled="rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)" :content="'common.schemaAuthAnother'">
                   <el-button
                     type="primary"
                     link
@@ -399,13 +399,12 @@ const columnList = ref<Array<{ label: string; prop: string; width: number }>>([
   { label: 'measurement.dataType', prop: 'dataType', width: 140 },
 ]);
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const canReadWriteSchemaByPath = computed(() => {
-  if (userAllEntityPrivileges.value.includes('READ_SCHEMA') || userAllEntityPrivileges.value.includes('WRITE_SCHEMA')) return true;
+const canReadWriteDataByParentPath = computed(() => {
+  if (userAllEntityPrivileges.value.includes('READ_DATA') || userAllEntityPrivileges.value.includes('WRITE_DATA')) return true;
   if (!currentStorage.value) return false;
-  const authList = getPathAuthList(currentStorage.value, userAllPathPrivileges.value);
+  const authList = getParentPathAuthList(currentStorage.value, userAllPathPrivileges.value);
   if (authList.length) {
-    return authList.includes('READ_SCHEMA') || authList.includes('WRITE_SCHEMA');
+    return authList.includes('READ_DATA') || authList.includes('WRITE_DATA');
   }
   return false;
 });
@@ -435,6 +434,15 @@ function rowCanWriteSchemaByPath(path: string) {
   const authList = getPathAuthList(path, userAllPathPrivileges.value);
   if (authList.length) {
     return authList.includes('WRITE_SCHEMA');
+  }
+  return false;
+}
+
+function rowReadWriteDataByParentPath(path: string) {
+  if (userAllEntityPrivileges.value.includes('READ_DATA') || userAllEntityPrivileges.value.includes('WRITE_DATA')) return true;
+  const authList = getParentPathAuthList(path, userAllPathPrivileges.value);
+  if (authList.length) {
+    return authList.includes('READ_DATA') || authList.includes('WRITE_DATA');
   }
   return false;
 }
@@ -522,11 +530,12 @@ function getListData() {
         timeseriesList.push(`${item.deviceName}.${item.timeseries}`);
         viewTypeList.push(item.viewType || 'BASE');
       });
+      const authTimeseries = tableData.value.measurements.filter((f) => rowReadWriteDataByParentPath(`${f.deviceName}.${f.timeseries}`)).map((d) => `${d.deviceName}.${d.timeseries}`);
       getBatchLastValue(timeseriesList, viewTypeList).then((newRes) => {
         if (newRes.data.values.length || newRes.data.timestamps.length) {
           tableData.value.measurements.forEach((item, index) => {
-            item.value = newRes.data.values[index] || '-';
-            item.valueTime = newRes.data.timestamps[index] || '-';
+            item.value = authTimeseries.includes(`${item.deviceName}.${item.timeseries}`) ? newRes.data.values[index] || '-' : t('common.noAuth');
+            item.valueTime = authTimeseries.includes(`${item.deviceName}.${item.timeseries}`) ? newRes.data.timestamps[index] || '-' : t('common.noAuth');
           });
         }
       });

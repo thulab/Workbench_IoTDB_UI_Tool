@@ -2,17 +2,22 @@
   <div>
     <div v-if="isAuth === false" class="auth-tip-container">
       <img src="@/assets/auth-tip.png" alt="" class="auth-tip-img" />
-      <span class="auth-tip-text">{{ t('common.noAuth') }}</span>
+      <span class="auth-tip-text">{{ t(content) }}</span>
     </div>
     <slot v-if="isAuth"></slot>
   </div>
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  isAuth: boolean;
-}>();
-
+withDefaults(
+  defineProps<{
+    isAuth: boolean;
+    content?: string;
+  }>(),
+  {
+    content: 'common.noAuth',
+  }
+);
 const { t } = useI18n();
 </script>
 

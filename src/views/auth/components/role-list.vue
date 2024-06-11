@@ -2,18 +2,18 @@
   <div class="list-title">
     <h4>{{ t('auth.roleList') }}</h4>
     <div class="operate-buttons">
-      <auth-tooltip :is-disabled="canManageRole">
-        <el-button link :class="['m-r-8', 'border-refresh-icon', !canManageRole ? '' : 'svg-button-hover-color']" :disabled="!canManageRole" @click="getList" id="auth-role-refresh">
+      <auth-tooltip :is-disabled="canManageRole" :content="'common.roleAuth'">
+        <el-button link :class="['m-r-8', 'border-refresh-icon', !canManageRole ? '' : 'svg-button-hover-color']" :disabled="!canManageRole" @click="getList()" id="auth-role-refresh">
           <i-custom-refresh />
         </el-button>
       </auth-tooltip>
-      <auth-tooltip :is-disabled="canManageRole">
+      <auth-tooltip :is-disabled="canManageRole" :content="'common.roleAuth'">
         <el-button link :disabled="!canManageRole" style="margin: 0" @click="handleAdd" id="auth-role-add"><i-custom-new-role /></el-button>
       </auth-tooltip>
     </div>
   </div>
 
-  <auth-container :is-auth="canManageRole" style="height: calc(100% - 70px)">
+  <auth-container :is-auth="canManageRole" class="role-list-box" :content="'common.roleAuth'" style="height: calc(100% - 70px)">
     <ul class="list-box" v-loading="loading">
       <template v-if="list.length">
         <li v-for="(item, i) in list" :key="item" :class="['item-box', current === item ? 'item-box-active' : '']" :id="`auth-role-${i}`" @click="(e) => handleSelect(item, e)">
@@ -41,7 +41,7 @@
     </ul>
   </auth-container>
 
-  <modal-role v-model:visible="dialogVisible" :list="list" @handle-save="getList" />
+  <modal-role v-model:visible="dialogVisible" :list="list" @handle-save="(name) => getList(name)" />
 </template>
 
 <script setup lang="ts">
@@ -66,10 +66,10 @@ const { requestFn: getRoleList, loading } = useRequest(AuthApi.getRoleList);
 const { requestFn: deleteRole } = useRequest(AuthApi.deleteRole);
 
 // 获取角色
-function getList() {
+function getList(name?: string) {
   getRoleList().then((res) => {
     list.value = res.data || [];
-    current.value = list.value[0] || '';
+    current.value = name && list.value.some((item) => item === name) ? name : list.value[0] || '';
   });
 }
 
@@ -107,11 +107,6 @@ function handleSelect(item: string, e: MouseEvent) {
   current.value = item;
 }
 
-onMounted(() => {
-  if (!props.canManageRole) return;
-  getList();
-});
-
 watch(
   () => current.value,
   (val) => {
@@ -137,6 +132,12 @@ watch(
 defineExpose({ getList });
 </script>
 
+<style lang="scss">
+.role-list-box .auth-tip-img {
+  width: 80px !important;
+  height: 80px !important;
+}
+</style>
 <style lang="scss" scoped>
 .list-title {
   display: flex;

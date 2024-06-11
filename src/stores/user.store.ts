@@ -108,6 +108,7 @@ export const useUserStore = defineStore(
 
     const canManageDatabase = computed(() => userAllEntityPrivileges.value.includes('MANAGE_DATABASE'));
     const canWriteSchema = computed(() => userAllEntityPrivileges.value.includes('WRITE_SCHEMA'));
+    const canWriteData = computed(() => userAllEntityPrivileges.value.includes('WRITE_DATA'));
     const canReadWriteSchema = computed(() => userAllPrivileges.value.includes('READ_SCHEMA') || userAllPrivileges.value.includes('WRITE_SCHEMA'));
     const canReadWriteData = computed(() => userAllPrivileges.value.includes('READ_DATA') || userAllPrivileges.value.includes('WRITE_DATA'));
     const canReadWriteSchemaData = computed(
@@ -120,7 +121,6 @@ export const useUserStore = defineStore(
     const canUsePipe = computed(() => userAllEntityPrivileges.value.includes('USE_PIPE'));
     const canManageUser = computed(() => userAllEntityPrivileges.value.includes('MANAGE_USER'));
     const canManageRole = computed(() => userAllEntityPrivileges.value.includes('MANAGE_ROLE'));
-    const canAlterPwd = computed(() => userAllEntityPrivileges.value.includes('MANAGE_USER'));
     const canMaintain = computed(() => userAllEntityPrivileges.value.includes('MAINTAIN'));
 
     function clearUserStore() {
@@ -200,13 +200,13 @@ export const useUserStore = defineStore(
       userAllPrivileges,
       canManageDatabase,
       canWriteSchema,
+      canWriteData,
       canReadWriteSchema,
       canReadWriteData,
       canReadWriteSchemaData,
       canUsePipe,
       canManageUser,
       canManageRole,
-      canAlterPwd,
       canMaintain,
       setUser,
       clearUserStore,

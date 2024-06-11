@@ -2,8 +2,18 @@
   <div class="storage-list-title">
     <h4>{{ t('measurement.databaseTitle') }}</h4>
     <div class="storage-operate-buttons">
-      <el-button link class="m-r-8 border-refresh-icon svg-button-hover-color" @click="getStorageList()" id="mesaurement-side-refresh"><i-custom-refresh /></el-button>
-      <auth-tooltip :is-disabled="canManageDatabase">
+      <auth-tooltip :is-disabled="canReadWriteSchema" :content="'common.schemaAuth'">
+        <el-button
+          link
+          :disabled="!canReadWriteSchema"
+          :class="['m-r-8', 'border-refresh-icon', !canReadWriteSchema ? '' : 'svg-button-hover-color']"
+          @click="getStorageList()"
+          id="mesaurement-side-refresh"
+        >
+          <i-custom-refresh />
+        </el-button>
+      </auth-tooltip>
+      <auth-tooltip :is-disabled="canManageDatabase" :content="'common.databaseAuth'">
         <el-button link style="margin: 0" :disabled="!canManageDatabase" @click="handleAddStorage" id="mesaurement-side-add">
           <i-custom-new-storage />
         </el-button>
@@ -11,12 +21,12 @@
     </div>
   </div>
 
-  <auth-container :is-auth="canReadWriteSchema" style="height: calc(100% - 70px)">
+  <auth-container :is-auth="canReadWriteSchema" :content="'common.schemaAuth'" style="height: calc(100% - 70px)">
     <ul class="storage-list-box" v-loading="storageLoading">
       <template v-if="storageList.length">
         <li v-for="(item, i) in storageList" :key="item" :class="['storage-item-box', currentStorage === item ? 'storage-item-box-active' : '']" @click="(e) => handleSelectStorage(item, e)">
           <span class="storage-item-text"><text-tooltip :content="item" /></span>
-          <auth-tooltip :is-disabled="canManageDatabase">
+          <auth-tooltip :is-disabled="canManageDatabase" :content="'common.databaseAuth'">
             <div
               class="storage-item-delete-box"
               :style="{ cursor: item === 'root.__system' || !canManageDatabase ? 'not-allowed' : 'pointer' }"
@@ -120,11 +130,6 @@ function handleSelectStorage(item: string, e: MouseEvent) {
   currentStorage.value = item;
 }
 
-onMounted(() => {
-  if (!props.canReadWriteSchema) return;
-  getStorageList(true);
-});
-
 watch(
   () => currentStorage.value,
   (val) => {
@@ -150,6 +155,17 @@ watch(
 defineExpose({ getStorageList });
 </script>
 
+<style lang="scss">
+.storage-list-wrapper .auth-tip-img {
+  width: 80px !important;
+  height: 80px !important;
+}
+
+.storage-list-wrapper .auth-tip-text {
+  width: 110px !important;
+  text-align: center;
+}
+</style>
 <style lang="scss" scoped>
 .storage-list-title {
   display: flex;

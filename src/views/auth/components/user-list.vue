@@ -2,8 +2,10 @@
   <div class="list-title">
     <h4>{{ t('auth.userList') }}</h4>
     <div class="operate-buttons">
-      <el-button link class="m-r-8 border-refresh-icon svg-button-hover-color" @click="getList" id="auth-user-refresh"><i-custom-refresh /></el-button>
-      <auth-tooltip :is-disabled="canManageUser">
+      <auth-tooltip :is-disabled="canManageUser" :content="'common.userAuth'">
+        <el-button link :disabled="!canManageUser" class="m-r-8 border-refresh-icon svg-button-hover-color" @click="getList()" id="auth-user-refresh"><i-custom-refresh /></el-button>
+      </auth-tooltip>
+      <auth-tooltip :is-disabled="canManageUser" :content="'common.userAuth'">
         <el-button link :disabled="!canManageUser" style="margin: 0" @click="handleAdd" id="auth-user-add"><i-custom-user-add /></el-button>
       </auth-tooltip>
     </div>
@@ -18,13 +20,8 @@
         </el-icon>
         <text-tooltip :content="item.name" />
       </span>
-      <auth-tooltip :is-disabled="(canManageUser && canAlterPwd) || userName === item.name">
-        <div
-          class="item-edit-box"
-          :style="{ cursor: !((canManageUser && canAlterPwd) || userName === item.name) ? 'not-allowed' : 'pointer' }"
-          :id="`auth-user-${i}-edit`"
-          @click="handleEdit(item.name)"
-        >
+      <auth-tooltip :is-disabled="canManageUser || userName === item.name" :content="'common.userAuth'">
+        <div class="item-edit-box" :style="{ cursor: !(canManageUser || userName === item.name) ? 'not-allowed' : 'pointer' }" :id="`auth-user-${i}-edit`" @click="handleEdit(item.name)">
           <i-custom-edit class="item-edit" />
           <i-custom-edit class="item-edit-active" />
         </div>
@@ -50,7 +47,7 @@
     </li>
   </ul>
   <modal-reset-password :title="t('auth.editUser')" :success-tip="t('auth.editUserSuccess')" :user-name="editUser" v-model:visible="modalVisible" />
-  <modal-user v-model:visible="modalUserVisible" :user-list="list" @handle-save="getList" />
+  <modal-user v-model:visible="modalUserVisible" :user-list="list" @handle-save="(name) => getList(name)" />
 </template>
 
 <script setup lang="ts">
@@ -61,7 +58,6 @@ import ICustomError from '~icons/custom/error.svg';
 
 const props = defineProps<{
   canManageUser: boolean;
-  canAlterPwd: boolean;
   userName: string;
 }>();
 
@@ -76,13 +72,20 @@ const modalVisible = ref(false);
 const modalUserVisible = ref(false);
 
 const {
-  requestFn: getList,
+  requestFn: getUserList,
   data: list,
   loading,
 } = useRequest(AuthApi.getUserList, {
   initData: [],
 });
 const { requestFn: deleteUser } = useRequest(AuthApi.deleteUser);
+
+// 获取用户
+function getList(name?: string) {
+  getUserList().then(() => {
+    current.value = name && list.value.some((item) => item.name === name) ? name : list.value[0]?.name || '';
+  });
+}
 
 // 新增角色
 function handleAdd() {
@@ -101,7 +104,7 @@ function handleDelete(item: string) {
 }
 
 function handleEdit(item: string) {
-  if (!((props.canManageUser && props.canAlterPwd) || props.userName === item)) return;
+  if (!(props.canManageUser || props.userName === item)) return;
   editUser.value = item;
   modalVisible.value = true;
 }
@@ -131,9 +134,7 @@ function handleSelect(item: string, e: MouseEvent) {
 }
 
 onMounted(() => {
-  getList().then(() => {
-    current.value = list.value[0]?.name;
-  });
+  getList();
 });
 
 watch(

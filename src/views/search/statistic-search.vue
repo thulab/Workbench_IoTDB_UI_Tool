@@ -25,10 +25,8 @@
         </base-form-item>
       </el-form>
       <div class="search-form-buttons">
-        <auth-tooltip :is-disabled="canReadWriteData">
-          <el-button @click="handleReset" :disabled="getListLoading || !canReadWriteData" id="statistic-search-reset">{{ t('common.reset') }}</el-button>
-        </auth-tooltip>
-        <auth-tooltip :is-disabled="canReadWriteData">
+        <el-button @click="handleReset" :disabled="getListLoading" id="statistic-search-reset">{{ t('common.reset') }}</el-button>
+        <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
           <el-button :disabled="searchFormData.path.length === 0 || !canReadWriteData" type="primary" @click="handleSearch" id="statistic-search-search">
             {{ getListLoading ? t('common.cancel') : t('common.query') }}
           </el-button>
@@ -40,7 +38,7 @@
       <div class="page-info-box">
         <h4 class="page-info-title">{{ t('common.searchDetail') }}</h4>
         <div class="page-detail-buttons">
-          <auth-tooltip :is-disabled="canReadWriteData">
+          <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
             <el-dropdown class="m-r-16" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData" @command="(val) => handleCommandDown(val)" id="statistic-search-download-dropdown">
               <el-button class="export-button" id="statistic-search-download" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData">
                 {{ t('common.export') }}
@@ -54,7 +52,7 @@
               </template>
             </el-dropdown>
           </auth-tooltip>
-          <auth-tooltip :is-disabled="canReadWriteData">
+          <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
             <el-button
               link
               @click="handleSearch"
@@ -68,7 +66,7 @@
         </div>
       </div>
 
-      <auth-container :is-auth="canReadWriteData" style="height: 100%">
+      <auth-container :is-auth="canReadWriteData" style="height: 100%" :content="'common.dataAuth'">
         <el-table
           :data="tableData"
           v-loading="getListLoading"
@@ -181,12 +179,16 @@ function getMinMaxData() {
     startTime: formatDate(copySearchFormData.datetimerange[0] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
     endTime: formatDate(copySearchFormData.datetimerange[1] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
     timestamp: timestamp.value,
-  }).then((res) => {
-    minMaxList.value = res.data.data || [];
-    if (res.data.message) {
-      tableErrorMessage.value.push(res.data.message);
-    }
-  });
+  })
+    .then((res) => {
+      minMaxList.value = res.data.data || [];
+      if (res.data.message) {
+        tableErrorMessage.value.push(res.data.message);
+      }
+    })
+    .catch(() => {
+      minMaxList.value = [];
+    });
 }
 
 function getAvgSumData() {
@@ -195,20 +197,21 @@ function getAvgSumData() {
     startTime: formatDate(copySearchFormData.datetimerange[0] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
     endTime: formatDate(copySearchFormData.datetimerange[1] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
     timestamp: timestamp.value,
-  }).then((res) => {
-    avgSumList.value = res.data.data || [];
-    if (res.data.message) {
-      tableErrorMessage.value.push(res.data.message);
-    }
-  });
+  })
+    .then((res) => {
+      avgSumList.value = res.data.data || [];
+      if (res.data.message) {
+        tableErrorMessage.value.push(res.data.message);
+      }
+    })
+    .catch(() => {
+      avgSumList.value = [];
+    });
 }
 
 function getListData() {
-  tableData.value = [];
-  minMaxList.value = [];
-  avgSumList.value = [];
-  tableErrorMessage.value = [];
   getListLoading.value = true;
+  tableErrorMessage.value = [];
   Promise.allSettled([getMinMaxData(), getAvgSumData()]).then(() => {
     tableData.value = minMaxList.value.map((item, index) => ({
       measurement: item.measurement,
