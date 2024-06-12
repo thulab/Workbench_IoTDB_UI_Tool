@@ -181,7 +181,7 @@ function handleChangeNode() {
 // 节点更新
 function handleConfirm() {
   saveLoading.value = true;
-  updateConfigs(inputEditor.value?.getContent()!, currentNode.value)
+  updateConfigs(configData.value, inputEditor.value?.getContent()!, currentNode.value)
     .then(() => {
       ElMessage.success({ message: t('common.updateSuccess'), grouping: true });
       getConfigDetail();
@@ -194,7 +194,7 @@ function handleConfirm() {
 // 全部节点更新
 function handleAllConfirm() {
   allSaveLoading.value = true;
-  updateConfigs(inputEditor.value?.getContent()!)
+  updateConfigs(configData.value, inputEditor.value?.getContent()!)
     .then(() => {
       ElMessage.success({ message: t('common.updateSuccess'), grouping: true });
       getConfigDetail();
