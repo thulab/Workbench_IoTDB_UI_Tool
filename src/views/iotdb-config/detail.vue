@@ -9,7 +9,7 @@
       </div>
     </el-header>
     <auth-container :is-auth="canMaintain" :content="'common.maintainAuth'" style="flex: 1; overflow: hidden">
-      <el-container class="p-0" style="width: 100%; height: 100%" v-loading="loading">
+      <el-container class="p-0" style="width: 100%; height: 100%">
         <el-main class="editor-wrapper">
           <div class="editor-box">
             <div class="flex-justify-between m-b-6">
@@ -30,7 +30,9 @@
                 </el-button>
               </div>
             </div>
-            <monaco-editor class="input-container" v-loading="configLoading" ref="inputEditor" />
+            <div v-loading="configLoading" class="input-container">
+              <monaco-editor ref="inputEditor" />
+            </div>
             <div class="editor-operate-box">
               <el-button plain @click="handleReset" id="iotdb-config-reset">{{ t('common.reset') }}</el-button>
               <el-button type="primary" :loading="saveLoading" :disabled="!configData" @click="handleConfirm" id="iotdb-config-save">{{ t('iotdbConfig.nodeEffect') }}</el-button>
@@ -92,7 +94,7 @@ const isEqualConfig = () => {
   return isEqual(configData.value, inputEditor.value?.getContent());
 };
 
-const { requestFn: getSystemInfo, loading } = useRequest(DashboardApi.getSystemInfo);
+const { requestFn: getSystemInfo } = useRequest(DashboardApi.getSystemInfo);
 const { requestFn: getConfigFile, loading: configLoading } = useRequest(ConfigApi.getConfigFile);
 const { requestFn: getConfigTemplate } = useRequest(ConfigApi.getConfigTemplate);
 const { requestFn: updateConfigs } = useRequest(ConfigApi.updateConfigs);
@@ -227,8 +229,12 @@ function initDetail() {
         const flag = nodeList.value.some((item) => `${item.nodeID}` === `${data.node}`);
         if (flag) {
           currentNode.value = data.node;
-          configData.value = data.configData;
-          inputEditor.value?.setContent(data.content || '');
+          if (!data.configData && !data.content) {
+            getConfigDetail();
+          } else {
+            configData.value = data.configData;
+            inputEditor.value?.setContent(data.content || '');
+          }
         } else {
           currentNode.value = nodeList.value[0].nodeID;
           getConfigDetail();

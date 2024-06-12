@@ -1,5 +1,5 @@
 <template>
-  <div v-bind="$attrs" class="monaco-container" ref="monacoContainer"></div>
+  <div class="monaco-container" ref="monacoContainer" v-loading="loading"></div>
 </template>
 
 <script setup lang="ts">
@@ -22,9 +22,11 @@ const props = withDefaults(
 const { locale } = useI18n();
 const monacoEditor = ref<monaco.editor.IStandaloneCodeEditor>();
 const monacoContainer = ref<HTMLElement>();
+const loading = ref(false);
 
 const initEditor = () => {
   if (monacoContainer.value) {
+    loading.value = true;
     editorLoader.config({
       'vs/nls': {
         availableLanguages: {
@@ -56,6 +58,7 @@ const initEditor = () => {
         },
         readOnly: props.readOnly,
       });
+      loading.value = false;
     });
   }
 };
