@@ -31,7 +31,7 @@
               </div>
             </div>
             <div v-loading="configLoading" class="input-container">
-              <monaco-editor ref="inputEditor" />
+              <monaco-editor ref="inputEditor" :content="configData" />
             </div>
             <div class="editor-operate-box">
               <el-button plain @click="handleReset" id="iotdb-config-reset">{{ t('common.reset') }}</el-button>
@@ -43,7 +43,7 @@
             <div class="flex-justify-between m-b-6">
               <h4 class="editor-title">{{ t('search.template') }}</h4>
             </div>
-            <monaco-editor class="output-container" ref="outputEditor" :read-only="true" />
+            <monaco-editor class="output-container" ref="outputEditor" :read-only="true" :content="templateData" />
           </div>
         </el-main>
       </el-container>
@@ -121,38 +121,26 @@ function getNodeList() {
 
 // 获取模板配置
 function getTemplate() {
-  if (outputEditor.value) {
-    getConfigTemplate()
-      .then((res) => {
-        templateData.value = res.data || '';
-        outputEditor.value?.setContent(templateData.value);
-      })
-      .catch(() => {
-        templateData.value = '';
-      });
-  } else {
-    nextTick(() => {
-      getTemplate();
+  getConfigTemplate()
+    .then((res) => {
+      templateData.value = res.data || '';
+      outputEditor.value?.setContent(templateData.value);
+    })
+    .catch(() => {
+      templateData.value = '';
     });
-  }
 }
 
 // 获取节点配置
 function getConfigDetail() {
-  if (inputEditor.value) {
-    getConfigFile(currentNode.value)
-      .then((res) => {
-        configData.value = res.data || '';
-        inputEditor.value?.setContent(configData.value);
-      })
-      .catch(() => {
-        configData.value = '';
-      });
-  } else {
-    nextTick(() => {
-      getConfigDetail();
+  getConfigFile(currentNode.value)
+    .then((res) => {
+      configData.value = res.data || '';
+      inputEditor.value?.setContent(configData.value);
+    })
+    .catch(() => {
+      configData.value = '';
     });
-  }
 }
 
 function handleChangeValid() {
@@ -193,7 +181,7 @@ function handleChangeNode() {
 // 节点更新
 function handleConfirm() {
   saveLoading.value = true;
-  updateConfigs(configData.value, currentNode.value)
+  updateConfigs(inputEditor.value?.getContent()!, currentNode.value)
     .then(() => {
       ElMessage.success({ message: t('common.updateSuccess'), grouping: true });
       getConfigDetail();
@@ -206,7 +194,7 @@ function handleConfirm() {
 // 全部节点更新
 function handleAllConfirm() {
   allSaveLoading.value = true;
-  updateConfigs(configData.value)
+  updateConfigs(inputEditor.value?.getContent()!)
     .then(() => {
       ElMessage.success({ message: t('common.updateSuccess'), grouping: true });
       getConfigDetail();
@@ -222,22 +210,17 @@ function handleReset() {
 }
 
 function initDetail() {
-  if (inputEditor.value) {
-    if (sessionStorage.getItem('configStorage')) {
-      const data = JSON.parse(sessionStorage.getItem('configStorage') as string);
-      if (data.node) {
-        const flag = nodeList.value.some((item) => `${item.nodeID}` === `${data.node}`);
-        if (flag) {
-          currentNode.value = data.node;
-          if (!data.configData && !data.content) {
-            getConfigDetail();
-          } else {
-            configData.value = data.configData;
-            inputEditor.value?.setContent(data.content || '');
-          }
-        } else {
-          currentNode.value = nodeList.value[0].nodeID;
+  if (sessionStorage.getItem('configStorage')) {
+    const data = JSON.parse(sessionStorage.getItem('configStorage') as string);
+    if (data.node) {
+      const flag = nodeList.value.some((item) => `${item.nodeID}` === `${data.node}`);
+      if (flag) {
+        currentNode.value = data.node;
+        if (!data.configData && !data.content) {
           getConfigDetail();
+        } else {
+          configData.value = data.configData;
+          inputEditor.value?.setContent(data.content || '');
         }
       } else {
         currentNode.value = nodeList.value[0].nodeID;
@@ -248,9 +231,8 @@ function initDetail() {
       getConfigDetail();
     }
   } else {
-    nextTick(() => {
-      initDetail();
-    });
+    currentNode.value = nodeList.value[0].nodeID;
+    getConfigDetail();
   }
 }
 
