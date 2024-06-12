@@ -4,7 +4,7 @@ import * as monaco from 'monaco-editor';
 loader.config({
   monaco,
   paths: {
-    vs: '/monaco-editor/min/vs',
+    vs: '/assets/monaco-editor/min/vs',
   },
 });
 
