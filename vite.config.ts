@@ -112,6 +112,9 @@ export default defineConfig(({ mode }) => {
         '@': srcPath,
       },
     },
+    optimizeDeps: {
+      exclude: ['monaco-editor'],
+    },
     server: {
       host: true,
       port: 8080,
