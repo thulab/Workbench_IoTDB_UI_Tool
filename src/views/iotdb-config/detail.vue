@@ -162,7 +162,7 @@ function handleChangeValid() {
       confirmButtonClass: 'iotdb-config-continue-confirm',
       cancelButtonClass: 'iotdb-config-continue-cancel',
       type: 'warning',
-      icon: markRaw(ICustomMessageWarning),
+      icon: markRaw(ICustomMessageWarning as unknown as object),
       closeOnClickModal: false,
       closeOnPressEscape: false,
     })
