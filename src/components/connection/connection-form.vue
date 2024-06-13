@@ -294,6 +294,7 @@ function handleTestLogin() {
           sessionStorage.setItem('sqlSearchStorage', '');
           sessionStorage.setItem('dataTrendStorage', '');
           sessionStorage.setItem('dataSpectrumStorage', '');
+          sessionStorage.setItem('configStorage', '');
           if (route.name === 'Login') {
             router.push({ path: '/' });
           } else {
