@@ -130,6 +130,8 @@ function handleChangeCluster(type: 'master' | 'slave') {
     });
   } else {
     changeCluster(type === 'master' ? 0 : 1).then(() => {
+      // eslint-disable-next-line no-underscore-dangle
+      window.__isReload__ = true;
       window.location.reload();
     });
   }

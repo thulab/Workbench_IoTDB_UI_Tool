@@ -11,7 +11,6 @@ const props = withDefaults(
     language?: string;
     theme?: string;
     readOnly?: boolean;
-    content: string;
   }>(),
   {
     language: 'shell',
@@ -24,6 +23,7 @@ const { locale } = useI18n();
 const monacoEditor = ref<monaco.editor.IStandaloneCodeEditor>();
 const monacoContainer = ref<HTMLElement>();
 const loading = ref(false);
+const content = ref<string>('');
 
 const initEditor = () => {
   loading.value = true;
@@ -59,14 +59,13 @@ const initEditor = () => {
       readOnly: props.readOnly,
     });
     loading.value = false;
-    if (props.content) {
-      toRaw(monacoEditor.value!).setValue(props.content);
-      monacoEditor.value!.getAction('editor.action.formatDocument')!.run();
-    }
+    toRaw(monacoEditor.value!).setValue(content.value);
+    monacoEditor.value!.getAction('editor.action.formatDocument')!.run();
   });
 };
 
 onMounted(() => {
+  content.value = '';
   initEditor();
 });
 
@@ -78,6 +77,8 @@ function setContent(val: string) {
   if (monacoEditor.value) {
     toRaw(monacoEditor.value!)?.setValue(val);
     monacoEditor.value!.getAction('editor.action.formatDocument')!.run();
+  } else {
+    content.value = val;
   }
 }
 

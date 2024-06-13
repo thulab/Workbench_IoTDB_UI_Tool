@@ -31,7 +31,7 @@
               </div>
             </div>
             <div v-loading="configLoading" class="input-container">
-              <monaco-editor ref="inputEditor" :content="configData" />
+              <monaco-editor ref="inputEditor" />
             </div>
             <div class="editor-operate-box">
               <el-button plain @click="handleReset" id="iotdb-config-reset">{{ t('common.reset') }}</el-button>
@@ -43,7 +43,7 @@
             <div class="flex-justify-between m-b-6">
               <h4 class="editor-title">{{ t('search.template') }}</h4>
             </div>
-            <monaco-editor class="output-container" ref="outputEditor" :read-only="true" :content="templateData" />
+            <monaco-editor class="output-container" ref="outputEditor" :read-only="true" />
           </div>
         </el-main>
       </el-container>
@@ -249,7 +249,12 @@ function setStorage() {
 
 onMounted(() => {
   window.addEventListener('beforeunload', () => {
-    setStorage();
+    // eslint-disable-next-line no-underscore-dangle
+    if (!window.__isReload__) {
+      setStorage();
+    } else {
+      sessionStorage.setItem('configStorage', '');
+    }
   });
 });
 

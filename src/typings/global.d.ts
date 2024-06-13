@@ -5,6 +5,7 @@ declare global {
   interface Window {
     __errBoxShowing__?: boolean;
     __echoTimer__?: number;
+    __isReload__?: boolean;
   }
   type TableResponse<T = any> = {
     pageNum?: number;
