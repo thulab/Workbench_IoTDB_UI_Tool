@@ -1158,7 +1158,14 @@ watch(
           searchFormData.aggregation = storageData.aggregation;
           dataTab.value = storageData.dataTab;
           pathList.value = storageData.pathList;
-          pointLineData.value = [...storageData.pointLineData];
+          pointLineData.value = storageData.pointLineData.map((item: MarkPointLine) => ({
+            ...item,
+            label: {
+              formatter: () => `D${item.group}-${item.order}`,
+              position: 'end',
+              offset: [0, item.order * 10],
+            },
+          }));
           markPointCount.value = storageData.markPointCount;
           pointList.value = storageData.pointList;
           activeNameSide.value = storageData.activeNameSide;
