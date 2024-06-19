@@ -582,7 +582,7 @@ function handleClickChart(params: echarts.ECElementEvent, points?: Array<[number
   }
   if (markPointCount.value > 9) {
     ElMessage.warning({
-      message: t('spectrum.overTip'),
+      message: t('dataTrend.pointOverTip'),
       grouping: true,
     });
     return;
