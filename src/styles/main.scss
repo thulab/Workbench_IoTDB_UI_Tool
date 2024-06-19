@@ -133,6 +133,11 @@
   --vscode-scrollbarSlider-hoverBackground: #dfe1ed !important;
   --vscode-scrollbarSlider-activeBackground: #dfe1ed !important;
 
+  div,
+  span {
+    font-family: inherit;
+  }
+
   // .overflow-guard > .monaco-scrollable-element {
   //   box-sizing: border-box;
   //   margin: 5px;
