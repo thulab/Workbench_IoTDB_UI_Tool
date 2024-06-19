@@ -298,6 +298,8 @@ function handleTestLogin() {
           if (route.name === 'Login') {
             router.push({ path: '/' });
           } else {
+            // eslint-disable-next-line no-underscore-dangle
+            window.__isReload__ = true;
             window.location.reload();
           }
         })
@@ -390,6 +392,8 @@ function handleSavePrometheus() {
   })
     .then(() => {
       ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
+      // eslint-disable-next-line no-underscore-dangle
+      window.__isReload__ = true;
       window.location.reload();
     })
     .finally(() => {

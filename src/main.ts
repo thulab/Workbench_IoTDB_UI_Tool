@@ -14,6 +14,8 @@ const vers = window.localStorage.getItem('appVersion');
 if (VITE_APP_VERSION !== vers) {
   localStorage.clear();
   localStorage.setItem('appVersion', VITE_APP_VERSION);
+  // eslint-disable-next-line no-underscore-dangle
+  window.__isReload__ = true;
   window.location.reload();
 }
 

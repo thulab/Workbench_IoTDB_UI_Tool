@@ -392,7 +392,12 @@ onBeforeUnmount(() => {
 
 onMounted(() => {
   window.addEventListener('beforeunload', () => {
-    setStorage();
+    // eslint-disable-next-line no-underscore-dangle
+    if (!window.__isReload__) {
+      setStorage();
+    } else {
+      sessionStorage.setItem('sqlSearchStorage', '');
+    }
   });
   if (sessionStorage.getItem('sqlSearchStorage')) {
     const storageData = JSON.parse(sessionStorage.getItem('sqlSearchStorage') as string);

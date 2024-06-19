@@ -1036,7 +1036,12 @@ function setStorage() {
 
 onMounted(() => {
   window.addEventListener('beforeunload', () => {
-    setStorage();
+    // eslint-disable-next-line no-underscore-dangle
+    if (!window.__isReload__) {
+      setStorage();
+    } else {
+      sessionStorage.setItem('dataSpectrumStorage', '');
+    }
     chartContainer.value = null;
     if (chartInstance) {
       chartInstance.clear();

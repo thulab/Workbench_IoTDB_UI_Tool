@@ -525,7 +525,12 @@ function setStorage() {
 
 onMounted(() => {
   window.addEventListener('beforeunload', () => {
-    setStorage();
+    // eslint-disable-next-line no-underscore-dangle
+    if (!window.__isReload__) {
+      setStorage();
+    } else {
+      sessionStorage.setItem('dataSearchStorage', '');
+    }
   });
   //   if (!canReadWriteData.value) return;
   //   firstLoad.value = true;
