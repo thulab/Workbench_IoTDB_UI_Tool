@@ -133,12 +133,12 @@
   --vscode-scrollbarSlider-hoverBackground: #dfe1ed !important;
   --vscode-scrollbarSlider-activeBackground: #dfe1ed !important;
 
-  .overflow-guard > .monaco-scrollable-element {
-    box-sizing: border-box;
-    margin: 0 5px;
-    width: calc(100% - 69px) !important;
-    // height: calc(100% - 10px) !important;
-  }
+  // .overflow-guard > .monaco-scrollable-element {
+  //   box-sizing: border-box;
+  //   margin: 5px;
+  //   width: calc(100% - 69px) !important;
+  //   height: calc(100% - 10px) !important;
+  // }
 
   .decorationsOverviewRuler {
     display: none !important;
