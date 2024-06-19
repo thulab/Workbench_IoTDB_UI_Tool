@@ -153,10 +153,13 @@ import ModalTemplateRename from './components/modal-template-rename.vue';
 
 interface PointData {
   name: string;
+  label: string;
   x: number;
   y: number;
   disabled: boolean;
   checked: boolean;
+  group: number;
+  order: number;
 }
 
 interface MarkPointLine {
@@ -168,7 +171,10 @@ interface MarkPointLine {
   label: {
     formatter: string | Function;
     position: string;
+    offset: number[];
   };
+  group: number;
+  order: number;
 }
 const predefineColors = ['#4992ff', '#7cffb2', '#fddd60', '#ff6e76', '#58d9f9', '#05c091', '#ff8a45', '#8d48e3', '#dd79ff', '#8AC211'];
 
@@ -247,6 +253,7 @@ const requiredRules = ref([
   },
 ]);
 let inited = false;
+let currentPoint = 0;
 const dataTab = ref<'running' | 'history'>('running');
 const pathList = ref<Trend.LineObj[]>([]);
 const loading = ref(true);
@@ -472,6 +479,35 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
       }
       setOption(chartOptions.value);
     });
+    chartInstance.on('highlight', (params: any) => {
+      if (params.batch && params.batch.length > 0) {
+        currentPoint = currentData.value[params?.batch[0].seriesIndex]?.timestamps[params?.batch[0].dataIndex];
+      }
+    });
+    chartInstance.getZr().on('click', (params) => {
+      if (!clickedCursor.value) return;
+      if (params.target && !params.topTarget) {
+        return;
+      }
+      // 点击到点上
+      if ((params.target as unknown as any)?.z === 3 || (params.target as unknown as any)?.z === 5) {
+        return;
+      }
+      if (params.topTarget && params.topTarget.type !== 'Line') return;
+      const findPoints: Array<[number, string, string]> = [];
+      currentData.value.forEach((item) => {
+        const i = item.timestamps.findIndex((f) => f === currentPoint);
+        if (i !== -1) {
+          findPoints.push([currentPoint, item.values[i], item.path]);
+        }
+      });
+      if (findPoints.length > 0) {
+        const point = [findPoints[0][0], findPoints[0][1]];
+        const param = { componentType: 'series', seriesName: findPoints[0][2], value: point };
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        handleClickChart(param as echarts.ECElementEvent, findPoints);
+      }
+    });
     // 初次加载，设置notMerge为true
     chartInstance.setOption(option, true);
     chartInstance.setOption({
@@ -487,7 +523,37 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
   }
 };
 
-function handleClickChart(params: echarts.ECElementEvent) {
+function handleAddPoint(points: Array<[number, string, string]>, num: number) {
+  points.forEach((item, pointIndex) => {
+    const [pointX, pointY, pointPath] = item;
+    pointLineData.value.push({
+      path: pointPath,
+      name: `${pointPath}_${pointX}_point_line`,
+      value: pointY as unknown as number,
+      xAxis: pointX,
+      yAxis: pointY as unknown as number,
+      label: {
+        formatter: `D${num}-${pointIndex + 1}`,
+        position: 'end',
+        offset: [0, (pointIndex + 1) * 10],
+      },
+      group: num,
+      order: pointIndex + 1,
+    });
+    pointList.value.push({
+      name: `${pointPath}_${pointX}_${pointY as unknown as number}`,
+      label: `D${num}-${pointIndex + 1}`,
+      x: pointX,
+      y: pointY as unknown as number,
+      disabled: false,
+      checked: false,
+      group: num,
+      order: pointIndex + 1,
+    });
+  });
+}
+
+function handleClickChart(params: echarts.ECElementEvent, points?: Array<[number, string, string]>) {
   const { seriesName, value, componentType } = params as { seriesName: string; value: number[] | number; componentType: string };
   if (componentType !== 'series' && componentType !== 'markLine' && componentType !== 'markPoint') return;
   let index = -1;
@@ -523,39 +589,52 @@ function handleClickChart(params: echarts.ECElementEvent) {
   }
   markPointCount.value++;
   const num = markPointCount.value;
-  pointLineData.value.push({
-    path: seriesName,
-    name: `${seriesName}_${(value as number[])[0]}_point_line`,
-    value: (value as number[])[1],
-    xAxis: (value as number[])[0],
-    yAxis: (value as number[])[1],
-    label: {
-      formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
-      position: 'end',
-    },
-  });
-  pointList.value.push({
-    name: `${seriesName}_${(value as number[])[0]}_${(value as number[])[1]}`,
-    x: (value as number[])[0],
-    y: (value as number[])[1],
-    disabled: false,
-    checked: false,
-  });
+  if (!points || points.length === 0) {
+    const data: Array<[number, string, string]> = [[(value as number[])[0], `${(value as number[])[1]}`, seriesName]];
+    handleAddPoint(data, num);
+  } else {
+    handleAddPoint(points, num);
+  }
   setOption(chartOptions.value);
 }
 
-function handleDelPoint(index: number) {
-  markPointCount.value--;
-  pointList.value.splice(index, 1);
-  pointLineData.value.splice(index, 1);
-  pointLineData.value.forEach((item, i) => {
-    if (i >= index) {
-      item.label = {
-        formatter: () => (markPointCount.value === 1 ? 'D' : `D${i + 1}`),
-        position: 'end',
-      };
-    }
-  });
+function handleDelPoint(data: PointData, index: number) {
+  const pointXSameList = pointList.value.filter((f) => f.x === data.x);
+  if (pointXSameList.length === 1) {
+    markPointCount.value--;
+    pointList.value.splice(index, 1);
+    pointList.value.forEach((item, i) => {
+      if (i >= index) {
+        item.group--;
+        item.label = `D${item.group}-${item.order}`;
+      }
+    });
+    pointLineData.value.splice(index, 1);
+    pointLineData.value.forEach((item, i) => {
+      if (i >= index) {
+        item.group--;
+        item.label = {
+          formatter: () => `D${item.group}-${item.order}`,
+          position: 'end',
+          offset: [0, item.order * 10],
+        };
+      }
+    });
+  } else {
+    pointList.value.splice(index, 1);
+    pointLineData.value.splice(index, 1);
+    pointXSameList.forEach((item) => {
+      const fIndex = pointList.value.findIndex((f) => f.x === item.x && f.y === item.y);
+      const fData = pointList.value[fIndex];
+      const lData = pointLineData.value[fIndex];
+      if (fIndex >= index) {
+        fData.order--;
+        lData.order--;
+        pointList.value.splice(fIndex, 1, { ...fData, label: `D${fData.group}-${fData.order}`, order: fData.order });
+        pointLineData.value.splice(fIndex, 1, { ...lData, label: { formatter: () => `D${lData.group}-${lData.order}`, position: 'end', offset: [0, lData.order * 10] }, order: lData.order });
+      }
+    });
+  }
   setOption(chartOptions.value);
 }
 
@@ -1079,13 +1158,7 @@ watch(
           searchFormData.aggregation = storageData.aggregation;
           dataTab.value = storageData.dataTab;
           pathList.value = storageData.pathList;
-          pointLineData.value = storageData.pointLineData.map((item: MarkPointLine, index: number) => ({
-            ...item,
-            label: {
-              formatter: () => (markPointCount.value === 1 ? 'D' : `D${index + 1}`),
-              position: 'end',
-            },
-          }));
+          pointLineData.value = [...storageData.pointLineData];
           markPointCount.value = storageData.markPointCount;
           pointList.value = storageData.pointList;
           activeNameSide.value = storageData.activeNameSide;

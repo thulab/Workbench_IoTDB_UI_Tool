@@ -16,13 +16,14 @@
               :disabled="pointDisabled(item)"
               @change="(val) => handleCheckDvalue(val, item)"
             />
-            {{ pointTitle(index) }}
+            <!-- {{ pointTitle(index) }} -->
+            {{ item.label }}：
           </div>
           <div class="cursor-point-data">
-            <p style="display: inline-flex; width: 140px"><text-tooltip :content="`X: ${item.x}`" /></p>
-            <p style="display: inline-flex; width: 140px"><text-tooltip :content="`Y: ${item.y}`" /></p>
+            <p style="display: inline-flex; width: 120px"><text-tooltip :content="`X: ${item.x}`" /></p>
+            <p style="display: inline-flex; width: 120px"><text-tooltip :content="`Y: ${item.y}`" /></p>
           </div>
-          <el-icon size="14" class="delete-icon" @click="handleDelPoint(index)" :id="`cursor-${index}-del`"><i-custom-close-circle /></el-icon>
+          <el-icon size="14" class="delete-icon" @click="handleDelPoint(item, index)" :id="`cursor-${index}-del`"><i-custom-close-circle /></el-icon>
         </li>
       </ul>
       <div v-if="pointCheckedData.length === 2" class="point-dvalue-box">
@@ -38,10 +39,13 @@ import type { CheckboxValueType } from 'element-plus';
 
 interface PointData {
   name: string;
+  label: string;
   x: number;
   y: number;
   disabled: boolean;
   checked: boolean;
+  group: number;
+  order: number;
 }
 
 interface MarkPointLine {
@@ -53,7 +57,10 @@ interface MarkPointLine {
   label: {
     formatter: string | Function;
     position: string;
+    offset: number[];
   };
+  group: number;
+  order: number;
 }
 
 const props = defineProps<{
@@ -64,13 +71,14 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (event: 'handleDelPoint', payload: number): void;
+  (event: 'handleDelPoint', data: PointData, payload: number): void;
   (event: 'handleOperate', payload: 'add' | 'del' | 'detail', data: string): void;
   (event: 'handleOperateAll'): void;
 }>();
 
 const { t } = useI18n();
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function pointTitle(i: number) {
   if (props.pointList.length === 1) {
     return 'D：';
@@ -87,8 +95,8 @@ function handleCheckDvalue(val: CheckboxValueType, data: PointData) {
   data.checked = val as boolean;
 }
 
-function handleDelPoint(index: number) {
-  emit('handleDelPoint', index);
+function handleDelPoint(data: PointData, index: number) {
+  emit('handleDelPoint', data, index);
 }
 </script>
 
@@ -131,6 +139,7 @@ function handleDelPoint(index: number) {
   font-weight: 400;
   line-height: 26px;
   color: #131926;
+  width: 120px;
 }
 
 .cursor-point-data {
