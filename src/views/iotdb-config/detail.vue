@@ -23,7 +23,19 @@
                     :value="item.nodeID"
                     :id="`iotdb-config-node-select-${item.nodeID}`"
                     :label="`${item.address}(${item.type})`"
-                  />
+                    :disabled="!['running', 'readonly'].includes(item.status.toLocaleLowerCase())"
+                  >
+                    <el-tooltip
+                      placement="top-start"
+                      effect="light"
+                      trigger="hover"
+                      :content="t('iotdbConfig.nodeTip')"
+                      popper-class="tooltip-box-width"
+                      :disabled="['running', 'readonly'].includes(item.status.toLocaleLowerCase())"
+                    >
+                      {{ `${item.address}(${item.type})` }}
+                    </el-tooltip>
+                  </el-option>
                 </el-select>
                 <el-button link @click="handleRefresh" id="iotdb-config-refresh" class="svg-button-hover-color m-l-16 p-0" style="height: 24px !important">
                   <el-icon size="24"><i-custom-refresh /></el-icon>
