@@ -13,7 +13,7 @@
           <!-- <i-custom-logo-title class="title-logo" /> -->
         </div>
         <h5 class="login-title">{{ t('login.title') }}</h5>
-        <el-form :hide-required-asterisk="true" :model="loginForm" :rules="rules" ref="formRef" class="login-form-box">
+        <el-form :hide-required-asterisk="true" :model="loginForm" :rules="rules" ref="formRef" :class="['login-form-box', isUseCaptcha ? 'login-form-margin' : '']">
           <label><input type="password" autocomplete="new-password" hidden /></label>
           <div class="connection-box">
             <el-form-item prop="connection">
@@ -61,7 +61,7 @@
               </template> -->
             </el-input>
           </el-form-item>
-          <el-form-item prop="captcha">
+          <el-form-item prop="captcha" v-if="isUseCaptcha">
             <el-input v-model="loginForm.captcha" autocomplete="off" :placeholder="t('login.captchaTip')" @keyup.enter="submitForm" id="login-captcha">
               <template #prefix>
                 <el-icon size="30"><i-custom-verification-code /></el-icon>
@@ -112,6 +112,7 @@ const loginForm = reactive<{
 });
 const pwdType = ref('password');
 const loading = ref(false);
+const isUseCaptcha = ref(false);
 
 const connectionVisible = ref(false);
 const connectionList = ref<Connection.ConnectionItem[]>([]);
@@ -124,6 +125,7 @@ const appVersion = computed(() => appStore.AppVersion);
 const { handleLangCommand } = useLangSwitch(useI18n());
 
 const { requestFn: login } = useRequest(UserApi.login);
+const { requestFn: loginCaptcha } = useRequest(UserApi.loginCaptcha);
 const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
 
 const validateuser = (rule: any, value: any, callback: any) => {
@@ -235,6 +237,12 @@ function getList() {
     });
 }
 
+function getCaptcha() {
+  loginCaptcha().then((res) => {
+    isUseCaptcha.value = res.data;
+  });
+}
+
 function handleChangeConnection(val: number) {
   const data = connectionList.value.find((item) => item.id === val);
   if (data) {
@@ -286,6 +294,7 @@ onMounted(() => {
   sessionStorage.clear();
   sessionStorage.setItem('nologin', '1');
   getList();
+  getCaptcha();
 });
 
 onUnmounted(() => {
@@ -392,11 +401,17 @@ watch(locale, () => {
   margin: 36px 0 0;
 
   :deep(.el-form-item--default) {
-    margin-bottom: 24px;
+    margin-bottom: 44px;
   }
 
   :deep(.el-input) {
     height: 36px !important;
+  }
+}
+
+.login-form-margin {
+  :deep(.el-form-item--default) {
+    margin-bottom: 24px;
   }
 }
 

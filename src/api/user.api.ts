@@ -13,6 +13,11 @@ class UserApi {
     return http.get('/logout');
   }
 
+  // 登录是否需要验证码
+  static loginCaptcha(): HttpResponseP<boolean> {
+    return http.get('/login/verifiable');
+  }
+
   // 当前登录用户权限
   static getLoginUserPrivileges(): HttpResponseP<
     Auth.UserPrivileges & {
