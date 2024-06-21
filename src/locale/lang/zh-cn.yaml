@@ -526,6 +526,7 @@ alarm:
   alarmConfig: 告警配置
   newAlarm: 新建告警
   editAlarm: 编辑告警
+  batchImportAlarm: 批量导入告警
   alarmDesc: 告警描述
   alarmRules: 告警规则
   batchDelete: 确认删除这些告警配置吗？

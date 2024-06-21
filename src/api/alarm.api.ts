@@ -12,6 +12,14 @@ class AlarmApi {
     return http.post('/alarm/getConfig', data);
   }
 
+  // 导入
+  static importAlarmData(data: FormData, fileType: string = 'csv'): HttpResponseP<StorageDevice.ImportMeasurementDataRes> {
+    if (fileType === 'csv') {
+      return http.post('/file/importAlarmConfigCsvData', data, { timeout: 60 * 30 * 1000 });
+    }
+    return http.post('/file/importAlarmConfigExcelData', data, { timeout: 60 * 30 * 1000 });
+  }
+
   // 删除告警配置
   static deleteAlarmConfig(data: number[]): HttpResponseP {
     return http.post('/alarm/deleteConfig', { alarmConfigIds: data });

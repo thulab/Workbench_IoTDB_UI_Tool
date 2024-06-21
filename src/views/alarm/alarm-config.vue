@@ -84,7 +84,10 @@
         <h4 class="page-table-title">{{ t('alarm.alarmConfig') }}</h4>
         <div class="operate-buttons">
           <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
-            <el-button type="primary" :disabled="!canUsePipe" @click="handleAdd" id="alarm-config-add">{{ t('alarm.newAlarm') }}</el-button>
+            <el-button type="primary" :disabled="!canUsePipe" @click="handleAdd" id="alarm-config-add">{{ t('common.create') }}</el-button>
+          </auth-tooltip>
+          <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
+            <el-button type="primary" :disabled="!canUsePipe" @click="handleImport" id="alarm-config-import">{{ t('common.import') }}</el-button>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
             <el-button :disabled="!multipleSelection.length || !canUsePipe" type="primary" @click="handleDel('batch', null)" id="alarm-config-batch-del">{{ t('common.batchDelete') }}</el-button>
@@ -174,6 +177,8 @@
     </el-main>
 
     <modal-config v-model:visible="editVisible" :alarm-config-id="alarmConfigId" :edit-type="editType" @handleSave="handleSaveConfig" />
+
+    <modal-import v-model:visible="importVisible" @handle-close="handleImportClose" />
   </el-container>
 </template>
 
@@ -190,6 +195,7 @@ import { useEnumStore, useUserStore } from '@/stores';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalConfig from './components/modal-config.vue';
+import ModalImport from './components/modal-import.vue';
 
 const { t, locale } = useI18n();
 const enumStore = useEnumStore();
@@ -245,6 +251,7 @@ const multipleSelection = ref<Alarm.QueryConfigResult[]>([]);
 const editVisible = ref(false);
 const editType = ref('add');
 const alarmConfigId = ref();
+const importVisible = ref(false);
 
 const getLevelColor = (data?: Alarm.QueryConfigResult) => {
   if (!data) {
@@ -392,6 +399,17 @@ function handleDel(type: string, data: Alarm.QueryConfigResult | null) {
 function handleSaveConfig() {
   handleReset();
   handleSearch();
+}
+
+// 导入
+function handleImport() {
+  importVisible.value = true;
+}
+
+function handleImportClose(reload: boolean) {
+  if (reload) {
+    handleSearch();
+  }
 }
 
 watch(
