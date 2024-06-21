@@ -111,6 +111,7 @@
               </template>
             </el-table-column>
             <el-table-column :label="t('alarm.alarmMeasurement')" prop="measurement" min-width="200" align="center" show-overflow-tooltip />
+            <el-table-column :label="t('alarm.alarmRules')" prop="alarmRules" min-width="160" align="center" show-overflow-tooltip />
             <el-table-column :label="t('alarm.alarmValue')" prop="alarmValue" min-width="160" align="center" show-overflow-tooltip />
             <el-table-column :label="t('alarm.alarmTime')" prop="createTime" sortable="custom" min-width="180" align="center" show-overflow-tooltip />
             <el-table-column :label="t('alarm.alarmDesc')" prop="alarmDesc" min-width="140" align="center" show-overflow-tooltip />

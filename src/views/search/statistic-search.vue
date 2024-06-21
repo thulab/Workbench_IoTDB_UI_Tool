@@ -87,6 +87,8 @@
           <el-table-column :label="t('common.maxValue')" prop="maxValue" min-width="160" align="center" show-overflow-tooltip />
           <el-table-column :label="t('common.maxValueTime')" prop="maxTime" min-width="190" align="center" show-overflow-tooltip />
           <el-table-column :label="t('common.avg')" prop="avgValue" min-width="160" align="center" show-overflow-tooltip />
+          <el-table-column v-if="showAuthCol" :label="t('common.std')" prop="stddev" min-width="160" align="center" show-overflow-tooltip />
+          <el-table-column v-if="showAuthCol" :label="t('common.variance')" prop="variance" min-width="160" align="center" show-overflow-tooltip />
           <el-table-column :label="t('common.total')" prop="sumValue" min-width="160" align="center" show-overflow-tooltip />
           <template #empty>
             <div class="table-empty-wrapper">
@@ -119,11 +121,13 @@ import { storeToRefs } from 'pinia';
 import { SearchApi } from '@/api';
 import { useTableHeight } from '@/composition-api';
 import { getStartAndEnd, today, getOneInterval, getOneIntervalNow, formatDate } from '@/utils/date';
-import { useUserStore } from '@/stores';
+import { iotdbShowAuth } from '@/utils/auth';
+import { useUserStore, useConnectionStore } from '@/stores';
 import ICustomCalender from '~icons/custom/calender.svg';
 
 const { t, locale } = useI18n();
 const userStore = useUserStore();
+const connectionStore = useConnectionStore();
 const { canReadWriteData } = storeToRefs(userStore);
 const { maxTableHeight } = useTableHeight(280);
 
@@ -171,6 +175,8 @@ const tableErrorMessage = ref<string[]>([]);
 const totalCount = computed(() => copySearchFormData.path.length);
 
 const searchPaginationPath = computed(() => copySearchFormData.path.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as string[]);
+
+const showAuthCol = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.3'));
 
 const { requestFn: getMinMax } = useRequest(SearchApi.getStatisticSearchMinMax);
 const { requestFn: getAvgSum } = useRequest(SearchApi.getStatisticSearchAvgSum);
@@ -225,6 +231,8 @@ function getListData() {
       maxTime: item.maxTime || '-',
       avgValue: avgSumList.value[index].avgValue || '-',
       sumValue: avgSumList.value[index].sumValue || '-',
+      stddev: avgSumList.value[index].stddev || '-',
+      variance: avgSumList.value[index].variance || '-',
     }));
     if (tableErrorMessage.value.length) {
       ElMessage.error({ message: tableErrorMessage.value[0], grouping: true });
@@ -251,6 +259,8 @@ function getListDataBatch() {
       maxTime: item.maxTime || '-',
       avgValue: item.avgValue || '-',
       sumValue: item.sumValue || '-',
+      stddev: item.stddev || '-',
+      variance: item.variance || '-',
     }));
     getListLoading.value = false;
   });

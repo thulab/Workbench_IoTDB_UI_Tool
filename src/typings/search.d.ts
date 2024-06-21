@@ -109,6 +109,8 @@ declare namespace Search {
     measurement: string;
     avgValue: string;
     sumValue: string;
+    stddev: string;
+    variance: string;
   }
 
   export interface FunctionData {

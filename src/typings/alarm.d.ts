@@ -18,7 +18,7 @@ declare namespace Alarm {
     measurement: string;
     alarmLevel: string;
     alarmDesc: string;
-    alarmRule: string;
+    alarmRules: string;
     status: number;
     createTime: DateModelType;
     updateTime: DateModelType;
@@ -62,6 +62,7 @@ declare namespace Alarm {
     alarmName: string;
     measurement: string;
     alarmLevel: string;
+    alarmRules: string;
     alarmDesc: string;
     alarmValue: DateModelType;
     hasRead: boolean;

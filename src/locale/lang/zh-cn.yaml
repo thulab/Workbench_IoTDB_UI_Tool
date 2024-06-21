@@ -58,6 +58,8 @@ common:
   day: 天
   lastValue: 最新值
   avg: 平均值
+  std: 标准差
+  variance: 方差
   maxValue: 最大值
   maxValueTime: 最大值时间
   minValue: 最小值
