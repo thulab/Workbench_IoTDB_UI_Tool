@@ -238,9 +238,9 @@ search:
   searchTime: 查询时间
   quickActions: 快捷操作
   function: 函数
-  template: 模板
+  template: 常用
   operatingInstructions: 操作说明
-  saveTemplate: 保存模板
+  saveTemplate: 保存常用
   queryTemplate: 查询%{time}
   name: 名称
   rename: 重命名
@@ -249,7 +249,7 @@ search:
   nameRuleTip: 请填写名称后确定
   newNameTip: 新名称为空，请重新输入
   nameRepeatTip: 与原名称相同，请重新输入
-  templateNameRepeatTip: 该模版名称已存在，请重新输入
+  templateNameRepeatTip: 该名称已存在，请重新输入
   deleteTabTip: 只有一个页签不允许删除
   batchImportData: 批量导入数据
   databaseSelectPlaceholder: 请选择数据库
@@ -470,7 +470,7 @@ dataTrend:
   historyTrend: 历史
   trendAttribute: 样式
   pointAttribute: 光标
-  commonTemplates: 模版
+  commonTemplates: 常用
   deleteTemplateTip: 是否删除常用趋势
   measurementEmptyTip: 请先添加测点并选中
   trendTip: 最大绘制%{tip}个点，超出后系统将自动调整

@@ -208,43 +208,16 @@
           </div>
         </el-main>
         <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand ? 'p-0' : '']" style="display: flex; flex-direction: column">
-          <div class="cursor-list-box" v-if="isExpand">
-            <h4 class="cursor-list-title">{{ t('spectrum.cursorTitle') }}</h4>
-            <div style="flex: 1; background-color: #fff; overflow-y: hidden; display: flex; padding: 12px 0 10px">
-              <div class="list-empty-wrapper" v-if="!pointList.length">
-                <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
-                <span class="data-empty-text">{{ t('common.noData') }}</span>
-              </div>
-              <div class="cursor-list-wrapper" v-else>
-                <ul class="cursor-list">
-                  <li v-for="(item, index) in pointList" :key="item.name" :class="['cursor-item-box']">
-                    <div class="cursor-text-box">
-                      <el-checkbox
-                        v-if="pointList.length !== 1"
-                        :checked="item.checked"
-                        class="m-r-4"
-                        :id="`spectrum-cursor-checkbox-${index}`"
-                        :disabled="pointDisabled(item)"
-                        @change="(val) => handleCheckDvalue(val, item)"
-                      />
-                      {{ pointTitle(index) }}
-                    </div>
-                    <div class="cursor-point-data">
-                      <p style="display: inline-flex; width: 140px"><text-tooltip :content="`X: ${item.x}`" /></p>
-                      <p style="display: inline-flex; width: 140px"><text-tooltip :content="`Y: ${item.y}`" /></p>
-                    </div>
-                    <el-icon size="14" class="delete-icon" @click="handleDelPoint(item, index)" :id="`cursor-${index}-del`"><i-custom-close-circle /></el-icon>
-                  </li>
-                </ul>
-                <div v-if="pointCheckedData.length === 2" class="point-dvalue-box">
-                  <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔX：${Math.abs(pointCheckedData[0].x - pointCheckedData[1].x)}`" /></p>
-                  <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔY：${Math.abs(Number(pointCheckedData[0].y) - Number(pointCheckedData[1].y))}`" /></p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <h4 v-if="!isExpand" class="cursor-collapse-title">{{ t('spectrum.cursorTitle') }}</h4>
-          <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="isExpand = !isExpand" id="spectrum-point-expand">
+          <el-tabs v-model="activeNameSide" stretch class="tabs-nav-aside" v-if="isExpand">
+            <el-tab-pane :label="t('dataTrend.pointAttribute')" name="point">
+              <point-list-tab :point-list="pointList" :point-line-data="pointLineData" :point-checked-data="pointCheckedData" @handleDelPoint="handleDelPoint" />
+            </el-tab-pane>
+            <!-- <el-tab-pane :label="t('dataTrend.commonTemplates')" name="template">
+              <template-list-tab ref="templateListRef" @handle-operate="handleOperateTemplate" />
+            </el-tab-pane> -->
+          </el-tabs>
+          <h4 class="collapse-title" v-if="!isExpand">{{ t(tabLabel) }}</h4>
+          <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="handleExpand" id="spectrum-point-expand">
             <i-custom-arrow-right-expand />
           </el-icon>
         </el-aside>
@@ -257,7 +230,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import type { FormInstance, SingleOrRange, DateModelType, CheckboxValueType } from 'element-plus';
+import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import dayjs from 'dayjs';
 import { debounce, cloneDeep } from 'lodash-es';
 import { vElementSize } from '@vueuse/components';
@@ -267,6 +240,7 @@ import { getStartAndEnd, today, getOneInterval, getOneIntervalNow } from '@/util
 import { useUserStore } from '@/stores';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalSql from './components/modal-sql.vue';
+import PointListTab from './components/point-list-tab.vue';
 
 interface PointData {
   name: string;
@@ -299,6 +273,11 @@ interface MarkPointLine {
     color: string;
   };
 }
+
+const tabList = [
+  { name: 'point', label: 'dataTrend.pointAttribute' },
+  { name: 'template', label: 'dataTrend.commonTemplates' },
+];
 
 const { t, locale } = useI18n();
 const methodDocLink = computed(
@@ -399,6 +378,8 @@ const requiredRules = ref([
   },
 ]);
 let currentPoint = 0;
+const activeNameSide = ref('point');
+const tabLabel = ref('dataTrend.pointAttribute');
 const dataEmpty = computed(() => chartData.timestamps.length === 0);
 const disableFrequency = computed(() => chartData.timestamps.length === 0 || drawedStatus.frequency);
 const disableSideband = computed(() => chartData.timestamps.length === 0 || drawedStatus.sideband);
@@ -409,6 +390,11 @@ const methodOptions = computed(() => [...methodList.value, { functionName: 'cust
 
 function disabledPath(item: StorageDevice.MeasurementDataItem) {
   return item.dataType === 'BOOLEAN' || item.dataType === 'TEXT';
+}
+
+function handleExpand() {
+  isExpand.value = !isExpand.value;
+  tabLabel.value = tabList.find((item) => item.name === activeNameSide.value)?.label || 'dataTrend.pointAttribute';
 }
 
 const seriesData = computed<ECOption>(
@@ -462,9 +448,9 @@ const chartOptions = computed<ECOption>(() => ({
     // appendToBody: true,
     formatter: (params) => {
       const paramsData = params as unknown as Array<Record<string, any>>;
-      const circle = `<div><span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color: #4992ff"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0].seriesName}</span></div>`;
-      const x = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;margin-right:4px">X:</span><span style="font-size:14px;color:#666;font-weight:400;">${paramsData[0].value[0]}</span></div>`;
-      const y = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;margin-right:4px">Y:</span><span style="font-size:14px;color:#666;font-weight:400;">${paramsData[0].value[1]}</span></div>`;
+      const circle = `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: #4992ff"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0].seriesName}</span></div>`;
+      const x = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;">X：</span><span style="font-size:14px;color:#666;font-weight:400;">${paramsData[0].value[0]}</span></div>`;
+      const y = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;">Y：</span><span style="font-size:14px;color:#666;font-weight:400;">${paramsData[0].value[1]}</span></div>`;
       return `${circle}${x}${y}`;
     },
   },
@@ -524,18 +510,6 @@ const { requestFn: getDWTData } = useRequest(SearchApi.getDWTData);
 const { requestFn: getPassData } = useRequest(SearchApi.getPassData);
 const { requestFn: getDataCount } = useRequest(SearchApi.getDataCount);
 const { requestFn: getCustomData } = useRequest(SearchApi.getCustomData);
-
-function pointTitle(i: number) {
-  if (pointList.value.length === 1) {
-    return 'D：';
-  }
-  return `D${i + 1}：`;
-}
-
-function pointDisabled(item: PointData) {
-  const flag = pointCheckedData.value.some((data) => data.name === item.name);
-  return pointCheckedData.value.length === 2 && !flag;
-}
 
 function handleInputCompression(val: string) {
   if (val) {
@@ -954,10 +928,6 @@ function handleClickChart(params: echarts.ECElementEvent) {
     if (sidebandData.value.length === 2) return;
     handleDealSideband(params);
   }
-}
-
-function handleCheckDvalue(val: CheckboxValueType, data: PointData) {
-  data.checked = val as boolean;
 }
 
 function handleEmptyOperate(type?: 'cursor' | 'frequency' | 'sideband') {
@@ -1477,6 +1447,40 @@ watch(
   transition: all 0.3s ease;
 }
 
+.tabs-nav-aside {
+  flex: 1;
+  width: 100%;
+  overflow-y: hidden;
+  height: calc(100% - 28px);
+
+  :deep(.el-tabs__header) {
+    margin: 0;
+    font-size: 14px;
+    line-height: 21px;
+    font-weight: 400;
+  }
+
+  :deep(.el-tabs__item) {
+    padding: 0 !important;
+    height: 24px !important;
+  }
+
+  :deep(.el-tabs__active-bar) {
+    border-radius: 2px 2px 0 0;
+  }
+
+  :deep(.el-tabs__content) {
+    width: 100%;
+    padding-top: 16px;
+    height: calc(100% - 40px);
+  }
+
+  .el-tab-pane {
+    height: 100%;
+    overflow-y: auto;
+  }
+}
+
 .expand-icon {
   position: absolute;
   bottom: 0;
@@ -1494,83 +1498,19 @@ watch(
   }
 }
 
-.cursor-list-box {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow-y: hidden;
-
-  .cursor-list-title {
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 21px;
-    color: #495ad4;
-    margin: 0 0 6px;
-  }
-
-  .cursor-list-wrapper {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-
-    .cursor-list {
-      flex: 1;
-      overflow-y: auto;
-    }
-  }
-}
-
-.cursor-collapse-title {
+.collapse-title {
   font-size: 14px;
   font-weight: 400;
   line-height: 17px;
   color: #495ad4;
   margin: 14px 5px 0;
 }
-
-.cursor-item-box {
-  display: flex;
-  align-items: flex-start;
-  position: relative;
-
-  .delete-icon {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    right: 4px;
-    display: none;
-    cursor: pointer;
-  }
-
-  &:hover .delete-icon {
-    display: block;
-  }
-}
-
-.cursor-text-box {
-  display: flex;
-  align-items: center;
-  margin: 0 0 4px 8px;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 26px;
-  color: #131926;
-}
-
-.cursor-point-data {
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 26px;
-  color: #131926;
-}
-
-.point-dvalue-box {
-  border-top: 1px dashed #dfe1ed;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 26px;
-  color: #131926;
-  padding: 4px 0 0;
-  margin: 0 8px;
+</style>
+<style lang="scss">
+.side-list-box {
+  border-radius: 2px;
+  background: #fff;
+  overflow-y: auto;
+  height: 100%;
 }
 </style>
