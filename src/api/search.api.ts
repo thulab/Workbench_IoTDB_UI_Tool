@@ -102,6 +102,20 @@ class SearchApi {
     return http.post('/visualization/getEnvelopeDemodulationData', data);
   }
 
+  // 频谱 小波变换：（函数名：DWT）
+  static getDWTData(data: Search.SpectrumDWTParams): HttpResponseP<Search.SpectrumData> {
+    return http.post('/visualization/getDWTData', data);
+  }
+
+  static getDataCount(data: Search.DataCountParams): HttpResponseP<number> {
+    return http.post('/data/getCountData', data);
+  }
+
+  // 频谱 低通滤波：（函数名： LOWPASS）高通滤波：（函数名： HIGHPASS）
+  static getPassData(data: Search.SpectrumPassParams): HttpResponseP<Search.SpectrumData> {
+    return http.post('/visualization/getPassData', data);
+  }
+
   // 频谱 custom
   static getCustomData(sql: string): HttpResponseP<Search.SpectrumData> {
     return http.post('/visualization/getCustomAlgorithmData', { sql });

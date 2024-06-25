@@ -87,7 +87,7 @@
             <el-button type="primary" :disabled="!canUsePipe" @click="handleAdd" id="alarm-config-add">{{ t('common.create') }}</el-button>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
-            <el-button type="primary" :disabled="!canUsePipe" @click="handleImport" id="alarm-config-import">{{ t('common.import') }}</el-button>
+            <el-button :disabled="!canUsePipe" @click="handleImport" id="alarm-config-import">{{ t('common.import') }}</el-button>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
             <el-button :disabled="!multipleSelection.length || !canUsePipe" type="primary" @click="handleDel('batch', null)" id="alarm-config-batch-del">{{ t('common.batchDelete') }}</el-button>

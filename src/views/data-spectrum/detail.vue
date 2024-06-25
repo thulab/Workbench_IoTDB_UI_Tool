@@ -14,7 +14,7 @@
                   <i-custom-question />
                 </el-tooltip>
               </template>
-              <el-select v-model="searchFormData.method" id="spectrum-search-method" style="width: 230px" :placeholder="t('spectrum.analysisMethodPlaceholder')">
+              <el-select v-model="searchFormData.method" id="spectrum-search-method" style="width: 230px" :placeholder="t('spectrum.analysisMethodPlaceholder')" @change="handleChangeMethod">
                 <el-option
                   v-for="item in methodOptions"
                   :key="item.functionName"
@@ -59,6 +59,34 @@
                   <el-input v-model.number="searchFormData.amplification" style="width: 120px" id="spectrum-search-expandingFold" @change="handleInputAmplification" />
                 </base-form-item>
               </template>
+              <template v-if="searchFormData.method === 'DWT'">
+                <ul class="search-data-list">
+                  <li :class="['search-data-type', { 'search-data-active': dwtTab === 'type' }]" id="spectrum-search-dwt-tab-type" @click="handleDWTTab('type')">{{ t('spectrum.filterType') }}</li>
+                  <li :class="['search-data-type', { 'search-data-active': dwtTab === 'number' }]" id="spectrum-search-dwt-tab-number" @click="handleDWTTab('number')">
+                    {{ t('spectrum.filterCoefficient') }}
+                  </li>
+                </ul>
+                <base-form-item label="" prop="dwtMethod" v-if="dwtTab === 'type'">
+                  <el-select v-model="searchFormData.dwtMethod" style="width: 96px" id="spectrum-search-dwt-method" :placeholder="t('spectrum.filterTypePlaceholder')">
+                    <el-option v-for="item in dwtMethodList" :key="item.value" :label="item.name" :value="item.value" :id="`spectrum-search-dwt-method-${item.value}`" />
+                  </el-select>
+                </base-form-item>
+                <base-form-item label="" prop="coef" v-if="dwtTab === 'number'">
+                  <el-input v-model="searchFormData.coef" style="width: 96px" id="spectrum-search-dwt-number" :placeholder="t('spectrum.compressParamsPlaceholder')" />
+                </base-form-item>
+                <base-form-item :label="`${t('spectrum.transformationNumbers')}：`" prop="layer" class="m-r-0">
+                  <el-input v-model="searchFormData.layer" style="width: 80px" id="spectrum-search-dwt-layer" :placeholder="t('spectrum.compressParamsPlaceholder')" />
+                </base-form-item>
+              </template>
+              <template v-if="['LOWPASS', 'HIGHPASS'].includes(searchFormData.method)">
+                <base-form-item prop="wpass" :rules="requiredRules">
+                  <template #label>
+                    {{ t('spectrum.cutoffFrequency') }}：
+                    <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width" :content="t('spectrum.cutoffFrequencyTip')"><i-custom-question /></el-tooltip>
+                  </template>
+                  <el-input v-model="searchFormData.wpass" style="width: 96px" id="spectrum-search-wpass" :placeholder="t('spectrum.compressParamsPlaceholder')" />
+                </base-form-item>
+              </template>
             </div>
           </div>
           <div class="flex-justify-between">
@@ -66,11 +94,24 @@
               <base-form-item prop="measurement" :label-width="locale === 'en' ? '140px' : '96px'" :rules="requiredRules">
                 <template #label>
                   {{ t('measurement.measurementChoose') }}：
-                  <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width">
+                  <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
+                    <template #content>
+                      {{ t('common.searchTipLimit100') }}
+                      <br />
+                      {{ t('spectrum.dwtTip') }}
+                    </template>
                     <i-custom-question />
                   </el-tooltip>
                 </template>
-                <timeseries-select-single id="spectrum-search-path" v-model="searchFormData.measurement" :selectWidth="230" :itemWidth="200" show-suffix :disabled-path="disabledPath" />
+                <timeseries-select-single
+                  id="spectrum-search-path"
+                  v-model="searchFormData.measurement"
+                  :selectWidth="230"
+                  :itemWidth="200"
+                  show-suffix
+                  :disabled-path="disabledPath"
+                  @handle-change-path="handleChangePath"
+                />
               </base-form-item>
               <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules">
                 <el-date-picker
@@ -85,6 +126,9 @@
                   :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
                   id="spectrum-search-datetimerange"
                 />
+              </base-form-item>
+              <base-form-item :label="`${t('spectrum.dataCount')}：`" v-if="searchFormData.method === 'DWT'" class="m-r-0">
+                {{ dataCount || dataCount === 0 ? dataCount : '-' }}
               </base-form-item>
             </div>
             <div v-if="searchFormData.method === 'custom'">
@@ -267,6 +311,7 @@ const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
 const isExpand = ref(true);
 const methodList = ref<Array<Search.FunctionData>>([]);
+const dwtTab = ref<'type' | 'number'>('type');
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive<{
   measurement: string;
@@ -276,6 +321,10 @@ const searchFormData = reactive<{
   frequency: string | number | undefined;
   amplification: string | number | undefined;
   datetimerange: [DateModelType, DateModelType];
+  dwtMethod: string;
+  coef: string;
+  layer: string | number;
+  wpass: string | number;
 }>({
   measurement: '',
   method: '',
@@ -284,6 +333,10 @@ const searchFormData = reactive<{
   frequency: '',
   amplification: 1,
   datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
+  dwtMethod: '',
+  coef: '',
+  layer: 1,
+  wpass: '',
 });
 let copySearchFormData = cloneDeep(searchFormData);
 const shortcutsDaterange = [
@@ -307,10 +360,17 @@ const resultList = computed<Array<{ name: string; value: string }>>(() => [
   { name: t('spectrum.abs'), value: 'abs' },
   { name: t('spectrum.angle'), value: 'angle' },
 ]);
+const dwtMethodList = computed<Array<{ name: string; value: string }>>(() => [
+  { name: 'Haar', value: 'Haar' },
+  { name: 'DB4', value: 'DB4' },
+  { name: 'DB6', value: 'DB6' },
+  { name: 'DB8', value: 'DB8' },
+]);
 const chartData = reactive<Search.SpectrumData>({
   timestamps: [],
   values: [],
 });
+const dataCount = ref<undefined | null | number>();
 const clickedOperate = ref<'cursor' | 'frequency' | 'sideband' | ''>('');
 const markPointCount = ref(0);
 const pointLineData = ref<Array<MarkPointLine>>([]);
@@ -400,6 +460,13 @@ const chartOptions = computed<ECOption>(() => ({
   tooltip: {
     trigger: 'axis',
     // appendToBody: true,
+    formatter: (params) => {
+      const paramsData = params as unknown as Array<Record<string, any>>;
+      const circle = `<div><span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color: #4992ff"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0].seriesName}</span></div>`;
+      const x = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;margin-right:4px">X:</span><span style="font-size:14px;color:#666;font-weight:400;">${paramsData[0].value[0]}</span></div>`;
+      const y = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;margin-right:4px">Y:</span><span style="font-size:14px;color:#666;font-weight:400;">${paramsData[0].value[1]}</span></div>`;
+      return `${circle}${x}${y}`;
+    },
   },
   toolbox: {
     show: true,
@@ -453,6 +520,9 @@ const chartOptions = computed<ECOption>(() => ({
 const { requestFn: getUDFFunction } = useRequest(SearchApi.getUDFFunction);
 const { requestFn: getFFTData } = useRequest(SearchApi.getFFTData);
 const { requestFn: getEnvelopeDemodulationData } = useRequest(SearchApi.getEnvelopeDemodulationData);
+const { requestFn: getDWTData } = useRequest(SearchApi.getDWTData);
+const { requestFn: getPassData } = useRequest(SearchApi.getPassData);
+const { requestFn: getDataCount } = useRequest(SearchApi.getDataCount);
 const { requestFn: getCustomData } = useRequest(SearchApi.getCustomData);
 
 function pointTitle(i: number) {
@@ -518,6 +588,39 @@ function handleInputSideband(val: string) {
     // eslint-disable-next-line no-dupe-else-if
   } else if (`${val}` === '0') {
     sideband.value = 1;
+  }
+}
+
+function handleDWTTab(val: 'type' | 'number') {
+  dwtTab.value = val;
+}
+
+function getCount() {
+  const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
+  const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
+  getDataCount({
+    measurement: copySearchFormData.measurement,
+    startTime: start,
+    endTime: end,
+  })
+    .then((res) => {
+      dataCount.value = res.data;
+    })
+    .catch(() => {
+      dataCount.value = undefined;
+    });
+}
+
+function handleChangeMethod(val: string) {
+  if (val === 'DWT' && searchFormData.measurement) {
+    getCount();
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function handleChangePath(val: string, data: StorageDevice.MeasurementDataItem[]) {
+  if (searchFormData.method === 'DWT') {
+    getCount();
   }
 }
 
@@ -894,6 +997,12 @@ function handleReset() {
   searchFormData.compression = '';
   searchFormData.frequency = '';
   searchFormData.amplification = 1;
+  dwtTab.value = 'type';
+  searchFormData.dwtMethod = '';
+  searchFormData.coef = '';
+  searchFormData.layer = 1;
+  searchFormData.wpass = '';
+  dataCount.value = undefined;
   sqlValue.value = '';
   searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
   copySearchFormData = cloneDeep(searchFormData);
@@ -947,6 +1056,51 @@ function getEnvelope() {
     });
 }
 
+function getDwt() {
+  const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
+  const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
+  getDWTData({
+    method: copySearchFormData.dwtMethod || '',
+    coef: copySearchFormData.coef || '',
+    layer: copySearchFormData.layer || '',
+    measurement: copySearchFormData.measurement,
+    startTime: start,
+    endTime: end,
+  })
+    .then((res) => {
+      chartData.timestamps = res.data.timestamps || [];
+      chartData.values = res.data.values || [];
+      setOption(chartOptions.value, true);
+    })
+    .catch(() => {
+      chartData.timestamps = [];
+      chartData.values = [];
+      setOption(chartOptions.value, true);
+    });
+}
+
+function getPass() {
+  const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
+  const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
+  getPassData({
+    udf: copySearchFormData.method === 'LOWPASS' ? 'low' : 'high',
+    wpass: copySearchFormData.wpass || '',
+    measurement: copySearchFormData.measurement,
+    startTime: start,
+    endTime: end,
+  })
+    .then((res) => {
+      chartData.timestamps = res.data.timestamps || [];
+      chartData.values = res.data.values || [];
+      setOption(chartOptions.value, true);
+    })
+    .catch(() => {
+      chartData.timestamps = [];
+      chartData.values = [];
+      setOption(chartOptions.value, true);
+    });
+}
+
 function getCustom() {
   getCustomData(sqlValue.value)
     .then((res) => {
@@ -984,6 +1138,24 @@ function handleSearch(unforce?: boolean) {
       return;
     }
     getEnvelope();
+  } else if (copySearchFormData.method === 'DWT') {
+    if ((dwtTab.value === 'type' && !copySearchFormData.dwtMethod) || (dwtTab.value === 'number' && !copySearchFormData.coef)) {
+      ElMessage.warning({
+        message: t('common.searchFormEmpty'),
+        grouping: true,
+      });
+      return;
+    }
+    getDwt();
+  } else if (['LOWPASS', 'HIGHPASS'].includes(copySearchFormData.method)) {
+    if (!copySearchFormData.wpass) {
+      ElMessage.warning({
+        message: t('common.searchFormEmpty'),
+        grouping: true,
+      });
+      return;
+    }
+    getPass();
   } else if (copySearchFormData.method === 'custom') {
     if (!sqlValue.value) {
       ElMessage.warning({
@@ -1018,6 +1190,8 @@ function setStorage() {
     'dataSpectrumStorage',
     JSON.stringify({
       ...copySearchFormData,
+      dataCount: dataCount.value,
+      dwtTab: dwtTab.value,
       clickedOperate: clickedOperate.value,
       markPointCount: markPointCount.value,
       pointLineData: pointLineData.value,
@@ -1084,7 +1258,13 @@ watch(
           searchFormData.frequency = storageData.frequency;
           searchFormData.amplification = storageData.amplification;
           searchFormData.datetimerange = storageData.datetimerange;
+          searchFormData.dwtMethod = storageData.dwtMethod;
+          searchFormData.coef = storageData.coef;
+          searchFormData.layer = storageData.layer;
+          searchFormData.wpass = storageData.wpass;
           markPointCount.value = storageData.markPointCount;
+          dwtTab.value = storageData.dwtTab;
+          dataCount.value = storageData.dataCount;
           const cursorData = storageData.pointLineData
             .filter((f: MarkPointLine) => f.type === 'cursor')
             .map((item: MarkPointLine, index: number) => {
@@ -1162,6 +1342,32 @@ watch(
     font-weight: 400;
     line-height: 21px;
     color: #495ad4;
+  }
+}
+
+.search-data-list {
+  display: inline-flex;
+  margin: 0 8px 0 0;
+  border-radius: 12px;
+  background-color: #fff;
+  padding: 4px;
+
+  .search-data-type {
+    padding: 3px 12px 3px 8px;
+    cursor: pointer;
+    border-radius: 12px;
+    background-color: transparent;
+    font-size: 12px;
+    line-height: 12px;
+    font-weight: 300;
+    color: #656a85;
+    white-space: nowrap;
+  }
+
+  .search-data-active {
+    background-color: #495ad4;
+    color: #fff;
+    padding: 3px 12px;
   }
 }
 

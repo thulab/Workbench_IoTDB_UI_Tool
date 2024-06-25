@@ -135,6 +135,29 @@ declare namespace Search {
     endTime: DateModelType;
   }
 
+  export interface SpectrumDWTParams {
+    method: string;
+    coef: string;
+    layer: string | number;
+    measurement: string;
+    startTime: DateModelType;
+    endTime: DateModelType;
+  }
+
+  export interface DataCountParams {
+    measurement: string;
+    startTime: DateModelType;
+    endTime: DateModelType;
+  }
+
+  export interface SpectrumPassParams {
+    udf: string;
+    wpass: number | string;
+    measurement: string;
+    startTime: DateModelType;
+    endTime: DateModelType;
+  }
+
   export interface SpectrumData {
     timestamps: number[];
     values: string[];

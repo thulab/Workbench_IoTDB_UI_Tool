@@ -770,6 +770,17 @@ spectrum:
   abs: 模
   angle: 幅角
   expandingFold: 扩增倍数
+  dwt: 小波变换
+  dwtTip: 注：若您选择小波变换，则要求所选择的测点数据必须为2的整数次幂
+  filterType: 滤波类型
+  filterTypePlaceholder: 请选择滤波类型
+  filterCoefficient: 滤波系数
+  transformationNumbers: 变换次数
+  dataCount: 数据数量
+  lowPass: 低通滤波
+  cutoffFrequency: 截止频率
+  cutoffFrequencyTip: 归一化后的截止频率，取值为(0,1)，不可缺省
+  highPass: 高通滤波
 iotdbConfig:
   searchPlaceholder: 请输入搜索内容
   configList: 配置列表
