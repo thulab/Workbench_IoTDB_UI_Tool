@@ -84,7 +84,7 @@
                     {{ t('spectrum.cutoffFrequency') }}：
                     <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width" :content="t('spectrum.cutoffFrequencyTip')"><i-custom-question /></el-tooltip>
                   </template>
-                  <el-input v-model="searchFormData.wpass" style="width: 96px" id="spectrum-search-wpass" :placeholder="t('spectrum.compressParamsPlaceholder')" />
+                  <el-input v-model="searchFormData.wpass" style="width: 96px" id="spectrum-search-wpass" :placeholder="t('spectrum.compressParamsPlaceholder')" @change="handleInputWpass" />
                 </base-form-item>
               </template>
             </div>
@@ -322,9 +322,9 @@ const searchFormData = reactive<{
   amplification: string | number | undefined;
   datetimerange: [DateModelType, DateModelType];
   dwtMethod: string;
-  coef: string;
-  layer: string | number;
-  wpass: string | number;
+  coef: string | undefined;
+  layer: string | number | undefined;
+  wpass: string | number | undefined;
 }>({
   measurement: '',
   method: '',
@@ -544,6 +544,16 @@ function handleInputCompression(val: string) {
     }
   } else {
     searchFormData.compression = undefined;
+  }
+}
+
+function handleInputWpass(val: string) {
+  if (val) {
+    if (!/^0.\d+$/.test(`${val}`)) {
+      searchFormData.wpass = undefined;
+    }
+  } else {
+    searchFormData.wpass = undefined;
   }
 }
 

@@ -773,7 +773,7 @@ spectrum:
   dwt: 小波变换
   dwtTip: 注：若您选择小波变换，则要求所选择的测点数据必须为2的整数次幂
   filterType: 滤波类型
-  filterTypePlaceholder: 请选择滤波类型
+  filterTypePlaceholder: 请选择类型
   filterCoefficient: 滤波系数
   transformationNumbers: 变换次数
   dataCount: 数据数量
