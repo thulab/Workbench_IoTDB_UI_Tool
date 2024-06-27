@@ -33,7 +33,7 @@
               <span class="params-title">{{ t('spectrum.paramsTitle') }}</span>
               <template v-if="searchFormData.method === 'FFT'">
                 <base-form-item :label="`${t('spectrum.returnResult')}：`" prop="resultType">
-                  <el-select v-model="searchFormData.resultType" style="width: 80px" id="spectrum-search-resultType">
+                  <el-select v-model="searchFormData.resultType" style="width: 84px" id="spectrum-search-resultType">
                     <el-option v-for="item in resultList" :key="item.value" :label="item.name" :value="item.value" :id="`spectrum-search-resultType-${item.value}`" />
                   </el-select>
                 </base-form-item>
@@ -75,7 +75,13 @@
                   <el-input v-model="searchFormData.coef" style="width: 96px" id="spectrum-search-dwt-number" :placeholder="t('spectrum.compressParamsPlaceholder')" />
                 </base-form-item>
                 <base-form-item :label="`${t('spectrum.transformationNumbers')}：`" prop="layer" class="m-r-0">
-                  <el-input v-model="searchFormData.layer" style="width: 80px" id="spectrum-search-dwt-layer" :placeholder="t('spectrum.compressParamsPlaceholder')" />
+                  <el-input
+                    v-model.number="searchFormData.layer"
+                    style="width: 84px"
+                    id="spectrum-search-dwt-layer"
+                    :placeholder="t('spectrum.compressParamsPlaceholder')"
+                    @change="handleInputLayer"
+                  />
                 </base-form-item>
               </template>
               <template v-if="['LOWPASS', 'HIGHPASS'].includes(searchFormData.method)">
@@ -569,6 +575,16 @@ function handleInputCompression(val: string) {
     }
   } else {
     searchFormData.compression = undefined;
+  }
+}
+
+function handleInputLayer(val: string) {
+  if (val) {
+    if (!/^\+?[1-9][0-9]*$/.test(`${val}`)) {
+      searchFormData.layer = undefined;
+    }
+  } else {
+    searchFormData.layer = undefined;
   }
 }
 

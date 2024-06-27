@@ -254,8 +254,8 @@ search:
   batchImportData: 批量导入数据
   databaseSelectPlaceholder: 请选择数据库
   deviceSelectPlaceholder: 请选择设备
-  templatePlaceholder: 请输入模板名称
-  deleteTemplateTip: 是否删除模板
+  templatePlaceholder: 请输入名称
+  deleteTemplateTip: 是否删除常用
   open: 打开
   noTemplate: 暂无模板
   sqlInput: SQL输入
