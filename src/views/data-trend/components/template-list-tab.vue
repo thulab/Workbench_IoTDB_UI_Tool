@@ -1,6 +1,6 @@
 <template>
   <div class="side-list-box" v-loading="loading">
-    <el-input :placeholder="t('search.templatePlaceholder')" v-model="filterText" size="small" @input="getQueryList" id="trend-template-search" style="padding: 2px 2px 0">
+    <el-input :placeholder="t('search.templatePlaceholder')" v-model="filterText" size="small" @input="getQueryList" :id="`${source}-template-search`" style="padding: 2px 2px 0">
       <template #suffix>
         <i-custom-search-icon />
       </template>
@@ -8,17 +8,17 @@
 
     <ul class="template-list">
       <template v-if="templateList.length">
-        <li v-for="item in templateList" :key="item.id" :id="`trend-template-${item.id}`" class="template-item-box" @click="(e) => handleSelect(item, e)">
+        <li v-for="item in templateList" :key="item.id" :id="`${source}-template-${item.id}`" class="template-item-box" @click="(e) => handleSelect(item, e)">
           <div class="template-item-text-box">
             <i-custom-template />
             <text-tooltip :content="item.name" class-name="template-item-text" />
           </div>
-          <div class="item-edit-box" :id="`trend-template-rename-${item.id}`" @click="handleSqlCommand('rename', item)">
+          <div class="item-edit-box" :id="`${source}-template-rename-${item.id}`" @click="handleSqlCommand('rename', item)">
             <i-custom-edit class="item-edit" />
             <i-custom-edit class="item-edit-active" />
           </div>
 
-          <div class="item-delete-box" :id="`trend-template-delete-${item.id}`" @click="handleSqlCommand('delete', item)">
+          <div class="item-delete-box" :id="`${source}-template-delete-${item.id}`" @click="handleSqlCommand('delete', item)">
             <i-custom-delete class="item-delete" />
             <i-custom-delete-active class="item-delete-active" />
           </div>
@@ -37,6 +37,15 @@ import { debounce } from 'lodash-es';
 import { SearchApi } from '@/api';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
+const props = withDefaults(
+  defineProps<{
+    source?: string;
+  }>(),
+  {
+    source: 'trend',
+  }
+);
+
 const emit = defineEmits(['handleOperate']);
 
 const { t } = useI18n();
@@ -47,8 +56,9 @@ const { requestFn: delTrendTemplate } = useRequest(SearchApi.delTrendTemplate);
 
 // 获取列表数据
 const getQueryList = debounce(() => {
-  getTrendTemplate(filterText.value).then((res) => {
-    templateList.value = res.data || [];
+  getTrendTemplate(filterText.value, props.source === 'trend' ? '' : 'spectrum').then((res) => {
+    const data = res.data || [];
+    templateList.value = data.filter((item: Search.TrendTemplate) => (props.source === 'trend' ? item.type !== 'spectrum' : item.type === 'spectrum'));
   });
 }, 500);
 
@@ -79,11 +89,11 @@ function handleSelect(data: Search.TrendTemplate, e: MouseEvent) {
 
 const handleSqlCommand = (val: string, data: Search.TrendTemplate) => {
   if (val === 'delete') {
-    ElMessageBox.confirm(t('dataTrend.deleteTemplateTip'), t('common.notice'), {
+    ElMessageBox.confirm(props.source === 'trend' ? t('dataTrend.deleteTemplateTip') : t('spectrum.deleteTemplateTip'), t('common.notice'), {
       confirmButtonText: t('common.confirm'),
       cancelButtonText: t('common.cancel'),
-      confirmButtonClass: 'del-trend-template-confirm',
-      cancelButtonClass: 'del-trend-template-cancel',
+      confirmButtonClass: `del-${props.source}-template-confirm`,
+      cancelButtonClass: `del-${props.source}-template-cancel`,
       type: 'warning',
       icon: ICustomMessageWarning,
     }).then(() => {

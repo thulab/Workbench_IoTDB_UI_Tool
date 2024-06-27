@@ -2,13 +2,13 @@
   <el-dialog :title="t('search.saveTemplate')" v-model="dialogVisible" width="480px" align-center>
     <el-form ref="formRef" :model="formData" :rules="formRules" label-position="left" @submit.prevent>
       <base-form-item :label="`${t('search.name')}：`" prop="name">
-        <el-input v-model="formData.name" :placeholder="t('common.placeHolder')" maxlength="25" show-word-limit id="trend-template-modal-name" />
+        <el-input v-model="formData.name" :placeholder="t('common.placeHolder')" maxlength="25" show-word-limit :id="`${source}-template-modal-name`" />
       </base-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="handleCancel" id="trend-template-modal-cancel">{{ t('common.cancel') }}</el-button>
-        <el-button type="primary" :loading="saveLoading" @click="handleConfirm" id="trend-template-modal-confirm">{{ t('common.confirm') }}</el-button>
+        <el-button @click="handleCancel" :id="`${source}-template-modal-cancel`">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="saveLoading" @click="handleConfirm" :id="`${source}-template-modal-confirm`">{{ t('common.confirm') }}</el-button>
       </span>
     </template>
   </el-dialog>
@@ -18,11 +18,17 @@
 import type { FormInstance } from 'element-plus';
 import dayjs from 'dayjs';
 
-const props = defineProps<{
-  visible: boolean;
-  saveLoading: boolean;
-  nameList: string[];
-}>();
+const props = withDefaults(
+  defineProps<{
+    visible: boolean;
+    saveLoading: boolean;
+    nameList: string[];
+    source?: string;
+  }>(),
+  {
+    source: 'trend',
+  }
+);
 
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
@@ -73,9 +79,14 @@ watch(
   (newVal) => {
     if (newVal) {
       formRef.value?.resetFields();
-      formData.name = t('dataTrend.trendTemplate', {
-        time: dayjs().format('YYYYMMDDHHmmss'),
-      });
+      formData.name =
+        props.source === 'trend'
+          ? t('dataTrend.trendTemplate', {
+              time: dayjs().format('YYYYMMDDHHmmss'),
+            })
+          : t('spectrum.spectrumTemplate', {
+              time: dayjs().format('YYYYMMDDHHmmss'),
+            });
     }
   }
 );

@@ -58,8 +58,8 @@ class SearchApi {
   }
 
   // 趋势模板列表
-  static getTrendTemplate(keyword: string): HttpResponseP {
-    return http.get('/trend/templates', { params: { keyword } });
+  static getTrendTemplate(keyword: string, type: string): HttpResponseP {
+    return http.get('/trend/templates', { params: { keyword, type } });
   }
 
   // 趋势模板删除

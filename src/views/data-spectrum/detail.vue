@@ -141,6 +141,7 @@
               <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
                 <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch()" id="spectrum-search-search">{{ t('common.apply') }}</el-button>
               </auth-tooltip>
+              <el-button :disabled="saveTemplateDisabled" @click="handleSaveTemplate" id="spectrum-search-save-template">{{ t('common.save') }}</el-button>
             </div>
           </div>
         </el-form>
@@ -212,9 +213,9 @@
             <el-tab-pane :label="t('dataTrend.pointAttribute')" name="point">
               <point-list-tab :point-list="pointList" :point-line-data="pointLineData" :point-checked-data="pointCheckedData" @handleDelPoint="handleDelPoint" />
             </el-tab-pane>
-            <!-- <el-tab-pane :label="t('dataTrend.commonTemplates')" name="template">
-              <template-list-tab ref="templateListRef" @handle-operate="handleOperateTemplate" />
-            </el-tab-pane> -->
+            <el-tab-pane :label="t('dataTrend.commonTemplates')" name="template">
+              <template-list-tab ref="templateListRef" :source="'spectrum'" @handle-operate="handleOperateTemplate" />
+            </el-tab-pane>
           </el-tabs>
           <h4 class="collapse-title" v-if="!isExpand">{{ t(tabLabel) }}</h4>
           <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="handleExpand" id="spectrum-point-expand">
@@ -225,6 +226,17 @@
     </el-main>
 
     <modal-sql v-model:visible="sqlVisible" :sql-value="sqlValue" @handleConfirm="handleConfirmSql" />
+
+    <modal-template v-model:visible="templateVisible" :name-list="nameList" :source="'spectrum'" :save-loading="saveTemplateLoading" @handleSave="handleSaveSuccess" />
+
+    <modal-template-rename
+      v-model:visible="renameVisible"
+      :old-name="renameData.name"
+      :name-list="nameList"
+      :source="'spectrum'"
+      :save-loading="saveTemplateLoading"
+      @handleSave="handleRenameSuccess"
+    />
   </el-container>
 </template>
 
@@ -241,6 +253,9 @@ import { useUserStore } from '@/stores';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalSql from './components/modal-sql.vue';
 import PointListTab from './components/point-list-tab.vue';
+import TemplateListTab from '../data-trend/components/template-list-tab.vue';
+import ModalTemplate from '../data-trend/components/modal-template.vue';
+import ModalTemplateRename from '../data-trend/components/modal-template-rename.vue';
 
 interface PointData {
   name: string;
@@ -378,11 +393,46 @@ const requiredRules = ref([
   },
 ]);
 let currentPoint = 0;
+const templateVisible = ref(false);
+const renameVisible = ref(false);
+const renameData = reactive<{
+  id: number | string;
+  name: string;
+  template: string;
+}>({
+  id: '',
+  name: '',
+  template: '',
+});
+const saveTemplateLoading = ref(false);
 const activeNameSide = ref('point');
 const tabLabel = ref('dataTrend.pointAttribute');
+const templateListRef = ref<InstanceType<typeof TemplateListTab>>();
+const nameList = computed(() => templateListRef.value?.templateList.map((item) => item.name) || []);
 const dataEmpty = computed(() => chartData.timestamps.length === 0);
 const disableFrequency = computed(() => chartData.timestamps.length === 0 || drawedStatus.frequency);
 const disableSideband = computed(() => chartData.timestamps.length === 0 || drawedStatus.sideband);
+const saveTemplateDisabled = computed(() => {
+  if (!searchFormData.method) {
+    return true;
+  }
+  if (searchFormData.method === 'ENVELOPE' && !searchFormData.measurement) {
+    return true;
+  }
+  if ((searchFormData.method === 'DWT' && dwtTab.value === 'type' && !searchFormData.dwtMethod) || (dwtTab.value === 'number' && !searchFormData.coef)) {
+    return true;
+  }
+  if (['LOWPASS', 'HIGHPASS'].includes(searchFormData.method) && !searchFormData.wpass) {
+    return true;
+  }
+  if (searchFormData.method === 'custom' && !sqlValue.value) {
+    return true;
+  }
+  if (!searchFormData.measurement) {
+    return true;
+  }
+  return false;
+});
 
 const xMax = computed(() => chartData.timestamps[chartData.timestamps.length - 1]);
 
@@ -510,6 +560,7 @@ const { requestFn: getDWTData } = useRequest(SearchApi.getDWTData);
 const { requestFn: getPassData } = useRequest(SearchApi.getPassData);
 const { requestFn: getDataCount } = useRequest(SearchApi.getDataCount);
 const { requestFn: getCustomData } = useRequest(SearchApi.getCustomData);
+const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTemplate);
 
 function handleInputCompression(val: string) {
   if (val) {
@@ -1155,6 +1206,82 @@ function handleSearch(unforce?: boolean) {
     }
     getFFT();
   }
+}
+
+function handleSaveTemplate() {
+  if (saveTemplateDisabled.value) return;
+  saveTemplateLoading.value = false;
+  templateVisible.value = true;
+}
+
+// 模板操作
+function handleOperateTemplate(val: string, data: Search.TrendTemplate) {
+  if (val === 'rename') {
+    renameData.id = +data.id!;
+    renameData.name = data.name;
+    renameData.template = data.template;
+    saveTemplateLoading.value = false;
+    renameVisible.value = true;
+  } else {
+    const templateData = JSON.parse(data.template);
+    searchFormData.measurement = templateData.measurement;
+    searchFormData.method = templateData.method;
+    searchFormData.resultType = templateData.resultType;
+    searchFormData.compression = templateData.compression;
+    searchFormData.frequency = templateData.frequency;
+    searchFormData.amplification = templateData.amplification;
+    searchFormData.datetimerange = templateData.datetimerange;
+    searchFormData.dwtMethod = templateData.dwtMethod;
+    searchFormData.coef = templateData.coef;
+    searchFormData.layer = templateData.layer;
+    searchFormData.wpass = templateData.wpass;
+    dwtTab.value = templateData.dwtTab;
+    if (searchFormData.measurement && searchFormData.method === 'DWT') {
+      getCount();
+    }
+    handleSearch();
+  }
+}
+
+function handleSaveSuccess(name: string) {
+  saveTemplateLoading.value = true;
+  const data = JSON.stringify({
+    ...searchFormData,
+    datetimerange: [dayjs(searchFormData.datetimerange[0]).valueOf(), dayjs(searchFormData.datetimerange[1]).valueOf()],
+    dwtTab: dwtTab.value,
+  });
+  upsertTrendTemplate({
+    id: '',
+    type: 'spectrum',
+    name,
+    template: data,
+  })
+    .then(() => {
+      ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
+      templateVisible.value = false;
+      templateListRef.value?.getQueryList();
+    })
+    .finally(() => {
+      saveTemplateLoading.value = false;
+    });
+}
+
+function handleRenameSuccess(name: string) {
+  saveTemplateLoading.value = true;
+  upsertTrendTemplate({
+    id: renameData.id,
+    type: 'spectrum',
+    name,
+    template: renameData.template,
+  })
+    .then(() => {
+      ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
+      renameVisible.value = false;
+      templateListRef.value?.getQueryList();
+    })
+    .finally(() => {
+      saveTemplateLoading.value = false;
+    });
 }
 
 function handleSql() {

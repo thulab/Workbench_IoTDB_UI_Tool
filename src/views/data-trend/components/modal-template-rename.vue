@@ -2,16 +2,16 @@
   <el-dialog :title="t('search.rename')" v-model="dialogVisible" width="480px" align-center>
     <el-form ref="formRef" :model="formData" :rules="formRules" :label-width="locale === 'en' ? '104px' : '80px'" label-position="left">
       <base-form-item :label="`${t('search.oldName')}：`" prop="oldName" class="type-input-disabled el-form-item-not-mandatory">
-        <el-input v-model="formData.oldName" disabled id="trend-template-rename-modal-old" />
+        <el-input v-model="formData.oldName" disabled :id="`${source}-template-rename-modal-old`" />
       </base-form-item>
       <base-form-item :label="`${t('search.newName')}：`" prop="name">
-        <el-input v-model="formData.name" :placeholder="t('common.placeHolder')" maxlength="25" show-word-limit id="trend-template-rename-modal-name" />
+        <el-input v-model="formData.name" :placeholder="t('common.placeHolder')" maxlength="25" show-word-limit :id="`${source}-template-rename-modal-name`" />
       </base-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="handleCancel" id="trend-template-rename-modal-cancel">{{ t('common.cancel') }}</el-button>
-        <el-button type="primary" :loading="saveLoading" @click="handleConfirm" id="trend-template-rename-modal-confirm">{{ t('common.confirm') }}</el-button>
+        <el-button @click="handleCancel" :id="`${source}-template-rename-modal-cancel`">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="saveLoading" @click="handleConfirm" :id="`${source}-template-rename-modal-confirm`">{{ t('common.confirm') }}</el-button>
       </span>
     </template>
   </el-dialog>
@@ -20,12 +20,18 @@
 <script setup lang="ts">
 import type { FormInstance } from 'element-plus';
 
-const props = defineProps<{
-  visible: boolean;
-  saveLoading: boolean;
-  oldName: string;
-  nameList: string[];
-}>();
+const props = withDefaults(
+  defineProps<{
+    visible: boolean;
+    saveLoading: boolean;
+    oldName: string;
+    nameList: string[];
+    source?: string;
+  }>(),
+  {
+    source: 'trend',
+  }
+);
 
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
