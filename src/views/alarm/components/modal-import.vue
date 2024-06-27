@@ -12,7 +12,7 @@
       <div class="select-file-box" v-if="activeStep === 0">
         <div class="select-item-box" style="align-items: center">
           <span class="select-item-label">{{ t('common.downloadTemplate') }}：</span>
-          <a href="/api/file/exportAlarmTemplate" class="template-button" target="_blank">alarm_template.xlsx</a>
+          <a href="/api/file/exportAlarmConfigTemplate" class="template-button" target="_blank">alarm_template.xlsx</a>
         </div>
         <div class="select-item-box">
           <span class="select-item-label">{{ t('common.importFile') }}：</span>
