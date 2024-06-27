@@ -15,7 +15,7 @@ class UserApi {
 
   // 登录是否需要验证码
   static loginCaptcha(): HttpResponseP<boolean> {
-    return http.get('/login/verifiable');
+    return http.get('/verifiable');
   }
 
   // 当前登录用户权限
