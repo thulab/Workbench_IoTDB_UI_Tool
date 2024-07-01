@@ -47,6 +47,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
+  (event: 'update:modelValue', val: string): void;
   (event: 'handleChangePath', val: string, data: StorageDevice.MeasurementDataItem[]): void;
 }>();
 

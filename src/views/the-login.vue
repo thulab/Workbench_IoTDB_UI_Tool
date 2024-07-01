@@ -4,7 +4,7 @@
       <img src="@/assets/login-bg.png" alt="" />
     </div>
     <div class="login-form-wrapper">
-      <div class="login-form-container">
+      <div class="login-form-container" :style="{ height: isUseCaptcha ? '540px' : '486px' }">
         <!-- eslint-disable-next-line vue/no-constant-condition -->
         <el-icon v-show="false" id="login-language" class="login-language-icon" size="30" @click="handleChangeLang"><i-custom-language-border /></el-icon>
         <div class="login-logo-box">
@@ -13,7 +13,7 @@
           <!-- <i-custom-logo-title class="title-logo" /> -->
         </div>
         <h5 class="login-title">{{ t('login.title') }}</h5>
-        <el-form :hide-required-asterisk="true" :model="loginForm" :rules="rules" ref="formRef" :class="['login-form-box', isUseCaptcha ? 'login-form-margin' : '']">
+        <el-form :hide-required-asterisk="true" :model="loginForm" :rules="rules" ref="formRef" class="login-form-box">
           <label><input type="password" autocomplete="new-password" hidden /></label>
           <div class="connection-box">
             <el-form-item prop="connection">
@@ -342,7 +342,6 @@ watch(locale, () => {
 
 .login-form-container {
   width: 480px;
-  height: 540px;
   border-radius: 6px;
   background: #fff;
   padding: 40px 60px;
@@ -401,17 +400,11 @@ watch(locale, () => {
   margin: 36px 0 0;
 
   :deep(.el-form-item--default) {
-    margin-bottom: 44px;
+    margin-bottom: 24px;
   }
 
   :deep(.el-input) {
     height: 36px !important;
-  }
-}
-
-.login-form-margin {
-  :deep(.el-form-item--default) {
-    margin-bottom: 24px;
   }
 }
 

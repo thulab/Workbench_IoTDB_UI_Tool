@@ -7,7 +7,7 @@
             {{ t('measurement.measurementChoose') }}：
             <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
-          <timeseries-select v-model="searchFormData.path" :is-show-view-btn="true" :is-boolean-text-disabled="true" id="statistic-search-path" />
+          <timeseries-select v-model="searchFormData.path" :disabled-path="(item) => ['TEXT', 'BOOLEAN'].includes(item.dataType)" id="statistic-search-path" />
         </base-form-item>
         <base-form-item :label="`${t('search.searchTime')}：`" prop="datetimerange">
           <el-date-picker

@@ -10,14 +10,7 @@
             {{ t('alarm.alarmMeasurement') }}：
             <el-tooltip effect="light" :content="t('common.searchAllTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
-          <timeseries-select
-            v-model="searchFormData.measurements"
-            filter-system
-            :is-show-view-btn="true"
-            :placeholder="t('alarm.alarmMeasurementPlaceholder')"
-            :viewText="t('dataTrend.choosedMeasurement')"
-            id="alarm-config-search-measurements"
-          />
+          <timeseries-select v-model="searchFormData.measurements" filter-system :placeholder="t('alarm.alarmMeasurementPlaceholder')" id="alarm-config-search-measurements" />
         </base-form-item>
         <base-form-item prop="alarmLevel">
           <template #label>
@@ -84,11 +77,11 @@
         <h4 class="page-table-title">{{ t('alarm.alarmConfig') }}</h4>
         <div class="operate-buttons">
           <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
-            <el-button type="primary" :disabled="!canUsePipe" @click="handleAdd" id="alarm-config-add">{{ t('common.create') }}</el-button>
+            <el-button type="primary" :disabled="!canUsePipe" @click="handleAdd" id="alarm-config-add">{{ t('alarm.newAlarm') }}</el-button>
           </auth-tooltip>
-          <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
+          <!-- <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
             <el-button :disabled="!canUsePipe" @click="handleImport" id="alarm-config-import">{{ t('common.import') }}</el-button>
-          </auth-tooltip>
+          </auth-tooltip> -->
           <auth-tooltip :is-disabled="canUsePipe" :content="'common.pipeAuth'">
             <el-button :disabled="!multipleSelection.length || !canUsePipe" type="primary" @click="handleDel('batch', null)" id="alarm-config-batch-del">{{ t('common.batchDelete') }}</el-button>
           </auth-tooltip>
@@ -402,6 +395,7 @@ function handleSaveConfig() {
 }
 
 // 导入
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleImport() {
   importVisible.value = true;
 }

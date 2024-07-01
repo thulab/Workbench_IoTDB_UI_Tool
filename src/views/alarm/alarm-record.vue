@@ -10,14 +10,7 @@
             {{ t('alarm.alarmMeasurement') }}：
             <el-tooltip effect="light" :content="t('common.searchAllTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
-          <timeseries-select
-            v-model="searchFormData.measurements"
-            filter-system
-            :is-show-view-btn="true"
-            :placeholder="t('alarm.alarmMeasurementPlaceholder')"
-            :viewText="t('dataTrend.choosedMeasurement')"
-            id="alarm-record-search-measurements"
-          />
+          <timeseries-select v-model="searchFormData.measurements" filter-system :placeholder="t('alarm.alarmMeasurementPlaceholder')" id="alarm-record-search-measurements" />
         </base-form-item>
         <base-form-item prop="alarmLevel">
           <template #label>

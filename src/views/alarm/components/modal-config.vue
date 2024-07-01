@@ -16,17 +16,18 @@
               {{ t('alarm.alarmMeasurement') }}：
               <el-tooltip v-if="editType === 'add'" effect="light" :content="t('common.searchAllTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
-            <timeseries-select-single
+            <timeseries-select
               id="alarm-config-modal-measurement"
               ref="timeseriesSelectSingleRef"
               v-model="formData.measurement"
               :selectWidth="250"
               :itemWidth="220"
-              show-suffix
               :key="dialogKey"
               :filter-system="true"
+              :is-show-view-btn="false"
+              :show-prefix="false"
               :disabled-select="editType === 'edit'"
-              :disabled-path="(item) => item.dataType === 'TEXT' || item.viewType === 'VIEW'"
+              :disabled-path="disabledPath"
               @handleChangePath="handleChangePath"
             />
           </base-form-item>
@@ -172,7 +173,7 @@ const requiredRules = ref([
 const formData = reactive<Alarm.ConfigData>({
   alarmConfigId: undefined,
   alarmName: '',
-  measurement: '',
+  measurement: [],
   measurementType: '',
   alarmLevel: '',
   alarmDesc: '',
@@ -255,6 +256,13 @@ const getLevelColor = computed(() => {
   return '#424561';
 });
 
+function disabledPath(item: StorageDevice.MeasurementDataItem) {
+  if (!formData.measurementType) {
+    return item.dataType === 'TEXT' || item.viewType === 'VIEW';
+  }
+  return item.dataType === 'TEXT' || item.viewType === 'VIEW' || item.dataType !== formData.measurementType;
+}
+
 const { requestFn: saveAlarmConfig } = useRequest(AlarmApi.saveAlarmConfig);
 const { requestFn: updateAlarmConfig } = useRequest(AlarmApi.updateAlarmConfig);
 const { requestFn: getAlarmConfigDetail } = useRequest(AlarmApi.getAlarmConfigDetail);
@@ -273,13 +281,16 @@ function getDetail() {
   });
 }
 
-function handleChangePath(val: string, data: StorageDevice.MeasurementDataItem[]) {
-  formRef.value?.resetFields();
-  formData.alarmRulesTypeVal = undefined;
-  formData.alarmDurationType = 'ms';
-  const current = data.find((f) => f.timeseries === val);
-  formData.measurement = val;
-  formData.measurementType = current?.dataType;
+function handleChangePath(vals: string[], data: StorageDevice.MeasurementDataItem[]) {
+  if (!vals.length) {
+    formRef.value?.resetFields();
+    formData.alarmRulesTypeVal = undefined;
+    formData.alarmDurationType = 'ms';
+  }
+  if (vals.length) {
+    const current = data.find((f) => f.timeseries === vals[0]);
+    formData.measurementType = current?.dataType;
+  }
 }
 
 function handleChangeBooleanRule(val: string) {

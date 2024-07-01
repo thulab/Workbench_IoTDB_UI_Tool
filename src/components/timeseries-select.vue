@@ -3,18 +3,20 @@
     class="remote-select-box"
     v-model="model"
     :id="id"
-    :placeholder="t('measurement.measurementNameSelectPlaceholder')"
+    :placeholder="t(placeholder)"
     filterable
     remote
     clearable
     multiple
     collapse-tags
     :collapse-tags-tooltip="false"
+    fit-input-width
     :remote-method="remoteMethod"
-    style="width: 336px"
-    :disabled="disabled"
+    :style="`width: ${selectWidth}px;`"
+    :disabled="disabledSelect"
+    @change="handleChangePath"
   >
-    <template #prefix>
+    <template #prefix v-if="showPrefix">
       <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
     </template>
     <el-option
@@ -23,15 +25,15 @@
       :label="item.timeseries"
       :value="item.timeseries"
       :id="`timeseries-select-${item.timeseries}`"
-      :disabled="isBooleanTextDisabled ? item.dataType === 'BOOLEAN' || item.dataType === 'TEXT' : false"
+      :disabled="disabledPath ? disabledPath(item) : false"
     >
-      <div class="remote-select-search-text">
+      <div :style="`display: flex; width: ${itemWidth}px;`">
         <text-tooltip :content="item.timeseries" />
       </div>
     </el-option>
   </el-select>
-  <el-button v-if="isShowViewBtn" type="primary" :disabled="!model.length" class="m-l-12" @click="() => (dialogVisible = true)">{{ viewText || t('dataTrend.choosedMeasurement') }}</el-button>
-  <el-dialog :title="viewText || t('dataTrend.choosedMeasurement')" v-model="dialogVisible" class="select-modal" align-center width="520px">
+  <el-button v-if="isShowViewBtn" type="primary" :disabled="!model.length" class="m-l-12" @click="() => (dialogVisible = true)">{{ t(viewText) }}</el-button>
+  <el-dialog :title="t(viewText)" v-model="dialogVisible" class="select-modal" align-center width="520px">
     <el-scrollbar :max-height="400">
       <ul class="select-list">
         <li v-for="(item, index) in model" :key="item" class="select-item">
@@ -50,16 +52,35 @@
 import { debounce } from 'lodash-es';
 import { StorageApi } from '@/api';
 
-const props = defineProps<{
-  modelValue: Array<string>;
-  id: string;
-  isShowViewBtn?: boolean;
-  placeholder?: string;
-  viewText?: string;
-  filterSystem?: boolean;
-  isBooleanTextDisabled?: boolean;
-  disabled?: boolean;
+const props = withDefaults(
+  defineProps<{
+    modelValue: Array<string>;
+    id: string;
+    isShowViewBtn?: boolean;
+    placeholder?: string;
+    viewText?: string;
+    filterSystem?: boolean;
+    showPrefix?: boolean;
+    disabledSelect?: boolean;
+    disabledPath?: (data: StorageDevice.MeasurementDataItem) => boolean;
+    selectWidth?: number;
+    itemWidth?: number;
+  }>(),
+  {
+    placeholder: 'measurement.measurementNameSelectPlaceholder',
+    isShowViewBtn: true,
+    viewText: 'dataTrend.choosedMeasurement',
+    showPrefix: true,
+    selectWidth: 336,
+    itemWidth: 300,
+  }
+);
+
+const emit = defineEmits<{
+  (event: 'update:modelValue', vals: string[]): void;
+  (event: 'handleChangePath', vals: string[], data: StorageDevice.MeasurementDataItem[]): void;
 }>();
+
 const { t } = useI18n();
 const model = useVModel(props, 'modelValue');
 const dialogVisible = ref(false);
@@ -84,6 +105,14 @@ const remoteMethod = debounce((query: string) => {
 function handleDelete(index: number) {
   model.value?.splice(index, 1);
 }
+
+function handleChangePath(vals: string[]) {
+  emit('handleChangePath', vals, measurementList.value);
+}
+
+defineExpose({
+  measurementList,
+});
 </script>
 
 <style scoped lang="scss">
@@ -177,10 +206,5 @@ function handleDelete(index: number) {
       }
     }
   }
-}
-
-.remote-select-search-text {
-  display: flex;
-  width: 300px;
 }
 </style>

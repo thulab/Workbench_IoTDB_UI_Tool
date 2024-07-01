@@ -33,7 +33,7 @@ declare namespace Alarm {
   export interface ConfigData {
     alarmConfigId?: number;
     alarmName: string;
-    measurement?: string;
+    measurement?: string[];
     measurementType?: string;
     alarmLevel: string;
     alarmDesc: string;
