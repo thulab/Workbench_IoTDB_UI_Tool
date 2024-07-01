@@ -647,10 +647,10 @@ function handleDWTTab(val: 'type' | 'number') {
 }
 
 function getCount() {
-  const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
-  const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
+  const start = dayjs(searchFormData.datetimerange[0]).valueOf();
+  const end = dayjs(searchFormData.datetimerange[1]).valueOf();
   getDataCount({
-    measurement: copySearchFormData.measurement,
+    measurement: searchFormData.measurement,
     startTime: start,
     endTime: end,
   })
