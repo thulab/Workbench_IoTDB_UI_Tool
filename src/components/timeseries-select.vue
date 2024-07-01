@@ -72,7 +72,7 @@ const props = withDefaults(
     viewText: 'dataTrend.choosedMeasurement',
     showPrefix: true,
     selectWidth: 336,
-    itemWidth: 300,
+    itemWidth: 284,
   }
 );
 

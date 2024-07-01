@@ -21,7 +21,7 @@
               ref="timeseriesSelectSingleRef"
               v-model="formData.measurement"
               :selectWidth="250"
-              :itemWidth="220"
+              :itemWidth="198"
               :key="dialogKey"
               :filter-system="true"
               :is-show-view-btn="false"
