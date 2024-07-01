@@ -131,6 +131,7 @@
                   :prefix-icon="ICustomCalender"
                   :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
                   id="spectrum-search-datetimerange"
+                  @change="handleChangeTime"
                 />
               </base-form-item>
               <base-form-item :label="`${t('spectrum.dataCount')}：`" v-if="searchFormData.method === 'DWT'" class="m-r-0">
@@ -671,6 +672,12 @@ function handleChangeMethod(val: string) {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleChangePath(val: string, data: StorageDevice.MeasurementDataItem[]) {
   if (searchFormData.method === 'DWT') {
+    getCount();
+  }
+}
+
+function handleChangeTime() {
+  if (searchFormData.method === 'DWT' && searchFormData.measurement) {
     getCount();
   }
 }
