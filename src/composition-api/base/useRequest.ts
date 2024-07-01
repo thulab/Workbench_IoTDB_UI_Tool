@@ -9,7 +9,11 @@ const { t } = i18n.global;
 
 // 1001
 // 1330 无权限
+// 2000 实例连接 IoTDB Prometheus 报错信息换行
+// 1320 审计日志 不弹异常
+// 9999 1380 新建测点 异常
 const alertErrorCode = [1001];
+const unTipCodes = [1320, 1380, 9999];
 
 interface Opt<T> {
   initData?: T;
@@ -38,7 +42,7 @@ const showError = (message: string, code?: number) => {
       .finally(() => {
         window.__errBoxShowing__ = false;
       });
-  } else if (code && !alertErrorCode.includes(code) && code !== 1320 && code !== 9999) {
+  } else if (code && !alertErrorCode.includes(code) && !unTipCodes.includes(code)) {
     ElMessage.error({
       message,
       grouping: true,
