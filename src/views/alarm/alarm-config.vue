@@ -389,7 +389,8 @@ function handleDel(type: string, data: Alarm.QueryConfigResult | null) {
   });
 }
 
-function handleSaveConfig() {
+function handleSaveConfig(unreload?: boolean) {
+  if (unreload) return;
   handleReset();
   handleSearch();
 }

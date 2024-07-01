@@ -143,6 +143,7 @@ import { storeToRefs } from 'pinia';
 import { AlarmApi } from '@/api';
 import { useEnumStore } from '@/stores';
 import TimeseriesSelectSingle from '@/components/timeseries-select-single.vue';
+import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
 const props = defineProps<{
   visible: boolean;
@@ -152,7 +153,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
-  (event: 'handleSave'): void;
+  (event: 'handleSave', unreload?: boolean): void;
 }>();
 
 const { t, locale } = useI18n();
@@ -184,8 +185,14 @@ const formData = reactive<Alarm.ConfigData>({
   alarmDurationType: 'ms',
 });
 const dialogKey = ref(0);
+const errorLink = ref('');
 
 const changeBoolean = computed(() => formData.measurementType === 'BOOLEAN' && formData.alarmRulesType === 'change');
+
+const linkTip = computed(
+  () =>
+    `<a href="/api/file/downloadErrorInfo?fileName=${errorLink.value}" target="_blank" rel="noopener noreferrer" style="color: #495ad4;text-decoration: underline;">${t('common.currentDownload')}</a>`
+);
 
 const checkRules = (rule: any, value: any, callback: any) => {
   if (!value) {
@@ -320,13 +327,33 @@ const handleConfirm = () => {
           ...params,
           measurement: formData.measurement,
           measurementType: formData.measurementType,
-        }).then((res) => {
-          if (res.code === 0) {
-            ElMessage.success({ message: t('alarm.newSuccess'), grouping: true });
-            dialogVisible.value = false;
-            emit('handleSave');
-          }
-        });
+        })
+          .then((res) => {
+            if (res.code === 0) {
+              ElMessage.success({ message: t('common.createSuccess'), grouping: true });
+              dialogVisible.value = false;
+              emit('handleSave');
+            }
+          })
+          .catch((err) => {
+            if (err.data) {
+              errorLink.value = err.data;
+              ElMessageBox.confirm(t('alarm.errorLinkTip', { link: linkTip.value }), t('common.notice'), {
+                showCancelButton: false,
+                confirmButtonText: t('common.confirm'),
+                confirmButtonClass: 'modal-alarm-config-error-confirm',
+                type: 'warning',
+                icon: ICustomMessageWarning,
+                closeOnClickModal: false,
+                closeOnPressEscape: false,
+                dangerouslyUseHTMLString: true,
+              }).finally(() => {
+                emit('handleSave', true);
+              });
+            } else {
+              ElMessage.error({ message: err.message, grouping: true });
+            }
+          });
       } else {
         updateAlarmConfig({
           ...params,
@@ -349,6 +376,7 @@ watch(
   () => props.visible,
   (newVal) => {
     if (newVal) {
+      errorLink.value = '';
       dialogKey.value++;
       formRef.value?.resetFields();
       formData.alarmRulesType = '';

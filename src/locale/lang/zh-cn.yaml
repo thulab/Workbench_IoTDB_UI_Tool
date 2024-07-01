@@ -149,6 +149,7 @@ common:
   warmTip: 温馨提示
   versionTip: 请升级至IoTDB V%{version}及以上版本使用
   userManual: 文档
+  currentDownload: 点此下载
 page:
   '403': 403页面
   '404': 404页面
@@ -535,6 +536,7 @@ alarm:
   newStatus: 仅查看最新状态
   alarmRecord: 告警记录
   alarmValue: 告警值
+  errorLinkTip: 当前告警批量创建存在错误，%{link}报错信息
   whetherConfirm: 是否确认
   batchDeleteRecord: 确认删除这些告警记录吗？
   singleDeleteRecord: 确认删除该条告警记录吗？
