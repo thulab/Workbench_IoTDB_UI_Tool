@@ -327,33 +327,28 @@ const handleConfirm = () => {
           ...params,
           measurement: formData.measurement,
           measurementType: formData.measurementType,
-        })
-          .then((res) => {
-            if (res.code === 0) {
-              ElMessage.success({ message: t('common.createSuccess'), grouping: true });
+        }).then((res) => {
+          if (res.data.filePath) {
+            errorLink.value = res.data.filePath;
+            ElMessageBox.confirm(t('alarm.errorLinkTip', { link: linkTip.value }), t('common.notice'), {
+              showCancelButton: false,
+              confirmButtonText: t('common.confirm'),
+              confirmButtonClass: 'modal-alarm-config-error-confirm',
+              type: 'warning',
+              icon: ICustomMessageWarning,
+              closeOnClickModal: false,
+              closeOnPressEscape: false,
+              dangerouslyUseHTMLString: true,
+            }).finally(() => {
               dialogVisible.value = false;
-              emit('handleSave');
-            }
-          })
-          .catch((err) => {
-            if (err.data) {
-              errorLink.value = err.data;
-              ElMessageBox.confirm(t('alarm.errorLinkTip', { link: linkTip.value }), t('common.notice'), {
-                showCancelButton: false,
-                confirmButtonText: t('common.confirm'),
-                confirmButtonClass: 'modal-alarm-config-error-confirm',
-                type: 'warning',
-                icon: ICustomMessageWarning,
-                closeOnClickModal: false,
-                closeOnPressEscape: false,
-                dangerouslyUseHTMLString: true,
-              }).finally(() => {
-                emit('handleSave', true);
-              });
-            } else {
-              ElMessage.error({ message: err.message, grouping: true });
-            }
-          });
+              emit('handleSave', true);
+            });
+          } else {
+            ElMessage.success({ message: t('common.createSuccess'), grouping: true });
+            dialogVisible.value = false;
+            emit('handleSave');
+          }
+        });
       } else {
         updateAlarmConfig({
           ...params,

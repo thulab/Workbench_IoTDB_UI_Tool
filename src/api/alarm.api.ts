@@ -26,7 +26,7 @@ class AlarmApi {
   }
 
   // 保存告警配置
-  static saveAlarmConfig(data: Alarm.ConfigData): HttpResponseP {
+  static saveAlarmConfig(data: Alarm.ConfigData): HttpResponseP<StorageDevice.ImportMeasurementDataRes> {
     return http.post('/alarm/addConfig', data);
   }
 
