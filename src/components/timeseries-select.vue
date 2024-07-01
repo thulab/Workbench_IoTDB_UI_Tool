@@ -1,6 +1,6 @@
 <template>
   <el-select
-    class="remote-select-box"
+    :class="['remote-select-box', disabledSelect ? 'remote-select-disabled-box' : '']"
     v-model="model"
     :id="id"
     :placeholder="t(placeholder)"
@@ -143,6 +143,12 @@ defineExpose({
 
   :deep(.el-select__tags-text) {
     max-width: 120px !important;
+  }
+
+  &.remote-select-disabled-box {
+    :deep(.el-select__tags-text) {
+      max-width: 100% !important;
+    }
   }
 
   :deep(.el-input__suffix) {
