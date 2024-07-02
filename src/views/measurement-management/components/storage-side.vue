@@ -144,7 +144,7 @@ watch(
   () => props.canReadWriteSchema,
   (val) => {
     if (val) {
-      getStorageList();
+      getStorageList(true);
     }
   },
   {
