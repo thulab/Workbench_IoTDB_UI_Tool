@@ -199,7 +199,7 @@ defineExpose({ getStorageList });
 }
 
 .storage-list-box {
-  height: calc(100% - 70px);
+  height: 100%;
   overflow-y: auto;
 }
 
