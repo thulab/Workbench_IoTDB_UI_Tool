@@ -294,7 +294,7 @@ function handleChangePath(vals: string[], data: StorageDevice.MeasurementDataIte
     formData.alarmRulesTypeVal = undefined;
     formData.alarmDurationType = 'ms';
   }
-  if (vals.length) {
+  if (vals.length && !formData.measurementType) {
     const current = data.find((f) => f.timeseries === vals[0]);
     formData.measurementType = current?.dataType;
   }
