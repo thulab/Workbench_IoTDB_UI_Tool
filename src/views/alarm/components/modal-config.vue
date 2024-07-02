@@ -343,7 +343,9 @@ const handleConfirm = () => {
               dialogVisible.value = false;
               emit('handleSave', true);
             });
-          } else {
+          } else if (res.data.errMsg) {
+            ElMessage.success({ message: res.data.errMsg, grouping: true });
+          } else if (res.data.status && !res.data.filePath) {
             ElMessage.success({ message: t('common.createSuccess'), grouping: true });
             dialogVisible.value = false;
             emit('handleSave');
