@@ -8,7 +8,7 @@
               {{ t('measurement.measurementChoose') }}：
               <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
-            <timeseries-select v-model="searchFormData.path" id="trend-search-path" />
+            <timeseries-select v-model="searchFormData.path" id="trend-search-path" :disabled-path="(item) => item.dataType === 'TEXT'" />
           </base-form-item>
           <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules">
             <ul class="search-data-list">
