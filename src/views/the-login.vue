@@ -6,7 +6,7 @@
     <div class="login-form-wrapper">
       <div class="login-form-container" :style="{ height: isUseCaptcha ? '540px' : '486px' }">
         <!-- eslint-disable-next-line vue/no-constant-condition -->
-        <el-icon v-show="true" id="login-language" class="login-language-icon" size="30" @click="handleChangeLang"><i-custom-language-border /></el-icon>
+        <el-icon v-show="false" id="login-language" class="login-language-icon" size="30" @click="handleChangeLang"><i-custom-language-border /></el-icon>
         <div class="login-logo-box">
           <i-custom-timecho-logo-en v-if="locale === 'en'" class="title-logo" />
           <i-custom-timecho-logo v-else class="title-logo" />
