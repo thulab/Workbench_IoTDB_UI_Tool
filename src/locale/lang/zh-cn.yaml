@@ -224,6 +224,7 @@ measurement:
   lastValueTime: 最新值时间
   baseMeasurement: 普通序列
   viewMeasurement: 视图序列
+  goAlarmTip: 该数据类型不支持创建告警
   calculateMeasurement: 计算序列
   deleteMeasurementTip: 此操作会删除数据库下全部测点和数据，是否删除？
   databaseModel: 数据模型
