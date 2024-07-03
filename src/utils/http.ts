@@ -61,13 +61,13 @@ async function responseInterceptor(response: HttpResponse<object>): Promise<Http
       type: 'error',
       showClose: false,
     }).finally(() => {
-      window.location.href = `/login?timestamp=${new Date().getTime()}`;
+      window.location.href = `/view/login?timestamp=${new Date().getTime()}`;
       sessionStorage.setItem('nologin', '1');
       return Promise.reject(response);
     }) as unknown as Promise<HttpResponse<object>>;
   }
   if (response.status === 401) {
-    window.location.href = `/login?timestamp=${new Date().getTime()}`;
+    window.location.href = `/view/login?timestamp=${new Date().getTime()}`;
     sessionStorage.setItem('nologin', '1');
     return Promise.reject(response);
   }

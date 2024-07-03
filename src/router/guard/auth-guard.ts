@@ -32,13 +32,13 @@ export function registerGuard(router: Router) {
     const menuStore = useMenuStore();
     const dynamicRouter = handleRouter(menuStore.menuList);
     // * Static Router(静态路由，必须配置首页地址，否则不能进首页)
-    const staticRouter = [HOME_URL, '/403'];
+    const staticRouter = [HOME_URL, '/view/403'];
     const routerList = dynamicRouter.concat(staticRouter);
 
     // * 如果访问的地址没有在路由表中重定向到403页面
     if (routerList.indexOf(to.path) !== -1) return next();
     return next({
-      path: '/403',
+      path: '/view/403',
     });
   });
 

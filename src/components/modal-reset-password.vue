@@ -137,7 +137,7 @@ const handleConfirm = () => {
             showClose: false,
           }).finally(() => {
             UserApi.logout();
-            window.location.href = `/login?timestamp=${new Date().getTime()}`;
+            window.location.href = `/view/login?timestamp=${new Date().getTime()}`;
           });
         }
         emit('handleSave');

@@ -31,7 +31,7 @@
       </div>
     </div>
     <el-scrollbar :style="{ height: !isCollapse ? 'calc(100% - 124px)' : 'calc(100% - 88px)' }">
-      <el-menu :default-active="activeMenu" :router="true" :collapse="isCollapse" :collapse-transition="false" :default-openeds="['/system/auth']" :unique-opened="false">
+      <el-menu :default-active="activeMenu" :router="true" :collapse="isCollapse" :collapse-transition="false" :default-openeds="['/view/system/auth']" :unique-opened="false">
         <layout-menu-sub-item :menu-list="menuList" :show-auth-menu="true" />
       </el-menu>
     </el-scrollbar>

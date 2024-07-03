@@ -8,6 +8,9 @@ const metaRouters = import.meta.glob('./modules/*.ts', { eager: true, import: 'd
 export const asyncRoutes: Array<RouteRecordRaw> = [];
 Object.keys(metaRouters).forEach((item) => {
   const data: Array<RouteRecordRaw> = getRouterByType(metaRouters[item]);
+  data.forEach((menuItem: RouteRecordRaw) => {
+    menuItem.path = `/view${menuItem.path}`;
+  });
   asyncRoutes.push(...data);
 });
 
@@ -22,7 +25,7 @@ const routes: Array<RouteRecordRaw> = [
     redirect: { name: '404' },
   },
   {
-    path: '/login',
+    path: '/view/login',
     name: 'Login',
     component: Login,
   },

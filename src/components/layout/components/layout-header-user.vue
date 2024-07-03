@@ -49,7 +49,7 @@ const handleLogout = () => {
   }).then(() => {
     logout().then(() => {
       userStore.setUser('');
-      window.location.href = `/login?timestamp=${new Date().getTime()}`;
+      window.location.href = `/view/login?timestamp=${new Date().getTime()}`;
     });
   });
 };
