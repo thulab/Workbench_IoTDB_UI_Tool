@@ -787,6 +787,7 @@ spectrum:
   spectrumTemplate: 分析%{time}
   deleteTemplateTip: 是否删除常用分析
 iotdbConfig:
+  template: 模板
   searchPlaceholder: 请输入搜索内容
   configList: 配置列表
   configFile: 配置文件地址：
