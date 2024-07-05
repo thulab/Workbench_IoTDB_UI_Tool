@@ -20,11 +20,12 @@
               id="alarm-config-modal-measurement"
               ref="timeseriesSelectSingleRef"
               v-model="formData.measurement"
-              :selectWidth="250"
+              :selectWidth="316"
               :itemWidth="198"
               :key="dialogKey"
               :filter-system="true"
               :is-show-view-btn="false"
+              :is-show-type="true"
               :show-prefix="false"
               :disabled-select="editType === 'edit'"
               :disabled-path="disabledPath"
@@ -53,17 +54,17 @@
               v-model="formData.alarmRulesType"
               :disabled="!formData.measurementType"
               @change="handleChangeBooleanRule"
-              style="width: 250px"
+              style="width: 316px"
               :placeholder="t('common.selectPlaceholder')"
               id="alarm-config-modal-rule-BOOLEAN"
             >
               <el-option v-for="item in booleanRuleEnum" :key="item.value" :label="item.name" :value="item.value" :id="`alarm-config-modal-rule-BOOLEAN-select-${item.value}`" />
             </el-select>
             <div v-else class="number-rule-box">
-              <el-select v-model="formData.alarmRulesType" :disabled="!formData.measurementType" style="width: 121px" class="m-r-8" id="alarm-config-modal-rule">
+              <el-select v-model="formData.alarmRulesType" :disabled="!formData.measurementType" style="width: 154px" class="m-r-8" id="alarm-config-modal-rule">
                 <el-option v-for="item in numberRuleEnum" :key="item.value" :label="item.name" :value="item.value" :id="`alarm-config-modal-rule-select-${item.value}`" />
               </el-select>
-              <el-input v-model="formData.alarmRulesTypeVal" :disabled="!formData.measurementType" :placeholder="t('common.placeHolder')" style="width: 121px" id="alarm-config-modal-rule-val" />
+              <el-input v-model="formData.alarmRulesTypeVal" :disabled="!formData.measurementType" :placeholder="t('common.placeHolder')" style="width: 154px" id="alarm-config-modal-rule-val" />
             </div>
           </base-form-item>
         </el-col>
@@ -89,7 +90,7 @@
               {{ t('alarm.alarmLevel') }}：
               <el-tooltip effect="light" :content="t('alarm.alarmLevelTip')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
-            <el-select v-model="formData.alarmLevel" style="width: 250px" class="level-select-box" id="alarm-config-modal-level">
+            <el-select v-model="formData.alarmLevel" style="width: 316px" class="level-select-box" id="alarm-config-modal-level">
               <template #prefix>
                 <el-icon v-if="formData.alarmLevel" :style="{ color: getLevelColor }" size="20"><i-custom-alarm-level /></el-icon>
               </template>

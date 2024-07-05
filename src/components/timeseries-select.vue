@@ -27,8 +27,18 @@
       :id="`timeseries-select-${item.timeseries}`"
       :disabled="disabledPath ? disabledPath(item) : false"
     >
-      <div :style="`display: flex; width: ${itemWidth}px;`">
-        <text-tooltip :content="item.timeseries" />
+      <div class="timeseries-option-box">
+        <template v-if="isShowType">
+          <i-custom-type-boolean v-if="item.dataType === 'BOOLEAN'" class="timeseries-type-text" />
+          <i-custom-type-double v-else-if="item.dataType === 'DOUBLE'" class="timeseries-type-text" />
+          <i-custom-type-float v-else-if="item.dataType === 'FLOAT'" class="timeseries-type-text" />
+          <i-custom-type-int32 v-else-if="item.dataType === 'INT32'" class="timeseries-type-text" />
+          <i-custom-type-int64 v-else-if="item.dataType === 'INT64'" class="timeseries-type-text" />
+          <i-custom-type-text v-else class="timeseries-type-text" />
+        </template>
+        <div :style="`display: flex; width: ${itemWidth}px;`">
+          <text-tooltip :content="item.timeseries" />
+        </div>
       </div>
     </el-option>
   </el-select>
@@ -65,6 +75,7 @@ const props = withDefaults(
     disabledPath?: (data: StorageDevice.MeasurementDataItem) => boolean;
     selectWidth?: number;
     itemWidth?: number;
+    isShowType?: boolean;
   }>(),
   {
     placeholder: 'measurement.measurementNameSelectPlaceholder',
@@ -73,6 +84,7 @@ const props = withDefaults(
     showPrefix: true,
     selectWidth: 336,
     itemWidth: 284,
+    isShowType: false,
   }
 );
 
@@ -211,6 +223,18 @@ defineExpose({
         display: block;
       }
     }
+  }
+}
+
+.timeseries-option-box {
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  .timeseries-type-text {
+    width: 58px;
+    height: 18px;
+    margin-right: 10px;
   }
 }
 </style>

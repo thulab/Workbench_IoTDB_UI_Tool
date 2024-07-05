@@ -480,6 +480,7 @@ dataTrend:
   pointOverTip: 最多支持标记10次，请删除后重新操作
   timeTip: 结束时间须大于开始时间，请重新操作
   booleanTip: boolean类型仅支持最新值计算，请修改采样策略后查看趋势
+  noDataTip: 当前时间范围内暂无数据
   measurementTip: '%{measurement}测点超过最大画图点数，已为您自动调整后展示'
   choosedMeasurement: 已选测点
   overMeasurementTip: 最多同时展示10条测点趋势
