@@ -333,6 +333,7 @@ const handleConfirm = () => {
             errorLink.value = res.data.filePath;
             ElMessageBox.confirm(t('alarm.errorLinkTip', { link: linkTip.value }), t('common.notice'), {
               showCancelButton: false,
+              showConfirmButton: false,
               confirmButtonText: t('common.confirm'),
               confirmButtonClass: 'modal-alarm-config-error-confirm',
               type: 'warning',
