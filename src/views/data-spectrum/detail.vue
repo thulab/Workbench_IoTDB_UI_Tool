@@ -145,9 +145,11 @@
             </div>
             <div class="search-form-buttons">
               <el-button @click="handleReset" id="spectrum-search-reset">{{ t('common.reset') }}</el-button>
-              <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
-                <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch()" id="spectrum-search-search">{{ t('common.apply') }}</el-button>
-              </auth-tooltip>
+              <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="applyTipDisabled" popper-class="tooltip-box-width">
+                <el-button :disabled="!applyTipDisabled" type="primary" @click="handleSearch()" id="spectrum-search-search">
+                  {{ t('common.apply') }}
+                </el-button>
+              </el-tooltip>
               <el-button :disabled="saveTemplateDisabled" @click="handleSaveTemplate" id="spectrum-search-save-template">{{ t('common.save') }}</el-button>
             </div>
           </div>
@@ -436,6 +438,23 @@ const saveTemplateDisabled = computed(() => {
     return true;
   }
   if (!searchFormData.measurement) {
+    return true;
+  }
+  return false;
+});
+
+const applyTip = computed(() => {
+  if (!canReadWriteData.value) {
+    return t('common.dataAuth');
+  }
+  if (saveTemplateDisabled.value) {
+    return t('common.searchFormEmpty');
+  }
+  return '';
+});
+
+const applyTipDisabled = computed(() => {
+  if (canReadWriteData.value && !saveTemplateDisabled.value) {
     return true;
   }
   return false;
