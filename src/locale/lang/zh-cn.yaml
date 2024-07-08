@@ -257,7 +257,7 @@ search:
   databaseSelectPlaceholder: 请选择数据库
   deviceSelectPlaceholder: 请选择设备
   templatePlaceholder: 请输入名称
-  deleteTemplateTip: 是否删除常用
+  deleteTemplateTip: 是否删除常用语句
   open: 打开
   noTemplate: 暂无模板
   sqlInput: SQL输入
