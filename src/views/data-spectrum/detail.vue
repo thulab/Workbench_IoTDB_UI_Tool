@@ -1079,6 +1079,9 @@ function getFFT() {
     .then((res) => {
       chartData.timestamps = res.data.timestamps || [];
       chartData.values = res.data.values || [];
+      if (!chartData.timestamps.length) {
+        ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
+      }
       setOption(chartOptions.value, true);
     })
     .catch(() => {
@@ -1101,6 +1104,9 @@ function getEnvelope() {
     .then((res) => {
       chartData.timestamps = res.data.timestamps || [];
       chartData.values = res.data.values || [];
+      if (!chartData.timestamps.length) {
+        ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
+      }
       setOption(chartOptions.value, true);
     })
     .catch(() => {
@@ -1124,6 +1130,9 @@ function getDwt() {
     .then((res) => {
       chartData.timestamps = res.data.timestamps || [];
       chartData.values = res.data.values || [];
+      if (!chartData.timestamps.length) {
+        ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
+      }
       setOption(chartOptions.value, true);
     })
     .catch(() => {
@@ -1146,6 +1155,9 @@ function getPass() {
     .then((res) => {
       chartData.timestamps = res.data.timestamps || [];
       chartData.values = res.data.values || [];
+      if (!chartData.timestamps.length) {
+        ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
+      }
       setOption(chartOptions.value, true);
     })
     .catch(() => {
@@ -1160,6 +1172,9 @@ function getCustom() {
     .then((res) => {
       chartData.timestamps = res.data.timestamps || [];
       chartData.values = res.data.values || [];
+      if (!chartData.timestamps.length) {
+        ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
+      }
       setOption(chartOptions.value, true);
     })
     .catch(() => {

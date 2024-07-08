@@ -242,17 +242,26 @@
             <el-table-column :label="t('common.operation')" width="240" align="center" fixed="right">
               <template #default="{ row }">
                 <el-button type="primary" link size="small" @click="handleRowData(row)" :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-data`">{{ t('page.data') }}</el-button>
-                <el-button
-                  type="primary"
+                <el-tooltip
                   v-if="appType === 1"
-                  link
-                  size="small"
-                  :disabled="currentStorage === 'root.__system'"
-                  @click="handleRowAlarm(row)"
-                  :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-alarm`"
+                  placement="top-start"
+                  effect="light"
+                  trigger="hover"
+                  :content="t('measurement.goAlarmTip')"
+                  :disabled="row.dataType !== 'TEXT'"
+                  popper-class="tooltip-box-width"
                 >
-                  {{ t('page.alarm') }}
-                </el-button>
+                  <el-button
+                    type="primary"
+                    link
+                    size="small"
+                    :disabled="currentStorage === 'root.__system' || row.dataType === 'TEXT'"
+                    @click="handleRowAlarm(row)"
+                    :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-alarm`"
+                  >
+                    {{ t('page.alarm') }}
+                  </el-button>
+                </el-tooltip>
                 <el-button
                   type="primary"
                   link
@@ -578,7 +587,7 @@ function handleSaveStorage() {
 
 // 查询
 function handleRefresh() {
-  if (!canReadWriteSchema.value) return;
+  // if (!canReadWriteSchema.value) return;
   pagination.pageNum = 1;
   getListData();
 }

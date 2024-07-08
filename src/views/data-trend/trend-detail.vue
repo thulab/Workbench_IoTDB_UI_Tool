@@ -801,6 +801,9 @@ function handleSearch(unforce?: boolean) {
       const paths = overPath.join(',');
       ElMessage.warning({ message: t('dataTrend.measurementTip', { measurement: paths }), grouping: true });
     }
+    if (!chartHistoryData.value.length) {
+      ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
+    }
     setOption(chartOptions.value, true);
     setOption({
       xAxis: {
