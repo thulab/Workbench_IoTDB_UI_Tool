@@ -53,7 +53,7 @@
           </div>
           <div class="preview-box m-l-16">
             <div class="flex-justify-between m-b-6">
-              <h4 class="editor-title">{{ t('search.template') }}</h4>
+              <h4 class="editor-title">{{ t('iotdbConfig.template') }}</h4>
             </div>
             <monaco-editor class="output-container" ref="outputEditor" :read-only="true" />
           </div>
