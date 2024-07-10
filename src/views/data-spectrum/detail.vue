@@ -1138,6 +1138,10 @@ function getEnvelope() {
 function getDwt() {
   const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
   const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
+  if (!copySearchFormData.layer) {
+    searchFormData.layer = 1;
+    copySearchFormData.layer = 1;
+  }
   getDWTData({
     method: dwtTab.value === 'type' ? copySearchFormData.dwtMethod : '',
     coef: dwtTab.value === 'number' ? copySearchFormData.coef! : '',
@@ -1354,7 +1358,6 @@ function setStorage() {
     'dataSpectrumStorage',
     JSON.stringify({
       ...copySearchFormData,
-      dataCount: dataCount.value,
       dwtTab: dwtTab.value,
       clickedOperate: clickedOperate.value,
       markPointCount: markPointCount.value,
@@ -1428,7 +1431,6 @@ watch(
           searchFormData.wpass = storageData.wpass;
           markPointCount.value = storageData.markPointCount;
           dwtTab.value = storageData.dwtTab;
-          // dataCount.value = storageData.dataCount;
           if (searchFormData.method === 'DWT' && searchFormData.measurement) {
             getCount();
           }
