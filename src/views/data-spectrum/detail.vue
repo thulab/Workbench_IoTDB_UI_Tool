@@ -590,7 +590,7 @@ const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTempl
 
 function handleInputCompression(val: string) {
   if (val) {
-    if (!/^[1]$|^0.\d+$/.test(`${val}`)) {
+    if (!/^[1]$|^0\.\d+$/.test(`${val}`)) {
       searchFormData.compression = undefined;
     }
   } else {
@@ -610,7 +610,7 @@ function handleInputLayer(val: string) {
 
 function handleInputWpass(val: string) {
   if (val) {
-    if (!/^0.\d+$/.test(`${val}`)) {
+    if (!/^0\.\d+$/.test(`${val}`)) {
       searchFormData.wpass = undefined;
     }
   } else {
