@@ -95,7 +95,7 @@
               </template>
             </div>
           </div>
-          <div class="flex-justify-between">
+          <div class="search-form-row-box">
             <div v-if="searchFormData.method !== 'custom'">
               <base-form-item prop="measurement" :label-width="locale === 'en' ? '140px' : '96px'" :rules="requiredRules">
                 <template #label>
@@ -1139,8 +1139,8 @@ function getDwt() {
   const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
   const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
   getDWTData({
-    method: copySearchFormData.dwtMethod || '',
-    coef: copySearchFormData.coef || '',
+    method: dwtTab.value === 'type' ? copySearchFormData.dwtMethod : '',
+    coef: dwtTab.value === 'number' ? copySearchFormData.coef! : '',
     layer: copySearchFormData.layer || '',
     measurement: copySearchFormData.measurement,
     startTime: start,
@@ -1493,6 +1493,18 @@ watch(
 
   :deep(.el-form-item--default) {
     margin: 0 24px 0 0;
+  }
+
+  .search-form-row-box {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .search-form-buttons {
+    margin-left: 12px;
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-self: end;
   }
 }
 
