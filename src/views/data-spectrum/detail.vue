@@ -1428,7 +1428,10 @@ watch(
           searchFormData.wpass = storageData.wpass;
           markPointCount.value = storageData.markPointCount;
           dwtTab.value = storageData.dwtTab;
-          dataCount.value = storageData.dataCount;
+          // dataCount.value = storageData.dataCount;
+          if (searchFormData.method === 'DWT' && searchFormData.measurement) {
+            getCount();
+          }
           const cursorData = storageData.pointLineData
             .filter((f: MarkPointLine) => f.type === 'cursor')
             .map((item: MarkPointLine, index: number) => {
