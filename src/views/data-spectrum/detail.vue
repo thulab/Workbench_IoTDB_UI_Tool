@@ -95,7 +95,7 @@
               </template>
             </div>
           </div>
-          <div class="flex-justify-between">
+          <div class="search-form-row-box">
             <div v-if="searchFormData.method !== 'custom'">
               <base-form-item prop="measurement" :label-width="locale === 'en' ? '140px' : '96px'" :rules="requiredRules">
                 <template #label>
@@ -145,9 +145,11 @@
             </div>
             <div class="search-form-buttons">
               <el-button @click="handleReset" id="spectrum-search-reset">{{ t('common.reset') }}</el-button>
-              <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
-                <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch()" id="spectrum-search-search">{{ t('common.apply') }}</el-button>
-              </auth-tooltip>
+              <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="applyTipDisabled" popper-class="tooltip-box-width">
+                <el-button :disabled="!applyTipDisabled" type="primary" @click="handleSearch()" id="spectrum-search-search">
+                  {{ t('common.apply') }}
+                </el-button>
+              </el-tooltip>
               <el-button :disabled="saveTemplateDisabled" @click="handleSaveTemplate" id="spectrum-search-save-template">{{ t('common.save') }}</el-button>
             </div>
           </div>
@@ -441,6 +443,23 @@ const saveTemplateDisabled = computed(() => {
   return false;
 });
 
+const applyTip = computed(() => {
+  if (!canReadWriteData.value) {
+    return t('common.dataAuth');
+  }
+  if (saveTemplateDisabled.value) {
+    return t('common.searchFormEmpty');
+  }
+  return '';
+});
+
+const applyTipDisabled = computed(() => {
+  if (canReadWriteData.value && !saveTemplateDisabled.value) {
+    return true;
+  }
+  return false;
+});
+
 const xMax = computed(() => chartData.timestamps[chartData.timestamps.length - 1]);
 
 const methodOptions = computed(() => [...methodList.value, { functionName: 'custom', name: t('spectrum.customAnalysis'), enable: true }]);
@@ -571,7 +590,7 @@ const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTempl
 
 function handleInputCompression(val: string) {
   if (val) {
-    if (!/^[1]$|^0.\d+$/.test(`${val}`)) {
+    if (!/^[1]$|^0\.\d+$/.test(`${val}`)) {
       searchFormData.compression = undefined;
     }
   } else {
@@ -591,7 +610,7 @@ function handleInputLayer(val: string) {
 
 function handleInputWpass(val: string) {
   if (val) {
-    if (!/^0.\d+$/.test(`${val}`)) {
+    if (!/^0\.\d+$/.test(`${val}`)) {
       searchFormData.wpass = undefined;
     }
   } else {
@@ -1119,9 +1138,13 @@ function getEnvelope() {
 function getDwt() {
   const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
   const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
+  if (!copySearchFormData.layer) {
+    searchFormData.layer = 1;
+    copySearchFormData.layer = 1;
+  }
   getDWTData({
-    method: copySearchFormData.dwtMethod || '',
-    coef: copySearchFormData.coef || '',
+    method: dwtTab.value === 'type' ? copySearchFormData.dwtMethod : '',
+    coef: dwtTab.value === 'number' ? copySearchFormData.coef! : '',
     layer: copySearchFormData.layer || '',
     measurement: copySearchFormData.measurement,
     startTime: start,
@@ -1335,7 +1358,6 @@ function setStorage() {
     'dataSpectrumStorage',
     JSON.stringify({
       ...copySearchFormData,
-      dataCount: dataCount.value,
       dwtTab: dwtTab.value,
       clickedOperate: clickedOperate.value,
       markPointCount: markPointCount.value,
@@ -1409,7 +1431,9 @@ watch(
           searchFormData.wpass = storageData.wpass;
           markPointCount.value = storageData.markPointCount;
           dwtTab.value = storageData.dwtTab;
-          dataCount.value = storageData.dataCount;
+          if (searchFormData.method === 'DWT' && searchFormData.measurement) {
+            getCount();
+          }
           const cursorData = storageData.pointLineData
             .filter((f: MarkPointLine) => f.type === 'cursor')
             .map((item: MarkPointLine, index: number) => {
@@ -1471,6 +1495,18 @@ watch(
 
   :deep(.el-form-item--default) {
     margin: 0 24px 0 0;
+  }
+
+  .search-form-row-box {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .search-form-buttons {
+    margin-left: 12px;
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-self: end;
   }
 }
 
