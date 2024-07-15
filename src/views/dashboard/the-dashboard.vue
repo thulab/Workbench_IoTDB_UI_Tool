@@ -25,7 +25,8 @@
                 <span class="module-label-text">{{ `${t('dashboard.serverStatus')}(Running)：` }}</span>
                 <span class="module-content-text" v-if="!systemData.dataNodeRatio && !systemData.configNodeRatio">-</span>
                 <span class="module-content-text" v-else>
-                  ConfigNode {{ systemData.configNodeRatio ? `${systemData.configNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }} DataNode
+                  AINode {{ systemData.aiNodeRatio ? `${systemData.aiNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }} ConfigNode
+                  {{ systemData.configNodeRatio ? `${systemData.configNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }} DataNode
                   {{ systemData.dataNodeRatio ? `${systemData.dataNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }}
                 </span>
               </li>
@@ -137,7 +138,8 @@
                 <span class="module-label-text">{{ `${t('dashboard.serverStatus')}(Running)：` }}</span>
                 <span class="module-content-text" v-if="!slaveData.dataNodeRatio && !slaveData.configNodeRatio">-</span>
                 <span class="module-content-text" v-else>
-                  ConfigNode {{ slaveData.configNodeRatio ? `${slaveData.configNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }} DataNode
+                  AINode {{ slaveData.aiNodeRatio ? `${slaveData.aiNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }} ConfigNode
+                  {{ slaveData.configNodeRatio ? `${slaveData.configNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }} DataNode
                   {{ slaveData.dataNodeRatio ? `${slaveData.dataNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }}
                 </span>
               </li>
@@ -261,6 +263,7 @@
                       :value="item.nodeID"
                       :id="`dashboard-monitor-select-node-select-${item.nodeID}`"
                       :label="item.address ? `${item.address}(${item.type})` : t('common.all')"
+                      :disabled="item.type === 'AINode'"
                     />
                   </el-select>
                 </div>
@@ -325,12 +328,14 @@ const showPrometheus = computed(() => enablePrometheus.value && configurePrometh
 const tableRef = ref<InstanceType<typeof ElTable>>();
 const slaveTableRef = ref<InstanceType<typeof ElTable>>();
 const systemData = reactive<Dashboard.SystemData>({
+  aiNodeRatio: '-',
   dataNodeRatio: '-',
   configNodeRatio: '-',
   active: false,
   expirationTime: '-',
 });
 const slaveData = ref<Dashboard.SystemData | null>({
+  aiNodeRatio: '-',
   dataNodeRatio: '-',
   configNodeRatio: '-',
   active: false,
