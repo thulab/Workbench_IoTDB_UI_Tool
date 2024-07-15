@@ -15,6 +15,7 @@ declare namespace Dashboard {
   }
 
   export interface SystemData {
+    aiNodeRatio: string;
     dataNodeRatio: string;
     configNodeRatio: string;
     active: boolean | null;
