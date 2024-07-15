@@ -296,7 +296,7 @@ function handleTestLogin() {
           sessionStorage.setItem('dataSpectrumStorage', '');
           sessionStorage.setItem('configStorage', '');
           if (route.name === 'Login') {
-            router.push({ path: '/' });
+            router.push({ name: 'Dashboard' });
           } else {
             // eslint-disable-next-line no-underscore-dangle
             window.__isReload__ = true;

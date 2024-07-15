@@ -271,7 +271,7 @@ const submitForm = () => {
       login(loginForm.user, loginForm.password, +loginForm.connection)
         .then(() => {
           userStore.setUser(loginForm.user);
-          router.push({ path: '/' });
+          router.push({ name: 'Dashboard' });
           sessionStorage.setItem('nologin', '0');
         })
         .catch(() => {

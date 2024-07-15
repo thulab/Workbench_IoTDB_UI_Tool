@@ -161,7 +161,7 @@ export const useUserStore = defineStore(
             sessionStorage.setItem('UserStore', '');
             sessionStorage.setItem('nologin', '1');
             router.push({
-              path: '/login',
+              name: 'Login',
               query: {
                 timestamp: new Date().getTime(),
               },
