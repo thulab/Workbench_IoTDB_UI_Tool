@@ -61,7 +61,7 @@
             </template>
           </el-input>
         </el-form-item>
-        <el-form-item :label="`${t('search.aggregation')}：`" prop="aggregation">
+        <el-form-item :label="`${t('search.aggregation')}：`" prop="aggregation" class="form-item-last">
           <el-input type="hidden" />
           <el-select v-model="searchFormData.aggregation" style="width: 80px" clearable id="data-search-aggregation" :disabled="getListLoading">
             <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-aggregation-select-${item.value}`" />

@@ -48,7 +48,7 @@
             id="alarm-config-search-datetimerange-create"
           />
         </base-form-item>
-        <base-form-item :label="`${t('common.updateTime')}：`" prop="updatetimerange">
+        <base-form-item :label="`${t('common.updateTime')}：`" prop="updatetimerange" class="form-item-last">
           <el-date-picker
             v-model="searchFormData.updatetimerange"
             type="datetimerange"

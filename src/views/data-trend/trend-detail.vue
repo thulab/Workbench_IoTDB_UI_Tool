@@ -36,7 +36,7 @@
               <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" :id="`trend-search-unitInterval-select-${item.value}`" />
             </el-select>
           </base-form-item>
-          <base-form-item v-show="!isRunningTab" :label="`${t('search.aggregation')}：`" prop="aggregation" :rules="requiredRules">
+          <base-form-item v-show="!isRunningTab" :label="`${t('search.aggregation')}：`" prop="aggregation" :rules="requiredRules" class="form-item-last">
             <el-select
               v-model="searchFormData.aggregation"
               :disabled="isRunningTab || searchFormData.unitInterval === 'origin'"
