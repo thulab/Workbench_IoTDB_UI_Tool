@@ -34,7 +34,7 @@
           <i-custom-type-float v-else-if="item.dataType === 'FLOAT'" class="timeseries-type-text" />
           <i-custom-type-int32 v-else-if="item.dataType === 'INT32'" class="timeseries-type-text" />
           <i-custom-type-int64 v-else-if="item.dataType === 'INT64'" class="timeseries-type-text" />
-          <i-custom-type-text v-else class="timeseries-type-text" />
+          <i-custom-type-text v-else-if="item.dataType === 'TEXT'" class="timeseries-type-text" />
         </template>
         <div :style="`display: flex; width: ${itemWidth}px;`">
           <text-tooltip :content="item.timeseries" />
