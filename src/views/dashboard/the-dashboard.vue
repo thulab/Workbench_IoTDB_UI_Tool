@@ -263,7 +263,6 @@
                       :value="item.nodeID"
                       :id="`dashboard-monitor-select-node-select-${item.nodeID}`"
                       :label="item.address ? `${item.address}(${item.type})` : t('common.all')"
-                      :disabled="item.type === 'AINode'"
                     />
                   </el-select>
                 </div>
@@ -367,9 +366,9 @@ const monitorDatanodeRef = ref<InstanceType<typeof MonitorDatanode>>();
 const monitorConfignodeRef = ref<InstanceType<typeof MonitorConfignode>>();
 const nodeList = computed(() => {
   if (clusterType.value === 'slave') {
-    return slaveNodes.value;
+    return slaveNodes.value.filter((item) => item.type !== 'AINode');
   }
-  return masterNodes.value;
+  return masterNodes.value.filter((item) => item.type !== 'AINode');
 });
 
 function showVersionCol(version: string) {
