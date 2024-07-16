@@ -34,8 +34,8 @@ common:
     This export operation is for exporting search results. Excel format supports
     a maximum download size of 2GB, CSV has no limit and is recommended for
     export
-  exportCSV: Export as .csv
-  exportXLSX: Export as .xlsx
+  exportCSV: Export CSV
+  exportXLSX: Export XLSX
   placeHolder: Please Enter
   selectPlaceholder: Please Select
   refresh: Refresh
@@ -47,6 +47,7 @@ common:
   fail: Fail
   error: Error
   query: Query
+  cancelQuery: Cancel
   reset: Reset
   submitSuccess: Operation Successful
   more: More
@@ -54,12 +55,12 @@ common:
   closeOther: Close Other Windows
   closeAll: Close All Windows
   notice: Notice
-  milliSecond: Millisecond
-  second: Second
-  minute: Minute
-  minuteAll: Minute
-  hour: Hour
-  day: Day
+  milliSecond: ms
+  second: s
+  minute: min
+  minuteAll: min
+  hour: h
+  day: d
   lastValue: Latest Value
   avg: Average
   maxValue: Maximum Value
@@ -146,6 +147,8 @@ common:
   warmTip: Tip
   versionTip: Please upgrade to IoTDB V%{version} or a higher version to use
   userManual: user manual
+  schemaAuth: Requires "READ_SCHEMA" or "WRITE-SCHEMA" permission
+  maintainAuth: Requires "MAINTAIN" permission
 page:
   '403': 403 Page
   '404': 404 Page
@@ -276,6 +279,7 @@ search:
   runOverTip: Template statement limit reached, please create a new template if needed
   runRepeatTip: Query is running, please do not repeat the operation
   emptyTip: Clear the page?
+  deleteTemplateTip: Do you want to delete common statements
 searchIotdb:
   aggregate: Aggregation Functions
   sum: Sum
@@ -431,8 +435,8 @@ dashboard:
   node: Node
   type: Type
   version: Version
-  versionEnterprise: 'TimechoDB V%{version}'
-  versionOpenSource: 'Apache IoTDB V%{version}'
+  versionEnterprise: TimechoDB V%{version}
+  versionOpenSource: Apache IoTDB V%{version}
   physicalMachine: Physical Machine
   monitorInfo: Monitoring Information
   masterCluster: Master
@@ -579,7 +583,7 @@ dataTrend:
   measurementTip: >-
     %{measurement} measurements exceed the maximum number of plotted
     measurements, it has been automatically adjusted for display.
-  choosedMeasurement: Selected measurements
+  choosedMeasurement: Selected
   overMeasurementTip: A maximum of 10 measurements can be displayed at the same time
   number10Tip: Only input positive integers in the range of 1-10
 calculate:
@@ -812,9 +816,15 @@ connection:
   slaveInfo: Backup Cluster Information
   connection: Connect Instance
   iotdbSuccess: IoTDB Connection Successful
-  allSuccess: Master and backup IoTDB clusters connected successfully. Master and backup clusters' Prometheus connected successfully.
-  masterSuccess: Master and backup IoTDB clusters connected successfully. Master clusters' Prometheus connected successfully.
-  slaveSuccess: Master and backup IoTDB clusters connected successfully. Backup clusters' Prometheus connected successfully.
+  allSuccess: >-
+    Master and backup IoTDB clusters connected successfully. Master and backup
+    clusters' Prometheus connected successfully.
+  masterSuccess: >-
+    Master and backup IoTDB clusters connected successfully. Master clusters'
+    Prometheus connected successfully.
+  slaveSuccess: >-
+    Master and backup IoTDB clusters connected successfully. Backup clusters'
+    Prometheus connected successfully.
   singleSuccess: IoTDB and Prometheus Connection Successful
   pwdEmptyTip: Please enter password
   prometheusSuccess: Prometheus Connection Successful

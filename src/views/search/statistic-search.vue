@@ -9,7 +9,7 @@
           </template>
           <timeseries-select v-model="searchFormData.path" :disabled-path="(item) => ['TEXT', 'BOOLEAN'].includes(item.dataType)" id="statistic-search-path" />
         </base-form-item>
-        <base-form-item :label="`${t('search.searchTime')}：`" prop="datetimerange">
+        <base-form-item :label="`${t('search.searchTime')}：`" prop="datetimerange" class="form-item-last">
           <el-date-picker
             v-model="searchFormData.datetimerange"
             type="datetimerange"

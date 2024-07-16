@@ -63,7 +63,7 @@
         </el-form-item>
         <el-form-item :label="`${t('search.aggregation')}：`" prop="aggregation" class="form-item-last">
           <el-input type="hidden" />
-          <el-select v-model="searchFormData.aggregation" style="width: 80px" clearable id="data-search-aggregation" :disabled="getListLoading">
+          <el-select v-model="searchFormData.aggregation" :style="{ width: locale === 'en' ? '120px' : '80px' }" clearable id="data-search-aggregation" :disabled="getListLoading">
             <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-aggregation-select-${item.value}`" />
           </el-select>
         </el-form-item>
@@ -73,7 +73,7 @@
           <el-button @click="handleReset(true)" :disabled="getListLoading || !canReadWriteData" id="data-search-reset">{{ t('common.reset') }}</el-button>
         </auth-tooltip>
         <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
-          <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="data-search-search">{{ getListLoading ? '取消查询' : t('common.query') }}</el-button>
+          <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="data-search-search">{{ getListLoading ? t('common.cancelQuery') : t('common.query') }}</el-button>
         </auth-tooltip>
       </div>
     </el-header>

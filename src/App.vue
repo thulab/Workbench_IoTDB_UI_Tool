@@ -11,6 +11,8 @@ const appStore = useAppStore();
 zhLocale.el.pagination.goto = '跳至';
 zhLocale.el.select.noData = '暂无数据';
 zhLocale.el.select.noMatch = '暂无数据';
+enLocale.el.pagination.pagesize = ' results/page';
+enLocale.el.pagination.goto = 'Go to page';
 
 const map = {
   [zhLocale.name]: zhLocale,
@@ -20,8 +22,10 @@ const map = {
 
 const { locale } = useI18n();
 const language = ref(map[locale.value]);
+document.documentElement.lang = locale.value;
 
 useLangSwitched(() => {
+  document.documentElement.lang = locale.value;
   language.value = map[locale.value];
 });
 </script>

@@ -11,6 +11,10 @@
   .el-input__wrapper {
     padding-left: 1px;
   }
+
+  &:lang(en) {
+    width: 120px !important;
+  }
 }
 
 .el-pagination.is-background .btn-prev,

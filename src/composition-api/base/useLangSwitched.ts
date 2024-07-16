@@ -20,6 +20,7 @@ export function useLangSwitched(callback: Function, init: boolean = false) {
   const { locale } = useI18n();
   watch(locale, () => {
     nextTick(() => {
+      document.documentElement.lang = locale.value;
       if (callback) callback();
     });
   });

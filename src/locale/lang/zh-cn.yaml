@@ -43,6 +43,7 @@ common:
   fail: 失败
   error: 错误
   query: 查询
+  cancelQuery: 取消查询
   reset: 重置
   submitSuccess: 操作成功
   more: 更多

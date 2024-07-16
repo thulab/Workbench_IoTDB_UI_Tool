@@ -63,6 +63,8 @@ const isDark = useDark();
 function handleChangeLang(val: '0' | '1') {
   handleLangCommand(val);
   nextTick(() => {
+    const { locale: useI18nLocale } = useI18n();
+    document.documentElement.lang = useI18nLocale.value;
     enumStore.loadAllEnum();
     userStore.loadPrivilegesEnum(true);
   });
