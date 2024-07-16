@@ -51,6 +51,7 @@ import IconEpArrowRight from '~icons/ep/arrow-right.svg';
 import IconEpMoon from '~icons/ep/moon.svg';
 import IconEpSunny from '~icons/ep/sunny.svg';
 
+const { locale } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
 const enumStore = useEnumStore();
@@ -63,8 +64,7 @@ const isDark = useDark();
 function handleChangeLang(val: '0' | '1') {
   handleLangCommand(val);
   nextTick(() => {
-    const { locale: useI18nLocale } = useI18n();
-    document.documentElement.lang = useI18nLocale.value;
+    document.documentElement.lang = locale.value;
     enumStore.loadAllEnum();
     userStore.loadPrivilegesEnum(true);
   });

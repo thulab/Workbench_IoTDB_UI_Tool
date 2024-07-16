@@ -204,7 +204,7 @@ import ModalAddRole from './components/modal-add-role.vue';
 import ModalPreviewRole from './components/modal-preview-role.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const connectionStore = useConnectionStore();
 const userStore = useUserStore();
 const { entityPrivilegesEnumGroup, entityPrivilegesEnumKeys, pathPrivilegesEnumGroup, pathPrivilegesEnumKeys, canManageUser, canManageRole } = storeToRefs(userStore);
@@ -471,6 +471,9 @@ function handleReset(type: 'view' | 'edit') {
 
 function calcColumnWidth(child: Auth.PrivilegeEnum) {
   if (child.desc.length > 0) {
+    if (locale.value === 'en') {
+      return child.desc.length * 8 + 64;
+    }
     return child.desc.length * 16 + 64;
   }
   return child.width;

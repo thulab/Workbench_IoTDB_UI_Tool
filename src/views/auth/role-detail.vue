@@ -151,7 +151,7 @@ import ModalPath from './components/modal-path.vue';
 import ModalAddUser from './components/modal-add-user.vue';
 import ModalPreviewUser from './components/modal-preview-user.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const currentRole = ref('');
 const pathVisible = ref(false);
 const editPathList = ref<string[]>([]);
@@ -272,6 +272,9 @@ function handleReset(type: 'edit' | 'view') {
 
 function calcColumnWidth(child: Auth.PrivilegeEnum) {
   if (child.desc.length > 0) {
+    if (locale.value === 'en') {
+      return child.desc.length * 8 + 64;
+    }
     return child.desc.length * 16 + 64;
   }
   return child.width;

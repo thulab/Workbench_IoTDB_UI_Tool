@@ -157,20 +157,21 @@ page:
   alarm: Alarm
   trend: Trend
   dashboard: Home
-  dataSync: Data Synchronization
+  dataSync: Data Sync
   measurement: Measurement Management
   dataSearch: Data Query
   statisticSearch: Statistical Query
   sql: SQL Operation
   system: System Management
-  auth: Authorization Management
-  user: User Management
-  role: Role Management
+  auth: Authorization
+  user: Users
+  role: Roles
   auditLog: Audit Log
   calculate: Calculation
   view: View
   spectrum: Spectrum
   visualization: Visualization
+  config: Database Config
 measurement:
   databaseTitle: Database
   deleteDatabaseTip: >-
@@ -660,9 +661,8 @@ auth:
   havingRole: Owned Roles
   detail: Permission Details
   removeAuthTip: >-
-    Please be careful:When removing parent path permissions, the child path
-    permissions included will also be removed synchronously. Please proceed with
-    caution.
+    Please be careful: removing parent path permissions will also remove the
+    child path permissions included.
   path: Path
   pathName: Path Name
   addPath: Add Path
@@ -744,6 +744,7 @@ auth:
   systemTitle: Timecho Real-Time Database Extension
   systemTitleWorkbench: TimechoDB Visual Console - Workbench
   versionTitle: Version：%{version}
+  editUserSuccess: Edited Successfully
 error:
   403Tip: Sorry, you do not have permission to access this page
   goHome: Back to Home
@@ -911,3 +912,7 @@ spectrum:
   angle: Phase Angle
   modulationFrequency: Modulation Frequency
   expandingFold: Amplification Factor
+iotdbConfig:
+  template: Template
+  nodeEffect: Node Effective
+  allEffect: All  Effective

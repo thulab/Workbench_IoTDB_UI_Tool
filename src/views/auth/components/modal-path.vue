@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="t('auth.addPath')" v-model="dialogVisible" width="480px" align-center :close-on-click-modal="false" id="auth-path-modal">
+  <el-dialog :title="t('auth.addPath')" v-model="dialogVisible" :width="locale === 'en' ? '598px' : '498px'" align-center :close-on-click-modal="false" id="auth-path-modal">
     <el-radio-group v-model="pathType" class="path-radio-group m-y-6">
       <div class="flex">
         <el-radio :value="'select'" id="auth-path-modal-select-radio">
@@ -13,8 +13,8 @@
             id="auth-path-modal-select-path"
             ref="timeseriesSelectSingleRef"
             v-model="selectPath"
-            :selectWidth="330"
-            :itemWidth="300"
+            :selectWidth="locale === 'en' ? 448 : 360"
+            :itemWidth="locale === 'en' ? 418 : 330"
             :is-clearable="true"
             class="path-select"
             :filter-system="true"
@@ -28,7 +28,7 @@
           {{ t('auth.pathMode') }}：
           <el-tooltip effect="light" :content="t('auth.pathModeTip')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
         </span>
-        <el-input v-model="inputPath" :placeholder="t('auth.pathModePlaceholder')" style="width: 330px" class="path-input" id="auth-path-modal-input-path">
+        <el-input v-model="inputPath" :placeholder="t('auth.pathModePlaceholder')" :style="{ width: locale === 'en' ? '448px' : '360px' }" class="path-input" id="auth-path-modal-input-path">
           <!-- <template #prepend>root.</template> -->
         </el-input>
       </el-radio>
@@ -57,7 +57,7 @@ const emit = defineEmits<{
 }>();
 
 const dialogVisible = useVModel(props, 'visible', emit);
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const pathType = ref('select');
 const inputPath = ref('');
 const selectPath = ref('');
@@ -107,9 +107,13 @@ watch(
 <style lang="scss" scoped>
 .radio-label {
   position: relative;
-  width: 96px;
+  width: 84px;
   display: inline-flex;
   text-align: left;
+
+  &:lang(en) {
+    width: 96px;
+  }
 }
 
 .search-path-box {
