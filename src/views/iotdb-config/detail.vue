@@ -97,9 +97,9 @@ const showWithVersionMenu = computed(() => iotdbShowAuth(connectionStore.connect
 
 const nodeList = computed(() => {
   if (clusterType.value === 'slave') {
-    return slaveNodes.value;
+    return slaveNodes.value.filter((item) => item.type !== 'AINode');
   }
-  return masterNodes.value;
+  return masterNodes.value.filter((item) => item.type !== 'AINode');
 });
 
 const isEqualConfig = () => {
