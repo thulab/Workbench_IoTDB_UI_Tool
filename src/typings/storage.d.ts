@@ -4,16 +4,16 @@ declare namespace StorageDevice {
     timeseries: string;
     description?: string;
     isAligned?: boolean;
-    dataType: IotdbDataType;
-    encoding: EncodingType;
-    compression: CompressionType;
+    dataType: IotdbDataType | string;
+    encoding: EncodingType | string;
+    compression: CompressionType | string;
     viewType?: string;
     isEditable?: boolean;
     value?: string;
     valueTime?: string;
   }
 
-  export interface GetStorageListResponse {
+  export interface GetDatabaseListResponse {
     pathNames: string[];
     totalCount: number;
   }
@@ -23,16 +23,16 @@ declare namespace StorageDevice {
     totalCount: number;
   }
 
-  export interface GetStorageGroupsInfoResponse {
+  export interface DatabaseInfo {
     groupName: string;
     ttl?: string;
     ttlUnit?: string;
     deviceCount: number;
     measurementCount: number;
-    dataCount: number;
+    dataCount?: number;
   }
 
-  export interface SaveStorageGroupsRequest {
+  export interface SaveDatabaseRequest {
     groupName: string;
     ttl?: number;
     ttlUnit?: string;

@@ -176,6 +176,7 @@ page:
   config: 数据库配置
 measurement:
   databaseTitle: 数据库
+  searchPlaceholder: 请输入搜索内容
   deleteDatabaseTip: 此操作会删除数据库下全部测点和数据，是否删除？
   newDataBase: 新建数据库
   databaseName: 数据库名称
@@ -206,19 +207,22 @@ measurement:
   addMeasurement: 添加测点
   deviceRuleEmptyTip: 设备名称不能为空
   deviceRuleTip: 请输入正确格式，只能由字母、数字、下划线以及UNICODE 中文字符组成
-  deleteMeasurementSingle: 是否删除测点
-  deleteMeasurementBatch: 确认删除这些测点吗
+  deleteMeasurementSingle: 是否删除测点？
+  deleteMeasurementBatch: 确认删除这些测点吗？
   measurementDescription: 测点描述
   measurementDescriptionPlaceholder: 请输入测点描述
   batchImportMeasurement: 批量导入测点
   importMeasurementTip: 仅支持上传 csv 和 xlsx 文件，将文件拖到此处，或
   importMeasurementRule: 文件格式不正确，目前仅支持上传.csv和.xlsx文件
   databaseInfo: 数据库信息
+  info: 信息
   databaseNum: 数据库数量
   deviceNum: 设备数量
   measurementNum: 测点数量
   totalNum: 数据总量
   measurementList: 测点列表
+  list: 列表
+  newValList: 数值
   measurementChoose: 测点选择
   measurementType: 测点类型
   lastValue: 最新值
@@ -230,6 +234,9 @@ measurement:
   deleteMeasurementTip: 此操作会删除数据库下全部测点和数据，是否删除？
   databaseModel: 数据模型
   databaseModelDoc: IoTDB树形模型指导文档
+  viewData: 查看数据
+  viewAlarm: 查看告警
+  viewTrend: 查看趋势
 search:
   datetime: 时间点
   datetimerange: 时间段

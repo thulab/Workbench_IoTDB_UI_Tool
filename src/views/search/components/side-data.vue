@@ -81,7 +81,7 @@ const { maxTableHeight } = useTableHeight(500);
 
 const emit = defineEmits(['get-function']);
 const { t } = useI18n();
-const { requestFn: getGroup, loading: storageLoading } = useRequest(StorageApi.getStorageGroups);
+const { requestFn: getDatabaseList, loading: storageLoading } = useRequest(StorageApi.getDatabases);
 const { requestFn: getDevice, loading: deviceLoading } = useRequest(StorageApi.getDeviceByGroup);
 const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementList);
 
@@ -95,7 +95,7 @@ const measurementList = ref<string[]>([]);
 
 // 获取数据库
 function getStorageList() {
-  getGroup({}).then((res) => {
+  getDatabaseList({}).then((res) => {
     const dataArr = res.data?.pathNames.map((item) => item);
     storageList.value = dataArr;
   });

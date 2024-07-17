@@ -3,17 +3,17 @@ import http from '@/utils/http';
 // 数据库
 class StorageApi {
   // 获取所有存储组
-  static getStorageGroups(params: SearchPageQuery): HttpResponseP<StorageDevice.GetStorageListResponse> {
+  static getDatabases(params: SearchPageQuery): HttpResponseP<StorageDevice.GetDatabaseListResponse> {
     return http.get('/schema/getDatabases', { params });
   }
 
   // 删除存储组
-  static deleteStorageGroups(groupName: string): HttpResponseP {
+  static deleteDatabase(groupName: string): HttpResponseP {
     return http.delete('/schema/deleteDatabase', { params: { groupName } });
   }
 
   // 保存/更新存储组
-  static saveStorageGroups(data: StorageDevice.SaveStorageGroupsRequest): HttpResponseP {
+  static saveDatabase(data: StorageDevice.SaveDatabaseRequest): HttpResponseP {
     return http.post('/schema/saveDatabase', data);
   }
 
@@ -23,12 +23,12 @@ class StorageApi {
   }
 
   // 更新存储组TTL
-  static upsertDatabaseTTL(data: StorageDevice.SaveStorageGroupsRequest): HttpResponseP {
+  static upsertDatabaseTTL(data: StorageDevice.SaveDatabaseRequest): HttpResponseP {
     return http.post('/schema/upsertDatabaseTTL', data);
   }
 
   //  存储组信息
-  static getStorageGroupsInfo(groupName: string): HttpResponseP<StorageDevice.GetStorageGroupsInfoResponse> {
+  static getDatabaseInfo(groupName: string): HttpResponseP<StorageDevice.DatabaseInfo> {
     return http.get('/schema/getDatabaseInfo', { params: { groupName } });
   }
 

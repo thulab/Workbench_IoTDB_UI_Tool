@@ -85,7 +85,7 @@ const formData = reactive<{
   ttl: '',
   ttlUnit: 'day',
 });
-const { requestFn: saveStorageGroups, loading: saveloading } = useRequest(StorageApi.saveStorageGroups);
+const { requestFn: saveDatabase, loading: saveloading } = useRequest(StorageApi.saveDatabase);
 
 /**
  * new/edit storage
@@ -106,7 +106,7 @@ const handleConfirm = () => {
         ttl: !formData.ttl ? undefined : +formData.ttl,
         ttlUnit: formData.ttlUnit || undefined,
       };
-      saveStorageGroups({ ...reqObj }).then((res) => {
+      saveDatabase({ ...reqObj }).then((res) => {
         if (res.code === 0) {
           ElMessage.success({ message: `${t('common.createSuccess')}`, grouping: true });
           dialogVisible.value = false;

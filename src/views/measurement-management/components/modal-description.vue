@@ -1,7 +1,7 @@
 <template>
   <el-dialog :title="t('common.edit')" v-model="dialogVisible" width="480px" align-center :close-on-click-modal="false" id="description-modal-database">
     <el-form ref="formRef" :model="formData" label-position="left" @submit.prevent>
-      <base-form-item :label="`${t('measurement.measurementDescription')}:`" prop="description">
+      <base-form-item :label="`${t('measurement.measurementDescription')}:`" prop="description" style="margin-bottom: 0">
         <el-input
           v-model="formData.description"
           :placeholder="t('measurement.measurementDescriptionPlaceholder')"
@@ -10,6 +10,7 @@
           id="description-modal-alias"
           type="textarea"
           :resize="'none'"
+          :rows="4"
         />
       </base-form-item>
     </el-form>

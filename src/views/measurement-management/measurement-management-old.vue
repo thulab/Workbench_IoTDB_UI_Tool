@@ -313,7 +313,7 @@
 
     <modal-storage v-model:visible="storageVisible" :can-write-schema="canWriteSchema" @handleSave="handleSaveStorage" />
 
-    <modal-measurement v-model:visible="measurementVisible" :group-name="currentStorage" @handleSave="handleSaveMeasurement" />
+    <modal-measurement-old v-model:visible="measurementVisible" :group-name="currentStorage" @handleSave="handleSaveMeasurement" />
 
     <modal-import v-model:visible="importVisible" @handle-close="handleImportClose" />
 
@@ -333,7 +333,7 @@ import { getPathAuthList, getParentPathAuthList } from '@/utils/auth';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import StorageSide from './components/storage-side.vue';
 import ModalStorage from './components/modal-storage.vue';
-import ModalMeasurement from './components/modal-measurement.vue';
+import ModalMeasurementOld from './components/modal-measurement-old.vue';
 import ModalImport from './components/modal-import.vue';
 import ModalDescription from './components/modal-description.vue';
 
@@ -357,7 +357,7 @@ const { maxTableHeight } = useTableHeight(400);
 const storageSideRef = ref<InstanceType<typeof StorageSide>>();
 const currentStorage = ref('');
 const searchKeyword = ref((route.query.measurement as string) || '');
-const storageInfos = ref<StorageDevice.GetStorageGroupsInfoResponse>({
+const storageInfos = ref<StorageDevice.DatabaseInfo>({
   groupName: '',
   ttl: undefined,
   ttlUnit: undefined,
@@ -456,8 +456,8 @@ function rowReadWriteDataByParentPath(path: string) {
   return false;
 }
 
-const { requestFn: deleteStorageGroups } = useRequest(StorageApi.deleteStorageGroups);
-const { requestFn: getStorageGroupsInfo } = useRequest(StorageApi.getStorageGroupsInfo);
+const { requestFn: deleteDatabase } = useRequest(StorageApi.deleteDatabase);
+const { requestFn: getDatabaseInfo } = useRequest(StorageApi.getDatabaseInfo);
 const { requestFn: upsertDatabaseTTL } = useRequest(StorageApi.upsertDatabaseTTL);
 const {
   requestFn: getMeasurementsInfosByFuzzy,
@@ -554,7 +554,7 @@ function getListData() {
 
 // 存储组详细信息
 function getStorageInfo(data: string) {
-  getStorageGroupsInfo(data).then((res) => {
+  getDatabaseInfo(data).then((res) => {
     if (res?.code === 0) {
       storageInfos.value = res.data;
     }
@@ -571,7 +571,7 @@ function handleDelStorage() {
     type: 'warning',
     icon: ICustomMessageWarning,
   }).then(() => {
-    deleteStorageGroups(currentStorage.value).then((res) => {
+    deleteDatabase(currentStorage.value).then((res) => {
       if (res.code === 0) {
         ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
         storageSideRef.value?.getStorageList();
@@ -636,7 +636,7 @@ function handleImport() {
 
 // 删除行
 function handleDelRow(type: string, row: StorageDevice.MeasurementItem | null) {
-  ElMessageBox.confirm(type === 'batch' ? `${t('measurement.deleteMeasurementBatch')}？` : `${t('measurement.deleteMeasurementSingle')}？`, t('common.notice'), {
+  ElMessageBox.confirm(type === 'batch' ? `${t('measurement.deleteMeasurementBatch')}` : `${t('measurement.deleteMeasurementSingle')}`, t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'mesaurement-table-del-confirm',

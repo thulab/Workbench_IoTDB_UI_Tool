@@ -220,11 +220,13 @@ measurement:
   importMeasurementTip: Only csv and xlsx files are supported, drag the file here, or
   importMeasurementRule: Incorrect file format, currently only .csv and .xlsx files are supported
   databaseInfo: Database Information
+  info: Information
   databaseNum: Databases
   deviceNum: Devices
   measurementNum: Measurements
   totalNum: Total Data
   measurementList: Measurement List
+  list: List
   measurementChoose: Measurement
   measurementType: Measurement Type
   lastValue: Latest Value

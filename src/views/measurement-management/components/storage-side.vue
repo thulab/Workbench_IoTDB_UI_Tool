@@ -64,12 +64,12 @@ const { t } = useI18n();
 const storageList = ref<string[]>([]);
 const currentStorage = ref((route.query.databse as string) || '');
 
-const { requestFn: getGroup, loading: storageLoading } = useRequest(StorageApi.getStorageGroups);
-const { requestFn: deleteStorageGroups } = useRequest(StorageApi.deleteStorageGroups);
+const { requestFn: getDatabaseList, loading: storageLoading } = useRequest(StorageApi.getDatabases);
+const { requestFn: deleteDatabase } = useRequest(StorageApi.deleteDatabase);
 
 // 获取数据库
 function getStorageList(isInitial?: boolean, current?: string) {
-  getGroup({}).then((res) => {
+  getDatabaseList({}).then((res) => {
     let data = res.data?.pathNames || [];
     if (data.some((s) => s === 'root.__system')) {
       data = data.filter((item) => item !== 'root.__system');
@@ -115,7 +115,7 @@ function handleDeleteStorage(item: string) {
     type: 'warning',
     icon: ICustomMessageWarning,
   }).then(() => {
-    deleteStorageGroups(item).then((res) => {
+    deleteDatabase(item).then((res) => {
       if (res.code === 0) {
         ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
         getStorageList();
