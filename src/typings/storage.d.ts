@@ -105,4 +105,25 @@ declare namespace StorageDevice {
     pageSize: number;
     nodePath?: string;
   }
+
+  export interface TreeNodeData {
+    node: string;
+    nodePath: string;
+    parentPath: string;
+    nodeType: string;
+    children?: TreeNodeData[];
+  }
+
+  export interface MeasurementData {
+    timeseries: string;
+    node: string;
+    description: string;
+    viewType: string;
+    isAligned: boolean;
+    dataType: IotdbDataType | string;
+    encoding: EncodingType | string;
+    compression: CompressionType | string;
+    latest: string;
+    latestTime: string;
+  }
 }

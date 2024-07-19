@@ -41,11 +41,11 @@
         </li>
         <li class="measurement-info-item" id="lastValue-li">
           <span class="measurement-info-item-label" id="lastValue-span">{{ t('measurement.lastValue') }}：</span>
-          {{ measurementInfos.value }}
+          {{ measurementInfos.latest }}
         </li>
         <li class="measurement-info-item" id="lastValueTime-li">
           <span class="measurement-info-item-label" id="lastValueTime-span">{{ t('measurement.lastValueTime') }}：</span>
-          {{ measurementInfos.valueTime }}
+          {{ measurementInfos.latestTime }}
         </li>
       </ul>
 
@@ -121,17 +121,17 @@ const userStore = useUserStore();
 const { userAllEntityPrivileges, userAllPathPrivileges } = storeToRefs(userStore);
 
 const { maxTableHeight } = useTableHeight(350);
-const measurementInfos = ref<StorageDevice.MeasurementItem>({
-  deviceName: '',
+const measurementInfos = ref<StorageDevice.MeasurementData>({
   timeseries: '',
+  node: '',
   description: '',
+  viewType: '',
   isAligned: false,
   dataType: '',
   encoding: '',
   compression: '',
-  viewType: '',
-  value: '',
-  valueTime: '',
+  latest: '',
+  latestTime: '',
 });
 const descriptionVisible = ref(false);
 const columns = ref<DynamicTableColumn[]>([]);
@@ -148,6 +148,7 @@ const getListLoading = ref(false);
 const defaultSort = ref<Sort>({ prop: 't0', order: 'descending' });
 const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
 
+const { requestFn: getMeasurementsInfo } = useRequest(StorageApi.getMeasurementsInfo);
 const { requestFn: getList } = useRequest(SearchApi.getDataSearchList);
 const { requestFn: deleteMeasurements } = useRequest(StorageApi.deleteMeasurements);
 
@@ -170,7 +171,11 @@ function rowReadWriteDataByPath(path: string) {
 }
 
 // TODO 获取测点详情
-function getDetail() {}
+function getDetail() {
+  getMeasurementsInfo(props.currentMeasurement).then((res) => {
+    measurementInfos.value = res.data;
+  });
+}
 
 function getListData() {
   columns.value = [];

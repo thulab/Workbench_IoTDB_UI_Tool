@@ -151,6 +151,8 @@ common:
   versionTip: 请升级至IoTDB V%{version}及以上版本使用
   userManual: 文档
   currentDownload: 点此下载
+  viewMore: 查看更多
+  viewAll: 查看全部
 page:
   '403': 403页面
   '404': 404页面

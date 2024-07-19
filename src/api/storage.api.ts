@@ -94,5 +94,15 @@ class StorageApi {
   static getDataModelTree(data: { nodePath: string } & PageQuery): HttpResponseP<StorageDevice.GetModelRes> {
     return http.post('/model/getNextNodes', data);
   }
+
+  // 测点列表左侧树形 按序列查询
+  static getNextNodeInfos(nodePath: string): HttpResponseP<Array<StorageDevice.TreeNodeData>> {
+    return http.get('/model/getNextNodeInfos', { params: { nodePath } });
+  }
+
+  // 测点详情
+  static getMeasurementsInfo(pathName: string): HttpResponseP<StorageDevice.MeasurementData> {
+    return http.get('/schema/getMeasurementsInfo', { params: { pathName } });
+  }
 }
 export default StorageApi;
