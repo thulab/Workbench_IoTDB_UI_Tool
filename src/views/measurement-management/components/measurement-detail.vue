@@ -1,7 +1,7 @@
 <template>
   <div class="measurement-detail-wrapper">
     <h4 class="info-title">{{ currentMeasurement }} {{ t('measurement.info') }}</h4>
-    <div class="measurement-info-box">
+    <div class="measurement-info-box" v-loading="infoLoading">
       <ul class="measurement-info-list">
         <li class="measurement-info-item" id="timeseries-name-li">
           <span class="measurement-info-item-label" id="timeseries-name-span">{{ t('measurement.measurementName') }}：</span>
@@ -77,7 +77,7 @@
 
     <h4 class="info-title">{{ currentMeasurement }} {{ t('measurement.newValList') }}</h4>
     <auth-container :is-auth="rowReadWriteDataByPath(currentMeasurement)" :content="'common.dataAuth'" style="flex: 1; overflow: auto">
-      <div class="measurement-table-details">
+      <div class="measurement-table-details" v-loading="loading">
         <dynamic-table
           :columns="columns"
           :table-data="tableDataPagination"
@@ -148,8 +148,8 @@ const getListLoading = ref(false);
 const defaultSort = ref<Sort>({ prop: 't0', order: 'descending' });
 const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
 
-const { requestFn: getMeasurementsInfo } = useRequest(StorageApi.getMeasurementsInfo);
-const { requestFn: getList } = useRequest(SearchApi.getDataSearchList);
+const { requestFn: getMeasurementsInfo, loading: infoLoading } = useRequest(StorageApi.getMeasurementsInfo);
+const { requestFn: getList, loading } = useRequest(SearchApi.getDataSearchList);
 const { requestFn: deleteMeasurements } = useRequest(StorageApi.deleteMeasurements);
 
 function rowCanWriteSchemaByPath(path: string) {

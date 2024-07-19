@@ -1,7 +1,7 @@
 <template>
   <div class="database-detail-wrapper">
     <h4 class="info-title">{{ currentDatabase }} {{ t('measurement.info') }}</h4>
-    <div class="database-info-box">
+    <div class="database-info-box" v-loading="infoLoading">
       <ul class="database-info-list">
         <li class="database-info-item" id="device-total-li">
           <el-icon size="24"><i-custom-device-num /></el-icon>
@@ -19,7 +19,7 @@
         <el-button
           plain
           class="el-button-delete"
-          :disabled="!currentDatabase || currentDatabase === 'root.__system' || !canManageDatabase"
+          :disabled="!currentDatabase || currentDatabase === 'root' || currentDatabase === 'root.__system' || !canManageDatabase"
           @click="handleDelDatabase"
           id="mesaurement-top-delete-databse"
         >
@@ -379,7 +379,7 @@ function rowReadWriteDataByParentPath(path: string) {
 }
 
 const { requestFn: deleteDatabase } = useRequest(StorageApi.deleteDatabase);
-const { requestFn: getDatabaseInfo } = useRequest(StorageApi.getDatabaseInfo);
+const { requestFn: getDatabaseInfo, loading: infoLoading } = useRequest(StorageApi.getDatabaseInfo);
 const {
   requestFn: getMeasurementsInfosByFuzzy,
   data: tableData,

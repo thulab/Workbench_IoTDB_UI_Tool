@@ -1,12 +1,12 @@
 <template>
   <div class="database-page-container">
     <div class="database-list-wrapper">
-      <side-tree />
+      <side-tree @handleChangeNode="handleChangeNode" />
     </div>
 
     <div class="database-details-wrapper">
-      <database-detail :current-database="currentNode" />
-      <!-- <measurement-detail :current-measurement="currentNode" /> -->
+      <database-detail v-if="currentNodeType === 'DATABASE'" :current-database="currentNode" />
+      <measurement-detail v-if="currentNodeType === 'TIMESERIES'" :current-measurement="currentNode" />
     </div>
   </div>
 </template>
@@ -14,10 +14,15 @@
 <script setup lang="ts">
 import SideTree from './components/side-tree.vue';
 import DatabaseDetail from './components/database-detail.vue';
-// import MeasurementDetail from './components/measurement-detail.vue';
+import MeasurementDetail from './components/measurement-detail.vue';
 
 const currentNode = ref('root');
-// const currentNode = ref('root.stock.Legacy.0700HK.L1_BidPrice');
+const currentNodeType = ref('DATABASE');
+
+function handleChangeNode(path: string, type: string) {
+  currentNode.value = path;
+  currentNodeType.value = type;
+}
 </script>
 
 <style lang="scss" scoped>
