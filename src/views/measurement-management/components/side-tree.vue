@@ -24,15 +24,15 @@
         >
           <template #default="{ node, data }">
             <!-- <div :style="`display: flex; width: ${nodeTextWidth(node)}px;`">
-            <text-tooltip :content="data.node" />
-          </div> -->
+              <text-tooltip :content="data.node" />
+            </div> -->
             <div v-if="data.nodeType !== 'PAGE'" class="node-text" :style="{ width: `${nodeTextWidth(node, data)}px` }">
               <el-icon size="16" v-if="data.nodeType === 'DATABASE' && data.node !== 'root'"><i-custom-storage-num /></el-icon>
               <el-icon size="16" v-if="data.nodeType === 'TIMESERIES'"><i-custom-measure-num /></el-icon>
               {{ data.node }}
             </div>
             <el-dropdown
-              v-if="(data.node === 'root' && data.nodeType !== 'PAGE') || (['DATABASE', 'TIMESERIES'].includes(data.nodeType) && data.nodePath !== 'root.__system')"
+              v-if="data.nodeType !== 'PAGE' && data.nodePath !== 'root.__system'"
               trigger="click"
               :id="`tree-node-dropdown-${data.nodePath}`"
               class="more-icon svg-button-hover-color"
@@ -48,7 +48,9 @@
               />
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item command="database" v-if="data.node === 'root'" :id="`tree-node-dropdown-new-database-${data.nodePath}`">{{ t('measurement.newDataBase') }}</el-dropdown-item>
+                  <el-dropdown-item command="database" v-if="data.node === 'root' || data.nodeType === 'SG INTERNAL'" :id="`tree-node-dropdown-new-database-${data.nodePath}`">
+                    {{ t('measurement.newDataBase') }}
+                  </el-dropdown-item>
                   <el-dropdown-item command="measurement" v-if="data.nodeType !== 'TIMESERIES'" :id="`tree-node-dropdown-new-measurement-${data.nodePath}`">
                     {{ t('measurement.newMeasurement') }}
                   </el-dropdown-item>
@@ -112,7 +114,7 @@ const currentDatabase = ref('');
 const initialLoading = ref(false);
 const expandNode = ref((route.query.databse as string) || 'root');
 
-// DATABASE, INTERNAL, DEVICE, TIMESERIES
+// DATABASE, SG INTERNAL, INTERNAL, DEVICE, TIMESERIES
 const treeData = ref<Array<StorageDevice.TreeNodeData>>([
   {
     node: 'root',
@@ -145,10 +147,11 @@ const onResize = debounce(() => {
   treeHeight.value = document.body.clientHeight - 48 - 100;
 }, 500);
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function nodeTextWidth(node: TreeNode, data: TreeNodeData) {
   // 44 = 24 展开收缩 + 16 右侧更多操作 + 4 文字与操作icon间距
   // 8 缩进大小
-  // TODO 根据类型 减去 icon 大小
+  // 根据类型 减去 icon 大小
   let width = 240 - 44 - ((+node.level! || 1) - 1) * 8;
   if ((data.nodeType === 'DATABASE' && data.node !== 'root') || data.nodeType === 'TIMESERIES') {
     width -= 16;
@@ -338,7 +341,7 @@ watch(
   }
 );
 
-defineExpose({ getTreeData });
+defineExpose({ handleRefresh });
 </script>
 <style lang="scss" scoped>
 .measurement-tree-wrapper {
