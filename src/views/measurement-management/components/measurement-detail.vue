@@ -1,11 +1,18 @@
 <template>
   <div class="measurement-detail-wrapper">
-    <h4 class="info-title">{{ currentMeasurement }} {{ t('measurement.info') }}</h4>
+    <h4 class="info-title">
+      <div :style="`display: inline-flex; max-width: 400px;`">
+        <text-tooltip :content="currentMeasurement" />
+      </div>
+      {{ t('measurement.info') }}
+    </h4>
     <div class="measurement-info-box" v-loading="infoLoading">
       <ul class="measurement-info-list">
         <li class="measurement-info-item" id="timeseries-name-li">
           <span class="measurement-info-item-label" id="timeseries-name-span">{{ t('measurement.measurementName') }}：</span>
-          {{ measurementInfos.timeseries }}
+          <div :style="`display: inline-flex; max-width: 200px;`">
+            <text-tooltip :content="measurementInfos.timeseries" />
+          </div>
         </li>
         <li class="measurement-info-item" id="description-li">
           <span class="measurement-info-item-label" id="description-span">{{ t('measurement.measurementDescription') }}：</span>
@@ -75,7 +82,12 @@
       </div>
     </div>
 
-    <h4 class="info-title">{{ currentMeasurement }} {{ t('measurement.newValList') }}</h4>
+    <h4 class="info-title">
+      <div :style="`display: inline-flex; max-width: 400px;`">
+        <text-tooltip :content="currentMeasurement" />
+      </div>
+      {{ t('measurement.newValList') }}
+    </h4>
     <auth-container :is-auth="rowReadWriteDataByPath(currentMeasurement)" :content="'common.dataAuth'" style="flex: 1; overflow: auto">
       <div class="measurement-table-details" v-loading="loading">
         <dynamic-table
@@ -151,6 +163,16 @@ const tableDataPagination = computed(() => tableData.value.slice(((pagination.pa
 const { requestFn: getMeasurementsInfo, loading: infoLoading } = useRequest(StorageApi.getMeasurementsInfo);
 const { requestFn: getList, loading } = useRequest(SearchApi.getDataSearchList);
 const { requestFn: deleteMeasurements } = useRequest(StorageApi.deleteMeasurements);
+
+const canReadWriteSchemaByPath = computed(() => {
+  if (userAllEntityPrivileges.value.includes('READ_SCHEMA') || userAllEntityPrivileges.value.includes('WRITE_SCHEMA')) return true;
+  if (!props.currentMeasurement) return false;
+  const authList = getPathAuthList(props.currentMeasurement, userAllPathPrivileges.value);
+  if (authList.length) {
+    return authList.includes('READ_SCHEMA') || authList.includes('WRITE_SCHEMA');
+  }
+  return false;
+});
 
 function rowCanWriteSchemaByPath(path: string) {
   if (userAllEntityPrivileges.value.includes('WRITE_SCHEMA')) return true;
@@ -276,10 +298,21 @@ function handleDelMeasurement() {
 }
 
 watch(
-  () => props.currentMeasurement,
-  (val, old) => {
-    if (val !== old) {
+  () => props.currentMeasurement && canReadWriteSchemaByPath.value,
+  (val) => {
+    if (val) {
       getDetail();
+    }
+  },
+  {
+    immediate: true,
+  }
+);
+
+watch(
+  () => props.currentMeasurement && rowReadWriteDataByPath(props.currentMeasurement),
+  (val) => {
+    if (val) {
       getListData();
     }
   },
@@ -371,6 +404,8 @@ watch(
 
 .operate-button-list {
   margin-left: 46px;
+  display: flex;
+  flex-wrap: nowrap;
 }
 
 .measurement-table-details {

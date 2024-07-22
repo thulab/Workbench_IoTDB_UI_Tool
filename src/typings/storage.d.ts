@@ -112,8 +112,8 @@ declare namespace StorageDevice {
     parentPath: string;
     nodeType: string;
     children?: TreeNodeData[];
+    pageNum?: number;
     totalPage?: number;
-    currentPage?: number;
   }
 
   export interface MeasurementData {

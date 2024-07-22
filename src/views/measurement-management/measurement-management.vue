@@ -1,7 +1,7 @@
 <template>
   <div class="database-page-container">
     <div class="database-list-wrapper">
-      <side-tree @handleChangeNode="handleChangeNode" />
+      <side-tree :can-read-write-schema="canReadWriteSchema" @handleChangeNode="handleChangeNode" />
     </div>
 
     <div class="database-details-wrapper">
@@ -12,11 +12,18 @@
 </template>
 
 <script setup lang="ts">
+import { useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import { useUserStore } from '@/stores';
 import SideTree from './components/side-tree.vue';
 import DatabaseDetail from './components/database-detail.vue';
 import MeasurementDetail from './components/measurement-detail.vue';
 
-const currentNode = ref('root');
+const route = useRoute();
+const userStore = useUserStore();
+const { canReadWriteSchema } = storeToRefs(userStore);
+const currentNode = ref((route.query.databse as string) || 'root');
+// const currentNode = ref('root');
 const currentNodeType = ref('DATABASE');
 
 function handleChangeNode(path: string, type: string) {

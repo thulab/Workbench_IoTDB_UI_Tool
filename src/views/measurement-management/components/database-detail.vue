@@ -1,6 +1,11 @@
 <template>
   <div class="database-detail-wrapper">
-    <h4 class="info-title">{{ currentDatabase }} {{ t('measurement.info') }}</h4>
+    <h4 class="info-title">
+      <div :style="`display: inline-flex; max-width: 400px;`">
+        <text-tooltip :content="currentDatabase" />
+      </div>
+      {{ t('measurement.info') }}
+    </h4>
     <div class="database-info-box" v-loading="infoLoading">
       <ul class="database-info-list">
         <li class="database-info-item" id="device-total-li">
@@ -28,7 +33,12 @@
       </auth-tooltip>
     </div>
 
-    <h4 class="info-title">{{ currentDatabase }} {{ t('measurement.list') }}</h4>
+    <h4 class="info-title">
+      <div :style="`display: inline-flex; max-width: 400px;`">
+        <text-tooltip :content="currentDatabase" />
+      </div>
+      {{ t('measurement.list') }}
+    </h4>
     <div class="search-form-container">
       <div class="search-form-box">
         <el-input v-model="searchKeyword" :placeholder="searchPlaceholder" @keyup.enter="handleRefresh" id="mesaurement-search" style="width: 340px">
@@ -643,16 +653,12 @@ onMounted(() => {
 });
 
 watch(
-  () => props.currentDatabase,
-  (val, old) => {
-    if (val !== old) {
+  () => props.currentDatabase && canReadWriteSchemaByPath.value,
+  (val) => {
+    if (val) {
       searchType.value = 'name';
-      if (!old) {
-        searchKeyword.value = (route.query.measurement || '') as string;
-      } else {
-        searchKeyword.value = '';
-      }
-      getDatabaseDetail(val);
+      searchKeyword.value = (route.query.measurement || '') as string;
+      getDatabaseDetail(props.currentDatabase);
       handleRefresh();
     }
   },
