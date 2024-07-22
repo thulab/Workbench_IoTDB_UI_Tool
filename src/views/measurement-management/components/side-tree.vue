@@ -82,7 +82,6 @@
 import type { ElTreeV2 } from 'element-plus';
 import type { TreeNode, TreeNodeData } from 'element-plus/es/components/tree-v2/src/types';
 import { debounce, cloneDeep } from 'lodash-es';
-import { useRoute } from 'vue-router';
 import { StorageApi } from '@/api';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalDatabase from './modal-database.vue';
@@ -102,17 +101,16 @@ const emit = defineEmits<{
   (event: 'handleChangeNode', path: string, type: string): void;
 }>();
 
-const pageSize = 2;
+const pageSize = 10;
 
 const { t } = useI18n();
-const route = useRoute();
 const searchText = ref('');
 const measurementTree = ref<InstanceType<typeof ElTreeV2>>();
 const databaseVisible = ref(false);
 const measurementVisible = ref(false);
 const currentDatabase = ref('');
 const initialLoading = ref(false);
-const expandNode = ref((route.query.databse as string) || 'root');
+const expandNode = ref('root');
 
 // DATABASE, SG INTERNAL, INTERNAL, DEVICE, TIMESERIES
 const treeData = ref<Array<StorageDevice.TreeNodeData>>([
@@ -199,13 +197,13 @@ function getTreeData() {
     })
     .finally(() => {
       initialLoading.value = false;
+      expandNode.value = 'root';
     });
 }
 
 function handleSearch() {}
 
 function handleRefresh() {
-  expandNode.value = 'root';
   emit('handleChangeNode', 'root', 'DATABASE');
   getTreeData();
 }

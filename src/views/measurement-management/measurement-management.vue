@@ -1,10 +1,10 @@
 <template>
   <div class="database-page-container">
     <div class="database-list-wrapper">
-      <side-tree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" @handleChangeNode="handleChangeNode" />
+      <side-tree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" @handle-change-node="handleChangeNode" />
     </div>
 
-    <div class="database-details-wrapper">
+    <div class="database-details-wrapper" :key="renderKey">
       <database-detail v-if="currentNodeType === 'DATABASE'" :current-database="currentNode" @handle-reload="handleReload" />
       <measurement-detail v-if="currentNodeType === 'TIMESERIES'" :current-measurement="currentNode" @handle-reload="handleReload" />
     </div>
@@ -23,10 +23,12 @@ const { canReadWriteSchema } = storeToRefs(userStore);
 const measurementSideTree = ref<InstanceType<typeof SideTree>>();
 const currentNode = ref('root');
 const currentNodeType = ref('DATABASE');
+const renderKey = ref(0);
 
 function handleChangeNode(path: string, type: string) {
   currentNode.value = path;
   currentNodeType.value = type;
+  renderKey.value++;
 }
 
 function handleReload() {
