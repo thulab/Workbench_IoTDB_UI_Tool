@@ -288,6 +288,10 @@ const props = defineProps<{
   currentDatabase: string;
 }>();
 
+const emit = defineEmits<{
+  (event: 'handleReload'): void;
+}>();
+
 const { t, locale } = useI18n();
 const appType = Number(import.meta.env.VITE_APP_TYPE);
 const pageText = appType === 1 ? t('measurement.calculateMeasurement') : t('measurement.viewMeasurement');
@@ -498,7 +502,7 @@ function handleDelDatabase() {
   }).then(() => {
     deleteDatabase(props.currentDatabase).then(() => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
-      // TODO 侧边树更新
+      emit('handleReload');
     });
   });
 }
@@ -569,7 +573,7 @@ function handleDelRow(type: string, row: StorageDevice.MeasurementItem | null) {
     }
     deleteMeasurements(measurementList).then(() => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
-      // TODO 侧边树更新
+      emit('handleReload');
       getDatabaseDetail(props.currentDatabase);
       handleRefresh();
     });
@@ -609,7 +613,7 @@ function handleSelectionChange(vals: StorageDevice.MeasurementItem[]) {
 
 // 保存物理量
 function handleSaveMeasurement() {
-  // TODO 侧边树更新
+  emit('handleReload');
   getDatabaseDetail(props.currentDatabase);
   handleRefresh();
 }
@@ -617,7 +621,7 @@ function handleSaveMeasurement() {
 // 导入物理量
 function handleImportClose(reload: boolean) {
   if (reload) {
-    // TODO 侧边树更新
+    emit('handleReload');
     getDatabaseDetail(props.currentDatabase);
     handleRefresh();
   }

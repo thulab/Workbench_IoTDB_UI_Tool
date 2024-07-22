@@ -125,6 +125,10 @@ const props = defineProps<{
   currentMeasurement: string;
 }>();
 
+const emit = defineEmits<{
+  (event: 'handleReload'): void;
+}>();
+
 const { t } = useI18n();
 const router = useRouter();
 const appType = Number(import.meta.env.VITE_APP_TYPE);
@@ -192,7 +196,7 @@ function rowReadWriteDataByPath(path: string) {
   return false;
 }
 
-// TODO 获取测点详情
+// 获取测点详情
 function getDetail() {
   getMeasurementsInfo(props.currentMeasurement).then((res) => {
     measurementInfos.value = res.data;
@@ -292,7 +296,7 @@ function handleDelMeasurement() {
   }).then(() => {
     deleteMeasurements([props.currentMeasurement]).then(() => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
-      // TODO 更新树，回到root
+      emit('handleReload');
     });
   });
 }

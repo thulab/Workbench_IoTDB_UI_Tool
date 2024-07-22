@@ -1,34 +1,36 @@
 <template>
   <div class="database-page-container">
     <div class="database-list-wrapper">
-      <side-tree :can-read-write-schema="canReadWriteSchema" @handleChangeNode="handleChangeNode" />
+      <side-tree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" @handleChangeNode="handleChangeNode" />
     </div>
 
     <div class="database-details-wrapper">
-      <database-detail v-if="currentNodeType === 'DATABASE'" :current-database="currentNode" />
-      <measurement-detail v-if="currentNodeType === 'TIMESERIES'" :current-measurement="currentNode" />
+      <database-detail v-if="currentNodeType === 'DATABASE'" :current-database="currentNode" @handle-reload="handleReload" />
+      <measurement-detail v-if="currentNodeType === 'TIMESERIES'" :current-measurement="currentNode" @handle-reload="handleReload" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/stores';
 import SideTree from './components/side-tree.vue';
 import DatabaseDetail from './components/database-detail.vue';
 import MeasurementDetail from './components/measurement-detail.vue';
 
-const route = useRoute();
 const userStore = useUserStore();
 const { canReadWriteSchema } = storeToRefs(userStore);
-const currentNode = ref((route.query.databse as string) || 'root');
-// const currentNode = ref('root');
+const measurementSideTree = ref<InstanceType<typeof SideTree>>();
+const currentNode = ref('root');
 const currentNodeType = ref('DATABASE');
 
 function handleChangeNode(path: string, type: string) {
   currentNode.value = path;
   currentNodeType.value = type;
+}
+
+function handleReload() {
+  measurementSideTree.value?.handleRefresh();
 }
 </script>
 
