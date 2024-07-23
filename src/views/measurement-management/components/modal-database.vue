@@ -61,6 +61,7 @@ const handleConfirm = () => {
     if (valid) {
       const reqObj = {
         groupName: `root.${formData.groupName}`,
+        ttlUnit: 'day',
       };
       saveDatabase({ ...reqObj }).then((res) => {
         if (res.code === 0) {
