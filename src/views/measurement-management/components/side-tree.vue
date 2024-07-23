@@ -73,15 +73,7 @@
         </el-tree-v2>
       </div>
 
-      <context-menu
-        v-show="isShowContextMenu"
-        ref="contextMenuRef"
-        :node-path="clickedNodeData.nodePath"
-        :is-show-database="isShowDatabase"
-        :is-show-measurement="isShowMeasurement"
-        :is-show-delete="isShowDelete"
-        @handle-command="(val) => handleCommand(val, clickedNodeData)"
-      />
+      <context-menu v-show="isShowContextMenu" ref="contextMenuRef" :clicked-node-data="clickedNodeData" @handle-command="(val) => handleCommand(val, clickedNodeData)" />
 
       <modal-database v-model:visible="databaseVisible" @handleSave="handleRefresh" />
       <modal-measurement v-model:visible="measurementVisible" :device-name="currentDatabase" @handleSave="handleRefresh" />
@@ -159,19 +151,9 @@ const paginationTree = ref<Array<StorageDevice.TreeNodeData>>([
 ]);
 
 const { requestFn: getNextNodeInfos } = useRequest(StorageApi.getNextNodeInfos);
-const { requestFn: deleteDatabase } = useRequest(StorageApi.deleteDatabase);
-const { requestFn: deleteMeasurements } = useRequest(StorageApi.deleteMeasurements);
+const { requestFn: deletePaths } = useRequest(StorageApi.deletePaths);
 
 const treeHeight = ref(document.body.clientHeight - 48 - 100);
-const isShowDatabase = computed(() => {
-  return clickedNodeData.node === 'root' || clickedNodeData.nodeType === 'SG INTERNAL';
-});
-const isShowMeasurement = computed(() => {
-  return clickedNodeData.nodeType !== 'TIMESERIES' && clickedNodeData.nodePath !== 'root.__system';
-});
-const isShowDelete = computed(() => {
-  return true;
-});
 
 const onResize = debounce(() => {
   // 48 header
@@ -235,7 +217,29 @@ function getTreeData() {
     });
 }
 
-function handleSearch() {}
+function handleSSEEvent(event: MessageEvent) {
+  if (event.data !== 'ping') {
+    console.log('Received event:', event.data);
+  }
+}
+
+async function subscribeToSSE() {
+  try {
+    StorageApi.getSSEData(searchText.value, handleSSEEvent, (event: Event) => {
+      // if (event.readyState === EventSource.CLOSED) {
+      //   console.log('SSE connection closed.');
+      // } else {
+      console.error('SSE connection error:', event);
+      // }
+    });
+  } catch (error) {
+    console.error('Error subscribing to SSE:', error);
+  }
+}
+
+function handleSearch() {
+  subscribeToSSE();
+}
 
 function handleRefresh() {
   emit('handleChangeNode', 'root', 'DATABASE');
@@ -263,30 +267,16 @@ function handleCommand(val: string, data: TreeNodeData) {
   } else if (val === 'measurement') {
     currentDatabase.value = data.nodePath;
     measurementVisible.value = true;
-  } else if (data.nodeType === 'DATABASE') {
-    ElMessageBox.confirm(t('measurement.deleteMeasurementTip'), t('common.notice'), {
-      confirmButtonText: t('common.confirm'),
-      cancelButtonText: t('common.cancel'),
-      confirmButtonClass: 'del-databse-confirm',
-      cancelButtonClass: 'del-databse-cancel',
-      type: 'warning',
-      icon: ICustomMessageWarning,
-    }).then(() => {
-      deleteDatabase(data.nodePath).then(() => {
-        ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
-        handleRefresh();
-      });
-    });
   } else {
-    ElMessageBox.confirm(t('measurement.deleteMeasurementSingle'), t('common.notice'), {
+    ElMessageBox.confirm(data.nodeType !== 'TIMESERIES' ? t('measurement.deleteMeasurementTip') : t('measurement.deleteMeasurementSingle'), t('common.notice'), {
       confirmButtonText: t('common.confirm'),
       cancelButtonText: t('common.cancel'),
-      confirmButtonClass: 'del-mesaurement-confirm',
-      cancelButtonClass: 'del-mesaurement-cancel',
+      confirmButtonClass: 'del-tree-node-confirm',
+      cancelButtonClass: 'del-tree-node-cancel',
       type: 'warning',
       icon: ICustomMessageWarning,
     }).then(() => {
-      deleteMeasurements([data.nodePath]).then(() => {
+      deletePaths(data.nodePath, data.nodeType).then(() => {
         ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
         handleRefresh();
       });

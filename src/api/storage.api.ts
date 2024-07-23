@@ -109,5 +109,27 @@ class StorageApi {
   static getMeasurementsInfo(pathName: string): HttpResponseP<StorageDevice.MeasurementData> {
     return http.get('/schema/getMeasurementsInfo', { params: { pathName } });
   }
+
+  // 删除树级路径
+  static deletePaths(path: string, type: string): HttpResponseP {
+    return http.delete('/schema/deletePaths', { params: { path, type } });
+  }
+
+  //  存储组信息
+  static async getSSEData(searchText: string, handleMessage: (event: MessageEvent) => void, handleError: (event: Event) => void) {
+    const response = await http.get('/sse/fuzzy', {
+      headers: { Accept: 'text/event-stream' },
+      responseType: 'stream',
+      params: {
+        path: searchText,
+      },
+    });
+
+    const eventSource = new EventSource(response.request.responseURL);
+    eventSource.addEventListener('message', handleMessage);
+
+    // 监听 'error' 事件以处理连接中断
+    eventSource.addEventListener('error', handleError);
+  }
 }
 export default StorageApi;
