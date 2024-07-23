@@ -360,10 +360,6 @@ function handleAll(e: MouseEvent, data: TreeNodeData) {
 function onMouseDown() {
   contextMenuTimer.value = setTimeout(() => {
     isShowContextMenu.value = false;
-    clickedNodeData.node = '';
-    clickedNodeData.nodePath = '';
-    clickedNodeData.nodeType = '';
-    clickedNodeData.parentPath = '';
   }, 200);
 }
 
