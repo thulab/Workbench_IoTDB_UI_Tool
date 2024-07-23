@@ -127,7 +127,7 @@ const emit = defineEmits<{
 const dialogVisible = useVModel(props, 'visible', emit);
 const activeName = ref('measurement_0');
 const { t, locale } = useI18n();
-const { requestFn: saveMeasurementList, loading: saveLoading } = useRequest(StorageApi.saveMeasurementList);
+const { requestFn: insertMeasurements, loading: saveLoading } = useRequest(StorageApi.insertMeasurements);
 
 const dataTypeOptions = ['BOOLEAN', 'INT32', 'INT64', 'FLOAT', 'DOUBLE', 'TEXT'];
 const encoding: { [key: string]: string[] } = {
@@ -169,7 +169,7 @@ function handleCopyRow(data: Partial<StorageDevice.MeasurementItem>, e: MouseEve
   e.stopPropagation();
   if (copyControl(data)) return;
   formData.measurementList.push({
-    deviceName: data.deviceName,
+    // deviceName: data.deviceName,
     timeseries: `${data.timeseries}_copy`,
     isAligned: data.isAligned,
     description: '',
@@ -206,7 +206,7 @@ function handleChangeRowDataType(val: string, item: Partial<StorageDevice.Measur
 // 追加行
 function handleAddRow() {
   formData.measurementList.push({
-    deviceName: `${props.deviceName}`,
+    // deviceName: `${props.deviceName}`,
     timeseries: '',
     isAligned: false,
     description: '',
@@ -223,12 +223,10 @@ function handleAddRow() {
 const handleConfirm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
-      const measurementVOList = formData.measurementList.map((item) => ({ ...item, deviceName: props.deviceName }));
-      saveMeasurementList({
-        deviceName: props.deviceName,
-        measurementVOList,
-        // TODO 删除字段
-        isAligned: false,
+      // const measurementVOList = formData.measurementList.map((item) => ({ ...item, deviceName: props.deviceName }));
+      const measurementVOList = formData.measurementList.map((item) => ({ ...item, timeseries: `${props.deviceName}.${item.timeseries}` }));
+      insertMeasurements({
+        measurements: measurementVOList,
       })
         .then((res) => {
           if (res.code === 0) {
@@ -266,7 +264,7 @@ watch(
       formRef.value?.resetFields();
       formData.measurementList = [];
       formData.measurementList.push({
-        deviceName: props.deviceName,
+        // deviceName: props.deviceName,
         timeseries: '',
         isAligned: false,
         description: '',

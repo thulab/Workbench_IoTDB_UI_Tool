@@ -68,9 +68,13 @@
   }
 }
 
+.el-message-box__container {
+  align-items: flex-start;
+}
+
 .el-message-box__status {
   top: 0;
-  transform: translateY(0);
+  transform: translateY(4px);
 
   svg {
     width: 18px !important;

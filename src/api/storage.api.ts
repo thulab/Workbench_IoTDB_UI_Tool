@@ -72,6 +72,11 @@ class StorageApi {
     return http.post('/schema/upsertDevices', data);
   }
 
+  // 保存物理量--new
+  static insertMeasurements(data: StorageDevice.InsertMeasurements): HttpResponseP<{ measurements: string[] }> {
+    return http.post('/schema/insertMeasurements', data);
+  }
+
   // 删除物理量
   static deleteMeasurements(measurementList: string[]): HttpResponseP {
     return http.post('/schema/deleteMeasurements', { measurementList });

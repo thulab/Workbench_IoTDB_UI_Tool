@@ -60,6 +60,10 @@ declare namespace StorageDevice {
     isAligned: boolean;
   }
 
+  export interface InsertMeasurements {
+    measurements: Partial<MeasurementItem>[];
+  }
+
   export interface ImportMeasurementDataRes {
     status: boolean;
     errMsg: string;

@@ -21,13 +21,7 @@
       </ul>
 
       <auth-tooltip :is-disabled="canManageDatabase" :content="'common.databaseAuth'">
-        <el-button
-          plain
-          class="el-button-delete"
-          :disabled="!currentDatabase || currentDatabase === 'root' || currentDatabase === 'root.__system' || !canManageDatabase"
-          @click="handleDelDatabase"
-          id="mesaurement-top-delete-databse"
-        >
+        <el-button plain class="el-button-delete" :disabled="!currentDatabase || !canManageDatabase" @click="handleDelDatabase" id="mesaurement-top-delete-databse">
           {{ t('common.delete') }}
         </el-button>
       </auth-tooltip>

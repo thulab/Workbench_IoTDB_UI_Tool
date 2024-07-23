@@ -31,7 +31,7 @@
               <el-icon size="16" v-if="data.nodeType === 'TIMESERIES'"><i-custom-measure-num /></el-icon>
               {{ data.node }}
             </div>
-            <el-dropdown
+            <!-- <el-dropdown
               v-if="data.nodeType !== 'PAGE' && data.nodePath !== 'root.__system'"
               trigger="click"
               :id="`tree-node-dropdown-${data.nodePath}`"
@@ -54,12 +54,13 @@
                   <el-dropdown-item command="measurement" v-if="data.nodeType !== 'TIMESERIES'" :id="`tree-node-dropdown-new-measurement-${data.nodePath}`">
                     {{ t('measurement.newMeasurement') }}
                   </el-dropdown-item>
-                  <el-dropdown-item command="delete" v-if="data.node !== 'root'" :id="`tree-node-dropdown-delete-${data.inodePathd}`">
+                  <el-dropdown-item command="delete" v-if="data.node !== 'root'" :id="`tree-node-dropdown-delete-${data.nodePath}`">
                     {{ t('common.delete') }}
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
-            </el-dropdown>
+            </el-dropdown> -->
+            <i-custom-more v-if="data.nodeType !== 'PAGE'" :id="`tree-node-dropdown-${data.nodePath}`" class="more-icon svg-button-hover-color" @click="(e) => handleClickMore(e, data)" />
             <div class="tree-node-operation-buttons" v-if="data.nodeType === 'PAGE'">
               <el-button type="primary" @click="(e) => handleNext(e, data)" :id="`tree-node-${data.nodePath}-more`" class="svg-button-hover-color">
                 {{ t('common.viewMore') }}
@@ -72,6 +73,16 @@
         </el-tree-v2>
       </div>
 
+      <context-menu
+        v-show="isShowContextMenu"
+        ref="contextMenuRef"
+        :node-path="clickedNodeData.nodePath"
+        :is-show-database="isShowDatabase"
+        :is-show-measurement="isShowMeasurement"
+        :is-show-delete="isShowDelete"
+        @handle-command="(val) => handleCommand(val, clickedNodeData)"
+      />
+
       <modal-database v-model:visible="databaseVisible" @handleSave="handleRefresh" />
       <modal-measurement v-model:visible="measurementVisible" :device-name="currentDatabase" @handleSave="handleRefresh" />
     </div>
@@ -83,7 +94,9 @@ import type { ElTreeV2 } from 'element-plus';
 import type { TreeNode, TreeNodeData } from 'element-plus/es/components/tree-v2/src/types';
 import { debounce, cloneDeep } from 'lodash-es';
 import { StorageApi } from '@/api';
+import useMenuStore from '@/stores/menu';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
+import ContextMenu from './context-menu.vue';
 import ModalDatabase from './modal-database.vue';
 import ModalMeasurement from './modal-measurement.vue';
 
@@ -104,6 +117,8 @@ const emit = defineEmits<{
 const pageSize = 10;
 
 const { t } = useI18n();
+const menuStore = useMenuStore();
+const isCollapse = computed((): boolean => menuStore.isCollapse);
 const searchText = ref('');
 const measurementTree = ref<InstanceType<typeof ElTreeV2>>();
 const databaseVisible = ref(false);
@@ -111,6 +126,16 @@ const measurementVisible = ref(false);
 const currentDatabase = ref('');
 const initialLoading = ref(false);
 const expandNode = ref('root');
+const isShowContextMenu = ref(false);
+const contextMenuRef = ref<InstanceType<typeof ContextMenu>>();
+const contextMenuTimer = ref();
+const clickedNodeData = reactive<StorageDevice.TreeNodeData>({
+  node: '',
+  nodePath: '',
+  parentPath: '',
+  nodeType: '',
+});
+const insertWidth = computed(() => (isCollapse.value ? 72 : 250));
 
 // DATABASE, SG INTERNAL, INTERNAL, DEVICE, TIMESERIES
 const treeData = ref<Array<StorageDevice.TreeNodeData>>([
@@ -138,6 +163,15 @@ const { requestFn: deleteDatabase } = useRequest(StorageApi.deleteDatabase);
 const { requestFn: deleteMeasurements } = useRequest(StorageApi.deleteMeasurements);
 
 const treeHeight = ref(document.body.clientHeight - 48 - 100);
+const isShowDatabase = computed(() => {
+  return clickedNodeData.node === 'root' || clickedNodeData.nodeType === 'SG INTERNAL';
+});
+const isShowMeasurement = computed(() => {
+  return clickedNodeData.nodeType !== 'TIMESERIES' && clickedNodeData.nodePath !== 'root.__system';
+});
+const isShowDelete = computed(() => {
+  return true;
+});
 
 const onResize = debounce(() => {
   // 48 header
@@ -206,6 +240,20 @@ function handleSearch() {}
 function handleRefresh() {
   emit('handleChangeNode', 'root', 'DATABASE');
   getTreeData();
+}
+
+function handleClickMore(e: MouseEvent, data: TreeNodeData) {
+  e.stopPropagation();
+  if (contextMenuTimer.value) {
+    clearTimeout(contextMenuTimer.value);
+    contextMenuTimer.value = undefined;
+  }
+  clickedNodeData.node = data.node;
+  clickedNodeData.nodePath = data.nodePath;
+  clickedNodeData.nodeType = data.nodeType;
+  clickedNodeData.parentPath = data.parentPath;
+  isShowContextMenu.value = true;
+  contextMenuRef.value!.$el.style.inset = `${e.clientY - 56}px auto auto ${e.clientX - insertWidth.value}px`;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -319,6 +367,16 @@ function handleAll(e: MouseEvent, data: TreeNodeData) {
   measurementTree.value?.setData(paginationTree.value);
 }
 
+function onMouseDown() {
+  contextMenuTimer.value = setTimeout(() => {
+    isShowContextMenu.value = false;
+    clickedNodeData.node = '';
+    clickedNodeData.nodePath = '';
+    clickedNodeData.nodeType = '';
+    clickedNodeData.parentPath = '';
+  }, 200);
+}
+
 onMounted(() => {
   window.addEventListener('resize', onResize);
 });
@@ -326,6 +384,17 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', onResize);
 });
+
+watch(
+  () => isShowContextMenu.value,
+  (newVal) => {
+    if (newVal) {
+      document.addEventListener('mousedown', onMouseDown);
+    } else {
+      document.removeEventListener('mousedown', onMouseDown);
+    }
+  }
+);
 
 watch(
   () => props.canReadWriteSchema,
