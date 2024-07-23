@@ -1,23 +1,30 @@
 <template>
   <ul class="context-menu-box">
-    <li v-if="isShowDatabase" :id="`tree-node-dropdown-new-database-${nodePath}`" :class="['context-menu-item']" @click="handleCommand('database')">
-      {{ t('measurement.newDataBase') }}
-    </li>
-    <li v-if="isShowMeasurement" :id="`tree-node-dropdown-new-measurement-${nodePath}`" :class="['context-menu-item']" @click="handleCommand('measurement')">
-      {{ t('measurement.newMeasurement') }}
-    </li>
-    <li v-if="isShowDelete" :id="`tree-node-dropdown-delete-${nodePath}`" :class="['context-menu-item']" @click="handleCommand('delete')">
-      {{ t('common.delete') }}
-    </li>
+    <auth-tooltip v-if="isShowDatabase" :is-disabled="canManageDatabase" :content="'common.databaseAuth'">
+      <li :id="`tree-node-dropdown-new-database-${clickedNodeData.nodePath}`" :class="['context-menu-item', { 'disabled-menu': !canManageDatabase }]" @click="handleCommand('database')">
+        {{ t('measurement.newDataBase') }}
+      </li>
+    </auth-tooltip>
+    <auth-tooltip v-if="isShowMeasurement" :is-disabled="canWriteSchemaByPath" :content="'common.schemaAuthAnother'">
+      <li :id="`tree-node-dropdown-new-measurement-${clickedNodeData.nodePath}`" :class="['context-menu-item', { 'disabled-menu': !canWriteSchemaByPath }]" @click="handleCommand('measurement')">
+        {{ t('measurement.newMeasurement') }}
+      </li>
+    </auth-tooltip>
+    <el-tooltip placement="top-start" effect="light" trigger="hover" :content="deleteTip" :disabled="deleteTipDisabled" popper-class="tooltip-box-width">
+      <li :id="`tree-node-dropdown-delete-${clickedNodeData.nodePath}`" :class="['context-menu-item', { 'disabled-menu': !deleteTipDisabled }]" @click="handleCommand('delete')">
+        {{ t('common.delete') }}
+      </li>
+    </el-tooltip>
   </ul>
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  nodePath: string;
-  isShowDatabase: boolean;
-  isShowMeasurement: boolean;
-  isShowDelete: boolean;
+import { storeToRefs } from 'pinia';
+import { useUserStore } from '@/stores';
+import { getPathAuthList } from '@/utils/auth';
+
+const props = defineProps<{
+  clickedNodeData: StorageDevice.TreeNodeData;
 }>();
 
 const emit = defineEmits<{
@@ -25,9 +32,50 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
+const userStore = useUserStore();
+const { canManageDatabase, userAllEntityPrivileges, userAllPathPrivileges } = storeToRefs(userStore);
+
+const isShowDatabase = computed(() => {
+  return props.clickedNodeData.node === 'root' || props.clickedNodeData.nodeType === 'SG INTERNAL';
+});
+const isShowMeasurement = computed(() => {
+  return props.clickedNodeData.nodeType !== 'TIMESERIES' && props.clickedNodeData.nodePath !== 'root.__system';
+});
+
+const canWriteSchemaByPath = computed(() => {
+  if (userAllEntityPrivileges.value.includes('WRITE_SCHEMA')) return true;
+  if (!props.clickedNodeData.nodePath) return false;
+  const authList = getPathAuthList(props.clickedNodeData.nodePath, userAllPathPrivileges.value);
+  if (authList.length) {
+    return authList.includes('WRITE_SCHEMA');
+  }
+  return false;
+});
+
+const deleteTip = computed(() => {
+  if (props.clickedNodeData.nodeType === 'DATABASE' && !canManageDatabase.value) {
+    return t('common.databaseAuth');
+  }
+  if (!canWriteSchemaByPath.value) {
+    return t('common.schemaAuthAnother');
+  }
+  return '';
+});
+
+const deleteTipDisabled = computed(() => {
+  if (props.clickedNodeData.nodeType === 'DATABASE' && canManageDatabase.value) {
+    return true;
+  }
+  if (canWriteSchemaByPath.value) {
+    return true;
+  }
+  return false;
+});
 
 function handleCommand(key: string) {
-  emit('handleCommand', key);
+  if ((key === 'database' && canManageDatabase.value) || (key === 'measurement' && canWriteSchemaByPath.value) || (key === 'delete' && deleteTipDisabled.value)) {
+    emit('handleCommand', key);
+  }
 }
 </script>
 <style lang="scss" scoped>

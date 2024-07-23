@@ -49,8 +49,8 @@
       </div>
 
       <div class="search-form-buttons">
-        <auth-tooltip :is-disabled="canWriteSchemaByParentPath" :content="'common.schemaAuthAnother'">
-          <el-button type="primary" :disabled="!currentDatabase || currentDatabase === 'root.__system' || !canWriteSchemaByParentPath" @click="handleAddMeasure" id="mesaurement-add">
+        <auth-tooltip :is-disabled="canWriteSchemaByPath" :content="'common.schemaAuthAnother'">
+          <el-button type="primary" :disabled="!currentDatabase || currentDatabase === 'root.__system' || !canWriteSchemaByPath" @click="handleAddMeasure" id="mesaurement-add">
             {{ t('common.create') }}
           </el-button>
         </auth-tooltip>
@@ -73,27 +73,27 @@
             </template>
           </el-dropdown>
         </auth-tooltip>
-        <auth-tooltip :is-disabled="canWriteSchemaByParentPath" :content="'common.schemaAuthAnother'">
-          <el-button :disabled="!currentDatabase || multipleSelection.length === 0 || !canWriteSchemaByParentPath" type="primary" @click="handleDelRow('batch', null)" id="mesaurement-batch-del">
+        <auth-tooltip :is-disabled="canWriteSchemaByPath" :content="'common.schemaAuthAnother'">
+          <el-button :disabled="!currentDatabase || multipleSelection.length === 0 || !canWriteSchemaByPath" type="primary" @click="handleDelRow('batch', null)" id="mesaurement-batch-del">
             {{ t('common.batchDelete') }}
           </el-button>
         </auth-tooltip>
-        <auth-tooltip :is-disabled="canReadWriteDataByParentPath" :content="'common.dataAuth'">
+        <auth-tooltip :is-disabled="canReadWriteDataByPath" :content="'common.dataAuth'">
           <el-button
-            :disabled="!currentDatabase || !canReadWriteDataByParentPath"
+            :disabled="!currentDatabase || !canReadWriteDataByPath"
             link
             @click="handleRefresh"
             id="mesaurement-refresh"
-            :class="!currentDatabase || !canReadWriteDataByParentPath ? '' : 'svg-button-hover-color'"
+            :class="!currentDatabase || !canReadWriteDataByPath ? '' : 'svg-button-hover-color'"
           >
             <i-custom-refresh style="width: 24px; height: 24px" />
           </el-button>
         </auth-tooltip>
-        <auth-tooltip :is-disabled="canReadWriteSchema" :content="'common.schemaAuth'">
+        <auth-tooltip :is-disabled="canReadWriteSchemaByPath" :content="'common.schemaAuth'">
           <el-button
             link
-            :class="[canReadWriteSchema ? 'svg-button-hover-color' : '', 'm-l-4']"
-            :disabled="!canReadWriteSchema"
+            :class="[canReadWriteSchemaByPath ? 'svg-button-hover-color' : '', 'm-l-4']"
+            :disabled="!canReadWriteSchemaByPath"
             ref="colButtonRef"
             id="measurement-column-filter"
             v-click-outside="handleClickOutside"
@@ -272,7 +272,7 @@ import { useTableHeight } from '@/composition-api';
 import { type CheckboxValueType, ClickOutside as vClickOutside } from 'element-plus';
 import { StorageApi } from '@/api';
 import { useUserStore } from '@/stores';
-import { getPathAuthList, getParentPathAuthList } from '@/utils/auth';
+import { getPathAuthList } from '@/utils/auth';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalMeasurement from './modal-measurement.vue';
 import ModalImport from './modal-import.vue';
@@ -292,7 +292,7 @@ const pageText = appType === 1 ? t('measurement.calculateMeasurement') : t('meas
 const router = useRouter();
 const route = useRoute();
 const userStore = useUserStore();
-const { canManageDatabase, canReadWriteSchema, canWriteSchema, userAllEntityPrivileges, userAllPathPrivileges } = storeToRefs(userStore);
+const { canManageDatabase, canWriteSchema, userAllEntityPrivileges, userAllPathPrivileges } = storeToRefs(userStore);
 
 const { maxTableHeight } = useTableHeight(370);
 const searchKeyword = ref((route.query.measurement as string) || '');
@@ -338,20 +338,20 @@ const columnList = ref<Array<{ label: string; prop: string; width: number }>>([
   { label: 'measurement.dataType', prop: 'dataType', width: 140 },
 ]);
 
-const canReadWriteDataByParentPath = computed(() => {
+const canReadWriteDataByPath = computed(() => {
   if (userAllEntityPrivileges.value.includes('READ_DATA') || userAllEntityPrivileges.value.includes('WRITE_DATA')) return true;
   if (!props.currentDatabase) return false;
-  const authList = getParentPathAuthList(props.currentDatabase, userAllPathPrivileges.value);
+  const authList = getPathAuthList(props.currentDatabase, userAllPathPrivileges.value);
   if (authList.length) {
     return authList.includes('READ_DATA') || authList.includes('WRITE_DATA');
   }
   return false;
 });
 
-const canWriteSchemaByParentPath = computed(() => {
+const canWriteSchemaByPath = computed(() => {
   if (userAllEntityPrivileges.value.includes('WRITE_SCHEMA')) return true;
   if (!props.currentDatabase) return false;
-  const authList = getParentPathAuthList(props.currentDatabase, userAllPathPrivileges.value);
+  const authList = getPathAuthList(props.currentDatabase, userAllPathPrivileges.value);
   if (authList.length) {
     return authList.includes('WRITE_SCHEMA');
   }
@@ -377,9 +377,9 @@ function rowCanWriteSchemaByPath(path: string) {
   return false;
 }
 
-function rowReadWriteDataByParentPath(path: string) {
+function rowReadWriteDataByPath(path: string) {
   if (userAllEntityPrivileges.value.includes('READ_DATA') || userAllEntityPrivileges.value.includes('WRITE_DATA')) return true;
-  const authList = getParentPathAuthList(path, userAllPathPrivileges.value);
+  const authList = getPathAuthList(path, userAllPathPrivileges.value);
   if (authList.length) {
     return authList.includes('READ_DATA') || authList.includes('WRITE_DATA');
   }
@@ -462,7 +462,7 @@ function getListData() {
         timeseriesList.push(`${item.deviceName}.${item.timeseries}`);
         viewTypeList.push(item.viewType || 'BASE');
       });
-      const authTimeseries = tableData.value.measurements.filter((f) => rowReadWriteDataByParentPath(`${f.deviceName}.${f.timeseries}`)).map((d) => `${d.deviceName}.${d.timeseries}`);
+      const authTimeseries = tableData.value.measurements.filter((f) => rowReadWriteDataByPath(`${f.deviceName}.${f.timeseries}`)).map((d) => `${d.deviceName}.${d.timeseries}`);
       getBatchLastValue(timeseriesList, viewTypeList).then((newRes) => {
         if (newRes.data.values.length || newRes.data.timestamps.length) {
           tableData.value.measurements.forEach((item, index) => {
