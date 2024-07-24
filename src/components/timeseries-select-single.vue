@@ -22,7 +22,7 @@
       :id="`select-path-single-${item.timeseries}`"
       :disabled="disabledPath ? disabledPath(item) : false"
     >
-      <div :style="`display: flex; width: ${itemWidth}px;`">
+      <div :style="`display: flex; width: 100%;`">
         <text-tooltip :content="item.timeseries" />
       </div>
     </el-option>

@@ -36,7 +36,7 @@
           <i-custom-type-int64 v-else-if="item.dataType === 'INT64'" class="timeseries-type-text" />
           <i-custom-type-text v-else-if="item.dataType === 'TEXT'" class="timeseries-type-text" />
         </template>
-        <div :style="`display: flex; width: ${itemWidth}px;`">
+        <div :style="`display: flex; width: ${isShowType ? 'calc(100% - 68px)' : '100%'}`">
           <text-tooltip :content="item.timeseries" />
         </div>
       </div>
@@ -232,7 +232,7 @@ defineExpose({
   width: 100%;
 
   .timeseries-type-text {
-    width: 58px;
+    flex: 0 0 58px;
     height: 18px;
     margin-right: 10px;
   }

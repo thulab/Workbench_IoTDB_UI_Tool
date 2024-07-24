@@ -182,7 +182,7 @@ watch(
     font-weight: 400;
     line-height: 18px;
     color: #424561;
-    width: 145px;
+    width: 168px;
     display: inline-flex;
   }
 }
@@ -191,7 +191,7 @@ watch(
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 0 32px;
+  margin: 0 8px;
 
   .path-detail-item {
     display: flex;

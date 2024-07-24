@@ -9,7 +9,7 @@
                 <i-custom-search-icon class="remote-select-search-icon" />
               </template>
               <template #prepend>
-                <el-select v-model="searchFormData.type" style="width: 88px" placeholder="" id="calculate-search-type">
+                <el-select v-model="searchFormData.type" :style="{ width: locale === 'en' ? '150px' : '88px' }" placeholder="" id="calculate-search-type">
                   <el-option :label="appType === 1 ? t('calculate.calculateName') : t('calculate.viewName')" value="name" id="calculate-search-type-name" />
                   <el-option :label="t('calculate.resultMeasurement')" value="measurement" id="calculate-search-type-measurement" />
                   <el-option :label="appType === 1 ? t('calculate.calculateDesc') : t('calculate.viewDesc')" value="desc" id="calculate-search-type-desc" />

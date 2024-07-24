@@ -40,7 +40,7 @@
             <el-select
               v-model="searchFormData.aggregation"
               :disabled="isRunningTab || searchFormData.unitInterval === 'origin'"
-              style="width: 80px"
+              :style="{ width: locale === 'en' ? '120px' : '80px' }"
               @change="handleChangeAggregation"
               id="trend-search-aggregation"
             >
@@ -184,7 +184,7 @@ const tabList = [
   { name: 'template', label: 'dataTrend.commonTemplates' },
 ];
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
 const userName = computed(() => userStore.userInfo.name);
@@ -377,8 +377,8 @@ const chartOptions = computed<ECOption>(() => ({
     feature: {
       dataZoom: {
         title: {
-          zoom: '放大',
-          back: '撤销',
+          zoom: t('common.zoom'),
+          back: t('common.revoke'),
         },
         icon: {
           zoom: 'path://M15 9L23 9L23 23L9 23L9 15M13 9L9 9M9 9L5 9M9 13L9 9M9 9L9 5',
@@ -386,11 +386,11 @@ const chartOptions = computed<ECOption>(() => ({
         },
       },
       restore: {
-        title: '还原',
+        title: t('common.restore'),
         icon: 'path://M13 21L15 24C10.0294 24 6 19.9706 6 15C6 12.7036 6.86006 10.6081 8.27564 9.01797M17 9L15 6C19.9706 6 24 10.0294 24 15C24 17.3063 23.1325 19.4101 21.7059 21.0026',
       },
       saveAsImage: {
-        title: '导出',
+        title: t('common.export'),
         icon: 'path://M18,12V7H7v16h11v-5 M24,15H13 M21,18l3-3l-3-3',
       },
     },
@@ -1212,6 +1212,12 @@ watch(
     immediate: true,
   }
 );
+
+watch(locale, () => {
+  nextTick(() => {
+    setOption(chartOptions.value);
+  });
+});
 
 onBeforeUnmount(() => {
   setStorage();

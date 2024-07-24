@@ -1,5 +1,5 @@
 <template>
-  <div class="menu" :style="{ width: isCollapse ? '40px' : locale === 'en' ? '260px' : '216px' }">
+  <div class="menu" :style="{ width: isCollapse ? '40px' : '216px' }">
     <div class="logo flex-align-center" :style="{ paddingLeft: isCollapse ? '6px' : '14px' }" id="layout-menu-logo" @click="handleDashboard">
       <el-icon alt="logo" v-if="isCollapse"><i-custom-logo /></el-icon>
       <el-icon class="title" v-if="!isCollapse">

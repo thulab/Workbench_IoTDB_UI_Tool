@@ -21,6 +21,7 @@ common:
   nextPage: Next Page
   save: Save
   clear: Clear
+  clearAll: Clear all
   noData: No Data
   tip: Tip
   add: Add
@@ -107,7 +108,7 @@ common:
   noAuth: No Permission
   apply: Apply
   auto: Auto
-  origin: Original Value
+  origin: Original
   color: Color
   lineWidth: Line Width
   doc: Documentation
@@ -149,6 +150,9 @@ common:
   userManual: user manual
   schemaAuth: Requires "READ_SCHEMA" or "WRITE-SCHEMA" permission
   maintainAuth: Requires "MAINTAIN" permission
+  zoom: Amplify
+  revoke: Revoke
+  restore: Restore
 page:
   '403': 403 Page
   '404': 404 Page
@@ -169,7 +173,7 @@ page:
   auditLog: Audit Log
   calculate: Calculation
   view: View
-  spectrum: Spectrum
+  spectrum: Analysis
   visualization: Visualization
   config: Database Config
 measurement:
@@ -570,8 +574,12 @@ dataSync:
   remainingTime: Estimated remaining time
   remainingTimeTip: Current time estimation may not be precise
 dataTrend:
-  realTrend: Real-time Trend
-  historyTrend: Historical Trend
+  realTrend: Real-Time
+  historyTrend: History
+  trendAttribute: Style
+  pointAttribute: Cursor
+  commonTemplates: Favorites
+  deleteTemplateTip: Do you want to delete common trends
   measurementEmptyTip: Please add measurements and select them first
   trendTip: >-
     Maximum drawing of %{tip} measurements; the system will automatically adjust
@@ -589,6 +597,8 @@ dataTrend:
   choosedMeasurement: Selected
   overMeasurementTip: A maximum of 10 measurements can be displayed at the same time
   number10Tip: Only input positive integers in the range of 1-10
+  trendTemplate: Trend%{time}
+  saveTrend: Save Trend
 calculate:
   namePlaceholder: Please enter a name
   descPlaceholder: Please enter a description
@@ -597,8 +607,8 @@ calculate:
   viewName: View name
   calculateDesc: Calculation description
   viewDesc: View description
-  calculateList: Calculation list
-  viewList: View list
+  calculateList: Calculation List
+  viewList: View List
   newCalculate: New calculation
   newView: New view
   editCalculate: Edit calculation
@@ -631,7 +641,7 @@ alarm:
   alarmMeasurementPlaceholder: Enter alarm measurement
   alarmLevel: Alarm level
   alarmLevelTip: Level one is the highest alarm level, followed by level two, and so on.
-  alarmConfig: Alarm configuration
+  alarmConfig: Alarm Configuration
   newAlarm: New alarm
   editAlarm: Edit alarm
   alarmDesc: Alarm description
@@ -640,7 +650,7 @@ alarm:
   singleDelete: Confirm the deletion of this alarm configuration?
   alarmTime: Alarm time
   newStatus: View latest status only
-  alarmRecord: Alarm record
+  alarmRecord: Alarm Record
   alarmValue: Alarm value
   whetherConfirm: Confirmation
   batchDeleteRecord: Are you sure you want to delete these alarm records?
@@ -888,11 +898,11 @@ flow:
   deleteEdgeTip: Please select an edge before deleting
 spectrum:
   analysisMethod: Analysis Pattern
-  analysisMethodPlaceholder: 请选择分析方式
+  analysisMethodPlaceholder: Choose the analysis method
   customAnalysis: Custom Analysis
   analysisMethodNoneTip: Please load this pattern
   compressParams: Compression
-  compressParamsPlaceholder: Please enter a compression ratio
+  compressParamsPlaceholder: Enter a compression ratio
   compressParamsTip: >-
     The compression ratio can be set between (0,1], representing the proportion
     of energy retained during lossy compression. By default, no compression is
@@ -914,6 +924,23 @@ spectrum:
   angle: Phase Angle
   modulationFrequency: Modulation Frequency
   expandingFold: Amplification Factor
+  dwt: DWT
+  dwtTip: >-
+    Note: If you choose wavelet transform, the selected measurement point data must be an integer power of 2
+  filterType: Type
+  filterTypePlaceholder: Select the type
+  filterCoefficient: Coefficient
+  transformationNumbers: Transformations
+  dataCount: Data quantity
+  lowPass: LOWPASS
+  cutoffFrequency: Cut-off frequency
+  cutoffFrequencyTip: 归一化后的截止频率，取值为(0,1)，不可缺省
+  highPass: HIGHPASS
+  paramsPlaceholder: Input parameter
+  spectrumTemplate: Analysis%{time}
+  deleteTemplateTip: Do you want to delete commonly used analysis
+  saveSpectrum: Save Analysis
+  applyTip: Please select the corresponding content and view it
 iotdbConfig:
   template: Template
   nodeEffect: Node Effective

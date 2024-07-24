@@ -17,7 +17,7 @@
             {{ t('alarm.alarmLevel') }}：
             <el-tooltip effect="light" :content="t('alarm.alarmLevelTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
-          <el-select v-model="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" class="level-select-box" style="width: 90px" id="alarm-record-search-level">
+          <el-select v-model="searchFormData.alarmLevel" :style="{ color: getLevelColor(), width: locale === 'en' ? '100px' : '90px' }" class="level-select-box" id="alarm-record-search-level">
             <template #prefix>
               <el-icon v-if="searchFormData.alarmLevel" :style="{ color: getLevelColor() }" size="20"><i-custom-alarm-level /></el-icon>
             </template>
@@ -95,7 +95,7 @@
           >
             <!-- <el-table-column type="selection" width="55" /> -->
             <el-table-column :label="t('alarm.alarmName')" prop="alarmName" min-width="160" align="center" show-overflow-tooltip />
-            <el-table-column :label="t('alarm.alarmLevel')" prop="alarmLevel" sortable="custom" min-width="120" align="center">
+            <el-table-column :label="t('alarm.alarmLevel')" prop="alarmLevel" sortable="custom" min-width="140" align="center">
               <template #default="{ row }">
                 <span v-if="row.alarmLevel" style="display: flex; align-items: center; justify-content: center; margin-left: -20px">
                   <el-icon size="20" :style="{ color: getLevelColor(row) }"><i-custom-alarm-level /></el-icon>

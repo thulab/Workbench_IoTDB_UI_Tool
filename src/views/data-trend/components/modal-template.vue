@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="t('search.saveTemplate')" v-model="dialogVisible" width="480px" align-center>
+  <el-dialog :title="source === 'trend' ? t('dataTrend.saveTrend') : t('spectrum.saveSpectrum')" v-model="dialogVisible" width="480px" align-center>
     <el-form ref="formRef" :model="formData" :rules="formRules" label-position="left" @submit.prevent>
       <base-form-item :label="`${t('search.name')}：`" prop="name">
         <el-input v-model="formData.name" :placeholder="t('common.placeHolder')" maxlength="25" show-word-limit :id="`${source}-template-modal-name`" />

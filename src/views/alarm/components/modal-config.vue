@@ -8,10 +8,15 @@
     :close-on-click-modal="false"
     id="alarm-config-modal"
   >
-    <el-form ref="formRef" :model="formData" class="source-form" label-position="left" :label-width="locale === 'en' ? '166px' : '98px'">
+    <el-form ref="formRef" :model="formData" class="source-form" label-position="left">
       <el-row>
         <el-col :span="12">
-          <base-form-item prop="measurement" :rules="editType === 'add' ? requiredRules : []" :class="editType === 'add' ? '' : 'el-form-item-not-mandatory'">
+          <base-form-item
+            prop="measurement"
+            :rules="editType === 'add' ? requiredRules : []"
+            :class="editType === 'add' ? '' : 'el-form-item-not-mandatory'"
+            :label-width="locale === 'en' ? '166px' : '98px'"
+          >
             <template #label>
               {{ t('alarm.alarmMeasurement') }}：
               <el-tooltip v-if="editType === 'add'" effect="light" :content="t('common.searchAllTipLimit100')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
@@ -20,7 +25,7 @@
               id="alarm-config-modal-measurement"
               ref="timeseriesSelectSingleRef"
               v-model="formData.measurement"
-              :selectWidth="316"
+              :selectWidth="locale === 'en' ? 248 : 316"
               :itemWidth="198"
               :key="dialogKey"
               :filter-system="true"
@@ -41,27 +46,27 @@
       </el-row>
       <el-row>
         <el-col :span="24">
-          <base-form-item :label="`${t('alarm.alarmName')}：`" prop="alarmName" :rules="requiredRules">
+          <base-form-item :label="`${t('alarm.alarmName')}：`" prop="alarmName" :rules="requiredRules" :label-width="locale === 'en' ? '166px' : '98px'">
             <el-input v-model="formData.alarmName" show-word-limit maxlength="20" :placeholder="t('alarm.alarmNamePlaceholder')" id="alarm-config-modal-name" />
           </base-form-item>
         </el-col>
       </el-row>
       <el-row>
         <el-col :span="12">
-          <base-form-item :label="`${t('alarm.alarmRules')}：`" prop="alarmRulesType" :rules="requiredRulesRules" class="alarm-rule-error">
+          <base-form-item :label="`${t('alarm.alarmRules')}：`" prop="alarmRulesType" :rules="requiredRulesRules" class="alarm-rule-error" :label-width="locale === 'en' ? '166px' : '98px'">
             <el-select
               v-if="formData.measurementType === 'BOOLEAN' || !formData.measurementType"
               v-model="formData.alarmRulesType"
               :disabled="!formData.measurementType"
               @change="handleChangeBooleanRule"
-              style="width: 316px"
+              :style="{ width: locale === 'en' ? '248px' : '316px' }"
               :placeholder="t('common.selectPlaceholder')"
               id="alarm-config-modal-rule-BOOLEAN"
             >
               <el-option v-for="item in booleanRuleEnum" :key="item.value" :label="item.name" :value="item.value" :id="`alarm-config-modal-rule-BOOLEAN-select-${item.value}`" />
             </el-select>
             <div v-else class="number-rule-box">
-              <el-select v-model="formData.alarmRulesType" :disabled="!formData.measurementType" style="width: 154px" class="m-r-8" id="alarm-config-modal-rule">
+              <el-select v-model="formData.alarmRulesType" :disabled="!formData.measurementType" :style="{ width: locale === 'en' ? '86px' : '154px' }" class="m-r-8" id="alarm-config-modal-rule">
                 <el-option v-for="item in numberRuleEnum" :key="item.value" :label="item.name" :value="item.value" :id="`alarm-config-modal-rule-select-${item.value}`" />
               </el-select>
               <el-input v-model="formData.alarmRulesTypeVal" :disabled="!formData.measurementType" :placeholder="t('common.placeHolder')" style="width: 154px" id="alarm-config-modal-rule-val" />
@@ -85,12 +90,12 @@
       </el-row>
       <el-row>
         <el-col :span="12">
-          <base-form-item prop="alarmLevel" :rules="requiredRules" :style="{ color: getLevelColor }">
+          <base-form-item prop="alarmLevel" :rules="requiredRules" :style="{ color: getLevelColor }" :label-width="locale === 'en' ? '166px' : '98px'">
             <template #label>
               {{ t('alarm.alarmLevel') }}：
               <el-tooltip effect="light" :content="t('alarm.alarmLevelTip')" placement="bottom" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
-            <el-select v-model="formData.alarmLevel" style="width: 316px" class="level-select-box" id="alarm-config-modal-level">
+            <el-select v-model="formData.alarmLevel" :style="{ width: locale === 'en' ? '248px' : '316px' }" class="level-select-box" id="alarm-config-modal-level">
               <template #prefix>
                 <el-icon v-if="formData.alarmLevel" :style="{ color: getLevelColor }" size="20"><i-custom-alarm-level /></el-icon>
               </template>
@@ -113,7 +118,7 @@
       </el-row>
       <el-row class="m-b-12">
         <el-col :span="24">
-          <base-form-item :label="`${t('alarm.alarmIntro')}：`" prop="alarmDesc" class="el-form-item-not-mandatory">
+          <base-form-item :label="`${t('alarm.alarmIntro')}：`" prop="alarmDesc" class="el-form-item-not-mandatory" :label-width="locale === 'en' ? '166px' : '98px'">
             <el-input
               type="textarea"
               v-model="formData.alarmDesc"
@@ -378,6 +383,7 @@ watch(
       errorLink.value = '';
       dialogKey.value++;
       formRef.value?.resetFields();
+      formData.measurement = [];
       formData.alarmRulesType = '';
       formData.alarmRulesTypeVal = undefined;
       formData.alarmDuration = 0;

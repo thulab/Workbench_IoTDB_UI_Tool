@@ -4,7 +4,7 @@
       <div class="search-form-box" style="margin-bottom: 18px">
         <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
           <div class="m-b-16 flex-align-center" style="height: 36px">
-            <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method" :label-width="locale === 'en' ? '140px' : '96px'" :rules="requiredRules">
+            <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
               <template #label>
                 {{ t('spectrum.analysisMethod') }}：
                 <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
@@ -33,7 +33,7 @@
               <span class="params-title">{{ t('spectrum.paramsTitle') }}</span>
               <template v-if="searchFormData.method === 'FFT'">
                 <base-form-item :label="`${t('spectrum.returnResult')}：`" prop="resultType">
-                  <el-select v-model="searchFormData.resultType" style="width: 84px" id="spectrum-search-resultType">
+                  <el-select v-model="searchFormData.resultType" :style="{ width: locale === 'en' ? '110px' : '84px' }" id="spectrum-search-resultType">
                     <el-option v-for="item in resultList" :key="item.value" :label="item.name" :value="item.value" :id="`spectrum-search-resultType-${item.value}`" />
                   </el-select>
                 </base-form-item>
@@ -44,7 +44,7 @@
                   </template>
                   <el-input
                     v-model="searchFormData.compression"
-                    style="width: 120px"
+                    :style="{ width: locale === 'en' ? '150px' : '120px' }"
                     :placeholder="t('spectrum.compressParamsPlaceholder')"
                     id="spectrum-search-compression"
                     @change="handleInputCompression"
@@ -67,37 +67,48 @@
                   </li>
                 </ul>
                 <base-form-item label="" prop="dwtMethod" v-if="dwtTab === 'type'">
-                  <el-select v-model="searchFormData.dwtMethod" style="width: 96px" id="spectrum-search-dwt-method" :placeholder="t('spectrum.filterTypePlaceholder')">
+                  <el-select
+                    v-model="searchFormData.dwtMethod"
+                    :style="{ width: locale === 'en' ? '110px' : '96px' }"
+                    id="spectrum-search-dwt-method"
+                    :placeholder="t('spectrum.filterTypePlaceholder')"
+                  >
                     <el-option v-for="item in dwtMethodList" :key="item.value" :label="item.name" :value="item.value" :id="`spectrum-search-dwt-method-${item.value}`" />
                   </el-select>
                 </base-form-item>
                 <base-form-item label="" prop="coef" v-if="dwtTab === 'number'">
-                  <el-input v-model="searchFormData.coef" style="width: 96px" id="spectrum-search-dwt-number" :placeholder="t('spectrum.compressParamsPlaceholder')" />
+                  <el-input v-model="searchFormData.coef" :style="{ width: locale === 'en' ? '110px' : '96px' }" id="spectrum-search-dwt-number" :placeholder="t('spectrum.paramsPlaceholder')" />
                 </base-form-item>
                 <base-form-item :label="`${t('spectrum.transformationNumbers')}：`" prop="layer" class="m-r-0">
                   <el-input
                     v-model.number="searchFormData.layer"
-                    style="width: 84px"
+                    :style="{ width: locale === 'en' ? '110px' : '84px' }"
                     id="spectrum-search-dwt-layer"
-                    :placeholder="t('spectrum.compressParamsPlaceholder')"
+                    :placeholder="t('spectrum.paramsPlaceholder')"
                     @change="handleInputLayer"
                   />
                 </base-form-item>
               </template>
               <template v-if="['LOWPASS', 'HIGHPASS'].includes(searchFormData.method)">
-                <base-form-item prop="wpass" :rules="requiredRules">
+                <base-form-item prop="wpass" :rules="requiredRules" class="form-item-last">
                   <template #label>
                     {{ t('spectrum.cutoffFrequency') }}：
                     <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width" :content="t('spectrum.cutoffFrequencyTip')"><i-custom-question /></el-tooltip>
                   </template>
-                  <el-input v-model="searchFormData.wpass" style="width: 96px" id="spectrum-search-wpass" :placeholder="t('spectrum.compressParamsPlaceholder')" @change="handleInputWpass" />
+                  <el-input
+                    v-model="searchFormData.wpass"
+                    :style="{ width: locale === 'en' ? '110px' : '96px' }"
+                    id="spectrum-search-wpass"
+                    :placeholder="t('spectrum.paramsPlaceholder')"
+                    @change="handleInputWpass"
+                  />
                 </base-form-item>
               </template>
             </div>
           </div>
           <div class="search-form-row-box">
             <div v-if="searchFormData.method !== 'custom'">
-              <base-form-item prop="measurement" :label-width="locale === 'en' ? '140px' : '96px'" :rules="requiredRules">
+              <base-form-item prop="measurement" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
                 <template #label>
                   {{ t('measurement.measurementChoose') }}：
                   <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
@@ -119,7 +130,7 @@
                   @handle-change-path="handleChangePath"
                 />
               </base-form-item>
-              <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules">
+              <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules" :class="[searchFormData.method === 'DWT' ? '' : 'form-item-last']">
                 <el-date-picker
                   v-model="searchFormData.datetimerange"
                   type="datetimerange"
@@ -139,7 +150,7 @@
               </base-form-item>
             </div>
             <div v-if="searchFormData.method === 'custom'">
-              <base-form-item :label="`${t('spectrum.sqlInput')}：`" prop="sql" :label-width="locale === 'en' ? '140px' : '96px'" class="el-form-item-not-mandatory">
+              <base-form-item :label="`${t('spectrum.sqlInput')}：`" prop="sql" :label-width="locale === 'en' ? '' : '96px'" class="el-form-item-not-mandatory">
                 <el-button type="primary" link id="spectrum-search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
               </base-form-item>
             </div>
@@ -306,7 +317,7 @@ const tabList = [
 const { t, locale } = useI18n();
 const methodDocLink = computed(
   () =>
-    `<a href="https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/Database-Programming.html#udtf-user-defined-timeseries-generating-function" target="_blank" rel="noopener noreferrer" style="color: #495ad4;"> ${t('common.userManual')}</a>`
+    `<a href="${locale.value === 'en' ? 'https://www.timecho.com/docs/UserGuide/latest/User-Manual/Database-Programming.html#udtf-user-defined-timeseries-generating-function' : 'https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/Database-Programming.html#udtf-user-defined-timeseries-generating-function'}" target="_blank" rel="noopener noreferrer" style="color: #495ad4;"> ${t('common.userManual')}</a>`
 );
 const userStore = useUserStore();
 const { canReadWriteData } = storeToRefs(userStore);
@@ -448,7 +459,7 @@ const applyTip = computed(() => {
     return t('common.dataAuth');
   }
   if (saveTemplateDisabled.value) {
-    return t('common.searchFormEmpty');
+    return t('spectrum.applyTip');
   }
   return '';
 });
@@ -535,8 +546,8 @@ const chartOptions = computed<ECOption>(() => ({
     feature: {
       dataZoom: {
         title: {
-          zoom: '放大',
-          back: '撤销',
+          zoom: t('common.zoom'),
+          back: t('common.revoke'),
         },
         icon: {
           zoom: 'path://M15 9L23 9L23 23L9 23L9 15M13 9L9 9M9 9L5 9M9 13L9 9M9 9L9 5',
@@ -544,11 +555,11 @@ const chartOptions = computed<ECOption>(() => ({
         },
       },
       restore: {
-        title: '还原',
+        title: t('common.restore'),
         icon: 'path://M13 21L15 24C10.0294 24 6 19.9706 6 15C6 12.7036 6.86006 10.6081 8.27564 9.01797M17 9L15 6C19.9706 6 24 10.0294 24 15C24 17.3063 23.1325 19.4101 21.7059 21.0026',
       },
       saveAsImage: {
-        title: '导出',
+        title: t('common.export'),
         icon: 'path://M18,12V7H7v16h11v-5 M24,15H13 M21,18l3-3l-3-3',
       },
     },
@@ -1216,7 +1227,7 @@ function handleSearch(unforce?: boolean) {
   }
   if (!copySearchFormData.method) {
     ElMessage.warning({
-      message: t('common.searchFormEmpty'),
+      message: t('spectrum.applyTip'),
       grouping: true,
     });
     return;
@@ -1224,7 +1235,7 @@ function handleSearch(unforce?: boolean) {
   if (copySearchFormData.method === 'ENVELOPE') {
     if (!copySearchFormData.measurement) {
       ElMessage.warning({
-        message: t('common.searchFormEmpty'),
+        message: t('spectrum.applyTip'),
         grouping: true,
       });
       return;
@@ -1233,7 +1244,7 @@ function handleSearch(unforce?: boolean) {
   } else if (copySearchFormData.method === 'DWT') {
     if ((dwtTab.value === 'type' && !copySearchFormData.dwtMethod) || (dwtTab.value === 'number' && !copySearchFormData.coef)) {
       ElMessage.warning({
-        message: t('common.searchFormEmpty'),
+        message: t('spectrum.applyTip'),
         grouping: true,
       });
       return;
@@ -1242,7 +1253,7 @@ function handleSearch(unforce?: boolean) {
   } else if (['LOWPASS', 'HIGHPASS'].includes(copySearchFormData.method)) {
     if (!copySearchFormData.wpass) {
       ElMessage.warning({
-        message: t('common.searchFormEmpty'),
+        message: t('spectrum.applyTip'),
         grouping: true,
       });
       return;
@@ -1251,7 +1262,7 @@ function handleSearch(unforce?: boolean) {
   } else if (copySearchFormData.method === 'custom') {
     if (!sqlValue.value) {
       ElMessage.warning({
-        message: t('common.searchFormEmpty'),
+        message: t('spectrum.applyTip'),
         grouping: true,
       });
       return;
@@ -1260,7 +1271,7 @@ function handleSearch(unforce?: boolean) {
   } else {
     if (!copySearchFormData.measurement) {
       ElMessage.warning({
-        message: t('common.searchFormEmpty'),
+        message: t('spectrum.applyTip'),
         grouping: true,
       });
       return;
@@ -1407,6 +1418,7 @@ onUnmounted(() => {
 watch(locale, () => {
   nextTick(() => {
     getUdfList();
+    setOption(chartOptions.value);
   });
 });
 
