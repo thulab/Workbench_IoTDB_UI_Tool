@@ -48,11 +48,11 @@
         </li>
         <li class="measurement-info-item" id="lastValue-li">
           <span class="measurement-info-item-label" id="lastValue-span">{{ t('measurement.lastValue') }}：</span>
-          {{ measurementInfos.latest }}
+          {{ rowReadWriteDataByPath(currentMeasurement) ? measurementInfos.latest : t('common.dataAuth') }}
         </li>
         <li class="measurement-info-item" id="lastValueTime-li">
           <span class="measurement-info-item-label" id="lastValueTime-span">{{ t('measurement.lastValueTime') }}：</span>
-          {{ measurementInfos.latestTime }}
+          {{ rowReadWriteDataByPath(currentMeasurement) ? measurementInfos.latestTime : t('common.dataAuth') }}
         </li>
       </ul>
 
