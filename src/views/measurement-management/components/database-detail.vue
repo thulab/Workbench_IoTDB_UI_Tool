@@ -178,7 +178,7 @@
                 {{ row.viewType === 'VIEW' ? `${pageText}` : t('measurement.baseMeasurement') }}
               </template>
               <template v-else-if="column.prop === 'isAligned'">
-                {{ typeof row.isAligned === 'boolean' ? (row.isAligned ? t('measurement.deviceAlign') : t('measurement.undeviceAlign')) : '-' }}
+                {{ typeof row.isAligned === 'boolean' ? (row.isAligned ? t('measurement.deviceAlignMeasurement') : t('measurement.undeviceAlignMeasurement')) : '-' }}
               </template>
               <template v-else>
                 {{ row[column.prop] }}

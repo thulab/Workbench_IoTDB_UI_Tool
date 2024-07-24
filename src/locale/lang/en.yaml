@@ -205,6 +205,8 @@ measurement:
   deviceNameInputPlaceholder: Please enter a device name
   newDevice: New Device
   deviceAlign: Align by Device
+  deviceAlignMeasurement: Aligned time series
+  undeviceAlignMeasurement: Non-aligned time series
   measurement: Measurement
   measurementName: Measurement Name
   measurementNamePlaceholder: Please enter the measurement name
@@ -739,6 +741,7 @@ auth:
   deleteUserTip: Are you sure you want to delete this user?
   editUser: Edit User
   resetPwd: Reset Password
+  resetPwdSuccess: Password reset successful
   layout: Log Out
   enterpriseTip: >-
     This feature is only available in the Enterprise version. Please contact

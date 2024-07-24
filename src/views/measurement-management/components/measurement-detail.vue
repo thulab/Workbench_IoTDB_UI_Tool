@@ -32,7 +32,7 @@
         </li>
         <li class="measurement-info-item" id="deviceAlign-li">
           <span class="measurement-info-item-label" id="deviceAlign-span">{{ t('measurement.deviceAlign') }}：</span>
-          {{ typeof measurementInfos.isAligned === 'boolean' ? (measurementInfos.isAligned ? t('measurement.deviceAlign') : t('measurement.undeviceAlign')) : '-' }}
+          {{ typeof measurementInfos.isAligned === 'boolean' ? (measurementInfos.isAligned ? t('measurement.deviceAlignMeasurement') : t('measurement.undeviceAlignMeasurement')) : '-' }}
         </li>
         <li class="measurement-info-item" id="dataType-li">
           <span class="measurement-info-item-label" id="dataType-span">{{ t('measurement.dataType') }}：</span>
