@@ -191,7 +191,11 @@ watch(
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 0 8px;
+  margin: 0 12px 0 32px;
+
+  &:lang(en) {
+    margin: 0 8px;
+  }
 
   .path-detail-item {
     display: flex;
