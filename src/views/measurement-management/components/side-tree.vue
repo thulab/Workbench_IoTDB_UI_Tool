@@ -127,7 +127,9 @@ const clickedNodeData = reactive<StorageDevice.TreeNodeData>({
   parentPath: '',
   nodeType: '',
 });
-const insertWidth = computed(() => (isCollapse.value ? 72 : 250));
+// 216+16 菜单宽度+MainPaddingLeft  39 下拉框宽度的一半 = 267
+// 40+16+39 = 95
+const insertWidth = computed(() => (isCollapse.value ? 95 : 267));
 
 // DATABASE, SG INTERNAL, INTERNAL, DEVICE, TIMESERIES
 const treeData = ref<Array<StorageDevice.TreeNodeData>>([
@@ -257,7 +259,7 @@ function handleClickMore(e: MouseEvent, data: TreeNodeData) {
   clickedNodeData.nodeType = data.nodeType;
   clickedNodeData.parentPath = data.parentPath;
   isShowContextMenu.value = true;
-  contextMenuRef.value!.$el.style.inset = `${e.clientY - 56}px auto auto ${e.clientX - insertWidth.value}px`;
+  contextMenuRef.value!.$el.style.inset = `${e.clientY - 52}px auto auto ${e.clientX - insertWidth.value}px`;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

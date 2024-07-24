@@ -1,21 +1,24 @@
 <template>
-  <ul class="context-menu-box">
-    <auth-tooltip v-if="isShowDatabase" :is-disabled="canManageDatabase" :content="'common.databaseAuth'">
-      <li :id="`tree-node-dropdown-new-database-${clickedNodeData.nodePath}`" :class="['context-menu-item', { 'disabled-menu': !canManageDatabase }]" @click="handleCommand('database')">
-        {{ t('measurement.newDataBase') }}
-      </li>
-    </auth-tooltip>
-    <auth-tooltip v-if="isShowMeasurement" :is-disabled="canWriteSchemaByPath" :content="'common.schemaAuthAnother'">
-      <li :id="`tree-node-dropdown-new-measurement-${clickedNodeData.nodePath}`" :class="['context-menu-item', { 'disabled-menu': !canWriteSchemaByPath }]" @click="handleCommand('measurement')">
-        {{ t('measurement.newMeasurement') }}
-      </li>
-    </auth-tooltip>
-    <el-tooltip placement="top-start" effect="light" trigger="hover" :content="deleteTip" :disabled="deleteTipDisabled" popper-class="tooltip-box-width">
-      <li :id="`tree-node-dropdown-delete-${clickedNodeData.nodePath}`" :class="['context-menu-item', { 'disabled-menu': !deleteTipDisabled }]" @click="handleCommand('delete')">
-        {{ t('common.delete') }}
-      </li>
-    </el-tooltip>
-  </ul>
+  <div class="context-menu-container">
+    <ul class="context-menu-box">
+      <auth-tooltip v-if="isShowDatabase" :is-disabled="canManageDatabase" :content="'common.databaseAuth'">
+        <li :id="`tree-node-dropdown-new-database-${clickedNodeData.nodePath}`" :class="['context-menu-item', { 'disabled-menu': !canManageDatabase }]" @click="handleCommand('database')">
+          {{ t('measurement.newDataBase') }}
+        </li>
+      </auth-tooltip>
+      <auth-tooltip v-if="isShowMeasurement" :is-disabled="canWriteSchemaByPath" :content="'common.schemaAuthAnother'">
+        <li :id="`tree-node-dropdown-new-measurement-${clickedNodeData.nodePath}`" :class="['context-menu-item', { 'disabled-menu': !canWriteSchemaByPath }]" @click="handleCommand('measurement')">
+          {{ t('measurement.newMeasurement') }}
+        </li>
+      </auth-tooltip>
+      <el-tooltip placement="top-start" effect="light" trigger="hover" :content="deleteTip" :disabled="deleteTipDisabled" popper-class="tooltip-box-width">
+        <li :id="`tree-node-dropdown-delete-${clickedNodeData.nodePath}`" :class="['context-menu-item', { 'disabled-menu': !deleteTipDisabled }]" @click="handleCommand('delete')">
+          {{ t('common.delete') }}
+        </li>
+      </el-tooltip>
+    </ul>
+    <span class="context-menu-arrow"></span>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -79,19 +82,24 @@ function handleCommand(key: string) {
 }
 </script>
 <style lang="scss" scoped>
-.context-menu-box {
+.context-menu-container {
   position: absolute;
   z-index: 10;
-  min-width: 72px;
-  border: 1px solid #dfe1ed;
-  background-color: #fff;
-  border-radius: 2px;
-  padding: 6px 0;
-  box-sizing: border-box;
   display: block;
   top: -9999px;
   left: -9999px;
+  border: 1px solid #dfe1ed;
+  background-color: #fff;
+  box-sizing: border-box;
   box-shadow: 0 4.26px 14.2px 0 rgb(32 37 71 / 6%);
+}
+
+.context-menu-box {
+  width: 78px;
+  box-sizing: border-box;
+  border-radius: 2px;
+  text-align: center;
+  padding: 6px 0;
   overflow: hidden;
 
   .context-menu-item {
@@ -119,6 +127,31 @@ function handleCommand(key: string) {
       color: #424561;
       opacity: 0.7;
     }
+  }
+}
+
+.context-menu-arrow {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  z-index: -1;
+
+  &::before {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 1px solid #dfe1ed;
+    background: var(--el-bg-color-overlay);
+    top: -1px;
+    right: 0;
+    border-top-left-radius: 2px;
+    border-bottom-color: transparent !important;
+    border-right-color: transparent !important;
+    content: ' ';
+    transform: rotate(45deg);
   }
 }
 </style>
