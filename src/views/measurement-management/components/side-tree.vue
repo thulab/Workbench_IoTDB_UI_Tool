@@ -1,5 +1,5 @@
 <template>
-  <auth-container :is-auth="canReadWriteSchema" :content="'common.schemaAuth'">
+  <auth-container :is-auth="canReadWriteSchema" :content="'common.schemaAuth'" style="height: 100%">
     <div class="measurement-tree-wrapper">
       <div class="search-refresh-box">
         <el-input :placeholder="t('measurement.searchPlaceholder')" v-model="searchText" id="measurement-tree-input" @keyup.enter="handleSearch" class="measurement-tree-search-input" />
@@ -227,11 +227,12 @@ function handleSSEEvent(event: MessageEvent) {
 
 async function subscribeToSSE() {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     StorageApi.getSSEData(searchText.value, handleSSEEvent, (event: Event) => {
-      // if (event.readyState === EventSource.CLOSED) {
+      // if (event.target?.readyState! === EventSource.CLOSED) {
       //   console.log('SSE connection closed.');
       // } else {
-      console.error('SSE connection error:', event);
+      //   console.error('SSE connection error:', event);
       // }
     });
   } catch (error) {

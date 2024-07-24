@@ -1,3 +1,4 @@
+import axios from 'axios';
 import http from '@/utils/http';
 
 // 数据库
@@ -102,7 +103,7 @@ class StorageApi {
 
   // 测点列表左侧树形 按序列查询
   static getNextNodeInfos(nodePath: string): HttpResponseP<Array<StorageDevice.TreeNodeData>> {
-    return http.get('/model/getNextNodeInfos', { params: { nodePath } });
+    return http.get('/model/getChildNodes', { params: { nodePath } });
   }
 
   // 测点详情
@@ -117,7 +118,7 @@ class StorageApi {
 
   //  存储组信息
   static async getSSEData(searchText: string, handleMessage: (event: MessageEvent) => void, handleError: (event: Event) => void) {
-    const response = await http.get('/sse/fuzzy', {
+    const response = await axios.get('/api/sse/searchSchemaTree', {
       headers: { Accept: 'text/event-stream' },
       responseType: 'stream',
       params: {
