@@ -148,8 +148,15 @@ common:
   warmTip: Tip
   versionTip: Please upgrade to IoTDB V%{version} or a higher version to use
   userManual: user manual
-  schemaAuth: Requires "READ_SCHEMA" or "WRITE-SCHEMA" permission
   maintainAuth: Requires "MAINTAIN" permission
+  databaseAuth: Requires "MANAGE_DATABASE" permission
+  schemaAuth: Requires "READ_SCHEMA" or "WRITE_SCHEMA" permission
+  schemaAuthAnother: Requires "WRITE_SCHEMA" permission
+  dataAuth: Requires "READ_DATA" or "WRITE_DATA" permission
+  dataAuthAnother: Requires "WRITE_DATA" permission
+  pipeAuth: Requires "USE_PIPE" permission
+  userAuth: Requires "MANAGE_USER" permission
+  roleAuth: Requires "MANAGE_ROLE" permission
   zoom: Amplify
   revoke: Revoke
   restore: Restore
