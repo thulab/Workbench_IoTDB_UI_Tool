@@ -36,7 +36,7 @@
             <div v-if="data.nodeType !== 'PAGE'" class="node-text" :style="{ width: `${nodeTextWidth(node, data)}px` }">
               <el-icon size="16" v-if="data.nodeType === 'DATABASE' && data.node !== 'root'"><i-custom-storage-num /></el-icon>
               <el-icon size="16" v-if="data.nodeType === 'TIMESERIES'"><i-custom-measure-num /></el-icon>
-              {{ data.node }}
+              <div class="node-text-content">{{ data.node }}</div>
             </div>
             <!-- <el-dropdown
               v-if="data.nodeType !== 'PAGE' && data.nodePath !== 'root.__system'"
@@ -548,6 +548,13 @@ defineExpose({ handleRefresh });
   line-height: 1.5;
   display: flex;
   align-items: center;
+
+  .node-text-content {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 .el-tree-node:focus {
