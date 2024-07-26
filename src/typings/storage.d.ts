@@ -116,6 +116,7 @@ declare namespace StorageDevice {
     parentPath: string;
     nodeType: string;
     children?: TreeNodeData[];
+    pageChildren?: TreeNodeData[];
     pageNum?: number;
     totalPage?: number;
   }

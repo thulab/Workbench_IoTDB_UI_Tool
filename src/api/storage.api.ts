@@ -1,5 +1,5 @@
-import axios from 'axios';
 import http from '@/utils/http';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
 
 // 数据库
 class StorageApi {
@@ -117,20 +117,32 @@ class StorageApi {
   }
 
   //  存储组信息
-  static async getSSEData(searchText: string, handleMessage: (event: MessageEvent) => void, handleError: (event: Event) => void) {
-    const response = await axios.get('/api/sse/searchSchemaTree', {
-      headers: { Accept: 'text/event-stream' },
-      responseType: 'stream',
-      params: {
-        path: searchText,
+  static async getSSEData(searchText: string, handleData: (data: any) => void) {
+    fetchEventSource(`/api/sse/searchSchemaTree?path=${searchText}`, {
+      async onopen(response) {
+        if (response.ok && response.headers.get('content-type') === 'text/event-stream') {
+          // everything's good
+        } else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+          // client-side errors are usually non-retriable:
+          throw new Error();
+        } else {
+          throw new Error();
+        }
+      },
+      onmessage(msg) {
+        if (msg.event === 'Error') {
+          console.log('onmessage Error:', msg.data);
+        } else {
+          handleData(msg.data);
+        }
+      },
+      onclose() {
+        console.log('onclose');
+      },
+      onerror(err) {
+        console.log('onerror:', err);
       },
     });
-
-    const eventSource = new EventSource(response.request.responseURL);
-    eventSource.addEventListener('message', handleMessage);
-
-    // 监听 'error' 事件以处理连接中断
-    eventSource.addEventListener('error', handleError);
   }
 }
 export default StorageApi;

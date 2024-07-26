@@ -48,6 +48,7 @@
     "@codemirror/state": "^6.4.1",
     "@codemirror/view": "^6.26.3",
     "@intlify/unplugin-vue-i18n": "^4.0.0",
+    "@microsoft/fetch-event-source": "^2.0.1",
     "@monaco-editor/loader": "^1.4.0",
     "@vueuse/components": "^10.9.0",
     "@vueuse/core": "^10.9.0",

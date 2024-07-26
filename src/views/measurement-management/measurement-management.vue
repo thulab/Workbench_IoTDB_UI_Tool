@@ -1,7 +1,7 @@
 <template>
   <div class="database-page-container">
     <div class="database-list-wrapper">
-      <side-tree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" @handle-change-node="handleChangeNode" />
+      <side-tree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" :current-node="currentNode" @handle-change-node="handleChangeNode" />
     </div>
 
     <div class="database-details-wrapper" :key="renderKey">
