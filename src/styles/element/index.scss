@@ -31,11 +31,12 @@
 }
 
 .el-scrollbar__thumb {
-  background-color: #dfe1ed !important;
+  background-color: #f0f1fa !important;
   opacity: 1;
 
   &:hover {
     opacity: 1;
+    background-color: #dfe1ed !important;
   }
 }
 
