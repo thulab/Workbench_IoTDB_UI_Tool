@@ -9,12 +9,12 @@
     <div class="database-info-box" v-loading="infoLoading">
       <ul class="database-info-list">
         <li class="database-info-item" id="device-total-li">
-          <el-icon size="24"><i-custom-device-num /></el-icon>
+          <!-- <el-icon size="24"><i-custom-device-num /></el-icon> -->
           <span class="database-info-item-label" id="device-total-span">{{ t('measurement.deviceNum') }}：</span>
           {{ canReadWriteSchemaByPath ? databaseInfos?.deviceCount || 0 : t('common.noAuth') }}
         </li>
         <li class="database-info-item" id="measurement-total-li">
-          <el-icon size="24"><i-custom-measure-num /></el-icon>
+          <!-- <el-icon size="24"><i-custom-measure-num /></el-icon> -->
           <span class="database-info-item-label" id="measurement-total-span">{{ t('measurement.measurementNum') }}：</span>
           {{ canReadWriteSchemaByPath ? databaseInfos?.measurementCount || 0 : t('common.noAuth') }}
         </li>
