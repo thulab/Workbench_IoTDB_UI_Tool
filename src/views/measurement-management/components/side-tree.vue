@@ -27,6 +27,7 @@
           :expand-on-click-node="true"
           :default-expanded-keys="[expandNode]"
           @node-click="handleNodeClick"
+          @node-collapse="handleNodeCollapse"
           @handle-scroll="handleScroll"
         >
           <!-- eslint-disable-next-line vue/no-unused-vars -->
@@ -363,8 +364,19 @@ function handleCommand(val: string, data: TreeNodeData) {
   }
 }
 
+function handleNodeCollapse(data: TreeNodeData, node: TreeNode) {
+  if (data.nodeType === 'PAGE') {
+    expandNode.value = node.parent?.data.nodePath;
+    measurementTree.value?.virtualizedTreeRef?.expandNode(node.parent!);
+  }
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
+  if (data.nodeType === 'PAGE') {
+    e.stopPropagation();
+    return;
+  }
   if (['DATABASE', 'TIMESERIES'].includes(data.nodeType)) {
     if (props.currentNode !== data.nodePath) {
       emit('handleChangeNode', data.nodePath, data.nodeType);
