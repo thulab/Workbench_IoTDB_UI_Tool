@@ -108,6 +108,12 @@ const clickedNodeData = reactive<StorageDevice.TreeNodeData>({
 // 216+16 菜单宽度+MainPaddingLeft  39 下拉框宽度的一半 = 267
 // 40+16+39 = 95
 const insertWidth = computed(() => (isCollapse.value ? 95 : 267));
+const loadingNode: StorageDevice.TreeNodeData = {
+  node: '',
+  nodePath: 'loading',
+  nodeType: 'loading',
+  parentPath: '',
+};
 
 // DATABASE, SG INTERNAL, INTERNAL, DEVICE, TIMESERIES
 const treeData = ref<Array<StorageDevice.TreeNodeData>>([
@@ -116,7 +122,7 @@ const treeData = ref<Array<StorageDevice.TreeNodeData>>([
     nodePath: 'root',
     nodeType: 'DATABASE',
     parentPath: '',
-    children: [],
+    children: [cloneDeep(loadingNode)],
     pageChildren: [],
   },
 ]);
@@ -149,6 +155,20 @@ function nodeTextWidth(node: TreeNode, data: TreeNodeData) {
   return width;
 }
 
+function fillChildLoading(data: StorageDevice.TreeNodeData[]) {
+  data.forEach((item) => {
+    if (!item.children && item.nodeType !== 'TIMESERIES') {
+      item.pageChildren = [
+        {
+          ...loadingNode,
+          parentPath: item.nodePath,
+        },
+      ];
+    }
+  });
+  return data;
+}
+
 function getTreeData() {
   initialLoading.value = true;
   treeData.value = [];
@@ -156,18 +176,20 @@ function getTreeData() {
     .then((res) => {
       const data = res.data || [];
       const rootTotal = Math.ceil(data.length / pageSize);
+      const cloneData = fillChildLoading(cloneDeep(data));
       treeData.value = [
         {
           node: 'root',
           nodePath: 'root',
           nodeType: 'DATABASE',
           parentPath: '',
-          children: cloneDeep(data),
-          pageChildren: data.slice(0, 1 * pageSize),
+          children: cloneDeep(cloneData),
+          pageChildren: cloneData.slice(0, 1 * pageSize),
           pageNum: 1,
           totalPage: rootTotal,
         },
       ];
+      console.log(treeData);
       if (rootTotal > 1) {
         treeData.value[0].pageChildren?.push({
           node: 'root',
@@ -402,14 +424,17 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
     measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
     return;
   }
-  if (measurementTree.value?.virtualizedTreeRef?.getNode(data.nodePath)?.children) return;
+  const children = measurementTree.value?.virtualizedTreeRef?.getNode(data.nodePath)?.children;
+  if (!children || (children[0].data as TreeNodeData).nodeType !== 'loading') return;
   getNextNodeInfos(data.nodePath).then((res) => {
     const list = res.data || [];
     // 展示点开操作查看的data 都在pageChildren 属性，需找到对应的children 上追加子节点
     const originTreeData = recursionFindCurrentByOrigin(data.nodePath, treeData.value)!;
-    originTreeData.children = cloneDeep(list);
-    const dataPathTotal = Math.ceil(list.length / pageSize);
-    data.pageChildren = list.slice(0, 1 * pageSize);
+    const cloneData = fillChildLoading(cloneDeep(list));
+    originTreeData.children = cloneDeep(cloneData);
+    const dataPathTotal = Math.ceil(cloneData.length / pageSize);
+
+    data.pageChildren = cloneData.slice(0, 1 * pageSize);
     data.pageNum = 1;
     data.totalPage = dataPathTotal;
     if (dataPathTotal > 1) {
@@ -422,6 +447,7 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
         totalPage: dataPathTotal,
       });
     }
+    console.log(data.pageChildren);
     measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
   });
 }
