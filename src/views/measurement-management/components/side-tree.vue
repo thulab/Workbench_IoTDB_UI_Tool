@@ -31,7 +31,7 @@
         >
           <!-- eslint-disable-next-line vue/no-unused-vars -->
           <template #default="{ node, data }">
-            <div v-if="data.nodeType !== 'PAGE'" class="node-text">
+            <div v-if="data.nodeType !== 'PAGE'" class="node-text" :id="`tree-node-content-${data.nodePath}`">
               <el-icon size="16" v-if="data.nodeType === 'DATABASE' && data.node !== 'root'"><i-custom-storage-num /></el-icon>
               <el-icon size="16" v-if="data.nodeType === 'TIMESERIES'"><i-custom-measure-num /></el-icon>
               {{ data.node }}
