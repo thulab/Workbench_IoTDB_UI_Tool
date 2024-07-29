@@ -26,6 +26,7 @@
           :height="treeHeight"
           :expand-on-click-node="true"
           :default-expanded-keys="[expandNode]"
+          @node-expand="handleNodeClick"
           @node-click="handleNodeClick"
           @node-collapse="handleNodeCollapse"
           @handle-scroll="handleScroll"
@@ -189,7 +190,6 @@ function getTreeData() {
           totalPage: rootTotal,
         },
       ];
-      console.log(treeData);
       if (rootTotal > 1) {
         treeData.value[0].pageChildren?.push({
           node: 'root',
@@ -447,7 +447,6 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
         totalPage: dataPathTotal,
       });
     }
-    console.log(data.pageChildren);
     measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
   });
 }
