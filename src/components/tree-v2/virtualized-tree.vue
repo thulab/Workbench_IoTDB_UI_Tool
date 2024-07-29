@@ -100,7 +100,7 @@ const initWrapStyle = () => {
   }
 };
 function handleScroll() {
-  const scrollLeft = (document.querySelector('.virtualized-tree-scroll')?.scrollLeft || 0) + 224;
+  const scrollLeft = (document.querySelector('.virtualized-tree-scroll')?.scrollLeft || 0) + 212;
   emit('handleScroll', scrollLeft);
 }
 
@@ -110,7 +110,6 @@ onUnmounted(() => {
 });
 onMounted(() => {
   initWrapStyle();
-
   document.querySelector('.virtualized-tree-scroll')?.addEventListener('scroll', handleScroll);
 });
 // #endregion
@@ -139,6 +138,7 @@ const callback = () => {
   const minWidth = minWidthNode?.clientWidth || 0;
   const targetWidth = maxWidth + maxPaddingLeft + checkBoxWidth;
   width.value = isNumber(targetWidth) ? `${targetWidth > minWidth ? targetWidth : minWidth}px` : '100%';
+  handleScroll();
   function getWidth(el: HTMLElement) {
     const elWidthNode = Array.from(el.children).find((item) => {
       return Array.from(item.classList || []).includes('el-tree-node__content');

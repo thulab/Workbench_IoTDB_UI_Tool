@@ -536,10 +536,11 @@ defineExpose({ handleRefresh });
 }
 
 .more-icon {
+  padding: 0 8px 0 4px;
   width: 16px;
   height: 16px;
   position: absolute;
-  left: 224px;
+  left: 212px;
   background-color: #fff;
 }
 
