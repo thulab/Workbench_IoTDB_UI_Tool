@@ -17,9 +17,8 @@
       </div>
 
       <div class="measurement-tree-box" v-loading="initialLoading || searchLoading">
-        <el-tree-v2
+        <virtualized-tree
           ref="measurementTree"
-          style="max-width: 240px"
           :data="treeData"
           :props="treeProps"
           :indent="8"
@@ -28,45 +27,15 @@
           :expand-on-click-node="true"
           :default-expanded-keys="[expandNode]"
           @node-click="handleNodeClick"
+          @handle-scroll="handleScroll"
         >
+          <!-- eslint-disable-next-line vue/no-unused-vars -->
           <template #default="{ node, data }">
-            <!-- <div :style="`display: flex; width: ${nodeTextWidth(node)}px;`">
-              <text-tooltip :content="data.node" />
-            </div> -->
-            <div v-if="data.nodeType !== 'PAGE'" class="node-text" :style="{ width: `${nodeTextWidth(node, data)}px` }">
+            <div v-if="data.nodeType !== 'PAGE'" class="node-text">
               <el-icon size="16" v-if="data.nodeType === 'DATABASE' && data.node !== 'root'"><i-custom-storage-num /></el-icon>
               <el-icon size="16" v-if="data.nodeType === 'TIMESERIES'"><i-custom-measure-num /></el-icon>
-              <div class="node-text-content">{{ data.node }}</div>
+              {{ data.node }}
             </div>
-            <!-- <el-dropdown
-              v-if="data.nodeType !== 'PAGE' && data.nodePath !== 'root.__system'"
-              trigger="click"
-              :id="`tree-node-dropdown-${data.nodePath}`"
-              class="more-icon svg-button-hover-color"
-              @command="(val) => handleCommand(val, data)"
-            >
-              <i-custom-more
-                @click="
-                  (e) => {
-                    e.stopPropagation();
-                  }
-                "
-                class="more-icon svg-button-hover-color"
-              />
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item command="database" v-if="data.node === 'root' || data.nodeType === 'SG INTERNAL'" :id="`tree-node-dropdown-new-database-${data.nodePath}`">
-                    {{ t('measurement.newDataBase') }}
-                  </el-dropdown-item>
-                  <el-dropdown-item command="measurement" v-if="data.nodeType !== 'TIMESERIES'" :id="`tree-node-dropdown-new-measurement-${data.nodePath}`">
-                    {{ t('measurement.newMeasurement') }}
-                  </el-dropdown-item>
-                  <el-dropdown-item command="delete" v-if="data.node !== 'root'" :id="`tree-node-dropdown-delete-${data.nodePath}`">
-                    {{ t('common.delete') }}
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown> -->
             <i-custom-more v-if="data.nodeType !== 'PAGE'" :id="`tree-node-dropdown-${data.nodePath}`" class="more-icon svg-button-hover-color" @click="(e: MouseEvent) => handleClickMore(e, data)" />
             <div class="tree-node-operation-buttons" v-if="data.nodeType === 'PAGE'">
               <el-button type="primary" @click="(e) => handleNext(e, data)" :id="`tree-node-${data.nodePath}-more`" class="svg-button-hover-color">
@@ -77,7 +46,7 @@
               </el-button>
             </div>
           </template>
-        </el-tree-v2>
+        </virtualized-tree>
       </div>
 
       <context-menu v-show="isShowContextMenu" ref="contextMenuRef" :clicked-node-data="clickedNodeData" @handle-command="(val) => handleCommand(val, clickedNodeData)" />
@@ -89,11 +58,11 @@
 </template>
 
 <script setup lang="ts">
-import type { ElTreeV2 } from 'element-plus';
 import type { TreeNode, TreeNodeData } from 'element-plus/es/components/tree-v2/src/types';
 import { debounce, cloneDeep } from 'lodash-es';
 import { StorageApi } from '@/api';
 import useMenuStore from '@/stores/menu';
+import VirtualizedTree from '@/components/tree-v2/virtualized-tree.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ContextMenu from './context-menu.vue';
 import ModalDatabase from './modal-database.vue';
@@ -120,7 +89,7 @@ const { t } = useI18n();
 const menuStore = useMenuStore();
 const isCollapse = computed((): boolean => menuStore.isCollapse);
 const searchText = ref('');
-const measurementTree = ref<InstanceType<typeof ElTreeV2>>();
+const measurementTree = ref<InstanceType<typeof VirtualizedTree>>();
 const databaseVisible = ref(false);
 const measurementVisible = ref(false);
 const currentDatabase = ref('');
@@ -167,6 +136,7 @@ const onResize = debounce(() => {
   treeHeight.value = document.body.clientHeight - 48 - 100;
 }, 500);
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function nodeTextWidth(node: TreeNode, data: TreeNodeData) {
   // 44 = 24 展开收缩 + 16 右侧更多操作 + 4 文字与操作icon间距
   // 8 缩进大小
@@ -282,7 +252,7 @@ function handleDealData() {
     dealingStatus.value = true;
     const dealingData: Array<StorageDevice.TreeNodeData> = searchResults.value.pop()!;
     internalDealData(dealingData);
-    measurementTree.value?.setData(treeData.value);
+    measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
   }
 }
 
@@ -417,10 +387,10 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
         totalPage: dataPathTotal,
       });
     }
-    measurementTree.value?.setData(treeData.value);
+    measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
     return;
   }
-  if (measurementTree.value?.getNode(data.nodePath)?.children) return;
+  if (measurementTree.value?.virtualizedTreeRef?.getNode(data.nodePath)?.children) return;
   getNextNodeInfos(data.nodePath).then((res) => {
     const list = res.data || [];
     // 展示点开操作查看的data 都在pageChildren 属性，需找到对应的children 上追加子节点
@@ -440,7 +410,7 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
         totalPage: dataPathTotal,
       });
     }
-    measurementTree.value?.setData(treeData.value);
+    measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
   });
 }
 
@@ -466,7 +436,7 @@ function handleNext(e: MouseEvent, data: TreeNodeData) {
       totalPage: currentTotalPage,
     });
   }
-  measurementTree.value?.setData(treeData.value);
+  measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
 }
 
 // 查看全部
@@ -476,13 +446,20 @@ function handleAll(e: MouseEvent, data: TreeNodeData) {
   const currentTreeData = recursionFindParent(data.nodePath, treeData.value)!;
   currentTreeData.pageChildren!.pop();
   currentTreeData.pageChildren = cloneDeep(originTreeData.children);
-  measurementTree.value?.setData(treeData.value);
+  measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
 }
 
 function onMouseDown() {
   contextMenuTimer.value = setTimeout(() => {
     isShowContextMenu.value = false;
   }, 200);
+}
+
+function handleScroll(scrollLeft: number) {
+  const iconList = document.querySelectorAll('.more-icon');
+  iconList.forEach((icon: any) => {
+    icon.style.left = scrollLeft;
+  });
 }
 
 onMounted(() => {
@@ -540,9 +517,6 @@ defineExpose({ handleRefresh });
 }
 
 .node-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   font-size: 12px;
   font-weight: 300;
   line-height: 1.5;
@@ -561,15 +535,19 @@ defineExpose({ handleRefresh });
   color: #495ad4;
 }
 
-:deep(.el-tree-node__content) {
-  position: relative !important;
-}
-
 .more-icon {
   width: 16px;
   height: 16px;
   position: absolute;
-  right: 0;
+  left: 224px;
+  background-color: #fff;
+}
+
+:deep(.el-tree-node__content:hover),
+:deep(.el-tree-node:focus) {
+  .more-icon {
+    background-color: transparent !important;
+  }
 }
 
 .tree-node-operation-buttons {

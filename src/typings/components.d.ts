@@ -109,6 +109,7 @@ declare module 'vue' {
     ICustomNavOpen: typeof import('~icons/custom/nav-open')['default']
     ICustomNewConnection: typeof import('~icons/custom/new-connection')['default']
     ICustomNewRole: typeof import('~icons/custom/new-role')['default']
+    ICustomNewStorage: typeof import('~icons/custom/new-storage')['default']
     ICustomPassword: typeof import('~icons/custom/password')['default']
     ICustomPause: typeof import('~icons/custom/pause')['default']
     ICustomPlayActive: typeof import('~icons/custom/play-active')['default']
@@ -129,6 +130,7 @@ declare module 'vue' {
     ICustomSyncStopped: typeof import('~icons/custom/sync-stopped')['default']
     ICustomSystemStatus: typeof import('~icons/custom/system-status')['default']
     ICustomTemplate: typeof import('~icons/custom/template')['default']
+    ICustomTime: typeof import('~icons/custom/time')['default']
     ICustomTimechoLogo: typeof import('~icons/custom/timecho-logo')['default']
     ICustomTimechoLogoEn: typeof import('~icons/custom/timecho-logo-en')['default']
     ICustomTimechoLogoWhite: typeof import('~icons/custom/timecho-logo-white')['default']
@@ -177,6 +179,7 @@ declare module 'vue' {
     Tooltip: typeof import('./../components/flow-graph/tooltip.vue')['default']
     UserPwd: typeof import('./../components/connection/user-pwd.vue')['default']
     VersionContainer: typeof import('./../components/version-container.vue')['default']
+    VirtualizedTree: typeof import('./../components/tree-v2/virtualized-tree.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']
