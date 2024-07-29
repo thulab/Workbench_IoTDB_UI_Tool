@@ -223,7 +223,7 @@
                   type="primary"
                   link
                   size="small"
-                  :disabled="currentDatabase === 'root.__system' || !rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)"
+                  :disabled="!rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)"
                   @click="handleDelRow('row', row)"
                   :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-del`"
                 >
@@ -404,9 +404,9 @@ const { requestFn: deleteMeasurements } = useRequest(StorageApi.deleteMeasuremen
 const { requestFn: exportMeasurementData } = useRequest(StorageApi.exportMeasurementData);
 
 function isSelectabled() {
-  if (props.currentDatabase === 'root.__system') {
-    return false;
-  }
+  // if (props.currentDatabase === 'root.__system') {
+  //   return false;
+  // }
   return true;
 }
 
