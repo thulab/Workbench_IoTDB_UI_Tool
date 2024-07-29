@@ -233,6 +233,22 @@ function recursionFindParent(path: string, data: Array<StorageDevice.TreeNodeDat
   return result;
 }
 
+function fillTreeLoading(nodes: Array<StorageDevice.TreeNodeData>) {
+  nodes.forEach((node) => {
+    if (node && !node.pageChildren && node.children && node.children.length > 0) {
+      node.pageChildren = [
+        {
+          ...loadingNode,
+          parentPath: node.nodePath,
+        },
+      ];
+    }
+    if (node.children) {
+      fillTreeLoading(node.children);
+    }
+  });
+}
+
 // 获取搜索结果合并树
 function mergeAndUpdateData(data: Array<StorageDevice.TreeNodeData>) {
   data.forEach((item) => {
@@ -288,6 +304,7 @@ function handleData(data: string) {
     // console.log('Received data:', JSON.parse(data));
     const childrenData = JSON.parse(data).children || [];
     const rootTotal = Math.ceil(childrenData.length / pageSize);
+    fillTreeLoading(childrenData);
     const dealData = [
       {
         node: 'root',
