@@ -152,7 +152,6 @@ declare module 'vue' {
     IEpArrowLeftBold: typeof import('~icons/ep/arrow-left-bold')['default']
     IEpArrowRightBold: typeof import('~icons/ep/arrow-right-bold')['default']
     IEpFullScreen: typeof import('~icons/ep/full-screen')['default']
-    IEpMoreFilled: typeof import('~icons/ep/more-filled')['default']
     IEpSearch: typeof import('~icons/ep/search')['default']
     LayoutFooter: typeof import('./../components/layout/layout-footer.vue')['default']
     LayoutHeader: typeof import('./../components/layout/layout-header.vue')['default']

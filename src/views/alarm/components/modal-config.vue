@@ -361,6 +361,7 @@ const handleConfirm = () => {
       } else {
         updateAlarmConfig({
           ...params,
+          measurement: formData.measurement,
           alarmConfigId: props.alarmConfigId,
         }).then((res) => {
           if (res.code === 0) {

@@ -67,7 +67,7 @@
                 </el-dropdown-menu>
               </template>
             </el-dropdown> -->
-            <i-custom-more v-if="data.nodeType !== 'PAGE'" :id="`tree-node-dropdown-${data.nodePath}`" class="more-icon svg-button-hover-color" @click="(e) => handleClickMore(e, data)" />
+            <i-custom-more v-if="data.nodeType !== 'PAGE'" :id="`tree-node-dropdown-${data.nodePath}`" class="more-icon svg-button-hover-color" @click="(e: MouseEvent) => handleClickMore(e, data)" />
             <div class="tree-node-operation-buttons" v-if="data.nodeType === 'PAGE'">
               <el-button type="primary" @click="(e) => handleNext(e, data)" :id="`tree-node-${data.nodePath}-more`" class="svg-button-hover-color">
                 {{ t('common.viewMore') }}
