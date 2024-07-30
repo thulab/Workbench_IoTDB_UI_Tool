@@ -427,7 +427,7 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
   }
   expandNode.value = data.nodePath;
   if (isSearchResult.value) {
-    const originTreeData = cloneDeep(recursionFindCurrentByOrigin(data.nodePath, treeData.value)!.children || []);
+    const originTreeData = cloneDeep(recursionFindCurrentByOrigin(data.nodePath, treeData.value)?.children || []);
     const dataPathTotal = Math.ceil(originTreeData.length / pageSize);
     data.pageChildren = originTreeData.slice(0, 1 * pageSize);
     data.pageNum = 1;
@@ -605,7 +605,7 @@ defineExpose({ handleRefresh });
 :deep(.el-tree-node__content:hover),
 :deep(.el-tree-node:focus) {
   .more-icon {
-    background-color: transparent !important;
+    background-color: #f7f8fc !important;
   }
 }
 

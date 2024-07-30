@@ -120,12 +120,14 @@ const callback = () => {
   let checkBoxWidth = 0;
   // 获取虚拟树dom
   const treeDom = document.querySelector(`.${wrapClassName} .${className} .el-tree .el-tree-virtual-list`);
-  nextTick(() => {
+  try {
     Array.from(treeDom?.children?.[0]?.children as unknown as HTMLElement[])?.forEach((item: HTMLElement) => {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       getWidth(item);
     });
-  });
+  } catch (e) {
+    return;
+  }
   // 是否存在checkbox
   const checkbox = document.querySelector(`.${wrapClassName} .${className} .el-tree .el-tree-virtual-list .el-checkbox`) as HTMLElement;
   if (checkbox) {
