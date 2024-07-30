@@ -420,6 +420,7 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
     e.stopPropagation();
     return;
   }
+  if (data.nodePath === expandNode.value) return;
   if (['DATABASE', 'TIMESERIES'].includes(data.nodeType)) {
     if (props.currentNode !== data.nodePath) {
       emit('handleChangeNode', data.nodePath, data.nodeType);
@@ -503,7 +504,7 @@ function handleAll(e: MouseEvent, data: TreeNodeData) {
   const originTreeData = recursionFindCurrentByOrigin(data.nodePath, treeData.value)!;
   const currentTreeData = recursionFindParent(data.nodePath, treeData.value)!;
   currentTreeData.pageChildren!.pop();
-  currentTreeData.pageChildren = cloneDeep(originTreeData.children);
+  currentTreeData.pageChildren = currentTreeData.pageChildren?.concat(originTreeData.children!.slice(data.pageNum * pageSize));
   measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
 }
 
