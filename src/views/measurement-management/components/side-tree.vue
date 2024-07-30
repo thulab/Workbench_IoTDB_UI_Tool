@@ -204,6 +204,7 @@ function getTreeData() {
     .finally(() => {
       initialLoading.value = false;
       expandNode.value = 'root';
+      measurementTree.value?.virtualizedTreeRef?.setExpandedKeys(['root']);
     });
 }
 
@@ -291,7 +292,9 @@ function handleDealData() {
     dealingStatus.value = true;
     const dealingData: Array<StorageDevice.TreeNodeData> = searchResults.value.pop()!;
     internalDealData(dealingData);
+    expandNode.value = 'root';
     measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
+    measurementTree.value?.virtualizedTreeRef?.setExpandedKeys(['root']);
   }
 }
 
@@ -344,7 +347,6 @@ async function subscribeToSSE() {
 }
 
 function handleSearch() {
-  emit('handleChangeNode', 'root', 'DATABASE');
   if (searchText.value.trim()) {
     searching.value = true;
     isSearchResult.value = true;
@@ -353,6 +355,8 @@ function handleSearch() {
     isSearchResult.value = false;
     getTreeData();
   }
+
+  emit('handleChangeNode', 'root', 'DATABASE');
 }
 
 function handleRefresh(unforce?: boolean) {
