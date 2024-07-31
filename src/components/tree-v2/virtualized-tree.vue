@@ -51,7 +51,8 @@ defineOptions({
 });
 
 const emit = defineEmits<{
-  (event: 'handleScroll', payload: number): void;
+  // (event: 'handleScroll', payload: number): void;
+  (event: 'handleClickMore', e: MouseEvent, payload: string): void;
 }>();
 
 // #region <移入移出>
@@ -99,18 +100,56 @@ const initWrapStyle = () => {
     window.addEventListener('resize', autoSetWrapStyle);
   }
 };
-function handleScroll() {
-  const scrollLeft = (document.querySelector('.virtualized-tree-scroll')?.scrollLeft || 0) + 212;
-  emit('handleScroll', scrollLeft);
+// function handleScroll() {
+//   const scrollLeft = (document.querySelector('.virtualized-tree-scroll')?.scrollLeft || 0) + 212;
+//   emit('handleScroll', scrollLeft);
+// }
+
+function contextMenuEvent(event: Event) {
+  // 阻止默认的右键菜单
+  event.preventDefault();
+
+  // 找到当前被点击的 el-tree-node 节点
+  let currentNode: any = event.target;
+  while (currentNode && !currentNode.classList.contains('el-tree-node')) {
+    currentNode = currentNode.parentNode;
+  }
+
+  if (currentNode) {
+    // 执行自定义的右键菜单逻辑
+    emit('handleClickMore', event as MouseEvent, currentNode.dataset.key);
+  } else {
+    console.log('未找到 el-tree-node 节点');
+  }
+}
+
+function handleContextMenu() {
+  const nodeList = document.querySelectorAll('.el-tree-node');
+  nodeList.forEach((node) => {
+    node.addEventListener('contextmenu', (event: Event) => {
+      contextMenuEvent(event);
+    });
+  });
+}
+
+function removeContextMenu() {
+  const nodeList = document.querySelectorAll('.el-tree-node');
+  nodeList.forEach((node) => {
+    node.removeEventListener('contextmenu', (event: Event) => {
+      contextMenuEvent(event);
+    });
+  });
 }
 
 onUnmounted(() => {
   window.removeEventListener('resize', autoSetWrapStyle);
-  document.querySelector('.virtualized-tree-scroll')?.removeEventListener('scroll', handleScroll);
+  // document.querySelector('.virtualized-tree-scroll')?.removeEventListener('scroll', handleScroll);
+  removeContextMenu();
 });
 onMounted(() => {
   initWrapStyle();
-  document.querySelector('.virtualized-tree-scroll')?.addEventListener('scroll', handleScroll);
+  handleContextMenu();
+  // document.querySelector('.virtualized-tree-scroll')?.addEventListener('scroll', handleScroll);
 });
 // #endregion
 const callback = () => {
@@ -142,7 +181,8 @@ const callback = () => {
   const minWidth = minWidthNode?.clientWidth || 0;
   const targetWidth = maxWidth + maxPaddingLeft + checkBoxWidth;
   width.value = isNumber(targetWidth) ? `${targetWidth > minWidth ? targetWidth : minWidth}px` : '100%';
-  handleScroll();
+  // handleScroll();
+  handleContextMenu();
   function getWidth(el: HTMLElement) {
     const elWidthNode = Array.from(el.children).find((item) => {
       return Array.from(item.classList || []).includes('el-tree-node__content');

@@ -29,7 +29,7 @@
           @node-expand="handleNodeClick"
           @node-click="handleNodeClick"
           @node-collapse="handleNodeCollapse"
-          @handle-scroll="handleScroll"
+          @handle-click-more="handleClickMore"
         >
           <!-- eslint-disable-next-line vue/no-unused-vars -->
           <template #default="{ node, data }">
@@ -38,7 +38,8 @@
               <el-icon size="16" v-if="data.nodeType === 'TIMESERIES'"><i-custom-measure-num /></el-icon>
               {{ data.node }}
             </div>
-            <i-custom-more v-if="data.nodeType !== 'PAGE'" :id="`tree-node-dropdown-${data.nodePath}`" class="more-icon svg-button-hover-color" @click="(e: MouseEvent) => handleClickMore(e, data)" />
+            <!-- eslint-disable-next-line vue/max-len -->
+            <!-- <i-custom-more v-if="data.nodeType !== 'PAGE'" :id="`tree-node-dropdown-${data.nodePath}`" class="more-icon svg-button-hover-color" @click="(e: MouseEvent) => handleClickMore(e, data)" /> -->
             <div class="tree-node-operation-buttons" v-if="data.nodeType === 'PAGE'">
               <el-button type="primary" @click="(e) => handleNext(e, data)" :id="`tree-node-${data.nodePath}-more`" class="svg-button-hover-color">
                 {{ t('common.viewMore') }}
@@ -193,7 +194,7 @@ function getTreeData() {
       if (rootTotal > 1) {
         treeData.value[0].pageChildren?.push({
           node: 'root',
-          nodePath: 'root',
+          nodePath: 'root__PAGE',
           nodeType: 'PAGE',
           parentPath: '',
           pageNum: 1,
@@ -323,7 +324,7 @@ function handleData(data: string) {
     if (rootTotal > 1) {
       dealData[0].pageChildren?.push({
         node: 'root',
-        nodePath: 'root',
+        nodePath: 'root__PAGE',
         nodeType: 'PAGE',
         parentPath: '',
         pageNum: 1,
@@ -370,12 +371,14 @@ function handleRefresh(unforce?: boolean) {
   }
 }
 
-function handleClickMore(e: MouseEvent, data: TreeNodeData) {
-  e.stopPropagation();
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function handleClickMore(e: MouseEvent, key: string) {
   if (contextMenuTimer.value) {
     clearTimeout(contextMenuTimer.value);
     contextMenuTimer.value = undefined;
   }
+  const data: TreeNodeData = measurementTree.value?.virtualizedTreeRef?.getNode(key)?.data!;
+  if (data.nodeType === 'PAGE') return;
   clickedNodeData.node = data.node;
   clickedNodeData.nodePath = data.nodePath;
   clickedNodeData.nodeType = data.nodeType;
@@ -417,7 +420,7 @@ function handleNodeCollapse(data: TreeNodeData, node: TreeNode) {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
   if (data.nodeType === 'PAGE') {
-    e.stopPropagation();
+    e?.stopPropagation();
     return;
   }
   if (data.nodePath === expandNode.value) return;
@@ -436,7 +439,7 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
     if (dataPathTotal > 1) {
       data.pageChildren?.push({
         node: data.node,
-        nodePath: data.nodePath,
+        nodePath: `${data.nodePath}__PAGE`,
         nodeType: 'PAGE',
         parentPath: data.parentPath || '',
         pageNum: 1,
@@ -462,7 +465,7 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
     if (dataPathTotal > 1) {
       data.pageChildren?.push({
         node: data.node,
-        nodePath: data.nodePath,
+        nodePath: `${data.nodePath}__PAGE`,
         nodeType: 'PAGE',
         parentPath: data.parentPath || '',
         pageNum: 1,
@@ -476,8 +479,8 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
 // 查看更多--下一页
 function handleNext(e: MouseEvent, data: TreeNodeData) {
   e.stopPropagation();
-  const originTreeData = recursionFindCurrentByOrigin(data.nodePath, treeData.value)!;
-  const currentTreeData = recursionFindParent(data.nodePath, treeData.value)!;
+  const originTreeData = recursionFindCurrentByOrigin(`${data.parentPath ? `${data.parentPath}.` : ''}${data.node}`, treeData.value)!;
+  const currentTreeData = recursionFindParent(`${data.parentPath ? `${data.parentPath}.` : ''}${data.node}`, treeData.value)!;
   currentTreeData.pageChildren!.pop();
   currentTreeData.pageChildren = currentTreeData.pageChildren?.concat(originTreeData.children!.slice(data.pageNum * pageSize, (data.pageNum + 1) * pageSize));
   currentTreeData.pageNum = data.pageNum + 1;
@@ -488,7 +491,7 @@ function handleNext(e: MouseEvent, data: TreeNodeData) {
   if (currentTreeData.pageNum! < currentTotalPage) {
     currentTreeData.pageChildren!.push({
       node: data.node,
-      nodePath: data.nodePath,
+      nodePath: `${data.nodePath}__PAGE`,
       nodeType: 'PAGE',
       parentPath: data.parentPath || '',
       pageNum: currentTreeData.pageNum || 1,
@@ -501,8 +504,8 @@ function handleNext(e: MouseEvent, data: TreeNodeData) {
 // 查看全部
 function handleAll(e: MouseEvent, data: TreeNodeData) {
   e.stopPropagation();
-  const originTreeData = recursionFindCurrentByOrigin(data.nodePath, treeData.value)!;
-  const currentTreeData = recursionFindParent(data.nodePath, treeData.value)!;
+  const originTreeData = recursionFindCurrentByOrigin(`${data.parentPath ? `${data.parentPath}.` : ''}${data.node}`, treeData.value)!;
+  const currentTreeData = recursionFindParent(`${data.parentPath ? `${data.parentPath}.` : ''}${data.node}`, treeData.value)!;
   currentTreeData.pageChildren!.pop();
   currentTreeData.pageChildren = currentTreeData.pageChildren?.concat(originTreeData.children!.slice(data.pageNum * pageSize));
   measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
@@ -514,12 +517,12 @@ function onMouseDown() {
   }, 200);
 }
 
-function handleScroll(scrollLeft: number) {
-  const iconList = document.querySelectorAll('.more-icon');
-  iconList.forEach((icon: any) => {
-    icon.style.left = scrollLeft;
-  });
-}
+// function handleScroll(scrollLeft: number) {
+//   const iconList = document.querySelectorAll('.more-icon');
+//   iconList.forEach((icon: any) => {
+//     icon.style.left = scrollLeft;
+//   });
+// }
 
 onMounted(() => {
   window.addEventListener('resize', onResize);
@@ -581,13 +584,7 @@ defineExpose({ handleRefresh });
   line-height: 1.5;
   display: flex;
   align-items: center;
-
-  .node-text-content {
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+  padding-right: 8px;
 }
 
 .el-tree-node:focus {
