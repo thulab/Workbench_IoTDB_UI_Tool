@@ -11,7 +11,7 @@
           {{ t('measurement.newMeasurement') }}
         </li>
       </auth-tooltip>
-      <el-tooltip placement="top-start" effect="light" trigger="hover" :content="deleteTip" :disabled="deleteTipDisabled" popper-class="tooltip-box-width">
+      <el-tooltip v-if="clickedNodeData.nodePath !== 'root'" placement="top-start" effect="light" trigger="hover" :content="deleteTip" :disabled="deleteTipDisabled" popper-class="tooltip-box-width">
         <li :id="`tree-node-dropdown-delete-${clickedNodeData.nodePath}`" :class="['context-menu-item', { 'disabled-menu': !deleteTipDisabled }]" @click="handleCommand('delete')">
           {{ t('common.delete') }}
         </li>

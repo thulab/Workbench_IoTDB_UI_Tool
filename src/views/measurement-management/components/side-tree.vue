@@ -378,7 +378,7 @@ function handleClickMore(e: MouseEvent, key: string) {
     contextMenuTimer.value = undefined;
   }
   const data: TreeNodeData = measurementTree.value?.virtualizedTreeRef?.getNode(key)?.data!;
-  if (data.nodeType === 'PAGE') return;
+  if (data.nodeType === 'PAGE' || data.nodePath.startsWith('root.__system')) return;
   clickedNodeData.node = data.node;
   clickedNodeData.nodePath = data.nodePath;
   clickedNodeData.nodeType = data.nodeType;

@@ -21,7 +21,13 @@
       </ul>
 
       <auth-tooltip :is-disabled="canManageDatabase" :content="'common.databaseAuth'">
-        <el-button plain class="el-button-delete" :disabled="!currentDatabase || !canManageDatabase" @click="handleDelDatabase" id="mesaurement-top-delete-databse">
+        <el-button
+          plain
+          class="el-button-delete"
+          :disabled="!currentDatabase || currentDatabase === 'root' || currentDatabase === 'root.__system' || !canManageDatabase"
+          @click="handleDelDatabase"
+          id="mesaurement-top-delete-databse"
+        >
           {{ t('common.delete') }}
         </el-button>
       </auth-tooltip>
@@ -223,7 +229,7 @@
                   type="primary"
                   link
                   size="small"
-                  :disabled="!rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)"
+                  :disabled="currentDatabase === 'root.__system' || !rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)"
                   @click="handleDelRow('row', row)"
                   :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-del`"
                 >
@@ -404,9 +410,9 @@ const { requestFn: deleteMeasurements } = useRequest(StorageApi.deleteMeasuremen
 const { requestFn: exportMeasurementData } = useRequest(StorageApi.exportMeasurementData);
 
 function isSelectabled() {
-  // if (props.currentDatabase === 'root.__system') {
-  //   return false;
-  // }
+  if (props.currentDatabase === 'root.__system') {
+    return false;
+  }
   return true;
 }
 
