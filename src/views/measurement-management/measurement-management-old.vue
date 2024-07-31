@@ -216,7 +216,7 @@
               :prop="column.prop"
               :min-width="column.width"
               align="center"
-              show-overflow-tooltip
+              :show-overflow-tooltip="column.prop !== 'description'"
             >
               <template #default="{ row }">
                 <div class="row-description-box" v-if="column.prop === 'description'">

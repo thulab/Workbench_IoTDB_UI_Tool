@@ -161,7 +161,7 @@
             :prop="column.prop"
             :min-width="column.width"
             align="center"
-            show-overflow-tooltip
+            :show-overflow-tooltip="column.prop !== 'description'"
           >
             <template #default="{ row }">
               <template v-if="column.prop === 'timeseries'">{{ `${row.deviceName}.${row.timeseries}` }}</template>
