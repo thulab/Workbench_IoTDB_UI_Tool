@@ -76,7 +76,6 @@
                 :max-height="260"
                 tooltip-effect="light"
                 :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
-                :default-sort="{ prop: 'type', order: 'ascending' }"
                 @sort-change="({ column, prop, order }) => handleSortChange({ column, prop, order }, 'master')"
               >
                 <el-table-column :label="t('dashboard.node')" prop="address" min-width="200" align="center" show-overflow-tooltip />
@@ -84,7 +83,7 @@
                   :label="t('dashboard.type')"
                   prop="type"
                   sortable="custom"
-                  :sort-orders="['ascending', 'descending']"
+                  :sort-orders="['ascending', 'descending', null]"
                   min-width="120"
                   align="center"
                   show-overflow-tooltip
@@ -94,7 +93,7 @@
                   :label="t('common.status')"
                   prop="status"
                   sortable="custom"
-                  :sort-orders="['ascending', 'descending']"
+                  :sort-orders="['ascending', 'descending', null]"
                   width="120"
                   align="left"
                   show-overflow-tooltip
@@ -189,7 +188,6 @@
                 :max-height="260"
                 tooltip-effect="light"
                 :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
-                :default-sort="{ prop: 'type', order: 'ascending' }"
                 @sort-change="({ column, prop, order }) => handleSortChange({ column, prop, order }, 'slave')"
               >
                 <el-table-column :label="t('dashboard.node')" prop="address" min-width="200" align="center" show-overflow-tooltip />
@@ -197,7 +195,7 @@
                   :label="t('dashboard.type')"
                   prop="type"
                   sortable="custom"
-                  :sort-orders="['ascending', 'descending']"
+                  :sort-orders="['ascending', 'descending', null]"
                   min-width="120"
                   align="center"
                   show-overflow-tooltip
@@ -207,7 +205,7 @@
                   :label="t('common.status')"
                   prop="status"
                   sortable="custom"
-                  :sort-orders="['ascending', 'descending']"
+                  :sort-orders="['ascending', 'descending', null]"
                   width="120"
                   align="left"
                   show-overflow-tooltip
@@ -345,9 +343,12 @@ const systemNumberData = reactive<Dashboard.SystemNumberData>({
   deviceNum: 0,
   measurementNum: 0,
 });
-const searchFormData = reactive({
+const searchFormData = reactive<{
+  orderBy: string[];
+  asc: string[];
+}>({
   orderBy: ['type', 'type'],
-  asc: ['asc', 'asc'],
+  asc: ['', ''],
 });
 const activeVisible = ref(false);
 const activeIsMaster = ref(true);
@@ -445,7 +446,7 @@ function getSystemData() {
           physicalMachine: '',
         },
       ],
-      res.data.masterNodeInfo.nodes ? [...res.data.masterNodeInfo.nodes] : []
+      res.data.masterNodeInfo.nodes ? [...res.data.masterNodeInfo.nodes.filter((item) => item.type === 'ConfigNode'), ...res.data.masterNodeInfo.nodes.filter((item) => item.type === 'DataNode')] : []
     );
     if (res.data.slaveNodeInfo) {
       assign(slaveData.value, res.data.slaveNodeInfo);
@@ -461,7 +462,7 @@ function getSystemData() {
             physicalMachine: '',
           },
         ],
-        res.data.slaveNodeInfo.nodes ? [...res.data.slaveNodeInfo.nodes] : []
+        res.data.slaveNodeInfo.nodes ? [...res.data.slaveNodeInfo.nodes.filter((item) => item.type === 'ConfigNode'), ...res.data.slaveNodeInfo.nodes.filter((item) => item.type === 'DataNode')] : []
       );
     } else {
       slaveData.value = null;
@@ -522,11 +523,23 @@ function handleChangeNode(val: string) {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleSortChange({ column, prop, order }: SortMethod<Alarm.QueryConfigResult>, type: 'master' | 'slave') {
   if (type === 'master') {
-    searchFormData.asc[0] = order === 'ascending' ? 'asc' : 'desc';
+    if (order === 'ascending') {
+      searchFormData.asc[0] = 'asc';
+    } else if (order === 'descending') {
+      searchFormData.asc[0] = 'desc';
+    } else {
+      searchFormData.asc[0] = '';
+    }
     searchFormData.orderBy[0] = prop;
   }
   if (type === 'slave') {
-    searchFormData.asc[1] = order === 'ascending' ? 'asc' : 'desc';
+    if (order === 'ascending') {
+      searchFormData.asc[1] = 'asc';
+    } else if (order === 'descending') {
+      searchFormData.asc[1] = 'desc';
+    } else {
+      searchFormData.asc[1] = '';
+    }
     searchFormData.orderBy[1] = prop;
   }
   handleRefreshSystem();

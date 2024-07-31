@@ -137,7 +137,7 @@ import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import dayjs from 'dayjs';
-import { debounce, cloneDeep, difference } from 'lodash-es';
+import { debounce, cloneDeep, difference, isEqual } from 'lodash-es';
 import { vElementSize } from '@vueuse/components';
 import { SearchApi } from '@/api';
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
@@ -997,19 +997,61 @@ function handleOperateTemplate(val: string, data: Search.TrendTemplate) {
     searchFormData.unitInterval = templateData.unitInterval;
     pathList.value = [];
     nextTick(() => {
-      pathList.value = templateData.pathList.map((item: Trend.LineObj) => ({ ...item }));
-      handleTrendTab(templateData.type, true);
+      const templatePaths = templateData.pathList.map((item: Trend.LineObj) => item.path).join(',');
+      const searchPaths = templateData.path.join(',');
+      const isSamePath = isEqual(templatePaths, searchPaths);
+      if (isSamePath) {
+        pathList.value = templateData.pathList.map((item: Trend.LineObj) => ({ ...item }));
+        handleTrendTab(templateData.type, true);
+      } else {
+        const existedColor = templateData.pathList.map((item: Trend.LineObj) => item.color);
+        const diffArr = difference(predefineColors, existedColor);
+        const resultPath: Array<Trend.LineObj> = [];
+        searchFormData.path.forEach((item, index) => {
+          const i = templateData.pathList.findIndex((pathItem: Trend.LineObj) => pathItem.path === item);
+          if (i !== -1) {
+            resultPath.push({ ...pathList.value[i] });
+          } else {
+            resultPath.push({
+              path: item,
+              color: diffArr[index] || predefineColors[index],
+              width: 2,
+              checked: true,
+              disabled: false,
+            });
+          }
+        });
+        pathList.value = [...resultPath];
+        handleTrendTab(templateData.type, true);
+      }
     });
   }
 }
 
 function handleSaveSuccess(name: string) {
   saveTemplateLoading.value = true;
+  const existedColor = pathList.value.map((item: Trend.LineObj) => item.color);
+  const diffArr = difference(predefineColors, existedColor);
+  const resultPath: Array<Trend.LineObj> = [];
+  searchFormData.path.forEach((item, index) => {
+    const i = pathList.value.findIndex((pathItem) => pathItem.path === item);
+    if (i !== -1) {
+      resultPath.push({ ...pathList.value[i] });
+    } else {
+      resultPath.push({
+        path: item,
+        color: diffArr[index] || predefineColors[index],
+        width: 2,
+        checked: true,
+        disabled: false,
+      });
+    }
+  });
   const data = JSON.stringify({
     ...searchFormData,
     datetimerange: [dayjs(searchFormData.datetimerange[0]).valueOf(), dayjs(searchFormData.datetimerange[1]).valueOf()],
     type: dataTab.value,
-    pathList: pathList.value,
+    pathList: resultPath,
   });
   upsertTrendTemplate({
     id: '',
@@ -1156,23 +1198,25 @@ watch(
         if (sessionStorage.getItem('dataTrendStorage')) {
           const storageData = JSON.parse(sessionStorage.getItem('dataTrendStorage') as string);
           searchFormData.path = storageData.path;
-          searchFormData.datetimerange = storageData.datetimerange;
-          searchFormData.unitInterval = storageData.unitInterval;
-          searchFormData.aggregation = storageData.aggregation;
-          dataTab.value = storageData.dataTab;
-          pathList.value = storageData.pathList;
-          pointLineData.value = storageData.pointLineData.map((item: MarkPointLine) => ({
-            ...item,
-            label: {
-              formatter: () => `D${item.group}-${item.order}`,
-              position: 'end',
-              offset: [0, item.order * 10],
-            },
-          }));
-          markPointCount.value = storageData.markPointCount;
-          pointList.value = storageData.pointList;
-          activeNameSide.value = storageData.activeNameSide;
-          loading.value = dataTab.value === 'running';
+          if (searchFormData.path?.length) {
+            searchFormData.datetimerange = storageData.datetimerange;
+            searchFormData.unitInterval = storageData.unitInterval;
+            searchFormData.aggregation = storageData.aggregation;
+            dataTab.value = storageData.dataTab;
+            pathList.value = storageData.pathList;
+            pointLineData.value = storageData.pointLineData.map((item: MarkPointLine) => ({
+              ...item,
+              label: {
+                formatter: () => `D${item.group}-${item.order}`,
+                position: 'end',
+                offset: [0, item.order * 10],
+              },
+            }));
+            markPointCount.value = storageData.markPointCount;
+            pointList.value = storageData.pointList;
+            activeNameSide.value = storageData.activeNameSide;
+            loading.value = dataTab.value === 'running';
+          }
           if (socketInstance.value && socketInstance.value.readyState === 1) {
             socketInstance.value?.send(
               JSON.stringify({
