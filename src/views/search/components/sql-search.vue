@@ -5,6 +5,10 @@
         <span>{{ t('search.sqlInput') }}</span>
       </div>
       <div class="sql-right-icon-box">
+        <el-button link @click="handleRevert" :disabled="code === codeOriginal" id="sql-search-operate-revert" class="svg-button-hover-color">
+          <i-custom-revert />
+          {{ t('common.reset') }}
+        </el-button>
         <el-button link @click="handleSave" id="sql-search-operate-save" class="svg-button-hover-color">
           <i-custom-sql-save />
           {{ t('common.save') }}
@@ -127,8 +131,9 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
 const props = defineProps<{
   code: string;
+  codeOriginal: string;
 }>();
-const emit = defineEmits(['save', 'update:code']);
+const emit = defineEmits(['save', 'update:code', 'revert']);
 
 const { t } = useI18n();
 const codeEditorRef = ref<InstanceType<typeof CodeEditor>>();
@@ -281,6 +286,9 @@ function querySqlRun(type?: string) {
 
 function handleSave() {
   emit('save');
+}
+function handleRevert() {
+  emit('revert');
 }
 
 function handleUpdate() {

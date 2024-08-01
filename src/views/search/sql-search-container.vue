@@ -11,7 +11,17 @@
                 </span>
               </template>
               <el-scrollbar :height="tabHeight">
-                <sql-search v-model:code="code[activiteSql]" @save="handleSave" ref="sqlSearchRef" />
+                <sql-search
+                  v-model:code="code[activiteSql]"
+                  :codeOriginal="codeOriginal[activiteSql]"
+                  @save="handleSave"
+                  @revert="
+                    () => {
+                      code[activiteSql] = codeOriginal[activiteSql];
+                    }
+                  "
+                  ref="sqlSearchRef"
+                />
               </el-scrollbar>
             </el-tab-pane>
           </el-tabs>
@@ -79,6 +89,17 @@
         </span>
       </template>
     </el-dialog>
+    <el-dialog :title="t('common.notice')" v-model="saveTipDialogVisible" width="480px" align-center>
+      <span style="line-height: 24px" class="inline-flex items-center">
+        <i-custom-message-warning class="m-r-4" />
+        {{ t('common.unsaveContinueTip') }}
+      </span>
+      <template #footer>
+        <el-button id="sql-search-modal-unsavetip-unsave" class="left" @click="handleUnsave">{{ t('common.unsave') }}</el-button>
+        <el-button @click="saveTipDialogVisible = false" id="sql-search-modal-unsavetip-cancel">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="saveLoading" @click="handleContiuneSave" id="sql-search-modal-unsavetip-confirm">{{ t('common.save') }}</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -97,6 +118,7 @@ const sqlSearchRef = ref<Array<InstanceType<typeof SqlSearch>>>([]);
 const codeMirrorReady = ref(true);
 const nameDialogVisible = ref(false);
 const renameDialogVisible = ref(false);
+const saveTipDialogVisible = ref(false);
 
 const { maxTableHeight: tabHeight } = useTableHeight(125);
 
@@ -114,7 +136,10 @@ const sqlList = ref<Search.SqlList[]>([
 const activeNameSide = ref('function');
 
 const code = reactive<Record<string, string>>({});
+const codeOriginal = reactive<Record<string, string>>({});
 code[activiteSql.value] = '';
+// 用于存储初始状态
+codeOriginal[activiteSql.value] = '';
 const sqlListRef = ref<InstanceType<typeof SideTemplate>>();
 const saveFormRef = ref<FormInstance>();
 const resaveFormRef = ref<FormInstance>();
@@ -164,11 +189,13 @@ function getSqlCode() {
   if (code[activiteSql.value]) return;
   const id = activiteSql.value.charAt(0) === '_' ? null : activiteSql.value;
   code[activiteSql.value] = '';
+  codeOriginal[activiteSql.value] = '';
   // tableData.list = [];
   if (!id) return;
   getSql(id).then((res) => {
     const resData = res.data;
     code[activiteSql.value] = resData.sqls;
+    codeOriginal[activiteSql.value] = resData.sqls;
   });
 }
 
@@ -214,6 +241,7 @@ function handleSqlOperate(val: string, data: Search.SqlList) {
       });
       activiteSql.value = currentSqlId;
       code[activiteSql.value] = '';
+      codeOriginal[activiteSql.value] = '';
     }
   }
 }
@@ -229,6 +257,7 @@ const handleTabAdd = throttle(() => {
   });
   activiteSql.value = currentSqlId;
   code[activiteSql.value] = '';
+  codeOriginal[activiteSql.value] = '';
 }, 999);
 // 点击tab
 function handleTabClick(tab: TabsPaneContext) {
@@ -248,30 +277,25 @@ function handleTabRemove(targetName: TabPaneName) {
   const index = sqlList.value.findIndex((f) => `${f.id}` === `${targetName}`);
   const current = sqlList.value[index];
   const id = `${targetName}`.charAt(0) === '_' ? null : (targetName as unknown as string);
-  if (!id) {
-    activiteSql.value = targetName as string;
-    saveForm.sqlName = current.queryName;
-    saveSource.value = 'close';
-    nameDialogVisible.value = true;
-    nextTick(() => {
-      saveFormRef.value?.clearValidate();
-    });
+  if (code[targetName].trim() !== codeOriginal[targetName].trim()) {
+    if (!id) {
+      activiteSql.value = targetName as string;
+      saveForm.sqlName = current.queryName;
+      saveSource.value = 'close';
+      nameDialogVisible.value = true;
+      nextTick(() => {
+        saveFormRef.value?.clearValidate();
+      });
+    } else if (id) {
+      activiteSql.value = targetName as string;
+      saveForm.sqlName = current.queryName;
+      saveSource.value = 'close';
+      saveTipDialogVisible.value = true;
+    }
   } else {
-    saveQuery({
-      id,
-      queryName: current.queryName,
-      sqls: code[targetName],
-    }).then((res) => {
-      if (res.code === 0) {
-        ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
-        // code[targetName] = '';
-        delete code[targetName];
-        const nextTab = sqlList.value[index + 1] || sqlList.value[index - 1];
-        activiteSql.value = `${nextTab.id}`;
-        sqlList.value.splice(index, 1);
-        sqlListRef.value?.getQueryList();
-      }
-    });
+    const nextTab = sqlList.value[index + 1] || sqlList.value[index - 1];
+    activiteSql.value = `${nextTab.id}`;
+    sqlList.value.splice(index, 1);
   }
 }
 
@@ -298,6 +322,7 @@ function handleNameConfirm() {
             sqlListRef.value?.getQueryList();
           } else {
             code[activiteSql.value] = '';
+            codeOriginal[activiteSql.value] = '';
             // delete code[activiteSql.value];
             const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
             const nextTab = sqlList.value[index + 1] || sqlList.value[index - 1];
@@ -310,6 +335,37 @@ function handleNameConfirm() {
     }
   });
 }
+function handleUnsave() {
+  saveTipDialogVisible.value = false;
+  code[activiteSql.value] = codeOriginal[activiteSql.value];
+  const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
+  const nextTab = sqlList.value[index + 1] || sqlList.value[index - 1];
+  activiteSql.value = `${nextTab?.id}`;
+  sqlList.value.splice(index, 1);
+}
+
+function handleContiuneSave() {
+  const targetName = activiteSql.value;
+  const id = activiteSql.value.charAt(0) === '_' ? null : activiteSql.value;
+  const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
+  saveQuery({
+    id,
+    queryName: saveForm.sqlName,
+    sqls: code[targetName],
+  }).then((res) => {
+    if (res.code === 0) {
+      saveTipDialogVisible.value = false;
+      ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
+      // code[targetName] = '';
+      delete code[targetName];
+      delete codeOriginal[targetName];
+      const nextTab = sqlList.value[index + 1] || sqlList.value[index - 1];
+      activiteSql.value = `${nextTab.id}`;
+      sqlList.value.splice(index, 1);
+      sqlListRef.value?.getQueryList();
+    }
+  });
+}
 // 取消保存模板
 function handleNameCancel() {
   if (saveSource.value === 'save') {
@@ -318,6 +374,7 @@ function handleNameCancel() {
     nameDialogVisible.value = false;
     // delete code[activiteSql.value];
     code[activiteSql.value] = '';
+    codeOriginal[activiteSql.value] = '';
     const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
     const nextTab = sqlList.value[index + 1] || sqlList.value[index - 1];
     activiteSql.value = `${nextTab?.id}`;
@@ -369,6 +426,7 @@ function handleSave() {
     }).then((res) => {
       if (res.code === 0) {
         ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
+        codeOriginal[activiteSql.value] = code[activiteSql.value];
       }
     });
   }
@@ -382,6 +440,7 @@ function setStorage() {
       sqlList: sqlList.value,
       activeNameSide: activeNameSide.value,
       code: { ...code },
+      codeOriginal: { ...codeOriginal },
     })
   );
 }
@@ -407,6 +466,10 @@ onMounted(() => {
     const allCodeKeys = Object.keys(storageData.code);
     allCodeKeys.forEach((sql) => {
       code[sql] = storageData.code[sql];
+    });
+    const allCodeMirrorKeys = Object.keys(storageData.codeOriginal);
+    allCodeMirrorKeys.forEach((sql) => {
+      codeOriginal[sql] = storageData.codeOriginal[sql];
     });
   }
 });

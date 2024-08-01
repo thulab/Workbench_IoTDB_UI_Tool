@@ -118,6 +118,7 @@ declare module 'vue' {
     ICustomQuestionNew: typeof import('~icons/custom/question-new')['default']
     ICustomQuestionWhite: typeof import('~icons/custom/question-white')['default']
     ICustomRefresh: typeof import('~icons/custom/refresh')['default']
+    ICustomRevert: typeof import('~icons/custom/revert')['default']
     ICustomRunAll: typeof import('~icons/custom/run-all')['default']
     ICustomRunPart: typeof import('~icons/custom/run-part')['default']
     ICustomSearchIcon: typeof import('~icons/custom/search-icon')['default']
