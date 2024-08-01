@@ -20,6 +20,7 @@ common:
   previousPage: Previous Page
   nextPage: Next Page
   save: Save
+  unsave: Do not save
   clear: Clear
   noData: No Data
   tip: Tip
@@ -133,6 +134,7 @@ common:
   test: Test
   continueTip: The current content is incomplete, do you want to continue?
   unsaveTip: The current content has not been saved, do you want to continue?
+  unsaveContinueTip: The current content has not been saved, do you want to continue save?
   continue: Continue
   giveup: Cancel
   example: For Example
