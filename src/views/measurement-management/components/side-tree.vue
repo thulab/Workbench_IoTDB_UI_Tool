@@ -431,22 +431,24 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
   }
   expandNode.value = data.nodePath;
   if (isSearchResult.value) {
-    const originTreeData = cloneDeep(recursionFindCurrentByOrigin(data.nodePath, treeData.value)?.children || []);
-    const dataPathTotal = Math.ceil(originTreeData.length / pageSize);
-    data.pageChildren = originTreeData.slice(0, 1 * pageSize);
-    data.pageNum = 1;
-    data.totalPage = dataPathTotal;
-    if (dataPathTotal > 1) {
-      data.pageChildren?.push({
-        node: data.node,
-        nodePath: `${data.nodePath}__PAGE`,
-        nodeType: 'PAGE',
-        parentPath: data.parentPath || '',
-        pageNum: 1,
-        totalPage: dataPathTotal,
-      });
+    if ((data.pageChildren && data.pageChildren.length === 0) || data.pageChildren[0].nodeType === 'loading') {
+      const originTreeData = cloneDeep(recursionFindCurrentByOrigin(data.nodePath, treeData.value)?.children || []);
+      const dataPathTotal = Math.ceil(originTreeData.length / pageSize);
+      data.pageChildren = originTreeData.slice(0, 1 * pageSize);
+      data.pageNum = 1;
+      data.totalPage = dataPathTotal;
+      if (dataPathTotal > 1) {
+        data.pageChildren?.push({
+          node: data.node,
+          nodePath: `${data.nodePath}__PAGE`,
+          nodeType: 'PAGE',
+          parentPath: data.parentPath || '',
+          pageNum: 1,
+          totalPage: dataPathTotal,
+        });
+      }
+      measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
     }
-    measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
     return;
   }
   const children = measurementTree.value?.virtualizedTreeRef?.getNode(data.nodePath)?.children;
