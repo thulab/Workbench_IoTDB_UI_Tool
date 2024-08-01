@@ -230,7 +230,7 @@ measurement:
   totalNum: 数据总量
   measurementList: 测点列表
   list: 列表
-  newValList: 数值
+  newValList: 数据
   measurementChoose: 测点选择
   measurementType: 测点类型
   lastValue: 最新值
