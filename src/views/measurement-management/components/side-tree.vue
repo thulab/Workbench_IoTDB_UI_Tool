@@ -17,39 +17,45 @@
       </div>
 
       <div class="measurement-tree-box" v-loading="initialLoading || searchLoading">
-        <virtualized-tree
-          ref="measurementTree"
-          :data="treeData"
-          :props="treeProps"
-          :indent="8"
-          :item-size="28"
-          :height="treeHeight"
-          :expand-on-click-node="true"
-          :default-expanded-keys="[expandNode]"
-          @node-expand="handleNodeClick"
-          @node-click="handleNodeClick"
-          @node-collapse="handleNodeCollapse"
-          @handle-click-more="handleClickMore"
-        >
-          <!-- eslint-disable-next-line vue/no-unused-vars -->
-          <template #default="{ node, data }">
-            <div v-if="data.nodeType !== 'PAGE'" class="node-text" :id="`tree-node-content-${data.nodePath}`">
-              <el-icon size="16" v-if="data.nodeType === 'DATABASE' && data.node !== 'root'"><i-custom-storage-num /></el-icon>
-              <el-icon size="16" v-if="data.nodeType === 'TIMESERIES'"><i-custom-measure-num /></el-icon>
-              {{ data.node }}
-            </div>
-            <!-- eslint-disable-next-line vue/max-len -->
-            <!-- <i-custom-more v-if="data.nodeType !== 'PAGE'" :id="`tree-node-dropdown-${data.nodePath}`" class="more-icon svg-button-hover-color" @click="(e: MouseEvent) => handleClickMore(e, data)" /> -->
-            <div class="tree-node-operation-buttons" v-if="data.nodeType === 'PAGE'">
-              <el-button type="primary" @click="(e) => handleNext(e, data)" :id="`tree-node-${data.nodePath}-more`" class="svg-button-hover-color">
-                {{ t('common.viewMore') }}
-              </el-button>
-              <el-button @click="(e) => handleAll(e, data)" :id="`tree-node-${data.nodePath}-all`" class="svg-button-hover-color">
-                {{ t('common.viewAll') }}
-              </el-button>
-            </div>
-          </template>
-        </virtualized-tree>
+        <template v-if="treeData && treeData.length">
+          <virtualized-tree
+            ref="measurementTree"
+            :data="treeData"
+            :props="treeProps"
+            :indent="8"
+            :item-size="28"
+            :height="treeHeight"
+            :expand-on-click-node="true"
+            :default-expanded-keys="[expandNode]"
+            @node-expand="handleNodeClick"
+            @node-click="handleNodeClick"
+            @node-collapse="handleNodeCollapse"
+            @handle-click-more="handleClickMore"
+          >
+            <!-- eslint-disable-next-line vue/no-unused-vars -->
+            <template #default="{ node, data }">
+              <div v-if="data.nodeType !== 'PAGE'" class="node-text" :id="`tree-node-content-${data.nodePath}`">
+                <el-icon size="16" v-if="data.nodeType === 'DATABASE' && data.node !== 'root'"><i-custom-storage-num /></el-icon>
+                <el-icon size="16" v-if="data.nodeType === 'TIMESERIES'"><i-custom-measure-num /></el-icon>
+                {{ data.node }}
+              </div>
+              <!-- eslint-disable-next-line vue/max-len -->
+              <!-- <i-custom-more v-if="data.nodeType !== 'PAGE'" :id="`tree-node-dropdown-${data.nodePath}`" class="more-icon svg-button-hover-color" @click="(e: MouseEvent) => handleClickMore(e, data)" /> -->
+              <div class="tree-node-operation-buttons" v-if="data.nodeType === 'PAGE'">
+                <el-button type="primary" @click="(e) => handleNext(e, data)" :id="`tree-node-${data.nodePath}-more`" class="svg-button-hover-color">
+                  {{ t('common.viewMore') }}
+                </el-button>
+                <el-button @click="(e) => handleAll(e, data)" :id="`tree-node-${data.nodePath}-all`" class="svg-button-hover-color">
+                  {{ t('common.viewAll') }}
+                </el-button>
+              </div>
+            </template>
+          </virtualized-tree>
+        </template>
+        <div class="list-empty-wrapper" v-else>
+          <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
+          <span class="data-empty-text">{{ t('common.noData') }}</span>
+        </div>
       </div>
 
       <context-menu v-show="isShowContextMenu" ref="contextMenuRef" :clicked-node-data="clickedNodeData" @handle-command="(val) => handleCommand(val, clickedNodeData)" />
