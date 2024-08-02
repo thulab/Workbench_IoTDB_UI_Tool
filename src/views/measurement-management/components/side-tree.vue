@@ -390,7 +390,11 @@ function handleClickMore(e: MouseEvent, key: string) {
   clickedNodeData.nodeType = data.nodeType;
   clickedNodeData.parentPath = data.parentPath;
   isShowContextMenu.value = true;
-  contextMenuRef.value!.$el.style.inset = `${e.clientY - 52}px auto auto ${e.clientX - insertWidth.value}px`;
+  let y = e.clientY - 52;
+  let x = e.clientX - insertWidth.value;
+  if (x < 0) x = 0;
+  if (document.body.clientHeight - y < 150) y = document.body.clientHeight - 150;
+  contextMenuRef.value!.$el.style.inset = `${y}px auto auto ${x}px`;
 }
 
 function handleCommand(val: string, data: TreeNodeData) {
