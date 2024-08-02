@@ -25,9 +25,9 @@
                 <span class="module-label-text">{{ `${t('dashboard.serverStatus')}(Running)：` }}</span>
                 <span class="module-content-text" v-if="!systemData.dataNodeRatio && !systemData.configNodeRatio">-</span>
                 <span class="module-content-text" v-else>
-                  AINode {{ systemData.aiNodeRatio ? `${systemData.aiNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }} ConfigNode
-                  {{ systemData.configNodeRatio ? `${systemData.configNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }} DataNode
+                  ConfigNode {{ systemData.configNodeRatio ? `${systemData.configNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }} DataNode
                   {{ systemData.dataNodeRatio ? `${systemData.dataNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }}
+                  AINode {{ systemData.aiNodeRatio ? `${systemData.aiNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }}
                 </span>
               </li>
               <li class="system-info-item">
