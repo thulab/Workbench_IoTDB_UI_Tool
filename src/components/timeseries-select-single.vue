@@ -64,7 +64,7 @@ const remoteMethod = debounce((query: string) => {
     if (lastMeasurementQuery === query) {
       let measurements = res.data?.measurements || [];
       if (props.filterSystem) {
-        measurements = measurements.filter((item) => !item.timeseries.startsWith('root.__system'));
+        measurements = measurements.filter((item) => !item.timeseries.startsWith('root.__system.'));
       }
       measurementList.value = measurements;
     }
