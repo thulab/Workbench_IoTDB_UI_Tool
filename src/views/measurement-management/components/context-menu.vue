@@ -69,7 +69,7 @@ const deleteTipDisabled = computed(() => {
   if (props.clickedNodeData.nodeType === 'DATABASE' && canManageDatabase.value) {
     return true;
   }
-  if (canWriteSchemaByPath.value) {
+  if (props.clickedNodeData.nodeType !== 'DATABASE' && canWriteSchemaByPath.value) {
     return true;
   }
   return false;
