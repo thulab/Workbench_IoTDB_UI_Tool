@@ -36,15 +36,15 @@
         </li>
         <li class="measurement-info-item" id="dataType-li">
           <span class="measurement-info-item-label" id="dataType-span">{{ t('measurement.dataType') }}：</span>
-          {{ measurementInfos.dataType }}
+          {{ measurementInfos.dataType || '-' }}
         </li>
         <li class="measurement-info-item" id="encoding-li">
           <span class="measurement-info-item-label" id="encoding-span">{{ t('measurement.encoding') }}：</span>
-          {{ measurementInfos.encoding }}
+          {{ measurementInfos.encoding || '-' }}
         </li>
         <li class="measurement-info-item" id="compression-li">
           <span class="measurement-info-item-label" id="compression-span">{{ t('measurement.compression') }}：</span>
-          {{ measurementInfos.compression }}
+          {{ measurementInfos.compression || '-' }}
         </li>
         <li class="measurement-info-item" id="lastValue-li">
           <span class="measurement-info-item-label" id="lastValue-span">{{ t('measurement.lastValue') }}：</span>
