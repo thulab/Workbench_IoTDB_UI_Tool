@@ -20,7 +20,7 @@
         </li>
       </ul>
 
-      <auth-tooltip :is-disabled="canManageDatabase" :content="'common.databaseAuth'">
+      <auth-tooltip :is-disabled="canManageDatabase || currentDatabase === 'root' || currentDatabase === 'root.__system'" :content="'common.databaseAuth'">
         <el-button
           plain
           class="el-button-delete"
