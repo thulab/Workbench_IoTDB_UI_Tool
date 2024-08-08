@@ -14,9 +14,15 @@
         <div class="connection-list-title">
           <h4>{{ t('connection.connectionList') }}</h4>
           <div>
-            <el-button link class="m-r-8 svg-button-hover-color" @click="handleRefresh" id="connection-side-refresh"><i-custom-border-refresh /></el-button>
-            <el-button link class="m-r-8 m-l-0 svg-button-hover-color" @click="handleGraph" id="connection-side-graph"><i-custom-graph /></el-button>
-            <el-button link style="margin: 0" @click="handleAddConnection" id="connection-side-add"><i-custom-new-connection /></el-button>
+            <el-tooltip effect="light" :content="t('common.refresh')">
+              <el-button link class="m-r-8 svg-button-hover-color" @click="handleRefresh" id="connection-side-refresh"><i-custom-border-refresh /></el-button>
+            </el-tooltip>
+            <el-tooltip effect="light" :content="t('connection.flowTip')">
+              <el-button link class="m-r-8 m-l-0 svg-button-hover-color" @click="handleGraph" id="connection-side-graph"><i-custom-graph /></el-button>
+            </el-tooltip>
+            <el-tooltip effect="light" :content="t('connection.addConnection')">
+              <el-button link style="margin: 0" @click="handleAddConnection" id="connection-side-add"><i-custom-new-connection /></el-button>
+            </el-tooltip>
           </div>
         </div>
         <el-input :placeholder="t('connection.namePlaceholder')" v-model="filterText" id="connection-list-input" @keyup.enter="handleFilter" class="connection-search-input">

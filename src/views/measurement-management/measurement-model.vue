@@ -95,6 +95,7 @@ const treeDataOptions = (detailData: StorageDevice.ModelData, width: number | 'a
       backgroundColor: '#fff',
       borderWidth: 1,
       borderColor: '#DFE1ED',
+      extraCssText: 'max-width:300px;',
       formatter: (params: Object) => {
         const { data } = params as unknown as { data: StorageDevice.ModelData };
         if (data.nodeType === 'database' || data.nodeType === 'internal') {
@@ -103,8 +104,33 @@ const treeDataOptions = (detailData: StorageDevice.ModelData, width: number | 'a
         if (data.nodeType === 'device' || data.nodeType === 'database_device') {
           return `<h4 style="font-size: 14px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;"><el-icon size="24"><i-custom-measure-num /></el-icon><span style="color: #131926;">${t('measurement.measurementNum')}：</span>${data.timeseriesCount || data.timeseriesCount === 0 ? data.timeseriesCount : '-'}</p>`;
         }
+        console.log(`<h4 style="font-size: 14px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4>
+                  <p style="font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85; margin-bottom: 8px; white-space: pre-line; word-break: break-all;">
+                    <span style="color: #131926;">${t('measurement.dataType')}：</span>${data.dataType || '-'}</p>
+                  <p style="font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85; margin-bottom: 8px; ">
+                    <span style="color: #131926;">${t('measurement.lastValue')}：</span>${data.value || '-'}
+                  </p>
+                  <p style="font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85; margin-bottom: 8px; ">
+                    <span style="color: #131926;">${t('measurement.lastValueTime')}：</span>${data.valueTime || '-'}
+                  </p>
+                  <p style="font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85; margin-top:0px; white-space: pre-line; word-break: break-all;">
+                    <span style="color: #131926;">${t('measurement.measurementDescription')}：</span>${data.dataType || '-'}</p>
+                  `);
         if (data.nodeType === 'timeseries') {
-          return `<h4 style="font-size: 14px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4><p font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;margin-bottom: 16px;"><span style="color: #131926;">${t('measurement.dataType')}：</span>${data.dataType || '-'}</p><p font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;margin-bottom: 16px;"><span style="color: #131926;">${t('measurement.lastValue')}：</span>${data.value || '-'}</p><p font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;"><span style="color: #131926;">${t('measurement.lastValueTime')}：</span>${data.valueTime || '-'}</p>`;
+          return `<h4 style="font-size: 14px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4>
+                  <p style="font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85; margin-bottom: 8px; white-space: normal; word-break: break-all;">
+                    <span style="color: #131926;">${t('measurement.dataType')}：</span>${data.dataType || '-'}
+                  </p>
+                  <p style="font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85; margin-bottom: 8px; ">
+                    <span style="color: #131926;">${t('measurement.lastValue')}：</span>${data.value || '-'}
+                  </p>
+                  <p style="font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85; margin-bottom: 8px; ">
+                    <span style="color: #131926;">${t('measurement.lastValueTime')}：</span>${data.valueTime || '-'}
+                  </p>
+                  <p style="font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85; margin-top:0px; white-space: normal; word-break: break-all;">
+                    <span style="color: #131926;">${t('measurement.measurementDescription')}：</span>${data.description || '-'}
+                  </p>
+                  `;
         }
         return '';
       },

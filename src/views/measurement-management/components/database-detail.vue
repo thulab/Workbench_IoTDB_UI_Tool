@@ -80,7 +80,12 @@
           </el-dropdown>
         </auth-tooltip>
         <auth-tooltip :is-disabled="canWriteSchemaByPath" :content="'common.schemaAuthAnother'">
-          <el-button :disabled="!currentDatabase || multipleSelection.length === 0 || !canWriteSchemaByPath" type="primary" @click="handleDelRow('batch', null)" id="mesaurement-batch-del">
+          <el-button
+            :disabled="!currentDatabase || multipleSelection.length === 0 || !canWriteSchemaByPath || selectSystemDatabase"
+            type="primary"
+            @click="handleDelRow('batch', null)"
+            id="mesaurement-batch-del"
+          >
             {{ t('common.batchDelete') }}
           </el-button>
         </auth-tooltip>
@@ -229,7 +234,7 @@
                   type="primary"
                   link
                   size="small"
-                  :disabled="currentDatabase === 'root.__system' || !rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)"
+                  :disabled="currentDatabase === 'root.__system' || row.deviceName.startsWith('root.__system.') || !rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)"
                   @click="handleDelRow('row', row)"
                   :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-del`"
                 >
@@ -344,6 +349,10 @@ const columnList = ref<Array<{ label: string; prop: string; width: number }>>([
   { label: 'measurement.dataType', prop: 'dataType', width: 140 },
 ]);
 
+const selectSystemDatabase = computed(() => {
+  if (!multipleSelection.value || multipleSelection.value.length === 0) return false;
+  return multipleSelection.value.some((item) => item.deviceName.startsWith('root.__system.'));
+});
 const canReadWriteDataByPath = computed(() => {
   if (userAllEntityPrivileges.value.includes('READ_DATA') || userAllEntityPrivileges.value.includes('WRITE_DATA')) return true;
   if (!props.currentDatabase) return false;

@@ -91,6 +91,7 @@ declare namespace StorageDevice {
     dataType?: string;
     newValue?: string;
     valueTime?: string;
+    description?: string;
     pageNum: number;
     pageSize?: number;
     children?: ModelData[];

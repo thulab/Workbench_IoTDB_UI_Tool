@@ -867,6 +867,7 @@ connection:
   addConnection: Add Instance
   connectionManagement: Instance Management
   connectionList: Instance List
+  flowTip: Instance Flowchart
   connectionIpTip: >-
     This address corresponds to the 'dn_rpc_address' field content in the
     'iotdb-datanode.properties' file under the 'IoTDB-conf' folder.

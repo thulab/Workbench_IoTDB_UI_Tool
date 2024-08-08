@@ -730,6 +730,7 @@ connection:
   addConnection: 新建实例
   connectionManagement: 实例管理
   connectionList: 实例列表
+  flowTip: 实例拓扑图
 flow:
   flowManagement: 流程图管理
   topologyMap: 拓扑图
