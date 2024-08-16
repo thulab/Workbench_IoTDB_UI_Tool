@@ -47,8 +47,8 @@
           </template>
           <template #prepend>
             <el-select v-model="searchType" style="width: 88px" placeholder="" id="measurement-search-type" class="measurement-search-type-select">
-              <el-option :label="t('measurement.measurementName')" value="name" id="measurement-search-type-name" />
-              <el-option :label="t('measurement.measurementDescription')" value="description" id="measurement-search-type-description" />
+              <el-option :label="t('measurement.measurementName2')" value="name" id="measurement-search-type-name" />
+              <el-option :label="t('measurement.measurementDescription2')" value="description" id="measurement-search-type-description" />
             </el-select>
           </template>
         </el-input>
@@ -847,5 +847,9 @@ watch(
 <style lang="scss">
 .col-filter-popover-box {
   padding: 8px !important;
+
+  &:lang(en) {
+    width: 248px !important;
+  }
 }
 </style>

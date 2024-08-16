@@ -114,7 +114,7 @@ import { cloneDeep } from 'lodash-es';
 import { storeToRefs } from 'pinia';
 import { LogApi } from '@/api';
 import { useConnectionStore, useUserStore } from '@/stores';
-import { getStartAndEnd, today, formatDate, getOneInterval, getOneIntervalNow } from '@/utils/date';
+import { getStartAndEnd, today, formatDate } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
 import OverflowClick from './components/overflow-click.vue';
 
@@ -134,20 +134,8 @@ const searchFormData = reactive({
 let copySearchFormData = cloneDeep(searchFormData);
 const timestamp = ref(0);
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
-const shortcutsDaterange = [
-  {
-    text: t('common.today'),
-    value: () => getStartAndEnd(0),
-  },
-  {
-    text: t('common.yesterday'),
-    value: () => getOneInterval(1),
-  },
-  {
-    text: t('common.7dayRecend'),
-    value: () => getOneIntervalNow(7),
-  },
-];
+const { shortcutsDaterange } = useShortcutsDate();
+
 const pagination = reactive({
   pageSize: 10,
   pageNum: 1,

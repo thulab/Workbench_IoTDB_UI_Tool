@@ -162,6 +162,7 @@ common:
   zoom: Amplify
   revoke: Revoke
   restore: Restore
+  viewLink: https://www.timecho.com/docs/UserGuide/latest/User-Manual/Operator-and-Expression.html
 page:
   '403': 403 Page
   '404': 404 Page
@@ -171,7 +172,7 @@ page:
   trend: Trend
   dashboard: Home
   dataSync: Data Sync
-  measurement: Measurement Management
+  measurement: Measurement
   dataSearch: Data Query
   statisticSearch: Statistical Query
   sql: SQL Operation
@@ -187,6 +188,7 @@ page:
   config: Database Config
 measurement:
   databaseTitle: Database
+  searchPlaceholder: Please enter search content
   deleteDatabaseTip: >-
     This operation will delete all measurements and data in the database, do you
     want to delete?
@@ -210,7 +212,7 @@ measurement:
   deviceAlignMeasurement: Aligned time series
   undeviceAlignMeasurement: Non-aligned time series
   measurement: Measurement
-  measurementName: Measurement Name
+  measurementName: Name
   measurementNamePlaceholder: Please enter the measurement name
   measurementNameSelectPlaceholder: Please select a measurement
   alias: Alias
@@ -229,7 +231,7 @@ measurement:
     underscores, and UNICODE Chinese characters
   deleteMeasurementSingle: Are you sure you want to delete the measurement?
   deleteMeasurementBatch: Are you sure you want to delete these measurements?
-  measurementDescription: Measurement Description
+  measurementDescription: Description
   measurementDescriptionPlaceholder: Please enter the measurement description
   batchImportMeasurement: Batch Import Measurements
   importMeasurementTip: Only csv and xlsx files are supported, drag the file here, or
@@ -242,6 +244,7 @@ measurement:
   totalNum: Total Data
   measurementList: Measurement List
   list: List
+  newValList: Data
   measurementChoose: Measurement
   measurementType: Measurement Type
   lastValue: Latest Value
@@ -254,6 +257,11 @@ measurement:
     want to delete?
   databaseModel: Data Model
   databaseModelDoc: Guide to the IoTDB Tree Data Structure
+  viewData: View Data
+  viewAlarm: View Alarms
+  viewTrend: View Trends
+  measurementName2: Name
+  measurementDescription2: Description
 search:
   datetime: Timestamp
   datetimerange: Time Range
@@ -552,8 +560,8 @@ dataSync:
     Please ensure that the target endpoint has created all the points from the
     sending endpoint or has enabled automatic metadata creation; otherwise, it
     may result in failure!
-  targetInfoIp: Please enter the target endpoint IP
-  targetInfoHost: Please enter the target endpoint port
+  targetInfoIp: Please enter the IP address
+  targetInfoHost: Please enter the port number
   logSendBatch: Batch Sending Mode
   waitTime: Waiting time
   waitTimeTip: The maximum waiting time before sending a batch of data
@@ -593,8 +601,7 @@ dataTrend:
   deleteTemplateTip: Do you want to delete common trends
   measurementEmptyTip: Please add measurements and select them first
   trendTip: >-
-    Maximum drawing of %{tip} measurements; the system will automatically adjust
-    if exceeded
+    Up to %{tip}  data points can be plotted. If the limit is exceeded, the system will automatically adjust.
   overTip: >-
     Exceeding the maximum number of plotted measurements, it has been
     automatically adjusted for display
@@ -610,23 +617,24 @@ dataTrend:
   number10Tip: Only input positive integers in the range of 1-10
   trendTemplate: Trend%{time}
   saveTrend: Save Trend
+  noDataTip: There is no data available within the current time range
 calculate:
   namePlaceholder: Please enter a name
   descPlaceholder: Please enter a description
-  resultMeasurement: Result measurement
-  calculateName: Calculation name
-  viewName: View name
-  calculateDesc: Calculation description
-  viewDesc: View description
+  resultMeasurement: Result Measurement
+  calculateName: Calculation Name
+  viewName: View Name
+  calculateDesc: Calculation Description
+  viewDesc: View Description
   calculateList: Calculation List
   viewList: View List
-  newCalculate: New calculation
-  newView: New view
-  editCalculate: Edit calculation
-  editView: Edit view
+  newCalculate: New Calculation
+  newView: New View
+  editCalculate: Edit Calculation
+  editView: Edit View
   expression: Expression
-  lastValue: Latest result
-  lastValueTime: Latest result time
+  lastValue: Latest Result
+  lastValueTime: Latest Result Time
   view: View data
   batchDeleteCalculate: Are you sure you want to delete these calculations?
   batchDeleteView: Are you sure you want to delete these views?
@@ -646,31 +654,31 @@ calculate:
     Supports the use of operators and functions (excluding aggregation
     functions), e.g., root.sgcc.wf03.wt01.temperature + 1; see detailed rules in
 alarm:
-  alarmName: Alarm name
+  alarmName: Alarm Name
   alarmNamePlaceholder: Enter alarm name
-  alarmMeasurement: Alarm measurement
+  alarmMeasurement: Alarm Measurement
   alarmMeasurementPlaceholder: Enter alarm measurement
-  alarmLevel: Alarm level
-  alarmLevelTip: Level one is the highest alarm level, followed by level two, and so on.
+  alarmLevel: Alarm Level
+  alarmLevelTip: Level 1 is the highest alarm level, followed by level 2, and so on.
   alarmConfig: Alarm Configuration
-  newAlarm: New alarm
-  editAlarm: Edit alarm
-  alarmDesc: Alarm description
-  alarmRules: Alarm rules
+  newAlarm: New Alarm
+  editAlarm: Edit Alarm
+  alarmDesc: Alarm Description
+  alarmRules: Alarm Rules
   batchDelete: Confirm the deletion of these alarm configurations?
   singleDelete: Confirm the deletion of this alarm configuration?
-  alarmTime: Alarm time
-  newStatus: View latest status only
+  alarmTime: Alarm Time
+  newStatus: View Latest Status Only
   alarmRecord: Alarm Record
-  alarmValue: Alarm value
+  alarmValue: Alarm Value
   whetherConfirm: Confirmation
   batchDeleteRecord: Are you sure you want to delete these alarm records?
   singleDeleteRecord: Are you sure you want to delete this alarm record?
   read: Read
   duration: Duration
   durationPlaceholder: Please enter the duration
-  frequency: Alarm frequency
-  alarmIntro: Alarm description
+  frequency: Alarm Frequency
+  alarmIntro: Alarm Description
   alarmIntroPlaceholder: Please enter the alarm description
   booleanRule: Please enter the alarm rule value
   numberRule: Alarm rule value must be numeric
@@ -776,7 +784,7 @@ error:
   500Tip: Sorry, you have been disconnected
 log:
   operateUser: User
-  ip: IP address
+  ip: IP Address
   ipPlaceholder: Enter IP address
   operationDetailPlaceholder: Enter operation details
   timeRange: Time Range
@@ -947,7 +955,7 @@ spectrum:
   dataCount: Data quantity
   lowPass: LOWPASS
   cutoffFrequency: Cut-off frequency
-  cutoffFrequencyTip: 归一化后的截止频率，取值为(0,1)，不可缺省
+  cutoffFrequencyTip: Normalized cut-off frequency, with a value of (0,1), cannot be defaulted
   highPass: HIGHPASS
   paramsPlaceholder: Input parameter
   spectrumTemplate: Analysis%{time}
@@ -956,5 +964,6 @@ spectrum:
   applyTip: Please select the corresponding content and view it
 iotdbConfig:
   template: Template
+  searchPlaceholder: Please enter search content
   nodeEffect: Node Effective
   allEffect: All  Effective

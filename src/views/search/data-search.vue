@@ -186,9 +186,9 @@ import dayjs from 'dayjs';
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import { cloneDeep } from 'lodash-es';
-import { useTableHeight } from '@/composition-api';
+import { useTableHeight, useShortcutsDate } from '@/composition-api';
 import { SearchApi } from '@/api';
-import { getStartAndEnd, today, getOneDay, getOneInterval, todayNow, getOneIntervalNow } from '@/utils/date';
+import { today, todayNow } from '@/utils/date';
 import { useUserStore } from '@/stores';
 import DynamicTable from '@/components/dynamic-table.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
@@ -229,34 +229,9 @@ const searchFormData = reactive({
   asc: 'asc',
 });
 let copySearchFormData = cloneDeep(searchFormData);
-const shortcutsDate = [
-  {
-    text: t('common.today'),
-    value: () => todayNow(),
-  },
-  {
-    text: t('common.yesterday'),
-    value: () => getOneDay(1),
-  },
-  {
-    text: t('common.7dayAgo'),
-    value: () => getOneDay(7),
-  },
-];
-const shortcutsDaterange = [
-  {
-    text: t('common.today'),
-    value: () => getStartAndEnd(0),
-  },
-  {
-    text: t('common.yesterday'),
-    value: () => getOneInterval(1),
-  },
-  {
-    text: t('common.7dayRecend'),
-    value: () => getOneIntervalNow(7),
-  },
-];
+
+const { shortcutsDate, shortcutsDaterange } = useShortcutsDate();
+
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 
 const searchDetailInfos = ref<Partial<Search.QueryDataResult>>({});

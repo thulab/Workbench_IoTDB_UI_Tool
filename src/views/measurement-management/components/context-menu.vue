@@ -102,6 +102,10 @@ function handleCommand(key: string) {
   padding: 6px 0;
   overflow: hidden;
 
+  &:lang(en) {
+    width: 118px;
+  }
+
   .context-menu-item {
     width: 100%;
     height: 24px;

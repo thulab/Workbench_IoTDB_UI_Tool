@@ -107,7 +107,7 @@
             <el-table-column :label="t('alarm.alarmRules')" prop="alarmRules" min-width="160" align="center" show-overflow-tooltip />
             <el-table-column :label="t('alarm.alarmValue')" prop="alarmValue" min-width="160" align="center" show-overflow-tooltip />
             <el-table-column :label="t('alarm.alarmTime')" prop="createTime" sortable="custom" min-width="180" align="center" show-overflow-tooltip />
-            <el-table-column :label="t('alarm.alarmDesc')" prop="alarmDesc" min-width="140" align="center" show-overflow-tooltip />
+            <el-table-column :label="t('alarm.alarmDesc')" prop="alarmDesc" min-width="160" align="center" show-overflow-tooltip />
             <el-table-column :label="t('alarm.whetherConfirm')" width="160" align="center" fixed="right">
               <template #default="{ row }">
                 <el-button v-if="!row.hasRead" type="primary" link size="small" @click="handleStatus(row)" :id="`alarm-record-table-${row.measurement}-confirm`">{{ t('common.ack') }}</el-button>
@@ -149,7 +149,7 @@ import type { FormInstance, DateModelType, ElTable } from 'element-plus';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash-es';
 import { storeToRefs } from 'pinia';
-import { getStartAndEnd, today, getOneInterval, getOneIntervalNow } from '@/utils/date';
+import { today } from '@/utils/date';
 import { getOptionField } from '@/utils/format';
 import { AlarmApi } from '@/api';
 import { useEnumStore, useUserStore } from '@/stores';
@@ -176,20 +176,8 @@ const searchFormData = reactive({
   createEndTime: null as unknown as DateModelType,
 });
 let copySearchFormData = cloneDeep(searchFormData);
-const shortcutsDaterange = [
-  {
-    text: t('common.today'),
-    value: () => getStartAndEnd(0),
-  },
-  {
-    text: t('common.yesterday'),
-    value: () => getOneInterval(1),
-  },
-  {
-    text: t('common.7dayRecend'),
-    value: () => getOneIntervalNow(7),
-  },
-];
+const { shortcutsDaterange } = useShortcutsDate();
+
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 const pagination = reactive({
   pageSize: 10,

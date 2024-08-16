@@ -79,6 +79,7 @@
     "ElCascaderMenu": true,
     "useLangSwitched": true,
     "useLangSwitch": true,
-    "useI18n": true
+    "useI18n": true,
+    "useShortcutsDate": true
   }
 }

@@ -308,7 +308,7 @@
 import type { FormInstance, SingleOrRange, DateModelType, TabsPaneContext } from 'element-plus';
 import { DataSyncApi } from '@/api';
 import CodeEditor from '@/views/search/components/code-editor.vue';
-import { getStartAndEnd, today, todayNow, getOneInterval, getOneIntervalNow, formatDate } from '@/utils/date';
+import { today, todayNow, formatDate } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
 
 const props = defineProps<{
@@ -390,20 +390,8 @@ const requiredNumberRules = ref([
     trigger: 'blur',
   },
 ]);
-const shortcutsDaterange = [
-  {
-    text: t('common.today'),
-    value: () => getStartAndEnd(0),
-  },
-  {
-    text: t('common.yesterday'),
-    value: () => getOneInterval(1),
-  },
-  {
-    text: t('common.7dayRecend'),
-    value: () => getOneIntervalNow(7),
-  },
-];
+const { shortcutsDaterange } = useShortcutsDate();
+
 const dealOptions = ref<DataSync.PluginData[]>([]);
 const sendOptions = ref<DataSync.PluginData[]>([]);
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();

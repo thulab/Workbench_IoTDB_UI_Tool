@@ -64,6 +64,7 @@ declare global {
   const useLangSwitched: typeof import('../composition-api/index')['useLangSwitched']
   const useRequest: typeof import('../composition-api/index')['useRequest']
   const useSessionStorage: typeof import('@vueuse/core')['useSessionStorage']
+  const useShortcutsDate: typeof import('../composition-api/index')['useShortcutsDate']
   const useSlots: typeof import('vue')['useSlots']
   const useTable: typeof import('../composition-api/index')['useTable']
   const useTableHeight: typeof import('../composition-api/index')['useTableHeight']

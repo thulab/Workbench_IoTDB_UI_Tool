@@ -158,6 +158,7 @@ common:
   zoom: 放大
   revoke: 撤销
   restore: 还原
+  viewLink: https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/Operator-and-Expression.html
 page:
   '403': 403页面
   '404': 404页面
@@ -245,6 +246,8 @@ measurement:
   viewData: 查看数据
   viewAlarm: 查看告警
   viewTrend: 查看趋势
+  measurementName2: 测点名称
+  measurementDescription2: 测点描述
 search:
   datetime: 时间点
   datetimerange: 时间段

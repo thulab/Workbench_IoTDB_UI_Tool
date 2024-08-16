@@ -180,7 +180,7 @@ import type { FormInstance, DateModelType, ElTable } from 'element-plus';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import dayjs from 'dayjs';
-import { getStartAndEnd, today, getOneInterval, getOneIntervalNow } from '@/utils/date';
+import { today } from '@/utils/date';
 import { getOptionField } from '@/utils/format';
 import { getPathAuthList } from '@/utils/auth';
 import { AlarmApi } from '@/api';
@@ -220,20 +220,8 @@ const searchFormData = reactive({
   updateStartTime: null as unknown as DateModelType,
   updateEndTime: null as unknown as DateModelType,
 });
-const shortcutsDaterange = [
-  {
-    text: t('common.today'),
-    value: () => getStartAndEnd(0),
-  },
-  {
-    text: t('common.yesterday'),
-    value: () => getOneInterval(1),
-  },
-  {
-    text: t('common.7dayRecend'),
-    value: () => getOneIntervalNow(7),
-  },
-];
+const { shortcutsDaterange } = useShortcutsDate();
+
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 const pagination = reactive({
   pageSize: 10,

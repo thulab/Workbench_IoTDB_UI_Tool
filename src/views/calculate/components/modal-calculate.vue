@@ -47,12 +47,7 @@
             <template #content>
               <p style="color: #131926; font-weight: 300; width: 230px">
                 {{ t('calculate.expressionTip') }}
-                <a
-                  href="https://www.timecho.com/docs/zh/UserGuide/V1.1.x/Operators-Functions/Overview.html#%E8%BF%90%E7%AE%97%E7%AC%A6%E5%92%8C%E5%87%BD%E6%95%B0"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style="color: #495ad4"
-                >
+                <a :href="t('common.viewLink')" target="_blank" rel="noopener noreferrer" style="color: #495ad4">
                   {{ t('common.doc') }}
                 </a>
               </p>

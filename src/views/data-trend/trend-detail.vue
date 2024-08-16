@@ -141,7 +141,7 @@ import { debounce, cloneDeep, difference, isEqual } from 'lodash-es';
 import { vElementSize } from '@vueuse/components';
 import { SearchApi } from '@/api';
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
-import { getStartAndEnd, today, getOneInterval, getOneIntervalNow } from '@/utils/date';
+import { today, getOneIntervalNow } from '@/utils/date';
 import { useUserStore, useConnectionStore } from '@/stores';
 import { useWebsocket } from '@/composition-api';
 import ICustomCalender from '~icons/custom/calender.svg';
@@ -210,20 +210,8 @@ const searchFormData = reactive<{
   aggregation: 'last_value',
 });
 let copySearchFormData = cloneDeep(searchFormData);
-const shortcutsDaterange = [
-  {
-    text: t('common.today'),
-    value: () => getStartAndEnd(0),
-  },
-  {
-    text: t('common.yesterday'),
-    value: () => getOneInterval(1),
-  },
-  {
-    text: t('common.7dayRecend'),
-    value: () => getOneIntervalNow(7),
-  },
-];
+const { shortcutsDaterange } = useShortcutsDate();
+
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 const timeUnits = computed(() => [
   { label: t('common.auto'), value: 'auto', timestamp: 1000 },

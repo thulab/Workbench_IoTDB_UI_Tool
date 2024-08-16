@@ -120,7 +120,7 @@ import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import { storeToRefs } from 'pinia';
 import { SearchApi } from '@/api';
 import { useTableHeight } from '@/composition-api';
-import { getStartAndEnd, today, getOneInterval, getOneIntervalNow, formatDate } from '@/utils/date';
+import { today, getOneIntervalNow, formatDate } from '@/utils/date';
 import { iotdbShowAuth } from '@/utils/auth';
 import { useUserStore, useConnectionStore } from '@/stores';
 import ICustomCalender from '~icons/custom/calender.svg';
@@ -144,20 +144,8 @@ const copySearchFormData = reactive({
   path: [] as string[],
   datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
 });
-const shortcutsDaterange = [
-  {
-    text: t('common.today'),
-    value: () => getStartAndEnd(0),
-  },
-  {
-    text: t('common.yesterday'),
-    value: () => getOneInterval(1),
-  },
-  {
-    text: t('common.7dayRecend'),
-    value: () => getOneIntervalNow(7),
-  },
-];
+const { shortcutsDaterange } = useShortcutsDate();
+
 const requiredRules = ref([
   {
     required: true,

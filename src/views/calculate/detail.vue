@@ -77,7 +77,7 @@
               >
                 <el-table-column type="selection" width="55" />
                 <el-table-column :label="appType === 1 ? t('calculate.calculateName') : t('calculate.viewName')" prop="name" width="160" align="center" show-overflow-tooltip />
-                <el-table-column :label="appType === 1 ? t('calculate.calculateDesc') : t('calculate.viewDesc')" prop="desc" width="180" align="center" show-overflow-tooltip />
+                <el-table-column :label="appType === 1 ? t('calculate.calculateDesc') : t('calculate.viewDesc')" prop="desc" width="200" align="center" show-overflow-tooltip />
                 <el-table-column :label="t('calculate.resultMeasurement')" prop="measurement" width="180" align="center" show-overflow-tooltip>
                   <template #default="{ row }">
                     <span class="measurement-text-button" @click="handleView(row)">{{ row.measurement }}</span>
