@@ -34,7 +34,7 @@
                   :prop="`measurementList[${index}].timeseries`"
                   :rules="requiredRules"
                   class="m-r-0"
-                  :label-width="locale === 'en' ? '198px' : '92px'"
+                  :label-width="locale === 'en' ? '108px' : '92px'"
                 >
                   <div class="measurement-name-box">
                     <div class="measurement-input-group">
@@ -53,7 +53,7 @@
                 </base-form-item>
               </el-col>
               <el-col :span="24">
-                <base-form-item :prop="`measurementList[${index}].description`" class="m-r-0 el-form-item-not-mandatory" :label-width="locale === 'en' ? '198px' : '92px'">
+                <base-form-item :prop="`measurementList[${index}].description`" class="m-r-0 el-form-item-not-mandatory" :label-width="locale === 'en' ? '108px' : '92px'">
                   <template #label>
                     {{ t('measurement.measurementDescription') }}：
                     <el-tooltip effect="light" :content="t('measurement.descriptionTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>

@@ -849,7 +849,7 @@ watch(
   padding: 8px !important;
 
   &:lang(en) {
-    width: 248px !important;
+    width: 220px !important;
   }
 }
 </style>
