@@ -1,7 +1,7 @@
 <template>
   <div class="database-detail-wrapper">
     <h4 class="info-title">
-      <div :style="`display: inline-flex; max-width: 400px;`">
+      <div style="display: inline-flex; max-width: calc(100% - 100px)">
         <text-tooltip :content="currentDatabase" />
       </div>
       {{ t('measurement.info') }}
@@ -34,7 +34,7 @@
     </div>
 
     <h4 class="info-title">
-      <div :style="`display: inline-flex; max-width: 400px;`">
+      <div style="display: inline-flex; max-width: calc(100% - 100px)">
         <text-tooltip :content="currentDatabase" />
       </div>
       {{ t('measurement.list') }}
@@ -219,16 +219,26 @@
                   {{ t('page.alarm') }}
                 </el-button>
               </el-tooltip>
-              <el-button
-                type="primary"
-                link
-                size="small"
-                :disabled="currentDatabase === 'root.__system' || row.dataType === 'TEXT'"
-                @click="handleRowTrend(row)"
-                :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-trend`"
+              <el-tooltip
+                v-if="appType === 1"
+                placement="top-start"
+                effect="light"
+                trigger="hover"
+                :content="t('measurement.goTrendTip')"
+                :disabled="row.dataType !== 'TEXT'"
+                popper-class="tooltip-box-width"
               >
-                {{ t('page.trend') }}
-              </el-button>
+                <el-button
+                  type="primary"
+                  link
+                  size="small"
+                  :disabled="currentDatabase === 'root.__system' || row.dataType === 'TEXT'"
+                  @click="handleRowTrend(row)"
+                  :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-trend`"
+                >
+                  {{ t('page.trend') }}
+                </el-button>
+              </el-tooltip>
               <auth-tooltip :is-disabled="rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)" :content="'common.schemaAuthAnother'">
                 <el-button
                   type="primary"
@@ -291,6 +301,7 @@ import ModalDescription from './modal-description.vue';
 
 const props = defineProps<{
   currentDatabase: string;
+  currentSearchText: string;
 }>();
 
 const emit = defineEmits<{
@@ -662,7 +673,7 @@ onMounted(() => {
     columnList.value = allColumns.value.filter((item) => checkedCols.value.includes(item.prop));
   }
   copyCheckedCols = cloneDeep(checkedCols.value);
-  searchKeyword.value = (route.query.measurement || '') as string;
+  searchKeyword.value = (props.currentSearchText || route.query.measurement || '') as string;
 });
 
 watch(
@@ -670,7 +681,21 @@ watch(
   (val) => {
     if (val) {
       searchType.value = 'name';
-      searchKeyword.value = (route.query.measurement || '') as string;
+      searchKeyword.value = (props.currentSearchText || route.query.measurement || '') as string;
+      getDatabaseDetail(props.currentDatabase);
+      handleRefresh();
+    }
+  },
+  {
+    immediate: true,
+  }
+);
+watch(
+  () => props.currentSearchText && canReadWriteSchemaByPath.value,
+  (val, oldValue) => {
+    if (val !== oldValue) {
+      searchType.value = 'name';
+      searchKeyword.value = (props.currentSearchText || '') as string;
       getDatabaseDetail(props.currentDatabase);
       handleRefresh();
     }

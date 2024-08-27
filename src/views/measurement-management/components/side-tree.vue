@@ -26,7 +26,7 @@
             :item-size="28"
             :height="treeHeight"
             :expand-on-click-node="true"
-            :default-expanded-keys="[expandNode]"
+            :default-expanded-keys="expandNodes"
             @node-expand="handleNodeClick"
             @node-click="handleNodeClick"
             @node-collapse="handleNodeCollapse"
@@ -35,9 +35,9 @@
             <!-- eslint-disable-next-line vue/no-unused-vars -->
             <template #default="{ node, data }">
               <div v-if="data.nodeType !== 'PAGE'" class="node-text" :id="`tree-node-content-${data.nodePath}`">
-                <el-icon size="16" v-if="data.nodeType === 'DATABASE' && data.node !== 'root'"><i-custom-storage-num /></el-icon>
-                <el-icon size="16" v-if="data.nodeType === 'TIMESERIES'"><i-custom-measure-num /></el-icon>
-                {{ data.node }}
+                <span class="tree-type" v-if="data.nodeType === 'DATABASE' && data.node !== 'root'">{{ t('measurement.treeDatabase') }}&nbsp;</span>
+                <span class="tree-type" v-if="data.nodeType === 'TIMESERIES'">{{ t('measurement.treeTimeseries') }}&nbsp;</span>
+                <span v-html="highlightNode(data.node)"></span>
               </div>
               <!-- eslint-disable-next-line vue/max-len -->
               <!-- <i-custom-more v-if="data.nodeType !== 'PAGE'" :id="`tree-node-dropdown-${data.nodePath}`" class="more-icon svg-button-hover-color" @click="(e: MouseEvent) => handleClickMore(e, data)" /> -->
@@ -89,7 +89,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (event: 'handleChangeNode', path: string, type: string): void;
+  (event: 'handleChangeNode', path: string, type: string, searchText: string): void;
 }>();
 
 const pageSize = 10;
@@ -104,6 +104,7 @@ const measurementVisible = ref(false);
 const currentDatabase = ref('');
 const initialLoading = ref(false);
 const expandNode = ref('root');
+const expandNodes = ref(['root']);
 const isShowContextMenu = ref(false);
 const contextMenuRef = ref<InstanceType<typeof ContextMenu>>();
 const contextMenuTimer = ref();
@@ -163,6 +164,13 @@ function nodeTextWidth(node: TreeNode, data: TreeNodeData) {
   return width;
 }
 
+function highlightNode(node: string) {
+  if (node.includes(searchText.value)) {
+    return node.replace(new RegExp(searchText.value, 'gi'), `<span class="highlight">${searchText.value}</span>`);
+  }
+  return node;
+}
+
 function fillChildLoading(data: StorageDevice.TreeNodeData[]) {
   data.forEach((item) => {
     if (!item.children && item.nodeType !== 'TIMESERIES') {
@@ -210,7 +218,7 @@ function getTreeData() {
     })
     .finally(() => {
       initialLoading.value = false;
-      expandNode.value = 'root';
+      expandNodes.value = ['root'];
       measurementTree.value?.virtualizedTreeRef?.setExpandedKeys(['root']);
     });
 }
@@ -240,22 +248,70 @@ function recursionFindParent(path: string, data: Array<StorageDevice.TreeNodeDat
   }
   return result;
 }
-
+// 填充 loading
 function fillTreeLoading(nodes: Array<StorageDevice.TreeNodeData>) {
   nodes.forEach((node) => {
     if (node && !node.pageChildren && node.children && node.children.length > 0) {
-      node.pageChildren = [
-        {
-          ...loadingNode,
-          parentPath: node.nodePath,
-        },
-      ];
+      const dataPathTotal = Math.ceil(node.children.length / pageSize);
+      node.pageChildren = node.children.slice(0, 1 * pageSize);
+      node.pageNum = 1;
+      node.totalPage = dataPathTotal;
+      if (dataPathTotal > 1) {
+        node.pageChildren?.push({
+          node: node.node,
+          nodePath: `${node.nodePath}__PAGE`,
+          nodeType: 'PAGE',
+          parentPath: node.parentPath || '',
+          pageNum: 1,
+          totalPage: dataPathTotal,
+        });
+      }
     }
     if (node.children) {
       fillTreeLoading(node.children);
     }
   });
 }
+
+// function fillNodePage(node: StorageDevice.TreeNodeData) {
+//   if (node && node.pageChildren && node.pageChildren.length === 1 && node.pageChildren[0].nodePath === 'loading' && node.children && node.children.length > 0) {
+//     const dataPathTotal = Math.ceil(node.children.length / pageSize);
+//     node.pageChildren = node.children.slice(0, 1 * pageSize);
+//     node.pageNum = 1;
+//     node.totalPage = dataPathTotal;
+//     if (dataPathTotal > 1) {
+//       node.pageChildren?.push({
+//         node: node.node,
+//         nodePath: `${node.nodePath}__PAGE`,
+//         nodeType: 'PAGE',
+//         parentPath: node.parentPath || '',
+//         pageNum: 1,
+//         totalPage: dataPathTotal,
+//       });
+//     }
+//   }
+// }
+
+// function fillTreePage(nodes: Array<StorageDevice.TreeNodeData>) {
+//   nodes.forEach((node) => {
+//     if (node && node.pageChildren && node.pageChildren.length === 1 && node.pageChildren[0].nodePath === 'loading' && node.children && node.children.length > 0) {
+//       const dataPathTotal = Math.ceil(node.children.length / pageSize);
+//       node.pageChildren = node.children.slice(0, 1 * pageSize);
+//       node.pageNum = 1;
+//       node.totalPage = dataPathTotal;
+//       if (dataPathTotal > 1) {
+//         node.pageChildren?.push({
+//           node: node.node,
+//           nodePath: `${node.nodePath}__PAGE`,
+//           nodeType: 'PAGE',
+//           parentPath: node.parentPath || '',
+//           pageNum: 1,
+//           totalPage: dataPathTotal,
+//         });
+//       }
+//     }
+//   });
+// }
 
 // 获取搜索结果合并树
 function mergeAndUpdateData(data: Array<StorageDevice.TreeNodeData>) {
@@ -294,14 +350,28 @@ function internalDealData(dealingData: Array<StorageDevice.TreeNodeData>) {
   }
 }
 
+function getFirstChilds(childData: Array<StorageDevice.TreeNodeData>) {
+  const result: Array<string> = [];
+  const data = childData || treeData;
+  if (data.length === 0) return result;
+  result.push(data[0].nodePath);
+  if (data[0].children && data[0].children.length > 0) {
+    result.push(...getFirstChilds(data[0].children));
+  }
+  return result;
+}
+
 function handleDealData() {
   if (!dealingStatus.value && searchResults.value.length) {
     dealingStatus.value = true;
     const dealingData: Array<StorageDevice.TreeNodeData> = searchResults.value.pop()!;
     internalDealData(dealingData);
-    expandNode.value = 'root';
-    measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
-    measurementTree.value?.virtualizedTreeRef?.setExpandedKeys(['root']);
+    nextTick(() => {
+      const firstChilds = getFirstChilds(treeData.value);
+      expandNodes.value = firstChilds;
+      measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
+      measurementTree.value?.virtualizedTreeRef?.setExpandedKeys(firstChilds);
+    });
   }
 }
 
@@ -362,8 +432,7 @@ function handleSearch() {
     isSearchResult.value = false;
     getTreeData();
   }
-
-  emit('handleChangeNode', 'root', 'DATABASE');
+  emit('handleChangeNode', 'root', 'DATABASE', searchText.value);
 }
 
 function handleRefresh(unforce?: boolean) {
@@ -371,7 +440,7 @@ function handleRefresh(unforce?: boolean) {
     handleSearch();
   } else {
     searchText.value = '';
-    emit('handleChangeNode', 'root', 'DATABASE');
+    emit('handleChangeNode', 'root', 'DATABASE', searchText.value);
     isSearchResult.value = false;
     getTreeData();
   }
@@ -434,12 +503,13 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
     return;
   }
   if (data.nodePath === expandNode.value) return;
-  if (['DATABASE', 'TIMESERIES'].includes(data.nodeType)) {
-    if (props.currentNode !== data.nodePath) {
-      emit('handleChangeNode', data.nodePath, data.nodeType);
-    }
+  // if (['DATABASE', 'TIMESERIES'].includes(data.nodeType)) {
+  if (props.currentNode !== data.nodePath) {
+    emit('handleChangeNode', data.nodePath, data.nodeType, searchText.value);
   }
+  // }
   expandNode.value = data.nodePath;
+  expandNodes.value = [data.nodePath];
   if (isSearchResult.value) {
     if ((data.pageChildren && data.pageChildren.length === 0) || data.pageChildren[0].nodeType === 'loading') {
       const originTreeData = cloneDeep(recursionFindCurrentByOrigin(data.nodePath, treeData.value)?.children || []);
@@ -625,5 +695,11 @@ defineExpose({ handleRefresh });
   :deep(.el-button) {
     height: 20px !important;
   }
+}
+
+.tree-type {
+  color: #495ad4;
+  font-size: 12px;
+  font-weight: bold;
 }
 </style>

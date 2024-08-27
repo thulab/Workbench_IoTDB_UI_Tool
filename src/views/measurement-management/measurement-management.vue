@@ -5,7 +5,7 @@
     </div>
 
     <div class="database-details-wrapper" :key="renderKey">
-      <database-detail v-if="currentNodeType === 'DATABASE'" :current-database="currentNode" @handle-reload="handleReload" />
+      <database-detail v-if="currentNodeType !== 'TIMESERIES'" :current-database="currentNode" :current-search-text="currentSearchText" @handle-reload="handleReload" />
       <measurement-detail v-if="currentNodeType === 'TIMESERIES'" :current-measurement="currentNode" @handle-reload="handleReload" />
     </div>
   </div>
@@ -23,10 +23,14 @@ const { canReadWriteSchema } = storeToRefs(userStore);
 const measurementSideTree = ref<InstanceType<typeof SideTree>>();
 const currentNode = ref('root');
 const currentNodeType = ref('DATABASE');
+const currentSearchText = ref('');
 const renderKey = ref(0);
 
-function handleChangeNode(path: string, type: string) {
+function handleChangeNode(path: string, type: string, searchText: string) {
   currentNode.value = path;
+  if (currentSearchText.value !== searchText) {
+    currentSearchText.value = searchText;
+  }
   currentNodeType.value = type;
   renderKey.value++;
 }

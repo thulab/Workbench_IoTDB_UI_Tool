@@ -1,7 +1,7 @@
 <template>
   <div class="measurement-detail-wrapper">
     <h4 class="info-title">
-      <div :style="`display: inline-flex; max-width: 400px;`">
+      <div style="display: inline-flex; max-width: calc(100% - 100px)">
         <text-tooltip :content="currentMeasurement" />
       </div>
       {{ t('measurement.info') }}
@@ -71,9 +71,19 @@
             {{ t('measurement.viewAlarm') }}
           </el-button>
         </el-tooltip>
-        <el-button size="small" :disabled="measurementInfos.dataType === 'TEXT'" @click="handleTrend" :id="`${currentMeasurement}-trend`">
-          {{ t('measurement.viewTrend') }}
-        </el-button>
+        <el-tooltip
+          v-if="appType === 1"
+          placement="top-start"
+          effect="light"
+          trigger="hover"
+          :content="t('measurement.goTrendTip')"
+          :disabled="measurementInfos.dataType !== 'TEXT'"
+          popper-class="tooltip-box-width"
+        >
+          <el-button size="small" :disabled="measurementInfos.dataType === 'TEXT'" @click="handleTrend" :id="`${currentMeasurement}-trend`">
+            {{ t('measurement.viewTrend') }}
+          </el-button>
+        </el-tooltip>
         <auth-tooltip :is-disabled="rowCanWriteSchemaByPath(currentMeasurement)" :content="'common.schemaAuthAnother'">
           <el-button size="small" :disabled="!rowCanWriteSchemaByPath(currentMeasurement)" @click="handleDelMeasurement" :id="`mesaurement-table-${currentMeasurement}-del`">
             {{ t('common.delete') }}
@@ -83,7 +93,7 @@
     </div>
 
     <h4 class="info-title">
-      <div :style="`display: inline-flex; max-width: 400px;`">
+      <div style="display: inline-flex; max-width: calc(100% - 100px)">
         <text-tooltip :content="currentMeasurement" />
       </div>
       {{ t('measurement.newValList') }}

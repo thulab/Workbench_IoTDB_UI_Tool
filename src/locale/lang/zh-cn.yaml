@@ -239,6 +239,7 @@ measurement:
   baseMeasurement: 普通序列
   viewMeasurement: 视图序列
   goAlarmTip: 该数据类型不支持创建告警
+  goTrendTip: 该数据类型不支持查看趋势
   calculateMeasurement: 计算序列
   deleteMeasurementTip: 此操作会删除数据库下全部测点和数据，是否删除？
   databaseModel: 数据模型
@@ -248,6 +249,8 @@ measurement:
   viewTrend: 查看趋势
   measurementName2: 测点名称
   measurementDescription2: 测点描述
+  treeDatabase: '@:measurement.databaseTitle'
+  treeTimeseries: '@:measurement.measurement'
 search:
   datetime: 时间点
   datetimerange: 时间段

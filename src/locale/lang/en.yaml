@@ -251,6 +251,8 @@ measurement:
   lastValueTime: Time of Latest Value
   baseMeasurement: Basic Series
   viewMeasurement: View Series
+  goAlarmTip: This data type does not support creating alarm
+  goTrendTip: This data type does not support view trend
   calculateMeasurement: Calculated Series
   deleteMeasurementTip: >-
     This operation will delete all measurements and data in the database, do you
@@ -262,6 +264,8 @@ measurement:
   viewTrend: View Trends
   measurementName2: Name
   measurementDescription2: Description
+  treeDatabase: DB
+  treeTimeseries: TS
 search:
   datetime: Timestamp
   datetimerange: Time Range
