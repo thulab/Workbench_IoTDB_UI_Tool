@@ -121,7 +121,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
-  (event: 'handleSave'): void;
+  (event: 'handleSave', path: string): void;
 }>();
 
 const dialogVisible = useVModel(props, 'visible', emit);
@@ -232,7 +232,7 @@ const handleConfirm = () => {
           if (res.code === 0) {
             ElMessage.success({ message: `${t('common.createSuccess')}`, grouping: true });
             dialogVisible.value = false;
-            emit('handleSave');
+            emit('handleSave', measurementVOList[0].timeseries);
           }
         })
         .catch((err) => {
@@ -246,7 +246,7 @@ const handleConfirm = () => {
             }).finally(() => {
               if (err.code === 9999) {
                 dialogVisible.value = false;
-                emit('handleSave');
+                emit('handleSave', measurementVOList[0].timeseries);
               }
             });
           }

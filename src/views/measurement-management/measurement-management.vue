@@ -12,6 +12,7 @@
         :current-search-text="currentSearchText"
         @handle-reload="handleReload"
         @handle-delete="handleDelete"
+        @handle-save-measurement="handleSaveMeasurement"
       />
       <measurement-detail v-if="currentNodeType === 'TIMESERIES'" :current-measurement="currentNode" @handle-reload="handleReload" @handle-delete="handleDelete" />
     </div>
@@ -45,8 +46,12 @@ function handleChangeNode(path: string, type: string, searchText: string) {
 function handleReload() {
   measurementSideTree.value?.handleRefresh();
 }
+
 function handleDelete(payload: StorageDevice.TreeEventPayload) {
   measurementSideTree.value?.handleOperate('delete', payload);
+}
+function handleSaveMeasurement(path: string) {
+  measurementSideTree.value?.handleOperate('add', { path, type: 'MEASUREMENT' });
 }
 </script>
 

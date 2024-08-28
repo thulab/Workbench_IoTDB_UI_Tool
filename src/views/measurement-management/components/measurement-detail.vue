@@ -307,7 +307,7 @@ function handleDelMeasurement() {
   }).then(() => {
     deleteMeasurements([props.currentMeasurement]).then(() => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
-      emit('handleDelete', { path: props.currentMeasurement, type: 'Timeseries' });
+      emit('handleDelete', { path: props.currentMeasurement, type: 'MEASUREMENT' });
     });
   });
 }

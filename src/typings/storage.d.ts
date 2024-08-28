@@ -136,6 +136,6 @@ declare namespace StorageDevice {
   }
   export interface TreeEventPayload {
     path: string;
-    type: 'DataBase' | 'Timeseries';
+    type: 'DATABASE' | 'MEASUREMENT';
   }
 }

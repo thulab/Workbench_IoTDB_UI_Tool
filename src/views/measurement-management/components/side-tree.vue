@@ -61,7 +61,7 @@
       <context-menu v-show="isShowContextMenu" ref="contextMenuRef" :clicked-node-data="clickedNodeData" @handle-command="(val) => handleCommand(val, clickedNodeData)" />
 
       <modal-database v-model:visible="databaseVisible" @handleSave="handleRefresh()" />
-      <modal-measurement v-model:visible="measurementVisible" :device-name="currentDatabase" @handleSave="handleRefresh()" />
+      <modal-measurement v-model:visible="measurementVisible" :device-name="currentDatabase" @handleSave="(path: string) => handleOperate('add', { path, type: 'MEASUREMENT' })" />
     </div>
   </auth-container>
 </template>
@@ -108,6 +108,8 @@ const expandNodes = ref(['root']);
 const isShowContextMenu = ref(false);
 const contextMenuRef = ref<InstanceType<typeof ContextMenu>>();
 const contextMenuTimer = ref();
+
+const addPaths = ref<string[]>([]);
 const clickedNodeData = reactive<StorageDevice.TreeNodeData>({
   node: '',
   nodePath: '',
@@ -412,6 +414,23 @@ function handleData(data: string) {
   }
 }
 
+function expandNodeByKey() {
+  if (addPaths.value.length > 0) {
+    const current = addPaths.value.splice(0, 1)[0];
+    if (current) {
+      const node = measurementTree.value?.virtualizedTreeRef?.getNode(current);
+      if (node) {
+        measurementTree.value?.virtualizedTreeRef?.expandNode(node);
+        nextTick(() => {
+          expandNodeByKey();
+        });
+      } else {
+        addPaths.value.unshift(current);
+      }
+    }
+  }
+}
+
 async function subscribeToSSE() {
   try {
     searchLoading.value = true;
@@ -446,13 +465,14 @@ function handleRefresh(unforce?: boolean) {
   }
 }
 
-function handleOperate(Operate: 'add' | 'delete', payload: StorageDevice.TreeEventPayload) {
-  const parentPath = payload.path.substring(0, payload.path.lastIndexOf('.'));
-  const item = recursionFindCurrentByOrigin(payload.path, treeData.value);
-  const parent = recursionFindCurrentByOrigin(parentPath, treeData.value);
-  const pageItem = recursionFindParent(payload.path, treeData.value);
-  const pageParent = recursionFindParent(parentPath, treeData.value);
+async function handleOperate(Operate: 'add' | 'delete', payload: StorageDevice.TreeEventPayload) {
   if (Operate === 'delete') {
+    const parentPath = payload.path.substring(0, payload.path.lastIndexOf('.'));
+    const item = recursionFindCurrentByOrigin(payload.path, treeData.value);
+    const parent = recursionFindCurrentByOrigin(parentPath, treeData.value);
+    const pageItem = recursionFindParent(payload.path, treeData.value);
+    const pageParent = recursionFindParent(parentPath, treeData.value);
+
     if (item && parent) {
       // 从 parent 的 children 中删除 item
       const index = parent.children!.findIndex((child) => child.nodePath === item.nodePath);
@@ -469,17 +489,33 @@ function handleOperate(Operate: 'add' | 'delete', payload: StorageDevice.TreeEve
     nextTick(() => {
       measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
     });
+    if (expandNode.value === payload.path) {
+      // 从 expandNodes 中删除 item
+      const index = expandNodes.value.findIndex((node) => node === payload.path);
+      if (index >= 0) {
+        expandNodes.value.splice(index, 1);
+      }
+      if (expandNodes.value.length === 0) {
+        expandNodes.value = [pageParent?.nodePath || 'root'];
+      }
+      emit('handleChangeNode', pageParent?.nodePath || 'root', pageParent?.nodeType || 'DATABASE', searchText.value);
+    }
   }
-  if (expandNode.value === payload.path) {
-    // 从 expandNodes 中删除 item
-    const index = expandNodes.value.findIndex((node) => node === payload.path);
-    if (index >= 0) {
-      expandNodes.value.splice(index, 1);
+
+  if (Operate === 'add') {
+    // 将 payload.path 按 . 拆分成数组。 比如 root.a1.b1 结果是 ['root','root.a1','root.a1.b1']
+    const pathArr = payload.path.split('.');
+    let fullPath = 'root';
+    pathArr.forEach(async (path, index) => {
+      if (index === 0) return;
+      fullPath = `${fullPath}.${path}`;
+      pathArr[index] = fullPath;
+    });
+    addPaths.value = pathArr;
+    addPaths.value.splice(0, 1);
+    if (addPaths.value.length > 0) {
+      expandNodeByKey();
     }
-    if (expandNodes.value.length === 0) {
-      expandNodes.value = [pageParent?.nodePath || 'root'];
-    }
-    emit('handleChangeNode', pageParent?.nodePath || 'root', pageParent?.nodeType || 'DATABASE', searchText.value);
   }
 }
 
@@ -592,6 +628,11 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
       });
     }
     measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
+    nextTick(() => {
+      if (addPaths.value.length > 0) {
+        expandNodeByKey();
+      }
+    });
   });
 }
 

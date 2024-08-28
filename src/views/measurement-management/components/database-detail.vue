@@ -308,6 +308,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: 'handleReload'): void;
   (event: 'handleDelete', payload: StorageDevice.TreeEventPayload): void;
+  (event: 'handleSaveMeasurement', path: string): void;
 }>();
 
 const { t, locale } = useI18n();
@@ -526,12 +527,12 @@ function handleDelDatabase() {
     if (props.currentNodeType === 'DataBase') {
       deleteDatabase(props.currentDatabase).then(() => {
         ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
-        emit('handleDelete', { path: props.currentDatabase, type: 'DataBase' });
+        emit('handleDelete', { path: props.currentDatabase, type: 'DATABASE' });
       });
     } else {
       deletePaths(props.currentDatabase, props.currentNodeType).then(() => {
         ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
-        emit('handleDelete', { path: props.currentDatabase, type: 'DataBase' });
+        emit('handleDelete', { path: props.currentDatabase, type: 'DATABASE' });
       });
     }
   });
@@ -604,7 +605,7 @@ function handleDelRow(type: string, row: StorageDevice.MeasurementItem | null) {
     deleteMeasurements(measurementList).then(() => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
       measurementList.forEach((item) => {
-        emit('handleDelete', { path: item, type: 'Timeseries' });
+        emit('handleDelete', { path: item, type: 'MEASUREMENT' });
       });
       getDatabaseDetail(props.currentDatabase);
       handleRefresh();
@@ -644,8 +645,8 @@ function handleSelectionChange(vals: StorageDevice.MeasurementItem[]) {
 }
 
 // 保存物理量
-function handleSaveMeasurement() {
-  emit('handleReload');
+function handleSaveMeasurement(path: string) {
+  emit('handleSaveMeasurement', path);
   getDatabaseDetail(props.currentDatabase);
   handleRefresh();
 }
