@@ -472,9 +472,9 @@ function handleReset(type: 'view' | 'edit') {
 function calcColumnWidth(child: Auth.PrivilegeEnum) {
   if (child.desc.length > 0) {
     if (locale.value === 'en') {
-      return child.desc.length * 8 + 64;
+      return child.desc.length * 8 + 8;
     }
-    return child.desc.length * 16 + 64;
+    return child.desc.length * 18 + 8;
   }
   return child.width;
 }

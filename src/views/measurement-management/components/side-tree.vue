@@ -35,9 +35,9 @@
             <!-- eslint-disable-next-line vue/no-unused-vars -->
             <template #default="{ node, data }">
               <div v-if="data.nodeType !== 'PAGE'" class="node-text" :id="`tree-node-content-${data.nodePath}`">
-                <span class="tree-type" v-if="data.nodeType === 'DATABASE' && data.node !== 'root'">{{ t('measurement.treeDatabase') }}&nbsp;</span>
-                <span class="tree-type" v-if="data.nodeType === 'TIMESERIES'">{{ t('measurement.treeTimeseries') }}&nbsp;</span>
-                <span v-html="highlightNode(data.node)"></span>
+                <el-icon size="16" v-if="data.nodeType === 'DATABASE' && data.node !== 'root'"><i-custom-DB /></el-icon>
+                <el-icon size="16" v-if="data.nodeType === 'TIMESERIES'"><i-custom-TS /></el-icon>
+                <span class="m-l-4" v-html="highlightNode(data.node)"></span>
               </div>
               <!-- eslint-disable-next-line vue/max-len -->
               <!-- <i-custom-more v-if="data.nodeType !== 'PAGE'" :id="`tree-node-dropdown-${data.nodePath}`" class="more-icon svg-button-hover-color" @click="(e: MouseEvent) => handleClickMore(e, data)" /> -->
