@@ -446,6 +446,43 @@ function handleRefresh(unforce?: boolean) {
   }
 }
 
+function handleOperate(Operate: 'add' | 'delete', payload: StorageDevice.TreeEventPayload) {
+  const parentPath = payload.path.substring(0, payload.path.lastIndexOf('.'));
+  const item = recursionFindCurrentByOrigin(payload.path, treeData.value);
+  const parent = recursionFindCurrentByOrigin(parentPath, treeData.value);
+  const pageItem = recursionFindParent(payload.path, treeData.value);
+  const pageParent = recursionFindParent(parentPath, treeData.value);
+  if (Operate === 'delete') {
+    if (item && parent) {
+      // 从 parent 的 children 中删除 item
+      const index = parent.children!.findIndex((child) => child.nodePath === item.nodePath);
+      if (index >= 0) {
+        parent.children!.splice(index, 1);
+      }
+    }
+    if (pageItem && pageParent) {
+      const pageIndex = pageParent.pageChildren!.findIndex((child) => child.nodePath === pageItem.nodePath);
+      if (pageIndex >= 0) {
+        pageParent.pageChildren!.splice(pageIndex, 1);
+      }
+    }
+    nextTick(() => {
+      measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
+    });
+  }
+  if (expandNode.value === payload.path) {
+    // 从 expandNodes 中删除 item
+    const index = expandNodes.value.findIndex((node) => node === payload.path);
+    if (index >= 0) {
+      expandNodes.value.splice(index, 1);
+    }
+    if (expandNodes.value.length === 0) {
+      expandNodes.value = [pageParent?.nodePath || 'root'];
+    }
+    emit('handleChangeNode', pageParent?.nodePath || 'root', pageParent?.nodeType || 'DATABASE', searchText.value);
+  }
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleClickMore(e: MouseEvent, key: string) {
   if (contextMenuTimer.value) {
@@ -483,7 +520,7 @@ function handleCommand(val: string, data: TreeNodeData) {
     }).then(() => {
       deletePaths(data.nodePath, data.nodeType).then(() => {
         ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
-        handleRefresh();
+        handleOperate('delete', { path: data.nodePath, type: data.nodeType });
       });
     });
   }
@@ -638,7 +675,7 @@ watch(
   }
 );
 
-defineExpose({ handleRefresh });
+defineExpose({ handleRefresh, handleOperate });
 </script>
 <style lang="scss" scoped>
 .measurement-tree-wrapper {

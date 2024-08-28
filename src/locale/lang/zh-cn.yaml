@@ -185,7 +185,7 @@ page:
 measurement:
   databaseTitle: 数据库
   searchPlaceholder: 请输入搜索内容
-  deleteDatabaseTip: 此操作会删除数据库下全部测点和数据，是否删除？
+  deleteDatabaseTip: 此操作会删除路径下全部测点和数据，是否删除？
   newDataBase: 新建数据库
   databaseName: 数据库名称
   databaseNamePlaceholder: 请输入数据库名称
@@ -241,7 +241,7 @@ measurement:
   goAlarmTip: 该数据类型不支持创建告警
   goTrendTip: 该数据类型不支持查看趋势
   calculateMeasurement: 计算序列
-  deleteMeasurementTip: 此操作会删除数据库下全部测点和数据，是否删除？
+  deleteMeasurementTip: 此操作会删除路径下全部测点和数据，是否删除？
   databaseModel: 数据模型
   databaseModelDoc: IoTDB树形模型指导文档
   viewData: 查看数据

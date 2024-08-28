@@ -134,4 +134,8 @@ declare namespace StorageDevice {
     latest: string;
     latestTime: string;
   }
+  export interface TreeEventPayload {
+    path: string;
+    type: 'DataBase' | 'Timeseries';
+  }
 }

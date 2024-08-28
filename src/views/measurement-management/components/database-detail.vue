@@ -302,10 +302,12 @@ import ModalDescription from './modal-description.vue';
 const props = defineProps<{
   currentDatabase: string;
   currentSearchText: string;
+  currentNodeType: string;
 }>();
 
 const emit = defineEmits<{
   (event: 'handleReload'): void;
+  (event: 'handleDelete', payload: StorageDevice.TreeEventPayload): void;
 }>();
 
 const { t, locale } = useI18n();
@@ -413,6 +415,7 @@ function rowReadWriteDataByPath(path: string) {
 }
 
 const { requestFn: deleteDatabase } = useRequest(StorageApi.deleteDatabase);
+const { requestFn: deletePaths } = useRequest(StorageApi.deletePaths);
 const { requestFn: getDatabaseInfo, loading: infoLoading } = useRequest(StorageApi.getDatabaseInfo);
 const {
   requestFn: getMeasurementsInfosByFuzzy,
@@ -520,10 +523,17 @@ function handleDelDatabase() {
     type: 'warning',
     icon: ICustomMessageWarning,
   }).then(() => {
-    deleteDatabase(props.currentDatabase).then(() => {
-      ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
-      emit('handleReload');
-    });
+    if (props.currentNodeType === 'DataBase') {
+      deleteDatabase(props.currentDatabase).then(() => {
+        ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
+        emit('handleDelete', { path: props.currentDatabase, type: 'DataBase' });
+      });
+    } else {
+      deletePaths(props.currentDatabase, props.currentNodeType).then(() => {
+        ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
+        emit('handleDelete', { path: props.currentDatabase, type: 'DataBase' });
+      });
+    }
   });
 }
 
@@ -593,7 +603,9 @@ function handleDelRow(type: string, row: StorageDevice.MeasurementItem | null) {
     }
     deleteMeasurements(measurementList).then(() => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
-      emit('handleReload');
+      measurementList.forEach((item) => {
+        emit('handleDelete', { path: item, type: 'Timeseries' });
+      });
       getDatabaseDetail(props.currentDatabase);
       handleRefresh();
     });

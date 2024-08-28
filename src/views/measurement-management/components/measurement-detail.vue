@@ -137,6 +137,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'handleReload'): void;
+  (event: 'handleDelete', payload: StorageDevice.TreeEventPayload): void;
 }>();
 
 const { t } = useI18n();
@@ -306,7 +307,7 @@ function handleDelMeasurement() {
   }).then(() => {
     deleteMeasurements([props.currentMeasurement]).then(() => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
-      emit('handleReload');
+      emit('handleDelete', { path: props.currentMeasurement, type: 'Timeseries' });
     });
   });
 }

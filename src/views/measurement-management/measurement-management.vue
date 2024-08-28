@@ -5,8 +5,15 @@
     </div>
 
     <div class="database-details-wrapper" :key="renderKey">
-      <database-detail v-if="currentNodeType !== 'TIMESERIES'" :current-database="currentNode" :current-search-text="currentSearchText" @handle-reload="handleReload" />
-      <measurement-detail v-if="currentNodeType === 'TIMESERIES'" :current-measurement="currentNode" @handle-reload="handleReload" />
+      <database-detail
+        v-if="currentNodeType !== 'TIMESERIES'"
+        :current-node-type="currentNodeType"
+        :current-database="currentNode"
+        :current-search-text="currentSearchText"
+        @handle-reload="handleReload"
+        @handle-delete="handleDelete"
+      />
+      <measurement-detail v-if="currentNodeType === 'TIMESERIES'" :current-measurement="currentNode" @handle-reload="handleReload" @handle-delete="handleDelete" />
     </div>
   </div>
 </template>
@@ -37,6 +44,9 @@ function handleChangeNode(path: string, type: string, searchText: string) {
 
 function handleReload() {
   measurementSideTree.value?.handleRefresh();
+}
+function handleDelete(payload: StorageDevice.TreeEventPayload) {
+  measurementSideTree.value?.handleOperate('delete', payload);
 }
 </script>
 
