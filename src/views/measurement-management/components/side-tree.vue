@@ -507,7 +507,7 @@ async function handleOperate(Operate: 'add' | 'delete', payload: StorageDevice.T
     const pathArr = payload.path.split('.');
     let fullPath = 'root';
     pathArr.forEach(async (path, index) => {
-      if (index === 0) return;
+      if (index === 0 || (index === pathArr.length && payload.type === 'MEASUREMENT')) return;
       fullPath = `${fullPath}.${path}`;
       pathArr[index] = fullPath;
     });
