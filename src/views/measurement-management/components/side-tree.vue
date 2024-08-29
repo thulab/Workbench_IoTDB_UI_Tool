@@ -515,6 +515,21 @@ async function handleOperate(Operate: 'add' | 'delete', payload: StorageDevice.T
     addPaths.value = pathArr;
     addPaths.value.splice(0, 1);
     if (addPaths.value.length > 0) {
+      if (!searchText.value) {
+        const item = recursionFindCurrentByOrigin(addPaths.value[0], treeData.value);
+        const pageItem = recursionFindParent(addPaths.value[0], treeData.value);
+        if (item) {
+          item.children = [cloneDeep(loadingNode)];
+          item.pageChildren = [cloneDeep(loadingNode)];
+        }
+        if (pageItem) {
+          pageItem.children = [cloneDeep(loadingNode)];
+          pageItem.pageChildren = [cloneDeep(loadingNode)];
+        }
+        nextTick(() => {
+          measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
+        });
+      }
       expandNodeByKey();
     }
   }
@@ -576,7 +591,7 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
     e?.stopPropagation();
     return;
   }
-  if (data.nodePath === expandNode.value) return;
+  if (data.nodePath === expandNode.value && (!data.pageChildren || data.pageChildren[0].nodeType !== 'loading')) return;
   // if (['DATABASE', 'TIMESERIES'].includes(data.nodeType)) {
   if (props.currentNode !== data.nodePath) {
     emit('handleChangeNode', data.nodePath, data.nodeType, searchText.value);
