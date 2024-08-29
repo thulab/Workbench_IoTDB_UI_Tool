@@ -515,7 +515,7 @@ async function handleOperate(Operate: 'add' | 'delete', payload: StorageDevice.T
     addPaths.value = pathArr;
     addPaths.value.splice(0, 1);
     if (addPaths.value.length > 0) {
-      if (!searchText.value) {
+      if (!isSearchResult.value) {
         const item = recursionFindCurrentByOrigin(addPaths.value[0], treeData.value);
         const pageItem = recursionFindParent(addPaths.value[0], treeData.value);
         if (item) {
@@ -621,7 +621,9 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
     return;
   }
   const children = measurementTree.value?.virtualizedTreeRef?.getNode(data.nodePath)?.children;
-  if (!children || (children[0].data as TreeNodeData).nodeType !== 'loading') return;
+  if ((!children || (children[0].data as TreeNodeData).nodeType !== 'loading') && data.pageChildren[0].nodeType !== 'loading') {
+    return;
+  }
   getNextNodeInfos(data.nodePath).then((res) => {
     const list = res.data || [];
     // 展示点开操作查看的data 都在pageChildren 属性，需找到对应的children 上追加子节点
