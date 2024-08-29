@@ -35,6 +35,7 @@ const currentSearchText = ref('');
 const renderKey = ref(0);
 
 function handleChangeNode(path: string, type: string, searchText: string) {
+  if (type === 'loading') return;
   currentNode.value = path;
   if (currentSearchText.value !== searchText) {
     currentSearchText.value = searchText;
