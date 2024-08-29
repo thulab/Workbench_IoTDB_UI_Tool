@@ -220,6 +220,7 @@ function getTreeData() {
     })
     .finally(() => {
       initialLoading.value = false;
+      measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
       expandNodes.value = ['root'];
       measurementTree.value?.virtualizedTreeRef?.setExpandedKeys(['root']);
     });
