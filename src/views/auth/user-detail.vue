@@ -45,9 +45,18 @@
               </h4>
             </div>
             <div class="table-list-box m-x-16">
-              <h4 class="table-box-title">{{ t('common.allSituation') }}</h4>
+              <div class="flex-justify-between">
+                <h4 class="table-box-title">{{ t('common.allSituation') }}</h4>
+                <div class="header-operate-buttons">
+                  <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('auth.docTip')" popper-class="tooltip-box-width">
+                    <el-button link class="m-r-4" style="margin-top: -4px" @click="handleDoc" id="user-doc">
+                      <el-icon size="24"><i-custom-model-doc /></el-icon>
+                    </el-button>
+                  </el-tooltip>
+                </div>
+              </div>
               <el-table :data="entityTableData" style="width: 100%">
-                <el-table-column :label="t('common.allChoose')" align="center" width="90">
+                <el-table-column :label="t('common.allChoose')" align="center" width="60">
                   <template #default="{ row }">
                     <el-icon v-if="!isEdit" class="moveDown3" size="21">
                       <i-custom-correct v-if="row.allChecked" />
@@ -95,10 +104,19 @@
               </el-table>
             </div>
             <div class="table-list-box m-x-16 m-b-16" v-if="canEdit">
-              <h4 class="table-box-title">{{ t('auth.path') }}</h4>
+              <div class="flex-justify-between">
+                <h4 class="table-box-title">{{ t('auth.path') }}</h4>
+                <div class="header-operate-buttons">
+                  <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('auth.docTip')" popper-class="tooltip-box-width">
+                    <el-button link class="m-r-4" style="margin-top: -4px" @click="handleDoc" id="user-path-doc">
+                      <el-icon size="24"><i-custom-model-doc /></el-icon>
+                    </el-button>
+                  </el-tooltip>
+                </div>
+              </div>
               <el-table :data="tableData" style="width: 100%" tooltip-effect="light" :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
                 <el-table-column :label="t('auth.pathName')" align="center" min-width="193" prop="path" show-overflow-tooltip />
-                <el-table-column :label="t('common.allChoose')" align="center" width="193">
+                <el-table-column :label="t('common.allChoose')" align="center" width="60">
                   <template #default="{ row, $index }">
                     <el-icon v-if="!isEdit || !row.path" class="moveDown3" size="21">
                       <i-custom-correct v-if="row.allChecked" />
@@ -150,7 +168,7 @@
                     </template>
                   </el-table-column>
                 </el-table-column>
-                <el-table-column :label="t('common.operation')" align="center" width="194" fixed="right">
+                <el-table-column :label="t('common.operation')" align="center" width="80" fixed="right">
                   <template #default="{ row }">
                     <el-button
                       link
@@ -474,7 +492,7 @@ function calcColumnWidth(child: Auth.PrivilegeEnum) {
     if (locale.value === 'en') {
       return child.desc.length * 8 + 8;
     }
-    return child.desc.length * 18 + 8;
+    return child.desc !== '运维' ? child.desc.length * 12 + 24 : child.desc.length * 16 * 2;
   }
   return child.width;
 }
@@ -544,6 +562,13 @@ function handleSave() {
       pageType.value = 'edit';
       getDetail();
     });
+}
+function handleDoc() {
+  if (locale.value === 'en') {
+    window.open('https://www.timecho.com/docs/UserGuide/latest/User-Manual/Authority-Management.html');
+  } else {
+    window.open('https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/Authority-Management.html');
+  }
 }
 
 watch(
@@ -658,6 +683,10 @@ watch(
     line-height: 21px;
     color: #495ad4;
     margin-bottom: 8px;
+  }
+
+  :deep(.el-table .cell) {
+    padding: 0 !important;
   }
 }
 

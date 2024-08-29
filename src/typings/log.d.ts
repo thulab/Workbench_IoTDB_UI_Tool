@@ -6,6 +6,7 @@ declare namespace Log {
     startTime: DateModelType;
     endTime: DateModelType;
     timestamp: DateModelType;
+    orderBy: 'asc' | 'desc';
   }
 
   export interface AuditData {

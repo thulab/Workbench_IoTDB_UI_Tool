@@ -37,7 +37,16 @@
               </h4>
             </div>
             <div class="table-list-box">
-              <h4 class="table-box-title">{{ t('common.allSituation') }}</h4>
+              <div class="flex-justify-between">
+                <h4 class="table-box-title">{{ t('common.allSituation') }}</h4>
+                <div class="header-operate-buttons">
+                  <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('auth.docTip')" popper-class="tooltip-box-width">
+                    <el-button link class="m-r-4" style="margin-top: -4px" @click="handleDoc" id="role-doc">
+                      <el-icon size="24"><i-custom-model-doc /></el-icon>
+                    </el-button>
+                  </el-tooltip>
+                </div>
+              </div>
               <el-table :data="[authData.entityPrivileges]" style="width: 100%" border>
                 <el-table-column :label="t('common.allChoose')" align="center" width="90" fixed="left">
                   <template #default="{ row }">
@@ -66,7 +75,16 @@
               </el-table>
             </div>
             <div class="table-list-box">
-              <h4 class="table-box-title">{{ t('auth.path') }}</h4>
+              <div class="flex-justify-between">
+                <h4 class="table-box-title">{{ t('auth.path') }}</h4>
+                <div class="header-operate-buttons">
+                  <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('auth.docTip')" popper-class="tooltip-box-width">
+                    <el-button link class="m-r-4" style="margin-top: -4px" @click="handleDoc" id="role-path-doc">
+                      <el-icon size="24"><i-custom-model-doc /></el-icon>
+                    </el-button>
+                  </el-tooltip>
+                </div>
+              </div>
               <el-table :data="authData.pathPrivileges" style="width: 100%" tooltip-effect="light" border :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
                 <el-table-column :label="t('auth.pathName')" prop="path" align="center" min-width="193" show-overflow-tooltip />
                 <el-table-column :label="t('common.allChoose')" align="center" width="193">
@@ -273,9 +291,9 @@ function handleReset(type: 'edit' | 'view') {
 function calcColumnWidth(child: Auth.PrivilegeEnum) {
   if (child.desc.length > 0) {
     if (locale.value === 'en') {
-      return child.desc.length * 8 + 64;
+      return child.desc.length * 8 + 8;
     }
-    return child.desc.length * 16 + 64;
+    return child.desc !== '运维' ? child.desc.length * 12 + 24 : child.desc.length * 16 * 2;
   }
   return child.width;
 }
@@ -385,6 +403,14 @@ function showAuthDetail(user: string) {
   previewVisible.value = true;
 }
 
+function handleDoc() {
+  if (locale.value === 'en') {
+    window.open('https://www.timecho.com/docs/UserGuide/latest/User-Manual/Authority-Management.html');
+  } else {
+    window.open('https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/Authority-Management.html');
+  }
+}
+
 watch(
   () => currentRole.value,
   (val, old) => {
@@ -490,6 +516,10 @@ watch(
     font-weight: 400;
     line-height: 18px;
     color: #424561;
+  }
+
+  :deep(.el-table .cell) {
+    padding: 0 !important;
   }
 }
 

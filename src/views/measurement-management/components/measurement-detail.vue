@@ -261,7 +261,7 @@ function getListData() {
 }
 
 function handleSortChange(data: { column: any; prop: string; order: any }) {
-  defaultSort.value = { prop: 't0', order: data.order };
+  defaultSort.value = { prop: 't0', order: data.order || 'descending' };
   getListData();
 }
 

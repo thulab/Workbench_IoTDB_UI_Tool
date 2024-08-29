@@ -645,6 +645,7 @@ auth:
   versionTitle: 版本号：%{version}
   systemDetail: 实时库涵盖了测点管理、查询、可视化、告警、权限等功能，旨在帮助用户更直观的进行跨实例管理，更简单的完成数据库操作，更高效的进行运维操作
   systemDetailWorkbench: Workbench涵盖了测点管理、查询、可视化、权限等功能，旨在帮助用户更直观的进行跨实例管理，更简单的完成数据库操作，更高效的进行运维操作
+  docTip: 权限含义具体说明请查看文档
 error:
   403Tip: 抱歉，您无权访问该页面
   goHome: 返回首页

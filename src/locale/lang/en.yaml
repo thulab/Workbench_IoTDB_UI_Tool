@@ -781,6 +781,7 @@ auth:
   systemTitleWorkbench: TimechoDB Visual Console - Workbench
   versionTitle: Version：%{version}
   editUserSuccess: Edited Successfully
+  docTip: Please refer to the document for specific instructions on the meaning of permissions
 error:
   403Tip: Sorry, you do not have permission to access this page
   goHome: Back to Home

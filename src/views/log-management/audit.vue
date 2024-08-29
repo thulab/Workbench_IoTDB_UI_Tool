@@ -59,9 +59,11 @@
                 :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
                 tooltip-effect="light"
                 :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
+                :default-sort="defaultSort"
+                @sort-change="handleSortChange"
                 ref="tableRef"
               >
-                <el-table-column :label="t('log.operateTime')" prop="time" width="180" align="center" show-overflow-tooltip />
+                <el-table-column :label="t('log.operateTime')" prop="time" width="180" align="center" sortable :sort-orders="['ascending', 'descending']" show-overflow-tooltip />
                 <el-table-column :label="t('log.ip')" prop="address" width="160" align="center" show-overflow-tooltip />
                 <el-table-column :label="t('log.operateUser')" prop="username" width="140" align="center" show-overflow-tooltip />
                 <el-table-column :label="t('common.operationDetail')" prop="log" min-width="280" align="left">
@@ -109,7 +111,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance } from 'element-plus';
+import type { FormInstance, Sort } from 'element-plus';
 import { cloneDeep } from 'lodash-es';
 import { storeToRefs } from 'pinia';
 import { LogApi } from '@/api';
@@ -124,6 +126,7 @@ const userStore = useUserStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
 const { canReadWriteData } = storeToRefs(userStore);
 const { maxTableHeight } = useTableHeight(315);
+const defaultSort = ref<Sort>({ prop: 'time', order: 'descending' });
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({
   username: '',
@@ -163,9 +166,15 @@ function getListData() {
     startTime: formatDate(copySearchFormData.time[0], 'YYYY-MM-DD HH:mm:ss.SSSZ'),
     endTime: formatDate(copySearchFormData.time[1], 'YYYY-MM-DD HH:mm:ss.SSSZ'),
     timestamp: timestamp.value,
+    orderBy: defaultSort.value.order === 'ascending' ? 'asc' : 'desc',
   }).then((res) => {
     totalCount.value = res.data.totalCount;
   });
+}
+
+function handleSortChange(data: { column: any; prop: string; order: any }) {
+  defaultSort.value = { prop: 'time', order: data.order };
+  getListData();
 }
 
 // 重置
