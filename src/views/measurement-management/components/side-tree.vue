@@ -220,6 +220,7 @@ function getTreeData() {
     })
     .finally(() => {
       initialLoading.value = false;
+      measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
       expandNodes.value = ['root'];
       measurementTree.value?.virtualizedTreeRef?.setExpandedKeys(['root']);
     });
@@ -507,13 +508,28 @@ async function handleOperate(Operate: 'add' | 'delete', payload: StorageDevice.T
     const pathArr = payload.path.split('.');
     let fullPath = 'root';
     pathArr.forEach(async (path, index) => {
-      if (index === 0 || (index === pathArr.length && payload.type === 'MEASUREMENT')) return;
+      if (index === 0 || (index === pathArr.length - 1 && payload.type === 'MEASUREMENT')) return;
       fullPath = `${fullPath}.${path}`;
       pathArr[index] = fullPath;
     });
     addPaths.value = pathArr;
     addPaths.value.splice(0, 1);
     if (addPaths.value.length > 0) {
+      if (!isSearchResult.value) {
+        const item = recursionFindCurrentByOrigin(addPaths.value[0], treeData.value);
+        const pageItem = recursionFindParent(addPaths.value[0], treeData.value);
+        if (item) {
+          item.children = [cloneDeep(loadingNode)];
+          item.pageChildren = [cloneDeep(loadingNode)];
+        }
+        if (pageItem) {
+          pageItem.children = [cloneDeep(loadingNode)];
+          pageItem.pageChildren = [cloneDeep(loadingNode)];
+        }
+        nextTick(() => {
+          measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
+        });
+      }
       expandNodeByKey();
     }
   }
@@ -575,7 +591,7 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
     e?.stopPropagation();
     return;
   }
-  if (data.nodePath === expandNode.value) return;
+  if (data.nodePath === expandNode.value && (!data.pageChildren || data.pageChildren[0].nodeType !== 'loading')) return;
   // if (['DATABASE', 'TIMESERIES'].includes(data.nodeType)) {
   if (props.currentNode !== data.nodePath) {
     emit('handleChangeNode', data.nodePath, data.nodeType, searchText.value);
@@ -605,7 +621,9 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
     return;
   }
   const children = measurementTree.value?.virtualizedTreeRef?.getNode(data.nodePath)?.children;
-  if (!children || (children[0].data as TreeNodeData).nodeType !== 'loading') return;
+  if ((!children || (children[0].data as TreeNodeData).nodeType !== 'loading') && data.pageChildren[0].nodeType !== 'loading') {
+    return;
+  }
   getNextNodeInfos(data.nodePath).then((res) => {
     const list = res.data || [];
     // 展示点开操作查看的data 都在pageChildren 属性，需找到对应的children 上追加子节点
