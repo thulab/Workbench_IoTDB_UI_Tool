@@ -219,15 +219,7 @@
                   {{ t('page.alarm') }}
                 </el-button>
               </el-tooltip>
-              <el-tooltip
-                v-if="appType === 1"
-                placement="top-start"
-                effect="light"
-                trigger="hover"
-                :content="t('measurement.goTrendTip')"
-                :disabled="row.dataType !== 'TEXT'"
-                popper-class="tooltip-box-width"
-              >
+              <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('measurement.goTrendTip')" :disabled="row.dataType !== 'TEXT'" popper-class="tooltip-box-width">
                 <el-button
                   type="primary"
                   link

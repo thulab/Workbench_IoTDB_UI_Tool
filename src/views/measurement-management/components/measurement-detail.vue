@@ -71,15 +71,7 @@
             {{ t('measurement.viewAlarm') }}
           </el-button>
         </el-tooltip>
-        <el-tooltip
-          v-if="appType === 1"
-          placement="top-start"
-          effect="light"
-          trigger="hover"
-          :content="t('measurement.goTrendTip')"
-          :disabled="measurementInfos.dataType !== 'TEXT'"
-          popper-class="tooltip-box-width"
-        >
+        <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('measurement.goTrendTip')" :disabled="measurementInfos.dataType !== 'TEXT'" popper-class="tooltip-box-width">
           <el-button size="small" :disabled="measurementInfos.dataType === 'TEXT'" @click="handleTrend" :id="`${currentMeasurement}-trend`">
             {{ t('measurement.viewTrend') }}
           </el-button>
