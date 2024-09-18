@@ -28,8 +28,8 @@
                 <el-tooltip effect="light" :content="t('dataSync.syncMeasurementPlaceholder')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
               </template>
               <el-radio-group v-model="formData.whole" id="data-sync-modal-aync-type">
-                <el-radio :label="true" id="data-sync-modal-aync-type-all">{{ t('dataSync.all') }}</el-radio>
-                <el-radio :label="false" class="radio-tip" id="data-sync-modal-aync-type-path">
+                <el-radio :value="true" id="data-sync-modal-aync-type-all">{{ t('dataSync.all') }}</el-radio>
+                <el-radio :value="false" class="radio-tip" id="data-sync-modal-aync-type-path">
                   {{ t('dataSync.prefix') }}
                   <el-tooltip effect="light" :content="t('dataSync.pathTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                 </el-radio>
@@ -47,8 +47,8 @@
               <el-tooltip effect="light" :content="t('dataSync.reforwardTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
             </template>
             <el-radio-group v-model="formData.reforward" id="data-sync-modal-reforward">
-              <el-radio :label="true" id="data-sync-modal-reforward-yes">{{ t('common.yes') }}</el-radio>
-              <el-radio :label="false" id="data-sync-modal-reforward-no">{{ t('common.no') }}</el-radio>
+              <el-radio :value="true" id="data-sync-modal-reforward-yes">{{ t('common.yes') }}</el-radio>
+              <el-radio :value="false" id="data-sync-modal-reforward-no">{{ t('common.no') }}</el-radio>
             </el-radio-group>
           </base-form-item>
           <div class="flex-align-center">
@@ -110,8 +110,8 @@
                 </el-tooltip>
               </template>
               <el-radio-group v-model="formData.triggerMode" @change="(val) => handleChangeTriggerMode(val as string as 'stream' | 'batch')" id="data-sync-modal-triggerMode">
-                <el-radio :label="'stream'" id="data-sync-modal-triggerMode-stream">{{ t('dataSync.realMode') }}</el-radio>
-                <el-radio :label="'batch'" id="data-sync-modal-triggerMode-batch">{{ t('dataSync.batchMode') }}</el-radio>
+                <el-radio :value="'stream'" id="data-sync-modal-triggerMode-stream">{{ t('dataSync.realMode') }}</el-radio>
+                <el-radio :value="'batch'" id="data-sync-modal-triggerMode-batch">{{ t('dataSync.batchMode') }}</el-radio>
               </el-radio-group>
             </base-form-item>
           </div>

@@ -4,7 +4,7 @@
       {{ t('connection.prometheus') }}：
       <el-tooltip effect="light" :content="t('connection.prometheusTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
     </template>
-    <el-input v-model.trim="prometheusUrl" :placeholder="`${t('common.example')}：http://ip:port/api/v1/query`" :id="`${formKey}-prometheusUrl`" />
+    <url-input v-model.trim="prometheusUrl" :placeholder="`ip:port`" :id="`${formKey}-prometheusUrl`" />
   </base-form-item>
 </template>
 

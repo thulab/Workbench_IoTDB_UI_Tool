@@ -180,6 +180,7 @@ declare module 'vue' {
     TimeseriesSelect: typeof import('./../components/timeseries-select.vue')['default']
     TimeseriesSelectSingle: typeof import('./../components/timeseries-select-single.vue')['default']
     Tooltip: typeof import('./../components/flow-graph/tooltip.vue')['default']
+    UrlInput: typeof import('./../components/url-input.vue')['default']
     UserPwd: typeof import('./../components/connection/user-pwd.vue')['default']
     VersionContainer: typeof import('./../components/version-container.vue')['default']
     VirtualizedTree: typeof import('./../components/tree-v2/virtualized-tree.vue')['default']
