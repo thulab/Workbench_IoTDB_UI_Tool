@@ -5,6 +5,7 @@ import ICustomQuerySQL from '@/assets/icons/query-sql.svg?raw';
 import ICustomQuery from '@/assets/icons/query.svg?raw';
 import ICustomQueryActive from '@/assets/icons/query-active.svg?raw';
 import ICustomQueryStatistic from '@/assets/icons/query-statistic.svg?raw';
+import ICustomQuerySQLActive from '@/assets/icons/query-sql-active.svg?raw';
 
 const route = [
   {
@@ -12,7 +13,7 @@ const route = [
     component: Layout,
     redirect: { name: 'DataSearch' },
     meta: {
-      title: 'common.query',
+      title: 'page.dataManage',
       icon: ICustomQuery,
       activeIcon: ICustomQueryActive,
       order: 20,
@@ -22,7 +23,7 @@ const route = [
         path: 'data-search',
         name: 'DataSearch',
         component: () => import('@/views/search/data-search.vue'),
-        meta: { keepAlive: true, title: 'page.dataSearch', icon: ICustomQueryData },
+        meta: { keepAlive: true, title: 'page.dataManage', icon: ICustomQueryData },
       },
       {
         path: 'statistic-search',
@@ -30,11 +31,25 @@ const route = [
         component: () => import('@/views/search/statistic-search.vue'),
         meta: { keepAlive: true, title: 'page.statisticSearch', icon: ICustomQueryStatistic },
       },
+    ],
+  },
+  {
+    path: '/sql',
+    component: Layout,
+    redirect: { name: 'SqlSearch' },
+    meta: {
+      title: 'page.sql',
+      icon: ICustomQuerySQL,
+      activeIcon: ICustomQuerySQLActive,
+      showTopLine: true,
+      order: 25,
+    },
+    children: [
       {
         path: 'sql-search',
         name: 'SqlSearch',
         component: () => import('@/views/search/sql-search-container.vue'),
-        meta: { keepAlive: true, title: 'page.sql', icon: ICustomQuerySQL },
+        meta: { keepAlive: true },
       },
     ],
   },

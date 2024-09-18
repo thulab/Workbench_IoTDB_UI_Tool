@@ -173,6 +173,7 @@ page:
   dashboard: Home
   dataSync: Data Sync
   measurement: Measurement
+  dataManage: Data Management
   dataSearch: Data Query
   statisticSearch: Statistical Query
   sql: SQL Operation
