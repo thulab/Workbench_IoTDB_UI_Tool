@@ -47,4 +47,5 @@
     "vue",
   ],
   "typescript.tsdk": "node_modules/typescript/lib",
+  "CodeGPT.apiKey": "OpenAI",
 }

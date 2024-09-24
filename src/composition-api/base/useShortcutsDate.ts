@@ -35,7 +35,6 @@ export default function useShortcutsDate() {
   ]);
 
   useLangSwitched(() => {
-    debugger;
     shortcutsDate.value = [
       {
         text: t('common.today'),

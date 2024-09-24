@@ -237,6 +237,21 @@ measurement:
   batchImportMeasurement: Batch Import Measurements
   importMeasurementTip: Only csv and xlsx files are supported, drag the file here, or
   importMeasurementRule: Incorrect file format, currently only .csv and .xlsx files are supported
+  importDataTip: Support uploading one or more files, drag the files here, or
+  importDataRule: Up to 20 files can be uploaded. Please delete them and try again
+  importingStatus: files
+  importedSuccessStatus: A total of %{total} files were imported, and %{success} were successfully imported
+  importedFailureStatus: A total of %{total} files were imported, with %{success} successful and %{failure} failed
+  waitingUpload: To be uploaded
+  uploading: Uploading
+  uploaded: Uploaded
+  uploadFailed: Upload Failed
+  waitingImport: To be imported
+  importing: Importing
+  imported: Imported
+  importFailed: Import Failed
+  fileName: File Name
+  num: Number
   databaseInfo: Database Information
   info: Information
   databaseNum: Databases

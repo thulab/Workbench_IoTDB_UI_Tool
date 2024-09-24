@@ -84,6 +84,7 @@ common:
   fileImport: 文件导入
   importFile: 导入文件
   importResult: 导入结果
+  importFormat: 导入格式
   downloadTemplate: 模板下载
   clickUpload: 点击上传
   clickReupload: 点击重新上传
@@ -224,6 +225,21 @@ measurement:
   batchImportMeasurement: 批量导入测点
   importMeasurementTip: 仅支持上传 csv 和 xlsx 文件，将文件拖到此处，或
   importMeasurementRule: 文件格式不正确，目前仅支持上传.csv和.xlsx文件
+  importDataTip: 支持上传一个或多个文件，将文件拖到此处，或
+  importDataRule: 最多支持上传20个文件，请删除后重新操作
+  importingStatus: 个文件
+  importedSuccessStatus: 共导入 %{total} 个文件，成功 %{success} 个
+  importedFailureStatus: 共导入 %{total} 个文件，成功 %{success} 个，失败 %{failure} 个
+  waitingUpload: 待上传
+  uploading: 上传中
+  uploaded: 已上传
+  uploadFailed: 上传失败
+  waitingImport: 待导入
+  importing: 导入中
+  imported: 已导入
+  importFailed: 导入失败
+  fileName: 文件名
+  num: 序号
   databaseInfo: 数据库信息
   info: 信息
   databaseNum: 数据库数量

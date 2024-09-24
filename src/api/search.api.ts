@@ -40,6 +40,22 @@ class SearchApi {
   }
 
   // 导入
+  static upload(data: FormData): HttpResponseP<string> {
+    return http.post('/file/upload', data, { timeout: 60 * 30 * 1000 });
+  }
+
+  static importFile(file: String, type: number): HttpResponseP<StorageDevice.ImportMeasurementDataRes> {
+    // 0:ts文件 1:csv 2:excel
+    let apiUrl = '/file/importTsFile';
+    if (type === 1) {
+      apiUrl = '/file/importDataCSVData';
+    } else if (type === 2) {
+      apiUrl = '/file/importDataExcelData';
+    }
+    return http.post(`${apiUrl}?file=${file}`, { file }, { timeout: 60 * 30 * 1000 });
+  }
+
+  // 导入
   static importQueryData(data: FormData, fileType: string = 'csv'): HttpResponseP<StorageDevice.ImportMeasurementDataRes> {
     if (fileType === 'csv') {
       return http.post('/file/importDataCSVData', data, { timeout: 60 * 30 * 1000 });

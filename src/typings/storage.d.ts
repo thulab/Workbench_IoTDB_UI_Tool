@@ -78,6 +78,17 @@ declare namespace StorageDevice {
     viewType: string;
   }
 
+  export interface UploadFileStatus<T> {
+    file: T;
+    uploadFileName?: string;
+    // 0: 待上传，1: 正在上传，2: 上传成功，-1: 上传失败
+    uploadStatus: 0 | 1 | 2 | -1;
+    // 0: 待导入，1: 正在导入，2: 导入成功，-1: 导入失败
+    importStatus: 0 | 1 | 2 | -1;
+    failedReason: string | undefined;
+    importResp?: ImportMeasurementDataRes;
+  }
+
   export interface ModelData {
     node: string;
     label?: string | Object;
