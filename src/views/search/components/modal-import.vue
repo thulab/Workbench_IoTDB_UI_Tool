@@ -173,12 +173,6 @@ const uploadResult = reactive({
 });
 
 const beforeUpload: UploadProps['beforeUpload'] = () => {
-  // const isExcel = checkValid(rawFile.name);
-  // if (!isExcel) {
-  //   ElMessage.error({ message: t('measurement.importMeasurementRule'), grouping: true });
-  //   return false;
-  // }
-  // uploadFileInfo.value = rawFile;
   return true;
 };
 // 文件替换

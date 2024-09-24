@@ -242,14 +242,14 @@ measurement:
   importingStatus: files
   importedSuccessStatus: A total of %{total} files were imported, and %{success} were successfully imported
   importedFailureStatus: A total of %{total} files were imported, with %{success} successful and %{failure} failed
-  waitingUpload: To be uploaded
+  waitingUpload: To uploaded
   uploading: Uploading
   uploaded: Uploaded
-  uploadFailed: Upload Failed
-  waitingImport: To be imported
+  uploadFailed: Upload Err
+  waitingImport: To imported
   importing: Importing
   imported: Imported
-  importFailed: Import Failed
+  importFailed: Import Err
   fileName: File Name
   num: Number
   databaseInfo: Database Information
