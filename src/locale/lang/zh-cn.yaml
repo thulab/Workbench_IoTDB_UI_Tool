@@ -227,6 +227,7 @@ measurement:
   importMeasurementRule: 文件格式不正确，目前仅支持上传.csv和.xlsx文件
   importDataTip: 支持上传一个或多个文件，将文件拖到此处，或
   importDataRule: 最多支持上传20个文件，请删除后重新操作
+  importDataRule2: 文件格式不正确
   importingStatus: 个文件
   importedSuccessStatus: 共导入 %{total} 个文件，成功 %{success} 个
   importedFailureStatus: 共导入 %{total} 个文件，成功 %{success} 个，失败 %{failure} 个

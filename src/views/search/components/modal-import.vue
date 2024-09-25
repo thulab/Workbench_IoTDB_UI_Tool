@@ -172,15 +172,26 @@ const uploadResult = reactive({
   errMsg: '',
 });
 
+const checkValid = (name: string) => {
+  return name.toLocaleLowerCase().endsWith(accept.value);
+};
+
 const beforeUpload: UploadProps['beforeUpload'] = () => {
   return true;
 };
+
 // 文件替换
 const handleExceed: UploadProps['onExceed'] = () => {
   ElMessage.warning(t('measurement.importDataRule'));
 };
 // 文件上传/替换
-const handleChange: UploadProps['onChange'] = () => {};
+const handleChange: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
+  const isValid = checkValid(uploadFile.name);
+  if (!isValid) {
+    ElMessage.error({ message: t('measurement.importDataRule2'), grouping: true });
+    uploadFiles.splice(uploadFiles.indexOf(uploadFile), 1);
+  }
+};
 // 删除文件
 const handleRemove: UploadProps['onRemove'] = (file) => {
   const findItem = uploadFileInfos.value?.find((item) => item.uid === file.uid);

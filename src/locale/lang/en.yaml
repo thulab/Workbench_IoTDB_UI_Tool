@@ -239,6 +239,7 @@ measurement:
   importMeasurementRule: Incorrect file format, currently only .csv and .xlsx files are supported
   importDataTip: Support uploading one or more files, drag the files here, or
   importDataRule: Up to 20 files can be uploaded. Please delete them and try again
+  importDataRule2: Incorrect file format
   importingStatus: files
   importedSuccessStatus: A total of %{total} files were imported, and %{success} were successfully imported
   importedFailureStatus: A total of %{total} files were imported, with %{success} successful and %{failure} failed
