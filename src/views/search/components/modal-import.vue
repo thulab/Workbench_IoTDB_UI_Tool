@@ -183,7 +183,7 @@ const handleExceed: UploadProps['onExceed'] = () => {
 const handleChange: UploadProps['onChange'] = () => {};
 // 删除文件
 const handleRemove: UploadProps['onRemove'] = (file) => {
-  const findItem = uploadFileInfos.value?.find((item) => item.name === file.name);
+  const findItem = uploadFileInfos.value?.find((item) => item.uid === file.uid);
   if (findItem) {
     uploadFileInfos.value?.splice(uploadFileInfos.value.indexOf(findItem), 1);
   }
@@ -191,7 +191,7 @@ const handleRemove: UploadProps['onRemove'] = (file) => {
 const handleRemoveClick = (file: UploadRawFile, e: MouseEvent) => {
   e.preventDefault();
   e.stopPropagation();
-  const findItem = uploadFileInfos.value?.find((item) => item.name === file.name);
+  const findItem = uploadFileInfos.value?.find((item) => item.uid === file.uid);
   if (findItem) {
     uploadFileInfos.value?.splice(uploadFileInfos.value.indexOf(findItem), 1);
   }
@@ -206,7 +206,7 @@ const canNext = () => {
 const customUpload: UploadProps['httpRequest'] = (options) => {
   const formData = new FormData();
   formData.append('file', options.file);
-  const currentItem = uploadDetail.value?.find((item) => item.file.name === options.file.name)!;
+  const currentItem = uploadDetail.value?.find((item) => item.file.uid === options.file.uid)!;
   currentItem.uploadStatus = 1;
   return upload(formData)
     .then((resp) => {
