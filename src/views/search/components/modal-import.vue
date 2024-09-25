@@ -51,10 +51,10 @@
 
               <div class="upload-info-box">
                 <ul class="upload-info-list">
-                  <li v-for="file in uploadFileInfos" :key="file.name" class="upload-info-item">
+                  <li v-for="file in uploadFileInfos" :key="file.uid" class="upload-info-item">
                     {{ file.name }}
                     <!-- 右侧增加删除 icon -->
-                    <div class="item-delete-box" :id="`upload-${file.name}-del`" @click="(e) => handleRemoveClick(file, e)">
+                    <div class="item-delete-box" :id="`upload-${file.uid}-del`" @click="(e) => handleRemoveClick(file, e)">
                       <i-custom-delete class="item-delete" />
                       <i-custom-delete-active class="item-delete-active" />
                     </div>
@@ -82,7 +82,7 @@
 
           <div class="upload-info-box">
             <ul class="upload-info-list">
-              <li v-for="uploadItem in uploadDetail" :key="uploadItem.file.name" class="upload-info-item">
+              <li v-for="uploadItem in uploadDetail" :key="uploadItem.file.uid" class="upload-info-item">
                 {{ uploadItem.file.name }}
                 <div class="item-box">
                   <upload-icon :status="uploadItem.uploadStatus" type="upload" />
