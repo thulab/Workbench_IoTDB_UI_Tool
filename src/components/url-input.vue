@@ -7,7 +7,7 @@
       </el-select>
     </template>
     <template #append>
-      <el-input class="append-input" v-model="form.pathname" />
+      <el-input class="append-input" disabled v-model="form.pathname" />
     </template>
   </el-input>
 </template>
