@@ -87,6 +87,7 @@ common:
   fileImport: File Import
   importFile: Import File
   importResult: Import Result
+  importFormat: Import Format
   downloadTemplate: Download Template
   clickUpload: Click to Upload
   clickReupload: Click to Re-upload
