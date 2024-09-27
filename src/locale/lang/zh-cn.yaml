@@ -111,6 +111,7 @@ common:
   pipeAuth: 需“流处理使用”权限
   userAuth: 需“用户管理”权限
   roleAuth: 需“角色管理”权限
+  modelAuth: 需“AI使用”权限
   apply: 应用
   auto: 自动
   origin: 原始值
@@ -159,6 +160,7 @@ common:
   revoke: 撤销
   restore: 还原
   viewLink: https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/Operator-and-Expression.html
+  comingSoon: 敬请期待
 page:
   '403': 403页面
   '404': 404页面
@@ -182,6 +184,7 @@ page:
   calculate: 计算
   view: 视图
   config: 数据库配置
+  aiAnalysis: AI分析
 measurement:
   databaseTitle: 数据库
   searchPlaceholder: 请输入搜索内容
@@ -828,3 +831,26 @@ iotdbConfig:
   nodeTip: 当前节点状态异常，请恢复后重新操作
   nodeEffect: 节点生效
   allEffect: 全部生效
+aiAnalysis:
+  visualization: AI可视化
+  modelManagement: 模型管理
+  modelName: 模型名称
+  modelNamePlaceholder: 请输入模型名称
+  modelList: 模型列表
+  importModel: 导入模型
+  modelType: 模型类型
+  state: 状态
+  modelConfig: 模型配置
+  noConfigs: 无
+  viewConfig: 查看
+  importModelFile: 将文件拖到此处，或
+  importModelNameHover: 模型名称：模型的全局唯一标识，不可重复。模型名称具备以下约束：<br/> 1. 允许出现标识符 [ 0-9 a-z A-Z _ ] （字母，数字，下划线）<br/> 2. 长度限制为 2-64 字符<br/> 3. 大小写敏感
+  configYaml: config.yaml
+  importModelRule: 文件格式不正确，目前仅支持上传.pt和.yaml文件
+  importModelTip: 仅接受 .pt 和 .yaml 文件。上传后，文件将自动重命名为 model.pt 和 config.yaml
+  importSuccessTip: 模型及配置文件已导入成功
+  importErrorTip: 模型及配置文件导入失败
+  modelNameRuleError: 名称不符合规范，请更改
+  modelNameExist: 名称已被使用，请更改
+  batchDelete: 确认删除这些模型吗？
+  singleDelete: 确认删除这个模型吗？
