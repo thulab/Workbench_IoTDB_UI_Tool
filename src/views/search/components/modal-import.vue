@@ -52,7 +52,7 @@
               <div class="upload-info-box">
                 <ul class="upload-info-list">
                   <li v-for="file in uploadFileInfos" :key="file.uid" class="upload-info-item">
-                    {{ file.name }}
+                    <div style="display: inline-flex; width: 480px"><text-tooltip :content="file.name" /></div>
                     <!-- 右侧增加删除 icon -->
                     <div class="item-delete-box" :id="`upload-${file.uid}-del`" @click="(e) => handleRemoveClick(file, e)">
                       <i-custom-delete class="item-delete" />
@@ -83,7 +83,7 @@
           <div class="upload-info-box">
             <ul class="upload-info-list">
               <li v-for="uploadItem in uploadDetail" :key="uploadItem.file.uid" class="upload-info-item">
-                {{ uploadItem.file.name }}
+                <div style="display: inline-flex; width: 280px"><text-tooltip :content="uploadItem.file.name" /></div>
                 <div class="item-box">
                   <upload-icon :status="uploadItem.uploadStatus" type="upload" />
                   <upload-icon class="m-l-16" :status="uploadItem.importStatus" type="import" />
@@ -103,12 +103,12 @@
       <div class="upload-result-box" v-else-if="activeStep === 2">
         <p>{{ t('measurement.importedFailureStatus', { total: uploadDetail.length, success: uploadResult.successNum, failure: uploadResult.failNum }) }}</p>
         <el-table class="upload-result-table" :data="uploadDetail" style="width: 100%" size="small" max-height="215">
-          <el-table-column type="index" :label="t('measurement.num')" width="40" align="center" />
-          <el-table-column prop="file.name" :label="t('measurement.fileName')" width="140" />
-          <el-table-column prop="importStatus" :label="t('common.status')" width="50" align="center">
+          <el-table-column type="index" :label="t('measurement.num')" width="60" align="center" />
+          <el-table-column prop="file.name" :label="t('measurement.fileName')" show-overflow-tooltip width="400" />
+          <el-table-column prop="importStatus" :label="t('common.status')" width="60" align="center">
             <template #default="{ row }">
               <span v-if="row.importStatus === 2">{{ t('common.success') }}</span>
-              <a v-else-if="row.importResp.filePath" :href="`/api/file/downloadErrorInfo?fileName=${row.importResp.filePath}`" class="error-link" target="_self" rel="noopener noreferrer">
+              <a v-else-if="row.importResp?.filePath" :href="`/api/file/downloadErrorInfo?fileName=${row.importResp?.filePath}`" class="error-link" target="_self" rel="noopener noreferrer">
                 {{ t('common.fail') }}
               </a>
               <el-popover v-else trigger="click" :content="row.failedReason" :width="350">
@@ -148,7 +148,7 @@ const emit = defineEmits<{
   (e: 'handle-close', reload: boolean): void;
 }>();
 
-const { requestFn: upload } = useRequest(SearchApi.upload);
+const { requestFn: upload } = useRequest(SearchApi.upload, { errMessage: false });
 const { requestFn: importFile } = useRequest(SearchApi.importFile, { errMessage: false });
 
 const { t } = useI18n();
@@ -318,7 +318,7 @@ watch(
   flex-direction: column;
   text-align: left;
   margin: 0 6px;
-  width: 100%;
+  width: calc(100% - 12px);
 }
 
 .upload-info-box {
@@ -328,6 +328,7 @@ watch(
   height: 123px;
   max-height: 123px;
   overflow: auto;
+  max-width: 522px;
 }
 
 .upload-info-list {
