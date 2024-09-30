@@ -151,6 +151,7 @@ common:
   warmTip: Tip
   versionTip: Please upgrade to IoTDB V%{version} or a higher version to use
   userManual: user manual
+  currentDownload: Download
   maintainAuth: Requires "MAINTAIN" permission
   databaseAuth: Requires "MANAGE_DATABASE" permission
   schemaAuth: Requires "READ_SCHEMA" or "WRITE_SCHEMA" permission
@@ -160,6 +161,8 @@ common:
   pipeAuth: Requires "USE_PIPE" permission
   userAuth: Requires "MANAGE_USER" permission
   roleAuth: Requires "MANAGE_ROLE" permission
+  viewMore: View More
+  viewAll: View All
   zoom: Amplify
   revoke: Revoke
   restore: Restore
@@ -242,13 +245,13 @@ measurement:
   importDataRule: Up to 20 files can be uploaded. Please delete them and try again
   importDataRule2: Incorrect file format
   importingStatus: files
-  importedSuccessStatus: A total of %{total} files were imported, and %{success} were successfully imported
-  importedFailureStatus: A total of %{total} files were imported, with %{success} successful and %{failure} failed
-  waitingUpload: To uploaded
+  importedSuccessStatus: A total of %{total} files was imported, and %{success} was successfully imported
+  importedFailureStatus: A total of %{total} files was imported, with %{success} successful and %{failure} failed
+  waitingUpload: To Usagepload
   uploading: Uploading
   uploaded: Uploaded
   uploadFailed: Upload Err
-  waitingImport: To imported
+  waitingImport: To Import
   importing: Importing
   imported: Imported
   importFailed: Import Err
