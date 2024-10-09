@@ -245,8 +245,8 @@ measurement:
   importDataRule: Up to 20 files can be uploaded. Please delete them and try again
   importDataRule2: Incorrect file format
   importingStatus: files
-  importedSuccessStatus: A total of {total} files was imported, and {success} was successfully imported | A total of {total} files was imported, and {success} was successfully imported | A total of {total} files ware imported, and {success} was successfully imported
-  importedFailureStatus: A total of {total} files was imported, with {success} successful and {failure} failed | A total of {total} files was imported, with {success} successful and {failure} failed | A total of {total} files ware imported, with {success} successful and {failure} failed
+  importedSuccessStatus: A total of {total} files was imported, and {success} was successfully imported | A total of {total} files was imported, and {success} was successfully imported | A total of {total} files were imported, and {success} successful
+  importedFailureStatus: A total of {total} files was imported, with {success} successful and {failure} failed | A total of {total} files was imported, with {success} successful and {failure} failed | A total of {total} files were imported, with {success} successful and {failure} failed
   waitingUpload: To Usagepload
   uploading: Uploading
   uploaded: Uploaded
