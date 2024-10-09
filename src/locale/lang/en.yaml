@@ -92,8 +92,8 @@ common:
   clickUpload: Click to Upload
   clickReupload: Click to Re-upload
   uploading: Uploading File
-  importSuccessTip: Import successful! A total of %{total} data
-  importResultTip: '%{successNum} data imported successfully, %{errorNum} data failed to import'
+  importSuccessTip: Import successful! A total of {total} data
+  importResultTip: '{successNum} data imported successfully, {errorNum} data failed to import'
   importTip: To avoid format errors, it is recommended to use a text editor to view
   searchTipLimit100: Only 100 search results are displayed, please search precisely if needed
   searchAllTipLimit100: >-
@@ -130,7 +130,7 @@ common:
   uploadSuccess: Upload Successful
   uploadError: Upload Failed
   fileTypeError: File Type Error
-  fileSizeError: File size cannot exceed %{size}MB!
+  fileSizeError: File size cannot exceed {size}MB!
   websockerVersionTip: >-
     Your browser does not support WebSocket, please upgrade to a more recent
     browser version!
@@ -149,7 +149,7 @@ common:
   deleteNode: Delete Node
   deleteEdge: Delete Edge
   warmTip: Tip
-  versionTip: Please upgrade to IoTDB V%{version} or a higher version to use
+  versionTip: Please upgrade to IoTDB V{version} or a higher version to use
   userManual: user manual
   currentDownload: Download
   maintainAuth: Requires "MAINTAIN" permission
@@ -245,8 +245,8 @@ measurement:
   importDataRule: Up to 20 files can be uploaded. Please delete them and try again
   importDataRule2: Incorrect file format
   importingStatus: files
-  importedSuccessStatus: A total of %{total} files was imported, and %{success} was successfully imported
-  importedFailureStatus: A total of %{total} files was imported, with %{success} successful and %{failure} failed
+  importedSuccessStatus: A total of {total} files was imported, and {success} was successfully imported | A total of {total} files was imported, and {success} was successfully imported | A total of {total} files ware imported, and {success} was successfully imported
+  importedFailureStatus: A total of {total} files was imported, with {success} successful and {failure} failed | A total of {total} files was imported, with {success} successful and {failure} failed | A total of {total} files ware imported, with {success} successful and {failure} failed
   waitingUpload: To Usagepload
   uploading: Uploading
   uploaded: Uploaded
@@ -303,7 +303,7 @@ search:
   template: Templates
   operatingInstructions: Operating Instructions
   saveTemplate: Save Template
-  queryTemplate: Query %{time}
+  queryTemplate: Query {time}
   name: Name
   rename: Rename
   oldName: Old Name
@@ -486,8 +486,8 @@ dashboard:
   node: Node
   type: Type
   version: Version
-  versionEnterprise: TimechoDB V%{version}
-  versionOpenSource: Apache IoTDB V%{version}
+  versionEnterprise: TimechoDB V{version}
+  versionOpenSource: Apache IoTDB V{version}
   physicalMachine: Physical Machine
   monitorInfo: Monitoring Information
   masterCluster: Master
@@ -626,7 +626,7 @@ dataTrend:
   deleteTemplateTip: Do you want to delete common trends
   measurementEmptyTip: Please add measurements and select them first
   trendTip: >-
-    Up to %{tip}  data points can be plotted. If the limit is exceeded, the system will automatically adjust.
+    Up to {tip}  data points can be plotted. If the limit is exceeded, the system will automatically adjust.
   overTip: >-
     Exceeding the maximum number of plotted measurements, it has been
     automatically adjusted for display
@@ -635,12 +635,12 @@ dataTrend:
     Boolean type supports only the latest value calculation; please modify the
     sampling strategy to view the trend
   measurementTip: >-
-    %{measurement} measurements exceed the maximum number of plotted
+    {measurement} measurements exceed the maximum number of plotted
     measurements, it has been automatically adjusted for display.
   choosedMeasurement: Selected
   overMeasurementTip: A maximum of 10 measurements can be displayed at the same time
   number10Tip: Only input positive integers in the range of 1-10
-  trendTemplate: Trend%{time}
+  trendTemplate: Trend{time}
   saveTrend: Save Trend
   noDataTip: There is no data available within the current time range
 calculate:
@@ -800,7 +800,7 @@ auth:
   systemInfo: System Information
   systemTitle: Timecho Real-Time Database Extension
   systemTitleWorkbench: TimechoDB Visual Console - Workbench
-  versionTitle: Version：%{version}
+  versionTitle: Version：{version}
   editUserSuccess: Edited Successfully
   docTip: Please refer to the document for specific instructions on the meaning of permissions
 error:
@@ -964,7 +964,7 @@ spectrum:
   sqlInput: Data Selection
   analysisMethodTip: >-
     If not available, please load the prefered analysis pattern before use. For
-    detailed instructions, refer to the %{doc}
+    detailed instructions, refer to the {doc}
   real: Real Part
   imag: Imaginary Part
   abs: Magnitude
@@ -984,7 +984,7 @@ spectrum:
   cutoffFrequencyTip: Normalized cut-off frequency, with a value of (0,1), cannot be defaulted
   highPass: HIGHPASS
   paramsPlaceholder: Input parameter
-  spectrumTemplate: Analysis%{time}
+  spectrumTemplate: Analysis{time}
   deleteTemplateTip: Do you want to delete commonly used analysis
   saveSpectrum: Save Analysis
   applyTip: Please select the corresponding content and view it

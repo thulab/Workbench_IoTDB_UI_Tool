@@ -37,6 +37,7 @@ export default defineConfig(({ mode }) => {
       preprocessorOptions: {
         scss: {
           additionalData: '@use "@/styles/element/theme/index.scss" as *;',
+          api: 'modern',
         },
       },
     },

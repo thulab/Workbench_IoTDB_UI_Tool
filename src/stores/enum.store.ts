@@ -173,7 +173,7 @@ export const useEnumStore = defineStore(
   {
     persist: {
       storage: sessionStorage,
-      afterRestore: (context) => {
+      afterHydrate: (context) => {
         if (!context.store.allEnum || Object.keys(context.store.allEnum).length === 0) {
           context.store.loadAllEnum();
         }

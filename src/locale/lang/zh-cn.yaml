@@ -89,8 +89,8 @@ common:
   clickUpload: 点击上传
   clickReupload: 点击重新上传
   uploading: 文件导入中
-  importSuccessTip: 导入成功！共%{total}条数据
-  importResultTip: 导入成功%{successNum}条数据，导入失败%{errorNum}条数据
+  importSuccessTip: 导入成功！共{total}条数据
+  importResultTip: 导入成功{successNum}条数据，导入失败{errorNum}条数据
   importTip: 为避免格式错误，推荐使用文本编辑器查看
   searchTipLimit100: 仅展示100条搜索结果，如有需要请精确搜索
   searchAllTipLimit100: 关键字搜索仅展示100条搜索结果，如有需要请精确搜索
@@ -134,7 +134,7 @@ common:
   uploadSuccess: 上传成功
   uploadError: 上传失败
   fileTypeError: 文件类型错误
-  fileSizeError: 文件大小不能超过%{size}MB!
+  fileSizeError: 文件大小不能超过{size}MB!
   websockerVersionTip: 您的浏览器不支持webSocket,请使用更高版本浏览器！
   test: 测试
   continueTip: 当前内容未填写完整，是否继续填写？
@@ -151,7 +151,7 @@ common:
   deleteNode: 删除节点
   deleteEdge: 删除边
   warmTip: 温馨提示
-  versionTip: 请升级至IoTDB V%{version}及以上版本使用
+  versionTip: 请升级至IoTDB V{version}及以上版本使用
   userManual: 文档
   currentDownload: 点此下载
   viewMore: 查看更多
@@ -229,8 +229,8 @@ measurement:
   importDataRule: 最多支持上传20个文件，请删除后重新操作
   importDataRule2: 文件格式不正确
   importingStatus: 个文件
-  importedSuccessStatus: 共导入 %{total} 个文件，成功 %{success} 个
-  importedFailureStatus: 共导入 %{total} 个文件，成功 %{success} 个，失败 %{failure} 个
+  importedSuccessStatus: 共导入 {total} 个文件，成功 {success} 个
+  importedFailureStatus: 共导入 {total} 个文件，成功 {success} 个，失败 {failure} 个
   waitingUpload: 待上传
   uploading: 上传中
   uploaded: 已上传
@@ -283,7 +283,7 @@ search:
   template: 常用
   operatingInstructions: 操作说明
   saveTemplate: 保存常用
-  queryTemplate: 查询%{time}
+  queryTemplate: 查询{time}
   name: 名称
   rename: 重命名
   oldName: 原名称
@@ -402,8 +402,8 @@ dashboard:
   node: 节点
   type: 类型
   version: 版本
-  versionEnterprise: '%{version} 企业版'
-  versionOpenSource: '%{version} 开源版'
+  versionEnterprise: '{version} 企业版'
+  versionOpenSource: '{version} 开源版'
   physicalMachine: 物理机
   monitorInfo: 监控信息
   masterCluster: 主集群
@@ -515,17 +515,17 @@ dataTrend:
   commonTemplates: 常用
   deleteTemplateTip: 是否删除常用趋势
   measurementEmptyTip: 请先添加测点并选中
-  trendTip: 最大绘制%{tip}个点，超出后系统将自动调整
+  trendTip: 最大绘制{tip}个点，超出后系统将自动调整
   overTip: 超过最大画图点数，已为您自动调整后展示
   pointOverTip: 最多支持标记10次，请删除后重新操作
   timeTip: 结束时间须大于开始时间，请重新操作
   booleanTip: boolean类型仅支持最新值计算，请修改采样策略后查看趋势
   noDataTip: 当前时间范围内暂无数据
-  measurementTip: '%{measurement}测点超过最大画图点数，已为您自动调整后展示'
+  measurementTip: '{measurement}测点超过最大画图点数，已为您自动调整后展示'
   choosedMeasurement: 已选测点
   overMeasurementTip: 最多同时展示10条测点趋势
   number10Tip: 只支持输入1-10范围内的正整数
-  trendTemplate: 趋势%{time}
+  trendTemplate: 趋势{time}
   saveTrend: 保存常用
 calculate:
   namePlaceholder: 请输入名称
@@ -579,7 +579,7 @@ alarm:
   newStatus: 仅查看最新状态
   alarmRecord: 告警记录
   alarmValue: 告警值
-  errorLinkTip: 当前告警批量创建存在错误，%{link}报错信息
+  errorLinkTip: 当前告警批量创建存在错误，{link}报错信息
   whetherConfirm: 是否确认
   batchDeleteRecord: 确认删除这些告警记录吗？
   singleDeleteRecord: 确认删除该条告警记录吗？
@@ -660,7 +660,7 @@ auth:
   oldPwdReg: 格式不符，请输入大小写字母、数字、特殊字符（!{'@'}#$%^&*()_+-=）
   systemTitle: IoTDB实时扩展组件
   systemTitleWorkbench: IoTDB可视化控制台—Workbench
-  versionTitle: 版本号：%{version}
+  versionTitle: 版本号：{version}
   systemDetail: 实时库涵盖了测点管理、查询、可视化、告警、权限等功能，旨在帮助用户更直观的进行跨实例管理，更简单的完成数据库操作，更高效的进行运维操作
   systemDetailWorkbench: Workbench涵盖了测点管理、查询、可视化、权限等功能，旨在帮助用户更直观的进行跨实例管理，更简单的完成数据库操作，更高效的进行运维操作
   docTip: 权限含义具体说明请查看文档
@@ -798,7 +798,7 @@ spectrum:
   analysisMethod: 分析方式
   analysisMethodPlaceholder: 请选择分析方式
   customAnalysis: 自定义分析
-  analysisMethodTip: 若没有以下分析方式请加载后进行使用，详细加载方式请查看%{doc}
+  analysisMethodTip: 若没有以下分析方式请加载后进行使用，详细加载方式请查看{doc}
   analysisMethodNoneTip: 请加载该方法
   overTip: 最多支持标注10个点，请删除后重新操作
   cursorTitle: 光标数值
@@ -829,7 +829,7 @@ spectrum:
   cutoffFrequencyTip: 归一化后的截止频率，取值为(0,1)，不可缺省
   highPass: 高通滤波
   paramsPlaceholder: 请输入参数
-  spectrumTemplate: 分析%{time}
+  spectrumTemplate: 分析{time}
   deleteTemplateTip: 是否删除常用分析
   saveSpectrum: 保存常用
   applyTip: 请选择相应内容后进行查看

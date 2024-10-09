@@ -215,8 +215,8 @@ export const useUserStore = defineStore(
   {
     persist: {
       storage: sessionStorage,
-      paths: ['privilegesEnum', 'userInfo'],
-      afterRestore: (context) => {
+      pick: ['privilegesEnum', 'userInfo'],
+      afterHydrate: (context) => {
         context.store.loadPrivilegesEnum();
       },
     },

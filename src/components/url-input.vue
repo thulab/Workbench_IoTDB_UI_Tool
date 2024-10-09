@@ -21,9 +21,7 @@ const form = ref({
   host: '',
   pathname: '/api/v1/query',
 });
-const sanitizeUrl = (url: string) => {
-  return url.replace(/\/{2,}/g, '/');
-};
+const sanitizeUrl = (url: string) => url.replace(/\/{2,}/g, '/');
 
 const fullUrl = computed({
   get() {

@@ -97,11 +97,11 @@
       <div class="select-result-box" v-if="activeStep === 2 && uploadResult.successNum === uploadDetail.length">
         <div class="success-box">
           <el-icon size="44"><i-custom-success-green /></el-icon>
-          <span class="success-tip">{{ t('measurement.importedSuccessStatus', { total: uploadDetail.length, success: uploadResult.successNum }) }}</span>
+          <span class="success-tip">{{ t('measurement.importedSuccessStatus', { total: uploadDetail.length, success: uploadResult.successNum }, uploadDetail.length) }}</span>
         </div>
       </div>
       <div class="upload-result-box" v-else-if="activeStep === 2">
-        <p>{{ t('measurement.importedFailureStatus', { total: uploadDetail.length, success: uploadResult.successNum, failure: uploadResult.failNum }) }}</p>
+        <p>{{ t('measurement.importedFailureStatus', { total: uploadDetail.length, success: uploadResult.successNum, failure: uploadResult.failNum }, uploadDetail.length) }}</p>
         <el-table class="upload-result-table" :data="uploadDetail" style="width: 100%" size="small" max-height="215">
           <el-table-column type="index" :label="t('measurement.num')" width="60" align="center" />
           <el-table-column prop="file.name" :label="t('measurement.fileName')" show-overflow-tooltip width="400" />
@@ -172,13 +172,9 @@ const uploadResult = reactive({
   errMsg: '',
 });
 
-const checkValid = (name: string) => {
-  return name.toLocaleLowerCase().endsWith(accept.value);
-};
+const checkValid = (name: string) => name.toLocaleLowerCase().endsWith(accept.value);
 
-const beforeUpload: UploadProps['beforeUpload'] = () => {
-  return true;
-};
+const beforeUpload: UploadProps['beforeUpload'] = () => true;
 
 // 文件替换
 const handleExceed: UploadProps['onExceed'] = () => {

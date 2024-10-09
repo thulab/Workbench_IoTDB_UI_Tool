@@ -57,7 +57,7 @@ export const useConnectionStore = defineStore(
   {
     persist: {
       storage: sessionStorage,
-      paths: ['connectionInfo'],
+      pick: ['connectionInfo'],
     },
   }
 );

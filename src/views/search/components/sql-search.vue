@@ -147,7 +147,7 @@ const pageNums = reactive<number[]>([]);
 const columnList = ref<Array<Array<DynamicTableColumn> | null>>([]);
 
 const tableData = reactive<{ list: Array<Record<string, any> | null> }>({
-  list: [] || null,
+  list: [],
 });
 const sqlResult = ref<Partial<Search.QuerySqlResponse>[]>([]);
 const activeName = ref<string | number>(0);
