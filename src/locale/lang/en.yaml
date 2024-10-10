@@ -247,7 +247,7 @@ measurement:
   importingStatus: files
   importedSuccessStatus: A total of {total} files was imported, and {success} successful | A total of {total} files was imported, and {success} successful | A total of {total} files were imported, and {success} successful
   importedFailureStatus: A total of {total} files was imported, with {success} successful and {failure} failed | A total of {total} files was imported, with {success} successful and {failure} failed | A total of {total} files were imported, with {success} successful and {failure} failed
-  waitingUpload: To Usagepload
+  waitingUpload: To Upload
   uploading: Uploading
   uploaded: Uploaded
   uploadFailed: Upload Err
