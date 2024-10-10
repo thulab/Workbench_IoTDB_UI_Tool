@@ -65,6 +65,8 @@ common:
   day: d
   lastValue: Latest Value
   avg: Average
+  std: Standard Deviation
+  variance: Variance
   maxValue: Maximum Value
   maxValueTime: Time of Maximum Value
   minValue: Minimum Value
