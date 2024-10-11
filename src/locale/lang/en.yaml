@@ -165,10 +165,12 @@ common:
   roleAuth: Requires "MANAGE_ROLE" permission
   viewMore: View More
   viewAll: View All
+  modelAuth: Requires "USE_MODEL" permission
   zoom: Amplify
   revoke: Revoke
   restore: Restore
   viewLink: https://www.timecho.com/docs/UserGuide/latest/User-Manual/Operator-and-Expression.html
+  comingSoon: Coming Soon
 page:
   '403': 403 Page
   '404': 404 Page
@@ -193,6 +195,7 @@ page:
   spectrum: Analysis
   visualization: Visualization
   config: Database Config
+  aiAnalysis: AI analysis
 measurement:
   databaseTitle: Database
   searchPlaceholder: Please enter search content
@@ -995,3 +998,26 @@ iotdbConfig:
   searchPlaceholder: Please enter search content
   nodeEffect: Node Effective
   allEffect: All  Effective
+aiAnalysis:
+  visualization: AI Visualization
+  modelManagement: Model Management
+  modelName: Model Name
+  modelNamePlaceholder: Please enter the model name
+  modelList: Model List
+  importModel: Import Model
+  modelType: Model Type
+  state: State
+  modelConfig: Model Config
+  noConfigs: Null
+  viewConfig: View Config
+  importModelFile: Drag the file here, or
+  importModelNameHover: Model name The globally unique identifier of the model, which cannot be repeated. The model name has the following constraints:<br/> 1. Identifiers [0-9 a-z A-Z _] (letters, numbers, underscores) are allowed<br/> 2. The length is limited to 2-64 characters<br/> 3. Case sensitive
+  configYaml: config.yaml
+  importModelRule: Incorrect file format, currently only .csv and .xlsx files are supported
+  importModelTip: Only .pt and .yaml files are accepted. Once uploaded, the files will be automatically renamed to model.pt and config.yaml
+  importSuccessTip: The model and configuration files have been imported successfully
+  importErrorTip: The model and configuration file import failed
+  modelNameRuleError: The name does not comply with the specification, please change it.
+  modelNameExist: The name is already taken, please change it
+  batchDelete: Are you sure you want to delete these models?
+  singleDelete: Are you sure you want to delete the model?

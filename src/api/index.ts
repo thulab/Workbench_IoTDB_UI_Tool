@@ -9,5 +9,6 @@ import DashboardApi from './dashboard.api';
 import ConnectionApi from './connection.api';
 import DataSyncApi from './data-sync.api';
 import ConfigApi from './config.api';
+import AIAnalysisApi from './ai-analysis.api';
 
-export { SearchApi, StorageApi, AlarmApi, UserApi, AuthApi, CalculateApi, LogApi, DashboardApi, ConnectionApi, DataSyncApi, ConfigApi };
+export { SearchApi, StorageApi, AlarmApi, UserApi, AuthApi, CalculateApi, LogApi, DashboardApi, ConnectionApi, DataSyncApi, ConfigApi, AIAnalysisApi };

@@ -104,6 +104,7 @@ export default defineConfig(({ mode }) => {
         /* options */
         // locale messages resource pre-compile option
         include: resolve(srcPath, './locale/lang/**'),
+        strictMessage: false,
       }),
       // VueDevTools(),
       UnoCSS(),
