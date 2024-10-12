@@ -1,7 +1,7 @@
 <template>
   <el-dialog :title="t('search.batchImportData')" v-model="dialogVisible" width="748px" class="new-storage-container" align-center :close-on-click-modal="false" id="data-search-modal-import">
     <div class="import-box">
-      <el-steps :active="activeStep" align-center class="import-step-box" id="data-search-import-steps">
+      <el-steps :active="activeStep" align-center finish-status="success" class="import-step-box" id="data-search-import-steps">
         <el-step :title="t('common.chooseFile')">
           <template #title>{{ t('common.chooseFile') }}</template>
         </el-step>
@@ -102,7 +102,7 @@
       </div>
       <div class="upload-result-box" v-else-if="activeStep === 2">
         <p>{{ t('measurement.importedFailureStatus', { total: uploadDetail.length, success: uploadResult.successNum, failure: uploadResult.failNum }, uploadDetail.length) }}</p>
-        <el-table class="upload-result-table" :data="uploadDetail" style="width: 100%" size="small" max-height="215">
+        <el-table class="upload-result-table" :data="uploadDetail" style="width: 100%" size="small" max-height="210">
           <el-table-column type="index" :label="t('measurement.num')" width="60" align="center" />
           <el-table-column prop="file.name" :label="t('measurement.fileName')" show-overflow-tooltip width="400" />
           <el-table-column prop="importStatus" :label="t('common.status')" width="60" align="center">
@@ -482,8 +482,8 @@ watch(
   .upload-result-table {
     border: 1px dashed #dfe1ed;
     margin-top: 8px;
-    height: 215px;
-    max-height: 215px;
+    height: 210px;
+    max-height: 210px;
   }
 }
 
