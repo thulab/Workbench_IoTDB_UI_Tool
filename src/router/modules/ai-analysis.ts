@@ -24,7 +24,7 @@ const route = [
       {
         path: 'model-management',
         name: 'ModelManagement',
-        component: () => import('@/views/aiAnalysis/model-management.vue'),
+        component: () => import('@/views/ai-analysis/model-management.vue'),
         meta: { keepAlive: true, title: 'aiAnalysis.modelManagement', icon: ICustomModelManagement },
       },
     ],

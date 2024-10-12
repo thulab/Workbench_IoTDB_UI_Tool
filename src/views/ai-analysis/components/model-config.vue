@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts" setup>
-import MonacoEditor from './monaco-editor.vue';
+import MonacoEditor from '@/components/monaco-editor/monaco-editor.vue';
 
 const props = defineProps<{
   visible: boolean;
