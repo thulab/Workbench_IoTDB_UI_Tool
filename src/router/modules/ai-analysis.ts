@@ -15,12 +15,12 @@ const route = [
       needVersion: '1.3.0',
     },
     children: [
-      // {
-      //   path: 'visualization',
-      //   name: 'Visualization',
-      //   component: () => import('@/views/aiAnalysis/model-management.vue'),
-      //   meta: { keepAlive: true, title: 'aiAnalysis.visualization', icon: ICustomAIAnalysis },
-      // },
+      {
+        path: 'visualization',
+        name: 'Visualization',
+        component: () => import('@/views/ai-analysis/visualization.vue'),
+        meta: { keepAlive: true, title: 'aiAnalysis.visualization', icon: ICustomAIAnalysis },
+      },
       {
         path: 'model-management',
         name: 'ModelManagement',
