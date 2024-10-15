@@ -174,6 +174,7 @@ declare module 'vue' {
     ModalFlow: typeof import('./../components/modal-flow.vue')['default']
     ModalResetPassword: typeof import('./../components/modal-reset-password.vue')['default']
     ModalSystem: typeof import('./../components/modal-system.vue')['default']
+    MonacoEditor: typeof import('./../components/monaco-editor/monaco-editor.vue')['default']
     Popconfirm: typeof import('./../components/popconfirm/popconfirm.vue')['default']
     Prometheus: typeof import('./../components/connection/prometheus.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

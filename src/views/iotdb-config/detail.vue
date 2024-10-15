@@ -70,8 +70,8 @@ import { isEqual } from 'lodash-es';
 import { useConnectionStore, useUserStore } from '@/stores';
 import { iotdbShowAuth } from '@/utils/auth';
 import { DashboardApi, ConfigApi } from '@/api';
+import MonacoEditor from '@/components/monaco-editor/monaco-editor.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
-import MonacoEditor from './components/monaco-editor.vue';
 
 const { t, locale } = useI18n();
 const router = useRouter();
