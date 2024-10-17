@@ -183,9 +183,12 @@ const handleRemove: UploadProps['onRemove'] = () => {
   uploadFileYaml.value = undefined;
 };
 // 上传
-const customUpload: UploadProps['httpRequest'] = () => {};
+const customUpload: UploadProps['httpRequest'] = () => {
+  return new Promise(() => {});
+};
 
 function handleSubmit() {
+  if (!uploadFilePt.value || !uploadFileYaml.value || !modelId.value) return;
   importModel(uploadFilePt.value, uploadFileYaml.value, modelId.value)
     .then((res) => {
       if (res.code === 0) {
