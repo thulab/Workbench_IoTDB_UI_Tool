@@ -105,6 +105,7 @@
 </template>
 
 <script lang="ts" setup>
+import type { ElTable } from 'element-plus';
 import { onMounted, reactive, ref, computed } from 'vue';
 import { useUserStore, useConnectionStore } from '@/stores';
 import { storeToRefs } from 'pinia';
@@ -128,9 +129,9 @@ const pagination = reactive({
   pageNum: 1,
 });
 const { maxTableHeight } = useTableHeight(300);
-const tableData = ref<DataSync.SynchronListData[]>([]);
+const tableData = ref<AIAnalysis.Model[]>([]);
 const totalCount = ref(0);
-const multipleSelection = ref<DataSync.SynchronListData[]>([]);
+const multipleSelection = ref<AIAnalysis.Model[]>([]);
 const modelConfig = ref<InstanceType<typeof ModelConfig>>();
 const tableRef = ref<InstanceType<typeof ElTable>>();
 
@@ -143,7 +144,7 @@ function getListData() {
   getModels(searchFormData.name).then((res) => {
     if (res.data) {
       tableData.value = res.data
-        .filter((item) => searchFormData === '' || item.modelId.includes(searchFormData.name))
+        .filter((item) => searchFormData.name === '' || item.modelId.includes(searchFormData.name))
         .map((item) => {
           item.configs = item.configs || '';
           return item;
@@ -165,7 +166,7 @@ function handleSearch() {
   getListData();
 }
 
-function handleSelectionChange(vals: DataSync.SynchronListData[]) {
+function handleSelectionChange(vals: AIAnalysis.Model[]) {
   multipleSelection.value = vals;
 }
 
