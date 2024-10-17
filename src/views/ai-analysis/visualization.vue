@@ -565,7 +565,11 @@ function handleChangePath(val: string, data: StorageDevice.MeasurementDataItem[]
   searchFormData.measurementType = current?.dataType || '';
 }
 
+const timeout = ref<number>();
+
 const setOption = (option: ECOption, noMerge: boolean = false) => {
+  console.log(option, 'setOption');
+  console.trace('option');
   if (chartInstance) {
     // 实例存在直接设置
     chartInstance.setOption(option, noMerge);
@@ -612,11 +616,13 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
     });
   } else {
     // 容器高度有问题时，延迟加载
-    setTimeout(() => {
+    if (timeout.value) clearTimeout(timeout.value);
+    // 避免卡死
+    timeout.value = setTimeout(() => {
       nextTick(() => {
         setOption(option);
       });
-    }, 300);
+    }, 10);
   }
 };
 
@@ -722,7 +728,6 @@ function handleSearch() {
   allTableData.value = [];
   analysisData.value = [];
   rawData.value = [];
-  setOption(chartOptions.value, true);
   if (searchFormData.type !== 2) {
     const query: AIAnalysis.SearchCondition = {
       modelType: searchFormData.type === 0 ? 'BUILT_IN_FORECAST' : 'BUILT_IN_ANOMALY_DETECTION',
@@ -790,6 +795,7 @@ function handleWriteBackSuccess(name: string) {
 
 // 导出
 function handleExportData(exportType: string) {
+  if (allTableData.value.length === 0 || tableData.value.length === 0) return;
   if (copySearchFormData.type !== 2) {
     const data = {
       modelType: copySearchFormData.type === 0 ? 'BUILT_IN_FORECAST' : 'BUILT_IN_ANOMALY_DETECTION',
