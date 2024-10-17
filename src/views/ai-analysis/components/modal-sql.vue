@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="t('spectrum.sqlInput')"
+    :title="t('search.sqlInput')"
     v-model="dialogVisible"
     width="748px"
     align-center
@@ -62,7 +62,7 @@ const handleEmpty = () => {
 
 const handleConfirm = () => {
   dialogVisible.value = false;
-  ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
+  ElMessage.success({ message: t('aiAnalysis.sqlConfrimTip'), grouping: true });
   emit('handleConfirm', sqlInput.value);
 };
 

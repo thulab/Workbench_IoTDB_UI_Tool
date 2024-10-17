@@ -10,6 +10,8 @@ import {
   type GaugeSeriesOption,
   TreeChart, // 树图
   type TreeSeriesOption,
+  ScatterChart, // 散点图
+  type ScatterSeriesOption,
 } from 'echarts/charts';
 import {
   TitleComponent,
@@ -54,6 +56,7 @@ type ECOption = echarts.ComposeOption<
   | DataZoomComponentOption
   | MarkPointComponentOption
   | MarkLineComponentOption
+  | ScatterSeriesOption
 >;
 
 // 注册必须的组件
@@ -68,6 +71,7 @@ echarts.use([
   DataZoomComponent,
   MarkPointComponent,
   MarkLineComponent,
+  ScatterChart,
   GaugeChart,
   LineChart,
   BarChart,

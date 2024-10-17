@@ -1,263 +1,250 @@
 <template>
-  <el-container class="data-spectrum-wrapper">
-    <el-header class="p-0" style="height: auto">
-      <div class="search-form-box" style="margin-bottom: 18px">
-        <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-          <div class="m-b-16 flex-align-center" style="height: 36px">
-            <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
-              <template #label>
-                {{ t('spectrum.analysisMethod') }}：
-                <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
-                  <template #content>
-                    <p style="color: #131926; font-weight: 300" v-html="t('spectrum.analysisMethodTip', { doc: methodDocLink })"></p>
-                  </template>
-                  <i-custom-question />
-                </el-tooltip>
-              </template>
-              <el-select v-model="searchFormData.method" id="spectrum-search-method" style="width: 230px" :placeholder="t('spectrum.analysisMethodPlaceholder')" @change="handleChangeMethod">
-                <el-option
-                  v-for="item in methodOptions"
-                  :key="item.functionName"
-                  :label="item.name"
-                  :value="item.functionName"
-                  :id="`spectrum-search-method-${item.functionName}`"
-                  :disabled="!item.enable"
+  <coming-soon-container :is-show="locale !== 'en'">
+    <active-container :is-show="connectionIsActive">
+      <el-container class="visualization-wrapper">
+        <el-header class="p-0 p-l-30 p-r-16" style="height: auto">
+          <div class="search-form-box" style="margin-bottom: 18px">
+            <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
+              <div class="m-b-16 flex-align-center" style="height: 36px">
+                <base-form-item :label="`${t('aiAnalysis.business')}：`" prop="type" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
+                  <el-radio-group v-model="searchFormData.type" id="business-type" @change="handleChangeType">
+                    <el-radio :value="0" id="business-type-0">{{ t('aiAnalysis.forecast') }}</el-radio>
+                    <el-radio :value="1" id="business-type-1">{{ t('aiAnalysis.anomalyDetection') }}</el-radio>
+                    <el-radio :value="2" id="business-type-2">{{ t('aiAnalysis.custom') }}</el-radio>
+                  </el-radio-group>
+                </base-form-item>
+                <base-form-item
+                  v-if="searchFormData.type !== 2"
+                  :label="`${t('aiAnalysis.modelSelect')}：`"
+                  prop="method"
+                  class="m-r-12"
+                  :label-width="locale === 'en' ? '' : '96px'"
+                  :rules="requiredRules"
                 >
-                  <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('spectrum.analysisMethodNoneTip')" popper-class="tooltip-box-width" :disabled="item.enable">
-                    {{ item.name }}
-                  </el-tooltip>
-                </el-option>
-              </el-select>
-            </base-form-item>
-            <div class="search-method-params-box" v-if="searchFormData.method && searchFormData.method !== 'custom'">
-              <span class="params-title">{{ t('spectrum.paramsTitle') }}</span>
-              <template v-if="searchFormData.method === 'FFT'">
-                <base-form-item :label="`${t('spectrum.returnResult')}：`" prop="resultType">
-                  <el-select v-model="searchFormData.resultType" :style="{ width: locale === 'en' ? '110px' : '84px' }" id="spectrum-search-resultType">
-                    <el-option v-for="item in resultList" :key="item.value" :label="item.name" :value="item.value" :id="`spectrum-search-resultType-${item.value}`" />
+                  <el-select v-model="searchFormData.method" id="search-method" style="width: 230px" :placeholder="t('common.selectPlaceholder')">
+                    <el-option
+                      v-for="item in modelOptions"
+                      :key="item.modelId"
+                      :label="item.modelId.indexOf('_') === 0 ? item.modelId.slice(1) : item.modelId"
+                      :value="item.modelId"
+                      :id="`search-method-${item.modelId}`"
+                    />
                   </el-select>
                 </base-form-item>
-                <base-form-item :label="`${t('spectrum.compressParams')}：`" prop="compression" class="m-r-0">
-                  <template #label>
-                    {{ t('spectrum.compressParams') }}：
-                    <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width" :content="t('spectrum.compressParamsTip')"><i-custom-question /></el-tooltip>
-                  </template>
-                  <el-input
-                    v-model="searchFormData.compression"
-                    :style="{ width: locale === 'en' ? '150px' : '120px' }"
-                    :placeholder="t('spectrum.compressParamsPlaceholder')"
-                    id="spectrum-search-compression"
-                    @change="handleInputCompression"
-                  />
-                </base-form-item>
-              </template>
-              <template v-if="searchFormData.method === 'ENVELOPE'">
-                <base-form-item :label="`${t('spectrum.modulationFrequency')}：`" prop="frequency">
-                  <el-input v-model.number="searchFormData.frequency" style="width: 120px" id="spectrum-search-frequency" @change="handleInputFrequency" />
-                </base-form-item>
-                <base-form-item :label="`${t('spectrum.expandingFold')}：`" prop="amplification" class="m-r-0">
-                  <el-input v-model.number="searchFormData.amplification" style="width: 120px" id="spectrum-search-expandingFold" @change="handleInputAmplification" />
-                </base-form-item>
-              </template>
-              <template v-if="searchFormData.method === 'DWT'">
-                <ul class="search-data-list">
-                  <li :class="['search-data-type', { 'search-data-active': dwtTab === 'type' }]" id="spectrum-search-dwt-tab-type" @click="handleDWTTab('type')">{{ t('spectrum.filterType') }}</li>
-                  <li :class="['search-data-type', { 'search-data-active': dwtTab === 'number' }]" id="spectrum-search-dwt-tab-number" @click="handleDWTTab('number')">
-                    {{ t('spectrum.filterCoefficient') }}
-                  </li>
-                </ul>
-                <base-form-item label="" prop="dwtMethod" v-if="dwtTab === 'type'">
-                  <el-select
-                    v-model="searchFormData.dwtMethod"
-                    :style="{ width: locale === 'en' ? '110px' : '96px' }"
-                    id="spectrum-search-dwt-method"
-                    :placeholder="t('spectrum.filterTypePlaceholder')"
-                  >
-                    <el-option v-for="item in dwtMethodList" :key="item.value" :label="item.name" :value="item.value" :id="`spectrum-search-dwt-method-${item.value}`" />
-                  </el-select>
-                </base-form-item>
-                <base-form-item label="" prop="coef" v-if="dwtTab === 'number'">
-                  <el-input v-model="searchFormData.coef" :style="{ width: locale === 'en' ? '110px' : '96px' }" id="spectrum-search-dwt-number" :placeholder="t('spectrum.paramsPlaceholder')" />
-                </base-form-item>
-                <base-form-item :label="`${t('spectrum.transformationNumbers')}：`" prop="layer" class="m-r-0">
-                  <el-input
-                    v-model.number="searchFormData.layer"
-                    :style="{ width: locale === 'en' ? '110px' : '84px' }"
-                    id="spectrum-search-dwt-layer"
-                    :placeholder="t('spectrum.paramsPlaceholder')"
-                    @change="handleInputLayer"
-                  />
-                </base-form-item>
-              </template>
-              <template v-if="['LOWPASS', 'HIGHPASS'].includes(searchFormData.method)">
-                <base-form-item prop="wpass" :rules="requiredRules" class="form-item-last">
-                  <template #label>
-                    {{ t('spectrum.cutoffFrequency') }}：
-                    <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width" :content="t('spectrum.cutoffFrequencyTip')"><i-custom-question /></el-tooltip>
-                  </template>
-                  <el-input
-                    v-model="searchFormData.wpass"
-                    :style="{ width: locale === 'en' ? '110px' : '96px' }"
-                    id="spectrum-search-wpass"
-                    :placeholder="t('spectrum.paramsPlaceholder')"
-                    @change="handleInputWpass"
-                  />
-                </base-form-item>
-              </template>
-            </div>
-          </div>
-          <div class="search-form-row-box">
-            <div v-if="searchFormData.method !== 'custom'">
-              <base-form-item prop="measurement" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
-                <template #label>
-                  {{ t('measurement.measurementChoose') }}：
-                  <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
-                    <template #content>
-                      {{ t('common.searchTipLimit100') }}
-                      <br />
-                      {{ t('spectrum.dwtTip') }}
-                    </template>
-                    <i-custom-question />
-                  </el-tooltip>
-                </template>
-                <timeseries-select-single
-                  id="spectrum-search-path"
-                  v-model="searchFormData.measurement"
-                  :selectWidth="230"
-                  :itemWidth="200"
-                  show-suffix
-                  :disabled-path="disabledPath"
-                  @handle-change-path="handleChangePath"
-                />
-              </base-form-item>
-              <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules" :class="[searchFormData.method === 'DWT' ? '' : 'form-item-last']">
-                <el-date-picker
-                  v-model="searchFormData.datetimerange"
-                  type="datetimerange"
-                  range-separator="-"
-                  unlink-panels
-                  :disabled-date="disabledDate"
-                  :shortcuts="shortcutsDaterange"
-                  :clearable="false"
-                  :prefix-icon="ICustomCalender"
-                  :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
-                  id="spectrum-search-datetimerange"
-                  @change="handleChangeTime"
-                />
-              </base-form-item>
-              <base-form-item :label="`${t('spectrum.dataCount')}：`" v-if="searchFormData.method === 'DWT'" class="m-r-0">
-                {{ dataCount || dataCount === 0 ? dataCount : '-' }}
-              </base-form-item>
-            </div>
-            <div v-if="searchFormData.method === 'custom'">
-              <base-form-item :label="`${t('spectrum.sqlInput')}：`" prop="sql" :label-width="locale === 'en' ? '' : '96px'" class="el-form-item-not-mandatory">
-                <el-button type="primary" link id="spectrum-search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
-              </base-form-item>
-            </div>
-            <div class="search-form-buttons">
-              <el-button @click="handleReset" id="spectrum-search-reset">{{ t('common.reset') }}</el-button>
-              <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="applyTipDisabled" popper-class="tooltip-box-width">
-                <el-button :disabled="!applyTipDisabled" type="primary" @click="handleSearch()" id="spectrum-search-search">
-                  {{ t('common.apply') }}
+                <el-button v-if="searchFormData.type !== 2" link @click="$router.push({ name: 'ModelManagement' })">
+                  <el-icon :size="24"><i-custom-edit /></el-icon>
                 </el-button>
-              </el-tooltip>
-              <el-button :disabled="saveTemplateDisabled" @click="handleSaveTemplate" id="spectrum-search-save-template">{{ t('common.save') }}</el-button>
-            </div>
+              </div>
+              <div class="search-form-row-box">
+                <div v-if="searchFormData.type !== 2">
+                  <base-form-item prop="measurement" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
+                    <template #label>
+                      {{ t('measurement.measurementChoose') }}：
+                      <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
+                        <template #content>
+                          {{ t('common.searchTipLimit100') }}
+                        </template>
+                        <i-custom-question />
+                      </el-tooltip>
+                    </template>
+                    <timeseries-select-single
+                      id="search-path"
+                      v-model="searchFormData.measurement"
+                      :selectWidth="230"
+                      :itemWidth="200"
+                      show-suffix
+                      :disabled-path="disabledPath"
+                      @handle-change-path="handleChangePath"
+                    />
+                  </base-form-item>
+                  <template v-if="searchFormData.type === 0">
+                    <base-form-item :label="`${t('aiAnalysis.forecastStart')}：`" :rules="requiredRules">
+                      <el-date-picker v-model="searchFormData.forecastStart" type="datetime" :prefix-icon="ICustomCalender" id="search-datetime" :clearable="false" style="width: 164px" />
+                    </base-form-item>
+                    <base-form-item :label="`${t('aiAnalysis.forecastData')}：`">
+                      <span style="font-size: 12px; color: #131926; font-weight: 300">{{ t('aiAnalysis.forecast96') }}</span>
+                    </base-form-item>
+                  </template>
+                  <template v-else-if="searchFormData.type === 1">
+                    <base-form-item :label="`${t('aiAnalysis.detectionTime')}：`" prop="datetimerange" :rules="requiredRules">
+                      <el-date-picker
+                        v-model="searchFormData.datetimerange"
+                        type="datetimerange"
+                        range-separator="-"
+                        unlink-panels
+                        :disabled-date="disabledDate"
+                        :shortcuts="shortcutsDaterange"
+                        :clearable="false"
+                        :prefix-icon="ICustomCalender"
+                        :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
+                        id="search-datetimerange"
+                      />
+                    </base-form-item>
+                    <base-form-item :label="`${t('aiAnalysis.anomalyRatio')}：`" :rules="requiredRules" class="m-r-0">
+                      <template #label>
+                        {{ t('aiAnalysis.anomalyRatio') }}：
+                        <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
+                          <template #content>
+                            {{ t('aiAnalysis.anomalyRatioTip') }}
+                          </template>
+                          <i-custom-question />
+                        </el-tooltip>
+                      </template>
+                      <el-input-number v-model="searchFormData.anomalyRatio" :min="0" :max="100" :controls="false" :placeholder="t('aiAnalysis.pleaseInputPercent')" style="width: 104px" />
+                      %
+                    </base-form-item>
+                  </template>
+                </div>
+                <div v-else>
+                  <base-form-item label="SQL：" prop="sql" class="el-form-item-not-mandatory">
+                    <el-button type="primary" link id="search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
+                  </base-form-item>
+                </div>
+                <div class="search-form-buttons">
+                  <el-button @click="handleReset" id="search-reset">{{ t('common.reset') }}</el-button>
+                  <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="canQuery" popper-class="tooltip-box-width">
+                    <el-button :disabled="!canQuery" type="primary" @click="handleSearch()" id="search-search">
+                      {{ t('common.query') }}
+                    </el-button>
+                  </el-tooltip>
+                </div>
+              </div>
+            </el-form>
           </div>
-        </el-form>
-      </div>
-    </el-header>
-    <el-main class="p-0">
-      <el-container class="chart-detail-wrapper">
-        <el-main class="p-0" style="position: relative">
-          <div ref="chartContainer" class="chart-container" :style="`height: ${'calc(100% - 30px);'}`" v-element-size="onResize"></div>
-          <div class="flex-align-center" style="margin-top: 2px">
-            <el-button
-              type="primary"
-              :plain="clickedOperate !== 'cursor'"
-              class="cursor-button"
-              id="spectrum-cursor"
-              style="height: 24px !important"
-              :disabled="dataEmpty"
-              :class="dataEmpty ? 'disable-cursor' : ''"
-              @click="handleClickOperate('cursor')"
-            >
-              {{ t('spectrum.cursor') }}
-            </el-button>
-            <div class="chart-operate-box">
-              <el-button
-                type="primary"
-                id="spectrum-harmonicFrequency"
-                color="#00B3AA"
-                :disabled="disableFrequency"
-                :plain="clickedOperate !== 'frequency'"
-                :class="disableFrequency ? 'disable-frequency' : ''"
-                @click="handleClickOperate('frequency')"
-              >
-                {{ t('spectrum.harmonicFrequency') }}
-              </el-button>
-              <el-input-number
-                v-model="harmonicFrequency"
-                :min="1"
-                :max="99"
-                step-strictly
-                id="spectrum-harmonicFrequency-input"
-                :disabled="dataEmpty || drawedStatus.frequency"
-                :controls="false"
-                :value-on-clear="1"
-              />
-            </div>
-            <div class="chart-operate-box">
-              <el-button
-                type="primary"
-                :plain="clickedOperate !== 'sideband'"
-                id="spectrum-sideband"
-                color="#6738BD"
-                :disabled="disableSideband"
-                :class="disableSideband ? 'disable-sideband' : ''"
-                @click="handleClickOperate('sideband')"
-              >
-                {{ t('spectrum.sideband') }}
-              </el-button>
-              <el-input-number v-model="sideband" :min="1" :max="99" step-strictly id="spectrum-sideband-input" :disabled="dataEmpty || drawedStatus.sideband" :controls="false" :value-on-clear="1" />
-            </div>
-            <el-tooltip effect="light" :content="t('common.clearAll')" placement="top" popper-class="tooltip-box-width">
-              <el-button link :class="['cursor-button-clear', 'm-l-8', dataEmpty ? '' : 'svg-button-hover-color']" id="spectrum-cursor-clear" :disabled="dataEmpty" @click="() => handleEmptyOperate()">
-                <el-icon size="18" color="#fff"><i-custom-delete /></el-icon>
-              </el-button>
-            </el-tooltip>
-          </div>
+        </el-header>
+        <el-main class="p-0 position-relative">
+          <el-container class="position-absolute p-x-16" style="height: 100%; width: 100%; z-index: 1000" v-if="searchFormData.type === 2">
+            <el-main class="page-table-details">
+              <div class="page-info-box">
+                <span></span>
+                <div class="search-form-buttons">
+                  <el-dropdown class="more-icon m-l-12" :disabled="!canReadWriteData || !canQuery" @command="(val) => handleCommandDown(val)" id="visualization-save-dropdown">
+                    <el-button :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" id="visualization-download" :disabled="!canReadWriteData">
+                      {{ searchFormData.type === 0 ? t('common.save') : t('common.export') }}
+                      <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+                    </el-button>
+                    <template #dropdown>
+                      <el-dropdown-menu>
+                        <el-dropdown-item command="csv" id="visualization-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
+                        <el-dropdown-item command="xlsx" id="visualization-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
+                        <el-dropdown-item v-if="searchFormData.type === 0" command="saveToIoTDB" id="visualization-saveToIoTDB">{{ t('aiAnalysis.saveToIoTDB') }}</el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
+                </div>
+              </div>
+              <div v-loading="false">
+                <dynamic-table
+                  :columns="columns"
+                  :table-data="tableDataPagination"
+                  :height="maxCustomTableHeight"
+                  :max-height="maxCustomTableHeight"
+                  v-model:current-page="pagination.pageNum"
+                  v-model:page-size="pagination.pageSize"
+                  :total="tableData.length"
+                  :show-pagination="true"
+                />
+              </div>
+            </el-main>
+          </el-container>
+          <el-container class="p-0 position-absolute" style="height: 100%; width: 100%" :style="{ opacity: searchFormData.type === 2 ? 0 : 1 }">
+            <el-header class="p-0">
+              <h4 class="info-title">
+                <span v-if="searchFormData.type !== 2">
+                  <span class="m-r-4">{{ searchFormData.measurement }}</span>
+                  {{ t('aiAnalysis.forecastResult') }}
+                </span>
+                <span v-else></span>
+                <div class="search-form-buttons p-r-8">
+                  <el-dropdown class="more-icon m-l-12" :disabled="!canReadWriteData || !canQuery" @command="(val) => handleCommandDown(val)" id="visualization-save-dropdown">
+                    <el-button :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" id="visualization-download" :disabled="!canReadWriteData">
+                      {{ searchFormData.type === 0 ? t('common.save') : t('common.export') }}
+                      <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+                    </el-button>
+                    <template #dropdown>
+                      <el-dropdown-menu>
+                        <el-dropdown-item command="csv" id="visualization-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
+                        <el-dropdown-item command="xlsx" id="visualization-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
+                        <el-dropdown-item v-if="searchFormData.type === 0" command="saveToIoTDB" id="visualization-saveToIoTDB">{{ t('aiAnalysis.saveToIoTDB') }}</el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
+                </div>
+              </h4>
+              <p class="trend-tip p-l-30 m-t-12">
+                <el-icon size="16" style="margin-right: 6px"><i-custom-info-warning /></el-icon>
+                <span v-html="t('dataTrend.trendTip', { tip })"></span>
+              </p>
+            </el-header>
+            <el-main class="chart-detail-wrapper">
+              <el-container style="height: 100%">
+                <el-main class="p-0" style="position: relative">
+                  <div ref="chartContainer" class="chart-container" :style="`height: ${'calc(100% );'}`" v-element-size="onResize"></div>
+                </el-main>
+                <el-aside
+                  width="352px"
+                  class="p-16 m-l-16 position-relative"
+                  style="display: flex; flex-direction: column; background-color: #f7f8fc; padding-bottom: 10px !important; overflow: hidden"
+                >
+                  <el-dropdown v-if="copySearchFormData.type === 1" placement="bottom" class="filter-btn" @command="(val) => handleFilter(val)">
+                    <el-button link id="filter-btn">
+                      <i-custom-filter style="width: 24px; height: 24px" />
+                    </el-button>
+                    <template #dropdown>
+                      <el-dropdown-menu>
+                        <el-dropdown-item command="all">{{ t('aiAnalysis.all') }}</el-dropdown-item>
+                        <el-dropdown-item command="normal">{{ t('aiAnalysis.normalValue') }}</el-dropdown-item>
+                        <el-dropdown-item command="anomaly">{{ t('aiAnalysis.anomalyValue') }}</el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
+
+                  <el-table height="100%" :data="paginatedData" @sort-change="handleSortChange" :cell-style="handleCellStyle">
+                    <el-table-column
+                      prop="time"
+                      :label="t('aiAnalysis.time')"
+                      sortable="custom"
+                      :sort-orders="['ascending', 'descending']"
+                      :formatter="formatterTime"
+                      show-overflow-tooltip
+                      width="170"
+                    />
+                    <el-table-column prop="value" :label="copySearchFormData.type === 0 ? t('aiAnalysis.forecastValue') : copySearchFormData.measurement" show-overflow-tooltip width="150">
+                      <template #header="{ column }">
+                        <span class="flex-header"><text-tooltip :content="column.label" /></span>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                  <div class="detail-pager">
+                    <span class="detail-total">{{ t('aiAnalysis.total', { total: allTableData.length }) }}</span>
+                    <el-pagination
+                      :page-size="pageSize"
+                      v-model:current-page="currentPage"
+                      class="el-pagination--small"
+                      size="small"
+                      :background="true"
+                      :pager-count="3"
+                      layout="prev, pager, next"
+                      :total="sortedData.length"
+                    />
+                  </div>
+                </el-aside>
+              </el-container>
+            </el-main>
+          </el-container>
         </el-main>
-        <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand ? 'p-0' : '']" style="display: flex; flex-direction: column">
-          <el-tabs v-model="activeNameSide" stretch class="tabs-nav-aside" v-if="isExpand">
-            <el-tab-pane :label="t('dataTrend.pointAttribute')" name="point">
-              <point-list-tab :point-list="pointList" :point-line-data="pointLineData" :point-checked-data="pointCheckedData" @handleDelPoint="handleDelPoint" />
-            </el-tab-pane>
-            <el-tab-pane :label="t('dataTrend.commonTemplates')" name="template">
-              <template-list-tab ref="templateListRef" :source="'spectrum'" @handle-operate="handleOperateTemplate" />
-            </el-tab-pane>
-          </el-tabs>
-          <h4 class="collapse-title" v-if="!isExpand">{{ t(tabLabel) }}</h4>
-          <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="handleExpand" id="spectrum-point-expand">
-            <i-custom-arrow-right-expand />
-          </el-icon>
-        </el-aside>
+        <modal-sql v-model:visible="sqlVisible" :sql-value="sqlValue" @handleConfirm="handleConfirmSql" />
+
+        <modal-write-back
+          v-model:visible="writeBackVisible"
+          :old-name="copySearchFormData.measurement"
+          :name-list="[copySearchFormData.measurement]"
+          :save-loading="writeBackLoading"
+          @handleSave="handleWriteBackSuccess"
+        />
       </el-container>
-    </el-main>
-
-    <modal-sql v-model:visible="sqlVisible" :sql-value="sqlValue" @handleConfirm="handleConfirmSql" />
-
-    <modal-template v-model:visible="templateVisible" :name-list="nameList" :source="'spectrum'" :save-loading="saveTemplateLoading" @handleSave="handleSaveSuccess" />
-
-    <modal-template-rename
-      v-model:visible="renameVisible"
-      :old-name="renameData.name"
-      :name-list="nameList"
-      :source="'spectrum'"
-      :save-loading="saveTemplateLoading"
-      @handleSave="handleRenameSuccess"
-    />
-  </el-container>
+    </active-container>
+  </coming-soon-container>
 </template>
 
 <script setup lang="ts">
@@ -266,133 +253,104 @@ import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import dayjs from 'dayjs';
 import { debounce, cloneDeep } from 'lodash-es';
 import { vElementSize } from '@vueuse/components';
-import { SearchApi } from '@/api';
+import { AIAnalysisApi } from '@/api';
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
-import { today, getOneIntervalNow } from '@/utils/date';
-import { useUserStore } from '@/stores';
+import { today, getOneIntervalNow, todayNow, formatDate } from '@/utils/date';
+import { useUserStore, useConnectionStore } from '@/stores';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalSql from './components/modal-sql.vue';
-import PointListTab from './components/point-list-tab.vue';
-import TemplateListTab from '../data-trend/components/template-list-tab.vue';
-import ModalTemplate from '../data-trend/components/modal-template.vue';
-import ModalTemplateRename from '../data-trend/components/modal-template-rename.vue';
-
-interface PointData {
-  name: string;
-  x: number;
-  y: number | string;
-  disabled: boolean;
-  checked: boolean;
-}
-
-interface MarkPointLine {
-  path: string;
-  type: string;
-  name: string;
-  value: number;
-  xAxis: number;
-  yAxis: number;
-  itemStyle: {
-    color: string;
-    // eslint-disable-next-line no-nested-ternary
-    borderColor: string;
-    borderWidth: number;
-  };
-  label: {
-    formatter: string | Function;
-    position: string;
-    color: string;
-  };
-  lineStyle: {
-    type: string | number[];
-    color: string;
-  };
-}
-
-const tabList = [
-  { name: 'point', label: 'dataTrend.pointAttribute' },
-  { name: 'template', label: 'dataTrend.commonTemplates' },
-];
+import ModalWriteBack from './components/modal-write-back.vue';
 
 const { t, locale } = useI18n();
-const methodDocLink = computed(
-  () =>
-    `<a href="${locale.value === 'en' ? 'https://www.timecho.com/docs/UserGuide/latest/User-Manual/Database-Programming.html#udtf-user-defined-timeseries-generating-function' : 'https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/Database-Programming.html#udtf-user-defined-timeseries-generating-function'}" target="_blank" rel="noopener noreferrer" style="color: #495ad4;"> ${t('common.userManual')}</a>`
-);
+
 const userStore = useUserStore();
 const { canReadWriteData } = storeToRefs(userStore);
 const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
-const isExpand = ref(true);
-const methodList = ref<Array<Search.FunctionData>>([]);
-const dwtTab = ref<'type' | 'number'>('type');
+const modelList = ref<Array<AIAnalysis.Model>>([]);
+
+const tip = '<span style="color:#495AD4;font-weight: 700;"> 2000 </span>';
+
+const connectionStore = useConnectionStore();
+const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
+
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive<{
+  type: 0 | 1 | 2;
   measurement: string;
+  measurementType: string;
   method: string;
-  resultType: string;
-  compression: string | number | undefined;
-  frequency: string | number | undefined;
-  amplification: string | number | undefined;
   datetimerange: [DateModelType, DateModelType];
-  dwtMethod: string;
-  coef: string | undefined;
-  layer: string | number | undefined;
-  wpass: string | number | undefined;
+  forecastStart: DateModelType;
+  anomalyRatio: number | undefined;
+  orderBy: string;
 }>({
+  type: 0,
   measurement: '',
-  method: '',
-  resultType: 'abs',
-  compression: '',
-  frequency: '',
-  amplification: 1,
+  measurementType: '',
+  method: 'Timer',
   datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
-  dwtMethod: '',
-  coef: '',
-  layer: 1,
-  wpass: '',
+  forecastStart: todayNow() as DateModelType,
+  anomalyRatio: undefined,
+  orderBy: 'ascending',
 });
 let copySearchFormData = cloneDeep(searchFormData);
 const { shortcutsDaterange } = useShortcutsDate();
 
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
-const resultList = computed<Array<{ name: string; value: string }>>(() => [
-  { name: t('spectrum.real'), value: 'real' },
-  { name: t('spectrum.imag'), value: 'imag' },
-  { name: t('spectrum.abs'), value: 'abs' },
-  { name: t('spectrum.angle'), value: 'angle' },
-]);
-const dwtMethodList = computed<Array<{ name: string; value: string }>>(() => [
-  { name: 'Haar', value: 'Haar' },
-  { name: 'DB4', value: 'DB4' },
-  { name: 'DB6', value: 'DB6' },
-  { name: 'DB8', value: 'DB8' },
-]);
-const chartData = reactive<Search.SpectrumData>({
-  timestamps: [],
-  values: [],
+
+const rawData = ref<AIAnalysis.SearchDataItem[]>([]);
+const analysisData = ref<AIAnalysis.SearchDataItem[]>([]);
+const allTableData = ref<AIAnalysis.SearchDataItem[]>([]);
+
+const minValue = ref(0);
+
+const currentPage = ref(1);
+
+const { maxTableHeight } = useTableHeight(390);
+
+const { maxTableHeight: maxCustomTableHeight } = useTableHeight(324);
+
+const pageSize = computed(() => Math.floor(maxTableHeight.value / 40));
+const filterCondition = ref('all');
+
+const valueShow = (item: AIAnalysis.SearchDataItem) => {
+  if (copySearchFormData.type === 0) return true;
+  if (filterCondition.value === 'all') {
+    return true;
+  }
+  if (filterCondition.value === 'anomaly') {
+    return item.isAnomaly;
+  }
+  return !item.isAnomaly;
+};
+const sortedData = computed(() => {
+  const data = [...allTableData.value].filter((item) => valueShow(item));
+  return data.sort((a, b) => (searchFormData.orderBy === 'ascending' ? a.time - b.time : b.time - a.time));
 });
-const dataCount = ref<undefined | null | number>();
-const clickedOperate = ref<'cursor' | 'frequency' | 'sideband' | ''>('');
-const markPointCount = ref(0);
-const pointLineData = ref<Array<MarkPointLine>>([]);
-const pointList = ref<Array<PointData>>([]);
-const pointCheckedData = computed(() => pointList.value.filter((item) => item.checked));
-const harmonicFrequency = ref<number | undefined>(1);
-const frequencyInterval = ref<number | undefined>();
-const sideband = ref<number | undefined>(1);
-const sidebandData = ref<number[]>([]);
+
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value;
+  const end = start + pageSize.value;
+  return sortedData.value.slice(start, end);
+});
+
+const columns = ref<DynamicTableColumn[]>([]);
+const tableData = ref<Record<string, any>[]>([]);
+const pagination = reactive({
+  pageSize: 10,
+  pageNum: 1,
+  columnSize: 100,
+  columnNum: 1,
+  totalColumnPage: 0,
+  totalColumnCount: 0,
+});
+const getListLoading = ref(false);
+const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
+
 const sqlVisible = ref(false);
 const sqlValue = ref('');
-const clickedStatus = reactive({
-  cursor: false,
-  frequency: false,
-  sideband: false,
-});
-const drawedStatus = reactive({
-  frequency: false,
-  sideband: false,
-});
+
 const requiredRules = ref([
   {
     required: true,
@@ -401,42 +359,19 @@ const requiredRules = ref([
   },
 ]);
 let currentPoint = 0;
-const templateVisible = ref(false);
-const renameVisible = ref(false);
-const renameData = reactive<{
-  id: number | string;
-  name: string;
-  template: string;
-}>({
-  id: '',
-  name: '',
-  template: '',
-});
-const saveTemplateLoading = ref(false);
-const activeNameSide = ref('point');
-const tabLabel = ref('dataTrend.pointAttribute');
-const templateListRef = ref<InstanceType<typeof TemplateListTab>>();
-const nameList = computed(() => templateListRef.value?.templateList.map((item) => item.name) || []);
-const dataEmpty = computed(() => chartData.timestamps.length === 0);
-const disableFrequency = computed(() => chartData.timestamps.length === 0 || drawedStatus.frequency);
-const disableSideband = computed(() => chartData.timestamps.length === 0 || drawedStatus.sideband);
-const saveTemplateDisabled = computed(() => {
-  if (!searchFormData.method) {
+const currentPointValue = ref(0);
+const writeBackVisible = ref(false);
+
+const writeBackLoading = ref(false);
+const dataEmpty = computed(() => allTableData.value.length === 0);
+const notComplete = computed(() => {
+  if (searchFormData.type === 0 && (!searchFormData.method || !searchFormData.measurement || !searchFormData.forecastStart)) {
     return true;
   }
-  if (searchFormData.method === 'ENVELOPE' && !searchFormData.measurement) {
+  if (searchFormData.type === 1 && (!searchFormData.method || !searchFormData.measurement || !searchFormData.datetimerange || !searchFormData.anomalyRatio)) {
     return true;
   }
-  if ((searchFormData.method === 'DWT' && dwtTab.value === 'type' && !searchFormData.dwtMethod) || (dwtTab.value === 'number' && !searchFormData.coef)) {
-    return true;
-  }
-  if (['LOWPASS', 'HIGHPASS'].includes(searchFormData.method) && !searchFormData.wpass) {
-    return true;
-  }
-  if (searchFormData.method === 'custom' && !sqlValue.value) {
-    return true;
-  }
-  if (!searchFormData.measurement) {
+  if (searchFormData.type === 2 && !sqlValue.value) {
     return true;
   }
   return false;
@@ -446,31 +381,48 @@ const applyTip = computed(() => {
   if (!canReadWriteData.value) {
     return t('common.dataAuth');
   }
-  if (saveTemplateDisabled.value) {
+  if (notComplete.value) {
     return t('spectrum.applyTip');
   }
   return '';
 });
 
-const applyTipDisabled = computed(() => {
-  if (canReadWriteData.value && !saveTemplateDisabled.value) {
+const canQuery = computed(() => {
+  if (canReadWriteData.value && !notComplete.value) {
     return true;
   }
   return false;
 });
 
-const xMax = computed(() => chartData.timestamps[chartData.timestamps.length - 1]);
-
-const methodOptions = computed(() => [...methodList.value, { functionName: 'custom', name: t('spectrum.customAnalysis'), enable: true }]);
+const modelOptions = computed(() => {
+  switch (searchFormData.type) {
+    case 0:
+      return modelList.value.filter((item) => item.modelId === 'Timer').concat(modelList.value.filter((item) => item.modelTypeValue === 'BUILT_IN_FORECAST'));
+    case 1:
+      return modelList.value.filter((item) => item.modelId === '_Stray');
+    case 2:
+      return modelList.value.filter((item) => item.modelTypeValue === 'USER_DEFINED' && item.modelId !== 'Timer');
+    default:
+      return [];
+  }
+});
 
 function disabledPath(item: StorageDevice.MeasurementDataItem) {
   return item.dataType === 'BOOLEAN' || item.dataType === 'TEXT';
 }
 
-function handleExpand() {
-  isExpand.value = !isExpand.value;
-  tabLabel.value = tabList.find((item) => item.name === activeNameSide.value)?.label || 'dataTrend.pointAttribute';
-}
+const anomalyPoints = computed(() => {
+  const data: AIAnalysis.SearchDataItem[] = [];
+  analysisData.value.forEach((element, index) => {
+    if (element.value === '1') {
+      data.push({
+        time: element.time,
+        value: rawData.value[index].value,
+      });
+    }
+  });
+  return data;
+});
 
 const seriesData = computed<ECOption>(
   () =>
@@ -483,35 +435,53 @@ const seriesData = computed<ECOption>(
           showAllSymbol: 'auto',
           connectNulls: false,
           symbolSize: 4,
-          name: copySearchFormData.measurement,
-          data: chartData.values.map((dataItem, index) => [chartData.timestamps[index], dataItem]),
-          markPoint: {
-            silent: true,
-            symbol: 'rect',
-            symbolSize: 8,
-            label: {
-              show: false,
-            },
-            animation: false,
-            data: pointLineData.value.length
-              ? pointLineData.value.map((point) => ({ path: point.path, name: point.name, value: point.value, xAxis: point.xAxis, yAxis: point.yAxis, itemStyle: point.itemStyle, type: point.type }))
-              : [],
-          },
-          markLine: {
-            silent: true,
-            symbol: 'none',
-            data: pointLineData.value.length
-              ? pointLineData.value.map((line) => ({ path: line.path, name: line.name, xAxis: line.xAxis, label: line.label, lineStyle: line.lineStyle, type: line.type }))
-              : [],
-            animation: false,
-          },
+          name: t('aiAnalysis.rawValue'),
+          data: rawData.value.map((dataItem) => [dataItem.time, dataItem.value]),
           lineStyle: {
             width: 2,
-            color: '#4992ff',
+            color: '#4B94FE',
           },
           itemStyle: {
-            color: '#4992ff',
+            color: '#4B94FE',
           },
+          z: 1,
+        },
+        {
+          type: copySearchFormData.type === 0 ? 'line' : 'scatter',
+          symbol: 'circle',
+          showSymbol: false,
+          showAllSymbol: 'auto',
+          connectNulls: false,
+          symbolSize: 4,
+          name: copySearchFormData.type === 0 ? t('aiAnalysis.forecastValue') : t('aiAnalysis.anomalyPoint'),
+          data: copySearchFormData.type === 0 ? analysisData.value.map((dataItem) => [dataItem.time, dataItem.value]) : anomalyPoints.value.map((dataItem) => [dataItem.time, dataItem.value]),
+          lineStyle: {
+            width: 2,
+            color: copySearchFormData.type === 0 ? '#FF6E76' : '#D43030',
+          },
+          itemStyle: {
+            color: copySearchFormData.type === 0 ? '#FF6E76' : '#D43030',
+          },
+          markLine: {
+            symbol: 'none',
+            lineStyle: {
+              type: [16, 10],
+              color: copySearchFormData.type === 0 ? '#FF6E76' : '#D43030',
+            },
+            data:
+              copySearchFormData.type === 0
+                ? []
+                : anomalyPoints.value.map((line) => [
+                    {
+                      coord: [line.time, minValue.value],
+                    },
+                    {
+                      coord: [line.time, line.value],
+                    },
+                  ]),
+            animation: false,
+          },
+          z: 2,
         },
       ],
     }) as unknown as ECOption
@@ -523,11 +493,13 @@ const chartOptions = computed<ECOption>(() => ({
     // appendToBody: true,
     formatter: (params) => {
       const paramsData = params as unknown as Array<Record<string, any>>;
-      const circle = `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: #4992ff"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0].seriesName}</span></div>`;
-      const x = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;">X：</span><span style="font-size:14px;color:#666;font-weight:400;">${paramsData[0].value[0]}</span></div>`;
-      const y = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;">Y：</span><span style="font-size:14px;color:#666;font-weight:400;">${paramsData[0].value[1]}</span></div>`;
-      return `${circle}${x}${y}`;
+      const x = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;"></span><span style="font-size:14px;color:#666;font-weight:400;">${formatDate(paramsData[0].value[0])}</span></div>`;
+      const circle = `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${paramsData[paramsData.length - 1].color}"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0].value[1]}</span></div>`;
+      return `${x}${circle}`;
     },
+  },
+  legend: {
+    data: allTableData.value.length > 0 ? [t('aiAnalysis.rawValue'), copySearchFormData.type === 0 ? t('aiAnalysis.forecastValue') : t('aiAnalysis.anomalyPoint')] : [],
   },
   toolbox: {
     show: true,
@@ -560,14 +532,12 @@ const chartOptions = computed<ECOption>(() => ({
   },
   connectNulls: false,
   xAxis: {
-    type: 'value',
+    type: 'time',
     boundaryGap: false,
     show: !dataEmpty.value,
     splitLine: {
       show: false,
     },
-    min: 0,
-    max: xMax.value,
   },
   yAxis: {
     type: 'value',
@@ -578,126 +548,28 @@ const chartOptions = computed<ECOption>(() => ({
   series: seriesData.value.series,
 }));
 
-const { requestFn: getUDFFunction } = useRequest(SearchApi.getUDFFunction);
-const { requestFn: getFFTData } = useRequest(SearchApi.getFFTData);
-const { requestFn: getEnvelopeDemodulationData } = useRequest(SearchApi.getEnvelopeDemodulationData);
-const { requestFn: getDWTData } = useRequest(SearchApi.getDWTData);
-const { requestFn: getPassData } = useRequest(SearchApi.getPassData);
-const { requestFn: getDataCount } = useRequest(SearchApi.getDataCount);
-const { requestFn: getCustomData } = useRequest(SearchApi.getCustomData);
-const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTemplate);
+const { requestFn: getModels } = useRequest(AIAnalysisApi.getModels);
+const { requestFn: search } = useRequest(AIAnalysisApi.search);
+const { requestFn: writeBack } = useRequest(AIAnalysisApi.writeBack);
+const { requestFn: getExportId } = useRequest(AIAnalysisApi.getExportId);
+const { requestFn: getCustomData, data: customData } = useRequest(AIAnalysisApi.getCustomData);
+const { requestFn: getCustomExportId } = useRequest(AIAnalysisApi.getCustomExportId);
 
-function handleInputCompression(val: string) {
-  if (val) {
-    if (!/^[1]$|^0\.\d+$/.test(`${val}`)) {
-      searchFormData.compression = undefined;
-    }
+const formatterTime = (row: AIAnalysis.SearchDataItem) => formatDate(row.time);
+
+function handleChangeType(val: string | number | boolean | undefined) {
+  if (val === 0 && modelOptions.value.find((item) => item.modelId === 'Timer')) {
+    searchFormData.method = 'Timer';
+  } else if (modelOptions.value.length > 0) {
+    searchFormData.method = modelOptions.value[0].modelId;
   } else {
-    searchFormData.compression = undefined;
+    searchFormData.method = '';
   }
 }
 
-function handleInputLayer(val: string) {
-  if (val) {
-    if (!/^\+?[1-9][0-9]*$/.test(`${val}`)) {
-      searchFormData.layer = undefined;
-    }
-  } else {
-    searchFormData.layer = undefined;
-  }
-}
-
-function handleInputWpass(val: string) {
-  if (val) {
-    if (!/^0\.\d+$/.test(`${val}`)) {
-      searchFormData.wpass = undefined;
-    }
-  } else {
-    searchFormData.wpass = undefined;
-  }
-}
-
-function handleInputFrequency(val: string) {
-  if (val) {
-    if (!/^\+?[1-9][0-9]*$/.test(`${val}`)) {
-      searchFormData.frequency = undefined;
-    }
-  } else {
-    searchFormData.frequency = undefined;
-  }
-}
-
-function handleInputAmplification(val: string) {
-  if (val) {
-    if (!/^\+?[1-9][0-9]*$/.test(`${val}`)) {
-      searchFormData.amplification = undefined;
-    }
-  } else {
-    searchFormData.amplification = undefined;
-  }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function handleInputHarmonicFrequency(val: string) {
-  if (val && !/^\+?[1-9][0-9]{0,1}$/.test(`${val}`)) {
-    harmonicFrequency.value = 1;
-  } else if (`${val}` === '0') {
-    harmonicFrequency.value = 1;
-    // eslint-disable-next-line no-dupe-else-if
-  } else if (`${val}` === '0') {
-    harmonicFrequency.value = 1;
-  }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function handleInputSideband(val: string) {
-  if (val && !/^\+?[1-9][0-9]{0,1}$/.test(`${val}`)) {
-    sideband.value = 1;
-  } else if (`${val}` === '0') {
-    sideband.value = 1;
-    // eslint-disable-next-line no-dupe-else-if
-  } else if (`${val}` === '0') {
-    sideband.value = 1;
-  }
-}
-
-function handleDWTTab(val: 'type' | 'number') {
-  dwtTab.value = val;
-}
-
-function getCount() {
-  const start = dayjs(searchFormData.datetimerange[0]).valueOf();
-  const end = dayjs(searchFormData.datetimerange[1]).valueOf();
-  getDataCount({
-    measurement: searchFormData.measurement,
-    startTime: start,
-    endTime: end,
-  })
-    .then((res) => {
-      dataCount.value = res.data;
-    })
-    .catch(() => {
-      dataCount.value = undefined;
-    });
-}
-
-function handleChangeMethod(val: string) {
-  if (val === 'DWT' && searchFormData.measurement) {
-    getCount();
-  }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleChangePath(val: string, data: StorageDevice.MeasurementDataItem[]) {
-  if (searchFormData.method === 'DWT') {
-    getCount();
-  }
-}
-
-function handleChangeTime() {
-  if (searchFormData.method === 'DWT' && searchFormData.measurement) {
-    getCount();
-  }
+  const current = data.find((f) => f.timeseries === val);
+  searchFormData.measurementType = current?.dataType || '';
 }
 
 const setOption = (option: ECOption, noMerge: boolean = false) => {
@@ -711,7 +583,6 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
     });
     // 若存在click事件，执行
     chartInstance.on('click', (params) => {
-      if (!clickedOperate.value) return;
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       handleClickChart(params);
     });
@@ -725,7 +596,6 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
       setOption(chartOptions.value);
     });
     chartInstance.getZr().on('click', (params) => {
-      if (!clickedOperate.value) return;
       if (params.target && !params.topTarget) {
         return;
       }
@@ -734,11 +604,10 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
         return;
       }
       if (params.topTarget && params.topTarget.type !== 'Line') return;
-      if (currentPoint && chartData.timestamps[currentPoint]) {
-        const point = [chartData.timestamps[currentPoint], chartData.values[currentPoint]];
-        const param = { componentType: 'series', seriesName: copySearchFormData.measurement, value: point };
+      if (currentPoint && allTableData.value[currentPoint]) {
+        const point = allTableData.value[currentPoint];
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        handleClickChart(param as echarts.ECElementEvent);
+        handleDeal(point);
       }
     });
     // 初次加载，设置notMerge为true
@@ -756,297 +625,26 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
   }
 };
 
-function handleDealCursor(params: echarts.ECElementEvent) {
-  // eslint-disable-next-line prefer-const
-  const { seriesName, value, componentType } = params as { seriesName: string; value: number[] | number; componentType: string };
-  let index = -1;
-  // let pointName = '';
-  if (componentType === 'series') {
-    index = pointLineData.value.findIndex((data) => data.path === seriesName && data.xAxis === (value as number[])[0] && data.type === 'cursor');
-    // pointName = `${seriesName}_${(value as number[])[0]}`;
-  } else if (componentType === 'markPoint') {
-    index = pointLineData.value.findIndex((data) => data.path === (params.data as unknown as any).path && data.value === value && data.type === 'cursor');
-    // pointName = `${(params.data as unknown as any).path}_${value}`;
-  } else {
-    // 'markLine'
-    index = pointLineData.value.findIndex((data) => data.path === (params.data as unknown as any).path && data.xAxis === value && data.type === 'cursor');
-    // pointName = `${(params.data as unknown as any).path}_${value}`;
-  }
-
-  if (index !== -1) {
-    // markPointCount.value--;
-    // pointLineData.value.splice(index, 1);
-    // pointLineData.value
-    //   .filter((f) => f.type === 'cursor')
-    //   .forEach((item, i) => {
-    //     if (i >= index) {
-    //       item.label = {
-    //         formatter: () => (markPointCount.value === 1 ? 'D' : `D${i + 1}`),
-    //         position: 'end',
-    //         color: '#fff',
-    //       };
-    //     }
-    //   });
-    // const pointIndex = pointList.value.findIndex((point) => point.name === pointName);
-    // if (pointIndex !== -1) {
-    //   pointList.value.splice(pointIndex, 1);
-    // }
-    // setOption(chartOptions.value);
-    return;
-  }
-  if (markPointCount.value > 9) {
-    ElMessage.warning({
-      message: t('spectrum.overTip'),
-      grouping: true,
-    });
-    return;
-  }
-  markPointCount.value++;
-  const num = markPointCount.value;
-  pointLineData.value.push({
-    path: seriesName,
-    type: 'cursor',
-    name: `${seriesName}_${(value as number[])[0]}_point_line`,
-    value: (value as number[])[1],
-    xAxis: (value as number[])[0],
-    yAxis: (value as number[])[1],
-    itemStyle: {
-      color: 'transparent',
-      borderColor: '#fff',
-      borderWidth: 1,
-    },
-    label: {
-      formatter: () => (markPointCount.value === 1 ? 'D' : `D${num}`),
-      position: 'end',
-      color: '#fff',
-    },
-    lineStyle: {
-      type: [16, 10],
-      color: '#DFE1ED',
-    },
-  });
-  pointList.value.push({
-    name: `${seriesName}_${(value as number[])[0]}`,
-    x: (value as number[])[0],
-    y: (value as number[])[1],
-    disabled: false,
-    checked: false,
-  });
-  setOption(chartOptions.value);
-}
-
-function handleDelPoint(data: PointData, index: number) {
-  pointList.value.splice(index, 1);
-  markPointCount.value--;
-  const pointIndex = pointLineData.value.findIndex((point) => point.name === `${data.name}_point_line` && point.type === 'cursor');
-  if (pointIndex !== -1) {
-    pointLineData.value.splice(pointIndex, 1);
-  }
-  pointLineData.value
-    .filter((f) => f.type === 'cursor')
-    .forEach((item, i) => {
-      if (i >= index) {
-        item.label = {
-          formatter: () => (markPointCount.value === 1 ? 'D' : `D${i + 1}`),
-          position: 'end',
-          color: '#fff',
-        };
-      }
-    });
-  setOption(chartOptions.value);
-}
-
-function handleDealFrequency(params: echarts.ECElementEvent) {
-  const { seriesName, value } = params as { seriesName: string; value: number[] };
-  frequencyInterval.value = value[0] as number;
-  if (!frequencyInterval.value) return;
-  drawedStatus.frequency = true;
-  for (let i = 1; i <= harmonicFrequency.value!; i++) {
-    if (i * frequencyInterval.value <= xMax.value) {
-      const x = i * frequencyInterval.value;
-      let y = '';
-      const index = chartData.timestamps.findIndex((num) => num === x);
-      if (index !== -1) {
-        y = chartData.values[index];
-      }
-      pointLineData.value.push({
-        path: seriesName,
-        type: 'frequency',
-        name: `${seriesName}_${x}_frequency`,
-        value: y as unknown as number,
-        xAxis: x,
-        yAxis: y as unknown as number,
-        itemStyle: {
-          color: 'transparent',
-          borderColor: '#28D5CB',
-          borderWidth: 1,
-        },
-        label: {
-          formatter: `H${i === 1 ? '' : i}`,
-          position: 'end',
-          color: '#28D5CB',
-        },
-        lineStyle: {
-          type: 'solid',
-          color: '#28D5CB',
-        },
-      });
-    }
-  }
-  setOption(chartOptions.value);
-}
-
-function handleDealSideband(params: echarts.ECElementEvent) {
-  const { seriesName, value } = params as { seriesName: string; value: number[] };
-  if (sidebandData.value.includes(value[0])) return;
-  sidebandData.value.push(value[0]);
-  drawedStatus.sideband = true;
-  if (sidebandData.value.length === 2) {
-    const interval = Math.abs(sidebandData.value[0] - sidebandData.value[1]);
-    // 左侧
-    for (let i = 1; i <= sideband.value!; i++) {
-      if (sidebandData.value[0] - i * interval > 0) {
-        const leftX = sidebandData.value[0] - i * interval;
-        let leftY = '';
-        const leftI = chartData.timestamps.findIndex((num) => num === leftX);
-        if (leftI !== -1) {
-          leftY = chartData.values[leftI];
-        }
-        pointLineData.value.push({
-          path: seriesName,
-          type: 'sideband',
-          name: `${seriesName}_${leftX}_sideband`,
-          value: leftY as unknown as number,
-          xAxis: leftX,
-          yAxis: leftY as unknown as number,
-          itemStyle: {
-            color: 'transparent',
-            borderColor: '#AA82F5',
-            borderWidth: 1,
-          },
-          label: {
-            formatter: `SL${i}`,
-            position: 'end',
-            color: '#AA82F5',
-          },
-          lineStyle: {
-            type: 'solid',
-            color: '#AA82F5',
-          },
-        });
-      }
-    }
-    // 当前
-    const currentX = sidebandData.value[0];
-    let currentY = '';
-    const currentI = chartData.timestamps.findIndex((num) => num === currentX);
-    if (currentI !== -1) {
-      currentY = chartData.values[currentI];
-    }
-    pointLineData.value.push({
-      path: seriesName,
-      type: 'sideband',
-      name: `${seriesName}_${currentX}_sideband`,
-      value: currentY as unknown as number,
-      xAxis: currentX,
-      yAxis: currentY as unknown as number,
-      itemStyle: {
-        color: 'transparent',
-        borderColor: '#AA82F5',
-        borderWidth: 1,
-      },
-      label: {
-        formatter: 'S',
-        position: 'end',
-        color: '#AA82F5',
-      },
-      lineStyle: {
-        type: 'solid',
-        color: '#AA82F5',
-      },
-    });
-    // 右侧
-    for (let i = 1; i <= sideband.value!; i++) {
-      if (sidebandData.value[0] + i * interval <= xMax.value) {
-        const rightX = sidebandData.value[0] + i * interval;
-        let rightY = '';
-        const rightI = chartData.timestamps.findIndex((num) => num === rightX);
-        if (rightI !== -1) {
-          rightY = chartData.values[rightI];
-        }
-        pointLineData.value.push({
-          path: seriesName,
-          type: 'sideband',
-          name: `${seriesName}_${rightX}_sideband`,
-          value: rightY as unknown as number,
-          xAxis: rightX,
-          yAxis: rightY as unknown as number,
-          itemStyle: {
-            color: 'transparent',
-            borderColor: '#AA82F5',
-            borderWidth: 1,
-          },
-          label: {
-            formatter: `SR${i}`,
-            position: 'end',
-            color: '#AA82F5',
-          },
-          lineStyle: {
-            type: 'solid',
-            color: '#AA82F5',
-          },
-        });
-      }
-    }
-    setOption(chartOptions.value);
-  }
+function handleDeal(point: AIAnalysis.SearchDataItem | undefined) {
+  if (!point) return;
+  const index = sortedData.value.findIndex((data) => data.time === point.time);
+  currentPointValue.value = point.time;
+  currentPage.value = Math.ceil((index + 1) / pageSize.value);
 }
 
 function handleClickChart(params: echarts.ECElementEvent) {
-  if (clickedOperate.value === 'cursor') {
-    if (params.componentType !== 'series' && params.componentType !== 'markLine' && params.componentType !== 'markPoint') return;
-    clickedStatus.cursor = true;
-    handleDealCursor(params);
-  } else if (clickedOperate.value === 'frequency') {
-    if (params.componentType !== 'series') return;
-    if (!harmonicFrequency.value) return;
-    clickedStatus.frequency = true;
-    if (frequencyInterval.value) return;
-    handleDealFrequency(params);
+  if (params.componentType !== 'series' && params.componentType !== 'markLine' && params.componentType !== 'markPoint') return;
+  const { value, componentType } = params as { seriesName: string; value: number[] | number; componentType: string };
+  if (componentType === 'series') {
+    handleDeal(sortedData.value.find((data) => data.time === (value as number[])[0]));
+  } else if (componentType === 'markLine') {
+    const [time] = (params?.data as any)?.coord || [];
+    if (time) {
+      handleDeal(sortedData.value.find((data) => data.time === (time as unknown as number)));
+    }
   } else {
-    if (params.componentType !== 'series') return;
-    if (!sideband.value) return;
-    clickedStatus.sideband = true;
-    if (sidebandData.value.length === 2) return;
-    handleDealSideband(params);
+    handleDeal(sortedData.value.find((data) => data.time === value));
   }
-}
-
-function handleEmptyOperate(type?: 'cursor' | 'frequency' | 'sideband') {
-  clickedOperate.value = type || '';
-  markPointCount.value = 0;
-  pointList.value = [];
-  pointLineData.value = [];
-  clickedStatus.cursor = false;
-  clickedStatus.frequency = false;
-  clickedStatus.sideband = false;
-  drawedStatus.frequency = false;
-  drawedStatus.sideband = false;
-  harmonicFrequency.value = 1;
-  sideband.value = 1;
-  frequencyInterval.value = undefined;
-  sidebandData.value = [];
-  setOption(chartOptions.value);
-}
-
-function handleClickOperate(type: 'cursor' | 'frequency' | 'sideband') {
-  if (clickedOperate.value === type) {
-    clickedOperate.value = '';
-    clickedStatus[type] = false;
-    return;
-  }
-  clickedOperate.value = type;
-  clickedStatus[type] = true;
 }
 
 const onResize = debounce(() => {
@@ -1055,293 +653,175 @@ const onResize = debounce(() => {
   }
 }, 50);
 
-function getUdfList() {
-  getUDFFunction().then((res) => {
-    methodList.value = res.data || [];
+function getModelList() {
+  getModels('').then((res) => {
+    modelList.value = res.data || [];
   });
 }
 
 // 重置
 function handleReset() {
+  searchFormData.type = 0;
   searchFormData.measurement = '';
   searchFormData.method = '';
-  searchFormData.resultType = 'abs';
-  searchFormData.compression = '';
-  searchFormData.frequency = '';
-  searchFormData.amplification = 1;
-  dwtTab.value = 'type';
-  searchFormData.dwtMethod = '';
-  searchFormData.coef = '';
-  searchFormData.layer = 1;
-  searchFormData.wpass = '';
-  dataCount.value = undefined;
+  searchFormData.measurementType = '';
+  searchFormData.method = 'Timer';
+  searchFormData.datetimerange = getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType];
+  searchFormData.forecastStart = todayNow() as DateModelType;
+  searchFormData.anomalyRatio = undefined;
+  searchFormData.orderBy = 'ascending';
   sqlValue.value = '';
-  searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
   copySearchFormData = cloneDeep(searchFormData);
-  chartData.timestamps = [];
-  chartData.values = [];
-  handleEmptyOperate();
+  allTableData.value = [];
+  rawData.value = [];
+  analysisData.value = [];
+  tableData.value = [];
   setOption(chartOptions.value, true);
 }
 
-function getFFT() {
-  const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
-  const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
-  getFFTData({
-    resultType: copySearchFormData.resultType,
-    compression: copySearchFormData.compression!,
-    measurement: copySearchFormData.measurement,
-    startTime: start,
-    endTime: end,
-  })
-    .then((res) => {
-      chartData.timestamps = res.data.timestamps || [];
-      chartData.values = res.data.values || [];
-      if (!chartData.timestamps.length) {
-        ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
-      }
-      setOption(chartOptions.value, true);
-    })
-    .catch(() => {
-      chartData.timestamps = [];
-      chartData.values = [];
-      setOption(chartOptions.value, true);
-    });
-}
-
-function getEnvelope() {
-  const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
-  const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
-  getEnvelopeDemodulationData({
-    frequency: copySearchFormData.frequency || '',
-    amplification: copySearchFormData.amplification || '',
-    measurement: copySearchFormData.measurement,
-    startTime: start,
-    endTime: end,
-  })
-    .then((res) => {
-      chartData.timestamps = res.data.timestamps || [];
-      chartData.values = res.data.values || [];
-      if (!chartData.timestamps.length) {
-        ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
-      }
-      setOption(chartOptions.value, true);
-    })
-    .catch(() => {
-      chartData.timestamps = [];
-      chartData.values = [];
-      setOption(chartOptions.value, true);
-    });
-}
-
-function getDwt() {
-  const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
-  const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
-  if (!copySearchFormData.layer) {
-    searchFormData.layer = 1;
-    copySearchFormData.layer = 1;
-  }
-  getDWTData({
-    method: dwtTab.value === 'type' ? copySearchFormData.dwtMethod : '',
-    coef: dwtTab.value === 'number' ? copySearchFormData.coef! : '',
-    layer: copySearchFormData.layer || '',
-    measurement: copySearchFormData.measurement,
-    startTime: start,
-    endTime: end,
-  })
-    .then((res) => {
-      chartData.timestamps = res.data.timestamps || [];
-      chartData.values = res.data.values || [];
-      if (!chartData.timestamps.length) {
-        ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
-      }
-      setOption(chartOptions.value, true);
-    })
-    .catch(() => {
-      chartData.timestamps = [];
-      chartData.values = [];
-      setOption(chartOptions.value, true);
-    });
-}
-
-function getPass() {
-  const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
-  const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
-  getPassData({
-    udf: copySearchFormData.method === 'LOWPASS' ? 'low' : 'high',
-    wpass: copySearchFormData.wpass || '',
-    measurement: copySearchFormData.measurement,
-    startTime: start,
-    endTime: end,
-  })
-    .then((res) => {
-      chartData.timestamps = res.data.timestamps || [];
-      chartData.values = res.data.values || [];
-      if (!chartData.timestamps.length) {
-        ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
-      }
-      setOption(chartOptions.value, true);
-    })
-    .catch(() => {
-      chartData.timestamps = [];
-      chartData.values = [];
-      setOption(chartOptions.value, true);
-    });
-}
-
 function getCustom() {
+  columns.value = [];
+  tableData.value = [];
   getCustomData(sqlValue.value)
     .then((res) => {
-      chartData.timestamps = res.data.timestamps || [];
-      chartData.values = res.data.values || [];
-      if (!chartData.timestamps.length) {
+      const list: DynamicTableColumn[] = [];
+      if (res.data?.outputs?.length > 0) {
+        res.data?.outputs?.forEach((item: AIAnalysis.CustomItem, index: number) => {
+          list.push({
+            label: item.name,
+            prop: `t${index}`,
+            defaultValue: '-',
+            fixed: index === 0 ? 'left' : undefined,
+            sortable: false,
+            // formatHeader: formatTimeseries,
+          });
+        });
+        columns.value = list;
+        const dataList: Record<string, any>[] = [];
+        if (res.data.outputs?.length > 0) {
+          res.data?.outputs[0].value.forEach((item, index) => {
+            const obj = {} as Record<string, string>;
+            res.data?.outputs.forEach((column, columnindex) => {
+              obj[`t${columnindex}`] = column.value[index];
+            });
+            dataList.push(obj);
+          });
+        }
+        tableData.value = dataList;
+      } else {
         ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
       }
-      setOption(chartOptions.value, true);
     })
-    .catch(() => {
-      chartData.timestamps = [];
-      chartData.values = [];
-      setOption(chartOptions.value, true);
+    .finally(() => {
+      getListLoading.value = false;
     });
 }
 
 // 查询
-function handleSearch(unforce?: boolean) {
+function handleSearch() {
   if (!canReadWriteData.value) return;
   copySearchFormData = cloneDeep(searchFormData);
-  if (!unforce) {
-    handleEmptyOperate();
-  }
-  if (!copySearchFormData.method) {
-    ElMessage.warning({
-      message: t('spectrum.applyTip'),
-      grouping: true,
-    });
-    return;
-  }
-  if (copySearchFormData.method === 'ENVELOPE') {
-    if (!copySearchFormData.measurement) {
-      ElMessage.warning({
-        message: t('spectrum.applyTip'),
-        grouping: true,
+  filterCondition.value = 'all';
+  currentPointValue.value = 0;
+  currentPage.value = 1;
+  allTableData.value = [];
+  analysisData.value = [];
+  rawData.value = [];
+  setOption(chartOptions.value, true);
+  if (searchFormData.type !== 2) {
+    const query: AIAnalysis.SearchCondition = {
+      modelType: searchFormData.type === 0 ? 'BUILT_IN_FORECAST' : 'BUILT_IN_ANOMALY_DETECTION',
+      modelId: searchFormData.method,
+      measurement: searchFormData.measurement,
+      startTime: searchFormData.type === 0 ? dayjs(searchFormData.forecastStart).valueOf() : dayjs(searchFormData.datetimerange[0]).valueOf(),
+      endTime: searchFormData.type === 1 ? dayjs(searchFormData.datetimerange[1]).valueOf() : undefined,
+      exceptionPercent: searchFormData.type === 1 ? searchFormData.anomalyRatio! / 100 : undefined,
+    };
+    search(query)
+      .then((res) => {
+        if (res.data.raw.length === 0 && res.data.analysis.length === 0) {
+          ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
+          return;
+        }
+        rawData.value = res.data.raw;
+        analysisData.value = res.data.analysis;
+        if (searchFormData.type === 0) {
+          allTableData.value = [...res.data.raw, ...res.data.analysis];
+        } else {
+          allTableData.value = res.data.raw;
+          analysisData.value.forEach((element, index) => {
+            if (element.value === '1') {
+              allTableData.value[index].isAnomaly = true;
+            }
+          });
+        }
+        minValue.value = Math.min(...rawData.value.map((item) => Number(item.value)));
+        if (!allTableData.value.length) {
+          ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
+        }
+        setOption(chartOptions.value, true);
+      })
+      .catch(() => {
+        currentPointValue.value = 0;
+        currentPage.value = 1;
+        rawData.value = [];
+        analysisData.value = [];
+        allTableData.value = [];
+        setOption(chartOptions.value, true);
       });
-      return;
-    }
-    getEnvelope();
-  } else if (copySearchFormData.method === 'DWT') {
-    if ((dwtTab.value === 'type' && !copySearchFormData.dwtMethod) || (dwtTab.value === 'number' && !copySearchFormData.coef)) {
-      ElMessage.warning({
-        message: t('spectrum.applyTip'),
-        grouping: true,
-      });
-      return;
-    }
-    getDwt();
-  } else if (['LOWPASS', 'HIGHPASS'].includes(copySearchFormData.method)) {
-    if (!copySearchFormData.wpass) {
-      ElMessage.warning({
-        message: t('spectrum.applyTip'),
-        grouping: true,
-      });
-      return;
-    }
-    getPass();
-  } else if (copySearchFormData.method === 'custom') {
-    if (!sqlValue.value) {
-      ElMessage.warning({
-        message: t('spectrum.applyTip'),
-        grouping: true,
-      });
-      return;
-    }
+  } else {
     getCustom();
-  } else {
-    if (!copySearchFormData.measurement) {
-      ElMessage.warning({
-        message: t('spectrum.applyTip'),
-        grouping: true,
-      });
-      return;
-    }
-    getFFT();
   }
 }
 
-function handleSaveTemplate() {
-  if (saveTemplateDisabled.value) return;
-  saveTemplateLoading.value = false;
-  templateVisible.value = true;
+function handleWriteBackSuccess(name: string) {
+  writeBackLoading.value = true;
+  const data = {
+    modelType: copySearchFormData.type === 0 ? 'BUILT_IN_FORECAST' : 'BUILT_IN_ANOMALY_DETECTION',
+    measurement: name,
+    dataType: copySearchFormData.measurementType,
+    raw: rawData.value,
+    analysis: analysisData.value,
+  };
+  writeBack(data)
+    .then(() => {
+      ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
+      writeBackVisible.value = false;
+    })
+    .finally(() => {
+      writeBackLoading.value = false;
+    });
 }
 
-// 模板操作
-function handleOperateTemplate(val: string, data: Search.TrendTemplate) {
-  if (val === 'rename') {
-    renameData.id = +data.id!;
-    renameData.name = data.name;
-    renameData.template = data.template;
-    saveTemplateLoading.value = false;
-    renameVisible.value = true;
+// 导出
+function handleExportData(exportType: string) {
+  if (copySearchFormData.type !== 2) {
+    const data = {
+      modelType: copySearchFormData.type === 0 ? 'BUILT_IN_FORECAST' : 'BUILT_IN_ANOMALY_DETECTION',
+      measurement: copySearchFormData.measurement,
+      dataType: copySearchFormData.measurementType,
+      raw: rawData.value,
+      analysis: analysisData.value,
+    };
+    getExportId(data).then((res) => {
+      const url = `/api/file/export${exportType !== 'csv' ? 'Excel' : ''}Analysis?exportId=${res.data}`;
+      window.open(url);
+    });
   } else {
-    const templateData = JSON.parse(data.template);
-    searchFormData.measurement = templateData.measurement;
-    searchFormData.method = templateData.method;
-    searchFormData.resultType = templateData.resultType;
-    searchFormData.compression = templateData.compression;
-    searchFormData.frequency = templateData.frequency;
-    searchFormData.amplification = templateData.amplification;
-    searchFormData.datetimerange = templateData.datetimerange;
-    searchFormData.dwtMethod = templateData.dwtMethod;
-    searchFormData.coef = templateData.coef;
-    searchFormData.layer = templateData.layer;
-    searchFormData.wpass = templateData.wpass;
-    dwtTab.value = templateData.dwtTab;
-    if (searchFormData.measurement && searchFormData.method === 'DWT') {
-      getCount();
-    }
-    handleSearch();
+    getCustomExportId(customData.value).then((res) => {
+      const url = `/api/file/export${exportType !== 'csv' ? 'Excel' : ''}AnalysisCustomize?exportId=${res.data}`;
+      window.open(url);
+    });
   }
 }
 
-function handleSaveSuccess(name: string) {
-  saveTemplateLoading.value = true;
-  const data = JSON.stringify({
-    ...searchFormData,
-    datetimerange: [dayjs(searchFormData.datetimerange[0]).valueOf(), dayjs(searchFormData.datetimerange[1]).valueOf()],
-    dwtTab: dwtTab.value,
-  });
-  upsertTrendTemplate({
-    id: '',
-    type: 'spectrum',
-    name,
-    template: data,
-  })
-    .then(() => {
-      ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
-      templateVisible.value = false;
-      templateListRef.value?.getQueryList();
-    })
-    .finally(() => {
-      saveTemplateLoading.value = false;
-    });
-}
-
-function handleRenameSuccess(name: string) {
-  saveTemplateLoading.value = true;
-  upsertTrendTemplate({
-    id: renameData.id,
-    type: 'spectrum',
-    name,
-    template: renameData.template,
-  })
-    .then(() => {
-      ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
-      renameVisible.value = false;
-      templateListRef.value?.getQueryList();
-    })
-    .finally(() => {
-      saveTemplateLoading.value = false;
-    });
+// 下载
+function handleCommandDown(val: string) {
+  if (val === 'saveToIoTDB') {
+    writeBackVisible.value = true;
+  } else {
+    handleExportData(val);
+  }
 }
 
 function handleSql() {
@@ -1352,23 +832,41 @@ function handleConfirmSql(val: string) {
   sqlValue.value = val;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function handleSortChange({ column, prop, order }: SortMethod<AIAnalysis.SearchDataItem>) {
+  searchFormData.orderBy = order;
+}
+/**
+ * Returns styles for a cell in the table. If the cell is in the second column
+ * and the row is marked as an anomaly, the text color is set to red.
+ *
+ * @param {Object} param0 - Information about the cell
+ * @param {AIAnalysis.SearchDataItem} param0.row - The row in the table
+ * @param {number} param0.columnIndex - The index of the column
+ * @returns {Object} - Styles to apply to the cell
+ */
+function handleCellStyle({ row, columnIndex }: { row: AIAnalysis.SearchDataItem; columnIndex: number }) {
+  if (columnIndex === 1) {
+    if (row.isAnomaly) {
+      return { color: 'red' };
+    }
+  }
+  if (row.time === currentPointValue.value) {
+    return { color: '#495AD4', fontWeight: '700' };
+  }
+  return {};
+}
+function handleFilter(val: string) {
+  currentPage.value = 1;
+  filterCondition.value = val;
+}
+
 function setStorage() {
   sessionStorage.setItem(
-    'dataSpectrumStorage',
+    'aiVisualizationStorage',
     JSON.stringify({
       ...copySearchFormData,
-      dwtTab: dwtTab.value,
-      clickedOperate: clickedOperate.value,
-      markPointCount: markPointCount.value,
-      pointLineData: pointLineData.value,
-      pointList: pointList.value,
-      harmonicFrequency: harmonicFrequency.value,
-      frequencyInterval: frequencyInterval.value,
-      sideband: sideband.value,
-      sidebandData: sidebandData.value,
       sqlValue: sqlValue.value,
-      clickedStatus: { ...clickedStatus },
-      drawedStatus: { ...drawedStatus },
       currentPoint,
     })
   );
@@ -1388,7 +886,7 @@ onMounted(() => {
       chartInstance.dispose();
     }
   });
-  getUdfList();
+  getModelList();
 });
 
 onBeforeUnmount(() => {
@@ -1405,7 +903,7 @@ onUnmounted(() => {
 
 watch(locale, () => {
   nextTick(() => {
-    getUdfList();
+    getModelList();
     setOption(chartOptions.value);
   });
 });
@@ -1415,57 +913,20 @@ watch(
   (val) => {
     setOption(chartOptions.value);
     if (val) {
-      if (sessionStorage.getItem('dataSpectrumStorage')) {
-        const storageData = JSON.parse(sessionStorage.getItem('dataSpectrumStorage') as string);
+      if (sessionStorage.getItem('aiVisualizationStorage')) {
+        const storageData = JSON.parse(sessionStorage.getItem('aiVisualizationStorage') as string);
         searchFormData.measurement = storageData.measurement;
-        if (searchFormData.measurement) {
-          searchFormData.method = storageData.method;
-          searchFormData.resultType = storageData.resultType;
-          searchFormData.compression = storageData.compression;
-          searchFormData.frequency = storageData.frequency;
-          searchFormData.amplification = storageData.amplification;
-          searchFormData.datetimerange = storageData.datetimerange;
-          searchFormData.dwtMethod = storageData.dwtMethod;
-          searchFormData.coef = storageData.coef;
-          searchFormData.layer = storageData.layer;
-          searchFormData.wpass = storageData.wpass;
-          markPointCount.value = storageData.markPointCount;
-          dwtTab.value = storageData.dwtTab;
-          if (searchFormData.method === 'DWT' && searchFormData.measurement) {
-            getCount();
-          }
-          const cursorData = storageData.pointLineData
-            .filter((f: MarkPointLine) => f.type === 'cursor')
-            .map((item: MarkPointLine, index: number) => ({
-              ...item,
-              label: {
-                formatter: () => (markPointCount.value === 1 ? 'D' : `D${index + 1}`),
-                position: 'end',
-                color: '#fff',
-              },
-            }));
-          const otherData = storageData.pointLineData.filter((f: MarkPointLine) => f.type !== 'cursor');
-          pointLineData.value = [...cursorData, ...otherData];
-          pointList.value = storageData.pointList;
-          harmonicFrequency.value = storageData.harmonicFrequency;
-          frequencyInterval.value = storageData.frequencyInterval;
-          sqlValue.value = storageData.sqlValue;
-          sideband.value = storageData.sideband;
-          clickedStatus.cursor = false;
-          clickedStatus.frequency = storageData.clickedStatus.frequency;
-          drawedStatus.frequency = storageData.drawedStatus.frequency;
-          clickedOperate.value = '';
-          if (storageData.sidebandData.length < 2) {
-            clickedStatus.sideband = false;
-            drawedStatus.sideband = false;
-            sidebandData.value = [];
-          } else {
-            clickedStatus.sideband = storageData.clickedStatus.sideband;
-            drawedStatus.sideband = storageData.drawedStatus.sideband;
-            sidebandData.value = storageData.sidebandData;
-          }
-          currentPoint = storageData.currentPoint;
-          handleSearch(true);
+        searchFormData.type = storageData.type;
+        searchFormData.method = storageData.method;
+        searchFormData.measurementType = storageData.measurementType;
+        searchFormData.anomalyRatio = storageData.anomalyRatio;
+        searchFormData.forecastStart = storageData.forecastStart;
+        searchFormData.datetimerange = storageData.datetimerange;
+        searchFormData.orderBy = storageData.orderBy;
+        sqlValue.value = storageData.sqlValue;
+        currentPoint = storageData.currentPoint;
+        if (canQuery.value) {
+          handleSearch();
         }
       }
     }
@@ -1477,11 +938,11 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-.data-spectrum-wrapper {
+.visualization-wrapper {
   border-radius: 6px;
   background: #fff;
   box-sizing: border-box;
-  padding: 26px 16px 16px 30px;
+  padding: 26px 0 16px;
 }
 
 .search-form-box {
@@ -1499,13 +960,13 @@ watch(
     display: flex;
     justify-content: space-between;
   }
+}
 
-  .search-form-buttons {
-    margin-left: 12px;
-    display: inline-flex;
-    flex-wrap: nowrap;
-    align-self: end;
-  }
+.search-form-buttons {
+  margin-left: 12px;
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-self: end;
 }
 
 .search-method-params-box {
@@ -1552,7 +1013,7 @@ watch(
 
 .chart-detail-wrapper {
   width: 100%;
-  height: 100%;
+  padding: 8px 16px 0 30px;
 }
 
 .chart-container {
@@ -1703,6 +1164,90 @@ watch(
   line-height: 17px;
   color: #495ad4;
   margin: 14px 5px 0;
+}
+
+.trend-tip {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 12px;
+  line-height: 12px;
+  color: #656a85;
+  font-weight: 300;
+}
+
+.info-title {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 21px;
+  color: #495ad4;
+  padding: 0 10px 6px 30px;
+  border-bottom: 1px solid #dfe1ed;
+}
+
+.detail-pager {
+  padding-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detail-total {
+  font-size: 12px;
+  font-weight: 700;
+  color: #495ad4;
+}
+
+.flex-header {
+  display: flex;
+  max-width: 100%;
+}
+
+.filter-btn {
+  position: absolute;
+  z-index: 9999;
+  right: 14px;
+  top: 22px;
+}
+
+.page-table-details {
+  padding: 8px 16px;
+  border-radius: 2px;
+  background: #f7f8fc;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  .page-info-title {
+    display: flex;
+    font-size: 14px;
+    line-height: 20px;
+    color: #495ad4;
+
+    .run-result-tip {
+      align-self: flex-end;
+      margin: 0 0 0 12px;
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      color: #808080;
+      font-weight: 400;
+
+      svg {
+        color: #ccc;
+        margin-right: 4px;
+      }
+    }
+  }
+
+  .page-info-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
 }
 </style>
 <style lang="scss">

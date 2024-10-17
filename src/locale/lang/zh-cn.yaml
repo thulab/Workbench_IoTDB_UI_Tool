@@ -186,7 +186,7 @@ page:
   calculate: 计算
   view: 视图
   config: 数据库配置
-  aiAnalysis: AI分析
+  aiAnalysis: AI 分析
 measurement:
   databaseTitle: 数据库
   searchPlaceholder: 请输入搜索内容
@@ -850,7 +850,7 @@ iotdbConfig:
   nodeEffect: 节点生效
   allEffect: 全部生效
 aiAnalysis:
-  visualization: AI可视化
+  visualization: AI 可视化
   modelManagement: 模型管理
   modelName: 模型名称
   modelNamePlaceholder: 请输入模型名称
@@ -872,3 +872,29 @@ aiAnalysis:
   modelNameExist: 名称已被使用，请更改
   batchDelete: 确认删除这些模型吗？
   singleDelete: 确认删除这个模型吗？
+  business: 业务场景
+  forecast: 预测
+  anomalyDetection: 异常检测
+  custom: 自定义
+  modelSelect: 模型选择
+  forecastResult: 测点预测结果
+  forecastStart: 预测起始时间
+  forecastData: 预测数据范围
+  forecast96: 当前模型默认预测未来 96 个点
+  detectionTime: 检测时间
+  anomalyRatio: 异常比例
+  anomalyRatioTip: 异常比例指在所选测点中异常测点所占的百分比，如设置为 10%，算法会尝试标记约 10%的异常数据点。本比例非精确保证，实际识别出的结果会随数据特性和分布变化。
+  pleaseInputPercent: 请输入百分比
+  saveToIoTDB: 数据写回 IoTDB
+  writeBack: 数据写回
+  sourceName: 原始测点
+  newName: 新测点名称
+  time: 时间
+  rawValue: 真实值
+  forecastValue: 预测值
+  anomalyPoint: 异常点
+  total: 共计 {total} 个点
+  all: 全部
+  normalValue: 正常值
+  anomalyValue: 异常值
+  sqlConfrimTip: 保存成功，请点击查询按钮查看结果

@@ -20,4 +20,24 @@ export default class AIAnalysisApi {
     formData.append('modelId', modelId);
     return http.post('/ai-analysis/importModel', formData);
   }
+
+  static search(data: AIAnalysis.SearchCondition): HttpResponseP<AIAnalysis.SearchDataResult> {
+    return http.post('/ai-analysis/search', data);
+  }
+
+  static getCustomData(sql: string): HttpResponseP<{ outputs: AIAnalysis.CustomItem[] }> {
+    return http.post('/ai-analysis/customize', { sql });
+  }
+
+  static writeBack(data: AIAnalysis.SearchDataResult & { modelType: string; measurement: string; dataType: string }): HttpResponseP {
+    return http.post('/ai-analysis/writeBack', data);
+  }
+
+  static getExportId(data: AIAnalysis.SearchDataResult & { modelType: string; measurement: string; dataType: string }): HttpResponseP<String> {
+    return http.post('/file/analysisExportId', data);
+  }
+
+  static getCustomExportId(data: { outputs: AIAnalysis.CustomItem[] }): HttpResponseP<String> {
+    return http.post('/file/analysisCustomizeExportId', data);
+  }
 }
