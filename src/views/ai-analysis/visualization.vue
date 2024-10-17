@@ -80,7 +80,7 @@
                         id="search-datetimerange"
                       />
                     </base-form-item>
-                    <base-form-item :label="`${t('aiAnalysis.anomalyRatio')}：`" :rules="requiredRules" class="m-r-0">
+                    <base-form-item :label="`${t('aiAnalysis.anomalyRatio')}：`" v-if="searchFormData.method === '_Stray'" class="m-r-0">
                       <template #label>
                         {{ t('aiAnalysis.anomalyRatio') }}：
                         <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
@@ -90,7 +90,7 @@
                           <i-custom-question />
                         </el-tooltip>
                       </template>
-                      <el-input-number v-model="searchFormData.anomalyRatio" :min="0" :max="100" :controls="false" :placeholder="t('aiAnalysis.pleaseInputPercent')" style="width: 104px" />
+                      <el-input-number v-model="searchFormData.anomalyRatio" :min="1" :max="99" :controls="false" :placeholder="t('aiAnalysis.pleaseInputPercent')" style="width: 104px" />
                       %
                     </base-form-item>
                   </template>
@@ -216,7 +216,7 @@
                     </el-table-column>
                   </el-table>
                   <div class="detail-pager">
-                    <span class="detail-total">{{ t('aiAnalysis.total', { total: allTableData.length }) }}</span>
+                    <span class="detail-total">{{ t('aiAnalysis.total', { total: sortedData.length }) }}</span>
                     <el-pagination :page-size="pageSize" v-model:current-page="currentPage" size="small" :background="true" :pager-count="5" layout="prev, pager, next" :total="sortedData.length" />
                   </div>
                 </el-aside>
@@ -361,7 +361,7 @@ const notComplete = computed(() => {
   if (searchFormData.type === 0 && (!searchFormData.method || !searchFormData.measurement || !searchFormData.forecastStart)) {
     return true;
   }
-  if (searchFormData.type === 1 && (!searchFormData.method || !searchFormData.measurement || !searchFormData.datetimerange || !searchFormData.anomalyRatio)) {
+  if (searchFormData.type === 1 && (!searchFormData.method || !searchFormData.measurement || !searchFormData.datetimerange)) {
     return true;
   }
   if (searchFormData.type === 2 && !sqlValue.value) {
@@ -392,7 +392,7 @@ const modelOptions = computed(() => {
     case 0:
       return modelList.value.filter((item) => item.modelId === 'Timer').concat(modelList.value.filter((item) => item.modelTypeValue === 'BUILT_IN_FORECAST'));
     case 1:
-      return modelList.value.filter((item) => item.modelId === '_Stray');
+      return modelList.value.filter((item) => item.modelTypeValue === 'BUILT_IN_ANOMALY_DETECTION').reverse();
     case 2:
       return modelList.value.filter((item) => item.modelTypeValue === 'USER_DEFINED' && item.modelId !== 'Timer');
     default:
@@ -735,7 +735,7 @@ function handleSearch() {
       measurement: searchFormData.measurement,
       startTime: searchFormData.type === 0 ? dayjs(searchFormData.forecastStart).valueOf() : dayjs(searchFormData.datetimerange[0]).valueOf(),
       endTime: searchFormData.type === 1 ? dayjs(searchFormData.datetimerange[1]).valueOf() : undefined,
-      exceptionPercent: searchFormData.type === 1 ? searchFormData.anomalyRatio! / 100 : undefined,
+      exceptionPercent: searchFormData.method === '_Stray' && searchFormData.anomalyRatio ? searchFormData.anomalyRatio! / 100 : undefined,
     };
     search(query)
       .then((res) => {
@@ -746,7 +746,7 @@ function handleSearch() {
         rawData.value = res.data.raw;
         analysisData.value = res.data.analysis;
         if (searchFormData.type === 0) {
-          allTableData.value = [...res.data.raw, ...res.data.analysis];
+          allTableData.value = [...res.data.analysis];
         } else {
           allTableData.value = res.data.raw;
           analysisData.value.forEach((element, index) => {
@@ -795,7 +795,7 @@ function handleWriteBackSuccess(name: string) {
 
 // 导出
 function handleExportData(exportType: string) {
-  if (allTableData.value.length === 0 || tableData.value.length === 0) return;
+  if (allTableData.value.length === 0 && tableData.value.length === 0) return;
   if (copySearchFormData.type !== 2) {
     const data = {
       modelType: copySearchFormData.type === 0 ? 'BUILT_IN_FORECAST' : 'BUILT_IN_ANOMALY_DETECTION',
