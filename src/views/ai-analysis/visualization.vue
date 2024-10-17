@@ -120,14 +120,14 @@
                 <div class="search-form-buttons">
                   <el-dropdown class="more-icon m-l-12" :disabled="!canReadWriteData || !canQuery" @command="(val) => handleCommandDown(val)" id="visualization-save-dropdown">
                     <el-button :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" id="visualization-download" :disabled="!canReadWriteData">
-                      {{ searchFormData.type === 0 ? t('common.save') : t('common.export') }}
+                      {{ saveText }}
                       <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                     </el-button>
                     <template #dropdown>
                       <el-dropdown-menu>
                         <el-dropdown-item command="csv" id="visualization-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
                         <el-dropdown-item command="xlsx" id="visualization-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
-                        <el-dropdown-item v-if="searchFormData.type === 0" command="saveToIoTDB" id="visualization-saveToIoTDB">{{ t('aiAnalysis.saveToIoTDB') }}</el-dropdown-item>
+                        <el-dropdown-item v-if="canWrithBack" command="saveToIoTDB" id="visualization-saveToIoTDB">{{ t('aiAnalysis.saveToIoTDB') }}</el-dropdown-item>
                       </el-dropdown-menu>
                     </template>
                   </el-dropdown>
@@ -217,16 +217,7 @@
                   </el-table>
                   <div class="detail-pager">
                     <span class="detail-total">{{ t('aiAnalysis.total', { total: allTableData.length }) }}</span>
-                    <el-pagination
-                      :page-size="pageSize"
-                      v-model:current-page="currentPage"
-                      class="el-pagination--small"
-                      size="small"
-                      :background="true"
-                      :pager-count="3"
-                      layout="prev, pager, next"
-                      :total="sortedData.length"
-                    />
+                    <el-pagination :page-size="pageSize" v-model:current-page="currentPage" size="small" :background="true" :pager-count="5" layout="prev, pager, next" :total="sortedData.length" />
                   </div>
                 </el-aside>
               </el-container>
@@ -264,7 +255,7 @@ import ModalWriteBack from './components/modal-write-back.vue';
 const { t, locale } = useI18n();
 
 const userStore = useUserStore();
-const { canReadWriteData } = storeToRefs(userStore);
+const { canReadWriteData, canWriteData } = storeToRefs(userStore);
 const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
 const modelList = ref<Array<AIAnalysis.Model>>([]);
@@ -299,6 +290,8 @@ const { shortcutsDaterange } = useShortcutsDate();
 
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 
+const saveText = computed(() => (searchFormData.type === 0 ? t('common.save') : t('common.export')));
+const canWrithBack = computed(() => searchFormData.type === 0 && canWriteData.value);
 const rawData = ref<AIAnalysis.SearchDataItem[]>([]);
 const analysisData = ref<AIAnalysis.SearchDataItem[]>([]);
 const allTableData = ref<AIAnalysis.SearchDataItem[]>([]);
@@ -619,9 +612,11 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
     });
   } else {
     // 容器高度有问题时，延迟加载
-    nextTick(() => {
-      setOption(option);
-    });
+    setTimeout(() => {
+      nextTick(() => {
+        setOption(option);
+      });
+    }, 300);
   }
 };
 
@@ -1247,6 +1242,17 @@ watch(
     justify-content: space-between;
     align-items: center;
     margin-bottom: 12px;
+  }
+}
+
+.el-pagination--small {
+  --el-pagination-button-width-small: 20px;
+  --el-pagination-button-height-small: 20px;
+
+  :deep(.btn-prev),
+  :deep(.btn-next),
+  :deep(.el-pager li) {
+    margin: 0 2px !important;
   }
 }
 </style>
