@@ -172,8 +172,8 @@
                 </div>
               </h4>
               <p class="trend-tip p-l-30 m-t-12">
-                <el-icon size="16" style="margin-right: 6px"><i-custom-info-warning /></el-icon>
-                <span v-html="t('dataTrend.trendTip', { tip })"></span>
+                <!-- <el-icon size="16" style="margin-right: 6px"><i-custom-info-warning /></el-icon>
+                <span v-html="t('dataTrend.trendTip', { tip })"></span> -->
               </p>
             </el-header>
             <el-main class="chart-detail-wrapper">
@@ -260,7 +260,7 @@ const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
 const modelList = ref<Array<AIAnalysis.Model>>([]);
 
-const tip = '<span style="color:#495AD4;font-weight: 700;"> 2000 </span>';
+// const tip = '<span style="color:#495AD4;font-weight: 700;"> 2000 </span>';
 
 const connectionStore = useConnectionStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
