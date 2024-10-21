@@ -622,7 +622,7 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
       nextTick(() => {
         setOption(option);
       });
-    }, 10);
+    }, 10) as unknown as number;
   }
 };
 
