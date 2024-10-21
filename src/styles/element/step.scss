@@ -1,6 +1,6 @@
 .el-step__title {
   font-size: 14px !important;
-  line-height: 21px !important;
+  line-height: 25px !important;
   font-weight: 700;
 }
 
@@ -8,7 +8,7 @@
   height: 1px !important;
   background-color: #dfe1ed !important;
 
-  // margin: 0 10px !important;
+  // margin: 0 10px !important;marginmarginmarginmarginmarginmarginmargin
 }
 
 .el-step__title.is-process {
@@ -30,10 +30,11 @@
 }
 
 .el-step__title.is-success {
-  color: #424561 !important;
+  color: #495ad4 !important;
 }
 
-.el-step__head.is-success {
+.el-step__head.is-success,
+.el-step__head.is-finish {
   color: #495ad4 !important;
   border-color: #495ad4 !important;
 
