@@ -22,7 +22,7 @@ export default function useWebsocket(url: string, receiveData: Function, isInit:
         socketInstance.value.close();
       }
       // 实例化socket
-      socketInstance.value = new WebSocket(`ws://${window.location.host}${url}`);
+      socketInstance.value = new WebSocket(`${window.location.protocol === 'http:' ? 'ws:' : 'wss:'}//${window.location.host}${url}`);
       // 监听socket连接
       socketInstance.value.onopen = () => {
         console.log('WebSocket opened.');
