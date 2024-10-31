@@ -264,6 +264,7 @@ const modelList = ref<Array<AIAnalysis.Model>>([]);
 
 const connectionStore = useConnectionStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
+let defaultMethod = 'Timer';
 
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive<{
@@ -279,7 +280,7 @@ const searchFormData = reactive<{
   type: 0,
   measurement: '',
   measurementType: '',
-  method: 'Timer',
+  method: defaultMethod,
   datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
   forecastStart: todayNow() as DateModelType,
   anomalyRatio: undefined,
@@ -657,6 +658,12 @@ const onResize = debounce(() => {
 function getModelList() {
   getModels('').then((res) => {
     modelList.value = res.data || [];
+    if (modelList.value.some((m) => m.modelId === 'Timer')) {
+      defaultMethod = 'Timer';
+    } else {
+      defaultMethod = modelList.value.filter((item) => item.modelTypeValue === 'BUILT_IN_FORECAST')[0].modelId;
+      searchFormData.method = defaultMethod;
+    }
   });
 }
 
@@ -666,7 +673,7 @@ function handleReset() {
   searchFormData.measurement = '';
   searchFormData.method = '';
   searchFormData.measurementType = '';
-  searchFormData.method = 'Timer';
+  searchFormData.method = defaultMethod;
   searchFormData.datetimerange = getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType];
   searchFormData.forecastStart = todayNow() as DateModelType;
   searchFormData.anomalyRatio = undefined;
