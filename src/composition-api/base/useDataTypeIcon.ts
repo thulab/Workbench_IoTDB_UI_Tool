@@ -10,6 +10,10 @@ export function useDataTypeIcon() {
       DOUBLE: 'DOUBLE',
       FLOAT: 'FLOAT',
       TIME: 'time',
+      TIMESTAMP: 'time',
+      DATE: 'time',
+      STRING: 'TEXT',
+      BLOB: 'TEXT',
     },
   });
   const getIconName = (icon?: IotdbDataType | 'TIME') => {
