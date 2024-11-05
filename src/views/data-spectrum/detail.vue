@@ -464,7 +464,7 @@ const xMax = computed(() => chartData.timestamps[chartData.timestamps.length - 1
 const methodOptions = computed(() => [...methodList.value, { functionName: 'custom', name: t('spectrum.customAnalysis'), enable: true }]);
 
 function disabledPath(item: StorageDevice.MeasurementDataItem) {
-  return item.dataType === 'BOOLEAN' || item.dataType === 'TEXT';
+  return item.dataType === 'BOOLEAN' || item.dataType === 'TEXT' || item.dataType === 'TIMESTAMP' || item.dataType === 'STRING' || item.dataType === 'BLOB' || item.dataType === 'DATE';
 }
 
 function handleExpand() {

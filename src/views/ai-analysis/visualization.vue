@@ -402,7 +402,7 @@ const modelOptions = computed(() => {
 });
 
 function disabledPath(item: StorageDevice.MeasurementDataItem) {
-  return item.dataType === 'BOOLEAN' || item.dataType === 'TEXT';
+  return item.dataType === 'BOOLEAN' || item.dataType === 'TEXT' || item.dataType === 'TIMESTAMP' || item.dataType === 'STRING' || item.dataType === 'BLOB' || item.dataType === 'DATE';
 }
 
 const anomalyPoints = computed(() => {

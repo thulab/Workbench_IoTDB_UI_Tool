@@ -102,7 +102,7 @@ declare global {
     keyword?: string | null;
   }
 
-  type IotdbDataType = 'BOOLEAN' | 'INT32' | 'INT64' | 'FLOAT' | 'DOUBLE' | 'TEXT';
+  type IotdbDataType = 'BOOLEAN' | 'INT32' | 'INT64' | 'FLOAT' | 'DOUBLE' | 'TEXT' | 'TIMESTAMP' | 'DATE' | 'STRING' | 'BLOB';
   type EncodingType = 'RLE' | 'PLAIN' | 'TS_2DIFF' | 'GORILLA' | 'ZIGZAG' | 'CHIMP' | 'SPRINTZ' | 'RLBE' | 'DICTIONARY';
   type CompressionType = 'UNCOMPRESSED' | 'SNAPPY' | 'LZ4' | 'GZIP' | 'ZSTD' | 'LZMA2';
 
