@@ -42,7 +42,7 @@ const route = [
       icon: ICustomQuerySQL,
       activeIcon: ICustomQuerySQLActive,
       showTopLine: true,
-      order: 25,
+      order: 22,
     },
     children: [
       {
