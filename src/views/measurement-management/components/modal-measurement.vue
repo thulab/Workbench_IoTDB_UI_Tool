@@ -52,6 +52,16 @@
                   </div>
                 </base-form-item>
               </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="24">
+                <base-form-item :prop="`measurementList[${index}].description`" class="m-r-0 el-form-item-not-mandatory" :label-width="locale === 'en' ? '108px' : '92px'">
+                  <template #label>{{ t('measurement.measurementAlias') }}：</template>
+                  <el-input v-model="item.alias" :placeholder="t('measurement.aliasPlaceholder')" :id="`measurement-modal-collapse-${index}-description`" maxlength="100" show-word-limit />
+                </base-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
               <el-col :span="24">
                 <base-form-item :prop="`measurementList[${index}].description`" class="m-r-0 el-form-item-not-mandatory" :label-width="locale === 'en' ? '108px' : '92px'">
                   <template #label>
@@ -65,6 +75,17 @@
                     maxlength="100"
                     show-word-limit
                   />
+                </base-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="24">
+                <base-form-item :prop="`measurementList[${index}].description`" class="m-r-0 el-form-item-not-mandatory" :label-width="locale === 'en' ? '108px' : '92px'">
+                  <template #label>
+                    {{ t('measurement.tag') }}：
+                    <el-tooltip effect="light" :content="t('measurement.tagTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+                  </template>
+                  <el-input v-model="item.tags" :placeholder="t('measurement.tagPlaceholder')" :id="`measurement-modal-collapse-${index}-description`" maxlength="100" show-word-limit />
                 </base-form-item>
               </el-col>
             </el-row>

@@ -23,6 +23,10 @@ class StorageApi {
     return http.post('/schema/alterDescription', { measurement, description });
   }
 
+  static saveAlias(measurement: string, description: string): HttpResponseP {
+    return http.post('/schema/alterAlias', { measurement, description });
+  }
+
   // 更新存储组TTL
   static upsertDatabaseTTL(data: StorageDevice.SaveDatabaseRequest): HttpResponseP {
     return http.post('/schema/upsertDatabaseTTL', data);

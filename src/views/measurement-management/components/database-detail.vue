@@ -176,6 +176,15 @@
           >
             <template #default="{ row }">
               <template v-if="column.prop === 'timeseries'">{{ `${row.deviceName}.${row.timeseries}` }}</template>
+              <div class="row-description-box" v-else-if="column.prop === 'alias'">
+                <div class="row-description-text">
+                  <text-tooltip :content="row.alias || ''" />
+                </div>
+                <div v-if="row.viewType !== 'VIEW'" class="edit-box flex-align-center" @click="handleEditAlias(row)">
+                  <i-custom-edit-normal class="edit-icon" />
+                  <i-custom-edit-active class="edit-icon-active" />
+                </div>
+              </div>
               <div class="row-description-box" v-else-if="column.prop === 'description'">
                 <div class="row-description-text">
                   <text-tooltip :content="row.description || ''" />
@@ -184,6 +193,9 @@
                   <i-custom-edit-normal class="edit-icon" />
                   <i-custom-edit-active class="edit-icon-active" />
                 </div>
+              </div>
+              <div class="row-description-box" v-else-if="column.prop === 'tags'">
+                <el-button link type="primary" @click="handleTagDetail(row)">{{ t('common.detail') }}</el-button>
               </div>
               <template v-else-if="column.prop === 'viewType'">
                 {{ row.viewType === 'VIEW' ? `${pageText}` : t('measurement.baseMeasurement') }}
@@ -274,6 +286,10 @@
     <modal-import v-model:visible="importVisible" @handle-close="handleImportClose" />
 
     <modal-description v-model:visible="descriptionVisible" :measurement="editMeasurement" :description="editDescription" @handleSave="getListData" />
+
+    <modal-alias v-model:visible="aliasVisible" :measurement="editMeasurement" :description="editAlias" @handleSave="getListData" />
+
+    <modal-tag v-model:visible="tagVisible" :measurement="editMeasurement" :description="editTags" />
   </div>
 </template>
 
@@ -290,6 +306,8 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalMeasurement from './modal-measurement.vue';
 import ModalImport from './modal-import.vue';
 import ModalDescription from './modal-description.vue';
+import ModalAlias from './modal-alias.vue';
+import ModalTag from './modal-tag.vue';
 
 const props = defineProps<{
   currentDatabase: string;
@@ -327,8 +345,12 @@ const multipleSelection = ref<StorageDevice.MeasurementItem[]>([]);
 const measurementVisible = ref(false);
 const importVisible = ref(false);
 const descriptionVisible = ref(false);
+const aliasVisible = ref(false);
+const tagVisible = ref(false);
 const editMeasurement = ref('');
 const editDescription = ref('');
+const editAlias = ref('');
+const editTags = ref('');
 const searchType = ref('name');
 const searchPlaceholder = computed(() => (searchType.value === 'name' ? t('calculate.namePlaceholder') : t('calculate.descPlaceholder')));
 
@@ -336,7 +358,9 @@ const colButtonRef = ref();
 const colPopoverRef = ref();
 const allColumns = ref<Array<{ label: string; prop: string; width: number }>>([
   { label: 'measurement.measurementName', prop: 'timeseries', width: 240 },
+  { label: 'measurement.alias', prop: 'alias', width: 140 },
   { label: 'measurement.measurementDescription', prop: 'description', width: 160 },
+  { label: 'measurement.tag', prop: 'tags', width: 120 },
   { label: 'measurement.dataType', prop: 'dataType', width: 140 },
   { label: 'measurement.measurementType', prop: 'viewType', width: 200 },
   { label: 'measurement.deviceAlign', prop: 'isAligned', width: 200 },
@@ -650,6 +674,17 @@ function handleImportClose(reload: boolean) {
     getDatabaseDetail(props.currentDatabase);
     handleRefresh();
   }
+}
+
+function handleEditAlias(row: StorageDevice.MeasurementItem) {
+  editMeasurement.value = `${row.deviceName}.${row.timeseries}`;
+  editAlias.value = row.alias || '';
+  aliasVisible.value = true;
+}
+function handleTagDetail(row: StorageDevice.MeasurementItem) {
+  editMeasurement.value = `${row.deviceName}.${row.timeseries}`;
+  editTags.value = row.tags || '';
+  tagVisible.value = true;
 }
 
 function handleEditDescription(row: StorageDevice.MeasurementItem) {

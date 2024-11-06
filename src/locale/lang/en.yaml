@@ -226,11 +226,16 @@ measurement:
   measurementNamePlaceholder: Please enter the measurement name
   measurementNameSelectPlaceholder: Please select a measurement
   alias: Alias
+  measurementAlias: Alias
+  tag: Tag
+  tagDetail: Tag Details
+  tagTip: 标签输入格式为“key=value”，若输入多个标签请使用“;”进行切割
   descriptionTip: >-
     Only supports input of uppercase and lowercase letters, numbers,
     underscores, UNICODE Chinese characters, special characters and real numbers
     need to be quoted with backticks
-  aliasPlaceholder: Please enter an alias
+  aliasPlaceholder: Please enter the measurement alias
+  tagPlaceholder: Please enter the tag
   dataType: Data Type
   encoding: Encoding
   compression: Compression
