@@ -112,118 +112,120 @@
             </el-form>
           </div>
         </el-header>
-        <el-main class="p-0 position-relative">
-          <el-container class="position-absolute p-x-16" style="height: 100%; width: 100%; z-index: 1000" v-if="searchFormData.type === 2">
-            <el-main class="page-table-details">
-              <div class="page-info-box">
-                <span></span>
-                <div class="search-form-buttons">
-                  <el-dropdown class="more-icon m-l-12" :disabled="!canReadWriteData || !canQuery" @command="(val) => handleCommandDown(val)" id="visualization-save-dropdown">
-                    <el-button :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" id="visualization-download" :disabled="!canReadWriteData">
-                      {{ saveText }}
-                      <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
-                    </el-button>
-                    <template #dropdown>
-                      <el-dropdown-menu>
-                        <el-dropdown-item command="csv" id="visualization-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
-                        <el-dropdown-item command="xlsx" id="visualization-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
-                        <el-dropdown-item v-if="canWrithBack" command="saveToIoTDB" id="visualization-saveToIoTDB">{{ t('aiAnalysis.saveToIoTDB') }}</el-dropdown-item>
-                      </el-dropdown-menu>
-                    </template>
-                  </el-dropdown>
-                </div>
-              </div>
-              <div v-loading="false">
-                <dynamic-table
-                  :columns="columns"
-                  :table-data="tableDataPagination"
-                  :height="maxCustomTableHeight"
-                  :max-height="maxCustomTableHeight"
-                  v-model:current-page="pagination.pageNum"
-                  v-model:page-size="pagination.pageSize"
-                  :total="tableData.length"
-                  :show-pagination="true"
-                />
-              </div>
-            </el-main>
-          </el-container>
-          <el-container class="p-0 position-absolute" style="height: 100%; width: 100%" :style="{ opacity: searchFormData.type === 2 ? 0 : 1 }">
-            <el-header class="p-0">
-              <h4 class="info-title">
-                <span v-if="searchFormData.type !== 2">
-                  <span class="m-r-4">{{ searchFormData.measurement }}</span>
-                  {{ t('aiAnalysis.forecastResult') }}
-                </span>
-                <span v-else></span>
-                <div class="search-form-buttons p-r-8">
-                  <el-dropdown class="more-icon m-l-12" :disabled="!canReadWriteData || !canQuery" @command="(val) => handleCommandDown(val)" id="visualization-save-dropdown">
-                    <el-button :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" id="visualization-download" :disabled="!canReadWriteData">
-                      {{ searchFormData.type === 0 ? t('common.save') : t('common.export') }}
-                      <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
-                    </el-button>
-                    <template #dropdown>
-                      <el-dropdown-menu>
-                        <el-dropdown-item command="csv" id="visualization-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
-                        <el-dropdown-item command="xlsx" id="visualization-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
-                        <el-dropdown-item v-if="searchFormData.type === 0" command="saveToIoTDB" id="visualization-saveToIoTDB">{{ t('aiAnalysis.saveToIoTDB') }}</el-dropdown-item>
-                      </el-dropdown-menu>
-                    </template>
-                  </el-dropdown>
-                </div>
-              </h4>
-              <p class="trend-tip p-l-30 m-t-12">
-                <!-- <el-icon size="16" style="margin-right: 6px"><i-custom-info-warning /></el-icon>
-                <span v-html="t('dataTrend.trendTip', { tip })"></span> -->
-              </p>
-            </el-header>
-            <el-main class="chart-detail-wrapper">
-              <el-container style="height: 100%">
-                <el-main class="p-0" style="position: relative">
-                  <div ref="chartContainer" class="chart-container" :style="`height: ${'calc(100% );'}`" v-element-size="onResize"></div>
-                </el-main>
-                <el-aside
-                  width="352px"
-                  class="p-16 m-l-16 position-relative"
-                  style="display: flex; flex-direction: column; background-color: #f7f8fc; padding-bottom: 10px !important; overflow: hidden"
-                >
-                  <el-dropdown v-if="copySearchFormData.type === 1" placement="bottom" class="filter-btn" @command="(val) => handleFilter(val)">
-                    <el-button link id="filter-btn">
-                      <i-custom-filter style="width: 24px; height: 24px" />
-                    </el-button>
-                    <template #dropdown>
-                      <el-dropdown-menu>
-                        <el-dropdown-item command="all">{{ t('aiAnalysis.all') }}</el-dropdown-item>
-                        <el-dropdown-item command="normal">{{ t('aiAnalysis.normalValue') }}</el-dropdown-item>
-                        <el-dropdown-item command="anomaly">{{ t('aiAnalysis.anomalyValue') }}</el-dropdown-item>
-                      </el-dropdown-menu>
-                    </template>
-                  </el-dropdown>
-
-                  <el-table height="100%" :data="paginatedData" @sort-change="handleSortChange" :cell-style="handleCellStyle">
-                    <el-table-column
-                      prop="time"
-                      :label="t('aiAnalysis.time')"
-                      sortable="custom"
-                      :sort-orders="['ascending', 'descending']"
-                      :formatter="formatterTime"
-                      show-overflow-tooltip
-                      width="170"
-                    />
-                    <el-table-column prop="value" :label="copySearchFormData.type === 0 ? t('aiAnalysis.forecastValue') : copySearchFormData.measurement" show-overflow-tooltip width="150">
-                      <template #header="{ column }">
-                        <span class="flex-header"><text-tooltip :content="column.label" /></span>
+        <auth-container :is-auth="canUseModel && canReadWriteData" :content="'common.dataAndModelAuth'" style="height: 100%; width: 100%">
+          <el-main class="p-0 position-relative">
+            <el-container class="position-absolute p-x-16" style="height: 100%; width: 100%; z-index: 1000" v-if="searchFormData.type === 2">
+              <el-main class="page-table-details">
+                <div class="page-info-box">
+                  <span></span>
+                  <div class="search-form-buttons">
+                    <el-dropdown class="more-icon m-l-12" :disabled="!canReadWriteData || !canQuery" @command="(val) => handleCommandDown(val)" id="visualization-save-dropdown">
+                      <el-button :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" id="visualization-download" :disabled="!canReadWriteData">
+                        {{ saveText }}
+                        <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+                      </el-button>
+                      <template #dropdown>
+                        <el-dropdown-menu>
+                          <el-dropdown-item command="csv" id="visualization-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
+                          <el-dropdown-item command="xlsx" id="visualization-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
+                          <el-dropdown-item v-if="canWrithBack" command="saveToIoTDB" id="visualization-saveToIoTDB">{{ t('aiAnalysis.saveToIoTDB') }}</el-dropdown-item>
+                        </el-dropdown-menu>
                       </template>
-                    </el-table-column>
-                  </el-table>
-                  <div class="detail-pager">
-                    <span class="detail-total">{{ t('aiAnalysis.total', { total: sortedData.length }) }}</span>
-                    <el-pagination :page-size="pageSize" v-model:current-page="currentPage" size="small" :background="true" :pager-count="5" layout="prev, pager, next" :total="sortedData.length" />
+                    </el-dropdown>
                   </div>
-                </el-aside>
-              </el-container>
-            </el-main>
-          </el-container>
-        </el-main>
+                </div>
+                <div v-loading="false">
+                  <dynamic-table
+                    :columns="columns"
+                    :table-data="tableDataPagination"
+                    :height="maxCustomTableHeight"
+                    :max-height="maxCustomTableHeight"
+                    v-model:current-page="pagination.pageNum"
+                    v-model:page-size="pagination.pageSize"
+                    :total="tableData.length"
+                    :show-pagination="true"
+                  />
+                </div>
+              </el-main>
+            </el-container>
+            <el-container class="p-0 position-absolute" style="height: 100%; width: 100%" :style="{ opacity: searchFormData.type === 2 ? 0 : 1 }">
+              <el-header class="p-0">
+                <h4 class="info-title">
+                  <span v-if="searchFormData.type !== 2">
+                    <span class="m-r-4">{{ searchFormData.measurement }}</span>
+                    {{ t('aiAnalysis.forecastResult') }}
+                  </span>
+                  <span v-else></span>
+                  <div class="search-form-buttons p-r-8">
+                    <el-dropdown class="more-icon m-l-12" :disabled="!canReadWriteData || !canQuery" @command="(val) => handleCommandDown(val)" id="visualization-save-dropdown">
+                      <el-button :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" id="visualization-download" :disabled="!canReadWriteData">
+                        {{ searchFormData.type === 0 ? t('common.save') : t('common.export') }}
+                        <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+                      </el-button>
+                      <template #dropdown>
+                        <el-dropdown-menu>
+                          <el-dropdown-item command="csv" id="visualization-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
+                          <el-dropdown-item command="xlsx" id="visualization-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
+                          <el-dropdown-item v-if="searchFormData.type === 0" command="saveToIoTDB" id="visualization-saveToIoTDB">{{ t('aiAnalysis.saveToIoTDB') }}</el-dropdown-item>
+                        </el-dropdown-menu>
+                      </template>
+                    </el-dropdown>
+                  </div>
+                </h4>
+                <p class="trend-tip p-l-30 m-t-12">
+                  <!-- <el-icon size="16" style="margin-right: 6px"><i-custom-info-warning /></el-icon>
+                <span v-html="t('dataTrend.trendTip', { tip })"></span> -->
+                </p>
+              </el-header>
+              <el-main class="chart-detail-wrapper">
+                <el-container style="height: 100%">
+                  <el-main class="p-0" style="position: relative">
+                    <div ref="chartContainer" class="chart-container" :style="`height: ${'calc(100% );'}`" v-element-size="onResize"></div>
+                  </el-main>
+                  <el-aside
+                    width="352px"
+                    class="p-16 m-l-16 position-relative"
+                    style="display: flex; flex-direction: column; background-color: #f7f8fc; padding-bottom: 10px !important; overflow: hidden"
+                  >
+                    <el-dropdown v-if="copySearchFormData.type === 1" placement="bottom" class="filter-btn" @command="(val) => handleFilter(val)">
+                      <el-button link id="filter-btn">
+                        <i-custom-filter style="width: 24px; height: 24px" />
+                      </el-button>
+                      <template #dropdown>
+                        <el-dropdown-menu>
+                          <el-dropdown-item command="all">{{ t('aiAnalysis.all') }}</el-dropdown-item>
+                          <el-dropdown-item command="normal">{{ t('aiAnalysis.normalValue') }}</el-dropdown-item>
+                          <el-dropdown-item command="anomaly">{{ t('aiAnalysis.anomalyValue') }}</el-dropdown-item>
+                        </el-dropdown-menu>
+                      </template>
+                    </el-dropdown>
+
+                    <el-table height="100%" :data="paginatedData" @sort-change="handleSortChange" :cell-style="handleCellStyle">
+                      <el-table-column
+                        prop="time"
+                        :label="t('aiAnalysis.time')"
+                        sortable="custom"
+                        :sort-orders="['ascending', 'descending']"
+                        :formatter="formatterTime"
+                        show-overflow-tooltip
+                        width="170"
+                      />
+                      <el-table-column prop="value" :label="copySearchFormData.type === 0 ? t('aiAnalysis.forecastValue') : copySearchFormData.measurement" show-overflow-tooltip width="150">
+                        <template #header="{ column }">
+                          <span class="flex-header"><text-tooltip :content="column.label" /></span>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                    <div class="detail-pager">
+                      <span class="detail-total">{{ t('aiAnalysis.total', { total: sortedData.length }) }}</span>
+                      <el-pagination :page-size="pageSize" v-model:current-page="currentPage" size="small" :background="true" :pager-count="5" layout="prev, pager, next" :total="sortedData.length" />
+                    </div>
+                  </el-aside>
+                </el-container>
+              </el-main>
+            </el-container>
+          </el-main>
+        </auth-container>
         <modal-sql v-model:visible="sqlVisible" :sql-value="sqlValue" @handleConfirm="handleConfirmSql" />
 
         <modal-write-back
@@ -255,7 +257,7 @@ import ModalWriteBack from './components/modal-write-back.vue';
 const { t, locale } = useI18n();
 
 const userStore = useUserStore();
-const { canReadWriteData, canWriteData } = storeToRefs(userStore);
+const { canReadWriteData, canWriteData, canUseModel } = storeToRefs(userStore);
 const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
 const modelList = ref<Array<AIAnalysis.Model>>([]);
@@ -372,8 +374,8 @@ const notComplete = computed(() => {
 });
 
 const applyTip = computed(() => {
-  if (!canReadWriteData.value) {
-    return t('common.dataAuth');
+  if (!canReadWriteData.value || !canUseModel.value) {
+    return t('common.dataAndModelAuth');
   }
   if (notComplete.value) {
     return t('spectrum.applyTip');
@@ -382,7 +384,7 @@ const applyTip = computed(() => {
 });
 
 const canQuery = computed(() => {
-  if (canReadWriteData.value && !notComplete.value) {
+  if (canReadWriteData.value && canUseModel.value && !notComplete.value) {
     return true;
   }
   return false;
@@ -569,8 +571,6 @@ function handleChangePath(val: string, data: StorageDevice.MeasurementDataItem[]
 const timeout = ref<number>();
 
 const setOption = (option: ECOption, noMerge: boolean = false) => {
-  console.log(option, 'setOption');
-  console.trace('option');
   if (chartInstance) {
     // 实例存在直接设置
     chartInstance.setOption(option, noMerge);
@@ -911,13 +911,15 @@ onUnmounted(() => {
 
 watch(locale, () => {
   nextTick(() => {
-    getModelList();
-    setOption(chartOptions.value);
+    if (canReadWriteData.value && canUseModel.value) {
+      getModelList();
+      setOption(chartOptions.value);
+    }
   });
 });
 
 watch(
-  () => canReadWriteData.value,
+  () => canReadWriteData.value && canUseModel.value,
   (val) => {
     setOption(chartOptions.value);
     if (val) {

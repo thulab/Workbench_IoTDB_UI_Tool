@@ -113,6 +113,7 @@ common:
   userAuth: 需“用户管理”权限
   roleAuth: 需“角色管理”权限
   modelAuth: 需“AI使用”权限
+  dataAndModelAuth: 需“AI使用”以及“读数据”或“读写数据”权限
   apply: 应用
   auto: 自动
   origin: 原始值
