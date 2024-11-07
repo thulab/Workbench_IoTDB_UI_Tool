@@ -166,6 +166,7 @@ common:
   viewMore: View More
   viewAll: View All
   modelAuth: Requires "USE_MODEL" permission
+  dataAndModelAuth: 需“AI使用”以及“读数据”或“读写数据”权限
   zoom: Amplify
   revoke: Revoke
   restore: Restore
