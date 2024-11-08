@@ -1,9 +1,9 @@
 <template>
   <el-container class="data-spectrum-wrapper">
     <el-header class="p-0" style="height: auto">
-      <div class="search-form-box" style="margin-bottom: 18px">
+      <div class="search-form-box" style="margin-bottom: 18px" :style="{ marginBottom: searchFormData.method !== 'DTW_MATCH' ? '18px' : '14px' }">
         <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-          <div class="m-b-16 flex-align-center" style="height: 36px">
+          <div class="m-b-16 flex-align-center" style="height: 36px" :style="{ marginBottom: searchFormData.method !== 'DTW_MATCH' ? '16px' : '12px !important' }">
             <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
               <template #label>
                 {{ t('spectrum.analysisMethod') }}：
@@ -29,7 +29,7 @@
                 </el-option>
               </el-select>
             </base-form-item>
-            <div class="search-method-params-box" v-if="searchFormData.method && searchFormData.method !== 'custom'">
+            <div class="search-method-params-box" v-if="searchFormData.method && searchFormData.method !== 'custom' && searchFormData.method !== 'DTW_MATCH'">
               <span class="params-title">{{ t('spectrum.paramsTitle') }}</span>
               <template v-if="searchFormData.method === 'FFT'">
                 <base-form-item :label="`${t('spectrum.returnResult')}：`" prop="resultType">
@@ -105,9 +105,46 @@
                 </base-form-item>
               </template>
             </div>
+            <div class="search-method-params-box" v-else-if="searchFormData.method === 'DTW_MATCH'">
+              <base-form-item prop="measurement" :label-width="locale === 'en' ? '' : '110px'" :rules="requiredRules">
+                <template #label>
+                  {{ t('spectrum.pending') }}：
+                  <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
+                    <template #content>
+                      {{ t('common.searchTipLimit100') }}
+                    </template>
+                    <i-custom-question />
+                  </el-tooltip>
+                </template>
+                <timeseries-select-single
+                  id="spectrum-search-path"
+                  v-model="searchFormData.measurement"
+                  :selectWidth="230"
+                  :itemWidth="200"
+                  show-suffix
+                  :disabled-path="disabledPathDTW"
+                  @handle-change-path="handleChangePath"
+                />
+              </base-form-item>
+              <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules" :class="[searchFormData.method === 'DWT' ? '' : 'form-item-last']">
+                <el-date-picker
+                  v-model="searchFormData.datetimerange"
+                  type="datetimerange"
+                  range-separator="-"
+                  unlink-panels
+                  :disabled-date="disabledDate"
+                  :shortcuts="shortcutsDaterange"
+                  :clearable="false"
+                  :prefix-icon="ICustomCalender"
+                  :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
+                  id="spectrum-search-datetimerange"
+                  @change="handleChangeTime"
+                />
+              </base-form-item>
+            </div>
           </div>
           <div class="search-form-row-box">
-            <div v-if="searchFormData.method !== 'custom'">
+            <div v-if="searchFormData.method !== 'custom' && searchFormData.method !== 'DTW_MATCH'">
               <base-form-item prop="measurement" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
                 <template #label>
                   {{ t('measurement.measurementChoose') }}：
@@ -149,12 +186,89 @@
                 {{ dataCount || dataCount === 0 ? dataCount : '-' }}
               </base-form-item>
             </div>
+            <div v-else-if="searchFormData.method === 'DTW_MATCH'">
+              <div class="search-method-params-box m-r-24" style="display: inline-block">
+                <base-form-item
+                  prop="measurement"
+                  :label-width="locale === 'en' ? '' : '92px'"
+                  :rules="requiredRules"
+                  :style="{ marginRight: searchFormData.partModel === 'fileUpload' ? '0 !important' : '24px' }"
+                >
+                  <template #label>{{ t('spectrum.segment') }}：</template>
+                  <ul class="switch-list">
+                    <li
+                      :class="['switch-type', { 'switch-active': searchFormData.partModel === 'existing' }]"
+                      id="data-search-type-datetime"
+                      @click="
+                        () => {
+                          searchFormData.partModel = 'existing';
+                        }
+                      "
+                    >
+                      {{ t('spectrum.existing') }}
+                    </li>
+                    <li
+                      :class="['switch-type', { 'switch-active': searchFormData.partModel === 'fileUpload' }]"
+                      id="data-search-type-datetimerange"
+                      @click="
+                        () => {
+                          searchFormData.partModel = 'fileUpload';
+                        }
+                      "
+                    >
+                      {{ t('spectrum.fileUpload') }}
+                    </li>
+                  </ul>
+                  <timeseries-select-single
+                    v-if="searchFormData.partModel === 'existing'"
+                    id="spectrum-search-path"
+                    v-model="searchFormData.partSeries"
+                    :selectWidth="230"
+                    :itemWidth="200"
+                    show-suffix
+                    :disabled-path="disabledPathDTW"
+                    @handle-change-path="handleChangePath"
+                  />
+
+                  <el-button type="primary" v-else @click="handleImport">
+                    {{ t('spectrum.fileUpload') }}
+                  </el-button>
+                </base-form-item>
+                <base-form-item v-if="searchFormData.partModel === 'existing'" :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules" class="form-item-last">
+                  <el-date-picker
+                    v-model="searchFormData.partDatetimerange"
+                    type="datetimerange"
+                    range-separator="-"
+                    unlink-panels
+                    :disabled-date="disabledDate"
+                    :shortcuts="shortcutsDaterange"
+                    :clearable="false"
+                    :prefix-icon="ICustomCalender"
+                    :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
+                    id="spectrum-search-datetimerange"
+                    @change="handleChangeTime"
+                  />
+                </base-form-item>
+              </div>
+              <div style="display: inline-block">
+                <base-form-item :label="`${t('spectrum.distance')}：`" :rules="requiredRules" prop="distance" class="m-r-0">
+                  <el-input
+                    v-model.number="searchFormData.distance"
+                    :style="{ width: locale === 'en' ? '110px' : '84px' }"
+                    id="spectrum-search-dwt-layer"
+                    :placeholder="t('spectrum.paramsPlaceholder')"
+                    @change="handleInputLayer"
+                  />
+                </base-form-item>
+              </div>
+            </div>
+
             <div v-if="searchFormData.method === 'custom'">
               <base-form-item :label="`${t('spectrum.sqlInput')}：`" prop="sql" :label-width="locale === 'en' ? '' : '96px'" class="el-form-item-not-mandatory">
                 <el-button type="primary" link id="spectrum-search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
               </base-form-item>
             </div>
-            <div class="search-form-buttons">
+            <div class="search-form-buttons" :style="{ marginBottom: searchFormData.method === 'DTW_MATCH' ? '4px' : '0' }">
               <el-button @click="handleReset" id="spectrum-search-reset">{{ t('common.reset') }}</el-button>
               <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="applyTipDisabled" popper-class="tooltip-box-width">
                 <el-button :disabled="!applyTipDisabled" type="primary" @click="handleSearch()" id="spectrum-search-search">
@@ -170,8 +284,8 @@
     <el-main class="p-0">
       <el-container class="chart-detail-wrapper">
         <el-main class="p-0" style="position: relative">
-          <div ref="chartContainer" class="chart-container" :style="`height: ${'calc(100% - 30px);'}`" v-element-size="onResize"></div>
-          <div class="flex-align-center" style="margin-top: 2px">
+          <div ref="chartContainer" class="chart-container" :style="{ height: searchFormData.method === 'DTW_MATCH' ? 'calc(100%)' : 'calc(100% - 30px)' }" v-element-size="onResize"></div>
+          <div class="flex-align-center" style="margin-top: 2px" v-if="searchFormData.method !== 'DTW_MATCH'">
             <el-button
               type="primary"
               :plain="clickedOperate !== 'cursor'"
@@ -228,19 +342,22 @@
             </el-tooltip>
           </div>
         </el-main>
-        <el-aside :width="isExpand ? '240px' : '24px'" :class="['path-list-wrapper', !isExpand ? 'p-0' : '']" style="display: flex; flex-direction: column">
-          <el-tabs v-model="activeNameSide" stretch class="tabs-nav-aside" v-if="isExpand">
-            <el-tab-pane :label="t('dataTrend.pointAttribute')" name="point">
-              <point-list-tab :point-list="pointList" :point-line-data="pointLineData" :point-checked-data="pointCheckedData" @handleDelPoint="handleDelPoint" />
+        <el-aside width="350px" class="path-list-wrapper" style="display: flex; flex-direction: column">
+          <el-tabs v-model="activeNameSide" stretch class="tabs-nav-aside">
+            <el-tab-pane :label="searchFormData.method !== 'DTW_MATCH' ? t('dataTrend.pointAttribute') : t('spectrum.match')" name="point">
+              <point-list-tab
+                v-if="searchFormData.method !== 'DTW_MATCH'"
+                :point-list="pointList"
+                :point-line-data="pointLineData"
+                :point-checked-data="pointCheckedData"
+                @handleDelPoint="handleDelPoint"
+              />
+              <match-list-tab v-else v-model:model-value="matchList" @handleOperate="handleOperate" />
             </el-tab-pane>
             <el-tab-pane :label="t('dataTrend.commonTemplates')" name="template">
               <template-list-tab ref="templateListRef" :source="'spectrum'" @handle-operate="handleOperateTemplate" />
             </el-tab-pane>
           </el-tabs>
-          <h4 class="collapse-title" v-if="!isExpand">{{ t(tabLabel) }}</h4>
-          <el-icon :class="['expand-icon', !isExpand ? 'collapse-icon' : '']" size="24" @click="handleExpand" id="spectrum-point-expand">
-            <i-custom-arrow-right-expand />
-          </el-icon>
         </el-aside>
       </el-container>
     </el-main>
@@ -257,6 +374,7 @@
       :save-loading="saveTemplateLoading"
       @handleSave="handleRenameSuccess"
     />
+    <modal-import v-model:visible="importVisible" :data-type="searchFormData.measurementType" @handle-close="handleImportClose" />
   </el-container>
 </template>
 
@@ -273,9 +391,11 @@ import { useUserStore } from '@/stores';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalSql from './components/modal-sql.vue';
 import PointListTab from './components/point-list-tab.vue';
+import MatchListTab from './components/match-list-tab.vue';
 import TemplateListTab from '../data-trend/components/template-list-tab.vue';
 import ModalTemplate from '../data-trend/components/modal-template.vue';
 import ModalTemplateRename from '../data-trend/components/modal-template-rename.vue';
+import ModalImport from './components/modal-import.vue';
 
 interface PointData {
   name: string;
@@ -309,11 +429,6 @@ interface MarkPointLine {
   };
 }
 
-const tabList = [
-  { name: 'point', label: 'dataTrend.pointAttribute' },
-  { name: 'template', label: 'dataTrend.commonTemplates' },
-];
-
 const { t, locale } = useI18n();
 const methodDocLink = computed(
   () =>
@@ -323,12 +438,12 @@ const userStore = useUserStore();
 const { canReadWriteData } = storeToRefs(userStore);
 const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
-const isExpand = ref(true);
 const methodList = ref<Array<Search.FunctionData>>([]);
 const dwtTab = ref<'type' | 'number'>('type');
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive<{
   measurement: string;
+  measurementType: string;
   method: string;
   resultType: string;
   compression: string | number | undefined;
@@ -339,8 +454,14 @@ const searchFormData = reactive<{
   coef: string | undefined;
   layer: string | number | undefined;
   wpass: string | number | undefined;
+  partModel: 'existing' | 'fileUpload';
+  partSeries: string;
+  partDatetimerange: [DateModelType, DateModelType];
+  values: string[];
+  distance: string | number | undefined;
 }>({
   measurement: '',
+  measurementType: '',
   method: '',
   resultType: 'abs',
   compression: '',
@@ -351,9 +472,16 @@ const searchFormData = reactive<{
   coef: '',
   layer: 1,
   wpass: '',
+  partModel: 'existing',
+  partSeries: '',
+  partDatetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
+  distance: '',
+  values: [],
 });
 let copySearchFormData = cloneDeep(searchFormData);
 const { shortcutsDaterange } = useShortcutsDate();
+
+const importVisible = ref(false);
 
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 const resultList = computed<Array<{ name: string; value: string }>>(() => [
@@ -412,9 +540,10 @@ const renameData = reactive<{
   name: '',
   template: '',
 });
+
+const matchList = ref<Search.MatchItem[]>([]);
 const saveTemplateLoading = ref(false);
 const activeNameSide = ref('point');
-const tabLabel = ref('dataTrend.pointAttribute');
 const templateListRef = ref<InstanceType<typeof TemplateListTab>>();
 const nameList = computed(() => templateListRef.value?.templateList.map((item) => item.name) || []);
 const dataEmpty = computed(() => chartData.timestamps.length === 0);
@@ -466,10 +595,8 @@ const methodOptions = computed(() => [...methodList.value, { functionName: 'cust
 function disabledPath(item: StorageDevice.MeasurementDataItem) {
   return item.dataType === 'BOOLEAN' || item.dataType === 'TEXT' || item.dataType === 'TIMESTAMP' || item.dataType === 'STRING' || item.dataType === 'BLOB' || item.dataType === 'DATE';
 }
-
-function handleExpand() {
-  isExpand.value = !isExpand.value;
-  tabLabel.value = tabList.find((item) => item.name === activeNameSide.value)?.label || 'dataTrend.pointAttribute';
+function disabledPathDTW(item: StorageDevice.MeasurementDataItem) {
+  return item.dataType === 'TEXT' || item.dataType === 'TIMESTAMP' || item.dataType === 'STRING' || item.dataType === 'BLOB' || item.dataType === 'DATE';
 }
 
 const seriesData = computed<ECOption>(
@@ -560,14 +687,14 @@ const chartOptions = computed<ECOption>(() => ({
   },
   connectNulls: false,
   xAxis: {
-    type: 'value',
+    type: copySearchFormData.method === 'DTW_MATCH' ? 'time' : 'value',
     boundaryGap: false,
     show: !dataEmpty.value,
     splitLine: {
       show: false,
     },
-    min: 0,
-    max: xMax.value,
+    min: copySearchFormData.method === 'DTW_MATCH' ? 'dataMin' : 0,
+    max: copySearchFormData.method === 'DTW_MATCH' ? 'dataMax' : xMax.value,
   },
   yAxis: {
     type: 'value',
@@ -585,6 +712,7 @@ const { requestFn: getDWTData } = useRequest(SearchApi.getDWTData);
 const { requestFn: getPassData } = useRequest(SearchApi.getPassData);
 const { requestFn: getDataCount } = useRequest(SearchApi.getDataCount);
 const { requestFn: getCustomData } = useRequest(SearchApi.getCustomData);
+const { requestFn: getDtwMatchData } = useRequest(SearchApi.getDtwMatchData);
 const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTemplate);
 
 function handleInputCompression(val: string) {
@@ -689,6 +817,8 @@ function handleChangeMethod(val: string) {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleChangePath(val: string, data: StorageDevice.MeasurementDataItem[]) {
+  const current = data.find((f) => f.timeseries === val);
+  searchFormData.measurementType = current?.dataType || '';
   if (searchFormData.method === 'DWT') {
     getCount();
   }
@@ -1061,6 +1191,17 @@ function getUdfList() {
   });
 }
 
+// 导入
+function handleImport() {
+  importVisible.value = true;
+}
+
+function handleImportClose(values: string[]) {
+  if (values && values.length) {
+    searchFormData.values = values;
+  }
+}
+
 // 重置
 function handleReset() {
   searchFormData.measurement = '';
@@ -1074,6 +1215,11 @@ function handleReset() {
   searchFormData.coef = '';
   searchFormData.layer = 1;
   searchFormData.wpass = '';
+  searchFormData.values = [];
+  searchFormData.partDatetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
+  searchFormData.partModel = 'existing';
+  searchFormData.partSeries = '';
+  searchFormData.distance = '';
   dataCount.value = undefined;
   sqlValue.value = '';
   searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
@@ -1206,6 +1352,36 @@ function getCustom() {
     });
 }
 
+function getDtwMatch() {
+  const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
+  const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
+  getDtwMatchData({
+    udf: 'dtw_match',
+    patternSeries: copySearchFormData.measurement,
+    patternStartTime: start,
+    patternEndTime: end,
+    values: copySearchFormData.partModel === 'fileUpload' ? copySearchFormData.values : undefined,
+    partSeries: copySearchFormData.partModel === 'existing' ? copySearchFormData.partSeries : undefined,
+    partStartTime: copySearchFormData.partModel === 'existing' ? dayjs(copySearchFormData.partDatetimerange[0]).valueOf() : undefined,
+    partEndTime: copySearchFormData.partModel === 'existing' ? dayjs(copySearchFormData.partDatetimerange[1]).valueOf() : undefined,
+    threshold: copySearchFormData.distance,
+  })
+    .then((res) => {
+      chartData.timestamps = res.data.timestamps || [];
+      chartData.values = res.data.values || [];
+      matchList.value = (res.data.matchValue || []).map((item) => ({ ...item, checked: false }));
+      if (!chartData.timestamps.length) {
+        ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
+      }
+      setOption(chartOptions.value, true);
+    })
+    .catch(() => {
+      chartData.timestamps = [];
+      chartData.values = [];
+      setOption(chartOptions.value, true);
+    });
+}
+
 // 查询
 function handleSearch(unforce?: boolean) {
   if (!canReadWriteData.value) return;
@@ -1256,6 +1432,20 @@ function handleSearch(unforce?: boolean) {
       return;
     }
     getCustom();
+  } else if (copySearchFormData.method === 'DTW_MATCH') {
+    if (
+      (!copySearchFormData.distance && copySearchFormData.distance !== 0) ||
+      !copySearchFormData.measurement ||
+      (copySearchFormData.partModel === 'fileUpload' && !copySearchFormData.values.length) ||
+      (copySearchFormData.partModel === 'existing' && !copySearchFormData.partSeries)
+    ) {
+      ElMessage.warning({
+        message: t('spectrum.applyTip'),
+        grouping: true,
+      });
+      return;
+    }
+    getDtwMatch();
   } else {
     if (!copySearchFormData.measurement) {
       ElMessage.warning({
@@ -1295,6 +1485,10 @@ function handleOperateTemplate(val: string, data: Search.TrendTemplate) {
     searchFormData.coef = templateData.coef;
     searchFormData.layer = templateData.layer;
     searchFormData.wpass = templateData.wpass;
+    searchFormData.partDatetimerange = templateData.partDatetimerange;
+    searchFormData.partModel = templateData.partModel;
+    searchFormData.partSeries = templateData.partSeries;
+    searchFormData.distance = templateData.distance;
     dwtTab.value = templateData.dwtTab;
     if (searchFormData.measurement && searchFormData.method === 'DWT') {
       getCount();
@@ -1351,6 +1545,7 @@ function handleSql() {
 function handleConfirmSql(val: string) {
   sqlValue.value = val;
 }
+function handleOperate() {}
 
 function setStorage() {
   sessionStorage.setItem(
@@ -1429,6 +1624,10 @@ watch(
           searchFormData.coef = storageData.coef;
           searchFormData.layer = storageData.layer;
           searchFormData.wpass = storageData.wpass;
+          searchFormData.partDatetimerange = storageData.partDatetimerange;
+          searchFormData.partModel = storageData.partModel;
+          searchFormData.partSeries = storageData.partSeries;
+          searchFormData.distance = storageData.distance;
           markPointCount.value = storageData.markPointCount;
           dwtTab.value = storageData.dwtTab;
           if (searchFormData.method === 'DWT' && searchFormData.measurement) {
@@ -1500,6 +1699,7 @@ watch(
   .search-form-row-box {
     display: flex;
     justify-content: space-between;
+    align-items: center;
   }
 
   .search-form-buttons {
@@ -1643,7 +1843,7 @@ watch(
   background-color: #f7f8fc;
   border-radius: 2px;
   box-sizing: border-box;
-  padding: 12px 12px 28px;
+  padding: 12px 16px 28px;
   position: relative;
   transition: all 0.3s ease;
 }
@@ -1706,12 +1906,36 @@ watch(
   color: #495ad4;
   margin: 14px 5px 0;
 }
+
+.switch-list {
+  display: flex;
+  margin-right: 12px;
+  border-radius: 12px;
+  background-color: #f0f1fa;
+  padding: 4px;
+
+  .switch-type {
+    padding: 3px 9px;
+    cursor: pointer;
+    border-radius: 12px;
+    background-color: transparent;
+    font-size: 12px;
+    line-height: 12px;
+    color: #656a85;
+  }
+
+  .switch-active {
+    background-color: #495ad4;
+    color: #fff;
+  }
+}
 </style>
 <style lang="scss">
 .side-list-box {
   border-radius: 2px;
   background: #fff;
   overflow-y: auto;
-  height: 100%;
+  height: calc(100% - 16px);
+  padding: 8px;
 }
 </style>

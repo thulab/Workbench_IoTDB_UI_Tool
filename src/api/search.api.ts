@@ -132,9 +132,21 @@ class SearchApi {
     return http.post('/visualization/getPassData', data);
   }
 
+  // 模式匹配
+  static getDtwMatchData(data: Search.DtwMatchParams): HttpResponseP<Search.MatchResp> {
+    return http.post('/visualization/getDtwMatchData', data);
+  }
+
   // 频谱 custom
   static getCustomData(sql: string): HttpResponseP<Search.SpectrumData> {
     return http.post('/visualization/getCustomAlgorithmData', { sql });
+  }
+
+  static parsingDtwMatchData(data: FormData, fileType: string = 'csv'): HttpResponseP<Search.ParsingDTWMatchDataRes> {
+    if (fileType === 'csv') {
+      return http.post('/file/parsingDTWMatchCsv', data, { timeout: 60 * 30 * 1000 });
+    }
+    return http.post('/file/parsingDTWMatchExcel', data, { timeout: 60 * 30 * 1000 });
   }
 }
 export default SearchApi;

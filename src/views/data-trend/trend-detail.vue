@@ -1430,6 +1430,7 @@ onUnmounted(() => {
   border-radius: 2px;
   background: #fff;
   overflow-y: auto;
-  height: 100%;
+  height: calc(100% - 16px);
+  padding: 8px;
 }
 </style>

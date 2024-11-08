@@ -113,7 +113,6 @@ common:
   userAuth: 需“用户管理”权限
   roleAuth: 需“角色管理”权限
   modelAuth: 需“AI使用”权限
-  dataAndModelAuth: 需“AI使用”以及“读数据”或“读写数据”权限
   apply: 应用
   auto: 自动
   origin: 原始值
@@ -158,6 +157,7 @@ common:
   currentDownload: 点此下载
   viewMore: 查看更多
   viewAll: 查看全部
+  dataAndModelAuth: 需“AI使用”以及“读数据”或“读写数据”权限
   zoom: 放大
   revoke: 撤销
   restore: 还原
@@ -842,6 +842,27 @@ spectrum:
   deleteTemplateTip: 是否删除常用分析
   saveSpectrum: 保存常用
   applyTip: 请选择相应内容后进行查看
+  pending: 待匹配测点
+  segment: 对比片段
+  existing: 已有测点
+  fileUpload: 文件上传
+  importTitle: 导入比对片段
+  importSuccessTip: 比对片段导入成功
+  importFailedTip: 比对片段导入失败
+  importedFailureStatus: 共导入 {total} 个数据点，成功 {success} 个，失败 {failure} 个
+  distance: 相对距离
+  distanceTip: >-
+    此参数为两者间的距离。相对距离越近，数值越小；相对距离越远，数值越大
+  ascByDistance: 按相对距离正序
+  descByDistance: 按相对距离倒序
+  ascByTime: 按时间正序
+  descByTime: 按时间倒序
+  matchResult: 匹配结果{val}
+  startTime: 起始时间
+  endTime: 终止时间
+  match: 匹配
+  total: 共 {total} 个结果
+
 iotdbConfig:
   template: 模板
   searchPlaceholder: 请输入搜索内容

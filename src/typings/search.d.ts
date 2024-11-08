@@ -157,9 +157,48 @@ declare namespace Search {
     startTime: DateModelType;
     endTime: DateModelType;
   }
+  export interface DtwMatchParams {
+    // 模式匹配：dtw_match
+    udf: string;
+    // 待匹配测点
+    patternSeries: string;
+    // 待匹配序列数据开始时间
+    patternStartTime: DateModelType;
+    // 待匹配序列数据结束时间
+    patternEndTime: DateModelType;
+    // 对比数据
+    values?: string[];
+    // 对比测点
+    partSeries?: string;
+    // 对比片段数据开始时间
+    partStartTime?: DateModelType;
+    // 对比片段数据结束时间
+    partEndTime?: DateModelType;
+    // 相似度阈值
+    threshold?: number | string;
+  }
 
   export interface SpectrumData {
     timestamps: number[];
+    values: string[];
+  }
+
+  export interface MatchItem {
+    dtwValue: number;
+    startTime: number;
+    endTime: number;
+    checked?: boolean;
+  }
+  export interface MatchResp extends SpectrumData {
+    matchValue: MatchItem[];
+  }
+
+  export interface ParsingDTWMatchDataRes {
+    status: boolean;
+    errMsg: string;
+    successNum: number;
+    failNum: number;
+    filePath: string;
     values: string[];
   }
 }

@@ -230,7 +230,7 @@ measurement:
   measurementAlias: Alias
   tag: Tag
   tagDetail: Tag Details
-  tagTip: 标签输入格式为“key=value”，若输入多个标签请使用“;”进行切割
+  tagTip: The label input format is "key=value". If multiple labels are entered, please use ";" to cut them
   descriptionTip: >-
     Only supports input of uppercase and lowercase letters, numbers,
     underscores, UNICODE Chinese characters, special characters and real numbers
@@ -999,6 +999,26 @@ spectrum:
   deleteTemplateTip: Do you want to delete commonly used analysis
   saveSpectrum: Save Analysis
   applyTip: Please select the corresponding content and view it
+  pending: Pending Measurements
+  segment: Compare Fragments
+  existing: Existing Measurements
+  fileUpload: File Upload
+  importTitle: Import Comparison Fragments
+  importSuccessTip: Comparison fragment imported successfully
+  importFailedTip: Comparison fragment import failed
+  importedFailureStatus: A total of {total} data points was imported, with {success} successful and {failure} failed | A total of {total} data points was imported, with {success} successful and {failure} failed | A total of {total} data points were imported, with {success} successful and {failure} failed
+  distance: Relative distance
+  distanceTip: >-
+    This parameter is the distance between the two. The closer the relative distance, the smaller the value; The farther the relative distance, the larger the value
+  ascByDistance: Relative Distance ASC
+  descByDistance: Relative Distance DESC
+  ascByTime: Time ASC
+  descByTime: Time DESC
+  matchResult: Match result {val}
+  startTime: Starting time
+  endTime: Termination time
+  match: Match
+  total: total {total}
 iotdbConfig:
   template: Template
   searchPlaceholder: Please enter search content
