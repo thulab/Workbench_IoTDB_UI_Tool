@@ -352,7 +352,7 @@
                 :point-checked-data="pointCheckedData"
                 @handleDelPoint="handleDelPoint"
               />
-              <match-list-tab v-else v-model:model-value="matchList" @handleOperate="handleOperate" />
+              <match-list-tab v-else v-model:model-value="matchList" @handle-check-change="handleCheckChange" />
             </el-tab-pane>
             <el-tab-pane :label="t('dataTrend.commonTemplates')" name="template">
               <template-list-tab ref="templateListRef" :source="'spectrum'" @handle-operate="handleOperateTemplate" />
@@ -542,6 +542,7 @@ const renameData = reactive<{
 });
 
 const matchList = ref<Search.MatchItem[]>([]);
+const checkMatchList = ref<Search.MatchItem[]>([]);
 const saveTemplateLoading = ref(false);
 const activeNameSide = ref('point');
 const templateListRef = ref<InstanceType<typeof TemplateListTab>>();
@@ -634,15 +635,37 @@ const seriesData = computed<ECOption>(
           },
           lineStyle: {
             width: 2,
-            color: '#4992ff',
+            color: copySearchFormData.method === 'DTW_MATCH' ? undefined : '#4992ff',
           },
           itemStyle: {
-            color: '#4992ff',
+            color: copySearchFormData.method === 'DTW_MATCH' ? undefined : '#4992ff',
           },
         },
       ],
     }) as unknown as ECOption
 );
+
+const visualMap = computed(() => {
+  if (copySearchFormData.method !== 'DTW_MATCH') {
+    return undefined;
+  }
+  return {
+    type: 'piecewise',
+    show: false,
+    dimension: 0,
+    seriesIndex: 0,
+    pieces: checkMatchList.value.map((item) => ({
+      min: item.startTime,
+      max: item.endTime,
+    })),
+    inRange: {
+      color: '#FF6E76',
+    },
+    outOfRange: {
+      color: '#4992ff',
+    },
+  };
+});
 
 const chartOptions = computed<ECOption>(() => ({
   tooltip: {
@@ -650,8 +673,8 @@ const chartOptions = computed<ECOption>(() => ({
     // appendToBody: true,
     formatter: (params) => {
       const paramsData = params as unknown as Array<Record<string, any>>;
-      const circle = `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: #4992ff"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0].seriesName}</span></div>`;
-      const x = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;">X：</span><span style="font-size:14px;color:#666;font-weight:400;">${paramsData[0].value[0]}</span></div>`;
+      const circle = `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${paramsData[0].color}"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0].seriesName}</span></div>`;
+      const x = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;">X：</span><span style="font-size:14px;color:#666;font-weight:400;">${paramsData[0].axisValueLabel}</span></div>`;
       const y = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;">Y：</span><span style="font-size:14px;color:#666;font-weight:400;">${paramsData[0].value[1]}</span></div>`;
       return `${circle}${x}${y}`;
     },
@@ -686,6 +709,7 @@ const chartOptions = computed<ECOption>(() => ({
     containLabel: true,
   },
   connectNulls: false,
+  visualMap: visualMap.value,
   xAxis: {
     type: copySearchFormData.method === 'DTW_MATCH' ? 'time' : 'value',
     boundaryGap: false,
@@ -1545,7 +1569,10 @@ function handleSql() {
 function handleConfirmSql(val: string) {
   sqlValue.value = val;
 }
-function handleOperate() {}
+function handleCheckChange(payload: Search.MatchItem[]) {
+  checkMatchList.value = payload;
+  setOption(chartOptions.value);
+}
 
 function setStorage() {
   sessionStorage.setItem(

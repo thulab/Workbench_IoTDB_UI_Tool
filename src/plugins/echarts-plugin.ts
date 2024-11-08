@@ -36,6 +36,10 @@ import {
   type MarkPointComponentOption,
   MarkLineComponent,
   type MarkLineComponentOption,
+  VisualMapComponent,
+  type VisualMapComponentOption,
+  VisualMapPiecewiseComponent,
+  VisualMapContinuousComponent,
 } from 'echarts/components';
 import { LabelLayout, UniversalTransition } from 'echarts/features';
 import { SVGRenderer, CanvasRenderer } from 'echarts/renderers';
@@ -57,6 +61,7 @@ type ECOption = echarts.ComposeOption<
   | MarkPointComponentOption
   | MarkLineComponentOption
   | ScatterSeriesOption
+  | VisualMapComponentOption
 >;
 
 // 注册必须的组件
@@ -71,6 +76,9 @@ echarts.use([
   DataZoomComponent,
   MarkPointComponent,
   MarkLineComponent,
+  VisualMapComponent,
+  VisualMapPiecewiseComponent,
+  VisualMapContinuousComponent,
   ScatterChart,
   GaugeChart,
   LineChart,

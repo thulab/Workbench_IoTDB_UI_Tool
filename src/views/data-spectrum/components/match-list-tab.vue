@@ -6,21 +6,21 @@
     </div>
     <div v-else class="flex flex-col">
       <div class="path-text-box flex-justify-between">
-        <el-checkbox :checked="allChecked" :indeterminate="isIndeterminate" @change="handleAllChecked" class="m-r-8" :id="`match-list-checkbox-all`">{{ t('common.allChoose') }}</el-checkbox>
-        <el-select id="match-list-order" v-model:model-value="order" style="width: 128px" @change="handleOrderChange">
-          <el-option :label="t('spectrum.descByDistance')" :value="0" id="`match-list-order-descByDistance" />
-          <el-option :label="t('spectrum.ascByDistance')" :value="1" id="`match-list-order-ascByDistance" />
-          <el-option :label="t('spectrum.descByTime')" :value="2" id="`match-list-order-descByTime" />
-          <el-option :label="t('spectrum.ascByTime')" :value="3" id="`match-list-order-ascByTime" />
+        <el-checkbox v-model="allChecked" :indeterminate="isIndeterminate" @change="handleAllChecked" class="m-r-8" :id="`match-list-checkbox-all`">{{ t('common.allChoose') }}</el-checkbox>
+        <el-select id="match-list-order" v-model:model-value="order" style="width: 168px" @change="handleOrderChange">
+          <el-option :label="t('spectrum.ascByDistance')" :value="0" id="`match-list-order-ascByDistance" />
+          <el-option :label="t('spectrum.descByDistance')" :value="1" id="`match-list-order-descByDistance" />
+          <el-option :label="t('spectrum.ascByTime')" :value="2" id="`match-list-order-ascByTime" />
+          <el-option :label="t('spectrum.descByTime')" :value="3" id="`match-list-order-descByTime" />
         </el-select>
       </div>
       <ul class="list-box" :style="{ height: `${maxTableHeight}px`, maxHeight: `${maxTableHeight}px` }" :key="listKey">
         <el-checkbox-group v-model="checkedItem" @change="handleCheckedChange">
           <li v-for="(item, index) in paginatedData" :key="index" :class="['path-item-box']">
             <div class="path-text-box">
-              <el-checkbox :key="index" :value="index" class="m-r-8" :id="`match-list-checkbox-${index}-true`" />
-              <div class="path-text">{{ t('spectrum.matchResult', { val: index + 1 }) }}</div>
-              <div class="path-text" style="width: 100%">{{ t('spectrum.distance', { val: index + 1 }) }}: {{ item.dtwValue }}</div>
+              <el-checkbox :key="index" :value="index" class="m-r-0" :id="`match-list-checkbox-${index}-true`" />
+              <div class="path-text" style="width: 105px">{{ t('spectrum.matchResult', { val: index + 1 }) }}</div>
+              <div class="path-text">{{ t('spectrum.distance', { val: index + 1 }) }}: {{ item.dtwValue }}</div>
             </div>
             <div class="path-text-box">
               <div class="path-time">
@@ -36,8 +36,17 @@
         </el-checkbox-group>
       </ul>
       <div class="detail-pager">
-        <span class="detail-total">{{ t('aiAnalysis.total', { total: sortedData.length }) }}</span>
-        <el-pagination :page-size="pageSize" v-model:current-page="currentPage" size="small" :background="true" :pager-count="5" layout="prev, pager, next" :total="sortedData.length" />
+        <span class="detail-total">{{ t('spectrum.total', { total: sortedData.length }) }}</span>
+        <el-pagination
+          :page-size="pageSize"
+          @current-change="handleCurrentChange"
+          v-model:current-page="currentPage"
+          size="small"
+          :background="true"
+          :pager-count="5"
+          layout="prev, pager, next"
+          :total="sortedData.length"
+        />
       </div>
     </div>
   </div>
@@ -54,13 +63,13 @@ const sortedData = computed(() => {
   const sortedList = [...matchList.value]; // create a copy of the array
   switch (order.value) {
     case 0:
-      return sortedList?.sort((a, b) => b.dtwValue - a.dtwValue);
-    case 1:
       return sortedList?.sort((a, b) => a.dtwValue - b.dtwValue);
+    case 1:
+      return sortedList?.sort((a, b) => b.dtwValue - a.dtwValue);
     case 2:
-      return sortedList?.sort((a, b) => b.startTime - a.startTime);
-    case 3:
       return sortedList?.sort((a, b) => a.startTime - b.startTime);
+    case 3:
+      return sortedList?.sort((a, b) => b.startTime - a.startTime);
     default:
       return matchList.value;
   }
@@ -76,28 +85,52 @@ const paginatedData = computed(() => {
   return sortedData.value.slice(start, end);
 });
 
-// const emit = defineEmits<{
-//   (event: 'handleOperate', data: string): void;
-// }>();
+const emit = defineEmits<{
+  (event: 'handleCheckChange', payload: Search.MatchItem[]): void;
+}>();
 
 const { t } = useI18n();
 const listKey = ref(0);
 const allChecked = ref(true);
 const isIndeterminate = ref(false);
+
+function notifyCheckChange() {
+  const checkData = paginatedData.value.filter((item, index) => checkedItem.value.includes(index));
+  emit('handleCheckChange', checkData);
+}
+
 function handleAllChecked(val: CheckboxValueType) {
   checkedItem.value = val ? paginatedData.value.map((i, index) => index) : [];
   isIndeterminate.value = false;
+  notifyCheckChange();
 }
 
 function handleCheckedChange(value: CheckboxValueType[]) {
   const checkedCount = value.length;
   allChecked.value = checkedCount === paginatedData.value.length;
   isIndeterminate.value = checkedCount > 0 && checkedCount < paginatedData.value.length;
+  notifyCheckChange();
+}
+
+function selectAll() {
+  allChecked.value = true;
+  isIndeterminate.value = false;
+  handleAllChecked(true);
 }
 function handleOrderChange() {
-  allChecked.value = true;
-  checkedItem.value = paginatedData.value.map((i, index) => index);
+  currentPage.value = 1;
+  selectAll();
 }
+function handleCurrentChange() {
+  selectAll();
+}
+
+watch(
+  () => matchList.value,
+  () => {
+    selectAll();
+  }
+);
 </script>
 
 <style lang="scss" scoped>
@@ -167,8 +200,7 @@ function handleOrderChange() {
     font-weight: 400;
     line-height: 18px;
     color: #424561;
-    width: 100px;
-    display: inline-flex;
+    display: inline-block;
   }
 
   .path-time {

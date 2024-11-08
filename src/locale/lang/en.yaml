@@ -1015,8 +1015,8 @@ spectrum:
   ascByTime: Time ASC
   descByTime: Time DESC
   matchResult: Match result {val}
-  startTime: Starting time
-  endTime: Termination time
+  startTime: Start time
+  endTime: End time
   match: Match
   total: total {total}
 iotdbConfig:
