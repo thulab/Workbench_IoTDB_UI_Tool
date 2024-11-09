@@ -126,7 +126,7 @@
                   @handle-change-path="handleChangePath"
                 />
               </base-form-item>
-              <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules" :class="[searchFormData.method === 'DWT' ? '' : 'form-item-last']">
+              <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules" class="form-item-last">
                 <el-date-picker
                   v-model="searchFormData.datetimerange"
                   type="datetimerange"
