@@ -109,7 +109,7 @@
 
 <script lang="ts" setup>
 import type { ElTable } from 'element-plus';
-import { onMounted, reactive, ref, computed } from 'vue';
+import { reactive, ref, computed } from 'vue';
 import { useUserStore, useConnectionStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 import { AIAnalysisApi } from '@/api';
@@ -224,11 +224,17 @@ function handleBatchDel() {
   handleDel('batch', null);
 }
 
-onMounted(() => {
-  if (!connectionIsActive.value) return;
-  // if (!canUseModel.value) return;
-  handleSearch();
-});
+watch(
+  () => connectionIsActive.value && canUseModel.value,
+  (val) => {
+    if (val) {
+      handleSearch();
+    }
+  },
+  {
+    immediate: true,
+  }
+);
 </script>
 
 <style lang="scss" scoped>
