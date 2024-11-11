@@ -113,7 +113,7 @@
           </div>
         </el-header>
         <auth-container :is-auth="canUseModel && canReadWriteData" :content="'common.dataAndModelAuth'" style="height: 100%; width: 100%">
-          <el-main class="p-0 position-relative">
+          <el-main class="p-0 position-relative" style="height: 100%">
             <el-container class="position-absolute p-x-16" style="height: 100%; width: 100%; z-index: 1000" v-if="searchFormData.type === 2">
               <el-main class="page-table-details">
                 <div class="page-info-box">
@@ -656,15 +656,25 @@ const onResize = debounce(() => {
 }, 50);
 
 function getModelList() {
-  getModels('').then((res) => {
-    modelList.value = res.data || [];
-    if (modelList.value.some((m) => m.modelId === 'Timer')) {
-      defaultMethod = 'Timer';
-    } else {
-      defaultMethod = modelList.value.filter((item) => item.modelTypeValue === 'BUILT_IN_FORECAST')[0].modelId;
+  if (!canUseModel.value) {
+    defaultMethod = '';
+    searchFormData.method = defaultMethod;
+    return;
+  }
+  getModels('')
+    .then((res) => {
+      modelList.value = res.data || [];
+      if (modelList.value.some((m) => m.modelId === 'Timer')) {
+        defaultMethod = 'Timer';
+      } else {
+        defaultMethod = modelList.value.filter((item) => item.modelTypeValue === 'BUILT_IN_FORECAST')[0].modelId || '';
+        searchFormData.method = defaultMethod;
+      }
+    })
+    .catch(() => {
+      defaultMethod = '';
       searchFormData.method = defaultMethod;
-    }
-  });
+    });
 }
 
 // 重置
