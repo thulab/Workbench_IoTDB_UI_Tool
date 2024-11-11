@@ -866,7 +866,7 @@ aiAnalysis:
   importModelNameHover: 模型名称：模型的全局唯一标识，不可重复。模型名称具备以下约束：<br/> 1. 允许出现标识符 [ 0-9 a-z A-Z _ ] （字母，数字，下划线）<br/> 2. 长度限制为 2-64 字符<br/> 3. 大小写敏感
   configYaml: config.yaml
   importModelRule: 文件格式不正确，目前仅支持上传.pt和.yaml文件
-  importModelTip: 仅接受 .pt 和 .yaml 文件。上传后，文件将自动重命名为 model.pt 和 config.yaml
+  importModelTip: 模型包由1个.pt文件和1个.yaml文件构成，必须同时上传这2个文件。上传后，文件将自动重命名为 model.pt 和 config.yaml
   importSuccessTip: 模型及配置文件已导入成功
   importErrorTip: 模型及配置文件导入失败
   modelNameRuleError: 名称不符合规范，请更改

@@ -113,7 +113,6 @@
 </template>
 
 <script lang="ts" setup>
-import { genFileId } from 'element-plus';
 import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
 import { AIAnalysisApi } from '@/api';
 
@@ -156,7 +155,8 @@ const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
 
   if (rawFile.name.endsWith('.pt')) {
     uploadFilePt.value = rawFile;
-  } else {
+  }
+  if (rawFile.name.endsWith('.yaml')) {
     uploadFileYaml.value = rawFile;
   }
 
@@ -165,15 +165,23 @@ const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
 // 文件替换
 const handleExceed: UploadProps['onExceed'] = (files) => {
   uploadRef.value!.clearFiles();
-  const file = files[0] as UploadRawFile;
-  file.uid = genFileId();
-  uploadRef.value!.handleStart(file);
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i] as UploadRawFile;
+    if (file.name.endsWith('.pt')) {
+      uploadFilePt.value = file;
+    }
+    if (file.name.endsWith('.yaml')) {
+      uploadFileYaml.value = file;
+    }
+  }
 };
 // 文件上传/替换
 const handleChange: UploadProps['onChange'] = (uploadFile) => {
   if (uploadFile.name.endsWith('.pt')) {
     uploadFilePt.value = uploadFile.raw;
-  } else {
+  }
+  if (uploadFile.name.endsWith('.yaml')) {
     uploadFileYaml.value = uploadFile.raw;
   }
 };
@@ -266,7 +274,7 @@ watch(
   .import-box {
     background-color: #f7f8fc;
     padding: 24px 16px;
-    height: 340px;
+    height: 370px;
     box-sizing: border-box;
 
     .file-info-box {

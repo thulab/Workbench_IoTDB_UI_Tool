@@ -1015,7 +1015,7 @@ aiAnalysis:
   importModelNameHover: Model name The globally unique identifier of the model, which cannot be repeated. The model name has the following constraints:<br/> 1. Identifiers [0-9 a-z A-Z _] (letters, numbers, underscores) are allowed<br/> 2. The length is limited to 2-64 characters<br/> 3. Case sensitive
   configYaml: config.yaml
   importModelRule: Incorrect file format, currently only .csv and .xlsx files are supported
-  importModelTip: Only .pt and .yaml files are accepted. Once uploaded, the files will be automatically renamed to model.pt and config.yaml
+  importModelTip: The model package consists of 1 .pt file and 1 .yaml file, and these two files must be uploaded at the same time. Once uploaded, the files will be automatically renamed to model.pt and config.yaml
   importSuccessTip: The model and configuration files have been imported successfully
   importErrorTip: The model and configuration file import failed
   modelNameRuleError: The name does not comply with the specification, please change it.

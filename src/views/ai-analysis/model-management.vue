@@ -28,7 +28,7 @@
                   <el-button type="primary" @click="handleImport" :disabled="!canUseModel" id="model-management-add">{{ t('aiAnalysis.importModel') }}</el-button>
                 </auth-tooltip>
                 <auth-tooltip :is-disabled="canUseModel" :content="'common.modelAuth'">
-                  <el-button type="primary" @click="handleBatchDel" :disabled="!canUseModel" id="model-management-batch-del">{{ t('common.batchDelete') }}</el-button>
+                  <el-button type="primary" @click="handleBatchDel" :disabled="!canUseModel || multipleSelection.length === 0" id="model-management-batch-del">{{ t('common.batchDelete') }}</el-button>
                 </auth-tooltip>
               </div>
             </div>
@@ -56,7 +56,10 @@
                       <div class="flex-center">
                         <div v-if="row.configs === ''">{{ t('aiAnalysis.noConfigs') }}</div>
                         <div v-else>
-                          <el-button type="primary" link size="small" @click="handleViewConfig(row)" :id="`model-management-table-${row.name}-del`">{{ t('aiAnalysis.viewConfig') }}</el-button>
+                          <el-button v-if="row.state === '可用'" type="primary" link size="small" @click="handleViewConfig(row)" :id="`model-management-table-${row.name}-del`">
+                            {{ t('aiAnalysis.viewConfig') }}
+                          </el-button>
+                          <div v-else>{{ t('aiAnalysis.viewConfig') }}</div>
                         </div>
                       </div>
                     </template>
@@ -154,16 +157,17 @@ function getListData() {
   });
 }
 
-function handleReset() {
-  searchFormData.name = '';
-  tableData.value = [];
-  totalCount.value = 0;
-}
-
 function handleSearch() {
   pagination.pageNum = 1;
   tableRef.value?.clearSelection();
   getListData();
+}
+
+function handleReset() {
+  searchFormData.name = '';
+  tableData.value = [];
+  totalCount.value = 0;
+  handleSearch();
 }
 
 function handleSelectionChange(vals: AIAnalysis.Model[]) {
