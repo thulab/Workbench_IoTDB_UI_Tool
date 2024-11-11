@@ -226,7 +226,7 @@ function handleBatchDel() {
 
 onMounted(() => {
   if (!connectionIsActive.value) return;
-  if (!canUseModel.value) return;
+  // if (!canUseModel.value) return;
   handleSearch();
 });
 </script>
