@@ -5,7 +5,7 @@
         <el-header class="search-form-wrapper p-x-0" style="height: auto">
           <el-form :model="searchFormData" label-position="left" size="default" inline @submit.prevent>
             <base-form-item :label="`${t('aiAnalysis.modelName')}：`" prop="name">
-              <el-input v-model="searchFormData.name" :placeholder="t('aiAnalysis.modelNamePlaceholder')" id="model-management-search-name" style="width: 200px">
+              <el-input v-model="searchFormData.name" :placeholder="t('aiAnalysis.modelNamePlaceholder')" @keyup.enter="handleSearch" id="model-management-search-name" style="width: 200px">
                 <template #prefix>
                   <i-custom-search-icon class="remote-select-search-icon" />
                 </template>
