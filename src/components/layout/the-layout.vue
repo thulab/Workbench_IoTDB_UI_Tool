@@ -51,7 +51,7 @@ onMounted(() => {});
 
 <style scoped lang="scss">
 .layout-wrapper {
-  min-width: 1420px;
+  min-width: 1440px;
   min-height: 600px;
 }
 
