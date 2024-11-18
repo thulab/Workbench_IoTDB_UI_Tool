@@ -1,9 +1,9 @@
 <template>
   <el-container class="data-spectrum-wrapper">
     <el-header class="p-0" style="height: auto">
-      <div class="search-form-box" style="margin-bottom: 18px" :style="{ marginBottom: searchFormData.method !== 'DTW_MATCH' ? '18px' : '14px' }">
+      <div class="search-form-box" style="margin-bottom: 18px" :style="{ marginBottom: searchFormData.method !== 'PATTERN_MATCH' ? '18px' : '14px' }">
         <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-          <div class="m-b-16 flex-align-center" style="height: 36px" :style="{ marginBottom: searchFormData.method !== 'DTW_MATCH' ? '16px' : '12px !important' }">
+          <div class="m-b-16 flex-align-center" style="height: 36px" :style="{ marginBottom: searchFormData.method !== 'PATTERN_MATCH' ? '16px' : '12px !important' }">
             <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
               <template #label>
                 {{ t('spectrum.analysisMethod') }}：
@@ -29,7 +29,7 @@
                 </el-option>
               </el-select>
             </base-form-item>
-            <div class="search-method-params-box" v-if="searchFormData.method && searchFormData.method !== 'custom' && searchFormData.method !== 'DTW_MATCH'">
+            <div class="search-method-params-box" v-if="searchFormData.method && searchFormData.method !== 'custom' && searchFormData.method !== 'PATTERN_MATCH'">
               <span class="params-title">{{ t('spectrum.paramsTitle') }}</span>
               <template v-if="searchFormData.method === 'FFT'">
                 <base-form-item :label="`${t('spectrum.returnResult')}：`" prop="resultType">
@@ -105,7 +105,7 @@
                 </base-form-item>
               </template>
             </div>
-            <div class="search-method-params-box" v-else-if="searchFormData.method === 'DTW_MATCH'">
+            <div class="search-method-params-box" v-else-if="searchFormData.method === 'PATTERN_MATCH'">
               <base-form-item prop="measurement" :label-width="locale === 'en' ? '' : '110px'" :rules="requiredRules">
                 <template #label>
                   {{ t('spectrum.pending') }}：
@@ -144,7 +144,7 @@
             </div>
           </div>
           <div class="search-form-row-box">
-            <div v-if="searchFormData.method !== 'custom' && searchFormData.method !== 'DTW_MATCH'">
+            <div v-if="searchFormData.method !== 'custom' && searchFormData.method !== 'PATTERN_MATCH'">
               <base-form-item prop="measurement" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
                 <template #label>
                   {{ t('measurement.measurementChoose') }}：
@@ -186,8 +186,8 @@
                 {{ dataCount || dataCount === 0 ? dataCount : '-' }}
               </base-form-item>
             </div>
-            <div v-else-if="searchFormData.method === 'DTW_MATCH'">
-              <div class="search-method-params-box m-r-24" style="display: inline-block">
+            <div v-else-if="searchFormData.method === 'PATTERN_MATCH'">
+              <div class="search-method-params-box m-r-12" style="display: inline-block">
                 <base-form-item
                   prop="measurement"
                   :label-width="locale === 'en' ? '' : '92px'"
@@ -251,7 +251,10 @@
                 </base-form-item>
               </div>
               <div style="display: inline-block">
-                <base-form-item :label="`${t('spectrum.distance')}：`" :rules="requiredRules" prop="distance" class="m-r-0">
+                <el-button type="primary" :disabled="!partTimestamps.length" class="detail-part-icon" @click="handleDetailPart" id="detail-part">
+                  <el-icon size="30"><i-custom-detail-eye /></el-icon>
+                </el-button>
+                <!-- <base-form-item :label="`${t('spectrum.distance')}：`" :rules="requiredRules" prop="distance" class="m-r-0">
                   <el-input
                     v-model.number="searchFormData.distance"
                     :style="{ width: locale === 'en' ? '110px' : '84px' }"
@@ -259,7 +262,7 @@
                     :placeholder="t('spectrum.paramsPlaceholder')"
                     @change="handleInputLayer"
                   />
-                </base-form-item>
+                </base-form-item> -->
               </div>
             </div>
 
@@ -268,7 +271,7 @@
                 <el-button type="primary" link id="spectrum-search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
               </base-form-item>
             </div>
-            <div class="search-form-buttons" :style="{ marginBottom: searchFormData.method === 'DTW_MATCH' ? '4px' : '0' }">
+            <div class="search-form-buttons" :style="{ marginBottom: searchFormData.method === 'PATTERN_MATCH' ? '4px' : '0' }">
               <el-button @click="handleReset" id="spectrum-search-reset">{{ t('common.reset') }}</el-button>
               <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="applyTipDisabled" popper-class="tooltip-box-width">
                 <el-button :disabled="!applyTipDisabled" type="primary" @click="handleSearch()" id="spectrum-search-search">
@@ -284,8 +287,8 @@
     <el-main class="p-0">
       <el-container class="chart-detail-wrapper">
         <el-main class="p-0" style="position: relative">
-          <div ref="chartContainer" class="chart-container" :style="{ height: searchFormData.method === 'DTW_MATCH' ? 'calc(100%)' : 'calc(100% - 30px)' }" v-element-size="onResize"></div>
-          <div class="flex-align-center" style="margin-top: 2px" v-if="searchFormData.method !== 'DTW_MATCH'">
+          <div ref="chartContainer" class="chart-container" :style="{ height: searchFormData.method === 'PATTERN_MATCH' ? 'calc(100%)' : 'calc(100% - 30px)' }" v-element-size="onResize"></div>
+          <div class="flex-align-center" style="margin-top: 2px" v-if="searchFormData.method !== 'PATTERN_MATCH'">
             <el-button
               type="primary"
               :plain="clickedOperate !== 'cursor'"
@@ -344,17 +347,17 @@
         </el-main>
         <el-aside width="350px" class="path-list-wrapper" style="display: flex; flex-direction: column">
           <el-tabs v-model="activeNameSide" stretch class="tabs-nav-aside">
-            <el-tab-pane :label="searchFormData.method !== 'DTW_MATCH' ? t('dataTrend.pointAttribute') : t('spectrum.match')" name="point">
+            <el-tab-pane :label="searchFormData.method !== 'PATTERN_MATCH' ? t('dataTrend.pointAttribute') : t('spectrum.match')" name="point">
               <point-list-tab
-                v-if="searchFormData.method !== 'DTW_MATCH'"
+                v-if="searchFormData.method !== 'PATTERN_MATCH'"
                 :point-list="pointList"
                 :point-line-data="pointLineData"
                 :point-checked-data="pointCheckedData"
                 @handleDelPoint="handleDelPoint"
               />
-              <match-list-tab v-else v-model:model-value="matchList" @handle-check-change="handleCheckChange" />
+              <match-list-tab v-else v-model:model-value="matchList" @handle-check-change="handleCheckChange" @handle-save="handleSaveMatch" />
             </el-tab-pane>
-            <el-tab-pane :label="t('dataTrend.commonTemplates')" name="template">
+            <el-tab-pane :label="t('dataTrend.commonTemplates')" class="p-t-16" name="template">
               <template-list-tab ref="templateListRef" :source="'spectrum'" @handle-operate="handleOperateTemplate" />
             </el-tab-pane>
           </el-tabs>
@@ -375,6 +378,7 @@
       @handleSave="handleRenameSuccess"
     />
     <modal-import v-model:visible="importVisible" :data-type="searchFormData.measurementType" @handle-close="handleImportClose" />
+    <dialog-chart v-model:visible="chartVisible" :times="partTimestamps" :values="partValues" />
   </el-container>
 </template>
 
@@ -396,6 +400,7 @@ import TemplateListTab from '../data-trend/components/template-list-tab.vue';
 import ModalTemplate from '../data-trend/components/modal-template.vue';
 import ModalTemplateRename from '../data-trend/components/modal-template-rename.vue';
 import ModalImport from './components/modal-import.vue';
+import DialogChart from './components/dialog-chart.vue';
 
 interface PointData {
   name: string;
@@ -457,6 +462,7 @@ const searchFormData = reactive<{
   partModel: 'existing' | 'fileUpload';
   partSeries: string;
   partDatetimerange: [DateModelType, DateModelType];
+  times: string[];
   values: string[];
   distance: string | number | undefined;
 }>({
@@ -476,6 +482,7 @@ const searchFormData = reactive<{
   partSeries: '',
   partDatetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
   distance: '',
+  times: [],
   values: [],
 });
 let copySearchFormData = cloneDeep(searchFormData);
@@ -543,6 +550,11 @@ const renameData = reactive<{
 
 const matchList = ref<Search.MatchItem[]>([]);
 const checkMatchList = ref<Search.MatchItem[]>([]);
+
+const partValues = ref<string[]>([]);
+const partTimestamps = ref<number[]>([]);
+const chartVisible = ref(false);
+
 const saveTemplateLoading = ref(false);
 const activeNameSide = ref('point');
 const templateListRef = ref<InstanceType<typeof TemplateListTab>>();
@@ -635,10 +647,10 @@ const seriesData = computed<ECOption>(
           },
           lineStyle: {
             width: 2,
-            color: copySearchFormData.method === 'DTW_MATCH' ? undefined : '#4992ff',
+            color: copySearchFormData.method === 'PATTERN_MATCH' ? undefined : '#4992ff',
           },
           itemStyle: {
-            color: copySearchFormData.method === 'DTW_MATCH' ? undefined : '#4992ff',
+            color: copySearchFormData.method === 'PATTERN_MATCH' ? undefined : '#4992ff',
           },
         },
       ],
@@ -646,7 +658,7 @@ const seriesData = computed<ECOption>(
 );
 
 const visualMap = computed(() => {
-  if (copySearchFormData.method !== 'DTW_MATCH') {
+  if (copySearchFormData.method !== 'PATTERN_MATCH') {
     return undefined;
   }
   return {
@@ -711,14 +723,14 @@ const chartOptions = computed<ECOption>(() => ({
   connectNulls: false,
   visualMap: visualMap.value,
   xAxis: {
-    type: copySearchFormData.method === 'DTW_MATCH' ? 'time' : 'value',
+    type: copySearchFormData.method === 'PATTERN_MATCH' ? 'time' : 'value',
     boundaryGap: false,
     show: !dataEmpty.value,
     splitLine: {
       show: false,
     },
-    min: copySearchFormData.method === 'DTW_MATCH' ? 'dataMin' : 0,
-    max: copySearchFormData.method === 'DTW_MATCH' ? 'dataMax' : xMax.value,
+    min: copySearchFormData.method === 'PATTERN_MATCH' ? 'dataMin' : 0,
+    max: copySearchFormData.method === 'PATTERN_MATCH' ? 'dataMax' : xMax.value,
   },
   yAxis: {
     type: 'value',
@@ -736,7 +748,8 @@ const { requestFn: getDWTData } = useRequest(SearchApi.getDWTData);
 const { requestFn: getPassData } = useRequest(SearchApi.getPassData);
 const { requestFn: getDataCount } = useRequest(SearchApi.getDataCount);
 const { requestFn: getCustomData } = useRequest(SearchApi.getCustomData);
-const { requestFn: getDtwMatchData } = useRequest(SearchApi.getDtwMatchData);
+const { requestFn: getPatternMatchData } = useRequest(SearchApi.getPatternMatchData);
+const { requestFn: getExportMatchDataFile } = useRequest(SearchApi.getExportMatchDataFile);
 const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTemplate);
 
 function handleInputCompression(val: string) {
@@ -1219,9 +1232,13 @@ function getUdfList() {
 function handleImport() {
   importVisible.value = true;
 }
+function handleDetailPart() {
+  chartVisible.value = !chartVisible.value;
+}
 
-function handleImportClose(values: string[]) {
-  if (values && values.length) {
+function handleImportClose(times: string[], values: string[]) {
+  if (times && times.length) {
+    searchFormData.times = times;
     searchFormData.values = values;
   }
 }
@@ -1239,6 +1256,7 @@ function handleReset() {
   searchFormData.coef = '';
   searchFormData.layer = 1;
   searchFormData.wpass = '';
+  searchFormData.times = [];
   searchFormData.values = [];
   searchFormData.partDatetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
   searchFormData.partModel = 'existing';
@@ -1376,23 +1394,25 @@ function getCustom() {
     });
 }
 
-function getDtwMatch() {
+function getPatternMatch() {
   const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
   const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
-  getDtwMatchData({
-    udf: 'dtw_match',
+  getPatternMatchData({
+    udf: 'pattern_match',
     patternSeries: copySearchFormData.measurement,
     patternStartTime: start,
     patternEndTime: end,
+    times: copySearchFormData.partModel === 'fileUpload' ? copySearchFormData.times : undefined,
     values: copySearchFormData.partModel === 'fileUpload' ? copySearchFormData.values : undefined,
     partSeries: copySearchFormData.partModel === 'existing' ? copySearchFormData.partSeries : undefined,
     partStartTime: copySearchFormData.partModel === 'existing' ? dayjs(copySearchFormData.partDatetimerange[0]).valueOf() : undefined,
     partEndTime: copySearchFormData.partModel === 'existing' ? dayjs(copySearchFormData.partDatetimerange[1]).valueOf() : undefined,
-    threshold: copySearchFormData.distance,
   })
     .then((res) => {
-      chartData.timestamps = res.data.timestamps || [];
-      chartData.values = res.data.values || [];
+      partTimestamps.value = res.data.partTimestamps || [];
+      partValues.value = res.data.partValues || [];
+      chartData.timestamps = res.data.patternTimestamps || [];
+      chartData.values = res.data.patternValues || [];
       matchList.value = (res.data.matchValue || []).map((item) => ({ ...item, checked: false }));
       if (!chartData.timestamps.length) {
         ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
@@ -1456,9 +1476,8 @@ function handleSearch(unforce?: boolean) {
       return;
     }
     getCustom();
-  } else if (copySearchFormData.method === 'DTW_MATCH') {
+  } else if (copySearchFormData.method === 'PATTERN_MATCH') {
     if (
-      (!copySearchFormData.distance && copySearchFormData.distance !== 0) ||
       !copySearchFormData.measurement ||
       (copySearchFormData.partModel === 'fileUpload' && !copySearchFormData.values.length) ||
       (copySearchFormData.partModel === 'existing' && !copySearchFormData.partSeries)
@@ -1469,7 +1488,7 @@ function handleSearch(unforce?: boolean) {
       });
       return;
     }
-    getDtwMatch();
+    getPatternMatch();
   } else {
     if (!copySearchFormData.measurement) {
       ElMessage.warning({
@@ -1499,6 +1518,7 @@ function handleOperateTemplate(val: string, data: Search.TrendTemplate) {
   } else {
     const templateData = JSON.parse(data.template);
     searchFormData.measurement = templateData.measurement;
+    searchFormData.measurementType = templateData.measurementType;
     searchFormData.method = templateData.method;
     searchFormData.resultType = templateData.resultType;
     searchFormData.compression = templateData.compression;
@@ -1573,6 +1593,23 @@ function handleCheckChange(payload: Search.MatchItem[]) {
   checkMatchList.value = payload;
   setOption(chartOptions.value);
 }
+function handleSaveMatch(times: Search.MatchItem[]) {
+  const saveTimes = [];
+  const saveValues = [];
+  for (let i = 0; i < chartData.timestamps.length; i++) {
+    const timestamp = chartData.timestamps[i];
+    const value = chartData.values[i];
+
+    if (times.some((item) => item.startTime <= timestamp && item.endTime >= timestamp)) {
+      saveTimes.push(timestamp);
+      saveValues.push(value);
+    }
+  }
+  getExportMatchDataFile(saveTimes, saveValues, copySearchFormData.measurement, copySearchFormData.measurementType).then((resp) => {
+    const url = `/api/file/download/${resp.data}`;
+    window.open(url);
+  });
+}
 
 function setStorage() {
   sessionStorage.setItem(
@@ -1641,6 +1678,7 @@ watch(
         const storageData = JSON.parse(sessionStorage.getItem('dataSpectrumStorage') as string);
         searchFormData.measurement = storageData.measurement;
         if (searchFormData.measurement) {
+          searchFormData.measurementType = storageData.measurementType;
           searchFormData.method = storageData.method;
           searchFormData.resultType = storageData.resultType;
           searchFormData.compression = storageData.compression;
@@ -1870,7 +1908,7 @@ watch(
   background-color: #f7f8fc;
   border-radius: 2px;
   box-sizing: border-box;
-  padding: 12px 16px 28px;
+  padding: 12px 16px;
   position: relative;
   transition: all 0.3s ease;
 }
@@ -1899,13 +1937,14 @@ watch(
 
   :deep(.el-tabs__content) {
     width: 100%;
-    padding-top: 16px;
-    height: calc(100% - 40px);
+    padding-top: 4px;
+    overflow: hidden;
+    height: calc(100% - 28px);
   }
 
   .el-tab-pane {
     height: 100%;
-    overflow-y: auto;
+    overflow: hidden;
   }
 }
 
@@ -1955,6 +1994,15 @@ watch(
     background-color: #495ad4;
     color: #fff;
   }
+}
+
+.detail-part-icon {
+  border-radius: 4px;
+  min-width: auto !important;
+  width: 30px !important;
+  height: 30px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 </style>
 <style lang="scss">

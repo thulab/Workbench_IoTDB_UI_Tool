@@ -1019,6 +1019,7 @@ spectrum:
   endTime: End time
   match: Match
   total: total {total}
+  dragTip: Hold down here and drag
 iotdbConfig:
   template: Template
   searchPlaceholder: Please enter search content

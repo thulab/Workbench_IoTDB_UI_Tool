@@ -862,6 +862,7 @@ spectrum:
   endTime: 终止时间
   match: 匹配
   total: 共 {total} 个结果
+  dragTip: 按住此处拖动
 
 iotdbConfig:
   template: 模板

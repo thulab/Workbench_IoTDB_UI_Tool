@@ -133,8 +133,12 @@ class SearchApi {
   }
 
   // 模式匹配
-  static getDtwMatchData(data: Search.DtwMatchParams): HttpResponseP<Search.MatchResp> {
-    return http.post('/visualization/getDtwMatchData', data);
+  static getPatternMatchData(data: Search.PatternMatchParams): HttpResponseP<Search.MatchResp> {
+    return http.post('/visualization/getPatternMatchData', data);
+  }
+
+  static getExportMatchDataFile(times: number[], values: string[], measurement: string, dataType: string): HttpResponseP<String> {
+    return http.post('/file/exportTsFile', { times, values, measurement, dataType });
   }
 
   // 频谱 custom
@@ -142,11 +146,11 @@ class SearchApi {
     return http.post('/visualization/getCustomAlgorithmData', { sql });
   }
 
-  static parsingDtwMatchData(data: FormData, fileType: string = 'csv'): HttpResponseP<Search.ParsingDTWMatchDataRes> {
+  static parsingPatternMatchData(data: FormData, fileType: string = 'csv'): HttpResponseP<Search.ParsingMatchDataRes> {
     if (fileType === 'csv') {
-      return http.post('/file/parsingDTWMatchCsv', data, { timeout: 60 * 30 * 1000 });
+      return http.post('/file/parsingPatternMatchCsv', data, { timeout: 60 * 30 * 1000 });
     }
-    return http.post('/file/parsingDTWMatchExcel', data, { timeout: 60 * 30 * 1000 });
+    return http.post('/file/parsingPatternMatchExcel', data, { timeout: 60 * 30 * 1000 });
   }
 }
 export default SearchApi;

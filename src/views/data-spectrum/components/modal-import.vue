@@ -12,7 +12,7 @@
       <div class="select-file-box" v-if="activeStep === 0">
         <div class="select-item-box" style="align-items: center">
           <span class="select-item-label">{{ t('common.downloadTemplate') }}：</span>
-          <a href="/api/file/downloadTemplate/DTW_MATCH" class="template-button" target="_blank">mode_template.csv</a>
+          <a href="/api/file/downloadTemplate/PATTERN_MATCH" class="template-button" target="_blank">mode_template.csv</a>
         </div>
         <div class="select-item-box">
           <span class="select-item-label">{{ t('common.importFile') }}：</span>
@@ -59,7 +59,7 @@
 
         <div class="error-box" v-if="uploadStatus === 'error'">
           <el-icon size="44"><i-custom-error /></el-icon>
-          <span class="error-tip" style="color: #d43030">{{ t('spectrum.importFailedTip') }}:{{ uploadResult.errMsg }}</span>
+          <span class="error-tip" style="color: #d43030">{{ t('spectrum.importFailedTip') }}</span>
           <a v-if="uploadResult.filePath" :href="`/api/file/downloadErrorInfo?fileName=${uploadResult.filePath}`" class="error-link" target="_self" rel="noopener noreferrer">
             {{ t('common.detail') }}
           </a>
@@ -109,10 +109,10 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
-  (e: 'handle-close', values: string[]): void;
+  (e: 'handle-close', times: string[], values: string[]): void;
 }>();
 
-const { requestFn: parsingDtwMatchData } = useRequest(SearchApi.parsingDtwMatchData);
+const { requestFn: parsingPatternMatchData } = useRequest(SearchApi.parsingPatternMatchData);
 
 const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
@@ -121,12 +121,13 @@ const isCSV = ref(true);
 const activeStep = ref(0);
 const uploadFileInfo = ref<File>();
 const uploadStatus = ref('');
-const uploadResult = reactive<Search.ParsingDTWMatchDataRes>({
+const uploadResult = reactive<Search.ParsingMatchDataRes>({
   status: true,
   successNum: 0,
   failNum: 0,
   filePath: '',
   errMsg: '',
+  times: [],
   values: [],
 });
 
@@ -168,13 +169,14 @@ const customUpload: UploadProps['httpRequest'] = (options) => {
   const formData = new FormData();
   formData.append('file', options.file);
   formData.append('dataType', props.dataType);
-  return parsingDtwMatchData(formData, isCSV.value ? 'csv' : 'xlsx')
+  return parsingPatternMatchData(formData, isCSV.value ? 'csv' : 'xlsx')
     .then((res) => {
       if (res.code === 0) {
         uploadResult.successNum = res.data.successNum;
         uploadResult.failNum = res.data.failNum;
         uploadResult.filePath = res.data.filePath;
         uploadResult.errMsg = res.data.errMsg;
+        uploadResult.times = res.data.times;
         uploadResult.values = res.data.values;
         const { status } = res.data;
         if (!status || (!res.data.successNum && res.data.failNum > 0)) {
@@ -205,7 +207,7 @@ function handleNext() {
 
 function handleClose() {
   dialogVisible.value = false;
-  emit('handle-close', uploadResult.values);
+  emit('handle-close', uploadResult.times, uploadResult.values);
 }
 
 watch(

@@ -317,7 +317,7 @@ watch(locale, () => {
   position: relative;
   display: flex;
   align-items: center;
-  min-width: 1300px;
+  min-width: 1420px;
   min-height: 640px;
 }
 

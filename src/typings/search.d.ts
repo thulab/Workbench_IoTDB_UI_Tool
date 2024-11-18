@@ -157,8 +157,8 @@ declare namespace Search {
     startTime: DateModelType;
     endTime: DateModelType;
   }
-  export interface DtwMatchParams {
-    // 模式匹配：dtw_match
+  export interface PatternMatchParams {
+    // 模式匹配：pattern_match
     udf: string;
     // 待匹配测点
     patternSeries: string;
@@ -166,6 +166,8 @@ declare namespace Search {
     patternStartTime: DateModelType;
     // 待匹配序列数据结束时间
     patternEndTime: DateModelType;
+    // 对比数据时间
+    times?: string[];
     // 对比数据
     values?: string[];
     // 对比测点
@@ -184,21 +186,26 @@ declare namespace Search {
   }
 
   export interface MatchItem {
-    dtwValue: number;
+    distance: number;
     startTime: number;
     endTime: number;
     checked?: boolean;
   }
-  export interface MatchResp extends SpectrumData {
+  export interface MatchResp {
+    patternTimestamps: number[];
+    patternValues: string[];
+    partTimestamps: number[];
+    partValues: string[];
     matchValue: MatchItem[];
   }
 
-  export interface ParsingDTWMatchDataRes {
+  export interface ParsingMatchDataRes {
     status: boolean;
     errMsg: string;
     successNum: number;
     failNum: number;
     filePath: string;
+    times: string[];
     values: string[];
   }
 }
