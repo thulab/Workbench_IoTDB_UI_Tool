@@ -301,7 +301,6 @@ const diskChartOptions = (diskMemoryChartData: Dashboard.MetricDiskRes): ECOptio
       axisPointer: {
         type: 'shadow',
       },
-      confine: true,
       formatter: (params) => {
         let res = '';
         const paramsData = params as unknown as Array<Record<string, any>>;
