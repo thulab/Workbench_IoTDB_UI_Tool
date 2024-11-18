@@ -1,5 +1,5 @@
 {
-  "name": "iotdb-real-time",
+  "name": "iotdb-workbench",
   "version": "1.5.1",
   "private": true,
   "type": "module",
@@ -16,12 +16,15 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:historian": "vite --mode historian",
     "dev:workbench": "vite --mode workbench",
     "build": "run-p type-check \"build-only {@}\" --",
+    "build:historian": "run-p type-check \"build-only:historian {@}\" --",
     "build:workbench": "run-p type-check \"build-only:workbench {@}\" --",
     "preview": "vite preview",
     "test:unit": "vitest",
     "build-only": "vite build",
+    "build-only:historian": "vite build --mode historian",
     "build-only:workbench": "vite build --mode workbench",
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
