@@ -89,6 +89,7 @@ function rowReadWriteDataByPath(path: string) {
 const treeDataOptions = (detailData: StorageDevice.ModelData, width: number | 'auto') =>
   ({
     tooltip: {
+      confine: true,
       trigger: 'item',
       triggerOn: 'mousemove',
       padding: 16,

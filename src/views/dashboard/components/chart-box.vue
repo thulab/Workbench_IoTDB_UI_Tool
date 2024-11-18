@@ -26,6 +26,7 @@ onMounted(() => {
   const option: ECOption = {
     tooltip: {
       trigger: 'axis',
+      confine: true,
       textStyle: {
         align: 'left',
       },

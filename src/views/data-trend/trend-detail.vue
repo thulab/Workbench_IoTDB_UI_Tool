@@ -348,6 +348,7 @@ const chartOptions = computed<ECOption>(() => ({
   legend: legendSelected.value,
   useUTC: false,
   tooltip: {
+    confine: true,
     trigger: 'axis',
     // appendToBody: true,
     formatter: (params) => {

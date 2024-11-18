@@ -682,10 +682,10 @@ const visualMap = computed(() => {
 const chartOptions = computed<ECOption>(() => ({
   tooltip: {
     trigger: 'axis',
-    // appendToBody: true,
+    confine: true,
     formatter: (params) => {
       const paramsData = params as unknown as Array<Record<string, any>>;
-      const circle = `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${paramsData[0].color}"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0].seriesName}</span></div>`;
+      const circle = `<div style="z-index: 9999"><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${paramsData[0].color}"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0].seriesName}</span></div>`;
       const x = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;">X：</span><span style="font-size:14px;color:#666;font-weight:400;">${paramsData[0].axisValueLabel}</span></div>`;
       const y = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;">Y：</span><span style="font-size:14px;color:#666;font-weight:400;">${paramsData[0].value[1]}</span></div>`;
       return `${circle}${x}${y}`;

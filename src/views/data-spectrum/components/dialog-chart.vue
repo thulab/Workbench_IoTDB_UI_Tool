@@ -6,9 +6,9 @@
     :title="t('spectrum.dragTip')"
     draggable
     :modal="false"
+    append-to-body
     width="775"
     style="padding: 0 !important"
-    :show-close="false"
     :close-on-click-modal="false"
   >
     <div class="echarts-box">
@@ -84,6 +84,10 @@ onMounted(() => {});
   border: 1px solid #dfe1ed;
 
   // box-shadow: 0 0 10px 5px rgb(255 255 255 / 50%);
+  .el-dialog__headerbtn {
+    top: 4px !important;
+    right: 4px !important;
+  }
 
   .el-dialog__header {
     text-align: center;

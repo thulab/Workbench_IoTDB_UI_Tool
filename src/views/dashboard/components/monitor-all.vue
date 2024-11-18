@@ -470,6 +470,7 @@ const diskChartOptions = (diskMemoryChartData: Dashboard.MetricDiskRes): ECOptio
   ({
     tooltip: {
       trigger: 'axis',
+      confine: true,
       show: true,
       axisPointer: {
         type: 'shadow',
