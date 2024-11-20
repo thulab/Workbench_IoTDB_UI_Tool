@@ -1626,6 +1626,20 @@ function handleConfirmSql(val: string) {
 function handleCheckChange(payload: Search.MatchItem[]) {
   checkMatchList.value = payload;
   setOption(chartOptions.value);
+  // if (checkMatchList.value.length === 1) {
+  //   const { startTime, endTime } = checkMatchList.value[0];
+  //   chartInstance.dispatchAction({
+  //     type: 'dataZoom',
+  //     startValue: startTime,
+  //     endValue: endTime,
+  //   });
+  // } else {
+  //   chartInstance.dispatchAction({
+  //     type: 'dataZoom',
+  //     start: 0,
+  //     end: 100,
+  //   });
+  // }
 }
 function handleSaveMatch(times: Search.MatchItem[]) {
   const saveTimes = [];

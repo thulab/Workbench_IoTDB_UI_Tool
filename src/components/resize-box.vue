@@ -1,6 +1,12 @@
 <template>
   <div>
-    <div v-if="dialogVisible" class="draggable-box" :style="{ width: `${boxWidth}px`, height: `${boxHeight}px`, left: `${boxX}px`, top: `${boxY}px` }" @mousedown="startDrag">
+    <div v-if="dialogVisible" class="draggable-box" :style="{ width: `${boxWidth}px`, height: `${boxHeight}px`, left: `${boxX}px`, top: `${boxY}px` }">
+      <div class="box-header" @mousedown.stop="startDrag">
+        {{ t('spectrum.dragTip') }}
+        <el-button link class="close-btn" @click="dialogVisible = false">
+          <el-icon size="20"><i-custom-close /></el-icon>
+        </el-button>
+      </div>
       <div class="resize-handle" @mousedown.stop="startResize"></div>
       <div class="box-content">
         <slot></slot>
@@ -10,6 +16,7 @@
 </template>
 
 <script lang="ts" setup>
+const { t } = useI18n();
 const props = defineProps({
   left: {
     type: Number,
@@ -33,7 +40,7 @@ const dialogVisible = defineModel<boolean>('visible');
 const boxX = ref<number>(props.left);
 const boxY = ref<number>(props.top);
 const boxWidth = ref<number>(props.width);
-const boxHeight = ref<number>(props.height);
+const boxHeight = ref<number>(props.height + 20);
 const dragging = ref<boolean>(false);
 const resizing = ref<boolean>(false);
 const startX = ref<number>(0);
@@ -100,8 +107,14 @@ const startResize = (e: MouseEvent) => {
 }
 
 .box-header {
-  background: #e0e0e0;
-  padding: 10px;
+  background: #100c29;
+  border-bottom: 1px solid #656a85;
+  color: #b9b8ce;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
   cursor: move;
   user-select: none;
 }
@@ -123,6 +136,20 @@ const startResize = (e: MouseEvent) => {
 .box-content {
   display: flex;
   width: 100%;
-  height: 100%;
+  height: calc(100% - 20px);
+}
+
+.close-btn {
+  position: absolute;
+  top: 0;
+  right: 4px;
+  height: 20px !important;
+  cursor: pointer;
+  padding: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #b9b8ce;
 }
 </style>

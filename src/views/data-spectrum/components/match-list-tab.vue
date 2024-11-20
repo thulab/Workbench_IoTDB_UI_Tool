@@ -7,7 +7,7 @@
     <div v-else class="flex flex-col">
       <div class="flex-justify-between p-b-4">
         <span class="detail-total">{{ t('spectrum.total', { total: sortedData.length }) }}</span>
-        <el-button type="primary" :disabled="!sortedData.length" link @click="handleSave" id="download-match-data">
+        <el-button type="primary" class="m-r-8" :disabled="!sortedData.length" link @click="handleSave" id="download-match-data">
           {{ t('spectrum.download') }}
         </el-button>
       </div>
