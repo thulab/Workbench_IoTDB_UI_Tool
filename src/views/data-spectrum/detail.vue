@@ -254,15 +254,24 @@
                 <el-button type="primary" :disabled="!partTimestamps.length" class="detail-part-icon" @click="handleDetailPart" id="detail-part">
                   <el-icon size="30"><i-custom-detail-eye /></el-icon>
                 </el-button>
-                <!-- <base-form-item :label="`${t('spectrum.distance')}：`" :rules="requiredRules" prop="distance" class="m-r-0">
+                <base-form-item :label="`${t('spectrum.distance')}：`" :rules="requiredRules" prop="distance" class="m-r-0 m-l-12">
+                  <template #label>
+                    {{ t('spectrum.distance') }}：
+                    <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
+                      <template #content>
+                        {{ t('spectrum.distanceTip') }}
+                      </template>
+                      <i-custom-question />
+                    </el-tooltip>
+                  </template>
                   <el-input
-                    v-model.number="searchFormData.distance"
+                    v-model="searchFormData.distance"
                     :style="{ width: locale === 'en' ? '110px' : '84px' }"
-                    id="spectrum-search-dwt-layer"
+                    id="spectrum-search-distance"
                     :placeholder="t('spectrum.paramsPlaceholder')"
-                    @change="handleInputLayer"
+                    @change="handleInputDistance"
                   />
-                </base-form-item> -->
+                </base-form-item>
               </div>
             </div>
 
@@ -378,7 +387,7 @@
       @handleSave="handleRenameSuccess"
     />
     <modal-import v-model:visible="importVisible" :data-type="searchFormData.measurementType" @handle-close="handleImportClose" />
-    <dialog-chart v-model:visible="chartVisible" :times="partTimestamps" :values="partValues" />
+    <dialog-chart v-if="copySearchFormData.method === 'PATTERN_MATCH'" v-model:visible="chartVisible" :times="partTimestamps" :values="partValues" />
   </el-container>
 </template>
 
@@ -771,6 +780,17 @@ function handleInputLayer(val: string) {
     searchFormData.layer = undefined;
   }
 }
+function handleInputDistance(val: string) {
+  if (val || Number(val) === 0) {
+    if (!/^(0|[1-9][0-9]*)(\.[0-9]+)?$|^0\.[0-9]+$/.test(`${val}`)) {
+      searchFormData.distance = undefined;
+    } else if (Number(val) < 0 || Number(val) > 100) {
+      searchFormData.distance = undefined;
+    }
+  } else {
+    searchFormData.distance = undefined;
+  }
+}
 
 function handleInputWpass(val: string) {
   if (val) {
@@ -849,6 +869,11 @@ function getCount() {
 function handleChangeMethod(val: string) {
   if (val === 'DWT' && searchFormData.measurement) {
     getCount();
+  }
+  if (val !== 'PATTERN_MATCH') {
+    chartVisible.value = false;
+  } else if (partTimestamps.value.length) {
+    chartVisible.value = true;
   }
 }
 
@@ -1397,11 +1422,13 @@ function getCustom() {
 function getPatternMatch() {
   const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
   const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
+  chartVisible.value = false;
   getPatternMatchData({
     udf: 'pattern_match',
     patternSeries: copySearchFormData.measurement,
     patternStartTime: start,
     patternEndTime: end,
+    threshold: 100 - Number(copySearchFormData.distance),
     times: copySearchFormData.partModel === 'fileUpload' ? copySearchFormData.times : undefined,
     values: copySearchFormData.partModel === 'fileUpload' ? copySearchFormData.values : undefined,
     partSeries: copySearchFormData.partModel === 'existing' ? copySearchFormData.partSeries : undefined,
@@ -1417,11 +1444,17 @@ function getPatternMatch() {
       if (!chartData.timestamps.length) {
         ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
       }
+      if (partTimestamps.value.length) {
+        chartVisible.value = true;
+      }
       setOption(chartOptions.value, true);
     })
     .catch(() => {
       chartData.timestamps = [];
       chartData.values = [];
+      matchList.value = [];
+      partTimestamps.value = [];
+      partValues.value = [];
       setOption(chartOptions.value, true);
     });
 }
@@ -1478,6 +1511,7 @@ function handleSearch(unforce?: boolean) {
     getCustom();
   } else if (copySearchFormData.method === 'PATTERN_MATCH') {
     if (
+      (!copySearchFormData.distance && copySearchFormData.distance !== 0) ||
       !copySearchFormData.measurement ||
       (copySearchFormData.partModel === 'fileUpload' && !copySearchFormData.values.length) ||
       (copySearchFormData.partModel === 'existing' && !copySearchFormData.partSeries)

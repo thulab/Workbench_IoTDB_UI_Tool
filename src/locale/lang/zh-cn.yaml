@@ -850,11 +850,11 @@ spectrum:
   importSuccessTip: 比对片段导入成功
   importFailedTip: 比对片段导入失败
   importedFailureStatus: 共导入 {total} 个数据点，成功 {success} 个，失败 {failure} 个
-  distance: 相对距离
+  distance: 相似度
   distanceTip: >-
-    此参数为两者间的距离。相对距离越近，数值越小；相对距离越远，数值越大
-  ascByDistance: 按相对距离正序
-  descByDistance: 按相对距离倒序
+    用于衡量对比片段与结果的相似性，取值范围为0-100，数值越高相似度越高
+  ascByDistance: 按相似度倒序
+  descByDistance: 按相似度正序
   ascByTime: 按时间正序
   descByTime: 按时间倒序
   matchResult: 匹配结果{val}
@@ -863,6 +863,7 @@ spectrum:
   match: 匹配
   total: 共 {total} 个结果
   dragTip: 按住此处拖动
+  download: 下载结果
 
 iotdbConfig:
   template: 模板

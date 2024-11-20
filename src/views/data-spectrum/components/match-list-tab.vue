@@ -7,8 +7,8 @@
     <div v-else class="flex flex-col">
       <div class="flex-justify-between p-b-4">
         <span class="detail-total">{{ t('spectrum.total', { total: sortedData.length }) }}</span>
-        <el-button type="primary" :disabled="!sortedData.length" class="save-match-icon" @click="handleSave" id="download-match-data">
-          <el-icon size="30"><i-custom-save-match /></el-icon>
+        <el-button type="primary" :disabled="!sortedData.length" link @click="handleSave" id="download-match-data">
+          {{ t('spectrum.download') }}
         </el-button>
       </div>
       <div class="side-list-box">
@@ -26,8 +26,8 @@
             <li v-for="(item, index) in paginatedData" :key="index" :class="['path-item-box']">
               <div class="path-text-box">
                 <el-checkbox :key="index" :value="index" class="m-r-0" :id="`match-list-checkbox-${index}-true`" />
-                <div class="path-text" style="width: 105px">{{ t('spectrum.matchResult', { val: index + 1 }) }}</div>
-                <div class="path-text">{{ t('spectrum.distance', { val: index + 1 }) }}: {{ item.distance }}</div>
+                <div class="path-text" style="width: 105px">{{ t('spectrum.matchResult', { val: item.resultNum }) }}</div>
+                <div class="path-text">{{ t('spectrum.distance', { val: index + 1 }) }}: {{ item.matchScore }}</div>
               </div>
               <div class="path-text-box">
                 <div class="path-time">
@@ -70,15 +70,15 @@ const sortedData = computed(() => {
   const sortedList = [...matchList.value]; // create a copy of the array
   switch (order.value) {
     case 0:
-      return sortedList?.sort((a, b) => a.distance - b.distance);
+      return sortedList?.sort((a, b) => a.distance - b.distance).map((item, index) => ({ ...item, resultNum: index + 1, matchScore: 100 - item.distance }));
     case 1:
-      return sortedList?.sort((a, b) => b.distance - a.distance);
+      return sortedList?.sort((a, b) => b.distance - a.distance).map((item, index) => ({ ...item, resultNum: index + 1, matchScore: 100 - item.distance }));
     case 2:
-      return sortedList?.sort((a, b) => a.startTime - b.startTime);
+      return sortedList?.sort((a, b) => a.startTime - b.startTime).map((item, index) => ({ ...item, resultNum: index + 1, matchScore: 100 - item.distance }));
     case 3:
-      return sortedList?.sort((a, b) => b.startTime - a.startTime);
+      return sortedList?.sort((a, b) => b.startTime - a.startTime).map((item, index) => ({ ...item, resultNum: index + 1, matchScore: 100 - item.distance }));
     default:
-      return matchList.value;
+      return matchList.value.map((item, index) => ({ ...item, resultNum: index + 1, matchScore: 100 - item.distance }));
   }
 });
 
@@ -284,14 +284,5 @@ watch(
 
 .list-box {
   overflow: auto;
-}
-
-.save-match-icon {
-  border-radius: 4px;
-  min-width: auto !important;
-  width: 30px !important;
-  height: 30px !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
 }
 </style>

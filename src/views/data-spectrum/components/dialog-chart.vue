@@ -1,20 +1,9 @@
 <template>
-  <el-dialog
-    class="chart-dialog"
-    v-model:model-value="dialogVisible"
-    destroy-on-close
-    :title="t('spectrum.dragTip')"
-    draggable
-    :modal="false"
-    append-to-body
-    width="775"
-    style="padding: 0 !important"
-    :close-on-click-modal="false"
-  >
-    <div class="echarts-box">
-      <the-chart :option="partOption" key="part" ref="chartRef" />
+  <resize-box :left="290" :top="220" :width="300" :height="160" v-model:visible="dialogVisible">
+    <div class="echarts-box resizer">
+      <the-chart :option="partOption" v-if="dialogVisible" key="part" ref="chartRef" :dark="true" />
     </div>
-  </el-dialog>
+  </resize-box>
 </template>
 <script lang="ts" setup>
 import TheChart from '@/components/the-chart.vue';
@@ -35,20 +24,45 @@ const chartRef = ref<InstanceType<typeof TheChart>>();
 const partOption = computed<ECOption>(() => {
   return {
     darkMode: true,
-    backgroundColor: '#100C29',
+    toolbox: {
+      show: true,
+      feature: {
+        dataZoom: {
+          title: {
+            zoom: t('common.zoom'),
+            back: t('common.revoke'),
+          },
+          icon: {
+            zoom: 'path://M15 9L23 9L23 23L9 23L9 15M13 9L9 9M9 9L5 9M9 13L9 9M9 9L9 5',
+            back: 'path://M9,9h14v14H9v-8 M12,12L9,9l3-3',
+          },
+        },
+        restore: {
+          title: t('common.restore'),
+          icon: 'path://M13 21L15 24C10.0294 24 6 19.9706 6 15C6 12.7036 6.86006 10.6081 8.27564 9.01797M17 9L15 6C19.9706 6 24 10.0294 24 15C24 17.3063 23.1325 19.4101 21.7059 21.0026',
+        },
+        saveAsImage: {
+          title: t('common.export'),
+          icon: 'path://M18,12V7H7v16h11v-5 M24,15H13 M21,18l3-3l-3-3',
+        },
+      },
+    },
+    // backgroundColor: '#100C29',
     grid: {
-      left: 20,
-      right: 60,
-      bottom: 20,
+      left: 10,
+      right: 20,
+      bottom: 10,
+      top: 30,
       containLabel: true,
     },
     xAxis: {
-      data: props.times,
+      type: 'time',
+      boundaryGap: false,
+      splitNumber: 2,
     },
     yAxis: {
       type: 'value',
       scale: true,
-      show: false,
     },
     series: [
       {
@@ -58,7 +72,7 @@ const partOption = computed<ECOption>(() => {
         showAllSymbol: 'auto',
         connectNulls: false,
         symbolSize: 4,
-        data: props.values,
+        data: props.values.map((dataItem, index) => [props.times[index], dataItem]),
         lineStyle: {
           width: 2,
           color: '#4992ff',
@@ -75,27 +89,7 @@ onMounted(() => {});
 
 <style lang="scss" scoped>
 .echarts-box {
-  width: 773px;
-  height: 335px;
-}
-</style>
-<style lang="scss">
-.chart-dialog {
-  border: 1px solid #dfe1ed;
-
-  // box-shadow: 0 0 10px 5px rgb(255 255 255 / 50%);
-  .el-dialog__headerbtn {
-    top: 4px !important;
-    right: 4px !important;
-  }
-
-  .el-dialog__header {
-    text-align: center;
-    padding: 2px 0 !important;
-  }
-
-  .el-dialog__body {
-    padding: 0 !important;
-  }
+  width: 100%;
+  height: 100%;
 }
 </style>

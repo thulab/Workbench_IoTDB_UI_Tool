@@ -12,6 +12,7 @@ let chartInstance: echarts.ECharts;
 
 const props = defineProps<{
   option: ECOption;
+  dark?: boolean;
   clickFunc?: Function;
 }>();
 
@@ -23,7 +24,7 @@ const setOption = (option: ECOption) => {
     chartInstance.setOption(option);
   } else if (chartContainer.value && chartContainer.value.clientHeight) {
     // 实例不存在，容器存在，容器高度存在
-    chartInstance = echarts.init(chartContainer.value);
+    chartInstance = echarts.init(chartContainer.value, props.dark ? 'dark' : 'light');
     // 若存在click事件，执行
     chartInstance.on('click', (params) => {
       if (props.clickFunc) {

@@ -1007,11 +1007,11 @@ spectrum:
   importSuccessTip: Comparison fragment imported successfully
   importFailedTip: Comparison fragment import failed
   importedFailureStatus: A total of {total} data points was imported, with {success} successful and {failure} failed | A total of {total} data points was imported, with {success} successful and {failure} failed | A total of {total} data points were imported, with {success} successful and {failure} failed
-  distance: Relative distance
+  distance: Similarity
   distanceTip: >-
-    This parameter is the distance between the two. The closer the relative distance, the smaller the value; The farther the relative distance, the larger the value
-  ascByDistance: Relative Distance ASC
-  descByDistance: Relative Distance DESC
+    Used to measure the similarity between the compared fragments and the results, with a value range of 0-100, the higher the value, the higher the similarity.
+  ascByDistance: Similarity ASC
+  descByDistance: Similarity DESC
   ascByTime: Time ASC
   descByTime: Time DESC
   matchResult: Match result {val}
@@ -1020,6 +1020,7 @@ spectrum:
   match: Match
   total: total {total}
   dragTip: Hold down here and drag
+  download: Download results
 iotdbConfig:
   template: Template
   searchPlaceholder: Please enter search content
