@@ -112,7 +112,7 @@
             </el-form>
           </div>
         </el-header>
-        <auth-container :is-auth="canUseModel && canReadWriteData" :content="'common.dataAndModelAuth'" style="height: 100%; width: 100%">
+        <auth-container :is-auth="canUseModel && canReadWriteData && enableAINode" :content="enableAINode ? 'common.dataAndModelAuth' : 'aiAnalysis.enableTip'" style="height: 100%; width: 100%">
           <el-main class="p-0 position-relative" style="height: 100%">
             <el-container class="position-absolute p-x-16" style="height: 100%; width: 100%; z-index: 1000" v-if="searchFormData.type === 2">
               <el-main class="page-table-details">
@@ -149,6 +149,7 @@
               </el-main>
             </el-container>
             <el-container class="p-0 position-absolute" style="height: 100%; width: 100%" :style="{ opacity: searchFormData.type === 2 ? 0 : 1 }">
+              <!--
               <el-header class="p-0">
                 <h4 class="info-title">
                   <span v-if="searchFormData.type !== 2">
@@ -172,11 +173,8 @@
                     </el-dropdown>
                   </div>
                 </h4>
-                <p class="trend-tip p-l-30 m-t-12">
-                  <!-- <el-icon size="16" style="margin-right: 6px"><i-custom-info-warning /></el-icon>
-                <span v-html="t('dataTrend.trendTip', { tip })"></span> -->
-                </p>
               </el-header>
+              -->
               <el-main class="chart-detail-wrapper">
                 <el-container style="height: 100%">
                   <el-main class="p-0" style="position: relative">
@@ -184,9 +182,25 @@
                   </el-main>
                   <el-aside
                     width="352px"
-                    class="p-16 m-l-16 position-relative"
+                    class="p-x-16 m-l-16 position-relative p-t-8"
                     style="display: flex; flex-direction: column; background-color: #f7f8fc; padding-bottom: 10px !important; overflow: hidden"
                   >
+                    <div class="flex-justify-between p-b-4">
+                      <span class="detail-total">{{ t('aiAnalysis.total', { total: sortedData.length }) }}</span>
+                      <el-dropdown class="more-icon m-r-8" :disabled="!canReadWriteData || !canQuery" @command="(val) => handleCommandDown(val)" id="visualization-save-dropdown">
+                        <el-button link type="primary" class="export-button" id="visualization-download" :disabled="!canReadWriteData">
+                          {{ t('spectrum.download') }}
+                          <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+                        </el-button>
+                        <template #dropdown>
+                          <el-dropdown-menu>
+                            <el-dropdown-item command="csv" id="visualization-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
+                            <el-dropdown-item command="xlsx" id="visualization-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
+                            <el-dropdown-item v-if="searchFormData.type === 0" command="saveToIoTDB" id="visualization-saveToIoTDB">{{ t('aiAnalysis.saveToIoTDB') }}</el-dropdown-item>
+                          </el-dropdown-menu>
+                        </template>
+                      </el-dropdown>
+                    </div>
                     <el-dropdown v-if="copySearchFormData.type === 1" placement="bottom" class="filter-btn" @command="(val) => handleFilter(val)">
                       <el-button link id="filter-btn">
                         <i-custom-filter style="width: 24px; height: 24px" />
@@ -214,10 +228,13 @@
                         <template #header="{ column }">
                           <span class="flex-header"><text-tooltip :content="column.label" /></span>
                         </template>
+                        <template #default="{ row }">
+                          <!-- 保留 4 位小数 -->
+                          <span>{{ row.value.toFixed(4) }}</span>
+                        </template>
                       </el-table-column>
                     </el-table>
                     <div class="detail-pager">
-                      <span class="detail-total">{{ t('aiAnalysis.total', { total: sortedData.length }) }}</span>
                       <el-pagination :page-size="pageSize" v-model:current-page="currentPage" size="small" :background="true" :pager-count="5" layout="prev, pager, next" :total="sortedData.length" />
                     </div>
                   </el-aside>
@@ -250,6 +267,7 @@ import { AIAnalysisApi } from '@/api';
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
 import { today, getOneIntervalNow, todayNow, formatDate } from '@/utils/date';
 import { useUserStore, useConnectionStore } from '@/stores';
+import { parse } from 'yaml';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalSql from './components/modal-sql.vue';
 import ModalWriteBack from './components/modal-write-back.vue';
@@ -266,6 +284,7 @@ const modelList = ref<Array<AIAnalysis.Model>>([]);
 
 const connectionStore = useConnectionStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
+const { enableAINode } = storeToRefs(connectionStore);
 let defaultMethod = 'Timer';
 
 const searchFormRef = ref<FormInstance>();
@@ -285,7 +304,7 @@ const searchFormData = reactive<{
   method: defaultMethod,
   datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
   forecastStart: todayNow() as DateModelType,
-  anomalyRatio: undefined,
+  anomalyRatio: 1,
   orderBy: 'ascending',
 });
 let copySearchFormData = cloneDeep(searchFormData);
@@ -403,8 +422,26 @@ const modelOptions = computed(() => {
   }
 });
 
+const allowedTypes = computed(() => {
+  let result: string[] = ['INT32', 'INT64', 'FLOAT', 'DOUBLE'];
+  const current = modelOptions.value.find((item) => item.modelId === searchFormData.method);
+  if (current && current.configs) {
+    let output = '';
+    current.configs.split(']').forEach((line) => {
+      if (line) {
+        output += `${line.replace(':[', ': [')}]\n`;
+      }
+    });
+    const data = parse(output);
+    if (data && data.inputDataType && data.inputDataType.length) {
+      result = data.inputDataType;
+    }
+  }
+  return result;
+});
+
 function disabledPath(item: StorageDevice.MeasurementDataItem) {
-  return item.dataType === 'BOOLEAN' || item.dataType === 'TEXT' || item.dataType === 'TIMESTAMP' || item.dataType === 'STRING' || item.dataType === 'BLOB' || item.dataType === 'DATE';
+  return allowedTypes.value.indexOf(item.dataType) === -1;
 }
 
 const anomalyPoints = computed(() => {
@@ -686,7 +723,7 @@ function handleReset() {
   searchFormData.method = defaultMethod;
   searchFormData.datetimerange = getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType];
   searchFormData.forecastStart = todayNow() as DateModelType;
-  searchFormData.anomalyRatio = undefined;
+  searchFormData.anomalyRatio = 1;
   searchFormData.orderBy = 'ascending';
   sqlValue.value = '';
   copySearchFormData = cloneDeep(searchFormData);
@@ -756,7 +793,7 @@ function handleSearch() {
     };
     search(query)
       .then((res) => {
-        if (res.data.raw.length === 0 && res.data.analysis.length === 0) {
+        if ((!res.data.raw || res.data.raw.length === 0) && (!res.data.analysis || res.data.analysis.length === 0)) {
           ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
           return;
         }
@@ -921,7 +958,7 @@ onUnmounted(() => {
 
 watch(locale, () => {
   nextTick(() => {
-    if (canReadWriteData.value && canUseModel.value) {
+    if (canReadWriteData.value && canUseModel.value && enableAINode.value) {
       getModelList();
       setOption(chartOptions.value);
     }
@@ -929,10 +966,11 @@ watch(locale, () => {
 });
 
 watch(
-  () => canReadWriteData.value && canUseModel.value,
+  () => canReadWriteData.value && canUseModel.value && enableAINode.value,
   (val) => {
     setOption(chartOptions.value);
     if (val) {
+      getModelList();
       if (sessionStorage.getItem('aiVisualizationStorage')) {
         const storageData = JSON.parse(sessionStorage.getItem('aiVisualizationStorage') as string);
         searchFormData.measurement = storageData.measurement;
@@ -1210,7 +1248,7 @@ watch(
 .detail-pager {
   padding-top: 14px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 }
 
@@ -1227,9 +1265,9 @@ watch(
 
 .filter-btn {
   position: absolute;
-  z-index: 9999;
+  z-index: 2;
   right: 14px;
-  top: 22px;
+  top: 46px;
 }
 
 .page-table-details {
