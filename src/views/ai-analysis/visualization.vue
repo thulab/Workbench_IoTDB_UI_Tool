@@ -790,6 +790,7 @@ function handleSearch() {
   searchFormData.orderBy = 'ascending';
   copySearchFormData = cloneDeep(searchFormData);
   filterCondition.value = 'all';
+  currentPoint = undefined;
   currentPointValue.value = 0;
   currentPage.value = 1;
   allTableData.value = [];
@@ -823,7 +824,12 @@ function handleSearch() {
             }
           });
         }
-        handleDeal(allTableData.value[0]);
+        const minTimePoint = allTableData.value.reduce((min, current) => {
+          return current.time < min.time ? current : min;
+        });
+        if (minTimePoint) {
+          handleDeal(minTimePoint);
+        }
         minValue.value = Math.min(...rawData.value.map((item) => Number(item.value)));
         if (!allTableData.value.length) {
           ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
