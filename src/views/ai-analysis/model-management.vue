@@ -5,7 +5,7 @@
         <el-header class="search-form-wrapper p-x-0" style="height: auto">
           <el-form :model="searchFormData" label-position="left" size="default" inline @submit.prevent>
             <base-form-item :label="`${t('aiAnalysis.modelName')}：`" prop="name">
-              <el-input v-model="searchFormData.name" :placeholder="t('aiAnalysis.modelNamePlaceholder')" id="model-management-search-name" style="width: 200px">
+              <el-input v-model="searchFormData.name" :placeholder="t('aiAnalysis.modelNamePlaceholder')" @keyup.enter="handleSearch" id="model-management-search-name" style="width: 200px">
                 <template #prefix>
                   <i-custom-search-icon class="remote-select-search-icon" />
                 </template>
@@ -13,9 +13,9 @@
             </base-form-item>
           </el-form>
           <div class="search-form-buttons">
-            <el-button @click="handleReset" id="model-management-search-reset">{{ t('common.reset') }}</el-button>
+            <el-button @click="handleReset" :disabled="!canUseModel || !enableAINode" id="model-management-search-reset">{{ t('common.reset') }}</el-button>
             <auth-tooltip :is-disabled="canUseModel" :content="'common.modelAuth'">
-              <el-button type="primary" @click="handleSearch" :disabled="!canUseModel" id="model-management-search-search">{{ t('common.query') }}</el-button>
+              <el-button type="primary" @click="handleSearch" :disabled="!canUseModel || !enableAINode" id="model-management-search-search">{{ t('common.query') }}</el-button>
             </auth-tooltip>
           </div>
         </el-header>
@@ -25,15 +25,17 @@
               <h4 class="page-table-title">{{ t('aiAnalysis.modelList') }}</h4>
               <div class="operate-buttons">
                 <auth-tooltip :is-disabled="canUseModel" :content="'common.modelAuth'">
-                  <el-button type="primary" @click="handleImport" :disabled="!canUseModel" id="model-management-add">{{ t('aiAnalysis.importModel') }}</el-button>
+                  <el-button type="primary" @click="handleImport" :disabled="!canUseModel || !enableAINode" id="model-management-add">{{ t('aiAnalysis.importModel') }}</el-button>
                 </auth-tooltip>
                 <auth-tooltip :is-disabled="canUseModel" :content="'common.modelAuth'">
-                  <el-button type="primary" @click="handleBatchDel" :disabled="!canUseModel" id="model-management-batch-del">{{ t('common.batchDelete') }}</el-button>
+                  <el-button type="primary" @click="handleBatchDel" :disabled="!canUseModel || multipleSelection.length === 0 || !enableAINode" id="model-management-batch-del">
+                    {{ t('common.batchDelete') }}
+                  </el-button>
                 </auth-tooltip>
               </div>
             </div>
 
-            <auth-container :is-auth="canUseModel" :content="'common.modelAuth'" style="height: 100%; width: 100%">
+            <auth-container :is-auth="canUseModel && enableAINode" :content="enableAINode ? 'common.modelAuth' : 'aiAnalysis.enableTip'" style="height: 100%; width: 100%">
               <div class="page-table-box">
                 <el-table
                   :data="tableDataPagination"
@@ -56,7 +58,10 @@
                       <div class="flex-center">
                         <div v-if="row.configs === ''">{{ t('aiAnalysis.noConfigs') }}</div>
                         <div v-else>
-                          <el-button type="primary" link size="small" @click="handleViewConfig(row)" :id="`model-management-table-${row.name}-del`">{{ t('aiAnalysis.viewConfig') }}</el-button>
+                          <el-button v-if="row.state === '可用'" type="primary" link size="small" @click="handleViewConfig(row)" :id="`model-management-table-${row.name}-del`">
+                            {{ t('aiAnalysis.viewConfig') }}
+                          </el-button>
+                          <div v-else>{{ t('aiAnalysis.viewConfig') }}</div>
                         </div>
                       </div>
                     </template>
@@ -106,7 +111,7 @@
 
 <script lang="ts" setup>
 import type { ElTable } from 'element-plus';
-import { onMounted, reactive, ref, computed } from 'vue';
+import { reactive, ref, computed } from 'vue';
 import { useUserStore, useConnectionStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 import { AIAnalysisApi } from '@/api';
@@ -119,6 +124,7 @@ const userStore = useUserStore();
 const { canUseModel } = storeToRefs(userStore);
 const connectionStore = useConnectionStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
+const { enableAINode } = storeToRefs(connectionStore);
 const importVisible = ref(false);
 const configVisible = ref(false);
 const searchFormData = reactive({
@@ -144,7 +150,7 @@ function getListData() {
   getModels(searchFormData.name).then((res) => {
     if (res.data) {
       tableData.value = res.data
-        .filter((item) => searchFormData.name === '' || item.modelId.includes(searchFormData.name))
+        .filter((item) => searchFormData.name === '' || item.modelId.toLowerCase().includes(searchFormData.name.toLowerCase()))
         .map((item) => {
           item.configs = item.configs || '';
           return item;
@@ -154,16 +160,17 @@ function getListData() {
   });
 }
 
-function handleReset() {
-  searchFormData.name = '';
-  tableData.value = [];
-  totalCount.value = 0;
-}
-
 function handleSearch() {
   pagination.pageNum = 1;
   tableRef.value?.clearSelection();
   getListData();
+}
+
+function handleReset() {
+  searchFormData.name = '';
+  tableData.value = [];
+  totalCount.value = 0;
+  handleSearch();
 }
 
 function handleSelectionChange(vals: AIAnalysis.Model[]) {
@@ -220,11 +227,17 @@ function handleBatchDel() {
   handleDel('batch', null);
 }
 
-onMounted(() => {
-  if (!connectionIsActive.value) return;
-  if (!canUseModel.value) return;
-  handleSearch();
-});
+watch(
+  () => connectionIsActive.value && canUseModel.value,
+  (val) => {
+    if (val) {
+      handleSearch();
+    }
+  },
+  {
+    immediate: true,
+  }
+);
 </script>
 
 <style lang="scss" scoped>
