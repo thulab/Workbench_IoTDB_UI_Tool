@@ -935,7 +935,7 @@ function handleDoc() {
   if (locale.value === 'en') {
     window.open('https://www.timecho.com/docs/UserGuide/latest/User-Manual/AINode_timecho.html');
   } else {
-    window.open('https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/AINode_timecho.html');
+    window.open('https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/AINode_timecho.html#%E4%BD%BF%E7%94%A8%E5%86%85%E7%BD%AE%E6%A8%A1%E5%9E%8B%E6%8E%A8%E7%90%86');
   }
 }
 
