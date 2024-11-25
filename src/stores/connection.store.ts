@@ -26,6 +26,7 @@ export const useConnectionStore = defineStore(
     const connectionIsMaster = ref();
     const connectionIsActive = ref<boolean | null>(null);
     const slaveConnectionStatus = ref(true);
+    const enableAINode = ref(false);
 
     function setConnection(data: Connection.ConnectionDetail) {
       connectionInfo.data = data;
@@ -43,6 +44,10 @@ export const useConnectionStore = defineStore(
       slaveConnectionStatus.value = data;
     }
 
+    function setEnableAINode(data: boolean) {
+      enableAINode.value = data;
+    }
+
     return {
       connectionInfo,
       setConnection,
@@ -52,12 +57,14 @@ export const useConnectionStore = defineStore(
       setConnectionActive,
       slaveConnectionStatus,
       setSlaveConnectionStatus,
+      enableAINode,
+      setEnableAINode,
     };
   },
   {
     persist: {
       storage: sessionStorage,
-      pick: ['connectionInfo'],
+      pick: ['connectionInfo', 'enableAINode'],
     },
   }
 );

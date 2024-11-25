@@ -1,12 +1,13 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { union, difference } from 'lodash-es';
-import { UserApi } from '@/api';
+import { UserApi, DashboardApi } from '@/api';
 import { useRouter } from 'vue-router';
 import { useConnectionStore } from './connection.store';
 
 const { requestFn: getLoginUserPrivileges } = useRequest(UserApi.getLoginUserPrivileges);
 const { requestFn: getPrivilegesEnum } = useRequest(UserApi.getPrivilegesEnum);
+const { requestFn: getSystemInfo } = useRequest(DashboardApi.getSystemInfo);
 
 export const useUserStore = defineStore(
   'UserStore',
@@ -155,6 +156,13 @@ export const useUserStore = defineStore(
             connectionStore.setConnectionActive(res.data.isActive);
             connectionStore.setSlaveConnectionStatus(res.data.slaveIsConnection);
             loadPrivilegesEnum(false);
+            getSystemInfo(['type', 'type'], ['', '']).then((systemInfoResp) => {
+              if (systemInfoResp.data.masterNodeInfo.nodes.some((i) => i.type === 'AINode' && i.status !== 'Unknown')) {
+                connectionStore.setEnableAINode(true);
+              } else {
+                connectionStore.setEnableAINode(false);
+              }
+            });
           })
           .catch((err) => {
             console.log(err, 'err');

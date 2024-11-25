@@ -13,9 +13,9 @@
             </base-form-item>
           </el-form>
           <div class="search-form-buttons">
-            <el-button @click="handleReset" id="model-management-search-reset">{{ t('common.reset') }}</el-button>
+            <el-button @click="handleReset" :disabled="!canUseModel || !enableAINode" id="model-management-search-reset">{{ t('common.reset') }}</el-button>
             <auth-tooltip :is-disabled="canUseModel" :content="'common.modelAuth'">
-              <el-button type="primary" @click="handleSearch" :disabled="!canUseModel" id="model-management-search-search">{{ t('common.query') }}</el-button>
+              <el-button type="primary" @click="handleSearch" :disabled="!canUseModel || !enableAINode" id="model-management-search-search">{{ t('common.query') }}</el-button>
             </auth-tooltip>
           </div>
         </el-header>
@@ -25,15 +25,17 @@
               <h4 class="page-table-title">{{ t('aiAnalysis.modelList') }}</h4>
               <div class="operate-buttons">
                 <auth-tooltip :is-disabled="canUseModel" :content="'common.modelAuth'">
-                  <el-button type="primary" @click="handleImport" :disabled="!canUseModel" id="model-management-add">{{ t('aiAnalysis.importModel') }}</el-button>
+                  <el-button type="primary" @click="handleImport" :disabled="!canUseModel || !enableAINode" id="model-management-add">{{ t('aiAnalysis.importModel') }}</el-button>
                 </auth-tooltip>
                 <auth-tooltip :is-disabled="canUseModel" :content="'common.modelAuth'">
-                  <el-button type="primary" @click="handleBatchDel" :disabled="!canUseModel || multipleSelection.length === 0" id="model-management-batch-del">{{ t('common.batchDelete') }}</el-button>
+                  <el-button type="primary" @click="handleBatchDel" :disabled="!canUseModel || multipleSelection.length === 0 || !enableAINode" id="model-management-batch-del">
+                    {{ t('common.batchDelete') }}
+                  </el-button>
                 </auth-tooltip>
               </div>
             </div>
 
-            <auth-container :is-auth="canUseModel" :content="'common.modelAuth'" style="height: 100%; width: 100%">
+            <auth-container :is-auth="canUseModel && enableAINode" :content="enableAINode ? 'common.modelAuth' : 'aiAnalysis.enableTip'" style="height: 100%; width: 100%">
               <div class="page-table-box">
                 <el-table
                   :data="tableDataPagination"
@@ -122,6 +124,7 @@ const userStore = useUserStore();
 const { canUseModel } = storeToRefs(userStore);
 const connectionStore = useConnectionStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
+const { enableAINode } = storeToRefs(connectionStore);
 const importVisible = ref(false);
 const configVisible = ref(false);
 const searchFormData = reactive({
@@ -147,7 +150,7 @@ function getListData() {
   getModels(searchFormData.name).then((res) => {
     if (res.data) {
       tableData.value = res.data
-        .filter((item) => searchFormData.name === '' || item.modelId.includes(searchFormData.name))
+        .filter((item) => searchFormData.name === '' || item.modelId.toLowerCase().includes(searchFormData.name.toLowerCase()))
         .map((item) => {
           item.configs = item.configs || '';
           return item;

@@ -899,3 +899,4 @@ aiAnalysis:
   normalValue: 正常值
   anomalyValue: 异常值
   sqlConfrimTip: 保存成功，请点击查询按钮查看结果
+  enableTip: 未接入AI节点及功能，请接入后查看
