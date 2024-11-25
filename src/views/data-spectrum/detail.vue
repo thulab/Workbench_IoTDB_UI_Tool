@@ -387,7 +387,7 @@
       @handleSave="handleRenameSuccess"
     />
     <modal-import v-model:visible="importVisible" :data-type="searchFormData.measurementType" @handle-close="handleImportClose" />
-    <dialog-chart v-if="copySearchFormData.method === 'PATTERN_MATCH'" v-model:visible="chartVisible" :times="partTimestamps" :values="partValues" />
+    <dialog-chart v-if="copySearchFormData.method === 'PATTERN_MATCH'" v-model:visible="chartDialogVisible" :times="partTimestamps" :values="partValues" />
   </el-container>
 </template>
 
@@ -490,7 +490,7 @@ const searchFormData = reactive<{
   partModel: 'existing',
   partSeries: '',
   partDatetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
-  distance: '',
+  distance: '0',
   times: [],
   values: [],
 });
@@ -562,7 +562,7 @@ const checkMatchList = ref<Search.MatchItem[]>([]);
 
 const partValues = ref<string[]>([]);
 const partTimestamps = ref<number[]>([]);
-const chartVisible = ref(false);
+const chartDialogVisible = ref(false);
 
 const saveTemplateLoading = ref(false);
 const activeNameSide = ref('point');
@@ -871,9 +871,12 @@ function handleChangeMethod(val: string) {
     getCount();
   }
   if (val !== 'PATTERN_MATCH') {
-    chartVisible.value = false;
-  } else if (partTimestamps.value.length) {
-    chartVisible.value = true;
+    chartDialogVisible.value = false;
+  } else {
+    searchFormData.partModel = 'existing';
+    if (partTimestamps.value.length) {
+      chartDialogVisible.value = true;
+    }
   }
 }
 
@@ -1258,7 +1261,7 @@ function handleImport() {
   importVisible.value = true;
 }
 function handleDetailPart() {
-  chartVisible.value = !chartVisible.value;
+  chartDialogVisible.value = !chartDialogVisible.value;
 }
 
 function handleImportClose(times: string[], values: string[]) {
@@ -1286,7 +1289,7 @@ function handleReset() {
   searchFormData.partDatetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
   searchFormData.partModel = 'existing';
   searchFormData.partSeries = '';
-  searchFormData.distance = '';
+  searchFormData.distance = '0';
   dataCount.value = undefined;
   sqlValue.value = '';
   searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
@@ -1422,7 +1425,7 @@ function getCustom() {
 function getPatternMatch() {
   const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
   const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
-  chartVisible.value = false;
+  chartDialogVisible.value = false;
   getPatternMatchData({
     udf: 'pattern_match',
     patternSeries: copySearchFormData.measurement,
@@ -1445,7 +1448,7 @@ function getPatternMatch() {
         ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
       }
       if (partTimestamps.value.length) {
-        chartVisible.value = true;
+        chartDialogVisible.value = true;
       }
       setOption(chartOptions.value, true);
     })
