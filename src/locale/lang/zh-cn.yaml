@@ -1,6 +1,7 @@
 common:
   submit: 提交
   confirm: 确定
+  confirmAndContinue: 确定并继续
   cancel: 取消
   detail: 详情
   searchDetail: 查询详情
@@ -928,3 +929,5 @@ aiAnalysis:
   anomalyValue: 异常值
   sqlConfrimTip: 保存成功，请点击查询按钮查看结果
   enableTip: 未接入AI节点及功能，请接入后查看
+  docTip: 模型具体说明请查看文档
+  measurementExist: 新测点名称已存在，数据将插入至该测点。如确认继续该操作，请点击确认并继续。

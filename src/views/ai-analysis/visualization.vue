@@ -31,9 +31,14 @@
                     />
                   </el-select>
                 </base-form-item>
-                <el-button v-if="searchFormData.type !== 2" link @click="$router.push({ name: 'ModelManagement' })">
+                <el-button v-if="searchFormData.type !== 2" link :disabled="!enableAINode" @click="$router.push({ name: 'ModelManagement' })">
                   <el-icon :size="24"><i-custom-edit /></el-icon>
                 </el-button>
+                <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('aiAnalysis.docTip')" popper-class="tooltip-box-width">
+                  <el-button link class="m-l-4" @click="handleDoc" id="user-path-doc">
+                    <el-icon size="24"><i-custom-model-doc /></el-icon>
+                  </el-button>
+                </el-tooltip>
               </div>
               <div class="search-form-row-box">
                 <div v-if="searchFormData.type !== 2">
@@ -97,11 +102,11 @@
                 </div>
                 <div v-else>
                   <base-form-item label="SQL：" prop="sql" class="el-form-item-not-mandatory">
-                    <el-button type="primary" link id="search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
+                    <el-button type="primary" :disabled="!enableAINode" link id="search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
                   </base-form-item>
                 </div>
                 <div class="search-form-buttons">
-                  <el-button @click="handleReset" id="search-reset">{{ t('common.reset') }}</el-button>
+                  <el-button @click="handleReset" :disabled="!enableAINode" id="search-reset">{{ t('common.reset') }}</el-button>
                   <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="canQuery" popper-class="tooltip-box-width">
                     <el-button :disabled="!canQuery" type="primary" @click="handleSearch()" id="search-search">
                       {{ t('common.query') }}
@@ -188,7 +193,7 @@
                     <div class="flex-justify-between p-b-4">
                       <span class="detail-total">{{ t('aiAnalysis.total', { total: sortedData.length }) }}</span>
                       <el-dropdown class="more-icon m-r-8" :disabled="!canReadWriteData || !canQuery" @command="(val) => handleCommandDown(val)" id="visualization-save-dropdown">
-                        <el-button link type="primary" class="export-button" id="visualization-download" :disabled="!canReadWriteData">
+                        <el-button link type="primary" class="export-button" id="visualization-download" :disabled="!canReadWriteData || !allTableData.length">
                           {{ t('spectrum.download') }}
                           <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                         </el-button>
@@ -230,7 +235,7 @@
                         </template>
                         <template #default="{ row }">
                           <!-- 保留 4 位小数 -->
-                          <span>{{ row.value.toFixed(4) }}</span>
+                          <span>{{ parseFloat(Number(row.value).toFixed(4)) }}</span>
                         </template>
                       </el-table-column>
                     </el-table>
@@ -373,7 +378,7 @@ const requiredRules = ref([
     trigger: 'blur',
   },
 ]);
-let currentPoint = 0;
+let currentPoint: number | undefined = 0;
 const currentPointValue = ref(0);
 const writeBackVisible = ref(false);
 
@@ -403,7 +408,7 @@ const applyTip = computed(() => {
 });
 
 const canQuery = computed(() => {
-  if (canReadWriteData.value && canUseModel.value && !notComplete.value) {
+  if (canReadWriteData.value && canUseModel.value && !notComplete.value && enableAINode.value) {
     return true;
   }
   return false;
@@ -527,7 +532,7 @@ const chartOptions = computed<ECOption>(() => ({
     formatter: (params) => {
       const paramsData = params as unknown as Array<Record<string, any>>;
       const x = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;"></span><span style="font-size:14px;color:#666;font-weight:400;">${formatDate(paramsData[0].value[0])}</span></div>`;
-      const circle = `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${paramsData[paramsData.length - 1].color}"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0].value[1]}</span></div>`;
+      const circle = `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${paramsData[paramsData.length - 1].color}"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[paramsData.length - 1].value[1]}</span></div>`;
       return `${x}${circle}`;
     },
   },
@@ -622,7 +627,14 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
       handleClickChart(params);
     });
     chartInstance.on('highlight', (params: any) => {
-      if (params.batch && params.batch.length > 0) currentPoint = params?.batch[0].dataIndex;
+      currentPoint = undefined;
+      if (params.batch && params.batch.length > 0) {
+        params.batch.forEach((item: any) => {
+          if (item.seriesIndex === 1 && item.dataIndex !== undefined) {
+            currentPoint = item.dataIndex;
+          }
+        });
+      }
     });
     // 若存在restore事件，执行
     chartInstance.on('restore', () => {
@@ -639,7 +651,7 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
         return;
       }
       if (params.topTarget && params.topTarget.type !== 'Line') return;
-      if (currentPoint && allTableData.value[currentPoint]) {
+      if ((currentPoint || currentPoint === 0) && allTableData.value[currentPoint]) {
         const point = allTableData.value[currentPoint];
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         handleDeal(point);
@@ -775,6 +787,7 @@ function getCustom() {
 // 查询
 function handleSearch() {
   if (!canReadWriteData.value) return;
+  searchFormData.orderBy = 'ascending';
   copySearchFormData = cloneDeep(searchFormData);
   filterCondition.value = 'all';
   currentPointValue.value = 0;
@@ -795,6 +808,7 @@ function handleSearch() {
       .then((res) => {
         if ((!res.data.raw || res.data.raw.length === 0) && (!res.data.analysis || res.data.analysis.length === 0)) {
           ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
+          setOption(chartOptions.value, true);
           return;
         }
         rawData.value = res.data.raw;
@@ -809,6 +823,7 @@ function handleSearch() {
             }
           });
         }
+        handleDeal(allTableData.value[0]);
         minValue.value = Math.min(...rawData.value.map((item) => Number(item.value)));
         if (!allTableData.value.length) {
           ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
@@ -914,6 +929,14 @@ function handleCellStyle({ row, columnIndex }: { row: AIAnalysis.SearchDataItem;
 function handleFilter(val: string) {
   currentPage.value = 1;
   filterCondition.value = val;
+}
+
+function handleDoc() {
+  if (locale.value === 'en') {
+    window.open('https://www.timecho.com/docs/UserGuide/latest/User-Manual/AINode_timecho.html');
+  } else {
+    window.open('https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/AINode_timecho.html');
+  }
 }
 
 function setStorage() {
