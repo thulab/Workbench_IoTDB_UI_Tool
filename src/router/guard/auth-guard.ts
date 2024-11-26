@@ -23,7 +23,7 @@ export function handleRouter(routerList: MenuOptions[], newArr: string[] = []) {
 export function registerGuard(router: Router) {
   // * 路由拦截
   router.beforeEach((to, from, next) => {
-    console.time('页面载入时间');
+    // console.time('页面载入时间');
     NProgress.start();
     useAppStore().routerViewLoading = true;
     // * 判断当前路由是否需要访问权限
@@ -43,7 +43,7 @@ export function registerGuard(router: Router) {
   });
 
   router.afterEach(() => {
-    console.timeEnd('页面载入时间');
+    // console.timeEnd('页面载入时间');
     useAppStore().routerViewLoading = false;
     NProgress.done();
   });

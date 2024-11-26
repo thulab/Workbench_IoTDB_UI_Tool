@@ -824,11 +824,14 @@ function handleSearch() {
             }
           });
         }
-        const minTimePoint = allTableData.value.reduce((min, current) => {
-          return current.time < min.time ? current : min;
-        });
-        if (minTimePoint) {
-          handleDeal(minTimePoint);
+        const anomalyData = allTableData.value.filter((item) => item.isAnomaly);
+        if (anomalyData.length > 0) {
+          const minTimePoint = anomalyData.reduce((min, current) => {
+            return current.time < min.time ? current : min;
+          });
+          if (minTimePoint) {
+            handleDeal(minTimePoint);
+          }
         }
         minValue.value = Math.min(...rawData.value.map((item) => Number(item.value)));
         if (!allTableData.value.length) {

@@ -129,11 +129,10 @@ function handleAdd() {
 function handleEditRow(data: any) {
   editData.value = data.ip;
   dialogVisible.value = true;
-  console.log(data);
 }
 
 function handleDelRow(data: any) {
-  console.log(data);
+  editData.value = data.ip;
   ElMessageBox.confirm(t('white.deleteTip'), t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),

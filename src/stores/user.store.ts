@@ -164,8 +164,7 @@ export const useUserStore = defineStore(
               }
             });
           })
-          .catch((err) => {
-            console.log(err, 'err');
+          .catch(() => {
             clearUserStore();
             sessionStorage.setItem('UserStore', '');
             sessionStorage.setItem('nologin', '1');

@@ -402,7 +402,6 @@ function handleCheckedEntity(row: Auth.UserEditAuthInfo, privilege: string, chec
 function handleAllCheckedPath(row: Auth.UserEditPathAuthInfo, value: boolean) {
   if (value) {
     // 赋予其 除角色权限外的所有权限
-    console.log(difference(pathPrivilegesEnumKeys.value, row.rolePrivileges));
     row.userSourceData.privileges = difference(pathPrivilegesEnumKeys.value, row.rolePrivileges);
   } else {
     row.userSourceData.privileges = [];
