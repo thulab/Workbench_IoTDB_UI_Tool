@@ -193,6 +193,7 @@ declare namespace Search {
   }
   export interface MatchResp {
     patternTimestamps: number[];
+    patternRawTimestamps: number[];
     patternValues: string[];
     partTimestamps: number[];
     partValues: string[];

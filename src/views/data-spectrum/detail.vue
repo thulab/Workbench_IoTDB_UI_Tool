@@ -562,6 +562,7 @@ const checkMatchList = ref<Search.MatchItem[]>([]);
 
 const partValues = ref<string[]>([]);
 const partTimestamps = ref<number[]>([]);
+const patternRawTimestamps = ref<number[]>([]);
 const chartDialogVisible = ref(false);
 
 const saveTemplateLoading = ref(false);
@@ -1442,6 +1443,7 @@ function getPatternMatch() {
       partTimestamps.value = res.data.partTimestamps || [];
       partValues.value = res.data.partValues || [];
       chartData.timestamps = res.data.patternTimestamps || [];
+      patternRawTimestamps.value = res.data.patternRawTimestamps || [];
       chartData.values = res.data.patternValues || [];
       matchList.value = (res.data.matchValue || []).map((item) => ({ ...item, checked: false }));
       if (!chartData.timestamps.length) {
@@ -1649,10 +1651,11 @@ function handleSaveMatch(times: Search.MatchItem[]) {
   const saveValues = [];
   for (let i = 0; i < chartData.timestamps.length; i++) {
     const timestamp = chartData.timestamps[i];
+    const rawTimestamp = patternRawTimestamps.value[i];
     const value = chartData.values[i];
 
     if (times.some((item) => item.startTime <= timestamp && item.endTime >= timestamp)) {
-      saveTimes.push(timestamp);
+      saveTimes.push(rawTimestamp);
       saveValues.push(value);
     }
   }
