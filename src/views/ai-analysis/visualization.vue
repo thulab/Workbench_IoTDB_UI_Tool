@@ -532,7 +532,14 @@ const chartOptions = computed<ECOption>(() => ({
     formatter: (params) => {
       const paramsData = params as unknown as Array<Record<string, any>>;
       const x = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;"></span><span style="font-size:14px;color:#666;font-weight:400;">${formatDate(paramsData[0].value[0])}</span></div>`;
-      const circle = `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${paramsData[paramsData.length - 1].color}"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[paramsData.length - 1].value[1]}</span></div>`;
+      let circle = '';
+      paramsData.forEach((item) => {
+        if (item.seriesName === t('aiAnalysis.rawValue')) {
+          circle += `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${item.value[1]}</span></div>`;
+        } else {
+          circle += `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${item.value[1]}</span></div>`;
+        }
+      });
       return `${x}${circle}`;
     },
   },
@@ -814,6 +821,9 @@ function handleSearch() {
         }
         rawData.value = res.data.raw;
         analysisData.value = res.data.analysis;
+        if (res.data.rawRange && res.data.rawRange.length > 0) {
+          rawData.value = [...rawData.value, ...res.data.rawRange];
+        }
         if (searchFormData.type === 0) {
           allTableData.value = [...res.data.analysis];
         } else {

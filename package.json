@@ -1,6 +1,6 @@
 {
   "name": "iotdb-workbench",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "private": true,
   "type": "module",
   "lint-staged": {

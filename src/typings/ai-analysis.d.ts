@@ -34,6 +34,7 @@ declare namespace AIAnalysis {
   export interface SearchDataResult {
     raw: SearchDataItem[];
     analysis: SearchDataItem[];
+    rawRange: SearchDataItem[];
   }
 
   export interface CustomItem {
