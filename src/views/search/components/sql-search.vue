@@ -302,9 +302,9 @@ function stopquery() {
   queryStop(timeNumber.value).then(() => {});
 }
 function exportSql(val: string, exportType: string) {
-  let url = `/api/file/exportExcelSqlData?sql=${val}`;
+  let url = `/api/file/exportExcelSqlData?sql=${encodeURI(val)}`;
   if (exportType === 'csv') {
-    url = `/api/file/exportCSVSqlData?sql=${val}`;
+    url = `/api/file/exportCSVSqlData?sql=${encodeURI(val)}`;
   }
   window.open(url);
 }
