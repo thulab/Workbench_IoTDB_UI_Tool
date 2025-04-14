@@ -916,6 +916,12 @@ connection:
   connectionIpTip: >-
     This address corresponds to the 'dn_rpc_address' field content in the
     'iotdb-datanode.properties' file under the 'IoTDB-conf' folder.
+  prometheusUsernameTip: prometheus username
+  prometheusPasswordTip: prometheus password
+  prometheusUsername: username
+  prometheusPassword: pwd
+  enableAuth: Basic Auth
+  disableAuth: No Auth
 flow:
   flowManagement: Flowchart Management
   topologyMap: Topology Map

@@ -25,7 +25,15 @@
             </span>
             <host-port v-model="formData.masterCluster.hostAndPortVOS" :form-key="'masterCluster.hostAndPortVOS'" :is-disabled="isShowSave" />
           </div>
-          <prometheus v-model="formData.masterCluster.prometheusUrl" :form-key="'masterCluster.prometheusUrl'" :class-name="'el-form-item-not-mandatory base-form-box'" />
+          <prometheus
+            v-model="formData.masterCluster.prometheusUrl"
+            v-model:username="formData.masterCluster.prometheusUsername"
+            v-model:password="formData.masterCluster.prometheusPassword"
+            :form-key="'masterCluster.prometheusUrl'"
+            :form-key-username="'masterCluster.prometheusUsername'"
+            :form-key-password="'masterCluster.prometheusPassword'"
+            :class-name="'el-form-item-not-mandatory base-form-box p-r-28'"
+          />
           <user-pwd v-model:username.local="formData.username" v-model:password.local="formData.password" v-model:errorPwd.local="errorPwd" :is-disabled="isShowSave" />
         </template>
         <!-- 集群版 -->
@@ -37,7 +45,15 @@
             </span>
             <host-port v-model="formData.masterCluster.hostAndPortVOS" :form-key="'masterCluster.hostAndPortVOS'" :is-disabled="isShowSave" :show-operate="true" />
           </div>
-          <prometheus v-model="formData.masterCluster.prometheusUrl" :form-key="'masterCluster.prometheusUrl'" :class-name="'el-form-item-not-mandatory base-form-box'" />
+          <prometheus
+            v-model="formData.masterCluster.prometheusUrl"
+            v-model:username="formData.masterCluster.prometheusUsername"
+            v-model:password="formData.masterCluster.prometheusPassword"
+            :form-key="'masterCluster.prometheusUrl'"
+            :form-key-username="'masterCluster.prometheusUsername'"
+            :form-key-password="'masterCluster.prometheusPassword'"
+            :class-name="'el-form-item-not-mandatory base-form-box p-r-28'"
+          />
           <user-pwd v-model:username.local="formData.username" v-model:password.local="formData.password" v-model:errorPwd.local="errorPwd" :is-disabled="isShowSave" />
         </template>
         <!-- 双活版 -->
@@ -55,7 +71,15 @@
                 </span>
                 <host-port v-model="formData.masterCluster.hostAndPortVOS" :form-key="'masterCluster.hostAndPortVOS'" :is-disabled="isShowSave" :show-operate="true" />
               </div>
-              <prometheus v-model="formData.masterCluster.prometheusUrl" :form-key="'masterCluster.prometheusUrl'" :class-name="'el-form-item-not-mandatory m-b-0 p-r-28'" />
+              <prometheus
+                v-model="formData.masterCluster.prometheusUrl"
+                v-model:username="formData.masterCluster.prometheusUsername"
+                v-model:password="formData.masterCluster.prometheusPassword"
+                :form-key="'masterCluster.prometheusUrl'"
+                :form-key-username="'masterCluster.prometheusUsername'"
+                :form-key-password="'masterCluster.prometheusPassword'"
+                :class-name="'el-form-item-not-mandatory p-r-28'"
+              />
             </el-collapse-item>
             <el-collapse-item :title="t('connection.slaveInfo')" name="slaveCluster" v-if="formData.slaveCluster">
               <template #title>
@@ -68,7 +92,15 @@
                 </span>
                 <host-port v-model="formData.slaveCluster.hostAndPortVOS" :form-key="'slaveCluster.hostAndPortVOS'" :is-disabled="isShowSave" :show-operate="true" />
               </div>
-              <prometheus v-model="formData.slaveCluster.prometheusUrl" :form-key="'slaveCluster.prometheusUrl'" :class-name="'el-form-item-not-mandatory m-b-0 p-r-28'" />
+              <prometheus
+                v-model="formData.slaveCluster.prometheusUrl"
+                v-model:username="formData.masterCluster.prometheusUsername"
+                v-model:password="formData.masterCluster.prometheusPassword"
+                :form-key="'slaveCluster.prometheusUrl'"
+                :form-key-username="'slaveCluster.prometheusUsername'"
+                :form-key-password="'slaveCluster.prometheusPassword'"
+                :class-name="'el-form-item-not-mandatory  p-r-28'"
+              />
             </el-collapse-item>
           </el-collapse>
         </template>
@@ -134,10 +166,14 @@ const formData = reactive<Connection.ConnectionDetail>({
   masterCluster: {
     hostAndPortVOS: [{ host: '', port: '' }],
     prometheusUrl: '',
+    prometheusUsername: '',
+    prometheusPassword: '',
   },
   slaveCluster: {
     hostAndPortVOS: [{ host: '', port: '' }],
     prometheusUrl: '',
+    prometheusUsername: '',
+    prometheusPassword: '',
   },
 });
 let sourceData = cloneDeep(formData);
@@ -175,6 +211,8 @@ function handleChangeType(type: 0 | 1 | 2) {
   formData.masterCluster = {
     hostAndPortVOS: [{ host: '', port: '' }],
     prometheusUrl: '',
+    prometheusUsername: '',
+    prometheusPassword: '',
   };
   formData.slaveCluster =
     type === 0
@@ -182,6 +220,8 @@ function handleChangeType(type: 0 | 1 | 2) {
       : {
           hostAndPortVOS: [{ host: '', port: '' }],
           prometheusUrl: '',
+          prometheusUsername: '',
+          prometheusPassword: '',
         };
 }
 
@@ -388,7 +428,11 @@ function handleSavePrometheus() {
   savePrometheus({
     id: formData.id,
     prometheusUrlMaster: formData.masterCluster.prometheusUrl,
+    prometheusUsernameMaster: formData.masterCluster.prometheusUsername,
+    prometheusPasswordMaster: formData.masterCluster.prometheusPassword,
     prometheusUrlSlave: formData.slaveCluster?.prometheusUrl || '',
+    prometheusUsernameSlave: formData.slaveCluster?.prometheusUsername || '',
+    prometheusPasswordSlave: formData.slaveCluster?.prometheusPassword || '',
   })
     .then(() => {
       ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
@@ -524,7 +568,7 @@ defineExpose({
     border-bottom: none;
 
     .el-collapse-item__content {
-      padding: 10px 8px !important;
+      padding: 10px 8px 1px !important;
       background-color: #f7f8fc;
     }
   }

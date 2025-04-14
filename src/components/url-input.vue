@@ -100,7 +100,7 @@ watch(
         }
       }
 
-      width: 110px;
+      width: 90px;
     }
   }
 }

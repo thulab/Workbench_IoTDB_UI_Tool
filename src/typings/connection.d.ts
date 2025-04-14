@@ -9,6 +9,8 @@ declare namespace Connection {
   export interface ConnectionClusterData {
     hostAndPortVOS: Array<{ host: string; port: number | string }>;
     prometheusUrl: string;
+    prometheusUsername?: string;
+    prometheusPassword?: string;
   }
 
   export interface ConnectionDetail {
@@ -30,6 +32,10 @@ declare namespace Connection {
   export interface SavePrometheusDetail {
     id: number | string;
     prometheusUrlMaster: string;
+    prometheusUsernameMaster?: string;
+    prometheusPasswordMaster?: string;
     prometheusUrlSlave: string;
+    prometheusUsernameSlave?: string;
+    prometheusPasswordSlave?: string;
   }
 }

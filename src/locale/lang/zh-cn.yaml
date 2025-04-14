@@ -766,6 +766,12 @@ connection:
   connectionManagement: 实例管理
   connectionList: 实例列表
   flowTip: 实例拓扑图
+  prometheusUsernameTip: 请输入Prometheus用户名
+  prometheusPasswordTip: 请输入Prometheus密码
+  prometheusUsername: 用户名
+  prometheusPassword: 密码
+  enableAuth: 开启认证
+  disableAuth: 关闭认证
 flow:
   flowManagement: 流程图管理
   topologyMap: 拓扑图
