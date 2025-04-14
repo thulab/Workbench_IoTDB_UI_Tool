@@ -76,6 +76,17 @@ const password = defineModel('password', {
 });
 
 const enableAuth = ref(false);
+watch(
+  username,
+  (val) => {
+    if (val && !enableAuth.value) {
+      enableAuth.value = true;
+    }
+  },
+  {
+    immediate: true,
+  }
+);
 </script>
 
 <style lang="scss" scoped>
