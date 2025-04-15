@@ -378,6 +378,10 @@ function handleTestPrometheus() {
   testPrometheus({
     prometheusUrlMaster: formData.masterCluster.prometheusUrl,
     prometheusUrlSlave: formData.slaveCluster?.prometheusUrl || '',
+    prometheusUsernameMaster: formData.masterCluster.prometheusUsername,
+    prometheusUsernameSlave: formData.slaveCluster?.prometheusUsername || '',
+    prometheusPasswordMaster: formData.masterCluster.prometheusPassword,
+    prometheusPasswordSlave: formData.slaveCluster?.prometheusPassword || '',
     doubleAlive: formData.type === 2,
   })
     .then(() => {

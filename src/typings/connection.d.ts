@@ -26,6 +26,10 @@ declare namespace Connection {
   export interface PrometheusDetail {
     prometheusUrlMaster: string;
     prometheusUrlSlave: string;
+    prometheusUsernameMaster?: string;
+    prometheusPasswordMaster?: string;
+    prometheusUsernameSlave?: string;
+    prometheusPasswordSlave?: string;
     doubleAlive: boolean;
   }
 

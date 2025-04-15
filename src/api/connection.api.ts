@@ -56,7 +56,14 @@ class ConnectionApi {
   }
 
   // 测试Prometheus
-  static testPrometheus(data: Connection.PrometheusDetail): HttpResponseP {
+  static testPrometheus(payload: Connection.PrometheusDetail): HttpResponseP {
+    const data = cloneDeep(payload);
+    if (data.prometheusPasswordMaster) {
+      data.prometheusPasswordMaster = encodeAES(data.prometheusPasswordMaster);
+    }
+    if (data.prometheusPasswordSlave) {
+      data.prometheusPasswordSlave = encodeAES(data.prometheusPasswordSlave);
+    }
     return http.post('/connection/testPrometheus', data);
   }
 
