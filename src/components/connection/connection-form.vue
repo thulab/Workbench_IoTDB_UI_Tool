@@ -94,8 +94,8 @@
               </div>
               <prometheus
                 v-model="formData.slaveCluster.prometheusUrl"
-                v-model:username="formData.masterCluster.prometheusUsername"
-                v-model:password="formData.masterCluster.prometheusPassword"
+                v-model:username="formData.slaveCluster.prometheusUsername"
+                v-model:password="formData.slaveCluster.prometheusPassword"
                 :form-key="'slaveCluster.prometheusUrl'"
                 :form-key-username="'slaveCluster.prometheusUsername'"
                 :form-key-password="'slaveCluster.prometheusPassword'"
