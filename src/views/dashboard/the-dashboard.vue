@@ -435,6 +435,9 @@ function getSystemData() {
     assign(systemNumberData, res.data);
     assign(systemData, res.data.masterNodeInfo);
     tableData.value = res.data.masterNodeInfo.nodes || [];
+    if (tableData.value.length > 0) {
+      connectionStore.setMasterConnectionStatus(true);
+    }
     masterNodes.value = concat(
       [
         {
