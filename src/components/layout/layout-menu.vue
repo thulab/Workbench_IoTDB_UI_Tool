@@ -70,6 +70,7 @@ const clusterType = computed(() => {
   return 'master';
 });
 const connectionName = computed(() => connectionStore.connectionInfo.data.name || t('connection.connection'));
+const masterConnectionStatus = computed(() => connectionStore.masterConnectionStatus);
 const slaveConnectionStatus = computed(() => connectionStore.slaveConnectionStatus);
 const connectionHost = computed(() => {
   const { type, masterCluster, slaveCluster } = connectionStore.connectionInfo.data;
@@ -121,8 +122,15 @@ const routesToMenu = (routeItem: RouteRecordRaw, parentPath: string) => {
 };
 
 function handleChangeCluster(type: 'master' | 'slave') {
-  if (!slaveConnectionStatus.value) {
+  if (type === 'slave' && !slaveConnectionStatus.value) {
     ElMessageBox.alert(t('connection.slaveError'), t('common.tip'), {
+      confirmButtonText: t('common.confirm'),
+      confirmButtonClass: 'change-slave-error-confirm',
+      type: 'warning',
+      showClose: false,
+    });
+  } else if (type === 'master' && !masterConnectionStatus.value) {
+    ElMessageBox.alert(t('connection.masterError'), t('common.tip'), {
       confirmButtonText: t('common.confirm'),
       confirmButtonClass: 'change-slave-error-confirm',
       type: 'warning',

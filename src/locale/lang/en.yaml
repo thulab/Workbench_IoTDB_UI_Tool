@@ -908,6 +908,7 @@ connection:
     Configuring Prometheus allows you to view some monitoring information in the
     interface. We recommend configuring and using it.
   slaveError: Backup Cluster is in an abnormal state. Please check and try again
+  masterError: Main Cluster is in an abnormal state. Please check and try again
   deleteTip: Do you want to delete this instance?
   addConnection: Add Instance
   connectionManagement: Instance Management

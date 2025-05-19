@@ -157,7 +157,10 @@ export const useUserStore = defineStore(
             connectionStore.setSlaveConnectionStatus(res.data.slaveIsConnection);
             loadPrivilegesEnum(false);
             getSystemInfo(['type', 'type'], ['', '']).then((systemInfoResp) => {
-              if (systemInfoResp.data.masterNodeInfo.nodes.some((i) => i.type === 'AINode' && i.status !== 'UnKnown')) {
+              if (!systemInfoResp.data.masterNodeInfo?.nodes) {
+                connectionStore.setMasterConnectionStatus(false);
+              }
+              if (systemInfoResp.data.masterNodeInfo?.nodes?.some((i) => i.type === 'AINode' && i.status !== 'UnKnown')) {
                 connectionStore.setEnableAINode(true);
               } else {
                 connectionStore.setEnableAINode(false);

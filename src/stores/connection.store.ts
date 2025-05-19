@@ -25,6 +25,7 @@ export const useConnectionStore = defineStore(
     });
     const connectionIsMaster = ref();
     const connectionIsActive = ref<boolean | null>(null);
+    const masterConnectionStatus = ref(true);
     const slaveConnectionStatus = ref(true);
     const enableAINode = ref(false);
 
@@ -38,6 +39,9 @@ export const useConnectionStore = defineStore(
 
     function setConnectionActive(data: boolean | null) {
       connectionIsActive.value = data;
+    }
+    function setMasterConnectionStatus(data: boolean) {
+      masterConnectionStatus.value = data;
     }
 
     function setSlaveConnectionStatus(data: boolean) {
@@ -57,6 +61,8 @@ export const useConnectionStore = defineStore(
       setConnectionActive,
       slaveConnectionStatus,
       setSlaveConnectionStatus,
+      masterConnectionStatus,
+      setMasterConnectionStatus,
       enableAINode,
       setEnableAINode,
     };
