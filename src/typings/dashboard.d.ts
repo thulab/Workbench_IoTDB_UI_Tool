@@ -20,7 +20,7 @@ declare namespace Dashboard {
     configNodeRatio: string;
     active: boolean | null;
     expirationTime: string | null;
-    serverTime: Date | null;
+    serverTime: string | null;
   }
 
   export interface ClusterNodeData {

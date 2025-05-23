@@ -223,7 +223,7 @@ const timeType = ref('datetimerange');
 const searchFormData = reactive({
   path: [] as string[],
   time: todayNow(),
-  datetimerange: [] as number[],
+  datetimerange: [],
   timeInterval: undefined as number | undefined,
   unitInterval: 's',
   aggregation: '',
@@ -361,7 +361,7 @@ function handleReset(force?: boolean) {
   searchFormData.time = todayNow();
   searchFormData.timeInterval = undefined;
   searchFormData.unitInterval = 's';
-  searchFormData.datetimerange = [] as number[];
+  searchFormData.datetimerange = [];
   searchFormData.aggregation = '';
   searchFormData.asc = 'desc';
   timeType.value = 'datetimerange';
@@ -478,7 +478,7 @@ function handleTimeType(type: 'datetime' | 'datetimerange') {
   if (timeType.value === type || getListLoading.value) return;
   timeType.value = type;
   searchFormData.time = todayNow();
-  searchFormData.datetimerange = [] as number[];
+  searchFormData.datetimerange = [];
 }
 // 下载
 function handleCommandDown(val: string) {

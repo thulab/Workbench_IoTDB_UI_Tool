@@ -139,11 +139,11 @@ const pagination = reactive({
 });
 const searchFormData = reactive({
   path: [] as string[],
-  datetimerange: [] as number[],
+  datetimerange: [],
 });
 const copySearchFormData = reactive({
   path: [] as string[],
-  datetimerange: [] as number[],
+  datetimerange: [],
 });
 const { shortcutsDaterange } = useShortcutsDate();
 
@@ -262,7 +262,7 @@ function getListDataBatch() {
 // 重置
 function handleReset() {
   searchFormData.path = [];
-  searchFormData.datetimerange = [] as number[];
+  searchFormData.datetimerange = [];
   copySearchFormData.path = searchFormData.path;
   copySearchFormData.datetimerange = searchFormData.datetimerange;
   timestamp.value = Number(new Date());
