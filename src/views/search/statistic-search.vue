@@ -19,7 +19,8 @@
             :shortcuts="shortcutsDaterange"
             :clearable="false"
             :prefix-icon="ICustomCalender"
-            :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
+            :start-placeholder="t('search.startTime')"
+            :end-placeholder="t('search.endTime')"
             id="statistic-search-datetimerange"
           />
         </base-form-item>
@@ -116,11 +117,11 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
+import type { FormInstance } from 'element-plus';
 import { storeToRefs } from 'pinia';
 import { SearchApi } from '@/api';
 import { useTableHeight } from '@/composition-api';
-import { today, getOneIntervalNow, formatDate } from '@/utils/date';
+import { formatDate } from '@/utils/date';
 import { iotdbShowAuth } from '@/utils/auth';
 import { useUserStore, useConnectionStore } from '@/stores';
 import ICustomCalender from '~icons/custom/calender.svg';
@@ -138,11 +139,11 @@ const pagination = reactive({
 });
 const searchFormData = reactive({
   path: [] as string[],
-  datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
+  datetimerange: [] as number[],
 });
 const copySearchFormData = reactive({
   path: [] as string[],
-  datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
+  datetimerange: [] as number[],
 });
 const { shortcutsDaterange } = useShortcutsDate();
 
@@ -153,7 +154,7 @@ const requiredRules = ref([
     trigger: 'blur',
   },
 ]);
-const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
+const disabledDate = (time: number) => time < new Date('1970-1-1').getTime();
 const getListLoading = ref(false);
 const timestamp = ref(0);
 const tableData = ref<Array<Search.StatisticSearchMinMaxObj & Search.StatisticSearchAvgSumObj>>([]);
@@ -172,10 +173,12 @@ const { requestFn: getStatisticData } = useRequest(SearchApi.getStatisticData);
 const { requestFn: exportStatisticData } = useRequest(SearchApi.exportStatisticData);
 
 function getMinMaxData() {
+  const startTime = copySearchFormData.datetimerange.length === 2 ? formatDate(copySearchFormData.datetimerange[0] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ') : undefined;
+  const endTime = copySearchFormData.datetimerange.length === 2 ? formatDate(copySearchFormData.datetimerange[1] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ') : undefined;
   return getMinMax({
     measurements: searchPaginationPath.value,
-    startTime: formatDate(copySearchFormData.datetimerange[0] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
-    endTime: formatDate(copySearchFormData.datetimerange[1] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
+    startTime,
+    endTime,
     timestamp: timestamp.value,
   })
     .then((res) => {
@@ -190,10 +193,12 @@ function getMinMaxData() {
 }
 
 function getAvgSumData() {
+  const startTime = copySearchFormData.datetimerange.length === 2 ? formatDate(copySearchFormData.datetimerange[0] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ') : undefined;
+  const endTime = copySearchFormData.datetimerange.length === 2 ? formatDate(copySearchFormData.datetimerange[1] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ') : undefined;
   return getAvgSum({
     measurements: searchPaginationPath.value,
-    startTime: formatDate(copySearchFormData.datetimerange[0] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
-    endTime: formatDate(copySearchFormData.datetimerange[1] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
+    startTime,
+    endTime,
     timestamp: timestamp.value,
   })
     .then((res) => {
@@ -257,7 +262,7 @@ function getListDataBatch() {
 // 重置
 function handleReset() {
   searchFormData.path = [];
-  searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
+  searchFormData.datetimerange = [] as number[];
   copySearchFormData.path = searchFormData.path;
   copySearchFormData.datetimerange = searchFormData.datetimerange;
   timestamp.value = Number(new Date());

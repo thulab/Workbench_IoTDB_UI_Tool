@@ -136,7 +136,8 @@
                   :shortcuts="shortcutsDaterange"
                   :clearable="false"
                   :prefix-icon="ICustomCalender"
-                  :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
+                  :start-placeholder="t('search.startTime')"
+                  :end-placeholder="t('search.endTime')"
                   id="spectrum-search-datetimerange"
                   @change="handleChangeTime"
                 />
@@ -177,7 +178,8 @@
                   :shortcuts="shortcutsDaterange"
                   :clearable="false"
                   :prefix-icon="ICustomCalender"
-                  :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
+                  :start-placeholder="t('search.startTime')"
+                  :end-placeholder="t('search.endTime')"
                   id="spectrum-search-datetimerange"
                   @change="handleChangeTime"
                 />
@@ -244,7 +246,8 @@
                     :shortcuts="shortcutsDaterange"
                     :clearable="false"
                     :prefix-icon="ICustomCalender"
-                    :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
+                    :start-placeholder="t('search.startTime')"
+                    :end-placeholder="t('search.endTime')"
                     id="spectrum-search-datetimerange"
                     @change="handleChangeTime"
                   />
@@ -393,13 +396,12 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
+import type { FormInstance, DateModelType } from 'element-plus';
 import dayjs from 'dayjs';
 import { debounce, cloneDeep } from 'lodash-es';
 import { vElementSize } from '@vueuse/components';
 import { SearchApi } from '@/api';
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
-import { today, getOneIntervalNow } from '@/utils/date';
 import { useUserStore } from '@/stores';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalSql from './components/modal-sql.vue';
@@ -463,14 +465,14 @@ const searchFormData = reactive<{
   compression: string | number | undefined;
   frequency: string | number | undefined;
   amplification: string | number | undefined;
-  datetimerange: [DateModelType, DateModelType];
+  datetimerange: [DateModelType, DateModelType] | [];
   dwtMethod: string;
   coef: string | undefined;
   layer: string | number | undefined;
   wpass: string | number | undefined;
   partModel: 'existing' | 'fileUpload';
   partSeries: string;
-  partDatetimerange: [DateModelType, DateModelType];
+  partDatetimerange: [DateModelType, DateModelType] | [];
   times: string[];
   values: string[];
   distance: string | number | undefined;
@@ -482,14 +484,14 @@ const searchFormData = reactive<{
   compression: '',
   frequency: '',
   amplification: 1,
-  datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
+  datetimerange: [],
   dwtMethod: '',
   coef: '',
   layer: 1,
   wpass: '',
   partModel: 'existing',
   partSeries: '',
-  partDatetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
+  partDatetimerange: [],
   distance: '0',
   times: [],
   values: [],
@@ -499,7 +501,7 @@ const { shortcutsDaterange } = useShortcutsDate();
 
 const importVisible = ref(false);
 
-const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
+const disabledDate = (time: number) => time < new Date('1970-1-1').getTime();
 const resultList = computed<Array<{ name: string; value: string }>>(() => [
   { name: t('spectrum.real'), value: 'real' },
   { name: t('spectrum.imag'), value: 'imag' },
@@ -852,8 +854,8 @@ function handleDWTTab(val: 'type' | 'number') {
 }
 
 function getCount() {
-  const start = dayjs(searchFormData.datetimerange[0]).valueOf();
-  const end = dayjs(searchFormData.datetimerange[1]).valueOf();
+  const start = searchFormData.datetimerange.length === 2 ? dayjs(searchFormData.datetimerange[0]).valueOf() : undefined;
+  const end = copySearchFormData.datetimerange.length === 2 ? dayjs(searchFormData.datetimerange[1]).valueOf() : undefined;
   getDataCount({
     measurement: searchFormData.measurement,
     startTime: start,
@@ -1287,13 +1289,13 @@ function handleReset() {
   searchFormData.wpass = '';
   searchFormData.times = [];
   searchFormData.values = [];
-  searchFormData.partDatetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
+  searchFormData.partDatetimerange = [];
   searchFormData.partModel = 'existing';
   searchFormData.partSeries = '';
   searchFormData.distance = '0';
   dataCount.value = undefined;
   sqlValue.value = '';
-  searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
+  searchFormData.datetimerange = [];
   copySearchFormData = cloneDeep(searchFormData);
   chartData.timestamps = [];
   chartData.values = [];
@@ -1302,8 +1304,8 @@ function handleReset() {
 }
 
 function getFFT() {
-  const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
-  const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
+  const start = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[0]).valueOf() : undefined;
+  const end = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[1]).valueOf() : undefined;
   getFFTData({
     resultType: copySearchFormData.resultType,
     compression: copySearchFormData.compression!,
@@ -1327,8 +1329,8 @@ function getFFT() {
 }
 
 function getEnvelope() {
-  const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
-  const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
+  const start = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[0]).valueOf() : undefined;
+  const end = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[1]).valueOf() : undefined;
   getEnvelopeDemodulationData({
     frequency: copySearchFormData.frequency || '',
     amplification: copySearchFormData.amplification || '',
@@ -1352,8 +1354,8 @@ function getEnvelope() {
 }
 
 function getDwt() {
-  const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
-  const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
+  const start = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[0]).valueOf() : undefined;
+  const end = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[1]).valueOf() : undefined;
   if (!copySearchFormData.layer) {
     searchFormData.layer = 1;
     copySearchFormData.layer = 1;
@@ -1382,8 +1384,8 @@ function getDwt() {
 }
 
 function getPass() {
-  const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
-  const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
+  const start = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[0]).valueOf() : undefined;
+  const end = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[1]).valueOf() : undefined;
   getPassData({
     udf: copySearchFormData.method === 'LOWPASS' ? 'low' : 'high',
     wpass: copySearchFormData.wpass || '',
@@ -1424,8 +1426,8 @@ function getCustom() {
 }
 
 function getPatternMatch() {
-  const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
-  const end = dayjs(copySearchFormData.datetimerange[1]).valueOf();
+  const start = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[0]).valueOf() : undefined;
+  const end = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[1]).valueOf() : undefined;
   chartDialogVisible.value = false;
   getPatternMatchData({
     udf: 'pattern_match',
@@ -1436,8 +1438,8 @@ function getPatternMatch() {
     times: copySearchFormData.partModel === 'fileUpload' ? copySearchFormData.times : undefined,
     values: copySearchFormData.partModel === 'fileUpload' ? copySearchFormData.values : undefined,
     partSeries: copySearchFormData.partModel === 'existing' ? copySearchFormData.partSeries : undefined,
-    partStartTime: copySearchFormData.partModel === 'existing' ? dayjs(copySearchFormData.partDatetimerange[0]).valueOf() : undefined,
-    partEndTime: copySearchFormData.partModel === 'existing' ? dayjs(copySearchFormData.partDatetimerange[1]).valueOf() : undefined,
+    partStartTime: copySearchFormData.partModel === 'existing' && copySearchFormData.partDatetimerange.length === 2 ? dayjs(copySearchFormData.partDatetimerange[0]).valueOf() : undefined,
+    partEndTime: copySearchFormData.partModel === 'existing' && copySearchFormData.partDatetimerange.length === 2 ? dayjs(copySearchFormData.partDatetimerange[1]).valueOf() : undefined,
   })
     .then((res) => {
       partTimestamps.value = res.data.partTimestamps || [];
@@ -1584,7 +1586,7 @@ function handleSaveSuccess(name: string) {
   saveTemplateLoading.value = true;
   const data = JSON.stringify({
     ...searchFormData,
-    datetimerange: [dayjs(searchFormData.datetimerange[0]).valueOf(), dayjs(searchFormData.datetimerange[1]).valueOf()],
+    datetimerange: searchFormData.datetimerange.length === 2 ? [dayjs(searchFormData.datetimerange[0]).valueOf(), dayjs(searchFormData.datetimerange[1]).valueOf()] : [],
     dwtTab: dwtTab.value,
   });
   upsertTrendTemplate({

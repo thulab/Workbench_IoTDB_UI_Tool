@@ -92,8 +92,8 @@ declare namespace Search {
 
   export interface StatisticSearch {
     measurements: string[];
-    startTime: DateModelType;
-    endTime: DateModelType;
+    startTime?: DateModelType;
+    endTime?: DateModelType;
     timestamp: number;
   }
 
@@ -123,8 +123,8 @@ declare namespace Search {
     resultType: string;
     compression: number | string;
     measurement: string;
-    startTime: DateModelType;
-    endTime: DateModelType;
+    startTime?: DateModelType;
+    endTime?: DateModelType;
   }
 
   export interface SpectrumENVELOPEParams {

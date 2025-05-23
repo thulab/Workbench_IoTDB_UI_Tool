@@ -65,5 +65,15 @@ class DashboardApi {
   static getActiveInfo(isMaster: boolean): HttpResponseP<Dashboard.ActiveData> {
     return http.get('/home/getActivationInfo', { params: { isMaster } });
   }
+
+  // 获取机器码
+  static getMachineCode(isMaster: boolean): HttpResponseP<string> {
+    return http.get('/home/getMachineCode', { params: { isMaster } });
+  }
+
+  // 激活
+  static toActive(license: string, isMaster: boolean): HttpResponseP<string> {
+    return http.post('/home/active', { license, isMaster });
+  }
 }
 export default DashboardApi;

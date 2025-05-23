@@ -282,6 +282,8 @@ measurement:
 search:
   datetime: 时间点
   datetimerange: 时间段
+  startTime: 开始时间
+  endTime: 结束时间
   timeInterval: 采样周期
   inputNumberPlaceholder: 请输入正整数
   aggregation: 采样策略
@@ -405,10 +407,17 @@ dashboard:
   slaveSystemInfo: 备集群系统信息
   deadTime: 数据截止
   serverStatus: 服务器状态
+  serverClock: 服务器时钟
   expirationTime: 激活到期
   activationExpirationTime: 激活到期时间
   isActive: 是否激活
   activeDetail: 激活详情
+  activeNow: 立即激活
+  machineCode: 机器码
+  activeCode: 激活码
+  activeCodePlaceholder: 请输入激活码
+  activeSuccess: 激活成功
+  totalCharacters: 共计 {count} 字符
   node: 节点
   type: 类型
   version: 版本
@@ -802,6 +811,7 @@ flow:
   cluster: 集群实例
   doubleAlive: 双活实例
   copySuccess: 复制成功
+  copyFailed: 复制失败
   copyTip: 请先选中节点再复制
   pasteSuccess: 粘贴成功
   pasteTip: 剪切板为空，不可粘贴

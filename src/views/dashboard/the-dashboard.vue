@@ -30,6 +30,11 @@
                   AINode {{ systemData.aiNodeRatio ? `${systemData.aiNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }}
                 </span>
               </li>
+              <li class="system-info-item" v-if="systemData.serverTime">
+                <el-icon size="24"><i-custom-system-clock /></el-icon>
+                <span class="module-label-text">{{ `${t('dashboard.serverClock')}：` }}</span>
+                <span class="module-content-text">{{ formatDate(systemData.serverTime, 'YYYY-MM-DD HH:mm:ss') }}</span>
+              </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-active-status /></el-icon>
                 <span class="module-label-text">{{ t('dashboard.isActive') }}：</span>
@@ -44,6 +49,17 @@
                   id="master-active-button"
                 >
                   {{ t('dashboard.activeDetail') }}
+                </el-button>
+                <el-button
+                  v-if="!systemData.active && showVersionCol134(connectionStore.connectionInfo.currentVersion || '')"
+                  type="primary"
+                  link
+                  class="m-l-8"
+                  style="text-decoration: underline"
+                  @click="handleClickActiveNow(true)"
+                  id="slave-active-now-button"
+                >
+                  {{ t('dashboard.activeNow') }}
                 </el-button>
               </li>
               <!-- <li class="system-info-item">
@@ -98,7 +114,11 @@
                   align="left"
                   show-overflow-tooltip
                   label-class-name="table-sort-column-box"
-                />
+                >
+                  <template #default="{ row }">
+                    <span :style="{ color: getStatusColor(row.status) }">{{ row.status }}</span>
+                  </template>
+                </el-table-column>
                 <el-table-column
                   :label="t('dashboard.version')"
                   prop="version"
@@ -142,6 +162,11 @@
                   {{ slaveData.dataNodeRatio ? `${slaveData.dataNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }}
                 </span>
               </li>
+              <li class="system-info-item" v-if="slaveData.serverTime">
+                <el-icon size="24"><i-custom-system-clock /></el-icon>
+                <span class="module-label-text">{{ `${t('dashboard.serverClock')}：` }}</span>
+                <span class="module-content-text">{{ formatDate(slaveData.serverTime, 'YYYY-MM-DD HH:mm:ss') }}</span>
+              </li>
               <li class="system-info-item">
                 <el-icon size="24"><i-custom-active-status /></el-icon>
                 <span class="module-label-text">{{ t('dashboard.isActive') }}：</span>
@@ -156,6 +181,17 @@
                   id="slave-active-button"
                 >
                   {{ t('dashboard.activeDetail') }}
+                </el-button>
+                <el-button
+                  v-if="!slaveData.active && showVersionCol134(connectionStore.connectionInfo.currentVersion || '')"
+                  type="primary"
+                  link
+                  class="m-l-8"
+                  style="text-decoration: underline"
+                  @click="handleClickActiveNow(false)"
+                  id="slave-active-now-button"
+                >
+                  {{ t('dashboard.activeNow') }}
                 </el-button>
               </li>
               <!-- <li class="system-info-item">
@@ -210,7 +246,11 @@
                   align="left"
                   show-overflow-tooltip
                   label-class-name="table-sort-column-box"
-                />
+                >
+                  <template #default="{ row }">
+                    <span :style="{ color: getStatusColor(row.status) }">{{ row.status }}</span>
+                  </template>
+                </el-table-column>
                 <el-table-column
                   :label="t('dashboard.version')"
                   prop="version"
@@ -298,6 +338,7 @@
         </div>
 
         <modal-active v-model:visible="activeVisible" :is-master="activeIsMaster" />
+        <modal-active-now v-model:visible="activeNowVisible" :is-master="activeIsMaster" />
       </el-main>
     </el-container>
   </el-scrollbar>
@@ -312,10 +353,12 @@ import { useUserStore, useConnectionStore } from '@/stores';
 import { DashboardApi } from '@/api';
 import { toThousands } from '@/utils/format';
 import { iotdbShowAuth } from '@/utils/auth';
+import { formatDate } from '@/utils/date';
 import MonitorAll from './components/monitor-all.vue';
 import MonitorDatanode from './components/monitor-datanode.vue';
 import MonitorConfignode from './components/monitor-confignode.vue';
 import ModalActive from './components/modal-active.vue';
+import ModalActiveNow from './components/modal-active-now.vue';
 
 const { t, locale } = useI18n();
 const userStore = useUserStore();
@@ -330,6 +373,7 @@ const systemData = reactive<Dashboard.SystemData>({
   configNodeRatio: '-',
   active: false,
   expirationTime: '-',
+  serverTime: null,
 });
 const slaveData = ref<Dashboard.SystemData | null>({
   aiNodeRatio: '-',
@@ -337,6 +381,7 @@ const slaveData = ref<Dashboard.SystemData | null>({
   configNodeRatio: '-',
   active: false,
   expirationTime: '-',
+  serverTime: null,
 });
 const systemNumberData = reactive<Dashboard.SystemNumberData>({
   databaseNum: 0,
@@ -351,6 +396,7 @@ const searchFormData = reactive<{
   asc: ['', ''],
 });
 const activeVisible = ref(false);
+const activeNowVisible = ref(false);
 const activeIsMaster = ref(true);
 const clusterType = ref<'master' | 'slave'>('master');
 const tableData = ref<Dashboard.NodeItem[]>([]);
@@ -372,6 +418,19 @@ const nodeList = computed(() => {
   return masterNodes.value.filter((item) => item.type !== 'AINode');
 });
 
+function getStatusColor(status: string) {
+  switch (status) {
+    case 'Running':
+      return '#44C795';
+    case 'ReadOnly':
+      return '#FF8D1A';
+    case 'UnKnown':
+      return '#D43030';
+    default:
+      return '#424561';
+  }
+}
+
 function showVersionCol(version: string) {
   if (!version) return false;
   return iotdbShowAuth(version, '1.2.1');
@@ -380,6 +439,11 @@ function showVersionCol(version: string) {
 function showVersionCol1312(version: string) {
   if (!version) return false;
   return iotdbShowAuth(version, '1.3.1.2');
+}
+
+function showVersionCol134(version: string) {
+  if (!version) return false;
+  return iotdbShowAuth(version, '1.3.4');
 }
 
 function formatVersion(row: Dashboard.NodeItem, type: 'slave' | 'master') {
@@ -558,6 +622,11 @@ function handleChangeCluster(type: 'master' | 'slave') {
 function handleClickActive(isMaster: boolean) {
   activeIsMaster.value = isMaster;
   activeVisible.value = true;
+}
+
+function handleClickActiveNow(isMaster: boolean) {
+  activeIsMaster.value = isMaster;
+  activeNowVisible.value = true;
 }
 
 watch(

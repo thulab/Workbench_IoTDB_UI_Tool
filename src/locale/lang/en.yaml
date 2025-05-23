@@ -301,6 +301,8 @@ measurement:
 search:
   datetime: Timestamp
   datetimerange: Time Range
+  startTime: Start Time
+  endTime: End Time
   timeInterval: Sampling Period
   inputNumberPlaceholder: Please enter a positive integer
   aggregation: Aggregation Strategy
@@ -492,6 +494,7 @@ dashboard:
   slaveSystemInfo: Backup System Information
   deadTime: Update Time
   serverStatus: Server Status
+  serverClock: Server Clock
   expirationTime: Activation Expired
   isActive: Activation
   node: Node
@@ -522,6 +525,12 @@ dashboard:
   activeCpuNum: CPU
   activeDataNodeNum: Datanode Nodes
   activeDetail: Details
+  activeNow: Activate Now
+  machineCode: Machine Code
+  activeCode: Activation Code
+  activeCodePlaceholder: Please enter the activation code
+  activeSuccess: Activation Successful
+  totalCharacters: Total {count} Characters
   activeDeviceNum: Devices
   activeMeasurementNum: Time Series
   used: Used
@@ -952,6 +961,7 @@ flow:
   cluster: Cluster Instance
   doubleAlive: Dual-Active Instance
   copySuccess: Copy Successful
+  copyFailed: Copy Failed
   copyTip: Please select a node before copying
   pasteSuccess: Paste Successful
   pasteTip: Clipboard is empty

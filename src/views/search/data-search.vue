@@ -41,9 +41,10 @@
               :shortcuts="shortcutsDaterange"
               :clearable="false"
               :prefix-icon="ICustomCalender"
+              :start-placeholder="t('search.startTime')"
+              :end-placeholder="t('search.endTime')"
               id="data-search-datetimerange"
               :disabled="getListLoading"
-              :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
             />
           </div>
         </el-form-item>
@@ -181,14 +182,14 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance, SingleOrRange, DateModelType, Sort } from 'element-plus';
+import type { FormInstance, Sort } from 'element-plus';
 import dayjs from 'dayjs';
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import { cloneDeep } from 'lodash-es';
 import { useTableHeight, useShortcutsDate } from '@/composition-api';
 import { SearchApi } from '@/api';
-import { today, todayNow } from '@/utils/date';
+import { todayNow } from '@/utils/date';
 import { useUserStore } from '@/stores';
 import DynamicTable from '@/components/dynamic-table.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
@@ -222,7 +223,7 @@ const timeType = ref('datetimerange');
 const searchFormData = reactive({
   path: [] as string[],
   time: todayNow(),
-  datetimerange: [new Date('1970-1-1').getTime(), todayNow()] as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
+  datetimerange: [] as number[],
   timeInterval: undefined as number | undefined,
   unitInterval: 's',
   aggregation: '',
@@ -232,7 +233,7 @@ let copySearchFormData = cloneDeep(searchFormData);
 
 const { shortcutsDate, shortcutsDaterange } = useShortcutsDate();
 
-const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
+const disabledDate = (time: number) => time < new Date('1970-1-1').getTime();
 
 const searchDetailInfos = ref<Partial<Search.QueryDataResult>>({});
 const hasNext = ref(false);
@@ -283,14 +284,14 @@ function getListData() {
   columns.value = [];
   tableData.value = [];
 
-  let startTime = 0;
-  let endTime = 0;
+  let startTime;
+  let endTime;
   if (timeType.value === 'datetime') {
     startTime = dayjs(copySearchFormData.time).valueOf();
     endTime = startTime + 1000;
   } else {
-    startTime = dayjs(copySearchFormData.datetimerange[0]).valueOf();
-    endTime = dayjs(copySearchFormData.datetimerange[1]).valueOf();
+    startTime = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[0]).valueOf() : undefined;
+    endTime = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[1]).valueOf() : undefined;
   }
 
   searchDetailInfos.value.status = undefined;
@@ -360,7 +361,7 @@ function handleReset(force?: boolean) {
   searchFormData.time = todayNow();
   searchFormData.timeInterval = undefined;
   searchFormData.unitInterval = 's';
-  searchFormData.datetimerange = ['1970-01-01 00:00:00', todayNow()] as [DateModelType, DateModelType];
+  searchFormData.datetimerange = [] as number[];
   searchFormData.aggregation = '';
   searchFormData.asc = 'desc';
   timeType.value = 'datetimerange';
@@ -477,7 +478,7 @@ function handleTimeType(type: 'datetime' | 'datetimerange') {
   if (timeType.value === type || getListLoading.value) return;
   timeType.value = type;
   searchFormData.time = todayNow();
-  searchFormData.datetimerange = ['1970-01-01 00:00:00', todayNow()] as [DateModelType, DateModelType];
+  searchFormData.datetimerange = [] as number[];
 }
 // 下载
 function handleCommandDown(val: string) {

@@ -13,7 +13,7 @@ const route = [
     component: Layout,
     redirect: { name: 'DataSearch' },
     meta: {
-      title: 'page.dataManage',
+      title: 'page.dataSearch',
       icon: ICustomQuery,
       activeIcon: ICustomQueryActive,
       order: 20,
@@ -23,7 +23,7 @@ const route = [
         path: 'data-search',
         name: 'DataSearch',
         component: () => import('@/views/search/data-search.vue'),
-        meta: { keepAlive: true, title: 'page.dataManage', icon: ICustomQueryData },
+        meta: { keepAlive: true, title: 'page.dataSearch', icon: ICustomQueryData },
       },
       {
         path: 'statistic-search',

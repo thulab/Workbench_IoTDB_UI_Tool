@@ -26,6 +26,30 @@ app.use(pinia);
 app.use(router);
 app.use(baseComponents);
 
+app.directive('copy', {
+  beforeMount(el, binding) {
+    el.style.cursor = 'pointer';
+    el.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(binding.value);
+        ElMessage.success(app.config.globalProperties.$t('flow.copySuccess'));
+      } catch (err) {
+        const textarea = document.createElement('textarea');
+        textarea.value = binding.value;
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+          document.execCommand('copy');
+          ElMessage.success(app.config.globalProperties.$t('flow.copySuccess'));
+        } catch (e) {
+          ElMessage.error(app.config.globalProperties.$t('flow.copyFailed'));
+        }
+        document.body.removeChild(textarea);
+      }
+    });
+  },
+});
+
 router.isReady().then(() => {
   app.mount('#app');
 });
