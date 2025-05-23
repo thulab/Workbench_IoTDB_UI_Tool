@@ -59,4 +59,14 @@ export const iotdbShowAuth = (version?: string, controlVersion: string = '1.2.3'
   return false;
 };
 
+/**
+ * 判断版本号的位数是否大于3
+ * @param {string} version 版本号字符串（如 "1.2.3.4"）
+ * @returns {boolean} 如果版本号位数大于3则返回true，否则返回false
+ */
+export const isVersionMoreThanThreeDigits = (version: string) => {
+  const parts = version.split('.');
+  return parts.length > 3;
+};
+
 export default { getPathAuthList };

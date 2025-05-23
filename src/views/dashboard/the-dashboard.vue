@@ -51,7 +51,10 @@
                   {{ t('dashboard.activeDetail') }}
                 </el-button>
                 <el-button
-                  v-if="!systemData.active && showVersionCol134(connectionStore.connectionInfo.currentVersion || '')"
+                  v-if="
+                    !systemData.active &&
+                    (showVersionMoreThanThreeDigits(connectionStore.connectionInfo.currentVersion || '') || showVersionCol134(connectionStore.connectionInfo.currentVersion || ''))
+                  "
                   type="primary"
                   link
                   class="m-l-8"
@@ -352,7 +355,7 @@ import { storeToRefs } from 'pinia';
 import { useUserStore, useConnectionStore } from '@/stores';
 import { DashboardApi } from '@/api';
 import { toThousands } from '@/utils/format';
-import { iotdbShowAuth } from '@/utils/auth';
+import { iotdbShowAuth, isVersionMoreThanThreeDigits } from '@/utils/auth';
 import { formatDate } from '@/utils/date';
 import MonitorAll from './components/monitor-all.vue';
 import MonitorDatanode from './components/monitor-datanode.vue';
@@ -444,6 +447,11 @@ function showVersionCol1312(version: string) {
 function showVersionCol134(version: string) {
   if (!version) return false;
   return iotdbShowAuth(version, '1.3.4');
+}
+
+function showVersionMoreThanThreeDigits(version: string) {
+  if (!version) return false;
+  return isVersionMoreThanThreeDigits(version);
 }
 
 function formatVersion(row: Dashboard.NodeItem, type: 'slave' | 'master') {
