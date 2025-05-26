@@ -422,16 +422,17 @@ const nodeList = computed(() => {
 });
 
 function getStatusColor(status: string) {
-  switch (status) {
-    case 'Running':
-      return '#44C795';
-    case 'ReadOnly':
-      return '#FF8D1A';
-    case 'UnKnown':
-      return '#D43030';
-    default:
-      return '#424561';
+  const lowerStatus = status.toLowerCase();
+  if (lowerStatus.includes('running')) {
+    return '#44C795';
   }
+  if (lowerStatus.includes('readonly')) {
+    return '#FF8D1A';
+  }
+  if (lowerStatus.includes('unknown')) {
+    return '#D43030';
+  }
+  return '#424561';
 }
 
 function showVersionCol(version: string) {
