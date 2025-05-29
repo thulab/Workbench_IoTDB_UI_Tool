@@ -20,71 +20,75 @@
               </p>
             </div>
             <ul class="system-info-list">
-              <li class="system-info-item">
-                <el-icon size="24"><i-custom-system-status /></el-icon>
-                <span class="module-label-text">{{ `${t('dashboard.serverStatus')}(Running)：` }}</span>
-                <span class="module-content-text" v-if="!systemData.dataNodeRatio && !systemData.configNodeRatio">-</span>
-                <span class="module-content-text" v-else>
-                  ConfigNode {{ systemData.configNodeRatio ? `${systemData.configNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }} DataNode
-                  {{ systemData.dataNodeRatio ? `${systemData.dataNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }}
-                  AINode {{ systemData.aiNodeRatio ? `${systemData.aiNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }}
-                </span>
-              </li>
-              <li class="system-info-item" v-if="systemData.serverTime">
-                <el-icon size="24"><i-custom-system-clock /></el-icon>
-                <span class="module-label-text">{{ `${t('dashboard.serverClock')}：` }}</span>
-                <span class="module-content-text">{{ formatDate(systemData.serverTime, 'YYYY-MM-DD HH:mm:ss') }}</span>
-              </li>
-              <li class="system-info-item">
-                <el-icon size="24"><i-custom-active-status /></el-icon>
-                <span class="module-label-text">{{ t('dashboard.isActive') }}：</span>
-                <span class="module-content-text" :style="{ color: systemData.active ? '#44C795' : '#D43030' }">{{ systemData.active ? t('common.yes') : t('common.no') }}</span>
-                <el-button
-                  v-if="systemData.active && showVersionCol1312(connectionStore.connectionInfo.currentVersion || '')"
-                  type="primary"
-                  link
-                  class="m-l-8"
-                  style="text-decoration: underline"
-                  @click="handleClickActive(true)"
-                  id="master-active-button"
-                >
-                  {{ t('dashboard.activeDetail') }}
-                </el-button>
-                <el-button
-                  v-if="
-                    !systemData.active &&
-                    (showVersionMoreThanThreeDigits(connectionStore.connectionInfo.currentVersion || '') || showVersionCol134(connectionStore.connectionInfo.currentVersion || ''))
-                  "
-                  type="primary"
-                  link
-                  class="m-l-8"
-                  style="text-decoration: underline"
-                  @click="handleClickActiveNow(true)"
-                  id="slave-active-now-button"
-                >
-                  {{ t('dashboard.activeNow') }}
-                </el-button>
-              </li>
-              <!-- <li class="system-info-item">
-                  <el-icon size="24"><i-custom-time /></el-icon>
-                  <span class="module-label-text">{{ t('dashboard.expirationTime') }}：</span>
-                  <span class="module-content-text">{{ systemData.expirationTime || '-' }}</span>
-                </li> -->
-              <li class="system-info-item">
-                <el-icon size="24"><i-custom-storage-num /></el-icon>
-                <span class="module-label-text">{{ t('measurement.databaseNum') }}：</span>
-                <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.databaseNum, '-') : t('common.noAuth') }}</span>
-              </li>
-              <li class="system-info-item">
-                <el-icon size="24"><i-custom-device-num /></el-icon>
-                <span class="module-label-text">{{ t('measurement.deviceNum') }}：</span>
-                <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.deviceNum, '-') : t('common.noAuth') }}</span>
-              </li>
-              <li class="system-info-item">
-                <el-icon size="24"><i-custom-measure-num /></el-icon>
-                <span class="module-label-text">{{ t('measurement.measurementNum') }}：</span>
-                <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.measurementNum, '-') : t('common.noAuth') }}</span>
-              </li>
+              <el-row style="margin-right: 24px">
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-system-status /></el-icon>
+                  <span class="module-label-text">{{ `${t('dashboard.serverStatus')}(Running)：` }}</span>
+                  <span class="module-content-text" v-if="!systemData.dataNodeRatio && !systemData.configNodeRatio">-</span>
+                  <span class="module-content-text" v-else>
+                    ConfigNode {{ systemData.configNodeRatio ? `${systemData.configNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }} DataNode
+                    {{ systemData.dataNodeRatio ? `${systemData.dataNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }}
+                    AINode {{ systemData.aiNodeRatio ? `${systemData.aiNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }}
+                  </span>
+                </li>
+                <li class="system-info-item" v-if="systemData.serverTime">
+                  <el-icon size="24"><i-custom-system-clock /></el-icon>
+                  <span class="module-label-text">{{ `${t('dashboard.serverClock')}：` }}</span>
+                  <span class="module-content-text">{{ formatDate(systemData.serverTime, 'YYYY-MM-DD HH:mm:ss') }}</span>
+                </li>
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-active-status /></el-icon>
+                  <span class="module-label-text">{{ t('dashboard.isActive') }}：</span>
+                  <span class="module-content-text" :style="{ color: systemData.active ? '#44C795' : '#D43030' }">{{ systemData.active ? t('common.yes') : t('common.no') }}</span>
+                  <el-button
+                    v-if="systemData.active && showVersionCol1312(connectionStore.connectionInfo.currentVersion || '')"
+                    type="primary"
+                    link
+                    class="m-l-8"
+                    style="text-decoration: underline"
+                    @click="handleClickActive(true)"
+                    id="master-active-button"
+                  >
+                    {{ t('dashboard.activeDetail') }}
+                  </el-button>
+                  <el-button
+                    v-if="
+                      !systemData.active &&
+                      (showVersionMoreThanThreeDigits(connectionStore.connectionInfo.currentVersion || '') || showVersionCol134(connectionStore.connectionInfo.currentVersion || ''))
+                    "
+                    type="primary"
+                    link
+                    class="m-l-8"
+                    style="text-decoration: underline"
+                    @click="handleClickActiveNow(true)"
+                    id="slave-active-now-button"
+                  >
+                    {{ t('dashboard.activeNow') }}
+                  </el-button>
+                </li>
+                <!-- <li class="system-info-item">
+                    <el-icon size="24"><i-custom-time /></el-icon>
+                    <span class="module-label-text">{{ t('dashboard.expirationTime') }}：</span>
+                    <span class="module-content-text">{{ systemData.expirationTime || '-' }}</span>
+                  </li> -->
+              </el-row>
+              <el-row>
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-storage-num /></el-icon>
+                  <span class="module-label-text">{{ t('measurement.databaseNum') }}：</span>
+                  <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.databaseNum, '-') : t('common.noAuth') }}</span>
+                </li>
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-device-num /></el-icon>
+                  <span class="module-label-text">{{ t('measurement.deviceNum') }}：</span>
+                  <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.deviceNum, '-') : t('common.noAuth') }}</span>
+                </li>
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-measure-num /></el-icon>
+                  <span class="module-label-text">{{ t('measurement.measurementNum') }}：</span>
+                  <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.measurementNum, '-') : t('common.noAuth') }}</span>
+                </li>
+              </el-row>
             </ul>
 
             <div class="table-box-wrapper">
@@ -155,68 +159,72 @@
               </p>
             </div>
             <ul class="system-info-list">
-              <li class="system-info-item">
-                <el-icon size="24"><i-custom-system-status /></el-icon>
-                <span class="module-label-text">{{ `${t('dashboard.serverStatus')}(Running)：` }}</span>
-                <span class="module-content-text" v-if="!slaveData.dataNodeRatio && !slaveData.configNodeRatio">-</span>
-                <span class="module-content-text" v-else>
-                  AINode {{ slaveData.aiNodeRatio ? `${slaveData.aiNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }} ConfigNode
-                  {{ slaveData.configNodeRatio ? `${slaveData.configNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }} DataNode
-                  {{ slaveData.dataNodeRatio ? `${slaveData.dataNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }}
-                </span>
-              </li>
-              <li class="system-info-item" v-if="slaveData.serverTime">
-                <el-icon size="24"><i-custom-system-clock /></el-icon>
-                <span class="module-label-text">{{ `${t('dashboard.serverClock')}：` }}</span>
-                <span class="module-content-text">{{ formatDate(slaveData.serverTime, 'YYYY-MM-DD HH:mm:ss') }}</span>
-              </li>
-              <li class="system-info-item">
-                <el-icon size="24"><i-custom-active-status /></el-icon>
-                <span class="module-label-text">{{ t('dashboard.isActive') }}：</span>
-                <span class="module-content-text" :style="{ color: slaveData.active ? '#44C795' : '#D43030' }">{{ slaveData.active ? t('common.yes') : t('common.no') }}</span>
-                <el-button
-                  v-if="slaveData.active && showVersionCol1312(connectionStore.connectionInfo.slaveVersion || '')"
-                  type="primary"
-                  link
-                  class="m-l-8"
-                  style="text-decoration: underline"
-                  @click="handleClickActive(false)"
-                  id="slave-active-button"
-                >
-                  {{ t('dashboard.activeDetail') }}
-                </el-button>
-                <el-button
-                  v-if="!slaveData.active && showVersionCol134(connectionStore.connectionInfo.currentVersion || '')"
-                  type="primary"
-                  link
-                  class="m-l-8"
-                  style="text-decoration: underline"
-                  @click="handleClickActiveNow(false)"
-                  id="slave-active-now-button"
-                >
-                  {{ t('dashboard.activeNow') }}
-                </el-button>
-              </li>
-              <!-- <li class="system-info-item">
-                <el-icon size="24"><i-custom-time /></el-icon>
-                <span class="module-label-text">{{ t('dashboard.expirationTime') }}：</span>
-                <span class="module-content-text">{{ slaveData.expirationTime || '-' }}</span>
-              </li> -->
-              <li class="system-info-item">
-                <el-icon size="24"><i-custom-storage-num /></el-icon>
-                <span class="module-label-text">{{ t('measurement.databaseNum') }}：</span>
-                <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.databaseNum, '-') : t('common.noAuth') }}</span>
-              </li>
-              <li class="system-info-item">
-                <el-icon size="24"><i-custom-device-num /></el-icon>
-                <span class="module-label-text">{{ t('measurement.deviceNum') }}：</span>
-                <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.deviceNum, '-') : t('common.noAuth') }}</span>
-              </li>
-              <li class="system-info-item">
-                <el-icon size="24"><i-custom-measure-num /></el-icon>
-                <span class="module-label-text">{{ t('measurement.measurementNum') }}：</span>
-                <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.measurementNum, '-') : t('common.noAuth') }}</span>
-              </li>
+              <el-row style="margin-right: 24px">
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-system-status /></el-icon>
+                  <span class="module-label-text">{{ `${t('dashboard.serverStatus')}(Running)：` }}</span>
+                  <span class="module-content-text" v-if="!slaveData.dataNodeRatio && !slaveData.configNodeRatio">-</span>
+                  <span class="module-content-text" v-else>
+                    AINode {{ slaveData.aiNodeRatio ? `${slaveData.aiNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }} ConfigNode
+                    {{ slaveData.configNodeRatio ? `${slaveData.configNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }} DataNode
+                    {{ slaveData.dataNodeRatio ? `${slaveData.dataNodeRatio}${locale === 'en' ? '' : '个'}` : '-' }}
+                  </span>
+                </li>
+                <li class="system-info-item" v-if="slaveData.serverTime">
+                  <el-icon size="24"><i-custom-system-clock /></el-icon>
+                  <span class="module-label-text">{{ `${t('dashboard.serverClock')}：` }}</span>
+                  <span class="module-content-text">{{ formatDate(slaveData.serverTime, 'YYYY-MM-DD HH:mm:ss') }}</span>
+                </li>
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-active-status /></el-icon>
+                  <span class="module-label-text">{{ t('dashboard.isActive') }}：</span>
+                  <span class="module-content-text" :style="{ color: slaveData.active ? '#44C795' : '#D43030' }">{{ slaveData.active ? t('common.yes') : t('common.no') }}</span>
+                  <el-button
+                    v-if="slaveData.active && showVersionCol1312(connectionStore.connectionInfo.slaveVersion || '')"
+                    type="primary"
+                    link
+                    class="m-l-8"
+                    style="text-decoration: underline"
+                    @click="handleClickActive(false)"
+                    id="slave-active-button"
+                  >
+                    {{ t('dashboard.activeDetail') }}
+                  </el-button>
+                  <el-button
+                    v-if="!slaveData.active && showVersionCol134(connectionStore.connectionInfo.currentVersion || '')"
+                    type="primary"
+                    link
+                    class="m-l-8"
+                    style="text-decoration: underline"
+                    @click="handleClickActiveNow(false)"
+                    id="slave-active-now-button"
+                  >
+                    {{ t('dashboard.activeNow') }}
+                  </el-button>
+                </li>
+                <!-- <li class="system-info-item">
+                  <el-icon size="24"><i-custom-time /></el-icon>
+                  <span class="module-label-text">{{ t('dashboard.expirationTime') }}：</span>
+                  <span class="module-content-text">{{ slaveData.expirationTime || '-' }}</span>
+                </li> -->
+              </el-row>
+              <el-row>
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-storage-num /></el-icon>
+                  <span class="module-label-text">{{ t('measurement.databaseNum') }}：</span>
+                  <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.databaseNum, '-') : t('common.noAuth') }}</span>
+                </li>
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-device-num /></el-icon>
+                  <span class="module-label-text">{{ t('measurement.deviceNum') }}：</span>
+                  <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.deviceNum, '-') : t('common.noAuth') }}</span>
+                </li>
+                <li class="system-info-item">
+                  <el-icon size="24"><i-custom-measure-num /></el-icon>
+                  <span class="module-label-text">{{ t('measurement.measurementNum') }}：</span>
+                  <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.measurementNum, '-') : t('common.noAuth') }}</span>
+                </li>
+              </el-row>
             </ul>
 
             <div class="table-box-wrapper">
