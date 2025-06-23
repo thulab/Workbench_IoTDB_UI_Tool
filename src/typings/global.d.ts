@@ -61,6 +61,7 @@ declare global {
     hideClose?: boolean;
     label?: string;
     order?: number; // 菜单顺序
+    sqlDialect?: 'all' | 'tree' | 'table'; // SQL 方言，all 表示所有方言都支持, 空 和 tree 代表仅树模型。table 代表仅表模型
   }
 
   type RouteConfig = RouteRecordRaw & {

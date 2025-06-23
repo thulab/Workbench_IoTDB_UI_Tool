@@ -14,6 +14,7 @@ const route = [
       activeIcon: ICustomDashboardActive,
       // hiddenMenu: true,
       order: 5,
+      sqlDialect: 'all',
     },
     children: [
       {
