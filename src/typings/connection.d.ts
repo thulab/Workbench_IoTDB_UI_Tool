@@ -4,6 +4,7 @@ declare namespace Connection {
     type: number;
     name: string;
     username: string;
+    model: string;
   }
 
   export interface ConnectionClusterData {
@@ -18,6 +19,7 @@ declare namespace Connection {
     type: 0 | 1 | 2;
     name: string;
     username: string;
+    model?: 'tree' | 'table';
     password?: string;
     masterCluster: ConnectionClusterData;
     slaveCluster?: ConnectionClusterData | null;

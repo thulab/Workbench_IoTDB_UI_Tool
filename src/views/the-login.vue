@@ -4,7 +4,7 @@
       <img src="@/assets/login-bg.png" alt="" />
     </div>
     <div class="login-form-wrapper">
-      <div class="login-form-container" :style="{ height: isUseCaptcha ? '540px' : '486px' }">
+      <div class="login-form-container" :style="{ height: isUseCaptcha ? '604px' : '550px' }">
         <!-- eslint-disable-next-line vue/no-constant-condition -->
         <el-icon v-show="true" id="login-language" class="login-language-icon" size="30" @click="handleChangeLang"><i-custom-language-border /></el-icon>
         <div class="login-logo-box">
@@ -61,6 +61,12 @@
               </template> -->
             </el-input>
           </el-form-item>
+          <el-form-item prop="model">
+            <el-radio-group v-model="loginForm.model" @change="(val) => handleChangeDefaultModel(val as 'tree' | 'table')" id="connection-modal-type">
+              <el-radio value="tree" id="connection-modal-type-0">{{ t('connection.treeModel') }}</el-radio>
+              <el-radio value="table" id="connection-modal-type-1">{{ t('connection.tableModel') }}</el-radio>
+            </el-radio-group>
+          </el-form-item>
           <el-form-item prop="captcha" v-if="isUseCaptcha">
             <el-input v-model="loginForm.captcha" autocomplete="off" :placeholder="t('login.captchaTip')" @keyup.enter="submitForm" id="login-captcha">
               <template #prefix>
@@ -103,11 +109,13 @@ const loginForm = reactive<{
   connection: string | number;
   user: string;
   password: string;
+  model: 'tree' | 'table';
   captcha: string;
 }>({
   connection: '',
   user: '',
   password: '',
+  model: 'tree',
   captcha: '',
 });
 const pwdType = ref('password');
@@ -127,6 +135,7 @@ const { handleLangCommand } = useLangSwitch(useI18n());
 const { requestFn: login } = useRequest(UserApi.login);
 const { requestFn: loginCaptcha } = useRequest(UserApi.loginCaptcha);
 const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
+const { requestFn: getConnectionDetail } = useRequest(ConnectionApi.getConnectionDetail);
 
 const validateuser = (rule: any, value: any, callback: any) => {
   if (value === '') {
@@ -189,6 +198,10 @@ const rules = reactive<FormRules>({
   ],
 });
 
+function handleChangeDefaultModel(model: 'tree' | 'table') {
+  loginForm.model = model;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleChangePwdType() {
   if (pwdType.value === 'password') {
@@ -243,10 +256,19 @@ function getCaptcha() {
   });
 }
 
+function getDetail(id: number) {
+  getConnectionDetail(id)
+    .then((res) => {
+      loginForm.model = res.data.model || 'tree';
+    })
+    .finally(() => {});
+}
+
 function handleChangeConnection(val: number) {
   const data = connectionList.value.find((item) => item.id === val);
   if (data) {
     loginForm.user = data.username;
+    getDetail(+data.id);
   }
 }
 

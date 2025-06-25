@@ -141,10 +141,12 @@ async function handleAddConnection() {
     type: 0,
     name: t('connection.addConnection'),
     username: '',
+    model: 'tree',
   });
   editType.value = 'add';
   connectionFormRef.value?.handleChangeType(0);
   connectionFormRef.value?.resetOperateLoading();
+  connectionFormRef.value?.handleChangeDefaultModel('tree');
 }
 
 // 获取实例列表

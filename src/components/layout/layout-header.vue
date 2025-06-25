@@ -17,6 +17,18 @@
     </div>
     <div class="header-ri flex-center">
       <!-- eslint-disable-next-line vue/no-constant-condition -->
+      <el-dropdown @command="handleChangeDefaultModel" v-show="true">
+        <span class="lang-icon m-r-20">
+          <i-custom-language />
+        </span>
+        <template #dropdown>
+          <el-dropdown-menu class="operate-dropdown">
+            <el-dropdown-item :disabled="connectionStore.connectionInfo.data.model === 'tree'" command="tree">{{ t('connection.treeModel') }}</el-dropdown-item>
+            <el-dropdown-item :disabled="connectionStore.connectionInfo.data.model === 'table'" command="table">{{ t('connection.tableModel') }}</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+      <!-- eslint-disable-next-line vue/no-constant-condition -->
       <el-dropdown @command="handleChangeLang" v-show="true">
         <span class="lang-icon m-r-20">
           <i-custom-language />
@@ -45,21 +57,25 @@ import { HOME_URL } from '@/config/app-config';
 import useMenuStore from '@/stores/menu';
 import { useI18n } from 'vue-i18n';
 import { useLangSwitch } from '@/composition-api';
-import { useEnumStore, useUserStore } from '@/stores';
+import { useEnumStore, useUserStore, useConnectionStore } from '@/stores';
+import { ConnectionApi } from '@/api';
 import UserHeader from './components/layout-header-user.vue';
 import IconEpArrowRight from '~icons/ep/arrow-right.svg';
 import IconEpMoon from '~icons/ep/moon.svg';
 import IconEpSunny from '~icons/ep/sunny.svg';
 
-const { locale } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
 const enumStore = useEnumStore();
+const connectionStore = useConnectionStore();
 const { langIndex, handleLangCommand } = useLangSwitch(useI18n());
 const matched = computed(() => route.matched.filter((item) => item.meta && item.meta.title && item.meta.title !== 'Home'));
 const menuStore = useMenuStore();
 const isCollapse = computed((): boolean => menuStore.isCollapse);
 const isDark = useDark();
+
+const { requestFn: saveConnection } = useRequest(ConnectionApi.saveConnection);
 
 function handleChangeLang(val: '0' | '1') {
   handleLangCommand(val);
@@ -68,6 +84,18 @@ function handleChangeLang(val: '0' | '1') {
     enumStore.loadAllEnum();
     userStore.loadPrivilegesEnum(true);
   });
+}
+
+function handleSaveConnection(modelVal: 'tree' | 'table') {
+  saveConnection({ ...connectionStore.connectionInfo.data, model: modelVal })
+    .then(() => {
+      connectionStore.setConnection({ ...connectionStore.connectionInfo.data, model: modelVal });
+    })
+    .finally(() => {});
+}
+
+function handleChangeDefaultModel(model: 'tree' | 'table') {
+  handleSaveConnection(model);
 }
 </script>
 

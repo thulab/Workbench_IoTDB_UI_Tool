@@ -273,6 +273,7 @@ measurement:
   databaseNum: Databases
   deviceNum: Devices
   measurementNum: Measurements
+  tableNum: Tables
   totalNum: Total Data
   measurementList: Measurement List
   list: List
@@ -932,6 +933,15 @@ connection:
   prometheusPassword: pwd
   enableAuth: Basic Auth
   disableAuth: No Auth
+  defaultModel: Default Model
+  treeModel: Tree Model
+  tableModel: Table Model
+  defaultModelTip: |
+    Tree Model: Manages measurement points as objects, where each point corresponds to a time series. The point names can be split to form a tree directory structure, providing a one-to-one mapping with the physical world, making read/write operations simple and intuitive.
+
+    Table Model: It is recommended to create a table for each type of device. Physical quantity collections of the same device type share common characteristics (e.g., collecting temperature and humidity data), enabling flexible and rich data analysis.
+
+    For more model details, refer to: Model Documentation
 flow:
   flowManagement: Flowchart Management
   topologyMap: Topology Map
@@ -1066,3 +1076,25 @@ aiAnalysis:
   modelNameExist: The name is already taken, please change it
   batchDelete: Are you sure you want to delete these models?
   singleDelete: Are you sure you want to delete the model?
+dataManage:
+  schema: Schema
+  table: Table
+  ttl: Data Retention Period
+  partitionInterval: Partition Interval
+  schemaDuplicate: Schema Replicas
+  dataDuplicate: Data Replicas
+  tables: Table Count
+  tableName: Table Name
+  comment: Description
+  tableNamePlaceholder: Enter table name
+  commentPlaceholder: Enter description
+  columns: Column Count
+  columnName: Column Name
+  dataType: Data Type
+  cateGory: Column Category
+  columnNamePlaceholder: Enter column name
+  data: Data
+  column: Column
+  selectColumnPlaceholder: Select columns to query
+  dataInsert: Data Insertion
+  columnsSelected: Selected Columns

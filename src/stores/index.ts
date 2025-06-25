@@ -3,10 +3,11 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import { useUserStore } from './user.store';
 import { useEnumStore } from './enum.store';
 import { useConnectionStore } from './connection.store';
+import { useDbStore } from './db.store';
 
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 
 export default pinia;
 
-export { useUserStore, useEnumStore, useConnectionStore };
+export { useUserStore, useEnumStore, useConnectionStore, useDbStore };

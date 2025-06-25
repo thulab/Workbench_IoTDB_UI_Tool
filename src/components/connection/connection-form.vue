@@ -104,6 +104,16 @@
             </el-collapse-item>
           </el-collapse>
         </template>
+        <base-form-item prop="type" :rules="requiredRules" class="base-form-box">
+          <template #label>
+            {{ t('connection.defaultModel') }}：
+            <el-tooltip effect="light" :content="t('connection.defaultModelTip')" placement="top" popper-class="tooltip-box-width tooltip-box-white-space"><i-custom-question /></el-tooltip>
+          </template>
+          <el-radio-group v-model="formData.model" @change="(val) => handleChangeDefaultModel(val as 'tree' | 'table')" id="connection-modal-type">
+            <el-radio value="tree" id="connection-modal-type-0">{{ t('connection.treeModel') }}</el-radio>
+            <el-radio value="table" id="connection-modal-type-1">{{ t('connection.tableModel') }}</el-radio>
+          </el-radio-group>
+        </base-form-item>
       </el-form>
     </el-scrollbar>
     <div class="connection-form-buttons">
@@ -163,6 +173,7 @@ const formData = reactive<Connection.ConnectionDetail>({
   name: '',
   username: '',
   password: '',
+  model: 'tree',
   masterCluster: {
     hostAndPortVOS: [{ host: '', port: '' }],
     prometheusUrl: '',
@@ -200,6 +211,10 @@ const { requestFn: testConnection } = useRequest(ConnectionApi.testConnection);
 const { requestFn: testPrometheus } = useRequest(ConnectionApi.testPrometheus);
 const { requestFn: loginByConnection } = useRequest(ConnectionApi.loginByConnection);
 
+function handleChangeDefaultModel(model: 'tree' | 'table') {
+  formData.model = model;
+}
+
 function handleChangeType(type: 0 | 1 | 2) {
   formRef.value?.resetFields();
   errorPwd.value = '';
@@ -223,6 +238,7 @@ function handleChangeType(type: 0 | 1 | 2) {
           prometheusUsername: '',
           prometheusPassword: '',
         };
+  handleChangeDefaultModel('tree');
 }
 
 function handleChangeConnection() {
@@ -273,6 +289,7 @@ function handleReset() {
     formData.name = sourceData.name;
     formData.username = sourceData.username;
     formData.password = '';
+    formData.model = sourceData.model;
     formData.masterCluster = cloneDeep(sourceData.masterCluster);
     if (sourceData.slaveCluster) {
       formData.slaveCluster = cloneDeep(sourceData.slaveCluster);
@@ -489,6 +506,7 @@ defineExpose({
   handleChangeType,
   resetOperateLoading,
   handleChangeConnection,
+  handleChangeDefaultModel,
 });
 </script>
 

@@ -78,14 +78,19 @@
                   <span class="module-label-text">{{ t('measurement.databaseNum') }}：</span>
                   <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.databaseNum, '-') : t('common.noAuth') }}</span>
                 </li>
-                <li class="system-info-item">
+                <li class="system-info-item" v-if="connectionStore.connectionInfo.data.model === 'tree'">
                   <el-icon size="24"><i-custom-device-num /></el-icon>
                   <span class="module-label-text">{{ t('measurement.deviceNum') }}：</span>
                   <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.deviceNum, '-') : t('common.noAuth') }}</span>
                 </li>
-                <li class="system-info-item">
+                <li class="system-info-item" v-if="connectionStore.connectionInfo.data.model === 'tree'">
                   <el-icon size="24"><i-custom-measure-num /></el-icon>
                   <span class="module-label-text">{{ t('measurement.measurementNum') }}：</span>
+                  <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.measurementNum, '-') : t('common.noAuth') }}</span>
+                </li>
+                <li class="system-info-item" v-if="connectionStore.connectionInfo.data.model === 'table'">
+                  <el-icon size="24"><i-custom-measure-num /></el-icon>
+                  <span class="module-label-text">{{ t('measurement.tableNum') }}：</span>
                   <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.measurementNum, '-') : t('common.noAuth') }}</span>
                 </li>
               </el-row>
@@ -214,14 +219,19 @@
                   <span class="module-label-text">{{ t('measurement.databaseNum') }}：</span>
                   <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.databaseNum, '-') : t('common.noAuth') }}</span>
                 </li>
-                <li class="system-info-item">
+                <li class="system-info-item" v-if="connectionStore.connectionInfo.data.model === 'tree'">
                   <el-icon size="24"><i-custom-device-num /></el-icon>
                   <span class="module-label-text">{{ t('measurement.deviceNum') }}：</span>
                   <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.deviceNum, '-') : t('common.noAuth') }}</span>
                 </li>
-                <li class="system-info-item">
+                <li class="system-info-item" v-if="connectionStore.connectionInfo.data.model === 'tree'">
                   <el-icon size="24"><i-custom-measure-num /></el-icon>
                   <span class="module-label-text">{{ t('measurement.measurementNum') }}：</span>
+                  <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.measurementNum, '-') : t('common.noAuth') }}</span>
+                </li>
+                <li class="system-info-item" v-if="connectionStore.connectionInfo.data.model === 'table'">
+                  <el-icon size="24"><i-custom-measure-num /></el-icon>
+                  <span class="module-label-text">{{ t('measurement.tableNum') }}：</span>
                   <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.measurementNum, '-') : t('common.noAuth') }}</span>
                 </li>
               </el-row>

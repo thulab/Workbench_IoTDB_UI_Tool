@@ -32,6 +32,10 @@ declare namespace StorageDevice {
     deviceCount: number;
     measurementCount: number;
     dataCount?: number;
+    partitionInterval?: number;
+    partitionIntervalUnit?: number;
+    schemaDuplicate?: number;
+    dataDuplicate?: number;
   }
 
   export interface SaveDatabaseRequest {
