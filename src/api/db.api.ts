@@ -13,7 +13,7 @@ class IoTDBApi {
 
   // 更新数据库
   static upsertDatabase(data: { ttl: string; ttlUnit: string; database?: string; tableName?: string }): HttpResponseP {
-    return http.post('/relational/schema/upsertDatabase', data);
+    return http.post('/relational/schema/upsertDatabaseTTL', data);
   }
 
   //  数据库信息
