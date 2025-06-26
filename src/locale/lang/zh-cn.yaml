@@ -1032,6 +1032,7 @@ dataManage:
   schema: 结构
   table: 表
   ttl: 数据保留时间
+  ttlPlaceholder: 为空代表INF(永久)
   partitionInterval: 时间分区间隔
   schemaDuplicate: 元数据副本数量
   dataDuplicate: 数据副本数量
@@ -1050,3 +1051,14 @@ dataManage:
   selectColumnPlaceholder: 请选择所要查询的列名称
   dataInsert: 数据插入
   columnsSelected: 已选择列
+  addDatabase: 新增数据库
+  databaseName: 数据库名称
+  databaseNameTip: 大小写不敏感，名称中包含下划线（_）、数字（非开头）、英文字母可以直接创建，名称中包含特殊字符（如`）、中文字符、数字开头时，必须用双引号 "" 括起来
+  databaseNamePlaceholder: 请输入数据库名称
+  databaseNameLenth: 字符长度不超过64，请重新输入
+  databaseNameExist: 该数据库已存在，请重新输入
+  specialCharsNeedQuotes: 特殊字符需要用双引号包裹
+  emptyQuotedName: 引号内名称不能为空
+  invalidNameFormat: 无效的名称格式
+  addDatabaseSuccess: 新建数据库成功
+  ttlUpdated: TTL已更新

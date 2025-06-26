@@ -28,6 +28,7 @@ const renderKey = ref(0);
 
 function handleNodeClick(nodeInfo: IoTDB.TreeNodeData) {
   currentNode.value = nodeInfo;
+  console.log('====Current Node:', currentNode.value);
   renderKey.value++;
 }
 </script>

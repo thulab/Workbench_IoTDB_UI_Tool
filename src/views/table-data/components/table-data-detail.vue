@@ -14,38 +14,19 @@
             {{ t('dataManage.columnName') }}：
             <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
-          <timeseries-select
+          <columns-select
             v-model="searchFormData.path"
             :disabled-select="getListLoading"
             :placeholder="t('dataManage.selectColumnPlaceholder')"
             :view-text="t('dataManage.columnsSelected')"
+            :current-node="currentNode"
             id="data-search-path"
+            @handle-change-path="handleChangePath"
           />
         </base-form-item>
-        <br />
         <el-form-item :label="`${t('search.searchTime')}：`" prop="time">
           <div class="search-time-wrapper">
-            <ul class="search-time-list">
-              <li :class="['search-time-type', { 'search-time-active': timeType === 'datetime' }]" id="data-search-type-datetime" @click="handleTimeType('datetime')">{{ t('search.datetime') }}</li>
-              <li :class="['search-time-type', { 'search-time-active': timeType === 'datetimerange' }]" id="data-search-type-datetimerange" @click="handleTimeType('datetimerange')">
-                {{ t('search.datetimerange') }}
-              </li>
-            </ul>
-            <el-input type="hidden" />
             <el-date-picker
-              v-if="timeType === 'datetime'"
-              v-model="searchFormData.time"
-              type="datetime"
-              :placeholder="t('common.selectPlaceholder')"
-              :disabled-date="disabledDate"
-              :shortcuts="shortcutsDate"
-              :clearable="false"
-              :prefix-icon="ICustomCalender"
-              id="data-search-datetime"
-              :disabled="getListLoading"
-            />
-            <el-date-picker
-              v-else
               v-model="searchFormData.datetimerange"
               type="datetimerange"
               range-separator="-"
@@ -128,6 +109,7 @@ import { todayNow } from '@/utils/date';
 import { useUserStore } from '@/stores';
 import DynamicTable from '@/components/dynamic-table.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
+import ColumnsSelect from './columns-select.vue';
 
 defineProps<{
   currentNode: IoTDB.TreeNodeData | null;
@@ -156,7 +138,7 @@ const searchFormData = reactive({
 });
 let copySearchFormData = cloneDeep(searchFormData);
 
-const { shortcutsDate, shortcutsDaterange } = useShortcutsDate();
+const { shortcutsDaterange } = useShortcutsDate();
 
 const disabledDate = (time: number) => time < new Date('1970-1-1').getTime();
 
@@ -177,6 +159,8 @@ const importVisible = ref(false);
 
 const getListLoading = ref(false);
 const defaultSort = ref<Sort>({ prop: 't0', order: 'descending' });
+
+const columnsSelected = ref<string[]>([]);
 
 // // 查询结果
 // const formatSqlInfo = computed(() => function (filed: string) {
@@ -272,6 +256,15 @@ function getListData() {
     });
 }
 
+function handleChangePath(columnsVal: string[]) {
+  columnsSelected.value = columnsVal;
+  searchFormData.path = columnsVal;
+  copySearchFormData.path = columnsVal;
+  if (firstLoad.value) {
+    getListData();
+  }
+}
+
 function handleSortChange(data: { column: any; prop: string; order: any }) {
   searchFormData.asc = data.order === 'ascending' ? 'asc' : 'desc';
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -325,82 +318,12 @@ function queryData(columnNum?: number) {
   getListData();
 }
 
-// function handleClickPage(type: string) {
-//   if (type === 'first') {
-//     pagination.pageNum = 1;
-//   } else if (type === 'prev') {
-//     pagination.pageNum--;
-//   } else {
-//     pagination.pageNum++;
-//   }
-//   getListData();
-// }
-
-// function handleChangePageSize(val: number) {
-//   pagination.pageSize = val;
-//   pagination.pageNum = 1;
-//   getListData();
-// }
-
-// // 导入
-// function handleImport() {
-//   importVisible.value = true;
-// }
-
 // 导入物理量
 function handleImportClose(reload: boolean) {
   if (reload) {
     handleSearch();
   }
 }
-
-// 导出
-// function handleExportData(exportType: string) {
-//   let startTime = 0;
-//   let endTime = 0;
-//   if (timeType.value === 'datetime') {
-//     startTime = dayjs(copySearchFormData.time).valueOf();
-//     endTime = startTime + 1000;
-//   } else {
-//     startTime = dayjs(copySearchFormData.datetimerange[0]).valueOf();
-//     endTime = dayjs(copySearchFormData.datetimerange[1]).valueOf();
-//   }
-//   exportData({
-//     measurements: copySearchFormData.path,
-//     startTime,
-//     endTime,
-//     aggregation: copySearchFormData.aggregation,
-//     timeInterval: copySearchFormData.timeInterval || undefined,
-//     unitInterval: copySearchFormData.unitInterval,
-//     asc: copySearchFormData.asc,
-//     spage: pagination.columnNum,
-//     ssize: pagination.columnSize,
-//     size: pagination.pageSize,
-//     page: pagination.pageNum,
-//   }).then((res) => {
-//     let url = `/api/file/exportExcelData?exportId=${res.data}`;
-//     if (exportType === 'csv') {
-//       url = `/api/file/exportCSVData?exportId=${res.data}`;
-//     }
-//     window.open(url);
-//   });
-// }
-
-// 切换查询时间类型
-function handleTimeType(type: 'datetime' | 'datetimerange') {
-  if (timeType.value === type || getListLoading.value) return;
-  timeType.value = type;
-  searchFormData.time = todayNow();
-  searchFormData.datetimerange = [];
-}
-// 下载
-// function handleCommandDown(val: string) {
-//   // if (!copySearchFormData.path.length) {
-//   //   errorDeviceTip.value = '请输入测点名称后进行搜索';
-//   //   return;
-//   // }
-//   handleExportData(val);
-// }
 
 function setStorage() {
   sessionStorage.setItem(

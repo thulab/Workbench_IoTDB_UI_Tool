@@ -6,7 +6,7 @@ declare namespace IoTDB {
     ttlUnit: string;
   }
 
-  export interface Column {
+  export interface ColumnVOS {
     columnName: string;
     comment?: string;
     cateGory: string;
@@ -15,7 +15,16 @@ declare namespace IoTDB {
 
   export interface Table {
     tableVO: tableVO;
-    columns: Column[];
+    columnVOS: ColumnVOS[];
+  }
+
+  export interface ValueRes {
+    databases: Database[];
+  }
+
+  export interface DatabaseRes {
+    sql: string;
+    value: ValueRes;
   }
 
   export interface Database {

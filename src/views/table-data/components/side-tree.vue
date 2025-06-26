@@ -18,7 +18,7 @@
           <i-custom-border-refresh style="width: 24px; height: 24px" />
         </el-button>
       </div>
-      <el-tree-v2 ref="schemaTree" :data="treeData" style="background-color: #fff" :props="treeProps" :indent="8" :item-size="28" :expand-on-click-node="true">
+      <el-tree-v2 ref="schemaTree" :data="treeData" style="background-color: #fff; overflow-y: auto" :props="treeProps" :indent="8" :item-size="28" :height="treeHeight" :expand-on-click-node="true">
         <!-- eslint-disable-next-line vue/no-unused-vars -->
         <template #default="{ node, data }">
           <div class="node-text" :id="`tree-node-content-${data.parentName || data.nodeName}`">
@@ -94,6 +94,7 @@
           </el-dropdown>
         </template>
       </el-tree-v2>
+      <modal-add-db v-model:visible="modalAddDbVisible" :database-names="databaseNames" @handle-save="handleRefresh" />
     </div>
   </auth-container>
 </template>
@@ -102,6 +103,8 @@
 import { storeToRefs } from 'pinia';
 import { useUserStore, useDbStore } from '@/stores';
 import { type ElTreeV2 } from 'element-plus';
+import { cloneDeep } from 'lodash-es';
+import ModalAddDb from './modal-add-db.vue';
 
 const emit = defineEmits<{
   (event: 'handleNodeClick', nodeInfo: IoTDB.TreeNodeData): void;
@@ -113,9 +116,11 @@ const userStore = useUserStore();
 const searchText = ref('');
 const searching = ref(false);
 const currentNode = ref<IoTDB.TreeNodeData | null>(null);
+const modalAddDbVisible = ref(false);
+const treeHeight = ref(document.body.clientHeight - 48 - 16 - 36 - 16 - 46);
 
 const { canReadWriteData } = storeToRefs(userStore);
-const { treeData } = storeToRefs(useDbStore());
+const { treeData, databaseNames } = storeToRefs(useDbStore());
 const { getDatabases } = useDbStore();
 
 const treeProps = {
@@ -152,20 +157,24 @@ function handleRefresh() {
   getDatabases();
 }
 
-function handleAddDB() {}
-
-// function handleNodeClick(node: any) {
-// }
+function handleAddDB() {
+  modalAddDbVisible.value = true;
+}
 
 function handleDatabaseOptionClick(command: string, node: IoTDB.TreeNodeData) {
   currentNode.value = node;
-  emit('handleNodeClick', node);
+  emit('handleNodeClick', currentNode.value);
 }
 
 function handleTableOptionClick(command: string, node: IoTDB.TreeNodeData) {
-  currentNode.value = node;
-  node.nodeType = 'TABLEDATA';
-  emit('handleNodeClick', node);
+  currentNode.value = cloneDeep(node);
+  if (command === 'tableData') {
+    currentNode.value.nodeType = 'TABLEDATA';
+    emit('handleNodeClick', currentNode.value);
+  }
+  if (command === 'tableSchema') {
+    emit('handleNodeClick', currentNode.value);
+  }
 }
 </script>
 <style lang="scss" scoped>

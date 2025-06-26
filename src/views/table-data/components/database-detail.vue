@@ -11,7 +11,18 @@
       <ul class="database-info-list">
         <li class="database-info-item" id="device-total-li">
           <span class="database-info-item-label" id="measurement-total-span">{{ t('dataManage.ttl') }}：</span>
-          {{ databaseInfos?.ttl }}
+          {{ databaseInfos?.ttl ? databaseInfos?.ttl : '-' }}
+          <el-icon
+            size="24"
+            class="m-r-6 svg-button-hover-color"
+            style="cursor: pointer"
+            @click="
+              modalTtlVisible = true;
+              ttlType = 'db';
+            "
+          >
+            <i-custom-edit />
+          </el-icon>
         </li>
         <li class="database-info-item" id="measurement-total-li">
           <span class="database-info-item-label" id="measurement-total-span">{{ t('dataManage.partitionInterval') }}：</span>
@@ -73,7 +84,19 @@
         <el-table-column type="selection" width="55" />
         <el-table-column :label="t('dataManage.tableName')" prop="nodeName" :show-overflow-tooltip="true" />
         <el-table-column :label="t('dataManage.comment')" prop="comment" :show-overflow-tooltip="true" />
-        <el-table-column label="TTL(ms)" prop="ttl" :show-overflow-tooltip="true" />
+        <el-table-column label="TTL(ms)" prop="ttl" :show-overflow-tooltip="true">
+          <template #default="{ row }">
+            <div class="row-description-box">
+              <div class="row-description-text">
+                <text-tooltip :content="row.ttl || ''" />
+              </div>
+              <div class="edit-box flex-align-center" @click="handleEditTableTTL(row)">
+                <i-custom-edit-normal class="edit-icon" />
+                <i-custom-edit-active class="edit-icon-active" />
+              </div>
+            </div>
+          </template>
+        </el-table-column>
         <template #empty>
           <div class="table-empty-wrapper">
             <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
@@ -87,6 +110,7 @@
       <div>sql语句</div>
       <el-icon size="24" class="svg-button-hover-color copy-icon"><i-custom-copy /></el-icon>
     </div>
+    <modal-ttl v-model:visible="modalTtlVisible" :current-node="currentNode" :current-table="currentTable" :type="ttlType" :key="modalTTLNum" @handle-save="handleRefresh()" />
   </div>
 </template>
 
@@ -94,9 +118,10 @@
 import { useRoute } from 'vue-router';
 import { StorageApi } from '@/api';
 import { useTableHeight } from '@/composition-api';
+import ModalTtl from './modal-ttl.vue';
 
 const props = defineProps<{
-  currentNode: IoTDB.TreeNodeData | null;
+  currentNode: IoTDB.TreeNodeData;
 }>();
 
 const { t } = useI18n();
@@ -107,6 +132,10 @@ const databaseInfos = ref<StorageDevice.DatabaseInfo | null>(null);
 const searchType = ref('tableName');
 const searchPlaceholder = computed(() => (searchType.value === 'tableName' ? t('dataManage.tableNamePlaceholder') : t('dataManage.commentPlaceholder')));
 const { maxTableHeight } = useTableHeight(370);
+const modalTtlVisible = ref(false);
+const currentTable = ref<IoTDB.TreeNodeData>();
+const modalTTLNum = ref(0);
+const ttlType = ref('db'); // 'db' or 'table'
 
 // 存储组详细信息
 function getDatabaseDetail(data: string) {
@@ -120,6 +149,13 @@ function getDatabaseDetail(data: string) {
 onMounted(() => {
   getDatabaseDetail(props.currentNode?.nodeName || '');
 });
+
+function handleEditTableTTL(row: IoTDB.TreeNodeData) {
+  ttlType.value = 'table';
+  currentTable.value = row;
+  modalTtlVisible.value = true;
+  modalTTLNum.value++;
+}
 
 watch(
   () => props.currentNode,
@@ -219,6 +255,40 @@ function handleRefresh() {
     right: 8px;
     bottom: 8px;
     cursor: pointer;
+  }
+}
+
+.row-description-box {
+  display: flex;
+  align-items: center;
+
+  .row-description-text {
+    max-width: 120px;
+    display: flex;
+  }
+
+  .edit-box {
+    flex: 0 0 16px;
+    cursor: pointer;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .edit-icon-active {
+      display: none;
+    }
+
+    &:hover {
+      .edit-icon {
+        display: none;
+      }
+
+      .edit-icon-active {
+        display: block;
+      }
+    }
   }
 }
 </style>
