@@ -8,12 +8,13 @@ class IoTDBApi {
 
   // 新增数据库
   static saveDatabase(database: string, ttl: string, ttlUnit: string): HttpResponseP {
-    return http.post('/relational/schema/saveDatabase', { database, ttl, ttlUnit });
+    console.log('saveDatabase', database, ttl, ttlUnit);
+    return http.post('/relational/schema/saveDatabase', { database, ttl, ttlUnit: 'millisecond' });
   }
 
   // 更新数据库
   static upsertDatabase(data: { ttl: string; ttlUnit: string; database?: string; tableName?: string }): HttpResponseP {
-    return http.post('/relational/schema/upsertDatabaseTTL', data);
+    return http.post('/relational/schema/upsertDatabaseTTL', { ...data, ttlUnit: 'millisecond' });
   }
 
   //  数据库信息
