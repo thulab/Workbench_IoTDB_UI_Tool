@@ -35,6 +35,7 @@ declare namespace IoTDB {
   export interface TreeNodeData {
     nodeName: string;
     parentName?: string;
+    database?: string;
     comment?: string;
     ttl?: string;
     columnName?: string;

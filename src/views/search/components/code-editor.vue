@@ -6,8 +6,10 @@
 import type { EditorState } from '@codemirror/state';
 import type { EditorView } from '@codemirror/view';
 import type { CSSProperties } from 'vue';
+import { useConnectionStore } from '@/stores';
 import { createEditorState, createEditorView, destroyEditorView, getEditorTools, events, EventKey } from '@/components/code-editor/code-mirror';
 import { IOTDB_EXTENSIONS } from '@/components/code-editor/lang-iotdb';
+import { IOTDB_EXTENSIONS as IOTDB_TABLE_EXTENSIONS } from '@/components/code-editor/lang-iotdb-table';
 
 const props = defineProps<{
   modelValue: string;
@@ -15,6 +17,11 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(events);
+const connectionStore = useConnectionStore();
+
+const extensions = computed(() => {
+  return connectionStore.isTableModel ? IOTDB_TABLE_EXTENSIONS : IOTDB_EXTENSIONS;
+});
 
 const config = shallowRef({
   autofocus: true,
@@ -23,7 +30,7 @@ const config = shallowRef({
   tabSize: 2,
   placeholder: '',
   autoDestroy: true,
-  extensions: IOTDB_EXTENSIONS,
+  extensions: extensions.value,
 });
 
 const codeContainerRef = shallowRef<HTMLDivElement>();

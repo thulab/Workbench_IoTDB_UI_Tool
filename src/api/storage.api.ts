@@ -38,8 +38,8 @@ class StorageApi {
   }
 
   //  存储组信息(表模型)
-  static getDatabaseInfoTable(groupName: string): HttpResponseP<StorageDevice.DatabaseInfo> {
-    return http.get('/relational/schema/getDatabaseInfo', { params: { groupName } });
+  static getDatabaseInfoTable(database: string): HttpResponseP<StorageDevice.DatabaseInfo> {
+    return http.get('/relational/schema/getDatabaseInfo', { params: { database } });
   }
 
   // 根据存储组和关键词查设备

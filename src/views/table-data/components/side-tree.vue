@@ -30,7 +30,7 @@
               <i-custom-attr v-else-if="data.nodeType === 'ATTRIBUTE'" />
               <i-custom-field v-else-if="data.nodeType === 'FIELD'" />
             </el-icon>
-            <text-tooltip :content="data.nodeName" />
+            <text-tooltip :content="data.nodeName + (data.comment ? ` (${data.comment})` : '')" />
           </div>
           <el-dropdown v-if="data.nodeType === 'DATABASE'" @command="handleDatabaseOptionClick($event, data)">
             <span class="lang-icon m-r-20">
@@ -50,7 +50,7 @@
                     <span>{{ t('dataManage.table') }}</span>
                   </div>
                 </el-dropdown-item>
-                <el-dropdown-item command="dbDelete">
+                <el-dropdown-item command="dbDelete" :disabled="data.database === 'information_schema'">
                   <div class="node-text">
                     <i-custom-field class="m-r-8" />
                     <span>{{ t('common.delete') }}</span>
@@ -197,6 +197,7 @@ function handleTableOptionClick(command: string, node: IoTDB.TreeNodeData) {
   line-height: 1.5;
   display: flex;
   align-items: center;
+  width: 100px;
   padding-right: 8px;
   flex: 1;
 }

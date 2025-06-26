@@ -5,11 +5,11 @@ import { basicSetup } from 'codemirror';
 import { keymap } from '@codemirror/view';
 import { defaultKeymap } from '@codemirror/commands';
 import type { CompletionContext } from '@codemirror/autocomplete';
-import { keywords, selectList } from '@/constants/code-mirror';
+import { tableKeywords, tableSelectList } from '@/constants/code-mirror';
 
-const IotdbKeywords = `${keywords.join(' ')} ENCODING PLAIN RLE TS_2DIFF GORILLA FREQ ZIGZAG UNCOMPRESSED SNAPPY LZ4 GZIP MAX_POINT_NUMBER DEADBAND SDT COMPDEV COMPMINTIME COMPMAXTIME`;
+const IotdbKeywords = `${tableKeywords.join(' ')} ENCODING PLAIN RLE TS_2DIFF GORILLA FREQ ZIGZAG UNCOMPRESSED SNAPPY LZ4 GZIP MAX_POINT_NUMBER DEADBAND SDT COMPDEV COMPMINTIME COMPMAXTIME`;
 const IotdbTypes = 'BOOLEAN INT32 INT64 FLOAT DOUBLE TEXT DATE TIMESTAMP BLOB STRING';
-const IotdbBuiltin = 'ROOT TIME TIMESTAMP AND OR NOT NULL CONTAINS';
+const IotdbBuiltin = 'TIME TIMESTAMP AND OR NOT NULL CONTAINS';
 
 export const IotdbSQL = SQLDialect.define({
   operatorChars: '*+-%<>!=&|^',
@@ -19,7 +19,7 @@ export const IotdbSQL = SQLDialect.define({
   hashComments: false,
   spaceAfterDashes: true,
   specialVar: '@?',
-  identifierQuotes: '`',
+  identifierQuotes: '"',
   keywords: IotdbKeywords.toLocaleLowerCase(),
   types: IotdbTypes.toLocaleLowerCase(),
   builtin: IotdbBuiltin.toLocaleLowerCase(),
@@ -28,11 +28,11 @@ export const IotdbSQL = SQLDialect.define({
 export const sqlExamplesCompletions = (context: CompletionContext) => {
   const before = context.matchBefore(/\w+/);
   if (!context.explicit && !before) return null;
-  const arr = Object.keys(selectList);
+  const arr = Object.keys(tableSelectList);
   const upperToken = before?.text.toLocaleUpperCase().trim() || '';
   if (arr.includes(upperToken)) {
     return {
-      options: selectList[upperToken].map((item: string) => ({
+      options: tableSelectList[upperToken].map((item: string) => ({
         label: item,
         type: 'text',
       })),

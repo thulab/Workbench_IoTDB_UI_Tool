@@ -44,7 +44,7 @@
             </el-tab-pane>
           </el-tabs>
           <a
-            :href="locale === 'en' ? 'https://timecho.com/docs/UserGuide/latest/SQL-Manual/SQL-Manual.html' : 'https://timecho.com/docs/zh/UserGuide/latest/SQL-Manual/SQL-Manual.html'"
+            :href="locale === 'en' ? 'https://timecho.com/docs/UserGuide/latest-table/SQL-Manual/Identifier.html' : 'https://timecho.com/docs/zh/UserGuide/latest-table/SQL-Manual/Identifier.html'"
             rel="noopener noreferrer"
             target="_blank"
             class="operate-link"
