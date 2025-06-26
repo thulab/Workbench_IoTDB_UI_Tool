@@ -87,6 +87,12 @@ function handleChangeLang(val: '0' | '1') {
 }
 
 function handleDashboard() {
+  sessionStorage.setItem('dataSearchStorage', '');
+  sessionStorage.setItem('statisticSearchStorage', '');
+  sessionStorage.setItem('sqlSearchStorage', '');
+  sessionStorage.setItem('dataTrendStorage', '');
+  sessionStorage.setItem('dataSpectrumStorage', '');
+  sessionStorage.setItem('configStorage', '');
   window.location.href = HOME_URL;
 }
 

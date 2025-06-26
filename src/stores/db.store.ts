@@ -9,9 +9,7 @@ export const useDbStore = defineStore('db', () => {
 
   async function getDatabases() {
     await fetchDatabases();
-    // console.log('=============Databases fetched res:', res);
     databases.value = schemaTreeData.value;
-    console.log('=============Databases fetched:', databases.value);
   }
 
   const treeData = computed<Array<IoTDB.TreeNodeData>>(() => {
