@@ -8,17 +8,17 @@ class IoTDBApi {
 
   // 新增数据库
   static saveDatabase(databasee: string, ttl: string, ttlUnit: string): HttpResponseP {
-    return http.post('/relational/schema/saveDatabase', { params: { databasee, ttl, ttlUnit } });
+    return http.post('/relational/schema/saveDatabase', { databasee, ttl, ttlUnit });
   }
 
   // 更新数据库
-  static upsertDatabase(params: { ttl: string; ttlUnit: string; database?: string; tableName?: string }): HttpResponseP {
-    return http.post('/relational/schema/upsertDatabase', { params: { database: params.database, tableName: params.tableName, ttl: params.ttl, ttlUnit: params.ttlUnit } });
+  static upsertDatabase(data: { ttl: string; ttlUnit: string; database?: string; tableName?: string }): HttpResponseP {
+    return http.post('/relational/schema/upsertDatabase', data);
   }
 
   //  数据库信息
-  static getDatabaseInfoTable(groupName: string): HttpResponseP<StorageDevice.DatabaseInfo> {
-    return http.get('/relational/schema/getDatabaseInfo', { params: { groupName } });
+  static getDatabaseInfoTable(database: string): HttpResponseP<StorageDevice.DatabaseInfo> {
+    return http.get('/relational/schema/getDatabaseInfo', { params: { database } });
   }
 
   static deleteDatabase(database: string): HttpResponseP {
