@@ -14,7 +14,7 @@ declare namespace IoTDB {
   }
 
   export interface Table {
-    tableVO: tableVO;
+    tableVO: TableVO;
     columnVOS: ColumnVOS[];
   }
 

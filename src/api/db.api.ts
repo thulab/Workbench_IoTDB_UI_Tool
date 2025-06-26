@@ -29,5 +29,10 @@ class IoTDBApi {
   static deleteTables(tables: string[]): HttpResponseP {
     return http.post('/relational/schema/deleteTable', tables);
   }
+
+  // 创建表
+  static saveTable(payload: IoTDB.Database): HttpResponseP<number> {
+    return http.post('/relational/schema/saveTable', payload);
+  }
 }
 export default IoTDBApi;

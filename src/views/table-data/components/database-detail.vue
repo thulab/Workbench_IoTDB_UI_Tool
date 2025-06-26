@@ -59,7 +59,7 @@
       </div>
 
       <div class="search-form-buttons">
-        <el-button type="primary" id="table-add">
+        <el-button type="primary" id="table-add" @click="showAddTableDialog">
           {{ t('common.add') }}
         </el-button>
         <el-button type="primary" id="mesaurement-batch-del" @click="handleDelRow('batch', null)" :disabled="!multipleSelection.length">
@@ -118,7 +118,8 @@
       <div>{{ sqlDes }}</div>
       <el-icon size="24" class="svg-button-hover-color copy-icon"><i-custom-copy /></el-icon>
     </div>
-    <modal-ttl v-model:visible="modalTtlVisible" :current-node="currentNode" :current-table="currentTable" :type="ttlType" :key="modalTTLNum" @handle-save="handleRefresh()" />
+    <modal-ttl v-model:visible="modalTtlVisible" :current-node="currentNode" :current-table="currentTable" :type="ttlType" :key="modalTTLNum" @handle-save="handleRefresh" />
+    <modal-add-table ref="addTableDialog" @handle-reload="handleRefresh" />
   </div>
 </template>
 
@@ -129,9 +130,14 @@ import { useTableHeight } from '@/composition-api';
 import { cloneDeep } from 'lodash-es';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalTtl from './modal-ttl.vue';
+import modalAddTable from './modal-add-table.vue';
 
 const props = defineProps<{
   currentNode: IoTDB.TreeNodeData;
+}>();
+
+const emit = defineEmits<{
+  (event: 'handleReload'): void;
 }>();
 
 const { t } = useI18n();
@@ -150,6 +156,13 @@ const ttlType = ref('db'); // 'db' or 'table'
 const tableDataShow = ref<IoTDB.TreeNodeData[]>();
 const multipleSelection = ref<IoTDB.TreeNodeData[]>([]);
 const sqlDes = ref('');
+const addTableDialog = ref<InstanceType<typeof modalAddTable>>();
+
+function showAddTableDialog() {
+  if (addTableDialog.value) {
+    addTableDialog.value?.open(props.currentNode);
+  }
+}
 
 // 存储组详细信息
 function getDatabaseDetail(data: string) {
@@ -173,7 +186,8 @@ function handleEditTableTTL(row: IoTDB.TreeNodeData) {
 }
 
 function handleRefresh() {
-  getDatabaseDetail(props.currentNode?.nodeName || '');
+  // getDatabaseDetail(props.currentNode?.nodeName || '');
+  emit('handleReload');
 }
 
 function handleSelectionChange(vals: IoTDB.TreeNodeData[]) {
