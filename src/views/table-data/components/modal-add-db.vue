@@ -38,7 +38,7 @@ const emit = defineEmits<{
   'update:visible': [visible: boolean];
   handleSave: [payload: string];
 }>();
-
+const errorName = ref<string | null>(null);
 const { t, locale } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const formKey = ref(0);
