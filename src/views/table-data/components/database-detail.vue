@@ -115,7 +115,7 @@
     </div>
 
     <div class="sql-statement">
-      <div>sql语句</div>
+      <div>{{ sqlDes }}</div>
       <el-icon size="24" class="svg-button-hover-color copy-icon"><i-custom-copy /></el-icon>
     </div>
     <modal-ttl v-model:visible="modalTtlVisible" :current-node="currentNode" :current-table="currentTable" :type="ttlType" :key="modalTTLNum" @handle-save="handleRefresh()" />
@@ -136,10 +136,10 @@ const props = defineProps<{
 
 const { t } = useI18n();
 const route = useRoute();
-const { requestFn: getDatabaseInfo } = useRequest(IoTDBApi.getDatabaseInfoTable);
+const { data: schemaDataDbInfo, requestFn: getDatabaseInfo } = useRequest(IoTDBApi.getDatabaseInfo);
 const { requestFn: deleteTables } = useRequest(IoTDBApi.deleteTables);
 const searchKeyword = ref((route.query.databaseSearch as string) || '');
-const databaseInfos = ref<StorageDevice.DatabaseInfo | null>(null);
+const databaseInfos = ref<IoTDB.DatabaseInfo | null>(null);
 const searchType = ref('tableName');
 const searchPlaceholder = computed(() => (searchType.value === 'tableName' ? t('dataManage.tableNamePlaceholder') : t('dataManage.commentPlaceholder')));
 const { maxTableHeight } = useTableHeight(370);
@@ -149,13 +149,14 @@ const modalTTLNum = ref(0);
 const ttlType = ref('db'); // 'db' or 'table'
 const tableDataShow = ref<IoTDB.TreeNodeData[]>();
 const multipleSelection = ref<IoTDB.TreeNodeData[]>([]);
+const sqlDes = ref('');
 
 // 存储组详细信息
 function getDatabaseDetail(data: string) {
-  getDatabaseInfo(data).then((res) => {
-    if (res?.code === 0) {
-      databaseInfos.value = res.data;
-    }
+  getDatabaseInfo(data).then(() => {
+    console.log('------Database detail:', schemaDataDbInfo.value.sql);
+    sqlDes.value = schemaDataDbInfo.value.sql || '';
+    databaseInfos.value = schemaDataDbInfo.value.value;
   });
 }
 

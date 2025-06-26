@@ -7,8 +7,8 @@ class IoTDBApi {
   }
 
   // 新增数据库
-  static saveDatabase(databasee: string, ttl: string, ttlUnit: string): HttpResponseP {
-    return http.post('/relational/schema/saveDatabase', { databasee, ttl, ttlUnit });
+  static saveDatabase(database: string, ttl: string, ttlUnit: string): HttpResponseP {
+    return http.post('/relational/schema/saveDatabase', { database, ttl, ttlUnit });
   }
 
   // 更新数据库
@@ -17,7 +17,7 @@ class IoTDBApi {
   }
 
   //  数据库信息
-  static getDatabaseInfoTable(database: string): HttpResponseP<StorageDevice.DatabaseInfo> {
+  static getDatabaseInfo(database: string): HttpResponseP<IoTDB.DatabaseInfoRes> {
     return http.get('/relational/schema/getDatabaseInfo', { params: { database } });
   }
 
@@ -26,7 +26,7 @@ class IoTDBApi {
   }
 
   static deleteTables(tables: string[]): HttpResponseP {
-    return http.post('/relational/schema/deleteTable', { params: { tables } });
+    return http.post('/relational/schema/deleteTable', tables);
   }
 }
 export default IoTDBApi;

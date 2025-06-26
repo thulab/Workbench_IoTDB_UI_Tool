@@ -44,4 +44,21 @@ declare namespace IoTDB {
     nodeType: 'DATABASE' | 'TABLE' | 'COLUMN' | 'TAG' | 'FIELD' | 'ATTRIBITE' | 'TIME' | 'TABLEDATA';
     children?: TreeNodeData[];
   }
+
+  export interface DatabaseInfo {
+    dataDuplicate: string;
+    deviceCount?: string;
+    groupName: string;
+    measurementCount?: string;
+    partitionInterval: number;
+    partitionIntervalUnit: string;
+    schemaDuplicate: string;
+    ttl?: string;
+    ttlUnit: string;
+  }
+
+  export interface DatabaseInfoRes {
+    sql: string;
+    value: DatabaseInfo;
+  }
 }
