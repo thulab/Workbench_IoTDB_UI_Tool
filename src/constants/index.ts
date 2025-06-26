@@ -11,7 +11,7 @@ export const langNameMap = {
   // de: langName[2],
 };
 
-// 数据查询 函数树
+// SQL操作 函数树
 export const functionTreeData = [
   {
     label: 'searchIotdb.aggregate',
@@ -135,5 +135,108 @@ export const functionTreeData = [
       { label: 'searchIotdb.equalSizeBucketOutlierSample', value: 'EQUAL_SIZE_BUCKET_OUTLIER_SAMPLE' },
       { label: 'searchIotdb.m4', value: 'M4' },
     ],
+  },
+];
+
+// SQL操作 表模型函数树
+export const tableFunctionTreeData = [
+  {
+    label: 'tableFunctions.aggregateFunctions',
+    value: 'sqlSearch.tableFunctions',
+    children: [
+      { label: 'tableFunctions.SUM', value: 'SUM' },
+      { label: 'tableFunctions.COUNT', value: 'COUNT' },
+      { label: 'tableFunctions.AVG', value: 'AVG' },
+      { label: 'tableFunctions.STDDEV', value: 'STDDEV' },
+      { label: 'tableFunctions.STDDEV_POP', value: 'STDDEV_POP' },
+      { label: 'tableFunctions.STDDEV_SAMP', value: 'STDDEV_SAMP' },
+      { label: 'tableFunctions.VARIANCE', value: 'VARIANCE' },
+      { label: 'tableFunctions.VAR_POP', value: 'VAR_POP' },
+      { label: 'tableFunctions.VAR_SAMP', value: 'VAR_SAMP' },
+      { label: 'tableFunctions.EXTREME', value: 'EXTREME' },
+      { label: 'tableFunctions.MODE', value: 'MODE' },
+      { label: 'tableFunctions.Max', value: 'Max' },
+      { label: 'tableFunctions.Min', value: 'Min' },
+      { label: 'tableFunctions.First', value: 'First' },
+      { label: 'tableFunctions.Last', value: 'Last' },
+      { label: 'tableFunctions.MAX_BY', value: 'MAX_BY' },
+      { label: 'tableFunctions.MIN_BY', value: 'MIN_BY' },
+      { label: 'tableFunctions.FIRST_BY', value: 'FIRST_BY' },
+      { label: 'tableFunctions.LAST_BY', value: 'LAST_BY' },
+    ],
+  },
+  {
+    label: 'tableFunctions.mathFunctions',
+    value: 'sqlSearch.mathFunctions',
+    children: [
+      { label: 'tableFunctions.SIN', value: 'SIN' },
+      { label: 'tableFunctions.COS', value: 'COS' },
+      { label: 'tableFunctions.TAN', value: 'TAN' },
+      { label: 'tableFunctions.ASIN', value: 'ASIN' },
+      { label: 'tableFunctions.ACOS', value: 'ACOS' },
+      { label: 'tableFunctions.ATAN', value: 'ATAN' },
+      { label: 'tableFunctions.SINH', value: 'SINH' },
+      { label: 'tableFunctions.COSH', value: 'COSH' },
+      { label: 'tableFunctions.TANH', value: 'TANH' },
+      { label: 'tableFunctions.DEGREES', value: 'DEGREES' },
+      { label: 'tableFunctions.RADIANS', value: 'RADIANS' },
+      { label: 'tableFunctions.ABS', value: 'ABS' },
+      { label: 'tableFunctions.SIGN', value: 'SIGN' },
+      { label: 'tableFunctions.CEIL', value: 'CEIL' },
+      { label: 'tableFunctions.FLOOR', value: 'FLOOR' },
+      { label: 'tableFunctions.ROUND', value: 'ROUND' },
+      { label: 'tableFunctions.EXP', value: 'EXP' },
+      { label: 'tableFunctions.LN', value: 'LN' },
+      { label: 'tableFunctions.LOG10', value: 'LOG10' },
+      { label: 'tableFunctions.SQRT', value: 'SQRT' },
+    ],
+  },
+  {
+    label: 'tableFunctions.compareFunctions',
+    value: 'sqlSearch.compareFunctions',
+    children: [
+      { label: 'tableFunctions.regexp_like', value: 'regexp_like' },
+      { label: 'tableFunctions.greatest', value: 'greatest' },
+      { label: 'tableFunctions.least', value: 'least' },
+    ],
+  },
+  {
+    label: 'tableFunctions.stringFunctions',
+    value: 'sqlSearch.stringFunctions',
+    children: [
+      { label: 'tableFunctions.Length', value: 'Length' },
+      { label: 'tableFunctions.Strops', value: 'Strops' },
+      { label: 'tableFunctions.Startswith', value: 'Startswith' },
+      { label: 'tableFunctions.Endswith', value: 'Endswith' },
+      { label: 'tableFunctions.Concat', value: 'Concat' },
+      { label: 'tableFunctions.Substring', value: 'Substring' },
+      { label: 'tableFunctions.Replace', value: 'Replace' },
+      { label: 'tableFunctions.Upper', value: 'Upper' },
+      { label: 'tableFunctions.Lower', value: 'Lower' },
+      { label: 'tableFunctions.Trim', value: 'Trim' },
+      { label: 'tableFunctions.StrCmp', value: 'StrCmp' },
+    ],
+  },
+  {
+    label: 'tableFunctions.convertFunctions',
+    value: 'sqlSearch.convertFunctions',
+    children: [
+      { label: 'tableFunctions.cast', value: 'cast' },
+      { label: 'tableFunctions.try_cast', value: 'try_cast' },
+      { label: 'tableFunctions.format', value: 'format' },
+    ],
+  },
+  {
+    label: 'tableFunctions.constantFunctions',
+    value: 'sqlSearch.constantFunctions',
+    children: [
+      { label: 'tableFunctions.PI', value: 'PI' },
+      { label: 'tableFunctions.E', value: 'E' },
+    ],
+  },
+  {
+    label: 'tableFunctions.trendFunctions',
+    value: 'sqlSearch.trendFunctions',
+    children: [{ label: 'tableFunctions.DIFF', value: 'DIFF' }],
   },
 ];

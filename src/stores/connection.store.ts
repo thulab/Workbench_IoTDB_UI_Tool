@@ -19,7 +19,6 @@ export const useConnectionStore = defineStore(
           hostAndPortVOS: [{ host: '', port: '' }],
           prometheusUrl: '',
         },
-        model: 'tree',
       },
       currentVersion: '',
       slaveVersion: '',
@@ -29,6 +28,7 @@ export const useConnectionStore = defineStore(
     const masterConnectionStatus = ref(true);
     const slaveConnectionStatus = ref(true);
     const enableAINode = ref(false);
+    const model = ref<'tree' | 'table'>('tree');
 
     function setConnection(data: Connection.ConnectionDetail) {
       connectionInfo.data = data;
@@ -54,11 +54,11 @@ export const useConnectionStore = defineStore(
     }
 
     const isTableModel = computed(() => {
-      return connectionInfo.data.model === 'table';
+      return model.value === 'table';
     });
 
-    const setModel = (model: 'tree' | 'table') => {
-      connectionInfo.data.model = model;
+    const setModel = (payload: 'tree' | 'table') => {
+      model.value = payload;
     };
 
     return {
@@ -74,6 +74,7 @@ export const useConnectionStore = defineStore(
       setMasterConnectionStatus,
       enableAINode,
       setEnableAINode,
+      model,
       isTableModel,
       setModel,
     };

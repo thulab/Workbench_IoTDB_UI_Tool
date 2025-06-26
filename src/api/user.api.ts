@@ -24,6 +24,7 @@ class UserApi {
       connection: Connection.ConnectionDetail;
       isMaster: boolean;
       isActive: boolean | null;
+      model: 'tree' | 'table';
       slaveIsConnection: boolean;
     } & { version: string; slaveVersion: string }
   > {

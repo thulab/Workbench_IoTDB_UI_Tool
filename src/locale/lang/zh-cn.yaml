@@ -162,7 +162,8 @@ common:
   zoom: 放大
   revoke: 撤销
   restore: 还原
-  viewLink: https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/Operator-and-Expression.html
+  viewLink: >-
+    https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/Operator-and-Expression.html
   comingSoon: 敬请期待
 page:
   '403': 403页面
@@ -323,6 +324,7 @@ search:
   runOverTip: 模版语句数量已达到上限，如有需要请新建模版进行操作
   runRepeatTip: 查询正在运行中，请勿重复操作
   emptyTip: 是否清空页面
+  object: 对象
 searchIotdb:
   aggregate: 聚合函数
   sum: 求和
@@ -402,6 +404,74 @@ searchIotdb:
   equalSizeBucketOutlierSample: 返回符合采样比例和桶内采样个数的等分桶离群值采样
   m4: >-
     返回每个窗口内的第一个点（first）、最后一个点（last）、最小值点（bottom）、最大值点（top）。在一个窗口内的聚合点输出之前，M4会将它们按照时间戳递增排序并且去重
+tableFunctions:
+  aggregateFunctions: 聚合函数
+  SUM: 求和
+  COUNT: 计算数据点数
+  COUNT_IF: COUNT_IF（exp） 用于统计满足指定布尔表达式的记录行数，exp 必须是一个布尔类型的表达式
+  AVG: 求平均值
+  STDDEV: 求样本标准差
+  STDDEV_POP: 求总体标准差
+  STDDEV_SAMP: 求样本标准差
+  VARIANCE: 求样本方差
+  VAR_POP: 求总体方差
+  VAR_SAMP: 求样本方差
+  EXTREME: 求具有最大绝对值的值。如果正值和负值的最大绝对值相等，则返回正值。
+  MODE: 求众数
+  Max: 求最大值
+  Min: 求最小值
+  First: 求时间戳最小且不为 NULL 的值
+  Last: 求时间戳最大且不为 NULL 的值
+  MAX_BY: MAX_BY（x， y） 求二元输入 x 和 y 在 y 最大时对应的 x 的值
+  MIN_BY: MIN_BY（x， y） 求二元输入 x 和 y 在 y 最小时对应的 x 的值
+  FIRST_BY: FIRST_BY（x， y） 求当 y 为第一个不为 NULL 的值时，同一行里对应的 x 值
+  LAST_BY: LAST_BY（x， y） 求当 y 为最后一个不为 NULL 的值时，同一行里对应的 x 值
+  mathFunctions: 数学函数
+  SIN: 正弦函数
+  COS: 余弦函数
+  TAN: 正切函数
+  ASIN: 反正弦函数
+  ACOS: 反余弦函数
+  ATAN: 反正切函数
+  SINH: 双曲正弦函数
+  COSH: 双曲余弦函数
+  TANH: 双曲正切函数
+  DEGREES: 转角度
+  RADIANS: 转弧度
+  ABS: 绝对值
+  SIGN: 符号函数
+  CEIL: 向上取整
+  FLOOR: 向下取整
+  ROUND: 四舍五入
+  EXP: 以 e 为底的指数
+  LN: 以 e 为底的对数
+  LOG10: 以 10 为底的对数
+  SQRT: 求平方根
+  compareFunctions: 比较函数
+  regexp_like: 评估字符串是否包含正则表达式模式
+  greatest: 参数列表中的最大值
+  least: 参数列表中的最小值
+  stringFunctions: 字符串处理函数
+  Length: 返回字符串的长度
+  Strops: 返回子字符串在字符串中第一次出现的起始位置
+  Startswith: 测试子字符串是否是字符串的前缀
+  Endswith: 测试字符串是否以指定的后缀结束
+  Concat: 返回字符串 string1、string2、...、stringN 的连接结果
+  Substring: 从指定位置提取字符到字符串末尾或从一个字符串中提取从指定位置开始、指定长度的子字符串
+  Replace: 从字符串中删除所有 search 的实例或将字符串中所有 search 的实例替换为 replace
+  Upper: 将字符串中的字母转换为大写
+  Lower: 将字符串中的字母转换为小写
+  Trim: 从源字符串中删除指定的开头和/或结尾字符
+  StrCmp: 用于比较两个输入序列，如果值相同返回 0 ， 序列 1 的值小于序列 2 的值返回一个负数，序列 1 的值大于序列 2 的值返回一个正数
+  convertFunctions: 转换函数
+  cast: 将数据转换为 type 参数指定的类型
+  try_cast: 将数据转换为 type 参数指定的类型
+  format: 格式化字符串
+  constantFunctions: 常序列生成函数
+  PI: 常序列的值：π 的 double 值，圆的周长与其直径的比值，即圆周率，等于 Java 标准库 中的 Math.PI
+  E: 常序列的值：e 的 double 值，自然对数的底，它等于 Java 标准库 中的 Math.E
+  trendFunctions: 趋势计算函数
+  DIFF: 计算当前行与上一行的差值。第一行，由于没有前一行数据，永远返回 NULL
 dashboard:
   systemInfo: 系统信息
   masterSystemInfo: 主集群系统信息
@@ -879,8 +949,7 @@ spectrum:
   importFailedTip: 比对片段导入失败
   importedFailureStatus: 共导入 {total} 个数据点，成功 {success} 个，失败 {failure} 个
   distance: 相似度
-  distanceTip: >-
-    用于衡量对比片段与结果的相似性，取值范围为0-100，数值越高相似度越高
+  distanceTip: 用于衡量对比片段与结果的相似性，取值范围为0-100，数值越高相似度越高
   ascByDistance: 按相似度倒序
   descByDistance: 按相似度正序
   ascByTime: 按时间正序
@@ -892,7 +961,6 @@ spectrum:
   total: 共 {total} 个结果
   dragTip: 点此拖动
   download: 下载结果
-
 iotdbConfig:
   template: 模板
   searchPlaceholder: 请输入搜索内容
@@ -919,7 +987,9 @@ aiAnalysis:
   noConfigs: 无
   viewConfig: 查看
   importModelFile: 将文件拖到此处，或
-  importModelNameHover: 模型名称：模型的全局唯一标识，不可重复。模型名称具备以下约束：<br/> 1. 允许出现标识符 [ 0-9 a-z A-Z _ ] （字母，数字，下划线）<br/> 2. 长度限制为 2-64 字符<br/> 3. 大小写敏感
+  importModelNameHover: >-
+    模型名称：模型的全局唯一标识，不可重复。模型名称具备以下约束：<br/> 1. 允许出现标识符 [ 0-9 a-z A-Z _ ]
+    （字母，数字，下划线）<br/> 2. 长度限制为 2-64 字符<br/> 3. 大小写敏感
   configYaml: config.yaml
   importModelRule: 文件格式不正确，目前仅支持上传.pt和.yaml文件
   importModelTip: 模型包由1个.pt文件和1个.yaml文件构成，必须同时上传这2个文件。上传后，文件将自动重命名为 model.pt 和 config.yaml

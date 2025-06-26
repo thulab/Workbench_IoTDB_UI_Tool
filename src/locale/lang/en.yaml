@@ -170,7 +170,8 @@ common:
   zoom: Amplify
   revoke: Revoke
   restore: Restore
-  viewLink: https://www.timecho.com/docs/UserGuide/latest/User-Manual/Operator-and-Expression.html
+  viewLink: >-
+    https://www.timecho.com/docs/UserGuide/latest/User-Manual/Operator-and-Expression.html
   comingSoon: Coming Soon
 page:
   '403': 403 Page
@@ -230,7 +231,9 @@ measurement:
   measurementAlias: Alias
   tag: Tag
   tagDetail: Tag Details
-  tagTip: The label input format is "key=value". If multiple labels are entered, please use ";" to cut them
+  tagTip: >-
+    The label input format is "key=value". If multiple labels are entered,
+    please use ";" to cut them
   descriptionTip: >-
     Only supports input of uppercase and lowercase letters, numbers,
     underscores, UNICODE Chinese characters, special characters and real numbers
@@ -256,8 +259,15 @@ measurement:
   importDataRule: Up to 20 files can be uploaded. Please delete them and try again
   importDataRule2: Incorrect file format
   importingStatus: files
-  importedSuccessStatus: A total of {total} files was imported, and {success} successful | A total of {total} files was imported, and {success} successful | A total of {total} files were imported, and {success} successful
-  importedFailureStatus: A total of {total} files was imported, with {success} successful and {failure} failed | A total of {total} files was imported, with {success} successful and {failure} failed | A total of {total} files were imported, with {success} successful and {failure} failed
+  importedSuccessStatus: >-
+    A total of {total} files was imported, and {success} successful | A total of
+    {total} files was imported, and {success} successful | A total of {total}
+    files were imported, and {success} successful
+  importedFailureStatus: >-
+    A total of {total} files was imported, with {success} successful and
+    {failure} failed | A total of {total} files was imported, with {success}
+    successful and {failure} failed | A total of {total} files were imported,
+    with {success} successful and {failure} failed
   waitingUpload: To Upload
   uploading: Uploading
   uploaded: Uploaded
@@ -345,6 +355,7 @@ search:
   runRepeatTip: Query is running, please do not repeat the operation
   emptyTip: Clear the page?
   deleteTemplateTip: Do you want to delete common statements
+  object: Objects
 searchIotdb:
   aggregate: Aggregation Functions
   sum: Sum
@@ -647,7 +658,8 @@ dataTrend:
   deleteTemplateTip: Do you want to delete common trends
   measurementEmptyTip: Please add measurements and select them first
   trendTip: >-
-    Up to {tip}  data points can be plotted. If the limit is exceeded, the system will automatically adjust.
+    Up to {tip}  data points can be plotted. If the limit is exceeded, the
+    system will automatically adjust.
   overTip: >-
     Exceeding the maximum number of plotted measurements, it has been
     automatically adjusted for display
@@ -823,7 +835,9 @@ auth:
   systemTitleWorkbench: TimechoDB Visual Console - Workbench
   versionTitle: Version：{version}
   editUserSuccess: Edited Successfully
-  docTip: Please refer to the document for specific instructions on the meaning of permissions
+  docTip: >-
+    Please refer to the document for specific instructions on the meaning of
+    permissions
 error:
   403Tip: Sorry, you do not have permission to access this page
   goHome: Back to Home
@@ -936,10 +950,18 @@ connection:
   defaultModel: Default Model
   treeModel: Tree Model
   tableModel: Table Model
-  defaultModelTip: |
-    Tree Model: Manages measurement points as objects, where each point corresponds to a time series. The point names can be split to form a tree directory structure, providing a one-to-one mapping with the physical world, making read/write operations simple and intuitive.
+  defaultModelTip: >
+    Tree Model: Manages measurement points as objects, where each point
+    corresponds to a time series. The point names can be split to form a tree
+    directory structure, providing a one-to-one mapping with the physical world,
+    making read/write operations simple and intuitive.
 
-    Table Model: It is recommended to create a table for each type of device. Physical quantity collections of the same device type share common characteristics (e.g., collecting temperature and humidity data), enabling flexible and rich data analysis.
+
+    Table Model: It is recommended to create a table for each type of device.
+    Physical quantity collections of the same device type share common
+    characteristics (e.g., collecting temperature and humidity data), enabling
+    flexible and rich data analysis.
+
 
     For more model details, refer to: Model Documentation
 flow:
@@ -1011,7 +1033,8 @@ spectrum:
   expandingFold: Amplification Factor
   dwt: DWT
   dwtTip: >-
-    Note: If you choose wavelet transform, the selected measurement point data must be an integer power of 2
+    Note: If you choose wavelet transform, the selected measurement point data
+    must be an integer power of 2
   filterType: Type
   filterTypePlaceholder: Select the type
   filterCoefficient: Coefficient
@@ -1033,10 +1056,16 @@ spectrum:
   importTitle: Import Comparison Fragments
   importSuccessTip: Comparison fragment imported successfully
   importFailedTip: Comparison fragment import failed
-  importedFailureStatus: A total of {total} data points was imported, with {success} successful and {failure} failed | A total of {total} data points was imported, with {success} successful and {failure} failed | A total of {total} data points were imported, with {success} successful and {failure} failed
+  importedFailureStatus: >-
+    A total of {total} data points was imported, with {success} successful and
+    {failure} failed | A total of {total} data points was imported, with
+    {success} successful and {failure} failed | A total of {total} data points
+    were imported, with {success} successful and {failure} failed
   distance: Similarity
   distanceTip: >-
-    Used to measure the similarity between the compared fragments and the results, with a value range of 0-100, the higher the value, the higher the similarity.
+    Used to measure the similarity between the compared fragments and the
+    results, with a value range of 0-100, the higher the value, the higher the
+    similarity.
   ascByDistance: Similarity ASC
   descByDistance: Similarity DESC
   ascByTime: Time ASC
@@ -1063,13 +1092,20 @@ aiAnalysis:
   modelType: Model Type
   state: State
   modelConfig: Model Config
-  noConfigs: Null
+  noConfigs: null
   viewConfig: View Config
   importModelFile: Drag the file here, or
-  importModelNameHover: Model name The globally unique identifier of the model, which cannot be repeated. The model name has the following constraints:<br/> 1. Identifiers [0-9 a-z A-Z _] (letters, numbers, underscores) are allowed<br/> 2. The length is limited to 2-64 characters<br/> 3. Case sensitive
+  importModelNameHover: >-
+    Model name The globally unique identifier of the model, which cannot be
+    repeated. The model name has the following constraints:<br/> 1. Identifiers
+    [0-9 a-z A-Z _] (letters, numbers, underscores) are allowed<br/> 2. The
+    length is limited to 2-64 characters<br/> 3. Case sensitive
   configYaml: config.yaml
   importModelRule: Incorrect file format, currently only .csv and .xlsx files are supported
-  importModelTip: The model package consists of 1 .pt file and 1 .yaml file, and these two files must be uploaded at the same time. Once uploaded, the files will be automatically renamed to model.pt and config.yaml
+  importModelTip: >-
+    The model package consists of 1 .pt file and 1 .yaml file, and these two
+    files must be uploaded at the same time. Once uploaded, the files will be
+    automatically renamed to model.pt and config.yaml
   importSuccessTip: The model and configuration files have been imported successfully
   importErrorTip: The model and configuration file import failed
   modelNameRuleError: The name does not comply with the specification, please change it.

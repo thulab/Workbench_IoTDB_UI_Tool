@@ -1,5 +1,5 @@
 <template>
-  <div class="search_div maxheight">
+  <div class="search_div max-height">
     <el-tree :data="data" :props="defaultProps" accordion ref="treeRef">
       <template #default="{ node, data }">
         <span class="custom-tree-node">
@@ -25,12 +25,15 @@
 <script lang="ts" setup>
 import type Node from 'element-plus/es/components/tree/src/model/node';
 import type { ElTree } from 'element-plus';
-import { functionTreeData } from '@/constants';
+import { useConnectionStore } from '@/stores';
+import { functionTreeData, tableFunctionTreeData } from '@/constants';
 
 const treeRef = ref<InstanceType<typeof ElTree> | null>(null);
 const emit = defineEmits(['get-function']);
+
+const connectionStore = useConnectionStore();
 const { t } = useI18n();
-const data = functionTreeData;
+const data = computed(() => (connectionStore.isTableModel ? tableFunctionTreeData : functionTreeData));
 const filterText = ref('');
 const tree = ref();
 

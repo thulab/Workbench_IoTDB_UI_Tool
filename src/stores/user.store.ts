@@ -154,6 +154,7 @@ export const useUserStore = defineStore(
             connectionStore.setConnection(res.data.connection);
             connectionStore.setConnectionMasterType(res.data.isMaster);
             connectionStore.setConnectionActive(res.data.isActive);
+            connectionStore.setModel(res.data.model);
             connectionStore.setSlaveConnectionStatus(res.data.slaveIsConnection);
             loadPrivilegesEnum(false);
             getSystemInfo(['type', 'type'], ['', '']).then((systemInfoResp) => {
