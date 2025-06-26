@@ -95,6 +95,7 @@ declare global {
     children?: MenuOptions[];
     isAuthMenu?: boolean;
     needVersion?: string;
+    sqlDialect?: 'all' | 'tree' | 'table'; // SQL 方言，all 表示所有方言都支持, 空 和 tree 代表仅树模型。table 代表仅表模型
   }
 
   type CallBackFunction = (success: boolean) => void;

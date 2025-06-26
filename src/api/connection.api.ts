@@ -94,5 +94,9 @@ class ConnectionApi {
   static getRelationalGraph(): HttpResponseP<{ detail: string }> {
     return http.get('/relationalGraph/get');
   }
+
+  static switchModel(model: 'tree' | 'table'): HttpResponseP {
+    return http.get('/changeModel', { params: { model } });
+  }
 }
 export default ConnectionApi;

@@ -56,15 +56,22 @@ const showVersionMenu = (version: string) => iotdbShowAuth(connectionStore.conne
 const menus = computed<MenuOptions[]>(() => {
   const { menuList } = props;
   menuList.sort((a, b) => (a.order || 0) - (b.order || 0));
-  return menuList.filter((item) => {
-    if (item.isAuthMenu) {
-      return props.showAuthMenu;
-    }
-    if (item.needVersion) {
-      return showVersionMenu(item.needVersion);
-    }
-    return true;
-  });
+  return menuList
+    .filter((item) => {
+      if (connectionStore.isTableModel) {
+        return item.sqlDialect === 'all' || item.sqlDialect === 'table';
+      }
+      return !item.sqlDialect || item.sqlDialect === 'all' || item.sqlDialect !== 'table';
+    })
+    .filter((item) => {
+      if (item.isAuthMenu) {
+        return props.showAuthMenu;
+      }
+      if (item.needVersion) {
+        return showVersionMenu(item.needVersion);
+      }
+      return true;
+    });
 });
 </script>
 

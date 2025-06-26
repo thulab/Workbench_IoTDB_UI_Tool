@@ -290,7 +290,7 @@ const submitForm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
       loading.value = true;
-      login(loginForm.user, loginForm.password, +loginForm.connection)
+      login(loginForm.user, loginForm.password, +loginForm.connection, loginForm.model)
         .then(() => {
           userStore.setUser(loginForm.user);
           router.push({ name: 'Dashboard' });

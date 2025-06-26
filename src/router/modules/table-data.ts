@@ -14,6 +14,7 @@ const route = [
       activeIcon: ICustomDataSyncActive,
       showTopLine: true,
       order: 7,
+      sqlDialect: 'table',
     },
     children: [
       {

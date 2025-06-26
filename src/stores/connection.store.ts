@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
 
 export const useConnectionStore = defineStore(
   'ConnectionStore',
@@ -19,6 +19,7 @@ export const useConnectionStore = defineStore(
           hostAndPortVOS: [{ host: '', port: '' }],
           prometheusUrl: '',
         },
+        model: 'tree',
       },
       currentVersion: '',
       slaveVersion: '',
@@ -52,6 +53,14 @@ export const useConnectionStore = defineStore(
       enableAINode.value = data;
     }
 
+    const isTableModel = computed(() => {
+      return connectionInfo.data.model === 'table';
+    });
+
+    const setModel = (model: 'tree' | 'table') => {
+      connectionInfo.data.model = model;
+    };
+
     return {
       connectionInfo,
       setConnection,
@@ -65,6 +74,8 @@ export const useConnectionStore = defineStore(
       setMasterConnectionStatus,
       enableAINode,
       setEnableAINode,
+      isTableModel,
+      setModel,
     };
   },
   {

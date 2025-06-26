@@ -104,6 +104,7 @@ const routesToMenu = (routeItem: RouteRecordRaw, parentPath: string) => {
     showTopLine: routeItem.meta?.showTopLine,
     isAuthMenu: routeItem.meta?.isAuthMenu,
     needVersion: routeItem.meta?.needVersion,
+    sqlDialect: routeItem.meta?.sqlDialect,
   } as MenuOptions;
   if (routeItem.children && routeItem.children.length > 0) {
     if (routeItem.children.length === 1 && !routeItem.meta?.alwayShow && (!routeItem.children[0].children?.length || routeItem.children[0].children?.length <= 1)) {

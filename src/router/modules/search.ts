@@ -43,6 +43,7 @@ const route = [
       activeIcon: ICustomQuerySQLActive,
       showTopLine: true,
       order: 22,
+      sqlDialect: 'all',
     },
     children: [
       {

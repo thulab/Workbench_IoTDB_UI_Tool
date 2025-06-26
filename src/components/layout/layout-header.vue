@@ -1,6 +1,6 @@
 <template>
   <div class="header">
-    <div class="header-lf flex-center">
+    <div class="header-lf flex justify-center items-center">
       <el-icon class="collapse-icon" id="layout-header-collapse" @click="menuStore.setCollapse()">
         <i-custom-nav-open v-if="isCollapse" />
         <i-custom-nav-close v-else />
@@ -15,16 +15,16 @@
         </transition-group>
       </el-breadcrumb>
     </div>
-    <div class="header-ri flex-center">
+    <div class="header-ri flex justify-center items-center">
       <!-- eslint-disable-next-line vue/no-constant-condition -->
       <el-dropdown @command="handleChangeDefaultModel" v-show="true">
-        <span class="lang-icon m-r-20">
-          <i-custom-language />
+        <span class="lang-icon lang-icon-color m-r-20">
+          <i-ep-switch />
         </span>
         <template #dropdown>
           <el-dropdown-menu class="operate-dropdown">
-            <el-dropdown-item :disabled="connectionStore.connectionInfo.data.model === 'tree'" command="tree">{{ t('connection.treeModel') }}</el-dropdown-item>
-            <el-dropdown-item :disabled="connectionStore.connectionInfo.data.model === 'table'" command="table">{{ t('connection.tableModel') }}</el-dropdown-item>
+            <el-dropdown-item :disabled="!connectionStore.isTableModel" command="tree">{{ t('connection.treeModel') }}</el-dropdown-item>
+            <el-dropdown-item :disabled="connectionStore.isTableModel" command="table">{{ t('connection.tableModel') }}</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -75,7 +75,7 @@ const menuStore = useMenuStore();
 const isCollapse = computed((): boolean => menuStore.isCollapse);
 const isDark = useDark();
 
-const { requestFn: saveConnection } = useRequest(ConnectionApi.saveConnection);
+const { requestFn: switchModel } = useRequest(ConnectionApi.switchModel);
 
 function handleChangeLang(val: '0' | '1') {
   handleLangCommand(val);
@@ -86,16 +86,16 @@ function handleChangeLang(val: '0' | '1') {
   });
 }
 
-function handleSaveConnection(modelVal: 'tree' | 'table') {
-  saveConnection({ ...connectionStore.connectionInfo.data, model: modelVal })
+function handleSwitchConnection(modelVal: 'tree' | 'table') {
+  switchModel(modelVal)
     .then(() => {
-      connectionStore.setConnection({ ...connectionStore.connectionInfo.data, model: modelVal });
+      connectionStore.setModel(modelVal);
     })
     .finally(() => {});
 }
 
 function handleChangeDefaultModel(model: 'tree' | 'table') {
-  handleSaveConnection(model);
+  handleSwitchConnection(model);
 }
 </script>
 
@@ -122,7 +122,6 @@ function handleChangeDefaultModel(model: 'tree' | 'table') {
     margin: 0 30px;
 
     .lang-icon {
-      background-color: var(--el-color-primary);
       border-radius: 6px;
       color: #fff;
       width: 28px;
@@ -134,6 +133,10 @@ function handleChangeDefaultModel(model: 'tree' | 'table') {
       &:focus-visible {
         outline: none;
       }
+    }
+
+    .lang-icon-color {
+      color: var(--el-color-primary);
     }
 
     .switch-dark {
