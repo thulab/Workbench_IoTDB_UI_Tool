@@ -15,7 +15,7 @@
           <i-custom-border-refresh style="width: 24px; height: 24px" />
         </el-button>
         <el-button link @click="handleAddDB()" :disabled="searching" id="db-tree-add-db" class="svg-button-hover-color m-l-16">
-          <i-custom-border-refresh style="width: 24px; height: 24px" />
+          <i-custom-add-border style="width: 24px; height: 24px" />
         </el-button>
       </div>
       <el-tree-v2 ref="schemaTree" :data="treeData" style="background-color: #fff; overflow-y: auto" :props="treeProps" :indent="8" :item-size="28" :height="treeHeight" :expand-on-click-node="true">
@@ -34,25 +34,25 @@
           </div>
           <el-dropdown v-if="data.nodeType === 'DATABASE'" @command="handleDatabaseOptionClick($event, data)">
             <span class="lang-icon m-r-20">
-              <i-custom-field />
+              <i-ep-more />
             </span>
             <template #dropdown>
               <el-dropdown-menu class="operate-dropdown">
                 <el-dropdown-item command="dbSchema">
                   <div class="node-text">
-                    <i-custom-field class="m-r-8" />
+                    <i-custom-tree-db class="m-r-8" />
                     <span>{{ t('dataManage.schema') }}</span>
                   </div>
                 </el-dropdown-item>
-                <el-dropdown-item command="addTable">
+                <el-dropdown-item command="addTable" :disabled="data.database === 'information_schema'">
                   <div class="node-text">
-                    <i-custom-field class="m-r-8" />
+                    <i-ep-plus class="m-r-8" />
                     <span>{{ t('dataManage.table') }}</span>
                   </div>
                 </el-dropdown-item>
                 <el-dropdown-item command="dbDelete" :disabled="data.database === 'information_schema'">
                   <div class="node-text">
-                    <i-custom-field class="m-r-8" />
+                    <i-ep-delete class="m-r-8" />
                     <span>{{ t('common.delete') }}</span>
                   </div>
                 </el-dropdown-item>
@@ -61,31 +61,31 @@
           </el-dropdown>
           <el-dropdown v-if="data.nodeType === 'TABLE'" @command="handleTableOptionClick($event, data)">
             <span class="lang-icon m-r-20">
-              <i-custom-attr />
+              <i-ep-more />
             </span>
             <template #dropdown>
               <el-dropdown-menu class="operate-dropdown">
                 <el-dropdown-item command="tableSchema">
                   <div class="node-text">
-                    <i-custom-field class="m-r-8" />
+                    <i-custom-table class="m-r-8" />
                     <span>{{ t('dataManage.schema') }}</span>
                   </div>
                 </el-dropdown-item>
                 <el-dropdown-item command="tableData">
                   <div class="node-text">
-                    <i-custom-field class="m-r-8" />
+                    <i-ep-data-line class="m-r-8" />
                     <span>{{ t('dataManage.data') }}</span>
                   </div>
                 </el-dropdown-item>
-                <el-dropdown-item command="addCloumn">
+                <el-dropdown-item command="addCloumn" :disabled="data.database === 'information_schema'">
                   <div class="node-text">
-                    <i-custom-field class="m-r-8" />
+                    <i-ep-plus class="m-r-8" />
                     <span>{{ t('dataManage.column') }}</span>
                   </div>
                 </el-dropdown-item>
-                <el-dropdown-item command="tableDelete">
+                <el-dropdown-item command="tableDelete" :disabled="data.database === 'information_schema'">
                   <div class="node-text">
-                    <i-custom-field class="m-r-8" />
+                    <i-ep-delete class="m-r-8" />
                     <span>{{ t('common.delete') }}</span>
                   </div>
                 </el-dropdown-item>

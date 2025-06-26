@@ -22,6 +22,10 @@ class IoTDBApi {
     return http.get('/relational/schema/getDatabaseInfo', { params: { database } });
   }
 
+  static getTableList(database: string): HttpResponseP<IoTDB.TableRes> {
+    return http.post('/relational/schema/getTablesInfo', { database });
+  }
+
   static deleteDatabase(database: string): HttpResponseP {
     return http.get('/relational/schema/deleteDatabase', { params: { database } });
   }
@@ -33,6 +37,10 @@ class IoTDBApi {
   // 创建表
   static saveTable(payload: IoTDB.Database): HttpResponseP<number> {
     return http.post('/relational/schema/saveTable', payload);
+  }
+
+  static alterComment(data: { database: string; tableName: string; tableComment?: string; columnName?: string; columnComment?: string }): HttpResponseP {
+    return http.post('/relational/schema/alterComment', data);
   }
 }
 export default IoTDBApi;

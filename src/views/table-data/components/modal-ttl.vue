@@ -24,8 +24,9 @@ const formRef = ref<FormInstance>();
 
 const props = defineProps<{
   visible: boolean;
-  currentNode: IoTDB.TreeNodeData;
-  currentTable: IoTDB.TreeNodeData | undefined;
+  currentDatabase?: string;
+  currentTable?: string;
+  currentTtl?: string | null;
   type: string; // 'db' or 'table'
 }>();
 
@@ -69,7 +70,8 @@ const handleConfirm = () => {
     if (valid) {
       if (props.type === 'table' && props.currentTable) {
         upsertDatabase({
-          tableName: props.currentTable?.nodeName,
+          database: props.currentDatabase!,
+          tableName: props.currentTable,
           ttl: formData.ttl,
           ttlUnit: formData.ttlUnit,
         }).then(() => {
@@ -80,7 +82,7 @@ const handleConfirm = () => {
       } else if (props.type === 'db') {
         // 更新数据库的TTL
         upsertDatabase({
-          database: props.currentNode?.nodeName,
+          database: props.currentDatabase!,
           ttl: formData.ttl,
           ttlUnit: formData.ttlUnit,
         }).then(() => {
@@ -99,6 +101,11 @@ watch(
     if (newVal) {
       formRef.value?.resetFields();
       formKey.value++;
+      if (props.currentTtl) {
+        formData.ttl = props.currentTtl || '';
+      } else {
+        formData.ttl = '';
+      }
     }
   }
 );

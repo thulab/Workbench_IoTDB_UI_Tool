@@ -31,6 +31,10 @@ declare namespace IoTDB {
     database: string;
     tables: Table[];
   }
+  export interface TableRes {
+    sql: string;
+    value: TableVO[];
+  }
 
   export interface TreeNodeData {
     nodeName: string;

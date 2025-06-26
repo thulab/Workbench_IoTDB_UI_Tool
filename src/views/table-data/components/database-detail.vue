@@ -17,8 +17,8 @@
             class="m-r-6 svg-button-hover-color"
             style="cursor: pointer"
             @click="
-              modalTtlVisible = true;
               ttlType = 'db';
+              modalTtlVisible = true;
             "
           >
             <i-custom-edit />
@@ -73,7 +73,7 @@
 
     <div class="storage-table-box">
       <el-table
-        :data="tableDataShow || []"
+        :data="tableDataShow"
         style="width: 100%"
         :height="maxTableHeight"
         :max-height="maxTableHeight"
@@ -83,8 +83,20 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" />
-        <el-table-column :label="t('dataManage.tableName')" prop="nodeName" :show-overflow-tooltip="true" />
-        <el-table-column :label="t('dataManage.comment')" prop="comment" :show-overflow-tooltip="true" />
+        <el-table-column :label="t('dataManage.tableName')" prop="tableName" :show-overflow-tooltip="true" />
+        <el-table-column :label="t('dataManage.comment')" prop="comment" :show-overflow-tooltip="true">
+          <template #default="{ row }">
+            <div class="row-description-box">
+              <div class="row-description-text">
+                <text-tooltip :content="row.comment && row.comment !== 'null' ? row.comment : '-'" />
+              </div>
+              <div class="edit-box flex-align-center" @click="handleEditTableComment(row)">
+                <i-custom-edit-normal class="edit-icon" />
+                <i-custom-edit-active class="edit-icon-active" />
+              </div>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column label="TTL(ms)" prop="ttl" :show-overflow-tooltip="true">
           <template #default="{ row }">
             <div class="row-description-box">
@@ -118,8 +130,23 @@
       <div>{{ sqlDes }}</div>
       <el-icon size="24" class="svg-button-hover-color copy-icon"><i-custom-copy /></el-icon>
     </div>
-    <modal-ttl v-model:visible="modalTtlVisible" :current-node="currentNode" :current-table="currentTable" :type="ttlType" :key="modalTTLNum" @handle-save="handleRefresh" />
     <modal-add-table ref="addTableDialog" @handle-reload="handleRefresh" />
+    <modal-ttl
+      v-model:visible="modalTtlVisible"
+      :current-database="currentNode?.database"
+      :current-table="currentTable?.tableName"
+      :current-ttl="ttlType === 'db' ? currentNode.ttl : currentTable?.ttl"
+      :type="ttlType"
+      :key="modalTTLNum"
+      @handle-save="handleRefresh()"
+    />
+    <modal-comment
+      v-model:visible="modalCommentVisible"
+      :current-table="currentTable?.tableName"
+      :current-database="currentNode?.database"
+      :current-comment="currentTable?.comment"
+      @handle-save="handleRefresh()"
+    />
   </div>
 </template>
 
@@ -127,10 +154,10 @@
 import { useRoute } from 'vue-router';
 import { IoTDBApi } from '@/api';
 import { useTableHeight } from '@/composition-api';
-import { cloneDeep } from 'lodash-es';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalTtl from './modal-ttl.vue';
 import modalAddTable from './modal-add-table.vue';
+import ModalComment from './modal-comment.vue';
 
 const props = defineProps<{
   currentNode: IoTDB.TreeNodeData;
@@ -143,6 +170,7 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const route = useRoute();
 const { data: schemaDataDbInfo, requestFn: getDatabaseInfo } = useRequest(IoTDBApi.getDatabaseInfo);
+const { data: tableVO, requestFn: getTableList } = useRequest(IoTDBApi.getTableList);
 const { requestFn: deleteTables } = useRequest(IoTDBApi.deleteTables);
 const searchKeyword = ref((route.query.databaseSearch as string) || '');
 const databaseInfos = ref<IoTDB.DatabaseInfo | null>(null);
@@ -150,10 +178,10 @@ const searchType = ref('tableName');
 const searchPlaceholder = computed(() => (searchType.value === 'tableName' ? t('dataManage.tableNamePlaceholder') : t('dataManage.commentPlaceholder')));
 const { maxTableHeight } = useTableHeight(370);
 const modalTtlVisible = ref(false);
-const currentTable = ref<IoTDB.TreeNodeData>();
+const modalCommentVisible = ref(false);
+const currentTable = ref<IoTDB.TableVO>();
 const modalTTLNum = ref(0);
 const ttlType = ref('db'); // 'db' or 'table'
-const tableDataShow = ref<IoTDB.TreeNodeData[]>();
 const multipleSelection = ref<IoTDB.TreeNodeData[]>([]);
 const sqlDes = ref('');
 const addTableDialog = ref<InstanceType<typeof modalAddTable>>();
@@ -167,27 +195,32 @@ function showAddTableDialog() {
 // 存储组详细信息
 function getDatabaseDetail(data: string) {
   getDatabaseInfo(data).then(() => {
-    console.log('------Database detail:', schemaDataDbInfo.value.sql);
     sqlDes.value = schemaDataDbInfo.value.sql || '';
     databaseInfos.value = schemaDataDbInfo.value.value;
   });
 }
 
 onMounted(() => {
-  tableDataShow.value = cloneDeep(props.currentNode?.children || []);
   getDatabaseDetail(props.currentNode?.nodeName || '');
+  getTableList(props.currentNode?.nodeName || '');
 });
 
-function handleEditTableTTL(row: IoTDB.TreeNodeData) {
+function handleEditTableTTL(row: IoTDB.TableVO) {
   ttlType.value = 'table';
   currentTable.value = row;
   modalTtlVisible.value = true;
   modalTTLNum.value++;
 }
+function handleEditTableComment(row: IoTDB.TableVO) {
+  currentTable.value = row;
+  modalCommentVisible.value = true;
+}
 
 function handleRefresh() {
   // getDatabaseDetail(props.currentNode?.nodeName || '');
   emit('handleReload');
+  getDatabaseDetail(props.currentNode?.nodeName || '');
+  getTableList(props.currentNode?.nodeName || '');
 }
 
 function handleSelectionChange(vals: IoTDB.TreeNodeData[]) {
@@ -225,19 +258,16 @@ watch(
   }
 );
 
-watch(
-  () => searchKeyword.value,
-  () => {
-    console.log('searchKeyword changed:', searchKeyword.value);
-    if (props.currentNode?.children) {
-      tableDataShow.value = props.currentNode.children.filter((item) =>
-        searchType.value === 'tableName'
-          ? item.nodeName.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase())
-          : item.comment?.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase())
-      );
-    }
+const tableDataShow = computed(() => {
+  if (tableVO.value?.value && tableVO.value.value.length) {
+    return tableVO.value.value.filter((item) =>
+      searchType.value === 'tableName'
+        ? item.tableName.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase())
+        : item.comment?.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase())
+    );
   }
-);
+  return [];
+});
 </script>
 <style lang="scss" scoped>
 .database-detail-wrapper {
