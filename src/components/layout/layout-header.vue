@@ -52,7 +52,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { HOME_URL } from '@/config/app-config';
 import useMenuStore from '@/stores/menu';
 import { useI18n } from 'vue-i18n';
@@ -66,6 +66,7 @@ import IconEpSunny from '~icons/ep/sunny.svg';
 
 const { t, locale } = useI18n();
 const route = useRoute();
+const router = useRouter();
 const userStore = useUserStore();
 const enumStore = useEnumStore();
 const connectionStore = useConnectionStore();
@@ -86,10 +87,15 @@ function handleChangeLang(val: '0' | '1') {
   });
 }
 
+function handleDashboard() {
+  router.push({ name: 'Dashboard' });
+}
+
 function handleSwitchConnection(modelVal: 'tree' | 'table') {
   switchModel(modelVal)
     .then(() => {
       connectionStore.setModel(modelVal);
+      handleDashboard();
     })
     .finally(() => {});
 }
