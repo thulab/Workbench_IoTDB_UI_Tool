@@ -73,7 +73,7 @@
 
     <div class="storage-table-box">
       <el-table
-        :data="currentNode?.children || []"
+        :data="tableDataShow || []"
         style="width: 100%"
         :height="maxTableHeight"
         :max-height="maxTableHeight"
@@ -118,6 +118,7 @@
 import { useRoute } from 'vue-router';
 import { StorageApi } from '@/api';
 import { useTableHeight } from '@/composition-api';
+import { cloneDeep } from 'lodash-es';
 import ModalTtl from './modal-ttl.vue';
 
 const props = defineProps<{
@@ -136,6 +137,7 @@ const modalTtlVisible = ref(false);
 const currentTable = ref<IoTDB.TreeNodeData>();
 const modalTTLNum = ref(0);
 const ttlType = ref('db'); // 'db' or 'table'
+const tableDataShow = ref<IoTDB.TreeNodeData[]>();
 
 // 存储组详细信息
 function getDatabaseDetail(data: string) {
@@ -147,6 +149,7 @@ function getDatabaseDetail(data: string) {
 }
 
 onMounted(() => {
+  tableDataShow.value = cloneDeep(props.currentNode?.children || []);
   getDatabaseDetail(props.currentNode?.nodeName || '');
 });
 
@@ -162,6 +165,20 @@ watch(
   (newNode) => {
     if (newNode) {
       getDatabaseDetail(newNode.nodeName);
+    }
+  }
+);
+
+watch(
+  () => searchKeyword.value,
+  () => {
+    console.log('searchKeyword changed:', searchKeyword.value);
+    if (props.currentNode?.children) {
+      tableDataShow.value = props.currentNode.children.filter((item) =>
+        searchType.value === 'tableName'
+          ? item.nodeName.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase())
+          : item.comment?.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase())
+      );
     }
   }
 );
