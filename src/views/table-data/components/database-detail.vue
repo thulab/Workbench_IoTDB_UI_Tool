@@ -62,7 +62,7 @@
         <el-button type="primary" id="table-add">
           {{ t('common.add') }}
         </el-button>
-        <el-button type="primary" id="mesaurement-batch-del">
+        <el-button type="primary" id="mesaurement-batch-del" @click="handleDelRow('batch', null)" :disabled="!multipleSelection.length">
           {{ t('common.batchDelete') }}
         </el-button>
         <el-button link @click="handleRefresh" id="mesaurement-refresh" class="svg-button-hover-color">
@@ -80,6 +80,7 @@
         tooltip-effect="light"
         ref="tableRef"
         :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
+        @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" />
         <el-table-column :label="t('dataManage.tableName')" prop="nodeName" :show-overflow-tooltip="true" />
@@ -95,6 +96,13 @@
                 <i-custom-edit-active class="edit-icon-active" />
               </div>
             </div>
+          </template>
+        </el-table-column>
+        <el-table-column :label="t('common.operation')" width="240" align="center" fixed="right">
+          <template #default="{ row }">
+            <el-button type="primary" link size="small" @click="handleDelRow('row', row)" :id="`mesaurement-table-${row.nodeName}-del`">
+              {{ t('common.delete') }}
+            </el-button>
           </template>
         </el-table-column>
         <template #empty>
@@ -116,9 +124,10 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import { StorageApi } from '@/api';
+import { IoTDBApi } from '@/api';
 import { useTableHeight } from '@/composition-api';
 import { cloneDeep } from 'lodash-es';
+import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalTtl from './modal-ttl.vue';
 
 const props = defineProps<{
@@ -127,7 +136,8 @@ const props = defineProps<{
 
 const { t } = useI18n();
 const route = useRoute();
-const { requestFn: getDatabaseInfo } = useRequest(StorageApi.getDatabaseInfoTable);
+const { requestFn: getDatabaseInfo } = useRequest(IoTDBApi.getDatabaseInfoTable);
+const { requestFn: deleteTables } = useRequest(IoTDBApi.deleteTables);
 const searchKeyword = ref((route.query.databaseSearch as string) || '');
 const databaseInfos = ref<StorageDevice.DatabaseInfo | null>(null);
 const searchType = ref('tableName');
@@ -138,6 +148,7 @@ const currentTable = ref<IoTDB.TreeNodeData>();
 const modalTTLNum = ref(0);
 const ttlType = ref('db'); // 'db' or 'table'
 const tableDataShow = ref<IoTDB.TreeNodeData[]>();
+const multipleSelection = ref<IoTDB.TreeNodeData[]>([]);
 
 // 存储组详细信息
 function getDatabaseDetail(data: string) {
@@ -158,6 +169,36 @@ function handleEditTableTTL(row: IoTDB.TreeNodeData) {
   currentTable.value = row;
   modalTtlVisible.value = true;
   modalTTLNum.value++;
+}
+
+function handleRefresh() {
+  getDatabaseDetail(props.currentNode?.nodeName || '');
+}
+
+function handleSelectionChange(vals: IoTDB.TreeNodeData[]) {
+  multipleSelection.value = vals.filter((item) => item.nodeType === 'TABLE');
+}
+
+function handleDelRow(type: string, row: IoTDB.TreeNodeData | null) {
+  ElMessageBox.confirm(type === 'batch' ? `${t('dataManage.delDbBatchTip')}` : `${t('dataManage.delDbSingleTip')}`, t('common.notice'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
+    confirmButtonClass: 'mesaurement-table-del-confirm',
+    cancelButtonClass: 'mesaurement-table-del-cancel',
+    type: 'warning',
+    icon: ICustomMessageWarning,
+  }).then(() => {
+    let measurementList = [];
+    if (type === 'batch') {
+      measurementList = multipleSelection.value?.map((i) => i.nodeName);
+    } else {
+      measurementList = row?.nodeName ? [row.nodeName] : [];
+    }
+    deleteTables(measurementList).then(() => {
+      ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
+      handleRefresh();
+    });
+  });
 }
 
 watch(
@@ -182,10 +223,6 @@ watch(
     }
   }
 );
-
-function handleRefresh() {
-  getDatabaseDetail(props.currentNode?.nodeName || '');
-}
 </script>
 <style lang="scss" scoped>
 .database-detail-wrapper {
