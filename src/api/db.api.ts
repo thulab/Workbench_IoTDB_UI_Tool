@@ -13,7 +13,7 @@ class IoTDBApi {
   }
 
   // 更新数据库
-  static upsertDatabase(data: { ttl: string; ttlUnit: string; database?: string; tableName?: string }): HttpResponseP {
+  static upsertDatabase(data: { ttl: string; ttlUnit: string; database?: string; tableName?: string }): HttpResponseP<{ sql: string }> {
     return http.post('/relational/schema/upsertDatabaseTTL', { ...data, ttlUnit: 'millisecond' });
   }
 
@@ -39,7 +39,7 @@ class IoTDBApi {
     return http.post('/relational/schema/saveTable', payload);
   }
 
-  static alterComment(data: { database: string; tableName: string; tableComment?: string; columnName?: string; columnComment?: string }): HttpResponseP {
+  static alterComment(data: { database: string; tableName: string; tableComment?: string; columnName?: string; columnComment?: string }): HttpResponseP<{ sql: string }> {
     return http.post('/relational/schema/alterComment', data);
   }
 }

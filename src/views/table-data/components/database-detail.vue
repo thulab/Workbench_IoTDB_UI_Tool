@@ -9,7 +9,7 @@
     </h4>
     <div class="database-info-box">
       <ul class="database-info-list">
-        <li class="database-info-item" id="device-total-li">
+        <li class="database-info-item" id="device-total-li" v-if="!isSystemDatabase">
           <span class="database-info-item-label" id="measurement-total-span">{{ t('dataManage.ttl') }}：</span>
           {{ databaseInfos?.ttl ? databaseInfos?.ttl : '-' }}
           <el-icon
@@ -24,15 +24,15 @@
             <i-custom-edit />
           </el-icon>
         </li>
-        <li class="database-info-item" id="measurement-total-li">
+        <li class="database-info-item" id="measurement-total-li" v-if="!isSystemDatabase">
           <span class="database-info-item-label" id="measurement-total-span">{{ t('dataManage.partitionInterval') }}：</span>
           {{ databaseInfos?.partitionInterval }} {{ databaseInfos?.partitionIntervalUnit }}
         </li>
-        <li class="database-info-item" id="measurement-total-li">
+        <li class="database-info-item" id="measurement-total-li" v-if="!isSystemDatabase">
           <span class="database-info-item-label" id="measurement-total-span">{{ t('dataManage.schemaDuplicate') }}：</span>
           {{ databaseInfos?.schemaDuplicate }}
         </li>
-        <li class="database-info-item" id="measurement-total-li">
+        <li class="database-info-item" id="measurement-total-li" v-if="!isSystemDatabase">
           <span class="database-info-item-label" id="measurement-total-span">{{ t('dataManage.dataDuplicate') }}：</span>
           {{ databaseInfos?.dataDuplicate }}
         </li>
@@ -45,12 +45,12 @@
 
     <div class="search-form-container">
       <div class="search-form-box">
-        <el-input v-model="searchKeyword" :placeholder="searchPlaceholder" @keyup.enter="handleRefresh" id="mesaurement-search" style="width: 340px">
+        <el-input v-model="searchKeyword" :placeholder="searchPlaceholder" @keyup.enter="goto(1)" id="mesaurement-search" style="width: 340px">
           <template #prefix>
-            <i-custom-search-icon class="remote-select-search-icon" @click="handleRefresh" />
+            <i-custom-search-icon class="remote-select-search-icon" />
           </template>
           <template #prepend>
-            <el-select v-model="searchType" style="width: 88px" placeholder="" id="measurement-search-type" class="measurement-search-type-select">
+            <el-select v-model="searchType" style="width: 88px" placeholder="" @change="goto(1)" id="measurement-search-type" class="measurement-search-type-select">
               <el-option :label="t('dataManage.tableName')" value="tableName" id="measurement-search-type-name" />
               <el-option :label="t('dataManage.comment')" value="comment" id="measurement-search-type-description" />
             </el-select>
@@ -73,7 +73,7 @@
 
     <div class="storage-table-box">
       <el-table
-        :data="tableDataShow"
+        :data="tableDataPagination"
         style="width: 100%"
         :height="maxTableHeight"
         :max-height="maxTableHeight"
@@ -90,7 +90,7 @@
               <div class="row-description-text">
                 <text-tooltip :content="row.comment && row.comment !== 'null' ? row.comment : '-'" />
               </div>
-              <div class="edit-box flex-align-center" @click="handleEditTableComment(row)">
+              <div class="edit-box flex-align-center" @click="handleEditTableComment(row)" v-if="!isSystemDatabase">
                 <i-custom-edit-normal class="edit-icon" />
                 <i-custom-edit-active class="edit-icon-active" />
               </div>
@@ -103,7 +103,7 @@
               <div class="row-description-text">
                 <text-tooltip :content="row.ttl || ''" />
               </div>
-              <div class="edit-box flex-align-center" @click="handleEditTableTTL(row)">
+              <div class="edit-box flex-align-center" @click="handleEditTableTTL(row)" v-if="!isSystemDatabase">
                 <i-custom-edit-normal class="edit-icon" />
                 <i-custom-edit-active class="edit-icon-active" />
               </div>
@@ -112,7 +112,7 @@
         </el-table-column>
         <el-table-column :label="t('common.operation')" width="240" align="center" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link size="small" @click="handleDelRow('row', row)" :id="`mesaurement-table-${row.nodeName}-del`">
+            <el-button type="primary" link size="small" @click="handleDelRow('row', row)" :disabled="isSystemDatabase" :id="`mesaurement-table-${row.nodeName}-del`">
               {{ t('common.delete') }}
             </el-button>
           </template>
@@ -124,13 +124,24 @@
           </div>
         </template>
       </el-table>
+      <div class="paination" v-if="total && total > 0">
+        <el-pagination
+          background
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
+          layout="prev, pager, next, sizes, jumper"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="total || 0"
+          :hide-on-single-page="total < 10"
+        />
+      </div>
     </div>
 
     <div class="sql-statement">
       <div>{{ sqlDes }}</div>
       <el-icon size="24" class="svg-button-hover-color copy-icon"><i-custom-copy /></el-icon>
     </div>
-    <modal-add-table ref="addTableDialog" @handle-reload="handleRefresh" />
+    <modal-add-table ref="addTableDialog" @handle-reload="handleRefresh" @append-sql="handleAppendSql" />
     <modal-ttl
       v-model:visible="modalTtlVisible"
       :current-database="currentNode?.database"
@@ -138,6 +149,7 @@
       :current-ttl="ttlType === 'db' ? currentNode.ttl : currentTable?.ttl"
       :type="ttlType"
       :key="modalTTLNum"
+      @append-sql="handleAppendSql"
       @handle-save="handleRefresh()"
     />
     <modal-comment
@@ -145,6 +157,7 @@
       :current-table="currentTable?.tableName"
       :current-database="currentNode?.database"
       :current-comment="currentTable?.comment"
+      @append-sql="handleAppendSql"
       @handle-save="handleRefresh()"
     />
   </div>
@@ -154,6 +167,7 @@
 import { useRoute } from 'vue-router';
 import { IoTDBApi } from '@/api';
 import { useTableHeight } from '@/composition-api';
+import { useDbStore } from '@/stores';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalTtl from './modal-ttl.vue';
 import ModalAddTable from './modal-add-table.vue';
@@ -163,9 +177,9 @@ const props = defineProps<{
   currentNode: IoTDB.TreeNodeData;
 }>();
 
-const emit = defineEmits<{
-  (event: 'handleReload'): void;
-}>();
+// const emit = defineEmits<{
+//   (event: 'handleReload'): void;
+// }>();
 
 const { t } = useI18n();
 const route = useRoute();
@@ -176,7 +190,7 @@ const searchKeyword = ref((route.query.databaseSearch as string) || '');
 const databaseInfos = ref<IoTDB.DatabaseInfo | null>(null);
 const searchType = ref('tableName');
 const searchPlaceholder = computed(() => (searchType.value === 'tableName' ? t('dataManage.tableNamePlaceholder') : t('dataManage.commentPlaceholder')));
-const { maxTableHeight } = useTableHeight(370);
+const { maxTableHeight } = useTableHeight(410);
 const modalTtlVisible = ref(false);
 const modalCommentVisible = ref(false);
 const currentTable = ref<IoTDB.TableVO>();
@@ -185,6 +199,40 @@ const ttlType = ref('db'); // 'db' or 'table'
 const multipleSelection = ref<IoTDB.TreeNodeData[]>([]);
 const sqlDes = ref('');
 const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
+const currentPage = ref(1);
+const pageSize = ref(10);
+
+const { getDatabases } = useDbStore();
+
+const isSystemDatabase = computed(() => {
+  return props.currentNode?.nodeName === 'information_schema';
+});
+
+function handleAppendSql(sql: string) {
+  if (sqlDes.value && !sqlDes.value.endsWith('\n')) {
+    sqlDes.value += '\n';
+  }
+  sqlDes.value += sql;
+}
+
+const tableDataFilter = computed(() => {
+  if (tableVO.value?.value && tableVO.value.value.length) {
+    return tableVO.value.value.filter((item) =>
+      searchType.value === 'tableName'
+        ? item.tableName.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase())
+        : item.comment?.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase())
+    );
+  }
+  return [];
+});
+
+const tableDataPagination = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value;
+  const end = start + pageSize.value;
+  return tableDataFilter.value.slice(start, end);
+});
+
+const total = computed(() => tableDataFilter.value.length || 0);
 
 function showAddTableDialog() {
   if (addTableDialog.value) {
@@ -195,15 +243,10 @@ function showAddTableDialog() {
 // 存储组详细信息
 function getDatabaseDetail(data: string) {
   getDatabaseInfo(data).then(() => {
-    sqlDes.value = schemaDataDbInfo.value.sql || '';
+    handleAppendSql(schemaDataDbInfo.value.sql || '');
     databaseInfos.value = schemaDataDbInfo.value.value;
   });
 }
-
-onMounted(() => {
-  getDatabaseDetail(props.currentNode?.nodeName || '');
-  getTableList(props.currentNode?.nodeName || '');
-});
 
 function handleEditTableTTL(row: IoTDB.TableVO) {
   ttlType.value = 'table';
@@ -217,10 +260,11 @@ function handleEditTableComment(row: IoTDB.TableVO) {
 }
 
 function handleRefresh() {
-  // getDatabaseDetail(props.currentNode?.nodeName || '');
-  emit('handleReload');
+  getDatabases();
   getDatabaseDetail(props.currentNode?.nodeName || '');
-  getTableList(props.currentNode?.nodeName || '');
+  getTableList(props.currentNode?.nodeName || '').then(() => {
+    handleAppendSql(tableVO.value?.sql || '');
+  });
 }
 
 function handleSelectionChange(vals: IoTDB.TreeNodeData[]) {
@@ -249,6 +293,10 @@ function handleDelRow(type: string, row: IoTDB.TreeNodeData | null) {
   });
 }
 
+function goto(page: number) {
+  currentPage.value = page;
+}
+
 watch(
   () => props.currentNode,
   (newNode) => {
@@ -258,15 +306,9 @@ watch(
   }
 );
 
-const tableDataShow = computed(() => {
-  if (tableVO.value?.value && tableVO.value.value.length) {
-    return tableVO.value.value.filter((item) =>
-      searchType.value === 'tableName'
-        ? item.tableName.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase())
-        : item.comment?.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase())
-    );
-  }
-  return [];
+onMounted(() => {
+  getDatabaseDetail(props.currentNode?.nodeName || '');
+  getTableList(props.currentNode?.nodeName || '');
 });
 </script>
 <style lang="scss" scoped>
@@ -341,13 +383,15 @@ const tableDataShow = computed(() => {
 }
 
 .sql-statement {
-  padding: 16px;
+  padding: 4px 16px;
   font-size: 12px;
   border: 1px solid #dfe1ed;
   border-radius: 6px;
-  height: 60px;
-  margin: 0 160px;
+  height: 80px;
+  margin: 0 16px 16px;
   position: relative;
+  white-space: pre;
+  line-height: 1.5;
 
   .copy-icon {
     position: absolute;
@@ -388,6 +432,17 @@ const tableDataShow = computed(() => {
         display: block;
       }
     }
+  }
+}
+
+.paination {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+
+  // padding: 10px 0px;
+  .el-pagination {
+    padding: 4px 5px 0;
   }
 }
 </style>

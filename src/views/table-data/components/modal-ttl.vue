@@ -33,6 +33,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:visible': [visible: boolean];
   handleSave: [payload: string];
+  appendSql: [sql: string];
 }>();
 
 const { t, locale } = useI18n();
@@ -74,10 +75,11 @@ const handleConfirm = () => {
           tableName: props.currentTable,
           ttl: formData.ttl,
           ttlUnit: formData.ttlUnit,
-        }).then(() => {
+        }).then((resp) => {
           ElMessage.success({ message: t('dataManage.ttlUpdated'), grouping: true });
           dialogVisible.value = false;
           emit('handleSave', formData.ttl);
+          emit('appendSql', resp.data.sql);
         });
       } else if (props.type === 'db') {
         // 更新数据库的TTL
@@ -85,10 +87,11 @@ const handleConfirm = () => {
           database: props.currentDatabase!,
           ttl: formData.ttl,
           ttlUnit: formData.ttlUnit,
-        }).then(() => {
+        }).then((resp) => {
           ElMessage.success({ message: t('dataManage.ttlUpdated'), grouping: true });
           dialogVisible.value = false;
           emit('handleSave', formData.ttl);
+          emit('appendSql', resp.data.sql);
         });
       }
     }

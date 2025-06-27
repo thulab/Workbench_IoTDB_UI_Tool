@@ -31,6 +31,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:visible': [visible: boolean];
   handleSave: [payload: string];
+  appendSql: [sql: string];
 }>();
 
 const { t } = useI18n();
@@ -61,10 +62,11 @@ const handleConfirm = () => {
         tableComment: !props.currentColumn ? formData.comment : undefined,
         columnName: props.currentColumn || undefined,
         columnComment: props.currentColumn ? formData.comment : undefined,
-      }).then(() => {
+      }).then((resp) => {
         ElMessage.success({ message: t('common.submitSuccess'), grouping: true });
         dialogVisible.value = false;
         emit('handleSave', formData.comment);
+        emit('appendSql', resp.data.sql);
       });
     }
   });
