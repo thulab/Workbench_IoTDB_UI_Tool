@@ -181,7 +181,7 @@ const copyColumn = (index: number) => {
   const columnToCopy = formData.columns[index];
   const newColumn = {
     ...columnToCopy,
-    name: `${columnToCopy.columnName}_copy`,
+    columnName: `${columnToCopy.columnName}_copy`,
   };
 
   formData.columns.splice(index + 1, 0, newColumn);
