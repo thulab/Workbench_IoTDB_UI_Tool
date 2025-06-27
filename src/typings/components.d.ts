@@ -15,6 +15,7 @@ declare module 'vue' {
     ComingSoonContainer: typeof import('./../components/coming-soon-container.vue')['default']
     ConnectionForm: typeof import('./../components/connection/connection-form.vue')['default']
     ContextMenu: typeof import('./../components/flow-graph/context-menu.vue')['default']
+    copy: typeof import('./../components/dynamic-table copy.vue')['default']
     CustomVueNode: typeof import('./../components/flow-graph/custom-vue-node.vue')['default']
     DynamicTable: typeof import('./../components/dynamic-table.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']

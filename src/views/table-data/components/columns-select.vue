@@ -30,12 +30,12 @@
           <i-custom-type-text v-else-if="item.dataType === 'TEXT'" class="timeseries-type-text" />
         </template>
         <div :style="`display: flex; width: ${isShowType ? 'calc(100% - 68px)' : '100%'}`">
-          <text-tooltip :content="item.nodeName" />
+          <text-tooltip :content="item.nodeName + (item.comment ? ` (${item.comment})` : '')" />
         </div>
       </div>
     </el-option>
   </el-select>
-  <el-button v-if="isShowViewBtn" type="primary" :disabled="!model.length" class="m-l-12" @click="() => (dialogVisible = true)">{{ t(viewText) }}</el-button>
+  <el-button v-if="isShowViewBtn" type="primary" :disabled="!model?.length" class="m-l-12" @click="() => (dialogVisible = true)">{{ t(viewText) }}</el-button>
   <el-dialog :title="t(viewText)" v-model="dialogVisible" class="select-modal" align-center width="520px">
     <el-scrollbar :max-height="400">
       <ul class="select-list">
@@ -94,7 +94,7 @@ const measurementList = ref<IoTDB.TreeNodeData[]>([]);
 let lastMeasurementQuery = '';
 const remoteMethod = debounce((query: string) => {
   lastMeasurementQuery = query;
-  measurementList.value = props.currentNode?.children?.filter((item) => item.nodeName.toLowerCase().includes(lastMeasurementQuery.toLowerCase())) || [];
+  measurementList.value = props.currentNode?.children?.filter((item) => item.nodeName !== 'time').filter((item) => item.nodeName.toLowerCase().includes(lastMeasurementQuery.toLowerCase())) || [];
 }, 500);
 
 function handleDelete(index: number) {
