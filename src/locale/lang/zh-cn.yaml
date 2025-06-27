@@ -1067,3 +1067,4 @@ dataManage:
   delDbBatchTip: 此操作会删除这些表及其包含的全部数据，是否删除？
   delColumnSingleTip: 此操作会删除该列及其对应的全部数据，是否删除？
   delColumnBatchTip: 此操作会删除这些列及其对应的全部数据，是否删除？
+  addCloumn: 添加列名

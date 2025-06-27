@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" :title="`新增${addType === 'addTable' ? '表' : '列'}`" width="700px" :before-close="handleClose">
+  <el-dialog v-model="dialogVisible" :title="`新增${addType === 'addTable' ? '表' : '列'}`" width="748px" :close-on-click-modal="false" id="table-modal-table-column">
     <el-form ref="formRef" :model="formData" label-width="120px" label-position="left">
       <!-- 表名 -->
       <base-form-item label="表名：" prop="tableName" required>
@@ -16,98 +16,90 @@
           {{ t('dataManage.ttl') }}：
           <el-tooltip effect="light" content="表的 TTL 默认为其所在数据库的 TTL" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
         </template>
-        <el-input v-model="formData.ttl" placeholder="请输入数据保留时间" clearable :disabled="addType !== 'addTable'">
+        <el-input v-model="formData.ttl" placeholder="请输入数据保留时间" clearable :disabled="addType !== 'addTable'" @input="handleNumberInput">
           <template #append>ms</template>
         </el-input>
       </base-form-item>
 
-      <el-divider />
+      <el-scrollbar :max-height="400" :min-height="152" class="measurement-list-box">
+        <el-collapse accordion v-model="activeName">
+          <el-collapse-item v-for="(item, index) in formData.columns" :key="index" :name="`measurement_${index}`">
+            <template #title>
+              <el-row class="collapse-title-box">
+                <el-col :span="12">
+                  <div class="all-path-name">{{ `名称：${item.columnName}` }}</div>
+                </el-col>
+                <el-col :span="8">
+                  <div class="collapse-data-type-box">
+                    <span class="data-type-label">{{ t('measurement.dataType') }}</span>
+                    <span>{{ item.dataType }}</span>
+                  </div>
+                </el-col>
+                <el-col :span="4">
+                  <div class="operate-box">
+                    <el-button link :disabled="existEmpty" @click.stop="copyColumn(index)" :id="`measurement-modal-collapse-${index}-copy`" :class="existEmpty ? '' : 'svg-button-hover-color'">
+                      <i-custom-copy />
+                    </el-button>
+                    <el-button link :class="['m-x-12', 'svg-button-hover-color']" @click.stop="deleteColumn(index)" :id="`measurement-modal-collapse-${index}-del`">
+                      <i-custom-delete />
+                    </el-button>
+                  </div>
+                </el-col>
+              </el-row>
+            </template>
 
-      <!-- 列列表 -->
-      <div class="column-list">
-        <div v-for="(column, index) in formData.columns" :key="index" class="column-item" :class="{ expanded: expandedIndex === index }">
-          <div class="column-header" @click="toggleExpand(index)">
-            <div class="column-title">
-              <span>列{{ index + 1 }}: {{ column.columnName }}</span>
-              <span class="column-type">{{ column.cateGory }}</span>
-            </div>
-            <div class="column-actions">
-              <el-tooltip content="复制" placement="top">
-                <el-icon size="24" class="svg-button-hover-color copy-icon" @click.stop="copyColumn(index)">
-                  <i-custom-copy />
-                </el-icon>
-              </el-tooltip>
-              <el-tooltip content="删除" placement="top">
-                <el-icon size="24" class="svg-button-hover-color copy-icon" @click.stop="deleteColumn(index)">
-                  <i-custom-delete />
-                </el-icon>
-              </el-tooltip>
-              <el-icon :class="{ rotate: expandedIndex === index }">
-                <i-ep-arrow-down class="svg-button-hover-color" />
-              </el-icon>
-            </div>
-          </div>
-
-          <div v-if="expandedIndex === index" class="column-details">
             <base-form-item label="列名：" required>
               <template #label>
                 {{ t('dataManage.columnName') }}：
                 <el-tooltip effect="light" :content="t('dataManage.databaseNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
               </template>
-              <el-input v-model="column.columnName" placeholder="请输入列名称" clearable />
+              <el-input v-model="item.columnName" placeholder="请输入列名称" clearable />
             </base-form-item>
 
             <base-form-item label="备注：">
-              <el-input v-model="column.comment" placeholder="请输入备注" type="textarea" :rows="2" maxlength="100" show-word-limit clearable />
+              <el-input v-model="item.comment" placeholder="请输入备注" type="textarea" :rows="2" maxlength="100" show-word-limit clearable />
             </base-form-item>
 
-            <base-form-item label="列类别：" required>
-              <el-select v-model="column.cateGory" placeholder="请选择列类别" @change="handleColumnTypeChange(index)">
-                <el-option v-for="item in columnTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
-              </el-select>
-            </base-form-item>
-
-            <base-form-item label="数据类型：" required>
-              <el-select v-model="column.dataType" placeholder="请选择数据类型" :disabled="['TAG', 'ATTRIBUTE'].includes(column.cateGory)">
-                <el-option v-for="item in dataTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
-              </el-select>
-            </base-form-item>
-          </div>
-        </div>
-      </div>
+            <el-row>
+              <el-col :span="12">
+                <base-form-item label="列类别：" required>
+                  <el-select v-model="item.cateGory" placeholder="请选择列类别" @change="handleColumnTypeChange(index)">
+                    <el-option v-for="item in columnTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+                  </el-select>
+                </base-form-item>
+              </el-col>
+              <el-col :span="12">
+                <base-form-item label="数据类型：" required>
+                  <el-select v-model="item.dataType" placeholder="请选择数据类型" :disabled="['TAG', 'ATTRIBUTE'].includes(item.cateGory)">
+                    <el-option v-for="item in dataTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+                  </el-select>
+                </base-form-item>
+              </el-col>
+            </el-row>
+          </el-collapse-item>
+        </el-collapse>
+      </el-scrollbar>
 
       <!-- 添加列按钮 -->
-      <base-form-item>
-        <el-button type="primary" :disabled="!canAddColumn" @click="addColumn">添加列 ({{ formData.columns.length }}/10)</el-button>
-      </base-form-item>
+
+      <el-button style="width: 100%" :class="['m-t-16', existEmpty ? '' : 'svg-button-hover-color']" :disabled="existEmpty || !canAddColumn" @click="addColumn" id="measurement-modal-collapse-add">
+        <i-custom-add class="m-r-4" />
+        {{ t('dataManage.addCloumn') }}({{ formData.columns.length }}/10)
+      </el-button>
     </el-form>
 
     <template #footer>
       <span class="dialog-footer">
-        <el-button
-          @click="
-            dialogVisible = false;
-            resetForm();
-          "
-        >
-          取消
-        </el-button>
-        <el-button type="primary" @click="handleConfirm">确定</el-button>
+        <el-button @click="dialogVisible = false">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="handleConfirm">{{ t('common.confirm') }}</el-button>
       </span>
     </template>
   </el-dialog>
 </template>
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue';
-import { ElMessage, ElMessageBox, ElDialog, ElForm, ElInput, ElSelect, ElOption, ElButton, ElDivider, ElTooltip, ElIcon } from 'element-plus';
+import { ElMessage, ElMessageBox, ElDialog, ElForm, ElInput, ElSelect, ElOption, ElButton, ElTooltip } from 'element-plus';
 import { IoTDBApi } from '@/api';
-
-// const props = withDefaults(defineProps<{
-//   addType?: string; // addTable or addColumn
-// }>(),
-// {
-//   addType: 'addTable',
-// });
 
 const emit = defineEmits<{
   (event: 'handleReload'): void;
@@ -116,10 +108,10 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const dialogVisible = ref(false);
 const formRef = ref(null);
-const expandedIndex = ref(-1);
 const { requestFn: saveTable } = useRequest(IoTDBApi.saveTable);
 const { requestFn: saveColumns } = useRequest(IoTDBApi.saveColumns);
 const addType = ref('addTable'); // addTable or addColumn
+const activeName = ref('measurement_0');
 
 const columnTypeOptions = [
   { label: 'TAG', value: 'TAG' },
@@ -174,6 +166,11 @@ const handleColumnTypeChange = (index: number) => {
   }
 };
 
+const existEmpty = computed(() => {
+  const flag = formData.columns.some((s) => !s.columnName || !s.dataType || !s.cateGory);
+  return flag;
+});
+
 // 添加新列
 const addColumn = () => {
   if (!canAddColumn.value) return;
@@ -186,7 +183,9 @@ const addColumn = () => {
   };
 
   formData.columns.push(newColumn);
-  expandedIndex.value = formData.columns.length - 1;
+  nextTick(() => {
+    activeName.value = `measurement_${formData.columns.length - 1}`;
+  });
 };
 
 // 复制列
@@ -200,8 +199,15 @@ const copyColumn = (index: number) => {
   };
 
   formData.columns.splice(index + 1, 0, newColumn);
-  expandedIndex.value = index + 1;
+  nextTick(() => {
+    activeName.value = `measurement_${formData.columns.length - 1}`;
+  });
   ElMessage.success('列已复制');
+};
+
+// 只允许输入数字
+const handleNumberInput = (value: string) => {
+  formData.ttl = value.replace(/[^\d]/g, '');
 };
 
 // 删除列
@@ -213,27 +219,9 @@ const deleteColumn = (index: number) => {
   })
     .then(() => {
       formData.columns.splice(index, 1);
-      if (expandedIndex.value === index) {
-        expandedIndex.value = -1;
-      } else if (expandedIndex.value > index) {
-        expandedIndex.value--;
-      }
       ElMessage.success('列已删除');
     })
     .catch(() => {});
-};
-
-// 展开/收起列详情
-const toggleExpand = (index: number) => {
-  expandedIndex.value = expandedIndex.value === index ? -1 : index;
-};
-
-// 重置表单
-const resetForm = () => {
-  formData.tableName = '';
-  formData.ttl = '';
-  formData.columns = [];
-  expandedIndex.value = -1;
 };
 
 // 确认提交
@@ -253,23 +241,18 @@ const handleConfirm = async () => {
     const column = formData.columns[i];
     if (!column.columnName.trim()) {
       ElMessage.warning(`请填写第 ${i + 1} 列的列名`);
-      expandedIndex.value = i;
       return;
     }
     if (!column.cateGory) {
       ElMessage.warning(`请选择第 ${i + 1} 列的列类别`);
-      expandedIndex.value = i;
       return;
     }
     if (!column.dataType) {
       ElMessage.warning(`请选择第 ${i + 1} 列的数据类型`);
-      expandedIndex.value = i;
       return;
     }
   }
 
-  // 这里可以添加提交表单的逻辑
-  console.log('表单数据:', JSON.parse(JSON.stringify(formData)));
   formDataBody.value.database = addType.value === 'addTable' ? currentNode.value?.nodeName || '' : currentNode.value?.parentName || '';
   formDataBody.value.tables.push({
     tableVO: {
@@ -289,7 +272,6 @@ const handleConfirm = async () => {
       .then(() => {
         ElMessage.success('表创建成功');
         dialogVisible.value = false;
-        resetForm();
         emit('handleReload');
       })
       .catch((error) => {
@@ -300,7 +282,6 @@ const handleConfirm = async () => {
       .then(() => {
         ElMessage.success('添加成功');
         dialogVisible.value = false;
-        resetForm();
         emit('handleReload');
       })
       .catch((error) => {
@@ -309,23 +290,16 @@ const handleConfirm = async () => {
   }
 };
 
-// 关闭弹窗确认
-const handleClose = (done: any) => {
-  ElMessageBox.confirm('确定要关闭吗？未保存的数据将丢失', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-  })
-    .then(() => {
-      resetForm();
-      done();
-    })
-    .catch(() => {});
-};
+function resetFormData() {
+  formData.tableName = '';
+  formData.ttl = '';
+  formData.columns = [];
+}
 
 // 暴露方法供父组件调用
 defineExpose({
   open: (currentVal: IoTDB.TreeNodeData, typeVal: string = 'addTable') => {
+    resetFormData();
     currentNode.value = currentVal;
     addType.value = typeVal;
     if (currentVal) {
@@ -338,80 +312,69 @@ defineExpose({
   },
   close: () => {
     dialogVisible.value = false;
-    resetForm();
   },
 });
 </script>
 <style lang="scss" scoped>
-.el-divider {
-  margin: 20px 0;
+.measurement-list-box {
+  border-bottom: none;
+
+  :deep(.el-form-item--default) {
+    margin-right: 9px;
+  }
+
+  :deep(.el-form-item__label) {
+    padding-right: 4px;
+  }
 }
 
-.dialog-footer {
+.collapse-title-box {
+  height: 100%;
+  width: calc(100% - 40px);
+
+  .all-path-name {
+    font-size: 14px;
+    font-weight: 400;
+    color: #424561;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 100%;
+    text-align: left;
+  }
+}
+
+.measurement-operate {
+  margin: 0 16px 0 24px;
+}
+
+.collapse-data-type-box {
   display: flex;
-  justify-content: flex-end;
-}
-
-.column-list {
-  margin-bottom: 20px;
-}
-
-.column-item {
-  border: 1px solid #ebeef5;
-  border-radius: 4px;
-  margin-bottom: 10px;
-  overflow: hidden;
-}
-
-.column-header {
-  display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  padding: 12px 15px;
-  background-color: #f5f7fa;
-  cursor: pointer;
-}
-
-.column-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.column-type {
-  background-color: #e6f7ff;
-  color: #1890ff;
-  padding: 2px 8px;
-  border-radius: 4px;
+  justify-content: center;
+  height: 100%;
   font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  color: #424561;
+
+  .data-type-label {
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 12px;
+    color: #656a85;
+    margin-bottom: 2px;
+  }
 }
 
-.column-actions {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
+.operate-box {
+  text-align: right;
 
-.column-actions .el-icon {
-  color: #606266;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.column-actions .el-icon:hover {
-  color: #1890ff;
-}
-
-.rotate {
-  transform: rotate(180deg);
-}
-
-.column-details {
-  padding: 15px;
-  background-color: #fff;
-}
-
-.base-form-item {
-  margin-bottom: 18px;
+  .el-button {
+    min-width: 28px !important;
+    padding: 0 !important;
+  }
 }
 </style>
