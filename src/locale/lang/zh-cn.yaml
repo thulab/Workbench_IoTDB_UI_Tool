@@ -1063,6 +1063,7 @@ dataManage:
   databaseNamePlaceholder: 请输入数据库名称
   databaseNameLenth: 字符长度不超过64，请重新输入
   databaseNameExist: 该数据库已存在，请重新输入
+  tableNameExist: 该表已存在，请重新输入
   specialCharsNeedQuotes: 特殊字符需要用双引号包裹
   emptyQuotedName: 引号内名称不能为空
   invalidNameFormat: 无效的名称格式

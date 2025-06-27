@@ -8,7 +8,7 @@
   >
     <el-form ref="formRef" :model="formData" label-width="120px" label-position="left">
       <!-- 表名 -->
-      <base-form-item :label="`${t('dataManage.tableName')}：`" prop="tableName" required>
+      <base-form-item :label="`${t('dataManage.tableName')}：`" prop="tableName" required :rules="tableNameRules">
         <template #label>
           {{ t('dataManage.tableName') }}：
           <el-tooltip effect="light" :content="t('dataManage.tableNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
@@ -54,7 +54,7 @@
               </el-row>
             </template>
 
-            <base-form-item :label="`${t('dataManage.columnName')}：`" required>
+            <base-form-item :label="`${t('dataManage.columnName')}：`" :prop="`columns[${index}].columnName`" required :rules="tableNameRules">
               <template #label>
                 {{ t('dataManage.columnName') }}：
                 <el-tooltip effect="light" :content="t('dataManage.tableNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
@@ -103,8 +103,8 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
+import type { FormInstance } from 'element-plus';
 import { ref, reactive, computed } from 'vue';
-import { ElMessage, ElMessageBox, ElDialog, ElForm, ElInput, ElSelect, ElOption, ElButton, ElTooltip } from 'element-plus';
 import { IoTDBApi } from '@/api';
 
 const emit = defineEmits<{
@@ -113,7 +113,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 const dialogVisible = ref(false);
-const formRef = ref(null);
+const formRef = ref<FormInstance>();
 const { requestFn: saveTable } = useRequest(IoTDBApi.saveTable);
 const { requestFn: saveColumns } = useRequest(IoTDBApi.saveColumns);
 const addType = ref('addTable'); // addTable or addColumn
@@ -159,6 +159,105 @@ const formDataBody = ref<IoTDB.Database>({
   tables: [],
 });
 const currentNode = ref<IoTDB.TreeNodeData>();
+const tableNames = computed(() => {
+  if (currentNode?.value && currentNode.value.children?.length) {
+    return currentNode.value.children.map((item) => item.nodeName);
+  }
+  return [];
+});
+// const rules = reactive<FormRules>({
+//   tableName: [
+//     {
+//       required: true,
+//       message: () => t('common.formRuleEmptyOperateShort'),
+//       trigger: 'blur',
+//     },
+//     {
+//       max: 64,
+//       message: () => t('dataManage.databaseNameLenth'),
+//       trigger: 'blur',
+//     },
+//     {
+//       validator: (rule: any, value: any, callback: any) => {
+//         if (value && tableNames.value.some((name) => name.toLocaleLowerCase() === value.toLocaleLowerCase())) {
+//           callback(new Error(t('dataManage.tableNameExist')));
+//         }
+
+//         // 情况1：简单名称（字母开头，可包含下划线和数字）
+//         const simplePattern = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+//         // 情况2：需要引号包裹的名称（包含特殊字符、中文或以数字开头）
+//         const needsQuotesPattern = /^".*"$/;
+//         // 特殊字符正则（包括中文、数字开头和各种特殊符号）
+//         const specialCharsPattern = /[`~!@#$%^&*()+=|{}':;',[\]<>/?\\]|[\u4e00-\u9fa5]|^[0-9]/;
+//         if (simplePattern.test(value)) {
+//           callback();
+//         } else if (specialCharsPattern.test(value) && !needsQuotesPattern.test(value)) {
+//           // 包含特殊字符但未用引号包裹
+//           callback(new Error(t('dataManage.specialCharsNeedQuotes'))); // Add i18n key
+//         } else if (needsQuotesPattern.test(value)) {
+//           // 检查引号内是否为空
+//           const unquoted = value.slice(1, -1);
+//           if (unquoted === '') {
+//             callback(new Error(t('dataManage.emptyQuotedName'))); // Add i18n key
+//           } else {
+//             callback();
+//           }
+//         } else {
+//           // 其他非法格式
+//           callback(new Error(t('dataManage.invalidNameFormat'))); // Add i18n key
+//         }
+//       },
+//       trigger: 'blur',
+//     },
+//   ],
+// });
+
+const validateName = (rule: any, value: any, callback: any) => {
+  if (value && tableNames.value.some((name) => name.toLocaleLowerCase() === value.toLocaleLowerCase())) {
+    callback(new Error(t('dataManage.tableNameExist')));
+  }
+
+  // 情况1：简单名称（字母开头，可包含下划线和数字）
+  const simplePattern = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+  // 情况2：需要引号包裹的名称（包含特殊字符、中文或以数字开头）
+  const needsQuotesPattern = /^".*"$/;
+  // 特殊字符正则（包括中文、数字开头和各种特殊符号）
+  const specialCharsPattern = /[`~!@#$%^&*()+=|{}':;',[\]<>/?\\]|[\u4e00-\u9fa5]|^[0-9]/;
+  if (simplePattern.test(value)) {
+    callback();
+  } else if (specialCharsPattern.test(value) && !needsQuotesPattern.test(value)) {
+    // 包含特殊字符但未用引号包裹
+    callback(new Error(t('dataManage.specialCharsNeedQuotes'))); // Add i18n key
+  } else if (needsQuotesPattern.test(value)) {
+    // 检查引号内是否为空
+    const unquoted = value.slice(1, -1);
+    if (unquoted === '') {
+      callback(new Error(t('dataManage.emptyQuotedName'))); // Add i18n key
+    } else {
+      callback();
+    }
+  } else {
+    // 其他非法格式
+    callback(new Error(t('dataManage.invalidNameFormat'))); // Add i18n key
+  }
+};
+
+const tableNameRules = ref([
+  {
+    required: true,
+    message: () => t('common.formRuleEmptyOperateShort'),
+    trigger: 'blur',
+  },
+  {
+    max: 64,
+    message: () => t('dataManage.databaseNameLenth'),
+    trigger: 'blur',
+  },
+  {
+    validator: validateName,
+    trigger: 'blur',
+  },
+]);
 
 // 是否可以添加新列
 const canAddColumn = computed(() => {
@@ -258,6 +357,12 @@ const handleConfirm = async () => {
       return;
     }
   }
+
+  let validate = false;
+  formRef.value?.validate((valid) => {
+    validate = valid;
+  });
+  if (!validate) return;
 
   formDataBody.value.database = addType.value === 'addTable' ? currentNode.value?.nodeName || '' : currentNode.value?.parentName || '';
   formDataBody.value.tables.push({
