@@ -26,10 +26,16 @@ class IoTDBApi {
     return http.post('/relational/schema/getTablesInfo', { database });
   }
 
-  static deleteDatabase(database: string): HttpResponseP {
-    return http.get('/relational/schema/deleteDatabase', { params: { database } });
+  static getColumnsList(database: string, tableName: string): HttpResponseP<IoTDB.ColumnRes> {
+    return http.post('/relational/schema/getColumnsInfo', { database, tableName });
   }
 
+  // 删除数据库
+  static deleteDatabase(database: string): HttpResponseP {
+    return http.delete('/relational/schema/deleteDatabase', { params: { database } });
+  }
+
+  // 删除表
   static deleteTables(tables: string[]): HttpResponseP {
     return http.post('/relational/schema/deleteTable', tables);
   }
@@ -37,6 +43,16 @@ class IoTDBApi {
   // 创建表
   static saveTable(payload: IoTDB.Database): HttpResponseP<number> {
     return http.post('/relational/schema/saveTable', payload);
+  }
+
+  // 创建列
+  static saveColumns(payload: IoTDB.Database): HttpResponseP<number> {
+    return http.post('/relational/schema/saveColumns', payload);
+  }
+
+  // 删除列
+  static deleteColumns(payload: IoTDB.DatabasePostData): HttpResponseP<number> {
+    return http.post('/relational/schema/deleteColumns', payload);
   }
 
   static alterComment(data: { database: string; tableName: string; tableComment?: string; columnName?: string; columnComment?: string }): HttpResponseP<{ sql: string }> {

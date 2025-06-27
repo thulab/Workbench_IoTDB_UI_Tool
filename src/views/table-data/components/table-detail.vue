@@ -22,9 +22,9 @@
 
     <div class="search-form-container">
       <div class="search-form-box">
-        <el-input v-model="searchKeyword" :placeholder="searchPlaceholder" @keyup.enter="handleRefresh" id="mesaurement-search" style="width: 340px">
+        <el-input v-model="searchKeyword" :placeholder="searchPlaceholder" id="mesaurement-search" style="width: 340px">
           <template #prefix>
-            <i-custom-search-icon class="remote-select-search-icon" @click="handleRefresh" />
+            <i-custom-search-icon class="remote-select-search-icon" />
           </template>
           <template #prepend>
             <el-select v-model="searchType" style="width: 88px" placeholder="" id="measurement-search-type" class="measurement-search-type-select">
@@ -36,10 +36,10 @@
       </div>
 
       <div class="search-form-buttons">
-        <el-button type="primary" id="table-add">
+        <el-button type="primary" id="table-add" @click="showAddTableDialog">
           {{ t('common.add') }}
         </el-button>
-        <el-button type="primary" id="mesaurement-batch-del">
+        <el-button type="primary" id="mesaurement-batch-del" @click="handleDelRow('batch', null)" :disabled="columnsSelection.length === 0">
           {{ t('common.batchDelete') }}
         </el-button>
         <el-button link @click="handleRefresh" id="mesaurement-refresh" class="svg-button-hover-color">
@@ -50,19 +50,36 @@
 
     <div class="storage-table-box">
       <el-table
-        :data="columnDataShow"
+        :data="columnDataFilter"
         style="width: 100%"
         :height="maxTableHeight"
         :max-height="maxTableHeight"
         tooltip-effect="light"
         ref="tableRef"
         :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
+        @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" />
-        <el-table-column :label="t('dataManage.columnName')" prop="nodeName" :show-overflow-tooltip="true" />
+        <el-table-column :label="t('dataManage.columnName')" prop="columnName" :show-overflow-tooltip="true" />
         <el-table-column :label="t('dataManage.comment')" prop="comment" :show-overflow-tooltip="true" />
         <el-table-column :label="t('dataManage.dataType')" prop="dataType" :show-overflow-tooltip="true" />
         <el-table-column :label="t('dataManage.cateGory')" prop="cateGory" :show-overflow-tooltip="true" />
+        <el-table-column :label="t('common.operation')" width="240" align="center" fixed="right">
+          <template #default="{ row }">
+            <el-tooltip
+              v-if="row.cateGory === 'TAG' || row.cateGory === 'TIME'"
+              effect="light"
+              :content="`${row.cateGory === 'TIME' ? 'TIME' : 'TAG'}列暂不支持删除`"
+              placement="top"
+              popper-class="table-tooltip-max-width"
+            >
+              {{ t('common.delete') }}
+            </el-tooltip>
+            <el-button v-else type="primary" link size="small" @click="handleDelRow('row', row)" :id="`mesaurement-table-${row.columnName}-del`">
+              {{ t('common.delete') }}
+            </el-button>
+          </template>
+        </el-table-column>
         <template #empty>
           <div class="table-empty-wrapper">
             <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
@@ -71,17 +88,20 @@
         </template>
       </el-table>
     </div>
+    <sql-preview ref="sqlPreviewRef" />
 
-    <div class="sql-statement">
-      <div>sql语句</div>
-      <el-icon size="24" class="svg-button-hover-color copy-icon"><i-custom-copy /></el-icon>
-    </div>
+    <modal-add-table ref="addTableDialog" add-type="addColumn" :current-node="currentNode" @handle-reload="handleRefresh" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { useTableHeight } from '@/composition-api';
+import { IoTDBApi } from '@/api';
+import { useDbStore } from '@/stores';
+import SqlPreview from '@/components/sql-preview.vue';
+import ModalAddTable from './modal-add-table.vue';
+import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
 const props = defineProps<{
   currentNode: IoTDB.TreeNodeData;
@@ -93,21 +113,80 @@ const searchKeyword = ref((route.query.databaseSearch as string) || '');
 const searchType = ref('columnName');
 const searchPlaceholder = computed(() => (searchType.value === 'columnName' ? t('dataManage.columnNamePlaceholder') : t('dataManage.commentPlaceholder')));
 const { maxTableHeight } = useTableHeight(370);
+const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
+const columnsSelection = ref<IoTDB.TreeNodeData[]>([]);
+const { requestFn: deleteColumns } = useRequest(IoTDBApi.deleteColumns);
+const { data: columnVOS, requestFn: getColumnsList } = useRequest(IoTDBApi.getColumnsList);
+const sqlPreviewRef = ref<InstanceType<typeof SqlPreview>>();
 
-onMounted(() => {});
+const { getDatabases } = useDbStore();
 
-const columnDataShow = computed(() => {
-  if (props.currentNode && props.currentNode.children) {
-    return props.currentNode.children.filter((item) =>
+function showAddTableDialog() {
+  if (addTableDialog.value) {
+    addTableDialog.value?.open(props.currentNode);
+  }
+}
+
+const columnDataFilter = computed(() => {
+  if (columnVOS.value?.value && columnVOS.value.value.length) {
+    return columnVOS.value.value.filter((item) =>
       searchType.value === 'columnName'
-        ? item.nodeName.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase())
+        ? item.columnName.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase())
         : item.comment?.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase())
     );
   }
   return [];
 });
 
-function handleRefresh() {}
+function handleSelectionChange(vals: IoTDB.TreeNodeData[]) {
+  columnsSelection.value = vals;
+}
+
+function handleAppendSql(sql: string) {
+  sqlPreviewRef.value?.appendSql(sql);
+}
+
+function getColumns() {
+  getColumnsList(props.currentNode?.parentName || '', props.currentNode?.nodeName || '').then(() => {
+    handleAppendSql(columnVOS.value?.sql || '');
+  });
+}
+
+onMounted(() => {
+  getColumns();
+});
+
+function handleRefresh() {
+  getDatabases();
+  getColumns();
+}
+
+function handleDelRow(type: string, row: IoTDB.TreeNodeData | null) {
+  ElMessageBox.confirm(type === 'batch' ? `${t('dataManage.delColumnBatchTip')}` : `${t('dataManage.delColumnSingleTip')}`, t('common.notice'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
+    confirmButtonClass: 'mesaurement-table-del-confirm',
+    cancelButtonClass: 'mesaurement-table-del-cancel',
+    type: 'warning',
+    icon: ICustomMessageWarning,
+  }).then(() => {
+    let columnDelList = [] as string[];
+    if (type === 'batch') {
+      columnDelList = columnsSelection.value?.map((i) => i.columnName) as string[];
+    } else {
+      columnDelList = row?.columnName ? [row.columnName] : [];
+    }
+    const deleteData: IoTDB.DatabasePostData = {
+      database: props.currentNode.parentName,
+      tableName: props.currentNode.nodeName,
+      columns: columnDelList,
+    };
+    deleteColumns(deleteData).then(() => {
+      ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
+      handleRefresh();
+    });
+  });
+}
 </script>
 <style lang="scss" scoped>
 .database-detail-wrapper {
@@ -178,22 +257,5 @@ function handleRefresh() {}
   margin: 0 16px 16px;
   padding: 16px;
   background-color: #f7f8fc;
-}
-
-.sql-statement {
-  padding: 16px;
-  font-size: 12px;
-  border: 1px solid #dfe1ed;
-  border-radius: 6px;
-  height: 60px;
-  margin: 0 160px;
-  position: relative;
-
-  .copy-icon {
-    position: absolute;
-    right: 8px;
-    bottom: 8px;
-    cursor: pointer;
-  }
 }
 </style>

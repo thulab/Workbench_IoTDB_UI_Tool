@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" title="新增表" width="700px" :before-close="handleClose">
+  <el-dialog v-model="dialogVisible" :title="`新增${addType === 'addTable' ? '表' : '列'}`" width="700px" :before-close="handleClose">
     <el-form ref="formRef" :model="formData" label-width="120px" label-position="left">
       <!-- 表名 -->
       <base-form-item label="表名：" prop="tableName" required>
@@ -7,7 +7,7 @@
           {{ t('dataManage.tableName') }}：
           <el-tooltip effect="light" :content="t('dataManage.databaseNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
         </template>
-        <el-input v-model="formData.tableName" placeholder="请输入表名" clearable />
+        <el-input v-model="formData.tableName" placeholder="请输入表名" clearable :disabled="addType !== 'addTable'" />
       </base-form-item>
 
       <!-- 数据保留时间 -->
@@ -16,7 +16,7 @@
           {{ t('dataManage.ttl') }}：
           <el-tooltip effect="light" content="表的 TTL 默认为其所在数据库的 TTL" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
         </template>
-        <el-input v-model="formData.ttl" placeholder="请输入数据保留时间" clearable>
+        <el-input v-model="formData.ttl" placeholder="请输入数据保留时间" clearable :disabled="addType !== 'addTable'">
           <template #append>ms</template>
         </el-input>
       </base-form-item>
@@ -95,6 +95,13 @@ import { ref, reactive, computed } from 'vue';
 import { ElMessage, ElMessageBox, ElDialog, ElForm, ElInput, ElSelect, ElOption, ElButton, ElDivider, ElTooltip, ElIcon } from 'element-plus';
 import { IoTDBApi } from '@/api';
 
+// const props = withDefaults(defineProps<{
+//   addType?: string; // addTable or addColumn
+// }>(),
+// {
+//   addType: 'addTable',
+// });
+
 const emit = defineEmits<{
   (event: 'handleReload'): void;
 }>();
@@ -104,6 +111,8 @@ const dialogVisible = ref(false);
 const formRef = ref(null);
 const expandedIndex = ref(-1);
 const { requestFn: saveTable } = useRequest(IoTDBApi.saveTable);
+const { requestFn: saveColumns } = useRequest(IoTDBApi.saveColumns);
+const addType = ref('addTable'); // addTable or addColumn
 
 const columnTypeOptions = [
   { label: 'TAG', value: 'TAG' },
@@ -254,7 +263,7 @@ const handleConfirm = async () => {
 
   // 这里可以添加提交表单的逻辑
   console.log('表单数据:', JSON.parse(JSON.stringify(formData)));
-  formDataBody.value.database = currentNode.value?.nodeName || '';
+  formDataBody.value.database = addType.value === 'addTable' ? currentNode.value?.nodeName || '' : currentNode.value?.parentName || '';
   formDataBody.value.tables.push({
     tableVO: {
       tableName: formData.tableName,
@@ -268,16 +277,29 @@ const handleConfirm = async () => {
       dataType: column.dataType,
     })),
   });
-  saveTable(formDataBody.value)
-    .then(() => {
-      ElMessage.success('表创建成功');
-      dialogVisible.value = false;
-      resetForm();
-      emit('handleReload');
-    })
-    .catch((error) => {
-      ElMessage.error(`表创建失败: ${error.message}`);
-    });
+  if (addType.value === 'addTable') {
+    saveTable(formDataBody.value)
+      .then(() => {
+        ElMessage.success('表创建成功');
+        dialogVisible.value = false;
+        resetForm();
+        emit('handleReload');
+      })
+      .catch((error) => {
+        ElMessage.error(`表创建失败: ${error.message}`);
+      });
+  } else {
+    saveColumns(formDataBody.value)
+      .then(() => {
+        ElMessage.success('添加成功');
+        dialogVisible.value = false;
+        resetForm();
+        emit('handleReload');
+      })
+      .catch((error) => {
+        ElMessage.error(`表创建失败: ${error.message}`);
+      });
+  }
 };
 
 // 关闭弹窗确认
@@ -296,10 +318,14 @@ const handleClose = (done: any) => {
 
 // 暴露方法供父组件调用
 defineExpose({
-  open: (currentVal: IoTDB.TreeNodeData) => {
+  open: (currentVal: IoTDB.TreeNodeData, typeVal: string = 'addTable') => {
     currentNode.value = currentVal;
+    addType.value = typeVal;
     if (currentVal) {
       formData.ttl = currentVal.ttl || '';
+    }
+    if (addType.value !== 'addTable') {
+      formData.tableName = currentVal.nodeName;
     }
     dialogVisible.value = true;
   },

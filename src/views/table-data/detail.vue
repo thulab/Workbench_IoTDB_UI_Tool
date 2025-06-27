@@ -1,11 +1,11 @@
 <template>
   <div class="database-page-container">
     <div class="database-list-wrapper">
-      <side-tree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" @handle-node-click="handleNodeClick" :key="reloadKey" />
+      <side-tree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" @handle-node-click="handleNodeClick" />
     </div>
 
-    <div class="database-details-wrapper" :key="renderKey">
-      <database-detail v-if="currentNode && currentNode.nodeType === 'DATABASE'" :current-node="currentNode" @handle-reload="reloadKey++" />
+    <div class="database-details-wrapper">
+      <database-detail v-if="currentNode && currentNode.nodeType === 'DATABASE'" :current-node="currentNode" />
       <table-detail v-if="currentNode && currentNode.nodeType === 'TABLE'" :current-node="currentNode" />
       <table-data-detail v-if="currentNode && currentNode.nodeType === 'TABLEDATA'" :current-node="currentNode" />
     </div>
@@ -24,13 +24,9 @@ import TableDataDetail from './components/table-data-detail.vue';
 const userStore = useUserStore();
 const { canReadWriteSchema } = storeToRefs(userStore);
 const currentNode = ref<IoTDB.TreeNodeData | null>(null);
-const renderKey = ref(0);
-const reloadKey = ref(0);
 
 function handleNodeClick(nodeInfo: IoTDB.TreeNodeData) {
   currentNode.value = nodeInfo;
-  console.log('====Current Node:', currentNode.value);
-  renderKey.value++;
 }
 </script>
 

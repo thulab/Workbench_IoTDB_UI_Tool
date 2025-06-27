@@ -1064,3 +1064,5 @@ dataManage:
   ttlUpdated: TTL已更新
   delDbSingleTip: 此操作会删除该表及其包含的全部数据，是否删除？
   delDbBatchTip: 此操作会删除这些表及其包含的全部数据，是否删除？
+  delColumnSingleTip: 此操作会删除该列及其对应的全部数据，是否删除？
+  delColumnBatchTip: 此操作会删除这些列及其对应的全部数据，是否删除？

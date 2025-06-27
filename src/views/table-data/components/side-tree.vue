@@ -132,9 +132,9 @@ const treeProps = {
   children: 'children',
 };
 
-function showAddTableDialog(nodeInfo: IoTDB.TreeNodeData) {
+function showAddTableDialog(nodeInfo: IoTDB.TreeNodeData, addType: string) {
   if (addTableDialog.value) {
-    addTableDialog.value?.open(nodeInfo);
+    addTableDialog.value?.open(nodeInfo, addType);
   }
 }
 
@@ -175,7 +175,7 @@ function handleDatabaseOptionClick(command: string, node: IoTDB.TreeNodeData) {
   if (command === 'dbSchema') {
     emit('handleNodeClick', currentNode.value);
   } else if (command === 'addTable') {
-    showAddTableDialog(currentNode.value);
+    showAddTableDialog(currentNode.value, 'addTable');
   }
 }
 
@@ -184,9 +184,10 @@ function handleTableOptionClick(command: string, node: IoTDB.TreeNodeData) {
   if (command === 'tableData') {
     currentNode.value.nodeType = 'TABLEDATA';
     emit('handleNodeClick', currentNode.value);
-  }
-  if (command === 'tableSchema') {
+  } else if (command === 'tableSchema') {
     emit('handleNodeClick', currentNode.value);
+  } else if (command === 'addCloumn') {
+    showAddTableDialog(currentNode.value, 'addColumn');
   }
 }
 </script>

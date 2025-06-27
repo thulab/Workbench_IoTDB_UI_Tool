@@ -35,6 +35,10 @@ declare namespace IoTDB {
     sql: string;
     value: TableVO[];
   }
+  export interface ColumnRes {
+    sql: string;
+    value: ColumnVOS[];
+  }
 
   export interface TreeNodeData {
     nodeName: string;
@@ -64,5 +68,11 @@ declare namespace IoTDB {
   export interface DatabaseInfoRes {
     sql: string;
     value: DatabaseInfo;
+  }
+
+  export interface DatabasePostData {
+    database?: string;
+    tableName: string;
+    columns: string[];
   }
 }
