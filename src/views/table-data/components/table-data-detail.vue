@@ -82,6 +82,7 @@
           />
           <div class="table-error-wrapper" v-if="searchDetailInfos.errMsg">Msg: {{ searchDetailInfos.errMsg }}</div>
         </div>
+        <sql-preview ref="sqlPreviewRef" style="margin: 8px 0 0; background-color: #fff" />
       </auth-container>
     </el-main>
 
@@ -100,6 +101,7 @@ import { TableDataApi } from '@/api';
 import { todayNow } from '@/utils/date';
 import { useUserStore } from '@/stores';
 import DynamicTable from '@/components/dynamic-table.vue';
+import SqlPreview from '@/components/sql-preview.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ColumnsSelect from './columns-select.vue';
 
@@ -107,11 +109,13 @@ const props = defineProps<{
   currentNode: IoTDB.TreeNodeData;
 }>();
 
+const sqlPreviewRef = ref<InstanceType<typeof SqlPreview>>();
+
 const { t } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
 const { canReadWriteData, canWriteData } = storeToRefs(userStore);
-const { maxTableHeight } = useTableHeight(330);
+const { maxTableHeight } = useTableHeight(440);
 
 const searchFormRef = ref<FormInstance>();
 const firstLoad = ref(true);
@@ -166,6 +170,10 @@ const columnsSelected = ref<string[]>([]);
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
 
+function handleAppendSql(sql: string) {
+  sqlPreviewRef.value?.appendSql(sql);
+}
+
 const { requestFn: getList } = useRequest(TableDataApi.getTableData);
 // const { requestFn: exportData } = useRequest(SearchApi.exportData);
 
@@ -219,6 +227,7 @@ function getListData() {
       });
       hasNext.value = res.data?.value.hasNext;
       searchDetailInfos.value = res.data.value || {};
+      handleAppendSql(res.data.sql);
     })
     .finally(() => {
       getListLoading.value = false;
