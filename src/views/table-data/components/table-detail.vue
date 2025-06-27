@@ -27,7 +27,7 @@
             <i-custom-search-icon class="remote-select-search-icon" />
           </template>
           <template #prepend>
-            <el-select v-model="searchType" style="width: 88px" placeholder="" id="measurement-search-type" class="measurement-search-type-select">
+            <el-select v-model="searchType" style="width: 88px" placeholder="" @change="goto(1)" id="measurement-search-type" class="measurement-search-type-select">
               <el-option :label="t('dataManage.columnName')" value="columnName" id="measurement-search-type-name" />
               <el-option :label="t('dataManage.comment')" value="comment" id="measurement-search-type-description" />
             </el-select>
@@ -50,7 +50,7 @@
 
     <div class="storage-table-box">
       <el-table
-        :data="columnDataFilter"
+        :data="tableDataPagination"
         style="width: 100%"
         :height="maxTableHeight"
         :max-height="maxTableHeight"
@@ -61,7 +61,19 @@
       >
         <el-table-column type="selection" width="55" />
         <el-table-column :label="t('dataManage.columnName')" prop="columnName" :show-overflow-tooltip="true" />
-        <el-table-column :label="t('dataManage.comment')" prop="comment" :show-overflow-tooltip="true" />
+        <el-table-column :label="t('dataManage.comment')" prop="comment" :show-overflow-tooltip="true">
+          <template #default="{ row }">
+            <div class="row-description-box">
+              <div class="row-description-text">
+                <text-tooltip :content="row.comment && row.comment !== 'null' ? row.comment : '-'" />
+              </div>
+              <div class="edit-box flex-align-center" @click="handleEditTableComment(row)" v-if="!isSystemDatabase">
+                <i-custom-edit-normal class="edit-icon" />
+                <i-custom-edit-active class="edit-icon-active" />
+              </div>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column :label="t('dataManage.dataType')" prop="dataType" :show-overflow-tooltip="true" />
         <el-table-column :label="t('dataManage.cateGory')" prop="cateGory" :show-overflow-tooltip="true" />
         <el-table-column :label="t('common.operation')" width="240" align="center" fixed="right">
@@ -87,10 +99,30 @@
           </div>
         </template>
       </el-table>
+      <div class="paination" v-if="total && total > 0">
+        <el-pagination
+          background
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
+          layout="prev, pager, next, sizes, jumper"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="total || 0"
+          :hide-on-single-page="total < 10"
+        />
+      </div>
     </div>
     <sql-preview ref="sqlPreviewRef" />
 
     <modal-add-table ref="addTableDialog" add-type="addColumn" :current-node="currentNode" @handle-reload="handleRefresh" />
+    <modal-comment
+      v-model:visible="modalCommentVisible"
+      :current-table="currentNode?.nodeName"
+      :current-database="currentNode?.parentName"
+      :current-column="currentColumn?.columnName"
+      :current-comment="currentColumn?.comment"
+      @append-sql="handleAppendSql"
+      @handle-save="handleRefresh()"
+    />
   </div>
 </template>
 
@@ -102,6 +134,7 @@ import { useDbStore } from '@/stores';
 import SqlPreview from '@/components/sql-preview.vue';
 import ModalAddTable from './modal-add-table.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
+import ModalComment from './modal-comment.vue';
 
 const props = defineProps<{
   currentNode: IoTDB.TreeNodeData;
@@ -112,18 +145,26 @@ const route = useRoute();
 const searchKeyword = ref((route.query.databaseSearch as string) || '');
 const searchType = ref('columnName');
 const searchPlaceholder = computed(() => (searchType.value === 'columnName' ? t('dataManage.columnNamePlaceholder') : t('dataManage.commentPlaceholder')));
-const { maxTableHeight } = useTableHeight(370);
+const { maxTableHeight } = useTableHeight(420);
 const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
 const columnsSelection = ref<IoTDB.TreeNodeData[]>([]);
 const { requestFn: deleteColumns } = useRequest(IoTDBApi.deleteColumns);
 const { data: columnVOS, requestFn: getColumnsList } = useRequest(IoTDBApi.getColumnsList);
 const sqlPreviewRef = ref<InstanceType<typeof SqlPreview>>();
+const modalCommentVisible = ref(false);
+const currentColumn = ref<IoTDB.ColumnVOS>();
+const currentPage = ref(1);
+const pageSize = ref(10);
 
 const { getDatabases } = useDbStore();
 
+const isSystemDatabase = computed(() => {
+  return props.currentNode?.parentName === 'information_schema';
+});
+
 function showAddTableDialog() {
   if (addTableDialog.value) {
-    addTableDialog.value?.open(props.currentNode);
+    addTableDialog.value?.open(props.currentNode, 'addColumn');
   }
 }
 
@@ -137,6 +178,14 @@ const columnDataFilter = computed(() => {
   }
   return [];
 });
+
+const tableDataPagination = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value;
+  const end = start + pageSize.value;
+  return columnDataFilter.value.slice(start, end);
+});
+
+const total = computed(() => columnDataFilter.value.length || 0);
 
 function handleSelectionChange(vals: IoTDB.TreeNodeData[]) {
   columnsSelection.value = vals;
@@ -155,6 +204,15 @@ function getColumns() {
 onMounted(() => {
   getColumns();
 });
+
+function handleEditTableComment(row: IoTDB.ColumnVOS) {
+  currentColumn.value = row;
+  modalCommentVisible.value = true;
+}
+
+function goto(page: number) {
+  currentPage.value = page;
+}
 
 function handleRefresh() {
   getDatabases();
@@ -257,5 +315,50 @@ function handleDelRow(type: string, row: IoTDB.TreeNodeData | null) {
   margin: 0 16px 16px;
   padding: 16px;
   background-color: #f7f8fc;
+}
+
+.row-description-box {
+  display: flex;
+  align-items: center;
+
+  .row-description-text {
+    max-width: 120px;
+    display: flex;
+  }
+
+  .edit-box {
+    flex: 0 0 16px;
+    cursor: pointer;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .edit-icon-active {
+      display: none;
+    }
+
+    &:hover {
+      .edit-icon {
+        display: none;
+      }
+
+      .edit-icon-active {
+        display: block;
+      }
+    }
+  }
+}
+
+.paination {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+
+  // padding: 10px 0px;
+  .el-pagination {
+    padding: 4px 5px 0;
+  }
 }
 </style>
