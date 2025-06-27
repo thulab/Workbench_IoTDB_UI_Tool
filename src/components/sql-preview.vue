@@ -22,10 +22,11 @@ const scrollbarRef = ref<ScrollbarInstance>();
 
 const { copy } = useClipboard({ source: sqls });
 
-const appendSql = (sql: string) => {
+const appendSql = (sql: string, prefix?: string) => {
   if (sqls.value && !sqls.value.endsWith('\n')) {
     sqls.value += '\n';
   }
+  if (prefix) sqls.value += `${prefix} `;
   sqls.value += sql;
   scrollbarRef.value?.scrollTo({ top: innerRef.value?.clientHeight || 0, behavior: 'smooth' });
 };
