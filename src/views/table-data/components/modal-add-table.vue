@@ -106,7 +106,6 @@ const expandedIndex = ref(-1);
 const { requestFn: saveTable } = useRequest(IoTDBApi.saveTable);
 
 const columnTypeOptions = [
-  { label: 'TIME', value: 'TIME' },
   { label: 'TAG', value: 'TAG' },
   { label: 'FIELD', value: 'FIELD' },
   { label: 'ATTRIBUTE', value: 'ATTRIBUTE' },
