@@ -9,13 +9,9 @@
     </h4>
     <el-header class="search-form-wrapper p-0" style="height: auto">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-        <base-form-item prop="path">
-          <template #label>
-            {{ t('dataManage.columnName') }}：
-            <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
-          </template>
+        <base-form-item prop="path" :label="t('dataManage.columnName')">
           <columns-select
-            v-model="searchFormData.path"
+            v-model="searchFormData.columns"
             :disabled-select="getListLoading"
             :placeholder="t('dataManage.selectColumnPlaceholder')"
             :view-text="t('dataManage.columnsSelected')"
@@ -59,7 +55,7 @@
           {{ t('common.searchDetail') }}
           <span class="run-result-tip">
             <i-custom-info-warning />
-            {{ t('search.export1000Tip') }}
+            {{ t('search.export1000RowTip') }}
           </span>
         </h4>
         <div class="page-detail-buttons">
@@ -74,20 +70,16 @@
 
       <auth-container :is-auth="canReadWriteData" style="height: 100%" :content="'common.dataAuth'">
         <div v-loading="getListLoading">
-          <div v-if="searchDetailInfos.status">
-            <dynamic-table
-              :columns="columns"
-              :table-data="tableDataPagination"
-              :height="maxTableHeight"
-              :max-height="maxTableHeight"
-              v-model:current-page="pagination.pageNum"
-              v-model:page-size="pagination.pageSize"
-              :total="tableData.length"
-              :show-pagination="true"
-              :default-sort="defaultSort"
-              @handleSortChange="handleSortChange"
-            />
-          </div>
+          <dynamic-table
+            :columns="columns"
+            :table-data="tableDataPagination"
+            :height="maxTableHeight"
+            :max-height="maxTableHeight"
+            v-model:current-page="pagination.pageNum"
+            v-model:page-size="pagination.pageSize"
+            :total="tableData.length"
+            :show-pagination="true"
+          />
           <div class="table-error-wrapper" v-if="searchDetailInfos.errMsg">Msg: {{ searchDetailInfos.errMsg }}</div>
         </div>
       </auth-container>
@@ -98,21 +90,21 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance, Sort } from 'element-plus';
+import type { FormInstance } from 'element-plus';
 import dayjs from 'dayjs';
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import { cloneDeep } from 'lodash-es';
 import { useTableHeight, useShortcutsDate } from '@/composition-api';
-import { SearchApi } from '@/api';
+import { TableDataApi } from '@/api';
 import { todayNow } from '@/utils/date';
 import { useUserStore } from '@/stores';
 import DynamicTable from '@/components/dynamic-table.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ColumnsSelect from './columns-select.vue';
 
-defineProps<{
-  currentNode: IoTDB.TreeNodeData | null;
+const props = defineProps<{
+  currentNode: IoTDB.TreeNodeData;
 }>();
 
 const { t } = useI18n();
@@ -125,16 +117,12 @@ const searchFormRef = ref<FormInstance>();
 const firstLoad = ref(true);
 
 const currentQueryTime = ref('');
-const timeType = ref('datetimerange');
 // const errorDeviceTip = ref('');
 const searchFormData = reactive({
-  path: [] as string[],
+  columns: [] as string[],
   time: todayNow(),
   datetimerange: [],
-  timeInterval: undefined as number | undefined,
-  unitInterval: 's',
-  aggregation: '',
-  asc: 'asc',
+  // asc: 'asc',
 });
 let copySearchFormData = cloneDeep(searchFormData);
 
@@ -158,7 +146,6 @@ const importVisible = ref(false);
 // const tableHeight = computed(() => (tableData.value.length > 0 ? maxTableHeight.value : maxTableHeight.value ));
 
 const getListLoading = ref(false);
-const defaultSort = ref<Sort>({ prop: 't0', order: 'descending' });
 
 const columnsSelected = ref<string[]>([]);
 
@@ -179,29 +166,18 @@ const columnsSelected = ref<string[]>([]);
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
 
-const { requestFn: getList } = useRequest(SearchApi.getDataSearchList);
+const { requestFn: getList } = useRequest(TableDataApi.getTableData);
 // const { requestFn: exportData } = useRequest(SearchApi.exportData);
 
 let controller = new AbortController();
 
 function getListData() {
-  if (copySearchFormData.timeInterval && !copySearchFormData.aggregation) {
-    ElMessage.error({ message: t('search.aggregationPlaceholder'), grouping: true });
-    return;
-  }
   firstLoad.value = false;
   columns.value = [];
   tableData.value = [];
 
-  let startTime;
-  let endTime;
-  if (timeType.value === 'datetime') {
-    startTime = dayjs(copySearchFormData.time).valueOf();
-    endTime = startTime + 1000;
-  } else {
-    startTime = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[0]).valueOf() : undefined;
-    endTime = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[1]).valueOf() : undefined;
-  }
+  const startTime = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[0]).valueOf() : undefined;
+  const endTime = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[1]).valueOf() : undefined;
 
   searchDetailInfos.value.status = undefined;
   searchDetailInfos.value.queryTime = '';
@@ -210,15 +186,11 @@ function getListData() {
   controller = new AbortController();
   getList(
     {
-      measurements: copySearchFormData.path,
+      database: props.currentNode.database!,
+      tableName: props.currentNode.nodeName!,
+      columnNames: copySearchFormData.columns && copySearchFormData.columns.length > 0 ? ['time', ...copySearchFormData.columns] : undefined,
       startTime,
       endTime,
-      aggregation: copySearchFormData.aggregation,
-      timeInterval: copySearchFormData.timeInterval || undefined,
-      unitInterval: copySearchFormData.unitInterval,
-      asc: copySearchFormData.asc,
-      spage: pagination.columnNum,
-      ssize: pagination.columnSize,
       size: 1000,
       page: pagination.pageNum,
     },
@@ -227,29 +199,26 @@ function getListData() {
     .then((res) => {
       // eslint-disable-next-line no-undef
       const list: DynamicTableColumn[] = [];
-      res.data?.metaDataList?.forEach((item: string, index: number) => {
+      res.data?.value.metaDataList?.forEach((item: string, index: number) => {
         list.push({
           label: item,
           prop: `t${index}`,
           defaultValue: '-',
           fixed: index === 0 ? 'left' : undefined,
-          sortable: index === 0 ? 'custom' : false,
+          sortable: false,
           // formatHeader: formatTimeseries,
         });
       });
       columns.value = list;
-      tableData.value = res.data?.valueList?.map((item: any[]) => {
+      tableData.value = res.data?.value.valueList?.map((item: any[]) => {
         const obj = {} as Record<string, string>;
         item.forEach((childItem, index) => {
           obj[`t${index}`] = childItem;
         });
         return obj;
       });
-      hasNext.value = res.data?.hasNext;
-      pagination.totalColumnPage = res.data?.totalColumnPage;
-      pagination.totalColumnCount = res.data?.totalColumnCount;
-      searchDetailInfos.value = res.data || {};
-      defaultSort.value = { prop: 't0', order: copySearchFormData.asc === 'asc' ? 'ascending' : 'descending' };
+      hasNext.value = res.data?.value.hasNext;
+      searchDetailInfos.value = res.data.value || {};
     })
     .finally(() => {
       getListLoading.value = false;
@@ -258,31 +227,20 @@ function getListData() {
 
 function handleChangePath(columnsVal: string[]) {
   columnsSelected.value = columnsVal;
-  searchFormData.path = columnsVal;
-  copySearchFormData.path = columnsVal;
+  searchFormData.columns = columnsVal;
+  copySearchFormData.columns = columnsVal;
   if (firstLoad.value) {
     getListData();
   }
-}
-
-function handleSortChange(data: { column: any; prop: string; order: any }) {
-  searchFormData.asc = data.order === 'ascending' ? 'asc' : 'desc';
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  handleSearch();
 }
 
 // 重置
 function handleReset(force?: boolean) {
   //  不知道为啥不生效了
   // searchFormRef.value?.resetFields();
-  searchFormData.path = [];
+  searchFormData.columns = [];
   searchFormData.time = todayNow();
-  searchFormData.timeInterval = undefined;
-  searchFormData.unitInterval = 's';
   searchFormData.datetimerange = [];
-  searchFormData.aggregation = '';
-  searchFormData.asc = 'desc';
-  timeType.value = 'datetimerange';
   pagination.pageNum = 1;
   if (force) {
     copySearchFormData = cloneDeep(searchFormData);
@@ -330,7 +288,6 @@ function setStorage() {
     'dataSearchStorage',
     JSON.stringify({
       ...copySearchFormData,
-      timeType: timeType.value,
     })
   );
 }
@@ -367,23 +324,15 @@ watch(
       getListLoading.value = false;
       if (route.query.measurement) {
         handleReset();
-        searchFormData.path = [route.query.measurement] as string[];
+        searchFormData.columns = [route.query.measurement] as string[];
         handleSearch();
         return;
       }
       if (sessionStorage.getItem('dataSearchStorage')) {
         const searchData = JSON.parse(sessionStorage.getItem('dataSearchStorage') as string);
-        searchFormData.path = searchData.path;
-        searchFormData.timeInterval = searchData.timeInterval;
-        searchFormData.unitInterval = searchData.unitInterval;
-        searchFormData.aggregation = searchData.aggregation;
-        searchFormData.asc = searchData.asc;
-        timeType.value = searchData.timeType;
-        if (timeType.value === 'datetime') {
-          searchFormData.time = searchData.time;
-        } else {
-          searchFormData.datetimerange = searchData.datetimerange;
-        }
+        searchFormData.columns = searchData.path;
+
+        searchFormData.datetimerange = searchData.datetimerange;
         handleSearch();
         return;
       }
@@ -391,7 +340,7 @@ watch(
       handleSearch();
     } else if (route.query.measurement) {
       handleReset();
-      searchFormData.path = [route.query.measurement] as string[];
+      searchFormData.columns = [route.query.measurement] as string[];
     }
   },
   {

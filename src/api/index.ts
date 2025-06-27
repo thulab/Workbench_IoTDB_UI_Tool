@@ -11,5 +11,6 @@ import DataSyncApi from './data-sync.api';
 import ConfigApi from './config.api';
 import AIAnalysisApi from './ai-analysis.api';
 import IoTDBApi from './db.api';
+import TableDataApi from './table-data.api';
 
-export { SearchApi, StorageApi, AlarmApi, UserApi, AuthApi, CalculateApi, LogApi, DashboardApi, ConnectionApi, DataSyncApi, ConfigApi, AIAnalysisApi, IoTDBApi };
+export { SearchApi, StorageApi, AlarmApi, UserApi, AuthApi, CalculateApi, LogApi, DashboardApi, ConnectionApi, DataSyncApi, ConfigApi, AIAnalysisApi, IoTDBApi, TableDataApi };

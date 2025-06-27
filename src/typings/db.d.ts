@@ -75,4 +75,16 @@ declare namespace IoTDB {
     tableName: string;
     columns: string[];
   }
+
+  export interface QueryDataByTableReq {
+    database: string;
+    tableName: string;
+    columnNames?: string[];
+    startTime?: string | number;
+    endTime?: string | number;
+    size?: number;
+    page?: number;
+    orderBy?: string;
+    asc?: 'asc' | 'desc';
+  }
 }

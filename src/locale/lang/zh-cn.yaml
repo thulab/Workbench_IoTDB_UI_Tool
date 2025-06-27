@@ -290,6 +290,7 @@ search:
   inputNumberPlaceholder: 请输入正整数
   aggregation: 采样策略
   export1000Tip: 默认最多展示1000行100列，如需更多请导出查看
+  export1000RowTip: 默认最多展示1000行，如需更多请导出查看
   aggregationPlaceholder: 请选择采样策略
   searchTime: 查询时间
   quickActions: 快捷操作
