@@ -60,25 +60,32 @@
         </h4>
         <div class="page-detail-buttons">
           <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
-            <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="data-search-search">{{ t('dataManage.dataInsert') }}</el-button>
+            <el-button type="primary" :disabled="!canReadWriteData" @click="handleInsert" id="data-search-search">{{ t('dataManage.dataInsert') }}</el-button>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canWriteData" :content="'common.dataAuthAnother'">
-            <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="data-search-search">{{ t('common.batchDelete') }}</el-button>
+            <el-button type="primary" :disabled="selectedRows.length === 0 || !selectedAllColumns" @click="handleBatchDelete" id="data-search-search">{{ t('common.batchDelete') }}</el-button>
           </auth-tooltip>
         </div>
       </div>
 
       <auth-container :is-auth="canReadWriteData" style="height: 100%" :content="'common.dataAuth'">
         <div v-loading="getListLoading">
-          <dynamic-table
+          <dynamic-edit-table
+            ref="dynamicEditTableRef"
+            :show-select="true"
             :columns="columns"
+            :table-info="currentNode"
             :table-data="tableDataPagination"
             :height="maxTableHeight"
             :max-height="maxTableHeight"
             v-model:current-page="pagination.pageNum"
             v-model:page-size="pagination.pageSize"
             :total="tableData.length"
+            :can-delete="selectedAllColumns"
             :show-pagination="true"
+            @selected-change="handleSelectChange"
+            @delete-row="handleDeleteRow"
+            @save-row="handleSave"
           />
           <div class="table-error-wrapper" v-if="searchDetailInfos.errMsg">Msg: {{ searchDetailInfos.errMsg }}</div>
         </div>
@@ -98,9 +105,9 @@ import { useRoute } from 'vue-router';
 import { cloneDeep } from 'lodash-es';
 import { useTableHeight, useShortcutsDate } from '@/composition-api';
 import { TableDataApi } from '@/api';
-import { todayNow } from '@/utils/date';
+import { todayNow, formatDate } from '@/utils/date';
 import { useUserStore } from '@/stores';
-import DynamicTable from '@/components/dynamic-table.vue';
+import DynamicEditTable from '@/components/dynamic-edit-table.vue';
 import SqlPreview from '@/components/sql-preview.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ColumnsSelect from './columns-select.vue';
@@ -110,6 +117,7 @@ const props = defineProps<{
 }>();
 
 const sqlPreviewRef = ref<InstanceType<typeof SqlPreview>>();
+const dynamicEditTableRef = ref<InstanceType<typeof DynamicEditTable>>();
 
 const { t } = useI18n();
 const route = useRoute();
@@ -128,7 +136,21 @@ const searchFormData = reactive({
   datetimerange: [],
   // asc: 'asc',
 });
-let copySearchFormData = cloneDeep(searchFormData);
+
+const copySearchFormData = ref<any>();
+
+const selectedAllColumns = computed(() => {
+  if (!props.currentNode?.children) {
+    return false;
+  }
+  if (copySearchFormData.value.columns?.length === 0 || !copySearchFormData.value.columns?.length) {
+    return true;
+  }
+  // 如果选择的列数等于当前节点的子节点数量，则全选
+  // 这里加1是因为time列是默认的第一列
+  // 如果没有选择列，则默认全选
+  return !!props.currentNode?.children?.length && copySearchFormData.value.columns?.length === props.currentNode.children.length - 1;
+});
 
 const { shortcutsDaterange } = useShortcutsDate();
 
@@ -146,6 +168,8 @@ const pagination = reactive({
   totalColumnPage: 0,
   totalColumnCount: 0,
 });
+
+const selectedRows = ref<Record<string, any>[]>([]);
 const importVisible = ref(false);
 // const tableHeight = computed(() => (tableData.value.length > 0 ? maxTableHeight.value : maxTableHeight.value ));
 
@@ -175,6 +199,8 @@ function handleAppendSql(sql: string) {
 }
 
 const { requestFn: getList } = useRequest(TableDataApi.getTableData);
+const { requestFn: deleteTableData } = useRequest(TableDataApi.deleteTableData);
+const { requestFn: insertTableData } = useRequest(TableDataApi.insertTableData);
 // const { requestFn: exportData } = useRequest(SearchApi.exportData);
 
 let controller = new AbortController();
@@ -184,8 +210,8 @@ function getListData() {
   columns.value = [];
   tableData.value = [];
 
-  const startTime = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[0]).valueOf() : undefined;
-  const endTime = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[1]).valueOf() : undefined;
+  const startTime = copySearchFormData.value.datetimerange.length === 2 ? dayjs(copySearchFormData.value.datetimerange[0]).valueOf() : undefined;
+  const endTime = copySearchFormData.value.datetimerange.length === 2 ? dayjs(copySearchFormData.value.datetimerange[1]).valueOf() : undefined;
 
   searchDetailInfos.value.status = undefined;
   searchDetailInfos.value.queryTime = '';
@@ -196,7 +222,7 @@ function getListData() {
     {
       database: props.currentNode.database!,
       tableName: props.currentNode.nodeName!,
-      columnNames: copySearchFormData.columns && copySearchFormData.columns.length > 0 ? ['time', ...copySearchFormData.columns] : undefined,
+      columnNames: copySearchFormData.value.columns && copySearchFormData.value.columns.length > 0 ? ['time', ...copySearchFormData.value.columns] : undefined,
       startTime,
       endTime,
       size: 1000,
@@ -210,10 +236,16 @@ function getListData() {
       res.data?.value.metaDataList?.forEach((item: string, index: number) => {
         list.push({
           label: item,
-          prop: `t${index}`,
+          prop: item,
           defaultValue: '-',
           fixed: index === 0 ? 'left' : undefined,
           sortable: false,
+          formatContent: (value: any) => {
+            if (index === 0 && item === 'time') {
+              return formatDate(Number(value));
+            }
+            return value;
+          },
           // formatHeader: formatTimeseries,
         });
       });
@@ -221,7 +253,7 @@ function getListData() {
       tableData.value = res.data?.value.valueList?.map((item: any[]) => {
         const obj = {} as Record<string, string>;
         item.forEach((childItem, index) => {
-          obj[`t${index}`] = childItem;
+          obj[list[index].prop] = childItem;
         });
         return obj;
       });
@@ -237,7 +269,6 @@ function getListData() {
 function handleChangePath(columnsVal: string[]) {
   columnsSelected.value = columnsVal;
   searchFormData.columns = columnsVal;
-  copySearchFormData.columns = columnsVal;
   if (firstLoad.value) {
     getListData();
   }
@@ -245,14 +276,12 @@ function handleChangePath(columnsVal: string[]) {
 
 // 重置
 function handleReset(force?: boolean) {
-  //  不知道为啥不生效了
-  // searchFormRef.value?.resetFields();
   searchFormData.columns = [];
   searchFormData.time = todayNow();
   searchFormData.datetimerange = [];
   pagination.pageNum = 1;
   if (force) {
-    copySearchFormData = cloneDeep(searchFormData);
+    copySearchFormData.value = cloneDeep(searchFormData);
     getListLoading.value = false;
     sessionStorage.setItem('dataSearchStorage', '');
     getListData();
@@ -271,7 +300,7 @@ function handleSearch() {
     return;
   }
   pagination.pageNum = 1;
-  copySearchFormData = cloneDeep(searchFormData);
+  copySearchFormData.value = cloneDeep(searchFormData);
   getListData();
 }
 
@@ -292,34 +321,109 @@ function handleImportClose(reload: boolean) {
   }
 }
 
+const allTagsColumns = computed(() => {
+  const tagsColumns = props.currentNode.children?.filter((item) => item.nodeType === 'TAG').map((item) => item.nodeName) || [];
+  return tagsColumns;
+});
+
+function getTags(row: Record<string, any>): Record<string, string> {
+  const tagsColumns = allTagsColumns.value;
+  if (!tagsColumns || tagsColumns.length === 0) {
+    return {};
+  }
+  const copyRow = cloneDeep(row);
+  Object.keys(row).forEach((key) => {
+    if (!tagsColumns.includes(key)) {
+      delete copyRow[key];
+    }
+  });
+  return copyRow;
+}
+
+function deleteData(rows: Record<string, any>[]) {
+  const deleteConditions: IoTDB.DeleteCondition[] = rows.map((row) => ({
+    tags: getTags(row),
+    time: row.time as unknown as number,
+  }));
+  // 处理删除数据逻辑
+  const data = {
+    database: props.currentNode.database!,
+    tableName: props.currentNode.nodeName!,
+    conditions: deleteConditions,
+  } as IoTDB.DeleteTableDataReq;
+  deleteTableData(data)
+    .then((resp) => {
+      ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
+      handleAppendSql(resp.data.sql);
+      nextTick(() => {
+        // 清空选中行
+        selectedRows.value = [];
+        handleSearch();
+      });
+    })
+    .catch((error) => {
+      ElMessage.error({ message: t('common.fail', { error: error.message }), grouping: true });
+    });
+}
+
+function handleBatchDelete() {
+  ElMessageBox.confirm(t('common.deleteConfirm'), t('common.operation'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
+    type: 'warning',
+  }).then(() => {
+    // 执行删除操作
+    deleteData(selectedRows.value);
+  });
+}
+
+function handleSelectChange(val: Record<string, any>[]) {
+  // 处理选中数据
+  selectedRows.value = val;
+}
+function handleDeleteRow(row: Record<string, any>) {
+  // 处理删除行
+  ElMessageBox.confirm(t('common.deleteConfirm'), t('common.operation'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
+    type: 'warning',
+  }).then(() => {
+    // 执行删除操作
+    deleteData([row]);
+  });
+}
+function handleInsert() {
+  dynamicEditTableRef.value?.newRow();
+}
+
+function handleSave(row: Record<string, any>) {
+  const copyRow = cloneDeep(row);
+  delete copyRow.editable;
+  delete copyRow.isNew;
+  const data = {
+    database: props.currentNode.database!,
+    tableName: props.currentNode.nodeName!,
+    metaDataList: Object.keys(copyRow),
+    valueList: Object.values(copyRow),
+  } as IoTDB.InsertTableDataReq;
+  insertTableData(data).then((resp) => {
+    ElMessage.success({ message: t('common.submitSuccess'), grouping: true });
+    handleAppendSql(resp.data.sql);
+    nextTick(() => {
+      handleSearch();
+    });
+    dynamicEditTableRef.value?.onSaveRow(row);
+  });
+}
+
 function setStorage() {
   sessionStorage.setItem(
     'dataSearchStorage',
     JSON.stringify({
-      ...copySearchFormData,
+      ...copySearchFormData.value,
     })
   );
 }
-
-onMounted(() => {
-  window.addEventListener('beforeunload', () => {
-    // eslint-disable-next-line no-underscore-dangle
-    if (!window.__isReload__) {
-      setStorage();
-    } else {
-      sessionStorage.setItem('dataSearchStorage', '');
-    }
-  });
-  //   if (!canReadWriteData.value) return;
-  //   firstLoad.value = true;
-  //   handleReset();
-  //   if (route.query.measurement) {
-  //     searchFormData.path = [route.query.measurement] as string[];
-  //     handleSearch();
-  //   } else {
-  //     handleSearch();
-  //   }
-});
 
 onBeforeUnmount(() => {
   setStorage();
@@ -339,7 +443,7 @@ watch(
       }
       if (sessionStorage.getItem('dataSearchStorage')) {
         const searchData = JSON.parse(sessionStorage.getItem('dataSearchStorage') as string);
-        searchFormData.columns = searchData.path;
+        searchFormData.columns = searchData.path || [];
 
         searchFormData.datetimerange = searchData.datetimerange;
         handleSearch();

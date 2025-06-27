@@ -87,4 +87,22 @@ declare namespace IoTDB {
     orderBy?: string;
     asc?: 'asc' | 'desc';
   }
+
+  export interface DeleteCondition {
+    tags: Record<string, string>;
+    time: string | number;
+  }
+
+  export interface DeleteTableDataReq {
+    database: string;
+    tableName: string;
+    conditions: DeleteCondition[];
+  }
+
+  export interface InsertTableDataReq {
+    database: string;
+    tableName: string;
+    metaDataList: string[];
+    valueList: string[];
+  }
 }

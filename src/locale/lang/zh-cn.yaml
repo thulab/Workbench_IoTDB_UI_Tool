@@ -165,6 +165,7 @@ common:
   viewLink: >-
     https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/Operator-and-Expression.html
   comingSoon: 敬请期待
+  onlyOneNewRow: 请保存后再新增
 page:
   '403': 403页面
   '404': 404页面
