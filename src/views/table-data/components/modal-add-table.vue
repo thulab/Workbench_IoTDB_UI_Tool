@@ -1,22 +1,28 @@
 <template>
-  <el-dialog v-model="dialogVisible" :title="`新增${addType === 'addTable' ? '表' : '列'}`" width="748px" :close-on-click-modal="false" id="table-modal-table-column">
+  <el-dialog
+    v-model="dialogVisible"
+    :title="`${t('common.add')}${addType === 'addTable' ? t('dataManage.table') : t('dataManage.column')}`"
+    width="748px"
+    :close-on-click-modal="false"
+    id="table-modal-table-column"
+  >
     <el-form ref="formRef" :model="formData" label-width="120px" label-position="left">
       <!-- 表名 -->
-      <base-form-item label="表名：" prop="tableName" required>
+      <base-form-item :label="`${t('dataManage.tableName')}：`" prop="tableName" required>
         <template #label>
           {{ t('dataManage.tableName') }}：
-          <el-tooltip effect="light" :content="t('dataManage.databaseNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+          <el-tooltip effect="light" :content="t('dataManage.tableNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
         </template>
-        <el-input v-model="formData.tableName" placeholder="请输入表名" clearable :disabled="addType !== 'addTable'" />
+        <el-input v-model="formData.tableName" :placeholder="t('dataManage.tableNamePlaceholder')" clearable :disabled="addType !== 'addTable'" />
       </base-form-item>
 
       <!-- 数据保留时间 -->
-      <base-form-item label="数据保留时间：" prop="ttl">
+      <base-form-item :label="`${t('dataManage.ttl')}：`" prop="ttl">
         <template #label>
           {{ t('dataManage.ttl') }}：
-          <el-tooltip effect="light" content="表的 TTL 默认为其所在数据库的 TTL" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+          <el-tooltip effect="light" :content="t('dataManage.ttlTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
         </template>
-        <el-input v-model="formData.ttl" placeholder="请输入数据保留时间" clearable :disabled="addType !== 'addTable'" @input="handleNumberInput">
+        <el-input v-model="formData.ttl" :placeholder="t('dataManage.ttlPlaceholder2')" clearable :disabled="addType !== 'addTable'" @input="handleNumberInput">
           <template #append>ms</template>
         </el-input>
       </base-form-item>
@@ -27,11 +33,11 @@
             <template #title>
               <el-row class="collapse-title-box">
                 <el-col :span="12">
-                  <div class="all-path-name">{{ `名称：${item.columnName}` }}</div>
+                  <div class="all-path-name">{{ `${t('dataManage.columnName')}：${item.columnName}` }}</div>
                 </el-col>
                 <el-col :span="8">
                   <div class="collapse-data-type-box">
-                    <span class="data-type-label">{{ t('measurement.dataType') }}</span>
+                    <span class="data-type-label">{{ t('dataManage.dataType') }}</span>
                     <span>{{ item.dataType }}</span>
                   </div>
                 </el-col>
@@ -48,29 +54,29 @@
               </el-row>
             </template>
 
-            <base-form-item label="列名：" required>
+            <base-form-item :label="`${t('dataManage.columnName')}：`" required>
               <template #label>
                 {{ t('dataManage.columnName') }}：
-                <el-tooltip effect="light" :content="t('dataManage.databaseNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                <el-tooltip effect="light" :content="t('dataManage.tableNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
               </template>
-              <el-input v-model="item.columnName" placeholder="请输入列名称" clearable />
+              <el-input v-model="item.columnName" :placeholder="t('dataManage.columnNamePlaceholder')" clearable />
             </base-form-item>
 
-            <base-form-item label="备注：">
-              <el-input v-model="item.comment" placeholder="请输入备注" type="textarea" :rows="2" maxlength="100" show-word-limit clearable />
+            <base-form-item :label="`${t('dataManage.comment')}：`">
+              <el-input v-model="item.comment" :placeholder="t('dataManage.commentPlaceholder')" type="textarea" :rows="2" maxlength="100" show-word-limit clearable />
             </base-form-item>
 
             <el-row>
               <el-col :span="12">
-                <base-form-item label="列类别：" required>
-                  <el-select v-model="item.cateGory" placeholder="请选择列类别" @change="handleColumnTypeChange(index)">
+                <base-form-item :label="`${t('dataManage.cateGory')}：`" required>
+                  <el-select v-model="item.cateGory" :placeholder="t('dataManage.cateGoryPlaceholder')" @change="handleColumnTypeChange(index)">
                     <el-option v-for="item in columnTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
                   </el-select>
                 </base-form-item>
               </el-col>
               <el-col :span="12">
-                <base-form-item label="数据类型：" required>
-                  <el-select v-model="item.dataType" placeholder="请选择数据类型" :disabled="['TAG', 'ATTRIBUTE'].includes(item.cateGory)">
+                <base-form-item :label="`${t('dataManage.dataType')}：`" required>
+                  <el-select v-model="item.dataType" :placeholder="t('dataManage.dataTypePlaceholder')" :disabled="['TAG', 'ATTRIBUTE'].includes(item.cateGory)">
                     <el-option v-for="item in dataTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
                   </el-select>
                 </base-form-item>

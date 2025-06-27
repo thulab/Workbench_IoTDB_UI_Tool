@@ -1035,6 +1035,7 @@ dataManage:
   table: 表
   ttl: 数据保留时间
   ttlPlaceholder: 为空代表INF(永久)
+  ttlPlaceholder2: 请输入数据保留时间
   partitionInterval: 时间分区间隔
   schemaDuplicate: 元数据副本数量
   dataDuplicate: 数据副本数量
@@ -1042,11 +1043,14 @@ dataManage:
   tableName: 表名
   comment: 备注
   tableNamePlaceholder: 请输入表名
+  tableNameTip: 大小写不敏感，名称可包含特殊字符，如  ～！"%` 等，包含特殊字符如 or 中文字符的数据库名创建时必须用双引号 "" 括起来，当为表命名时，最外层的双引号（""）不会在实际创建的表名中出现”
   commentPlaceholder: 请输入备注
   columns: 列数量
   columnName: 列名
   dataType: 数据类型
+  dataTypePlaceholder: 请选择数据类型
   cateGory: 列类别
+  cateGoryPlaceholder: 请选择列类别
   columnNamePlaceholder: 请输入列名
   data: 数据
   column: 列
@@ -1069,3 +1073,4 @@ dataManage:
   delColumnSingleTip: 此操作会删除该列及其对应的全部数据，是否删除？
   delColumnBatchTip: 此操作会删除这些列及其对应的全部数据，是否删除？
   addCloumn: 添加列名
+  ttlTip: 表的 TTL 默认为其所在数据库的 TTL

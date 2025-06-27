@@ -1115,24 +1115,44 @@ aiAnalysis:
 dataManage:
   schema: Schema
   table: Table
-  ttl: Data Retention Period
-  partitionInterval: Partition Interval
-  schemaDuplicate: Schema Replicas
-  dataDuplicate: Data Replicas
-  tables: Table Count
+  ttl: Data Retention Time
+  ttlPlaceholder: Empty means INF (permanent)
+  ttlPlaceholder2: Please enter data retention time
+  partitionInterval: Time Partition Interval
+  schemaDuplicate: Schema Replica Count
+  dataDuplicate: Data Replica Count
+  tables: Number of Tables
   tableName: Table Name
-  comment: Description
-  tableNamePlaceholder: Enter table name
-  commentPlaceholder: Enter description
-  columns: Column Count
+  comment: Remarks
+  tableNamePlaceholder: Please enter table name
+  tableNameTip: Case insensitive. Names can contain special characters like ~!\"%`. Names containing special characters or Chinese characters must be enclosed in double quotes "". When naming tables, the outermost double quotes will not appear in the actual table name.
+  commentPlaceholder: Please enter remarks
+  columns: Number of Columns
   columnName: Column Name
   dataType: Data Type
+  dataTypePlaceholder: Please select data type
   cateGory: Column Category
-  columnNamePlaceholder: Enter column name
+  cateGoryPlaceholder: Please select column category
+  columnNamePlaceholder: Please enter column name
   data: Data
   column: Column
-  selectColumnPlaceholder: Select columns to query
+  selectColumnPlaceholder: Please select columns to query
   dataInsert: Data Insertion
+  columnsSelected: Selected Columns
   addDatabase: Add Database
   databaseName: Database Name
-  databaseNameTip: Case insensitive. Names containing underscores (_), numbers (not at beginning), or English letters can be created directly. Names containing special characters (like `), Chinese characters, or starting with numbers must be wrapped in double quotes "".
+  databaseNameTip: Case insensitive. Names containing underscores (_), numbers (not at beginning), or English letters can be created directly. Names containing special characters (like `), Chinese characters, or starting with numbers must be enclosed in double quotes "".
+  databaseNamePlaceholder: Please enter database name
+  databaseNameLenth: Maximum 64 characters allowed. Please re-enter.
+  databaseNameExist: Database already exists. Please re-enter.
+  specialCharsNeedQuotes: Special characters must be wrapped in quotes
+  emptyQuotedName: Name inside quotes cannot be empty
+  invalidNameFormat: Invalid name format
+  addDatabaseSuccess: Database created successfully
+  ttlUpdated: TTL updated
+  delDbSingleTip: This will delete the table and all its data. Proceed?
+  delDbBatchTip: This will delete these tables and all their data. Proceed?
+  delColumnSingleTip: This will delete the column and all its data. Proceed?
+  delColumnBatchTip: This will delete these columns and all their data. Proceed?
+  addCloumn: Add Column
+  ttlTip: Table TTL defaults to its database's TTL
