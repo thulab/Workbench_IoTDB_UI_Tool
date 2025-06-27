@@ -50,7 +50,7 @@
 
     <div class="storage-table-box">
       <el-table
-        :data="currentNode?.children || []"
+        :data="columnDataShow"
         style="width: 100%"
         :height="maxTableHeight"
         :max-height="maxTableHeight"
@@ -83,8 +83,8 @@
 import { useRoute } from 'vue-router';
 import { useTableHeight } from '@/composition-api';
 
-defineProps<{
-  currentNode: IoTDB.TreeNodeData | null;
+const props = defineProps<{
+  currentNode: IoTDB.TreeNodeData;
 }>();
 
 const { t } = useI18n();
@@ -95,6 +95,17 @@ const searchPlaceholder = computed(() => (searchType.value === 'columnName' ? t(
 const { maxTableHeight } = useTableHeight(370);
 
 onMounted(() => {});
+
+const columnDataShow = computed(() => {
+  if (props.currentNode && props.currentNode.children) {
+    return props.currentNode.children.filter((item) =>
+      searchType.value === 'columnName'
+        ? item.nodeName.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase())
+        : item.comment?.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase())
+    );
+  }
+  return [];
+});
 
 function handleRefresh() {}
 </script>
