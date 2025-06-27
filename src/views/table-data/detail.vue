@@ -4,7 +4,7 @@
       <side-tree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" @handle-node-click="handleNodeClick" />
     </div>
 
-    <div class="database-details-wrapper">
+    <div class="database-details-wrapper" :key="detailKey">
       <database-detail v-if="currentNode && currentNode.nodeType === 'DATABASE'" :current-node="currentNode" />
       <table-detail v-if="currentNode && currentNode.nodeType === 'TABLE'" :current-node="currentNode" />
       <table-data-detail v-if="currentNode && currentNode.nodeType === 'TABLEDATA'" :current-node="currentNode" />
@@ -24,9 +24,11 @@ import TableDataDetail from './components/table-data-detail.vue';
 const userStore = useUserStore();
 const { canReadWriteSchema } = storeToRefs(userStore);
 const currentNode = ref<IoTDB.TreeNodeData | null>(null);
+const detailKey = ref(0);
 
 function handleNodeClick(nodeInfo: IoTDB.TreeNodeData) {
   currentNode.value = nodeInfo;
+  detailKey.value++;
 }
 </script>
 
