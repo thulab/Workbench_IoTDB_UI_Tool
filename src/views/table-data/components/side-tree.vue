@@ -95,6 +95,7 @@
         </template>
       </el-tree-v2>
       <modal-add-db v-model:visible="modalAddDbVisible" :database-names="databaseNames" @handle-save="handleRefresh" />
+      <modal-add-table ref="addTableDialog" @handle-reload="handleRefresh" />
     </div>
   </auth-container>
 </template>
@@ -105,6 +106,7 @@ import { useUserStore, useDbStore } from '@/stores';
 import { type ElTreeV2 } from 'element-plus';
 import { cloneDeep } from 'lodash-es';
 import ModalAddDb from './modal-add-db.vue';
+import ModalAddTable from './modal-add-table.vue';
 
 const emit = defineEmits<{
   (event: 'handleNodeClick', nodeInfo: IoTDB.TreeNodeData): void;
@@ -115,9 +117,10 @@ const schemaTree = ref<InstanceType<typeof ElTreeV2>>();
 const userStore = useUserStore();
 const searchText = ref('');
 const searching = ref(false);
-const currentNode = ref<IoTDB.TreeNodeData | null>(null);
+const currentNode = ref<IoTDB.TreeNodeData>();
 const modalAddDbVisible = ref(false);
 const treeHeight = ref(document.body.clientHeight - 48 - 16 - 36 - 16 - 46);
+const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
 
 const { canReadWriteData } = storeToRefs(userStore);
 const { treeData, databaseNames } = storeToRefs(useDbStore());
@@ -128,6 +131,12 @@ const treeProps = {
   label: 'nodeName',
   children: 'children',
 };
+
+function showAddTableDialog(nodeInfo: IoTDB.TreeNodeData) {
+  if (addTableDialog.value) {
+    addTableDialog.value?.open(nodeInfo);
+  }
+}
 
 const setDefaultTreeExpandKeys = async () => {
   await getDatabases();
@@ -163,7 +172,11 @@ function handleAddDB() {
 
 function handleDatabaseOptionClick(command: string, node: IoTDB.TreeNodeData) {
   currentNode.value = node;
-  emit('handleNodeClick', currentNode.value);
+  if (command === 'dbSchema') {
+    emit('handleNodeClick', currentNode.value);
+  } else if (command === 'addTable') {
+    showAddTableDialog(currentNode.value);
+  }
 }
 
 function handleTableOptionClick(command: string, node: IoTDB.TreeNodeData) {

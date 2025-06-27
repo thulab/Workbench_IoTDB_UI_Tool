@@ -156,7 +156,7 @@ import { IoTDBApi } from '@/api';
 import { useTableHeight } from '@/composition-api';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalTtl from './modal-ttl.vue';
-import modalAddTable from './modal-add-table.vue';
+import ModalAddTable from './modal-add-table.vue';
 import ModalComment from './modal-comment.vue';
 
 const props = defineProps<{
@@ -184,7 +184,7 @@ const modalTTLNum = ref(0);
 const ttlType = ref('db'); // 'db' or 'table'
 const multipleSelection = ref<IoTDB.TreeNodeData[]>([]);
 const sqlDes = ref('');
-const addTableDialog = ref<InstanceType<typeof modalAddTable>>();
+const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
 
 function showAddTableDialog() {
   if (addTableDialog.value) {

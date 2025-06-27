@@ -10,7 +10,7 @@
         <el-input v-model.trim="formData.databaseName" maxlength="32" :placeholder="t('dataManage.databaseNamePlaceholder')" show-word-limit id="auth-user-modal-name" />
       </base-form-item>
       <base-form-item :label="`${t('dataManage.ttl')}：`" prop="ttl">
-        <el-input v-model="formData.ttl" maxlength="32" autocomplete="off" :placeholder="t('dataManage.ttlPlaceholder')" show-password id="auth-user-modal-pwd">
+        <el-input v-model="formData.ttl" maxlength="32" autocomplete="off" :placeholder="t('dataManage.ttlPlaceholder')" id="auth-user-modal-pwd">
           <template #append>ms</template>
         </el-input>
       </base-form-item>
