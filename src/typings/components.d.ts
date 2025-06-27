@@ -193,6 +193,7 @@ declare module 'vue' {
     ResizeBox: typeof import('./../components/resize-box.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SqlPreview: typeof import('./../components/sql-preview.vue')['default']
     TextTooltip: typeof import('./../components/text-tooltip.vue')['default']
     TheCaptcha: typeof import('./../components/the-captcha.vue')['default']
     TheChart: typeof import('./../components/the-chart.vue')['default']

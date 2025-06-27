@@ -136,11 +136,8 @@
         />
       </div>
     </div>
+    <sql-preview ref="sqlPreviewRef" />
 
-    <div class="sql-statement">
-      <div>{{ sqlDes }}</div>
-      <el-icon size="24" class="svg-button-hover-color copy-icon"><i-custom-copy /></el-icon>
-    </div>
     <modal-add-table ref="addTableDialog" @handle-reload="handleRefresh" @append-sql="handleAppendSql" />
     <modal-ttl
       v-model:visible="modalTtlVisible"
@@ -168,6 +165,7 @@ import { useRoute } from 'vue-router';
 import { IoTDBApi } from '@/api';
 import { useTableHeight } from '@/composition-api';
 import { useDbStore } from '@/stores';
+import SqlPreview from '@/components/sql-preview.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalTtl from './modal-ttl.vue';
 import ModalAddTable from './modal-add-table.vue';
@@ -180,6 +178,8 @@ const props = defineProps<{
 // const emit = defineEmits<{
 //   (event: 'handleReload'): void;
 // }>();
+
+const sqlPreviewRef = ref<InstanceType<typeof SqlPreview>>();
 
 const { t } = useI18n();
 const route = useRoute();
@@ -197,7 +197,6 @@ const currentTable = ref<IoTDB.TableVO>();
 const modalTTLNum = ref(0);
 const ttlType = ref('db'); // 'db' or 'table'
 const multipleSelection = ref<IoTDB.TreeNodeData[]>([]);
-const sqlDes = ref('');
 const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
 const currentPage = ref(1);
 const pageSize = ref(10);
@@ -209,10 +208,7 @@ const isSystemDatabase = computed(() => {
 });
 
 function handleAppendSql(sql: string) {
-  if (sqlDes.value && !sqlDes.value.endsWith('\n')) {
-    sqlDes.value += '\n';
-  }
-  sqlDes.value += sql;
+  sqlPreviewRef.value?.appendSql(sql);
 }
 
 const tableDataFilter = computed(() => {
@@ -380,25 +376,6 @@ onMounted(() => {
   margin: 0 16px 16px;
   padding: 16px;
   background-color: #f7f8fc;
-}
-
-.sql-statement {
-  padding: 4px 16px;
-  font-size: 12px;
-  border: 1px solid #dfe1ed;
-  border-radius: 6px;
-  height: 80px;
-  margin: 0 16px 16px;
-  position: relative;
-  white-space: pre;
-  line-height: 1.5;
-
-  .copy-icon {
-    position: absolute;
-    right: 8px;
-    bottom: 8px;
-    cursor: pointer;
-  }
 }
 
 .row-description-box {
