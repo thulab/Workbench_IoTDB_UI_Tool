@@ -21,7 +21,7 @@ export const useDbStore = defineStore('db', () => {
         database: db.database,
         children: [],
       };
-      db.tables.forEach((table) => {
+      db.tables?.forEach((table) => {
         const tableNode: IoTDB.TreeNodeData = {
           nodeName: table.tableVO.tableName,
           parentName: db.database,
