@@ -165,52 +165,6 @@ const tableNames = computed(() => {
   }
   return [];
 });
-// const rules = reactive<FormRules>({
-//   tableName: [
-//     {
-//       required: true,
-//       message: () => t('common.formRuleEmptyOperateShort'),
-//       trigger: 'blur',
-//     },
-//     {
-//       max: 64,
-//       message: () => t('dataManage.databaseNameLenth'),
-//       trigger: 'blur',
-//     },
-//     {
-//       validator: (rule: any, value: any, callback: any) => {
-//         if (value && tableNames.value.some((name) => name.toLocaleLowerCase() === value.toLocaleLowerCase())) {
-//           callback(new Error(t('dataManage.tableNameExist')));
-//         }
-
-//         // 情况1：简单名称（字母开头，可包含下划线和数字）
-//         const simplePattern = /^[a-zA-Z][a-zA-Z0-9_]*$/;
-//         // 情况2：需要引号包裹的名称（包含特殊字符、中文或以数字开头）
-//         const needsQuotesPattern = /^".*"$/;
-//         // 特殊字符正则（包括中文、数字开头和各种特殊符号）
-//         const specialCharsPattern = /[`~!@#$%^&*()+=|{}':;',[\]<>/?\\]|[\u4e00-\u9fa5]|^[0-9]/;
-//         if (simplePattern.test(value)) {
-//           callback();
-//         } else if (specialCharsPattern.test(value) && !needsQuotesPattern.test(value)) {
-//           // 包含特殊字符但未用引号包裹
-//           callback(new Error(t('dataManage.specialCharsNeedQuotes'))); // Add i18n key
-//         } else if (needsQuotesPattern.test(value)) {
-//           // 检查引号内是否为空
-//           const unquoted = value.slice(1, -1);
-//           if (unquoted === '') {
-//             callback(new Error(t('dataManage.emptyQuotedName'))); // Add i18n key
-//           } else {
-//             callback();
-//           }
-//         } else {
-//           // 其他非法格式
-//           callback(new Error(t('dataManage.invalidNameFormat'))); // Add i18n key
-//         }
-//       },
-//       trigger: 'blur',
-//     },
-//   ],
-// });
 
 const validateName = (rule: any, value: any, callback: any) => {
   if (value && tableNames.value.some((name) => name.toLocaleLowerCase() === value.toLocaleLowerCase())) {
@@ -359,7 +313,7 @@ const handleConfirm = async () => {
   }
 
   let validate = false;
-  formRef.value?.validate((valid) => {
+  await formRef.value?.validate((valid) => {
     validate = valid;
   });
   if (!validate) return;
