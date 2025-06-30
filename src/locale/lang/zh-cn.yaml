@@ -1075,3 +1075,4 @@ dataManage:
   delColumnBatchTip: 此操作会删除这些列及其对应的全部数据，是否删除？
   addCloumn: 添加列名
   ttlTip: 表的 TTL 默认为其所在数据库的 TTL
+  batchImportData: 批量导入数据

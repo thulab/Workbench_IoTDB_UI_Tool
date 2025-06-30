@@ -58,5 +58,44 @@ class IoTDBApi {
   static alterComment(data: { database: string; tableName: string; tableComment?: string; columnName?: string; columnComment?: string }): HttpResponseP<{ sql: string }> {
     return http.post('/relational/schema/alterComment', data);
   }
+
+  // 导入表数据
+  static importTableData(data: FormData, fileType: string = 'csv'): HttpResponseP<StorageDevice.ImportMeasurementDataRes> {
+    if (fileType === 'csv') {
+      return http.post('/file/importMeasurementCSVData', data, { timeout: 60 * 30 * 1000 });
+    }
+    return http.post('/file/importMeasurementExcelData', data, { timeout: 60 * 30 * 1000 });
+  }
+
+  // 导出表数据
+  static exportTableData(data: Record<string, string | number | Date | null> & PageQuery): HttpResponseP {
+    return http.post('/file/measurementDataExportId', data);
+  }
+
+  // 导入列
+  static importColumns(data: FormData, fileType: string = 'csv'): HttpResponseP<StorageDevice.ImportMeasurementDataRes> {
+    if (fileType === 'csv') {
+      return http.post('/file/importMeasurementCSVData', data, { timeout: 60 * 30 * 1000 });
+    }
+    return http.post('/file/importMeasurementExcelData', data, { timeout: 60 * 30 * 1000 });
+  }
+
+  // 导出列
+  static exportColumns(data: Record<string, string | number | Date | null> & PageQuery): HttpResponseP {
+    return http.post('/file/measurementDataExportId', data);
+  }
+
+  // 导入表
+  static importTables(data: FormData, fileType: string = 'csv'): HttpResponseP<StorageDevice.ImportMeasurementDataRes> {
+    if (fileType === 'csv') {
+      return http.post('/file/importMeasurementCSVData', data, { timeout: 60 * 30 * 1000 });
+    }
+    return http.post('/file/importMeasurementExcelData', data, { timeout: 60 * 30 * 1000 });
+  }
+
+  // 导出表
+  static exportTables(data: Record<string, string | number | Date | null> & PageQuery): HttpResponseP {
+    return http.post('/file/measurementDataExportId', data);
+  }
 }
 export default IoTDBApi;

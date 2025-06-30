@@ -62,6 +62,25 @@
           <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
             <el-button type="primary" :disabled="!canReadWriteData" @click="handleInsert" id="data-search-search">{{ t('dataManage.dataInsert') }}</el-button>
           </auth-tooltip>
+          <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
+            <el-button class="m-l-16" :disabled="!canReadWriteData" @click="handleImport" id="table-data-import">
+              {{ t('common.import') }}
+            </el-button>
+          </auth-tooltip>
+          <auth-tooltip :is-disabled="canReadWriteData" :content="'common.schemaAuth'">
+            <el-dropdown class="m-x-16" :disabled="!canReadWriteData || !(tableData.length > 0)" @command="(val) => handleCommandDown(val)" id="mesaurement-download-dropdown">
+              <el-button :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" :disabled="!canReadWriteData || !(tableData.length > 0)" id="mesaurement-download">
+                {{ t('common.export') }}
+                <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="csv" id="mesaurement-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
+                  <el-dropdown-item command="xlsx" id="mesaurement-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </auth-tooltip>
           <auth-tooltip :is-disabled="canWriteData" :content="'common.dataAuthAnother'">
             <el-button type="primary" :disabled="selectedRows.length === 0 || !selectedAllColumns" @click="handleBatchDelete" id="data-search-search">{{ t('common.batchDelete') }}</el-button>
           </auth-tooltip>
@@ -93,7 +112,7 @@
       </auth-container>
     </el-main>
 
-    <modal-import v-model:visible="importVisible" @handle-close="handleImportClose" />
+    <modal-import-data v-model:visible="importVisible" @handle-close="handleImportClose" />
   </el-container>
 </template>
 
@@ -104,13 +123,14 @@ import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import { cloneDeep } from 'lodash-es';
 import { useTableHeight, useShortcutsDate } from '@/composition-api';
-import { TableDataApi } from '@/api';
+import { TableDataApi, IoTDBApi } from '@/api';
 import { todayNow, formatDate } from '@/utils/date';
 import { useUserStore } from '@/stores';
 import DynamicEditTable from '@/components/dynamic-edit-table.vue';
 import SqlPreview from '@/components/sql-preview.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ColumnsSelect from './columns-select.vue';
+import ModalImportData from './modal-import-data.vue';
 
 const props = defineProps<{
   currentNode: IoTDB.TreeNodeData;
@@ -119,7 +139,7 @@ const props = defineProps<{
 const sqlPreviewRef = ref<InstanceType<typeof SqlPreview>>();
 const dynamicEditTableRef = ref<InstanceType<typeof DynamicEditTable>>();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
 const { canReadWriteData, canWriteData } = storeToRefs(userStore);
@@ -177,20 +197,6 @@ const getListLoading = ref(false);
 
 const columnsSelected = ref<string[]>([]);
 
-// // 查询结果
-// const formatSqlInfo = computed(() => function (filed: string) {
-//   const data: Partial<Search.QueryDataResult> = searchDetailInfos?.value;
-//   if (filed === 'status') {
-//     // eslint-disable-next-line no-nested-ternary
-//     return data.status === undefined ? '' : (data.status ? '查询成功' : '查询失败');
-//   } if (filed === 'startQueryTime') {
-//     return currentQueryTime.value;
-//   } if (filed === 'queryTime') {
-//     return data.status ? data.queryTime : '';
-//   }
-//   return '';
-// });
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
 
@@ -201,7 +207,7 @@ function handleAppendSql(sql: string) {
 const { requestFn: getList } = useRequest(TableDataApi.getTableData);
 const { requestFn: deleteTableData } = useRequest(TableDataApi.deleteTableData);
 const { requestFn: insertTableData } = useRequest(TableDataApi.insertTableData);
-// const { requestFn: exportData } = useRequest(SearchApi.exportData);
+const { requestFn: exportTableData } = useRequest(IoTDBApi.exportTableData);
 
 let controller = new AbortController();
 
@@ -272,6 +278,32 @@ function handleChangePath(columnsVal: string[]) {
   if (firstLoad.value) {
     getListData();
   }
+}
+
+// 导入
+function handleImport() {
+  importVisible.value = true;
+}
+
+// 导出
+function handleExportData(exportType: string) {
+  exportTableData({
+    pathName: props.currentNode.parentName,
+    keyword: searchKeyword.value,
+    type: searchType.value,
+    ...pagination,
+  }).then((res) => {
+    let url = `/api/file/exportExcelMeasurementData?exportId=${res.data}`;
+    if (exportType === 'csv') {
+      url = `/api/file/exportCSVMeasurementData?exportId=${res.data}`;
+    }
+    window.open(url);
+  });
+}
+
+// 下载
+function handleCommandDown(val: string) {
+  handleExportData(val);
 }
 
 // 重置
