@@ -18,7 +18,16 @@
           <i-custom-add-border style="width: 24px; height: 24px" />
         </el-button>
       </div>
-      <el-tree-v2 ref="schemaTree" :data="treeData" style="background-color: #fff; overflow-y: auto" :props="treeProps" :indent="8" :item-size="28" :height="treeHeight" :expand-on-click-node="true">
+      <el-tree-v2
+        ref="schemaTree"
+        :data="filterTreeData()"
+        style="background-color: #fff; overflow-y: auto"
+        :props="treeProps"
+        :indent="8"
+        :item-size="28"
+        :height="treeHeight"
+        :expand-on-click-node="true"
+      >
         <!-- eslint-disable-next-line vue/no-unused-vars -->
         <template #default="{ node, data }">
           <div class="node-text" :id="`tree-node-content-${data.parentName || data.nodeName}`">
@@ -150,6 +159,38 @@ const setDefaultTreeExpandKeys = async () => {
     }, 300);
   }
 };
+
+function filterTreeData(): IoTDB.TreeNodeData[] {
+  const searchTextLower = searchText.value.toLowerCase();
+
+  const filterNode = (node: IoTDB.TreeNodeData): IoTDB.TreeNodeData | null => {
+    const nodeCopy = cloneDeep(node);
+    nodeCopy.children = [];
+
+    const isCurrentMatch = node.nodeName.toLowerCase().includes(searchTextLower);
+
+    if (node.children) {
+      node.children.forEach((child) => {
+        const filteredChild = filterNode(child);
+        if (filteredChild) {
+          nodeCopy.children?.push(filteredChild);
+        }
+      });
+    }
+
+    return isCurrentMatch || (nodeCopy.children && nodeCopy.children.length > 0) ? nodeCopy : null;
+  };
+
+  const result: IoTDB.TreeNodeData[] = [];
+  treeData.value.forEach((dbNode) => {
+    const filteredNode = filterNode(dbNode);
+    if (filteredNode) {
+      result.push(filteredNode);
+    }
+  });
+
+  return result;
+}
 
 onMounted(() => {
   setDefaultTreeExpandKeys();
