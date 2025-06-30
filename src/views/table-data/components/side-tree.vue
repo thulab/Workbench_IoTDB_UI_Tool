@@ -41,8 +41,8 @@
             </el-icon>
             <text-tooltip :content="data.nodeName + (data.comment ? ` (${data.comment})` : '')" />
           </div>
-          <el-dropdown v-if="data.nodeType === 'DATABASE'" @command="handleDatabaseOptionClick($event, data)">
-            <span class="lang-icon m-r-20">
+          <el-dropdown v-if="data.nodeType === 'DATABASE'" trigger="click" @command="handleDatabaseOptionClick($event, data)">
+            <span class="lang-icon m-r-20" @click.stop>
               <i-ep-more />
             </span>
             <template #dropdown>
@@ -68,8 +68,8 @@
               </el-dropdown-menu>
             </template>
           </el-dropdown>
-          <el-dropdown v-if="data.nodeType === 'TABLE'" @command="handleTableOptionClick($event, data)">
-            <span class="lang-icon m-r-20">
+          <el-dropdown v-if="data.nodeType === 'TABLE'" trigger="click" @command="handleTableOptionClick($event, data)">
+            <span class="lang-icon m-r-20" @click.stop>
               <i-ep-more />
             </span>
             <template #dropdown>

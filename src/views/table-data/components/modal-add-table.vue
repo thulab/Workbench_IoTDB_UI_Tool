@@ -120,9 +120,9 @@ const addType = ref('addTable'); // addTable or addColumn
 const activeName = ref('measurement_0');
 
 const columnTypeOptions = [
-  { label: 'TAG', value: 'TAG' },
-  { label: 'FIELD', value: 'FIELD' },
-  { label: 'ATTRIBUTE', value: 'ATTRIBUTE' },
+  { label: 'TAG（标签列）', value: 'TAG' },
+  { label: 'FIELD（测点列）', value: 'FIELD' },
+  { label: 'ATTRIBUTE（属性列）', value: 'ATTRIBUTE' },
 ];
 
 const dataTypeOptions = [
@@ -333,25 +333,17 @@ const handleConfirm = async () => {
     })),
   });
   if (addType.value === 'addTable') {
-    saveTable(formDataBody.value)
-      .then(() => {
-        ElMessage.success('表创建成功');
-        dialogVisible.value = false;
-        emit('handleReload');
-      })
-      .catch((error) => {
-        ElMessage.error(`表创建失败: ${error.message}`);
-      });
+    saveTable(formDataBody.value).then(() => {
+      ElMessage.success('表创建成功');
+      dialogVisible.value = false;
+      emit('handleReload');
+    });
   } else {
-    saveColumns(formDataBody.value)
-      .then(() => {
-        ElMessage.success('添加成功');
-        dialogVisible.value = false;
-        emit('handleReload');
-      })
-      .catch((error) => {
-        ElMessage.error(`表创建失败: ${error.message}`);
-      });
+    saveColumns(formDataBody.value).then(() => {
+      ElMessage.success('添加成功');
+      dialogVisible.value = false;
+      emit('handleReload');
+    });
   }
 };
 
