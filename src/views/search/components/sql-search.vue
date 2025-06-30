@@ -173,6 +173,7 @@ const pagination = reactive({
 
 const { requestFn: queryStop } = useRequest(SearchApi.queryStop);
 const { requestFn: querySql } = useRequest(SearchApi.querySql);
+const { requestFn: exportSqlData } = useRequest(SearchApi.exportSqlData);
 
 function getList(index: number) {
   return (value: any) => {
@@ -302,11 +303,17 @@ function stopquery() {
   queryStop(timeNumber.value).then(() => {});
 }
 function exportSql(val: string, exportType: string) {
-  let url = `/api/file/exportExcelSqlData?sql=${encodeURI(val)}`;
-  if (exportType === 'csv') {
-    url = `/api/file/exportCSVSqlData?sql=${encodeURI(val)}`;
-  }
-  window.open(url);
+  exportSqlData(val).then((res) => {
+    if (res.data) {
+      let url = `/api/file/exportExcelSqlData?exportId=${encodeURI(res.data)}`;
+      if (exportType === 'csv') {
+        url = `/api/file/exportCSVSqlData?exportId=${encodeURI(res.data)}`;
+      }
+      window.open(url);
+    } else {
+      ElMessage.error({ message: t('common.fileDownError'), grouping: true });
+    }
+  });
 }
 // 下载
 function handleCommandDown(val: string, index: number) {

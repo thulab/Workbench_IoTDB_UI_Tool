@@ -34,6 +34,11 @@ class SearchApi {
     return http.get('/query/stop', { params: { timestamp } });
   }
 
+  // sql query 获取导出id
+  static exportSqlData(sql: string): HttpResponseP {
+    return http.post('/file/exportSqlDataId', { sql });
+  }
+
   // Import query
   static exportData(data: Search.QueryDataParams): HttpResponseP {
     return http.post('/file/dataGetExportId', data);
