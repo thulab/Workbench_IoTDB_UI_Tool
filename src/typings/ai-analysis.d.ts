@@ -27,6 +27,9 @@ declare namespace AIAnalysis {
     forecastCount?: number;
     // 预测数据依据点数
     forecastTailCount?: number;
+    // "database"."table"
+    path?: string;
+    tags?: string[];
   }
   export interface SearchDataItem {
     time: number;
@@ -59,5 +62,10 @@ declare namespace AIAnalysis {
     // 树模型无用; 表模型时为列名(测点列)
     field?: string;
     params?: string[];
+  }
+  export interface CascaderOption {
+    label: string;
+    value: string;
+    children?: CascaderOption[];
   }
 }

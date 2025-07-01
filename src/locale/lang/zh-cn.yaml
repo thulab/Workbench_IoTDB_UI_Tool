@@ -1043,6 +1043,9 @@ aiAnalysis:
   moreParam: 更多参数
   superParam: 超参数
   fineTuningSuccess: 已成功提交微调任务
+  chooseDatabaseAndTable: 请选择数据库和表
+  chooseDevice: 请选择设备
+  chooseMeasurement: 请选择测点
 dataManage:
   schema: 结构
   table: 表

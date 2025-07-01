@@ -1,15 +1,19 @@
 import { defineStore } from 'pinia';
 import IoTDBApi from '@/api/db.api';
+import { useConnectionStore } from './connection.store';
 
 const { data: schemaTreeData, requestFn: fetchDatabases } = useRequest(IoTDBApi.getDatabases);
 
 export const useDbStore = defineStore('db', () => {
   const databases = ref<IoTDB.DatabaseRes>();
   const databaseNames = ref<string[]>([]);
+  const connectionStore = useConnectionStore();
 
   async function getDatabases() {
-    await fetchDatabases();
-    databases.value = schemaTreeData.value;
+    if (connectionStore.isTableModel) {
+      await fetchDatabases();
+      databases.value = schemaTreeData.value;
+    }
   }
 
   const treeData = computed<Array<IoTDB.TreeNodeData>>(() => {

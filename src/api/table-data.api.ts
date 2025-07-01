@@ -13,5 +13,9 @@ class TableDataApi {
   static insertTableData(data: IoTDB.InsertTableDataReq): HttpResponseP<{ sql: string }> {
     return http.post('/relational/data/saveDataInfo', data);
   }
+
+  static getDevices(database: string, table: string): HttpResponseP<Search.QuerySqlResponse> {
+    return http.get('/relational/data/getDevices', { params: { database, table } });
+  }
 }
 export default TableDataApi;

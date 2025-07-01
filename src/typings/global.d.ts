@@ -21,6 +21,7 @@ declare global {
   type ApiResponse<T = any> = {
     success: boolean;
     data: T;
+    sql?: string;
     code: number;
     message: string;
   };

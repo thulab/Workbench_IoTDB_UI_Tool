@@ -9,7 +9,7 @@
                 <base-form-item :label="`${t('aiAnalysis.business')}：`" prop="type" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
                   <el-radio-group v-model="searchFormData.type" id="business-type" @change="handleChangeType">
                     <el-radio :value="0" id="business-type-0">{{ t('aiAnalysis.forecast') }}</el-radio>
-                    <el-radio :value="1" id="business-type-1">{{ t('aiAnalysis.anomalyDetection') }}</el-radio>
+                    <el-radio :value="1" :disabled="connectionStore.isTableModel" id="business-type-1">{{ t('aiAnalysis.anomalyDetection') }}</el-radio>
                     <el-radio :value="2" id="business-type-2">{{ t('aiAnalysis.custom') }}</el-radio>
                   </el-radio-group>
                 </base-form-item>
@@ -44,26 +44,67 @@
               </div>
               <div class="search-form-row-box">
                 <div v-if="searchFormData.type !== 2">
-                  <base-form-item prop="measurement" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
-                    <template #label>
-                      {{ t('measurement.measurementChoose') }}：
-                      <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
-                        <template #content>
-                          {{ t('common.searchTipLimit100') }}
-                        </template>
-                        <i-custom-question />
-                      </el-tooltip>
-                    </template>
-                    <timeseries-select-single
-                      id="search-path"
-                      v-model="searchFormData.measurement"
-                      :selectWidth="230"
-                      :itemWidth="200"
-                      show-suffix
-                      :disabled-path="disabledPath"
-                      @handle-change-path="handleChangePath"
-                    />
-                  </base-form-item>
+                  <template v-if="connectionStore.isTableModel">
+                    <base-form-item prop="database" :label="`${t('measurement.measurementChoose')}：`" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
+                      <el-cascader
+                        v-model="searchFormData.tableSelect"
+                        :options="tableOptions"
+                        show-all-levels
+                        :props="{ expandTrigger: 'hover' }"
+                        id="search-database"
+                        class="m-l-[8px]"
+                        :placeholder="t('aiAnalysis.chooseDatabaseAndTable')"
+                        @change="handleTableSelected"
+                      />
+                      <el-cascader
+                        v-model="searchFormData.device"
+                        :disabled="!searchFormData.table"
+                        :options="deviceOptions"
+                        :props="{ expandTrigger: 'hover' }"
+                        filterable
+                        id="search-database"
+                        :placeholder="t('aiAnalysis.chooseDevice')"
+                        class="m-l-[8px]"
+                      />
+                      <el-select
+                        v-model="searchFormData.measurement"
+                        :disabled="!searchFormData.table"
+                        class="m-l-[8px]"
+                        id="search-device"
+                        :placeholder="t('aiAnalysis.chooseMeasurement')"
+                        style="width: 200px"
+                      >
+                        <el-option
+                          v-for="item in currentTable?.children?.filter((item) => item.cateGory === 'FIELD' && allowedTypes.includes(item.dataType!))"
+                          :key="item.nodeName"
+                          :label="item.nodeName + (item.comment ? `(${item.comment})` : '')"
+                          :value="item.nodeName"
+                        />
+                      </el-select>
+                    </base-form-item>
+                  </template>
+                  <template v-else>
+                    <base-form-item prop="measurement" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
+                      <template #label>
+                        {{ t('measurement.measurementChoose') }}：
+                        <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
+                          <template #content>
+                            {{ t('common.searchTipLimit100') }}
+                          </template>
+                          <i-custom-question />
+                        </el-tooltip>
+                      </template>
+                      <timeseries-select-single
+                        id="search-path"
+                        v-model="searchFormData.measurement"
+                        :selectWidth="230"
+                        :itemWidth="200"
+                        show-suffix
+                        :disabled-path="disabledPath"
+                        @handle-change-path="handleChangePath"
+                      />
+                    </base-form-item>
+                  </template>
                   <template v-if="searchFormData.type === 0">
                     <base-form-item :label="`${t('aiAnalysis.forecastStart')}：`" :rules="requiredRules">
                       <el-date-picker v-model="searchFormData.forecastStart" type="datetime" :prefix-icon="ICustomCalender" id="search-datetime" :clearable="false" style="width: 164px" />
@@ -203,7 +244,9 @@
                           <el-dropdown-menu>
                             <el-dropdown-item command="csv" id="visualization-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
                             <el-dropdown-item command="xlsx" id="visualization-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
-                            <el-dropdown-item v-if="searchFormData.type === 0" command="saveToIoTDB" id="visualization-saveToIoTDB">{{ t('aiAnalysis.saveToIoTDB') }}</el-dropdown-item>
+                            <el-dropdown-item v-if="searchFormData.type === 0 && !connectionStore.isTableModel" command="saveToIoTDB" id="visualization-saveToIoTDB">
+                              {{ t('aiAnalysis.saveToIoTDB') }}
+                            </el-dropdown-item>
                           </el-dropdown-menu>
                         </template>
                       </el-dropdown>
@@ -278,15 +321,16 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
+import type { FormInstance, SingleOrRange, DateModelType, CascaderValue } from 'element-plus';
 import dayjs from 'dayjs';
 import { debounce, cloneDeep } from 'lodash-es';
 import { vElementSize } from '@vueuse/components';
-import { AIAnalysisApi } from '@/api';
+import { AIAnalysisApi, TableDataApi } from '@/api';
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
 import { today, getOneIntervalNow, todayNow, formatDate } from '@/utils/date';
-import { useUserStore, useConnectionStore } from '@/stores';
+import { useUserStore, useConnectionStore, useDbStore } from '@/stores';
 import { parse } from 'yaml';
+import { convertDeviceDataToOptions, convertTags } from '@/utils/tree';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalSql from './components/modal-sql.vue';
 import ModalWriteBack from './components/modal-write-back.vue';
@@ -302,6 +346,7 @@ const modelList = ref<Array<AIAnalysis.Model>>([]);
 // const tip = '<span style="color:#495AD4;font-weight: 700;"> 2000 </span>';
 
 const connectionStore = useConnectionStore();
+const dbStore = useDbStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
 const { enableAINode } = storeToRefs(connectionStore);
 let defaultMethod = ['sundial'];
@@ -316,6 +361,10 @@ const searchFormData = reactive<{
   forecastStart: DateModelType;
   anomalyRatio: number | undefined;
   orderBy: string;
+  database?: string;
+  table?: string;
+  device?: CascaderValue;
+  tableSelect?: CascaderValue;
 }>({
   type: 0,
   measurement: '',
@@ -347,6 +396,27 @@ const { maxTableHeight: maxCustomTableHeight } = useTableHeight(324);
 
 const pageSize = computed(() => Math.floor(maxTableHeight.value / 40));
 const filterCondition = ref('all');
+
+const tableOptions = computed(() => {
+  if (!connectionStore.isTableModel) {
+    return [];
+  }
+  return dbStore.treeData.map((item) => {
+    return {
+      label: item.database,
+      value: item.database,
+      children: item.children?.map((child) => ({
+        label: child.nodeName + (child.comment ? ` (${child.comment})` : ''),
+        value: child.nodeName,
+      })),
+    };
+  });
+});
+
+const currentTable = ref<IoTDB.TreeNodeData | null>(null);
+
+const deviceOptions = ref<AIAnalysis.CascaderOption[]>([]);
+const deviceColumns = ref<string[]>();
 
 const valueShow = (item: AIAnalysis.SearchDataItem) => {
   if (copySearchFormData.type === 0) return true;
@@ -847,10 +917,10 @@ function getCustom() {
 }
 
 const realMotheds = computed<string[]>(() => {
-  if (searchFormData.type === 0) {
+  if (copySearchFormData.type === 0) {
     return copySearchFormData.method as string[];
   }
-  if (searchFormData.type === 1) {
+  if (copySearchFormData.type === 1) {
     return [copySearchFormData.method] as string[];
   }
   return [];
@@ -873,6 +943,8 @@ function handleSearch() {
       modelType: searchFormData.type === 0 ? 'BUILT_IN_FORECAST' : 'BUILT_IN_ANOMALY_DETECTION',
       modelId: searchFormData.type === 0 ? searchFormData.method : [searchFormData.method as string],
       measurement: searchFormData.measurement,
+      path: connectionStore.isTableModel ? `"${searchFormData.database}"."${searchFormData.table}"` : undefined,
+      tags: connectionStore.isTableModel ? convertTags(searchFormData.device as string[], deviceColumns.value) : undefined,
       startTime: searchFormData.type === 0 ? dayjs(searchFormData.forecastStart).valueOf() : dayjs(searchFormData.datetimerange[0]).valueOf(),
       endTime: searchFormData.type === 1 ? dayjs(searchFormData.datetimerange[1]).valueOf() : undefined,
       exceptionPercent: searchFormData.method === '_Stray' && searchFormData.anomalyRatio ? searchFormData.anomalyRatio! / 100 : undefined,
@@ -1039,6 +1111,32 @@ function handleCellStyle({ row, columnIndex }: { row: AIAnalysis.SearchDataItem;
   }
   return {};
 }
+
+function handleTableSelected(value: CascaderValue) {
+  const payload = value as unknown as string[];
+  if (value && payload.length > 0) {
+    [searchFormData.database, searchFormData.table] = payload;
+    searchFormData.measurement = '';
+    searchFormData.measurementType = '';
+    currentTable.value = dbStore.treeData.find((item) => item.database === searchFormData.database)?.children?.find((child) => child.nodeName === searchFormData.table) || null;
+    TableDataApi.getDevices(searchFormData.database, searchFormData.table)
+      .then((res) => {
+        // 使用工具函数处理数据
+        deviceColumns.value = res.data.data.metaDataList;
+        deviceOptions.value = convertDeviceDataToOptions(res.data.data.valueList);
+      })
+      .catch(() => {
+        searchFormData.measurement = '';
+        searchFormData.measurementType = '';
+      });
+  } else {
+    searchFormData.database = undefined;
+    searchFormData.table = undefined;
+    searchFormData.measurement = '';
+    searchFormData.measurementType = '';
+  }
+}
+
 function handleFilter(val: string) {
   currentPage.value = 1;
   filterCondition.value = val;
@@ -1077,6 +1175,7 @@ onMounted(() => {
       chartInstance.dispose();
     }
   });
+  dbStore.getDatabases();
   getModelList();
 });
 
@@ -1128,6 +1227,15 @@ watch(
   {
     immediate: true,
   }
+);
+watch(
+  () => connectionStore.isTableModel,
+  (val) => {
+    if (val && dbStore.treeData.length === 0) {
+      dbStore.getDatabases();
+    }
+  },
+  { immediate: true }
 );
 </script>
 
