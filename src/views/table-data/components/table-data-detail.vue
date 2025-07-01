@@ -102,6 +102,7 @@
             :total="tableData.length"
             :can-delete="selectedAllColumns"
             :show-pagination="true"
+            :cannot-delete-tip="t('dataManage.cannotDeleteTip')"
             @selected-change="handleSelectChange"
             @delete-row="handleDeleteRow"
             @save-row="handleSave"

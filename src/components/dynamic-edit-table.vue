@@ -36,10 +36,13 @@
           </el-table-column>
           <el-table-column fixed="right" width="200" align="center" label="操作">
             <template #default="scope">
-              <el-button v-if="!scope.row.editable" :disabled="!canDelete" class="edit-f" type="text" size="small" @click="$emit('deleteRow', scope.row)">
+              <el-button v-if="!scope.row.editable && canDelete" class="edit-f" type="text" size="small" @click="$emit('deleteRow', scope.row)">
                 {{ t('common.delete') }}
               </el-button>
-              <template v-else>
+              <el-tooltip v-if="!scope.row.editable && !canDelete" effect="light" :content="cannotDeleteTip" placement="top" popper-class="table-tooltip-max-width">
+                {{ t('common.delete') }}
+              </el-tooltip>
+              <template v-if="scope.row.editable">
                 <el-button class="edit-f" type="text" size="small" @click="handleSaveRow(scope.row)">{{ t('common.save') }}</el-button>
                 <el-button
                   class="edit-f"
@@ -104,6 +107,7 @@ const props = defineProps<{
   showSelect?: boolean;
   currentNode?: IoTDB.TreeNodeData;
   canDelete?: boolean;
+  cannotDeleteTip?: string;
 }>();
 const emit = defineEmits<{
   (event: 'batchDelete'): Promise<void>;
