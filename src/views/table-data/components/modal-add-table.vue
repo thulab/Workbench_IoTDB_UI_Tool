@@ -2,7 +2,7 @@
   <el-dialog
     v-model="dialogVisible"
     :title="`${t('common.add')}${addType === 'addTable' ? t('dataManage.table') : t('dataManage.column')}`"
-    width="748px"
+    width="800px"
     :close-on-click-modal="false"
     id="table-modal-table-column"
   >
@@ -315,6 +315,7 @@ const handleConfirm = async () => {
   if (!validate) return;
 
   formDataBody.value.database = addType.value === 'addTable' ? currentNode.value?.nodeName || '' : currentNode.value?.parentName || '';
+  formDataBody.value.tables = [];
   formDataBody.value.tables.push({
     tableVO: {
       tableName: formData.tableName,
