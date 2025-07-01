@@ -153,10 +153,14 @@ function showAddTableDialog(nodeInfo: IoTDB.TreeNodeData, addType: string) {
   }
 }
 
-const setDefaultTreeExpandKeys = async () => {
+const setDefaultTreeExpandKeys = async (dbName: string = '') => {
   await getDatabases();
   if (treeData.value && treeData.value.length) {
-    const firstNode = treeData.value[0];
+    let firstNode = treeData.value[0];
+    if (dbName) {
+      const matchedNode = treeData.value.find((node) => node.nodeName === dbName);
+      firstNode = matchedNode ?? treeData.value[0];
+    }
     currentNode.value = firstNode;
     emit('handleNodeClick', firstNode);
     setTimeout(() => {
@@ -251,7 +255,7 @@ function handleDelTable(tableNode: IoTDB.TreeNodeData) {
     deleteTables(tableNode.database!, delTableList).then(() => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
       if (currentNodeShow.value?.nodeName === currentNode.value?.nodeName) {
-        setDefaultTreeExpandKeys();
+        setDefaultTreeExpandKeys(currentNodeShow?.value?.database);
       } else {
         handleRefresh();
       }
