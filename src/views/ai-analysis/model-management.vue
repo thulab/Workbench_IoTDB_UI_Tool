@@ -56,13 +56,19 @@
                   <el-table-column :label="t('aiAnalysis.modelName')" prop="modelId" min-width="180" align="center" show-overflow-tooltip />
                   <el-table-column :label="t('aiAnalysis.category')" prop="categoryString" min-width="160" align="center" show-overflow-tooltip />
                   <el-table-column :label="t('aiAnalysis.modelType')" prop="modelType" min-width="160" align="center" show-overflow-tooltip />
-                  <el-table-column :label="t('aiAnalysis.state')" prop="stateString" min-width="120" align="center" show-overflow-tooltip />
+                  <el-table-column :label="t('aiAnalysis.state')" prop="stateString" min-width="120" align="center" show-overflow-tooltip>
+                    <template #default="{ row }">
+                      <el-tag :type="formatState(row.state)" class="model-state-tag" :id="`model-management-table-${row.name}-state`">
+                        {{ row.stateString }}
+                      </el-tag>
+                    </template>
+                  </el-table-column>
                   <el-table-column :label="t('aiAnalysis.modelConfig')" v-if="false" prop="configs" width="160" align="center" show-overflow-tooltip>
                     <template #default="{ row }">
                       <div class="flex justify-center items-center">
                         <div v-if="row.configs === ''">{{ t('aiAnalysis.noConfigs') }}</div>
                         <div v-else>
-                          <el-button v-if="row.state === '可用'" type="primary" link size="small" @click="handleViewConfig(row)" :id="`model-management-table-${row.name}-del`">
+                          <el-button v-if="row.state === 'ACTIVE'" type="primary" link size="small" @click="handleViewConfig(row)" :id="`model-management-table-${row.name}-del`">
                             {{ t('aiAnalysis.viewConfig') }}
                           </el-button>
                           <div v-else>{{ t('aiAnalysis.viewConfig') }}</div>
@@ -153,6 +159,18 @@ const tableDataPagination = computed(() => tableData.value.slice(((pagination.pa
 
 const { requestFn: getModels, loading } = useRequest(AIAnalysisApi.getModels);
 const { requestFn: batchDeleteModel } = useRequest(AIAnalysisApi.batchDeleteModel);
+
+function formatState(state: string) {
+  switch (state) {
+    case 'ACTIVE':
+      return 'success';
+    case 'INACTIVE':
+    case 'FAILED':
+      return 'danger';
+    default:
+      return 'warning';
+  }
+}
 
 function getListData() {
   getModels(searchFormData.name).then((res) => {
