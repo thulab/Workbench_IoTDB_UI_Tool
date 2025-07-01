@@ -89,7 +89,7 @@
                   <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.measurementNum, '-') : t('common.noAuth') }}</span>
                 </li>
                 <li class="system-info-item" v-if="connectionStore.connectionInfo.data.model === 'table'">
-                  <el-icon size="24"><i-custom-measure-num /></el-icon>
+                  <el-icon size="24"><i-custom-table2 /></el-icon>
                   <span class="module-label-text">{{ t('measurement.tableNum') }}：</span>
                   <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.measurementNum, '-') : t('common.noAuth') }}</span>
                 </li>
@@ -230,7 +230,7 @@
                   <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.measurementNum, '-') : t('common.noAuth') }}</span>
                 </li>
                 <li class="system-info-item" v-if="connectionStore.connectionInfo.data.model === 'table'">
-                  <el-icon size="24"><i-custom-measure-num /></el-icon>
+                  <el-icon size="24"><i-custom-table2 /></el-icon>
                   <span class="module-label-text">{{ t('measurement.tableNum') }}：</span>
                   <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.measurementNum, '-') : t('common.noAuth') }}</span>
                 </li>

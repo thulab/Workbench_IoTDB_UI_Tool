@@ -50,13 +50,14 @@ defineExpose({
 .sql-statement {
   padding: 4px 0 4px 16px;
   font-size: 12px;
-  border: 1px solid #dfe1ed;
-  border-radius: 6px;
+  border-radius: 2px;
   height: 100px;
   margin: 0 16px;
   position: relative;
   white-space: pre;
   line-height: 1.5;
+  background-color: #f7f8fc;
+  color: #424561;
 
   .copy-icon {
     position: absolute;

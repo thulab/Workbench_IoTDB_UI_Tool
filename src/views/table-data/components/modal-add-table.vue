@@ -64,7 +64,7 @@
               </el-row>
               <el-row>
                 <el-col>
-                  <base-form-item style="width: 100%" :label="`${t('dataManage.comment')}：`">
+                  <base-form-item style="width: 100%; margin-left: 10px" :label="`${t('dataManage.comment')}：`">
                     <el-input v-model="item.comment" :placeholder="t('dataManage.commentPlaceholder')" maxlength="100" show-word-limit />
                   </base-form-item>
                 </el-col>

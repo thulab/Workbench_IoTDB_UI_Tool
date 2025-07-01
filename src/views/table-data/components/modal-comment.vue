@@ -3,7 +3,7 @@
     <el-form label-width="80px" ref="formRef" :rules="rules" :model="formData" label-position="left" :key="formKey">
       <label><input type="password" autocomplete="new-password" hidden /></label>
       <base-form-item :label="t('dataManage.comment')" prop="comment">
-        <el-input v-model="formData.comment" autocomplete="off" maxlength="100" show-word-limit type="textarea" :rows="6" />
+        <el-input v-model="formData.comment" autocomplete="off" maxlength="100" show-word-limit type="textarea" :rows="6" :placeholder="t('dataManage.commentPlaceholder')" />
       </base-form-item>
     </el-form>
     <template #footer>

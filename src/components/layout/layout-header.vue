@@ -19,7 +19,7 @@
       <!-- eslint-disable-next-line vue/no-constant-condition -->
       <el-dropdown @command="handleChangeDefaultModel" v-show="true">
         <span class="lang-icon lang-icon-color m-r-20">
-          <i-ep-switch />
+          <i-custom-tree-table-switch />
         </span>
         <template #dropdown>
           <el-dropdown-menu class="operate-dropdown">

@@ -15,7 +15,7 @@
           <i-custom-border-refresh style="width: 24px; height: 24px" />
         </el-button>
         <el-button link @click="handleAddDB()" :disabled="searching" id="db-tree-add-db" class="svg-button-hover-color m-l-16">
-          <i-custom-add-border style="width: 24px; height: 24px" />
+          <i-custom-add-db-border style="width: 24px; height: 24px" />
         </el-button>
       </div>
       <el-tree-v2
@@ -34,34 +34,34 @@
             <el-icon size="18" color="var(--el-color-primary)" class="m-r-[4px]">
               <i-custom-tree-db v-if="data.nodeType === 'DATABASE'" />
               <i-custom-table v-else-if="data.nodeType === 'TABLE'" />
-              <i-custom-tree-time v-else-if="data.nodeType === 'TIME'" />
-              <i-custom-tag v-else-if="data.nodeType === 'TAG'" />
-              <i-custom-attr v-else-if="data.nodeType === 'ATTRIBUTE'" />
-              <i-custom-field v-else-if="data.nodeType === 'FIELD'" />
+              <el-tag v-else-if="data.nodeType === 'TIME'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Time</el-tag>
+              <el-tag v-else-if="data.nodeType === 'TAG'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Tag</el-tag>
+              <el-tag v-else-if="data.nodeType === 'ATTRIBUTE'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Attr</el-tag>
+              <el-tag v-else-if="data.nodeType === 'FIELD'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Field</el-tag>
             </el-icon>
             <text-tooltip :content="data.nodeName + (data.comment ? ` (${data.comment})` : '')" />
           </div>
           <el-dropdown v-if="data.nodeType === 'DATABASE'" trigger="click" @command="handleDatabaseOptionClick($event, data)">
             <span class="lang-icon m-r-20" @click.stop>
-              <i-ep-more />
+              <el-icon size="24" class="svg-button-hover-color"><i-custom-more /></el-icon>
             </span>
             <template #dropdown>
               <el-dropdown-menu class="operate-dropdown">
                 <el-dropdown-item command="dbSchema">
                   <div class="node-text">
-                    <i-custom-tree-db class="m-r-8" />
+                    <i-custom-structure class="m-r-8" />
                     <span>{{ t('dataManage.schema') }}</span>
                   </div>
                 </el-dropdown-item>
                 <el-dropdown-item command="addTable" :disabled="data.database === 'information_schema'">
                   <div class="node-text">
-                    <i-ep-plus class="m-r-8" />
+                    <i-custom-add-border2-active class="m-r-8" />
                     <span>{{ t('dataManage.table') }}</span>
                   </div>
                 </el-dropdown-item>
                 <el-dropdown-item command="dbDelete" :disabled="data.database === 'information_schema'">
                   <div class="node-text">
-                    <i-ep-delete class="m-r-8" />
+                    <i-custom-delete-active class="m-r-8" />
                     <span>{{ t('common.delete') }}</span>
                   </div>
                 </el-dropdown-item>
@@ -70,31 +70,31 @@
           </el-dropdown>
           <el-dropdown v-if="data.nodeType === 'TABLE'" trigger="click" @command="handleTableOptionClick($event, data)">
             <span class="lang-icon m-r-20" @click.stop>
-              <i-ep-more />
+              <el-icon size="24" class="svg-button-hover-color"><i-custom-more /></el-icon>
             </span>
             <template #dropdown>
               <el-dropdown-menu class="operate-dropdown">
                 <el-dropdown-item command="tableSchema">
                   <div class="node-text">
-                    <i-custom-table class="m-r-8" />
+                    <i-custom-structure class="m-r-8" />
                     <span>{{ t('dataManage.schema') }}</span>
                   </div>
                 </el-dropdown-item>
                 <el-dropdown-item command="tableData">
                   <div class="node-text">
-                    <i-ep-data-line class="m-r-8" />
+                    <i-custom-data class="m-r-8" />
                     <span>{{ t('dataManage.data') }}</span>
                   </div>
                 </el-dropdown-item>
                 <el-dropdown-item command="addCloumn" :disabled="data.database === 'information_schema'">
                   <div class="node-text">
-                    <i-ep-plus class="m-r-8" />
+                    <i-custom-add-border2-active class="m-r-8" />
                     <span>{{ t('dataManage.column') }}</span>
                   </div>
                 </el-dropdown-item>
                 <el-dropdown-item command="tableDelete" :disabled="data.database === 'information_schema'">
                   <div class="node-text">
-                    <i-ep-delete class="m-r-8" />
+                    <i-custom-delete-active class="m-r-8" />
                     <span>{{ t('common.delete') }}</span>
                   </div>
                 </el-dropdown-item>
@@ -298,5 +298,13 @@ function handleTableOptionClick(command: string, node: IoTDB.TreeNodeData) {
   width: 100px;
   padding-right: 8px;
   flex: 1;
+}
+
+.tree-column-type-tag {
+  font-style: normal;
+  width: 28px;
+  height: 16px;
+  font-size: 10px;
+  margin-right: 12px;
 }
 </style>
