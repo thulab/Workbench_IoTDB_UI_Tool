@@ -16,6 +16,7 @@ export const useDbStore = defineStore('db', () => {
     const data: Array<IoTDB.TreeNodeData> = [];
     databases.value?.value.databases.forEach((db) => {
       const dbNode: IoTDB.TreeNodeData = {
+        id: db.database,
         nodeName: db.database,
         nodeType: 'DATABASE',
         database: db.database,
@@ -23,6 +24,7 @@ export const useDbStore = defineStore('db', () => {
       };
       db.tables?.forEach((table) => {
         const tableNode: IoTDB.TreeNodeData = {
+          id: `${db.database}-${table.tableVO.tableName}`,
           nodeName: table.tableVO.tableName,
           parentName: db.database,
           database: db.database,
@@ -31,6 +33,7 @@ export const useDbStore = defineStore('db', () => {
           ttl: table.tableVO.ttl,
           children: table.columnVOS
             .map((col) => ({
+              id: `${db.database}-${table.tableVO.tableName}-${col.columnName}`,
               nodeName: col.columnName,
               database: db.database,
               parentName: table.tableVO.tableName,

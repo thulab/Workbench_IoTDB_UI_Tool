@@ -131,7 +131,7 @@ const searchText = ref('');
 const searching = ref(false);
 const currentNode = ref<IoTDB.TreeNodeData>();
 const modalAddDbVisible = ref(false);
-const treeHeight = ref(document.body.clientHeight - 48 - 16 - 36 - 16 - 46);
+const treeHeight = ref(document.body.clientHeight - 150);
 const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
 const { requestFn: deleteDatabase } = useRequest(IoTDBApi.deleteDatabase);
 const { requestFn: deleteTables } = useRequest(IoTDBApi.deleteTables);
@@ -141,7 +141,7 @@ const { treeData, databaseNames } = storeToRefs(useDbStore());
 const { getDatabases } = useDbStore();
 
 const treeProps = {
-  value: 'nodeName',
+  value: 'id',
   label: 'nodeName',
   children: 'children',
 };
