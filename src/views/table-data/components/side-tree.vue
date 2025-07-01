@@ -121,6 +121,7 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
 const emit = defineEmits<{
   (event: 'handleNodeClick', nodeInfo: IoTDB.TreeNodeData): void;
+  (event: 'uploadDetail'): void;
 }>();
 
 const { t } = useI18n();
@@ -129,7 +130,6 @@ const userStore = useUserStore();
 const searchText = ref('');
 const searching = ref(false);
 const currentNode = ref<IoTDB.TreeNodeData>();
-const lastNodeShow = ref<IoTDB.TreeNodeData>();
 const modalAddDbVisible = ref(false);
 const treeHeight = ref(document.body.clientHeight - 48 - 16 - 36 - 16 - 46);
 const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
@@ -209,7 +209,7 @@ function handleSearch() {
 }
 
 function handleRefresh() {
-  getDatabases();
+  emit('uploadDetail');
 }
 
 function handleAddDB() {
@@ -228,11 +228,7 @@ function handleDelDb(dbNode: IoTDB.TreeNodeData) {
   }).then(() => {
     deleteDatabase(dbNode.nodeName).then(() => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
-      if (dbNode.nodeName === lastNodeShow.value?.database) {
-        setDefaultTreeExpandKeys();
-      } else {
-        handleRefresh();
-      }
+      handleRefresh();
     });
   });
 }
@@ -249,11 +245,7 @@ function handleDelTable(tableNode: IoTDB.TreeNodeData) {
     const delTableList = tableNode?.nodeName ? [tableNode.nodeName] : [];
     deleteTables(tableNode.database!, delTableList).then(() => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
-      if (tableNode.nodeName === lastNodeShow.value?.nodeName) {
-        setDefaultTreeExpandKeys();
-      } else {
-        handleRefresh();
-      }
+      handleRefresh();
     });
   });
 }
@@ -262,7 +254,6 @@ function handleDatabaseOptionClick(command: string, node: IoTDB.TreeNodeData) {
   currentNode.value = node;
   if (command === 'dbSchema') {
     emit('handleNodeClick', currentNode.value);
-    lastNodeShow.value = cloneDeep(node);
   } else if (command === 'addTable') {
     showAddTableDialog(currentNode.value, 'addTable');
   } else if (command === 'dbDelete') {
@@ -274,11 +265,9 @@ function handleTableOptionClick(command: string, node: IoTDB.TreeNodeData) {
   currentNode.value = cloneDeep(node);
   if (command === 'tableData') {
     currentNode.value.nodeType = 'TABLEDATA';
-    lastNodeShow.value = cloneDeep(node);
     emit('handleNodeClick', currentNode.value);
   } else if (command === 'tableSchema') {
     emit('handleNodeClick', currentNode.value);
-    lastNodeShow.value = cloneDeep(node);
   } else if (command === 'addCloumn') {
     showAddTableDialog(currentNode.value, 'addColumn');
   } else if (command === 'tableDelete') {

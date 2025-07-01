@@ -302,6 +302,10 @@ onMounted(() => {
   getDatabaseDetail(props.currentNode?.nodeName || '');
   getTableList(props.currentNode?.nodeName || '');
 });
+
+defineExpose({
+  handleRefresh,
+});
 </script>
 <style lang="scss" scoped>
 .database-detail-wrapper {

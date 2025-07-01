@@ -493,6 +493,10 @@ watch(
     immediate: true,
   }
 );
+
+defineExpose({
+  handleSearch,
+});
 </script>
 
 <style lang="scss" scoped>

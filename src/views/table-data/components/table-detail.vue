@@ -245,6 +245,10 @@ function handleDelRow(type: string, row: IoTDB.TreeNodeData | null) {
     });
   });
 }
+
+defineExpose({
+  handleRefresh,
+});
 </script>
 <style lang="scss" scoped>
 .database-detail-wrapper {

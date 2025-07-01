@@ -1,13 +1,13 @@
 <template>
   <div class="database-page-container">
     <div class="database-list-wrapper">
-      <side-tree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" @handle-node-click="handleNodeClick" />
+      <side-tree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" @handle-node-click="handleNodeClick" @upload-detail="handleUploadDetail" />
     </div>
 
     <div class="database-details-wrapper" :key="detailKey">
-      <database-detail v-if="currentNode && currentNode.nodeType === 'DATABASE'" :current-node="currentNode" />
-      <table-detail v-if="currentNode && currentNode.nodeType === 'TABLE'" :current-node="currentNode" />
-      <table-data-detail v-if="currentNode && currentNode.nodeType === 'TABLEDATA'" :current-node="currentNode" />
+      <database-detail ref="dbDtail" v-if="currentNode && currentNode.nodeType === 'DATABASE'" :current-node="currentNode" />
+      <table-detail ref="tableDtail" v-if="currentNode && currentNode.nodeType === 'TABLE'" :current-node="currentNode" />
+      <table-data-detail ref="tableDataDtail" v-if="currentNode && currentNode.nodeType === 'TABLEDATA'" :current-node="currentNode" />
     </div>
   </div>
 </template>
@@ -25,10 +25,19 @@ const userStore = useUserStore();
 const { canReadWriteSchema } = storeToRefs(userStore);
 const currentNode = ref<IoTDB.TreeNodeData | null>(null);
 const detailKey = ref(0);
+const dbDtail = ref<InstanceType<typeof DatabaseDetail>>();
+const tableDtail = ref<InstanceType<typeof TableDetail>>();
+const tableDataDtail = ref<InstanceType<typeof TableDataDetail>>();
 
 function handleNodeClick(nodeInfo: IoTDB.TreeNodeData) {
   currentNode.value = nodeInfo;
   detailKey.value++;
+}
+
+function handleUploadDetail() {
+  dbDtail?.value?.handleRefresh();
+  tableDtail?.value?.handleRefresh();
+  tableDataDtail?.value?.handleSearch();
 }
 </script>
 
