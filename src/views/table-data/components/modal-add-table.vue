@@ -6,90 +6,86 @@
     :close-on-click-modal="false"
     id="table-modal-table-column"
   >
-    <el-form ref="formRef" :model="formData" label-width="120px" label-position="left">
-      <!-- 表名 -->
-      <base-form-item :label="`${t('dataManage.tableName')}：`" prop="tableName" required :rules="tableNameRules">
-        <template #label>
-          {{ t('dataManage.tableName') }}：
-          <el-tooltip effect="light" :content="t('dataManage.tableNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
-        </template>
-        <el-input v-model="formData.tableName" :placeholder="t('dataManage.tableNamePlaceholder')" clearable :disabled="addType !== 'addTable'" />
-      </base-form-item>
+    <el-form ref="formRef" :inline="true" :model="formData" label-position="left">
+      <el-row class="form-item-row">
+        <el-col>
+          <!-- 表名 -->
+          <base-form-item class="form-item-width" :label="`${t('dataManage.tableName')}：`" prop="tableName" required :rules="tableNameRules">
+            <template #label>
+              {{ t('dataManage.tableName') }}：
+              <el-tooltip effect="light" :content="t('dataManage.tableNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+            </template>
+            <el-input v-model="formData.tableName" :placeholder="t('dataManage.tableNamePlaceholder')" maxlength="100" show-word-limit :disabled="addType !== 'addTable'" />
+          </base-form-item>
+        </el-col>
+        <el-col>
+          <!-- 数据保留时间 -->
+          <base-form-item class="form-item-width" :label="`${t('dataManage.ttl')}：`" prop="ttl">
+            <template #label>
+              {{ t('dataManage.ttl') }}：
+              <el-tooltip effect="light" :content="t('dataManage.ttlTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+            </template>
+            <el-input v-model="formData.ttl" :placeholder="t('dataManage.ttlPlaceholder2')" :disabled="addType !== 'addTable'" @input="handleNumberInput">
+              <template #append>ms</template>
+            </el-input>
+          </base-form-item>
+        </el-col>
+      </el-row>
 
-      <!-- 数据保留时间 -->
-      <base-form-item :label="`${t('dataManage.ttl')}：`" prop="ttl">
-        <template #label>
-          {{ t('dataManage.ttl') }}：
-          <el-tooltip effect="light" :content="t('dataManage.ttlTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
-        </template>
-        <el-input v-model="formData.ttl" :placeholder="t('dataManage.ttlPlaceholder2')" clearable :disabled="addType !== 'addTable'" @input="handleNumberInput">
-          <template #append>ms</template>
-        </el-input>
-      </base-form-item>
-
-      <el-scrollbar :max-height="400" :min-height="152" class="measurement-list-box">
-        <el-collapse accordion v-model="activeName">
-          <el-collapse-item v-for="(item, index) in formData.columns" :key="index" :name="`measurement_${index}`">
-            <template #title>
-              <el-row class="collapse-title-box">
-                <el-col :span="12">
-                  <div class="all-path-name">{{ `${t('dataManage.columnName')}：${item.columnName}` }}</div>
+      <div style="max-height: 400px; min-height: 0; overflow-y: auto">
+        <div v-for="(item, index) in formData.columns" :key="index" :name="`measurement_${index}`">
+          <div style="background-color: white; height: 12px"></div>
+          <div class="column-info-item">
+            <div class="left-view">
+              <el-row class="form-item-row" style="grid-template-columns: 1fr 1fr 1fr">
+                <el-col>
+                  <base-form-item class="form-item-width" :label="`${t('dataManage.columnName')}：`" :prop="`columns[${index}].columnName`" required :rules="tableNameRules">
+                    <template #label>
+                      {{ t('dataManage.columnName') }}：
+                      <el-tooltip effect="light" :content="t('dataManage.tableNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                    </template>
+                    <el-input v-model="item.columnName" :placeholder="t('dataManage.columnNamePlaceholder')" clearable />
+                  </base-form-item>
                 </el-col>
-                <el-col :span="8">
-                  <div class="collapse-data-type-box">
-                    <span class="data-type-label">{{ t('dataManage.dataType') }}</span>
-                    <span>{{ item.dataType }}</span>
-                  </div>
+                <el-col>
+                  <base-form-item class="form-item-width" :label="`${t('dataManage.cateGory')}：`" required>
+                    <el-select v-model="item.cateGory" :placeholder="t('dataManage.cateGoryPlaceholder')" @change="handleColumnTypeChange(index)">
+                      <el-option v-for="item in columnTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+                    </el-select>
+                  </base-form-item>
                 </el-col>
-                <el-col :span="4">
-                  <div class="operate-box">
-                    <el-button link :disabled="existEmpty" @click.stop="copyColumn(index)" :id="`measurement-modal-collapse-${index}-copy`" :class="existEmpty ? '' : 'svg-button-hover-color'">
-                      <i-custom-copy />
-                    </el-button>
-                    <el-button link :class="['m-x-12', 'svg-button-hover-color']" @click.stop="deleteColumn(index)" :id="`measurement-modal-collapse-${index}-del`">
-                      <i-custom-delete />
-                    </el-button>
-                  </div>
+                <el-col>
+                  <base-form-item class="form-item-width" :label="`${t('dataManage.dataType')}：`" required>
+                    <el-select v-model="item.dataType" :placeholder="t('dataManage.dataTypePlaceholder')" :disabled="['TAG', 'ATTRIBUTE'].includes(item.cateGory)">
+                      <el-option v-for="item in dataTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+                    </el-select>
+                  </base-form-item>
                 </el-col>
               </el-row>
-            </template>
+              <el-row>
+                <el-col>
+                  <base-form-item style="width: 100%" :label="`${t('dataManage.comment')}：`">
+                    <el-input v-model="item.comment" :placeholder="t('dataManage.commentPlaceholder')" maxlength="100" show-word-limit />
+                  </base-form-item>
+                </el-col>
+              </el-row>
+            </div>
 
-            <base-form-item :label="`${t('dataManage.columnName')}：`" :prop="`columns[${index}].columnName`" required :rules="tableNameRules">
-              <template #label>
-                {{ t('dataManage.columnName') }}：
-                <el-tooltip effect="light" :content="t('dataManage.tableNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
-              </template>
-              <el-input v-model="item.columnName" :placeholder="t('dataManage.columnNamePlaceholder')" clearable />
-            </base-form-item>
-
-            <base-form-item :label="`${t('dataManage.comment')}：`">
-              <el-input v-model="item.comment" :placeholder="t('dataManage.commentPlaceholder')" type="textarea" :rows="2" maxlength="100" show-word-limit clearable />
-            </base-form-item>
-
-            <el-row>
-              <el-col :span="12">
-                <base-form-item :label="`${t('dataManage.cateGory')}：`" required>
-                  <el-select v-model="item.cateGory" :placeholder="t('dataManage.cateGoryPlaceholder')" @change="handleColumnTypeChange(index)">
-                    <el-option v-for="item in columnTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
-                  </el-select>
-                </base-form-item>
-              </el-col>
-              <el-col :span="12">
-                <base-form-item :label="`${t('dataManage.dataType')}：`" required>
-                  <el-select v-model="item.dataType" :placeholder="t('dataManage.dataTypePlaceholder')" :disabled="['TAG', 'ATTRIBUTE'].includes(item.cateGory)">
-                    <el-option v-for="item in dataTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
-                  </el-select>
-                </base-form-item>
-              </el-col>
-            </el-row>
-          </el-collapse-item>
-        </el-collapse>
-      </el-scrollbar>
+            <div style="display: flex; flex-direction: column; margin-top: -12px">
+              <el-button link :disabled="existEmpty" @click.stop="copyColumn(index)" :id="`measurement-modal-collapse-${index}-copy`" :class="existEmpty ? '' : 'svg-button-hover-color'">
+                <i-custom-copy />
+              </el-button>
+              <el-button link :class="['m-x-12', 'svg-button-hover-color']" @click.stop="deleteColumn(index)" :id="`measurement-modal-collapse-${index}-del`">
+                <i-custom-delete />
+              </el-button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- 添加列按钮 -->
-
       <el-button style="width: 100%" :class="['m-t-16', existEmpty ? '' : 'svg-button-hover-color']" :disabled="existEmpty || !canAddColumn" @click="addColumn" id="measurement-modal-collapse-add">
-        <i-custom-add class="m-r-4" />
+        <i-custom-add-border2 class="m-r-4" />
         {{ t('dataManage.addCloumn') }}({{ formData.columns.length }}/10)
       </el-button>
     </el-form>
@@ -375,6 +371,17 @@ defineExpose({
 });
 </script>
 <style lang="scss" scoped>
+.column-info-item {
+  background-color: #f7f8fc;
+  padding: 12px 8px 0;
+  display: flex;
+  align-items: center;
+
+  .left-view {
+    flex: 1;
+  }
+}
+
 .measurement-list-box {
   border-bottom: none;
 
@@ -434,6 +441,16 @@ defineExpose({
   .el-button {
     min-width: 28px !important;
     padding: 0 !important;
+  }
+}
+
+.form-item-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 26px;
+
+  .form-item-width {
+    width: 100%;
   }
 }
 </style>

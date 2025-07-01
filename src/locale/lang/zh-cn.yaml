@@ -1079,7 +1079,7 @@ dataManage:
   delTableBatchTip: 此操作会删除这些表及其包含的全部数据，是否删除？
   delColumnSingleTip: 此操作会删除该列及其对应的全部数据，是否删除？
   delColumnBatchTip: 此操作会删除这些列及其对应的全部数据，是否删除？
-  addCloumn: 添加列名
+  addCloumn: 添加列
   ttlTip: 表的 TTL 默认为其所在数据库的 TTL
   batchImportData: 批量导入数据
   cannotDeleteTip: 仅在显示全部列且未选中列时可用
