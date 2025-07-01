@@ -9,9 +9,41 @@
       <base-form-item :label="`${t('aiAnalysis.fineTuningModel')}：`" :placeholder="t('aiAnalysis.fineTuningModelPlaceholder')" prop="tunedModelId">
         <el-input v-model="formData.tunedModelId" id="fine-tuning-name" />
       </base-form-item>
-      <base-form-item :label="`${t('aiAnalysis.fineTuningData')}：`" prop="name">
+      <base-form-item :label="`${t('aiAnalysis.fineTuningData')}：`" v-if="!connectionStore.isTableModel" prop="name">
         <timeseries-select-single id="fine-tuning-path" v-model="formData.path" :selectWidth="230" :itemWidth="200" show-suffix :disabled-path="disabledPath" />
       </base-form-item>
+      <template v-else>
+        <base-form-item :label="`${t('measurement.databaseTitle')}：`" prop="database">
+          <el-select v-model="formData.database" id="fine-tuning-database" @change="handleDatabaseSelected" v-loading="getModelsLoading">
+            <el-option v-for="item in dbStore.treeData" :key="item.nodeName" :label="item.nodeName" :value="item.nodeName" />
+          </el-select>
+        </base-form-item>
+        <base-form-item :label="`${t('dataManage.table')}：`" prop="table">
+          <el-select
+            v-model="formData.table"
+            id="fine-tuning-table"
+            v-loading="getModelsLoading"
+            :disabled="!formData.database"
+            @change="
+              () => {
+                formData.measurement = '';
+              }
+            "
+          >
+            <el-option v-for="item in currentDatabase?.children || []" :key="item.nodeName" :label="item.nodeName + (item.comment ? `(${item.comment})` : '')" :value="item.nodeName" />
+          </el-select>
+        </base-form-item>
+        <base-form-item :label="`${t('measurement.measurement')}：`" prop="measurement">
+          <el-select v-model="formData.measurement" id="fine-tuning-measurement" :disabled="!formData.table" v-loading="getModelsLoading">
+            <el-option
+              v-for="item in currentTable?.children?.filter((item) => item.cateGory === 'FIELD') || []"
+              :key="item.nodeName"
+              :label="item.nodeName + (item.comment ? `(${item.comment})` : '')"
+              :value="item.nodeName"
+            />
+          </el-select>
+        </base-form-item>
+      </template>
       <div class="exits-tip" v-if="!paramsVisible">
         <el-button link type="primary" @click="showParam">{{ t('aiAnalysis.moreParam') }}</el-button>
       </div>
@@ -34,6 +66,7 @@
 <script setup lang="ts">
 import type { FormInstance } from 'element-plus';
 import MonacoEditor from '@/components/monaco-editor/monaco-editor.vue';
+import { useConnectionStore, useDbStore } from '@/stores';
 
 import { AIAnalysisApi } from '@/api';
 
@@ -50,6 +83,9 @@ const emit = defineEmits<{
 }>();
 
 const inputEditor = ref<InstanceType<typeof MonacoEditor>>();
+const connectionStore = useConnectionStore();
+
+const dbStore = useDbStore();
 
 const { requestFn: fineTune, loading: saveLoading } = useRequest(AIAnalysisApi.fineTune);
 const { requestFn: getModels, loading: getModelsLoading } = useRequest(AIAnalysisApi.getModels);
@@ -65,6 +101,9 @@ const formData = reactive<{
   path: string;
   field: string;
   params: string;
+  database?: string;
+  table?: string;
+  measurement?: string;
 }>({
   rawModelId: '',
   tunedModelId: '',
@@ -77,7 +116,7 @@ const formRules = reactive({
     {
       required: true,
       message: t('common.formRuleEmptyOperateShort'),
-      trigger: 'blur',
+      trigger: 'change',
     },
   ],
   tunedModelId: [
@@ -91,12 +130,41 @@ const formRules = reactive({
     {
       required: true,
       message: t('common.formRuleEmptyOperateShort'),
-      trigger: 'blur',
+      trigger: 'change',
+    },
+  ],
+  database: [
+    {
+      required: true,
+      message: t('common.formRuleEmptyOperateShort'),
+      trigger: 'change',
+    },
+  ],
+  table: [
+    {
+      required: true,
+      message: t('common.formRuleEmptyOperateShort'),
+      trigger: 'change',
+    },
+  ],
+  measurement: [
+    {
+      required: true,
+      message: t('common.formRuleEmptyOperateShort'),
+      trigger: 'change',
     },
   ],
 });
 
 const modelList = ref<Array<AIAnalysis.Model>>([]);
+
+const currentDatabase = computed(() => {
+  return dbStore.treeData.find((item) => item.nodeName === formData.database);
+});
+
+const currentTable = computed(() => {
+  return currentDatabase.value?.children?.find((item) => item.nodeName === formData.table);
+});
 
 const modelOptions = computed(() => {
   return modelList.value.filter((item) => ['Timer-Sundial', 'Timer-XL'].includes(item.modelType));
@@ -120,8 +188,8 @@ function handleConfirm() {
       fineTune({
         rawModelId: formData.rawModelId,
         tunedModelId: formData.tunedModelId,
-        path: formData.path,
-        field: formData.field,
+        path: connectionStore.isTableModel ? `"${formData.database}"."${formData.table}"` : formData.path,
+        field: connectionStore.isTableModel ? `"${formData.measurement}"` : formData.field,
         params: inputEditor.value?.getContent()?.split('\n') || undefined,
       }).then(() => {
         ElMessage.success(t('aiAnalysis.fineTuningSuccess'));
@@ -138,10 +206,16 @@ function initContent() {
   inputEditor.value?.setContent(formData.params);
 }
 
+function handleDatabaseSelected() {
+  formData.table = '';
+  formData.measurement = '';
+}
+
 onMounted(() => {
   getModels('').then((res) => {
     modelList.value = res.data.filter((item) => item.state === 'ACTIVE') || [];
   });
+  dbStore.getDatabases();
 });
 
 watch(
