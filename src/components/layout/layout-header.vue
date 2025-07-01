@@ -93,7 +93,6 @@ function handleDashboard() {
   sessionStorage.setItem('dataTrendStorage', '');
   sessionStorage.setItem('dataSpectrumStorage', '');
   sessionStorage.setItem('configStorage', '');
-  debugger;
   window.location.href = HOME_URL;
 }
 

@@ -29,11 +29,11 @@ export default class AIAnalysisApi {
     return http.post('/ai-analysis/customize', { sql });
   }
 
-  static writeBack(data: AIAnalysis.SearchDataResult & { modelType: string; measurement: string; dataType: string }): HttpResponseP {
+  static writeBack(data: { raw: AIAnalysis.SearchDataItem[]; analysis: AIAnalysis.SearchDataItem[]; modelType: string; measurement: string; dataType: string }): HttpResponseP {
     return http.post('/ai-analysis/writeBack', data);
   }
 
-  static getExportId(data: AIAnalysis.SearchDataResult & { modelType: string; measurement: string; dataType: string }): HttpResponseP<String> {
+  static getExportId(data: { modelType: string; measurement: string; dataType: string; raw: AIAnalysis.SearchDataItem[]; analysis: AIAnalysis.SearchDataItem[] }): HttpResponseP<String> {
     return http.post('/file/analysisExportId', data);
   }
 

@@ -983,7 +983,8 @@ aiAnalysis:
   modelNamePlaceholder: 请输入模型名称
   modelList: 模型列表
   importModel: 导入模型
-  modelType: 模型类型
+  modelType: 模型系列
+  category: 模型类型
   state: 状态
   modelConfig: 模型配置
   noConfigs: 无
@@ -1006,6 +1007,7 @@ aiAnalysis:
   anomalyDetection: 异常检测
   custom: 自定义
   modelSelect: 模型选择
+  modelSelectPlaceholder: 请选择模型
   forecastResult: 测点预测结果
   forecastStart: 预测起始时间
   forecastData: 预测数据范围
@@ -1030,6 +1032,7 @@ aiAnalysis:
   enableTip: 未接入AI节点及功能，请接入后查看
   docTip: 模型具体说明请查看文档
   measurementExist: 新测点名称已存在，数据将插入至该测点。如确认继续该操作，请点击确认并继续。
+  cannotDel: 内置模型不能删除
 dataManage:
   schema: 结构
   table: 表
@@ -1043,7 +1046,9 @@ dataManage:
   tableName: 表名
   comment: 备注
   tableNamePlaceholder: 请输入表名
-  tableNameTip: 大小写不敏感，名称可包含特殊字符，如  ～！"%` 等，包含特殊字符如 or 中文字符的数据库名创建时必须用双引号 "" 括起来，当为表命名时，最外层的双引号（""）不会在实际创建的表名中出现”
+  tableNameTip: >-
+    大小写不敏感，名称可包含特殊字符，如  ～！"%` 等，包含特殊字符如 or 中文字符的数据库名创建时必须用双引号 ""
+    括起来，当为表命名时，最外层的双引号（""）不会在实际创建的表名中出现”
   commentPlaceholder: 请输入备注
   columns: 列数量
   columnName: 列名

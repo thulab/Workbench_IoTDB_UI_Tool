@@ -21,14 +21,16 @@
                   :label-width="locale === 'en' ? '' : '96px'"
                   :rules="requiredRules"
                 >
-                  <el-select v-model="searchFormData.method" id="search-method" style="width: 230px" :placeholder="t('common.selectPlaceholder')">
-                    <el-option
-                      v-for="item in modelOptions"
-                      :key="item.modelId"
-                      :label="item.modelId.indexOf('_') === 0 ? item.modelId.slice(1) : item.modelId"
-                      :value="item.modelId"
-                      :id="`search-method-${item.modelId}`"
-                    />
+                  <el-select
+                    v-model="searchFormData.method"
+                    id="search-method"
+                    style="width: 400px"
+                    :multiple="searchFormData.type === 0"
+                    :multiple-limit="5"
+                    collapse-tags
+                    :placeholder="t('common.selectPlaceholder')"
+                  >
+                    <el-option v-for="item in modelOptions" :key="item.modelId" :label="`${item.modelId} (${item.modelType})`" :value="item.modelId" :id="`search-method-${item.modelId}`" />
                   </el-select>
                 </base-form-item>
                 <el-button v-if="searchFormData.type !== 2" link :disabled="!enableAINode" @click="$router.push({ name: 'ModelManagement' })">
@@ -229,7 +231,7 @@
                         show-overflow-tooltip
                         width="170"
                       />
-                      <el-table-column prop="value" :label="copySearchFormData.type === 0 ? t('aiAnalysis.forecastValue') : copySearchFormData.measurement" show-overflow-tooltip width="150">
+                      <el-table-column prop="value" v-if="copySearchFormData.type === 1" :label="copySearchFormData.measurement" show-overflow-tooltip width="150">
                         <template #header="{ column }">
                           <span class="flex-header"><text-tooltip :content="column.label" /></span>
                         </template>
@@ -238,6 +240,17 @@
                           <span>{{ parseFloat(Number(row.value).toFixed(4)) }}</span>
                         </template>
                       </el-table-column>
+                      <template v-else>
+                        <el-table-column prop="value" v-for="item in copySearchFormData.method" :key="item" :label="item + t('aiAnalysis.forecastValue')" show-overflow-tooltip width="100">
+                          <template #header="{ column }">
+                            <span class="flex-header"><text-tooltip :content="column.label" /></span>
+                          </template>
+                          <template #default="{ row }">
+                            <!-- 保留 4 位小数 -->
+                            <span>{{ parseFloat(Number(row[`${item}_value`]).toFixed(4)) }}</span>
+                          </template>
+                        </el-table-column>
+                      </template>
                     </el-table>
                     <div class="detail-pager">
                       <el-pagination :page-size="pageSize" v-model:current-page="currentPage" size="small" :background="true" :pager-count="5" layout="prev, pager, next" :total="sortedData.length" />
@@ -255,6 +268,7 @@
           :old-name="copySearchFormData.measurement"
           :name-list="[copySearchFormData.measurement]"
           :save-loading="writeBackLoading"
+          :model-id-list="copySearchFormData.type === 0 ? (copySearchFormData.method as string[]) : ([copySearchFormData.method] as string[])"
           @handleSave="handleWriteBackSuccess"
         />
       </el-container>
@@ -290,14 +304,14 @@ const modelList = ref<Array<AIAnalysis.Model>>([]);
 const connectionStore = useConnectionStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
 const { enableAINode } = storeToRefs(connectionStore);
-let defaultMethod = 'Timer';
+let defaultMethod = ['sundial'];
 
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive<{
   type: 0 | 1 | 2;
   measurement: string;
   measurementType: string;
-  method: string;
+  method: string | string[];
   datetimerange: [DateModelType, DateModelType];
   forecastStart: DateModelType;
   anomalyRatio: number | undefined;
@@ -320,7 +334,7 @@ const disabledDate = (time: number) => time > today() || time < new Date('1970-1
 const saveText = computed(() => (searchFormData.type === 0 ? t('common.save') : t('common.export')));
 const canWrithBack = computed(() => searchFormData.type === 0 && canWriteData.value);
 const rawData = ref<AIAnalysis.SearchDataItem[]>([]);
-const analysisData = ref<AIAnalysis.SearchDataItem[]>([]);
+const analysisData = ref<AIAnalysis.AnalysisVo[]>([]);
 const allTableData = ref<AIAnalysis.SearchDataItem[]>([]);
 
 const minValue = ref(0);
@@ -414,14 +428,16 @@ const canQuery = computed(() => {
   return false;
 });
 
+const ANOMALY_DETECTION_TYPES = ['GaussianHmm', 'GmmHmm', 'Stray'];
+
 const modelOptions = computed(() => {
   switch (searchFormData.type) {
     case 0:
-      return modelList.value.filter((item) => item.modelId === 'Timer').concat(modelList.value.filter((item) => item.modelTypeValue === 'BUILT_IN_FORECAST'));
+      return modelList.value.filter((item) => ANOMALY_DETECTION_TYPES.indexOf(item.modelType) === -1 && item.category !== 'USER-DEFINED');
     case 1:
-      return modelList.value.filter((item) => item.modelTypeValue === 'BUILT_IN_ANOMALY_DETECTION').reverse();
+      return modelList.value.filter((item) => ANOMALY_DETECTION_TYPES.indexOf(item.modelType) !== -1 && item.category !== 'USER-DEFINED');
     case 2:
-      return modelList.value.filter((item) => item.modelTypeValue === 'USER_DEFINED' && item.modelId !== 'Timer');
+      return modelList.value.filter((item) => item.category === 'USER-DEFINED');
     default:
       return [];
   }
@@ -451,7 +467,8 @@ function disabledPath(item: StorageDevice.MeasurementDataItem) {
 
 const anomalyPoints = computed(() => {
   const data: AIAnalysis.SearchDataItem[] = [];
-  analysisData.value.forEach((element, index) => {
+  if (copySearchFormData.type !== 1) return data;
+  analysisData.value[0].data.forEach((element, index) => {
     if (element.value === '1') {
       data.push({
         time: element.time,
@@ -460,6 +477,70 @@ const anomalyPoints = computed(() => {
     }
   });
   return data;
+});
+
+const colors = ['#7cffb2', '#fddd60', '#ff6e76', '#58d9f9', '#05c091', '#ff8a45'];
+
+const aiSeriesData = computed(() => {
+  if (copySearchFormData.type === 0) {
+    return analysisData.value.map((item, index) => ({
+      type: 'line',
+      symbol: 'circle',
+      showSymbol: false,
+      showAllSymbol: 'auto',
+      connectNulls: false,
+      symbolSize: 4,
+      name: item.modelId + t('aiAnalysis.forecastValue'),
+      data: item.data.map((dataItem) => [dataItem.time, dataItem.value]),
+      lineStyle: {
+        width: 2,
+        color: colors[index % colors.length],
+      },
+      itemStyle: {
+        color: colors[index % colors.length],
+      },
+      z: 2 + index,
+    }));
+  }
+  if (copySearchFormData.type === 1) {
+    return [
+      {
+        type: 'scatter',
+        symbol: 'circle',
+        showSymbol: false,
+        showAllSymbol: 'auto',
+        connectNulls: false,
+        symbolSize: 4,
+        name: t('aiAnalysis.anomalyPoint'),
+        data: anomalyPoints.value.map((dataItem) => [dataItem.time, dataItem.value]),
+        lineStyle: {
+          width: 2,
+          color: '#D43030',
+        },
+        itemStyle: {
+          color: '#D43030',
+        },
+        markLine: {
+          symbol: 'none',
+          lineStyle: {
+            type: [16, 10],
+            color: '#D43030',
+          },
+          data: anomalyPoints.value.map((line) => [
+            {
+              coord: [line.time, minValue.value],
+            },
+            {
+              coord: [line.time, line.value],
+            },
+          ]),
+          animation: false,
+        },
+        z: 2,
+      },
+    ];
+  }
+  return [];
 });
 
 const seriesData = computed<ECOption>(
@@ -484,46 +565,20 @@ const seriesData = computed<ECOption>(
           },
           z: 1,
         },
-        {
-          type: copySearchFormData.type === 0 ? 'line' : 'scatter',
-          symbol: 'circle',
-          showSymbol: false,
-          showAllSymbol: 'auto',
-          connectNulls: false,
-          symbolSize: 4,
-          name: copySearchFormData.type === 0 ? t('aiAnalysis.forecastValue') : t('aiAnalysis.anomalyPoint'),
-          data: copySearchFormData.type === 0 ? analysisData.value.map((dataItem) => [dataItem.time, dataItem.value]) : anomalyPoints.value.map((dataItem) => [dataItem.time, dataItem.value]),
-          lineStyle: {
-            width: 2,
-            color: copySearchFormData.type === 0 ? '#FF6E76' : '#D43030',
-          },
-          itemStyle: {
-            color: copySearchFormData.type === 0 ? '#FF6E76' : '#D43030',
-          },
-          markLine: {
-            symbol: 'none',
-            lineStyle: {
-              type: [16, 10],
-              color: copySearchFormData.type === 0 ? '#FF6E76' : '#D43030',
-            },
-            data:
-              copySearchFormData.type === 0
-                ? []
-                : anomalyPoints.value.map((line) => [
-                    {
-                      coord: [line.time, minValue.value],
-                    },
-                    {
-                      coord: [line.time, line.value],
-                    },
-                  ]),
-            animation: false,
-          },
-          z: 2,
-        },
+        ...aiSeriesData.value,
       ],
     }) as unknown as ECOption
 );
+
+const legend = computed(() => {
+  if (copySearchFormData.type === 0) {
+    return [t('aiAnalysis.rawValue'), ...analysisData.value.map((item) => item.modelId + t('aiAnalysis.forecastValue'))];
+  }
+  if (copySearchFormData.type === 1) {
+    return [t('aiAnalysis.rawValue'), t('aiAnalysis.anomalyPoint')];
+  }
+  return [];
+});
 
 const chartOptions = computed<ECOption>(() => ({
   tooltip: {
@@ -534,17 +589,17 @@ const chartOptions = computed<ECOption>(() => ({
       const x = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;"></span><span style="font-size:14px;color:#666;font-weight:400;">${formatDate(paramsData[0].value[0])}</span></div>`;
       let circle = '';
       paramsData.forEach((item) => {
-        if (item.seriesName === t('aiAnalysis.rawValue')) {
+        if (copySearchFormData.type === 1) {
           circle += `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${item.value[1]}</span></div>`;
         } else {
-          circle += `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${item.value[1]}</span></div>`;
+          circle += `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;margin-left:2px">${item.seriesName}: </span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${parseFloat(Number(item.value[1]).toFixed(4))}</span></div>`;
         }
       });
       return `${x}${circle}`;
     },
   },
   legend: {
-    data: allTableData.value.length > 0 ? [t('aiAnalysis.rawValue'), copySearchFormData.type === 0 ? t('aiAnalysis.forecastValue') : t('aiAnalysis.anomalyPoint')] : [],
+    data: legend.value,
   },
   toolbox: {
     show: true,
@@ -713,22 +768,22 @@ const onResize = debounce(() => {
 
 function getModelList() {
   if (!canUseModel.value) {
-    defaultMethod = '';
+    defaultMethod = [];
     searchFormData.method = defaultMethod;
     return;
   }
   getModels('')
     .then((res) => {
-      modelList.value = res.data || [];
-      if (modelList.value.some((m) => m.modelId === 'Timer')) {
-        defaultMethod = 'Timer';
+      modelList.value = res.data.filter((item) => item.state === 'ACTIVE') || [];
+      if (modelList.value.some((m) => m.modelId === 'sundial')) {
+        defaultMethod = ['sundial'];
       } else {
-        defaultMethod = modelList.value.filter((item) => item.modelTypeValue === 'BUILT_IN_FORECAST')[0].modelId || '';
+        defaultMethod = [modelList.value.filter((item) => ANOMALY_DETECTION_TYPES.indexOf(item.modelType) === -1 && item.category !== 'USER-DEFINED')[0].modelId || ''];
         searchFormData.method = defaultMethod;
       }
     })
     .catch(() => {
-      defaultMethod = '';
+      defaultMethod = [];
       searchFormData.method = defaultMethod;
     });
 }
@@ -806,7 +861,7 @@ function handleSearch() {
   if (searchFormData.type !== 2) {
     const query: AIAnalysis.SearchCondition = {
       modelType: searchFormData.type === 0 ? 'BUILT_IN_FORECAST' : 'BUILT_IN_ANOMALY_DETECTION',
-      modelId: searchFormData.method,
+      modelId: searchFormData.type === 0 ? searchFormData.method : [searchFormData.method as string],
       measurement: searchFormData.measurement,
       startTime: searchFormData.type === 0 ? dayjs(searchFormData.forecastStart).valueOf() : dayjs(searchFormData.datetimerange[0]).valueOf(),
       endTime: searchFormData.type === 1 ? dayjs(searchFormData.datetimerange[1]).valueOf() : undefined,
@@ -814,21 +869,35 @@ function handleSearch() {
     };
     search(query)
       .then((res) => {
-        if ((!res.data.raw || res.data.raw.length === 0) && (!res.data.analysis || res.data.analysis.length === 0)) {
+        if ((!res.data.raw || res.data.raw.length === 0) && (!res.data.analysis || res.data.analysis[0].length === 0)) {
           ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
           setOption(chartOptions.value, true);
           return;
         }
         rawData.value = res.data.raw;
-        analysisData.value = res.data.analysis;
+        Object.keys(res.data.analysis).forEach((key: string) => {
+          analysisData.value.push({
+            modelId: key,
+            data: res.data.analysis[key],
+          });
+        });
         if (res.data.rawRange && res.data.rawRange.length > 0) {
           rawData.value = [...rawData.value, ...res.data.rawRange];
         }
         if (searchFormData.type === 0) {
-          allTableData.value = [...res.data.analysis];
+          allTableData.value = analysisData.value[0].data.map((element, index) => {
+            const dataItem: AIAnalysis.SearchDataItem = {
+              time: element.time,
+            };
+            analysisData.value.forEach((item) => {
+              dataItem[`${item.modelId}_value`] = item.data[index].value;
+            });
+            return dataItem;
+          });
         } else {
           allTableData.value = res.data.raw;
-          analysisData.value.forEach((element, index) => {
+          // 标记异常点，异常检测时仅会有一个模型
+          analysisData.value[0].data.forEach((element, index) => {
             if (element.value === '1') {
               allTableData.value[index].isAnomaly = true;
             }
@@ -862,14 +931,14 @@ function handleSearch() {
   }
 }
 
-function handleWriteBackSuccess(name: string) {
+function handleWriteBackSuccess(name: string, modelId: string) {
   writeBackLoading.value = true;
   const data = {
     modelType: copySearchFormData.type === 0 ? 'BUILT_IN_FORECAST' : 'BUILT_IN_ANOMALY_DETECTION',
     measurement: name,
     dataType: copySearchFormData.measurementType,
     raw: rawData.value,
-    analysis: analysisData.value,
+    analysis: copySearchFormData.type === 0 ? analysisData.value.find((item) => item.modelId === modelId)!.data : analysisData.value[0].data,
   };
   writeBack(data)
     .then(() => {
@@ -884,13 +953,28 @@ function handleWriteBackSuccess(name: string) {
 // 导出
 function handleExportData(exportType: string) {
   if (allTableData.value.length === 0 && tableData.value.length === 0) return;
-  if (copySearchFormData.type !== 2) {
+  if (copySearchFormData.type === 0) {
+    // 将 allTableData 表格转换为 AIAnalysis.CustomItem[]，每一列为一项{name: string, value: string[]}
+    // allTableData.value 中 每一行的数据为 key: value 的形式
+    const tableDataColumns = Object.keys(allTableData.value[0] || {}).filter((key) => key !== 'value' && key !== 'isAnomaly');
+    const data: AIAnalysis.CustomItem[] = tableDataColumns.map((column) => {
+      return {
+        name: column.endsWith('_value') ? column.substring(0, column.length - 6) + t('aiAnalysis.forecastValue') : column,
+        value: allTableData.value.map((item) => item[column] as string),
+      };
+    });
+
+    getCustomExportId({ outputs: data }).then((res) => {
+      const url = `/api/file/export${exportType !== 'csv' ? 'Excel' : ''}AnalysisCustomize?exportId=${res.data}`;
+      window.open(url);
+    });
+  } else if (copySearchFormData.type === 1) {
     const data = {
-      modelType: copySearchFormData.type === 0 ? 'BUILT_IN_FORECAST' : 'BUILT_IN_ANOMALY_DETECTION',
+      modelType: 'BUILT_IN_ANOMALY_DETECTION',
       measurement: copySearchFormData.measurement,
       dataType: copySearchFormData.measurementType,
       raw: rawData.value,
-      analysis: analysisData.value,
+      analysis: analysisData.value[0].data,
     };
     getExportId(data).then((res) => {
       const url = `/api/file/export${exportType !== 'csv' ? 'Excel' : ''}Analysis?exportId=${res.data}`;

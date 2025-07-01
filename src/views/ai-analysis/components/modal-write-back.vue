@@ -4,6 +4,11 @@
       <base-form-item :label="`${t('aiAnalysis.sourceName')}：`" prop="oldName" class="type-input-disabled el-form-item-not-mandatory">
         <el-input v-model="formData.oldName" disabled :id="`write-back-modal-old`" />
       </base-form-item>
+      <base-form-item :label="`${t('aiAnalysis.modelSelect')}：`" :placeholder="t('aiAnalysis.modelSelectPlaceholder')" prop="modelId">
+        <el-select v-model="formData.modelId" :id="`write-back-modal-model`">
+          <el-option v-for="item in props.modelIdList" :key="item" :label="item" :value="item" />
+        </el-select>
+      </base-form-item>
       <base-form-item :label="`${t('aiAnalysis.newName')}：`" prop="name">
         <el-input v-model="formData.name" :placeholder="t('common.placeHolder')" @input="handleChange" show-word-limit :id="`write-back-modal-name`" />
       </base-form-item>
@@ -37,6 +42,7 @@ const props = withDefaults(
     visible: boolean;
     saveLoading: boolean;
     oldName: string;
+    modelIdList: string[];
     nameList: string[];
   }>(),
   {}
@@ -44,7 +50,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
-  (event: 'handleSave', payload: string): void;
+  (event: 'handleSave', payload: string, modelId: string): void;
 }>();
 
 // 测点已存在
@@ -58,9 +64,11 @@ const formRef = ref<FormInstance>();
 const formData = reactive<{
   oldName: string;
   name: string;
+  modelId: string;
 }>({
   oldName: '',
   name: '',
+  modelId: '',
 });
 const formRules = reactive({
   name: [
@@ -81,6 +89,13 @@ const formRules = reactive({
       trigger: 'blur',
     },
   ],
+  modelId: [
+    {
+      required: true,
+      message: t('common.formRuleEmptyOperateShort'),
+      trigger: 'blur',
+    },
+  ],
 });
 
 function handleChange() {
@@ -95,13 +110,13 @@ function handleConfirm() {
   formRef.value?.validate((valid) => {
     if (valid) {
       if (measurementExist.value) {
-        emit('handleSave', formData.name);
+        emit('handleSave', formData.name, formData.modelId);
       } else {
         getMeasurement(formData.name).then((res) => {
           if (res.data?.measurements.length && res.data?.measurements.some((item) => item.timeseries === formData.name)) {
             measurementExist.value = true;
           } else {
-            emit('handleSave', formData.name);
+            emit('handleSave', formData.name, formData.modelId);
           }
         });
       }

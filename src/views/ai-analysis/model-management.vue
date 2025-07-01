@@ -51,11 +51,12 @@
                 >
                   <el-table-column type="selection" :reserve-selection="true" :selectable="(row) => !row.modelType.startsWith('内置模型')" width="55" />
                   <el-table-column :label="t('aiAnalysis.modelName')" prop="modelId" min-width="180" align="center" show-overflow-tooltip />
+                  <el-table-column :label="t('aiAnalysis.category')" prop="categoryString" min-width="160" align="center" show-overflow-tooltip />
                   <el-table-column :label="t('aiAnalysis.modelType')" prop="modelType" min-width="160" align="center" show-overflow-tooltip />
-                  <el-table-column :label="t('aiAnalysis.state')" prop="state" min-width="120" align="center" show-overflow-tooltip />
-                  <el-table-column :label="t('aiAnalysis.modelConfig')" prop="configs" width="160" align="center" show-overflow-tooltip>
+                  <el-table-column :label="t('aiAnalysis.state')" prop="stateString" min-width="120" align="center" show-overflow-tooltip />
+                  <el-table-column :label="t('aiAnalysis.modelConfig')" v-if="false" prop="configs" width="160" align="center" show-overflow-tooltip>
                     <template #default="{ row }">
-                      <div class="flex-center">
+                      <div class="flex justify-center items-center">
                         <div v-if="row.configs === ''">{{ t('aiAnalysis.noConfigs') }}</div>
                         <div v-else>
                           <el-button v-if="row.state === '可用'" type="primary" link size="small" @click="handleViewConfig(row)" :id="`model-management-table-${row.name}-del`">
@@ -69,10 +70,10 @@
                   <el-table-column :label="t('common.operation')" width="180" align="center" fixed="right">
                     <template #default="{ row }">
                       <div>
-                        <el-button v-if="!row.modelType.startsWith('内置模型')" type="primary" link size="small" @click="handleDel('row', row)" :id="`model-management-table-${row.name}-del`">
+                        <el-button v-if="!(row.category === 'BUILT-IN')" type="primary" link size="small" @click="handleDel('row', row)" :id="`model-management-table-${row.name}-del`">
                           {{ t('common.delete') }}
                         </el-button>
-                        <div v-else>{{ t('common.delete') }}</div>
+                        <el-tooltip effect="light" :content="t('aiAnalysis.cannotDel')" v-else>{{ t('common.delete') }}</el-tooltip>
                       </div>
                     </template>
                   </el-table-column>

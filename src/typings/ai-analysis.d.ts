@@ -2,15 +2,17 @@ declare namespace AIAnalysis {
   export interface Model {
     modelId: string;
     modelType: string;
-    modelTypeValue: string;
+    category: string;
+    categoryString: string;
     state: string;
+    stateString: string;
     configs: string;
   }
   export interface SearchCondition {
     // 业务场景(预测：BUILT_IN_FORECAST；异常检测：BUILT_IN_ANOMALY_DETECTION；自定义：USER_DEFINED)
     modelType: string;
     // 模型选择
-    modelId: string;
+    modelId: string | string[];
     // 测点
     measurement: string;
     // 开始时间
@@ -28,13 +30,20 @@ declare namespace AIAnalysis {
   }
   export interface SearchDataItem {
     time: number;
-    value: string;
+    value?: string;
+    // 预测时多模型数据，key为 modelId_value
+    [key: string]: string | number | undefined | boolean;
     isAnomaly?: boolean;
   }
   export interface SearchDataResult {
     raw: SearchDataItem[];
-    analysis: SearchDataItem[];
+    analysis: Record<string, SearchDataItem[]>;
     rawRange?: SearchDataItem[];
+  }
+
+  export interface AnalysisVo {
+    modelId: string;
+    data: SearchDataItem[];
   }
 
   export interface CustomItem {
