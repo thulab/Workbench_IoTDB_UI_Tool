@@ -25,6 +25,9 @@
               <h4 class="page-table-title">{{ t('aiAnalysis.modelList') }}</h4>
               <div class="operate-buttons">
                 <auth-tooltip :is-disabled="canUseModel" :content="'common.modelAuth'">
+                  <el-button type="primary" @click="handleFineTuning" :disabled="!canUseModel || !enableAINode" id="model-management-fineTuning">{{ t('aiAnalysis.fineTuning') }}</el-button>
+                </auth-tooltip>
+                <auth-tooltip :is-disabled="canUseModel" :content="'common.modelAuth'">
                   <el-button type="primary" @click="handleImport" :disabled="!canUseModel || !enableAINode" id="model-management-add">{{ t('aiAnalysis.importModel') }}</el-button>
                 </auth-tooltip>
                 <auth-tooltip :is-disabled="canUseModel" :content="'common.modelAuth'">
@@ -105,6 +108,8 @@
         <model-import v-model:visible="importVisible" @handle-close="handleImportClose" />
 
         <model-config v-model:visible="configVisible" ref="modelConfig" />
+
+        <modal-fine-tuning v-model:visible="fineTuningVisible" @handle-save="handleFineTuningSuccess" />
       </el-container>
     </active-container>
   </coming-soon-container>
@@ -119,6 +124,7 @@ import { AIAnalysisApi } from '@/api';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModelImport from './components/model-import.vue';
 import ModelConfig from './components/model-config.vue';
+import ModalFineTuning from './components/modal-fine-tuning.vue';
 
 const { t, locale } = useI18n();
 const userStore = useUserStore();
@@ -128,6 +134,7 @@ const connectionIsActive = computed(() => typeof connectionStore.connectionIsAct
 const { enableAINode } = storeToRefs(connectionStore);
 const importVisible = ref(false);
 const configVisible = ref(false);
+const fineTuningVisible = ref(false);
 const searchFormData = reactive({
   name: '',
 });
@@ -191,7 +198,18 @@ function handleImport() {
   importVisible.value = true;
 }
 
+function handleFineTuning() {
+  fineTuningVisible.value = true;
+}
+
 function handleImportClose(reload: boolean) {
+  if (reload) {
+    handleSearch();
+  }
+}
+
+function handleFineTuningSuccess(reload: boolean) {
+  fineTuningVisible.value = false;
   if (reload) {
     handleSearch();
   }

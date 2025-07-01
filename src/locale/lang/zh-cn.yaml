@@ -983,6 +983,7 @@ aiAnalysis:
   modelNamePlaceholder: 请输入模型名称
   modelList: 模型列表
   importModel: 导入模型
+  fineTuning: 一键微调
   modelType: 模型系列
   category: 模型类型
   state: 状态
@@ -1033,6 +1034,15 @@ aiAnalysis:
   docTip: 模型具体说明请查看文档
   measurementExist: 新测点名称已存在，数据将插入至该测点。如确认继续该操作，请点击确认并继续。
   cannotDel: 内置模型不能删除
+  sourceModel: 原模型名称
+  sourceModelPlaceholder: 请选择原模型名称
+  fineTuningModel: 微调模型名称
+  fineTuningModelPlaceholder: 请输入微调后的模型名称
+  fineTuningData: 微调数据范围
+  fineTuningDataPlaceholder: 请选择需要微调的测点
+  moreParam: 更多参数
+  superParam: 超参数
+  fineTuningSuccess: 已成功提交微调任务
 dataManage:
   schema: 结构
   table: 表

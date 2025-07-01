@@ -37,7 +37,11 @@ export default class AIAnalysisApi {
     return http.post('/file/analysisExportId', data);
   }
 
-  static getCustomExportId(data: { outputs: AIAnalysis.CustomItem[] }): HttpResponseP<String> {
+  static getCustomExportId(data: { outputs: AIAnalysis.CustomItem[] }): HttpResponseP<string> {
     return http.post('/file/analysisCustomizeExportId', data);
+  }
+
+  static fineTune(data: AIAnalysis.FineTuningData): HttpResponseP<string> {
+    return http.post('/ai-analysis/tuned', data);
   }
 }

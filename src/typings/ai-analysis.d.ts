@@ -50,4 +50,14 @@ declare namespace AIAnalysis {
     name: string;
     value: string[];
   }
+
+  export interface FineTuningData {
+    rawModelId: string;
+    tunedModelId: string;
+    // 树模型时为：测点 root.sg1.d1.s1 ; 表模型时为  database.table
+    path: string;
+    // 树模型无用; 表模型时为列名(测点列)
+    field?: string;
+    params?: string[];
+  }
 }
