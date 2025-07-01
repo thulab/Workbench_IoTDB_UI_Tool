@@ -8,44 +8,51 @@
       <span class="m-l-8">{{ t('dataManage.data') }}</span>
     </h4>
     <el-header class="search-form-wrapper p-0" style="height: auto">
-      <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-        <base-form-item prop="path" :label="t('dataManage.columnName')">
-          <columns-select
-            v-model="searchFormData.columns"
-            :disabled-select="getListLoading"
-            :placeholder="t('dataManage.selectColumnPlaceholder')"
-            :view-text="t('dataManage.columnsSelected')"
-            :current-node="currentNode"
-            id="data-search-path"
-            @handle-change-path="handleChangePath"
-          />
-        </base-form-item>
-        <el-form-item :label="`${t('search.searchTime')}：`" prop="time">
-          <div class="search-time-wrapper">
-            <el-date-picker
-              v-model="searchFormData.datetimerange"
-              type="datetimerange"
-              range-separator="-"
-              unlink-panels
-              :disabled-date="disabledDate"
-              :shortcuts="shortcutsDaterange"
-              :clearable="false"
-              :prefix-icon="ICustomCalender"
-              :start-placeholder="t('search.startTime')"
-              :end-placeholder="t('search.endTime')"
-              id="data-search-datetimerange"
-              :disabled="getListLoading"
-            />
-          </div>
-        </el-form-item>
-      </el-form>
-      <div class="search-form-buttons">
-        <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
-          <el-button @click="handleReset(true)" :disabled="getListLoading || !canReadWriteData" id="data-search-reset">{{ t('common.reset') }}</el-button>
-        </auth-tooltip>
-        <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
-          <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="data-search-search">{{ getListLoading ? t('common.cancelQuery') : t('common.query') }}</el-button>
-        </auth-tooltip>
+      <div style="display: flex; align-items: center; width: 100%">
+        <div style="flex: 1">
+          <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
+            <div style="display: flex; align-items: center">
+              <base-form-item prop="path" :label="t('dataManage.columnName')">
+                <columns-select
+                  v-model="searchFormData.columns"
+                  :disabled-select="getListLoading"
+                  :placeholder="t('dataManage.selectColumnPlaceholder')"
+                  :view-text="t('dataManage.columnsSelected')"
+                  :current-node="currentNode"
+                  :select-width="220"
+                  id="data-search-path"
+                  @handle-change-path="handleChangePath"
+                />
+              </base-form-item>
+              <el-form-item :label="`${t('search.searchTime')}：`" prop="time">
+                <div class="search-time-wrapper">
+                  <el-date-picker
+                    v-model="searchFormData.datetimerange"
+                    type="datetimerange"
+                    range-separator="-"
+                    unlink-panels
+                    :disabled-date="disabledDate"
+                    :shortcuts="shortcutsDaterange"
+                    :clearable="false"
+                    :prefix-icon="ICustomCalender"
+                    :start-placeholder="t('search.startTime')"
+                    :end-placeholder="t('search.endTime')"
+                    id="data-search-datetimerange"
+                    :disabled="getListLoading"
+                  />
+                </div>
+              </el-form-item>
+            </div>
+          </el-form>
+        </div>
+        <div class="search-form-buttons">
+          <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
+            <el-button @click="handleReset(true)" :disabled="getListLoading || !canReadWriteData" id="data-search-reset">{{ t('common.reset') }}</el-button>
+          </auth-tooltip>
+          <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
+            <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="data-search-search">{{ getListLoading ? t('common.cancelQuery') : t('common.query') }}</el-button>
+          </auth-tooltip>
+        </div>
       </div>
     </el-header>
 

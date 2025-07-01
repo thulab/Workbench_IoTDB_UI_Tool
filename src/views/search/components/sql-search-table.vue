@@ -33,7 +33,7 @@
         <div v-if="codeMirrorReady">
           <h4 style="font-size: 14px; font-weight: 700; color: #495ad4; margin: 0 0 12px">{{ t('search.quickActions') }}</h4>
           <el-tabs v-model="activeNameSide" class="tabs-nav-aside">
-            <el-tab-pane :label="t('search.object')" name="data">
+            <el-tab-pane :label="t('measurement.measurement')" name="data">
               <side-table-schema @get-function="getFunction" />
             </el-tab-pane>
             <el-tab-pane :label="t('search.function')" name="function">
