@@ -112,7 +112,7 @@
         </el-table-column>
         <el-table-column :label="t('common.operation')" width="240" align="center" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link size="small" @click="handleDelRow('row', row)" :disabled="isSystemDatabase" :id="`mesaurement-table-${row.nodeName}-del`">
+            <el-button type="primary" link size="small" @click="handleDelRow('row', row)" :disabled="isSystemDatabase" :id="`mesaurement-table-${row.tableName}-del`">
               {{ t('common.delete') }}
             </el-button>
           </template>
@@ -175,10 +175,6 @@ const props = defineProps<{
   currentNode: IoTDB.TreeNodeData;
 }>();
 
-// const emit = defineEmits<{
-//   (event: 'handleReload'): void;
-// }>();
-
 const sqlPreviewRef = ref<InstanceType<typeof SqlPreview>>();
 
 const { t } = useI18n();
@@ -196,7 +192,7 @@ const modalCommentVisible = ref(false);
 const currentTable = ref<IoTDB.TableVO>();
 const modalTTLNum = ref(0);
 const ttlType = ref('db'); // 'db' or 'table'
-const multipleSelection = ref<IoTDB.TreeNodeData[]>([]);
+const multipleSelection = ref<IoTDB.TableVO[]>([]);
 const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
 const currentPage = ref(1);
 const pageSize = ref(10);
@@ -263,12 +259,13 @@ function handleRefresh() {
   });
 }
 
-function handleSelectionChange(vals: IoTDB.TreeNodeData[]) {
-  multipleSelection.value = vals.filter((item) => item.nodeType === 'TABLE');
+function handleSelectionChange(vals: IoTDB.TableVO[]) {
+  console.log('----vals: ', vals);
+  multipleSelection.value = vals;
 }
 
-function handleDelRow(type: string, row: IoTDB.TreeNodeData | null) {
-  ElMessageBox.confirm(type === 'batch' ? `${t('dataManage.delDbBatchTip')}` : `${t('dataManage.delDbSingleTip')}`, t('common.notice'), {
+function handleDelRow(type: string, row: IoTDB.TableVO | null) {
+  ElMessageBox.confirm(type === 'batch' ? `${t('dataManage.delTableBatchTip')}` : `${t('dataManage.delTableSingleTip')}`, t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),
     confirmButtonClass: 'mesaurement-table-del-confirm',
@@ -278,11 +275,11 @@ function handleDelRow(type: string, row: IoTDB.TreeNodeData | null) {
   }).then(() => {
     let measurementList = [];
     if (type === 'batch') {
-      measurementList = multipleSelection.value?.map((i) => i.nodeName);
+      measurementList = multipleSelection.value?.map((i) => i.tableName);
     } else {
-      measurementList = row?.nodeName ? [row.nodeName] : [];
+      measurementList = row?.tableName ? [row.tableName] : [];
     }
-    deleteTables(measurementList).then(() => {
+    deleteTables(props.currentNode.nodeName, measurementList).then(() => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
       handleRefresh();
     });

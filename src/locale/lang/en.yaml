@@ -1150,8 +1150,8 @@ dataManage:
   invalidNameFormat: Invalid name format
   addDatabaseSuccess: Database created successfully
   ttlUpdated: TTL updated
-  delDbSingleTip: This will delete the table and all its data. Proceed?
-  delDbBatchTip: This will delete these tables and all their data. Proceed?
+  delTableSingleTip: This will delete the table and all its data. Proceed?
+  delTableBatchTip: This will delete these tables and all their data. Proceed?
   delColumnSingleTip: This will delete the column and all its data. Proceed?
   delColumnBatchTip: This will delete these columns and all their data. Proceed?
   addCloumn: Add Column

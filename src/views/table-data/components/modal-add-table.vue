@@ -351,6 +351,8 @@ function resetFormData() {
   formData.tableName = '';
   formData.ttl = '';
   formData.columns = [];
+  formDataBody.value.database = '';
+  formDataBody.value.tables = [];
 }
 
 // 暴露方法供父组件调用

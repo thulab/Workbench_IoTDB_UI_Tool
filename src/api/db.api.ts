@@ -36,8 +36,8 @@ class IoTDBApi {
   }
 
   // 删除表
-  static deleteTables(tables: string[]): HttpResponseP {
-    return http.post('/relational/schema/deleteTable', tables);
+  static deleteTables(database: string, tables: string[]): HttpResponseP {
+    return http.post('/relational/schema/deleteTables', { database, tables });
   }
 
   // 创建表

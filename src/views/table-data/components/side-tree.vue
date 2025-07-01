@@ -112,10 +112,12 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { useUserStore, useDbStore } from '@/stores';
+import { IoTDBApi } from '@/api';
 import { type ElTreeV2 } from 'element-plus';
 import { cloneDeep } from 'lodash-es';
 import ModalAddDb from './modal-add-db.vue';
 import ModalAddTable from './modal-add-table.vue';
+import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
 const emit = defineEmits<{
   (event: 'handleNodeClick', nodeInfo: IoTDB.TreeNodeData): void;
@@ -127,9 +129,12 @@ const userStore = useUserStore();
 const searchText = ref('');
 const searching = ref(false);
 const currentNode = ref<IoTDB.TreeNodeData>();
+const lastNodeShow = ref<IoTDB.TreeNodeData>();
 const modalAddDbVisible = ref(false);
 const treeHeight = ref(document.body.clientHeight - 48 - 16 - 36 - 16 - 46);
 const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
+const { requestFn: deleteDatabase } = useRequest(IoTDBApi.deleteDatabase);
+const { requestFn: deleteTables } = useRequest(IoTDBApi.deleteTables);
 
 const { canReadWriteData } = storeToRefs(userStore);
 const { treeData, databaseNames } = storeToRefs(useDbStore());
@@ -211,12 +216,57 @@ function handleAddDB() {
   modalAddDbVisible.value = true;
 }
 
+// 删除数据库
+function handleDelDb(dbNode: IoTDB.TreeNodeData) {
+  ElMessageBox.confirm(t('dataManage.delDbSingleTip'), t('common.notice'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
+    confirmButtonClass: 'mesaurement-table-del-confirm',
+    cancelButtonClass: 'mesaurement-table-del-cancel',
+    type: 'warning',
+    icon: ICustomMessageWarning,
+  }).then(() => {
+    deleteDatabase(dbNode.nodeName).then(() => {
+      ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
+      if (dbNode.nodeName === lastNodeShow.value?.database) {
+        setDefaultTreeExpandKeys();
+      } else {
+        handleRefresh();
+      }
+    });
+  });
+}
+
+function handleDelTable(tableNode: IoTDB.TreeNodeData) {
+  ElMessageBox.confirm(t('dataManage.delTableSingleTip'), t('common.notice'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
+    confirmButtonClass: 'mesaurement-table-del-confirm',
+    cancelButtonClass: 'mesaurement-table-del-cancel',
+    type: 'warning',
+    icon: ICustomMessageWarning,
+  }).then(() => {
+    const delTableList = tableNode?.nodeName ? [tableNode.nodeName] : [];
+    deleteTables(tableNode.database!, delTableList).then(() => {
+      ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
+      if (tableNode.nodeName === lastNodeShow.value?.nodeName) {
+        setDefaultTreeExpandKeys();
+      } else {
+        handleRefresh();
+      }
+    });
+  });
+}
+
 function handleDatabaseOptionClick(command: string, node: IoTDB.TreeNodeData) {
   currentNode.value = node;
   if (command === 'dbSchema') {
     emit('handleNodeClick', currentNode.value);
+    lastNodeShow.value = cloneDeep(node);
   } else if (command === 'addTable') {
     showAddTableDialog(currentNode.value, 'addTable');
+  } else if (command === 'dbDelete') {
+    handleDelDb(node);
   }
 }
 
@@ -224,11 +274,15 @@ function handleTableOptionClick(command: string, node: IoTDB.TreeNodeData) {
   currentNode.value = cloneDeep(node);
   if (command === 'tableData') {
     currentNode.value.nodeType = 'TABLEDATA';
+    lastNodeShow.value = cloneDeep(node);
     emit('handleNodeClick', currentNode.value);
   } else if (command === 'tableSchema') {
     emit('handleNodeClick', currentNode.value);
+    lastNodeShow.value = cloneDeep(node);
   } else if (command === 'addCloumn') {
     showAddTableDialog(currentNode.value, 'addColumn');
+  } else if (command === 'tableDelete') {
+    handleDelTable(node);
   }
 }
 </script>
