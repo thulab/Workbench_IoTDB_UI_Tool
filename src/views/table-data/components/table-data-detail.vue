@@ -126,7 +126,7 @@ import { cloneDeep } from 'lodash-es';
 import { useTableHeight, useShortcutsDate } from '@/composition-api';
 import { TableDataApi } from '@/api';
 import { todayNow, formatDate } from '@/utils/date';
-import { useUserStore } from '@/stores';
+import { useUserStore, useDbStore } from '@/stores';
 import DynamicEditTable from '@/components/dynamic-edit-table.vue';
 import SqlPreview from '@/components/sql-preview.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
@@ -145,6 +145,7 @@ const route = useRoute();
 const userStore = useUserStore();
 const { canReadWriteData, canWriteData } = storeToRefs(userStore);
 const { maxTableHeight } = useTableHeight(440);
+const { getDatabases } = useDbStore();
 
 const searchFormRef = ref<FormInstance>();
 const firstLoad = ref(true);
@@ -180,6 +181,7 @@ const disabledDate = (time: number) => time < new Date('1970-1-1').getTime();
 const searchDetailInfos = ref<Partial<Search.QueryDataResult>>({});
 const hasNext = ref(false);
 const columns = ref<DynamicTableColumn[]>([]);
+const columnTypes = ref<string[]>([]);
 const tableData = ref<Record<string, any>[]>([]);
 const pagination = reactive({
   pageSize: 10,
@@ -264,6 +266,7 @@ function getListData() {
         });
         return obj;
       });
+      columnTypes.value = res.data?.value.metaDataTypeList ? res.data?.value.metaDataTypeList : [];
       hasNext.value = res.data?.value.hasNext;
       searchDetailInfos.value = res.data.value || {};
       handleAppendSql(res.data.sql);
@@ -430,15 +433,29 @@ function handleInsert() {
   dynamicEditTableRef.value?.newRow();
 }
 
+// 将值自动加单引号
+function processValues(values: string[], types: string[]): string[] {
+  return values.map((value, index) => {
+    const currentType = types[index]?.toUpperCase();
+
+    if (['STRING', 'BLOB', 'TEXT'].includes(currentType)) {
+      return `'${value}'`;
+    }
+    return value;
+  });
+}
+
 function handleSave(row: Record<string, any>) {
   const copyRow = cloneDeep(row);
   delete copyRow.editable;
   delete copyRow.isNew;
+  const valueList = Object.values(copyRow);
+  const processedValues = processValues(valueList, columnTypes.value);
   const data = {
     database: props.currentNode.database!,
     tableName: props.currentNode.nodeName!,
     metaDataList: Object.keys(copyRow),
-    valueList: Object.values(copyRow),
+    valueList: processedValues,
   } as IoTDB.InsertTableDataReq;
   insertTableData(data).then((resp) => {
     ElMessage.success({ message: t('common.submitSuccess'), grouping: true });
@@ -495,8 +512,13 @@ watch(
   }
 );
 
+function handleRefresh() {
+  getDatabases();
+  handleSearch();
+}
+
 defineExpose({
-  handleSearch,
+  handleRefresh,
 });
 </script>
 

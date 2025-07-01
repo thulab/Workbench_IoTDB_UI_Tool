@@ -21,6 +21,7 @@ declare namespace Search {
     currentPage: number;
     currentColumnPage: number;
     metaDataList: string[];
+    metaDataTypeList?: string[];
     typeList: DataType[];
     valueList: string[][];
     queryTime: string;

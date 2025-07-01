@@ -37,7 +37,7 @@ function handleNodeClick(nodeInfo: IoTDB.TreeNodeData) {
 function handleUploadDetail() {
   dbDtail?.value?.handleRefresh();
   tableDtail?.value?.handleRefresh();
-  tableDataDtail?.value?.handleSearch();
+  tableDataDtail?.value?.handleRefresh();
 }
 </script>
 

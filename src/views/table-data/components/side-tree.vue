@@ -11,7 +11,7 @@
           class="measurement-tree-search-input"
         />
 
-        <el-button link @click="handleRefresh()" :disabled="searching" id="db-tree-refresh" class="svg-button-hover-color m-l-16">
+        <el-button link @click="handleRefresh" :disabled="searching" id="db-tree-refresh" class="svg-button-hover-color m-l-16">
           <i-custom-border-refresh style="width: 24px; height: 24px" />
         </el-button>
         <el-button link @click="handleAddDB()" :disabled="searching" id="db-tree-add-db" class="svg-button-hover-color m-l-16">
