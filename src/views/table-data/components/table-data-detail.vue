@@ -123,7 +123,7 @@ import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import { cloneDeep } from 'lodash-es';
 import { useTableHeight, useShortcutsDate } from '@/composition-api';
-import { TableDataApi, IoTDBApi } from '@/api';
+import { TableDataApi } from '@/api';
 import { todayNow, formatDate } from '@/utils/date';
 import { useUserStore } from '@/stores';
 import DynamicEditTable from '@/components/dynamic-edit-table.vue';
@@ -207,7 +207,7 @@ function handleAppendSql(sql: string) {
 const { requestFn: getList } = useRequest(TableDataApi.getTableData);
 const { requestFn: deleteTableData } = useRequest(TableDataApi.deleteTableData);
 const { requestFn: insertTableData } = useRequest(TableDataApi.insertTableData);
-const { requestFn: exportTableData } = useRequest(IoTDBApi.exportTableData);
+// const { requestFn: exportTableData } = useRequest(IoTDBApi.exportTableData);
 
 let controller = new AbortController();
 
@@ -286,24 +286,25 @@ function handleImport() {
 }
 
 // 导出
-function handleExportData(exportType: string) {
-  exportTableData({
-    pathName: props.currentNode.parentName,
-    keyword: searchKeyword.value,
-    type: searchType.value,
-    ...pagination,
-  }).then((res) => {
-    let url = `/api/file/exportExcelMeasurementData?exportId=${res.data}`;
-    if (exportType === 'csv') {
-      url = `/api/file/exportCSVMeasurementData?exportId=${res.data}`;
-    }
-    window.open(url);
-  });
-}
+// function handleExportData(exportType: string) {
+//   exportTableData({
+//     pathName: props.currentNode.parentName,
+//     keyword: searchKeyword.value,
+//     type: searchType.value,
+//     ...pagination,
+//   }).then((res) => {
+//     let url = `/api/file/exportExcelMeasurementData?exportId=${res.data}`;
+//     if (exportType === 'csv') {
+//       url = `/api/file/exportCSVMeasurementData?exportId=${res.data}`;
+//     }
+//     window.open(url);
+//   });
+// }
 
 // 下载
 function handleCommandDown(val: string) {
-  handleExportData(val);
+  // handleExportData(val);
+  console.log(val);
 }
 
 // 重置
