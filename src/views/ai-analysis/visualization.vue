@@ -846,6 +846,16 @@ function getCustom() {
     });
 }
 
+const realMotheds = computed<string[]>(() => {
+  if (searchFormData.type === 0) {
+    return copySearchFormData.method as string[];
+  }
+  if (searchFormData.type === 1) {
+    return [copySearchFormData.method] as string[];
+  }
+  return [];
+});
+
 // 查询
 function handleSearch() {
   if (!canReadWriteData.value) return;
@@ -875,7 +885,7 @@ function handleSearch() {
           return;
         }
         rawData.value = res.data.raw;
-        Object.keys(res.data.analysis).forEach((key: string) => {
+        realMotheds.value.forEach((key: string) => {
           analysisData.value.push({
             modelId: key,
             data: res.data.analysis[key],
