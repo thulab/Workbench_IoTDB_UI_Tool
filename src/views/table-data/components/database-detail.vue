@@ -260,7 +260,6 @@ function handleRefresh() {
 }
 
 function handleSelectionChange(vals: IoTDB.TableVO[]) {
-  console.log('----vals: ', vals);
   multipleSelection.value = vals;
 }
 
