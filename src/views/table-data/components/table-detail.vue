@@ -169,14 +169,20 @@ function showAddTableDialog() {
 }
 
 const columnDataFilter = computed(() => {
-  if (columnVOS.value?.value && columnVOS.value.value.length) {
-    return columnVOS.value.value.filter((item) =>
-      searchType.value === 'columnName'
-        ? item.columnName.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase())
-        : item.comment?.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase())
-    );
-  }
-  return [];
+  if (!columnVOS.value?.value?.length) return [];
+  const filteredData = columnVOS.value.value.filter((item) =>
+    searchType.value === 'columnName' ? item.columnName.toLowerCase().includes(searchKeyword.value.toLowerCase()) : item.comment?.toLowerCase().includes(searchKeyword.value.toLowerCase())
+  );
+
+  return filteredData.sort((a, b) => {
+    const categoryOrder = ['TIME', 'TAG', 'ATTRIBUTE', 'FIELD'];
+    const indexA = categoryOrder.indexOf(a.cateGory);
+    const indexB = categoryOrder.indexOf(b.cateGory);
+    if (indexA !== indexB) {
+      return indexA - indexB;
+    }
+    return a.columnName.localeCompare(b.columnName);
+  });
 });
 
 const tableDataPagination = computed(() => {

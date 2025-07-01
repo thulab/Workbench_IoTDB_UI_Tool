@@ -29,15 +29,29 @@ export const useDbStore = defineStore('db', () => {
           nodeType: 'TABLE',
           comment: table.tableVO.comment === 'null' ? '' : table.tableVO.comment,
           ttl: table.tableVO.ttl,
-          children: table.columnVOS.map((col) => ({
-            nodeName: col.columnName,
-            database: db.database,
-            parentName: table.tableVO.tableName,
-            comment: col.comment === 'null' ? '' : col.comment,
-            dataType: col.dataType,
-            cateGory: col.cateGory,
-            nodeType: col.cateGory as IoTDB.TreeNodeData['nodeType'],
-          })),
+          children: table.columnVOS
+            .map((col) => ({
+              nodeName: col.columnName,
+              database: db.database,
+              parentName: table.tableVO.tableName,
+              comment: col.comment === 'null' ? '' : col.comment,
+              dataType: col.dataType,
+              cateGory: col.cateGory,
+              nodeType: col.cateGory as IoTDB.TreeNodeData['nodeType'],
+            }))
+            .sort((a, b) => {
+              // 定义排序优先级
+              const categoryOrder = ['TIME', 'TAG', 'ATTRIBUTE', 'FIELD'];
+              // 获取两个元素的类别索引
+              const indexA = categoryOrder.indexOf(a.cateGory);
+              const indexB = categoryOrder.indexOf(b.cateGory);
+              // 如果类别不同，按类别优先级排序
+              if (indexA !== indexB) {
+                return indexA - indexB;
+              }
+              // 如果类别相同，按nodeName字母排序
+              return a.nodeName.localeCompare(b.nodeName);
+            }),
         };
         dbNode.children?.push(tableNode);
       });
