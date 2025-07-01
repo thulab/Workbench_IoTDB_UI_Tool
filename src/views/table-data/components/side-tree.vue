@@ -130,6 +130,7 @@ const userStore = useUserStore();
 const searchText = ref('');
 const searching = ref(false);
 const currentNode = ref<IoTDB.TreeNodeData>();
+const currentNodeShow = ref<IoTDB.TreeNodeData>();
 const modalAddDbVisible = ref(false);
 const treeHeight = ref(document.body.clientHeight - 150);
 const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
@@ -228,7 +229,11 @@ function handleDelDb(dbNode: IoTDB.TreeNodeData) {
   }).then(() => {
     deleteDatabase(dbNode.nodeName).then(() => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
-      handleRefresh();
+      if (currentNodeShow.value?.nodeName === currentNode.value?.database) {
+        setDefaultTreeExpandKeys();
+      } else {
+        handleRefresh();
+      }
     });
   });
 }
@@ -245,7 +250,11 @@ function handleDelTable(tableNode: IoTDB.TreeNodeData) {
     const delTableList = tableNode?.nodeName ? [tableNode.nodeName] : [];
     deleteTables(tableNode.database!, delTableList).then(() => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
-      handleRefresh();
+      if (currentNodeShow.value?.nodeName === currentNode.value?.nodeName) {
+        setDefaultTreeExpandKeys();
+      } else {
+        handleRefresh();
+      }
     });
   });
 }
@@ -253,6 +262,7 @@ function handleDelTable(tableNode: IoTDB.TreeNodeData) {
 function handleDatabaseOptionClick(command: string, node: IoTDB.TreeNodeData) {
   currentNode.value = node;
   if (command === 'dbSchema') {
+    currentNodeShow.value = cloneDeep(node);
     emit('handleNodeClick', currentNode.value);
   } else if (command === 'addTable') {
     showAddTableDialog(currentNode.value, 'addTable');
@@ -264,9 +274,11 @@ function handleDatabaseOptionClick(command: string, node: IoTDB.TreeNodeData) {
 function handleTableOptionClick(command: string, node: IoTDB.TreeNodeData) {
   currentNode.value = cloneDeep(node);
   if (command === 'tableData') {
+    currentNodeShow.value = cloneDeep(node);
     currentNode.value.nodeType = 'TABLEDATA';
     emit('handleNodeClick', currentNode.value);
   } else if (command === 'tableSchema') {
+    currentNodeShow.value = cloneDeep(node);
     emit('handleNodeClick', currentNode.value);
   } else if (command === 'addCloumn') {
     showAddTableDialog(currentNode.value, 'addColumn');
