@@ -84,11 +84,20 @@ function setContent(val: string) {
   }
 }
 
+function setScrollToButtom() {
+  const editor = toRaw(monacoEditor.value);
+  if (editor) {
+    const height = editor.getContentHeight();
+    editor.setScrollPosition({ scrollTop: height });
+  }
+}
+
 defineExpose({
   monacoEditor,
   initEditor,
   getContent,
   setContent,
+  setScrollToButtom,
 });
 </script>
 <style lang="scss" scoped>

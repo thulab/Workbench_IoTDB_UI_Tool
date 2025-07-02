@@ -1,15 +1,13 @@
 <template>
   <div class="sql-statement">
-    <el-scrollbar ref="scrollbarRef">
-      <div ref="innerRef">{{ sqls }}</div>
-    </el-scrollbar>
+    <monaco-editor ref="innerRef" :read-only="true" />
     <el-icon size="24" @click="copySql" class="svg-button-hover-color copy-icon"><i-custom-copy /></el-icon>
   </div>
 </template>
 
 <script setup lang="ts">
-import { type ScrollbarInstance } from 'element-plus';
 import { useClipboard } from '@vueuse/core';
+import MonacoEditor from '@/components/monaco-editor/monaco-editor.vue';
 
 const { t } = useI18n();
 const props = defineProps<{
@@ -17,8 +15,7 @@ const props = defineProps<{
 }>();
 
 const sqls = ref(props.sql || '');
-const innerRef = ref<HTMLDivElement>();
-const scrollbarRef = ref<ScrollbarInstance>();
+const innerRef = ref<InstanceType<typeof MonacoEditor>>();
 
 const { copy } = useClipboard({ source: sqls });
 
@@ -28,7 +25,8 @@ const appendSql = (sql: string, prefix?: string) => {
   }
   if (prefix) sqls.value += `${prefix} `;
   sqls.value += sql;
-  scrollbarRef.value?.scrollTo({ top: innerRef.value?.clientHeight || 0, behavior: 'smooth' });
+  innerRef.value?.setContent(sqls.value);
+  innerRef.value?.setScrollToButtom();
 };
 
 const copySql = () => {
@@ -48,16 +46,12 @@ defineExpose({
 
 <style lang="scss" scoped>
 .sql-statement {
-  padding: 4px 0 4px 16px;
-  font-size: 12px;
   border-radius: 2px;
   height: 100px;
-  margin: 0 16px;
+  margin: 16px 0 0 !important;
   position: relative;
   white-space: pre;
   line-height: 1.5;
-  background-color: #f7f8fc;
-  color: #424561;
 
   .copy-icon {
     position: absolute;

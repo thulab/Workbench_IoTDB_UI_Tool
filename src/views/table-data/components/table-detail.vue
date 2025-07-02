@@ -261,7 +261,8 @@ defineExpose({
 .database-detail-wrapper {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: calc(100% - 32px);
+  padding: 16px;
 }
 
 .info-title {
@@ -269,7 +270,7 @@ defineExpose({
   font-weight: 700;
   line-height: 21px;
   color: #495ad4;
-  padding: 14px 0 6px 16px;
+  padding-bottom: 6px;
   border-bottom: 1px solid #dfe1ed;
   display: flex;
   align-items: center;
@@ -278,7 +279,7 @@ defineExpose({
 .database-info-box {
   display: flex;
   justify-content: space-between;
-  padding: 8px 16px;
+  padding: 8px 0;
 }
 
 .database-info-list {
@@ -308,7 +309,7 @@ defineExpose({
 .search-form-container {
   display: flex;
   justify-content: space-between;
-  padding: 16px;
+  padding: 16px 0;
 
   .search-form-box {
     display: flex;
@@ -323,7 +324,6 @@ defineExpose({
 }
 
 .storage-table-box {
-  margin: 0 16px 16px;
   padding: 16px;
   background-color: #f7f8fc;
 }

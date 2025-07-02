@@ -116,9 +116,9 @@
           />
           <div class="table-error-wrapper" v-if="searchDetailInfos.errMsg">Msg: {{ searchDetailInfos.errMsg }}</div>
         </div>
-        <sql-preview ref="sqlPreviewRef" style="margin: 8px 0 0; background-color: #fff" />
       </auth-container>
     </el-main>
+    <sql-preview ref="sqlPreviewRef" style="margin: 8px 0 0; background-color: #fff" />
 
     <modal-import-data v-model:visible="importVisible" :current-node="currentNode" @handle-close="handleImportClose" />
   </el-container>
@@ -535,7 +535,7 @@ defineExpose({
   font-weight: 700;
   line-height: 21px;
   color: #495ad4;
-  padding: 14px 0 6px;
+  padding: 0 6px 16px;
   border-bottom: 1px solid #dfe1ed;
   display: flex;
   align-items: center;
