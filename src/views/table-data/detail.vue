@@ -31,7 +31,6 @@ const tableDataDtail = ref<InstanceType<typeof TableDataDetail>>();
 
 function handleNodeClick(nodeInfo: IoTDB.TreeNodeData) {
   currentNode.value = nodeInfo;
-  console.log('======firstNode recive', currentNode.value);
   detailKey.value++;
 }
 

@@ -238,7 +238,10 @@ function getListData() {
     {
       database: props.currentNode.database!,
       tableName: props.currentNode.nodeName!,
-      columnNames: copySearchFormData.value.columns && copySearchFormData.value.columns.length > 0 ? ['time', ...copySearchFormData.value.columns] : undefined,
+      columnNames:
+        copySearchFormData.value.columns && copySearchFormData.value.columns.length > 0
+          ? ['time', ...copySearchFormData.value.columns]
+          : [...(props.currentNode.children?.map((item) => item.nodeName) || [])],
       startTime,
       endTime,
       size: 1000,
