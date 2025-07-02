@@ -1,7 +1,7 @@
 <template>
   <div class="database-page-container">
     <div class="database-list-wrapper">
-      <side-tree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" @handle-node-click="handleNodeClick" @upload-detail="handleUploadDetail" />
+      <side-tree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" @handle-node-click="handleNodeClick" @update-detail="handleUpdateDetail" />
     </div>
 
     <div class="database-details-wrapper" :key="detailKey">
@@ -31,10 +31,11 @@ const tableDataDtail = ref<InstanceType<typeof TableDataDetail>>();
 
 function handleNodeClick(nodeInfo: IoTDB.TreeNodeData) {
   currentNode.value = nodeInfo;
+  console.log('======firstNode recive', currentNode.value);
   detailKey.value++;
 }
 
-function handleUploadDetail() {
+function handleUpdateDetail() {
   dbDtail?.value?.handleRefresh();
   tableDtail?.value?.handleRefresh();
   tableDataDtail?.value?.handleRefresh();

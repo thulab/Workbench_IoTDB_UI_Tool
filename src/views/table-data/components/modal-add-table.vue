@@ -102,6 +102,7 @@
 import type { FormInstance } from 'element-plus';
 import { ref, reactive, computed } from 'vue';
 import { IoTDBApi } from '@/api';
+import { useDbStore } from '@/stores';
 
 const emit = defineEmits<{
   (event: 'handleReload'): void;
@@ -114,6 +115,7 @@ const { requestFn: saveTable } = useRequest(IoTDBApi.saveTable);
 const { requestFn: saveColumns } = useRequest(IoTDBApi.saveColumns);
 const addType = ref('addTable'); // addTable or addColumn
 const activeName = ref('measurement_0');
+const { setFirstLoad } = useDbStore();
 
 const columnTypeOptions = [
   { label: 'TAG（标签列）', value: 'TAG' },
@@ -333,12 +335,14 @@ const handleConfirm = async () => {
     saveTable(formDataBody.value).then(() => {
       ElMessage.success('表创建成功');
       dialogVisible.value = false;
+      setFirstLoad(true);
       emit('handleReload');
     });
   } else {
     saveColumns(formDataBody.value).then(() => {
       ElMessage.success('添加成功');
       dialogVisible.value = false;
+      setFirstLoad(true);
       emit('handleReload');
     });
   }

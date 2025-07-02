@@ -12,7 +12,9 @@
       <div class="select-file-box" v-if="activeStep === 0">
         <div class="select-item-box" style="align-items: center">
           <span class="select-item-label">{{ t('common.downloadTemplate') }}：</span>
-          <a href="/api/file/exportMeasurementTemplate" class="template-button" target="_blank">Data_template.csv</a>
+          <a :href="`/api/file/exportDataTemplateTable?database=${currentNode.database}&tableName=${currentNode.nodeName}`" class="template-button" target="_blank" rel="noopener noreferrer">
+            data_template.csv
+          </a>
         </div>
         <div class="select-item-box">
           <span class="select-item-label">{{ t('common.importFile') }}：</span>
@@ -96,6 +98,7 @@ import { StorageApi } from '@/api';
 
 const props = defineProps<{
   visible: boolean;
+  currentNode: IoTDB.TreeNodeData;
 }>();
 
 const emit = defineEmits<{

@@ -26,6 +26,7 @@
 <script setup lang="ts">
 import type { FormInstance, FormRules } from 'element-plus';
 import IoTDBApi from '@/api/db.api';
+import { useDbStore } from '@/stores';
 
 const formRef = ref<FormInstance>();
 
@@ -42,6 +43,7 @@ const errorName = ref<string | null>(null);
 const { t, locale } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const formKey = ref(0);
+const { setFirstLoad } = useDbStore();
 
 const formData = reactive({
   databaseName: '',
@@ -103,6 +105,7 @@ const handleConfirm = () => {
       saveDatabase(formData.databaseName, formData.ttl, formData.ttlUnit).then(() => {
         ElMessage.success({ message: t('dataManage.addDatabaseSuccess'), grouping: true });
         dialogVisible.value = false;
+        setFirstLoad(true);
         emit('handleSave', formData.databaseName);
       });
     }

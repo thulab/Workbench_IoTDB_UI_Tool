@@ -120,7 +120,7 @@
       </auth-container>
     </el-main>
 
-    <modal-import-data v-model:visible="importVisible" @handle-close="handleImportClose" />
+    <modal-import-data v-model:visible="importVisible" :current-node="currentNode" @handle-close="handleImportClose" />
   </el-container>
 </template>
 

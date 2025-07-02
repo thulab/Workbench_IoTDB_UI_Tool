@@ -8,11 +8,13 @@ export const useDbStore = defineStore('db', () => {
   const databases = ref<IoTDB.DatabaseRes>();
   const databaseNames = ref<string[]>([]);
   const connectionStore = useConnectionStore();
+  const firstLoad = ref(true);
 
   async function getDatabases() {
-    if (connectionStore.isTableModel) {
+    if (connectionStore.isTableModel && firstLoad.value) {
       await fetchDatabases();
       databases.value = schemaTreeData.value;
+      firstLoad.value = false;
     }
   }
 
@@ -68,10 +70,22 @@ export const useDbStore = defineStore('db', () => {
     return data;
   });
 
+  function setFirstLoad(value: boolean) {
+    firstLoad.value = value;
+  }
+
+  watch(
+    () => connectionStore.isTableModel,
+    async () => {
+      await getDatabases();
+    }
+  );
+
   return {
     treeData,
     databaseNames,
     getDatabases,
+    setFirstLoad,
   };
 });
 

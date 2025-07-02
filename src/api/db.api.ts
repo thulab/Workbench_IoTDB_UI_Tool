@@ -62,14 +62,14 @@ class IoTDBApi {
   // 导入表数据
   static importTableData(data: FormData, fileType: string = 'csv'): HttpResponseP<StorageDevice.ImportMeasurementDataRes> {
     if (fileType === 'csv') {
-      return http.post('/file/importMeasurementCSVData', data, { timeout: 60 * 30 * 1000 });
+      return http.post('/file/importTableDataCSVData', data, { timeout: 60 * 30 * 1000 });
     }
-    return http.post('/file/importMeasurementExcelData', data, { timeout: 60 * 30 * 1000 });
+    return http.post('/file/importTableDataExcelData', data, { timeout: 60 * 30 * 1000 });
   }
 
   // 导出表数据
   static exportTableData(data: Record<string, string | number | Date | null> & PageQuery): HttpResponseP {
-    return http.post('/file/measurementDataExportId', data);
+    return http.post('/file/tableDataExportId', data);
   }
 
   // 导入列
@@ -88,14 +88,14 @@ class IoTDBApi {
   // 导入表
   static importTables(data: FormData, fileType: string = 'csv'): HttpResponseP<StorageDevice.ImportMeasurementDataRes> {
     if (fileType === 'csv') {
-      return http.post('/file/importMeasurementCSVData', data, { timeout: 60 * 30 * 1000 });
+      return http.post('/file/importTableCSVData', data, { timeout: 60 * 30 * 1000 });
     }
-    return http.post('/file/importMeasurementExcelData', data, { timeout: 60 * 30 * 1000 });
+    return http.post('/file/importTableExcelData', data, { timeout: 60 * 30 * 1000 });
   }
 
   // 导出表
   static exportTables(data: Record<string, string | number | Date | null> & PageQuery): HttpResponseP {
-    return http.post('/file/measurementDataExportId', data);
+    return http.post('/file/tableExportId', data);
   }
 }
 export default IoTDBApi;

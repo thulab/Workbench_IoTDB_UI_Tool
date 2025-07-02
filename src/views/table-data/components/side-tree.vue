@@ -121,7 +121,7 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
 const emit = defineEmits<{
   (event: 'handleNodeClick', nodeInfo: IoTDB.TreeNodeData): void;
-  (event: 'uploadDetail'): void;
+  (event: 'updateDetail'): void;
 }>();
 
 const { t } = useI18n();
@@ -139,7 +139,8 @@ const { requestFn: deleteTables } = useRequest(IoTDBApi.deleteTables);
 
 const { canReadWriteData } = storeToRefs(userStore);
 const { treeData, databaseNames } = storeToRefs(useDbStore());
-const { getDatabases } = useDbStore();
+const { getDatabases, setFirstLoad } = useDbStore();
+const firstLoad = ref(true);
 
 const treeProps = {
   value: 'id',
@@ -162,6 +163,7 @@ const setDefaultTreeExpandKeys = async (dbName: string = '') => {
       firstNode = matchedNode ?? treeData.value[0];
     }
     currentNode.value = firstNode;
+    console.log('======firstNode', firstNode);
     emit('handleNodeClick', firstNode);
     setTimeout(() => {
       const expandedKeys = [firstNode.nodeName];
@@ -203,6 +205,7 @@ function filterTreeData(): IoTDB.TreeNodeData[] {
 }
 
 onMounted(() => {
+  console.log('-----side tree mounted');
   setDefaultTreeExpandKeys();
 });
 
@@ -214,7 +217,7 @@ function handleSearch() {
 }
 
 function handleRefresh() {
-  emit('uploadDetail');
+  emit('updateDetail');
 }
 
 function handleAddDB() {
@@ -233,6 +236,7 @@ function handleDelDb(dbNode: IoTDB.TreeNodeData) {
   }).then(() => {
     deleteDatabase(dbNode.nodeName).then(() => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
+      setFirstLoad(true);
       if (currentNodeShow.value?.nodeName === currentNode.value?.database) {
         setDefaultTreeExpandKeys();
       } else {
@@ -254,6 +258,7 @@ function handleDelTable(tableNode: IoTDB.TreeNodeData) {
     const delTableList = tableNode?.nodeName ? [tableNode.nodeName] : [];
     deleteTables(tableNode.database!, delTableList).then(() => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
+      setFirstLoad(true);
       if (currentNodeShow.value?.nodeName === currentNode.value?.nodeName) {
         setDefaultTreeExpandKeys(currentNodeShow?.value?.database);
       } else {
@@ -290,6 +295,16 @@ function handleTableOptionClick(command: string, node: IoTDB.TreeNodeData) {
     handleDelTable(node);
   }
 }
+
+watch(
+  () => treeData.value,
+  () => {
+    if (firstLoad.value) {
+      setDefaultTreeExpandKeys();
+      firstLoad.value = false;
+    }
+  }
+);
 </script>
 <style lang="scss" scoped>
 .db-tree-wrapper {

@@ -156,7 +156,7 @@ const currentColumn = ref<IoTDB.ColumnVOS>();
 const currentPage = ref(1);
 const pageSize = ref(10);
 
-const { getDatabases } = useDbStore();
+const { getDatabases, setFirstLoad } = useDbStore();
 
 const isSystemDatabase = computed(() => {
   return props.currentNode?.parentName === 'information_schema';
@@ -247,6 +247,7 @@ function handleDelRow(type: string, row: IoTDB.TreeNodeData | null) {
     };
     deleteColumns(deleteData).then(() => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
+      setFirstLoad(true);
       handleRefresh();
     });
   });
