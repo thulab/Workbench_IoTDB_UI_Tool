@@ -11,7 +11,16 @@
           class="measurement-tree-search-input"
         />
 
-        <el-button link @click="handleRefresh" :disabled="searching" id="db-tree-refresh" class="svg-button-hover-color m-l-16">
+        <el-button
+          link
+          @click="
+            setFirstLoad(true);
+            handleRefresh();
+          "
+          :disabled="searching"
+          id="db-tree-refresh"
+          class="svg-button-hover-color m-l-16"
+        >
           <i-custom-border-refresh style="width: 24px; height: 24px" />
         </el-button>
         <el-button link @click="handleAddDB()" :disabled="searching" id="db-tree-add-db" class="svg-button-hover-color m-l-16">
@@ -103,7 +112,7 @@
           </el-dropdown>
         </template>
       </el-tree-v2>
-      <modal-add-db v-model:visible="modalAddDbVisible" :database-names="databaseNames" @handle-save="handleRefresh" />
+      <modal-add-db v-model:visible="modalAddDbVisible" @handle-save="handleRefresh" />
       <modal-add-table ref="addTableDialog" @handle-reload="handleRefresh" />
     </div>
   </auth-container>
@@ -138,7 +147,7 @@ const { requestFn: deleteDatabase } = useRequest(IoTDBApi.deleteDatabase);
 const { requestFn: deleteTables } = useRequest(IoTDBApi.deleteTables);
 
 const { canReadWriteData } = storeToRefs(userStore);
-const { treeData, databaseNames } = storeToRefs(useDbStore());
+const { treeData } = storeToRefs(useDbStore());
 const { getDatabases, setFirstLoad } = useDbStore();
 const firstLoad = ref(true);
 
@@ -205,7 +214,6 @@ function filterTreeData(): IoTDB.TreeNodeData[] {
 }
 
 onMounted(() => {
-  console.log('-----side tree mounted');
   setDefaultTreeExpandKeys();
 });
 

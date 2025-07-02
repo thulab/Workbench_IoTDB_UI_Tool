@@ -13,6 +13,7 @@ export const useDbStore = defineStore('db', () => {
   async function getDatabases() {
     if (connectionStore.isTableModel && firstLoad.value) {
       await fetchDatabases();
+      databaseNames.value = [];
       databases.value = schemaTreeData.value;
       firstLoad.value = false;
     }

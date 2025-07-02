@@ -1098,5 +1098,7 @@ dataManage:
   delColumnBatchTip: 此操作会删除这些列及其对应的全部数据，是否删除？
   addCloumn: 添加列
   ttlTip: 表的 TTL 默认为其所在数据库的 TTL
+  batchImportTable: 批量导入表结构
+  batchImportColumn: 批量导入列结构
   batchImportData: 批量导入数据
   cannotDeleteTip: 仅在显示全部列且未选中列时可用

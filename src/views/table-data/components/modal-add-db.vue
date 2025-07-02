@@ -24,6 +24,7 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
 import type { FormInstance, FormRules } from 'element-plus';
 import IoTDBApi from '@/api/db.api';
 import { useDbStore } from '@/stores';
@@ -32,7 +33,6 @@ const formRef = ref<FormInstance>();
 
 const props = defineProps<{
   visible: boolean;
-  databaseNames: string[];
 }>();
 
 const emit = defineEmits<{
@@ -44,6 +44,7 @@ const { t, locale } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const formKey = ref(0);
 const { setFirstLoad } = useDbStore();
+const { databaseNames } = storeToRefs(useDbStore());
 
 const formData = reactive({
   databaseName: '',
@@ -65,7 +66,7 @@ const rules = reactive<FormRules>({
     },
     {
       validator: (rule: any, value: any, callback: any) => {
-        if (value && props.databaseNames.some((name) => name.toLocaleLowerCase() === value.toLocaleLowerCase())) {
+        if (value && databaseNames.value.some((name) => name.toLocaleLowerCase() === value.toLocaleLowerCase())) {
           callback(new Error(t('dataManage.databaseNameExist')));
         }
 

@@ -62,6 +62,25 @@
         <el-button type="primary" id="table-add" @click="showAddTableDialog">
           {{ t('common.add') }}
         </el-button>
+        <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
+          <el-button class="m-l-16" :disabled="!canReadWriteData" @click="handleImport" id="table-data-import">
+            {{ t('common.import') }}
+          </el-button>
+        </auth-tooltip>
+        <auth-tooltip :is-disabled="canReadWriteData" :content="'common.schemaAuth'">
+          <el-dropdown class="m-x-16" :disabled="!canReadWriteData || !(tableDataFilter.length > 0)" @command="(val) => handleCommandDown(val)" id="mesaurement-download-dropdown">
+            <el-button :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" :disabled="!canReadWriteData || !(tableDataFilter.length > 0)" id="mesaurement-download">
+              {{ t('common.export') }}
+              <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="csv" id="mesaurement-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
+                <el-dropdown-item command="xlsx" id="mesaurement-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </auth-tooltip>
         <el-button type="primary" id="mesaurement-batch-del" @click="handleDelRow('batch', null)" :disabled="!multipleSelection.length">
           {{ t('common.batchDelete') }}
         </el-button>
@@ -157,19 +176,22 @@
       @append-sql="handleAppendSql"
       @handle-save="handleRefresh()"
     />
+    <modal-import-table v-model:visible="importVisible" import-type="table" :current-node="currentNode" @handle-close="handleImportClose" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { IoTDBApi } from '@/api';
+import { storeToRefs } from 'pinia';
 import { useTableHeight } from '@/composition-api';
-import { useDbStore } from '@/stores';
+import { useDbStore, useUserStore } from '@/stores';
 import SqlPreview from '@/components/sql-preview.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalTtl from './modal-ttl.vue';
 import ModalAddTable from './modal-add-table.vue';
 import ModalComment from './modal-comment.vue';
+import ModalImportTable from './modal-import-table.vue';
 
 const props = defineProps<{
   currentNode: IoTDB.TreeNodeData;
@@ -177,11 +199,12 @@ const props = defineProps<{
 
 const sqlPreviewRef = ref<InstanceType<typeof SqlPreview>>();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 const { data: schemaDataDbInfo, requestFn: getDatabaseInfo } = useRequest(IoTDBApi.getDatabaseInfo);
 const { data: tableVO, requestFn: getTableList } = useRequest(IoTDBApi.getTableList);
 const { requestFn: deleteTables } = useRequest(IoTDBApi.deleteTables);
+const { requestFn: exportTableId } = useRequest(IoTDBApi.exportTableId);
 const searchKeyword = ref((route.query.databaseSearch as string) || '');
 const databaseInfos = ref<IoTDB.DatabaseInfo | null>(null);
 const searchType = ref('tableName');
@@ -196,6 +219,9 @@ const multipleSelection = ref<IoTDB.TableVO[]>([]);
 const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
 const currentPage = ref(1);
 const pageSize = ref(10);
+const userStore = useUserStore();
+const { canReadWriteData } = storeToRefs(userStore);
+const importVisible = ref(false);
 
 const { getDatabases, setFirstLoad } = useDbStore();
 
@@ -288,6 +314,38 @@ function handleDelRow(type: string, row: IoTDB.TableVO | null) {
 
 function goto(page: number) {
   currentPage.value = page;
+}
+
+// 导出
+function handleExportData(exportType: string) {
+  exportTableId({
+    database: props.currentNode?.nodeName,
+    name: searchType.value === 'tableName' ? searchKeyword.value : '',
+    comment: searchType.value === 'comment' ? searchKeyword.value : '',
+  }).then((res) => {
+    let url = `/api/file/exportExcelTableColumnTable?exportId=${res.data}`;
+    if (exportType === 'csv') {
+      url = `/api/file/exportCsvTableColumnTable?exportId=${res.data}`;
+    }
+    window.open(url);
+  });
+}
+
+// 下载
+function handleCommandDown(val: string) {
+  handleExportData(val);
+}
+
+// 导入
+function handleImport() {
+  importVisible.value = true;
+}
+
+// 导入物理量
+function handleImportClose(reload: boolean) {
+  if (reload) {
+    handleRefresh();
+  }
 }
 
 watch(

@@ -85,17 +85,16 @@ class IoTDBApi {
     return http.post('/file/measurementDataExportId', data);
   }
 
-  // 导入表
   static importTables(data: FormData, fileType: string = 'csv'): HttpResponseP<StorageDevice.ImportMeasurementDataRes> {
     if (fileType === 'csv') {
-      return http.post('/file/importTableCSVData', data, { timeout: 60 * 30 * 1000 });
+      return http.post('/file/importCsvTableColumnTable', data, { timeout: 60 * 30 * 1000 });
     }
-    return http.post('/file/importTableExcelData', data, { timeout: 60 * 30 * 1000 });
+    return http.post('/file/importExcelTableColumnTable', data, { timeout: 60 * 30 * 1000 });
   }
 
   // 导出表
-  static exportTables(data: Record<string, string | number | Date | null> & PageQuery): HttpResponseP {
-    return http.post('/file/tableExportId', data);
+  static exportTableId(data: Record<string, string | number | Date | null> & PageQuery): HttpResponseP {
+    return http.post('/file/exportTableColumnTableId', data);
   }
 }
 export default IoTDBApi;
