@@ -35,7 +35,7 @@ const { treeData } = storeToRefs(useDbStore());
 const { getDatabases } = useDbStore();
 
 const treeProps = {
-  value: 'nodeName',
+  value: 'id',
   label: 'nodeName',
   children: 'children',
 };

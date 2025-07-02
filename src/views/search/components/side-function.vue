@@ -57,7 +57,7 @@ function getFunction(node: Node) {
   padding: 20px 0 0;
   background: #fff;
 
-  &.maxheight {
+  &.max-height {
     height: calc(100vh - 240px);
     overflow: auto;
   }
