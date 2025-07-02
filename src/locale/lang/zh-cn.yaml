@@ -1038,7 +1038,11 @@ aiAnalysis:
   sourceModelPlaceholder: 请选择原模型名称
   fineTuningModel: 微调模型名称
   fineTuningModelPlaceholder: 请输入微调后的模型名称
-  fineTuningData: 微调数据范围
+  fineTuningData: 微调数据集
+  databasePlaceholeder: 请选择数据库
+  tablePlaceholder: 请选择表
+  measurementPlaceholder: 请选择测点
+  dataSetTimeRange: 数据集时间
   fineTuningDataPlaceholder: 请选择需要微调的测点
   moreParam: 更多参数
   superParam: 超参数

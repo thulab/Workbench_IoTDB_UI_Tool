@@ -10,15 +10,16 @@
         <el-input v-model="formData.tunedModelId" id="fine-tuning-name" />
       </base-form-item>
       <base-form-item :label="`${t('aiAnalysis.fineTuningData')}：`" v-if="!connectionStore.isTableModel" prop="name">
-        <timeseries-select-single id="fine-tuning-path" v-model="formData.path" :selectWidth="230" :itemWidth="200" show-suffix :disabled-path="disabledPath" />
+        <timeseries-select-single id="fine-tuning-path" v-model="formData.path" :selectWidth="388" :itemWidth="200" show-suffix :disabled-path="disabledPath" />
       </base-form-item>
       <template v-else>
-        <base-form-item :label="`${t('measurement.databaseTitle')}：`" prop="database">
+        <base-form-item :label="`${t('aiAnalysis.fineTuningData')}：`" prop="database">
           <el-select v-model="formData.database" id="fine-tuning-database" @change="handleDatabaseSelected" v-loading="getModelsLoading">
             <el-option v-for="item in dbStore.treeData" :key="item.nodeName" :label="item.nodeName" :value="item.nodeName" />
           </el-select>
         </base-form-item>
-        <base-form-item :label="`${t('dataManage.table')}：`" prop="table">
+        <base-form-item label="" prop="table" class="hidden-label">
+          <template #label></template>
           <el-select
             v-model="formData.table"
             id="fine-tuning-table"
@@ -33,7 +34,7 @@
             <el-option v-for="item in currentDatabase?.children || []" :key="item.nodeName" :label="item.nodeName + (item.comment ? `(${item.comment})` : '')" :value="item.nodeName" />
           </el-select>
         </base-form-item>
-        <base-form-item :label="`${t('measurement.measurement')}：`" prop="measurement">
+        <base-form-item label="" prop="measurement" class="hidden-label">
           <el-select v-model="formData.measurement" id="fine-tuning-measurement" :disabled="!formData.table" v-loading="getModelsLoading">
             <el-option
               v-for="item in currentTable?.children?.filter((item) => item.cateGory === 'FIELD') || []"
@@ -44,6 +45,20 @@
           </el-select>
         </base-form-item>
       </template>
+      <base-form-item :label="`${t('aiAnalysis.dataSetTimeRange')}：`" prop="field">
+        <el-date-picker
+          v-model="formData.timeRange"
+          type="datetimerange"
+          range-separator="-"
+          unlink-panels
+          :shortcuts="shortcutsDaterange"
+          :clearable="true"
+          :prefix-icon="ICustomCalender"
+          :start-placeholder="t('search.startTime')"
+          :end-placeholder="t('search.endTime')"
+          id="data-search-datetimerange"
+        />
+      </base-form-item>
       <div class="exits-tip" v-if="!paramsVisible">
         <el-button link type="primary" @click="showParam">{{ t('aiAnalysis.moreParam') }}</el-button>
       </div>
@@ -64,11 +79,12 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance } from 'element-plus';
+import type { FormInstance, DateModelType } from 'element-plus';
 import MonacoEditor from '@/components/monaco-editor/monaco-editor.vue';
 import { useConnectionStore, useDbStore } from '@/stores';
-
 import { AIAnalysisApi } from '@/api';
+import { getStartAndEnd } from '@/utils/date';
+import ICustomCalender from '~icons/custom/calender.svg';
 
 const props = withDefaults(
   defineProps<{
@@ -94,6 +110,8 @@ const { t, locale } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const paramsVisible = ref(false);
 
+const { shortcutsDaterange } = useShortcutsDate();
+
 const formRef = ref<FormInstance>();
 const formData = reactive<{
   rawModelId: string;
@@ -102,6 +120,7 @@ const formData = reactive<{
   field: string;
   params: string;
   database?: string;
+  timeRange: [DateModelType, DateModelType] | [];
   table?: string;
   measurement?: string;
 }>({
@@ -110,6 +129,7 @@ const formData = reactive<{
   path: '',
   field: '',
   params: '',
+  timeRange: [],
 });
 const formRules = reactive({
   rawModelId: [
@@ -228,6 +248,7 @@ watch(
       formData.field = '';
       formData.params = '';
       formRef.value?.resetFields();
+      formData.timeRange = getStartAndEnd();
     }
   }
 );
