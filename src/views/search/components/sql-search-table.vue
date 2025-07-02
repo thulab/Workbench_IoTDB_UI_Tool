@@ -43,12 +43,7 @@
               <side-template ref="sqlListRef" @handle-sql-operate="handleSqlOperate" />
             </el-tab-pane>
           </el-tabs>
-          <a
-            :href="locale === 'en' ? 'https://timecho.com/docs/UserGuide/latest-table/SQL-Manual/Identifier.html' : 'https://timecho.com/docs/zh/UserGuide/latest-table/SQL-Manual/Identifier.html'"
-            rel="noopener noreferrer"
-            target="_blank"
-            class="operate-link"
-          >
+          <a :href="operatingLink" rel="noopener noreferrer" target="_blank" class="operate-link">
             <i-custom-question />
             {{ t('search.operatingInstructions') }}
           </a>
@@ -183,6 +178,17 @@ const saveSource = ref('save');
 
 const { requestFn: getSql } = useRequest(SearchApi.getSql);
 const { requestFn: saveQuery, loading: saveLoading } = useRequest(SearchApi.saveQuery);
+
+const operatingLink = computed(() => {
+  // 根据当前语言环境返回对应的链接
+  let link = locale.value === 'en' ? 'https://timecho.com/docs/' : 'https://timecho.com/docs/zh/';
+  if (activeNameSide.value === 'function') {
+    link += 'UserGuide/latest-Table/SQL-Manual/Basis-Function.html';
+  } else {
+    link += 'UserGuide/latest-Table/SQL-Manual/overview.html';
+  }
+  return link;
+});
 
 // 获取code
 function getSqlCode() {
