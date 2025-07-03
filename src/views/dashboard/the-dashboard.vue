@@ -375,6 +375,7 @@ import { DashboardApi } from '@/api';
 import { toThousands } from '@/utils/format';
 import { iotdbShowAuth, isVersionMoreThanThreeDigits } from '@/utils/auth';
 import { formatDate } from '@/utils/date';
+import { useRoute } from 'vue-router';
 import MonitorAll from './components/monitor-all.vue';
 import MonitorDatanode from './components/monitor-datanode.vue';
 import MonitorConfignode from './components/monitor-confignode.vue';
@@ -382,6 +383,8 @@ import ModalActive from './components/modal-active.vue';
 import ModalActiveNow from './components/modal-active-now.vue';
 
 const { t, locale } = useI18n();
+
+const route = useRoute();
 const userStore = useUserStore();
 const connectionStore = useConnectionStore();
 const { enablePrometheus, configurePrometheus, canReadWriteSchema, canMaintain } = storeToRefs(userStore);
@@ -432,6 +435,7 @@ const currentNodeType = ref('');
 const monitorAllRef = ref<InstanceType<typeof MonitorAll>>();
 const monitorDatanodeRef = ref<InstanceType<typeof MonitorDatanode>>();
 const monitorConfignodeRef = ref<InstanceType<typeof MonitorConfignode>>();
+
 const nodeList = computed(() => {
   if (clusterType.value === 'slave') {
     return slaveNodes.value.filter((item) => item.type !== 'AINode');
@@ -656,6 +660,17 @@ function handleClickActiveNow(isMaster: boolean) {
   activeNowVisible.value = true;
 }
 
+onMounted(() => {
+  if (route.query.switch) {
+    sessionStorage.setItem('dataSearchStorage', '');
+    sessionStorage.setItem('statisticSearchStorage', '');
+    sessionStorage.setItem('sqlSearchStorage', '');
+    sessionStorage.setItem('dataTrendStorage', '');
+    sessionStorage.setItem('dataSpectrumStorage', '');
+    sessionStorage.setItem('configStorage', '');
+    sessionStorage.setItem('aiVisualizationStorage', '');
+  }
+});
 watch(
   () => canMaintain.value,
   (val) => {

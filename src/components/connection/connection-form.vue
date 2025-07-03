@@ -353,6 +353,7 @@ function handleTestLogin() {
           sessionStorage.setItem('dataTrendStorage', '');
           sessionStorage.setItem('dataSpectrumStorage', '');
           sessionStorage.setItem('configStorage', '');
+          sessionStorage.setItem('aiVisualizationStorage', '');
           if (route.name === 'Login') {
             router.push({ name: 'Dashboard' });
           } else {
