@@ -274,6 +274,7 @@ function getDetail(id: number) {
   getConnectionDetail(id)
     .then((res) => {
       assign(formData, res.data);
+      formData.model = res.data.model || 'tree';
       formData.password = '';
       sourceData = cloneDeep(formData);
     })
