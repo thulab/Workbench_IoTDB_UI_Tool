@@ -3,7 +3,7 @@
     <active-container :is-show="connectionIsActive">
       <el-container class="visualization-wrapper">
         <el-header class="p-0 p-l-30 p-r-16" style="height: auto">
-          <div class="search-form-box" style="margin-bottom: 18px">
+          <div class="search-form-box" style="margin-bottom: 2px">
             <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
               <div class="m-b-16 flex-align-center" style="height: 36px">
                 <base-form-item :label="`${t('aiAnalysis.business')}：`" prop="type" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
@@ -45,7 +45,7 @@
               <div class="search-form-row-box">
                 <div v-if="searchFormData.type !== 2">
                   <template v-if="connectionStore.isTableModel">
-                    <base-form-item prop="database" :label="`${t('measurement.measurementChoose')}：`" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
+                    <base-form-item prop="database" style="margin-bottom: 16px" :label="`${t('measurement.measurementChoose')}：`" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
                       <el-cascader
                         v-model="searchFormData.tableSelect"
                         :options="tableOptions"
@@ -84,7 +84,7 @@
                     </base-form-item>
                   </template>
                   <template v-else>
-                    <base-form-item prop="measurement" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
+                    <base-form-item prop="measurement" style="margin-bottom: 16px" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
                       <template #label>
                         {{ t('measurement.measurementChoose') }}：
                         <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
@@ -106,11 +106,11 @@
                     </base-form-item>
                   </template>
                   <template v-if="searchFormData.type === 0">
-                    <base-form-item :label="`${t('aiAnalysis.forecastStart')}：`" :rules="requiredRules">
+                    <base-form-item style="margin-bottom: 16px" :label="`${t('aiAnalysis.forecastStart')}：`" :rules="requiredRules">
                       <el-date-picker v-model="searchFormData.forecastStart" type="datetime" :prefix-icon="ICustomCalender" id="search-datetime" :clearable="false" style="width: 164px" />
                     </base-form-item>
-                    <base-form-item :label="`${t('aiAnalysis.forecastData')}：`">
-                      <span style="font-size: 12px; color: #131926; font-weight: 300">{{ t('aiAnalysis.forecast96') }}</span>
+                    <base-form-item style="margin-bottom: 16px" :label="`${t('aiAnalysis.forecastData')}：`">
+                      <span style="font-size: 12px; color: #131926; font-weight: 300; line-height: 28px">{{ t('aiAnalysis.forecast96') }}</span>
                     </base-form-item>
                   </template>
                   <template v-else-if="searchFormData.type === 1">
@@ -144,11 +144,11 @@
                   </template>
                 </div>
                 <div v-else>
-                  <base-form-item label="SQL：" prop="sql" class="el-form-item-not-mandatory">
+                  <base-form-item label="SQL：" prop="sql" class="el-form-item-not-mandatory" style="margin-bottom: 16px">
                     <el-button type="primary" :disabled="!enableAINode" link id="search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
                   </base-form-item>
                 </div>
-                <div class="search-form-buttons">
+                <div class="search-form-buttons" style="margin-bottom: 16px">
                   <el-button @click="handleReset" :disabled="!enableAINode" id="search-reset">{{ t('common.reset') }}</el-button>
                   <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="canQuery" popper-class="tooltip-box-width">
                     <el-button :disabled="!canQuery" type="primary" @click="handleSearch()" id="search-search">
