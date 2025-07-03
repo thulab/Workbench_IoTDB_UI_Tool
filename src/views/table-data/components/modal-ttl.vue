@@ -101,6 +101,8 @@ const handleConfirm = () => {
 watch(
   () => props.visible,
   (newVal) => {
+    console.log('------------visible', newVal);
+    console.log('------------props.currentTtl', props.currentTtl);
     if (newVal) {
       formRef.value?.resetFields();
       formKey.value++;

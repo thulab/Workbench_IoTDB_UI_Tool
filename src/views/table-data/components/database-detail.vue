@@ -162,9 +162,8 @@
       v-model:visible="modalTtlVisible"
       :current-database="currentNode?.database"
       :current-table="currentTable?.tableName"
-      :current-ttl="ttlType === 'db' ? currentNode.ttl : currentTable?.ttl"
+      :current-ttl="ttlType === 'db' ? databaseInfos?.ttl : currentTable?.ttl"
       :type="ttlType"
-      :key="modalTTLNum"
       @append-sql="handleAppendSql"
       @handle-save="handleRefresh()"
     />
@@ -213,7 +212,6 @@ const { maxTableHeight } = useTableHeight(410);
 const modalTtlVisible = ref(false);
 const modalCommentVisible = ref(false);
 const currentTable = ref<IoTDB.TableVO>();
-const modalTTLNum = ref(0);
 const ttlType = ref('db'); // 'db' or 'table'
 const multipleSelection = ref<IoTDB.TableVO[]>([]);
 const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
@@ -270,7 +268,6 @@ function handleEditTableTTL(row: IoTDB.TableVO) {
   ttlType.value = 'table';
   currentTable.value = row;
   modalTtlVisible.value = true;
-  modalTTLNum.value++;
 }
 function handleEditTableComment(row: IoTDB.TableVO) {
   currentTable.value = row;
