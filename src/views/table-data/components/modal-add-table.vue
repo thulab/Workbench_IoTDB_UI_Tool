@@ -179,18 +179,18 @@ const validateName = (rule: any, value: any, callback: any) => {
     callback();
   } else if (specialCharsPattern.test(value) && !needsQuotesPattern.test(value)) {
     // 包含特殊字符但未用引号包裹
-    callback(new Error(t('dataManage.specialCharsNeedQuotes'))); // Add i18n key
+    callback(new Error(t('dataManage.specialCharsNeedQuotes')));
   } else if (needsQuotesPattern.test(value)) {
     // 检查引号内是否为空
     const unquoted = value.slice(1, -1);
     if (unquoted === '') {
-      callback(new Error(t('dataManage.emptyQuotedName'))); // Add i18n key
+      callback(new Error(t('dataManage.emptyQuotedName')));
     } else {
       callback();
     }
   } else {
     // 其他非法格式
-    callback(new Error(t('dataManage.invalidNameFormat'))); // Add i18n key
+    callback(new Error(t('dataManage.invalidNameFormat')));
   }
 };
 
@@ -259,7 +259,7 @@ const copyColumn = (index: number) => {
   nextTick(() => {
     activeName.value = `measurement_${formData.columns.length - 1}`;
   });
-  ElMessage.success('列已复制');
+  ElMessage.success(t('dataManage.columnCopySuccess'));
 };
 
 // 只允许输入数字
@@ -269,14 +269,14 @@ const handleNumberInput = (value: string) => {
 
 // 删除列
 const deleteColumn = (index: number) => {
-  ElMessageBox.confirm('是否删除该列？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+  ElMessageBox.confirm(t('dataManage.deleteColumnTip'), t('common.tip'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
     type: 'warning',
   })
     .then(() => {
       formData.columns.splice(index, 1);
-      ElMessage.success('列已删除');
+      ElMessage.success(t('dataManage.columnDeleted'));
     })
     .catch(() => {});
 };
@@ -284,12 +284,12 @@ const deleteColumn = (index: number) => {
 // 确认提交
 const handleConfirm = async () => {
   if (!formData.tableName.trim()) {
-    ElMessage.warning('请输入表名');
+    ElMessage.warning(t('dataManage.tableNamePlaceholder'));
     return;
   }
 
   if (formData.columns.length === 0) {
-    ElMessage.warning('请至少添加一列');
+    ElMessage.warning(t('dataManage.oneColumnRequired'));
     return;
   }
 
@@ -297,15 +297,7 @@ const handleConfirm = async () => {
   for (let i = 0; i < formData.columns.length; i++) {
     const column = formData.columns[i];
     if (!column.columnName.trim()) {
-      ElMessage.warning(`请填写第 ${i + 1} 列的列名`);
-      return;
-    }
-    if (!column.cateGory) {
-      ElMessage.warning(`请选择第 ${i + 1} 列的列类别`);
-      return;
-    }
-    if (!column.dataType) {
-      ElMessage.warning(`请选择第 ${i + 1} 列的数据类型`);
+      ElMessage.warning(`${t('dataManage.inputIndexColumnName', { index: i + 1 })}`);
       return;
     }
   }
@@ -333,7 +325,7 @@ const handleConfirm = async () => {
   });
   if (addType.value === 'addTable') {
     saveTable(formDataBody.value).then(() => {
-      ElMessage.success('表创建成功');
+      ElMessage.success(t('common.saveSuccess'));
       dialogVisible.value = false;
       setActiveList([formDataBody.value.database, `${formDataBody.value.database}-${formDataBody.value.tables[0].tableVO.tableName}`]);
       setFirstLoad(true);
@@ -341,7 +333,7 @@ const handleConfirm = async () => {
     });
   } else {
     saveColumns(formDataBody.value).then(() => {
-      ElMessage.success('添加成功');
+      ElMessage.success(t('common.saveSuccess'));
       dialogVisible.value = false;
       setActiveList([formDataBody.value.database, `${formDataBody.value.database}-${formDataBody.value.tables[0].tableVO.tableName}`]);
       setFirstLoad(true);
@@ -358,7 +350,6 @@ function resetFormData() {
   formDataBody.value.tables = [];
 }
 
-// 暴露方法供父组件调用
 defineExpose({
   open: (currentVal: IoTDB.TreeNodeData, typeVal: string = 'addTable') => {
     resetFormData();

@@ -1145,14 +1145,25 @@ dataManage:
   databaseNamePlaceholder: Please enter database name
   databaseNameLenth: Maximum 64 characters allowed. Please re-enter.
   databaseNameExist: Database already exists. Please re-enter.
+  tableNameExist: This table already exists. Please re-enter.
   specialCharsNeedQuotes: Special characters must be wrapped in quotes
   emptyQuotedName: Name inside quotes cannot be empty
   invalidNameFormat: Invalid name format
   addDatabaseSuccess: Database created successfully
   ttlUpdated: TTL updated
+  delDbSingleTip: This will delete the database and all its contained tables and data. Proceed?
   delTableSingleTip: This will delete the table and all its data. Proceed?
   delTableBatchTip: This will delete these tables and all their data. Proceed?
   delColumnSingleTip: This will delete the column and all its data. Proceed?
   delColumnBatchTip: This will delete these columns and all their data. Proceed?
   addCloumn: Add Column
   ttlTip: Table TTL defaults to its database's TTL
+  batchImportTable: Batch import table structure
+  batchImportColumn: Batch import column structure
+  batchImportData: Batch import data
+  cannotDeleteTip: Only available when showing all columns and no columns are selected
+  columnCopySuccess: Column copied successfully
+  deleteColumnTip: Delete this column?
+  columnDeleted: Column deleted
+  oneColumnRequired: Please add at least one column
+  inputIndexColumnName: Please enter column name for column {index}

@@ -150,7 +150,6 @@ const { requestFn: deleteTables } = useRequest(IoTDBApi.deleteTables);
 const { canReadWriteData } = storeToRefs(userStore);
 const { treeData, activeKeyList } = storeToRefs(useDbStore());
 const { getDatabases, setFirstLoad, setActiveList } = useDbStore();
-// const firstLoad = ref(true);
 
 const treeProps = {
   value: 'id',
@@ -276,9 +275,7 @@ function handleDelTable(tableNode: IoTDB.TreeNodeData) {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
       setFirstLoad(true);
       if (currentNodeShow.value?.nodeName === currentNode.value?.nodeName) {
-        // setActiveValue(`${currentNodeShow.value?.database}-${currentNodeShow.value?.nodeName}`)
         setActiveList([`${currentNodeShow.value?.database}`]);
-        // setDefaultTreeExpandKeys(currentNodeShow?.value?.database);
         setDefaultTreeExpandKeys();
       } else {
         handleRefresh();

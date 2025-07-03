@@ -1102,3 +1102,8 @@ dataManage:
   batchImportColumn: 批量导入列结构
   batchImportData: 批量导入数据
   cannotDeleteTip: 仅在显示全部列且未选中列时可用
+  columnCopySuccess: 列已复制
+  deleteColumnTip: 是否删除该列？
+  columnDeleted: 列已删除
+  oneColumnRequired: 请至少添加一列
+  inputIndexColumnName: 请填写第 {index} 列的列名

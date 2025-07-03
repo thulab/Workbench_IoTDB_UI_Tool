@@ -201,7 +201,6 @@ const pagination = reactive({
 
 const selectedRows = ref<Record<string, any>[]>([]);
 const importVisible = ref(false);
-// const tableHeight = computed(() => (tableData.value.length > 0 ? maxTableHeight.value : maxTableHeight.value ));
 
 const getListLoading = ref(false);
 
