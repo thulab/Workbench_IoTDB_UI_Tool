@@ -1,6 +1,6 @@
 <template>
   <div class="sql-statement">
-    <monaco-editor ref="innerRef" :read-only="true" />
+    <monaco-editor ref="innerRef" :read-only="true" language="sql" />
     <el-icon size="24" @click="copySql" class="svg-button-hover-color copy-icon"><i-custom-copy /></el-icon>
   </div>
 </template>
