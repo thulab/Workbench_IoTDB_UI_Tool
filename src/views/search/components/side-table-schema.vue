@@ -7,10 +7,10 @@
           <el-icon size="18" color="var(--el-color-primary)" class="m-r-[4px]">
             <i-custom-tree-db v-if="data.nodeType === 'DATABASE'" />
             <i-custom-table v-else-if="data.nodeType === 'TABLE'" />
-            <i-custom-tree-time v-else-if="data.nodeType === 'TIME'" />
-            <i-custom-tag v-else-if="data.nodeType === 'TAG'" />
-            <i-custom-attr v-else-if="data.nodeType === 'ATTRIBUTE'" />
-            <i-custom-field v-else-if="data.nodeType === 'FIELD'" />
+            <el-tag v-else-if="data.nodeType === 'TIME'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Time</el-tag>
+            <el-tag v-else-if="data.nodeType === 'TAG'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Tag</el-tag>
+            <el-tag v-else-if="data.nodeType === 'ATTRIBUTE'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Attr</el-tag>
+            <el-tag v-else-if="data.nodeType === 'FIELD'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Field</el-tag>
           </el-icon>
           <text-tooltip :content="data.nodeName + (data.comment ? ` (${data.comment})` : '')" />
         </div>
@@ -81,5 +81,13 @@ onMounted(() => {
   display: flex;
   align-items: center;
   padding-right: 8px;
+}
+
+.tree-column-type-tag {
+  font-style: normal;
+  width: 28px;
+  height: 16px;
+  font-size: 10px;
+  margin-right: 12px;
 }
 </style>
