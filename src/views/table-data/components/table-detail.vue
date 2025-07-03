@@ -11,7 +11,10 @@
       <ul class="database-info-list">
         <li class="database-info-item" id="device-total-li">
           <span class="database-info-item-label" id="measurement-total-span">{{ t('dataManage.ttl') }}：</span>
-          {{ currentNode?.ttl }}
+          {{ localCurrentNode?.ttl ? localCurrentNode?.ttl : 'INF' }}
+          <el-icon size="24" class="m-r-6 svg-button-hover-color" style="cursor: pointer" @click="handleEditTableTTL()">
+            <i-custom-edit />
+          </el-icon>
         </li>
         <li class="database-info-item" id="measurement-total-li">
           <span class="database-info-item-label" id="measurement-total-span">{{ t('dataManage.columns') }}：</span>
@@ -133,6 +136,19 @@
     <sql-preview ref="sqlPreviewRef" />
 
     <modal-add-table ref="addTableDialog" add-type="addColumn" :current-node="currentNode" @handle-reload="handleRefresh" />
+    <modal-ttl
+      v-model:visible="modalTtlVisible"
+      :current-database="currentNode?.database"
+      :current-table="currentNode?.nodeName"
+      :current-ttl="localCurrentNode?.ttl"
+      type="table"
+      @append-sql="handleAppendSql"
+      @handle-save="
+        (newTtl: string) => {
+          localCurrentNode.ttl = newTtl;
+        }
+      "
+    />
     <modal-comment
       v-model:visible="modalCommentVisible"
       :current-table="currentNode?.nodeName"
@@ -157,6 +173,7 @@ import ModalAddTable from './modal-add-table.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalComment from './modal-comment.vue';
 import ModalImportTable from './modal-import-table.vue';
+import ModalTtl from './modal-ttl.vue';
 
 const props = defineProps<{
   currentNode: IoTDB.TreeNodeData;
@@ -181,6 +198,8 @@ const pageSize = ref(10);
 const userStore = useUserStore();
 const { canReadWriteData } = storeToRefs(userStore);
 const importVisible = ref(false);
+const modalTtlVisible = ref(false);
+const localCurrentNode = ref<IoTDB.TreeNodeData>({ ...props.currentNode });
 
 const { getDatabases, setFirstLoad, setActiveList } = useDbStore();
 
@@ -237,6 +256,10 @@ onMounted(() => {
   getColumns();
 });
 
+function handleEditTableTTL() {
+  modalTtlVisible.value = true;
+}
+
 function handleEditTableComment(row: IoTDB.ColumnVOS) {
   currentColumn.value = row;
   modalCommentVisible.value = true;
@@ -247,7 +270,6 @@ function goto(page: number) {
 }
 
 function handleRefresh() {
-  console.log('---------------handleRefresh');
   getDatabases();
   getColumns();
 }
