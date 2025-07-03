@@ -223,7 +223,7 @@ const userStore = useUserStore();
 const { canReadWriteData } = storeToRefs(userStore);
 const importVisible = ref(false);
 
-const { getDatabases, setFirstLoad } = useDbStore();
+const { getDatabases, setFirstLoad, setActiveList } = useDbStore();
 
 const isSystemDatabase = computed(() => {
   return props.currentNode?.nodeName === 'information_schema';
@@ -306,6 +306,7 @@ function handleDelRow(type: string, row: IoTDB.TableVO | null) {
     }
     deleteTables(props.currentNode.nodeName, measurementList).then(() => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
+      setActiveList([`${props.currentNode.database}`]);
       setFirstLoad(true);
       handleRefresh();
     });
@@ -344,6 +345,7 @@ function handleImport() {
 // 导入物理量
 function handleImportClose(reload: boolean) {
   if (reload) {
+    setActiveList([`${props.currentNode.database}`]);
     handleRefresh();
   }
 }

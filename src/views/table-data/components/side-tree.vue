@@ -148,7 +148,7 @@ const { requestFn: deleteDatabase } = useRequest(IoTDBApi.deleteDatabase);
 const { requestFn: deleteTables } = useRequest(IoTDBApi.deleteTables);
 
 const { canReadWriteData } = storeToRefs(userStore);
-const { treeData, activeKeyList, firstLoad } = storeToRefs(useDbStore());
+const { treeData, activeKeyList } = storeToRefs(useDbStore());
 const { getDatabases, setFirstLoad, setActiveList } = useDbStore();
 // const firstLoad = ref(true);
 
@@ -179,11 +179,13 @@ const setDefaultTreeExpandKeys = async () => {
       }
     }
     currentNode.value = activeNode;
-    currentNodeShow.value = activeNode;
-    emit('handleNodeClick', activeNode);
-    setTimeout(() => {
-      schemaTree.value?.setExpandedKeys(activeKeyList.value);
-    }, 300);
+    if (currentNodeShow?.value?.id !== activeNode.id) {
+      currentNodeShow.value = activeNode;
+      emit('handleNodeClick', activeNode);
+      setTimeout(() => {
+        schemaTree.value?.setExpandedKeys(activeKeyList.value);
+      }, 300);
+    }
   }
 };
 
@@ -316,10 +318,7 @@ function handleTableOptionClick(command: string, node: IoTDB.TreeNodeData) {
 watch(
   () => treeData.value,
   () => {
-    if (firstLoad.value) {
-      setDefaultTreeExpandKeys();
-      firstLoad.value = false;
-    }
+    setDefaultTreeExpandKeys();
   }
 );
 </script>
