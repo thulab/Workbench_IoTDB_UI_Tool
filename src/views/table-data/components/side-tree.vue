@@ -36,6 +36,7 @@
         :item-size="28"
         :height="treeHeight"
         :expand-on-click-node="true"
+        node-key="id"
       >
         <!-- eslint-disable-next-line vue/no-unused-vars -->
         <template #default="{ node, data }">
@@ -147,9 +148,9 @@ const { requestFn: deleteDatabase } = useRequest(IoTDBApi.deleteDatabase);
 const { requestFn: deleteTables } = useRequest(IoTDBApi.deleteTables);
 
 const { canReadWriteData } = storeToRefs(userStore);
-const { treeData } = storeToRefs(useDbStore());
-const { getDatabases, setFirstLoad } = useDbStore();
-const firstLoad = ref(true);
+const { treeData, activeKeyList, firstLoad } = storeToRefs(useDbStore());
+const { getDatabases, setFirstLoad, setActiveList } = useDbStore();
+// const firstLoad = ref(true);
 
 const treeProps = {
   value: 'id',
@@ -163,20 +164,25 @@ function showAddTableDialog(nodeInfo: IoTDB.TreeNodeData, addType: string) {
   }
 }
 
-const setDefaultTreeExpandKeys = async (dbName: string = '') => {
+const setDefaultTreeExpandKeys = async () => {
   await getDatabases();
   if (treeData.value && treeData.value.length) {
-    let firstNode = treeData.value[0];
-    if (dbName) {
-      const matchedNode = treeData.value.find((node) => node.nodeName === dbName);
-      firstNode = matchedNode ?? treeData.value[0];
+    let activeNode = treeData.value[0];
+    if (activeKeyList.value.length) {
+      if (activeKeyList.value.length === 2) {
+        const activeDb = treeData.value.find((node) => node.id === activeKeyList.value[0]);
+        const activeTable = activeDb?.children?.find((node) => node.id === activeKeyList.value[1]);
+        if (activeTable) activeNode = activeTable;
+      } else {
+        const activeDb = treeData.value.find((node) => node.id === activeKeyList.value[0]);
+        if (activeDb) activeNode = activeDb;
+      }
     }
-    currentNode.value = firstNode;
-    console.log('======firstNode', firstNode);
-    emit('handleNodeClick', firstNode);
+    currentNode.value = activeNode;
+    currentNodeShow.value = activeNode;
+    emit('handleNodeClick', activeNode);
     setTimeout(() => {
-      const expandedKeys = [firstNode.nodeName];
-      schemaTree.value?.setExpandedKeys(expandedKeys);
+      schemaTree.value?.setExpandedKeys(activeKeyList.value);
     }, 300);
   }
 };
@@ -268,7 +274,10 @@ function handleDelTable(tableNode: IoTDB.TreeNodeData) {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
       setFirstLoad(true);
       if (currentNodeShow.value?.nodeName === currentNode.value?.nodeName) {
-        setDefaultTreeExpandKeys(currentNodeShow?.value?.database);
+        // setActiveValue(`${currentNodeShow.value?.database}-${currentNodeShow.value?.nodeName}`)
+        setActiveList([`${currentNodeShow.value?.database}`]);
+        // setDefaultTreeExpandKeys(currentNodeShow?.value?.database);
+        setDefaultTreeExpandKeys();
       } else {
         handleRefresh();
       }

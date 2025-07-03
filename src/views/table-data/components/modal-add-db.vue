@@ -43,7 +43,7 @@ const errorName = ref<string | null>(null);
 const { t, locale } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const formKey = ref(0);
-const { setFirstLoad } = useDbStore();
+const { setFirstLoad, setActiveList } = useDbStore();
 const { databaseNames } = storeToRefs(useDbStore());
 
 const formData = reactive({
@@ -106,6 +106,7 @@ const handleConfirm = () => {
       saveDatabase(formData.databaseName, formData.ttl, formData.ttlUnit).then(() => {
         ElMessage.success({ message: t('dataManage.addDatabaseSuccess'), grouping: true });
         dialogVisible.value = false;
+        setActiveList([formData.databaseName]);
         setFirstLoad(true);
         emit('handleSave', formData.databaseName);
       });

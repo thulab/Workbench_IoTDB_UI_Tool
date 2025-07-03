@@ -9,13 +9,13 @@ export const useDbStore = defineStore('db', () => {
   const databaseNames = ref<string[]>([]);
   const connectionStore = useConnectionStore();
   const firstLoad = ref(true);
+  const activeKeyList = ref<string[]>([]);
 
   async function getDatabases() {
     if (connectionStore.isTableModel && firstLoad.value) {
       await fetchDatabases();
       databaseNames.value = [];
       databases.value = schemaTreeData.value;
-      firstLoad.value = false;
     }
   }
 
@@ -68,11 +68,19 @@ export const useDbStore = defineStore('db', () => {
       data.push(dbNode);
       databaseNames.value.push(db.database);
     });
+    if (!activeKeyList.value.length && databaseNames.value.length) {
+      const [firstDatabase] = databaseNames.value;
+      activeKeyList.value = [firstDatabase];
+    }
     return data;
   });
 
   function setFirstLoad(value: boolean) {
     firstLoad.value = value;
+  }
+
+  function setActiveList(activeKeyVal: string[]) {
+    activeKeyList.value = activeKeyVal;
   }
 
   watch(
@@ -83,10 +91,13 @@ export const useDbStore = defineStore('db', () => {
   );
 
   return {
+    firstLoad,
     treeData,
     databaseNames,
+    activeKeyList,
     getDatabases,
     setFirstLoad,
+    setActiveList,
   };
 });
 

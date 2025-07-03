@@ -115,7 +115,7 @@ const { requestFn: saveTable } = useRequest(IoTDBApi.saveTable);
 const { requestFn: saveColumns } = useRequest(IoTDBApi.saveColumns);
 const addType = ref('addTable'); // addTable or addColumn
 const activeName = ref('measurement_0');
-const { setFirstLoad } = useDbStore();
+const { setFirstLoad, setActiveList } = useDbStore();
 
 const columnTypeOptions = [
   { label: 'TAG（标签列）', value: 'TAG' },
@@ -335,6 +335,7 @@ const handleConfirm = async () => {
     saveTable(formDataBody.value).then(() => {
       ElMessage.success('表创建成功');
       dialogVisible.value = false;
+      setActiveList([formDataBody.value.database, `${formDataBody.value.database}-${formDataBody.value.tables[0].tableVO.tableName}`]);
       setFirstLoad(true);
       emit('handleReload');
     });
@@ -342,6 +343,7 @@ const handleConfirm = async () => {
     saveColumns(formDataBody.value).then(() => {
       ElMessage.success('添加成功');
       dialogVisible.value = false;
+      setActiveList([formDataBody.value.database, `${formDataBody.value.database}-${formDataBody.value.tables[0].tableVO.tableName}`]);
       setFirstLoad(true);
       emit('handleReload');
     });

@@ -171,6 +171,7 @@ const { maxTableHeight } = useTableHeight(420);
 const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
 const columnsSelection = ref<IoTDB.TreeNodeData[]>([]);
 const { requestFn: deleteColumns } = useRequest(IoTDBApi.deleteColumns);
+const { requestFn: exportTableId } = useRequest(IoTDBApi.exportTableId);
 const { data: columnVOS, requestFn: getColumnsList } = useRequest(IoTDBApi.getColumnsList);
 const sqlPreviewRef = ref<InstanceType<typeof SqlPreview>>();
 const modalCommentVisible = ref(false);
@@ -278,10 +279,25 @@ function handleDelRow(type: string, row: IoTDB.TreeNodeData | null) {
   });
 }
 
+// 导出
+function handleExportData(exportType: string) {
+  exportTableId({
+    database: props.currentNode?.database!,
+    tableName: props.currentNode?.nodeName,
+    name: searchType.value === 'columnName' ? searchKeyword.value : '',
+    comment: searchType.value === 'comment' ? searchKeyword.value : '',
+  }).then((res) => {
+    let url = `/api/file/exportExcelTableColumnTable?exportId=${res.data}`;
+    if (exportType === 'csv') {
+      url = `/api/file/exportCsvTableColumnTable?exportId=${res.data}`;
+    }
+    window.open(url);
+  });
+}
+
 // 下载
 function handleCommandDown(val: string) {
-  // handleExportData(val);
-  console.log(val);
+  handleExportData(val);
 }
 
 // 导入
