@@ -68,8 +68,8 @@ class IoTDBApi {
   }
 
   // 导出表数据
-  static exportTableDataId(data: Record<string, string | number | Date | null> & PageQuery): HttpResponseP {
-    return http.post('/file/tableDataExportId', data);
+  static exportTableDataId(data: IoTDB.QueryDataByTableReq): HttpResponseP {
+    return http.post('/file/exportTableDataTableId', data);
   }
 
   // 导入表/列

@@ -131,7 +131,7 @@ import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import { cloneDeep } from 'lodash-es';
 import { useTableHeight, useShortcutsDate } from '@/composition-api';
-import { TableDataApi } from '@/api';
+import { TableDataApi, IoTDBApi } from '@/api';
 import { todayNow, formatDate } from '@/utils/date';
 import { useUserStore, useDbStore } from '@/stores';
 import DynamicEditTable from '@/components/dynamic-edit-table.vue';
@@ -216,7 +216,7 @@ function handleAppendSql(sql: string) {
 const { requestFn: getList } = useRequest(TableDataApi.getTableData);
 const { requestFn: deleteTableData } = useRequest(TableDataApi.deleteTableData);
 const { requestFn: insertTableData } = useRequest(TableDataApi.insertTableData);
-// const { requestFn: exportTableData } = useRequest(IoTDBApi.exportTableData);
+const { requestFn: exportTableDataId } = useRequest(IoTDBApi.exportTableDataId);
 
 let controller = new AbortController();
 
@@ -299,25 +299,33 @@ function handleImport() {
 }
 
 // 导出
-// function handleExportData(exportType: string) {
-//   exportTableData({
-//     pathName: props.currentNode.parentName,
-//     keyword: searchKeyword.value,
-//     type: searchType.value,
-//     ...pagination,
-//   }).then((res) => {
-//     let url = `/api/file/exportExcelMeasurementData?exportId=${res.data}`;
-//     if (exportType === 'csv') {
-//       url = `/api/file/exportCSVMeasurementData?exportId=${res.data}`;
-//     }
-//     window.open(url);
-//   });
-// }
+function handleExportData(exportType: string) {
+  const startTime = copySearchFormData.value.datetimerange.length === 2 ? dayjs(copySearchFormData.value.datetimerange[0]).valueOf() : undefined;
+  const endTime = copySearchFormData.value.datetimerange.length === 2 ? dayjs(copySearchFormData.value.datetimerange[1]).valueOf() : undefined;
+
+  exportTableDataId({
+    database: props.currentNode.database!,
+    tableName: props.currentNode.nodeName!,
+    columnNames:
+      copySearchFormData.value.columns && copySearchFormData.value.columns.length > 0
+        ? ['time', ...copySearchFormData.value.columns]
+        : [...(props.currentNode.children?.map((item) => item.nodeName) || [])],
+    startTime,
+    endTime,
+    size: 1000,
+    page: pagination.pageNum,
+  }).then((res) => {
+    let url = `/api/file/exportExcelTableDataTable?exportId=${res.data}`;
+    if (exportType === 'csv') {
+      url = `/api/file/exportCsvTableDataTable?exportId=${res.data}`;
+    }
+    window.open(url);
+  });
+}
 
 // 下载
 function handleCommandDown(val: string) {
-  // handleExportData(val);
-  console.log(val);
+  handleExportData(val);
 }
 
 // 重置
