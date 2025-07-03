@@ -94,7 +94,7 @@
 <script lang="ts" setup>
 import { genFileId } from 'element-plus';
 import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
-import { StorageApi } from '@/api';
+import { IoTDBApi } from '@/api';
 
 const props = defineProps<{
   visible: boolean;
@@ -106,7 +106,7 @@ const emit = defineEmits<{
   (e: 'handle-close', reload: boolean): void;
 }>();
 
-const { requestFn: importMeasurementData } = useRequest(StorageApi.importMeasurementData);
+const { requestFn: importTableData } = useRequest(IoTDBApi.importTableData);
 
 const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
@@ -158,8 +158,10 @@ const handleRemove: UploadProps['onRemove'] = () => {
 // 上传
 const customUpload: UploadProps['httpRequest'] = (options) => {
   const formData = new FormData();
+  formData.append('database', props.currentNode.database!);
+  formData.append('tableName', props.currentNode.nodeName);
   formData.append('file', options.file);
-  return importMeasurementData(formData, isCSV.value ? 'csv' : 'xlsx')
+  return importTableData(formData, isCSV.value ? 'csv' : 'xlsx')
     .then((res) => {
       if (res.code === 0) {
         uploadResult.successNum = res.data.successNum;

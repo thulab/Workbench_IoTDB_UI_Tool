@@ -62,9 +62,9 @@ class IoTDBApi {
   // 导入表数据
   static importTableData(data: FormData, fileType: string = 'csv'): HttpResponseP<StorageDevice.ImportMeasurementDataRes> {
     if (fileType === 'csv') {
-      return http.post('/file/importTableDataCSVData', data, { timeout: 60 * 30 * 1000 });
+      return http.post('/file/importCsvTableDataTable', data, { timeout: 60 * 30 * 1000 });
     }
-    return http.post('/file/importTableDataExcelData', data, { timeout: 60 * 30 * 1000 });
+    return http.post('/file/importExcelTableDataTable', data, { timeout: 60 * 30 * 1000 });
   }
 
   // 导出表数据
