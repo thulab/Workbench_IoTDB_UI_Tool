@@ -252,7 +252,7 @@ function handleDelDb(dbNode: IoTDB.TreeNodeData) {
     deleteDatabase(dbNode.nodeName).then(() => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
       setFirstLoad(true);
-      if (currentNodeShow.value?.nodeName === currentNode.value?.database) {
+      if (currentNodeShow.value?.database === currentNode.value?.nodeName) {
         setDefaultTreeExpandKeys();
       } else {
         handleRefresh();
