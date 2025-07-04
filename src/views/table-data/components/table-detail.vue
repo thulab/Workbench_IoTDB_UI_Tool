@@ -31,8 +31,10 @@
           </template>
           <template #prepend>
             <el-select v-model="searchType" style="width: 88px" placeholder="" @change="goto(1)" id="measurement-search-type" class="measurement-search-type-select">
-              <el-option :label="t('dataManage.columnName')" value="columnName" id="measurement-search-type-name" />
-              <el-option :label="t('dataManage.comment')" value="comment" id="measurement-search-type-description" />
+              <el-option :label="t('dataManage.columnName')" value="columnName" id="data-search-column-name" />
+              <el-option :label="t('dataManage.comment')" value="comment" id="data-search-type-comment" />
+              <el-option :label="t('dataManage.dataType')" value="dataType" id="data-search-data-type" />
+              <el-option :label="t('dataManage.cateGory')" value="cateGory" id="data-search-category" />
             </el-select>
           </template>
         </el-input>
@@ -79,6 +81,7 @@
         tooltip-effect="light"
         ref="tableRef"
         :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
+        @sort-change="handleSortChange"
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" />
@@ -96,8 +99,8 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column :label="t('dataManage.dataType')" prop="dataType" :show-overflow-tooltip="true" />
-        <el-table-column :label="t('dataManage.cateGory')" prop="cateGory" :show-overflow-tooltip="true" />
+        <el-table-column :label="t('dataManage.dataType')" prop="dataType" sortable :show-overflow-tooltip="true" />
+        <el-table-column :label="t('dataManage.cateGory')" prop="cateGory" sortable :show-overflow-tooltip="true" />
         <el-table-column :label="t('common.operation')" width="240" align="center" fixed="right">
           <template #default="{ row }">
             <el-tooltip
@@ -183,7 +186,6 @@ const { t, locale } = useI18n();
 const route = useRoute();
 const searchKeyword = ref((route.query.databaseSearch as string) || '');
 const searchType = ref('columnName');
-const searchPlaceholder = computed(() => (searchType.value === 'columnName' ? t('dataManage.columnNamePlaceholder') : t('dataManage.commentPlaceholder')));
 const { maxTableHeight } = useTableHeight(420);
 const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
 const columnsSelection = ref<IoTDB.TreeNodeData[]>([]);
@@ -200,6 +202,8 @@ const { canReadWriteData } = storeToRefs(userStore);
 const importVisible = ref(false);
 const modalTtlVisible = ref(false);
 const localCurrentNode = ref<IoTDB.TreeNodeData>({ ...props.currentNode });
+const orderBy = ref('');
+const order = ref('');
 
 const { getDatabases, setFirstLoad, setActiveList } = useDbStore();
 
@@ -213,11 +217,38 @@ function showAddTableDialog() {
   }
 }
 
+const searchPlaceholder = computed(() => {
+  switch (searchType.value) {
+    case 'columnName':
+      return t('dataManage.columnNamePlaceholder');
+    case 'comment':
+      return t('dataManage.commentPlaceholder');
+    case 'dataType':
+      return t('dataManage.dataTypePlaceholder');
+    case 'cateGory':
+      return t('dataManage.cateGoryPlaceholder');
+    default:
+      return '';
+  }
+});
+
 const columnDataFilter = computed(() => {
   if (!columnVOS.value?.value?.length) return [];
-  const filteredData = columnVOS.value.value.filter((item) =>
-    searchType.value === 'columnName' ? item.columnName.toLowerCase().includes(searchKeyword.value.toLowerCase()) : item.comment?.toLowerCase().includes(searchKeyword.value.toLowerCase())
-  );
+  const keyword = (searchKeyword.value || '').trim().toLowerCase();
+  const filteredData = columnVOS.value.value.filter((item) => {
+    switch (searchType.value) {
+      case 'columnName':
+        return item.columnName.toLowerCase().includes(keyword);
+      case 'comment':
+        return item.comment?.toLowerCase().includes(keyword);
+      case 'dataType':
+        return item.dataType.toLowerCase().includes(keyword);
+      case 'cateGory':
+        return item.cateGory.toLowerCase().includes(keyword);
+      default:
+        return columnVOS.value.value;
+    }
+  });
 
   return filteredData.sort((a, b) => {
     const categoryOrder = ['TIME', 'TAG', 'ATTRIBUTE', 'FIELD'];
@@ -250,6 +281,13 @@ function getColumns() {
   getColumnsList(props.currentNode?.parentName || '', props.currentNode?.nodeName || '').then(() => {
     handleAppendSql(columnVOS.value?.sql || '');
   });
+}
+
+function handleSortChange(sort: { prop: string; order: string }) {
+  console.log(sort.prop);
+  console.log(sort.order);
+  orderBy.value = sort.prop;
+  order.value = sort.order;
 }
 
 onMounted(() => {
@@ -305,11 +343,21 @@ function handleDelRow(type: string, row: IoTDB.TreeNodeData | null) {
 
 // 导出
 function handleExportData(exportType: string) {
+  let orderVal = '';
+  if (order.value === 'ascending') {
+    orderVal = 'asc';
+  } else if (order.value === 'descending') {
+    orderVal = 'desc';
+  }
   exportTableId({
     database: props.currentNode?.database!,
     tableName: props.currentNode?.nodeName,
     name: searchType.value === 'columnName' ? searchKeyword.value : '',
     comment: searchType.value === 'comment' ? searchKeyword.value : '',
+    dataType: searchType.value === 'dataType' ? searchKeyword.value : '',
+    cateGory: searchType.value === 'cateGory' ? searchKeyword.value : '',
+    orderBy: orderBy.value,
+    asc: orderVal,
   }).then((res) => {
     let url = `/api/file/exportExcelTableColumnTable?exportId=${res.data}`;
     if (exportType === 'csv') {
