@@ -1,6 +1,15 @@
 <template>
   <div class="search_div max-height">
-    <el-tree-v2 ref="schemaTree" :data="treeData" style="background-color: #fff; overflow-y: auto" :props="treeProps" :indent="8" :item-size="28" :height="maxTableHeight" :expand-on-click-node="true">
+    <el-tree-v2
+      ref="schemaTree"
+      :data="treeData"
+      style="background-color: #fff; overflow-y: auto"
+      :props="treeProps"
+      :indent="8"
+      :item-size="28"
+      :height="maxTableHeight"
+      :expand-on-click-node="false"
+    >
       <!-- eslint-disable-next-line vue/no-unused-vars -->
       <template #default="{ node, data }">
         <div class="node-text" :id="`tree-node-content-${data.parentName || data.nodeName}`" @dblclick="(event) => handleNodeClick(data.nodeName, event)">
