@@ -1114,6 +1114,13 @@ aiAnalysis:
   singleDelete: Are you sure you want to delete the model?
 dataManage:
   schema: Schema
+  dbSchema: Database Structure
+  addTable: Add Table
+  deleteDb: Delete Database
+  tableSchema: View Table Structure
+  tableData: View Data
+  newColumn: Add Column
+  deleteTable: Delete Table
   table: Table
   ttl: Data Retention Time
   ttlPlaceholder: Empty means INF (permanent)
