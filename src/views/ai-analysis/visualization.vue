@@ -323,7 +323,7 @@
 import { storeToRefs } from 'pinia';
 import type { FormInstance, SingleOrRange, DateModelType, CascaderValue } from 'element-plus';
 import dayjs from 'dayjs';
-import { debounce, cloneDeep } from 'lodash-es';
+import { debounce, cloneDeep, intersection } from 'lodash-es';
 import { vElementSize } from '@vueuse/components';
 import { AIAnalysisApi, TableDataApi } from '@/api';
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
@@ -862,6 +862,10 @@ function getModelList() {
 function handleReset() {
   searchFormData.type = 0;
   searchFormData.measurement = '';
+  searchFormData.database = '';
+  searchFormData.table = '';
+  searchFormData.device = [];
+  searchFormData.tableSelect = [];
   searchFormData.method = '';
   searchFormData.measurementType = '';
   searchFormData.method = defaultMethod;
@@ -1210,12 +1214,19 @@ watch(
         const storageData = JSON.parse(sessionStorage.getItem('aiVisualizationStorage') as string);
         searchFormData.measurement = storageData.measurement;
         searchFormData.type = storageData.type;
-        searchFormData.method = storageData.method;
+        searchFormData.method = intersection(
+          storageData.method,
+          modelOptions.value.map((item) => item.modelId)
+        );
         searchFormData.measurementType = storageData.measurementType;
         searchFormData.anomalyRatio = storageData.anomalyRatio;
         searchFormData.forecastStart = storageData.forecastStart;
         searchFormData.datetimerange = storageData.datetimerange;
         searchFormData.orderBy = storageData.orderBy;
+        searchFormData.database = storageData.database;
+        searchFormData.table = storageData.table;
+        searchFormData.device = storageData.device;
+        searchFormData.tableSelect = storageData.tableSelect;
         sqlValue.value = storageData.sqlValue;
         currentPoint = storageData.currentPoint;
         if (canQuery.value) {
