@@ -44,8 +44,14 @@
             <el-icon size="18" color="var(--el-color-primary)" class="m-r-[4px]">
               <i-custom-tree-db v-if="data.nodeType === 'DATABASE'" />
               <i-custom-table v-else-if="data.nodeType === 'TABLE'" />
-              <el-tag v-else-if="data.nodeType === 'TIME'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Time</el-tag>
-              <el-tag v-else-if="data.nodeType === 'TAG'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Tag</el-tag>
+              <div v-else-if="data.nodeType === 'TIME'" class="tree-column-icon-container">
+                <el-icon size="14"><i-ep-key /></el-icon>
+                <el-tag disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Time</el-tag>
+              </div>
+              <div v-else-if="data.nodeType === 'TAG'" class="tree-column-icon-container">
+                <el-icon size="14"><i-ep-key /></el-icon>
+                <el-tag disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Time</el-tag>
+              </div>
               <el-tag v-else-if="data.nodeType === 'ATTRIBUTE'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Attr</el-tag>
               <el-tag v-else-if="data.nodeType === 'FIELD'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Field</el-tag>
             </el-icon>
@@ -342,6 +348,12 @@ watch(
   width: 100px;
   padding-right: 8px;
   flex: 1;
+}
+
+.tree-column-icon-container {
+  display: flex;
+  align-items: center;
+  margin-left: -12px;
 }
 
 .tree-column-type-tag {
