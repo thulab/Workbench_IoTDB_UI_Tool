@@ -1052,6 +1052,13 @@ aiAnalysis:
   chooseMeasurement: 请选择测点
 dataManage:
   schema: 结构
+  dbSchema: 数据库结构
+  addTable: 新增表
+  deleteDb: 删除数据库
+  tableSchema: 查看表结构
+  tableData: 查看数据
+  newColumn: 新增列
+  deleteTable: 删除表
   table: 表
   ttl: 数据保留时间
   ttlPlaceholder: 为空代表INF(永久)

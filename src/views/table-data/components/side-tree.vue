@@ -60,19 +60,19 @@
                 <el-dropdown-item command="dbSchema">
                   <div class="node-text">
                     <i-custom-structure class="m-r-8" />
-                    <span>{{ t('dataManage.schema') }}</span>
+                    <span>{{ t('dataManage.dbSchema') }}</span>
                   </div>
                 </el-dropdown-item>
                 <el-dropdown-item command="addTable" :disabled="data.database === 'information_schema'">
                   <div class="node-text">
                     <i-custom-add-border2-active class="m-r-8" />
-                    <span>{{ t('dataManage.table') }}</span>
+                    <span>{{ t('dataManage.addTable') }}</span>
                   </div>
                 </el-dropdown-item>
                 <el-dropdown-item command="dbDelete" :disabled="data.database === 'information_schema'">
                   <div class="node-text">
                     <i-custom-delete-active class="m-r-8" />
-                    <span>{{ t('common.delete') }}</span>
+                    <span>{{ t('dataManage.deleteDb') }}</span>
                   </div>
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -87,25 +87,25 @@
                 <el-dropdown-item command="tableSchema">
                   <div class="node-text">
                     <i-custom-structure class="m-r-8" />
-                    <span>{{ t('dataManage.schema') }}</span>
+                    <span>{{ t('dataManage.tableSchema') }}</span>
                   </div>
                 </el-dropdown-item>
                 <el-dropdown-item command="tableData">
                   <div class="node-text">
                     <i-custom-data class="m-r-8" />
-                    <span>{{ t('dataManage.data') }}</span>
+                    <span>{{ t('dataManage.tableData') }}</span>
                   </div>
                 </el-dropdown-item>
                 <el-dropdown-item command="addCloumn" :disabled="data.database === 'information_schema'">
                   <div class="node-text">
                     <i-custom-add-border2-active class="m-r-8" />
-                    <span>{{ t('dataManage.column') }}</span>
+                    <span>{{ t('dataManage.newColumn') }}</span>
                   </div>
                 </el-dropdown-item>
                 <el-dropdown-item command="tableDelete" :disabled="data.database === 'information_schema'">
                   <div class="node-text">
                     <i-custom-delete-active class="m-r-8" />
-                    <span>{{ t('common.delete') }}</span>
+                    <span>{{ t('dataManage.deleteTable') }}</span>
                   </div>
                 </el-dropdown-item>
               </el-dropdown-menu>
