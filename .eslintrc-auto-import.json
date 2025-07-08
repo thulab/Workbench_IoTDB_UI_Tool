@@ -88,6 +88,11 @@
     "useId": true,
     "useModel": true,
     "useTemplateRef": true,
-    "useElementSize": true
+    "useElementSize": true,
+    "onBeforeRouteLeave": true,
+    "onBeforeRouteUpdate": true,
+    "useLink": true,
+    "useRoute": true,
+    "useRouter": true
   }
 }

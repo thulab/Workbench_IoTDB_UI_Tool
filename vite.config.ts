@@ -49,6 +49,7 @@ export default defineConfig(({ mode }) => {
         // , '@vueuse/core'
         imports: [
           'vue',
+          'vue-router',
           {
             '@vueuse/core': [
               // named imports
