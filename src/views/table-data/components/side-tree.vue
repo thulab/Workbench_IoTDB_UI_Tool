@@ -36,6 +36,7 @@
         :item-size="28"
         :height="treeHeight"
         :expand-on-click-node="true"
+        @current-change="handleSelectNode"
         node-key="id"
       >
         <!-- eslint-disable-next-line vue/no-unused-vars -->
@@ -129,7 +130,7 @@
 import { storeToRefs } from 'pinia';
 import { useUserStore, useDbStore } from '@/stores';
 import { IoTDBApi } from '@/api';
-import { type ElTreeV2 } from 'element-plus';
+import type { ElTreeV2 } from 'element-plus';
 import { cloneDeep } from 'lodash-es';
 import ModalAddDb from './modal-add-db.vue';
 import ModalAddTable from './modal-add-table.vue';
@@ -318,6 +319,14 @@ function handleTableOptionClick(command: string, node: IoTDB.TreeNodeData) {
   }
 }
 
+function handleSelectNode(data: IoTDB.TreeNodeData) {
+  if (data && data.id && (data.nodeType === 'DATABASE' || data.nodeType === 'TABLE')) {
+    currentNode.value = data;
+    currentNodeShow.value = cloneDeep(data);
+    emit('handleNodeClick', currentNode.value);
+  }
+}
+
 watch(
   () => treeData.value,
   () => {
@@ -362,5 +371,12 @@ watch(
   height: 16px;
   font-size: 10px;
   margin-right: 12px;
+}
+
+.lang-icon,
+.svg-button-hover-color {
+  &:focus-visible {
+    outline: none;
+  }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <el-tooltip :disabled="tooltipDisabled" :content="props.content" :placement="placement" effect="light" popper-class="tooltip-max-width">
+  <el-tooltip :disabled="tooltipDisabled" :content="props.content" :placement="placement" :show-after="500" effect="light" popper-class="tooltip-max-width">
     <div class="over-flow" :class="props.className" @mouseover="onMouseOver('contentRef')" @focus="onMouseOver('contentRef')">
       <span ref="contentRef" :class="props.spanClassName">{{ content || '-' }}</span>
     </div>

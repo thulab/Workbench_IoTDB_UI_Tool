@@ -837,7 +837,7 @@ const onResize = debounce(() => {
 }, 50);
 
 function getModelList() {
-  if (!canUseModel.value) {
+  if (!canUseModel.value || !enableAINode.value) {
     defaultMethod = [];
     searchFormData.method = defaultMethod;
     return;

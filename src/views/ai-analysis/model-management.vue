@@ -115,7 +115,7 @@
 
         <model-config v-model:visible="configVisible" ref="modelConfig" />
 
-        <modal-fine-tuning v-model:visible="fineTuningVisible" @handle-save="handleFineTuningSuccess" />
+        <modal-fine-tuning v-model:visible="fineTuningVisible" v-if="fineTuningVisible" @handle-save="handleFineTuningSuccess" />
       </el-container>
     </active-container>
   </coming-soon-container>
@@ -265,7 +265,7 @@ function handleBatchDel() {
 }
 
 watch(
-  () => connectionIsActive.value && canUseModel.value,
+  () => connectionIsActive.value && canUseModel.value && enableAINode.value,
   (val) => {
     if (val) {
       handleSearch();

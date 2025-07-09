@@ -5,13 +5,13 @@ import { axiosRequestAdapter } from '@alova/adapter-axios';
 import VueHook from 'alova/vue';
 import http from './http';
 
-const http2 = createAlova({
+const httpAlova = createAlova({
   statesHook: VueHook, // VueHook / ReactHook / SvelteHook
   requestAdapter: axiosRequestAdapter({
     axios: http,
   }),
 });
 
-export default http2;
+export default httpAlova;
 
-export { http2 };
+export { httpAlova };
