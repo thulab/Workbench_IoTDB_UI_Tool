@@ -50,7 +50,7 @@ declare namespace IoTDB {
     columnName?: string;
     cateGory?: string;
     dataType?: string;
-    nodeType: 'DATABASE' | 'TABLE' | 'COLUMN' | 'TAG' | 'FIELD' | 'ATTRIBITE' | 'TIME' | 'TABLEDATA';
+    nodeType: 'DATABASE' | 'TABLE' | 'COLUMN' | 'TAG' | 'FIELD' | 'ATTRIBUTE' | 'TIME' | 'TABLEDATA';
     children?: TreeNodeData[];
   }
 

@@ -319,7 +319,8 @@ function handleTableOptionClick(command: string, node: IoTDB.TreeNodeData) {
   }
 }
 
-function handleSelectNode(data: IoTDB.TreeNodeData) {
+function handleSelectNode(payload: { [key: string]: any }) {
+  const data = payload as IoTDB.TreeNodeData;
   if (data && data.id && (data.nodeType === 'DATABASE' || data.nodeType === 'TABLE')) {
     currentNode.value = data;
     currentNodeShow.value = cloneDeep(data);
