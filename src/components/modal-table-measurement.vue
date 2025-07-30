@@ -466,7 +466,7 @@ const addMeasurements = async () => {
       const key = `${condition}-${measurement}`;
       const exists = internalSelectedMeasurements.value.some((m) => `${m.condition}-${m.measurement}` === key);
 
-      if (!exists && internalSelectedMeasurements.value.length + newMeasurements.length < props.selectedLimit) {
+      if (!exists) {
         newMeasurements.push({
           condition,
           device: Object.keys(device).map((key) => ({ variable: key, value: device[key] })),
@@ -476,10 +476,12 @@ const addMeasurements = async () => {
     });
   });
 
-  if (newMeasurements.length === 0) {
-    if (internalSelectedMeasurements.value.length >= props.selectedLimit) {
+  if (newMeasurements.length !== 0) {
+    if (internalSelectedMeasurements.value.length + newMeasurements.length >= props.selectedLimit) {
       ElMessage.warning(t('common.selectMeasurementLimit', { limit: props.selectedLimit }));
+      return;
     }
+  } else {
     return;
   }
 

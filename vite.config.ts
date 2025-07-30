@@ -129,6 +129,10 @@ export default defineConfig(({ mode }) => {
           target: proxyTarget,
           ws: true,
         },
+        '/api/relational/trendData': {
+          target: proxyTarget,
+          ws: true,
+        },
       },
     },
   };

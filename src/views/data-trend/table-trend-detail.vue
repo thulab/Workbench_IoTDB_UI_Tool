@@ -662,9 +662,18 @@ const onResize = debounce(() => {
   }
 }, 50);
 
+const buildParams = (operate: string, measurements: IoTDB.SelectedMeasurement[]) => {
+  return JSON.stringify({
+    operate,
+    database: copySearchFormData.database || searchFormData.database,
+    tableName: copySearchFormData.table || searchFormData.table,
+    fields: measurements.map((item) => ({ value: item.condition, variable: item.measurement, path: formatDevice(item.device, item.measurement) })),
+  });
+};
+
 // 重置
 function handleReset(force?: boolean) {
-  socketInstance.value?.send(JSON.stringify({ operate: 'del', paths: [...searchFormData.selectedMeasurement] }));
+  socketInstance.value?.send(buildParams('del', searchFormData.selectedMeasurement));
   if (force) {
     searchFormData.selectedMeasurement = [];
   }
@@ -708,11 +717,12 @@ function handleExpand() {
 
 function dealSearchPath() {
   copySearchFormData = cloneDeep(searchFormData);
-  const allCurrentPaths = pathList.value.map((item) => item.selectedMeasurement);
+  const allCurrentPaths = pathList.value.map((item) => item.selectedMeasurement) as IoTDB.SelectedMeasurement[];
   const addPaths = difference(
     copySearchFormData.selectedMeasurement.map((item) => formatDevice(item.device, item.measurement)),
     allCurrentPaths.map((item) => formatDevice(item!.device, item!.measurement)),
   );
+  const addMeasurements = copySearchFormData.selectedMeasurement.filter((item) => addPaths.includes(formatDevice(item.device, item.measurement)));
   const deletePaths = difference(
     allCurrentPaths.map((item) => formatDevice(item!.device, item!.measurement)),
     copySearchFormData.selectedMeasurement.map((item) => formatDevice(item.device, item.measurement)),
@@ -723,8 +733,9 @@ function dealSearchPath() {
       pathList.value.splice(index, 1);
     }
   });
+  const deleteMeasurements = allCurrentPaths.filter((item) => deletePaths.includes(formatDevice(item!.device, item!.measurement)));
   if (deletePaths.length > 0) {
-    socketInstance.value?.send(JSON.stringify({ operate: 'del', paths: [...deletePaths] }));
+    socketInstance.value?.send(buildParams('del', deleteMeasurements));
     deletePaths.forEach((deleteItem) => {
       const index = chartData.value.findIndex((data) => data.path === deleteItem);
       if (index !== -1) {
@@ -749,7 +760,7 @@ function dealSearchPath() {
   if (isRunningTab.value) {
     loading.value = true;
     if (addPaths.length > 0) {
-      socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [...addPaths] }));
+      socketInstance.value?.send(buildParams('add', addMeasurements));
     }
   }
 }
@@ -873,14 +884,20 @@ function handleData(data: any) {
   }
 }
 
-const { socketInstance, initWebsocket } = useWebsocket('/api/trendData', handleData, false);
+const { socketInstance, initWebsocket } = useWebsocket('/api/relational/trendData', handleData, false);
 
 function handlePlay(val: boolean) {
   if (val) {
     if (!socketInstance.value || socketInstance.value.readyState > 1) {
       initWebsocket(() => {
         const paths = chartData.value.map((data) => data.path);
-        socketInstance.value?.send(JSON.stringify({ operate: 'add', paths }));
+        const allCurrentPaths = pathList.value.map((item) => item.selectedMeasurement) as IoTDB.SelectedMeasurement[];
+        socketInstance.value?.send(
+          buildParams(
+            'add',
+            allCurrentPaths.filter((item) => paths.includes(formatDevice(item.device, item.measurement))),
+          ),
+        );
       });
     }
     chartData.value.forEach((data) => {
@@ -924,16 +941,20 @@ function handleTrendTab(type: 'running' | 'history', unforce?: boolean) {
         chartData.value = [];
         setOption(chartOptions.value, true);
       }
+      const allCurrentPaths = pathList.value.map((item) => item.selectedMeasurement) as IoTDB.SelectedMeasurement[];
+
       const currentChecked = chartData.value.map((item) => item.path);
       const cloneChecked = pathList.value.map((item) => item.path);
       const del = difference(currentChecked, cloneChecked);
       const add = difference(cloneChecked, currentChecked);
       loading.value = true;
       if (add.length > 0) {
-        socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [...add] }));
+        const addMeasurements = allCurrentPaths.filter((item) => add.includes(formatDevice(item.device, item.measurement)));
+        socketInstance.value?.send(buildParams('add', addMeasurements));
       }
       if (del.length > 0) {
-        socketInstance.value?.send(JSON.stringify({ operate: 'del', paths: [...del] }));
+        const delMeasurements = allCurrentPaths.filter((item) => del.includes(formatDevice(item.device, item.measurement)));
+        socketInstance.value?.send(buildParams('del', delMeasurements));
         del.forEach((deleteItem) => {
           const index = chartData.value.findIndex((data) => data.path === deleteItem);
           if (index !== -1) {
@@ -952,10 +973,12 @@ function handleOperatePath(type: 'add' | 'del' | 'detail', path: string) {
     return;
   }
   if (dataTab.value === 'running') {
+    const allCurrentPaths = pathList.value.map((item) => item.selectedMeasurement) as IoTDB.SelectedMeasurement[];
+    const selectedMeasurement = allCurrentPaths.find((item) => formatDevice(item.device, item.measurement) === path) as IoTDB.SelectedMeasurement;
     if (type === 'add') {
-      socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [path] }));
+      socketInstance.value?.send(buildParams('add', [selectedMeasurement]));
     } else if (type === 'del') {
-      socketInstance.value?.send(JSON.stringify({ operate: 'del', paths: [path] }));
+      socketInstance.value?.send(buildParams('del', [selectedMeasurement]));
       const index = chartData.value.findIndex((data) => data.path === path);
       const historyIndex = chartHistoryData.value.findIndex((data) => data.path === path);
       if (index !== -1) {
@@ -1223,7 +1246,7 @@ watch(
               }),
             );
             if (dataTab.value === 'running' && searchFormData.selectedMeasurement.length) {
-              socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [...searchFormData.selectedMeasurement] }));
+              socketInstance.value?.send(buildParams('add', searchFormData.selectedMeasurement));
             }
           } else {
             socketInstance.value?.addEventListener('open', () => {
@@ -1236,7 +1259,7 @@ watch(
                 }),
               );
               if (dataTab.value === 'running' && searchFormData.selectedMeasurement.length) {
-                socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [...searchFormData.selectedMeasurement] }));
+                socketInstance.value?.send(buildParams('add', searchFormData.selectedMeasurement));
               }
             });
           }
