@@ -309,7 +309,7 @@
             v-model:visible="writeBackVisible"
             :database="currentTable?.database || ''"
             :table="currentTable?.nodeName || ''"
-            :tags="copySearchFormData.selectedMeasurement || []"
+            :tags="copySearchFormData.selectedMeasurement?.device"
             :field-name="copySearchFormData.measurement"
             @handleConfirm="handleWriteBackSuccess"
           />

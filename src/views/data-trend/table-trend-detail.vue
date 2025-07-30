@@ -675,6 +675,8 @@ const buildParams = (operate: string, measurements: IoTDB.SelectedMeasurement[])
 function handleReset(force?: boolean) {
   socketInstance.value?.send(buildParams('del', searchFormData.selectedMeasurement));
   if (force) {
+    searchFormData.database = '';
+    searchFormData.table = '';
     searchFormData.selectedMeasurement = [];
   }
   searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];

@@ -25,7 +25,7 @@
             </span>
             <host-port v-model="formData.masterCluster.hostAndPortVOS" :form-key="'masterCluster.hostAndPortVOS'" :is-disabled="isShowSave" />
           </div>
-          <prometheus
+          <prometheus-input
             v-model="formData.masterCluster.prometheusUrl"
             v-model:username="formData.masterCluster.prometheusUsername"
             v-model:password="formData.masterCluster.prometheusPassword"
@@ -45,7 +45,7 @@
             </span>
             <host-port v-model="formData.masterCluster.hostAndPortVOS" :form-key="'masterCluster.hostAndPortVOS'" :is-disabled="isShowSave" :show-operate="true" />
           </div>
-          <prometheus
+          <prometheus-input
             v-model="formData.masterCluster.prometheusUrl"
             v-model:username="formData.masterCluster.prometheusUsername"
             v-model:password="formData.masterCluster.prometheusPassword"
@@ -71,7 +71,7 @@
                 </span>
                 <host-port v-model="formData.masterCluster.hostAndPortVOS" :form-key="'masterCluster.hostAndPortVOS'" :is-disabled="isShowSave" :show-operate="true" />
               </div>
-              <prometheus
+              <prometheus-input
                 v-model="formData.masterCluster.prometheusUrl"
                 v-model:username="formData.masterCluster.prometheusUsername"
                 v-model:password="formData.masterCluster.prometheusPassword"
@@ -92,7 +92,7 @@
                 </span>
                 <host-port v-model="formData.slaveCluster.hostAndPortVOS" :form-key="'slaveCluster.hostAndPortVOS'" :is-disabled="isShowSave" :show-operate="true" />
               </div>
-              <prometheus
+              <prometheus-input
                 v-model="formData.slaveCluster.prometheusUrl"
                 v-model:username="formData.slaveCluster.prometheusUsername"
                 v-model:password="formData.slaveCluster.prometheusPassword"
