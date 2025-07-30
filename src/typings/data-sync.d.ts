@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 declare namespace DataSync {
   export interface SynchronListData {
     name: string;

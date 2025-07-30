@@ -1,11 +1,11 @@
-@import './pagination';
-@import './date';
-@import './modal';
-@import './button';
-@import './input';
-@import './table';
-@import './collapse';
-@import './step';
+@use './pagination';
+@use './date';
+@use './modal';
+@use './button';
+@use './input';
+@use './table';
+@use './collapse';
+@use './step';
 
 :root {
   --el-text-color-regular: #656a85;
@@ -19,7 +19,7 @@
 }
 
 .menu {
-  // --el-menu-item-font-size: 12px !important;
+  // --el-menu-item-font-size: 12px !important;--el-menu-item-font-size
 }
 
 ::-webkit-scrollbar-thumb {

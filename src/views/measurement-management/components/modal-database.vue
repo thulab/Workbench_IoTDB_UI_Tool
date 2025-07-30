@@ -80,6 +80,6 @@ watch(
     if (newVal) {
       formRef.value?.resetFields();
     }
-  }
+  },
 );
 </script>

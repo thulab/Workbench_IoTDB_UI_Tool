@@ -104,6 +104,12 @@
   .el-input__prefix-inner > :last-child {
     margin-right: 0;
   }
+
+  &.search-select {
+    .el-select__wrapper {
+      padding: 1px !important;
+    }
+  }
 }
 
 .el-select-dropdown__item.is-disabled {

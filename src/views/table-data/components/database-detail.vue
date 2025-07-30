@@ -236,7 +236,7 @@ const tableDataFilter = computed(() => {
     return tableVO.value.value.filter((item) =>
       searchType.value === 'tableName'
         ? item.tableName.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase())
-        : item.comment?.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase())
+        : item.comment?.toLocaleLowerCase().includes(searchKeyword.value.toLocaleLowerCase()),
     );
   }
   return [];
@@ -353,7 +353,7 @@ watch(
     if (newNode) {
       getDatabaseDetail(newNode.nodeName);
     }
-  }
+  },
 );
 
 onMounted(() => {

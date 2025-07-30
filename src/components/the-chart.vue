@@ -13,6 +13,7 @@ let chartInstance: echarts.ECharts;
 const props = defineProps<{
   option: ECOption;
   dark?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   clickFunc?: Function;
 }>();
 
@@ -58,7 +59,7 @@ watch(
   (newOption) => {
     setOption(newOption);
   },
-  { deep: true }
+  { deep: true },
 );
 
 onMounted(() => {

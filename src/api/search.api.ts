@@ -49,7 +49,7 @@ class SearchApi {
     return http.post('/file/upload', data, { timeout: 60 * 30 * 1000 });
   }
 
-  static importFile(file: String, type: number): HttpResponseP<StorageDevice.ImportMeasurementDataRes> {
+  static importFile(file: string, type: number): HttpResponseP<StorageDevice.ImportMeasurementDataRes> {
     // 0:ts文件 1:csv 2:excel
     let apiUrl = '/file/importTsFile';
     if (type === 1) {
@@ -142,7 +142,7 @@ class SearchApi {
     return http.post('/visualization/getPatternMatchData', data);
   }
 
-  static getExportMatchDataFile(times: number[], values: string[], measurement: string, dataType: string): HttpResponseP<String> {
+  static getExportMatchDataFile(times: number[], values: string[], measurement: string, dataType: string): HttpResponseP<string> {
     return http.post('/file/exportTsFile', { times, values, measurement, dataType });
   }
 

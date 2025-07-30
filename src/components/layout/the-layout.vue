@@ -20,7 +20,7 @@
         </section>
       </el-main>
       <el-footer>
-        <layout-footer v-if="false" />
+        <!-- <layout-footer v-if="false" /> -->
       </el-footer>
     </el-container>
   </el-container>
@@ -39,7 +39,7 @@ import { storeToRefs } from 'pinia';
 import LayoutMenu from './layout-menu.vue';
 import LayoutHeader from './layout-header.vue';
 import LayoutTabs from './layout-tabs.vue';
-import LayoutFooter from './layout-footer.vue';
+// import LayoutFooter from './layout-footer.vue';
 
 const route = useRoute();
 const appStore = useAppStore();

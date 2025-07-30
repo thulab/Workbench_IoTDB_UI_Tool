@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 declare namespace Log {
   export interface QueryAuditList {
     username: string;

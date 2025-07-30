@@ -11,3 +11,5 @@ node_modules/*
 /src/typings/auto-imports.d.ts
 /src/typings/components.d.ts
 public/
+.editorconfig
+.gitattributes

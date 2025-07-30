@@ -242,7 +242,6 @@ function handleChangeType(type: 0 | 1 | 2) {
 }
 
 function handleChangeConnection() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return new Promise((resolve, reject) => {
     ElMessageBox.confirm(editType.value === 'add' ? t('common.continueTip') : t('common.unsaveTip'), t('common.notice'), {
       confirmButtonText: t('common.continue'),
@@ -357,7 +356,6 @@ function handleTestLogin() {
           if (route.name === 'Login') {
             router.push({ name: 'Dashboard' });
           } else {
-            // eslint-disable-next-line no-underscore-dangle
             window.__isReload__ = true;
             window.location.reload();
           }
@@ -459,7 +457,7 @@ function handleSavePrometheus() {
   })
     .then(() => {
       ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
-      // eslint-disable-next-line no-underscore-dangle
+
       window.__isReload__ = true;
       window.location.reload();
     })
@@ -493,7 +491,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 
 watch(locale, () => {

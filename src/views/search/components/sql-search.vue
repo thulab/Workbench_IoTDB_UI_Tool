@@ -189,7 +189,7 @@ const tableDataPagination = computed(() =>
       ...item,
       list: item?.list?.slice(((pageNums[index] || 1) - 1) * pagination.pageSize, (pageNums[index] || 1) * pagination.pageSize) as Record<string, any>[],
     };
-  })
+  }),
 );
 
 let controller = new AbortController();
@@ -236,7 +236,7 @@ function querySqlRun(type?: string) {
                 prop: `t${index}`,
                 width: 'auto',
                 fixed: index === 0 ? 'left' : false,
-              }))
+              })),
             );
           } else {
             columnList.value.push(null);
@@ -336,7 +336,7 @@ function handleCommandDown(val: string, index: number) {
               prop: `t${i}`,
               width: 'auto',
               fixed: i === 0 ? 'left' : false,
-            }))
+            })),
           );
         } else {
           columnList.value.splice(index, 1, null);

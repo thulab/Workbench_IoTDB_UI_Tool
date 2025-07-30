@@ -156,7 +156,6 @@ function getConfigDetail() {
 }
 
 function handleChangeValid() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return new Promise((resolve, reject) => {
     ElMessageBox.confirm(t('iotdbConfig.continueTip'), t('common.notice'), {
       confirmButtonText: t('common.continue'),
@@ -193,7 +192,7 @@ function handleChangeNode() {
 // 节点更新
 function handleConfirm() {
   saveLoading.value = true;
-  updateConfigs(configData.value, inputEditor.value?.getContent()!, currentNode.value)
+  updateConfigs(configData.value, inputEditor.value?.getContent(), currentNode.value)
     .then(() => {
       ElMessage.success({ message: t('common.updateSuccess'), grouping: true });
       getConfigDetail();
@@ -206,7 +205,7 @@ function handleConfirm() {
 // 全部节点更新
 function handleAllConfirm() {
   allSaveLoading.value = true;
-  updateConfigs(configData.value, inputEditor.value?.getContent()!)
+  updateConfigs(configData.value, inputEditor.value?.getContent())
     .then(() => {
       ElMessage.success({ message: t('common.updateSuccess'), grouping: true });
       getConfigDetail();
@@ -255,13 +254,12 @@ function setStorage() {
       content: inputEditor.value?.getContent(),
       configData: configData.value,
       node: currentNode.value,
-    })
+    }),
   );
 }
 
 onMounted(() => {
   window.addEventListener('beforeunload', () => {
-    // eslint-disable-next-line no-underscore-dangle
     if (!window.__isReload__) {
       setStorage();
     } else {
@@ -283,7 +281,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 
 watch(
@@ -300,7 +298,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 
 watch(
@@ -312,7 +310,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 
 watch(locale, () => {

@@ -202,7 +202,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 
 watch(
@@ -225,7 +225,7 @@ watch(
         formData.expression = '';
       }
     }
-  }
+  },
 );
 </script>
 

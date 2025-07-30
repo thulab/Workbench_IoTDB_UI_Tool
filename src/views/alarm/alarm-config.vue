@@ -320,7 +320,6 @@ function handleSelectionChange(vals: Alarm.QueryConfigResult[]) {
   multipleSelection.value = vals;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleSortChange({ column, prop, order }: SortMethod<Alarm.QueryConfigResult>) {
   const lastOrderBy = searchFormData.orderBy;
   const lastAsc = searchFormData.asc;
@@ -383,12 +382,6 @@ function handleSaveConfig(unreload?: boolean) {
   handleSearch();
 }
 
-// 导入
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function handleImport() {
-  importVisible.value = true;
-}
-
 function handleImportClose(reload: boolean) {
   if (reload) {
     handleSearch();
@@ -408,7 +401,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 
 watch(locale, () => {

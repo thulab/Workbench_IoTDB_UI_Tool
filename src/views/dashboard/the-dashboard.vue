@@ -544,7 +544,7 @@ function getSystemData() {
           physicalMachine: '',
         },
       ],
-      res.data.masterNodeInfo.nodes ? [...res.data.masterNodeInfo.nodes.filter((item) => item.type === 'ConfigNode'), ...res.data.masterNodeInfo.nodes.filter((item) => item.type === 'DataNode')] : []
+      res.data.masterNodeInfo.nodes ? [...res.data.masterNodeInfo.nodes.filter((item) => item.type === 'ConfigNode'), ...res.data.masterNodeInfo.nodes.filter((item) => item.type === 'DataNode')] : [],
     );
     if (res.data.slaveNodeInfo) {
       assign(slaveData.value, res.data.slaveNodeInfo);
@@ -560,7 +560,7 @@ function getSystemData() {
             physicalMachine: '',
           },
         ],
-        res.data.slaveNodeInfo.nodes ? [...res.data.slaveNodeInfo.nodes.filter((item) => item.type === 'ConfigNode'), ...res.data.slaveNodeInfo.nodes.filter((item) => item.type === 'DataNode')] : []
+        res.data.slaveNodeInfo.nodes ? [...res.data.slaveNodeInfo.nodes.filter((item) => item.type === 'ConfigNode'), ...res.data.slaveNodeInfo.nodes.filter((item) => item.type === 'DataNode')] : [],
       );
     } else {
       slaveData.value = null;
@@ -618,7 +618,6 @@ function handleChangeNode(val: string) {
   handleRefreshMonitor();
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleSortChange({ column, prop, order }: SortMethod<Alarm.QueryConfigResult>, type: 'master' | 'slave') {
   if (type === 'master') {
     if (order === 'ascending') {
@@ -680,7 +679,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 
 watch(
@@ -692,7 +691,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 
 watch(
@@ -704,7 +703,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 
 watch(locale, () => {
@@ -829,5 +828,5 @@ onUnmounted(() => {
 }
 </style>
 <style lang="scss">
-@import './components/monitor-module';
+@use './components/monitor-module';
 </style>

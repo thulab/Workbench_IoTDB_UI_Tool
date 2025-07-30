@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 declare namespace Server {
   export interface ConnectionInfo {
     name?: string;

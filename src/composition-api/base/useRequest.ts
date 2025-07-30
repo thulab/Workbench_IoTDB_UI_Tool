@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-underscore-dangle */
-
 import { ref, type Ref } from 'vue';
 
 import i18n from '@/locale/index';

@@ -153,6 +153,6 @@ watch(
       formRef.value?.resetFields();
       formKey.value++;
     }
-  }
+  },
 );
 </script>

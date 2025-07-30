@@ -55,6 +55,7 @@ interface MarkPointLine {
   xAxis: number;
   yAxis: number;
   label: {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     formatter: string | Function;
     position: string;
     offset: number[];
@@ -78,13 +79,12 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function pointTitle(i: number) {
-  if (props.pointList.length === 1) {
-    return 'D：';
-  }
-  return `D${i + 1}：`;
-}
+// function pointTitle(i: number) {
+//   if (props.pointList.length === 1) {
+//     return 'D：';
+//   }
+//   return `D${i + 1}：`;
+// }
 
 function pointDisabled(item: PointData) {
   const flag = props.pointCheckedData.some((data) => data.name === item.name);

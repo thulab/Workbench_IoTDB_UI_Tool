@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 
-const useMenuStore = defineStore({
-  id: 'MenuState',
+const useMenuStore = defineStore('menuStore', {
   state: () => ({
     isCollapse: false,
     menuList: [] as Array<MenuOptions>,

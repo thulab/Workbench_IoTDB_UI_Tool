@@ -142,12 +142,12 @@ watch(
   (val) => {
     emit(
       'handleSelect',
-      list.value?.find((item) => item.name === val)
+      list.value?.find((item) => item.name === val),
     );
   },
   {
     immediate: true,
-  }
+  },
 );
 
 watch(
@@ -159,7 +159,7 @@ watch(
     if (!val.some((item) => item.name === current.value)) {
       current.value = val[0]?.name;
     }
-  }
+  },
 );
 
 defineExpose({ getList });

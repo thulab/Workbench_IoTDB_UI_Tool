@@ -305,9 +305,8 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormInstance, SingleOrRange, DateModelType, TabsPaneContext } from 'element-plus';
+import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import { DataSyncApi } from '@/api';
-import CodeEditor from '@/views/search/components/code-editor.vue';
 import { today, todayNow, formatDate } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
 
@@ -326,7 +325,7 @@ const emit = defineEmits<{
 const { t, locale } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const formRef = ref<FormInstance>();
-const codeEditorRef = ref<InstanceType<typeof CodeEditor>>();
+// const codeEditorRef = ref<InstanceType<typeof CodeEditor>>();
 const activeTab = ref('select');
 const codeMirrorReady = ref(false);
 const codeMirrorKey = ref(0);
@@ -437,15 +436,14 @@ const isDisabledHosts = computed(() => {
 
 const { requestFn: getPilePluginsList } = useRequest(DataSyncApi.getPilePluginsList);
 const { requestFn: getTaskDetail } = useRequest(DataSyncApi.getTaskDetail);
-const { requestFn: getAdvancedTaskDetail } = useRequest(DataSyncApi.getAdvancedTaskDetail);
+// const { requestFn: getAdvancedTaskDetail } = useRequest(DataSyncApi.getAdvancedTaskDetail);
 const { requestFn: saveSynchronTask } = useRequest(DataSyncApi.saveSynchronTask);
 const { requestFn: saveAdvancedTask } = useRequest(DataSyncApi.saveAdvancedTask);
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function codeEditorReady() {
-  codeMirrorReady.value = true;
-  codeEditorRef.value?.setCodeEditorReadonly(props.editType === 'view');
-}
+// function codeEditorReady() {
+//   codeMirrorReady.value = true;
+//   codeEditorRef.value?.setCodeEditorReadonly(props.editType === 'view');
+// }
 
 function handleAddHost() {
   formData.value.targetInfos.push({ host: '', port: '' });
@@ -508,13 +506,12 @@ function handleResetForm() {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function handleTabClick(tab: TabsPaneContext) {
-  if (tab.props.name === 'select') {
-    errorName.value = '';
-    formRef.value?.clearValidate();
-  }
-}
+// function handleTabClick(tab: TabsPaneContext) {
+//   if (tab.props.name === 'select') {
+//     errorName.value = '';
+//     formRef.value?.clearValidate();
+//   }
+// }
 
 function getPlugin() {
   return getPilePluginsList().then((res) => {
@@ -538,12 +535,11 @@ function getSelectDetail() {
   });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getInputDetail() {
-  return getAdvancedTaskDetail(props.editData).then((res) => {
-    taskInputVal.value = res.data.advancedInput || '';
-  });
-}
+// function getInputDetail() {
+//   return getAdvancedTaskDetail(props.editData).then((res) => {
+//     taskInputVal.value = res.data.advancedInput || '';
+//   });
+// }
 
 function getDetail() {
   loading.value = true;
@@ -665,7 +661,7 @@ watch(
         });
       }
     }
-  }
+  },
 );
 </script>
 

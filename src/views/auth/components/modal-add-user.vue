@@ -92,7 +92,7 @@ watch(
       formData.name = [];
       getUserList();
     }
-  }
+  },
 );
 </script>
 <style lang="scss">

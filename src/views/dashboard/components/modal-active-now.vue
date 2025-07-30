@@ -3,7 +3,7 @@
     <el-form ref="formRef" :model="formData" class="m-t-14 m-b-34" @submit.prevent>
       <base-form-item :label="`${t('dashboard.machineCode')}：`" prop="machineCode">
         <div style="display: flex; align-items: flex-start">
-          <div style="flex: 1; word-break: break-word; white-space: normal">{{ formData.machineCode }}</div>
+          <div style="flex: 1; overflow-wrap: break-word; white-space: normal">{{ formData.machineCode }}</div>
           <el-icon :key="formData.machineCode" v-copy="formData.machineCode" size="24" class="svg-button-hover-color"><i-custom-copy /></el-icon>
         </div>
       </base-form-item>
@@ -68,7 +68,7 @@ watch(
       formData.activeCode = '';
       getDetail();
     }
-  }
+  },
 );
 </script>
 

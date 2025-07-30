@@ -93,7 +93,7 @@ watch(
       formData.name = [];
       getRoleList();
     }
-  }
+  },
 );
 </script>
 <style lang="scss">

@@ -62,8 +62,8 @@ const setCodeEditorReadonly = (val: boolean) => {
 
 const getSelectionText = () => {
   if (view.value) {
-    const { from, to } = view.value!.state.selection.main;
-    const res = view.value!.state.sliceDoc(from, to);
+    const { from, to } = view.value.state.selection.main;
+    const res = view.value.state.sliceDoc(from, to);
     const resWithoutComments = res.replace(/(\/\*(\s|.)*?\*\/)|(--.*$)/gm, '');
     const resWithoutWhitespace = resWithoutComments.replace(/^\s+/gm, '');
     // if (replaceWrap) {
@@ -111,7 +111,7 @@ onMounted(() => {
       if (newValue !== editorTools.getDoc()) {
         editorTools.setDoc(newValue);
       }
-    }
+    },
   );
   if (config.value.disabled) {
     editorTools.toggleDisabled(config.value.disabled);
@@ -127,15 +127,15 @@ onMounted(() => {
   watch(
     () => props.style,
     (style) => editorTools.setStyle(style),
-    { immediate: true }
+    { immediate: true },
   );
   if (config.value.autofocus) {
     editorTools.focus();
   }
 
   emit(EventKey.Ready, {
-    state: state.value!,
-    view: view.value!,
+    state: state.value,
+    view: view.value,
     container: codeContainerRef.value!,
   });
 });

@@ -362,7 +362,7 @@ const tableData = computed<Auth.UserEditPathAuthInfo[]>(() => {
         rolePrivileges: [],
         allChecked: item.privileges.length >= pathPrivilegesEnumKeys.value.length,
         privileges: union(item.privileges, []),
-      }) as Auth.UserEditPathAuthInfo
+      }) as Auth.UserEditPathAuthInfo,
   );
   rolePathPrivileges.value?.forEach((item) => {
     joinRolePathPrivileges(result, item);
@@ -382,7 +382,7 @@ const tableData = computed<Auth.UserEditPathAuthInfo[]>(() => {
   return result;
 });
 
-const editPathList = computed(() => tableData.value.map((item) => item.path!).filter((item) => item));
+const editPathList = computed(() => tableData.value.map((item) => item.path).filter((item) => item));
 function handleAllCheckedEntity(row: Auth.UserEditAuthInfo, value: boolean) {
   if (value) {
     // 赋予其 除角色权限外的所有权限
@@ -437,7 +437,7 @@ function getDetail() {
       const userPrivileges = authData.value.pathPrivileges || [];
       difference(
         rolePaths,
-        userPrivileges.map((item) => item.path)
+        userPrivileges.map((item) => item.path),
       ).forEach((path) => {
         userPrivileges.push({ path, privileges: [] });
       });
@@ -455,7 +455,7 @@ function handleAddRole(roleNames: string[]) {
       const rolePaths = res.data.pathPrivileges.map((item) => item.path);
       difference(
         rolePaths,
-        pathUserPrivileges.value.map((item) => item.path)
+        pathUserPrivileges.value.map((item) => item.path),
       ).forEach((path) => {
         pathUserPrivileges.value.push({ path, privileges: [] });
       });
@@ -587,7 +587,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 </script>
 

@@ -90,7 +90,7 @@ const props = withDefaults(
   defineProps<{
     visible: boolean;
   }>(),
-  {}
+  {},
 );
 
 const emit = defineEmits<{
@@ -250,7 +250,7 @@ watch(
       formRef.value?.resetFields();
       formData.timeRange = getStartAndEnd();
     }
-  }
+  },
 );
 </script>
 

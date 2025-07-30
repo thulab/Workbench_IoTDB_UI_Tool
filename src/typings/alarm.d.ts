@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 declare namespace Alarm {
   export interface QueryConfigParams {
     alarmName: string | null;

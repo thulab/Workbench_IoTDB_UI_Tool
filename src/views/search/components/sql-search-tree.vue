@@ -124,7 +124,6 @@ const { maxTableHeight: tabHeight } = useTableHeight(125);
 
 const activiteSql = ref<string>(`_${dayjs().format('YYYY-MM-DD HH:mm:ss:SSS')}`);
 
-// eslint-disable-next-line no-useless-escape
 const sqlList = ref<Search.SqlList[]>([
   {
     id: activiteSql.value,
@@ -441,7 +440,7 @@ function setStorage() {
       activeNameSide: activeNameSide.value,
       code: { ...code },
       codeOriginal: { ...codeOriginal },
-    })
+    }),
   );
 }
 
@@ -451,7 +450,6 @@ onBeforeUnmount(() => {
 
 onMounted(() => {
   window.addEventListener('beforeunload', () => {
-    // eslint-disable-next-line no-underscore-dangle
     if (!window.__isReload__) {
       setStorage();
     } else {

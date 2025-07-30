@@ -197,7 +197,7 @@ const changeBoolean = computed(() => formData.measurementType === 'BOOLEAN' && f
 
 const linkTip = computed(
   () =>
-    `<a href="/api/file/downloadErrorInfo?fileName=${errorLink.value}" target="_blank" rel="noopener noreferrer" style="color: #495ad4;text-decoration: underline;">${t('common.currentDownload')}</a>`
+    `<a href="/api/file/downloadErrorInfo?fileName=${errorLink.value}" target="_blank" rel="noopener noreferrer" style="color: #495ad4;text-decoration: underline;">${t('common.currentDownload')}</a>`,
 );
 
 const checkRules = (rule: any, value: any, callback: any) => {
@@ -397,7 +397,7 @@ watch(
         formData.alarmConfigId = undefined;
       }
     }
-  }
+  },
 );
 </script>
 

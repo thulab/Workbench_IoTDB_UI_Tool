@@ -22,7 +22,7 @@ const useMutationObserver = (
     childList: true, // 观察目标子节点的变化，是否有添加或者删除
     attributes: false, // 观察属性变动
     subtree: true, // 观察后代节点，默认为 false
-  }
+  },
 ) => {
   const observer = ref<MutationObserver>();
   const observerCallback = throttle(callback, 200);
@@ -43,7 +43,7 @@ const useMutationObserver = (
 
     // 以上述配置开始观察目标节点
     observerCB.observe(targetNode, config);
-    // eslint-disable-next-line consistent-return
+
     return observerCB;
   };
   onMounted(() => {

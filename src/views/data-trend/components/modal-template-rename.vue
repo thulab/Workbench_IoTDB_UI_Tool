@@ -30,7 +30,7 @@ const props = withDefaults(
   }>(),
   {
     source: 'trend',
-  }
+  },
 );
 
 const emit = defineEmits<{
@@ -88,7 +88,7 @@ watch(
       formRef.value?.resetFields();
       formData.oldName = props.oldName;
     }
-  }
+  },
 );
 </script>
 

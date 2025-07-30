@@ -1,8 +1,11 @@
 <template>
   <el-dialog :title="t('auth.systemInfo')" v-model="dialogVisible" width="320px" align-center :close-on-click-modal="false" id="system-modal" class="system-dialog">
     <div class="system-info-box">
-      <i-custom-timecho-logo-en v-if="locale === 'en'" class="system-logo" />
-      <i-custom-timecho-logo v-else class="system-logo" />
+      <p class="flex items-end">
+        <i-custom-timecho-logo-en v-if="locale === 'en'" class="system-logo" />
+        <i-custom-timecho-logo v-else class="system-logo" />
+        <span class="logo-version system-info">2.x</span>
+      </p>
       <p class="system-title">{{ systemTitle }}</p>
       <p class="system-version">{{ t('auth.versionTitle', { version: appVersion }) }}</p>
       <p class="system-detail">{{ systemDetail }}</p>

@@ -294,7 +294,7 @@ const p99DataOptions = reactive({
 const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.0'));
 
 function isChartEmpty(optionData: DataSync.PipeMonitorData[]) {
-  return optionData.every((item) => item!.used!.timestamp!.length === 0);
+  return optionData.every((item) => item.used.timestamp.length === 0);
 }
 
 const { requestFn: getSystemInfo, loading } = useRequest(DashboardApi.getSystemInfo);
@@ -320,7 +320,7 @@ function getSystemData() {
           physicalMachine: '',
         },
       ],
-      res.data.masterNodeInfo.nodes ? res.data.masterNodeInfo.nodes.filter((item) => item.type === 'DataNode') : []
+      res.data.masterNodeInfo.nodes ? res.data.masterNodeInfo.nodes.filter((item) => item.type === 'DataNode') : [],
     );
     if (res.data.slaveNodeInfo) {
       slaveNodes.value = concat(
@@ -334,7 +334,7 @@ function getSystemData() {
             physicalMachine: '',
           },
         ],
-        res.data.slaveNodeInfo.nodes ? res.data.slaveNodeInfo.nodes.filter((item) => item.type === 'DataNode') : []
+        res.data.slaveNodeInfo.nodes ? res.data.slaveNodeInfo.nodes.filter((item) => item.type === 'DataNode') : [],
       );
     } else {
       slaveNodes.value = [];
@@ -432,7 +432,6 @@ function getInitial() {
     clearTimeout(refreshInterval.value);
     isInit.value = false;
     refreshInterval.value = setTimeout(() => {
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
       getMonitorData();
     }, 30 * 1000);
   });
@@ -473,7 +472,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 
 onUnmounted(() => {
@@ -523,7 +522,7 @@ onUnmounted(() => {
 }
 </style>
 <style lang="scss" scoped>
-@import '@/views/dashboard/components/monitor-module';
+@use '@/views/dashboard/components/monitor-module';
 
 .data-sync-detail-wrapper {
   border-radius: 6px;

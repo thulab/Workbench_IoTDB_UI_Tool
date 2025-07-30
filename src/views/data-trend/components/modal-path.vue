@@ -105,7 +105,7 @@ watch(
       formData.color = props.defaultColor;
       dialogKey.value++;
     }
-  }
+  },
 );
 </script>
 

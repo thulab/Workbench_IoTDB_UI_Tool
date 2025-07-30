@@ -50,7 +50,7 @@ watch(
       tableData.value = [];
       getDetail();
     }
-  }
+  },
 );
 </script>
 

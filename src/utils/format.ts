@@ -38,3 +38,24 @@ export function transformDecimal(num: number, point: number) {
   decimalNum = Number(decimalNum);
   return decimalNum;
 }
+
+export function formatSelectedMeasurement(data: IoTDB.SelectedMeasurement) {
+  return formatDevice(data.device, data.measurement);
+}
+
+export function formatDevice(
+  device: {
+    variable: string;
+    value?: string;
+  }[],
+  measurement: string,
+) {
+  return (
+    device
+      .filter((item) => item.value)
+      .map((item) => item.value)
+      .join(', ') +
+    '-' +
+    measurement
+  );
+}

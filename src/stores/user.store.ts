@@ -81,7 +81,7 @@ export const useUserStore = defineStore(
       const userPrivileges = allPrivileges.value?.pathPrivileges || [];
       difference(
         rolePaths,
-        userPrivileges.map((item) => item.path)
+        userPrivileges.map((item) => item.path),
       ).forEach((path) => {
         userPrivileges.push({ path, privileges: [] });
       });
@@ -117,7 +117,7 @@ export const useUserStore = defineStore(
         userAllPrivileges.value.includes('READ_SCHEMA') ||
         userAllPrivileges.value.includes('WRITE_SCHEMA') ||
         userAllPrivileges.value.includes('READ_DATA') ||
-        userAllPrivileges.value.includes('WRITE_DATA')
+        userAllPrivileges.value.includes('WRITE_DATA'),
     );
     const canUsePipe = computed(() => userAllEntityPrivileges.value.includes('USE_PIPE'));
     const canManageUser = computed(() => userAllEntityPrivileges.value.includes('MANAGE_USER'));
@@ -141,10 +141,10 @@ export const useUserStore = defineStore(
     }
 
     // 加载用户权限
-    function loadPrivileges(forceReload?: boolean) {
+    async function loadPrivileges(forceReload?: boolean) {
       if (!forceReload && !userInfo.value.name) return;
       if (forceReload) {
-        getLoginUserPrivileges()
+        await getLoginUserPrivileges()
           .then((res) => {
             userInfo.value.name = res.data.userName;
             allPrivileges.value = res.data;
@@ -183,10 +183,10 @@ export const useUserStore = defineStore(
     }
 
     loadPrivileges(false);
-    function setUser(name: string) {
+    async function setUser(name: string) {
       userInfo.value.name = name;
       if (name) {
-        loadPrivileges(true);
+        await loadPrivileges(true);
         loadPrivilegesEnum(true);
       }
     }
@@ -233,7 +233,7 @@ export const useUserStore = defineStore(
         context.store.loadPrivilegesEnum();
       },
     },
-  }
+  },
 );
 
 export default useUserStore;

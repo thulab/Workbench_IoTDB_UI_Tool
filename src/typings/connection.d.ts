@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 declare namespace Connection {
   export interface ConnectionItem {
     id: number | string;

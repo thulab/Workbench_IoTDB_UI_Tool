@@ -153,7 +153,6 @@ import { today } from '@/utils/date';
 import { getOptionField } from '@/utils/format';
 import { AlarmApi } from '@/api';
 import { useEnumStore, useUserStore } from '@/stores';
-import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ICustomCalender from '~icons/custom/calender.svg';
 
 const enumStore = useEnumStore();
@@ -209,7 +208,6 @@ const {
     list: [],
   },
 });
-const { requestFn: deleteAlarmRecord } = useRequest(AlarmApi.deleteAlarmRecord);
 const { requestFn: exportAlarmRecord } = useRequest(AlarmApi.exportAlarmRecord);
 const { requestFn: updateAlarmRecordStatus } = useRequest(AlarmApi.updateAlarmRecordStatus);
 
@@ -265,7 +263,6 @@ function handleSelectionChange(vals: Alarm.QueryRecordResult[]) {
   multipleSelection.value = vals;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleSortChange({ column, prop, order }: SortMethod<Alarm.QueryRecordResult>) {
   const lastOrderBy = searchFormData.orderBy;
   const lastAsc = searchFormData.asc;
@@ -306,31 +303,6 @@ function handleStatus(row: Alarm.QueryRecordResult) {
   });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function handleDel(type: string, data: Alarm.QueryRecordResult | null) {
-  ElMessageBox.confirm(type === 'batch' ? t('alarm.batchDeleteRecord') : t('alarm.singleDeleteRecord'), t('common.notice'), {
-    confirmButtonText: t('common.confirm'),
-    cancelButtonText: t('common.cancel'),
-    confirmButtonClass: 'alarm-record-del-confirm',
-    cancelButtonClass: 'alarm-record-del-cancel',
-    type: 'warning',
-    icon: ICustomMessageWarning,
-  }).then(() => {
-    let alarmRecordIds = [];
-    if (type === 'batch') {
-      alarmRecordIds = multipleSelection.value?.map((i) => i.alarmRecordId);
-    } else {
-      alarmRecordIds = data?.alarmRecordId ? [data.alarmRecordId] : [];
-    }
-    deleteAlarmRecord(alarmRecordIds).then((res) => {
-      if (res.code === 0) {
-        ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
-        handleSearch();
-      }
-    });
-  });
-}
-
 watch(
   () => canUsePipe.value,
   (val) => {
@@ -343,7 +315,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 
 watch(locale, () => {

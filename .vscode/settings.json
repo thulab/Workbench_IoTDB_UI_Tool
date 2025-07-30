@@ -1,4 +1,10 @@
 {
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "tsconfig.json": "tsconfig.*.json, env.d.ts",
+    "vite.config.*": "jsconfig*, vitest.config.*, cypress.config.*, playwright.config.*",
+    "package.json": "package-lock.json, pnpm*, .yarnrc*, yarn*, .eslint*, eslint*, .oxlint*, oxlint*, .prettier*, prettier*, .editorconfig"
+  },
   "i18n-ally.localesPaths": [
     "src/locale/lang"
   ],
@@ -19,7 +25,11 @@
     "google-cn",
     "google"
   ],
+    "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
   "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[vue]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -47,6 +57,5 @@
     "vue",
   ],
   "typescript.tsdk": "node_modules/typescript/lib",
-  "CodeGPT.apiKey": "OpenAI",
   "oxc.enable": true,
 }

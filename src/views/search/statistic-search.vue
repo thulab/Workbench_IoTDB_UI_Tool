@@ -163,13 +163,13 @@ const avgSumList = ref<Search.StatisticSearchAvgSumObj[]>([]);
 const tableErrorMessage = ref<string[]>([]);
 const totalCount = computed(() => copySearchFormData.path.length);
 
-const searchPaginationPath = computed(() => copySearchFormData.path.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as string[]);
+const searchPaginationPath = computed(() => copySearchFormData.path.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize));
 
 const showAuthCol = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.3'));
 
 const { requestFn: getMinMax } = useRequest(SearchApi.getStatisticSearchMinMax);
 const { requestFn: getAvgSum } = useRequest(SearchApi.getStatisticSearchAvgSum);
-const { requestFn: getStatisticData } = useRequest(SearchApi.getStatisticData);
+// const { requestFn: getStatisticData } = useRequest(SearchApi.getStatisticData);
 const { requestFn: exportStatisticData } = useRequest(SearchApi.exportStatisticData);
 
 function getMinMaxData() {
@@ -234,31 +234,6 @@ function getListData() {
   });
 }
 
-// 批量查询列表数据
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getListDataBatch() {
-  getListLoading.value = true;
-  getStatisticData({
-    measurements: searchPaginationPath.value,
-    startTime: formatDate(copySearchFormData.datetimerange[0] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
-    endTime: formatDate(copySearchFormData.datetimerange[1] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
-    timestamp: timestamp.value,
-  }).then((res) => {
-    tableData.value = res.data?.map((item) => ({
-      measurement: item.measurement,
-      minValue: item.minValue || '-',
-      minTime: item.minTime || '-',
-      maxValue: item.maxValue || '-',
-      maxTime: item.maxTime || '-',
-      avgValue: item.avgValue || '-',
-      sumValue: item.sumValue || '-',
-      stddev: item.stddev || '-',
-      variance: item.variance || '-',
-    }));
-    getListLoading.value = false;
-  });
-}
-
 // 重置
 function handleReset() {
   searchFormData.path = [];
@@ -317,13 +292,12 @@ function setStorage() {
     'statisticSearchStorage',
     JSON.stringify({
       ...copySearchFormData,
-    })
+    }),
   );
 }
 
 onMounted(() => {
   window.addEventListener('beforeunload', () => {
-    // eslint-disable-next-line no-underscore-dangle
     if (!window.__isReload__) {
       setStorage();
     } else {
@@ -355,7 +329,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 </script>
 

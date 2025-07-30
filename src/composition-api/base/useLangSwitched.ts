@@ -15,7 +15,7 @@ export function useLangSwitch(i18n: Composer) {
     handleLangCommand,
   };
 }
-
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function useLangSwitched(callback: Function, init: boolean = false) {
   const { locale } = useI18n();
   watch(locale, () => {

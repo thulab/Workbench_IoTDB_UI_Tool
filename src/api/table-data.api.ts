@@ -14,8 +14,20 @@ class TableDataApi {
     return http.post('/relational/data/saveDataInfo', data);
   }
 
-  static getDevices(database: string, table: string): HttpResponseP<Search.QuerySqlResponse> {
-    return http.get('/relational/data/getDevices', { params: { database, table } });
+  static getDevices(data: { database: string; table: string; conditions: { variable: string; value: string }[] }, pageNum: number, pageSize: number): HttpResponseP<Search.QuerySqlResponse> {
+    return http.post('/relational/data/getDevices', { ...data, pageNum, pageSize });
+  }
+
+  static getTrendHistoryData(data: {
+    database: string;
+    tableName: string;
+    fieldCondition: { variable: string; value: string }[];
+    startTime: string | number;
+    endTime: string | number;
+    groupBy: string;
+    aggregateFun: string;
+  }): HttpResponseP<Trend.TableHistoryTrendResponse> {
+    return http.post('/trend/relational/history', data);
   }
 }
 export default TableDataApi;

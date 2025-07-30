@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 declare namespace Calculate {
   export interface CalculateItem {
     name: string;

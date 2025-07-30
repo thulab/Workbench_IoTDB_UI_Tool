@@ -124,7 +124,7 @@ watch(
       formRef.value?.resetFields();
       formData.ttlUnit = 'day';
     }
-  }
+  },
 );
 </script>
 

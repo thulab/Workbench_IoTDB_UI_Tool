@@ -5,16 +5,16 @@
 
 /* stylelint-disable selector-class-pattern */
 
-@import 'abstracts/variables';
+@use './abstracts/variables' as *;
 
 /** base **/
 
-@import 'base/base';
-@import 'base/reset';
+@use 'base/base';
+@use 'base/reset';
 
 /** el-fix **/
 
-@import 'element/index';
+@use 'element/index';
 
 #app {
   width: 100%;
@@ -151,10 +151,10 @@
   }
 
   // .overflow-guard > .monaco-scrollable-element {
-  //   box-sizing: border-box;
-  //   margin: 5px;
-  //   width: calc(100% - 69px) !important;
-  //   height: calc(100% - 10px) !important;
+  //   box-sizing: border-box;box-sizingbox-sizingbox-sizingbox-sizingbox-sizingbox-sizingbox-sizingbox-sizingbox-sizing
+  //   margin: 5px;marginmarginmarginmarginmarginmarginmarginmarginmargin
+  //   width: calc(100% - 69px) !important;widthwidthwidthwidthwidthwidthwidthwidthwidth
+  //   height: calc(100% - 10px) !important;heightheightheightheightheightheightheightheightheight
   // }
 
   .decorationsOverviewRuler {

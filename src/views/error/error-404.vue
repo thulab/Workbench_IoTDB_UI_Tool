@@ -19,5 +19,5 @@ const tabStore = useTabsStore();
 </script>
 
 <style scoped lang="scss">
-@import './error';
+@use './error';
 </style>

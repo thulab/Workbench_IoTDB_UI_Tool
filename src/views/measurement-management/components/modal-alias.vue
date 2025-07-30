@@ -61,6 +61,6 @@ watch(
       formRef.value?.resetFields();
       formData.description = props.description || '';
     }
-  }
+  },
 );
 </script>

@@ -206,8 +206,7 @@ const getListLoading = ref(false);
 
 const columnsSelected = ref<string[]>([]);
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
+const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize));
 
 function handleAppendSql(sql: string) {
   sqlPreviewRef.value?.appendSql(sql);
@@ -236,7 +235,7 @@ function getListData() {
   getList(
     {
       database: props.currentNode.database!,
-      tableName: props.currentNode.nodeName!,
+      tableName: props.currentNode.nodeName,
       columnNames:
         copySearchFormData.value.columns && copySearchFormData.value.columns.length > 0
           ? ['time', ...copySearchFormData.value.columns]
@@ -246,10 +245,9 @@ function getListData() {
       size: 1000,
       page: pagination.pageNum,
     },
-    controller
+    controller,
   )
     .then((res) => {
-      // eslint-disable-next-line no-undef
       const list: DynamicTableColumn[] = [];
       res.data?.value.metaDataList?.forEach((item: string, index: number) => {
         list.push({
@@ -305,7 +303,7 @@ function handleExportData(exportType: string) {
 
   exportTableDataId({
     database: props.currentNode.database!,
-    tableName: props.currentNode.nodeName!,
+    tableName: props.currentNode.nodeName,
     columnNames:
       copySearchFormData.value.columns && copySearchFormData.value.columns.length > 0
         ? ['time', ...copySearchFormData.value.columns]
@@ -358,16 +356,6 @@ function handleSearch() {
   getListData();
 }
 
-// 列
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function queryData(columnNum?: number) {
-  pagination.pageSize = 10;
-  pagination.pageNum = 1;
-  pagination.columnNum = columnNum || 1;
-  pagination.columnSize = 100;
-  getListData();
-}
-
 // 导入物理量
 function handleImportClose(reload: boolean) {
   if (reload) {
@@ -402,7 +390,7 @@ function deleteData(rows: Record<string, any>[]) {
   // 处理删除数据逻辑
   const data = {
     database: props.currentNode.database!,
-    tableName: props.currentNode.nodeName!,
+    tableName: props.currentNode.nodeName,
     conditions: deleteConditions,
   } as IoTDB.DeleteTableDataReq;
   deleteTableData(data)
@@ -470,7 +458,7 @@ function handleSave(row: Record<string, any>) {
   const processedValues = processValues(valueList, columnTypes.value);
   const data = {
     database: props.currentNode.database!,
-    tableName: props.currentNode.nodeName!,
+    tableName: props.currentNode.nodeName,
     metaDataList: Object.keys(copyRow),
     valueList: processedValues,
   } as IoTDB.InsertTableDataReq;
@@ -489,7 +477,7 @@ function setStorage() {
     'dataSearchStorage',
     JSON.stringify({
       ...copySearchFormData.value,
-    })
+    }),
   );
 }
 
@@ -526,7 +514,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 
 function handleRefresh() {

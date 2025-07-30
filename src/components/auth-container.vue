@@ -16,7 +16,7 @@ withDefaults(
   }>(),
   {
     content: 'common.noAuth',
-  }
+  },
 );
 const { t } = useI18n();
 </script>

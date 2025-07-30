@@ -1,5 +1,3 @@
-/* eslint-disable prefer-promise-reject-errors */
-
 import { createAlova } from 'alova';
 import { axiosRequestAdapter } from '@alova/adapter-axios';
 import VueHook from 'alova/vue';

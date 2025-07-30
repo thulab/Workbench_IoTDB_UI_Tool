@@ -45,7 +45,7 @@ const props = withDefaults(
     modelIdList: string[];
     nameList: string[];
   }>(),
-  {}
+  {},
 );
 
 const emit = defineEmits<{
@@ -131,7 +131,7 @@ watch(
       formRef.value?.resetFields();
       formData.oldName = props.oldName;
     }
-  }
+  },
 );
 </script>
 

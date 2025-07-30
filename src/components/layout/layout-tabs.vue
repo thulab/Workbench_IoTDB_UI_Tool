@@ -47,7 +47,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 
 // Tab Click

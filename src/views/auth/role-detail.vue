@@ -433,7 +433,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 </script>
 

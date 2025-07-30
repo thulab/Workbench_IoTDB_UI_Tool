@@ -33,7 +33,7 @@ export default class AIAnalysisApi {
     return http.post('/ai-analysis/writeBack', data);
   }
 
-  static getExportId(data: { modelType: string; measurement: string; dataType: string; raw: AIAnalysis.SearchDataItem[]; analysis: AIAnalysis.SearchDataItem[] }): HttpResponseP<String> {
+  static getExportId(data: { modelType: string; measurement: string; dataType: string; raw: AIAnalysis.SearchDataItem[]; analysis: AIAnalysis.SearchDataItem[] }): HttpResponseP<string> {
     return http.post('/file/analysisExportId', data);
   }
 

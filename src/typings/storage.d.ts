@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 declare namespace StorageDevice {
   export interface MeasurementItem {
     deviceName: string;
@@ -97,7 +99,7 @@ declare namespace StorageDevice {
 
   export interface ModelData {
     node: string;
-    label?: string | Object;
+    label?: string | object;
     value?: string;
     nodePath: string;
     nodeType: string; // database, database_device, device, timeseries, interna
@@ -115,7 +117,7 @@ declare namespace StorageDevice {
     collapsed?: boolean;
     hasNext?: boolean;
     hasPre?: boolean;
-    label?: Object;
+    label?: object;
     leafDeep?: number;
   }
 

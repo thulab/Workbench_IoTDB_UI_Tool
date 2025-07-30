@@ -27,7 +27,7 @@ const props = withDefaults(
   }>(),
   {
     source: 'trend',
-  }
+  },
 );
 
 const emit = defineEmits<{
@@ -88,6 +88,6 @@ watch(
               time: dayjs().format('YYYYMMDDHHmmss'),
             });
     }
-  }
+  },
 );
 </script>

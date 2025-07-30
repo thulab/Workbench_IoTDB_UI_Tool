@@ -332,7 +332,7 @@ watch(
   () => treeData.value,
   () => {
     setDefaultTreeExpandKeys();
-  }
+  },
 );
 </script>
 <style lang="scss" scoped>

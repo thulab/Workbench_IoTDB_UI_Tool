@@ -267,8 +267,7 @@ const defaultSort = ref<Sort>({ prop: 't0', order: 'descending' });
 //   return '';
 // });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
+const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize));
 
 const { requestFn: getList } = useRequest(SearchApi.getDataSearchList);
 const { requestFn: exportData } = useRequest(SearchApi.exportData);
@@ -313,10 +312,9 @@ function getListData() {
       size: 1000,
       page: pagination.pageNum,
     },
-    controller
+    controller,
   )
     .then((res) => {
-      // eslint-disable-next-line no-undef
       const list: DynamicTableColumn[] = [];
       res.data?.metaDataList?.forEach((item: string, index: number) => {
         list.push({
@@ -349,7 +347,7 @@ function getListData() {
 
 function handleSortChange(data: { column: any; prop: string; order: any }) {
   searchFormData.asc = data.order === 'ascending' ? 'asc' : 'desc';
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+
   handleSearch();
 }
 
@@ -400,16 +398,6 @@ function handleInputInterval(val: string) {
   } else {
     searchFormData.timeInterval = undefined;
   }
-}
-
-// 列
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function queryData(columnNum?: number) {
-  pagination.pageSize = 10;
-  pagination.pageNum = 1;
-  pagination.columnNum = columnNum || 1;
-  pagination.columnSize = 100;
-  getListData();
 }
 
 // function handleClickPage(type: string) {
@@ -495,13 +483,12 @@ function setStorage() {
     JSON.stringify({
       ...copySearchFormData,
       timeType: timeType.value,
-    })
+    }),
   );
 }
 
 onMounted(() => {
   window.addEventListener('beforeunload', () => {
-    // eslint-disable-next-line no-underscore-dangle
     if (!window.__isReload__) {
       setStorage();
     } else {
@@ -560,7 +547,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 </script>
 

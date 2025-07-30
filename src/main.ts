@@ -14,7 +14,7 @@ const vers = window.localStorage.getItem('appVersion');
 if (VITE_APP_VERSION !== vers) {
   localStorage.clear();
   localStorage.setItem('appVersion', VITE_APP_VERSION);
-  // eslint-disable-next-line no-underscore-dangle
+
   window.__isReload__ = true;
   window.location.reload();
 }
@@ -33,7 +33,7 @@ app.directive('copy', {
       try {
         await navigator.clipboard.writeText(binding.value);
         ElMessage.success(app.config.globalProperties.$t('flow.copySuccess'));
-      } catch (err) {
+      } catch {
         const textarea = document.createElement('textarea');
         textarea.value = binding.value;
         document.body.appendChild(textarea);
@@ -41,7 +41,7 @@ app.directive('copy', {
         try {
           document.execCommand('copy');
           ElMessage.success(app.config.globalProperties.$t('flow.copySuccess'));
-        } catch (e) {
+        } catch {
           ElMessage.error(app.config.globalProperties.$t('flow.copyFailed'));
         }
         document.body.removeChild(textarea);

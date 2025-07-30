@@ -60,7 +60,7 @@ watch(
       modelValue.value = '';
     }
   },
-  { deep: true }
+  { deep: true },
 );
 
 watch(
@@ -68,7 +68,7 @@ watch(
   (newValue) => {
     fullUrl.value = newValue || '';
   },
-  { immediate: true }
+  { immediate: true },
 );
 </script>
 

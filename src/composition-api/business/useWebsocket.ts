@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import i18n from '@/locale/index';
 
 const { t } = i18n.global;
-
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export default function useWebsocket(url: string, receiveData: Function, isInit: boolean = true) {
   const socketInstance = ref<WebSocket | null>();
 
@@ -13,7 +13,7 @@ export default function useWebsocket(url: string, receiveData: Function, isInit:
    * 2 连接正在关闭
    * 3 连接已经关闭/打开连接失败
    */
-
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   function initWebsocket(handleOpen?: Function) {
     if (!('WebSocket' in window)) {
       ElMessage.warning({ message: t('common.websockerVersionTip'), grouping: true });

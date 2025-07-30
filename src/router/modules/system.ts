@@ -84,7 +84,7 @@ const route = [
       {
         path: 'audit',
         name: 'AuditLog',
-        component: () => import('@/views/log-management/audit.vue'),
+        component: () => import('@/views/log-management/the-audit.vue'),
         meta: {
           keepAlive: true,
           title: 'page.auditLog',
@@ -94,7 +94,7 @@ const route = [
       {
         path: 'config',
         name: 'IoTDBConfig',
-        component: () => import('@/views/iotdb-config/detail.vue'),
+        component: () => import('@/views/iotdb-config/iotdb-config.vue'),
         meta: {
           keepAlive: true,
           title: 'page.config',
@@ -105,7 +105,7 @@ const route = [
       // {
       //   path: 'white-list',
       //   name: 'WhiteList',
-      //   component: () => import('@/views/white-list/detail.vue'),
+      //   component: () => import('@/views/white-list/white-list.vue'),
       //   meta: {
       //     keepAlive: true,
       //     title: '白名单管理',
@@ -124,6 +124,7 @@ const route = [
       activeIcon: ICustomVisualizationActive,
       showTopLine: true,
       order: 25,
+      sqlDialect: 'all',
     },
     children: [
       {
@@ -137,9 +138,20 @@ const route = [
         },
       },
       {
+        path: 'table-detail',
+        name: 'TableTrendDetail',
+        component: () => import('@/views/data-trend/table-trend-detail.vue'),
+        meta: {
+          sqlDialect: 'table',
+          keepAlive: true,
+          title: 'page.trend',
+          icon: ICustomTrend,
+        },
+      },
+      {
         path: 'spectrum',
         name: 'SpectrumDetail',
-        component: () => import('@/views/data-spectrum/detail.vue'),
+        component: () => import('@/views/data-spectrum/the-spectrum.vue'),
         meta: {
           keepAlive: true,
           title: 'page.spectrum',
@@ -164,7 +176,7 @@ const route = [
       {
         path: 'detail',
         name: 'CalculateDetail',
-        component: () => import('@/views/calculate/detail.vue'),
+        component: () => import('@/views/calculate/the-calculate.vue'),
         meta: { keepAlive: true },
       },
     ],
@@ -185,7 +197,7 @@ const route = [
       {
         path: 'detail',
         name: 'CalculateDetail',
-        component: () => import('@/views/calculate/detail.vue'),
+        component: () => import('@/views/calculate/the-calculate.vue'),
         meta: { keepAlive: true },
       },
     ],

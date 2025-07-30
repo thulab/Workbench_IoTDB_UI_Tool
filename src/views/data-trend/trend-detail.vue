@@ -169,6 +169,7 @@ interface MarkPointLine {
   xAxis: number;
   yAxis: number;
   label: {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     formatter: string | Function;
     position: string;
     offset: number[];
@@ -285,7 +286,7 @@ const legendSelected = computed(() => ({
       pre[cur.path] = cur.checked || false;
       return pre;
     },
-    {} as Record<string, boolean>
+    {} as Record<string, boolean>,
   ),
 }));
 
@@ -341,7 +342,7 @@ const seriesData = computed<ECOption>(
           color: pathList.value.find((data) => data.path === item.path)?.color,
         },
       })),
-    }) as unknown as ECOption
+    }) as unknown as ECOption,
 );
 
 const chartOptions = computed<ECOption>(() => ({
@@ -438,12 +439,11 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
     // 若存在click事件，执行
     chartInstance.on('click', (params) => {
       if (isRunningTab.value || !clickedCursor.value) return;
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+
       handleClickChart(params);
     });
     // 若存在restore事件，执行
     chartInstance.on('restore', () => {
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
       // handleEmptyPoint();
       if (!isRunningTab.value) {
         const start = dayjs(copySearchFormData.datetimerange[0]).valueOf();
@@ -493,7 +493,7 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
       if (findPoints.length > 0) {
         const point = [findPoints[0][0], findPoints[0][1]];
         const param = { componentType: 'series', seriesName: findPoints[0][2], value: point };
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+
         handleClickChart(param as echarts.ECElementEvent, findPoints);
       }
     });
@@ -643,7 +643,6 @@ const onResize = debounce(() => {
 
 // 重置
 function handleReset(force?: boolean) {
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   socketInstance.value?.send(JSON.stringify({ operate: 'del', paths: [...searchFormData.path] }));
   if (force) {
     searchFormData.path = [];
@@ -698,7 +697,6 @@ function dealSearchPath() {
     }
   });
   if (deletePaths.length > 0) {
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     socketInstance.value?.send(JSON.stringify({ operate: 'del', paths: [...deletePaths] }));
     deletePaths.forEach((deleteItem) => {
       const index = chartData.value.findIndex((data) => data.path === deleteItem);
@@ -722,7 +720,6 @@ function dealSearchPath() {
   if (isRunningTab.value) {
     loading.value = true;
     if (addPaths.length > 0) {
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
       socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [...addPaths] }));
     }
   }
@@ -972,7 +969,7 @@ function handleSaveTemplate() {
 // 模板操作
 function handleOperateTemplate(val: string, data: Search.TrendTemplate) {
   if (val === 'rename') {
-    renameData.id = +data.id!;
+    renameData.id = +data.id;
     renameData.name = data.name;
     renameData.type = data.type;
     renameData.template = data.template;
@@ -1084,7 +1081,7 @@ function init() {
         connectionId: connectionId.value,
         user: userName.value,
         type: connectionType.value,
-      })
+      }),
     );
   } else {
     socketInstance.value?.addEventListener('open', () => {
@@ -1094,7 +1091,7 @@ function init() {
           connectionId: connectionId.value,
           user: userName.value,
           type: connectionType.value,
-        })
+        }),
       );
     });
   }
@@ -1112,13 +1109,12 @@ function setStorage() {
       markPointCount: markPointCount.value,
       pointList: pointList.value,
       activeNameSide: activeNameSide.value,
-    })
+    }),
   );
 }
 
 onMounted(() => {
   window.addEventListener('beforeunload', () => {
-    // eslint-disable-next-line no-underscore-dangle
     if (!window.__isReload__) {
       setStorage();
     } else {
@@ -1165,7 +1161,7 @@ watch(
                 connectionId: connectionId.value,
                 user: userName.value,
                 type: connectionType.value,
-              })
+              }),
             );
             socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [route.query.measurement as string] }));
           } else {
@@ -1176,7 +1172,7 @@ watch(
                   connectionId: connectionId.value,
                   user: userName.value,
                   type: connectionType.value,
-                })
+                }),
               );
               socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [route.query.measurement as string] }));
             });
@@ -1213,7 +1209,7 @@ watch(
                 connectionId: connectionId.value,
                 user: userName.value,
                 type: connectionType.value,
-              })
+              }),
             );
             if (dataTab.value === 'running' && searchFormData.path.length) {
               socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [...searchFormData.path] }));
@@ -1226,7 +1222,7 @@ watch(
                   connectionId: connectionId.value,
                   user: userName.value,
                   type: connectionType.value,
-                })
+                }),
               );
               if (dataTab.value === 'running' && searchFormData.path.length) {
                 socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: [...searchFormData.path] }));
@@ -1243,7 +1239,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 
 watch(locale, () => {

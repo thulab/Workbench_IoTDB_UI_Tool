@@ -796,7 +796,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 </script>
 

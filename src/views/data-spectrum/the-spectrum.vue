@@ -430,11 +430,12 @@ interface MarkPointLine {
   yAxis: number;
   itemStyle: {
     color: string;
-    // eslint-disable-next-line no-nested-ternary
+
     borderColor: string;
     borderWidth: number;
   };
   label: {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     formatter: string | Function;
     position: string;
     color: string;
@@ -448,7 +449,7 @@ interface MarkPointLine {
 const { t, locale } = useI18n();
 const methodDocLink = computed(
   () =>
-    `<a href="${locale.value === 'en' ? 'https://www.timecho.com/docs/UserGuide/latest/User-Manual/Database-Programming.html#udtf-user-defined-timeseries-generating-function' : 'https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/Database-Programming.html#udtf-user-defined-timeseries-generating-function'}" target="_blank" rel="noopener noreferrer" style="color: #495ad4;"> ${t('common.userManual')}</a>`
+    `<a href="${locale.value === 'en' ? 'https://www.timecho.com/docs/UserGuide/latest/User-Manual/Database-Programming.html#udtf-user-defined-timeseries-generating-function' : 'https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/Database-Programming.html#udtf-user-defined-timeseries-generating-function'}" target="_blank" rel="noopener noreferrer" style="color: #495ad4;"> ${t('common.userManual')}</a>`,
 );
 const userStore = useUserStore();
 const { canReadWriteData } = storeToRefs(userStore);
@@ -666,7 +667,7 @@ const seriesData = computed<ECOption>(
           },
         },
       ],
-    }) as unknown as ECOption
+    }) as unknown as ECOption,
 );
 
 const visualMap = computed(() => {
@@ -825,29 +826,21 @@ function handleInputAmplification(val: string) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function handleInputHarmonicFrequency(val: string) {
-  if (val && !/^\+?[1-9][0-9]{0,1}$/.test(`${val}`)) {
-    harmonicFrequency.value = 1;
-  } else if (`${val}` === '0') {
-    harmonicFrequency.value = 1;
-    // eslint-disable-next-line no-dupe-else-if
-  } else if (`${val}` === '0') {
-    harmonicFrequency.value = 1;
-  }
-}
+// function handleInputHarmonicFrequency(val: string) {
+//   if (val && !/^\+?[1-9][0-9]{0,1}$/.test(`${val}`)) {
+//     harmonicFrequency.value = 1;
+//   } else if (`${val}` === '0') {
+//     harmonicFrequency.value = 1;
+//   }
+// }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function handleInputSideband(val: string) {
-  if (val && !/^\+?[1-9][0-9]{0,1}$/.test(`${val}`)) {
-    sideband.value = 1;
-  } else if (`${val}` === '0') {
-    sideband.value = 1;
-    // eslint-disable-next-line no-dupe-else-if
-  } else if (`${val}` === '0') {
-    sideband.value = 1;
-  }
-}
+// function handleInputSideband(val: string) {
+//   if (val && !/^\+?[1-9][0-9]{0,1}$/.test(`${val}`)) {
+//     sideband.value = 1;
+//   } else if (`${val}` === '0') {
+//     sideband.value = 1;
+//   }
+// }
 
 function handleDWTTab(val: 'type' | 'number') {
   dwtTab.value = val;
@@ -883,7 +876,6 @@ function handleChangeMethod(val: string) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleChangePath(val: string, data: StorageDevice.MeasurementDataItem[]) {
   const current = data.find((f) => f.timeseries === val);
   searchFormData.measurementType = current?.dataType || '';
@@ -910,7 +902,7 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
     // 若存在click事件，执行
     chartInstance.on('click', (params) => {
       if (!clickedOperate.value) return;
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+
       handleClickChart(params);
     });
     chartInstance.on('highlight', (params: any) => {
@@ -918,7 +910,6 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
     });
     // 若存在restore事件，执行
     chartInstance.on('restore', () => {
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
       // handleEmptyOperate();
       setOption(chartOptions.value);
     });
@@ -935,7 +926,7 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
       if (currentPoint && chartData.timestamps[currentPoint]) {
         const point = [chartData.timestamps[currentPoint], chartData.values[currentPoint]];
         const param = { componentType: 'series', seriesName: copySearchFormData.measurement, value: point };
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+
         handleClickChart(param as echarts.ECElementEvent);
       }
     });
@@ -955,7 +946,6 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
 };
 
 function handleDealCursor(params: echarts.ECElementEvent) {
-  // eslint-disable-next-line prefer-const
   const { seriesName, value, componentType } = params as { seriesName: string; value: number[] | number; componentType: string };
   let index = -1;
   // let pointName = '';
@@ -1056,7 +1046,7 @@ function handleDelPoint(data: PointData, index: number) {
 
 function handleDealFrequency(params: echarts.ECElementEvent) {
   const { seriesName, value } = params as { seriesName: string; value: number[] };
-  frequencyInterval.value = value[0] as number;
+  frequencyInterval.value = value[0];
   if (!frequencyInterval.value) return;
   drawedStatus.frequency = true;
   for (let i = 1; i <= harmonicFrequency.value!; i++) {
@@ -1551,7 +1541,7 @@ function handleSaveTemplate() {
 // 模板操作
 function handleOperateTemplate(val: string, data: Search.TrendTemplate) {
   if (val === 'rename') {
-    renameData.id = +data.id!;
+    renameData.id = +data.id;
     renameData.name = data.name;
     renameData.template = data.template;
     saveTemplateLoading.value = false;
@@ -1685,13 +1675,12 @@ function setStorage() {
       clickedStatus: { ...clickedStatus },
       drawedStatus: { ...drawedStatus },
       currentPoint,
-    })
+    }),
   );
 }
 
 onMounted(() => {
   window.addEventListener('beforeunload', () => {
-    // eslint-disable-next-line no-underscore-dangle
     if (!window.__isReload__) {
       setStorage();
     } else {
@@ -1794,7 +1783,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 </script>
 

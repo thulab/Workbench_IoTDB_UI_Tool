@@ -88,7 +88,7 @@ export const useDbStore = defineStore('db', () => {
     () => connectionStore.isTableModel,
     async () => {
       await getDatabases();
-    }
+    },
   );
 
   return {

@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import type { App, Component } from 'vue';
 // import BabelChart from './base/babel-chart.vue';
 // import TotalInfo from './base/total-info.vue';

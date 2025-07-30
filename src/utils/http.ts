@@ -1,4 +1,3 @@
-/* eslint-disable prefer-promise-reject-errors */
 import Axios, { type InternalAxiosRequestConfig } from 'axios';
 import NProgress from '@/config/nprogress-config';
 import { langNameMap } from '@/constants';
@@ -30,7 +29,6 @@ function requestInterceptor(config: InternalAxiosRequestConfig): InternalAxiosRe
   return config;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function requestErrorInterceptor(error: any) {
   ElMessage.error({ message: error, grouping: true });
   requestCount -= 1;
@@ -80,6 +78,7 @@ function responseErrorInterceptor(error: { isAxiosError?: boolean; message?: str
     NProgress.done();
   }
   if (Axios.isCancel(error)) {
+    // eslint-disable-next-line prefer-promise-reject-errors
     return Promise.reject({ message: 'cancel request' });
   }
   // if (error.isAxiosError) {

@@ -143,7 +143,7 @@ const tableData = computed(() => {
   const userPrivileges = authData.value.pathPrivileges || [];
   difference(
     rolePaths,
-    userPrivileges.map((item) => item.path)
+    userPrivileges.map((item) => item.path),
   ).forEach((path) => {
     userPrivileges.push({ path, privileges: [] });
   });
@@ -181,7 +181,7 @@ watch(
     if (newVal) {
       getDetail();
     }
-  }
+  },
 );
 </script>
 <style lang="scss">

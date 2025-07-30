@@ -13,7 +13,7 @@ const props = withDefaults(
     spanClassName?: string;
     offset?: number;
   }>(),
-  {}
+  {},
 );
 const emit = defineEmits<{
   (event: 'handleClick'): void;

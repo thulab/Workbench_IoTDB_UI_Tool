@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 declare namespace IoTDB {
   export interface TableVO {
     tableName: string;
@@ -105,5 +106,16 @@ declare namespace IoTDB {
     tableName: string;
     metaDataList: string[];
     valueList: string[];
+  }
+
+  export interface TagFilter {
+    variable: string;
+    value?: string;
+  }
+
+  export interface SelectedMeasurement {
+    device: TagFilter[];
+    condition: string;
+    measurement: string;
   }
 }

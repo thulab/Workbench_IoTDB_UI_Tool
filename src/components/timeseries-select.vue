@@ -85,7 +85,7 @@ const props = withDefaults(
     selectWidth: 336,
     itemWidth: 284,
     isShowType: false,
-  }
+  },
 );
 
 const emit = defineEmits<{

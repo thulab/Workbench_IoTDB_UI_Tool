@@ -728,21 +728,21 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 watch(
   () => props.currentSearchText && canReadWriteSchemaByPath.value,
   (val, oldValue) => {
     if (val !== oldValue) {
       searchType.value = 'name';
-      searchKeyword.value = (props.currentSearchText || '') as string;
+      searchKeyword.value = props.currentSearchText || '';
       getDatabaseDetail(props.currentDatabase);
       handleRefresh();
     }
   },
   {
     immediate: true,
-  }
+  },
 );
 </script>
 <style lang="scss" scoped>

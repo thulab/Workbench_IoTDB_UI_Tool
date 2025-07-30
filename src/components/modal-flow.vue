@@ -406,7 +406,7 @@ Graph.registerNode(
       },
     ],
   },
-  true
+  true,
 );
 
 Graph.registerNode(
@@ -457,7 +457,7 @@ Graph.registerNode(
       },
     ],
   },
-  true
+  true,
 );
 
 // 状态变更重置节点操作
@@ -560,22 +560,22 @@ function initialGraph(isDisabled?: boolean) {
     .use(
       new Clipboard({
         enabled: !isDisabled,
-      })
+      }),
     )
     .use(
       new History({
         enabled: !isDisabled,
-      })
+      }),
     )
     .use(
       new Keyboard({
         enabled: !isDisabled,
-      })
+      }),
     )
     .use(
       new Selection({
         enabled: !isDisabled,
-      })
+      }),
     )
     .use(
       new Transform({
@@ -584,13 +584,13 @@ function initialGraph(isDisabled?: boolean) {
           preserveAspectRatio: true,
         },
         rotating: false,
-      })
+      }),
     )
     .use(
       new Scroller({
         enabled: true,
         pannable: true,
-      })
+      }),
     )
     .use(new Export());
 
@@ -715,13 +715,13 @@ function graphWatchEvent() {
   graph.value?.on('node:mouseenter', () => {
     if (!isEdit.value) return;
     const container = document.getElementById('graph-container')!;
-    const allPorts = container.querySelectorAll('.x6-port-body') as NodeListOf<SVGElement>;
+    const allPorts = container.querySelectorAll('.x6-port-body');
     showPorts(allPorts, true);
   });
   graph.value?.on('node:mouseleave', () => {
     if (!isEdit.value) return;
     const container = document.getElementById('graph-container')!;
-    const allPorts = container.querySelectorAll('.x6-port-body') as NodeListOf<SVGElement>;
+    const allPorts = container.querySelectorAll('.x6-port-body');
     showPorts(allPorts, false);
   });
   // 添加边
@@ -816,7 +816,7 @@ function graphWatchEvent() {
       contextMenuTimer.value = undefined;
     }
     if (graph.value && graph.value.getSelectedCells().length > 0) {
-      const [cell] = graph.value!.getSelectedCells();
+      const [cell] = graph.value.getSelectedCells();
       if (cell.shape === 'edge') {
         operateEdge.value = cell;
         contextMenuType.value = 'edge';
@@ -833,7 +833,7 @@ function graphWatchEvent() {
     contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
   });
   // 节点右击
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   graph.value?.on('node:contextmenu', ({ e, x, y, node, view }) => {
     if (!isEdit.value) return;
     if (contextMenuTimer.value) {
@@ -846,7 +846,7 @@ function graphWatchEvent() {
     contextMenuRef.value!.$el.style.inset = `${e.clientY - 100}px auto auto ${e.clientX}px`;
   });
   // 边右击
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   graph.value?.on('edge:contextmenu', ({ e, x, y, view, edge }) => {
     if (!isEdit.value) return;
     if (contextMenuTimer.value) {
@@ -986,7 +986,7 @@ function loadStencil() {
           },
         },
       ],
-    })
+    }),
   );
   const clusterNodes = clusterList.value.map((item) =>
     graph.value!.createNode({
@@ -1013,7 +1013,7 @@ function loadStencil() {
           },
         },
       ],
-    })
+    }),
   );
   const doubleLiveNodes = doubleLiveList.value.map((item) =>
     graph.value!.createNode({
@@ -1040,7 +1040,7 @@ function loadStencil() {
           },
         },
       ],
-    })
+    }),
   );
   stencil.value?.load([baseNode], 'group1');
   stencil.value?.load(standAloneNodes, 'group2');
@@ -1284,20 +1284,20 @@ async function handleEdit() {
 }
 
 // 导出
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function handleExport() {
-  if (viewNode.value && connectionFormRef.value?.isCanSave) {
-    const flag = await connectionFormRef.value?.handleChangeConnection();
-    if (!flag) return;
-  }
-  graph.value!.exportPNG('chart', {
-    copyStyles: true,
-    width: graph.value!.size.options.width + 200,
-    height: graph.value!.size.options.height + 200,
-    padding: 100,
-    quality: 1,
-  });
-}
+
+// async function handleExport() {
+//   if (viewNode.value && connectionFormRef.value?.isCanSave) {
+//     const flag = await connectionFormRef.value?.handleChangeConnection();
+//     if (!flag) return;
+//   }
+//   graph.value!.exportPNG('chart', {
+//     copyStyles: true,
+//     width: graph.value!.size.options.width + 200,
+//     height: graph.value!.size.options.height + 200,
+//     padding: 100,
+//     quality: 1,
+//   });
+// }
 
 // 保存实例信息
 function handleRefresh() {
@@ -1318,7 +1318,7 @@ watch(
     } else {
       document.removeEventListener('mousedown', onMouseDown);
     }
-  }
+  },
 );
 
 watch(
@@ -1349,7 +1349,7 @@ watch(
       graph.value?.dispose();
       graph.value?.off();
     }
-  }
+  },
 );
 </script>
 

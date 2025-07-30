@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import type { AxiosResponse } from 'axios';
 import type { TableColumnCtx } from 'element-plus';
 
@@ -124,6 +125,7 @@ declare global {
     placeholder?: string;
     size?: string;
     type: 'RADIO' | 'INPUT';
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     format?: Function;
     required?: boolean;
     disabled?: boolean;

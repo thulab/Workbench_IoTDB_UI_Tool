@@ -203,7 +203,7 @@ watch(
       uploadFileInfo.value = undefined;
       uploadStatus.value = '';
     }
-  }
+  },
 );
 </script>
 

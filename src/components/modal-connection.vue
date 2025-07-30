@@ -281,7 +281,7 @@ watch(
         getList();
       }
     }
-  }
+  },
 );
 </script>
 

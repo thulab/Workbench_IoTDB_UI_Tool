@@ -95,6 +95,7 @@ common:
   importTip: 为避免格式错误，推荐使用文本编辑器查看
   searchTipLimit100: 仅展示100条搜索结果，如有需要请精确搜索
   searchAllTipLimit100: 关键字搜索仅展示100条搜索结果，如有需要请精确搜索
+  selectMeasurementLimit: 系统最多支持同时选择{limit}个测点
   'yes': 是
   'no': 否
   master: 主
@@ -796,6 +797,7 @@ login:
   serverError: 内部服务异常，请联系管理员
   layoutTip: 您是否确认退出登录?
   resetPwdLogin: 密码已修改，请重新登录
+  versionTip: 当前系统仅适用于 2.0 以上版本的数据库，请更新后使用
 alarmEnum:
   change0: 变0告警
   change1: 变1告警
@@ -1050,6 +1052,14 @@ aiAnalysis:
   chooseDatabaseAndTable: 请选择数据库和表
   chooseDevice: 请选择设备
   chooseMeasurement: 请选择测点
+  writeBackSourceDatabase: 数据库
+  writeBackSourceTable: 表
+  writeBackSourceMeasurement: 测点
+  writeBackSourceTags: 设备
+  writeBackTargetDatabase: 目标数据库
+  writeBackTargetTable: 目标表
+  writeBackTargetMeasurement: 目标测点
+  writeBackTargetTags: 目标设备
 dataManage:
   schema: 结构
   dbSchema: 数据库结构
@@ -1114,3 +1124,10 @@ dataManage:
   columnDeleted: 列已删除
   oneColumnRequired: 请至少添加一列
   inputIndexColumnName: 请填写第 {index} 列的列名
+
+tableMeasurement:
+  measurementSelect: 选择测点
+  measurementSelectPlaceholder: 请选择测点
+  measurementSelected: 所选测点
+  limitReached: 已达到最大测点选择数量
+  addSuccess: '{count} 个测点添加成功'

@@ -154,17 +154,16 @@ const onResize = debounce(() => {
   treeHeight.value = document.body.clientHeight - 48 - 100;
 }, 500);
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function nodeTextWidth(node: TreeNode, data: TreeNodeData) {
-  // 44 = 24 展开收缩 + 16 右侧更多操作 + 4 文字与操作icon间距
-  // 8 缩进大小
-  // 根据类型 减去 icon 大小
-  let width = 240 - 44 - ((+node.level! || 1) - 1) * 8;
-  if ((data.nodeType === 'DATABASE' && data.node !== 'root') || data.nodeType === 'TIMESERIES') {
-    width -= 16;
-  }
-  return width;
-}
+// function nodeTextWidth(node: TreeNode, data: TreeNodeData) {
+//   // 44 = 24 展开收缩 + 16 右侧更多操作 + 4 文字与操作icon间距
+//   // 8 缩进大小
+//   // 根据类型 减去 icon 大小
+//   let width = 240 - 44 - ((+node.level || 1) - 1) * 8;
+//   if ((data.nodeType === 'DATABASE' && data.node !== 'root') || data.nodeType === 'TIMESERIES') {
+//     width -= 16;
+//   }
+//   return width;
+// }
 
 function highlightNode(node: string) {
   if (node.includes(searchText.value)) {
@@ -535,13 +534,12 @@ async function handleOperate(Operate: 'add' | 'delete', payload: StorageDevice.T
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleClickMore(e: MouseEvent, key: string) {
   if (contextMenuTimer.value) {
     clearTimeout(contextMenuTimer.value);
     contextMenuTimer.value = undefined;
   }
-  const data: TreeNodeData = measurementTree.value?.virtualizedTreeRef?.getNode(key)?.data!;
+  const data: TreeNodeData = measurementTree.value?.virtualizedTreeRef?.getNode(key)?.data as TreeNodeData;
   if (data.nodeType === 'PAGE' || data.nodePath === 'root.__system' || data.nodePath.startsWith('root.__system.')) return;
   clickedNodeData.node = data.node;
   clickedNodeData.nodePath = data.nodePath;
@@ -585,7 +583,6 @@ function handleNodeCollapse(data: TreeNodeData, node: TreeNode) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
   if (data.nodeType === 'PAGE') {
     e?.stopPropagation();
@@ -718,7 +715,7 @@ watch(
     } else {
       document.removeEventListener('mousedown', onMouseDown);
     }
-  }
+  },
 );
 
 watch(
@@ -731,7 +728,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 
 defineExpose({ handleRefresh, handleOperate });

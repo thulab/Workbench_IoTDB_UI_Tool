@@ -100,7 +100,7 @@ watch(
         selectPath.value = '';
       });
     }
-  }
+  },
 );
 </script>
 

@@ -19,7 +19,7 @@ const props = withDefaults(
   }>(),
   {
     placement: 'top',
-  }
+  },
 );
 const tooltipDisabled = ref(true);
 const onMouseOver = (str: string) => {

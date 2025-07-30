@@ -85,7 +85,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 </script>
 

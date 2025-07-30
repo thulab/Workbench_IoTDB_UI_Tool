@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { computed, reactive, type Ref, ref } from 'vue';
 import Validator from '@/utils/validator';
 import { hasOwn } from '@/utils/index';
@@ -47,7 +46,6 @@ export default function useTable<P extends Array<any>, T>(getList: (...params: P
 
   const { paging = true } = options || {};
 
-  // eslint-disable-next-line consistent-return
   function getDefaultFn(fnName: FnName) {
     if (options && options[fnName] && typeof options[fnName] === 'function') {
       return options[fnName];

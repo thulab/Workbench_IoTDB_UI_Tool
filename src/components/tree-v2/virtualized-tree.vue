@@ -122,22 +122,20 @@ function contextMenuEvent(event: Event) {
     console.log('未找到 el-tree-node 节点');
   }
 }
-
+const contextmenuEvent = (event: Event) => {
+  contextMenuEvent(event);
+};
 function handleContextMenu() {
   const nodeList = document.querySelectorAll('.el-tree-node');
   nodeList.forEach((node) => {
-    node.addEventListener('contextmenu', (event: Event) => {
-      contextMenuEvent(event);
-    });
+    node.addEventListener('contextmenu', contextmenuEvent);
   });
 }
 
 function removeContextMenu() {
   const nodeList = document.querySelectorAll('.el-tree-node');
   nodeList.forEach((node) => {
-    node.removeEventListener('contextmenu', (event: Event) => {
-      contextMenuEvent(event);
-    });
+    node.removeEventListener('contextmenu', contextmenuEvent);
   });
 }
 
@@ -161,16 +159,14 @@ const callback = () => {
   const treeDom = document.querySelector(`.${wrapClassName} .${className} .el-tree .el-tree-virtual-list`);
   try {
     Array.from(treeDom?.children?.[0]?.children as unknown as HTMLElement[])?.forEach((item: HTMLElement) => {
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
       getWidth(item);
     });
-  } catch (e) {
+  } catch {
     return;
   }
   // 是否存在checkbox
   const checkbox = document.querySelector(`.${wrapClassName} .${className} .el-tree .el-tree-virtual-list .el-checkbox`) as HTMLElement;
   if (checkbox) {
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define, no-unsafe-optional-chaining
     const checkBoxMargin = +getElNodeAttrValue(checkbox, 'margin-right')?.split('px')?.[0] || 0;
     const checkBoxClientWidth = checkbox.clientWidth;
     checkBoxWidth = checkBoxMargin + checkBoxClientWidth;
@@ -188,7 +184,6 @@ const callback = () => {
       return Array.from(item.classList || []).includes('el-tree-node__content');
     }) as HTMLElement;
     if (elWidthNode) {
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define, no-unsafe-optional-chaining
       const paddingLeftValue = +getElNodeAttrValue(elWidthNode, 'padding-left')?.split('px')?.[0] || 0;
       const elWidthNodeList = elWidthNode?.children || ([] as HTMLElement[]);
       let elWidth = 0;
@@ -213,7 +208,7 @@ const callback = () => {
 };
 const getElNodeAttrValue = (el: HTMLElement, attrKey: string) => {
   const computedStyles = getComputedStyle(el);
-  return computedStyles.getPropertyValue(attrKey) as string;
+  return computedStyles.getPropertyValue(attrKey);
 };
 useMutationObserver(`.${wrapClassName} .${className} .el-tree`, callback);
 

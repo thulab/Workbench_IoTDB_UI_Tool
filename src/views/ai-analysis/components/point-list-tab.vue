@@ -53,11 +53,12 @@ interface MarkPointLine {
   yAxis: number;
   itemStyle: {
     color: string;
-    // eslint-disable-next-line no-nested-ternary
+
     borderColor: string;
     borderWidth: number;
   };
   label: {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     formatter: string | Function;
     position: string;
     color: string;

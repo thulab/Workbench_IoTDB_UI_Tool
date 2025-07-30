@@ -95,7 +95,7 @@ function handleBlurWidth(ev: FocusEvent, data: Trend.LineObj, index: number) {
   if (val) {
     width = +val;
   }
-  pathList.value.splice(index, 1, { ...data, width: width as number });
+  pathList.value.splice(index, 1, { ...data, width });
 }
 
 function handleChangeWidth(val: number | undefined, data: Trend.LineObj, index: number) {
@@ -110,7 +110,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 </script>
 

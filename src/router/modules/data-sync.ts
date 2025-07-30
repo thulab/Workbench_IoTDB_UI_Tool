@@ -20,7 +20,7 @@ const route = [
       {
         path: 'detail',
         name: 'DataSync',
-        component: () => import('@/views/data-sync/detail.vue'),
+        component: () => import('@/views/data-sync/sync-detail.vue'),
         meta: { keepAlive: true, title: 'page.dataSync', icon: ICustomDataSync },
       },
     ],

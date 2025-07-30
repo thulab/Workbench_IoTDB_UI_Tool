@@ -29,7 +29,7 @@ export const useEnumStore = defineStore(
             name: t('alarmEnum.change'),
             paramMap: null,
           },
-        ]
+        ],
     );
     // 数值类型告警规则
     const alarmNumberRuleEnum = computed(
@@ -65,7 +65,7 @@ export const useEnumStore = defineStore(
             name: t('alarmEnum.uq'),
             paramMap: null,
           },
-        ]
+        ],
     );
     // 告警频率
     const alarmFrequencyEnum = computed(
@@ -106,7 +106,7 @@ export const useEnumStore = defineStore(
             name: t('alarmEnum.sixty'),
             paramMap: null,
           },
-        ]
+        ],
     );
     // 告警等级
     const alarmLevelEnum = computed(
@@ -152,7 +152,7 @@ export const useEnumStore = defineStore(
               icon: 'icon5',
             },
           },
-        ]
+        ],
     );
 
     function loadAllEnum() {
@@ -179,7 +179,7 @@ export const useEnumStore = defineStore(
         }
       },
     },
-  }
+  },
 );
 
 export default useEnumStore;

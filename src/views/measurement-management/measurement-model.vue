@@ -97,7 +97,7 @@ const treeDataOptions = (detailData: StorageDevice.ModelData, width: number | 'a
       borderWidth: 1,
       borderColor: '#DFE1ED',
       extraCssText: 'max-width:300px;',
-      formatter: (params: Object) => {
+      formatter: (params: object) => {
         const { data } = params as unknown as { data: StorageDevice.ModelData };
         if (data.nodeType === 'database' || data.nodeType === 'internal') {
           return `<h4 style="font-size: 14px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;margin-right: 24px;"><el-icon size="24"><i-custom-device-num /></el-icon><span style="color: #131926;">${t('measurement.deviceNum')}：</span>${data.deviceCount || data.deviceCount === 0 ? data.deviceCount : '-'}</p><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;"><el-icon size="24"><i-custom-measure-num /></el-icon><span style="color: #131926;">${t('measurement.measurementNum')}：</span>${data.timeseriesCount || data.timeseriesCount === 0 ? data.timeseriesCount : '-'}</p>`;
@@ -468,7 +468,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 </script>
 

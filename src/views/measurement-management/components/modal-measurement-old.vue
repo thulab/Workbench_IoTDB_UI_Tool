@@ -178,7 +178,7 @@ const dialogVisible = useVModel(props, 'visible', emit);
 const activeName = ref('measurement_0');
 const { t, locale } = useI18n();
 const { requestFn: getDevice } = useRequest(StorageApi.getDeviceByGroup);
-const { requestFn: getMeasurementsInfosByFuzzy } = useRequest(StorageApi.getMeasurementsInfosByFuzzy);
+// const { requestFn: getMeasurementsInfosByFuzzy } = useRequest(StorageApi.getMeasurementsInfosByFuzzy);
 const { requestFn: getIsAlignedDevice } = useRequest(StorageApi.getIsAlignedDevice);
 const { requestFn: saveMeasurementList, loading: saveLoading } = useRequest(StorageApi.saveMeasurementList);
 const { requestFn: deleteMeasurements } = useRequest(StorageApi.deleteMeasurements);
@@ -252,24 +252,6 @@ const remoteMethod = debounce((query: string) => {
     }
   });
 }, 500);
-
-// 获取物理量
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getMeasurementList(val: string) {
-  getMeasurementsInfosByFuzzy({
-    dataBaseOrDevice: 'device',
-    pathName: val,
-    keyword: '',
-    pageNum: 1,
-    pageSize: 10,
-  }).then((res) => {
-    const data = res.data?.measurements?.map((item) => ({ ...item, isEditable: false }));
-    data.forEach((item) => {
-      formData.measurementList.unshift({ ...item });
-    });
-    activeName.value = `measurement_${formData.measurementList.length - 1}`;
-  });
-}
 
 // 切换新建设备
 function handleChangeAdd(val: CheckboxValueType) {
@@ -367,7 +349,7 @@ function handleChangeDevice(val: string) {
 
 // 切换数据类型
 function handleChangeRowDataType(val: string, item: Partial<StorageDevice.MeasurementItem>, index: number) {
-  formData.measurementList.splice(index, 1, { ...item, encoding: encoding[val][0] as string as EncodingType });
+  formData.measurementList.splice(index, 1, { ...item, encoding: encoding[val][0] as EncodingType });
 }
 
 // 追加行
@@ -445,7 +427,7 @@ watch(
         isEditable: true,
       });
     }
-  }
+  },
 );
 </script>
 

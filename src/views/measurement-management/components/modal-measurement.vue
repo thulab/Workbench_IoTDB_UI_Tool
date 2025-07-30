@@ -221,7 +221,7 @@ function handleDelRow(i: number, e: MouseEvent) {
 
 // 切换数据类型
 function handleChangeRowDataType(val: string, item: Partial<StorageDevice.MeasurementItem>, index: number) {
-  formData.measurementList.splice(index, 1, { ...item, encoding: encoding[val][0] as string as EncodingType });
+  formData.measurementList.splice(index, 1, { ...item, encoding: encoding[val][0] as EncodingType });
 }
 
 // 追加行
@@ -294,7 +294,7 @@ watch(
         compression: 'SNAPPY',
       });
     }
-  }
+  },
 );
 </script>
 

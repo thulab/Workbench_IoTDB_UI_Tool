@@ -350,7 +350,7 @@ function handleExportData(exportType: string) {
     orderVal = 'desc';
   }
   exportTableId({
-    database: props.currentNode?.database!,
+    database: props.currentNode?.database,
     tableName: props.currentNode?.nodeName,
     name: searchType.value === 'columnName' ? searchKeyword.value : '',
     comment: searchType.value === 'comment' ? searchKeyword.value : '',

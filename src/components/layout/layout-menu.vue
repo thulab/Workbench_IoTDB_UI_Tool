@@ -6,6 +6,7 @@
         <i-custom-timecho-logo-white-en v-if="locale === 'en'" />
         <i-custom-timecho-logo-white v-else />
       </el-icon>
+      <span class="logo-version" v-if="!isCollapse">2.x</span>
     </div>
     <div class="connection-box" :style="{ padding: isCollapse ? '0 0 0 5px' : '0 16px 0 10px' }">
       <div class="connection-divider"></div>
@@ -139,7 +140,6 @@ function handleChangeCluster(type: 'master' | 'slave') {
     });
   } else {
     changeCluster(type === 'master' ? 0 : 1).then(() => {
-      // eslint-disable-next-line no-underscore-dangle
       window.__isReload__ = true;
       window.location.reload();
     });
@@ -248,13 +248,6 @@ watch(locale, () => {
         width: 105px;
         font-size: 105px;
       }
-    }
-
-    span {
-      font-size: 22px;
-      font-weight: bold;
-      color: #dadada;
-      white-space: nowrap;
     }
 
     img {

@@ -13,6 +13,6 @@ defineProps<{
 
 <script lang="ts">
 export default defineComponent({
-  name: 'Tooltip',
+  name: 'ToolTip',
 });
 </script>

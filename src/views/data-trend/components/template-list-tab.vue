@@ -40,10 +40,12 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 const props = withDefaults(
   defineProps<{
     source?: string;
+    sqlDialect?: 'table' | '';
   }>(),
   {
     source: 'trend',
-  }
+    sqlDialect: '',
+  },
 );
 
 const emit = defineEmits(['handleOperate']);
@@ -56,9 +58,17 @@ const { requestFn: delTrendTemplate } = useRequest(SearchApi.delTrendTemplate);
 
 // 获取列表数据
 const getQueryList = debounce(() => {
-  getTrendTemplate(filterText.value, props.source === 'trend' ? '' : 'spectrum').then((res) => {
+  getTrendTemplate(filterText.value, props.source === 'trend' ? '' : props.sqlDialect === 'table' ? 'table-spectrum' : '').then((res) => {
     const data = res.data || [];
-    templateList.value = data.filter((item: Search.TrendTemplate) => (props.source === 'trend' ? item.type !== 'spectrum' : item.type === 'spectrum'));
+    templateList.value = data
+      .filter((item: Search.TrendTemplate) => (props.source === 'trend' ? item.type.indexOf('spectrum') === -1 : item.type.indexOf('spectrum') !== -1))
+      .filter((item: Search.TrendTemplate) => {
+        if (props.sqlDialect === 'table') {
+          return item.type.indexOf('table') !== -1;
+        } else {
+          return item.type.indexOf('table') === -1;
+        }
+      });
   });
 }, 500);
 
@@ -97,7 +107,7 @@ const handleSqlCommand = (val: string, data: Search.TrendTemplate) => {
       type: 'warning',
       icon: ICustomMessageWarning,
     }).then(() => {
-      delTrendTemplate(+data.id!).then(() => {
+      delTrendTemplate(+data.id).then(() => {
         ElMessage({
           type: 'success',
           message: `${t('common.deleteSuccess')}`,

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/*  eslint-disable no-unused-vars */
 import type { CSSProperties } from 'vue';
 import { EditorState, type EditorStateConfig, Compartment, type Extension, StateEffect } from '@codemirror/state';
 import { EditorView, type EditorViewConfig, ViewUpdate, keymap, placeholder } from '@codemirror/view';
@@ -145,7 +145,7 @@ export const getEditorTools = (view: EditorView) => {
           color: '#495ad4',
           border: 'none',
         },
-      })
+      }),
     );
   };
 

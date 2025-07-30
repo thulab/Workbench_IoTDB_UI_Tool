@@ -16,7 +16,7 @@ const props = withDefaults(
     language: 'shell',
     theme: 'vs',
     readOnly: false,
-  }
+  },
 );
 
 const { locale } = useI18n();
@@ -60,8 +60,8 @@ const initEditor = () => {
       readOnly: props.readOnly,
     });
     loading.value = false;
-    toRaw(monacoEditor.value!).setValue(content.value);
-    monacoEditor.value!.getAction('editor.action.formatDocument')!.run();
+    toRaw(monacoEditor.value).setValue(content.value);
+    monacoEditor.value.getAction('editor.action.formatDocument')!.run();
   });
 };
 
@@ -77,8 +77,8 @@ function getContent() {
 
 function setContent(val: string) {
   if (monacoEditor.value) {
-    toRaw(monacoEditor.value!)?.setValue(val);
-    monacoEditor.value!.getAction('editor.action.formatDocument')!.run();
+    toRaw(monacoEditor.value)?.setValue(val);
+    monacoEditor.value.getAction('editor.action.formatDocument')!.run();
   } else {
     content.value = val;
   }

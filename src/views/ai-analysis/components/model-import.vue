@@ -263,7 +263,7 @@ watch(
       uploadStatusPt.value = '';
       uploadStatusYaml.value = '';
     }
-  }
+  },
 );
 </script>
 

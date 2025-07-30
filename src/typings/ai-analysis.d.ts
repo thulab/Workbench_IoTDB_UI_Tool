@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 declare namespace AIAnalysis {
   export interface Model {
     modelId: string;

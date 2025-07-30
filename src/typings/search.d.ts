@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 declare namespace Search {
   export interface QueryDataParams {
     measurements: string[];

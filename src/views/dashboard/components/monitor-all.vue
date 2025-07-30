@@ -75,6 +75,7 @@
 </template>
 
 <script setup lang="ts">
+/* eslint-disable no-sparse-arrays */
 import { type ECOption } from '@/plugins/echarts-plugin';
 import { toThousands, transformDecimal } from '@/utils/format';
 import { DashboardApi } from '@/api';
@@ -480,9 +481,7 @@ const diskChartOptions = (diskMemoryChartData: Dashboard.MetricDiskRes): ECOptio
         const paramsData = params as unknown as Array<Record<string, any>>;
         const circle = '<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:';
         paramsData.forEach((item) => {
-          // eslint-disable-next-line no-nested-ternary
           res += `<div style="margin: 10px 0 0;">${circle}${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;margin-left:2px">${item.seriesName}</span><span style="float:right;margin-left:20px;font-size:14px;color:#666;font-weight:900">${
-            // eslint-disable-next-line no-nested-ternary
             item.axisValueLabel === t('dashboard.diskMemory')
               ? item.seriesName === t('dashboard.useMemory')
                 ? `${diskMemoryChartData.diskUse} ${diskMemoryChartData.useUnit}`
@@ -574,7 +573,6 @@ const diskChartOptions = (diskMemoryChartData: Dashboard.MetricDiskRes): ECOptio
         name: t('dashboard.residueMemory'),
         type: 'bar',
         stack: 'total',
-        // eslint-disable-next-line no-sparse-arrays
         data: [, transformDecimal(diskMemoryChartData.diskTotal! - transformDecimal(diskMemoryChartData.diskTotal! * diskMemoryChartData.diskUseRatio, 3), 3)],
         itemStyle: {
           color: '#DFE1ED',

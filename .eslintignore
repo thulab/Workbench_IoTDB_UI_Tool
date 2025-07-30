@@ -1,6 +1,0 @@
-.vscode/*
-node_modules/*
-/dist
-/public
-/src/typings/auto-imports.d.ts
-/src/typings/components.d.ts

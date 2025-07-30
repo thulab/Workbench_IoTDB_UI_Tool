@@ -84,6 +84,6 @@ watch(
         formData.comment = '';
       }
     }
-  }
+  },
 );
 </script>

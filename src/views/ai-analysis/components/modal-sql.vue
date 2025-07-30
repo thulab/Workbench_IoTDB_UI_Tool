@@ -72,6 +72,6 @@ watch(
     if (newVal) {
       sqlInput.value = props.sqlValue;
     }
-  }
+  },
 );
 </script>

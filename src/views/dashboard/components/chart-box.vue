@@ -13,8 +13,8 @@ import type { ECOption } from '@/plugins/echarts-plugin';
 
 const props = defineProps<{
   data: {
-    type: Object;
-    title: String;
+    type: object;
+    title: string;
     options: ECOption;
   };
 }>();
@@ -65,7 +65,7 @@ watch(
   },
   {
     deep: true,
-  }
+  },
 );
 </script>
 

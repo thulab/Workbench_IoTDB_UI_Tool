@@ -15,6 +15,7 @@
 </template>
 
 <script lang="ts" setup>
+// disable
 import type { FormInstance } from 'element-plus';
 
 const props = defineProps<{
@@ -71,7 +72,7 @@ watch(
       formRef.value?.resetFields();
       formData.ip = props.editData ? props.editData : '';
     }
-  }
+  },
 );
 </script>
 

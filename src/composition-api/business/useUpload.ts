@@ -19,7 +19,7 @@ export default function useUpload(fileType: string[], fileSize: number) {
       })
       .catch(() => {
         ElMessage.error({ message: t('common.uploadError'), grouping: true });
-        return Promise.reject();
+        return Promise.reject(new Error(t('common.uploadError')));
       });
   }
   const httpRequest: UploadProps['httpRequest'] = (options) => uploadFile(options.file);

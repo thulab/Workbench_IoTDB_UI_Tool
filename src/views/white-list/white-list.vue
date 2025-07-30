@@ -160,7 +160,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 </script>
 

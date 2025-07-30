@@ -248,7 +248,7 @@ function handleStatus(type: string, data: DataSync.SynchronListData | null, stat
   if (type === 'batch') {
     statusData = multipleSelection.value.filter((item) => item.state === realStatus).map((d) => d.name);
   } else if (data?.state === realStatus) {
-    statusData = [data!.name];
+    statusData = [data.name];
   } else {
     statusData = [];
   }
@@ -319,7 +319,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 </script>
 

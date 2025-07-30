@@ -72,7 +72,7 @@
               t(
                 'spectrum.importedFailureStatus',
                 { total: uploadResult.successNum + uploadResult.failNum, successNum: uploadResult.successNum, errorNum: uploadResult.failNum },
-                uploadResult.successNum + uploadResult.failNum
+                uploadResult.successNum + uploadResult.failNum,
               )
             }}
           </span>
@@ -218,7 +218,7 @@ watch(
       uploadFileInfo.value = undefined;
       uploadStatus.value = '';
     }
-  }
+  },
 );
 </script>
 

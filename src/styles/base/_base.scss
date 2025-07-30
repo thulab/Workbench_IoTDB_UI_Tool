@@ -1,3 +1,5 @@
+@use '../abstracts/variables' as *;
+
 @each $distance in $distance-list {
   .m-#{$distance} {
     margin: $distance + px !important;
@@ -244,4 +246,24 @@
 .highlight {
   color: var(--el-color-primary);
   font-weight: bold;
+}
+
+.logo-version {
+  color: white;
+  font-size: 26px;
+  line-height: 37.5px;
+  margin-left: 12px;
+
+  &.login {
+    color: var(--el-color-primary);
+    margin-left: 4px;
+    font-size: 32px;
+  }
+
+  &.system-info {
+    color: var(--el-color-primary);
+    font-size: 30px;
+    line-height: 1;
+    margin-left: 8px;
+  }
 }

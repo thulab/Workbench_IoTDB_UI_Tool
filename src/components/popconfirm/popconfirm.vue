@@ -45,7 +45,7 @@ import 'element-plus/theme-chalk/src/popover.scss';
 import { popconfirmEmits, popconfirmProps } from './popconfirm';
 
 defineOptions({
-  name: 'Popconfirm',
+  name: 'PopConfirm',
 });
 
 const props = defineProps(popconfirmProps);

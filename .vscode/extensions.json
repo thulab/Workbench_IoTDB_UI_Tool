@@ -1,10 +1,14 @@
 {
   "recommendations": [
-    "dbaeumer.vscode-eslint",
     "lokalise.i18n-ally",
     "stylelint.vscode-stylelint",
-    "vue.volar",
     "redjue.git-commit-plugin",
-    "antfu.iconify"
+    "antfu.iconify",
+    "Vue.volar",
+    "vitest.explorer",
+    "dbaeumer.vscode-eslint",
+    "EditorConfig.EditorConfig",
+    "oxc.oxc-vscode",
+    "esbenp.prettier-vscode"
   ]
 }

@@ -3,8 +3,7 @@ import type { TabPaneProps } from 'element-plus';
 import router from '@/router';
 import { HOME_URL, TABS_BLACK_LIST } from '@/config/app-config';
 
-const useTabsStore = defineStore({
-  id: 'useTabsState',
+const useTabsStore = defineStore('tabsStore', {
   state: () => ({
     tabsMenuValue: HOME_URL,
     tabsMenuList: [

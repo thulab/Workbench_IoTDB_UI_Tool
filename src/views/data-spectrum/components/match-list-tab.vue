@@ -142,7 +142,7 @@ watch(
   () => matchList.value,
   () => {
     selectAll();
-  }
+  },
 );
 </script>
 

@@ -94,6 +94,6 @@ watch(
       errorName.value = '';
       formRef.value?.resetFields();
     }
-  }
+  },
 );
 </script>

@@ -19,7 +19,7 @@ const route = [
       {
         path: 'visualization',
         name: 'Visualization',
-        component: () => import('@/views/ai-analysis/visualization.vue'),
+        component: () => import('@/views/ai-analysis/the-visualization.vue'),
         meta: { keepAlive: true, title: 'aiAnalysis.visualization', icon: ICustomAIAnalysis, sqlDialect: 'all' },
       },
       {

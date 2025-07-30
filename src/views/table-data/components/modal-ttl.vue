@@ -110,6 +110,6 @@ watch(
         formData.ttl = '';
       }
     }
-  }
+  },
 );
 </script>

@@ -20,7 +20,7 @@ const route = [
       {
         path: 'detail',
         name: 'DataManage',
-        component: () => import('@/views/table-data/detail.vue'),
+        component: () => import('@/views/table-data/table-data.vue'),
         meta: { keepAlive: true },
       },
     ],

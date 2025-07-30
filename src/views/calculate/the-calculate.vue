@@ -354,7 +354,7 @@ function handleDel(type: string, data: Calculate.CalculateItem | null) {
       cancelButtonClass: 'del-calculate-cancel',
       type: 'warning',
       icon: ICustomMessageWarning,
-    }
+    },
   ).then(() => {
     let arr = [];
     if (type === 'batch') {
@@ -407,7 +407,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 </script>
 

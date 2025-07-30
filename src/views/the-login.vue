@@ -10,6 +10,7 @@
         <div class="login-logo-box">
           <i-custom-timecho-logo-en v-if="locale === 'en'" class="title-logo" />
           <i-custom-timecho-logo v-else class="title-logo" />
+          <span class="logo-version login">2.x</span>
           <!-- <i-custom-logo-title class="title-logo" /> -->
         </div>
         <h5 class="login-title">{{ t('login.title') }}</h5>
@@ -82,7 +83,7 @@
           </el-form-item>
         </el-form>
       </div>
-      <p class="right-text">copyrightⒸ Timecho {{ appVersion }}</p>
+      <p class="right-text">copyrightⒸ Timecho V{{ appVersion }}</p>
     </div>
 
     <modal-connection v-model:visible="connectionVisible" @handleClose="getList" />
@@ -133,6 +134,7 @@ const appVersion = computed(() => appStore.AppVersion);
 const { handleLangCommand } = useLangSwitch(useI18n());
 
 const { requestFn: login } = useRequest(UserApi.login);
+const { requestFn: logout } = useRequest(UserApi.logout);
 const { requestFn: loginCaptcha } = useRequest(UserApi.loginCaptcha);
 const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
 const { requestFn: getConnectionDetail } = useRequest(ConnectionApi.getConnectionDetail);
@@ -202,18 +204,17 @@ function handleChangeDefaultModel(model: 'tree' | 'table') {
   loginForm.model = model;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function handleChangePwdType() {
-  if (pwdType.value === 'password') {
-    pwdType.value = 'text';
-  } else {
-    pwdType.value = 'password';
-  }
-  formRef.value?.clearValidate('password');
-}
+// function handleChangePwdType() {
+//   if (pwdType.value === 'password') {
+//     pwdType.value = 'text';
+//   } else {
+//     pwdType.value = 'password';
+//   }
+//   formRef.value?.clearValidate('password');
+// }
 
 // 获取实例列表
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 function getList() {
   connectionLoading.value = true;
   getConnectionList()
@@ -291,10 +292,23 @@ const submitForm = () => {
     if (valid) {
       loading.value = true;
       login(loginForm.user, loginForm.password, +loginForm.connection, loginForm.model)
-        .then(() => {
-          userStore.setUser(loginForm.user);
-          router.push({ name: 'Dashboard' });
-          sessionStorage.setItem('nologin', '0');
+        .then(async () => {
+          await userStore.setUser(loginForm.user);
+          if (sessionStorage.getItem('iotdbVersion')?.indexOf('1.') === 0) {
+            ElMessageBox.alert(t('login.versionTip'), t('common.tip'), {
+              confirmButtonText: t('common.confirm'),
+              type: 'warning',
+            }).finally(() => {
+              // 退出登录，刷新页面;
+              logout().then(() => {
+                userStore.setUser('');
+                window.location.href = `/view/login?timestamp=${new Date().getTime()}`;
+              });
+            });
+          } else {
+            router.push({ name: 'Dashboard' });
+            sessionStorage.setItem('nologin', '0');
+          }
         })
         .catch(() => {
           captchaRef.value?.onRefresh();

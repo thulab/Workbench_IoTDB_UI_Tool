@@ -165,7 +165,7 @@ const pagination = reactive({
 });
 const getListLoading = ref(false);
 const defaultSort = ref<Sort>({ prop: 't0', order: 'descending' });
-const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize) as Record<string, any>[]);
+const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize));
 
 const { requestFn: getMeasurementsInfo, loading: infoLoading } = useRequest(StorageApi.getMeasurementsInfo);
 const { requestFn: getList, loading } = useRequest(SearchApi.getDataSearchList);
@@ -224,7 +224,6 @@ function getListData() {
     page: pagination.pageNum,
   })
     .then((res) => {
-      // eslint-disable-next-line no-undef
       const list: DynamicTableColumn[] = [];
       res.data?.metaDataList?.forEach((item: string, index: number) => {
         list.push({
@@ -313,7 +312,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 
 watch(
@@ -325,7 +324,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 </script>
 <style lang="scss" scoped>

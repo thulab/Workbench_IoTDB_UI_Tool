@@ -84,7 +84,7 @@ export const useConnectionStore = defineStore(
       storage: sessionStorage,
       pick: ['connectionInfo', 'enableAINode'],
     },
-  }
+  },
 );
 
 export default useConnectionStore;

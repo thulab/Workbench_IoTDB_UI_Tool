@@ -4,7 +4,7 @@ import Login from '@/views/the-login.vue';
 import { getRouterByType } from '@/utils/system-version';
 import { registerGuard as registerAuthGuard } from './guard/auth-guard';
 
-const metaRouters = import.meta.glob('./modules/*.ts', { eager: true, import: 'default' }) as Record<string, Array<RouteRecordRaw>>;
+const metaRouters = import.meta.glob('./modules/*.ts', { eager: true, import: 'default' });
 export const asyncRoutes: Array<RouteRecordRaw> = [];
 Object.keys(metaRouters).forEach((item) => {
   const data: Array<RouteRecordRaw> = getRouterByType(metaRouters[item]);
