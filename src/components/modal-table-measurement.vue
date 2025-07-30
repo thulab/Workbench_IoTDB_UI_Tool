@@ -84,8 +84,8 @@
               ref="deviceTableRef"
               :data="deviceTableData"
               style="max-width: 500px"
-              :height="200"
-              :max-height="200"
+              :height="260"
+              :max-height="260"
               v-loading="searchLoading"
               tooltip-effect="light"
               :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
@@ -246,7 +246,7 @@ const internalSelectedMeasurements = ref<IoTDB.SelectedMeasurement[]>([]);
 const { requestFn: getDevices, loading: searchLoading } = useRequest(TableDataApi.getDevices);
 
 const currentPage = ref(1);
-const noMoreData = ref(false);
+const noMoreData = ref(true);
 // 计算属性
 const databaseOptions = computed(() => {
   return treeData.value.map((db) => ({
@@ -477,7 +477,7 @@ const addMeasurements = async () => {
   });
 
   if (newMeasurements.length !== 0) {
-    if (internalSelectedMeasurements.value.length + newMeasurements.length >= props.selectedLimit) {
+    if (internalSelectedMeasurements.value.length + newMeasurements.length > props.selectedLimit) {
       ElMessage.warning(t('common.selectMeasurementLimit', { limit: props.selectedLimit }));
       return;
     }

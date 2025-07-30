@@ -53,41 +53,15 @@
                         :label-width="locale === 'en' ? '' : '96px'"
                         :rules="requiredRules"
                       >
-                        <el-cascader
-                          v-model="searchFormData.tableSelect"
-                          :options="tableOptions"
-                          show-all-levels
-                          :props="{ expandTrigger: 'hover' }"
-                          id="search-database"
-                          class="m-l-[8px]"
-                          :placeholder="t('aiAnalysis.chooseDatabaseAndTable')"
-                          @change="handleTableSelected"
-                        />
-                        <el-cascader
-                          v-model="searchFormData.device"
-                          :disabled="!searchFormData.table"
-                          :options="deviceOptions"
-                          :props="{ expandTrigger: 'hover' }"
-                          filterable
-                          id="search-database"
-                          :placeholder="t('aiAnalysis.chooseDevice')"
-                          class="m-l-[8px]"
-                        />
-                        <el-select
-                          v-model="searchFormData.measurement"
-                          :disabled="!searchFormData.table"
-                          class="m-l-[8px]"
-                          id="search-device"
-                          :placeholder="t('aiAnalysis.chooseMeasurement')"
-                          style="width: 200px"
-                        >
-                          <el-option
-                            v-for="item in currentTable?.children?.filter((item) => item.cateGory === 'FIELD' && allowedTypes.includes(item.dataType!))"
-                            :key="item.nodeName"
-                            :label="item.nodeName + (item.comment ? `(${item.comment})` : '')"
-                            :value="item.nodeName"
-                          />
-                        </el-select>
+                        <el-button type="primary" @click="handleSelectMeasurement">{{ t('tableMeasurement.measurementSelect') }}</el-button>
+                        <span v-if="searchFormData.database" class="m-l-[24px]">
+                          {{ t('measurement.databaseTitle') }}：
+                          <span class="c-[#656A85]">{{ searchFormData.database }}</span>
+                        </span>
+                        <span v-if="searchFormData.table" class="m-l-[24px]">
+                          {{ t('dataManage.table') }}：
+                          <span class="c-[#656A85]">{{ searchFormData.table }}</span>
+                        </span>
                       </base-form-item>
                     </template>
                     <template v-else>
@@ -335,9 +309,17 @@
             v-model:visible="writeBackVisible"
             :database="currentTable?.database || ''"
             :table="currentTable?.nodeName || ''"
-            :tags="copySearchFormData?.device || []"
+            :tags="copySearchFormData.selectedMeasurement || []"
             :field-name="copySearchFormData.measurement"
             @handleConfirm="handleWriteBackSuccess"
+          />
+          <modal-table-measurement
+            v-model:visible="tableMeasurementVisible"
+            :current-database="searchFormData.database"
+            :current-table="searchFormData.table"
+            :selected-limit="1"
+            :selected-measurements="searchFormData.selectedMeasurement ? [searchFormData.selectedMeasurement] : []"
+            @confirm="handleConfirmMeasurement"
           />
         </el-container>
       </active-container>
@@ -347,7 +329,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import type { FormInstance, SingleOrRange, DateModelType, CascaderValue } from 'element-plus';
+import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import dayjs from 'dayjs';
 import { debounce, cloneDeep, intersection } from 'lodash-es';
 import { vElementSize } from '@vueuse/components';
@@ -356,8 +338,8 @@ import { echarts, type ECOption } from '@/plugins/echarts-plugin';
 import { today, getOneIntervalNow, todayNow, formatDate } from '@/utils/date';
 import { useUserStore, useConnectionStore, useDbStore } from '@/stores';
 import { parse } from 'yaml';
-import { convertTags } from '@/utils/tree';
 import { iotdbShowAuth } from '@/utils/auth';
+import ModalTableMeasurement from '@/components/modal-table-measurement.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalSql from './components/modal-sql.vue';
 import ModalWriteBack from './components/modal-write-back.vue';
@@ -392,8 +374,7 @@ const searchFormData = reactive<{
   orderBy: string;
   database?: string;
   table?: string;
-  device?: CascaderValue;
-  tableSelect?: CascaderValue;
+  selectedMeasurement?: IoTDB.SelectedMeasurement;
 }>({
   type: 0,
   measurement: '',
@@ -426,26 +407,9 @@ const { maxTableHeight: maxCustomTableHeight } = useTableHeight(324);
 const pageSize = computed(() => Math.floor(maxTableHeight.value / 40));
 const filterCondition = ref('all');
 
-const tableOptions = computed(() => {
-  if (!connectionStore.isTableModel) {
-    return [];
-  }
-  return dbStore.treeData.map((item) => {
-    return {
-      label: item.database,
-      value: item.database,
-      children: item.children?.map((child) => ({
-        label: child.nodeName + (child.comment ? ` (${child.comment})` : ''),
-        value: child.nodeName,
-      })),
-    };
-  });
-});
+const tableMeasurementVisible = ref(false);
 
 const currentTable = ref<IoTDB.TreeNodeData | null>(null);
-
-const deviceOptions = ref<AIAnalysis.CascaderOption[]>([]);
-const deviceColumns = ref<string[]>();
 
 const valueShow = (item: AIAnalysis.SearchDataItem) => {
   if (copySearchFormData.type === 0) return true;
@@ -891,8 +855,7 @@ function handleReset() {
   searchFormData.measurement = '';
   searchFormData.database = '';
   searchFormData.table = '';
-  searchFormData.device = [];
-  searchFormData.tableSelect = [];
+  searchFormData.selectedMeasurement = undefined;
   searchFormData.method = '';
   searchFormData.measurementType = '';
   searchFormData.method = defaultMethod;
@@ -975,7 +938,7 @@ function handleSearch() {
       modelId: searchFormData.type === 0 ? searchFormData.method : [searchFormData.method as string],
       measurement: searchFormData.measurement,
       path: connectionStore.isTableModel ? `"${searchFormData.database}"."${searchFormData.table}"` : undefined,
-      tags: connectionStore.isTableModel ? convertTags(searchFormData.device as string[], deviceColumns.value) : undefined,
+      tags: connectionStore.isTableModel ? searchFormData.selectedMeasurement?.condition.split(' AND ') : undefined,
       startTime: searchFormData.type === 0 ? dayjs(searchFormData.forecastStart).valueOf() : dayjs(searchFormData.datetimerange[0]).valueOf(),
       endTime: searchFormData.type === 1 ? dayjs(searchFormData.datetimerange[1]).valueOf() : undefined,
       exceptionPercent: searchFormData.method === '_Stray' && searchFormData.anomalyRatio ? searchFormData.anomalyRatio / 100 : undefined,
@@ -1142,31 +1105,6 @@ function handleCellStyle({ row, columnIndex }: { row: AIAnalysis.SearchDataItem;
   return {};
 }
 
-function handleTableSelected(value: CascaderValue) {
-  const payload = value as unknown as string[];
-  if (value && payload.length > 0) {
-    [searchFormData.database, searchFormData.table] = payload;
-    searchFormData.measurement = '';
-    searchFormData.measurementType = '';
-    currentTable.value = dbStore.treeData.find((item) => item.database === searchFormData.database)?.children?.find((child) => child.nodeName === searchFormData.table) || null;
-    // TableDataApi.getDevices(searchFormData.database, searchFormData.table)
-    //   .then((res) => {
-    //     // 使用工具函数处理数据
-    //     deviceColumns.value = res.data.data.metaDataList;
-    //     deviceOptions.value = convertDeviceDataToOptions(res.data.data.valueList);
-    //   })
-    //   .catch(() => {
-    //     searchFormData.measurement = '';
-    //     searchFormData.measurementType = '';
-    //   });
-  } else {
-    searchFormData.database = undefined;
-    searchFormData.table = undefined;
-    searchFormData.measurement = '';
-    searchFormData.measurementType = '';
-  }
-}
-
 function handleFilter(val: string) {
   currentPage.value = 1;
   filterCondition.value = val;
@@ -1179,6 +1117,18 @@ function handleDoc() {
     window.open('https://www.timecho.com/docs/zh/UserGuide/latest/AI-capability/AINode_timecho.html#_4-4-%E4%BD%BF%E7%94%A8%E5%86%85%E7%BD%AE%E6%A8%A1%E5%9E%8B%E6%8E%A8%E7%90%86');
   }
 }
+
+const handleSelectMeasurement = () => {
+  tableMeasurementVisible.value = true;
+};
+
+const handleConfirmMeasurement = (database: string, table: string, selected: IoTDB.SelectedMeasurement[]) => {
+  searchFormData.database = database;
+  searchFormData.table = table;
+  [searchFormData.selectedMeasurement] = selected;
+  searchFormData.measurement = searchFormData.selectedMeasurement.measurement;
+  tableMeasurementVisible.value = false;
+};
 
 function setStorage() {
   sessionStorage.setItem(
@@ -1250,8 +1200,7 @@ watch(
         searchFormData.orderBy = storageData.orderBy;
         searchFormData.database = storageData.database;
         searchFormData.table = storageData.table;
-        searchFormData.device = storageData.device;
-        searchFormData.tableSelect = storageData.tableSelect;
+        searchFormData.selectedMeasurement = storageData.selectedMeasurement;
         sqlValue.value = storageData.sqlValue;
         currentPoint = storageData.currentPoint;
         if (canQuery.value) {
