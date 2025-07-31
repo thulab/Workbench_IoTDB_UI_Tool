@@ -117,5 +117,6 @@ declare namespace IoTDB {
     device: TagFilter[];
     condition: string;
     measurement: string;
+    measurementType?: string;
   }
 }

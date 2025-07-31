@@ -109,7 +109,7 @@
                           id="search-datetimerange"
                         />
                       </base-form-item>
-                      <base-form-item :label="`${t('aiAnalysis.anomalyRatio')}：`" v-if="searchFormData.method === '_Stray'" class="m-r-0">
+                      <base-form-item :label="`${t('aiAnalysis.anomalyRatio')}：`" v-if="searchFormData.method === 'stray'" class="m-r-0">
                         <template #label>
                           {{ t('aiAnalysis.anomalyRatio') }}：
                           <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
@@ -157,7 +157,7 @@
                           <el-dropdown-menu>
                             <el-dropdown-item command="csv" id="visualization-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
                             <el-dropdown-item command="xlsx" id="visualization-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
-                            <el-dropdown-item v-if="canWrithBack" command="saveToIoTDB" id="visualization-saveToIoTDB">{{ t('aiAnalysis.saveToIoTDB') }}</el-dropdown-item>
+                            <el-dropdown-item v-if="canWriteBack" command="saveToIoTDB" id="visualization-saveToIoTDB">{{ t('aiAnalysis.saveToIoTDB') }}</el-dropdown-item>
                           </el-dropdown-menu>
                         </template>
                       </el-dropdown>
@@ -225,7 +225,7 @@
                             <el-dropdown-menu>
                               <el-dropdown-item command="csv" id="visualization-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
                               <el-dropdown-item command="xlsx" id="visualization-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
-                              <el-dropdown-item v-if="searchFormData.type === 0 && !connectionStore.isTableModel" command="saveToIoTDB" id="visualization-saveToIoTDB">
+                              <el-dropdown-item v-if="searchFormData.type === 0" command="saveToIoTDB" id="visualization-saveToIoTDB">
                                 {{ t('aiAnalysis.saveToIoTDB') }}
                               </el-dropdown-item>
                             </el-dropdown-menu>
@@ -307,11 +307,13 @@
           <modal-write-back-table
             v-if="connectionStore.isTableModel"
             v-model:visible="writeBackVisible"
-            :database="currentTable?.database || ''"
-            :table="currentTable?.nodeName || ''"
+            :database="copySearchFormData?.database || ''"
+            :table="copySearchFormData?.table || ''"
+            :model-id-list="(copySearchFormData?.method as string[]) || []"
             :tags="copySearchFormData.selectedMeasurement?.device"
             :field-name="copySearchFormData.measurement"
-            @handleConfirm="handleWriteBackSuccess"
+            :save-loading="writeBackLoading"
+            @handleSave="handleWriteBackTableSuccess"
           />
           <modal-table-measurement
             v-model:visible="tableMeasurementVisible"
@@ -333,7 +335,7 @@ import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import dayjs from 'dayjs';
 import { debounce, cloneDeep, intersection } from 'lodash-es';
 import { vElementSize } from '@vueuse/components';
-import { AIAnalysisApi } from '@/api';
+import { AIAnalysisApi, TableDataApi } from '@/api';
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
 import { today, getOneIntervalNow, todayNow, formatDate } from '@/utils/date';
 import { useUserStore, useConnectionStore, useDbStore } from '@/stores';
@@ -343,6 +345,7 @@ import ModalTableMeasurement from '@/components/modal-table-measurement.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalSql from './components/modal-sql.vue';
 import ModalWriteBack from './components/modal-write-back.vue';
+import ModalWriteBackTable from './components/modal-write-back-table.vue';
 
 const { t, locale } = useI18n();
 
@@ -391,7 +394,7 @@ const { shortcutsDaterange } = useShortcutsDate();
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 
 const saveText = computed(() => (searchFormData.type === 0 ? t('common.save') : t('common.export')));
-const canWrithBack = computed(() => searchFormData.type === 0 && canWriteData.value);
+const canWriteBack = computed(() => searchFormData.type === 0 && canWriteData.value);
 const rawData = ref<AIAnalysis.SearchDataItem[]>([]);
 const analysisData = ref<AIAnalysis.AnalysisVo[]>([]);
 const allTableData = ref<AIAnalysis.SearchDataItem[]>([]);
@@ -408,8 +411,6 @@ const pageSize = computed(() => Math.floor(maxTableHeight.value / 40));
 const filterCondition = ref('all');
 
 const tableMeasurementVisible = ref(false);
-
-const currentTable = ref<IoTDB.TreeNodeData | null>(null);
 
 const valueShow = (item: AIAnalysis.SearchDataItem) => {
   if (copySearchFormData.type === 0) return true;
@@ -485,7 +486,7 @@ const applyTip = computed(() => {
 });
 
 const canQuery = computed(() => {
-  if (canReadWriteData.value && canUseModel.value && !notComplete.value && enableAINode.value) {
+  if (canReadWriteData.value && canUseModel.value && !notComplete.value && enableAINode.value && searchFormData.method && searchFormData.method.length) {
     return true;
   }
   return false;
@@ -714,6 +715,7 @@ const chartOptions = computed<ECOption>(() => ({
 const { requestFn: getModels } = useRequest(AIAnalysisApi.getModels);
 const { requestFn: search } = useRequest(AIAnalysisApi.search);
 const { requestFn: writeBack } = useRequest(AIAnalysisApi.writeBack);
+const { requestFn: writeBackTable } = useRequest(TableDataApi.writeBack);
 const { requestFn: getExportId } = useRequest(AIAnalysisApi.getExportId);
 const { requestFn: getCustomData, data: customData } = useRequest(AIAnalysisApi.getCustomData);
 const { requestFn: getCustomExportId } = useRequest(AIAnalysisApi.getCustomExportId);
@@ -838,6 +840,7 @@ function getModelList() {
       modelList.value = res.data.filter((item) => item.state === 'ACTIVE') || [];
       if (modelList.value.some((m) => m.modelId === 'sundial')) {
         defaultMethod = ['sundial'];
+        searchFormData.method = defaultMethod;
       } else {
         defaultMethod = [modelList.value.filter((item) => ANOMALY_DETECTION_TYPES.indexOf(item.modelType) === -1 && item.category !== 'USER-DEFINED')[0].modelId || ''];
         searchFormData.method = defaultMethod;
@@ -1026,6 +1029,33 @@ function handleWriteBackSuccess(name: string, modelId: string) {
     });
 }
 
+function handleWriteBackTableSuccess(payload: AIAnalysis.WriteBackTableFrom) {
+  writeBackLoading.value = true;
+  const data: AIAnalysis.WriteBackTablePayload = {
+    modelType: copySearchFormData.type === 0 ? 'BUILT_IN_FORECAST' : 'BUILT_IN_ANOMALY_DETECTION',
+    newField: {
+      database: payload.database,
+      tableName: payload.table,
+      tags: payload.tags.map((tag) => ({
+        variable: tag.tagName,
+        value: tag.tagValue || null,
+      })),
+      field: payload.fieldName,
+      dataType: copySearchFormData.measurementType,
+    },
+    raw: rawData.value,
+    analysis: copySearchFormData.type === 0 ? analysisData.value.find((item) => item.modelId === payload.modelId)!.data : analysisData.value[0].data,
+  };
+  writeBackTable(data)
+    .then(() => {
+      ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
+      writeBackVisible.value = false;
+    })
+    .finally(() => {
+      writeBackLoading.value = false;
+    });
+}
+
 // 导出
 function handleExportData(exportType: string) {
   if (allTableData.value.length === 0 && tableData.value.length === 0) return;
@@ -1127,6 +1157,7 @@ const handleConfirmMeasurement = (database: string, table: string, selected: IoT
   searchFormData.table = table;
   [searchFormData.selectedMeasurement] = selected;
   searchFormData.measurement = searchFormData.selectedMeasurement.measurement;
+  searchFormData.measurementType = searchFormData.selectedMeasurement.measurementType!;
   tableMeasurementVisible.value = false;
 };
 

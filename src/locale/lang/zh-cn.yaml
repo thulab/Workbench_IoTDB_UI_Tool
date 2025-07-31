@@ -1060,6 +1060,7 @@ aiAnalysis:
   writeBackTargetTable: 目标表
   writeBackTargetMeasurement: 目标测点
   writeBackTargetTags: 目标设备
+  writeBackUnchangedTips: 目标数据库、表、设备、测点与原始测点相同，若不修改，将会覆盖原始测点数据，是否继续？
 dataManage:
   schema: 结构
   dbSchema: 数据库结构

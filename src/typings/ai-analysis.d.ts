@@ -69,4 +69,32 @@ declare namespace AIAnalysis {
     value: string;
     children?: CascaderOption[];
   }
+
+  export interface WriteBackTableFrom {
+    database: string;
+    table: string;
+    tags: {
+      tagName: string;
+      tagValue?: string | null;
+    }[];
+    fieldName: string;
+    fieldType?: string;
+    modelId: string;
+  }
+
+  export interface WriteBackTablePayload {
+    modelType: string;
+    newField: {
+      database: string;
+      tableName: string;
+      tags: {
+        variable: string;
+        value: string | null;
+      }[];
+      field: string;
+      dataType: string;
+    };
+    raw: SearchDataItem[];
+    analysis: SearchDataItem[];
+  }
 }

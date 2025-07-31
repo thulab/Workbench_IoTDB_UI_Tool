@@ -36,10 +36,11 @@
 import { computed } from 'vue';
 import { type MenuProvider } from 'element-plus';
 import useMenuStore from '@/stores/menu';
-import { useConnectionStore } from '@/stores';
+import { useConnectionStore, useUserStore } from '@/stores';
 import { iotdbShowAuth } from '@/utils/auth';
 
 const menuStore = useMenuStore();
+const userStore = useUserStore();
 const connectionStore = useConnectionStore();
 const isCollapse = computed((): boolean => menuStore.isCollapse);
 const rootMenu = inject<MenuProvider>('rootMenu');
@@ -58,6 +59,8 @@ const menus = computed<MenuOptions[]>(() => {
   menuList.sort((a, b) => (a.order || 0) - (b.order || 0));
   return menuList
     .filter((item) => {
+      // 未登录
+      if (!userStore.userInfo.name) return false;
       if (connectionStore.isTableModel) {
         return item.sqlDialect === 'all' || item.sqlDialect === 'table';
       }

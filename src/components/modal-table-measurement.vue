@@ -135,6 +135,7 @@
                 <el-option
                   v-for="measurement in availableMeasurements"
                   :key="measurement.nodeName"
+                  :disabled="!props.supportedTypes.includes(measurement.dataType || '')"
                   :label="measurement.nodeName + (measurement.comment ? ` (${measurement.comment})` : '')"
                   :value="measurement.nodeName!"
                 />
@@ -237,6 +238,7 @@ const formData = reactive({
   selectedTable: '',
   selectedTags: '',
   selectedMeasurement: [] as string[], // 支持多选测点
+  selectedMeasurementType: [] as string[], // 支持多选测点类型
 });
 const tagFilters = ref<IoTDB.TagFilter[]>([{ variable: '', value: '' }]);
 const deviceTableData = ref<Record<string, string>[]>([]);
@@ -285,7 +287,7 @@ const availableTags = computed(() => {
 const availableMeasurements = computed(() => {
   if (!currentTableInfo.value) return [];
 
-  return currentTableInfo.value.children?.filter((col) => col.nodeType === 'FIELD' && props.supportedTypes.includes(col.dataType || '')) || [];
+  return currentTableInfo.value.children?.filter((col) => col.nodeType === 'FIELD') || [];
 });
 
 const canAdd = computed(() => {
@@ -349,7 +351,9 @@ const initModal = async () => {
   formData.selectedMeasurement = [];
 
   // 清除表单验证
-  formRef.value?.clearValidate();
+  nextTick(() => {
+    formRef.value?.clearValidate();
+  });
 };
 
 const handleDatabaseChange = () => {
@@ -465,12 +469,13 @@ const addMeasurements = async () => {
     formData.selectedMeasurement.forEach((measurement) => {
       const key = `${condition}-${measurement}`;
       const exists = internalSelectedMeasurements.value.some((m) => `${m.condition}-${m.measurement}` === key);
-
+      const measurementType = availableMeasurements.value.find((m) => m.nodeName === measurement)?.dataType || '';
       if (!exists) {
         newMeasurements.push({
           condition,
           device: Object.keys(device).map((key) => ({ variable: key, value: device[key] })),
           measurement,
+          measurementType,
         });
       }
     });

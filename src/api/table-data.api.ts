@@ -29,5 +29,9 @@ class TableDataApi {
   }): HttpResponseP<Trend.TableHistoryTrendResponse> {
     return http.post('/trend/relational/history', data);
   }
+
+  static writeBack(data: AIAnalysis.WriteBackTablePayload): HttpResponseP {
+    return http.post('/ai-analysis/relational/writeBack', data);
+  }
 }
 export default TableDataApi;
