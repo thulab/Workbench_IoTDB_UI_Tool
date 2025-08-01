@@ -189,6 +189,7 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalConfig from './components/modal-config.vue';
 import ModalImport from './components/modal-import.vue';
+import type { QueryConfigResult } from '@/types/alarm';
 
 const { t, locale } = useI18n();
 const enumStore = useEnumStore();
@@ -228,13 +229,13 @@ const pagination = reactive({
   pageNum: 1,
 });
 const totalCount = ref(0);
-const multipleSelection = ref<Alarm.QueryConfigResult[]>([]);
+const multipleSelection = ref<QueryConfigResult[]>([]);
 const editVisible = ref(false);
 const editType = ref('add');
 const alarmConfigId = ref();
 const importVisible = ref(false);
 
-const getLevelColor = (data?: Alarm.QueryConfigResult) => {
+const getLevelColor = (data?: QueryConfigResult) => {
   if (!data) {
     if (searchFormData.alarmLevel) {
       const res = levelOptions.value.find((f) => f.value === searchFormData.alarmLevel);
@@ -316,11 +317,11 @@ function onChangePage(page: number) {
   getListData();
 }
 
-function handleSelectionChange(vals: Alarm.QueryConfigResult[]) {
+function handleSelectionChange(vals: QueryConfigResult[]) {
   multipleSelection.value = vals;
 }
 
-function handleSortChange({ column, prop, order }: SortMethod<Alarm.QueryConfigResult>) {
+function handleSortChange({ column, prop, order }: globalThis.SortMethod<QueryConfigResult>) {
   const lastOrderBy = searchFormData.orderBy;
   const lastAsc = searchFormData.asc;
   searchFormData.asc = order === 'ascending' ? 'asc' : 'desc';
@@ -332,7 +333,7 @@ function handleSortChange({ column, prop, order }: SortMethod<Alarm.QueryConfigR
   handleSearch();
 }
 
-function handleStatus(row: Alarm.QueryConfigResult) {
+function handleStatus(row: QueryConfigResult) {
   const { status } = row;
   updateAlarmConfigStatus(row.alarmConfigId, status === 1 ? 2 : 1).then(() => {
     ElMessage.success({ message: t('common.statusSuccess'), grouping: true });
@@ -346,13 +347,13 @@ function handleAdd() {
   editVisible.value = true;
 }
 
-function handleEdit(row: Alarm.QueryConfigResult) {
+function handleEdit(row: QueryConfigResult) {
   editType.value = 'edit';
   alarmConfigId.value = row.alarmConfigId;
   editVisible.value = true;
 }
 
-function handleDel(type: string, data: Alarm.QueryConfigResult | null) {
+function handleDel(type: string, data: QueryConfigResult | null) {
   ElMessageBox.confirm(type === 'batch' ? t('alarm.batchDelete') : t('alarm.singleDelete'), t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),

@@ -119,6 +119,7 @@ import { useConnectionStore, useUserStore } from '@/stores';
 import { getStartAndEnd, today, formatDate } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
 import OverflowClick from './components/overflow-click.vue';
+import type { AuditData } from '@/types';
 
 const { t } = useI18n();
 const connectionStore = useConnectionStore();
@@ -206,7 +207,7 @@ function onChangePage(page: number) {
   getListData();
 }
 
-function handleView(row: Log.AuditData) {
+function handleView(row: AuditData) {
   editDetail.value = row.log;
   dialogVisible.value = true;
 }

@@ -154,6 +154,7 @@ import { getOptionField } from '@/utils/format';
 import { AlarmApi } from '@/api';
 import { useEnumStore, useUserStore } from '@/stores';
 import ICustomCalender from '~icons/custom/calender.svg';
+import type { QueryRecordResult } from '@/types';
 
 const enumStore = useEnumStore();
 const { t, locale } = useI18n();
@@ -183,9 +184,9 @@ const pagination = reactive({
   pageNum: 1,
 });
 const totalCount = ref(0);
-const multipleSelection = ref<Alarm.QueryRecordResult[]>([]);
+const multipleSelection = ref<QueryRecordResult[]>([]);
 
-const getLevelColor = (data?: Alarm.QueryRecordResult) => {
+const getLevelColor = (data?: QueryRecordResult) => {
   if (!data) {
     if (searchFormData.alarmLevel) {
       const res = levelOptions.value.find((f) => f.value === searchFormData.alarmLevel);
@@ -259,11 +260,11 @@ function onChangePage(page: number) {
   getListData();
 }
 
-function handleSelectionChange(vals: Alarm.QueryRecordResult[]) {
+function handleSelectionChange(vals: QueryRecordResult[]) {
   multipleSelection.value = vals;
 }
 
-function handleSortChange({ column, prop, order }: SortMethod<Alarm.QueryRecordResult>) {
+function handleSortChange({ column, prop, order }: globalThis.SortMethod<QueryRecordResult>) {
   const lastOrderBy = searchFormData.orderBy;
   const lastAsc = searchFormData.asc;
   searchFormData.asc = order === 'ascending' ? 'asc' : 'desc';
@@ -294,7 +295,7 @@ function handleCommandDown(val: string) {
   });
 }
 
-function handleStatus(row: Alarm.QueryRecordResult) {
+function handleStatus(row: QueryRecordResult) {
   updateAlarmRecordStatus(row.alarmTraceId).then(() => {
     ElMessage.success({ message: t('alarm.read'), grouping: true });
     // handleSearch();

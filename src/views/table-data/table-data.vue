@@ -20,16 +20,17 @@ import SideTree from './components/side-tree.vue';
 import DatabaseDetail from './components/database-detail.vue';
 import TableDetail from './components/table-detail.vue';
 import TableDataDetail from './components/table-data-detail.vue';
+import type { TableTreeNodeData } from '@/types/table-data';
 
 const userStore = useUserStore();
 const { canReadWriteSchema } = storeToRefs(userStore);
-const currentNode = ref<IoTDB.TreeNodeData | null>(null);
+const currentNode = ref<TableTreeNodeData | null>(null);
 const detailKey = ref(0);
 const dbDtail = ref<InstanceType<typeof DatabaseDetail>>();
 const tableDtail = ref<InstanceType<typeof TableDetail>>();
 const tableDataDtail = ref<InstanceType<typeof TableDataDetail>>();
 
-function handleNodeClick(nodeInfo: IoTDB.TreeNodeData) {
+function handleNodeClick(nodeInfo: TableTreeNodeData) {
   currentNode.value = nodeInfo;
   detailKey.value++;
 }

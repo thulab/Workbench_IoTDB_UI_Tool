@@ -61,6 +61,7 @@
 <script setup lang="ts">
 import { debounce } from 'lodash-es';
 import { StorageApi } from '@/api';
+import type { MeasurementDataItem } from '@/types';
 
 const props = withDefaults(
   defineProps<{
@@ -72,7 +73,7 @@ const props = withDefaults(
     filterSystem?: boolean;
     showPrefix?: boolean;
     disabledSelect?: boolean;
-    disabledPath?: (data: StorageDevice.MeasurementDataItem) => boolean;
+    disabledPath?: (data: MeasurementDataItem) => boolean;
     selectWidth?: number;
     itemWidth?: number;
     isShowType?: boolean;
@@ -90,13 +91,13 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (event: 'update:modelValue', vals: string[]): void;
-  (event: 'handleChangePath', vals: string[], data: StorageDevice.MeasurementDataItem[]): void;
+  (event: 'handleChangePath', vals: string[], data: MeasurementDataItem[]): void;
 }>();
 
 const { t } = useI18n();
 const model = useVModel(props, 'modelValue');
 const dialogVisible = ref(false);
-const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);
+const measurementList = ref<MeasurementDataItem[]>([]);
 
 const { requestFn: getMeasurement } = useRequest(StorageApi.getMeasurementAllObjList);
 

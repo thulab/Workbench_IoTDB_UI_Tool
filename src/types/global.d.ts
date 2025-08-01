@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import type { AxiosResponse } from 'axios';
 import type { TableColumnCtx } from 'element-plus';
+import type { RouteRecordRaw } from 'vue-router';
 
 declare global {
   interface Window {
@@ -135,14 +136,5 @@ declare global {
     column: TableColumnCtx<T>;
     prop: string;
     order: 'ascending' | 'descending';
-  }
-
-  interface ConfigEnumData {
-    value: string;
-    name: string;
-    paramMap?: {
-      color?: string;
-      icon?: string;
-    };
   }
 }

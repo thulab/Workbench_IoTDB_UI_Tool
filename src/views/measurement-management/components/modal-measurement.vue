@@ -134,6 +134,7 @@
 import type { FormInstance } from 'element-plus';
 import { StorageApi } from '@/api';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
+import type { MeasurementItem } from '@/types';
 
 const props = defineProps<{
   visible: boolean;
@@ -172,7 +173,7 @@ const requiredRules = ref([
   },
 ]);
 const formData = reactive<{
-  measurementList: Array<Partial<StorageDevice.MeasurementItem>>;
+  measurementList: Array<Partial<MeasurementItem>>;
 }>({
   measurementList: [],
 });
@@ -182,10 +183,10 @@ const existEmpty = computed(() => {
   return flag;
 });
 
-const copyControl = (data: Partial<StorageDevice.MeasurementItem>) => !data.timeseries || !data.dataType || !data.encoding || !data.compression;
+const copyControl = (data: Partial<MeasurementItem>) => !data.timeseries || !data.dataType || !data.encoding || !data.compression;
 
 // 复制
-function handleCopyRow(data: Partial<StorageDevice.MeasurementItem>, e: MouseEvent) {
+function handleCopyRow(data: Partial<MeasurementItem>, e: MouseEvent) {
   e.preventDefault();
   e.stopPropagation();
   if (copyControl(data)) return;
@@ -220,8 +221,8 @@ function handleDelRow(i: number, e: MouseEvent) {
 }
 
 // 切换数据类型
-function handleChangeRowDataType(val: string, item: Partial<StorageDevice.MeasurementItem>, index: number) {
-  formData.measurementList.splice(index, 1, { ...item, encoding: encoding[val][0] as EncodingType });
+function handleChangeRowDataType(val: string, item: Partial<MeasurementItem>, index: number) {
+  formData.measurementList.splice(index, 1, { ...item, encoding: encoding[val][0] as globalThis.EncodingType });
 }
 
 // 追加行

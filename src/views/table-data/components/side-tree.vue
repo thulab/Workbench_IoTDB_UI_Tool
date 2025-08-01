@@ -135,9 +135,10 @@ import { cloneDeep } from 'lodash-es';
 import ModalAddDb from './modal-add-db.vue';
 import ModalAddTable from './modal-add-table.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
+import type { TableTreeNodeData } from '@/types';
 
 const emit = defineEmits<{
-  (event: 'handleNodeClick', nodeInfo: IoTDB.TreeNodeData): void;
+  (event: 'handleNodeClick', nodeInfo: TableTreeNodeData): void;
   (event: 'updateDetail'): void;
 }>();
 
@@ -146,8 +147,8 @@ const schemaTree = ref<InstanceType<typeof ElTreeV2>>();
 const userStore = useUserStore();
 const searchText = ref('');
 const searching = ref(false);
-const currentNode = ref<IoTDB.TreeNodeData>();
-const currentNodeShow = ref<IoTDB.TreeNodeData>();
+const currentNode = ref<TableTreeNodeData>();
+const currentNodeShow = ref<TableTreeNodeData>();
 const modalAddDbVisible = ref(false);
 const treeHeight = ref(document.body.clientHeight - 150);
 const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
@@ -164,7 +165,7 @@ const treeProps = {
   children: 'children',
 };
 
-function showAddTableDialog(nodeInfo: IoTDB.TreeNodeData, addType: string) {
+function showAddTableDialog(nodeInfo: TableTreeNodeData, addType: string) {
   if (addTableDialog.value) {
     addTableDialog.value?.open(nodeInfo, addType);
   }
@@ -195,10 +196,10 @@ const setDefaultTreeExpandKeys = async () => {
   }
 };
 
-function filterTreeData(): IoTDB.TreeNodeData[] {
+function filterTreeData(): TableTreeNodeData[] {
   const searchTextLower = searchText.value.toLowerCase();
 
-  const filterNode = (node: IoTDB.TreeNodeData): IoTDB.TreeNodeData | null => {
+  const filterNode = (node: TableTreeNodeData): TableTreeNodeData | null => {
     const nodeCopy = cloneDeep(node);
     nodeCopy.children = [];
 
@@ -216,7 +217,7 @@ function filterTreeData(): IoTDB.TreeNodeData[] {
     return isCurrentMatch || (nodeCopy.children && nodeCopy.children.length > 0) ? nodeCopy : null;
   };
 
-  const result: IoTDB.TreeNodeData[] = [];
+  const result: TableTreeNodeData[] = [];
   treeData.value.forEach((dbNode) => {
     const filteredNode = filterNode(dbNode);
     if (filteredNode) {
@@ -247,7 +248,7 @@ function handleAddDB() {
 }
 
 // 删除数据库
-function handleDelDb(dbNode: IoTDB.TreeNodeData) {
+function handleDelDb(dbNode: TableTreeNodeData) {
   ElMessageBox.confirm(t('dataManage.delDbSingleTip'), t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),
@@ -268,7 +269,7 @@ function handleDelDb(dbNode: IoTDB.TreeNodeData) {
   });
 }
 
-function handleDelTable(tableNode: IoTDB.TreeNodeData) {
+function handleDelTable(tableNode: TableTreeNodeData) {
   ElMessageBox.confirm(t('dataManage.delTableSingleTip'), t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),
@@ -291,7 +292,7 @@ function handleDelTable(tableNode: IoTDB.TreeNodeData) {
   });
 }
 
-function handleDatabaseOptionClick(command: string, node: IoTDB.TreeNodeData) {
+function handleDatabaseOptionClick(command: string, node: TableTreeNodeData) {
   currentNode.value = node;
   if (command === 'dbSchema') {
     currentNodeShow.value = cloneDeep(node);
@@ -303,7 +304,7 @@ function handleDatabaseOptionClick(command: string, node: IoTDB.TreeNodeData) {
   }
 }
 
-function handleTableOptionClick(command: string, node: IoTDB.TreeNodeData) {
+function handleTableOptionClick(command: string, node: TableTreeNodeData) {
   currentNode.value = cloneDeep(node);
   if (command === 'tableData') {
     currentNodeShow.value = cloneDeep(node);
@@ -320,7 +321,7 @@ function handleTableOptionClick(command: string, node: IoTDB.TreeNodeData) {
 }
 
 function handleSelectNode(payload: { [key: string]: any }) {
-  const data = payload as IoTDB.TreeNodeData;
+  const data = payload as TableTreeNodeData;
   if (data && data.id && (data.nodeType === 'DATABASE' || data.nodeType === 'TABLE')) {
     currentNode.value = data;
     currentNodeShow.value = cloneDeep(data);

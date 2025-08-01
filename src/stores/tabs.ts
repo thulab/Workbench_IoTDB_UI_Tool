@@ -13,13 +13,13 @@ const useTabsStore = defineStore('tabsStore', {
         icon: 'home-filled',
         close: false,
       },
-    ] as Array<MenuOptions>,
+    ] as Array<globalThis.MenuOptions>,
   }),
   getters: {},
   actions: {
-    async addTabs(tabItem: MenuOptions, push: boolean = true) {
+    async addTabs(tabItem: globalThis.MenuOptions, push: boolean = true) {
       if (TABS_BLACK_LIST.includes(tabItem.path)) return;
-      const tabInfo: MenuOptions = {
+      const tabInfo: globalThis.MenuOptions = {
         title: tabItem.title,
         path: tabItem.path,
         close: tabItem.close,
@@ -55,7 +55,7 @@ const useTabsStore = defineStore('tabsStore', {
     async setTabsMenuValue(tabsMenuValue: string) {
       this.tabsMenuValue = tabsMenuValue;
     },
-    async setTabsMenuList(tabsMenuList: Array<MenuOptions>) {
+    async setTabsMenuList(tabsMenuList: Array<globalThis.MenuOptions>) {
       this.tabsMenuList = tabsMenuList;
     },
     async closeMultipleTab(tabsMenuValue?: string) {
@@ -67,7 +67,7 @@ const useTabsStore = defineStore('tabsStore', {
     },
   },
   persist: {
-    storage: sessionStorage,
+    storage: window.sessionStorage,
   },
 });
 export default useTabsStore;

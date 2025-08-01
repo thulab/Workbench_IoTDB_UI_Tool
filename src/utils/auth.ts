@@ -1,30 +1,30 @@
 /**
  * 逐级查找权限，直到找到权限或者到达根节点
  * @param path 路径
- * @param dataPrivilegeLMap
+ * @param dataPrivilegeMap
  * @returns
  */
 
-export const getPathAuthList = (path: string, dataPrivilegeLMap: Array<{ path: string; privileges: string[] }> | null | undefined, level: number = 0): string[] => {
-  if (!dataPrivilegeLMap) return [];
-  const pathData = dataPrivilegeLMap.find((item) => level === 0 && item.path === path);
+export const getPathAuthList = (path: string, dataPrivilegeMap: Array<{ path: string; privileges: string[] }> | null | undefined, level: number = 0): string[] => {
+  if (!dataPrivilegeMap) return [];
+  const pathData = dataPrivilegeMap.find((item) => level === 0 && item.path === path);
   if (pathData) return pathData.privileges;
   if (path === 'root') return [];
   path = path.substring(0, path.lastIndexOf('.'));
-  const pathVagueData = dataPrivilegeLMap.find((item) => item.path === `${path}.**`);
+  const pathVagueData = dataPrivilegeMap.find((item) => item.path === `${path}.**`);
   if (pathVagueData) return pathVagueData.privileges;
-  return getPathAuthList(path, dataPrivilegeLMap, level + 1);
+  return getPathAuthList(path, dataPrivilegeMap, level + 1);
 };
 
-export const getParentPathAuthList = (path: string, dataPrivilegeLMap: Array<{ path: string; privileges: string[] }> | null | undefined, level: number = 0): string[] => {
-  if (!dataPrivilegeLMap) return [];
-  const pathData = dataPrivilegeLMap.find((item) => level === 0 && (item.path === path || item.path === `${path}.**`));
+export const getParentPathAuthList = (path: string, dataPrivilegeMap: Array<{ path: string; privileges: string[] }> | null | undefined, level: number = 0): string[] => {
+  if (!dataPrivilegeMap) return [];
+  const pathData = dataPrivilegeMap.find((item) => level === 0 && (item.path === path || item.path === `${path}.**`));
   if (pathData) return pathData.privileges;
   if (path === 'root') return [];
   path = path.substring(0, path.lastIndexOf('.'));
-  const pathVagueData = dataPrivilegeLMap.find((item) => item.path === `${path}.**`);
+  const pathVagueData = dataPrivilegeMap.find((item) => item.path === `${path}.**`);
   if (pathVagueData) return pathVagueData.privileges;
-  return getParentPathAuthList(path, dataPrivilegeLMap, level + 1);
+  return getParentPathAuthList(path, dataPrivilegeMap, level + 1);
 };
 
 const splitVersion = (version: string) => {
@@ -36,7 +36,7 @@ const splitVersion = (version: string) => {
 
 // 1.2.3及以上版本布置权限最新版
 export const iotdbShowAuth = (version?: string, controlVersion: string = '1.2.3') => {
-  const iotdbVersion = version || sessionStorage.getItem('iotdbVersion') || '';
+  const iotdbVersion = version || window.sessionStorage.getItem('iotdbVersion') || '';
   const versionArr = splitVersion(iotdbVersion) || [];
   const controlVersionArr = splitVersion(controlVersion) || [];
   if (versionArr.length && controlVersionArr.length) {

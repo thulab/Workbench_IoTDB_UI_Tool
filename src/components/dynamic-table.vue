@@ -69,7 +69,7 @@
 import type { Sort } from 'element-plus';
 
 const props = defineProps<{
-  columns: Array<DynamicTableColumn>;
+  columns: Array<globalThis.DynamicTableColumn>;
   tableData: Array<Record<string, any>>;
   defaultSort?: Sort;
   maxHeight: number;

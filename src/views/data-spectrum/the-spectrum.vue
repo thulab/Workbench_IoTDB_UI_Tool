@@ -412,6 +412,7 @@ import ModalTemplate from '../data-trend/components/modal-template.vue';
 import ModalTemplateRename from '../data-trend/components/modal-template-rename.vue';
 import ModalImport from './components/modal-import.vue';
 import DialogChart from './components/dialog-chart.vue';
+import type { FunctionData, SpectrumData, MatchItem, MeasurementDataItem, TrendTemplate } from '@/types';
 
 interface PointData {
   name: string;
@@ -455,7 +456,7 @@ const userStore = useUserStore();
 const { canReadWriteData } = storeToRefs(userStore);
 const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
-const methodList = ref<Array<Search.FunctionData>>([]);
+const methodList = ref<Array<FunctionData>>([]);
 const dwtTab = ref<'type' | 'number'>('type');
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive<{
@@ -515,7 +516,7 @@ const dwtMethodList = computed<Array<{ name: string; value: string }>>(() => [
   { name: 'DB6', value: 'DB6' },
   { name: 'DB8', value: 'DB8' },
 ]);
-const chartData = reactive<Search.SpectrumData>({
+const chartData = reactive<SpectrumData>({
   timestamps: [],
   values: [],
 });
@@ -560,8 +561,8 @@ const renameData = reactive<{
   template: '',
 });
 
-const matchList = ref<Search.MatchItem[]>([]);
-const checkMatchList = ref<Search.MatchItem[]>([]);
+const matchList = ref<MatchItem[]>([]);
+const checkMatchList = ref<MatchItem[]>([]);
 
 const partValues = ref<string[]>([]);
 const partTimestamps = ref<number[]>([]);
@@ -618,10 +619,10 @@ const xMax = computed(() => chartData.timestamps[chartData.timestamps.length - 1
 
 const methodOptions = computed(() => [...methodList.value, { functionName: 'custom', name: t('spectrum.customAnalysis'), enable: true }]);
 
-function disabledPath(item: StorageDevice.MeasurementDataItem) {
+function disabledPath(item: MeasurementDataItem) {
   return item.dataType === 'BOOLEAN' || item.dataType === 'TEXT' || item.dataType === 'TIMESTAMP' || item.dataType === 'STRING' || item.dataType === 'BLOB' || item.dataType === 'DATE';
 }
-function disabledPathDTW(item: StorageDevice.MeasurementDataItem) {
+function disabledPathDTW(item: MeasurementDataItem) {
   return item.dataType === 'TEXT' || item.dataType === 'TIMESTAMP' || item.dataType === 'STRING' || item.dataType === 'BLOB' || item.dataType === 'DATE';
 }
 
@@ -876,7 +877,7 @@ function handleChangeMethod(val: string) {
   }
 }
 
-function handleChangePath(val: string, data: StorageDevice.MeasurementDataItem[]) {
+function handleChangePath(val: string, data: MeasurementDataItem[]) {
   const current = data.find((f) => f.timeseries === val);
   searchFormData.measurementType = current?.dataType || '';
   if (searchFormData.method === 'DWT') {
@@ -1539,7 +1540,7 @@ function handleSaveTemplate() {
 }
 
 // 模板操作
-function handleOperateTemplate(val: string, data: Search.TrendTemplate) {
+function handleOperateTemplate(val: string, data: TrendTemplate) {
   if (val === 'rename') {
     renameData.id = +data.id;
     renameData.name = data.name;
@@ -1620,7 +1621,7 @@ function handleSql() {
 function handleConfirmSql(val: string) {
   sqlValue.value = val;
 }
-function handleCheckChange(payload: Search.MatchItem[]) {
+function handleCheckChange(payload: MatchItem[]) {
   checkMatchList.value = payload;
   setOption(chartOptions.value);
   // if (checkMatchList.value.length === 1) {
@@ -1638,7 +1639,7 @@ function handleCheckChange(payload: Search.MatchItem[]) {
   //   });
   // }
 }
-function handleSaveMatch(times: Search.MatchItem[]) {
+function handleSaveMatch(times: MatchItem[]) {
   const saveTimes = [];
   const saveValues = [];
   for (let i = 0; i < chartData.timestamps.length; i++) {
@@ -1658,7 +1659,7 @@ function handleSaveMatch(times: Search.MatchItem[]) {
 }
 
 function setStorage() {
-  sessionStorage.setItem(
+  window.sessionStorage.setItem(
     'dataSpectrumStorage',
     JSON.stringify({
       ...copySearchFormData,
@@ -1684,7 +1685,7 @@ onMounted(() => {
     if (!window.__isReload__) {
       setStorage();
     } else {
-      sessionStorage.setItem('dataSpectrumStorage', '');
+      window.sessionStorage.setItem('dataSpectrumStorage', '');
     }
     chartContainer.value = null;
     if (chartInstance) {
@@ -1719,8 +1720,8 @@ watch(
   (val) => {
     setOption(chartOptions.value);
     if (val) {
-      if (sessionStorage.getItem('dataSpectrumStorage')) {
-        const storageData = JSON.parse(sessionStorage.getItem('dataSpectrumStorage') as string);
+      if (window.sessionStorage.getItem('dataSpectrumStorage')) {
+        const storageData = JSON.parse(window.sessionStorage.getItem('dataSpectrumStorage') as string);
         searchFormData.measurement = storageData.measurement;
         if (searchFormData.measurement) {
           searchFormData.measurementType = storageData.measurementType;

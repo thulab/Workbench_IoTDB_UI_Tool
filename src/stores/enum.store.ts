@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { AlarmApi } from '@/api';
 import i18n from '@/locale/index';
+import type { ConfigEnumData } from '@/types';
 
 const { t } = i18n.global;
 
@@ -172,7 +173,7 @@ export const useEnumStore = defineStore(
   },
   {
     persist: {
-      storage: sessionStorage,
+      storage: window.sessionStorage,
       afterHydrate: (context) => {
         if (!context.store.allEnum || Object.keys(context.store.allEnum).length === 0) {
           context.store.loadAllEnum();

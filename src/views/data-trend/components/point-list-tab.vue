@@ -36,6 +36,7 @@
 
 <script setup lang="ts">
 import type { CheckboxValueType } from 'element-plus';
+import type { LineObj } from '@/types';
 
 interface PointData {
   name: string;
@@ -68,7 +69,7 @@ const props = defineProps<{
   pointList: PointData[];
   pointLineData: MarkPointLine[];
   pointCheckedData: PointData[];
-  pathList: Trend.LineObj[];
+  pathList: LineObj[];
 }>();
 
 const emit = defineEmits<{

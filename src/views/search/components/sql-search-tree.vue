@@ -112,6 +112,7 @@ import SideFunction from './side-function.vue';
 import SideData from './side-data.vue';
 import SideTemplate from './side-template.vue';
 import SqlSearch from './sql-search.vue';
+import type { SqlList } from '@/types';
 
 const { t, locale } = useI18n();
 const sqlSearchRef = ref<Array<InstanceType<typeof SqlSearch>>>([]);
@@ -124,7 +125,7 @@ const { maxTableHeight: tabHeight } = useTableHeight(125);
 
 const activiteSql = ref<string>(`_${dayjs().format('YYYY-MM-DD HH:mm:ss:SSS')}`);
 
-const sqlList = ref<Search.SqlList[]>([
+const sqlList = ref<SqlList[]>([
   {
     id: activiteSql.value,
     queryName: t('search.queryTemplate', {
@@ -208,7 +209,7 @@ function getFunction(val: string) {
 }
 
 // 模板操作
-function handleSqlOperate(val: string, data: Search.SqlList) {
+function handleSqlOperate(val: string, data: SqlList) {
   const index = sqlList.value.findIndex((f) => `${f.id}` === `${data.id}`);
   if (val === 'open') {
     if (index > -1) {
@@ -432,7 +433,7 @@ function handleSave() {
 }
 
 function setStorage() {
-  sessionStorage.setItem(
+  window.sessionStorage.setItem(
     'sqlSearchStorage',
     JSON.stringify({
       activiteSql: activiteSql.value,
@@ -453,11 +454,11 @@ onMounted(() => {
     if (!window.__isReload__) {
       setStorage();
     } else {
-      sessionStorage.setItem('sqlSearchStorage', '');
+      window.sessionStorage.setItem('sqlSearchStorage', '');
     }
   });
-  if (sessionStorage.getItem('sqlSearchStorage')) {
-    const storageData = JSON.parse(sessionStorage.getItem('sqlSearchStorage') as string);
+  if (window.sessionStorage.getItem('sqlSearchStorage')) {
+    const storageData = JSON.parse(window.sessionStorage.getItem('sqlSearchStorage') as string);
     activiteSql.value = storageData.activiteSql;
     sqlList.value = storageData.sqlList;
     activeNameSide.value = storageData.activeNameSide;

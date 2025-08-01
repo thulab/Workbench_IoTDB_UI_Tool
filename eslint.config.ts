@@ -17,7 +17,7 @@ export default defineConfigWithVueTs(
   {
     name: 'app/files-to-lint',
     files: ['**/*.{ts,mts,tsx,vue}'],
-    ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**', '**/public/assets/**', '**/src/typings/auto-imports.d.ts', '**/src/typings/components.d.ts'],
+    ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**', '**/public/assets/**', '**/src/types/auto-imports.d.ts', '**/src/types/components.d.ts'],
     languageOptions: {
       // Use the auto-imported globals from .eslintrc-auto-import.json
       globals: autoImport.globals,
@@ -27,7 +27,7 @@ export default defineConfigWithVueTs(
     },
   },
 
-  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**', '**/public/assets/**', '**/src/typings/auto-imports.d.ts', '**/src/typings/components.d.ts']),
+  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**', '**/public/assets/**', '**/src/types/auto-imports.d.ts', '**/src/types/components.d.ts']),
 
   pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
@@ -37,7 +37,6 @@ export default defineConfigWithVueTs(
     name: 'app/allow-any',
     files: ['**/*.{ts,mts,tsx,vue}'],
     rules: {
-      'no-undef': 'off',
       'eslint(no-sparse-arrays)': 'off', // This rule is disabled to allow sparse arrays in the code
       '@typescript-eslint/no-unused-vars': 'off', // use no-unused-vars
       '@typescript-eslint/no-explicit-any': 'warn',

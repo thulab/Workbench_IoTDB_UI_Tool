@@ -7,11 +7,6 @@
 export {}
 declare global {
   const EffectScope: typeof import('vue')['EffectScope']
-  const ElMessage: typeof import('element-plus/es')['ElMessage']
-  const ElMessageBox: typeof import('element-plus/es')['ElMessageBox']
-  const IconEpArrowRight: (typeof import('~icons/ep/arrow-right'))['default']
-  const IconEpMoon: (typeof import('~icons/ep/moon'))['default']
-  const IconEpSunny: (typeof import('~icons/ep/sunny'))['default']
   const computed: typeof import('vue')['computed']
   const createApp: typeof import('vue')['createApp']
   const customRef: typeof import('vue')['customRef']
@@ -63,7 +58,6 @@ declare global {
   const useCssVars: typeof import('vue')['useCssVars']
   const useDark: typeof import('@vueuse/core')['useDark']
   const useDataTypeIcon: typeof import('../composition-api/index')['useDataTypeIcon']
-  const useElementSize: typeof import('@vueuse/core')['useElementSize']
   const useI18n: typeof import('vue-i18n')['useI18n']
   const useId: typeof import('vue')['useId']
   const useLangSwitch: typeof import('../composition-api/index')['useLangSwitch']

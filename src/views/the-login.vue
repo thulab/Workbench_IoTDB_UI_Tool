@@ -64,8 +64,8 @@
           </el-form-item>
           <el-form-item prop="model">
             <el-radio-group v-model="loginForm.model" @change="(val) => handleChangeDefaultModel(val as 'tree' | 'table')" id="connection-modal-type">
-              <el-radio value="tree" id="connection-modal-type-0">{{ t('connection.treeModel') }}</el-radio>
-              <el-radio value="table" id="connection-modal-type-1">{{ t('connection.tableModel') }}</el-radio>
+              <el-radio value="tree" id="connection-modal-type-0">{{ t('treeModel') }}</el-radio>
+              <el-radio value="table" id="connection-modal-type-1">{{ t('tableModel') }}</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item prop="captcha" v-if="isUseCaptcha">
@@ -99,6 +99,7 @@ import useAppStore from '@/stores/app';
 import ModalConnection from '@/components/modal-connection.vue';
 import TheCaptcha from '@/components/the-captcha.vue';
 import { useLangSwitch } from '@/composition-api';
+import type { ConnectionItem } from '@/types';
 
 const { t, locale } = useI18n();
 const router = useRouter();
@@ -124,8 +125,8 @@ const loading = ref(false);
 const isUseCaptcha = ref(false);
 
 const connectionVisible = ref(false);
-const connectionList = ref<Connection.ConnectionItem[]>([]);
-const connectionOptions = ref<Array<{ label: string; options: Array<Connection.ConnectionItem> }>>([]);
+const connectionList = ref<ConnectionItem[]>([]);
+const connectionOptions = ref<Array<{ label: string; options: Array<ConnectionItem> }>>([]);
 const connectionLoading = ref(false);
 
 const captcha = ref('');
@@ -220,9 +221,9 @@ function getList() {
   getConnectionList()
     .then((res) => {
       connectionList.value = res.data || [];
-      const standAloneList: Connection.ConnectionItem[] = [];
-      const doubleLiveList: Connection.ConnectionItem[] = [];
-      const clusterList: Connection.ConnectionItem[] = [];
+      const standAloneList: ConnectionItem[] = [];
+      const doubleLiveList: ConnectionItem[] = [];
+      const clusterList: ConnectionItem[] = [];
       connectionList.value.forEach((item) => {
         if (item.type === 1) {
           clusterList.push(item);
@@ -278,7 +279,7 @@ function handleSelectConnection() {
 }
 
 function handleChangeLang() {
-  const lang = localStorage.getItem('lang');
+  const lang = window.localStorage.getItem('lang');
   if (lang && lang === 'cn') {
     handleLangCommand('1');
   } else {
@@ -294,7 +295,7 @@ const submitForm = () => {
       login(loginForm.user, loginForm.password, +loginForm.connection, loginForm.model)
         .then(async () => {
           await userStore.setUser(loginForm.user);
-          if (sessionStorage.getItem('iotdbVersion')?.indexOf('1.') === 0) {
+          if (window.sessionStorage.getItem('iotdbVersion')?.indexOf('1.') === 0) {
             ElMessageBox.alert(t('login.versionTip'), t('common.tip'), {
               confirmButtonText: t('common.confirm'),
               type: 'warning',
@@ -307,7 +308,7 @@ const submitForm = () => {
             });
           } else {
             router.push({ name: 'Dashboard' });
-            sessionStorage.setItem('nologin', '0');
+            window.sessionStorage.setItem('nologin', '0');
           }
         })
         .catch(() => {
@@ -322,13 +323,13 @@ const submitForm = () => {
 
 onMounted(() => {
   userStore.clearUserStore();
-  // sessionStorage.setItem('UserStore', '');
-  // sessionStorage.setItem('ConnectionStore', '');
-  // sessionStorage.setItem('iotdbVersion', '');
-  // sessionStorage.setItem('nologin', '1');
-  // sessionStorage.setItem('EnumStore', '');
-  sessionStorage.clear();
-  sessionStorage.setItem('nologin', '1');
+  // window.sessionStorage.setItem('UserStore', '');
+  // window.sessionStorage.setItem('ConnectionStore', '');
+  // window.sessionStorage.setItem('iotdbVersion', '');
+  // window.sessionStorage.setItem('nologin', '1');
+  // window.sessionStorage.setItem('EnumStore', '');
+  window.sessionStorage.clear();
+  window.sessionStorage.setItem('nologin', '1');
   getList();
   getCaptcha();
 });

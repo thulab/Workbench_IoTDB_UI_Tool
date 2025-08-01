@@ -167,6 +167,7 @@ import TemplateListTab from './components/template-list-tab.vue';
 import ModalTemplate from './components/modal-template.vue';
 import ModalTemplateRename from './components/modal-template-rename.vue';
 import { formatDevice } from '@/utils/format';
+import type { TrendData, LineObj, TrendTemplate, SelectedMeasurement } from '@/types';
 
 interface PointData {
   name: string;
@@ -218,7 +219,7 @@ const minDataTime = ref(-1);
 const searchFormData = reactive<{
   database: string;
   table: string;
-  selectedMeasurement: IoTDB.SelectedMeasurement[];
+  selectedMeasurement: SelectedMeasurement[];
   datetimerange: [DateModelType, DateModelType];
   unitInterval: string;
   aggregation: string;
@@ -264,14 +265,14 @@ const requiredRules = ref([
 let inited = false;
 let currentPoint = 0;
 const dataTab = ref<'running' | 'history'>('running');
-const pathList = ref<Trend.LineObj[]>([]);
+const pathList = ref<LineObj[]>([]);
 const loading = ref(true);
 const isRunningTab = computed(() => dataTab.value === 'running');
 const checkedData = computed(() => pathList.value.filter((item) => item.checked));
 // 实时数据
-const chartData = ref<Search.TrendData[]>([]);
+const chartData = ref<TrendData[]>([]);
 // 历史数据
-const chartHistoryData = ref<Search.TrendData[]>([]);
+const chartHistoryData = ref<TrendData[]>([]);
 // 当前数据
 const currentData = computed(() => (isRunningTab.value ? chartData.value : chartHistoryData.value));
 const pointLineData = ref<Array<MarkPointLine>>([]);
@@ -662,7 +663,7 @@ const onResize = debounce(() => {
   }
 }, 50);
 
-const buildParams = (operate: string, measurements: IoTDB.SelectedMeasurement[]) => {
+const buildParams = (operate: string, measurements: SelectedMeasurement[]) => {
   return JSON.stringify({
     operate,
     database: copySearchFormData.database || searchFormData.database,
@@ -719,7 +720,7 @@ function handleExpand() {
 
 function dealSearchPath() {
   copySearchFormData = cloneDeep(searchFormData);
-  const allCurrentPaths = pathList.value.map((item) => item.selectedMeasurement) as IoTDB.SelectedMeasurement[];
+  const allCurrentPaths = pathList.value.map((item) => item.selectedMeasurement) as SelectedMeasurement[];
   const addPaths = difference(
     copySearchFormData.selectedMeasurement.map((item) => formatDevice(item.device, item.measurement)),
     allCurrentPaths.map((item) => formatDevice(item!.device, item!.measurement)),
@@ -847,7 +848,7 @@ function handleSearch(unforce?: boolean) {
 
 function handleData(data: any) {
   const jsonData: {
-    data: Search.TrendData[];
+    data: TrendData[];
     operate: string;
   } = JSON.parse(data) || [];
   if (loading.value && jsonData.operate === 'get') {
@@ -893,7 +894,7 @@ function handlePlay(val: boolean) {
     if (!socketInstance.value || socketInstance.value.readyState > 1) {
       initWebsocket(() => {
         const paths = chartData.value.map((data) => data.path);
-        const allCurrentPaths = pathList.value.map((item) => item.selectedMeasurement) as IoTDB.SelectedMeasurement[];
+        const allCurrentPaths = pathList.value.map((item) => item.selectedMeasurement) as SelectedMeasurement[];
         socketInstance.value?.send(
           buildParams(
             'add',
@@ -943,7 +944,7 @@ function handleTrendTab(type: 'running' | 'history', unforce?: boolean) {
         chartData.value = [];
         setOption(chartOptions.value, true);
       }
-      const allCurrentPaths = pathList.value.map((item) => item.selectedMeasurement) as IoTDB.SelectedMeasurement[];
+      const allCurrentPaths = pathList.value.map((item) => item.selectedMeasurement) as SelectedMeasurement[];
 
       const currentChecked = chartData.value.map((item) => item.path);
       const cloneChecked = pathList.value.map((item) => item.path);
@@ -975,8 +976,8 @@ function handleOperatePath(type: 'add' | 'del' | 'detail', path: string) {
     return;
   }
   if (dataTab.value === 'running') {
-    const allCurrentPaths = pathList.value.map((item) => item.selectedMeasurement) as IoTDB.SelectedMeasurement[];
-    const selectedMeasurement = allCurrentPaths.find((item) => formatDevice(item.device, item.measurement) === path) as IoTDB.SelectedMeasurement;
+    const allCurrentPaths = pathList.value.map((item) => item.selectedMeasurement) as SelectedMeasurement[];
+    const selectedMeasurement = allCurrentPaths.find((item) => formatDevice(item.device, item.measurement) === path) as SelectedMeasurement;
     if (type === 'add') {
       socketInstance.value?.send(buildParams('add', [selectedMeasurement]));
     } else if (type === 'del') {
@@ -1024,7 +1025,7 @@ function handleSaveTemplate() {
 }
 
 // 模板操作
-function handleOperateTemplate(val: string, data: Search.TrendTemplate) {
+function handleOperateTemplate(val: string, data: TrendTemplate) {
   if (val === 'rename') {
     renameData.id = +data.id;
     renameData.name = data.name;
@@ -1042,18 +1043,18 @@ function handleOperateTemplate(val: string, data: Search.TrendTemplate) {
     searchFormData.unitInterval = templateData.unitInterval;
     pathList.value = [];
     nextTick(() => {
-      const templatePaths = templateData.pathList.map((item: Trend.LineObj) => item.path).join(',');
-      const searchPaths = templateData.selectedMeasurement.map((item: IoTDB.SelectedMeasurement) => formatDevice(item.device, item.measurement)).join(',');
+      const templatePaths = templateData.pathList.map((item: LineObj) => item.path).join(',');
+      const searchPaths = templateData.selectedMeasurement.map((item: SelectedMeasurement) => formatDevice(item.device, item.measurement)).join(',');
       const isSamePath = isEqual(templatePaths, searchPaths);
       if (isSamePath) {
-        pathList.value = templateData.pathList.map((item: Trend.LineObj) => ({ ...item }));
+        pathList.value = templateData.pathList.map((item: LineObj) => ({ ...item }));
         handleTrendTab(templateData.type.replace('table-', ''), true);
       } else {
-        const existedColor = templateData.pathList.map((item: Trend.LineObj) => item.color);
+        const existedColor = templateData.pathList.map((item: LineObj) => item.color);
         const diffArr = difference(predefineColors, existedColor);
-        const resultPath: Array<Trend.LineObj> = [];
+        const resultPath: Array<LineObj> = [];
         searchFormData.selectedMeasurement.forEach((item, index) => {
-          const i = templateData.pathList.findIndex((pathItem: Trend.LineObj) => pathItem.path === formatDevice(item.device, item.measurement));
+          const i = templateData.pathList.findIndex((pathItem: LineObj) => pathItem.path === formatDevice(item.device, item.measurement));
           if (i !== -1) {
             resultPath.push({ ...pathList.value[i] });
           } else {
@@ -1076,9 +1077,9 @@ function handleOperateTemplate(val: string, data: Search.TrendTemplate) {
 
 function handleSaveSuccess(name: string) {
   saveTemplateLoading.value = true;
-  const existedColor = pathList.value.map((item: Trend.LineObj) => item.color);
+  const existedColor = pathList.value.map((item: LineObj) => item.color);
   const diffArr = difference(predefineColors, existedColor);
-  const resultPath: Array<Trend.LineObj> = [];
+  const resultPath: Array<LineObj> = [];
   searchFormData.selectedMeasurement.forEach((item, index) => {
     const i = pathList.value.findIndex((pathItem) => pathItem.path === formatDevice(item.device, item.measurement));
     if (i !== -1) {
@@ -1162,7 +1163,7 @@ const handleSelectMeasurement = () => {
   tableMeasurementVisible.value = true;
 };
 
-const handleConfirmMeasurement = (database: string, table: string, selected: IoTDB.SelectedMeasurement[]) => {
+const handleConfirmMeasurement = (database: string, table: string, selected: SelectedMeasurement[]) => {
   searchFormData.database = database;
   searchFormData.table = table;
   searchFormData.selectedMeasurement = selected;
@@ -1170,7 +1171,7 @@ const handleConfirmMeasurement = (database: string, table: string, selected: IoT
 };
 
 function setStorage() {
-  sessionStorage.setItem(
+  window.sessionStorage.setItem(
     'tableDataTrendStorage',
     JSON.stringify({
       ...copySearchFormData,
@@ -1189,7 +1190,7 @@ onMounted(() => {
     if (!window.__isReload__) {
       setStorage();
     } else {
-      sessionStorage.setItem('tableDataTrendStorage', '');
+      window.sessionStorage.setItem('tableDataTrendStorage', '');
     }
     chartContainer.value = null;
     if (chartInstance) {
@@ -1214,8 +1215,8 @@ watch(
         return;
       }
       initWebsocket(() => {
-        if (sessionStorage.getItem('tableDataTrendStorage')) {
-          const storageData = JSON.parse(sessionStorage.getItem('tableDataTrendStorage') as string);
+        if (window.sessionStorage.getItem('tableDataTrendStorage')) {
+          const storageData = JSON.parse(window.sessionStorage.getItem('tableDataTrendStorage') as string);
           searchFormData.database = storageData.database;
           searchFormData.table = storageData.table;
           searchFormData.selectedMeasurement = storageData.selectedMeasurement || [];

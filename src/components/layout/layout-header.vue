@@ -87,13 +87,13 @@ function handleChangeLang(val: '0' | '1') {
 }
 
 function handleDashboard() {
-  sessionStorage.setItem('dataSearchStorage', '');
-  sessionStorage.setItem('statisticSearchStorage', '');
-  sessionStorage.setItem('sqlSearchStorage', '');
-  sessionStorage.setItem('dataTrendStorage', '');
-  sessionStorage.setItem('dataSpectrumStorage', '');
-  sessionStorage.setItem('configStorage', '');
-  sessionStorage.setItem('aiVisualizationStorage', '');
+  window.sessionStorage.setItem('dataSearchStorage', '');
+  window.sessionStorage.setItem('statisticSearchStorage', '');
+  window.sessionStorage.setItem('sqlSearchStorage', '');
+  window.sessionStorage.setItem('dataTrendStorage', '');
+  window.sessionStorage.setItem('dataSpectrumStorage', '');
+  window.sessionStorage.setItem('configStorage', '');
+  window.sessionStorage.setItem('aiVisualizationStorage', '');
   nextTick(() => {
     window.location.href = `${HOME_URL}?switch=1`;
   });

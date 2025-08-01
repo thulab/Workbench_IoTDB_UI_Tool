@@ -32,7 +32,7 @@ const showError = (message: string, code?: number) => {
     })
       .then(() => {
         if (code && code === 1008) {
-          localStorage.setItem('authorization', '');
+          window.localStorage.setItem('authorization', '');
           window.location.reload();
         }
       })
@@ -49,7 +49,7 @@ const showError = (message: string, code?: number) => {
   }
 };
 
-export const showErrorFn = (err: HttpError, defaultErrMessage?: string | boolean) => {
+export const showErrorFn = (err: globalThis.HttpError, defaultErrMessage?: string | boolean) => {
   if (err.status && err.status !== 200 && (err.status !== 401 || err.status !== 403)) {
     ElMessage.error({ message: t('login.serverError'), grouping: true });
   } else if (typeof defaultErrMessage === 'string') {
@@ -63,7 +63,7 @@ export const showErrorFn = (err: HttpError, defaultErrMessage?: string | boolean
   }
 };
 
-export default function useRequest<Requests extends Array<any>, Resp>(apiFn: (...args: Requests) => HttpResponseP<Resp>, opt?: Opt<Resp>) {
+export default function useRequest<Requests extends Array<any>, Resp>(apiFn: (...args: Requests) => globalThis.HttpResponseP<Resp>, opt?: Opt<Resp>) {
   const options = {
     errMessage: true,
     ...opt,
@@ -72,7 +72,7 @@ export default function useRequest<Requests extends Array<any>, Resp>(apiFn: (..
   const data = ref(options.initData as Resp) as Ref<Resp>;
   const error = ref(null) as Ref<any>;
 
-  function requestFn(...args: Requests): Promise<ApiResponse<Resp>> {
+  function requestFn(...args: Requests): Promise<globalThis.ApiResponse<Resp>> {
     loading.value = true;
     return apiFn(...args)
       .then((response) => {
@@ -81,11 +81,11 @@ export default function useRequest<Requests extends Array<any>, Resp>(apiFn: (..
           ElMessage.success(options.message);
         }
         if (response.headers.authorization) {
-          localStorage.setItem('authorization', response.headers.authorization);
+          window.localStorage.setItem('authorization', response.headers.authorization);
         }
         return response.data;
       })
-      .catch((err: HttpError) => {
+      .catch((err: globalThis.HttpError) => {
         error.value = err;
         if (err.type === 'application/json') {
           return err.text().then((str: string) => {

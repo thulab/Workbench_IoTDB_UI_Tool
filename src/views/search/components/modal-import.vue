@@ -138,6 +138,7 @@
 <script lang="ts" setup>
 import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
 import { SearchApi } from '@/api';
+import type { UploadFileStatus } from '@/types';
 
 const props = defineProps<{
   visible: boolean;
@@ -164,7 +165,7 @@ const accept = computed(() => {
 const activeStep = ref(0);
 const uploadFileInfos = ref<UploadRawFile[]>();
 const uploadStatus = ref('');
-const uploadDetail = ref<Array<StorageDevice.UploadFileStatus<UploadRawFile>>>([]);
+const uploadDetail = ref<Array<UploadFileStatus<UploadRawFile>>>([]);
 const uploadResult = reactive({
   successNum: 0,
   failNum: 0,

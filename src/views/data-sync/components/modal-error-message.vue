@@ -17,8 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ElScrollbar } from 'element-plus';
-
+import type { ElScrollbar } from 'element-plus';
 const props = defineProps<{
   visible: boolean;
   content: string;

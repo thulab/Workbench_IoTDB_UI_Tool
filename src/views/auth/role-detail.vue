@@ -168,6 +168,7 @@ import RoleList from './components/role-list.vue';
 import ModalPath from './components/modal-path.vue';
 import ModalAddUser from './components/modal-add-user.vue';
 import ModalPreviewUser from './components/modal-preview-user.vue';
+import type { PrivilegeEnum } from '@/types';
 
 const { t, locale } = useI18n();
 const currentRole = ref('');
@@ -288,7 +289,7 @@ function handleReset(type: 'edit' | 'view') {
   getDetail();
 }
 
-function calcColumnWidth(child: Auth.PrivilegeEnum) {
+function calcColumnWidth(child: PrivilegeEnum) {
   if (child.desc.length > 0) {
     if (locale.value === 'en') {
       return child.desc.length * 8 + 8;

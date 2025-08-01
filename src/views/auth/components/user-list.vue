@@ -55,6 +55,7 @@ import { AuthApi } from '@/api';
 import ModalResetPassword from '@/components/modal-reset-password.vue';
 import ModalUser from './modal-user.vue';
 import ICustomError from '~icons/custom/error.svg';
+import type { DBUser } from '@/types';
 
 const props = defineProps<{
   canManageUser: boolean;
@@ -62,7 +63,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (event: 'handleSelect', payload?: Auth.DBUser): void;
+  (event: 'handleSelect', payload?: DBUser): void;
 }>();
 
 const { t } = useI18n();

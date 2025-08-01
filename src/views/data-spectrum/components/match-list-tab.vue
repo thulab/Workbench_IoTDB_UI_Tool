@@ -62,8 +62,9 @@
 <script setup lang="ts">
 import type { CheckboxValueType } from 'element-plus';
 import { formatDate } from '@/utils/date';
+import type { MatchItem } from '@/types';
 
-const matchList = defineModel<Search.MatchItem[]>('modelValue', { default: [] });
+const matchList = defineModel<MatchItem[]>('modelValue', { default: [] });
 const checkedItem = ref<number[]>([]);
 const order = ref(0);
 const sortedData = computed(() => {
@@ -93,8 +94,8 @@ const paginatedData = computed(() => {
 });
 
 const emit = defineEmits<{
-  (event: 'handleCheckChange', payload: Search.MatchItem[]): void;
-  (event: 'handleSave', times: Search.MatchItem[]): void;
+  (event: 'handleCheckChange', payload: MatchItem[]): void;
+  (event: 'handleSave', times: MatchItem[]): void;
 }>();
 
 const { t } = useI18n();

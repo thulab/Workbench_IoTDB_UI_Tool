@@ -53,6 +53,7 @@
 
 <script setup lang="ts">
 import { debounce } from 'lodash-es';
+import type { TableTreeNodeData, MeasurementDataItem } from '@/types';
 
 const props = withDefaults(
   defineProps<{
@@ -64,11 +65,11 @@ const props = withDefaults(
     filterSystem?: boolean;
     showPrefix?: boolean;
     disabledSelect?: boolean;
-    disabledPath?: (data: StorageDevice.MeasurementDataItem) => boolean;
+    disabledPath?: (data: MeasurementDataItem) => boolean;
     selectWidth?: number;
     itemWidth?: number;
     isShowType?: boolean;
-    currentNode?: IoTDB.TreeNodeData | null;
+    currentNode?: TableTreeNodeData | null;
   }>(),
   {
     placeholder: 'measurement.measurementNameSelectPlaceholder',
@@ -83,13 +84,13 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (event: 'update:modelValue', vals: string[]): void;
-  (event: 'handleChangePath', vals: string[], data: IoTDB.TreeNodeData[]): void;
+  (event: 'handleChangePath', vals: string[], data: TableTreeNodeData[]): void;
 }>();
 
 const { t } = useI18n();
 const model = useVModel(props, 'modelValue');
 const dialogVisible = ref(false);
-const measurementList = ref<IoTDB.TreeNodeData[]>([]);
+const measurementList = ref<TableTreeNodeData[]>([]);
 
 let lastMeasurementQuery = '';
 const remoteMethod = debounce((query: string) => {

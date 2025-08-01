@@ -50,9 +50,10 @@
 <script setup lang="ts">
 import type { CheckboxValueType } from 'element-plus';
 import ModalPath from './modal-path.vue';
+import type { LineObj } from '@/types';
 
 const props = defineProps<{
-  modelValue: Trend.LineObj[];
+  modelValue: LineObj[];
   dataTab: 'running' | 'history';
   aggregation: 'avg' | 'max_value' | 'min_value' | 'last_value' | string;
 }>();
@@ -75,21 +76,21 @@ const editPathList = ref<string[]>([]);
 const defaultColor = ref('');
 
 // 弃用
-function handleSavePath(data: Trend.LineObj) {
+function handleSavePath(data: LineObj) {
   pathList.value.push({ ...data, checked: true, disabled: false });
   emit('handleOperate', 'add', data.path);
 }
 
-function handleChecked(val: CheckboxValueType, data: Trend.LineObj, index: number) {
+function handleChecked(val: CheckboxValueType, data: LineObj, index: number) {
   pathList.value.splice(index, 1, { ...data, checked: val as boolean });
   emit('handleOperate', 'detail', data.path);
 }
-function handleChangeColor(val: string | null, data: Trend.LineObj, index: number) {
+function handleChangeColor(val: string | null, data: LineObj, index: number) {
   pathList.value.splice(index, 1, { ...data, color: val as string });
   emit('handleOperate', 'detail', data.path);
 }
 
-function handleBlurWidth(ev: FocusEvent, data: Trend.LineObj, index: number) {
+function handleBlurWidth(ev: FocusEvent, data: LineObj, index: number) {
   const val = (ev?.target as unknown as { value: string | null | undefined })?.value || '';
   let width = 2;
   if (val) {
@@ -98,7 +99,7 @@ function handleBlurWidth(ev: FocusEvent, data: Trend.LineObj, index: number) {
   pathList.value.splice(index, 1, { ...data, width });
 }
 
-function handleChangeWidth(val: number | undefined, data: Trend.LineObj, index: number) {
+function handleChangeWidth(val: number | undefined, data: LineObj, index: number) {
   pathList.value.splice(index, 1, { ...data, width: val as number });
   emit('handleOperate', 'detail', data.path);
 }

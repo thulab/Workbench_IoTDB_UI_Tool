@@ -152,6 +152,7 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalCalculate from './components/modal-calculate.vue';
 import ModalExpression from './components/modal-expression.vue';
 import ModalImport from './components/modal-import.vue';
+import type { CalculateItem } from '@/types';
 
 const { t, locale } = useI18n();
 const appType = Number(import.meta.env.VITE_APP_TYPE);
@@ -171,7 +172,7 @@ const pagination = reactive({
   pageNum: 1,
 });
 const totalCount = ref(0);
-const multipleSelection = ref<Calculate.CalculateItem[]>([]);
+const multipleSelection = ref<CalculateItem[]>([]);
 const editType = ref('add');
 const editVisible = ref(false);
 const editData = ref();
@@ -298,12 +299,12 @@ function onChangePage(page: number) {
   getListData();
 }
 
-function handleSelectionChange(vals: Calculate.CalculateItem[]) {
+function handleSelectionChange(vals: CalculateItem[]) {
   multipleSelection.value = vals;
 }
 
 // 测点管理
-function handleView(row: Calculate.CalculateItem) {
+function handleView(row: CalculateItem) {
   router.push({
     name: 'MeasurementManagement',
     query: {
@@ -314,7 +315,7 @@ function handleView(row: Calculate.CalculateItem) {
 }
 
 // 数据查询
-function handleQuery(row: Calculate.CalculateItem) {
+function handleQuery(row: CalculateItem) {
   router.push({
     name: 'DataSearch',
     query: {
@@ -324,7 +325,7 @@ function handleQuery(row: Calculate.CalculateItem) {
 }
 
 // 表达式
-function handleExpression(row: Calculate.CalculateItem) {
+function handleExpression(row: CalculateItem) {
   editExpression.value = row.expression || '';
   expressionVisible.value = true;
 }
@@ -335,13 +336,13 @@ function handleAdd() {
   editVisible.value = true;
 }
 
-function handleEdit(row: Calculate.CalculateItem) {
+function handleEdit(row: CalculateItem) {
   editType.value = 'edit';
   editData.value = { ...row };
   editVisible.value = true;
 }
 
-function handleDel(type: string, data: Calculate.CalculateItem | null) {
+function handleDel(type: string, data: CalculateItem | null) {
   ElMessageBox.confirm(
     type === 'batch'
       ? `${appType === 1 ? t('calculate.batchDeleteCalculate') : t('calculate.batchDeleteView')}`

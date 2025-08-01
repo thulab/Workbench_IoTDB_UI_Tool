@@ -308,6 +308,7 @@ import ModalImport from './modal-import.vue';
 import ModalDescription from './modal-description.vue';
 import ModalAlias from './modal-alias.vue';
 import ModalTag from './modal-tag.vue';
+import type { MeasurementItem, DatabaseInfo, TreeEventPayload } from '@/types';
 
 const props = defineProps<{
   currentDatabase: string;
@@ -317,7 +318,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'handleReload'): void;
-  (event: 'handleDelete', payload: StorageDevice.TreeEventPayload): void;
+  (event: 'handleDelete', payload: TreeEventPayload): void;
   (event: 'handleSaveMeasurement', path: string): void;
 }>();
 
@@ -331,7 +332,7 @@ const { canManageDatabase, canWriteSchema, userAllEntityPrivileges, userAllPathP
 
 const { maxTableHeight } = useTableHeight(370);
 const searchKeyword = ref((route.query.measurement as string) || '');
-const databaseInfos = ref<StorageDevice.DatabaseInfo>({
+const databaseInfos = ref<DatabaseInfo>({
   groupName: '',
   deviceCount: 0,
   measurementCount: 0,
@@ -341,7 +342,7 @@ const pagination = reactive({
   pageNum: 1,
 });
 const totalCount = ref(0);
-const multipleSelection = ref<StorageDevice.MeasurementItem[]>([]);
+const multipleSelection = ref<MeasurementItem[]>([]);
 const measurementVisible = ref(false);
 const importVisible = ref(false);
 const descriptionVisible = ref(false);
@@ -488,7 +489,7 @@ function handleConfirmCol() {
   colPopoverRef.value.hide();
   copyCheckedCols = cloneDeep(checkedCols.value);
   columnList.value = allColumns.value.filter((item) => checkedCols.value.includes(item.prop));
-  localStorage.setItem('measurementCols', checkedCols.value.join(','));
+  window.localStorage.setItem('measurementCols', checkedCols.value.join(','));
 }
 
 // 列表接口
@@ -603,7 +604,7 @@ function handleImport() {
 }
 
 // 删除行
-function handleDelRow(type: string, row: StorageDevice.MeasurementItem | null) {
+function handleDelRow(type: string, row: MeasurementItem | null) {
   ElMessageBox.confirm(type === 'batch' ? `${t('measurement.deleteMeasurementBatch')}` : `${t('measurement.deleteMeasurementSingle')}`, t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),
@@ -629,7 +630,7 @@ function handleDelRow(type: string, row: StorageDevice.MeasurementItem | null) {
   });
 }
 
-function handleRowData(row: StorageDevice.MeasurementItem) {
+function handleRowData(row: MeasurementItem) {
   router.push({
     name: 'DataSearch',
     query: {
@@ -638,7 +639,7 @@ function handleRowData(row: StorageDevice.MeasurementItem) {
   });
 }
 
-function handleRowAlarm(row: StorageDevice.MeasurementItem) {
+function handleRowAlarm(row: MeasurementItem) {
   router.push({
     name: 'AlarmConfig',
     query: {
@@ -647,7 +648,7 @@ function handleRowAlarm(row: StorageDevice.MeasurementItem) {
   });
 }
 
-function handleRowTrend(row: StorageDevice.MeasurementItem) {
+function handleRowTrend(row: MeasurementItem) {
   router.push({
     name: 'TrendDetail',
     query: {
@@ -656,7 +657,7 @@ function handleRowTrend(row: StorageDevice.MeasurementItem) {
   });
 }
 
-function handleSelectionChange(vals: StorageDevice.MeasurementItem[]) {
+function handleSelectionChange(vals: MeasurementItem[]) {
   multipleSelection.value = vals;
 }
 
@@ -676,25 +677,25 @@ function handleImportClose(reload: boolean) {
   }
 }
 
-function handleEditAlias(row: StorageDevice.MeasurementItem) {
+function handleEditAlias(row: MeasurementItem) {
   editMeasurement.value = `${row.deviceName}.${row.timeseries}`;
   editAlias.value = row.alias || '';
   aliasVisible.value = true;
 }
-function handleTagDetail(row: StorageDevice.MeasurementItem) {
+function handleTagDetail(row: MeasurementItem) {
   editMeasurement.value = `${row.deviceName}.${row.timeseries}`;
   editTags.value = row.tags || '';
   tagVisible.value = true;
 }
 
-function handleEditDescription(row: StorageDevice.MeasurementItem) {
+function handleEditDescription(row: MeasurementItem) {
   editMeasurement.value = `${row.deviceName}.${row.timeseries}`;
   editDescription.value = row.description || '';
   descriptionVisible.value = true;
 }
 
 onMounted(() => {
-  const defaultCols = localStorage.getItem('measurementCols');
+  const defaultCols = window.localStorage.getItem('measurementCols');
   if (!defaultCols) {
     isCheckAll.value = false;
     checkedCols.value = ['timeseries', 'description', 'dataType'];

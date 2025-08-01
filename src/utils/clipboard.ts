@@ -13,7 +13,7 @@ export function copyNode(node: HTMLElement) {
     return navigator.clipboard.writeText(node.textContent || '');
   }
 
-  const selection = getSelection();
+  const selection = globalThis.getSelection();
   if (selection == null) {
     return Promise.reject(new Error());
   }

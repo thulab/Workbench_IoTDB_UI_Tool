@@ -80,6 +80,7 @@ import { type ECOption } from '@/plugins/echarts-plugin';
 import { toThousands, transformDecimal } from '@/utils/format';
 import { DashboardApi } from '@/api';
 import DataContainer from './data-container.vue';
+import type { MetricDiskRes } from '@/types';
 
 const props = defineProps<{
   clusterType: 'master' | 'slave';
@@ -138,7 +139,7 @@ const configNodeSystemData = reactive<PieChartData>({
   percent: 0,
 });
 
-const diskMemoryData = reactive<Dashboard.MetricDiskRes>({
+const diskMemoryData = reactive<MetricDiskRes>({
   diskTotal: null,
   totalUnit: '',
   diskUse: 0,
@@ -467,7 +468,7 @@ const memoryChartOptions = (dataNode: PieChartData, configNode: PieChartData, to
     ],
   }) as ECOption;
 
-const diskChartOptions = (diskMemoryChartData: Dashboard.MetricDiskRes): ECOption =>
+const diskChartOptions = (diskMemoryChartData: MetricDiskRes): ECOption =>
   ({
     tooltip: {
       trigger: 'axis',

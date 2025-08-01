@@ -53,6 +53,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/stores';
+import type { PrivilegeEnum } from '@/types';
 
 const props = defineProps<{
   visible: boolean;
@@ -97,7 +98,7 @@ const tableData = computed(() => {
   return props.pathPrivileges;
 });
 
-function calcColumnWidth(child: Auth.PrivilegeEnum) {
+function calcColumnWidth(child: PrivilegeEnum) {
   if (child.desc.length > 0) {
     return child.desc.length * 16 + 64;
   }

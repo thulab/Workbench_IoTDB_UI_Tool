@@ -122,6 +122,7 @@ import { getPathAuthList } from '@/utils/auth';
 import { todayNow } from '@/utils/date';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalDescription from './modal-description.vue';
+import type { MeasurementData, TreeEventPayload } from '@/types';
 
 const props = defineProps<{
   currentMeasurement: string;
@@ -129,7 +130,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'handleReload'): void;
-  (event: 'handleDelete', payload: StorageDevice.TreeEventPayload): void;
+  (event: 'handleDelete', payload: TreeEventPayload): void;
 }>();
 
 const { t } = useI18n();
@@ -140,7 +141,7 @@ const userStore = useUserStore();
 const { userAllEntityPrivileges, userAllPathPrivileges } = storeToRefs(userStore);
 
 const { maxTableHeight } = useTableHeight(350);
-const measurementInfos = ref<StorageDevice.MeasurementData>({
+const measurementInfos = ref<MeasurementData>({
   timeseries: '',
   node: '',
   description: '',
@@ -153,7 +154,7 @@ const measurementInfos = ref<StorageDevice.MeasurementData>({
   latestTime: '',
 });
 const descriptionVisible = ref(false);
-const columns = ref<DynamicTableColumn[]>([]);
+const columns = ref<globalThis.DynamicTableColumn[]>([]);
 const tableData = ref<Record<string, any>[]>([]);
 const pagination = reactive({
   pageSize: 10,
@@ -224,7 +225,7 @@ function getListData() {
     page: pagination.pageNum,
   })
     .then((res) => {
-      const list: DynamicTableColumn[] = [];
+      const list: globalThis.DynamicTableColumn[] = [];
       res.data?.metaDataList?.forEach((item: string, index: number) => {
         list.push({
           label: item,

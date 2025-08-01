@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ElConfigProvider } from 'element-plus';
 import zhLocale from 'element-plus/es/locale/lang/zh-cn';
 import enLocale from 'element-plus/es/locale/lang/en';
 // import deLocale from 'element-plus/es/locale/lang/de';

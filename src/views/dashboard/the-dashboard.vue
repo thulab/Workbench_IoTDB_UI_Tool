@@ -381,6 +381,7 @@ import MonitorDatanode from './components/monitor-datanode.vue';
 import MonitorConfignode from './components/monitor-confignode.vue';
 import ModalActive from './components/modal-active.vue';
 import ModalActiveNow from './components/modal-active-now.vue';
+import type { SystemData, SystemNumberData, NodeItem, QueryConfigResult } from '@/types';
 
 const { t, locale } = useI18n();
 
@@ -391,7 +392,7 @@ const { enablePrometheus, configurePrometheus, canReadWriteSchema, canMaintain }
 const showPrometheus = computed(() => enablePrometheus.value && configurePrometheus.value);
 const tableRef = ref<InstanceType<typeof ElTable>>();
 const slaveTableRef = ref<InstanceType<typeof ElTable>>();
-const systemData = reactive<Dashboard.SystemData>({
+const systemData = reactive<SystemData>({
   aiNodeRatio: '-',
   dataNodeRatio: '-',
   configNodeRatio: '-',
@@ -399,7 +400,7 @@ const systemData = reactive<Dashboard.SystemData>({
   expirationTime: '-',
   serverTime: null,
 });
-const slaveData = ref<Dashboard.SystemData | null>({
+const slaveData = ref<SystemData | null>({
   aiNodeRatio: '-',
   dataNodeRatio: '-',
   configNodeRatio: '-',
@@ -407,7 +408,7 @@ const slaveData = ref<Dashboard.SystemData | null>({
   expirationTime: '-',
   serverTime: null,
 });
-const systemNumberData = reactive<Dashboard.SystemNumberData>({
+const systemNumberData = reactive<SystemNumberData>({
   databaseNum: 0,
   deviceNum: 0,
   measurementNum: 0,
@@ -423,14 +424,14 @@ const activeVisible = ref(false);
 const activeNowVisible = ref(false);
 const activeIsMaster = ref(true);
 const clusterType = ref<'master' | 'slave'>('master');
-const tableData = ref<Dashboard.NodeItem[]>([]);
-const slaveTableData = ref<Dashboard.NodeItem[]>([]);
+const tableData = ref<NodeItem[]>([]);
+const slaveTableData = ref<NodeItem[]>([]);
 const refreshInterval = ref();
 const systemTime = ref();
 const monitorTime = ref();
 const monitorNode = ref('');
-const masterNodes = ref<Dashboard.NodeItem[]>([]);
-const slaveNodes = ref<Dashboard.NodeItem[]>([]);
+const masterNodes = ref<NodeItem[]>([]);
+const slaveNodes = ref<NodeItem[]>([]);
 const currentNodeType = ref('');
 const monitorAllRef = ref<InstanceType<typeof MonitorAll>>();
 const monitorDatanodeRef = ref<InstanceType<typeof MonitorDatanode>>();
@@ -477,7 +478,7 @@ function showVersionMoreThanThreeDigits(version: string) {
   return isVersionMoreThanThreeDigits(version);
 }
 
-function formatVersion(row: Dashboard.NodeItem, type: 'slave' | 'master') {
+function formatVersion(row: NodeItem, type: 'slave' | 'master') {
   if (type === 'slave') {
     if (slaveData.value!.active || row.version.split('.').length === 4) {
       return t('dashboard.versionEnterprise', { version: row.version });
@@ -618,7 +619,7 @@ function handleChangeNode(val: string) {
   handleRefreshMonitor();
 }
 
-function handleSortChange({ column, prop, order }: SortMethod<Alarm.QueryConfigResult>, type: 'master' | 'slave') {
+function handleSortChange({ column, prop, order }: globalThis.SortMethod<QueryConfigResult>, type: 'master' | 'slave') {
   if (type === 'master') {
     if (order === 'ascending') {
       searchFormData.asc[0] = 'asc';
@@ -661,13 +662,13 @@ function handleClickActiveNow(isMaster: boolean) {
 
 onMounted(() => {
   if (route.query.switch) {
-    sessionStorage.setItem('dataSearchStorage', '');
-    sessionStorage.setItem('statisticSearchStorage', '');
-    sessionStorage.setItem('sqlSearchStorage', '');
-    sessionStorage.setItem('dataTrendStorage', '');
-    sessionStorage.setItem('dataSpectrumStorage', '');
-    sessionStorage.setItem('configStorage', '');
-    sessionStorage.setItem('aiVisualizationStorage', '');
+    window.sessionStorage.setItem('dataSearchStorage', '');
+    window.sessionStorage.setItem('statisticSearchStorage', '');
+    window.sessionStorage.setItem('sqlSearchStorage', '');
+    window.sessionStorage.setItem('dataTrendStorage', '');
+    window.sessionStorage.setItem('dataSpectrumStorage', '');
+    window.sessionStorage.setItem('configStorage', '');
+    window.sessionStorage.setItem('aiVisualizationStorage', '');
   }
 });
 watch(

@@ -55,6 +55,7 @@ import { storeToRefs } from 'pinia';
 import { union, difference } from 'lodash-es';
 import { useUserStore } from '@/stores';
 import { AuthApi } from '@/api';
+import type { AuthByRoleRes, PrivilegeEnum } from '@/types';
 
 const props = defineProps<{
   visible: boolean;
@@ -106,7 +107,7 @@ const entityTableData = computed(() => {
  * @param data 合并完的结果
  * @param role 要合并的角色
  */
-function mergeRolePathPrivileges(data: Array<{ path: string; privileges: string[] }>, role: Auth.AuthByRoleRes) {
+function mergeRolePathPrivileges(data: Array<{ path: string; privileges: string[] }>, role: AuthByRoleRes) {
   role.pathPrivileges.forEach((item) => {
     const path = data.find((pathItem) => pathItem.path === item.path);
     if (!path) {
@@ -168,7 +169,7 @@ const tableData = computed(() => {
   return result;
 });
 
-function calcColumnWidth(child: Auth.PrivilegeEnum) {
+function calcColumnWidth(child: PrivilegeEnum) {
   if (child.desc.length > 0) {
     return child.desc.length * 16 + 64;
   }

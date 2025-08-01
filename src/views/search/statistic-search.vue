@@ -118,6 +118,7 @@
 
 <script setup lang="ts">
 import type { FormInstance } from 'element-plus';
+import type { StatisticSearchMinMaxObj, StatisticSearchAvgSumObj } from '@/types';
 import { storeToRefs } from 'pinia';
 import { SearchApi } from '@/api';
 import { useTableHeight } from '@/composition-api';
@@ -157,9 +158,9 @@ const requiredRules = ref([
 const disabledDate = (time: number) => time < new Date('1970-1-1').getTime();
 const getListLoading = ref(false);
 const timestamp = ref(0);
-const tableData = ref<Array<Search.StatisticSearchMinMaxObj & Search.StatisticSearchAvgSumObj>>([]);
-const minMaxList = ref<Search.StatisticSearchMinMaxObj[]>([]);
-const avgSumList = ref<Search.StatisticSearchAvgSumObj[]>([]);
+const tableData = ref<Array<StatisticSearchMinMaxObj & StatisticSearchAvgSumObj>>([]);
+const minMaxList = ref<StatisticSearchMinMaxObj[]>([]);
+const avgSumList = ref<StatisticSearchAvgSumObj[]>([]);
 const tableErrorMessage = ref<string[]>([]);
 const totalCount = computed(() => copySearchFormData.path.length);
 
@@ -288,7 +289,7 @@ function handleCommandDown(val: string) {
 }
 
 function setStorage() {
-  sessionStorage.setItem(
+  window.sessionStorage.setItem(
     'statisticSearchStorage',
     JSON.stringify({
       ...copySearchFormData,
@@ -301,7 +302,7 @@ onMounted(() => {
     if (!window.__isReload__) {
       setStorage();
     } else {
-      sessionStorage.setItem('statisticSearchStorage', '');
+      window.sessionStorage.setItem('statisticSearchStorage', '');
     }
   });
 });
@@ -314,9 +315,9 @@ watch(
   () => canReadWriteData.value,
   (val) => {
     if (val) {
-      if (sessionStorage.getItem('statisticSearchStorage')) {
-        if (sessionStorage.getItem('statisticSearchStorage')) {
-          const searchData = JSON.parse(sessionStorage.getItem('statisticSearchStorage') as string);
+      if (window.sessionStorage.getItem('statisticSearchStorage')) {
+        if (window.sessionStorage.getItem('statisticSearchStorage')) {
+          const searchData = JSON.parse(window.sessionStorage.getItem('statisticSearchStorage') as string);
           searchFormData.path = searchData.path;
           searchFormData.datetimerange = searchData.datetimerange;
           if (searchFormData.path.length === 0) return;

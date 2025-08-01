@@ -309,6 +309,7 @@ import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
 import { DataSyncApi } from '@/api';
 import { today, todayNow, formatDate } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
+import type { SynchronFormData, PluginData } from '@/types';
 
 const props = defineProps<{
   visible: boolean;
@@ -391,10 +392,10 @@ const requiredNumberRules = ref([
 ]);
 const { shortcutsDaterange } = useShortcutsDate();
 
-const dealOptions = ref<DataSync.PluginData[]>([]);
-const sendOptions = ref<DataSync.PluginData[]>([]);
+const dealOptions = ref<PluginData[]>([]);
+const sendOptions = ref<PluginData[]>([]);
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
-const formData = ref<DataSync.SynchronFormData>({
+const formData = ref<SynchronFormData>({
   name: '',
   whole: true,
   path: '',

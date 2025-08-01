@@ -1,6 +1,5 @@
 import { ref } from 'vue';
 import CommonApi from '@/api/common.api';
-import { ElMessage } from 'element-plus';
 import type { UploadProps } from 'element-plus';
 import i18n from '@/locale/index';
 

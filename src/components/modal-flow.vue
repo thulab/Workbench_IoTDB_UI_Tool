@@ -178,6 +178,7 @@ import graphDoubleLiveIcon from '@/assets/icons/graph-double-live.svg';
 import ContextMenu from './flow-graph/context-menu.vue';
 import ConnectionForm from './connection/connection-form.vue';
 import TooltipTool from './flow-graph/graph';
+import type { ConnectionItem } from '@/types';
 
 const props = defineProps<{
   visible: boolean;
@@ -209,9 +210,9 @@ const stencilContainerRef = ref<HTMLElement | null>(null);
 const graphContainerRef = ref<HTMLElement | null>(null);
 const graph = ref<Graph>();
 const stencil = ref<Stencil>();
-const standAloneList = ref<Connection.ConnectionItem[]>([]);
-const doubleLiveList = ref<Connection.ConnectionItem[]>([]);
-const clusterList = ref<Connection.ConnectionItem[]>([]);
+const standAloneList = ref<ConnectionItem[]>([]);
+const doubleLiveList = ref<ConnectionItem[]>([]);
+const clusterList = ref<ConnectionItem[]>([]);
 const listLoading = ref(false);
 const isShowTextStyle = ref(false);
 const textStyle = reactive({

@@ -38,13 +38,14 @@
 import { storeToRefs } from 'pinia';
 import { useDbStore } from '@/stores';
 import { type ElTreeV2 } from 'element-plus';
+import type { TableTreeNodeData } from '@/types';
 
 const { maxTableHeight } = useTableHeight(220);
 
 const emit = defineEmits(['get-function']);
 
 const schemaTree = ref<InstanceType<typeof ElTreeV2>>();
-const currentNode = ref<IoTDB.TreeNodeData | null>(null);
+const currentNode = ref<TableTreeNodeData | null>(null);
 
 const { treeData } = storeToRefs(useDbStore());
 const { getDatabases } = useDbStore();

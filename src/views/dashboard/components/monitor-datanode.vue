@@ -102,6 +102,7 @@ import { type ECOption } from '@/plugins/echarts-plugin';
 import { toThousands, transformDecimal } from '@/utils/format';
 import { DashboardApi } from '@/api';
 import DataContainer from './data-container.vue';
+import type { MetricDiskRes } from '@/types';
 
 const props = defineProps<{
   node: string;
@@ -146,7 +147,7 @@ const memoryData = reactive<GaugeChartData>({
   valueUnit: 'GiB',
 });
 
-const diskMemoryData = reactive<Dashboard.MetricDiskRes>({
+const diskMemoryData = reactive<MetricDiskRes>({
   diskTotal: null,
   totalUnit: '',
   diskUse: 0,
@@ -293,7 +294,7 @@ const diskIOChartOptions = (categoryList: string[], valueList: number[]) =>
     ],
   }) as ECOption;
 
-const diskChartOptions = (diskMemoryChartData: Dashboard.MetricDiskRes): ECOption =>
+const diskChartOptions = (diskMemoryChartData: MetricDiskRes): ECOption =>
   ({
     tooltip: {
       trigger: 'axis',

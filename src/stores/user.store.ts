@@ -4,6 +4,7 @@ import { union, difference } from 'lodash-es';
 import { UserApi, DashboardApi } from '@/api';
 import { useRouter } from 'vue-router';
 import { useConnectionStore } from './connection.store';
+import type { UserPrivileges, PrivilegesEnum } from '@/types';
 
 const { requestFn: getLoginUserPrivileges } = useRequest(UserApi.getLoginUserPrivileges);
 const { requestFn: getPrivilegesEnum } = useRequest(UserApi.getPrivilegesEnum);
@@ -21,8 +22,8 @@ export const useUserStore = defineStore(
       name: string;
     });
 
-    const allPrivileges = ref<Auth.UserPrivileges>();
-    const privilegesEnum = ref<Auth.PrivilegesEnum>();
+    const allPrivileges = ref<UserPrivileges>();
+    const privilegesEnum = ref<PrivilegesEnum>();
 
     // 权限配置
     // 全局
@@ -148,7 +149,7 @@ export const useUserStore = defineStore(
           .then((res) => {
             userInfo.value.name = res.data.userName;
             allPrivileges.value = res.data;
-            sessionStorage.setItem('iotdbVersion', res.data.version);
+            window.sessionStorage.setItem('iotdbVersion', res.data.version);
             connectionStore.connectionInfo.currentVersion = res.data.version;
             connectionStore.connectionInfo.slaveVersion = res.data.slaveVersion;
             connectionStore.setConnection(res.data.connection);
@@ -170,8 +171,8 @@ export const useUserStore = defineStore(
           })
           .catch(() => {
             clearUserStore();
-            sessionStorage.setItem('UserStore', '');
-            sessionStorage.setItem('nologin', '1');
+            window.sessionStorage.setItem('UserStore', '');
+            window.sessionStorage.setItem('nologin', '1');
             router.push({
               name: 'Login',
               query: {
@@ -227,7 +228,7 @@ export const useUserStore = defineStore(
   },
   {
     persist: {
-      storage: sessionStorage,
+      storage: window.sessionStorage,
       pick: ['privilegesEnum', 'userInfo'],
       afterHydrate: (context) => {
         context.store.loadPrivilegesEnum();

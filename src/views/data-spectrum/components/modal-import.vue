@@ -101,6 +101,7 @@
 import { genFileId } from 'element-plus';
 import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
 import { SearchApi } from '@/api';
+import type { ParsingMatchDataRes } from '@/types';
 
 const props = defineProps<{
   visible: boolean;
@@ -121,7 +122,7 @@ const isCSV = ref(true);
 const activeStep = ref(0);
 const uploadFileInfo = ref<File>();
 const uploadStatus = ref('');
-const uploadResult = reactive<Search.ParsingMatchDataRes>({
+const uploadResult = reactive<ParsingMatchDataRes>({
   status: true,
   successNum: 0,
   failNum: 0,

@@ -16,7 +16,7 @@ export function useDataTypeIcon() {
       BLOB: 'TEXT',
     },
   });
-  const getIconName = (icon?: IotdbDataType | 'TIME') => {
+  const getIconName = (icon?: globalThis.IotdbDataType | 'TIME') => {
     if (!icon) return '';
     return iconArr.icon[icon];
   };

@@ -46,7 +46,7 @@ const isCollapse = computed((): boolean => menuStore.isCollapse);
 const rootMenu = inject<MenuProvider>('rootMenu');
 
 const props = defineProps<{
-  menuList: MenuOptions[];
+  menuList: globalThis.MenuOptions[];
   showAuthMenu?: boolean;
 }>();
 
@@ -54,7 +54,7 @@ const { locale } = useI18n();
 
 const showVersionMenu = (version: string) => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, version);
 
-const menus = computed<MenuOptions[]>(() => {
+const menus = computed<globalThis.MenuOptions[]>(() => {
   const { menuList } = props;
   menuList.sort((a, b) => (a.order || 0) - (b.order || 0));
   return menuList

@@ -85,6 +85,7 @@ import { useConnectionStore, useDbStore } from '@/stores';
 import { AIAnalysisApi } from '@/api';
 import { getStartAndEnd } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
+import type { Model, MeasurementDataItem } from '@/types';
 
 const props = withDefaults(
   defineProps<{
@@ -176,7 +177,7 @@ const formRules = reactive({
   ],
 });
 
-const modelList = ref<Array<AIAnalysis.Model>>([]);
+const modelList = ref<Array<Model>>([]);
 
 const currentDatabase = computed(() => {
   return dbStore.treeData.find((item) => item.nodeName === formData.database);
@@ -194,7 +195,7 @@ const allowedTypes = computed(() => {
   return result;
 });
 
-function disabledPath(item: StorageDevice.MeasurementDataItem) {
+function disabledPath(item: MeasurementDataItem) {
   return allowedTypes.value.indexOf(item.dataType) === -1;
 }
 

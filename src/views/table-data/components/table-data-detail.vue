@@ -139,9 +139,10 @@ import SqlPreview from '@/components/sql-preview.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ColumnsSelect from './columns-select.vue';
 import ModalImportData from './modal-import-data.vue';
+import type { TableTreeNodeData, QueryDataResult, DeleteCondition, DeleteTableDataReq, InsertTableDataReq } from '@/types';
 
 const props = defineProps<{
-  currentNode: IoTDB.TreeNodeData;
+  currentNode: TableTreeNodeData;
 }>();
 
 const sqlPreviewRef = ref<InstanceType<typeof SqlPreview>>();
@@ -185,9 +186,9 @@ const { shortcutsDaterange } = useShortcutsDate();
 
 const disabledDate = (time: number) => time < new Date('1970-1-1').getTime();
 
-const searchDetailInfos = ref<Partial<Search.QueryDataResult>>({});
+const searchDetailInfos = ref<Partial<QueryDataResult>>({});
 const hasNext = ref(false);
-const columns = ref<DynamicTableColumn[]>([]);
+const columns = ref<globalThis.DynamicTableColumn[]>([]);
 const columnTypes = ref<string[]>([]);
 const tableData = ref<Record<string, any>[]>([]);
 const pagination = reactive({
@@ -248,7 +249,7 @@ function getListData() {
     controller,
   )
     .then((res) => {
-      const list: DynamicTableColumn[] = [];
+      const list: globalThis.DynamicTableColumn[] = [];
       res.data?.value.metaDataList?.forEach((item: string, index: number) => {
         list.push({
           label: item,
@@ -335,7 +336,7 @@ function handleReset(force?: boolean) {
   if (force) {
     copySearchFormData.value = cloneDeep(searchFormData);
     getListLoading.value = false;
-    sessionStorage.setItem('dataSearchStorage', '');
+    window.sessionStorage.setItem('dataSearchStorage', '');
     getListData();
   }
 }
@@ -383,7 +384,7 @@ function getTags(row: Record<string, any>): Record<string, string> {
 }
 
 function deleteData(rows: Record<string, any>[]) {
-  const deleteConditions: IoTDB.DeleteCondition[] = rows.map((row) => ({
+  const deleteConditions: DeleteCondition[] = rows.map((row) => ({
     tags: getTags(row),
     time: row.time as unknown as number,
   }));
@@ -392,7 +393,7 @@ function deleteData(rows: Record<string, any>[]) {
     database: props.currentNode.database!,
     tableName: props.currentNode.nodeName,
     conditions: deleteConditions,
-  } as IoTDB.DeleteTableDataReq;
+  } as DeleteTableDataReq;
   deleteTableData(data)
     .then((resp) => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
@@ -461,7 +462,7 @@ function handleSave(row: Record<string, any>) {
     tableName: props.currentNode.nodeName,
     metaDataList: Object.keys(copyRow),
     valueList: processedValues,
-  } as IoTDB.InsertTableDataReq;
+  } as InsertTableDataReq;
   insertTableData(data).then((resp) => {
     ElMessage.success({ message: t('common.submitSuccess'), grouping: true });
     handleAppendSql(resp.data.sql);
@@ -473,7 +474,7 @@ function handleSave(row: Record<string, any>) {
 }
 
 function setStorage() {
-  sessionStorage.setItem(
+  window.sessionStorage.setItem(
     'dataSearchStorage',
     JSON.stringify({
       ...copySearchFormData.value,
@@ -497,8 +498,8 @@ watch(
         handleSearch();
         return;
       }
-      if (sessionStorage.getItem('dataSearchStorage')) {
-        const searchData = JSON.parse(sessionStorage.getItem('dataSearchStorage') as string);
+      if (window.sessionStorage.getItem('dataSearchStorage')) {
+        const searchData = JSON.parse(window.sessionStorage.getItem('dataSearchStorage') as string);
         searchFormData.columns = searchData.path || [];
 
         searchFormData.datetimerange = searchData.datetimerange;

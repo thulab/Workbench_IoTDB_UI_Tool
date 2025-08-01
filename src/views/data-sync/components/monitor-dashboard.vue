@@ -105,6 +105,7 @@ import { useConnectionStore } from '@/stores';
 import { DashboardApi, DataSyncApi } from '@/api';
 import DataContainer from '@/views/dashboard/components/data-container.vue';
 import TheChart from '@/components/the-chart.vue';
+import type { PipeMonitorData, NodeItem } from '@/types';
 
 const emit = defineEmits<{
   (event: 'handleClose'): void;
@@ -123,8 +124,8 @@ const connectionStore = useConnectionStore();
 const refreshInterval = ref();
 const monitorTime = ref();
 const clusterType = ref<'master' | 'slave'>('master');
-const masterNodes = ref<Dashboard.NodeItem[]>([]);
-const slaveNodes = ref<Dashboard.NodeItem[]>([]);
+const masterNodes = ref<NodeItem[]>([]);
+const slaveNodes = ref<NodeItem[]>([]);
 const monitorNode = ref('');
 const searchFormData = reactive({
   orderBy: ['type', 'type'],
@@ -136,9 +137,9 @@ const remainingTime = reactive<RemainingTimeData>({
   timeUnit: '',
 });
 
-const memoryData = ref<DataSync.PipeMonitorData[]>([]);
-const p50Data = ref<DataSync.PipeMonitorData[]>([]);
-const p99Data = ref<DataSync.PipeMonitorData[]>([]);
+const memoryData = ref<PipeMonitorData[]>([]);
+const p50Data = ref<PipeMonitorData[]>([]);
+const p99Data = ref<PipeMonitorData[]>([]);
 const isInit = ref(true);
 
 const nodeList = computed(() => {
@@ -163,7 +164,7 @@ const lineColor = computed(() => {
   return colorList[0];
 });
 
-function getLegendSelected(optionData: DataSync.PipeMonitorData[], chartName: string) {
+function getLegendSelected(optionData: PipeMonitorData[], chartName: string) {
   let obj: { [key: string]: boolean } = {};
   optionData.forEach((item, index) => {
     if (monitorNode.value === '') {
@@ -195,7 +196,7 @@ function getLegendSelected(optionData: DataSync.PipeMonitorData[], chartName: st
   return obj;
 }
 
-const lineChartOptions = (optionData: DataSync.PipeMonitorData[], dataUnit: string, chartName: string) =>
+const lineChartOptions = (optionData: PipeMonitorData[], dataUnit: string, chartName: string) =>
   ({
     color: lineColor.value,
     useUTC: false,
@@ -293,7 +294,7 @@ const p99DataOptions = reactive({
 
 const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '1.3.0'));
 
-function isChartEmpty(optionData: DataSync.PipeMonitorData[]) {
+function isChartEmpty(optionData: PipeMonitorData[]) {
   return optionData.every((item) => item.used.timestamp.length === 0);
 }
 

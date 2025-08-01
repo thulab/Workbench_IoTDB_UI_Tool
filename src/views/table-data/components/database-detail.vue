@@ -191,9 +191,10 @@ import ModalTtl from './modal-ttl.vue';
 import ModalAddTable from './modal-add-table.vue';
 import ModalComment from './modal-comment.vue';
 import ModalImportTable from './modal-import-table.vue';
+import type { TableTreeNodeData, TableDatabaseInfo, TableVO } from '@/types';
 
 const props = defineProps<{
-  currentNode: IoTDB.TreeNodeData;
+  currentNode: TableTreeNodeData;
 }>();
 
 const sqlPreviewRef = ref<InstanceType<typeof SqlPreview>>();
@@ -205,15 +206,15 @@ const { data: tableVO, requestFn: getTableList } = useRequest(IoTDBApi.getTableL
 const { requestFn: deleteTables } = useRequest(IoTDBApi.deleteTables);
 const { requestFn: exportTableId } = useRequest(IoTDBApi.exportTableId);
 const searchKeyword = ref((route.query.databaseSearch as string) || '');
-const databaseInfos = ref<IoTDB.DatabaseInfo | null>(null);
+const databaseInfos = ref<TableDatabaseInfo | null>(null);
 const searchType = ref('tableName');
 const searchPlaceholder = computed(() => (searchType.value === 'tableName' ? t('dataManage.tableNamePlaceholder') : t('dataManage.commentPlaceholder')));
 const { maxTableHeight } = useTableHeight(410);
 const modalTtlVisible = ref(false);
 const modalCommentVisible = ref(false);
-const currentTable = ref<IoTDB.TableVO>();
+const currentTable = ref<TableVO>();
 const ttlType = ref('db'); // 'db' or 'table'
-const multipleSelection = ref<IoTDB.TableVO[]>([]);
+const multipleSelection = ref<TableVO[]>([]);
 const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
 const currentPage = ref(1);
 const pageSize = ref(10);
@@ -264,12 +265,12 @@ function getDatabaseDetail(data: string) {
   });
 }
 
-function handleEditTableTTL(row: IoTDB.TableVO) {
+function handleEditTableTTL(row: TableVO) {
   ttlType.value = 'table';
   currentTable.value = row;
   modalTtlVisible.value = true;
 }
-function handleEditTableComment(row: IoTDB.TableVO) {
+function handleEditTableComment(row: TableVO) {
   currentTable.value = row;
   modalCommentVisible.value = true;
 }
@@ -282,11 +283,11 @@ function handleRefresh() {
   });
 }
 
-function handleSelectionChange(vals: IoTDB.TableVO[]) {
+function handleSelectionChange(vals: TableVO[]) {
   multipleSelection.value = vals;
 }
 
-function handleDelRow(type: string, row: IoTDB.TableVO | null) {
+function handleDelRow(type: string, row: TableVO | null) {
   ElMessageBox.confirm(type === 'batch' ? `${t('dataManage.delTableBatchTip')}` : `${t('dataManage.delTableSingleTip')}`, t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),

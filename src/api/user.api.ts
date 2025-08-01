@@ -1,27 +1,28 @@
 import http from '@/utils/http';
 import { encodeAES } from '@/utils/secret';
+import type { UserPrivileges, ConnectionDetail, PrivilegesEnum } from '@/types';
 
 class UserApi {
   // 登录
-  static login(user: string, password: string, id: number, model: string): HttpResponseP {
+  static login(user: string, password: string, id: number, model: string): globalThis.HttpResponseP {
     return http.post('/login', { user, password: encodeAES(password), id, model });
   }
 
   // 退出登录
-  static logout(): HttpResponseP {
-    sessionStorage.setItem('nologin', '1');
+  static logout(): globalThis.HttpResponseP {
+    window.sessionStorage.setItem('nologin', '1');
     return http.get('/logout');
   }
 
   // 登录是否需要验证码
-  static loginCaptcha(): HttpResponseP<boolean> {
+  static loginCaptcha(): globalThis.HttpResponseP<boolean> {
     return http.get('/verifiable');
   }
 
   // 当前登录用户权限
-  static getLoginUserPrivileges(): HttpResponseP<
-    Auth.UserPrivileges & {
-      connection: Connection.ConnectionDetail;
+  static getLoginUserPrivileges(): globalThis.HttpResponseP<
+    UserPrivileges & {
+      connection: ConnectionDetail;
       isMaster: boolean;
       isActive: boolean | null;
       model: 'tree' | 'table';
@@ -32,7 +33,7 @@ class UserApi {
   }
 
   // 权限配置项
-  static getPrivilegesEnum(): HttpResponseP<Auth.PrivilegesEnum> {
+  static getPrivilegesEnum(): globalThis.HttpResponseP<PrivilegesEnum> {
     return http.get('/privileges/getPrivilegeConfig');
   }
 }

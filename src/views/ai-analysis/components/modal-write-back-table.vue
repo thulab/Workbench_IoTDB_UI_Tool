@@ -56,6 +56,7 @@
 
 <script setup lang="ts">
 import type { FormInstance, FormRules } from 'element-plus';
+import type { TagFilter, WriteBackTableFrom } from '@/types';
 
 const props = withDefaults(
   defineProps<{
@@ -63,7 +64,7 @@ const props = withDefaults(
     saveLoading: boolean;
     database: string;
     table: string;
-    tags?: IoTDB.TagFilter[];
+    tags?: TagFilter[];
     fieldName: string;
     modelIdList: string[];
   }>(),
@@ -71,7 +72,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (event: 'handleSave', payload: AIAnalysis.WriteBackTableFrom): void;
+  (event: 'handleSave', payload: WriteBackTableFrom): void;
 }>();
 
 // 测点已存在
@@ -81,7 +82,7 @@ const { t, locale } = useI18n();
 
 const dialogVisible = defineModel<boolean>('visible');
 const formRef = ref<FormInstance>();
-const formData = reactive<AIAnalysis.WriteBackTableFrom>({
+const formData = reactive<WriteBackTableFrom>({
   database: props.database,
   table: props.table,
   tags: props.tags?.map((tag) => ({ tagName: tag.variable, tagValue: tag.value })) || [],

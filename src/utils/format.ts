@@ -1,3 +1,4 @@
+import type { SelectedMeasurement } from '@/types';
 export { formatDate } from './date';
 export const formatTimeseries = (timeseries: string, prefix?: string) => {
   if (!timeseries) {
@@ -39,7 +40,7 @@ export function transformDecimal(num: number, point: number) {
   return decimalNum;
 }
 
-export function formatSelectedMeasurement(data: IoTDB.SelectedMeasurement) {
+export function formatSelectedMeasurement(data: SelectedMeasurement) {
   return formatDevice(data.device, data.measurement);
 }
 

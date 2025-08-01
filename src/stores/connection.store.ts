@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia';
 import { reactive, computed } from 'vue';
+import type { ConnectionDetail } from '@/types/connection';
 
 export const useConnectionStore = defineStore(
   'ConnectionStore',
   () => {
-    const connectionInfo = reactive<{ data: Connection.ConnectionDetail; currentVersion?: string; slaveVersion?: string }>({
+    const connectionInfo = reactive<{ data: ConnectionDetail; currentVersion?: string; slaveVersion?: string }>({
       data: {
         id: '',
         type: 0,
@@ -30,7 +31,7 @@ export const useConnectionStore = defineStore(
     const enableAINode = ref(false);
     const model = ref<'tree' | 'table'>('tree');
 
-    function setConnection(data: Connection.ConnectionDetail) {
+    function setConnection(data: ConnectionDetail) {
       connectionInfo.data = data;
     }
 
@@ -81,7 +82,7 @@ export const useConnectionStore = defineStore(
   },
   {
     persist: {
-      storage: sessionStorage,
+      storage: window.sessionStorage,
       pick: ['connectionInfo', 'enableAINode'],
     },
   },

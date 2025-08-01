@@ -128,6 +128,7 @@ import DynamicTable from '@/components/dynamic-table.vue';
 import { SearchApi } from '@/api';
 import CodeEditor from './code-editor.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
+import type { QuerySqlResponse } from '@/types';
 
 const props = defineProps<{
   code: string;
@@ -144,12 +145,12 @@ const standTable = ref(null);
 
 const pageNums = reactive<number[]>([]);
 
-const columnList = ref<Array<Array<DynamicTableColumn> | null>>([]);
+const columnList = ref<Array<Array<globalThis.DynamicTableColumn> | null>>([]);
 
 const tableData = reactive<{ list: Array<Record<string, any> | null> }>({
   list: [],
 });
-const sqlResult = ref<Partial<Search.QuerySqlResponse>[]>([]);
+const sqlResult = ref<Partial<QuerySqlResponse>[]>([]);
 const activeName = ref<string | number>(0);
 const total = computed(() => tableData.list.map((item) => item?.list?.length));
 const timeNumber = ref(0);

@@ -8,8 +8,8 @@ import type { Router } from 'vue-router';
  * 使用递归处理路由菜单
  * @param newArr 所有菜单数组
  */
-export function handleRouter(routerList: MenuOptions[], newArr: string[] = []) {
-  routerList.forEach((item: MenuOptions) => {
+export function handleRouter(routerList: globalThis.MenuOptions[], newArr: string[] = []) {
+  routerList.forEach((item: globalThis.MenuOptions) => {
     if (typeof item === 'object' && item.path) {
       newArr.push(item.path);
     }

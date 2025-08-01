@@ -21,9 +21,9 @@ function requestInterceptor(config: InternalAxiosRequestConfig): InternalAxiosRe
     NProgress.start();
     requestCount += 1;
   }
-  const langKey = (localStorage.getItem('lang') || 'cn') as 'cn' | 'en';
+  const langKey = (window.localStorage.getItem('lang') || 'cn') as 'cn' | 'en';
   if (config && config.headers) {
-    // config.headers.Authorization = localStorage.getItem('authorization') || '';
+    // config.headers.Authorization = window.localStorage.getItem('authorization') || '';
     config.headers.lang = langNameMap[langKey];
   }
   return config;
@@ -35,7 +35,7 @@ function requestErrorInterceptor(error: any) {
   return Promise.reject(error);
 }
 
-async function responseInterceptor(response: HttpResponse<object>): Promise<HttpResponse<object>> {
+async function responseInterceptor(response: globalThis.HttpResponse<object>): Promise<globalThis.HttpResponse<object>> {
   requestCount -= 1;
   if (requestCount < 1) {
     NProgress.done();
@@ -50,7 +50,7 @@ async function responseInterceptor(response: HttpResponse<object>): Promise<Http
   if (response.headers['content-disposition'] && response.headers['content-disposition'].indexOf('attachment') > -1 && data instanceof Blob && data.type !== 'application/json') {
     return Promise.resolve(response);
   }
-  const logined = sessionStorage.getItem('nologin') === '0';
+  const logined = window.sessionStorage.getItem('nologin') === '0';
   if (response.status === 403 || (response.status === 401 && logined)) {
     return ElMessageBox.alert(t('login.loginExpire'), t('common.tip'), {
       confirmButtonText: t('common.confirm'),
@@ -60,13 +60,13 @@ async function responseInterceptor(response: HttpResponse<object>): Promise<Http
       showClose: false,
     }).finally(() => {
       window.location.href = `/view/login?timestamp=${new Date().getTime()}`;
-      sessionStorage.setItem('nologin', '1');
+      window.sessionStorage.setItem('nologin', '1');
       return Promise.reject(response);
-    }) as unknown as Promise<HttpResponse<object>>;
+    }) as unknown as Promise<globalThis.HttpResponse<object>>;
   }
   if (response.status === 401) {
     window.location.href = `/view/login?timestamp=${new Date().getTime()}`;
-    sessionStorage.setItem('nologin', '1');
+    window.sessionStorage.setItem('nologin', '1');
     return Promise.reject(response);
   }
   return Promise.reject(data);

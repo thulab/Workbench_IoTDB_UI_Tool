@@ -201,12 +201,13 @@ import { useI18n } from 'vue-i18n';
 import { TableDataApi } from '@/api';
 import { formatDevice } from '@/utils/format';
 import type { FormInstance, TableInstance } from 'element-plus';
+import type { TableTreeNodeData, SelectedMeasurement, TagFilter } from '@/types';
 
 const props = withDefaults(
   defineProps<{
     currentDatabase?: string;
     currentTable?: string;
-    selectedMeasurements?: IoTDB.SelectedMeasurement[];
+    selectedMeasurements?: SelectedMeasurement[];
     selectedLimit?: number;
     supportedTypes?: string[];
   }>(),
@@ -217,7 +218,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  confirm: [database: string, table: string, measurements: IoTDB.SelectedMeasurement[]];
+  confirm: [database: string, table: string, measurements: SelectedMeasurement[]];
   close: [];
 }>();
 
@@ -240,10 +241,10 @@ const formData = reactive({
   selectedMeasurement: [] as string[], // 支持多选测点
   selectedMeasurementType: [] as string[], // 支持多选测点类型
 });
-const tagFilters = ref<IoTDB.TagFilter[]>([{ variable: '', value: '' }]);
+const tagFilters = ref<TagFilter[]>([{ variable: '', value: '' }]);
 const deviceTableData = ref<Record<string, string>[]>([]);
 const selectedDevices = ref<Record<string, string>[]>([]);
-const internalSelectedMeasurements = ref<IoTDB.SelectedMeasurement[]>([]);
+const internalSelectedMeasurements = ref<SelectedMeasurement[]>([]);
 
 const { requestFn: getDevices, loading: searchLoading } = useRequest(TableDataApi.getDevices);
 
@@ -322,7 +323,7 @@ const formRules = {
 };
 
 // 设备表格列配置
-const deviceColumns = computed<DynamicTableColumn[]>(() => {
+const deviceColumns = computed<globalThis.DynamicTableColumn[]>(() => {
   return availableTags.value.map((tag) => ({
     prop: tag.nodeName,
     label: tag.nodeName + (tag.comment ? ` (${tag.comment})` : ''),
@@ -377,7 +378,7 @@ const handleTableChange = () => {
   formData.selectedMeasurement = [];
 };
 
-const canChoice = (option: IoTDB.TreeNodeData, index: number) => {
+const canChoice = (option: TableTreeNodeData, index: number) => {
   // 获取除了当前 index 外的其他选项项的 key
   const keys = tagFilters.value.map((tag, i) => (i !== index ? tag.variable : '')).filter((key) => key);
   return keys.indexOf(option.nodeName) === -1;
@@ -399,7 +400,7 @@ const loadDevice = async (page: number = 1) => {
   await getDevices(
     {
       database: formData.selectedDatabase,
-      table: formData.selectedTable,
+      tableName: formData.selectedTable,
       conditions: tagFilters.value.reduce(
         (acc, tag) => {
           if (tag.variable && tag.value) {
@@ -449,7 +450,7 @@ const handleDeviceSelection = (devices: Record<string, string>[]) => {
 
 const addMeasurements = async () => {
   if (!canAdd.value) return;
-  const newMeasurements: IoTDB.SelectedMeasurement[] = [];
+  const newMeasurements: SelectedMeasurement[] = [];
 
   // formData.selectedMeasurement.forEach((measurement) => {
   //   if (!availableMeasurements.value.some((m) => m.nodeName === measurement)) {

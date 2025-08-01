@@ -221,6 +221,7 @@ import ModalPath from './components/modal-path.vue';
 import ModalAddRole from './components/modal-add-role.vue';
 import ModalPreviewRole from './components/modal-preview-role.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
+import type { DBUser, AuthByRoleRes, UserEditPathAuthInfo, UserEditAuthInfo, PrivilegeEnum } from '@/types';
 
 const { t, locale } = useI18n();
 const connectionStore = useConnectionStore();
@@ -229,7 +230,7 @@ const { entityPrivilegesEnumGroup, entityPrivilegesEnumKeys, pathPrivilegesEnumG
 const userName = computed(() => userStore.userInfo.name);
 
 const listRef = ref<InstanceType<typeof List>>();
-const currentUser = ref<Auth.DBUser>();
+const currentUser = ref<DBUser>();
 const pathVisible = ref(false);
 const addRoleVisible = ref(false);
 const previewRoleVisible = ref(false);
@@ -263,7 +264,7 @@ const selectRoleList = computed(() => authData.value?.rolesToPrivileges?.map((it
 
 const { requestFn: updateUserAuth, loading: saveLoading } = useRequest(AuthApi.updateUserAuth);
 
-const currentRole = ref<Auth.AuthByRoleRes | undefined>(undefined);
+const currentRole = ref<AuthByRoleRes | undefined>(undefined);
 
 const { requestFn: getRoleAuth, loading: roleLoading } = useRequest(AuthApi.getAuthByRole);
 
@@ -287,7 +288,7 @@ const pathUserPrivileges = ref<{ path: string; privileges: string[] }[]>([]);
  * 全局权限表格数据，包含用户和用户所有角色的权限
  */
 const entityTableData = computed(() => {
-  const result: Auth.UserEditAuthInfo = {
+  const result: UserEditAuthInfo = {
     userPrivileges: entityUserPrivileges.value,
     rolePrivileges: (authData.value.rolesToPrivileges || []).flatMap((item) => item.entityPrivileges),
     allChecked: false,
@@ -305,7 +306,7 @@ const entityTableData = computed(() => {
  * @param data 合并完的结果
  * @param role 要合并的角色
  */
-function mergeRolePathPrivileges(data: Array<{ path: string; privileges: string[] }>, role: Auth.AuthByRoleRes) {
+function mergeRolePathPrivileges(data: Array<{ path: string; privileges: string[] }>, role: AuthByRoleRes) {
   role.pathPrivileges.forEach((item) => {
     const path = data.find((pathItem) => pathItem.path === item.path);
     if (!path) {
@@ -329,7 +330,7 @@ const rolePathPrivileges = computed(() => {
   });
   return result;
 });
-function joinRolePathPrivileges(data: Auth.UserEditPathAuthInfo[], rolePathAuth: { path: string; privileges: string[] }) {
+function joinRolePathPrivileges(data: UserEditPathAuthInfo[], rolePathAuth: { path: string; privileges: string[] }) {
   const path = data.find((pathItem) => pathItem.path === rolePathAuth.path);
   if (path) {
     //   data.push({
@@ -353,7 +354,7 @@ function joinRolePathPrivileges(data: Auth.UserEditPathAuthInfo[], rolePathAuth:
 /**
  * 路径权限表格数据，没有数据时，添加一行空数据
  */
-const tableData = computed<Auth.UserEditPathAuthInfo[]>(() => {
+const tableData = computed<UserEditPathAuthInfo[]>(() => {
   const result = pathUserPrivileges.value.map(
     (item) =>
       ({
@@ -362,7 +363,7 @@ const tableData = computed<Auth.UserEditPathAuthInfo[]>(() => {
         rolePrivileges: [],
         allChecked: item.privileges.length >= pathPrivilegesEnumKeys.value.length,
         privileges: union(item.privileges, []),
-      }) as Auth.UserEditPathAuthInfo,
+      }) as UserEditPathAuthInfo,
   );
   rolePathPrivileges.value?.forEach((item) => {
     joinRolePathPrivileges(result, item);
@@ -383,7 +384,7 @@ const tableData = computed<Auth.UserEditPathAuthInfo[]>(() => {
 });
 
 const editPathList = computed(() => tableData.value.map((item) => item.path).filter((item) => item));
-function handleAllCheckedEntity(row: Auth.UserEditAuthInfo, value: boolean) {
+function handleAllCheckedEntity(row: UserEditAuthInfo, value: boolean) {
   if (value) {
     // 赋予其 除角色权限外的所有权限
     entityUserPrivileges.value = difference(entityPrivilegesEnumKeys.value, row.rolePrivileges);
@@ -391,7 +392,7 @@ function handleAllCheckedEntity(row: Auth.UserEditAuthInfo, value: boolean) {
     entityUserPrivileges.value = [];
   }
 }
-function handleCheckedEntity(row: Auth.UserEditAuthInfo, privilege: string, checked: boolean) {
+function handleCheckedEntity(row: UserEditAuthInfo, privilege: string, checked: boolean) {
   if (checked) {
     row.userPrivileges.push(privilege);
   } else {
@@ -399,7 +400,7 @@ function handleCheckedEntity(row: Auth.UserEditAuthInfo, privilege: string, chec
   }
 }
 
-function handleAllCheckedPath(row: Auth.UserEditPathAuthInfo, value: boolean) {
+function handleAllCheckedPath(row: UserEditPathAuthInfo, value: boolean) {
   if (value) {
     // 赋予其 除角色权限外的所有权限
     row.userSourceData.privileges = difference(pathPrivilegesEnumKeys.value, row.rolePrivileges);
@@ -407,7 +408,7 @@ function handleAllCheckedPath(row: Auth.UserEditPathAuthInfo, value: boolean) {
     row.userSourceData.privileges = [];
   }
 }
-function handleCheckedPath(row: Auth.UserEditPathAuthInfo, privilege: string, checked: boolean) {
+function handleCheckedPath(row: UserEditPathAuthInfo, privilege: string, checked: boolean) {
   if (checked) {
     row.userSourceData.privileges.push(privilege);
   } else {
@@ -421,7 +422,7 @@ function handleAddRow() {
 function handleSavePath(path: string) {
   authData.value.pathPrivileges.push({ path, privileges: [] });
 }
-function handleDelRow(row: Auth.UserEditPathAuthInfo) {
+function handleDelRow(row: UserEditPathAuthInfo) {
   const index = pathUserPrivileges.value.findIndex((item) => item.path === row.path);
   pathUserPrivileges.value.splice(index, 1);
 }
@@ -475,7 +476,7 @@ function handleDeleteRole(index: number) {
     authData.value.rolesToPrivileges.splice(index, 1);
   });
 }
-function showRoleDetail(role: Auth.AuthByRoleRes) {
+function showRoleDetail(role: AuthByRoleRes) {
   currentRole.value = role;
   previewRoleVisible.value = true;
 }
@@ -486,7 +487,7 @@ function handleReset(type: 'view' | 'edit') {
   getDetail();
 }
 
-function calcColumnWidth(child: Auth.PrivilegeEnum) {
+function calcColumnWidth(child: PrivilegeEnum) {
   if (child.desc.length > 0) {
     if (locale.value === 'en') {
       return child.desc.length * 8 + 8;

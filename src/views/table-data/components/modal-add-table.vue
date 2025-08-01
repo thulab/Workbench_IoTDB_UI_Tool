@@ -103,6 +103,7 @@ import type { FormInstance } from 'element-plus';
 import { ref, reactive, computed } from 'vue';
 import { IoTDBApi } from '@/api';
 import { useDbStore } from '@/stores';
+import type { TableTreeNodeData, Database } from '@/types';
 
 const emit = defineEmits<{
   (event: 'handleReload'): void;
@@ -152,11 +153,11 @@ const formData = reactive<{
   ttlUnit: 'ms',
   columns: [],
 });
-const formDataBody = ref<IoTDB.Database>({
+const formDataBody = ref<Database>({
   database: '',
   tables: [],
 });
-const currentNode = ref<IoTDB.TreeNodeData>();
+const currentNode = ref<TableTreeNodeData>();
 const tableNames = computed(() => {
   if (currentNode?.value && currentNode.value.children?.length) {
     return currentNode.value.children.map((item) => item.nodeName);
@@ -351,7 +352,7 @@ function resetFormData() {
 }
 
 defineExpose({
-  open: (currentVal: IoTDB.TreeNodeData, typeVal: string = 'addTable') => {
+  open: (currentVal: TableTreeNodeData, typeVal: string = 'addTable') => {
     resetFormData();
     currentNode.value = currentVal;
     addType.value = typeVal;

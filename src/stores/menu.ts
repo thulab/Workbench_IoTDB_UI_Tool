@@ -3,14 +3,14 @@ import { defineStore } from 'pinia';
 const useMenuStore = defineStore('menuStore', {
   state: () => ({
     isCollapse: false,
-    menuList: [] as Array<MenuOptions>,
+    menuList: [] as Array<globalThis.MenuOptions>,
   }),
   getters: {},
   actions: {
     async setCollapse() {
       this.isCollapse = !this.isCollapse;
     },
-    async setMenuList(menuList: Array<MenuOptions>) {
+    async setMenuList(menuList: Array<globalThis.MenuOptions>) {
       this.menuList = menuList;
     },
   },

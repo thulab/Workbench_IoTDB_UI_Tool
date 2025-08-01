@@ -1,13 +1,14 @@
 import dayjs from 'dayjs';
+import type { DateModelType } from 'element-plus';
 
-export const formatDate = (date: number | string, format = 'YYYY-MM-DD HH:mm:ss.SSS') => {
+export const formatDate = (date: DateModelType, format = 'YYYY-MM-DD HH:mm:ss.SSS') => {
   if (!date) {
     return '';
   }
   return dayjs(new Date(date)).format(format);
 };
 
-export const timestamp = (date: number | string) => dayjs(new Date(date)).valueOf();
+export const timestamp = (date: DateModelType) => dayjs(new Date(date)).valueOf();
 
 export const getStartAndEnd = (day: number = 7): [number, number] => [
   dayjs(dayjs().format('YYYY-MM-DD 00:00:00')).valueOf() - day * 24 * 60 * 60 * 1000,

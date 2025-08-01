@@ -150,6 +150,7 @@ import PointListTab from './components/point-list-tab.vue';
 import TemplateListTab from './components/template-list-tab.vue';
 import ModalTemplate from './components/modal-template.vue';
 import ModalTemplateRename from './components/modal-template-rename.vue';
+import type { LineObj, TrendData, TrendTemplate } from '@/types';
 
 interface PointData {
   name: string;
@@ -244,14 +245,14 @@ const requiredRules = ref([
 let inited = false;
 let currentPoint = 0;
 const dataTab = ref<'running' | 'history'>('running');
-const pathList = ref<Trend.LineObj[]>([]);
+const pathList = ref<LineObj[]>([]);
 const loading = ref(true);
 const isRunningTab = computed(() => dataTab.value === 'running');
 const checkedData = computed(() => pathList.value.filter((item) => item.checked));
 // 实时数据
-const chartData = ref<Search.TrendData[]>([]);
+const chartData = ref<TrendData[]>([]);
 // 历史数据
-const chartHistoryData = ref<Search.TrendData[]>([]);
+const chartHistoryData = ref<TrendData[]>([]);
 // 当前数据
 const currentData = computed(() => (isRunningTab.value ? chartData.value : chartHistoryData.value));
 const pointLineData = ref<Array<MarkPointLine>>([]);
@@ -802,7 +803,7 @@ function handleSearch(unforce?: boolean) {
 
 function handleData(data: any) {
   const jsonData: {
-    data: Search.TrendData[];
+    data: TrendData[];
     operate: string;
   } = JSON.parse(data) || [];
   if (loading.value && jsonData.operate === 'get') {
@@ -967,7 +968,7 @@ function handleSaveTemplate() {
 }
 
 // 模板操作
-function handleOperateTemplate(val: string, data: Search.TrendTemplate) {
+function handleOperateTemplate(val: string, data: TrendTemplate) {
   if (val === 'rename') {
     renameData.id = +data.id;
     renameData.name = data.name;
@@ -983,18 +984,18 @@ function handleOperateTemplate(val: string, data: Search.TrendTemplate) {
     searchFormData.unitInterval = templateData.unitInterval;
     pathList.value = [];
     nextTick(() => {
-      const templatePaths = templateData.pathList.map((item: Trend.LineObj) => item.path).join(',');
+      const templatePaths = templateData.pathList.map((item: LineObj) => item.path).join(',');
       const searchPaths = templateData.path.join(',');
       const isSamePath = isEqual(templatePaths, searchPaths);
       if (isSamePath) {
-        pathList.value = templateData.pathList.map((item: Trend.LineObj) => ({ ...item }));
+        pathList.value = templateData.pathList.map((item: LineObj) => ({ ...item }));
         handleTrendTab(templateData.type, true);
       } else {
-        const existedColor = templateData.pathList.map((item: Trend.LineObj) => item.color);
+        const existedColor = templateData.pathList.map((item: LineObj) => item.color);
         const diffArr = difference(predefineColors, existedColor);
-        const resultPath: Array<Trend.LineObj> = [];
+        const resultPath: Array<LineObj> = [];
         searchFormData.path.forEach((item, index) => {
-          const i = templateData.pathList.findIndex((pathItem: Trend.LineObj) => pathItem.path === item);
+          const i = templateData.pathList.findIndex((pathItem: LineObj) => pathItem.path === item);
           if (i !== -1) {
             resultPath.push({ ...pathList.value[i] });
           } else {
@@ -1016,9 +1017,9 @@ function handleOperateTemplate(val: string, data: Search.TrendTemplate) {
 
 function handleSaveSuccess(name: string) {
   saveTemplateLoading.value = true;
-  const existedColor = pathList.value.map((item: Trend.LineObj) => item.color);
+  const existedColor = pathList.value.map((item: LineObj) => item.color);
   const diffArr = difference(predefineColors, existedColor);
-  const resultPath: Array<Trend.LineObj> = [];
+  const resultPath: Array<LineObj> = [];
   searchFormData.path.forEach((item, index) => {
     const i = pathList.value.findIndex((pathItem) => pathItem.path === item);
     if (i !== -1) {
@@ -1099,7 +1100,7 @@ function init() {
 }
 
 function setStorage() {
-  sessionStorage.setItem(
+  window.sessionStorage.setItem(
     'dataTrendStorage',
     JSON.stringify({
       ...copySearchFormData,
@@ -1118,7 +1119,7 @@ onMounted(() => {
     if (!window.__isReload__) {
       setStorage();
     } else {
-      sessionStorage.setItem('dataTrendStorage', '');
+      window.sessionStorage.setItem('dataTrendStorage', '');
     }
     chartContainer.value = null;
     if (chartInstance) {
@@ -1180,8 +1181,8 @@ watch(
           setOption(chartOptions.value);
           return;
         }
-        if (sessionStorage.getItem('dataTrendStorage')) {
-          const storageData = JSON.parse(sessionStorage.getItem('dataTrendStorage') as string);
+        if (window.sessionStorage.getItem('dataTrendStorage')) {
+          const storageData = JSON.parse(window.sessionStorage.getItem('dataTrendStorage') as string);
           searchFormData.path = storageData.path;
           if (searchFormData.path?.length) {
             searchFormData.datetimerange = storageData.datetimerange;

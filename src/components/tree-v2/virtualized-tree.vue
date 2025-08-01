@@ -207,7 +207,7 @@ const callback = () => {
   }
 };
 const getElNodeAttrValue = (el: HTMLElement, attrKey: string) => {
-  const computedStyles = getComputedStyle(el);
+  const computedStyles = globalThis.getComputedStyle(el);
   return computedStyles.getPropertyValue(attrKey);
 };
 useMutationObserver(`.${wrapClassName} .${className} .el-tree`, callback);

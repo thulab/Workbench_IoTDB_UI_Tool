@@ -25,9 +25,10 @@
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/stores';
 import { getPathAuthList } from '@/utils/auth';
+import type { TreeNodeData } from '@/types';
 
 const props = defineProps<{
-  clickedNodeData: StorageDevice.TreeNodeData;
+  clickedNodeData: TreeNodeData;
 }>();
 
 const emit = defineEmits<{

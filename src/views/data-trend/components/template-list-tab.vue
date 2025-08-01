@@ -36,6 +36,7 @@
 import { debounce } from 'lodash-es';
 import { SearchApi } from '@/api';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
+import type { TrendTemplate } from '@/types';
 
 const props = withDefaults(
   defineProps<{
@@ -52,7 +53,7 @@ const emit = defineEmits(['handleOperate']);
 
 const { t } = useI18n();
 const filterText = ref('');
-const templateList = ref<Search.TrendTemplate[]>([]);
+const templateList = ref<TrendTemplate[]>([]);
 const { requestFn: getTrendTemplate, loading } = useRequest(SearchApi.getTrendTemplate);
 const { requestFn: delTrendTemplate } = useRequest(SearchApi.delTrendTemplate);
 
@@ -61,8 +62,8 @@ const getQueryList = debounce(() => {
   getTrendTemplate(filterText.value, props.source === 'trend' ? '' : props.sqlDialect === 'table' ? 'table-spectrum' : '').then((res) => {
     const data = res.data || [];
     templateList.value = data
-      .filter((item: Search.TrendTemplate) => (props.source === 'trend' ? item.type.indexOf('spectrum') === -1 : item.type.indexOf('spectrum') !== -1))
-      .filter((item: Search.TrendTemplate) => {
+      .filter((item: TrendTemplate) => (props.source === 'trend' ? item.type.indexOf('spectrum') === -1 : item.type.indexOf('spectrum') !== -1))
+      .filter((item: TrendTemplate) => {
         if (props.sqlDialect === 'table') {
           return item.type.indexOf('table') !== -1;
         } else {
@@ -92,12 +93,12 @@ const canStopPropagation = (e: HTMLElement): boolean => {
 };
 
 // 选择
-function handleSelect(data: Search.TrendTemplate, e: MouseEvent) {
+function handleSelect(data: TrendTemplate, e: MouseEvent) {
   if (canStopPropagation(e.target as HTMLElement)) return;
   emit('handleOperate', 'open', data);
 }
 
-const handleSqlCommand = (val: string, data: Search.TrendTemplate) => {
+const handleSqlCommand = (val: string, data: TrendTemplate) => {
   if (val === 'delete') {
     ElMessageBox.confirm(props.source === 'trend' ? t('dataTrend.deleteTemplateTip') : t('spectrum.deleteTemplateTip'), t('common.notice'), {
       confirmButtonText: t('common.confirm'),

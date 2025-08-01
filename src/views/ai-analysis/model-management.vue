@@ -132,6 +132,7 @@ import { useUserStore, useConnectionStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 import { AIAnalysisApi } from '@/api';
 import { iotdbShowAuth } from '@/utils/auth';
+import type { Model } from '@/types';
 
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModelImport from './components/model-import.vue';
@@ -157,9 +158,9 @@ const pagination = reactive({
   pageNum: 1,
 });
 const { maxTableHeight } = useTableHeight(300);
-const tableData = ref<AIAnalysis.Model[]>([]);
+const tableData = ref<Model[]>([]);
 const totalCount = ref(0);
-const multipleSelection = ref<AIAnalysis.Model[]>([]);
+const multipleSelection = ref<Model[]>([]);
 const modelConfig = ref<InstanceType<typeof ModelConfig>>();
 const tableRef = ref<InstanceType<typeof ElTable>>();
 
@@ -207,7 +208,7 @@ function handleReset() {
   handleSearch();
 }
 
-function handleSelectionChange(vals: AIAnalysis.Model[]) {
+function handleSelectionChange(vals: Model[]) {
   multipleSelection.value = vals;
 }
 
@@ -241,7 +242,7 @@ function handleFineTuningSuccess(reload: boolean) {
   }
 }
 
-function handleDel(type: string, data: AIAnalysis.Model | null) {
+function handleDel(type: string, data: Model | null) {
   ElMessageBox.confirm(type === 'batch' ? t('aiAnalysis.batchDelete') : t('aiAnalysis.singleDelete'), t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),
@@ -263,7 +264,7 @@ function handleDel(type: string, data: AIAnalysis.Model | null) {
   });
 }
 
-// function handleViewConfig(data: AIAnalysis.Model | null) {
+// function handleViewConfig(data: Model | null) {
 //   configVisible.value = true;
 //   modelConfig.value?.configContent(data!.configs);
 // }

@@ -72,6 +72,7 @@ import { iotdbShowAuth } from '@/utils/auth';
 import { DashboardApi, ConfigApi } from '@/api';
 import MonacoEditor from '@/components/monaco-editor/monaco-editor.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
+import type { NodeItem } from '@/types';
 
 const { t, locale } = useI18n();
 const router = useRouter();
@@ -80,8 +81,8 @@ const userStore = useUserStore();
 const { canMaintain } = storeToRefs(userStore);
 const currentNode = ref('');
 const clusterType = ref<'master' | 'slave'>('master');
-const masterNodes = ref<Dashboard.NodeItem[]>([]);
-const slaveNodes = ref<Dashboard.NodeItem[]>([]);
+const masterNodes = ref<NodeItem[]>([]);
+const slaveNodes = ref<NodeItem[]>([]);
 const searchFormData = reactive({
   orderBy: ['type', 'type'],
   asc: ['asc', 'asc'],
@@ -221,8 +222,8 @@ function handleReset() {
 }
 
 function initDetail() {
-  if (sessionStorage.getItem('configStorage')) {
-    const data = JSON.parse(sessionStorage.getItem('configStorage') as string);
+  if (window.sessionStorage.getItem('configStorage')) {
+    const data = JSON.parse(window.sessionStorage.getItem('configStorage') as string);
     if (data.node) {
       const flag = nodeList.value.some((item) => `${item.nodeID}` === `${data.node}`);
       if (flag) {
@@ -248,7 +249,7 @@ function initDetail() {
 }
 
 function setStorage() {
-  sessionStorage.setItem(
+  window.sessionStorage.setItem(
     'configStorage',
     JSON.stringify({
       content: inputEditor.value?.getContent(),
@@ -263,7 +264,7 @@ onMounted(() => {
     if (!window.__isReload__) {
       setStorage();
     } else {
-      sessionStorage.setItem('configStorage', '');
+      window.sessionStorage.setItem('configStorage', '');
     }
   });
 });

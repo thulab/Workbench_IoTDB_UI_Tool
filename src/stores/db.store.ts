@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia';
 import IoTDBApi from '@/api/db.api';
 import { useConnectionStore } from './connection.store';
+import type { TableTreeNodeData, DatabaseRes } from '@/types';
 
 const { data: schemaTreeData, requestFn: fetchDatabases } = useRequest(IoTDBApi.getDatabases);
 
 export const useDbStore = defineStore('db', () => {
-  const databases = ref<IoTDB.DatabaseRes>();
+  const databases = ref<DatabaseRes>();
   const databaseNames = ref<string[]>([]);
   const connectionStore = useConnectionStore();
   const firstLoad = ref(true);
@@ -20,10 +21,10 @@ export const useDbStore = defineStore('db', () => {
     }
   }
 
-  const treeData = computed<Array<IoTDB.TreeNodeData>>(() => {
-    const data: Array<IoTDB.TreeNodeData> = [];
+  const treeData = computed<Array<TableTreeNodeData>>(() => {
+    const data: Array<TableTreeNodeData> = [];
     databases.value?.value.databases.forEach((db) => {
-      const dbNode: IoTDB.TreeNodeData = {
+      const dbNode: TableTreeNodeData = {
         id: db.database,
         nodeName: db.database,
         nodeType: 'DATABASE',
@@ -31,7 +32,7 @@ export const useDbStore = defineStore('db', () => {
         children: [],
       };
       db.tables?.forEach((table) => {
-        const tableNode: IoTDB.TreeNodeData = {
+        const tableNode: TableTreeNodeData = {
           id: `${db.database}-${table.tableVO.tableName}`,
           nodeName: table.tableVO.tableName,
           parentName: db.database,
@@ -48,7 +49,7 @@ export const useDbStore = defineStore('db', () => {
               comment: col.comment === 'null' ? '' : col.comment,
               dataType: col.dataType,
               cateGory: col.cateGory,
-              nodeType: col.cateGory as IoTDB.TreeNodeData['nodeType'],
+              nodeType: col.cateGory as TableTreeNodeData['nodeType'],
             }))
             .sort((a, b) => {
               // 定义排序优先级

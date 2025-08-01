@@ -29,4 +29,7 @@ coverage
 *.sw?
 
 # Auto-generated files
+/src/typings/auto-imports.d.ts
 /src/typings/components.d.ts
+/src/types/auto-imports.d.ts
+/src/types/components.d.ts

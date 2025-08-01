@@ -73,7 +73,7 @@ export default defineConfig(({ mode }) => {
             prefix: 'Icon',
           }),
         ],
-        dts: './src/typings/auto-imports.d.ts',
+        dts: './src/types/auto-imports.d.ts',
         // Generate corresponding .eslintrc-auto-import.json file.
         // eslint globals Docs - https://eslint.org/docs/user-guide/configuring/language-options#specifying-globals
         eslintrc: {
@@ -94,7 +94,7 @@ export default defineConfig(({ mode }) => {
             importStyle: 'sass',
           }),
         ],
-        dts: './src/typings/components.d.ts',
+        dts: './src/types/components.d.ts',
       }),
       Icons({
         autoInstall: true,
@@ -107,8 +107,8 @@ export default defineConfig(({ mode }) => {
         include: resolve(srcPath, './locale/lang/**'),
         strictMessage: false,
       }),
-      VueDevTools(),
       UnoCSS(),
+      VueDevTools(),
     ],
     resolve: {
       alias: {

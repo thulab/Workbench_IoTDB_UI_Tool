@@ -194,6 +194,7 @@ import { useUserStore } from '@/stores';
 import DynamicTable from '@/components/dynamic-table.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalImport from './components/modal-import.vue';
+import type { QueryDataResult } from '@/types';
 
 const { t, locale } = useI18n();
 const route = useRoute();
@@ -235,9 +236,9 @@ const { shortcutsDate, shortcutsDaterange } = useShortcutsDate();
 
 const disabledDate = (time: number) => time < new Date('1970-1-1').getTime();
 
-const searchDetailInfos = ref<Partial<Search.QueryDataResult>>({});
+const searchDetailInfos = ref<Partial<QueryDataResult>>({});
 const hasNext = ref(false);
-const columns = ref<DynamicTableColumn[]>([]);
+const columns = ref<globalThis.DynamicTableColumn[]>([]);
 const tableData = ref<Record<string, any>[]>([]);
 const pagination = reactive({
   pageSize: 10,
@@ -315,7 +316,7 @@ function getListData() {
     controller,
   )
     .then((res) => {
-      const list: DynamicTableColumn[] = [];
+      const list: globalThis.DynamicTableColumn[] = [];
       res.data?.metaDataList?.forEach((item: string, index: number) => {
         list.push({
           label: item,
@@ -367,7 +368,7 @@ function handleReset(force?: boolean) {
   if (force) {
     copySearchFormData = cloneDeep(searchFormData);
     getListLoading.value = false;
-    sessionStorage.setItem('dataSearchStorage', '');
+    window.sessionStorage.setItem('dataSearchStorage', '');
     getListData();
   }
 }
@@ -478,7 +479,7 @@ function handleCommandDown(val: string) {
 }
 
 function setStorage() {
-  sessionStorage.setItem(
+  window.sessionStorage.setItem(
     'dataSearchStorage',
     JSON.stringify({
       ...copySearchFormData,
@@ -492,7 +493,7 @@ onMounted(() => {
     if (!window.__isReload__) {
       setStorage();
     } else {
-      sessionStorage.setItem('dataSearchStorage', '');
+      window.sessionStorage.setItem('dataSearchStorage', '');
     }
   });
   //   if (!canReadWriteData.value) return;
@@ -522,8 +523,8 @@ watch(
         handleSearch();
         return;
       }
-      if (sessionStorage.getItem('dataSearchStorage')) {
-        const searchData = JSON.parse(sessionStorage.getItem('dataSearchStorage') as string);
+      if (window.sessionStorage.getItem('dataSearchStorage')) {
+        const searchData = JSON.parse(window.sessionStorage.getItem('dataSearchStorage') as string);
         searchFormData.path = searchData.path;
         searchFormData.timeInterval = searchData.timeInterval;
         searchFormData.unitInterval = searchData.unitInterval;

@@ -1,5 +1,5 @@
 <template>
-  <div class="search_div maxheight" v-loading="loading">
+  <div class="search_div max-height" v-loading="loading">
     <el-input :placeholder="t('search.templatePlaceholder')" v-model="filterText" size="small" @input="getQueryList" id="sql-search-template-search">
       <template #suffix>
         <i-custom-search-icon />
@@ -47,12 +47,13 @@
 import { debounce } from 'lodash-es';
 import { SearchApi } from '@/api';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
+import type { SqlList } from '@/types';
 
 const emit = defineEmits(['handleSqlOperate']);
 
 const { t } = useI18n();
 const filterText = ref('');
-const sqlList = ref<Search.SqlList[]>([]);
+const sqlList = ref<SqlList[]>([]);
 const { requestFn: getQuery, loading } = useRequest(SearchApi.getQuery);
 const { requestFn: deleteQueryS } = useRequest(SearchApi.deleteQueryS);
 
@@ -85,12 +86,12 @@ const canStopPropagation = (e: HTMLElement): boolean => {
 };
 
 // 选择
-function handleSelect(data: Search.SqlList, e: MouseEvent) {
+function handleSelect(data: SqlList, e: MouseEvent) {
   if (canStopPropagation(e.target as HTMLElement)) return;
   emit('handleSqlOperate', 'open', data);
 }
 
-const handleSqlCommand = (val: string, data: Search.SqlList) => {
+const handleSqlCommand = (val: string, data: SqlList) => {
   if (val === 'delete') {
     ElMessageBox.confirm(t('search.deleteTemplateTip'), t('common.notice'), {
       confirmButtonText: t('common.confirm'),

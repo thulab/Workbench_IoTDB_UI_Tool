@@ -92,9 +92,10 @@
 
 <script lang="ts" setup>
 import type { Sort } from 'element-plus';
+import type { TableTreeNodeData } from '@/types';
 
 const props = defineProps<{
-  columns: Array<DynamicTableColumn>;
+  columns: Array<globalThis.DynamicTableColumn>;
   tableData: Array<Record<string, any>>;
   defaultSort?: Sort;
   maxHeight: number;
@@ -105,7 +106,7 @@ const props = defineProps<{
   total?: number;
   batchDeleting?: boolean;
   showSelect?: boolean;
-  currentNode?: IoTDB.TreeNodeData;
+  currentNode?: TableTreeNodeData;
   canDelete?: boolean;
   cannotDeleteTip?: string;
 }>();

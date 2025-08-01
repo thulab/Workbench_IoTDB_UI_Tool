@@ -3,16 +3,16 @@ import Validator from '@/utils/validator';
 import { hasOwn } from '@/utils/index';
 import useRequest from '@/composition-api/base/useRequest';
 
-type Resp<T> = ApiResponse<T[] | TableResponse<T>>;
+type Resp<T> = globalThis.ApiResponse<T[] | globalThis.TableResponse<T>>;
 
 type BuildParams<P extends Array<any>> = (page: number, size: number) => P;
 type ProcessResp<T> = (response: Resp<T>) => Resp<T>;
-type ListGetter<T> = (data: Ref<T[] | TableResponse<T>>) => T[];
+type ListGetter<T> = (data: Ref<T[] | globalThis.TableResponse<T>>) => T[];
 type ListSetter<T> = (data: T[]) => void;
 type FnName = 'buildParams' | 'processResp' | 'listGetter' | 'listSetter';
 
 interface Opt<P extends Array<any>, T> {
-  initData: T[] | TableResponse<T>;
+  initData: T[] | globalThis.TableResponse<T>;
   /** 是否分页  默认 true 分页 */
   paging: boolean;
   /** 构造请求参数
@@ -33,7 +33,7 @@ interface Opt<P extends Array<any>, T> {
   listSetter: ListSetter<T>;
 }
 
-export default function useTable<P extends Array<any>, T>(getList: (...params: P) => HttpResponseP<T[] | TableResponse<T>>, options?: Partial<Opt<P, T>>) {
+export default function useTable<P extends Array<any>, T>(getList: (...params: P) => globalThis.HttpResponseP<T[] | globalThis.TableResponse<T>>, options?: Partial<Opt<P, T>>) {
   const { loading, data, error, requestFn } = useRequest(getList, {
     initData: options?.initData,
   });
@@ -69,7 +69,7 @@ export default function useTable<P extends Array<any>, T>(getList: (...params: P
       return defaultFn(response);
     }
     if (paging) {
-      const resp = response as ApiResponse<TableResponse<T>>;
+      const resp = response as globalThis.ApiResponse<globalThis.TableResponse<T>>;
       if (hasOwn(resp.data, 'totalCount')) {
         pagination.total = resp.data.totalCount as number;
       } else if (resp.data.hasNext as boolean) {
@@ -81,14 +81,14 @@ export default function useTable<P extends Array<any>, T>(getList: (...params: P
     return response;
   }
 
-  function listGetter(d: Ref<T[] | TableResponse<T>>): T[] {
+  function listGetter(d: Ref<T[] | globalThis.TableResponse<T>>): T[] {
     const defaultFn = getDefaultFn('listGetter') as ListGetter<T>;
     if (defaultFn) {
       return defaultFn(d);
     }
     if (data.value) {
       if (paging) {
-        return ((data.value as TableResponse<T>).content || (data.value as TableResponse<T>).dataList) as T[];
+        return ((data.value as globalThis.TableResponse<T>).content || (data.value as globalThis.TableResponse<T>).dataList) as T[];
       }
       return data.value as T[];
     }
@@ -103,7 +103,7 @@ export default function useTable<P extends Array<any>, T>(getList: (...params: P
 
     if (data.value) {
       if (paging) {
-        (data.value as TableResponse<T>).content = val;
+        (data.value as globalThis.TableResponse<T>).content = val;
       }
       (data.value as T[]) = val;
     }

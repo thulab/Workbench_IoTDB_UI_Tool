@@ -25,6 +25,7 @@ import { useUserStore } from '@/stores';
 import SideTree from './components/side-tree.vue';
 import DatabaseDetail from './components/database-detail.vue';
 import MeasurementDetail from './components/measurement-detail.vue';
+import type { TreeEventPayload } from '@/types';
 
 const userStore = useUserStore();
 const { canReadWriteSchema } = storeToRefs(userStore);
@@ -48,7 +49,7 @@ function handleReload() {
   measurementSideTree.value?.handleRefresh();
 }
 
-function handleDelete(payload: StorageDevice.TreeEventPayload) {
+function handleDelete(payload: TreeEventPayload) {
   measurementSideTree.value?.handleOperate('delete', payload);
 }
 function handleSaveMeasurement(path: string) {

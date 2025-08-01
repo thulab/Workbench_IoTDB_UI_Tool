@@ -76,6 +76,7 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ContextMenu from './context-menu.vue';
 import ModalDatabase from './modal-database.vue';
 import ModalMeasurement from './modal-measurement.vue';
+import type { TreeNodeData as StorageDeviceTreeNodeData, TreeEventPayload } from '@/types';
 
 const treeProps = {
   value: 'nodePath',
@@ -110,7 +111,7 @@ const contextMenuRef = ref<InstanceType<typeof ContextMenu>>();
 const contextMenuTimer = ref();
 
 const addPaths = ref<string[]>([]);
-const clickedNodeData = reactive<StorageDevice.TreeNodeData>({
+const clickedNodeData = reactive<StorageDeviceTreeNodeData>({
   node: '',
   nodePath: '',
   parentPath: '',
@@ -119,7 +120,7 @@ const clickedNodeData = reactive<StorageDevice.TreeNodeData>({
 // 216+16 菜单宽度+MainPaddingLeft  39 下拉框宽度的一半 = 267
 // 40+16+39 = 95
 const insertWidth = computed(() => (isCollapse.value ? 95 : 267));
-const loadingNode: StorageDevice.TreeNodeData = {
+const loadingNode: StorageDeviceTreeNodeData = {
   node: '',
   nodePath: 'loading',
   nodeType: 'loading',
@@ -127,7 +128,7 @@ const loadingNode: StorageDevice.TreeNodeData = {
 };
 
 // DATABASE, SG INTERNAL, INTERNAL, DEVICE, TIMESERIES
-const treeData = ref<Array<StorageDevice.TreeNodeData>>([
+const treeData = ref<Array<StorageDeviceTreeNodeData>>([
   {
     node: 'root',
     nodePath: 'root',
@@ -138,7 +139,7 @@ const treeData = ref<Array<StorageDevice.TreeNodeData>>([
   },
 ]);
 const isSearchResult = ref(false);
-const searchResults = ref<Array<Array<StorageDevice.TreeNodeData>>>([]);
+const searchResults = ref<Array<Array<StorageDeviceTreeNodeData>>>([]);
 const searching = ref(false);
 const searchLoading = ref(false);
 const dealingStatus = ref(false);
@@ -172,7 +173,7 @@ function highlightNode(node: string) {
   return node;
 }
 
-function fillChildLoading(data: StorageDevice.TreeNodeData[]) {
+function fillChildLoading(data: StorageDeviceTreeNodeData[]) {
   data.forEach((item) => {
     if (!item.children && item.nodeType !== 'TIMESERIES') {
       item.pageChildren = [
@@ -226,7 +227,7 @@ function getTreeData() {
 }
 
 // 递归源数据查找节点添加pagechildren
-function recursionFindCurrentByOrigin(path: string, data: Array<StorageDevice.TreeNodeData>) {
+function recursionFindCurrentByOrigin(path: string, data: Array<StorageDeviceTreeNodeData>) {
   const result = data.find((item) => item.nodePath === path);
   if (result) return result;
   for (let i = 0; i < data.length; i++) {
@@ -239,7 +240,7 @@ function recursionFindCurrentByOrigin(path: string, data: Array<StorageDevice.Tr
 }
 
 // 递归查找节点添加children
-function recursionFindParent(path: string, data: Array<StorageDevice.TreeNodeData>) {
+function recursionFindParent(path: string, data: Array<StorageDeviceTreeNodeData>) {
   const result = data.find((item) => item.nodePath === path);
   if (result) return result;
   for (let i = 0; i < data.length; i++) {
@@ -251,7 +252,7 @@ function recursionFindParent(path: string, data: Array<StorageDevice.TreeNodeDat
   return result;
 }
 // 填充 loading
-function fillTreeLoading(nodes: Array<StorageDevice.TreeNodeData>) {
+function fillTreeLoading(nodes: Array<StorageDeviceTreeNodeData>) {
   nodes.forEach((node) => {
     if (node && !node.pageChildren && node.children && node.children.length > 0) {
       const dataPathTotal = Math.ceil(node.children.length / pageSize);
@@ -275,7 +276,7 @@ function fillTreeLoading(nodes: Array<StorageDevice.TreeNodeData>) {
   });
 }
 
-// function fillNodePage(node: StorageDevice.TreeNodeData) {
+// function fillNodePage(node: StorageDeviceTreeNodeData) {
 //   if (node && node.pageChildren && node.pageChildren.length === 1 && node.pageChildren[0].nodePath === 'loading' && node.children && node.children.length > 0) {
 //     const dataPathTotal = Math.ceil(node.children.length / pageSize);
 //     node.pageChildren = node.children.slice(0, 1 * pageSize);
@@ -294,7 +295,7 @@ function fillTreeLoading(nodes: Array<StorageDevice.TreeNodeData>) {
 //   }
 // }
 
-// function fillTreePage(nodes: Array<StorageDevice.TreeNodeData>) {
+// function fillTreePage(nodes: Array<StorageDeviceTreeNodeData>) {
 //   nodes.forEach((node) => {
 //     if (node && node.pageChildren && node.pageChildren.length === 1 && node.pageChildren[0].nodePath === 'loading' && node.children && node.children.length > 0) {
 //       const dataPathTotal = Math.ceil(node.children.length / pageSize);
@@ -316,7 +317,7 @@ function fillTreeLoading(nodes: Array<StorageDevice.TreeNodeData>) {
 // }
 
 // 获取搜索结果合并树
-function mergeAndUpdateData(data: Array<StorageDevice.TreeNodeData>) {
+function mergeAndUpdateData(data: Array<StorageDeviceTreeNodeData>) {
   data.forEach((item) => {
     if (item.children) {
       let node = recursionFindCurrentByOrigin(item.nodePath, treeData.value);
@@ -338,7 +339,7 @@ function mergeAndUpdateData(data: Array<StorageDevice.TreeNodeData>) {
   });
 }
 
-function internalDealData(dealingData: Array<StorageDevice.TreeNodeData>) {
+function internalDealData(dealingData: Array<StorageDeviceTreeNodeData>) {
   if (treeData.value.length === 0) {
     treeData.value = dealingData;
   } else {
@@ -352,7 +353,7 @@ function internalDealData(dealingData: Array<StorageDevice.TreeNodeData>) {
   }
 }
 
-function getFirstChilds(childData: Array<StorageDevice.TreeNodeData>) {
+function getFirstChilds(childData: Array<StorageDeviceTreeNodeData>) {
   const result: Array<string> = [];
   const data = childData || treeData;
   if (data.length === 0) return result;
@@ -366,7 +367,7 @@ function getFirstChilds(childData: Array<StorageDevice.TreeNodeData>) {
 function handleDealData() {
   if (!dealingStatus.value && searchResults.value.length) {
     dealingStatus.value = true;
-    const dealingData: Array<StorageDevice.TreeNodeData> = searchResults.value.pop()!;
+    const dealingData: Array<StorageDeviceTreeNodeData> = searchResults.value.pop()!;
     internalDealData(dealingData);
     nextTick(() => {
       const firstChilds = getFirstChilds(treeData.value);
@@ -465,7 +466,7 @@ function handleRefresh(unforce?: boolean) {
   }
 }
 
-async function handleOperate(Operate: 'add' | 'delete', payload: StorageDevice.TreeEventPayload) {
+async function handleOperate(Operate: 'add' | 'delete', payload: TreeEventPayload) {
   if (Operate === 'delete') {
     const parentPath = payload.path.substring(0, payload.path.lastIndexOf('.'));
     const item = recursionFindCurrentByOrigin(payload.path, treeData.value);

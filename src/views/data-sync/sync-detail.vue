@@ -71,7 +71,7 @@
                 <el-table-column :label="t('dataSync.address')" prop="targetAddress" min-width="160" align="center" show-overflow-tooltip />
                 <el-table-column :label="t('dataSync.status')" prop="state" width="160" align="center" show-overflow-tooltip>
                   <template #default="{ row }">
-                    <div class="flex-center">
+                    <div class="flex justify-center items-center">
                       <el-icon v-if="row.state === 'stopped'" size="16" class="m-t-4"><i-custom-sync-stopped /></el-icon>
                       <el-icon v-else size="16" class="m-t-4"><i-custom-sync-running /></el-icon>
                       <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('common.errorDetail')" :disabled="!row.exceptionMessage" popper-class="tooltip-box-width">
@@ -136,6 +136,7 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalSync from './components/modal-sync.vue';
 import ModalErrorMessage from './components/modal-error-message.vue';
 import MonitorDashboard from './components/monitor-dashboard.vue';
+import type { SynchronListData } from '@/types';
 
 const { t } = useI18n();
 const connectionStore = useConnectionStore();
@@ -169,9 +170,9 @@ const pagination = reactive({
   pageSize: 10,
   pageNum: 1,
 });
-const tableData = ref<DataSync.SynchronListData[]>([]);
+const tableData = ref<SynchronListData[]>([]);
 const totalCount = ref(0);
-const multipleSelection = ref<DataSync.SynchronListData[]>([]);
+const multipleSelection = ref<SynchronListData[]>([]);
 const editType = ref('add');
 const editVisible = ref(false);
 const editData = ref('');
@@ -218,11 +219,11 @@ function onChangePage(page: number) {
   pagination.pageNum = page;
 }
 
-function handleSelectionChange(vals: DataSync.SynchronListData[]) {
+function handleSelectionChange(vals: SynchronListData[]) {
   multipleSelection.value = vals;
 }
 
-function handleStatusInfo(row: DataSync.SynchronListData) {
+function handleStatusInfo(row: SynchronListData) {
   if (!row.exceptionMessage) return;
   editErrorMessage.value = row.exceptionMessage;
   errorMessageVisible.value = true;
@@ -235,14 +236,14 @@ function handleAdd() {
   editVisible.value = true;
 }
 
-function handleEdit(row: DataSync.SynchronListData) {
+function handleEdit(row: SynchronListData) {
   editType.value = 'view';
   editData.value = row.name;
   editTime.value = todayNow();
   editVisible.value = true;
 }
 
-function handleStatus(type: string, data: DataSync.SynchronListData | null, state: 'running' | 'stopped') {
+function handleStatus(type: string, data: SynchronListData | null, state: 'running' | 'stopped') {
   let statusData: string[] = [];
   const realStatus = state === 'running' ? 'stopped' : 'running';
   if (type === 'batch') {
@@ -269,7 +270,7 @@ function handleStatus(type: string, data: DataSync.SynchronListData | null, stat
   }
 }
 
-function handleDel(type: string, data: DataSync.SynchronListData | null) {
+function handleDel(type: string, data: SynchronListData | null) {
   ElMessageBox.confirm(type === 'batch' ? t('dataSync.batchDelete') : t('dataSync.singleDelete'), t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),

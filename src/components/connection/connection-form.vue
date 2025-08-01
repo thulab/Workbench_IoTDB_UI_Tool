@@ -136,6 +136,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { ConnectionApi } from '@/api';
 import { useUserStore, useConnectionStore } from '@/stores';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
+import type { ConnectionDetail } from '@/types';
 
 const props = defineProps<{
   editType: string;
@@ -167,7 +168,7 @@ const requiredRules = ref([
     trigger: 'blur',
   },
 ]);
-const formData = reactive<Connection.ConnectionDetail>({
+const formData = reactive<ConnectionDetail>({
   id: '',
   type: 0,
   name: '',
@@ -341,18 +342,18 @@ function handleTestLogin() {
         .then((res) => {
           formData.id = res.data;
           userStore.setUser(formData.username);
-          sessionStorage.setItem('nologin', '0');
+          window.sessionStorage.setItem('nologin', '0');
           connectionStore.setConnection({
             ...formData,
             password: '',
           });
-          sessionStorage.setItem('dataSearchStorage', '');
-          sessionStorage.setItem('statisticSearchStorage', '');
-          sessionStorage.setItem('sqlSearchStorage', '');
-          sessionStorage.setItem('dataTrendStorage', '');
-          sessionStorage.setItem('dataSpectrumStorage', '');
-          sessionStorage.setItem('configStorage', '');
-          sessionStorage.setItem('aiVisualizationStorage', '');
+          window.sessionStorage.setItem('dataSearchStorage', '');
+          window.sessionStorage.setItem('statisticSearchStorage', '');
+          window.sessionStorage.setItem('sqlSearchStorage', '');
+          window.sessionStorage.setItem('dataTrendStorage', '');
+          window.sessionStorage.setItem('dataSpectrumStorage', '');
+          window.sessionStorage.setItem('configStorage', '');
+          window.sessionStorage.setItem('aiVisualizationStorage', '');
           if (route.name === 'Login') {
             router.push({ name: 'Dashboard' });
           } else {

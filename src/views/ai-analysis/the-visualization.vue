@@ -346,6 +346,7 @@ import ICustomCalender from '~icons/custom/calender.svg';
 import ModalSql from './components/modal-sql.vue';
 import ModalWriteBack from './components/modal-write-back.vue';
 import ModalWriteBackTable from './components/modal-write-back-table.vue';
+import type { Model, SelectedMeasurement, WriteBackTableFrom, SearchDataItem, AnalysisVo, MeasurementDataItem, CustomItem, SearchCondition, WriteBackTablePayload } from '@/types';
 
 const { t, locale } = useI18n();
 
@@ -353,7 +354,7 @@ const userStore = useUserStore();
 const { canReadWriteData, canWriteData, canUseModel } = storeToRefs(userStore);
 const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
-const modelList = ref<Array<AIAnalysis.Model>>([]);
+const modelList = ref<Array<Model>>([]);
 
 // const tip = '<span style="color:#495AD4;font-weight: 700;"> 2000 </span>';
 
@@ -377,7 +378,7 @@ const searchFormData = reactive<{
   orderBy: string;
   database?: string;
   table?: string;
-  selectedMeasurement?: IoTDB.SelectedMeasurement;
+  selectedMeasurement?: SelectedMeasurement;
 }>({
   type: 0,
   measurement: '',
@@ -395,9 +396,9 @@ const disabledDate = (time: number) => time > today() || time < new Date('1970-1
 
 const saveText = computed(() => (searchFormData.type === 0 ? t('common.save') : t('common.export')));
 const canWriteBack = computed(() => searchFormData.type === 0 && canWriteData.value);
-const rawData = ref<AIAnalysis.SearchDataItem[]>([]);
-const analysisData = ref<AIAnalysis.AnalysisVo[]>([]);
-const allTableData = ref<AIAnalysis.SearchDataItem[]>([]);
+const rawData = ref<SearchDataItem[]>([]);
+const analysisData = ref<AnalysisVo[]>([]);
+const allTableData = ref<SearchDataItem[]>([]);
 
 const minValue = ref(0);
 
@@ -412,7 +413,7 @@ const filterCondition = ref('all');
 
 const tableMeasurementVisible = ref(false);
 
-const valueShow = (item: AIAnalysis.SearchDataItem) => {
+const valueShow = (item: SearchDataItem) => {
   if (copySearchFormData.type === 0) return true;
   if (filterCondition.value === 'all') {
     return true;
@@ -433,7 +434,7 @@ const paginatedData = computed(() => {
   return sortedData.value.slice(start, end);
 });
 
-const columns = ref<DynamicTableColumn[]>([]);
+const columns = ref<globalThis.DynamicTableColumn[]>([]);
 const tableData = ref<Record<string, any>[]>([]);
 const pagination = reactive({
   pageSize: 10,
@@ -525,12 +526,12 @@ const allowedTypes = computed(() => {
   return result;
 });
 
-function disabledPath(item: StorageDevice.MeasurementDataItem) {
+function disabledPath(item: MeasurementDataItem) {
   return allowedTypes.value.indexOf(item.dataType) === -1;
 }
 
 const anomalyPoints = computed(() => {
-  const data: AIAnalysis.SearchDataItem[] = [];
+  const data: SearchDataItem[] = [];
   if (copySearchFormData.type !== 1) return data;
   analysisData.value[0].data.forEach((element, index) => {
     if (element.value === '1') {
@@ -720,7 +721,7 @@ const { requestFn: getExportId } = useRequest(AIAnalysisApi.getExportId);
 const { requestFn: getCustomData, data: customData } = useRequest(AIAnalysisApi.getCustomData);
 const { requestFn: getCustomExportId } = useRequest(AIAnalysisApi.getCustomExportId);
 
-const formatterTime = (row: AIAnalysis.SearchDataItem) => formatDate(row.time);
+const formatterTime = (row: SearchDataItem) => formatDate(row.time);
 
 function handleChangeType(val: string | number | boolean | undefined) {
   if (val === 0 && modelOptions.value.find((item) => item.modelId === 'Timer')) {
@@ -732,7 +733,7 @@ function handleChangeType(val: string | number | boolean | undefined) {
   }
 }
 
-function handleChangePath(val: string, data: StorageDevice.MeasurementDataItem[]) {
+function handleChangePath(val: string, data: MeasurementDataItem[]) {
   const current = data.find((f) => f.timeseries === val);
   searchFormData.measurementType = current?.dataType || '';
 }
@@ -801,7 +802,7 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
   }
 };
 
-function handleDeal(point: AIAnalysis.SearchDataItem | undefined) {
+function handleDeal(point: SearchDataItem | undefined) {
   if (!point) return;
   const index = sortedData.value.findIndex((data) => data.time === point.time);
   currentPointValue.value = point.time;
@@ -880,9 +881,9 @@ function getCustom() {
   tableData.value = [];
   getCustomData(sqlValue.value)
     .then((res) => {
-      const list: DynamicTableColumn[] = [];
+      const list: globalThis.DynamicTableColumn[] = [];
       if (res.data?.outputs?.length > 0) {
-        res.data?.outputs?.forEach((item: AIAnalysis.CustomItem, index: number) => {
+        res.data?.outputs?.forEach((item: CustomItem, index: number) => {
           list.push({
             label: item.name,
             prop: `t${index}`,
@@ -936,7 +937,7 @@ function handleSearch() {
   analysisData.value = [];
   rawData.value = [];
   if (searchFormData.type !== 2) {
-    const query: AIAnalysis.SearchCondition = {
+    const query: SearchCondition = {
       modelType: searchFormData.type === 0 ? 'BUILT_IN_FORECAST' : 'BUILT_IN_ANOMALY_DETECTION',
       modelId: searchFormData.type === 0 ? searchFormData.method : [searchFormData.method as string],
       measurement: searchFormData.measurement,
@@ -965,7 +966,7 @@ function handleSearch() {
         }
         if (searchFormData.type === 0) {
           allTableData.value = analysisData.value[0].data.map((element, index) => {
-            const dataItem: AIAnalysis.SearchDataItem = {
+            const dataItem: SearchDataItem = {
               time: element.time,
             };
             analysisData.value.forEach((item) => {
@@ -1029,9 +1030,9 @@ function handleWriteBackSuccess(name: string, modelId: string) {
     });
 }
 
-function handleWriteBackTableSuccess(payload: AIAnalysis.WriteBackTableFrom) {
+function handleWriteBackTableSuccess(payload: WriteBackTableFrom) {
   writeBackLoading.value = true;
-  const data: AIAnalysis.WriteBackTablePayload = {
+  const data: WriteBackTablePayload = {
     modelType: copySearchFormData.type === 0 ? 'BUILT_IN_FORECAST' : 'BUILT_IN_ANOMALY_DETECTION',
     newField: {
       database: payload.database,
@@ -1063,7 +1064,7 @@ function handleExportData(exportType: string) {
     // 将 allTableData 表格转换为 AIAnalysis.CustomItem[]，每一列为一项{name: string, value: string[]}
     // allTableData.value 中 每一行的数据为 key: value 的形式
     const tableDataColumns = Object.keys(allTableData.value[0] || {}).filter((key) => key !== 'value' && key !== 'isAnomaly');
-    const data: AIAnalysis.CustomItem[] = tableDataColumns.map((column) => {
+    const data: CustomItem[] = tableDataColumns.map((column) => {
       return {
         name: column.endsWith('_value') ? column.substring(0, column.length - 6) + t('aiAnalysis.forecastValue') : column,
         value: allTableData.value.map((item) => item[column] as string),
@@ -1111,7 +1112,7 @@ function handleConfirmSql(val: string) {
   sqlValue.value = val;
 }
 
-function handleSortChange({ column, prop, order }: SortMethod<AIAnalysis.SearchDataItem>) {
+function handleSortChange({ column, prop, order }: globalThis.SortMethod<SearchDataItem>) {
   searchFormData.orderBy = order;
 }
 /**
@@ -1123,7 +1124,7 @@ function handleSortChange({ column, prop, order }: SortMethod<AIAnalysis.SearchD
  * @param {number} param0.columnIndex - The index of the column
  * @returns {Object} - Styles to apply to the cell
  */
-function handleCellStyle({ row, columnIndex }: { row: AIAnalysis.SearchDataItem; columnIndex: number }) {
+function handleCellStyle({ row, columnIndex }: { row: SearchDataItem; columnIndex: number }) {
   if (columnIndex === 1) {
     if (row.isAnomaly) {
       return { color: 'red' };
@@ -1152,17 +1153,22 @@ const handleSelectMeasurement = () => {
   tableMeasurementVisible.value = true;
 };
 
-const handleConfirmMeasurement = (database: string, table: string, selected: IoTDB.SelectedMeasurement[]) => {
+const handleConfirmMeasurement = (database: string, table: string, selected: SelectedMeasurement[]) => {
   searchFormData.database = database;
   searchFormData.table = table;
   [searchFormData.selectedMeasurement] = selected;
-  searchFormData.measurement = searchFormData.selectedMeasurement.measurement;
-  searchFormData.measurementType = searchFormData.selectedMeasurement.measurementType!;
+  if (searchFormData.selectedMeasurement) {
+    searchFormData.measurement = searchFormData.selectedMeasurement.measurement;
+    searchFormData.measurementType = searchFormData.selectedMeasurement.measurementType || '';
+  } else {
+    searchFormData.measurement = '';
+    searchFormData.measurementType = '';
+  }
   tableMeasurementVisible.value = false;
 };
 
 function setStorage() {
-  sessionStorage.setItem(
+  window.sessionStorage.setItem(
     'aiVisualizationStorage',
     JSON.stringify({
       ...copySearchFormData,
@@ -1177,7 +1183,7 @@ onMounted(() => {
     if (!window.__isReload__) {
       setStorage();
     } else {
-      sessionStorage.setItem('dataSpectrumStorage', '');
+      window.sessionStorage.setItem('dataSpectrumStorage', '');
     }
     chartContainer.value = null;
     if (chartInstance) {
@@ -1216,8 +1222,8 @@ watch(
     setOption(chartOptions.value);
     if (val) {
       getModelList();
-      if (sessionStorage.getItem('aiVisualizationStorage')) {
-        const storageData = JSON.parse(sessionStorage.getItem('aiVisualizationStorage') as string);
+      if (window.sessionStorage.getItem('aiVisualizationStorage')) {
+        const storageData = JSON.parse(window.sessionStorage.getItem('aiVisualizationStorage') as string);
         searchFormData.measurement = storageData.measurement;
         searchFormData.type = storageData.type;
         searchFormData.method = intersection(

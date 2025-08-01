@@ -4,7 +4,7 @@ import zhLocale from 'element-plus/es/locale/lang/zh-cn';
 import enLocale from 'element-plus/es/locale/lang/en';
 // import deLocale from 'element-plus/es/locale/lang/de';
 
-const locale: 'cn' | 'en' = (window?.localStorage?.getItem('lang') || 'cn') as 'cn' | 'en';
+const locale: 'cn' | 'en' = (window?.window.localStorage?.getItem('lang') || 'cn') as 'cn' | 'en';
 
 export const langNameMap = {
   cn: zhLocale.name,

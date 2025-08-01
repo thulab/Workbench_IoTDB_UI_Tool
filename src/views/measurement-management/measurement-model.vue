@@ -43,8 +43,9 @@ import viewMeasurementIcom from '@/assets/icons/view-measurement.svg';
 import { StorageApi } from '@/api';
 import { useUserStore } from '@/stores';
 import { getPathAuthList } from '@/utils/auth';
+import type { ModelData } from '@/types';
 
-const treeData = ref<StorageDevice.ModelData>({
+const treeData = ref<ModelData>({
   node: 'root',
   nodePath: 'root',
   nodeType: 'root',
@@ -86,7 +87,7 @@ function rowReadWriteDataByPath(path: string) {
   return false;
 }
 
-const treeDataOptions = (detailData: StorageDevice.ModelData, width: number | 'auto') =>
+const treeDataOptions = (detailData: ModelData, width: number | 'auto') =>
   ({
     tooltip: {
       confine: true,
@@ -98,7 +99,7 @@ const treeDataOptions = (detailData: StorageDevice.ModelData, width: number | 'a
       borderColor: '#DFE1ED',
       extraCssText: 'max-width:300px;',
       formatter: (params: object) => {
-        const { data } = params as unknown as { data: StorageDevice.ModelData };
+        const { data } = params as unknown as { data: ModelData };
         if (data.nodeType === 'database' || data.nodeType === 'internal') {
           return `<h4 style="font-size: 14px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;margin-right: 24px;"><el-icon size="24"><i-custom-device-num /></el-icon><span style="color: #131926;">${t('measurement.deviceNum')}：</span>${data.deviceCount || data.deviceCount === 0 ? data.deviceCount : '-'}</p><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;"><el-icon size="24"><i-custom-measure-num /></el-icon><span style="color: #131926;">${t('measurement.measurementNum')}：</span>${data.timeseriesCount || data.timeseriesCount === 0 ? data.timeseriesCount : '-'}</p>`;
         }
@@ -188,7 +189,7 @@ const treeDataOptions = (detailData: StorageDevice.ModelData, width: number | 'a
               padding: [0, 0, 0, 8],
             },
           },
-          formatter: (params: { data: StorageDevice.ModelData }) => {
+          formatter: (params: { data: ModelData }) => {
             if (params.data.nodeType === 'database') {
               return `{database|}{textSpace|${params.data.node}}`;
             }
@@ -235,7 +236,7 @@ function handleDoc() {
 }
 // 获取数据模型树当前展开的最大层级, 如果大于 2 就直接返回 3，用于设定宽度
 
-function getMaxExpandLevel(data: StorageDevice.ModelData, level = 0) {
+function getMaxExpandLevel(data: ModelData, level = 0) {
   // 如果节点为叶子节点，返回当前层级
   if (!data.children || data.children.length === 0) {
     return level;
@@ -301,7 +302,7 @@ function getModalTreeData() {
     });
 }
 
-function dealData(data: StorageDevice.ModelData[]) {
+function dealData(data: ModelData[]) {
   for (let i = 0; i < data.length; i++) {
     data[i].collapsed = true;
     if (data[i].children?.length) {
@@ -327,7 +328,7 @@ function dealData(data: StorageDevice.ModelData[]) {
   }
 }
 
-const deepSearchSelf = (data: StorageDevice.ModelData, path: string, index: number, levelData: StorageDevice.ModelData) => {
+const deepSearchSelf = (data: ModelData, path: string, index: number, levelData: ModelData) => {
   if (data.nodePath === path) {
     data.collapsed = !levelData.collapsed;
     data.children = levelData.children || [];
@@ -346,7 +347,7 @@ const deepSearchSelf = (data: StorageDevice.ModelData, path: string, index: numb
 
 let loading = false;
 
-const getItemByPath = (data: StorageDevice.ModelData, nodePath: string) => {
+const getItemByPath = (data: ModelData, nodePath: string) => {
   let result = null;
   if (data.nodePath === nodePath) {
     result = data;
@@ -361,12 +362,12 @@ const getItemByPath = (data: StorageDevice.ModelData, nodePath: string) => {
   return result;
 };
 
-const setCollapsed = (data: StorageDevice.ModelData, collapsed: boolean) => {
+const setCollapsed = (data: ModelData, collapsed: boolean) => {
   data.collapsed = collapsed;
   const treeDataItem = getItemByPath(treeData?.value, data.nodePath);
   if (treeDataItem) treeDataItem.collapsed = collapsed;
 };
-function clickFunction(params: { data: StorageDevice.ModelData }) {
+function clickFunction(params: { data: ModelData }) {
   if (loading) return;
   if (params.data.nodeType !== 'next' && params.data.nodeType !== 'pre') {
     if (params.data.nodeType === 'timeseries') return;

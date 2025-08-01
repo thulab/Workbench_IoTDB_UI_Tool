@@ -37,6 +37,7 @@
 
 <script lang="ts" setup>
 import type { FormInstance } from 'element-plus';
+import type { LineObj } from '@/types';
 
 const props = defineProps<{
   visible: boolean;
@@ -47,14 +48,14 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'update:visible', visible: boolean): void;
-  (event: 'handleSave', payload: Trend.LineObj): void;
+  (event: 'handleSave', payload: LineObj): void;
 }>();
 
 const dialogKey = ref(0);
 const { t, locale } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const formRef = ref<FormInstance>();
-const formData = reactive<Trend.LineObj>({
+const formData = reactive<LineObj>({
   path: '',
   color: '',
   width: 2,

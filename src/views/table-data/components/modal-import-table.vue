@@ -101,11 +101,12 @@
 import { genFileId } from 'element-plus';
 import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
 import { IoTDBApi } from '@/api';
+import type { TableTreeNodeData } from '@/types';
 
 const props = defineProps<{
   visible: boolean;
   importType: string; // table | column | tableData
-  currentNode: IoTDB.TreeNodeData;
+  currentNode: TableTreeNodeData;
 }>();
 
 const emit = defineEmits<{

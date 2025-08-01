@@ -177,9 +177,10 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import ModalComment from './modal-comment.vue';
 import ModalImportTable from './modal-import-table.vue';
 import ModalTtl from './modal-ttl.vue';
+import type { TableTreeNodeData, ColumnVOS, DatabasePostData } from '@/types/table-data';
 
 const props = defineProps<{
-  currentNode: IoTDB.TreeNodeData;
+  currentNode: TableTreeNodeData;
 }>();
 
 const { t, locale } = useI18n();
@@ -188,20 +189,20 @@ const searchKeyword = ref((route.query.databaseSearch as string) || '');
 const searchType = ref('columnName');
 const { maxTableHeight } = useTableHeight(420);
 const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
-const columnsSelection = ref<IoTDB.TreeNodeData[]>([]);
+const columnsSelection = ref<TableTreeNodeData[]>([]);
 const { requestFn: deleteColumns } = useRequest(IoTDBApi.deleteColumns);
 const { requestFn: exportTableId } = useRequest(IoTDBApi.exportTableId);
 const { data: columnVOS, requestFn: getColumnsList } = useRequest(IoTDBApi.getColumnsList);
 const sqlPreviewRef = ref<InstanceType<typeof SqlPreview>>();
 const modalCommentVisible = ref(false);
-const currentColumn = ref<IoTDB.ColumnVOS>();
+const currentColumn = ref<ColumnVOS>();
 const currentPage = ref(1);
 const pageSize = ref(10);
 const userStore = useUserStore();
 const { canReadWriteData } = storeToRefs(userStore);
 const importVisible = ref(false);
 const modalTtlVisible = ref(false);
-const localCurrentNode = ref<IoTDB.TreeNodeData>({ ...props.currentNode });
+const localCurrentNode = ref<TableTreeNodeData>({ ...props.currentNode });
 const orderBy = ref('');
 const order = ref('');
 
@@ -269,7 +270,7 @@ const tableDataPagination = computed(() => {
 
 const total = computed(() => columnDataFilter.value.length || 0);
 
-function handleSelectionChange(vals: IoTDB.TreeNodeData[]) {
+function handleSelectionChange(vals: TableTreeNodeData[]) {
   columnsSelection.value = vals;
 }
 
@@ -298,7 +299,7 @@ function handleEditTableTTL() {
   modalTtlVisible.value = true;
 }
 
-function handleEditTableComment(row: IoTDB.ColumnVOS) {
+function handleEditTableComment(row: ColumnVOS) {
   currentColumn.value = row;
   modalCommentVisible.value = true;
 }
@@ -312,7 +313,7 @@ function handleRefresh() {
   getColumns();
 }
 
-function handleDelRow(type: string, row: IoTDB.TreeNodeData | null) {
+function handleDelRow(type: string, row: TableTreeNodeData | null) {
   ElMessageBox.confirm(type === 'batch' ? `${t('dataManage.delColumnBatchTip')}` : `${t('dataManage.delColumnSingleTip')}`, t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),
@@ -327,7 +328,7 @@ function handleDelRow(type: string, row: IoTDB.TreeNodeData | null) {
     } else {
       columnDelList = row?.columnName ? [row.columnName] : [];
     }
-    const deleteData: IoTDB.DatabasePostData = {
+    const deleteData: DatabasePostData = {
       database: props.currentNode.parentName,
       tableName: props.currentNode.nodeName,
       columns: columnDelList,

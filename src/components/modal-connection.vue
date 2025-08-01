@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="t('connection.connectionManagement')"
+    :title="t('connectionManagement')"
     v-model="dialogVisible"
     width="860px"
     align-center
@@ -12,20 +12,20 @@
     <el-container class="connection-wrapper" v-loading="listLoading">
       <el-aside width="240px" class="connection-list-wrapper">
         <div class="connection-list-title">
-          <h4>{{ t('connection.connectionList') }}</h4>
+          <h4>{{ t('connectionList') }}</h4>
           <div>
             <el-tooltip effect="light" :content="t('common.refresh')">
               <el-button link class="m-r-8 svg-button-hover-color" @click="handleRefresh" id="connection-side-refresh"><i-custom-border-refresh /></el-button>
             </el-tooltip>
-            <el-tooltip effect="light" :content="t('connection.flowTip')">
+            <el-tooltip effect="light" :content="t('flowTip')">
               <el-button link class="m-r-8 m-l-0 svg-button-hover-color" @click="handleGraph" id="connection-side-graph"><i-custom-graph /></el-button>
             </el-tooltip>
-            <el-tooltip effect="light" :content="t('connection.addConnection')">
+            <el-tooltip effect="light" :content="t('addConnection')">
               <el-button link style="margin: 0" @click="handleAddConnection" id="connection-side-add"><i-custom-new-connection /></el-button>
             </el-tooltip>
           </div>
         </div>
-        <el-input :placeholder="t('connection.namePlaceholder')" v-model="filterText" id="connection-list-input" @keyup.enter="handleFilter" class="connection-search-input">
+        <el-input :placeholder="t('namePlaceholder')" v-model="filterText" id="connection-list-input" @keyup.enter="handleFilter" class="connection-search-input">
           <template #prefix>
             <i-custom-search-icon class="remote-select-search-icon" />
           </template>
@@ -54,7 +54,7 @@
               <popconfirm
                 :confirm-button-text="t('common.confirm')"
                 :cancel-button-text="t('common.cancel')"
-                :title="t('connection.deleteTip')"
+                :title="t('deleteTip')"
                 v-if="item.id !== connectionStore.connectionInfo.data.id || route.name === 'Login'"
                 :icon="ICustomError"
                 width="200"
@@ -96,6 +96,7 @@ import { useConnectionStore } from '@/stores';
 import ModalFlow from '@/components/modal-flow.vue';
 import ICustomError from '~icons/custom/error.svg';
 import ConnectionForm from './connection/connection-form.vue';
+import type { ConnectionItem } from '@/types';
 
 const props = defineProps<{
   visible: boolean;
@@ -114,8 +115,8 @@ const dialogVisible = useVModel(props, 'visible', emit);
 const filterText = ref('');
 const editType = ref<'add' | 'edit' | 'view'>('add');
 const connectionFormRef = ref<InstanceType<typeof ConnectionForm>>();
-const connectionList = ref<Connection.ConnectionItem[]>([]);
-const filterList = ref<Connection.ConnectionItem[]>([]);
+const connectionList = ref<ConnectionItem[]>([]);
+const filterList = ref<ConnectionItem[]>([]);
 const current = ref<string | number>('');
 const listLoading = ref(false);
 const detailLoading = ref(false);
@@ -139,7 +140,7 @@ async function handleAddConnection() {
   filterList.value.unshift({
     id: '',
     type: 0,
-    name: t('connection.addConnection'),
+    name: t('addConnection'),
     username: '',
     model: 'tree',
   });
@@ -156,9 +157,9 @@ function getList(id?: number) {
   getConnectionList()
     .then((res) => {
       const data = res.data || [];
-      const standAloneList: Connection.ConnectionItem[] = [];
-      const doubleLiveList: Connection.ConnectionItem[] = [];
-      const clusterList: Connection.ConnectionItem[] = [];
+      const standAloneList: ConnectionItem[] = [];
+      const doubleLiveList: ConnectionItem[] = [];
+      const clusterList: ConnectionItem[] = [];
       data.forEach((item) => {
         if (item.type === 1) {
           clusterList.push(item);
@@ -226,7 +227,7 @@ const canStopPropagation = (e: HTMLElement): boolean => {
   return false;
 };
 
-function handleDelete(item: Connection.ConnectionItem) {
+function handleDelete(item: ConnectionItem) {
   if (item.id === '' && editType.value === 'add') {
     filterList.value.shift();
     connectionFormRef.value?.resetOperateLoading();
@@ -244,7 +245,7 @@ function handleDelete(item: Connection.ConnectionItem) {
 }
 
 // 选择
-async function handleSelect(item: Connection.ConnectionItem, e: MouseEvent) {
+async function handleSelect(item: ConnectionItem, e: MouseEvent) {
   if (canStopPropagation(e.target as HTMLElement)) return;
   if (editType.value === 'add' && item.id === '') return;
   if (editType.value === 'add') {

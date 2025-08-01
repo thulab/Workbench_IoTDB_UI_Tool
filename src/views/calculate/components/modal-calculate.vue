@@ -97,11 +97,12 @@ import { CalculateApi } from '@/api';
 import CodeEditor from '@/views/search/components/code-editor.vue';
 import SideData from './side-data.vue';
 import SideFunction from './side-function.vue';
+import type { CalculateItem } from '@/types';
 
 const props = defineProps<{
   visible: boolean;
   editType: string;
-  editData?: Calculate.CalculateItem;
+  editData?: CalculateItem;
 }>();
 
 const emit = defineEmits<{

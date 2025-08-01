@@ -106,7 +106,7 @@ const routesToMenu = (routeItem: RouteRecordRaw, parentPath: string) => {
     isAuthMenu: routeItem.meta?.isAuthMenu,
     needVersion: routeItem.meta?.needVersion,
     sqlDialect: routeItem.meta?.sqlDialect,
-  } as MenuOptions;
+  } as globalThis.MenuOptions;
   if (routeItem.children && routeItem.children.length > 0) {
     if (routeItem.children.length === 1 && !routeItem.meta?.alwayShow && (!routeItem.children[0].children?.length || routeItem.children[0].children?.length <= 1)) {
       menu.path = getRoutePath(routeItem.children[0], path);
@@ -147,7 +147,7 @@ function handleChangeCluster(type: 'master' | 'slave') {
 }
 
 const getMenuList = () => {
-  const menuList = [] as Array<MenuOptions>;
+  const menuList = [] as Array<globalThis.MenuOptions>;
   const routesHasTitle = allRoutes.value.filter((item) => item?.meta?.title && !item.meta?.hiddenMenu);
   routesHasTitle.forEach((item) => {
     menuList.push(routesToMenu(item, ''));
@@ -170,7 +170,7 @@ onMounted(async () => {
 
 const activeMenu = computed((): string => route.path);
 const isCollapse = computed((): boolean => menuStore.isCollapse);
-const menuList = computed((): MenuOptions[] => menuStore.menuList);
+const menuList = computed((): globalThis.MenuOptions[] => menuStore.menuList);
 
 const screenWidth = ref<number>(0);
 const screenHeight = ref<number>(0);

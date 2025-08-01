@@ -150,6 +150,7 @@ import { AlarmApi } from '@/api';
 import { useEnumStore } from '@/stores';
 import TimeseriesSelectSingle from '@/components/timeseries-select-single.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
+import type { ConfigData, MeasurementDataItem, ConfigEnumData } from '@/types';
 
 const props = defineProps<{
   visible: boolean;
@@ -177,7 +178,7 @@ const requiredRules = ref([
   },
 ]);
 
-const formData = reactive<Alarm.ConfigData>({
+const formData = reactive<ConfigData>({
   alarmConfigId: undefined,
   alarmName: '',
   measurement: [],
@@ -269,7 +270,7 @@ const getLevelColor = computed(() => {
   return '#424561';
 });
 
-function disabledPath(item: StorageDevice.MeasurementDataItem) {
+function disabledPath(item: MeasurementDataItem) {
   if (!formData.measurementType) {
     return item.dataType === 'TEXT' || item.viewType === 'VIEW';
   }
@@ -294,7 +295,7 @@ function getDetail() {
   });
 }
 
-function handleChangePath(vals: string[], data: StorageDevice.MeasurementDataItem[]) {
+function handleChangePath(vals: string[], data: MeasurementDataItem[]) {
   if (!vals.length) {
     formRef.value?.resetFields();
     formData.alarmRulesTypeVal = undefined;

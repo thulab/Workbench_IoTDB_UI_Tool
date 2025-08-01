@@ -1,5 +1,5 @@
 <template>
-  <div class="search_div maxheight">
+  <div class="search_div max-height">
     <el-input class="m-b-8 filter-input" v-model="filterMeasurementText" :placeholder="t('measurement.measurementNamePlaceholder')" @input="getMeasurementList" id="calculate-modal-input-measurement">
       <!-- <template #suffix><i-ep-search /></template> -->
     </el-input>
@@ -25,6 +25,7 @@
 <script lang="ts" setup>
 import { debounce } from 'lodash-es';
 import { StorageApi } from '@/api';
+import type { MeasurementDataItem } from '@/types';
 
 const emit = defineEmits(['get-function']);
 
@@ -32,7 +33,7 @@ const { t } = useI18n();
 const { requestFn: getMeasurement, loading: measurementLoading } = useRequest(StorageApi.getMeasurementAllObjList);
 
 const filterMeasurementText = ref('');
-const measurementList = ref<StorageDevice.MeasurementDataItem[]>([]);
+const measurementList = ref<MeasurementDataItem[]>([]);
 
 let lastMeasurementQuery = '';
 const getMeasurementList = debounce(() => {
@@ -45,7 +46,7 @@ const getMeasurementList = debounce(() => {
 }, 500);
 
 // 添加
-function handleAdd(item: StorageDevice.MeasurementDataItem) {
+function handleAdd(item: MeasurementDataItem) {
   const res = item.timeseries;
   emit('get-function', res);
 }

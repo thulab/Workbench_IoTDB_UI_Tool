@@ -23,13 +23,14 @@
 <script setup lang="ts">
 import type { FormInstance, FormRules } from 'element-plus';
 import { AuthApi } from '@/api';
+import type { DBUser } from '@/types';
 
 defineOptions({ name: 'ModalResetPassword' });
 const formRef = ref<FormInstance>();
 
 const props = defineProps<{
   visible: boolean;
-  userList: Auth.DBUser[];
+  userList: DBUser[];
 }>();
 
 const emit = defineEmits<{
