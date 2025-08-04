@@ -64,8 +64,8 @@
           </el-form-item>
           <el-form-item prop="model">
             <el-radio-group v-model="loginForm.model" @change="(val) => handleChangeDefaultModel(val as 'tree' | 'table')" id="connection-modal-type">
-              <el-radio value="tree" id="connection-modal-type-0">{{ t('treeModel') }}</el-radio>
-              <el-radio value="table" id="connection-modal-type-1">{{ t('tableModel') }}</el-radio>
+              <el-radio value="tree" id="connection-modal-type-0">{{ t('connection.treeModel') }}</el-radio>
+              <el-radio value="table" id="connection-modal-type-1">{{ t('connection.tableModel') }}</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item prop="captcha" v-if="isUseCaptcha">

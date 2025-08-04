@@ -8,9 +8,10 @@ import i18n from '@/locale';
 import 'virtual:uno.css';
 import '@/styles/main.scss';
 
-const VITE_APP_VERSION = import.meta.env.__APP_VERSION__;
+const VITE_APP_VERSION = __APP_VERSION__;
 
 const vers = window.localStorage.getItem('appVersion');
+
 if (VITE_APP_VERSION !== vers) {
   window.localStorage.clear();
   window.localStorage.setItem('appVersion', VITE_APP_VERSION);

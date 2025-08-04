@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="t('connectionManagement')"
+    :title="t('connection.connectionManagement')"
     v-model="dialogVisible"
     width="860px"
     align-center
@@ -12,20 +12,20 @@
     <el-container class="connection-wrapper" v-loading="listLoading">
       <el-aside width="240px" class="connection-list-wrapper">
         <div class="connection-list-title">
-          <h4>{{ t('connectionList') }}</h4>
+          <h4>{{ t('connection.connectionList') }}</h4>
           <div>
             <el-tooltip effect="light" :content="t('common.refresh')">
               <el-button link class="m-r-8 svg-button-hover-color" @click="handleRefresh" id="connection-side-refresh"><i-custom-border-refresh /></el-button>
             </el-tooltip>
-            <el-tooltip effect="light" :content="t('flowTip')">
+            <el-tooltip effect="light" :content="t('connection.flowTip')">
               <el-button link class="m-r-8 m-l-0 svg-button-hover-color" @click="handleGraph" id="connection-side-graph"><i-custom-graph /></el-button>
             </el-tooltip>
-            <el-tooltip effect="light" :content="t('addConnection')">
+            <el-tooltip effect="light" :content="t('connection.addConnection')">
               <el-button link style="margin: 0" @click="handleAddConnection" id="connection-side-add"><i-custom-new-connection /></el-button>
             </el-tooltip>
           </div>
         </div>
-        <el-input :placeholder="t('namePlaceholder')" v-model="filterText" id="connection-list-input" @keyup.enter="handleFilter" class="connection-search-input">
+        <el-input :placeholder="t('connection.namePlaceholder')" v-model="filterText" id="connection-list-input" @keyup.enter="handleFilter" class="connection-search-input">
           <template #prefix>
             <i-custom-search-icon class="remote-select-search-icon" />
           </template>

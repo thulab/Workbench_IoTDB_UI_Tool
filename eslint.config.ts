@@ -20,7 +20,7 @@ export default defineConfigWithVueTs(
     ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**', '**/public/assets/**', '**/src/types/auto-imports.d.ts', '**/src/types/components.d.ts'],
     languageOptions: {
       // Use the auto-imported globals from .eslintrc-auto-import.json
-      globals: autoImport.globals,
+      globals: { ...autoImport.globals, ElMessageBox: true, ElMessage: true, __APP_VERSION__: true, __APP_BUILD_COMMIT__: true, __APP_BUILD_DATE__: true },
       parserOptions: {
         tsconfigRootDir: __dirname,
       },
