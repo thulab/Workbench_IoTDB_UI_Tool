@@ -963,7 +963,8 @@ connection:
     flexible and rich data analysis.
 
 
-    For more model details, refer to: Model Documentation
+    For more model details, refer to: {link}
+  modelDesc: Model Documentation
 flow:
   flowManagement: Flowchart Management
   topologyMap: Topology Map

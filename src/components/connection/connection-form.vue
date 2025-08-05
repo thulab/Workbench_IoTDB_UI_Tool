@@ -107,7 +107,9 @@
         <base-form-item prop="type" :rules="requiredRules" class="base-form-box">
           <template #label>
             {{ t('connection.defaultModel') }}：
-            <el-tooltip effect="light" :content="t('connection.defaultModelTip')" placement="top" popper-class="tooltip-box-width tooltip-box-white-space"><i-custom-question /></el-tooltip>
+            <el-tooltip :visible="true" effect="light" :content="tooltipContent" raw-content placement="top" popper-class="tooltip-box-width tooltip-box-white-space">
+              <i-custom-question
+            /></el-tooltip>
           </template>
           <el-radio-group v-model="formData.model" @change="(val) => handleChangeDefaultModel(val as 'tree' | 'table')" id="connection-modal-type">
             <el-radio value="tree" id="connection-modal-type-0">{{ t('connection.treeModel') }}</el-radio>
@@ -193,6 +195,14 @@ const errorPwd = ref('');
 const testLoading = ref(false);
 const connectLoading = ref(false);
 const saveLoading = ref(false);
+
+const tooltipContent = computed(() => {
+  let link = 'https://www.timecho.com/docs/zh/UserGuide/latest/Background-knowledge/Data-Model-and-Terminology_timecho.html';
+  if (locale.value === 'en') {
+    link = 'https://www.timecho.com/docs/UserGuide/latest/Background-knowledge/Data-Model-and-Terminology_timecho.html';
+  }
+  return t('connection.defaultModelTip', { link: `<a href="${link}" class="c-[var(--el-color-primary)] text-3" target="_blank">${t('connection.modelDesc')}</a>` });
+});
 
 const isCanSave = computed(() => {
   if (formData.id) {

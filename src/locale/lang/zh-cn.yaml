@@ -865,7 +865,8 @@ connection:
 
     表模型：推荐为每类设备创建一张表，同类设备的物理量采集都具备一定共性（如都采集温度和湿度物理量），数据分析灵活丰富。
 
-    更多模型信息参考：模型说明
+    更多模型信息参考：{link}
+  modelDesc: 模型说明
 flow:
   flowManagement: 流程图管理
   topologyMap: 拓扑图
