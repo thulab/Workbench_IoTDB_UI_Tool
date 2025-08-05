@@ -107,9 +107,7 @@
         <base-form-item prop="type" :rules="requiredRules" class="base-form-box">
           <template #label>
             {{ t('connection.defaultModel') }}：
-            <el-tooltip :visible="true" effect="light" :content="tooltipContent" raw-content placement="top" popper-class="tooltip-box-width tooltip-box-white-space">
-              <i-custom-question
-            /></el-tooltip>
+            <el-tooltip effect="light" :content="tooltipContent" raw-content placement="top" popper-class="tooltip-box-width tooltip-box-white-space"> <i-custom-question /></el-tooltip>
           </template>
           <el-radio-group v-model="formData.model" @change="(val) => handleChangeDefaultModel(val as 'tree' | 'table')" id="connection-modal-type">
             <el-radio value="tree" id="connection-modal-type-0">{{ t('connection.treeModel') }}</el-radio>
