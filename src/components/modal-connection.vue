@@ -54,7 +54,7 @@
               <popconfirm
                 :confirm-button-text="t('common.confirm')"
                 :cancel-button-text="t('common.cancel')"
-                :title="t('deleteTip')"
+                :title="t('connection.deleteTip')"
                 v-if="item.id !== connectionStore.connectionInfo.data.id || route.name === 'Login'"
                 :icon="ICustomError"
                 width="200"
@@ -140,7 +140,7 @@ async function handleAddConnection() {
   filterList.value.unshift({
     id: '',
     type: 0,
-    name: t('addConnection'),
+    name: t('connection.addConnection'),
     username: '',
     model: 'tree',
   });
