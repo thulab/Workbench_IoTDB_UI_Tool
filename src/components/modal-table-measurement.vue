@@ -200,7 +200,8 @@ import { useDbStore } from '@/stores';
 import { useI18n } from 'vue-i18n';
 import { TableDataApi } from '@/api';
 import { formatDevice } from '@/utils/format';
-import type { FormInstance, TableInstance } from 'element-plus';
+import type { FormInstance, TableInstance, FormRules } from 'element-plus';
+
 import type { TableTreeNodeData, SelectedMeasurement, TagFilter } from '@/types';
 
 const props = withDefaults(
@@ -303,13 +304,13 @@ const canAdd = computed(() => {
 });
 
 // 表单验证规则
-const formRules = {
+const formRules = reactive<FormRules>({
   selectedDatabase: [{ required: true, message: t('common.formRuleEmptyOperateShort'), trigger: 'change' }],
   selectedTable: [{ required: true, message: t('common.formRuleEmptyOperateShort'), trigger: 'change' }],
   selectedMeasurement: [{ required: true, message: t('common.formRuleEmptyOperateShort'), trigger: 'change' }],
   selectedTags: [
     {
-      validator: (rule: any, value: any, callback: any) => {
+      validator: (rule, value, callback) => {
         const validTags = tagFilters.value.filter((tag) => tag.variable && tag.value);
         if (availableTags.value.length !== 0 && validTags.length === 0) {
           callback(new Error(t('common.formRuleEmptyOperateShort')));
@@ -320,7 +321,7 @@ const formRules = {
       trigger: 'blur',
     },
   ],
-};
+});
 
 // 设备表格列配置
 const deviceColumns = computed<globalThis.DynamicTableColumn[]>(() => {

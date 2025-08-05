@@ -144,7 +144,7 @@
 
 <script lang="ts" setup>
 import { assign } from 'lodash-es';
-import type { FormInstance } from 'element-plus';
+import type { FormInstance, FormItemRule } from 'element-plus';
 import { storeToRefs } from 'pinia';
 import { AlarmApi } from '@/api';
 import { useEnumStore } from '@/stores';
@@ -201,7 +201,7 @@ const linkTip = computed(
     `<a href="/api/file/downloadErrorInfo?fileName=${errorLink.value}" target="_blank" rel="noopener noreferrer" style="color: #495ad4;text-decoration: underline;">${t('common.currentDownload')}</a>`,
 );
 
-const checkRules = (rule: any, value: any, callback: any) => {
+const checkRules: FormItemRule['validator'] = (rule, value, callback) => {
   if (!value) {
     return callback(new Error(t('common.formRuleEmptyOperateShort')));
   }
@@ -233,7 +233,7 @@ const requiredRulesRules = ref([
   },
 ]);
 
-const checkDuration = (rule: any, value: any, callback: any) => {
+const checkDuration: FormItemRule['validator'] = (rule, value, callback) => {
   if (!value && value !== 0) {
     return callback(new Error(t('common.formRuleEmptyOperateShort')));
   }

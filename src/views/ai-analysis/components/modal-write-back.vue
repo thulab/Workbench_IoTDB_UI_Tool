@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance } from 'element-plus';
+import type { FormInstance, FormRules } from 'element-plus';
 
 import { StorageApi } from '@/api';
 
@@ -70,11 +70,11 @@ const formData = reactive<{
   name: '',
   modelId: '',
 });
-const formRules = reactive({
+const formRules = reactive<FormRules>({
   name: [
     {
       required: true,
-      validator: (rule: any, value: any, callback: any) => {
+      validator: (rule, value, callback) => {
         if (!value || !value.trim()) {
           return callback(new Error(t('search.newNameTip')));
         }

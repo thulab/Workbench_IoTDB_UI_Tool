@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormInstance } from 'element-plus';
+import type { FormInstance, FormItemRule } from 'element-plus';
 import type { LineObj } from '@/types';
 
 const props = defineProps<{
@@ -67,7 +67,7 @@ const requiredRules = ref([
     trigger: 'blur',
   },
 ]);
-const checkNumber = (rule: any, value: any, callback: any) => {
+const checkNumber: FormItemRule['validator'] = (rule, value, callback) => {
   if (!value && value !== 0) {
     formData.width = 2;
     return callback();

@@ -28,6 +28,7 @@
 </template>
 
 <script setup lang="ts">
+import type { FormItemRule } from 'element-plus';
 const props = defineProps<{
   modelValue: Array<{ host: string; port: number | string }>;
   formKey: string;
@@ -39,7 +40,7 @@ const props = defineProps<{
 const { t, locale } = useI18n();
 const hostAndPortList = useVModel(props, 'modelValue');
 
-const requiredRules = ref([
+const requiredRules = reactive<FormItemRule[]>([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
@@ -47,14 +48,14 @@ const requiredRules = ref([
   },
 ]);
 
-const requiredPortRules = ref([
+const requiredPortRules = reactive<FormItemRule[]>([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
     trigger: 'blur',
   },
   {
-    validator: (rule: any, value: any, callback: any) => {
+    validator: (rule, value, callback) => {
       if (!/^\+?[1-9][0-9]*$/.test(`${value}`)) {
         return callback(new Error(t('common.errorTip')));
       }

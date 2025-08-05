@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance } from 'element-plus';
+import type { FormInstance, FormRules } from 'element-plus';
 import dayjs from 'dayjs';
 
 const props = withDefaults(
@@ -38,11 +38,11 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const dialogVisible = useVModel(props, 'visible', emit);
 const formRef = ref<FormInstance>();
-const formRules = reactive({
+const formRules = reactive<FormRules>({
   name: [
     {
       required: true,
-      validator: (rule: any, value: any, callback: any) => {
+      validator: (rule, value, callback) => {
         if (!value || !value.trim()) {
           return callback(new Error(t('search.nameRuleTip')));
         }

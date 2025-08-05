@@ -92,7 +92,7 @@
 
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
-import type { FormInstance, FormRules } from 'element-plus';
+import type { FormInstance, FormRules, FormItemRule } from 'element-plus';
 import { UserApi, ConnectionApi } from '@/api';
 import { useUserStore } from '@/stores';
 import useAppStore from '@/stores/app';
@@ -140,7 +140,7 @@ const { requestFn: loginCaptcha } = useRequest(UserApi.loginCaptcha);
 const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
 const { requestFn: getConnectionDetail } = useRequest(ConnectionApi.getConnectionDetail);
 
-const validateuser = (rule: any, value: any, callback: any) => {
+const validateuser: FormItemRule['validator'] = (rule, value, callback) => {
   if (value === '') {
     return callback(new Error(t('login.userNameTip')));
   }
@@ -150,7 +150,7 @@ const validateuser = (rule: any, value: any, callback: any) => {
   return callback();
 };
 
-const validatepassword = (rule: any, value: any, callback: any) => {
+const validatepassword: FormItemRule['validator'] = (rule, value, callback) => {
   if (value === '') {
     return callback(new Error(t('login.pwdTip')));
   }

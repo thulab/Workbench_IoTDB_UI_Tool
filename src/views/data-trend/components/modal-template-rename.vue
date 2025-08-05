@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance } from 'element-plus';
+import type { FormInstance, FormRules } from 'element-plus';
 
 const props = withDefaults(
   defineProps<{
@@ -48,11 +48,11 @@ const formData = reactive<{
   oldName: '',
   name: '',
 });
-const formRules = reactive({
+const formRules = reactive<FormRules>({
   name: [
     {
       required: true,
-      validator: (rule: any, value: any, callback: any) => {
+      validator: (rule, value, callback) => {
         if (!value || !value.trim()) {
           return callback(new Error(t('search.newNameTip')));
         }

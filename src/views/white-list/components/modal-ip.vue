@@ -16,7 +16,7 @@
 
 <script lang="ts" setup>
 // disable
-import type { FormInstance } from 'element-plus';
+import type { FormInstance, FormRules } from 'element-plus';
 
 const props = defineProps<{
   visible: boolean;
@@ -37,12 +37,12 @@ const formData = reactive({
 });
 
 const ipRegExp = /^(?:(?:1[0-9][0-9]\.)|(?:2[0-4][0-9]\.)|(?:25[0-5]\.)|(?:[1-9][0-9]\.)|(?:[0-9/*]\.)){3}(?:(?:1[0-9][0-9])|(?:2[0-4][0-9])|(?:25[0-5])|(?:[1-9][0-9])|(?:[0-9/*]))$/;
-const rules = reactive({
+const rules = reactive<FormRules>({
   ip: [
     {
       required: true,
       trigger: 'blur',
-      validator: (rule: any, value: any, callback: any) => {
+      validator: (rule, value, callback) => {
         if (!value) {
           return callback(t('common.formRuleEmptyOperateShort'));
         }

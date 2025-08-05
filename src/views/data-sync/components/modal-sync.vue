@@ -305,7 +305,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
+import type { FormInstance, SingleOrRange, DateModelType, FormItemRule } from 'element-plus';
 import { DataSyncApi } from '@/api';
 import { today, todayNow, formatDate } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
@@ -349,14 +349,14 @@ const requiredNameRules = ref([
     trigger: 'blur',
   },
 ]);
-const requiredPortRules = ref([
+const requiredPortRules = ref<FormItemRule[]>([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
     trigger: 'blur',
   },
   {
-    validator: (rule: any, value: any, callback: any) => {
+    validator: (rule, value, callback) => {
       if (!/^\+?[1-9][0-9]*$/.test(`${value}`)) {
         return callback(new Error(t('common.errorTip')));
       }
@@ -368,14 +368,14 @@ const requiredPortRules = ref([
     trigger: 'blur',
   },
 ]);
-const requiredNumberRules = ref([
+const requiredNumberRules = ref<FormItemRule[]>([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
     trigger: 'blur',
   },
   {
-    validator: (rule: any, value: any, callback: any) => {
+    validator: (rule, value, callback) => {
       if (value.toString().indexOf('.') > -1) {
         return callback(new Error(t('common.errorTip')));
       }

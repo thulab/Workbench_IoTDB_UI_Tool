@@ -99,7 +99,7 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import type { FormInstance } from 'element-plus';
+import type { FormInstance, FormItemRule } from 'element-plus';
 import { ref, reactive, computed } from 'vue';
 import { IoTDBApi } from '@/api';
 import { useDbStore } from '@/stores';
@@ -165,7 +165,7 @@ const tableNames = computed(() => {
   return [];
 });
 
-const validateName = (rule: any, value: any, callback: any) => {
+const validateName: FormItemRule['validator'] = (rule, value, callback) => {
   if (value && tableNames.value.some((name) => name.toLocaleLowerCase() === value.toLocaleLowerCase())) {
     callback(new Error(t('dataManage.tableNameExist')));
   }

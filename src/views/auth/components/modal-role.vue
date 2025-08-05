@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormInstance } from 'element-plus';
+import type { FormInstance, FormItemRule } from 'element-plus';
 import { AuthApi } from '@/api';
 
 const props = defineProps<{
@@ -37,7 +37,7 @@ const formData = reactive({
   name: '',
 });
 
-const requiredRules = ref([
+const requiredRules = ref<FormItemRule[]>([
   {
     required: true,
     message: () => t('common.formRuleEmptyOperateShort'),
@@ -55,7 +55,7 @@ const requiredRules = ref([
     trigger: 'blur',
   },
   {
-    validator: (rule: any, value: any, callback: any) => {
+    validator: (rule, value, callback) => {
       if (value && props.list.some((item) => item === value)) {
         callback(new Error(t('auth.roleExist')));
       } else {

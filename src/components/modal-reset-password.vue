@@ -109,7 +109,7 @@ const rules = reactive<FormRules>({
       trigger: 'blur',
     },
     {
-      validator: (rule: any, value: any, callback: any) => {
+      validator: (rule, value, callback) => {
         if (value !== formData.password) {
           callback(new Error(t('auth.pwdUnSame')));
         } else {

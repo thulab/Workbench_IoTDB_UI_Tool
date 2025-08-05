@@ -99,7 +99,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormInstance, TabsPaneContext, TabPaneName } from 'element-plus';
+import type { FormInstance, TabsPaneContext, TabPaneName, FormRules } from 'element-plus';
 import dayjs from 'dayjs';
 import { throttle } from 'lodash-es';
 import { SearchApi } from '@/api';
@@ -157,11 +157,11 @@ const resaveForm = reactive<{
   sqlName: '',
   id: '',
 });
-const resaveFormRules = reactive({
+const resaveFormRules = reactive<FormRules>({
   sqlName: [
     {
       required: true,
-      validator: (rule: any, value: any, callback: any) => {
+      validator: (rule, value, callback) => {
         if (!value || !value.trim()) {
           return callback(new Error(t('search.newNameTip')));
         }

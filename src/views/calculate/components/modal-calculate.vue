@@ -92,7 +92,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormInstance } from 'element-plus';
+import type { FormInstance, FormRules } from 'element-plus';
 import { CalculateApi } from '@/api';
 import CodeEditor from '@/views/search/components/code-editor.vue';
 import SideData from './side-data.vue';
@@ -127,10 +127,10 @@ const requiredRules = ref([
   },
 ]);
 
-const requiredExpressionRules = ref([
+const requiredExpressionRules = ref<FormRules>([
   {
     required: true,
-    validator: (rule: any, value: any, callback: any) => {
+    validator: (rule, value, callback) => {
       if (!value || !value.trim()) {
         return callback(new Error(t('common.formRuleEmptyOperateShort')));
       }
