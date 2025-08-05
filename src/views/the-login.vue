@@ -10,7 +10,7 @@
         <div class="login-logo-box">
           <i-custom-timecho-logo-en v-if="locale === 'en'" class="title-logo" />
           <i-custom-timecho-logo v-else class="title-logo" />
-          <span class="logo-version login">2.x</span>
+          <span class="logo-version login">{{ t('common.versionTips') }}</span>
           <!-- <i-custom-logo-title class="title-logo" /> -->
         </div>
         <h5 class="login-title">{{ t('login.title') }}</h5>
@@ -83,7 +83,10 @@
           </el-form-item>
         </el-form>
       </div>
-      <p class="right-text">copyrightⒸ Timecho V{{ appVersion }}</p>
+      <p class="right-text">
+        copyrightⒸ Timecho <br />
+        Workbench V{{ appVersion }}
+      </p>
     </div>
 
     <modal-connection v-model:visible="connectionVisible" @handleClose="getList" />
@@ -396,6 +399,7 @@ watch(locale, () => {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
   margin: 30px 0 40px;
 
   .timecho-logo {
@@ -481,6 +485,7 @@ watch(locale, () => {
   font-size: 12px;
   font-weight: 300;
   line-height: 18px;
+  text-align: center;
   color: #fff;
 }
 

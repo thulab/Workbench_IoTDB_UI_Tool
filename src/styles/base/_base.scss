@@ -249,15 +249,14 @@
 }
 
 .logo-version {
-  color: white;
-  font-size: 26px;
-  line-height: 37.5px;
-  margin-left: 12px;
+  color: #656a85;
+  margin-left: 4px;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 300;
 
   &.login {
-    color: var(--el-color-primary);
-    margin-left: 4px;
-    font-size: 32px;
+    margin-top: 8px;
   }
 
   &.system-info {

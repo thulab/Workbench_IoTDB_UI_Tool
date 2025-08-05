@@ -6,7 +6,6 @@
         <i-custom-timecho-logo-white-en v-if="locale === 'en'" />
         <i-custom-timecho-logo-white v-else />
       </el-icon>
-      <span class="logo-version" v-if="!isCollapse">2.x</span>
     </div>
     <div class="connection-box" :style="{ padding: isCollapse ? '0 0 0 5px' : '0 16px 0 10px' }">
       <div class="connection-divider"></div>
@@ -36,6 +35,10 @@
         <layout-menu-sub-item :menu-list="menuList" :show-auth-menu="true" />
       </el-menu>
     </el-scrollbar>
+    <div class="p-[16px] text-center" v-if="!isCollapse">
+      <!-- 固定在底部 -->
+      <span class="logo-version">{{ t('common.versionTips') }}</span>
+    </div>
 
     <modal-connection v-model:visible="connectionVisible" :is-toggle="true" />
   </div>

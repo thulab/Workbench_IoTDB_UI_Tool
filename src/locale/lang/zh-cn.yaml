@@ -154,7 +154,7 @@ common:
   deleteNode: 删除节点
   deleteEdge: 删除边
   warmTip: 温馨提示
-  versionTip: 请升级至IoTDB V{version}及以上版本使用
+  versionTip: 请升级至 IoTDB V{version} 及以上版本使用
   userManual: 文档
   currentDownload: 点此下载
   viewMore: 查看更多
@@ -167,6 +167,7 @@ common:
     https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/Operator-and-Expression.html
   comingSoon: 敬请期待
   onlyOneNewRow: 请保存后再新增
+  versionTips: 适配 IoTDB V2.0 及以上版本
 page:
   '403': 403页面
   '404': 404页面
@@ -752,8 +753,7 @@ auth:
   inputPwd: 输入密码
   oldPwdReg: 格式不符，请输入大小写字母、数字、特殊字符（!{'@'}#$%^&*()_+-=）
   systemTitle: IoTDB实时扩展组件
-  systemTitleWorkbench: IoTDB可视化控制台—Workbench
-  versionTitle: 版本号：{version}
+  systemTitleWorkbench: 可视化控制台（Workbench）V{version}
   systemDetail: 实时库涵盖了测点管理、查询、可视化、告警、权限等功能，旨在帮助用户更直观的进行跨实例管理，更简单的完成数据库操作，更高效的进行运维操作
   systemDetailWorkbench: Workbench涵盖了测点管理、查询、可视化、权限等功能，旨在帮助用户更直观的进行跨实例管理，更简单的完成数据库操作，更高效的进行运维操作
   docTip: 权限含义具体说明请查看文档

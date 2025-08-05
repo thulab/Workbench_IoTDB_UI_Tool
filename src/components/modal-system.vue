@@ -4,10 +4,9 @@
       <p class="flex items-end">
         <i-custom-timecho-logo-en v-if="locale === 'en'" class="system-logo" />
         <i-custom-timecho-logo v-else class="system-logo" />
-        <span class="logo-version system-info">2.x</span>
       </p>
       <p class="system-title">{{ systemTitle }}</p>
-      <p class="system-version">{{ t('auth.versionTitle', { version: appVersion }) }}</p>
+      <p class="system-version">({{ t('common.versionTips') }})</p>
       <p class="system-detail">{{ systemDetail }}</p>
     </div>
   </el-dialog>
@@ -29,7 +28,7 @@ const appType = Number(import.meta.env.VITE_APP_TYPE);
 const appStore = useAppStore();
 const dialogVisible = useVModel(props, 'visible', emit);
 const appVersion = computed(() => appStore.AppVersion);
-const systemTitle = computed(() => (appType === 1 ? t('auth.systemTitle') : t('auth.systemTitleWorkbench')));
+const systemTitle = computed(() => (appType === 1 ? t('auth.systemTitle') : t('auth.systemTitleWorkbench', { version: appVersion.value })));
 const systemDetail = computed(() => (appType === 1 ? t('auth.systemDetail') : t('auth.systemDetailWorkbench')));
 </script>
 
