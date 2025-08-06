@@ -27,7 +27,6 @@
             :height="treeHeight"
             :expand-on-click-node="true"
             :default-expanded-keys="expandNodes"
-            @node-expand="handleNodeClick"
             @node-click="handleNodeClick"
             @node-collapse="handleNodeCollapse"
             @handle-click-more="handleClickMore"
@@ -596,7 +595,7 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
   }
   // }
   expandNode.value = data.nodePath;
-  expandNodes.value = [data.nodePath];
+  // expandNodes.value = [data.nodeParent, data.nodePath];
   if (isSearchResult.value) {
     if ((data.pageChildren && data.pageChildren.length === 0) || data.pageChildren[0].nodeType === 'loading') {
       const originTreeData = cloneDeep(recursionFindCurrentByOrigin(data.nodePath, treeData.value)?.children || []);
@@ -644,6 +643,7 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
       });
     }
     measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
+    measurementTree.value?.virtualizedTreeRef?.expandNode(node);
     nextTick(() => {
       if (addPaths.value.length > 0) {
         expandNodeByKey();
