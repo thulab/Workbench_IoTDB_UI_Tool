@@ -31,7 +31,7 @@ class StorageApi {
 
   // 保存/更新存储组
   static saveDatabase(data: SaveDatabaseRequest): globalThis.HttpResponseP {
-    return http.post('/schema/saveDatabase', data);
+    return http.post('/schema/saveDatabase', { ...data, database: data.groupName });
   }
 
   // 修改描述
@@ -45,7 +45,7 @@ class StorageApi {
 
   // 更新存储组TTL
   static upsertDatabaseTTL(data: SaveDatabaseRequest): globalThis.HttpResponseP {
-    return http.post('/schema/upsertDatabaseTTL', data);
+    return http.post('/schema/upsertDatabaseTTL', { ...data, database: data.groupName });
   }
 
   //  存储组信息
