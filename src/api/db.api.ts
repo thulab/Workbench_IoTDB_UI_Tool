@@ -43,6 +43,7 @@ class IoTDBApi {
 
   // 创建表
   static saveTable(payload: Database): globalThis.HttpResponseP<number> {
+    payload.tables[0].tableVO.ttlUnit = 'millisecond';
     return http.post('/relational/schema/saveTable', payload);
   }
 
