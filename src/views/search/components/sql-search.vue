@@ -206,7 +206,16 @@ function querySqlRun(type?: string) {
     return;
   }
   if (runFlag.value) {
-    const sqlsArr = codeStr?.split(';\n');
+    const sqlsArr = codeStr
+      ?.split(';\n')
+      .map((item) => {
+        let sql = item.trim();
+        if (sql.endsWith(';')) {
+          sql = sql.slice(0, -1);
+        }
+        return sql;
+      })
+      .filter((item) => item.length > 0);
     if (sqlsArr?.length > 50) {
       ElMessage.warning({ message: t('search.runOverTip'), grouping: true });
       return;

@@ -325,7 +325,7 @@ search:
   runResult: 执行结果
   runningResult: 运行结果
   runEmptyTip: 请先输入语句再运行
-  runOverTip: 模版语句数量已达到上限，如有需要请新建模版进行操作
+  runOverTip: 语句数量已达到上限，如有需要请页签后进行操作
   runRepeatTip: 查询正在运行中，请勿重复操作
   emptyTip: 是否清空页面
   object: 对象
