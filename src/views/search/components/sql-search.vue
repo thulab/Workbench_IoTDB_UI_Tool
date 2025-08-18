@@ -193,6 +193,13 @@ const tableDataPagination = computed(() =>
   }),
 );
 
+const trimEnd = (str: string, char: string) => {
+  if (str.endsWith(char)) {
+    return trimEnd(str.slice(0, -1), char);
+  }
+  return str;
+};
+
 let controller = new AbortController();
 
 // 执行sql
@@ -210,9 +217,7 @@ function querySqlRun(type?: string) {
       ?.split(';\n')
       .map((item) => {
         let sql = item.trim();
-        if (sql.endsWith(';')) {
-          sql = sql.slice(0, -1);
-        }
+        sql = trimEnd(sql, ';');
         return sql;
       })
       .filter((item) => item.length > 0);
