@@ -33,8 +33,8 @@
             <el-select v-model="searchType" style="width: 88px" placeholder="" @change="goto(1)" id="measurement-search-type" class="measurement-search-type-select">
               <el-option :label="t('dataManage.columnName')" value="columnName" id="data-search-column-name" />
               <el-option :label="t('dataManage.comment')" value="comment" id="data-search-type-comment" />
-              <el-option :label="t('dataManage.dataType')" value="dataType" id="data-search-data-type" />
-              <el-option :label="t('dataManage.cateGory')" value="cateGory" id="data-search-category" />
+              <el-option :label="t('dataManage.dataType')" value="datatype" id="data-search-data-type" />
+              <el-option :label="t('dataManage.cateGory')" value="category" id="data-search-category" />
             </el-select>
           </template>
         </el-input>
@@ -99,14 +99,14 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column :label="t('dataManage.dataType')" prop="dataType" sortable :show-overflow-tooltip="true" />
-        <el-table-column :label="t('dataManage.cateGory')" prop="cateGory" sortable :show-overflow-tooltip="true" />
+        <el-table-column :label="t('dataManage.dataType')" prop="datatype" sortable :show-overflow-tooltip="true" />
+        <el-table-column :label="t('dataManage.cateGory')" prop="category" sortable :show-overflow-tooltip="true" />
         <el-table-column :label="t('common.operation')" width="240" align="center" fixed="right">
           <template #default="{ row }">
             <el-tooltip
-              v-if="row.cateGory === 'TAG' || row.cateGory === 'TIME'"
+              v-if="row.category === 'TAG' || row.category === 'TIME'"
               effect="light"
-              :content="`${row.cateGory === 'TIME' ? 'TIME' : 'TAG'}列暂不支持删除`"
+              :content="`${row.category === 'TIME' ? 'TIME' : 'TAG'}列暂不支持删除`"
               placement="top"
               popper-class="table-tooltip-max-width"
             >
@@ -236,25 +236,28 @@ const searchPlaceholder = computed(() => {
 const columnDataFilter = computed(() => {
   if (!columnVOS.value?.value?.length) return [];
   const keyword = (searchKeyword.value || '').trim().toLowerCase();
-  const filteredData = columnVOS.value.value.filter((item) => {
-    switch (searchType.value) {
-      case 'columnName':
-        return item.columnName.toLowerCase().includes(keyword);
-      case 'comment':
-        return item.comment?.toLowerCase().includes(keyword);
-      case 'dataType':
-        return item.dataType.toLowerCase().includes(keyword);
-      case 'cateGory':
-        return item.cateGory.toLowerCase().includes(keyword);
-      default:
-        return columnVOS.value.value;
-    }
-  });
+  let filteredData = columnVOS.value.value;
+  if (keyword) {
+    filteredData = columnVOS.value.value.filter((item) => {
+      switch (searchType.value) {
+        case 'columnName':
+          return item.columnName.toLowerCase().includes(keyword);
+        case 'comment':
+          return item.comment?.toLowerCase().includes(keyword);
+        case 'datatype':
+          return item.datatype.toLowerCase().includes(keyword);
+        case 'category':
+          return item.category.toLowerCase().includes(keyword);
+        default:
+          return columnVOS.value.value;
+      }
+    });
+  }
 
   return filteredData.sort((a, b) => {
     const categoryOrder = ['TIME', 'TAG', 'ATTRIBUTE', 'FIELD'];
-    const indexA = categoryOrder.indexOf(a.cateGory);
-    const indexB = categoryOrder.indexOf(b.cateGory);
+    const indexA = categoryOrder.indexOf(a.category);
+    const indexB = categoryOrder.indexOf(b.category);
     if (indexA !== indexB) {
       return indexA - indexB;
     }
@@ -285,8 +288,6 @@ function getColumns() {
 }
 
 function handleSortChange(sort: { prop: string; order: string }) {
-  console.log(sort.prop);
-  console.log(sort.order);
   orderBy.value = sort.prop;
   order.value = sort.order;
 }

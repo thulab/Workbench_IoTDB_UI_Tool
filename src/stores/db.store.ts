@@ -47,16 +47,16 @@ export const useDbStore = defineStore('db', () => {
               database: db.database,
               parentName: table.tableVO.tableName,
               comment: col.comment === 'null' ? '' : col.comment,
-              dataType: col.dataType,
-              cateGory: col.cateGory,
-              nodeType: col.cateGory as TableTreeNodeData['nodeType'],
+              datatype: col.datatype,
+              category: col.category,
+              nodeType: col.category as TableTreeNodeData['nodeType'],
             }))
             .sort((a, b) => {
               // 定义排序优先级
               const categoryOrder = ['TIME', 'TAG', 'ATTRIBUTE', 'FIELD'];
               // 获取两个元素的类别索引
-              const indexA = categoryOrder.indexOf(a.cateGory);
-              const indexB = categoryOrder.indexOf(b.cateGory);
+              const indexA = categoryOrder.indexOf(a.category);
+              const indexB = categoryOrder.indexOf(b.category);
               // 如果类别不同，按类别优先级排序
               if (indexA !== indexB) {
                 return indexA - indexB;
