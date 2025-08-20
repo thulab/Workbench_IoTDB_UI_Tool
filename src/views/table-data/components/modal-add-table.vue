@@ -49,14 +49,14 @@
                 </el-col>
                 <el-col>
                   <base-form-item class="form-item-width" :label="`${t('dataManage.cateGory')}：`" required>
-                    <el-select v-model="item.cateGory" :placeholder="t('dataManage.cateGoryPlaceholder')" @change="handleColumnTypeChange(index)">
+                    <el-select v-model="item.category" :placeholder="t('dataManage.cateGoryPlaceholder')" @change="handleColumnTypeChange(index)">
                       <el-option v-for="item in columnTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
                   </base-form-item>
                 </el-col>
                 <el-col>
                   <base-form-item class="form-item-width" :label="`${t('dataManage.dataType')}：`" required>
-                    <el-select v-model="item.dataType" :placeholder="t('dataManage.dataTypePlaceholder')" :disabled="['TAG', 'ATTRIBUTE'].includes(item.cateGory)">
+                    <el-select v-model="item.datatype" :placeholder="t('dataManage.dataTypePlaceholder')" :disabled="['TAG', 'ATTRIBUTE'].includes(item.category)">
                       <el-option v-for="item in dataTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
                   </base-form-item>
@@ -144,8 +144,8 @@ const formData = reactive<{
   columns: Array<{
     columnName: string;
     comment: string;
-    cateGory: string;
-    dataType: string;
+    category: string;
+    datatype: string;
   }>;
 }>({
   tableName: '',
@@ -219,13 +219,13 @@ const canAddColumn = computed(() => {
 
 // 监听列类型变化
 const handleColumnTypeChange = (index: number) => {
-  if (['TAG', 'ATTRIBUTE'].includes(formData.columns[index].cateGory)) {
-    formData.columns[index].dataType = 'STRING';
+  if (['TAG', 'ATTRIBUTE'].includes(formData.columns[index].category)) {
+    formData.columns[index].datatype = 'STRING';
   }
 };
 
 const existEmpty = computed(() => {
-  const flag = formData.columns.some((s) => !s.columnName || !s.dataType || !s.cateGory);
+  const flag = formData.columns.some((s) => !s.columnName || !s.datatype || !s.category);
   return flag;
 });
 
@@ -236,8 +236,8 @@ const addColumn = () => {
   const newColumn = {
     columnName: '',
     comment: '',
-    cateGory: 'FIELD',
-    dataType: 'STRING',
+    category: 'FIELD',
+    datatype: 'STRING',
   };
 
   formData.columns.push(newColumn);
@@ -320,8 +320,8 @@ const handleConfirm = async () => {
     columnVOS: formData.columns.map((column) => ({
       columnName: column.columnName,
       comment: column.comment,
-      cateGory: column.cateGory,
-      dataType: column.dataType,
+      category: column.category,
+      datatype: column.datatype,
     })),
   });
   if (addType.value === 'addTable') {

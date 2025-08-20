@@ -224,9 +224,9 @@ const searchPlaceholder = computed(() => {
       return t('dataManage.columnNamePlaceholder');
     case 'comment':
       return t('dataManage.commentPlaceholder');
-    case 'dataType':
+    case 'datatype':
       return t('dataManage.dataTypePlaceholder');
-    case 'cateGory':
+    case 'category':
       return t('dataManage.cateGoryPlaceholder');
     default:
       return '';
@@ -356,8 +356,8 @@ function handleExportData(exportType: string) {
     tableName: props.currentNode?.nodeName,
     name: searchType.value === 'columnName' ? searchKeyword.value : '',
     comment: searchType.value === 'comment' ? searchKeyword.value : '',
-    dataType: searchType.value === 'dataType' ? searchKeyword.value : '',
-    cateGory: searchType.value === 'cateGory' ? searchKeyword.value : '',
+    dataType: searchType.value === 'datatype' ? searchKeyword.value : '',
+    cateGory: searchType.value === 'category' ? searchKeyword.value : '',
     orderBy: orderBy.value,
     asc: orderVal,
   }).then((res) => {
