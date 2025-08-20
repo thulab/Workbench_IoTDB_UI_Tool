@@ -8,8 +8,8 @@ export interface TableVO {
 export interface ColumnVOS {
   columnName: string;
   comment?: string;
-  cateGory: string;
-  dataType: string;
+  category: string;
+  datatype: string;
 }
 
 export interface Table {

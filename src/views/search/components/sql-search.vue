@@ -243,12 +243,13 @@ function querySqlRun(type?: string) {
         tableData.list = []; // 值
         sqlResult.value = data || [];
         data.forEach((item) => {
-          const length = <number[]>[];
+          // const length = <number[]>[];
           if (item.metaDataList) {
             columnList.value.push(
               item.metaDataList.map((eleitem, index) => ({
                 label: eleitem,
                 prop: `t${index}`,
+                defaultValue: '-',
                 width: 'auto',
                 fixed: index === 0 ? 'left' : false,
               })),
@@ -261,9 +262,9 @@ function querySqlRun(type?: string) {
               list: item.valueList.map((eleitem) => {
                 const obj = <Record<string, string>>{};
                 for (let i = 0; i < eleitem.length; i++) {
-                  if (eleitem[i].length > length[i] || !length[i]) {
-                    length[i] = eleitem[i].length;
-                  }
+                  // if (eleitem[i].length > length[i] || !length[i]) {
+                  //   length[i] = eleitem[i].length;
+                  // }
                   obj[`t${i}`] = eleitem[i];
                 }
                 return obj;
