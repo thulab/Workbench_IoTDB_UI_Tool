@@ -860,8 +860,18 @@ function handleData(data: any) {
       const index = chartData.value.findIndex((f) => f.path === item.path);
       if (index !== -1) {
         const originData = chartData.value[index];
-        originData.timestamps.push(...item.timestamps);
-        originData.values.push(...item.values);
+        const endTimestamp = originData.timestamps[originData.timestamps.length - 1];
+        const reversedTimestamps = item.timestamps.reverse();
+        const reversedValues = item.values.reverse();
+
+        for (const [i, time] of reversedTimestamps.entries()) {
+          if (time > endTimestamp) {
+            originData.timestamps.push(...reversedTimestamps.slice(i));
+            originData.values.push(...reversedValues.slice(i));
+            break; // 找到目标位置后立即终止循环
+          }
+        }
+
         // 有效的数据索引（10 分钟内的）
         const effectiveIndex = originData.timestamps.findIndex((time) => time >= minTime);
         if (effectiveIndex > 0) {
@@ -872,8 +882,8 @@ function handleData(data: any) {
       } else {
         const dataItem = {
           path: item.path,
-          timestamps: item.timestamps,
-          values: item.values,
+          timestamps: item.timestamps.reverse(),
+          values: item.values.reverse(),
         };
         chartData.value.push(dataItem);
       }
