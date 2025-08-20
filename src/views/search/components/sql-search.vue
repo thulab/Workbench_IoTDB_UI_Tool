@@ -193,6 +193,13 @@ const tableDataPagination = computed(() =>
   }),
 );
 
+const trimEnd = (str: string, char: string) => {
+  if (str.endsWith(char)) {
+    return trimEnd(str.slice(0, -1), char);
+  }
+  return str;
+};
+
 let controller = new AbortController();
 
 // 执行sql
@@ -206,7 +213,14 @@ function querySqlRun(type?: string) {
     return;
   }
   if (runFlag.value) {
-    const sqlsArr = codeStr?.split(';\n');
+    const sqlsArr = codeStr
+      ?.split(';\n')
+      .map((item) => {
+        let sql = item.trim();
+        sql = trimEnd(sql, ';');
+        return sql;
+      })
+      .filter((item) => item.length > 0);
     if (sqlsArr?.length > 50) {
       ElMessage.warning({ message: t('search.runOverTip'), grouping: true });
       return;
