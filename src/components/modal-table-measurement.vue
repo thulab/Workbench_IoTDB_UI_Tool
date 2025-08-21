@@ -471,7 +471,7 @@ const addMeasurements = async () => {
     formData.selectedMeasurement.forEach((measurement) => {
       const key = `${condition}-${measurement}`;
       const exists = internalSelectedMeasurements.value.some((m) => `${m.condition}-${m.measurement}` === key);
-      const measurementType = availableMeasurements.value.find((m) => m.nodeName === measurement)?.dataType || '';
+      const measurementType = availableMeasurements.value.find((m) => m.nodeName === measurement)?.datatype || '';
       if (!exists) {
         newMeasurements.push({
           condition,

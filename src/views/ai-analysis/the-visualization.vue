@@ -1037,10 +1037,13 @@ function handleWriteBackTableSuccess(payload: WriteBackTableFrom) {
     newField: {
       database: payload.database,
       tableName: payload.table,
-      tags: payload.tags.map((tag) => ({
-        variable: tag.tagName,
-        value: tag.tagValue || null,
-      })),
+      tags:
+        payload.tags
+          .filter((tag) => tag.tagName)
+          .map((tag) => ({
+            variable: tag.tagName,
+            value: tag.tagValue || null,
+          })) || [],
       field: payload.fieldName,
       dataType: copySearchFormData.measurementType,
     },
