@@ -47,8 +47,8 @@ export interface TableTreeNodeData {
   comment?: string;
   ttl?: string;
   columnName?: string;
-  cateGory?: string;
-  dataType?: string;
+  category?: string;
+  datatype?: string;
   nodeType: 'DATABASE' | 'TABLE' | 'COLUMN' | 'TAG' | 'FIELD' | 'ATTRIBUTE' | 'TIME' | 'TABLEDATA';
   children?: TableTreeNodeData[];
 }
