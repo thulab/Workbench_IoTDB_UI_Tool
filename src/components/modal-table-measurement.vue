@@ -135,7 +135,7 @@
                 <el-option
                   v-for="measurement in availableMeasurements"
                   :key="measurement.nodeName"
-                  :disabled="!props.supportedTypes.includes(measurement.dataType || '')"
+                  :disabled="!props.supportedTypes.includes(measurement.datatype || '')"
                   :label="measurement.nodeName + (measurement.comment ? ` (${measurement.comment})` : '')"
                   :value="measurement.nodeName!"
                 />
