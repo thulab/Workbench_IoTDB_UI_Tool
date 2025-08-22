@@ -51,7 +51,7 @@
               </div>
               <div v-else-if="data.nodeType === 'TAG'" class="tree-column-icon-container">
                 <el-icon size="14"><i-ep-key /></el-icon>
-                <el-tag disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Time</el-tag>
+                <el-tag disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Tag</el-tag>
               </div>
               <el-tag v-else-if="data.nodeType === 'ATTRIBUTE'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Attr</el-tag>
               <el-tag v-else-if="data.nodeType === 'FIELD'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Field</el-tag>
