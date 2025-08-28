@@ -1,5 +1,5 @@
 <template>
-  <div class="search_div maxheight">
+  <div class="search_div max-height">
     <el-select
       v-model="storageName"
       style="width: 100%"

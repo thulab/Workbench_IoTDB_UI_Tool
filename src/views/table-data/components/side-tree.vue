@@ -174,7 +174,7 @@ function showAddTableDialog(nodeInfo: TableTreeNodeData, addType: string) {
 const setDefaultTreeExpandKeys = async () => {
   await getDatabases();
   if (treeData.value && treeData.value.length) {
-    let activeNode = treeData.value[0];
+    let activeNode = treeData.value[0]!;
     if (activeKeyList.value.length) {
       if (activeKeyList.value.length === 2) {
         const activeDb = treeData.value.find((node) => node.id === activeKeyList.value[0]);

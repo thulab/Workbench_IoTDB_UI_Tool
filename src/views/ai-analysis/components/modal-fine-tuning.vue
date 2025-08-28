@@ -37,7 +37,7 @@
         <base-form-item label="" prop="measurement" class="hidden-label">
           <el-select v-model="formData.measurement" id="fine-tuning-measurement" :disabled="!formData.table" v-loading="getModelsLoading">
             <el-option
-              v-for="item in currentTable?.children?.filter((item) => item.cateGory === 'FIELD') || []"
+              v-for="item in currentTable?.children?.filter((item) => item.category === 'FIELD') || []"
               :key="item.nodeName"
               :label="item.nodeName + (item.comment ? `(${item.comment})` : '')"
               :value="item.nodeName"
@@ -188,7 +188,7 @@ const currentTable = computed(() => {
 });
 
 const modelOptions = computed(() => {
-  return modelList.value.filter((item) => ['Timer-Sundial', 'Timer-XL'].includes(item.modelType));
+  return modelList.value.filter((item) => ['Timer-Sundial', 'Timer-XL']!.includes(item.modelType));
 });
 const allowedTypes = computed(() => {
   const result: string[] = ['INT32', 'INT64', 'FLOAT', 'DOUBLE'];

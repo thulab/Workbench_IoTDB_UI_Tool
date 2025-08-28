@@ -79,9 +79,9 @@ const slaveConnectionStatus = computed(() => connectionStore.slaveConnectionStat
 const connectionHost = computed(() => {
   const { type, masterCluster, slaveCluster } = connectionStore.connectionInfo.data;
   if (type === 2 && clusterType.value === 'slave' && slaveCluster) {
-    return `${slaveCluster.hostAndPortVOS[0].host}:${slaveCluster.hostAndPortVOS[0].port}`;
+    return `${slaveCluster.hostAndPortVOS[0]!.host}:${slaveCluster.hostAndPortVOS[0]!.port}`;
   }
-  return `${masterCluster.hostAndPortVOS[0].host}:${masterCluster.hostAndPortVOS[0].port}`;
+  return `${masterCluster.hostAndPortVOS[0]!.host}:${masterCluster.hostAndPortVOS[0]!.port}`;
 });
 
 // const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion));
@@ -90,7 +90,7 @@ const { requestFn: changeCluster } = useRequest(ConnectionApi.changeCluster);
 
 const getRoutePath = (routeItem: RouteRecordRaw, parentPath: string) => {
   const path = routeItem.path.indexOf('/') === 0 ? routeItem.path : `${parentPath}/${routeItem.path}`;
-  return path.replaceAll('//', '/');
+  return path.replace(/\/\//g, '/');
 };
 
 const routesToMenu = (routeItem: RouteRecordRaw, parentPath: string) => {
@@ -111,8 +111,8 @@ const routesToMenu = (routeItem: RouteRecordRaw, parentPath: string) => {
     sqlDialect: routeItem.meta?.sqlDialect,
   } as globalThis.MenuOptions;
   if (routeItem.children && routeItem.children.length > 0) {
-    if (routeItem.children.length === 1 && !routeItem.meta?.alwayShow && (!routeItem.children[0].children?.length || routeItem.children[0].children?.length <= 1)) {
-      menu.path = getRoutePath(routeItem.children[0], path);
+    if (routeItem.children.length === 1 && !routeItem.meta?.alwayShow && (!routeItem.children[0]!.children?.length || routeItem.children[0]!.children?.length <= 1)) {
+      menu.path = getRoutePath(routeItem.children[0]!, path);
     } else {
       const routesHasTitle = routeItem.children.filter((item) => item?.meta?.title && !item.meta?.hiddenMenu);
       routesHasTitle.forEach((item) => {

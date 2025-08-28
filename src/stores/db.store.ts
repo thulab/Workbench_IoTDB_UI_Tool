@@ -3,7 +3,7 @@ import IoTDBApi from '@/api/db.api';
 import { useConnectionStore } from './connection.store';
 import type { TableTreeNodeData, DatabaseRes } from '@/types';
 
-const { data: schemaTreeData, requestFn: fetchDatabases } = useRequest(IoTDBApi.getDatabases);
+const { data: schemaTreeData, loading: databaseLoading, requestFn: fetchDatabases } = useRequest(IoTDBApi.getDatabases);
 
 export const useDbStore = defineStore('db', () => {
   const databases = ref<DatabaseRes>();
@@ -68,11 +68,13 @@ export const useDbStore = defineStore('db', () => {
         dbNode.children?.push(tableNode);
       });
       data.push(dbNode);
-      databaseNames.value.push(db.database);
+      if (!databaseNames.value.includes(db.database)) {
+        databaseNames.value.push(db.database);
+      }
     });
     if (!activeKeyList.value.length && databaseNames.value.length) {
       const [firstDatabase] = databaseNames.value;
-      activeKeyList.value = [firstDatabase];
+      activeKeyList.value = [firstDatabase!];
     }
     return data;
   });
@@ -100,6 +102,7 @@ export const useDbStore = defineStore('db', () => {
     getDatabases,
     setFirstLoad,
     setActiveList,
+    databaseLoading,
   };
 });
 

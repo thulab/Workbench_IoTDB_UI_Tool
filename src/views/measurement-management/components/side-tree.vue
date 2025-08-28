@@ -207,7 +207,7 @@ function getTreeData() {
         },
       ];
       if (rootTotal > 1) {
-        treeData.value[0].pageChildren?.push({
+        treeData.value[0]!.pageChildren?.push({
           node: 'root',
           nodePath: 'root__PAGE',
           nodeType: 'PAGE',
@@ -230,7 +230,7 @@ function recursionFindCurrentByOrigin(path: string, data: Array<StorageDeviceTre
   const result = data.find((item) => item.nodePath === path);
   if (result) return result;
   for (let i = 0; i < data.length; i++) {
-    const item = data[i];
+    const item = data[i]!;
     if (path.startsWith(`${item.nodePath}.`)) {
       return recursionFindCurrentByOrigin(path, item.children!);
     }
@@ -243,7 +243,7 @@ function recursionFindParent(path: string, data: Array<StorageDeviceTreeNodeData
   const result = data.find((item) => item.nodePath === path);
   if (result) return result;
   for (let i = 0; i < data.length; i++) {
-    const item = data[i];
+    const item = data[i]!;
     if (path.startsWith(`${item.nodePath}.`)) {
       return recursionFindParent(path, item.pageChildren!);
     }
@@ -276,7 +276,7 @@ function fillTreeLoading(nodes: Array<StorageDeviceTreeNodeData>) {
 }
 
 // function fillNodePage(node: StorageDeviceTreeNodeData) {
-//   if (node && node.pageChildren && node.pageChildren.length === 1 && node.pageChildren[0].nodePath === 'loading' && node.children && node.children.length > 0) {
+//   if (node && node.pageChildren && node.pageChildren.length === 1 && node.pageChildren[0]!.nodePath === 'loading' && node.children && node.children.length > 0) {
 //     const dataPathTotal = Math.ceil(node.children.length / pageSize);
 //     node.pageChildren = node.children.slice(0, 1 * pageSize);
 //     node.pageNum = 1;
@@ -296,7 +296,7 @@ function fillTreeLoading(nodes: Array<StorageDeviceTreeNodeData>) {
 
 // function fillTreePage(nodes: Array<StorageDeviceTreeNodeData>) {
 //   nodes.forEach((node) => {
-//     if (node && node.pageChildren && node.pageChildren.length === 1 && node.pageChildren[0].nodePath === 'loading' && node.children && node.children.length > 0) {
+//     if (node && node.pageChildren && node.pageChildren.length === 1 && node.pageChildren[0]!.nodePath === 'loading' && node.children && node.children.length > 0) {
 //       const dataPathTotal = Math.ceil(node.children.length / pageSize);
 //       node.pageChildren = node.children.slice(0, 1 * pageSize);
 //       node.pageNum = 1;
@@ -356,9 +356,9 @@ function getFirstChilds(childData: Array<StorageDeviceTreeNodeData>) {
   const result: Array<string> = [];
   const data = childData || treeData;
   if (data.length === 0) return result;
-  result.push(data[0].nodePath);
-  if (data[0].children && data[0].children.length > 0) {
-    result.push(...getFirstChilds(data[0].children));
+  result.push(data[0]!.nodePath);
+  if (data[0]!.children && data[0]!.children.length > 0) {
+    result.push(...getFirstChilds(data[0]!.children));
   }
   return result;
 }
@@ -400,7 +400,7 @@ function handleData(data: string) {
       },
     ];
     if (rootTotal > 1) {
-      dealData[0].pageChildren?.push({
+      dealData[0]!.pageChildren?.push({
         node: 'root',
         nodePath: 'root__PAGE',
         nodeType: 'PAGE',
@@ -515,8 +515,8 @@ async function handleOperate(Operate: 'add' | 'delete', payload: TreeEventPayloa
     addPaths.value.splice(0, 1);
     if (addPaths.value.length > 0) {
       if (!isSearchResult.value) {
-        const item = recursionFindCurrentByOrigin(addPaths.value[0], treeData.value);
-        const pageItem = recursionFindParent(addPaths.value[0], treeData.value);
+        const item = recursionFindCurrentByOrigin(addPaths.value[0]!, treeData.value);
+        const pageItem = recursionFindParent(addPaths.value[0]!, treeData.value);
         if (item) {
           item.children = [cloneDeep(loadingNode)];
           item.pageChildren = [cloneDeep(loadingNode)];
@@ -588,8 +588,8 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
     e?.stopPropagation();
     return;
   }
-  if (data.nodePath === expandNode.value && (!data.pageChildren || data.pageChildren[0].nodeType !== 'loading')) return;
-  // if (['DATABASE', 'TIMESERIES'].includes(data.nodeType)) {
+  if (data.nodePath === expandNode.value && (!data.pageChildren || data.pageChildren[0]!.nodeType !== 'loading')) return;
+  // if (['DATABASE', 'TIMESERIES']!.includes(data.nodeType)) {
   if (props.currentNode !== data.nodePath) {
     emit('handleChangeNode', data.nodePath, data.nodeType, searchText.value);
   }
@@ -597,7 +597,7 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
   expandNode.value = data.nodePath;
   // expandNodes.value = [data.nodeParent, data.nodePath];
   if (isSearchResult.value) {
-    if ((data.pageChildren && data.pageChildren.length === 0) || data.pageChildren[0].nodeType === 'loading') {
+    if ((data.pageChildren && data.pageChildren.length === 0) || data.pageChildren[0]!.nodeType === 'loading') {
       const originTreeData = cloneDeep(recursionFindCurrentByOrigin(data.nodePath, treeData.value)?.children || []);
       const dataPathTotal = Math.ceil(originTreeData.length / pageSize);
       data.pageChildren = originTreeData.slice(0, 1 * pageSize);
@@ -618,7 +618,7 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
     return;
   }
   const children = measurementTree.value?.virtualizedTreeRef?.getNode(data.nodePath)?.children;
-  if ((!children || (children[0].data as TreeNodeData).nodeType !== 'loading') && data.pageChildren[0].nodeType !== 'loading') {
+  if ((!children || (children[0]!.data as TreeNodeData).nodeType !== 'loading') && data.pageChildren[0]!.nodeType !== 'loading') {
     return;
   }
   getNextNodeInfos(data.nodePath).then((res) => {

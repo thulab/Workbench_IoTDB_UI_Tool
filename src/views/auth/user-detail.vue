@@ -226,6 +226,9 @@ import type { DBUser, AuthByRoleRes, UserEditPathAuthInfo, UserEditAuthInfo, Pri
 const { t, locale } = useI18n();
 const connectionStore = useConnectionStore();
 const userStore = useUserStore();
+
+const router = useRouter();
+
 const { entityPrivilegesEnumGroup, entityPrivilegesEnumKeys, pathPrivilegesEnumGroup, pathPrivilegesEnumKeys, canManageUser, canManageRole } = storeToRefs(userStore);
 const userName = computed(() => userStore.userInfo.name);
 
@@ -571,6 +574,12 @@ function handleDoc() {
   }
 }
 
+onBeforeMount(() => {
+  if (connectionStore.isTableModel) {
+    router.push({ name: 'TableUserManagement' });
+  }
+});
+
 watch(
   () => currentUser.value,
   (val, old) => {
@@ -636,16 +645,18 @@ watch(
   margin: 12px 16px;
   display: flex;
   font-size: 14px;
+  align-items: center;
 
   .el-tag {
     cursor: pointer;
-    margin: 0 8px 8px 0;
+    margin: 0 8px 0 0;
   }
 
   .detail-role-box {
     flex: 1;
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
   }
 
   .el-tag--info {

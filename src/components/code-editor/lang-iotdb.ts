@@ -32,7 +32,7 @@ export const sqlExamplesCompletions = (context: CompletionContext) => {
   const upperToken = before?.text.toLocaleUpperCase().trim() || '';
   if (arr.includes(upperToken)) {
     return {
-      options: selectList[upperToken].map((item: string) => ({
+      options: selectList[upperToken]!.map((item: string) => ({
         label: item,
         type: 'text',
       })),

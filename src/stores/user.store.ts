@@ -4,7 +4,7 @@ import { union, difference } from 'lodash-es';
 import { UserApi, DashboardApi } from '@/api';
 import { useRouter } from 'vue-router';
 import { useConnectionStore } from './connection.store';
-import type { UserPrivileges, PrivilegesEnum } from '@/types';
+import type { LoginUserPrivileges, PrivilegesEnum } from '@/types';
 
 const { requestFn: getLoginUserPrivileges } = useRequest(UserApi.getLoginUserPrivileges);
 const { requestFn: getPrivilegesEnum } = useRequest(UserApi.getPrivilegesEnum);
@@ -22,7 +22,7 @@ export const useUserStore = defineStore(
       name: string;
     });
 
-    const allPrivileges = ref<UserPrivileges>();
+    const allPrivileges = ref<LoginUserPrivileges>();
     const privilegesEnum = ref<PrivilegesEnum>();
 
     // 权限配置
@@ -126,6 +126,9 @@ export const useUserStore = defineStore(
     const canMaintain = computed(() => userAllEntityPrivileges.value.includes('MAINTAIN'));
     const canUseModel = computed(() => userAllEntityPrivileges.value.includes('USE_MODEL'));
 
+    const canManageUserWithTableModel = computed(() => allPrivileges.value?.tableGlobalPrivileges.some((item) => item.privilegeName === 'MANAGE_USER') || false);
+    const canManageRoleWithTableModel = computed(() => allPrivileges.value?.tableGlobalPrivileges.some((item) => item.privilegeName === 'MANAGE_ROLE') || false);
+
     function clearUserStore() {
       userInfo.value.name = '';
       allPrivileges.value = undefined;
@@ -220,6 +223,8 @@ export const useUserStore = defineStore(
       canUsePipe,
       canManageUser,
       canManageRole,
+      canManageUserWithTableModel,
+      canManageRoleWithTableModel,
       canMaintain,
       setUser,
       clearUserStore,

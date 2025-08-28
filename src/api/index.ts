@@ -12,5 +12,6 @@ import ConfigApi from './config.api';
 import AIAnalysisApi from './ai-analysis.api';
 import IoTDBApi from './db.api';
 import TableDataApi from './table-data.api';
+import RelationalPrivilegesApi from './relational-privileges.api';
 
-export { SearchApi, StorageApi, AlarmApi, UserApi, AuthApi, CalculateApi, LogApi, DashboardApi, ConnectionApi, DataSyncApi, ConfigApi, AIAnalysisApi, IoTDBApi, TableDataApi };
+export { SearchApi, StorageApi, AlarmApi, UserApi, AuthApi, CalculateApi, LogApi, DashboardApi, ConnectionApi, DataSyncApi, ConfigApi, AIAnalysisApi, IoTDBApi, TableDataApi, RelationalPrivilegesApi };

@@ -245,7 +245,7 @@ function getMaxExpandLevel(data: ModelData, level = 0) {
   let maxLevel = level;
   // 遍历子节点
   for (let i = 0; i < data.children.length; i++) {
-    const child = data.children[i];
+    const child = data.children[i]!;
     // 如果子节点是展开状态
     if (child.collapsed === false && child.children && child.children.length > 0) {
       // 递归获取子节点的最大展开层级
@@ -304,24 +304,24 @@ function getModalTreeData() {
 
 function dealData(data: ModelData[]) {
   for (let i = 0; i < data.length; i++) {
-    data[i].collapsed = true;
-    if (data[i].children?.length) {
-      if (data[i].hasNext) {
-        data[i].children?.push({
+    data[i]!.collapsed = true;
+    if (data[i]!.children?.length) {
+      if (data[i]!.hasNext) {
+        data[i]!.children?.push({
           node: t('common.nextPage'),
-          nodePath: data[i].nodePath,
+          nodePath: data[i]!.nodePath,
           nodeType: 'next',
-          pageNum: data[i].pageNum,
-          pageSize: data[i].pageSize,
+          pageNum: data[i]!.pageNum,
+          pageSize: data[i]!.pageSize,
         });
       }
-      if (data[i].hasPre) {
-        data[i].children?.unshift({
+      if (data[i]!.hasPre) {
+        data[i]!.children?.unshift({
           node: t('common.previousPage'),
-          nodePath: data[i].nodePath,
+          nodePath: data[i]!.nodePath,
           nodeType: 'pre',
-          pageNum: data[i].pageNum,
-          pageSize: data[i].pageSize,
+          pageNum: data[i]!.pageNum,
+          pageSize: data[i]!.pageSize,
         });
       }
     }
@@ -339,7 +339,7 @@ const deepSearchSelf = (data: ModelData, path: string, index: number, levelData:
     index++;
     if (data.children && data.children.length) {
       for (let i = 0; i < data.children.length; i++) {
-        deepSearchSelf(data.children[i], path, index, levelData);
+        deepSearchSelf(data.children[i]!, path, index, levelData);
       }
     }
   }

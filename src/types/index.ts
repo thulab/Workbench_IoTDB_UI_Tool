@@ -12,3 +12,4 @@ export * from './server';
 export * from './tree-data';
 export * from './table-data';
 export * from './trend';
+export * from './relational-privileges';

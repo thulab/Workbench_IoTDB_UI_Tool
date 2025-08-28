@@ -54,7 +54,7 @@ class StorageApi {
   }
 
   // 根据存储组和关键词查设备
-  static getDeviceByGroup(params: globalThis.PageQuery & { groupName: string }): globalThis.HttpResponseP<GetPathListResponse> {
+  static getDeviceByGroup(params: globalThis.PageQuery & { groupName: string; keyword: string }): globalThis.HttpResponseP<GetPathListResponse> {
     return http.get('/schema/getDevicesByGroupName', { params });
   }
 
@@ -64,7 +64,7 @@ class StorageApi {
   }
 
   // 根据设备和关键词查物理量
-  static getMeasurementList(params: globalThis.PageQuery & { deviceName: string }): globalThis.HttpResponseP<GetPathListResponse> {
+  static getMeasurementList(params: globalThis.PageQuery & { deviceName: string; keyword: string }): globalThis.HttpResponseP<GetPathListResponse> {
     return http.get('/schema/getMeasurementsByDeviceName', { params });
   }
 

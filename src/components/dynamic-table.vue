@@ -15,22 +15,22 @@
         >
           <el-table-column fixed="left" v-if="showSelect" type="selection" width="50" align="center" />
           <el-table-column
-            :key="item.prop"
-            :prop="item.prop"
+            :key="item!.prop"
+            :prop="item!.prop"
             v-for="item of columnsByPage"
             min-width="180px"
-            :width="`${item.width}px`"
-            :align="item.align"
-            :fixed="item.fixed"
-            :sortable="item.sortable"
+            :width="`${item!.width}px`"
+            :align="item!.align"
+            :fixed="item!.fixed"
+            :sortable="item!.sortable"
             :sort-orders="['ascending', 'descending']"
             show-overflow-tooltip
           >
             <template #header>
-              <span :class="item.sortable ? '' : 'flex-header'"><text-tooltip :content="item.label" /></span>
+              <span :class="item!.sortable ? '' : 'flex-header'"><text-tooltip :content="item!.label" /></span>
             </template>
             <template #default="scope">
-              <span>{{ item.formatContent ? item.formatContent(scope.row[item.prop] || item.defaultValue) : scope.row[item.prop] || item.defaultValue }}</span>
+              <span>{{ item!.formatContent ? item!.formatContent(scope.row[item!.prop] || item!.defaultValue) : scope.row[item!.prop] || item!.defaultValue }}</span>
             </template>
           </el-table-column>
           <slot name="append-column"></slot>

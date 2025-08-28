@@ -20,8 +20,8 @@
 .el-table .sort-caret.ascending {
   border-bottom-color: #a0a3b8 !important;
 
-  // border-width: 0 4px 8px !important;
-  // top: -4px !important;
+  // border-width: 0 4px 8px !important;border-width
+  // top: -4px !important;top
 }
 
 .el-table .ascending .sort-caret.ascending {
@@ -31,8 +31,8 @@
 .el-table .sort-caret.descending {
   border-top-color: #a0a3b8 !important;
 
-  // border-width: 8px 4px 0 !important;
-  // bottom: -2px !important;
+  // border-width: 8px 4px 0 !important;border-width
+  // bottom: -2px !important;bottom
 }
 
 .el-table .descending .sort-caret.descending {
@@ -50,4 +50,10 @@
 .el-table__footer {
   width: 100% !important;
   table-layout: fixed !important;
+}
+
+.small-table {
+  .el-table__row .el-table__cell {
+    padding: 0;
+  }
 }

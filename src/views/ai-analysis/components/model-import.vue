@@ -142,7 +142,7 @@ const modelId = ref('');
 const checkValid = (name: string) => {
   const suffix = name.split('.');
   const ptReg = /pt|yaml/i;
-  const isModel = ptReg.test(suffix[suffix.length - 1]) && suffix.length > 1;
+  const isModel = ptReg.test(suffix[suffix.length - 1]!) && suffix.length > 1;
   return isModel;
 };
 

@@ -7,7 +7,7 @@ import { registerGuard as registerAuthGuard } from './guard/auth-guard';
 const metaRouters = import.meta.glob('./modules/*.ts', { eager: true, import: 'default' });
 export const asyncRoutes: Array<RouteRecordRaw> = [];
 Object.keys(metaRouters).forEach((item) => {
-  const data: Array<RouteRecordRaw> = getRouterByType(metaRouters[item]);
+  const data: Array<RouteRecordRaw> = getRouterByType(metaRouters[item] as RouteRecordRaw[]);
   data.forEach((menuItem: RouteRecordRaw) => {
     menuItem.path = `/view${menuItem.path}`;
   });

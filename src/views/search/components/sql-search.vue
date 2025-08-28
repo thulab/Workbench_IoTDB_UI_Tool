@@ -65,11 +65,11 @@
           <div class="run-result-infos">
             <!-- <ul>
               <li class="run-result-item">
-                <i-custom-query-success v-if="sqlResult[index].status === true" />
-                <i-custom-query-error v-else-if="sqlResult[index].status === false" />
+                <i-custom-query-success v-if="sqlResult[index]!.status === true" />
+                <i-custom-query-error v-else-if="sqlResult[index]!.status === false" />
                 <i-custom-query-status v-else />
                 查询状态：
-                <span :style="{ color: sqlResult[index].status !== undefined ? sqlResult[index].status ? '#44C795' : '#D43030' : '#656A85' }">{{ formatSqlInfo('status', index) }}</span>
+                <span :style="{ color: sqlResult[index]!.status !== undefined ? sqlResult[index]!.status ? '#44C795' : '#D43030' : '#656A85' }">{{ formatSqlInfo('status', index) }}</span>
               </li>
               <li class="run-result-item"><i-custom-query-start-time />开始时间：{{ formatSqlInfo('startQueryTime', index) }}</li>
               <li class="run-result-item"><i-custom-query-time />查询耗时：{{ formatSqlInfo('queryTime', index) }}</li>
@@ -81,13 +81,13 @@
                 {{ t('common.refresh') }}
               </el-button>
               <el-dropdown
-                :disabled="!sqlResult[index].status"
+                :disabled="!sqlResult[index]!.status"
                 class="more-icon m-l-12"
                 @command="(val) => handleCommandDown(val, index)"
-                v-show="sqlResult[index].status && tableDataPagination[index]?.list?.length > 0"
+                v-show="sqlResult[index]!.status && tableDataPagination[index]!.list?.length > 0"
                 id="sql-search-download-dropdown"
               >
-                <el-button link :class="['sql-export-button', !sqlResult[index].status ? '' : 'svg-button-hover-color']" :disabled="!sqlResult[index].status" id="sql-search-download">
+                <el-button link :class="['sql-export-button', !sqlResult[index]!.status ? '' : 'svg-button-hover-color']" :disabled="!sqlResult[index]!.status" id="sql-search-download">
                   <i-custom-download style="transform: translate(0, 0)" />
                   {{ t('common.export') }}
                   <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
@@ -101,12 +101,12 @@
               </el-dropdown>
             </div>
           </div>
-          <div class="tab_table" v-if="sqlResult[index].status">
+          <div class="tab_table" v-if="sqlResult[index]!.status">
             <dynamic-table
               v-if="item"
               ref="standTable"
               :columns="item"
-              :table-data="tableDataPagination[index].list || []"
+              :table-data="tableDataPagination[index]!.list || []"
               :max-height="maxTableHeight"
               :height="maxTableHeight"
               v-model:current-page="pageNums[index]"
@@ -116,7 +116,7 @@
               show-pagination
             />
           </div>
-          <div class="tab_table" v-if="sqlResult[index].errMsg">Msg: {{ sqlResult[index].errMsg }}</div>
+          <div class="tab_table" v-if="sqlResult[index]!.errMsg">Msg: {{ sqlResult[index]!.errMsg }}</div>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -262,10 +262,10 @@ function querySqlRun(type?: string) {
               list: item.valueList.map((eleitem) => {
                 const obj = <Record<string, string>>{};
                 for (let i = 0; i < eleitem.length; i++) {
-                  // if (eleitem[i].length > length[i] || !length[i]) {
-                  //   length[i] = eleitem[i].length;
+                  // if (eleitem[i]!.length > length[i] || !length[i]) {
+                  //   length[i] = eleitem[i]!.length;
                   // }
-                  obj[`t${i}`] = eleitem[i];
+                  obj[`t${i}`] = eleitem[i]!;
                 }
                 return obj;
               }),
@@ -333,16 +333,16 @@ function exportSql(val: string, exportType: string) {
 }
 // 下载
 function handleCommandDown(val: string, index: number) {
-  const { sql = '' } = sqlResult.value[index];
+  const { sql = '' } = sqlResult.value[index]!;
   if (val === 'refresh') {
-    sqlResult.value[index].startQueryTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    sqlResult.value[index]!.startQueryTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
     columnList.value.splice(index, 1, []);
     tableData.list.splice(index, 1, {});
     querySql({ sqls: [sql], timestamp: dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).valueOf() }).then((res) => {
       const { data } = res;
-      sqlResult.value[index] = Object.assign(sqlResult.value[index], data[0]);
+      sqlResult.value[index] = Object.assign(sqlResult.value[index]!, data[0]);
       data.forEach((item) => {
-        const length = <number[]>[];
+        // const length = <number[]>[];
         if (item.metaDataList) {
           columnList.value.splice(
             index,
@@ -362,10 +362,10 @@ function handleCommandDown(val: string, index: number) {
             list: item.valueList.map((eleitem) => {
               const obj = <Record<string, string>>{};
               for (let i = 0; i < eleitem.length; i++) {
-                if (eleitem[i].length > length[i] || !length[i]) {
-                  length[i] = eleitem[i].length;
-                }
-                obj[`t${i}`] = eleitem[i];
+                // if (eleitem[i]!.length > length[i]! || !length[i]) {
+                //   length[i] = eleitem[i]!.length;
+                // }
+                obj[`t${i}`] = eleitem[i]!;
               }
               return obj;
             }),

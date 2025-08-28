@@ -27,8 +27,8 @@ export function toThousands(num: number, defaultFormat: string = '') {
 export function transformDecimal(num: number, point: number) {
   let decimalNum = null;
   const arr = num.toString().split('.');
-  if (arr.length > 1 && arr[1].length > point) {
-    const decimal = arr[1].slice(point, point + 1);
+  if (arr.length > 1 && arr[1]!.length > point) {
+    const decimal = arr[1]!.slice(point, point + 1);
     if (decimal === '5') {
       num += 0.1 ** (point + 1);
     }

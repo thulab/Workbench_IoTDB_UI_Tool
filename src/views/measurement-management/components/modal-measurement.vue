@@ -31,7 +31,7 @@
               <el-col :span="24">
                 <base-form-item
                   :label="`${t('measurement.measurementName')}：`"
-                  :prop="`measurementList[${index}].timeseries`"
+                  :prop="`measurementList[${index}]!.timeseries`"
                   :rules="requiredRules"
                   class="m-r-0"
                   :label-width="locale === 'en' ? '108px' : '92px'"
@@ -55,7 +55,7 @@
             </el-row>
             <el-row>
               <el-col :span="24">
-                <base-form-item :prop="`measurementList[${index}].description`" class="m-r-0 el-form-item-not-mandatory" :label-width="locale === 'en' ? '108px' : '92px'">
+                <base-form-item :prop="`measurementList[${index}]!.description`" class="m-r-0 el-form-item-not-mandatory" :label-width="locale === 'en' ? '108px' : '92px'">
                   <template #label>{{ t('measurement.measurementAlias') }}：</template>
                   <el-input v-model="item.alias" :placeholder="t('measurement.aliasPlaceholder')" :id="`measurement-modal-collapse-${index}-description`" maxlength="100" show-word-limit />
                 </base-form-item>
@@ -63,7 +63,7 @@
             </el-row>
             <el-row>
               <el-col :span="24">
-                <base-form-item :prop="`measurementList[${index}].description`" class="m-r-0 el-form-item-not-mandatory" :label-width="locale === 'en' ? '108px' : '92px'">
+                <base-form-item :prop="`measurementList[${index}]!.description`" class="m-r-0 el-form-item-not-mandatory" :label-width="locale === 'en' ? '108px' : '92px'">
                   <template #label>
                     {{ t('measurement.measurementDescription') }}：
                     <el-tooltip effect="light" :content="t('measurement.descriptionTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
@@ -80,7 +80,7 @@
             </el-row>
             <el-row>
               <el-col :span="24">
-                <base-form-item :prop="`measurementList[${index}].description`" class="m-r-0 el-form-item-not-mandatory" :label-width="locale === 'en' ? '108px' : '92px'">
+                <base-form-item :prop="`measurementList[${index}]!.description`" class="m-r-0 el-form-item-not-mandatory" :label-width="locale === 'en' ? '108px' : '92px'">
                   <template #label>
                     {{ t('measurement.tag') }}：
                     <el-tooltip effect="light" :content="t('measurement.tagTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
@@ -91,21 +91,21 @@
             </el-row>
             <el-row>
               <el-col :span="8">
-                <base-form-item :label="`${t('measurement.dataType')}：`" :prop="`measurementList[${index}].dataType`" :rules="requiredRules">
+                <base-form-item :label="`${t('measurement.dataType')}：`" :prop="`measurementList[${index}]!.dataType`" :rules="requiredRules">
                   <el-select v-model="item.dataType" @change="(val) => handleChangeRowDataType(val, item, index)" :id="`measurement-modal-collapse-${index}-dataType`">
                     <el-option v-for="dtype in dataTypeOptions" :key="dtype" :label="dtype" :value="dtype" :id="`measurement-modal-collapse-${index}-dataType-select-${dtype}`" />
                   </el-select>
                 </base-form-item>
               </el-col>
               <el-col :span="8">
-                <base-form-item :label="`${t('measurement.encoding')}：`" :prop="`measurementList[${index}].encoding`" :rules="requiredRules">
+                <base-form-item :label="`${t('measurement.encoding')}：`" :prop="`measurementList[${index}]!.encoding`" :rules="requiredRules">
                   <el-select v-model="item.encoding" :disabled="!item.dataType" :id="`measurement-modal-collapse-${index}-encoding`">
                     <el-option v-for="enc in encodingOptions(item.dataType as string)" :key="enc" :label="enc" :value="enc" :id="`measurement-modal-collapse-${index}-encoding-select-${enc}`" />
                   </el-select>
                 </base-form-item>
               </el-col>
               <el-col :span="8">
-                <base-form-item :label="`${t('measurement.compression')}：`" :prop="`measurementList[${index}].compression`" :rules="requiredRules" style="margin-right: 0">
+                <base-form-item :label="`${t('measurement.compression')}：`" :prop="`measurementList[${index}]!.compression`" :rules="requiredRules" style="margin-right: 0">
                   <el-select v-model="item.compression" :id="`measurement-modal-collapse-${index}-compression`">
                     <el-option v-for="com in compressionOptions" :key="com" :label="com" :value="com" :id="`measurement-modal-collapse-${index}-compression-select-${com}`" />
                   </el-select>
@@ -222,7 +222,7 @@ function handleDelRow(i: number, e: MouseEvent) {
 
 // 切换数据类型
 function handleChangeRowDataType(val: string, item: Partial<MeasurementItem>, index: number) {
-  formData.measurementList.splice(index, 1, { ...item, encoding: encoding[val][0] as globalThis.EncodingType });
+  formData.measurementList.splice(index, 1, { ...item, encoding: encoding[val]![0] as globalThis.EncodingType });
 }
 
 // 追加行
@@ -254,7 +254,7 @@ const handleConfirm = () => {
           if (res.code === 0) {
             ElMessage.success({ message: `${t('common.createSuccess')}`, grouping: true });
             dialogVisible.value = false;
-            emit('handleSave', measurementVOList[0].timeseries);
+            emit('handleSave', measurementVOList[0]!.timeseries);
           }
         })
         .catch((err) => {
@@ -268,7 +268,7 @@ const handleConfirm = () => {
             }).finally(() => {
               if (err.code === 9999) {
                 dialogVisible.value = false;
-                emit('handleSave', measurementVOList[0].timeseries);
+                emit('handleSave', measurementVOList[0]!.timeseries);
               }
             });
           }

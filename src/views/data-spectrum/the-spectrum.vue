@@ -89,7 +89,7 @@
                   />
                 </base-form-item>
               </template>
-              <template v-if="['LOWPASS', 'HIGHPASS'].includes(searchFormData.method)">
+              <template v-if="['LOWPASS', 'HIGHPASS']!.includes(searchFormData.method)">
                 <base-form-item prop="wpass" :rules="requiredRules" class="form-item-last">
                   <template #label>
                     {{ t('spectrum.cutoffFrequency') }}：
@@ -586,7 +586,7 @@ const saveTemplateDisabled = computed(() => {
   if ((searchFormData.method === 'DWT' && dwtTab.value === 'type' && !searchFormData.dwtMethod) || (dwtTab.value === 'number' && !searchFormData.coef)) {
     return true;
   }
-  if (['LOWPASS', 'HIGHPASS'].includes(searchFormData.method) && !searchFormData.wpass) {
+  if (['LOWPASS', 'HIGHPASS']!.includes(searchFormData.method) && !searchFormData.wpass) {
     return true;
   }
   if (searchFormData.method === 'custom' && !sqlValue.value) {
@@ -615,7 +615,7 @@ const applyTipDisabled = computed(() => {
   return false;
 });
 
-const xMax = computed(() => chartData.timestamps[chartData.timestamps.length - 1]);
+const xMax = computed(() => chartData.timestamps[chartData.timestamps.length - 1]!);
 
 const methodOptions = computed(() => [...methodList.value, { functionName: 'custom', name: t('spectrum.customAnalysis'), enable: true }]);
 
@@ -693,67 +693,70 @@ const visualMap = computed(() => {
   };
 });
 
-const chartOptions = computed<ECOption>(() => ({
-  tooltip: {
-    trigger: 'axis',
-    confine: true,
-    formatter: (params) => {
-      const paramsData = params as unknown as Array<Record<string, any>>;
-      const circle = `<div style="z-index: 9999"><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${paramsData[0].color}"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0].seriesName}</span></div>`;
-      const x = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;">X：</span><span style="font-size:14px;color:#666;font-weight:400;">${paramsData[0].axisValueLabel}</span></div>`;
-      const y = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;">Y：</span><span style="font-size:14px;color:#666;font-weight:400;">${paramsData[0].value[1]}</span></div>`;
-      return `${circle}${x}${y}`;
-    },
-  },
-  toolbox: {
-    show: true,
-    feature: {
-      dataZoom: {
-        title: {
-          zoom: t('common.zoom'),
-          back: t('common.revoke'),
-        },
-        icon: {
-          zoom: 'path://M15 9L23 9L23 23L9 23L9 15M13 9L9 9M9 9L5 9M9 13L9 9M9 9L9 5',
-          back: 'path://M9,9h14v14H9v-8 M12,12L9,9l3-3',
+const chartOptions = computed<ECOption>(
+  () =>
+    ({
+      tooltip: {
+        trigger: 'axis',
+        confine: true,
+        formatter: (params: Array<Record<string, any>>) => {
+          const paramsData = params;
+          const circle = `<div style="z-index: 9999"><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${paramsData[0]!.color}"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0]!.seriesName}</span></div>`;
+          const x = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;">X：</span><span style="font-size:14px;color:#666;font-weight:400;">${paramsData[0]!.axisValueLabel}</span></div>`;
+          const y = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;">Y：</span><span style="font-size:14px;color:#666;font-weight:400;">${paramsData[0]!.value[1]}</span></div>`;
+          return `${circle}${x}${y}`;
         },
       },
-      restore: {
-        title: t('common.restore'),
-        icon: 'path://M13 21L15 24C10.0294 24 6 19.9706 6 15C6 12.7036 6.86006 10.6081 8.27564 9.01797M17 9L15 6C19.9706 6 24 10.0294 24 15C24 17.3063 23.1325 19.4101 21.7059 21.0026',
+      toolbox: {
+        show: true,
+        feature: {
+          dataZoom: {
+            title: {
+              zoom: t('common.zoom'),
+              back: t('common.revoke'),
+            },
+            icon: {
+              zoom: 'path://M15 9L23 9L23 23L9 23L9 15M13 9L9 9M9 9L5 9M9 13L9 9M9 9L9 5',
+              back: 'path://M9,9h14v14H9v-8 M12,12L9,9l3-3',
+            },
+          },
+          restore: {
+            title: t('common.restore'),
+            icon: 'path://M13 21L15 24C10.0294 24 6 19.9706 6 15C6 12.7036 6.86006 10.6081 8.27564 9.01797M17 9L15 6C19.9706 6 24 10.0294 24 15C24 17.3063 23.1325 19.4101 21.7059 21.0026',
+          },
+          saveAsImage: {
+            title: t('common.export'),
+            icon: 'path://M18,12V7H7v16h11v-5 M24,15H13 M21,18l3-3l-3-3',
+          },
+        },
       },
-      saveAsImage: {
-        title: t('common.export'),
-        icon: 'path://M18,12V7H7v16h11v-5 M24,15H13 M21,18l3-3l-3-3',
+      grid: {
+        left: 20,
+        right: 60,
+        bottom: 20,
+        containLabel: true,
       },
-    },
-  },
-  grid: {
-    left: 20,
-    right: 60,
-    bottom: 20,
-    containLabel: true,
-  },
-  connectNulls: false,
-  visualMap: visualMap.value,
-  xAxis: {
-    type: copySearchFormData.method === 'PATTERN_MATCH' ? 'time' : 'value',
-    boundaryGap: false,
-    show: !dataEmpty.value,
-    splitLine: {
-      show: false,
-    },
-    min: copySearchFormData.method === 'PATTERN_MATCH' ? 'dataMin' : 0,
-    max: copySearchFormData.method === 'PATTERN_MATCH' ? 'dataMax' : xMax.value,
-  },
-  yAxis: {
-    type: 'value',
-    show: !dataEmpty.value,
-    scale: true,
-  },
-  animation: true,
-  series: seriesData.value.series,
-}));
+      connectNulls: false,
+      visualMap: visualMap.value,
+      xAxis: {
+        type: copySearchFormData.method === 'PATTERN_MATCH' ? 'time' : 'value',
+        boundaryGap: false,
+        show: !dataEmpty.value,
+        splitLine: {
+          show: false,
+        },
+        min: copySearchFormData.method === 'PATTERN_MATCH' ? 'dataMin' : 0,
+        max: copySearchFormData.method === 'PATTERN_MATCH' ? 'dataMax' : xMax.value,
+      },
+      yAxis: {
+        type: 'value',
+        show: !dataEmpty.value,
+        scale: true,
+      },
+      animation: true,
+      series: seriesData.value.series,
+    }) as unknown as ECOption,
+);
 
 const { requestFn: getUDFFunction } = useRequest(SearchApi.getUDFFunction);
 const { requestFn: getFFTData } = useRequest(SearchApi.getFFTData);
@@ -852,8 +855,8 @@ function getCount() {
   const end = copySearchFormData.datetimerange.length === 2 ? dayjs(searchFormData.datetimerange[1]).valueOf() : undefined;
   getDataCount({
     measurement: searchFormData.measurement,
-    startTime: start,
-    endTime: end,
+    startTime: start!,
+    endTime: end!,
   })
     .then((res) => {
       dataCount.value = res.data;
@@ -907,7 +910,7 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
       handleClickChart(params);
     });
     chartInstance.on('highlight', (params: any) => {
-      if (params.batch && params.batch.length > 0) currentPoint = params?.batch[0].dataIndex;
+      if (params.batch && params.batch.length > 0) currentPoint = params?.batch[0]!.dataIndex;
     });
     // 若存在restore事件，执行
     chartInstance.on('restore', () => {
@@ -996,9 +999,9 @@ function handleDealCursor(params: echarts.ECElementEvent) {
     path: seriesName,
     type: 'cursor',
     name: `${seriesName}_${(value as number[])[0]}_point_line`,
-    value: (value as number[])[1],
-    xAxis: (value as number[])[0],
-    yAxis: (value as number[])[1],
+    value: (value as number[])[1]!,
+    xAxis: (value as number[])[0]!,
+    yAxis: (value as number[])[1]!,
     itemStyle: {
       color: 'transparent',
       borderColor: '#fff',
@@ -1016,8 +1019,8 @@ function handleDealCursor(params: echarts.ECElementEvent) {
   });
   pointList.value.push({
     name: `${seriesName}_${(value as number[])[0]}`,
-    x: (value as number[])[0],
-    y: (value as number[])[1],
+    x: (value as number[])[0]!,
+    y: (value as number[])[1]!,
     disabled: false,
     checked: false,
   });
@@ -1056,7 +1059,7 @@ function handleDealFrequency(params: echarts.ECElementEvent) {
       let y = '';
       const index = chartData.timestamps.findIndex((num) => num === x);
       if (index !== -1) {
-        y = chartData.values[index];
+        y = chartData.values[index]!;
       }
       pointLineData.value.push({
         path: seriesName,
@@ -1087,19 +1090,19 @@ function handleDealFrequency(params: echarts.ECElementEvent) {
 
 function handleDealSideband(params: echarts.ECElementEvent) {
   const { seriesName, value } = params as { seriesName: string; value: number[] };
-  if (sidebandData.value.includes(value[0])) return;
-  sidebandData.value.push(value[0]);
+  if (sidebandData.value.includes(value[0]!)) return;
+  sidebandData.value.push(value[0]!);
   drawedStatus.sideband = true;
   if (sidebandData.value.length === 2) {
-    const interval = Math.abs(sidebandData.value[0] - sidebandData.value[1]);
+    const interval = Math.abs(sidebandData.value[0]! - sidebandData.value[1]!);
     // 左侧
     for (let i = 1; i <= sideband.value!; i++) {
-      if (sidebandData.value[0] - i * interval > 0) {
-        const leftX = sidebandData.value[0] - i * interval;
+      if (sidebandData.value[0]! - i * interval > 0) {
+        const leftX = sidebandData.value[0]! - i * interval;
         let leftY = '';
         const leftI = chartData.timestamps.findIndex((num) => num === leftX);
         if (leftI !== -1) {
-          leftY = chartData.values[leftI];
+          leftY = chartData.values[leftI]!;
         }
         pointLineData.value.push({
           path: seriesName,
@@ -1126,11 +1129,11 @@ function handleDealSideband(params: echarts.ECElementEvent) {
       }
     }
     // 当前
-    const currentX = sidebandData.value[0];
+    const currentX = sidebandData.value[0]!;
     let currentY = '';
     const currentI = chartData.timestamps.findIndex((num) => num === currentX);
     if (currentI !== -1) {
-      currentY = chartData.values[currentI];
+      currentY = chartData.values[currentI]!;
     }
     pointLineData.value.push({
       path: seriesName,
@@ -1156,12 +1159,12 @@ function handleDealSideband(params: echarts.ECElementEvent) {
     });
     // 右侧
     for (let i = 1; i <= sideband.value!; i++) {
-      if (sidebandData.value[0] + i * interval <= xMax.value) {
-        const rightX = sidebandData.value[0] + i * interval;
+      if (sidebandData.value[0]! + i * interval <= xMax.value) {
+        const rightX = sidebandData.value[0]! + i * interval;
         let rightY = '';
         const rightI = chartData.timestamps.findIndex((num) => num === rightX);
         if (rightI !== -1) {
-          rightY = chartData.values[rightI];
+          rightY = chartData.values[rightI]!;
         }
         pointLineData.value.push({
           path: seriesName,
@@ -1326,8 +1329,8 @@ function getEnvelope() {
     frequency: copySearchFormData.frequency || '',
     amplification: copySearchFormData.amplification || '',
     measurement: copySearchFormData.measurement,
-    startTime: start,
-    endTime: end,
+    startTime: start!,
+    endTime: end!,
   })
     .then((res) => {
       chartData.timestamps = res.data.timestamps || [];
@@ -1356,8 +1359,8 @@ function getDwt() {
     coef: dwtTab.value === 'number' ? copySearchFormData.coef! : '',
     layer: copySearchFormData.layer || '',
     measurement: copySearchFormData.measurement,
-    startTime: start,
-    endTime: end,
+    startTime: start!,
+    endTime: end!,
   })
     .then((res) => {
       chartData.timestamps = res.data.timestamps || [];
@@ -1381,8 +1384,8 @@ function getPass() {
     udf: copySearchFormData.method === 'LOWPASS' ? 'low' : 'high',
     wpass: copySearchFormData.wpass || '',
     measurement: copySearchFormData.measurement,
-    startTime: start,
-    endTime: end,
+    startTime: start!,
+    endTime: end!,
   })
     .then((res) => {
       chartData.timestamps = res.data.timestamps || [];
@@ -1423,8 +1426,8 @@ function getPatternMatch() {
   getPatternMatchData({
     udf: 'pattern_match',
     patternSeries: copySearchFormData.measurement,
-    patternStartTime: start,
-    patternEndTime: end,
+    patternStartTime: start!,
+    patternEndTime: end!,
     threshold: 100 - Number(copySearchFormData.distance),
     times: copySearchFormData.partModel === 'fileUpload' ? copySearchFormData.times : undefined,
     values: copySearchFormData.partModel === 'fileUpload' ? copySearchFormData.values : undefined,
@@ -1489,7 +1492,7 @@ function handleSearch(unforce?: boolean) {
       return;
     }
     getDwt();
-  } else if (['LOWPASS', 'HIGHPASS'].includes(copySearchFormData.method)) {
+  } else if (['LOWPASS', 'HIGHPASS']!.includes(copySearchFormData.method)) {
     if (!copySearchFormData.wpass) {
       ElMessage.warning({
         message: t('spectrum.applyTip'),
@@ -1643,9 +1646,9 @@ function handleSaveMatch(times: MatchItem[]) {
   const saveTimes = [];
   const saveValues = [];
   for (let i = 0; i < chartData.timestamps.length; i++) {
-    const timestamp = chartData.timestamps[i];
-    const rawTimestamp = patternRawTimestamps.value[i];
-    const value = chartData.values[i];
+    const timestamp = chartData.timestamps[i]!;
+    const rawTimestamp = patternRawTimestamps.value[i]!;
+    const value = chartData.values[i]!;
 
     if (times.some((item) => item.startTime <= timestamp && item.endTime >= timestamp)) {
       saveTimes.push(rawTimestamp);

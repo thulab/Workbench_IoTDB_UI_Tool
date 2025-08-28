@@ -236,7 +236,7 @@ function handleAddRow() {
 
 // 保存路径
 function handleSavePath(path: string) {
-  if (authData.value.pathPrivileges.length === 1 && !authData.value.pathPrivileges[0].path) {
+  if (authData.value.pathPrivileges.length === 1 && !authData.value.pathPrivileges[0]!.path) {
     authData.value.pathPrivileges.splice(0, 1, { path, privileges: [] });
   } else {
     authData.value.pathPrivileges.push({ path, privileges: [] });
@@ -270,9 +270,9 @@ function handleCheckedEntity(val: CheckboxValueType, auth?: string) {
 // 路径
 function handleCheckedPath(val: CheckboxValueType, index: number, auth?: string) {
   if (!auth) {
-    authData.value.pathPrivileges.splice(index, 1, { path: authData.value.pathPrivileges[index].path, privileges: val ? [...pathPrivilegesEnumKeys.value] : [] });
+    authData.value.pathPrivileges.splice(index, 1, { path: authData.value.pathPrivileges[index]!.path, privileges: val ? [...pathPrivilegesEnumKeys.value] : [] });
   } else {
-    const data: { path: string; privileges: string[] } = { ...authData.value.pathPrivileges[index] };
+    const data: { path: string; privileges: string[] } = { ...authData.value.pathPrivileges[index]! };
     if (val) {
       data.privileges.push(auth);
     } else {
@@ -530,19 +530,21 @@ watch(
 }
 
 .detail-user-list {
-  margin: 18px 16px 32px;
+  margin: 12px 16px;
   font-size: 14px;
   color: #131926;
   display: flex;
+  align-items: center;
 
   .el-tag {
     cursor: pointer;
-    margin: 0 8px 8px 0;
+    margin: 0 8px 0 0;
   }
 
   .detail-user-box {
     flex: 1;
     display: flex;
+    align-items: center;
     flex-wrap: wrap;
   }
 

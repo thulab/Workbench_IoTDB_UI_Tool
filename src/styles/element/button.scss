@@ -93,12 +93,18 @@
   }
 }
 
+.icon-green {
+  path {
+    fill: green !important;
+  }
+}
+
 .svg-button-hover-color:hover {
   path {
     fill: #495ad4 !important;
   }
 
   // rect {
-  //   stroke: #495ad4 !important;
+  //   stroke: #495ad4 !important;strokestrokestrokestrokestroke
   // }
 }

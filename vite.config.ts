@@ -16,7 +16,12 @@ import dayjs from 'dayjs';
 import UnoCSS from 'unocss/vite';
 
 function runGit(str: string) {
-  return execSync(str).toString().replace('\n', '');
+  try {
+    return execSync(str).toString().replace('\n', '');
+  } catch (error) {
+    console.error(`Error executing git command: ${str}`, error);
+    return '';
+  }
 }
 
 // https://vitejs.dev/config/

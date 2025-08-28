@@ -27,6 +27,7 @@ const route = [
       icon: ICustomSystemConfig,
       activeIcon: ICustomSystemConfigActive,
       order: 40,
+      sqlDialect: 'all',
     },
     children: [
       {
@@ -37,6 +38,7 @@ const route = [
           hideLine: true,
           icon: ICustomAuth,
           isAuthMenu: true,
+          sqlDialect: 'all',
         },
         children: [
           {
@@ -51,10 +53,34 @@ const route = [
             },
           },
           {
+            path: 'table-user',
+            name: 'TableUserManagement',
+            component: () => import('@/views/auth/table-user-detail.vue'),
+            meta: {
+              sqlDialect: 'table',
+              keepAlive: true,
+              title: 'page.user',
+              icon: ICustomAuthUser,
+              isAuthMenu: true,
+            },
+          },
+          {
             path: 'role',
             name: 'RoleManagement',
             component: () => import('@/views/auth/role-detail.vue'),
             meta: {
+              keepAlive: true,
+              title: 'page.role',
+              icon: ICustomAuthRole,
+              isAuthMenu: true,
+            },
+          },
+          {
+            path: 'table-role',
+            name: 'TableRoleManagement',
+            component: () => import('@/views/auth/table-role-detail.vue'),
+            meta: {
+              sqlDialect: 'table',
               keepAlive: true,
               title: 'page.role',
               icon: ICustomAuthRole,

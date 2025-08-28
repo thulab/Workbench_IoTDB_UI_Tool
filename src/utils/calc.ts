@@ -1,8 +1,8 @@
 export default class Calculator {
   static add(...args: Array<string | number>): number {
     const [a, b, ...ns] = args;
-    const m = this.fixParam(a, 0);
-    const n = this.fixParam(b, 0);
+    const m = this.fixParam(a!, 0);
+    const n = this.fixParam(b!, 0);
     const len1 = this.getDecimalLen(m);
     const len2 = this.getDecimalLen(n);
     const len = Math.max(len1, len2);
@@ -18,13 +18,13 @@ export default class Calculator {
 
   static subtract(...args: Array<string | number>): number {
     const arr = args.slice(1).map((n) => -Number(n));
-    return this.add(args[0], ...arr);
+    return this.add(args[0]!, ...arr);
   }
 
   static multiply(...args: Array<string | number>): number {
     const [a, b, ...ns] = args;
-    const m = this.fixParam(a, 1);
-    const n = this.fixParam(b, 1);
+    const m = this.fixParam(a!, 1);
+    const n = this.fixParam(b!, 1);
     const len1 = this.getDecimalLen(m);
     const len2 = this.getDecimalLen(n);
     const len = len1 + len2;
@@ -40,8 +40,8 @@ export default class Calculator {
 
   static divide(...args: Array<string | number>): number {
     const [a, b, ...ns] = args;
-    const m = this.fixParam(a, 1);
-    const n = this.fixParam(b, 1);
+    const m = this.fixParam(a!, 1);
+    const n = this.fixParam(b!, 1);
     const len1 = this.getDecimalLen(m);
     const len2 = this.getDecimalLen(n);
     const len = Math.max(len1, len2);
@@ -99,8 +99,8 @@ export default class Calculator {
         arr.unshift('.');
       } else {
         const j = index - i;
-        const m = arr[j];
-        const n = arr[j - 1];
+        const m = arr[j]!;
+        const n = arr[j - 1]!;
         arr[j] = n;
         arr[j - 1] = m;
       }
@@ -124,7 +124,7 @@ export default class Calculator {
         } else if (m !== '.') {
           arr.push('0');
         } else {
-          const n = arr[j + 1];
+          const n = arr[j + 1]!;
           arr[j] = n;
           arr[j + 1] = m;
         }
@@ -134,7 +134,7 @@ export default class Calculator {
   }
 
   static fixParam(a: number | string, val: number) {
-    if (['', undefined, null].includes(a as string | null | undefined)) {
+    if (['', undefined, null]!.includes(a as string | null | undefined)) {
       return val;
     }
     if (typeof a === 'boolean') {
@@ -151,7 +151,7 @@ export default class Calculator {
     if (arrN.length === 1) {
       return Number(n);
     }
-    arrN[1] = arrN[1].substring(0, end);
+    arrN[1] = arrN[1]!.substring(0, end);
     return Number(arrN.join('.'));
   }
 }

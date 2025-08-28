@@ -158,7 +158,7 @@ watch(
       current.value = '';
     }
     if (!val.some((item) => item.name === current.value)) {
-      current.value = val[0]?.name;
+      current.value = val[0]?.name || '';
     }
   },
 );

@@ -27,8 +27,8 @@
         </li>
       </ul>
       <div v-if="pointCheckedData.length === 2" class="point-dvalue-box">
-        <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔX：${Math.abs(pointCheckedData[0].x - pointCheckedData[1].x)}`" /></p>
-        <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔY：${Math.abs(pointCheckedData[0].y - pointCheckedData[1].y)}`" /></p>
+        <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔX：${Math.abs(pointCheckedData[0]!.x - pointCheckedData[1]!.x)}`" /></p>
+        <p style="display: inline-flex; width: 190px"><text-tooltip :content="`ΔY：${Math.abs(pointCheckedData[0]!.y - pointCheckedData[1]!.y)}`" /></p>
       </div>
     </div>
   </div>

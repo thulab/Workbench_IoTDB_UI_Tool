@@ -1,6 +1,6 @@
 import http from '@/utils/http';
 import { encodeAES } from '@/utils/secret';
-import type { UserPrivileges, ConnectionDetail, PrivilegesEnum } from '@/types';
+import type { ConnectionDetail, PrivilegesEnum, LoginUserPrivileges } from '@/types';
 
 class UserApi {
   // 登录
@@ -21,7 +21,7 @@ class UserApi {
 
   // 当前登录用户权限
   static getLoginUserPrivileges(): globalThis.HttpResponseP<
-    UserPrivileges & {
+    LoginUserPrivileges & {
       connection: ConnectionDetail;
       isMaster: boolean;
       isActive: boolean | null;

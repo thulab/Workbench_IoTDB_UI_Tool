@@ -280,7 +280,7 @@ const lineChartOptions = (optionData: PipeMonitorData[], dataUnit: string, chart
       showSymbol: false,
       data: item.used.memoryCost.map((dataItem, index) => [item.used.timestamp[index], dataItem]),
     })),
-  }) as ECOption;
+  }) as unknown as ECOption;
 
 const memoryDataOptions = reactive({
   data: lineChartOptions(memoryData.value, memoryData.value[0]?.unit || '', 'memory'),

@@ -59,7 +59,7 @@ const treeProps = {
 const setDefaultTreeExpandKeys = async () => {
   await getDatabases();
   if (treeData.value && treeData.value.length) {
-    const firstNode = treeData.value[0];
+    const firstNode = treeData.value[0]!;
     currentNode.value = firstNode;
     setTimeout(() => {
       const expandedKeys = [firstNode.nodeName];

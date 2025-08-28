@@ -318,7 +318,7 @@ const diskChartOptions = (diskMemoryChartData: MetricDiskRes): ECOption =>
                 : '-'
           }</span></div>`;
         });
-        return `<div style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0].axisValueLabel}</div>${res}`;
+        return `<div style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0]!.axisValueLabel}</div>${res}`;
       },
     },
     grid: {

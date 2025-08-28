@@ -286,8 +286,8 @@ function getDetail() {
   getAlarmConfigDetail(props.alarmConfigId).then((res) => {
     assign(formData, res.data);
     if (res.data.alarmRules?.length) {
-      formData.alarmRulesType = res.data.alarmRules[0].operator;
-      formData.alarmRulesTypeVal = res.data.alarmRules[0].value;
+      formData.alarmRulesType = res.data.alarmRules[0]!.operator;
+      formData.alarmRulesTypeVal = res.data.alarmRules[0]!.value;
     }
     if (!res.data.alarmFrequency) {
       formData.alarmFrequency = 'ONCE';

@@ -62,9 +62,10 @@ const rules = reactive<FormRules>({
       trigger: 'blur',
     },
     {
+      // 原始密码的长度可以是 4 - 32
       min: 4,
       max: 32,
-      message: () => t('auth.pwdLength'),
+      message: () => t('auth.userNameLength'),
       trigger: 'blur',
     },
     {
@@ -80,7 +81,8 @@ const rules = reactive<FormRules>({
       trigger: 'blur',
     },
     {
-      min: 4,
+      // 新密码的长度需要是 12 - 32
+      min: 12,
       max: 32,
       message: () => t('auth.pwdLength'),
       trigger: 'blur',

@@ -1,6 +1,6 @@
 export default class Validator {
   static isEmpty(val: any) {
-    return ['', null, undefined].indexOf(val) > -1 || (val.trim ? val.trim() === '' : false) || val.length === 0;
+    return ['', null, undefined]!.indexOf(val) > -1 || (val.trim ? val.trim() === '' : false) || val.length === 0;
   }
 
   static isNumber(val: any) {

@@ -173,7 +173,7 @@ function getList(id?: number) {
       filterList.value = connectionList.value.filter((item) => item.name.includes(filterText.value));
       if (filterList.value.length) {
         const flag = !id && id !== 0 ? false : filterList.value.some((item) => +item.id === +id);
-        current.value = flag ? id! : +filterList.value[0].id;
+        current.value = flag ? id! : +filterList.value[0]!.id;
         connectionFormRef.value?.getDetail(current.value);
       } else {
         detailLoading.value = false;
@@ -210,7 +210,7 @@ async function handleFilter() {
   editType.value = 'edit';
   filterList.value = connectionList.value.filter((item) => item.name.includes(filterText.value));
   if (filterList.value.length) {
-    current.value = +filterList.value[0].id;
+    current.value = +filterList.value[0]!.id;
     connectionFormRef.value?.getDetail(current.value);
   }
 }

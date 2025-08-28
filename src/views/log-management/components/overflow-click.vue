@@ -20,8 +20,8 @@ const emit = defineEmits<{
 }>();
 
 const handleVisible = (str: string) => {
-  const parentWidth: number = props.offset ? proxy.$refs[str].parentNode.offsetWidth - props.offset : proxy.$refs[str].parentNode.offsetWidth;
-  const contentWidth: number = proxy.$refs[str].offsetWidth;
+  const parentWidth: number = props.offset ? proxy.$refs[str]!.parentNode.offsetWidth - props.offset : proxy.$refs[str]!.parentNode.offsetWidth;
+  const contentWidth: number = proxy.$refs[str]!.offsetWidth;
   if (contentWidth > parentWidth) {
     emit('handleClick');
   }

@@ -373,7 +373,7 @@ const handleTableChange = () => {
   if (availableTags.value.length === 0) {
     tagFilters.value = [{ variable: '', value: '' }];
   } else {
-    tagFilters.value = [{ variable: availableTags.value[0].nodeName, value: '' }];
+    tagFilters.value = [{ variable: availableTags.value[0]!.nodeName, value: '' }];
   }
 
   formData.selectedMeasurement = [];
@@ -388,7 +388,7 @@ const canChoice = (option: TableTreeNodeData, index: number) => {
 const addTagFilter = () => {
   if (tagFilters.value.length >= availableTags.value.length) return;
   const unSelectedTags = availableTags.value.filter((tag) => !tagFilters.value.some((f) => f.variable === tag.nodeName));
-  tagFilters.value.push({ variable: unSelectedTags[0].nodeName, value: '' });
+  tagFilters.value.push({ variable: unSelectedTags[0]!.nodeName, value: '' });
 };
 
 const removeTagFilter = (index: number) => {

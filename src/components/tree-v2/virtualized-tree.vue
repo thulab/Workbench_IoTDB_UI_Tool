@@ -167,7 +167,7 @@ const callback = () => {
   // 是否存在checkbox
   const checkbox = document.querySelector(`.${wrapClassName} .${className} .el-tree .el-tree-virtual-list .el-checkbox`) as HTMLElement;
   if (checkbox) {
-    const checkBoxMargin = +getElNodeAttrValue(checkbox, 'margin-right')?.split('px')?.[0] || 0;
+    const checkBoxMargin = +(getElNodeAttrValue(checkbox, 'margin-right')?.split('px')?.[0] || 0);
     const checkBoxClientWidth = checkbox.clientWidth;
     checkBoxWidth = checkBoxMargin + checkBoxClientWidth;
   }
@@ -184,7 +184,7 @@ const callback = () => {
       return Array.from(item.classList || []).includes('el-tree-node__content');
     }) as HTMLElement;
     if (elWidthNode) {
-      const paddingLeftValue = +getElNodeAttrValue(elWidthNode, 'padding-left')?.split('px')?.[0] || 0;
+      const paddingLeftValue = +(getElNodeAttrValue(elWidthNode, 'padding-left')?.split('px')?.[0] || 0);
       const elWidthNodeList = elWidthNode?.children || ([] as HTMLElement[]);
       let elWidth = 0;
       // 获取padding

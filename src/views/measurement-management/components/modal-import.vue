@@ -131,8 +131,8 @@ const checkValid = (name: string) => {
   const suffix = name.split('.');
   const excelReg = /xlsx|csv/i;
   const csvReg = /csv/i;
-  const isExcel = excelReg.test(suffix[suffix.length - 1]) && suffix.length > 1;
-  isCSV.value = csvReg.test(suffix[suffix.length - 1]) && suffix.length > 1;
+  const isExcel = excelReg.test(suffix[suffix.length - 1]!) && suffix.length > 1;
+  isCSV.value = csvReg.test(suffix[suffix.length - 1]!) && suffix.length > 1;
   return isExcel;
 };
 

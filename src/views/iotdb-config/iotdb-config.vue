@@ -23,7 +23,7 @@
                     :value="item.nodeID"
                     :id="`iotdb-config-node-select-${item.nodeID}`"
                     :label="`${item.address}(${item.type})`"
-                    :disabled="!['running', 'readonly'].includes(item.status.toLocaleLowerCase())"
+                    :disabled="!['running', 'readonly']!.includes(item.status.toLocaleLowerCase())"
                   >
                     <el-tooltip
                       placement="top-start"
@@ -31,7 +31,7 @@
                       trigger="hover"
                       :content="t('iotdbConfig.nodeTip')"
                       popper-class="tooltip-box-width"
-                      :disabled="['running', 'readonly'].includes(item.status.toLocaleLowerCase())"
+                      :disabled="['running', 'readonly']!.includes(item.status.toLocaleLowerCase())"
                     >
                       {{ `${item.address}(${item.type})` }}
                     </el-tooltip>
@@ -193,7 +193,7 @@ function handleChangeNode() {
 // 节点更新
 function handleConfirm() {
   saveLoading.value = true;
-  updateConfigs(configData.value, inputEditor.value?.getContent(), currentNode.value)
+  updateConfigs(configData.value, inputEditor.value?.getContent() || '', currentNode.value)
     .then(() => {
       ElMessage.success({ message: t('common.updateSuccess'), grouping: true });
       getConfigDetail();
@@ -206,7 +206,7 @@ function handleConfirm() {
 // 全部节点更新
 function handleAllConfirm() {
   allSaveLoading.value = true;
-  updateConfigs(configData.value, inputEditor.value?.getContent())
+  updateConfigs(configData.value, inputEditor.value?.getContent() || '')
     .then(() => {
       ElMessage.success({ message: t('common.updateSuccess'), grouping: true });
       getConfigDetail();
@@ -235,15 +235,15 @@ function initDetail() {
           inputEditor.value?.setContent(data.content || '');
         }
       } else {
-        currentNode.value = nodeList.value[0].nodeID;
+        currentNode.value = nodeList.value[0]!.nodeID;
         getConfigDetail();
       }
     } else {
-      currentNode.value = nodeList.value[0].nodeID;
+      currentNode.value = nodeList.value[0]!.nodeID;
       getConfigDetail();
     }
   } else {
-    currentNode.value = nodeList.value[0].nodeID;
+    currentNode.value = nodeList.value[0]!.nodeID;
     getConfigDetail();
   }
 }

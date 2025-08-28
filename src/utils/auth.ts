@@ -29,7 +29,7 @@ export const getParentPathAuthList = (path: string, dataPrivilegeMap: Array<{ pa
 
 const splitVersion = (version: string) => {
   if (version.indexOf('-') > -1) {
-    return version.split('-')[0].split('.');
+    return version.split('-')[0]!.split('.');
   }
   return version.split('.');
 };
@@ -42,18 +42,19 @@ export const iotdbShowAuth = (version?: string, controlVersion: string = '1.2.3'
   if (versionArr.length && controlVersionArr.length) {
     const [majorStr, minorStr, releaseStr, minorReleaseStr] = versionArr;
     const [majorControlStr, minorControlStr, releaseControlStr, minorReleaseControlStr] = controlVersionArr;
-    const major = +majorStr; // 主版本
-    const minor = +minorStr; // 次版本
-    const release = +releaseStr; // 修订版本
-    if (major > +majorControlStr) return true;
-    if (major === +majorControlStr && minor > +minorControlStr) return true;
+    const major = +majorStr!; // 主版本
+    const minor = +minorStr!; // 次版本
+    const release = +releaseStr!; // 修订版本
+    if (major > +majorControlStr!) return true;
+    if (major === +majorControlStr! && minor > +minorControlStr!) return true;
     if (minorReleaseControlStr) {
       if (minorReleaseStr) {
-        if ((major === +majorControlStr && minor === +minorControlStr && release > +releaseControlStr) || (release === +releaseControlStr && +minorReleaseStr >= +minorReleaseControlStr)) return true;
-      } else if (major === +majorControlStr && minor === +minorControlStr && release > +releaseControlStr) {
+        if ((major === +majorControlStr! && minor === +minorControlStr! && release > +releaseControlStr!) || (release === +releaseControlStr! && +minorReleaseStr >= +minorReleaseControlStr!))
+          return true;
+      } else if (major === +majorControlStr! && minor === +minorControlStr! && release > +releaseControlStr!) {
         return true;
       }
-    } else if (major === +majorControlStr && minor >= +minorControlStr && release >= +releaseControlStr) return true;
+    } else if (major === +majorControlStr! && minor >= +minorControlStr! && release >= +releaseControlStr!) return true;
     return false;
   }
   return false;

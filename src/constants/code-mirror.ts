@@ -276,7 +276,7 @@ const tableKeywords = [
   'WHERE',
   'WITH',
   'FILL',
-].concat([
+]!.concat([
   'SHOW',
   'USE',
   'DESC',

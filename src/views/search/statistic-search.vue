@@ -7,7 +7,7 @@
             {{ t('measurement.measurementChoose') }}：
             <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
-          <timeseries-select v-model="searchFormData.path" :disabled-path="(item) => ['TEXT', 'BOOLEAN', 'TIMESTAMP', 'DATE', 'STRING', 'BLOB'].includes(item.dataType)" id="statistic-search-path" />
+          <timeseries-select v-model="searchFormData.path" :disabled-path="(item) => ['TEXT', 'BOOLEAN', 'TIMESTAMP', 'DATE', 'STRING', 'BLOB']!.includes(item.dataType)" id="statistic-search-path" />
         </base-form-item>
         <base-form-item :label="`${t('search.searchTime')}：`" prop="datetimerange" class="form-item-last">
           <el-date-picker
@@ -174,8 +174,8 @@ const { requestFn: getAvgSum } = useRequest(SearchApi.getStatisticSearchAvgSum);
 const { requestFn: exportStatisticData } = useRequest(SearchApi.exportStatisticData);
 
 function getMinMaxData() {
-  const startTime = copySearchFormData.datetimerange.length === 2 ? formatDate(copySearchFormData.datetimerange[0] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ') : undefined;
-  const endTime = copySearchFormData.datetimerange.length === 2 ? formatDate(copySearchFormData.datetimerange[1] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ') : undefined;
+  const startTime = copySearchFormData.datetimerange.length === 2 ? formatDate(copySearchFormData.datetimerange[0]! as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ') : undefined;
+  const endTime = copySearchFormData.datetimerange.length === 2 ? formatDate(copySearchFormData.datetimerange[1]! as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ') : undefined;
   return getMinMax({
     measurements: searchPaginationPath.value,
     startTime,
@@ -194,8 +194,8 @@ function getMinMaxData() {
 }
 
 function getAvgSumData() {
-  const startTime = copySearchFormData.datetimerange.length === 2 ? formatDate(copySearchFormData.datetimerange[0] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ') : undefined;
-  const endTime = copySearchFormData.datetimerange.length === 2 ? formatDate(copySearchFormData.datetimerange[1] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ') : undefined;
+  const startTime = copySearchFormData.datetimerange.length === 2 ? formatDate(copySearchFormData.datetimerange[0]! as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ') : undefined;
+  const endTime = copySearchFormData.datetimerange.length === 2 ? formatDate(copySearchFormData.datetimerange[1]! as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ') : undefined;
   return getAvgSum({
     measurements: searchPaginationPath.value,
     startTime,
@@ -223,10 +223,10 @@ function getListData() {
       minTime: item.minTime || '-',
       maxValue: item.maxValue || '-',
       maxTime: item.maxTime || '-',
-      avgValue: avgSumList.value[index].avgValue || '-',
-      sumValue: avgSumList.value[index].sumValue || '-',
-      stddev: avgSumList.value[index].stddev || '-',
-      variance: avgSumList.value[index].variance || '-',
+      avgValue: avgSumList.value[index]!.avgValue || '-',
+      sumValue: avgSumList.value[index]!.sumValue || '-',
+      stddev: avgSumList.value[index]!.stddev || '-',
+      variance: avgSumList.value[index]!.variance || '-',
     }));
     if (tableErrorMessage.value.length) {
       ElMessage.error({ message: tableErrorMessage.value[0], grouping: true });
@@ -276,8 +276,8 @@ function onChangePage(page: number) {
 function handleCommandDown(val: string) {
   exportStatisticData({
     measurements: copySearchFormData.path,
-    startTime: formatDate(copySearchFormData.datetimerange[0] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
-    endTime: formatDate(copySearchFormData.datetimerange[1] as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
+    startTime: formatDate(copySearchFormData.datetimerange[0]! as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
+    endTime: formatDate(copySearchFormData.datetimerange[1]! as number | string, 'YYYY-MM-DD HH:mm:ss.SSSZ'),
     timestamp: timestamp.value,
   }).then((res) => {
     let url = `/api/file/exportExcelStatistics?exportId=${res.data}`;

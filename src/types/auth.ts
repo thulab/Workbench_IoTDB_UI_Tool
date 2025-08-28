@@ -1,3 +1,4 @@
+import type { SinglePrivilegeVo } from './relational-privileges';
 export interface DBUser {
   name: string;
   password: string;
@@ -45,6 +46,12 @@ export interface UserPrivileges {
   pathPrivileges: Array<{ path: string; privileges: string[] }>;
   rolesToPrivileges: Array<AuthByRoleRes>;
 }
+
+export interface LoginUserPrivileges extends UserPrivileges {
+  tableDataPrivileges: Array<{ scope: string; dataPrivileges: SinglePrivilegeVo[] }>;
+  tableGlobalPrivileges: Array<SinglePrivilegeVo>;
+}
+
 export interface UserAuthInfo extends AuthByRole {
   roleName?: string;
   userName: string;

@@ -48,7 +48,7 @@ const onRefresh = () => {
   // ctx.fillRect(0, 0, width, height);
 
   for (let i = 1; i <= 4; i++) {
-    const txt = allLetter[randomNum(0, allLetter.length)];
+    const txt = allLetter[randomNum(0, allLetter.length)]!;
     code += txt;
     ctx.font = `${randomNum(height / 2, height)}px SimHei`; // 随机生成字体大小
     ctx.fillStyle = randomColor(50, 160); // 随机生成字体颜色
@@ -62,7 +62,7 @@ const onRefresh = () => {
     /** 设置旋转角度和坐标原点* */
     ctx.translate(x, y);
     ctx.rotate((deg * Math.PI) / 180);
-    ctx.fillText(txt, 0, 0);
+    ctx.fillText(txt!, 0, 0);
     /** 恢复旋转角度和坐标原点* */
     ctx.rotate((-deg * Math.PI) / 180);
     ctx.translate(-x, -y);

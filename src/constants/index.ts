@@ -240,3 +240,8 @@ export const tableFunctionTreeData = [
     children: [{ label: 'tableFunctions.DIFF', value: 'DIFF' }],
   },
 ];
+
+// 表模型全局权限
+export const relationalAllScopePrivilegesEnum = ['MANAGE_USER', 'MANAGE_ROLE'];
+// 表模型路径权限
+export const relationalDataScopePrivilegesEnum = ['CREATE', 'DROP', 'ALTER', 'SELECT', 'INSERT', 'DELETE'];

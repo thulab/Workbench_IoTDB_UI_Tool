@@ -12,12 +12,12 @@
               </template>
               <el-scrollbar :height="tabHeight">
                 <sql-search
-                  v-model:code="code[activiteSql]"
-                  :codeOriginal="codeOriginal[activiteSql]"
+                  v-model:code="code[activiteSql]!"
+                  :codeOriginal="codeOriginal[activiteSql]!"
                   @save="handleSave"
                   @revert="
                     () => {
-                      code[activiteSql] = codeOriginal[activiteSql];
+                      code[activiteSql] = codeOriginal[activiteSql]!;
                     }
                   "
                   ref="sqlSearchRef"
@@ -210,7 +210,7 @@ function getFunction(val: string) {
   // code[activiteSql.value] += val;
   const index = sqlList.value.findIndex((f) => `${f.id}` === `${activiteSql.value}`);
   if (index !== -1) {
-    sqlSearchRef.value[index].insertContent(val);
+    sqlSearchRef.value[index]!.insertContent(val);
   }
 }
 
@@ -268,7 +268,7 @@ const handleTabAdd = throttle(() => {
 // 点击tab
 function handleTabClick(tab: TabsPaneContext) {
   if (tab.index) {
-    const data = sqlList.value[tab.index as unknown as number];
+    const data = sqlList.value[tab.index as unknown as number]!;
     // code.value = '';
     // tableData.list = [];
     activiteSql.value = `${data.id}`;
@@ -281,9 +281,9 @@ function handleTabRemove(targetName: TabPaneName) {
     return;
   }
   const index = sqlList.value.findIndex((f) => `${f.id}` === `${targetName}`);
-  const current = sqlList.value[index];
+  const current = sqlList.value[index]!;
   const id = `${targetName}`.charAt(0) === '_' ? null : (targetName as unknown as string);
-  if (code[targetName].trim() !== codeOriginal[targetName].trim()) {
+  if (code[targetName]!.trim() !== codeOriginal[targetName]!.trim()) {
     if (!id) {
       activiteSql.value = targetName as string;
       saveForm.sqlName = current.queryName;
@@ -299,7 +299,7 @@ function handleTabRemove(targetName: TabPaneName) {
       saveTipDialogVisible.value = true;
     }
   } else {
-    const nextTab = sqlList.value[index + 1] || sqlList.value[index - 1];
+    const nextTab = sqlList.value[index + 1] || sqlList.value[index - 1]!;
     activiteSql.value = `${nextTab.id}`;
     sqlList.value.splice(index, 1);
   }
@@ -313,7 +313,7 @@ function handleNameConfirm() {
       const data = {
         id,
         queryName: saveForm.sqlName,
-        sqls: code[activiteSql.value],
+        sqls: code[activiteSql.value]!,
       };
       saveQuery(data).then((res) => {
         if (res.code === 0) {
@@ -343,7 +343,7 @@ function handleNameConfirm() {
 }
 function handleUnsave() {
   saveTipDialogVisible.value = false;
-  code[activiteSql.value] = codeOriginal[activiteSql.value];
+  code[activiteSql.value] = codeOriginal[activiteSql.value]!;
   const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
   const nextTab = sqlList.value[index + 1] || sqlList.value[index - 1];
   activiteSql.value = `${nextTab?.id}`;
@@ -357,7 +357,7 @@ function handleContiuneSave() {
   saveQuery({
     id,
     queryName: saveForm.sqlName,
-    sqls: code[targetName],
+    sqls: code[targetName]!,
   }).then((res) => {
     if (res.code === 0) {
       saveTipDialogVisible.value = false;
@@ -365,7 +365,7 @@ function handleContiuneSave() {
       // code[targetName] = '';
       delete code[targetName];
       delete codeOriginal[targetName];
-      const nextTab = sqlList.value[index + 1] || sqlList.value[index - 1];
+      const nextTab = sqlList.value[index + 1] || sqlList.value[index - 1]!;
       activiteSql.value = `${nextTab.id}`;
       sqlList.value.splice(index, 1);
       sqlListRef.value?.getQueryList();
@@ -395,7 +395,7 @@ function handleRenameConfirm() {
       const data = {
         id,
         queryName: resaveForm.sqlName,
-        sqls: code[id],
+        sqls: code[id]!,
       };
       saveQuery(data).then((res) => {
         if (res.code === 0) {
@@ -415,7 +415,7 @@ function handleRenameConfirm() {
 // 保存
 function handleSave() {
   const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
-  const current = sqlList.value[index];
+  const current = sqlList.value[index]!;
   const id = `${current.id}`.charAt(0) === '_' ? null : `${current.id}`;
   if (!id) {
     saveForm.sqlName = current.queryName;
@@ -428,11 +428,11 @@ function handleSave() {
     saveQuery({
       id,
       queryName: current.queryName,
-      sqls: code[activiteSql.value],
+      sqls: code[activiteSql.value]!,
     }).then((res) => {
       if (res.code === 0) {
         ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
-        codeOriginal[activiteSql.value] = code[activiteSql.value];
+        codeOriginal[activiteSql.value] = code[activiteSql.value]!;
       }
     });
   }

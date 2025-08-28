@@ -37,7 +37,7 @@ const fullUrl = computed({
       } else {
         form.value.protocol = 'http://';
       }
-      const url = value.replaceAll(form.value.protocol, '');
+      const url = value.replace(new RegExp(form.value.protocol, 'g'), '');
       const splitIndex = url.indexOf('/');
       form.value.host = url.substring(0, splitIndex);
       form.value.pathname = url.substring(splitIndex);

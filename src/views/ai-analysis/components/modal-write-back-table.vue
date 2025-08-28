@@ -25,9 +25,9 @@
       <base-form-item :label="`${t('aiAnalysis.writeBackTargetTags')}：`" prop="tags">
         <template v-for="(tag, index) in formData.tags" :key="index">
           <div class="flex items-center mb-2">
-            <el-input v-model="formData.tags[index].tagName" class="w-[120px]" :placeholder="t('common.placeHolder')" :id="`write-back-modal-tags-${index}`" />
+            <el-input v-model="formData.tags[index]!.tagName" class="w-[120px]" :placeholder="t('common.placeHolder')" :id="`write-back-modal-tags-${index}`" />
             <span class="p-[8px]">：</span>
-            <el-input class="flex-1" v-model="formData.tags[index].tagValue" :placeholder="t('common.placeHolder')" :id="`write-back-modal-tag-value-${index}`" />
+            <el-input class="flex-1" v-model="formData.tags[index]!.tagValue" :placeholder="t('common.placeHolder')" :id="`write-back-modal-tag-value-${index}`" />
           </div>
         </template>
       </base-form-item>

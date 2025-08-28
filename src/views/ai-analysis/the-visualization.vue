@@ -424,7 +424,7 @@ const valueShow = (item: SearchDataItem) => {
   return !item.isAnomaly;
 };
 const sortedData = computed(() => {
-  const data = [...allTableData.value].filter((item) => valueShow(item));
+  const data = [...allTableData.value]!.filter((item) => valueShow(item));
   return data.sort((a, b) => (searchFormData.orderBy === 'ascending' ? a.time - b.time : b.time - a.time));
 });
 
@@ -533,11 +533,11 @@ function disabledPath(item: MeasurementDataItem) {
 const anomalyPoints = computed(() => {
   const data: SearchDataItem[] = [];
   if (copySearchFormData.type !== 1) return data;
-  analysisData.value[0].data.forEach((element, index) => {
+  analysisData.value[0]!.data.forEach((element, index) => {
     if (element.value === '1') {
       data.push({
         time: element.time,
-        value: rawData.value[index].value,
+        value: rawData.value[index]!.value,
       });
     }
   });
@@ -645,73 +645,76 @@ const legend = computed(() => {
   return [];
 });
 
-const chartOptions = computed<ECOption>(() => ({
-  tooltip: {
-    trigger: 'axis',
-    // appendToBody: true,
-    formatter: (params) => {
-      const paramsData = params as unknown as Array<Record<string, any>>;
-      const x = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;"></span><span style="font-size:14px;color:#666;font-weight:400;">${formatDate(paramsData[0].value[0])}</span></div>`;
-      let circle = '';
-      paramsData.forEach((item) => {
-        if (copySearchFormData.type === 1) {
-          circle += `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${item.value[1]}</span></div>`;
-        } else {
-          circle += `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;margin-left:2px">${item.seriesName}: </span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${parseFloat(Number(item.value[1]).toFixed(4))}</span></div>`;
-        }
-      });
-      return `${x}${circle}`;
-    },
-  },
-  legend: {
-    data: legend.value,
-  },
-  toolbox: {
-    show: true,
-    feature: {
-      dataZoom: {
-        title: {
-          zoom: t('common.zoom'),
-          back: t('common.revoke'),
-        },
-        icon: {
-          zoom: 'path://M15 9L23 9L23 23L9 23L9 15M13 9L9 9M9 9L5 9M9 13L9 9M9 9L9 5',
-          back: 'path://M9,9h14v14H9v-8 M12,12L9,9l3-3',
+const chartOptions = computed<ECOption>(
+  () =>
+    ({
+      tooltip: {
+        trigger: 'axis',
+        // appendToBody: true,
+        formatter: (params: Array<Record<string, any>>) => {
+          const paramsData = params;
+          const x = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;"></span><span style="font-size:14px;color:#666;font-weight:400;">${formatDate(paramsData[0]!.value[0])}</span></div>`;
+          let circle = '';
+          paramsData.forEach((item) => {
+            if (copySearchFormData.type === 1) {
+              circle += `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${item.value[1]}</span></div>`;
+            } else {
+              circle += `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;margin-left:2px">${item.seriesName}: </span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${parseFloat(Number(item.value[1]).toFixed(4))}</span></div>`;
+            }
+          });
+          return `${x}${circle}`;
         },
       },
-      restore: {
-        title: t('common.restore'),
-        icon: 'path://M13 21L15 24C10.0294 24 6 19.9706 6 15C6 12.7036 6.86006 10.6081 8.27564 9.01797M17 9L15 6C19.9706 6 24 10.0294 24 15C24 17.3063 23.1325 19.4101 21.7059 21.0026',
+      legend: {
+        data: legend.value,
       },
-      saveAsImage: {
-        title: t('common.export'),
-        icon: 'path://M18,12V7H7v16h11v-5 M24,15H13 M21,18l3-3l-3-3',
+      toolbox: {
+        show: true,
+        feature: {
+          dataZoom: {
+            title: {
+              zoom: t('common.zoom'),
+              back: t('common.revoke'),
+            },
+            icon: {
+              zoom: 'path://M15 9L23 9L23 23L9 23L9 15M13 9L9 9M9 9L5 9M9 13L9 9M9 9L9 5',
+              back: 'path://M9,9h14v14H9v-8 M12,12L9,9l3-3',
+            },
+          },
+          restore: {
+            title: t('common.restore'),
+            icon: 'path://M13 21L15 24C10.0294 24 6 19.9706 6 15C6 12.7036 6.86006 10.6081 8.27564 9.01797M17 9L15 6C19.9706 6 24 10.0294 24 15C24 17.3063 23.1325 19.4101 21.7059 21.0026',
+          },
+          saveAsImage: {
+            title: t('common.export'),
+            icon: 'path://M18,12V7H7v16h11v-5 M24,15H13 M21,18l3-3l-3-3',
+          },
+        },
       },
-    },
-  },
-  grid: {
-    left: 20,
-    right: 60,
-    bottom: 20,
-    containLabel: true,
-  },
-  connectNulls: false,
-  xAxis: {
-    type: 'time',
-    boundaryGap: false,
-    show: !dataEmpty.value,
-    splitLine: {
-      show: false,
-    },
-  },
-  yAxis: {
-    type: 'value',
-    show: !dataEmpty.value,
-    scale: true,
-  },
-  animation: true,
-  series: seriesData.value.series,
-}));
+      grid: {
+        left: 20,
+        right: 60,
+        bottom: 20,
+        containLabel: true,
+      },
+      connectNulls: false,
+      xAxis: {
+        type: 'time',
+        boundaryGap: false,
+        show: !dataEmpty.value,
+        splitLine: {
+          show: false,
+        },
+      },
+      yAxis: {
+        type: 'value',
+        show: !dataEmpty.value,
+        scale: true,
+      },
+      animation: true,
+      series: seriesData.value.series,
+    }) as unknown as ECOption,
+);
 
 const { requestFn: getModels } = useRequest(AIAnalysisApi.getModels);
 const { requestFn: search } = useRequest(AIAnalysisApi.search);
@@ -727,7 +730,7 @@ function handleChangeType(val: string | number | boolean | undefined) {
   if (val === 0 && modelOptions.value.find((item) => item.modelId === 'Timer')) {
     searchFormData.method = 'Timer';
   } else if (modelOptions.value.length > 0) {
-    searchFormData.method = modelOptions.value[0].modelId;
+    searchFormData.method = modelOptions.value[0]!.modelId;
   } else {
     searchFormData.method = '';
   }
@@ -843,7 +846,7 @@ function getModelList() {
         defaultMethod = ['sundial'];
         searchFormData.method = defaultMethod;
       } else {
-        defaultMethod = [modelList.value.filter((item) => ANOMALY_DETECTION_TYPES.indexOf(item.modelType) === -1 && item.category !== 'USER-DEFINED')[0].modelId || ''];
+        defaultMethod = [modelList.value.filter((item) => ANOMALY_DETECTION_TYPES.indexOf(item.modelType) === -1 && item.category !== 'USER-DEFINED')[0]!.modelId || ''];
         searchFormData.method = defaultMethod;
       }
     })
@@ -896,10 +899,10 @@ function getCustom() {
         columns.value = list;
         const dataList: Record<string, any>[] = [];
         if (res.data.outputs?.length > 0) {
-          res.data?.outputs[0].value.forEach((item, index) => {
+          res.data?.outputs[0]!.value.forEach((item, index) => {
             const obj = {} as Record<string, string>;
             res.data?.outputs.forEach((column, columnindex) => {
-              obj[`t${columnindex}`] = column.value[index];
+              obj[`t${columnindex}`] = column.value[index]!;
             });
             dataList.push(obj);
           });
@@ -949,7 +952,7 @@ function handleSearch() {
     };
     search(query)
       .then((res) => {
-        if ((!res.data.raw || res.data.raw.length === 0) && (!res.data.analysis || res.data.analysis[0].length === 0)) {
+        if ((!res.data.raw || res.data.raw.length === 0) && (!res.data.analysis || res.data.analysis[0]!.length === 0)) {
           ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
           setOption(chartOptions.value, true);
           return;
@@ -958,28 +961,28 @@ function handleSearch() {
         realMotheds.value.forEach((key: string) => {
           analysisData.value.push({
             modelId: key,
-            data: res.data.analysis[key],
+            data: res.data.analysis[key]!,
           });
         });
         if (res.data.rawRange && res.data.rawRange.length > 0) {
           rawData.value = [...rawData.value, ...res.data.rawRange];
         }
         if (searchFormData.type === 0) {
-          allTableData.value = analysisData.value[0].data.map((element, index) => {
+          allTableData.value = analysisData.value[0]!.data.map((element, index) => {
             const dataItem: SearchDataItem = {
               time: element.time,
             };
             analysisData.value.forEach((item) => {
-              dataItem[`${item.modelId}_value`] = item.data[index].value;
+              dataItem[`${item.modelId}_value`] = item.data[index]!.value;
             });
             return dataItem;
           });
         } else {
           allTableData.value = res.data.raw;
           // 标记异常点，异常检测时仅会有一个模型
-          analysisData.value[0].data.forEach((element, index) => {
+          analysisData.value[0]!.data.forEach((element, index) => {
             if (element.value === '1') {
-              allTableData.value[index].isAnomaly = true;
+              allTableData.value[index]!.isAnomaly = true;
             }
           });
         }
@@ -1018,7 +1021,7 @@ function handleWriteBackSuccess(name: string, modelId: string) {
     measurement: name,
     dataType: copySearchFormData.measurementType,
     raw: rawData.value,
-    analysis: copySearchFormData.type === 0 ? analysisData.value.find((item) => item.modelId === modelId)!.data : analysisData.value[0].data,
+    analysis: copySearchFormData.type === 0 ? analysisData.value.find((item) => item.modelId === modelId)!.data : analysisData.value[0]!.data,
   };
   writeBack(data)
     .then(() => {
@@ -1048,7 +1051,7 @@ function handleWriteBackTableSuccess(payload: WriteBackTableFrom) {
       dataType: copySearchFormData.measurementType,
     },
     raw: rawData.value,
-    analysis: copySearchFormData.type === 0 ? analysisData.value.find((item) => item.modelId === payload.modelId)!.data : analysisData.value[0].data,
+    analysis: copySearchFormData.type === 0 ? analysisData.value.find((item) => item.modelId === payload.modelId)!.data : analysisData.value[0]!.data,
   };
   writeBackTable(data)
     .then(() => {
@@ -1084,7 +1087,7 @@ function handleExportData(exportType: string) {
       measurement: copySearchFormData.measurement,
       dataType: copySearchFormData.measurementType,
       raw: rawData.value,
-      analysis: analysisData.value[0].data,
+      analysis: analysisData.value[0]!.data,
     };
     getExportId(data).then((res) => {
       const url = `/api/file/export${exportType !== 'csv' ? 'Excel' : ''}Analysis?exportId=${res.data}`;

@@ -8,7 +8,7 @@ export function useLangSwitch(i18n: Composer) {
   const handleLangCommand = (val: '0' | '1') => {
     window.localStorage.setItem('lang', langIndexMap[val]);
     langIndex.value = +val;
-    i18n.locale.value = langName[val];
+    i18n.locale.value = langName[val]!;
   };
   return {
     langIndex,

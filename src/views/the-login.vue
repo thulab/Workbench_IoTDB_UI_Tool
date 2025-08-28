@@ -245,8 +245,8 @@ function getList() {
       // if (connectionList.value.length) {
       //   const firstConnection = connectionOptions.value.find((item) => item.options.length);
       //   if (firstConnection) {
-      //     loginForm.connection = firstConnection?.options[0].id;
-      //     loginForm.user = firstConnection?.options[0].username;
+      //     loginForm.connection = firstConnection?.options[0]!.id;
+      //     loginForm.user = firstConnection?.options[0]!.username;
       //   }
       // }
     })

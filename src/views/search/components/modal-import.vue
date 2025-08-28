@@ -214,7 +214,7 @@ const canNext = () => {
 const customUpload: UploadProps['httpRequest'] = (options) => {
   const formData = new FormData();
   formData.append('file', options.file);
-  const currentItem = uploadDetail.value?.find((item) => item.file.uid === options.file.uid);
+  const currentItem = uploadDetail.value.find((item) => item.file.uid === options.file.uid)!;
   currentItem.uploadStatus = 1;
   return upload(formData)
     .then((resp) => {

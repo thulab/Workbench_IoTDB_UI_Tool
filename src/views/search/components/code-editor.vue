@@ -44,7 +44,7 @@ const view = shallowRef<EditorView>();
 
 const insertContent = (content: string) => {
   if (view.value!.state.selection && view.value!.state.selection.ranges && view.value!.state.selection.ranges.length > 0) {
-    const { from, to } = view.value!.state.selection.ranges[0];
+    const { from, to } = view.value!.state.selection.ranges[0]!;
     view.value!.dispatch({
       changes: { from, to, insert: content },
       selection: { anchor: from + content.length },

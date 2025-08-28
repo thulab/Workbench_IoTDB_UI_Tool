@@ -39,7 +39,7 @@
             <div class="left-view">
               <el-row class="form-item-row" style="grid-template-columns: 1fr 1fr 1fr">
                 <el-col>
-                  <base-form-item class="form-item-width" :label="`${t('dataManage.columnName')}：`" :prop="`columns[${index}].columnName`" required :rules="tableNameRules">
+                  <base-form-item class="form-item-width" :label="`${t('dataManage.columnName')}：`" :prop="`columns[${index}]!.columnName`" required :rules="tableNameRules">
                     <template #label>
                       {{ t('dataManage.columnName') }}：
                       <el-tooltip effect="light" :content="t('dataManage.tableNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
@@ -56,7 +56,7 @@
                 </el-col>
                 <el-col>
                   <base-form-item class="form-item-width" :label="`${t('dataManage.dataType')}：`" required>
-                    <el-select v-model="item.datatype" :placeholder="t('dataManage.dataTypePlaceholder')" :disabled="['TAG', 'ATTRIBUTE'].includes(item.category)">
+                    <el-select v-model="item.datatype" :placeholder="t('dataManage.dataTypePlaceholder')" :disabled="['TAG', 'ATTRIBUTE']!.includes(item.category)">
                       <el-option v-for="item in dataTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
                   </base-form-item>
@@ -219,8 +219,8 @@ const canAddColumn = computed(() => {
 
 // 监听列类型变化
 const handleColumnTypeChange = (index: number) => {
-  if (['TAG', 'ATTRIBUTE'].includes(formData.columns[index].category)) {
-    formData.columns[index].datatype = 'STRING';
+  if (['TAG', 'ATTRIBUTE']!.includes(formData.columns[index]!.category)) {
+    formData.columns[index]!.datatype = 'STRING';
   }
 };
 
@@ -250,7 +250,7 @@ const addColumn = () => {
 const copyColumn = (index: number) => {
   if (!canAddColumn.value) return;
 
-  const columnToCopy = formData.columns[index];
+  const columnToCopy = formData.columns[index]!;
   const newColumn = {
     ...columnToCopy,
     columnName: `${columnToCopy.columnName}_copy`,
@@ -296,7 +296,7 @@ const handleConfirm = async () => {
 
   // 检查所有列是否填写完整
   for (let i = 0; i < formData.columns.length; i++) {
-    const column = formData.columns[i];
+    const column = formData.columns[i]!;
     if (!column.columnName.trim()) {
       ElMessage.warning(`${t('dataManage.inputIndexColumnName', { index: i + 1 })}`);
       return;
@@ -328,7 +328,7 @@ const handleConfirm = async () => {
     saveTable(formDataBody.value).then(() => {
       ElMessage.success(t('common.saveSuccess'));
       dialogVisible.value = false;
-      setActiveList([formDataBody.value.database, `${formDataBody.value.database}-${formDataBody.value.tables[0].tableVO.tableName}`]);
+      setActiveList([formDataBody.value.database, `${formDataBody.value.database}-${formDataBody.value.tables[0]!.tableVO.tableName}`]);
       setFirstLoad(true);
       emit('handleReload');
     });
@@ -336,7 +336,7 @@ const handleConfirm = async () => {
     saveColumns(formDataBody.value).then(() => {
       ElMessage.success(t('common.saveSuccess'));
       dialogVisible.value = false;
-      setActiveList([formDataBody.value.database, `${formDataBody.value.database}-${formDataBody.value.tables[0].tableVO.tableName}`]);
+      setActiveList([formDataBody.value.database, `${formDataBody.value.database}-${formDataBody.value.tables[0]!.tableVO.tableName}`]);
       setFirstLoad(true);
       emit('handleReload');
     });

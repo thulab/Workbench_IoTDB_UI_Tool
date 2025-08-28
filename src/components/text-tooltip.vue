@@ -23,8 +23,8 @@ const props = withDefaults(
 );
 const tooltipDisabled = ref(true);
 const onMouseOver = (str: string) => {
-  const parentWidth: number = proxy.$refs[str].parentNode.offsetWidth;
-  const contentWidth: number = proxy.$refs[str].offsetWidth;
+  const parentWidth: number = proxy.$refs[str]!.parentNode.offsetWidth;
+  const contentWidth: number = proxy.$refs[str]!.offsetWidth;
   if (contentWidth > parentWidth) {
     tooltipDisabled.value = false;
   } else {

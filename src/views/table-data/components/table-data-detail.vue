@@ -270,7 +270,7 @@ function getListData() {
       tableData.value = res.data?.value.valueList?.map((item: any[]) => {
         const obj = {} as Record<string, string>;
         item.forEach((childItem, index) => {
-          obj[list[index].prop] = childItem;
+          obj[list[index]!.prop] = childItem;
         });
         return obj;
       });
@@ -442,9 +442,9 @@ function handleInsert() {
 // 将值自动加单引号
 function processValues(values: string[], types: string[]): string[] {
   return values.map((value, index) => {
-    const currentType = types[index]?.toUpperCase();
+    const currentType = types[index]!.toUpperCase();
 
-    if (['STRING', 'BLOB', 'TEXT'].includes(currentType)) {
+    if (['STRING', 'BLOB', 'TEXT']!.includes(currentType)) {
       return `'${value}'`;
     }
     return value;

@@ -14,6 +14,7 @@ common:
   batchDelete: 批量删除
   batchRun: 批量启动
   batchStop: 批量停止
+  pre: 上一步
   next: 下一步
   finish: 完成
   deleteConfirm: 是否确认删除?
@@ -732,7 +733,7 @@ auth:
   userNameLength: 字符长度不小于4，请重新输入
   userNameExg: 格式不符，请输入大小写字母、数字、特殊字符（!{'@'}#$%^&*()_+-=）
   userExist: 该用户已存在，请重新输入
-  pwdLength: 字符长度不小于4，请重新输入
+  pwdLength: 字符长度不小于12，请重新输入
   pwdExg: 格式不符，请输入大小写字母、数字、特殊字符（!{'@'}#$%^&*()_+-=）
   pwdUnSame: 密码不一致，请重新输入
   userSuccess: 新建用户成功
@@ -757,6 +758,35 @@ auth:
   systemDetail: 实时库涵盖了测点管理、查询、可视化、告警、权限等功能，旨在帮助用户更直观的进行跨实例管理，更简单的完成数据库操作，更高效的进行运维操作
   systemDetailWorkbench: Workbench涵盖了测点管理、查询、可视化、权限等功能，旨在帮助用户更直观的进行跨实例管理，更简单的完成数据库操作，更高效的进行运维操作
   docTip: 权限含义具体说明请查看文档
+  relational:
+    allScope: 全局权限
+    dataScope: 数据权限
+    MANAGE_USER: 用户管理
+    MANAGE_ROLE: 角色管理
+    scope: 权限范围
+    selectedScope: 所选范围
+    type: 权限类型
+    all: 全选
+    CREATE: 创建
+    DROP: 删除
+    ALTER: 修改
+    SELECT: 查询数据
+    INSERT: 插入/更新数据
+    DELETE: 删除数据
+    addScope: 添加权限范围
+    isEnable: 是否启用
+    canGrant: 是否可转授
+    desc: 描述
+    allDesc: 获得权限范围内的全部操作权限
+    CREATEDesc: 允许在权限范围内创建任意数据库/表
+    DROPDesc: 允许在权限范围内删除任意数据库/表
+    ALTERDesc: 允许在权限范围内修改任意数据库/表的定义
+    SELECTDesc: 允许在权限范围内查询数据库/表的数据
+    INSERTDesc: 允许在权限范围内插入/更新数据库/表中的数据
+    DELETEDesc: 允许在权限范围内删除数据库/表中的数据
+    selectPrivilegeTip: 请选择需要授予的权限
+    deleteDataAuthTip: 是否删除该数据权限？
+    editTip: 该权限为角色所有，如需修改请修改角色权限
 error:
   403Tip: 抱歉，您无权访问该页面
   goHome: 返回首页

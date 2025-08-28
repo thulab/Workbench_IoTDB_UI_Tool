@@ -82,7 +82,7 @@ const partOption = computed<ECOption>(() => {
         },
       },
     ],
-  };
+  } as unknown as ECOption;
 });
 onMounted(() => {});
 </script>

@@ -667,7 +667,7 @@ function resetState() {
 // 控制连接桩显示/隐藏
 const showPorts = (portList: NodeListOf<SVGElement>, show: boolean) => {
   for (let i = 0, len = portList.length; i < len; i += 1) {
-    portList[i].style.visibility = show ? 'visible' : 'hidden';
+    portList[i]!.style.visibility = show ? 'visible' : 'hidden';
   }
 };
 
@@ -676,8 +676,8 @@ function getEdgeStyle(edge: Edge) {
   isShowNodeStyle.value = false;
   isShowEdgeStyle.value = true;
   currentEdge.value = edge;
-  const style = edge.attr().line.style as JSONObject;
-  const targetMarker = edge.attr().line.targetMarker as JSONObject;
+  const style = edge.attr().line!.style as JSONObject;
+  const targetMarker = edge.attr().line!.targetMarker as JSONObject;
   if (!edge.getConnector()) {
     edgeStyle.lineType = 'normal';
   } else if (edge.getConnector().name === 'rounded' && style.animation === 'none') {
@@ -687,7 +687,7 @@ function getEdgeStyle(edge: Edge) {
   } else {
     edgeStyle.lineType = 'normal';
   }
-  edgeStyle.color = (edge.attr().line.stroke as string) || '#495AD4';
+  edgeStyle.color = (edge.attr().line!.stroke as string) || '#495AD4';
   edgeStyle.arrowType = (targetMarker.name as string) || 'block';
   edgeStyle.arrowWidth = (targetMarker.height as number) || 12;
   edgeStyle.arrowHeight = (targetMarker.width as number) || 8;
@@ -700,8 +700,8 @@ function getNodeStyle(node: Node) {
     // 文本输入
     isShowTextStyle.value = true;
     isShowNodeStyle.value = false;
-    textStyle.fontSize = (node.attrs!.text.fontSize as number) || 14;
-    textStyle.color = (node.attrs!.text.fill as string) || '#495AD4';
+    textStyle.fontSize = (node.attrs!.text!.fontSize as number) || 14;
+    textStyle.color = (node.attrs!.text!.fill as string) || '#495AD4';
   } else {
     isShowTextStyle.value = false;
     isShowNodeStyle.value = true;
@@ -716,14 +716,14 @@ function graphWatchEvent() {
   graph.value?.on('node:mouseenter', () => {
     if (!isEdit.value) return;
     const container = document.getElementById('graph-container')!;
-    const allPorts = container.querySelectorAll('.x6-port-body');
-    showPorts(allPorts, true);
+    const allPorts = container.querySelectorAll('.x6-port-body')!;
+    showPorts(allPorts as NodeListOf<SVGElement>, true);
   });
   graph.value?.on('node:mouseleave', () => {
     if (!isEdit.value) return;
     const container = document.getElementById('graph-container')!;
-    const allPorts = container.querySelectorAll('.x6-port-body');
-    showPorts(allPorts, false);
+    const allPorts = container.querySelectorAll('.x6-port-body')!;
+    showPorts(allPorts as NodeListOf<SVGElement>, false);
   });
   // 添加边
   graph.value?.on('edge:added', ({ edge }) => {
@@ -818,7 +818,7 @@ function graphWatchEvent() {
     }
     if (graph.value && graph.value.getSelectedCells().length > 0) {
       const [cell] = graph.value.getSelectedCells();
-      if (cell.shape === 'edge') {
+      if (cell!.shape === 'edge') {
         operateEdge.value = cell;
         contextMenuType.value = 'edge';
       } else {

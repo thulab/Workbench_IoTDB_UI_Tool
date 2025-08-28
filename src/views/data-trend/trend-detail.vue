@@ -346,65 +346,68 @@ const seriesData = computed<ECOption>(
     }) as unknown as ECOption,
 );
 
-const chartOptions = computed<ECOption>(() => ({
-  legend: legendSelected.value,
-  useUTC: false,
-  tooltip: {
-    confine: true,
-    trigger: 'axis',
-    // appendToBody: true,
-    formatter: (params) => {
-      let res = '';
-      const paramsData = params as unknown as Array<Record<string, any>>;
-      const circle = '<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:';
-      checkedData.value.forEach((item) => {
-        const data = paramsData.find((f) => f.seriesName === item.path);
-        res += `<div style="margin: 10px 0 0;">${circle}${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;margin-left:2px">${data ? data.seriesName : item.path}</span><span style="float:right;margin-left:20px;font-size:14px;color:#666;font-weight:900">${data ? data.data[1] : null}</span></div>`;
-      });
-      return `<div style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0].axisValueLabel}</div>${res}`;
-    },
-  },
-  toolbox: {
-    feature: {
-      dataZoom: {
-        title: {
-          zoom: t('common.zoom'),
-          back: t('common.revoke'),
-        },
-        icon: {
-          zoom: 'path://M15 9L23 9L23 23L9 23L9 15M13 9L9 9M9 9L5 9M9 13L9 9M9 9L9 5',
-          back: 'path://M9,9h14v14H9v-8 M12,12L9,9l3-3',
+const chartOptions = computed<ECOption>(
+  () =>
+    ({
+      legend: legendSelected.value,
+      useUTC: false,
+      tooltip: {
+        confine: true,
+        trigger: 'axis',
+        // appendToBody: true,
+        formatter: (params: Array<Record<string, any>>) => {
+          let res = '';
+          const paramsData = params;
+          const circle = '<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:';
+          checkedData.value.forEach((item) => {
+            const data = paramsData.find((f) => f.seriesName === item.path);
+            res += `<div style="margin: 10px 0 0;">${circle}${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;margin-left:2px">${data ? data.seriesName : item.path}</span><span style="float:right;margin-left:20px;font-size:14px;color:#666;font-weight:900">${data ? data.data[1] : null}</span></div>`;
+          });
+          return `<div style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0]!.axisValueLabel}</div>${res}`;
         },
       },
-      restore: {
-        title: t('common.restore'),
-        icon: 'path://M13 21L15 24C10.0294 24 6 19.9706 6 15C6 12.7036 6.86006 10.6081 8.27564 9.01797M17 9L15 6C19.9706 6 24 10.0294 24 15C24 17.3063 23.1325 19.4101 21.7059 21.0026',
+      toolbox: {
+        feature: {
+          dataZoom: {
+            title: {
+              zoom: t('common.zoom'),
+              back: t('common.revoke'),
+            },
+            icon: {
+              zoom: 'path://M15 9L23 9L23 23L9 23L9 15M13 9L9 9M9 9L5 9M9 13L9 9M9 9L9 5',
+              back: 'path://M9,9h14v14H9v-8 M12,12L9,9l3-3',
+            },
+          },
+          restore: {
+            title: t('common.restore'),
+            icon: 'path://M13 21L15 24C10.0294 24 6 19.9706 6 15C6 12.7036 6.86006 10.6081 8.27564 9.01797M17 9L15 6C19.9706 6 24 10.0294 24 15C24 17.3063 23.1325 19.4101 21.7059 21.0026',
+          },
+          saveAsImage: {
+            title: t('common.export'),
+            icon: 'path://M18,12V7H7v16h11v-5 M24,15H13 M21,18l3-3l-3-3',
+          },
+        },
       },
-      saveAsImage: {
-        title: t('common.export'),
-        icon: 'path://M18,12V7H7v16h11v-5 M24,15H13 M21,18l3-3l-3-3',
+      grid: {
+        left: 20,
+        right: 60,
+        bottom: 20,
+        containLabel: true,
       },
-    },
-  },
-  grid: {
-    left: 20,
-    right: 60,
-    bottom: 20,
-    containLabel: true,
-  },
-  connectNulls: false,
-  xAxis: {
-    type: 'time',
-    boundaryGap: false,
-    show: inited ? pathList.value.length > 0 : true,
-  },
-  yAxis: {
-    type: 'value',
-    scale: true,
-  },
-  animation: !isRunningTab.value,
-  series: seriesData.value.series,
-}));
+      connectNulls: false,
+      xAxis: {
+        type: 'time',
+        boundaryGap: false,
+        show: inited ? pathList.value.length > 0 : true,
+      },
+      yAxis: {
+        type: 'value',
+        scale: true,
+      },
+      animation: !isRunningTab.value,
+      series: seriesData.value.series,
+    }) as unknown as ECOption,
+);
 
 const { requestFn: getHistoryTrend } = useRequest(SearchApi.getHistoryTrend);
 const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTemplate);
@@ -471,7 +474,7 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
     });
     chartInstance.on('highlight', (params: any) => {
       if (params.batch && params.batch.length > 0) {
-        currentPoint = currentData.value[params?.batch[0].seriesIndex]?.timestamps[params?.batch[0].dataIndex];
+        currentPoint = currentData.value[params?.batch[0]!.seriesIndex]?.timestamps[params?.batch[0]!.dataIndex]!;
       }
     });
     chartInstance.getZr().on('click', (params) => {
@@ -488,12 +491,12 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
       currentData.value.forEach((item) => {
         const i = item.timestamps.findIndex((f) => f === currentPoint);
         if (i !== -1) {
-          findPoints.push([currentPoint, item.values[i], item.path]);
+          findPoints.push([currentPoint, item.values[i]!, item.path]);
         }
       });
       if (findPoints.length > 0) {
-        const point = [findPoints[0][0], findPoints[0][1]];
-        const param = { componentType: 'series', seriesName: findPoints[0][2], value: point };
+        const point = [findPoints[0]![0]!, findPoints[0]![1]!];
+        const param = { componentType: 'series', seriesName: findPoints[0]![2]!, value: point };
 
         handleClickChart(param as echarts.ECElementEvent, findPoints);
       }
@@ -580,7 +583,7 @@ function handleClickChart(params: echarts.ECElementEvent, points?: Array<[number
   markPointCount.value++;
   const num = markPointCount.value;
   if (!points || points.length === 0) {
-    const data: Array<[number, string, string]> = [[(value as number[])[0], `${(value as number[])[1]}`, seriesName]];
+    const data: Array<[number, string, string]> = [[(value as number[])[0]!, `${(value as number[])[1]}`, seriesName]];
     handleAddPoint(data, num);
   } else {
     handleAddPoint(points, num);
@@ -614,14 +617,18 @@ function handleDelPoint(data: PointData, index: number) {
     pointList.value.splice(index, 1);
     pointLineData.value.splice(index, 1);
     pointXSameList.forEach((item) => {
-      const fIndex = pointList.value.findIndex((f) => f.x === item.x && f.y === item.y);
-      const fData = pointList.value[fIndex];
-      const lData = pointLineData.value[fIndex];
-      if (fIndex >= index) {
-        fData.order--;
-        lData.order--;
-        pointList.value.splice(fIndex, 1, { ...fData, label: `D${fData.group}-${fData.order}`, order: fData.order });
-        pointLineData.value.splice(fIndex, 1, { ...lData, label: { formatter: () => `D${lData.group}-${lData.order}`, position: 'end', offset: [0, lData.order * 10] }, order: lData.order });
+      const firstIndex = pointList.value.findIndex((f) => f.x === item.x && f.y === item.y);
+      const firstData = pointList.value[firstIndex]!;
+      const lastData = pointLineData.value[firstIndex]!;
+      if (firstIndex >= index) {
+        firstData.order--;
+        lastData.order--;
+        pointList.value.splice(firstIndex, 1, { ...firstData, label: `D${firstData.group}-${firstData.order}`, order: firstData.order });
+        pointLineData.value.splice(firstIndex, 1, {
+          ...lastData,
+          label: { formatter: () => `D${lastData.group}-${lastData.order}`, position: 'end', offset: [0, lastData.order * 10] },
+          order: lastData.order,
+        });
       }
     });
   }
@@ -711,7 +718,7 @@ function dealSearchPath() {
   addPaths.forEach((item, index) => {
     pathList.value.push({
       path: item,
-      color: diffArr[index] || predefineColors[index],
+      color: diffArr[index] || predefineColors[index]!,
       width: 2,
       checked: true,
       disabled: false,
@@ -814,8 +821,8 @@ function handleData(data: any) {
     jsonData.data.forEach((item) => {
       const index = chartData.value.findIndex((f) => f.path === item.path);
       if (index !== -1) {
-        const originData = chartData.value[index];
-        const endTimestamp = originData.timestamps[originData.timestamps.length - 1];
+        const originData = chartData.value[index]!;
+        const endTimestamp = originData.timestamps[originData.timestamps.length - 1]!;
         const reversedTimestamps = item.timestamps.reverse();
         const reversedValues = item.values.reverse();
 
@@ -864,7 +871,7 @@ function handlePlay(val: boolean) {
     chartData.value.forEach((data) => {
       if (data.timestamps.length > 0) {
         data.values.push('');
-        data.timestamps.push(data.timestamps[data.timestamps.length - 1] + 1);
+        data.timestamps.push(data.timestamps[data.timestamps.length - 1]! + 1);
       }
     });
   }
@@ -1006,11 +1013,11 @@ function handleOperateTemplate(val: string, data: TrendTemplate) {
         searchFormData.path.forEach((item, index) => {
           const i = templateData.pathList.findIndex((pathItem: LineObj) => pathItem.path === item);
           if (i !== -1) {
-            resultPath.push({ ...pathList.value[i] });
+            resultPath.push({ ...pathList.value[i]! });
           } else {
             resultPath.push({
               path: item,
-              color: diffArr[index] || predefineColors[index],
+              color: diffArr[index] || predefineColors[index]!,
               width: 2,
               checked: true,
               disabled: false,
@@ -1032,11 +1039,11 @@ function handleSaveSuccess(name: string) {
   searchFormData.path.forEach((item, index) => {
     const i = pathList.value.findIndex((pathItem) => pathItem.path === item);
     if (i !== -1) {
-      resultPath.push({ ...pathList.value[i] });
+      resultPath.push({ ...pathList.value[i]! });
     } else {
       resultPath.push({
         path: item,
-        color: diffArr[index] || predefineColors[index],
+        color: diffArr[index] || predefineColors[index]!,
         width: 2,
         checked: true,
         disabled: false,
