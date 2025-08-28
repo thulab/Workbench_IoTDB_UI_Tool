@@ -7,7 +7,11 @@
             {{ t('measurement.measurementChoose') }}：
             <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
-          <timeseries-select v-model="searchFormData.path" :disabled-path="(item) => ['TEXT', 'BOOLEAN', 'TIMESTAMP', 'DATE', 'STRING', 'BLOB']!.includes(item.dataType)" id="statistic-search-path" />
+          <timeseries-select
+            v-model="searchFormData.path"
+            :disabled-path="(item: MeasurementDataItem) => ['TEXT', 'BOOLEAN', 'TIMESTAMP', 'DATE', 'STRING', 'BLOB']!.includes(item.dataType)"
+            id="statistic-search-path"
+          />
         </base-form-item>
         <base-form-item :label="`${t('search.searchTime')}：`" prop="datetimerange" class="form-item-last">
           <el-date-picker
@@ -118,7 +122,7 @@
 
 <script setup lang="ts">
 import type { FormInstance } from 'element-plus';
-import type { StatisticSearchMinMaxObj, StatisticSearchAvgSumObj } from '@/types';
+import type { StatisticSearchMinMaxObj, StatisticSearchAvgSumObj, MeasurementDataItem } from '@/types';
 import { storeToRefs } from 'pinia';
 import { SearchApi } from '@/api';
 import { useTableHeight } from '@/composition-api';

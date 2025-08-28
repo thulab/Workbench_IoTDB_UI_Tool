@@ -14,7 +14,7 @@
           :itemWidth="locale === 'en' ? 250 : 320"
           class="path-select"
           :key="dialogKey"
-          :disabled-path="(item) => item.dataType === 'TEXT' || pathList.includes(item.timeseries)"
+          :disabled-path="(item: MeasurementDataItem) => item.dataType === 'TEXT' || pathList.includes(item.timeseries)"
         />
       </base-form-item>
       <div class="chart-detail-box">
@@ -37,7 +37,7 @@
 
 <script lang="ts" setup>
 import type { FormInstance, FormItemRule } from 'element-plus';
-import type { LineObj } from '@/types';
+import type { LineObj, MeasurementDataItem } from '@/types';
 
 const props = defineProps<{
   visible: boolean;

@@ -8,7 +8,7 @@
               {{ t('measurement.measurementChoose') }}：
               <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
-            <timeseries-select v-model="searchFormData.path" id="trend-search-path" :disabled-path="(item) => item.dataType === 'TEXT'" />
+            <timeseries-select v-model="searchFormData.path" id="trend-search-path" :disabled-path="(item: MeasurementDataItem) => item.dataType === 'TEXT'" />
           </base-form-item>
           <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules">
             <ul class="search-data-list">
@@ -150,7 +150,7 @@ import PointListTab from './components/point-list-tab.vue';
 import TemplateListTab from './components/template-list-tab.vue';
 import ModalTemplate from './components/modal-template.vue';
 import ModalTemplateRename from './components/modal-template-rename.vue';
-import type { LineObj, TrendData, TrendTemplate } from '@/types';
+import type { LineObj, TrendData, TrendTemplate, MeasurementDataItem } from '@/types';
 
 interface PointData {
   name: string;
