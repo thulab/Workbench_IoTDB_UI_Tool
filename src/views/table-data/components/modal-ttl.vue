@@ -3,7 +3,7 @@
     <el-form :label-width="locale === 'en' ? '170px' : '120px'" ref="formRef" :rules="rules" :model="formData" label-position="left" :key="formKey">
       <label><input type="password" autocomplete="new-password" hidden /></label>
       <base-form-item :label="`${t('dataManage.ttl')}：`" prop="ttl">
-        <el-input v-model="formData.ttl" autocomplete="off" :placeholder="t('dataManage.ttlPlaceholder')" @input="handleNumberInput">
+        <el-input v-model.number="formData.ttl" autocomplete="off" :placeholder="t('dataManage.ttlPlaceholder')" @input="handleNumberInput">
           <template #append>ms</template>
         </el-input>
       </base-form-item>
@@ -50,20 +50,7 @@ const handleNumberInput = (value: string) => {
   formData.ttl = value.replace(/[^\d]/g, '');
 };
 
-const rules = reactive<FormRules>({
-  databaseName: [
-    {
-      required: true,
-      message: () => t('common.formRuleEmptyOperateShort'),
-      trigger: 'blur',
-    },
-    {
-      max: 64,
-      message: () => t('dataManage.databaseNameLenth'),
-      trigger: 'blur',
-    },
-  ],
-});
+const rules = reactive<FormRules>({});
 const { requestFn: upsertDatabase, loading } = useRequest(IoTDBApi.upsertDatabase);
 
 const handleConfirm = () => {

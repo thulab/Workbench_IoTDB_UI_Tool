@@ -99,7 +99,7 @@
 <script setup lang="ts">
 /* eslint-disable no-sparse-arrays */
 import { type ECOption } from '@/plugins/echarts-plugin';
-import { toThousands, transformDecimal } from '@/utils/format';
+import { toThousands, transformDecimal, limitMax } from '@/utils/format';
 import { DashboardApi } from '@/api';
 import DataContainer from './data-container.vue';
 import type { MetricDiskRes } from '@/types';
@@ -494,7 +494,10 @@ function getMemory() {
       if (res.data) {
         memoryData.dataCount = res.data.memoryTotal;
         memoryData.valueUnit = res.data.unit;
-        memoryData.dataVal = transformDecimal(res.data.memoryRatio * 100, 1);
+        memoryData.dataVal = limitMax(transformDecimal(res.data.memoryRatio * 100, 1), 100);
+      } else {
+        memoryData.dataVal = 0;
+        memoryData.dataCount = null;
       }
     })
     .catch(() => {

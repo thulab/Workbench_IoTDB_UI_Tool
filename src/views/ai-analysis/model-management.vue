@@ -57,8 +57,16 @@
                   >
                     <el-table-column type="selection" :reserve-selection="true" :selectable="(row) => !row.modelType.startsWith('内置模型')" width="55" />
                     <el-table-column :label="t('aiAnalysis.modelName')" prop="modelId" min-width="180" align="center" show-overflow-tooltip />
-                    <el-table-column :label="t('aiAnalysis.category')" prop="categoryString" min-width="160" align="center" show-overflow-tooltip />
-                    <el-table-column :label="t('aiAnalysis.modelType')" prop="modelType" min-width="160" align="center" show-overflow-tooltip />
+                    <el-table-column :label="t('aiAnalysis.category')" prop="categoryString" min-width="160" align="center" show-overflow-tooltip>
+                      <template #default="{ row }">
+                        {{ row.categoryString || '-' }}
+                      </template>
+                    </el-table-column>
+                    <el-table-column :label="t('aiAnalysis.modelType')" prop="modelType" min-width="160" align="center" show-overflow-tooltip>
+                      <template #default="{ row }">
+                        {{ row.modelType || '-' }}
+                      </template>
+                    </el-table-column>
                     <el-table-column :label="t('aiAnalysis.state')" prop="stateString" min-width="120" align="center" show-overflow-tooltip>
                       <template #default="{ row }">
                         <el-tag :type="formatState(row.state)" class="model-state-tag" :id="`model-management-table-${row.name}-state`">
@@ -85,7 +93,9 @@
                           <el-button v-if="!(row.category === 'BUILT-IN')" type="primary" link size="small" @click="handleDel('row', row)" :id="`model-management-table-${row.name}-del`">
                             {{ t('common.delete') }}
                           </el-button>
-                          <el-tooltip effect="light" :content="t('aiAnalysis.cannotDel')" v-else>{{ t('common.delete') }}</el-tooltip>
+                          <el-tooltip effect="light" :content="t('aiAnalysis.cannotDel')" v-else>
+                            <el-button link disabled> {{ t('common.delete') }}</el-button></el-tooltip
+                          >
                         </div>
                       </template>
                     </el-table-column>

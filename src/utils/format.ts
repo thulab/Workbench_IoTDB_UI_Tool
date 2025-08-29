@@ -40,6 +40,11 @@ export function transformDecimal(num: number, point: number) {
   return decimalNum;
 }
 
+export function limitMax(num: number, max: number) {
+  if (num > max) return max;
+  return num;
+}
+
 export function formatSelectedMeasurement(data: SelectedMeasurement) {
   return formatDevice(data.device, data.measurement);
 }

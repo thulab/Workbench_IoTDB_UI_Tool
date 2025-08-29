@@ -25,7 +25,7 @@
               {{ t('dataManage.ttl') }}：
               <el-tooltip effect="light" :content="t('dataManage.ttlTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
             </template>
-            <el-input v-model="formData.ttl" :placeholder="t('dataManage.ttlPlaceholder2')" :disabled="addType !== 'addTable'" @input="handleNumberInput">
+            <el-input v-model.number="formData.ttl" :placeholder="t('dataManage.ttlPlaceholder2')" :disabled="addType !== 'addTable'" @input="handleNumberInput">
               <template #append>ms</template>
             </el-input>
           </base-form-item>
@@ -39,7 +39,7 @@
             <div class="left-view">
               <el-row class="form-item-row" style="grid-template-columns: 1fr 1fr 1fr">
                 <el-col>
-                  <base-form-item class="form-item-width" :label="`${t('dataManage.columnName')}：`" :prop="`columns[${index}]!.columnName`" required :rules="tableNameRules">
+                  <base-form-item class="form-item-width" :label="`${t('dataManage.columnName')}：`" :prop="`columns[${index}].columnName`" required :rules="tableNameRules">
                     <template #label>
                       {{ t('dataManage.columnName') }}：
                       <el-tooltip effect="light" :content="t('dataManage.tableNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
@@ -202,8 +202,8 @@ const tableNameRules = ref([
     trigger: 'blur',
   },
   {
-    max: 64,
-    message: () => t('dataManage.databaseNameLenth'),
+    max: 100,
+    message: () => t('dataManage.tableNameLength'),
     trigger: 'blur',
   },
   {

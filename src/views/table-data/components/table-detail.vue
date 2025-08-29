@@ -11,7 +11,7 @@
       <ul class="database-info-list">
         <li class="database-info-item" id="device-total-li">
           <span class="database-info-item-label" id="measurement-total-span">{{ t('dataManage.ttl') }}：</span>
-          {{ localCurrentNode?.ttl ? localCurrentNode?.ttl : 'INF' }}
+          {{ localCurrentNode?.ttl ? `${localCurrentNode?.ttl} ms` : 'INF' }}
           <el-icon size="24" class="m-r-6 svg-button-hover-color" style="cursor: pointer" @click="handleEditTableTTL()">
             <i-custom-edit />
           </el-icon>
@@ -225,9 +225,9 @@ const searchPlaceholder = computed(() => {
     case 'comment':
       return t('dataManage.commentPlaceholder');
     case 'datatype':
-      return t('dataManage.dataTypePlaceholder');
+      return t('dataManage.datatypeInputPlaceholder');
     case 'category':
-      return t('dataManage.cateGoryPlaceholder');
+      return t('dataManage.categoryInputPlaceholder');
     default:
       return '';
   }

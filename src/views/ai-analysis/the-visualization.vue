@@ -10,7 +10,9 @@
                   <base-form-item :label="`${t('aiAnalysis.business')}：`" prop="type" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
                     <el-radio-group v-model="searchFormData.type" id="business-type" @change="handleChangeType">
                       <el-radio :value="0" id="business-type-0">{{ t('aiAnalysis.forecast') }}</el-radio>
-                      <el-radio :value="1" :disabled="connectionStore.isTableModel" id="business-type-1">{{ t('aiAnalysis.anomalyDetection') }}</el-radio>
+                      <el-tooltip effect="light" trigger="hover" :disabled="!connectionStore.isTableModel" :content="t('aiAnalysis.forecastTip')">
+                        <el-radio :value="1" :disabled="connectionStore.isTableModel" id="business-type-1">{{ t('aiAnalysis.anomalyDetection') }}</el-radio>
+                      </el-tooltip>
                       <el-radio :value="2" id="business-type-2">{{ t('aiAnalysis.custom') }}</el-radio>
                     </el-radio-group>
                   </base-form-item>
@@ -31,7 +33,14 @@
                       collapse-tags
                       :placeholder="t('common.selectPlaceholder')"
                     >
-                      <el-option v-for="item in modelOptions" :key="item.modelId" :label="`${item.modelId} (${item.modelType})`" :value="item.modelId" :id="`search-method-${item.modelId}`" />
+                      <el-option
+                        v-for="item in modelOptions"
+                        :key="item.modelId"
+                        :label="`${item.modelId} (${item.modelType})`"
+                        :disabled="item.state !== 'ACTIVE'"
+                        :value="item.modelId"
+                        :id="`search-method-${item.modelId}`"
+                      />
                     </el-select>
                   </base-form-item>
                   <el-button v-if="searchFormData.type !== 2" link :disabled="!enableAINode" @click="$router.push({ name: 'ModelManagement' })">
@@ -480,14 +489,14 @@ const applyTip = computed(() => {
   if (!canReadWriteData.value || !canUseModel.value) {
     return t('common.dataAndModelAuth');
   }
-  if (notComplete.value) {
-    return t('spectrum.applyTip');
+  if (!showAuthMenu.value) {
+    return t('common.useVersionTip', { version: '2.0.5' });
   }
-  return '';
+  return t('spectrum.applyTip');
 });
 
 const canQuery = computed(() => {
-  if (canReadWriteData.value && canUseModel.value && !notComplete.value && enableAINode.value && searchFormData.method && searchFormData.method.length) {
+  if (canReadWriteData.value && canUseModel.value && !notComplete.value && enableAINode.value && ((searchFormData.method && searchFormData.method.length) || sqlValue.value)) {
     return true;
   }
   return false;
@@ -841,7 +850,7 @@ function getModelList() {
   }
   getModels('')
     .then((res) => {
-      modelList.value = res.data.filter((item) => item.state === 'ACTIVE') || [];
+      modelList.value = res.data || [];
       if (modelList.value.some((m) => m.modelId === 'sundial')) {
         defaultMethod = ['sundial'];
         searchFormData.method = defaultMethod;
@@ -1148,11 +1157,12 @@ function handleFilter(val: string) {
 }
 
 function handleDoc() {
-  if (locale.value === 'en') {
-    window.open('https://www.timecho.com/docs/UserGuide/latest/AI-capability/AINode_timecho.html#_4-4-using-built-in-model-reasoning');
-  } else {
-    window.open('https://www.timecho.com/docs/zh/UserGuide/latest/AI-capability/AINode_timecho.html#_4-4-%E4%BD%BF%E7%94%A8%E5%86%85%E7%BD%AE%E6%A8%A1%E5%9E%8B%E6%8E%A8%E7%90%86');
-  }
+  const urlHost = `https://www.timecho.com/docs`;
+  const urlLocale = locale.value === 'en' ? '' : '/zh';
+  const urlModel = connectionStore.isTableModel ? 'latest-Table/' : 'latest/';
+  const urlEnded = locale.value === 'en' ? '#_4-4-using-built-in-model-reasoning' : '#_4-4-使用内置模型推理';
+  const url = `${urlHost}${urlLocale}/UserGuide/${urlModel}AI-capability/AINode_timecho.html${urlEnded}`;
+  window.open(url);
 }
 
 const handleSelectMeasurement = () => {

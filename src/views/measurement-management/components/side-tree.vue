@@ -28,6 +28,7 @@
             :expand-on-click-node="true"
             :default-expanded-keys="expandNodes"
             @node-click="handleNodeClick"
+            @node-expand="handleNodeClick"
             @node-collapse="handleNodeCollapse"
             @handle-click-more="handleClickMore"
           >

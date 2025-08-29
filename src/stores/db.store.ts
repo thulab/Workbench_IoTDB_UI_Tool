@@ -79,6 +79,8 @@ export const useDbStore = defineStore('db', () => {
     return data;
   });
 
+  const userTreeData = computed(() => treeData.value.filter((db) => !['information_schema'].includes(db.nodeName)));
+
   function setFirstLoad(value: boolean) {
     firstLoad.value = value;
   }
@@ -97,6 +99,7 @@ export const useDbStore = defineStore('db', () => {
   return {
     firstLoad,
     treeData,
+    userTreeData,
     databaseNames,
     activeKeyList,
     getDatabases,

@@ -171,11 +171,11 @@
               </span>
               <div class="ip-port-list">
                 <div class="ip-port-item" v-for="(item, index) in formData.targetInfos" :key="`${index}_host_port`">
-                  <base-form-item label="" :prop="`targetInfos[${index}]!.host`" :rules="requiredRules">
+                  <base-form-item label="" :prop="`targetInfos[${index}].host`" :rules="requiredRules">
                     <el-input v-model.trim="item.host" :placeholder="t('dataSync.targetInfoIp')" style="width: 200px" :id="`data-sync-modal-${index}-host`" />
                   </base-form-item>
                   <span class="ip-port-divider">:</span>
-                  <base-form-item label="" :prop="`targetInfos[${index}]!.port`" :rules="requiredPortRules">
+                  <base-form-item label="" :prop="`targetInfos[${index}].port`" :rules="requiredPortRules">
                     <el-input v-model.number="item.port" :placeholder="t('dataSync.targetInfoHost')" style="width: 210px" :id="`data-sync-modal-${index}-port`" />
                   </base-form-item>
                   <el-button

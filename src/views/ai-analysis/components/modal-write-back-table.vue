@@ -2,12 +2,22 @@
   <el-dialog :title="t('aiAnalysis.writeBack')" v-model="dialogVisible" width="480px" align-center>
     <el-form ref="formRef" :model="formData" :rules="formRules" :label-width="locale === 'en' ? '104px' : '110px'" label-position="right">
       <base-form-item :label="`${t('aiAnalysis.sourceName')}：`" prop="oldName" class="type-input-disabled el-form-item-not-mandatory">
-        <el-descriptions :column="1">
-          <el-descriptions-item :label="`${t('aiAnalysis.writeBackSourceDatabase')}：`">{{ props.database }}</el-descriptions-item>
-          <el-descriptions-item :label="`${t('aiAnalysis.writeBackSourceTable')}：`">{{ props.table }}</el-descriptions-item>
-          <el-descriptions-item :label="`${t('aiAnalysis.writeBackSourceTags')}：`">{{ props.tags?.map((tag) => tag.value).join(', ') }}</el-descriptions-item>
+        <el-descriptions :column="1" class="w-full">
+          <el-descriptions-item :label="`${t('aiAnalysis.writeBackSourceDatabase')}：`">
+            <span class="inline-flex w-[260px]"> <text-tooltip :content="props.database" /> </span>
+          </el-descriptions-item>
+          <el-descriptions-item :label="`${t('aiAnalysis.writeBackSourceTable')}：`">
+            <span class="inline-flex w-[260px]"> <text-tooltip :content="props.table" /> </span>
+          </el-descriptions-item>
+          <el-descriptions-item :label="`${t('aiAnalysis.writeBackSourceTags')}：`">
+            <span class="inline-flex w-[260px]">
+              <text-tooltip :content="props.tags?.map((tag) => tag.value).join(', ') || ''" />
+            </span>
+          </el-descriptions-item>
           <el-descriptions-item :label="`${t('aiAnalysis.writeBackSourceMeasurement')}：`">
-            {{ props.fieldName }}
+            <span class="inline-flex w-[260px]">
+              <text-tooltip :content="props.fieldName" />
+            </span>
           </el-descriptions-item>
         </el-descriptions>
       </base-form-item>

@@ -11,7 +11,7 @@
       <ul class="database-info-list">
         <li class="database-info-item" id="device-total-li" v-if="!isSystemDatabase">
           <span class="database-info-item-label" id="measurement-total-span">{{ t('dataManage.ttl') }}：</span>
-          {{ databaseInfos?.ttl ? databaseInfos?.ttl : 'INF' }}
+          {{ databaseInfos?.ttl ? `${databaseInfos?.ttl} ms` : 'INF' }}
           <el-icon
             size="24"
             class="m-r-6 svg-button-hover-color"

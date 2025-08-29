@@ -1151,7 +1151,7 @@ dataManage:
   databaseName: Database Name
   databaseNameTip: Case insensitive. Names containing underscores (_), numbers (not at beginning), or English letters can be created directly. Names containing special characters (like `), Chinese characters, or starting with numbers must be enclosed in double quotes "".
   databaseNamePlaceholder: Please enter database name
-  databaseNameLenth: Maximum 64 characters allowed. Please re-enter.
+  databaseNameLength: Maximum 64 characters allowed. Please re-enter.
   databaseNameExist: Database already exists. Please re-enter.
   tableNameExist: This table already exists. Please re-enter.
   specialCharsNeedQuotes: Special characters must be wrapped in quotes
