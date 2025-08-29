@@ -26,7 +26,7 @@ const requiredUserRules = ref([
   {
     min: 4,
     max: 32,
-    message: () => t('auth.pwdLength'),
+    message: () => t('auth.userNameLength'),
     trigger: 'blur',
   },
   {

@@ -31,10 +31,10 @@ common:
   create: 新建
   import: 导入
   export: 导出
-  exportTip: excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出
-  exportTipAll: 此导出操作为搜索结果导出。excel格式最大支持下载量为2G，csv无限制，推荐使用csv格式导出
-  exportCSV: 以.csv格式导出
-  exportXLSX: 以.xlsx格式导出
+  exportTip: excel 格式最大支持下载量为 2G，csv 无限制，推荐使用 csv 格式导出
+  exportTipAll: 此导出操作为搜索结果导出。excel 格式最大支持下载量为 2G，csv 无限制，推荐使用 csv 格式导出
+  exportCSV: 以 .csv 格式导出
+  exportXLSX: 以 .xlsx 格式导出
   placeHolder: 请输入
   selectPlaceholder: 请选择
   refresh: 刷新

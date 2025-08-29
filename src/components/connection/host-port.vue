@@ -1,11 +1,11 @@
 <template>
   <div class="ip-port-list">
     <div class="ip-port-item" v-for="(item, index) in hostAndPortList" :key="`${formKey}-${index}`">
-      <base-form-item label="" :prop="`${formKey}[${index}]!.host`" :rules="requiredRules">
+      <base-form-item label="" :prop="`${formKey}[${index}].host`" :rules="requiredRules">
         <el-input v-model.trim="item.host" :placeholder="t('connection.ipTip')" style="width: 200px" :id="`${formKey}-${index}-host`" :disabled="!isDisabled" />
       </base-form-item>
       <span class="ip-port-divider">:</span>
-      <base-form-item label="" :prop="`${formKey}[${index}]!.port`" :rules="requiredPortRules">
+      <base-form-item label="" :prop="`${formKey}[${index}].port`" :rules="requiredPortRules">
         <el-input v-model.number="item.port" :placeholder="t('connection.portTip')" :style="{ width: locale === 'en' ? '148px' : '148px' }" :id="`${formKey}-${index}-port`" :disabled="!isDisabled" />
       </base-form-item>
       <template v-if="showOperate">
