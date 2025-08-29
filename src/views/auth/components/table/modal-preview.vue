@@ -5,13 +5,13 @@
         <span class="fs-[14px] m-r-[24px]">{{ t('auth.relational.allScope') }}：</span>
         <template v-if="formData.canManageUser">
           <span class="flex items-center !m-r-[24px]">
-            <i-custom-correct />
+            <i-custom-correct class="m-r-8" />
             {{ t('auth.relational.MANAGE_USER') }}
           </span>
         </template>
         <el-checkbox disabled v-model="formData.canManageUser" class="!m-r-[24px]" v-else>{{ t('auth.relational.MANAGE_USER') }}</el-checkbox>
         <template v-if="formData.canManageRole">
-          <i-custom-correct />
+          <i-custom-correct class="m-r-8" />
           {{ t('auth.relational.MANAGE_ROLE') }}
         </template>
         <el-checkbox disabled v-model="formData.canManageRole" class="!m-l-0" v-else>{{ t('auth.relational.MANAGE_ROLE') }}</el-checkbox>
@@ -24,7 +24,14 @@
           <div class="header-operate-buttons"></div>
         </div>
         <el-table :data="tableData" style="width: 100%" v-loading="dataPrivilegesLoading" tooltip-effect="light" border :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
-          <el-table-column :label="t('auth.relational.scope')" prop="scope" align="center" :width="193" />
+          <el-table-column :label="t('auth.relational.scope')" prop="scope" align="center" :width="193">
+            <template #default="{ row }">
+              <span class="flex items-center justify-center">
+                <i-custom-role v-if="row.role"></i-custom-role>
+                <text-tooltip :content="row.scope" />
+              </span>
+            </template>
+          </el-table-column>
           <el-table-column :label="t('auth.relational.type')" align="center">
             <el-table-column
               v-for="(col, ci) in relationalDataScopePrivilegesEnum"

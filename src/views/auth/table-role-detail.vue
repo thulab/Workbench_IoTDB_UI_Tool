@@ -47,8 +47,20 @@
             </div>
             <div class="detail-user-list">
               <span class="fs-[14px] m-r-[24px]">{{ t('auth.relational.allScope') }}：</span>
-              <el-checkbox :disabled="!canManageRole" v-model="formData.canManageUser" @change="handleAllScopeChange('MANAGE_USER')">{{ t('auth.relational.MANAGE_USER') }}</el-checkbox>
-              <el-checkbox :disabled="!canManageRole" v-model="formData.canManageRole" @change="handleAllScopeChange('MANAGE_ROLE')">{{ t('auth.relational.MANAGE_ROLE') }}</el-checkbox>
+              <template v-if="!formData.canManageRole">
+                <span class="flex items-center !m-r-[24px]">
+                  <i-custom-correct class="m-r-8" />
+                  {{ t('auth.relational.MANAGE_USER') }}
+                </span>
+              </template>
+              <el-checkbox :disabled="!canManageRole" v-else v-model="formData.canManageUser" @change="handleAllScopeChange('MANAGE_USER')">{{ t('auth.relational.MANAGE_USER') }}</el-checkbox>
+              <template v-if="!formData.canManageRole">
+                <span class="flex items-center !m-r-[24px]">
+                  <i-custom-correct class="m-r-8" />
+                  {{ t('auth.relational.MANAGE_ROLE') }}
+                </span>
+              </template>
+              <el-checkbox :disabled="!canManageRole" v-else v-model="formData.canManageRole" @change="handleAllScopeChange('MANAGE_ROLE')">{{ t('auth.relational.MANAGE_ROLE') }}</el-checkbox>
             </div>
             <div class="detail-user-list">
               <span class="fs-[14px]">{{ t('auth.relational.dataScope') }}：</span>

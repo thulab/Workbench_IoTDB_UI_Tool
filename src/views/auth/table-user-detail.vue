@@ -55,8 +55,24 @@
             </div>
             <div class="detail-role-list">
               <span class="fs-[14px] m-r-[24px]">{{ t('auth.relational.allScope') }}：</span>
-              <el-checkbox :disabled="!canManageUser" v-model="formData.canManageUser" @change="handleAllScopeChange('MANAGE_USER')">{{ t('auth.relational.MANAGE_USER') }}</el-checkbox>
-              <el-checkbox :disabled="!canManageUser" v-model="formData.canManageRole" @change="handleAllScopeChange('MANAGE_ROLE')">{{ t('auth.relational.MANAGE_ROLE') }}</el-checkbox>
+              <template v-if="!formData.canManageUser || isManager">
+                <span class="flex items-center !m-r-[24px]">
+                  <i-custom-correct class="m-r-8" />
+                  {{ t('auth.relational.MANAGE_USER') }}
+                </span>
+              </template>
+              <el-checkbox :disabled="!canManageUser || isManager" v-else v-model="formData.canManageUser" @change="handleAllScopeChange('MANAGE_USER')">{{
+                t('auth.relational.MANAGE_USER')
+              }}</el-checkbox>
+              <template v-if="!formData.canManageUser || isManager">
+                <span class="flex items-center !m-r-[24px]">
+                  <i-custom-correct class="m-r-8" />
+                  {{ t('auth.relational.MANAGE_ROLE') }}
+                </span>
+              </template>
+              <el-checkbox :disabled="!canManageUser || isManager" v-else v-model="formData.canManageRole" @change="handleAllScopeChange('MANAGE_ROLE')">{{
+                t('auth.relational.MANAGE_ROLE')
+              }}</el-checkbox>
             </div>
             <div class="detail-role-list">
               <span class="fs-[14px]">{{ t('auth.relational.dataScope') }}：</span>
@@ -102,7 +118,7 @@
                 </el-table-column>
               </el-table>
 
-              <el-button v-if="canManageUser" style="width: 100%" class="m-t-24 svg-button-hover-color" @click="handleAddRow" id="auth-role-path">
+              <el-button v-if="canManageUser && !isManager" style="width: 100%" class="m-t-24 svg-button-hover-color" @click="handleAddRow" id="auth-role-path">
                 <i-custom-add class="m-r-4" />
                 {{ t('auth.relational.addScope') }}
               </el-button>
@@ -111,7 +127,7 @@
         </el-main>
       </el-container>
 
-      <modal-add-scope v-model:visible="addScopeVisible" :type="'role'" :current-data="currentRow" :name="currentUser?.name!" @handleSave="handleSaveDataPrivileges" />
+      <modal-add-scope v-model:visible="addScopeVisible" type="user" :current-data="currentRow" :name="currentUser?.name!" @handleSave="handleSaveDataPrivileges" />
       <modal-add-role v-model:visible="bindRoleVisible" :current-user="currentUser?.name!" :selected="selectRoleList" @add-role="handleAddRoleConfirm" />
       <modal-preview v-model:visible="previewVisible" type="role" :name="previewRole!" />
     </el-container>

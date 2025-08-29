@@ -11,6 +11,12 @@ export interface DataPrivilegeVo {
    */
   scope?: string;
   /**
+   * 角色
+   * @type {string}
+   * @memberof DataPrivilegeVo
+   */
+  role?: string;
+  /**
    * 数据权限
    * @type {Array<SinglePrivilegeVo>}
    * @memberof DataPrivilegeVo
