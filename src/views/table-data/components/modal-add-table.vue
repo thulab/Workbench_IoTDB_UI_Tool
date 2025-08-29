@@ -44,7 +44,8 @@
                       {{ t('dataManage.columnName') }}：
                       <el-tooltip effect="light" :content="t('dataManage.columnNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                     </template>
-                    <el-input v-model="item.columnName" :placeholder="t('dataManage.columnNamePlaceholder')" clearable />
+                    <!-- Added ref for focusing -->
+                    <el-input v-model="item.columnName" :placeholder="t('dataManage.columnNamePlaceholder')" clearable :ref="(el: any) => setColumnInputRef(el, index)" />
                   </base-form-item>
                 </el-col>
                 <el-col>
@@ -99,8 +100,8 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import type { FormInstance, FormItemRule } from 'element-plus';
-import { ref, reactive, computed } from 'vue';
+import type { FormInstance, FormItemRule, InputInstance } from 'element-plus';
+import { ref, reactive, computed, nextTick } from 'vue';
 import { IoTDBApi } from '@/api';
 import { useDbStore } from '@/stores';
 import type { TableTreeNodeData, Database } from '@/types';
@@ -229,6 +230,16 @@ const existEmpty = computed(() => {
   return flag;
 });
 
+// 列名输入框 refs 与聚焦逻辑
+const columnNameInputRefs = ref<Array<InputInstance | null>>([]);
+const setColumnInputRef = (el: InputInstance | null, index: number) => {
+  if (el) columnNameInputRefs.value[index] = el; // 保存 ElInput 实例
+};
+const focusColumnInput = (index: number) => {
+  const inst = columnNameInputRefs.value[index];
+  inst?.focus();
+};
+
 // 添加新列
 const addColumn = () => {
   if (!canAddColumn.value) return;
@@ -243,6 +254,7 @@ const addColumn = () => {
   formData.columns.push(newColumn);
   nextTick(() => {
     activeName.value = `measurement_${formData.columns.length - 1}`;
+    focusColumnInput(formData.columns.length - 1);
   });
 };
 
@@ -259,6 +271,7 @@ const copyColumn = (index: number) => {
   formData.columns.splice(index + 1, 0, newColumn);
   nextTick(() => {
     activeName.value = `measurement_${formData.columns.length - 1}`;
+    focusColumnInput(index + 1);
   });
   ElMessage.success(t('dataManage.columnCopySuccess'));
 };
@@ -277,6 +290,7 @@ const deleteColumn = (index: number) => {
   })
     .then(() => {
       formData.columns.splice(index, 1);
+      columnNameInputRefs.value.splice(index, 1);
       ElMessage.success(t('dataManage.columnDeleted'));
     })
     .catch(() => {});
