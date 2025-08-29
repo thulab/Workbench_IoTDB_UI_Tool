@@ -62,7 +62,7 @@
       <div class="select-result-box" v-if="activeStep === 2">
         <div class="success-box" v-if="uploadStatus === 'success'">
           <el-icon size="44"><i-custom-success-green /></el-icon>
-          <span class="success-tip">{{ t('common.importSuccessTip', { total: uploadResult.successNum }) }}</span>
+          <span class="success-tip">{{ t('common.importTableSuccessTip', { total: uploadResult.successNum }) }}</span>
         </div>
 
         <div class="error-box" v-if="uploadStatus === 'error'">

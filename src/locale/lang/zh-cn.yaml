@@ -95,6 +95,7 @@ common:
   clickReupload: 点击重新上传
   uploading: 文件导入中
   importSuccessTip: 导入成功！共{total}条数据
+  importTableSuccessTip: 导入成功！共 {total} 个表
   importResultTip: 导入成功{successNum}条数据，导入失败{errorNum}条数据
   importTip: 为避免格式错误，推荐使用文本编辑器查看
   searchTipLimit100: 仅展示100条搜索结果，如有需要请精确搜索
