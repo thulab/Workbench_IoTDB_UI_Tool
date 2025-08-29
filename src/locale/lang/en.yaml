@@ -1157,6 +1157,8 @@ dataManage:
   specialCharsNeedQuotes: Special characters must be wrapped in quotes
   emptyQuotedName: Name inside quotes cannot be empty
   invalidNameFormat: Invalid name format
+  ttlTooLarge: TTL value is too large
+  ttlInvalidNumber: Please enter a valid non-negative integer TTL
   addDatabaseSuccess: Database created successfully
   ttlUpdated: TTL updated
   delDbSingleTip: This will delete the database and all its contained tables and data. Proceed?

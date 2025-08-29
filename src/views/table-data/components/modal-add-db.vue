@@ -4,7 +4,7 @@
       <label><input type="password" autocomplete="new-password" hidden /></label>
       <base-form-item :label="`${t('auth.userName')}：`" prop="databaseName" :error="errorName">
         <template #label>
-          {{ t('dataManage.addDatabase') }}：
+          {{ t('dataManage.databaseName') }}：
           <el-tooltip effect="light" :content="t('dataManage.databaseNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
         </template>
         <el-input v-model.trim="formData.databaseName" maxlength="64" :placeholder="t('dataManage.databaseNamePlaceholder')" show-word-limit id="auth-user-modal-name" />
@@ -28,6 +28,7 @@ import { storeToRefs } from 'pinia';
 import type { FormInstance, FormRules } from 'element-plus';
 import IoTDBApi from '@/api/db.api';
 import { useDbStore } from '@/stores';
+import Validator from '@/utils/validator';
 
 const formRef = ref<FormInstance>();
 
@@ -95,6 +96,15 @@ const rules = reactive<FormRules>({
         }
       },
       trigger: 'blur',
+    },
+  ],
+  ttl: [
+    {
+      validator: (_rule, value, callback) => {
+        const result = Validator.validateTTL(value, t);
+        if (result === true) return callback();
+        callback(result as Error);
+      },
     },
   ],
 });

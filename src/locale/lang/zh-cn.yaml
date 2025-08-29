@@ -895,7 +895,7 @@ connection:
   treeModel: 树模型
   tableModel: 表模型
   defaultModelTip: |
-    树模型：以测点为对象进行管理，每个测点对应一条时间序列，测点名按。分割可形成一个树形目录结构，与物理世界一一对应，对测点的读写操作简单直观。
+    树模型：以测点为对象进行管理，每个测点对应一条时间序列，测点名按.分割可形成一个树形目录结构，与物理世界一一对应，对测点的读写操作简单直观。
 
     表模型：推荐为每类设备创建一张表，同类设备的物理量采集都具备一定共性（如都采集温度和湿度物理量），数据分析灵活丰富。
 
@@ -1118,8 +1118,8 @@ dataManage:
   comment: 备注
   tableNamePlaceholder: 请输入表名
   tableNameTip: >-
-    大小写不敏感，名称可包含特殊字符，如  ～！"%` 等，包含特殊字符如 or 中文字符的数据库名创建时必须用双引号 ""
-    括起来，当为表命名时，最外层的双引号（""）不会在实际创建的表名中出现”
+    表名具有以下特性：大小写不敏感，名称可包含特殊字符，如  ~!"%` 等，包含特殊字符或中文字符的表名创建时必须用双引号 ""
+    括起来，当为表命名时，最外层的双引号（""）不会在实际创建的表名中出现
   commentPlaceholder: 请输入备注
   columns: 列数量
   columnName: 列名
@@ -1130,6 +1130,9 @@ dataManage:
   cateGoryPlaceholder: 请选择列类别
   categoryInputPlaceholder: 请输入列类别
   columnNamePlaceholder: 请输入列名
+  columnNameTip: >-
+    列名具有以下特性：大小写不敏感，名称可包含特殊字符，如  ~!"%` 等，包含特殊字符或中文字符的列名创建时必须用双引号 ""
+    括起来，当为列命名时，最外层的双引号（""）不会在实际创建的列名中出现
   data: 数据
   column: 列
   selectColumnPlaceholder: 请选择所要查询的列名称
@@ -1146,8 +1149,10 @@ dataManage:
   specialCharsNeedQuotes: 特殊字符需要用双引号包裹
   emptyQuotedName: 引号内名称不能为空
   invalidNameFormat: 无效的名称格式
+  ttlTooLarge: TTL 值过大
+  ttlInvalidNumber: 请输入合法的非负整数 TTL
   addDatabaseSuccess: 新建数据库成功
-  ttlUpdated: TTL已更新
+  ttlUpdated: TTL 已更新
   delDbSingleTip: 此操作会删除该数据库及其包含的所有表和数据，是否删除？
   delTableSingleTip: 此操作会删除该表及其包含的全部数据，是否删除？
   delTableBatchTip: 此操作会删除这些表及其包含的全部数据，是否删除？

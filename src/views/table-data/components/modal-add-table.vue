@@ -42,7 +42,7 @@
                   <base-form-item class="form-item-width" :label="`${t('dataManage.columnName')}：`" :prop="`columns[${index}].columnName`" required :rules="tableNameRules">
                     <template #label>
                       {{ t('dataManage.columnName') }}：
-                      <el-tooltip effect="light" :content="t('dataManage.tableNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+                      <el-tooltip effect="light" :content="t('dataManage.columnNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                     </template>
                     <el-input v-model="item.columnName" :placeholder="t('dataManage.columnNamePlaceholder')" clearable />
                   </base-form-item>
