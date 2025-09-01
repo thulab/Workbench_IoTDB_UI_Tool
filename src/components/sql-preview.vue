@@ -31,7 +31,7 @@ const appendSql = (sql: string, prefix?: string) => {
 
 const copyText = async (text: string) => {
   // 检查浏览器是否支持 Clipboard API
-  if (isSupported) {
+  if (isSupported && window.location.protocol === 'https:') {
     try {
       await copy(text);
       ElMessage.success(t('flow.copySuccess'));
