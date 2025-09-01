@@ -146,6 +146,8 @@ export const tableFunctionTreeData = [
     children: [
       { label: 'tableFunctions.SUM', value: 'SUM' },
       { label: 'tableFunctions.COUNT', value: 'COUNT' },
+      { label: 'tableFunctions.COUNT_IF', value: 'COUNT_IF' },
+      { label: 'tableFunctions.APPROX_COUNT_DISTINCT', value: 'APPROX_COUNT_DISTINCT' },
       { label: 'tableFunctions.AVG', value: 'AVG' },
       { label: 'tableFunctions.STDDEV', value: 'STDDEV' },
       { label: 'tableFunctions.STDDEV_POP', value: 'STDDEV_POP' },
@@ -195,7 +197,6 @@ export const tableFunctionTreeData = [
     label: 'tableFunctions.compareFunctions',
     value: 'sqlSearch.compareFunctions',
     children: [
-      { label: 'tableFunctions.regexp_like', value: 'regexp_like' },
       { label: 'tableFunctions.greatest', value: 'greatest' },
       { label: 'tableFunctions.least', value: 'least' },
     ],
@@ -215,6 +216,7 @@ export const tableFunctionTreeData = [
       { label: 'tableFunctions.Lower', value: 'Lower' },
       { label: 'tableFunctions.Trim', value: 'Trim' },
       { label: 'tableFunctions.StrCmp', value: 'StrCmp' },
+      { label: 'tableFunctions.regexp_like', value: 'regexp_like' },
     ],
   },
   {

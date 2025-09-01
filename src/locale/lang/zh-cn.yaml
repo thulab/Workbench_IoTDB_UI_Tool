@@ -97,6 +97,7 @@ common:
   importSuccessTip: 导入成功！共{total}条数据
   importTableSuccessTip: 导入成功！共 {total} 个表
   importResultTip: 导入成功{successNum}条数据，导入失败{errorNum}条数据
+  importTableResultTip: 共导入 {total} 个表，成功 {successNum} 个，失败 {errorNum} 个
   importTip: 为避免格式错误，推荐使用文本编辑器查看
   searchTipLimit100: 仅展示100条搜索结果，如有需要请精确搜索
   searchAllTipLimit100: 关键字搜索仅展示100条搜索结果，如有需要请精确搜索
@@ -419,6 +420,7 @@ tableFunctions:
   SUM: 求和
   COUNT: 计算数据点数
   COUNT_IF: COUNT_IF（exp） 用于统计满足指定布尔表达式的记录行数，exp 必须是一个布尔类型的表达式
+  APPROX_COUNT_DISTINCT: APPROX_COUNT_DISTINCT(x[,maxStandardError]) 函数提供 COUNT(DISTINCT x) 的近似值，返回不同输入值的近似个数。
   AVG: 求平均值
   STDDEV: 求样本标准差
   STDDEV_POP: 求总体标准差
@@ -1120,7 +1122,7 @@ dataManage:
   tableNamePlaceholder: 请输入表名
   tableNameTip: >-
     表名具有以下特性：大小写不敏感，名称可包含特殊字符，如  ~!"%` 等，包含特殊字符或中文字符的表名创建时必须用双引号 ""
-    括起来，当为表命名时，最外层的双引号（""）不会在实际创建的表名中出现
+    括起来，当为表命名时，最外层的双引号（""）不会在实际创建的表名中出现，若表名本身需要包含双引号（"），则需用两个双引号（""） 表示一个双引号
   commentPlaceholder: 请输入备注
   columns: 列数量
   columnName: 列名
@@ -1128,12 +1130,16 @@ dataManage:
   dataTypePlaceholder: 请选择数据类型
   datatypeInputPlaceholder: 请输入数据类型
   cateGory: 列类别
+  categoryTip1: 时间列（TIME）：每个时序表必须有一个时间列，且列名必须为 time，数据类型为 TIMESTAMP
+  categoryTip2: 标签列（TAG）：设备的唯一标识（联合主键），可以为 0 至多个；标签信息不可修改和删除，但允许增加；推荐按粒度由大到小进行排列
+  categoryTip3: 属性列（ATTRIBUTE）：对设备的补充描述，不随时间变化；设备属性信息可以有 0 个或多个，可以更新或新增；少量希望修改的静态属性可以存至此列
+  categoryTip4: 测点列（FIELD）：一个设备采集的测点可以有 1 个至多个，值随时间变化；表的测点列没有数量限制，可以达到数十万以上
   cateGoryPlaceholder: 请选择列类别
   categoryInputPlaceholder: 请输入列类别
   columnNamePlaceholder: 请输入列名
   columnNameTip: >-
     列名具有以下特性：大小写不敏感，名称可包含特殊字符，如  ~!"%` 等，包含特殊字符或中文字符的列名创建时必须用双引号 ""
-    括起来，当为列命名时，最外层的双引号（""）不会在实际创建的列名中出现
+    括起来，当为列命名时，最外层的双引号（""）不会在实际创建的列名中出现，若列名本身需要包含双引号（"），则需用两个双引号（""） 表示一个双引号
   data: 数据
   column: 列
   selectColumnPlaceholder: 请选择所要查询的列名称

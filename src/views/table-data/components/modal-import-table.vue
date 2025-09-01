@@ -75,7 +75,9 @@
 
         <div class="partial-box" v-if="uploadStatus === 'partial'">
           <el-icon size="44"><i-custom-message-warning /></el-icon>
-          <span class="error-tip">{{ t('common.importResultTip', { successNum: uploadResult.successNum, errorNum: uploadResult.failNum }) }}</span>
+          <span class="error-tip">{{
+            t('common.importTableResultTip', { total: uploadResult.successNum + uploadResult.failNum, successNum: uploadResult.successNum, errorNum: uploadResult.failNum })
+          }}</span>
           <a v-if="uploadResult.filePath" :href="`/api/file/downloadErrorInfo?fileName=${uploadResult.filePath}`" class="error-link" target="_self" rel="noopener noreferrer">
             {{ t('common.detail') }}
           </a>

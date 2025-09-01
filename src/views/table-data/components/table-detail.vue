@@ -100,7 +100,16 @@
           </template>
         </el-table-column>
         <el-table-column :label="t('dataManage.dataType')" prop="datatype" sortable :show-overflow-tooltip="true" />
-        <el-table-column :label="t('dataManage.cateGory')" prop="category" sortable :show-overflow-tooltip="true" />
+        <el-table-column :label="t('dataManage.cateGory')" prop="category" sortable>
+          <template #header>
+            <el-tooltip effect="light" popper-class="tooltip-max-width" :show-after="500">
+              <template #content>
+                {{ t('dataManage.categoryTip1') }}<br />{{ t('dataManage.categoryTip2') }} <br />{{ t('dataManage.categoryTip3') }} <br />{{ t('dataManage.categoryTip4') }}
+              </template>
+              <span>{{ t('dataManage.cateGory') }}</span>
+            </el-tooltip>
+          </template>
+        </el-table-column>
         <el-table-column :label="t('common.operation')" width="240" align="center" fixed="right">
           <template #default="{ row }">
             <el-tooltip

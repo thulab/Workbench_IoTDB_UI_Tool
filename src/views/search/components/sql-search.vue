@@ -53,7 +53,7 @@
       <h4 style="font-size: 14px; font-weight: 700; line-height: 20px; color: #495ad4">{{ t('search.runResult') }}</h4>
       <span class="run-result-tip">
         <i-custom-info-warning />
-        {{ t('search.export1000Tip') }}
+        {{ connectionStore.isTableModel ? t('search.export1000RowTip') : t('search.export1000Tip') }}
       </span>
     </div>
     <div class="tabs" v-if="tableData.list && tableData.list.length > 0">
@@ -129,6 +129,7 @@ import { SearchApi } from '@/api';
 import CodeEditor from './code-editor.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import type { QuerySqlResponse } from '@/types';
+import { useConnectionStore } from '@/stores';
 
 const props = defineProps<{
   code: string;
@@ -140,6 +141,7 @@ const { t } = useI18n();
 const codeEditorRef = ref<InstanceType<typeof CodeEditor>>();
 const codeVal = useVModel(props, 'code');
 const codeMirrorReady = ref(false);
+const connectionStore = useConnectionStore();
 
 const standTable = ref(null);
 

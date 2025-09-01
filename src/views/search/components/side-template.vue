@@ -8,21 +8,22 @@
 
     <ul class="sql-list">
       <template v-if="sqlList.length">
-        <li v-for="item in sqlList" :key="item.id" :id="`sql-template-${item.id}`" class="sql-item-box" @click="(e) => handleSelect(item, e)">
-          <div class="sql-item-text-box">
-            <i-custom-template />
-            <text-tooltip :content="item.queryName" class-name="sql-item-text" />
-          </div>
-          <div class="item-edit-box" :id="`sql-template-rename-${item.id}`" @click="handleSqlCommand('rename', item)">
-            <i-custom-edit class="item-edit" />
-            <i-custom-edit class="item-edit-active" />
-          </div>
+        <el-scrollbar :max-height="'calc(100vh - 250px)'">
+          <li v-for="item in sqlList" :key="item.id" :id="`sql-template-${item.id}`" class="sql-item-box" @click="(e) => handleSelect(item, e)">
+            <div class="sql-item-text-box">
+              <i-custom-template />
+              <text-tooltip :content="item.queryName" class-name="sql-item-text" />
+            </div>
+            <div class="item-edit-box" :id="`sql-template-rename-${item.id}`" @click="handleSqlCommand('rename', item)">
+              <i-custom-edit class="item-edit" />
+              <i-custom-edit class="item-edit-active" />
+            </div>
 
-          <div class="item-delete-box" :id="`sql-template-delete-${item.id}`" @click="handleSqlCommand('delete', item)">
-            <i-custom-delete class="item-delete" />
-            <i-custom-delete-active class="item-delete-active" />
-          </div>
-          <!-- <i-ep-more-filled @click="item.focused = true" v-if="!item.focused" :id="`sql-template-dropdown-${item.id}`" class="more-icon" />
+            <div class="item-delete-box" :id="`sql-template-delete-${item.id}`" @click="handleSqlCommand('delete', item)">
+              <i-custom-delete class="item-delete" />
+              <i-custom-delete-active class="item-delete-active" />
+            </div>
+            <!-- <i-ep-more-filled @click="item.focused = true" v-if="!item.focused" :id="`sql-template-dropdown-${item.id}`" class="more-icon" />
           <el-dropdown v-else :id="`sql-template-dropdown-${item.id}`" class="more-icon" @command="(val) => handleSqlCommand(val, item)">
             <i-ep-more-filled />
             <template #dropdown>
@@ -33,7 +34,8 @@
               </el-dropdown-menu>
             </template>
           </el-dropdown> -->
-        </li>
+          </li>
+        </el-scrollbar>
       </template>
       <div class="list-empty-wrapper" v-else>
         <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
