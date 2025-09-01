@@ -20,7 +20,7 @@
               <i-custom-question />
             </el-tooltip>
           </div>
-          <el-input v-model="modelId" :placeholder="t('aiAnalysis.modelNamePlaceholder')" id="ai-analysis-search-name" style="width: 536px" maxlength="100" show-word-limit />
+          <el-input v-model="modelId" :placeholder="t('aiAnalysis.modelNamePlaceholder')" id="ai-analysis-search-name" style="width: 536px" maxlength="64" show-word-limit />
         </div>
 
         <div class="select-item-box" style="margin-left: 8px">
