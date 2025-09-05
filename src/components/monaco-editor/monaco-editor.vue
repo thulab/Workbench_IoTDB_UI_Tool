@@ -19,7 +19,6 @@ const props = withDefaults(
   },
 );
 
-const { locale } = useI18n();
 const monacoEditor = ref<monaco.editor.IStandaloneCodeEditor>();
 const monacoContainer = ref<HTMLElement>();
 const loading = ref(false);
@@ -28,13 +27,14 @@ const emit = defineEmits(['mounted']);
 
 const initEditor = () => {
   loading.value = true;
-  editorLoader.config({
-    'vs/nls': {
-      availableLanguages: {
-        '*': locale.value === 'zh-cn' ? 'zh-cn' : '',
-      },
-    },
-  });
+  // editorLoader.config({
+  //   monaco: monacoAll,
+  //   'vs/nls': {
+  //     availableLanguages: {
+  //       '*': locale.value === 'zh-cn' ? 'zh-cn' : '',
+  //     },
+  //   },
+  // });
   editorLoader.init().then((monacoInstance) => {
     monacoEditor.value = monacoInstance.editor.create(monacoContainer.value!, {
       value: '',
@@ -44,7 +44,7 @@ const initEditor = () => {
       automaticLayout: true,
       fontSize: 12,
       lineHeight: 24,
-      contextmenu: true,
+      contextmenu: false,
       // wordBreak: 'keepAll',
       // defaultColorDecorators: true,
       scrollBeyondLastLine: false,

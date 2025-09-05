@@ -173,6 +173,17 @@ common:
   viewLink: >-
     https://www.timecho.com/docs/UserGuide/latest/User-Manual/Operator-and-Expression.html
   comingSoon: Coming Soon
+  confirmAndContinue: ''
+  formRuleFormat: ''
+  formRuleMaxLength: ''
+  formRuleMinLength: ''
+  importTableResultTip: ''
+  importTableSuccessTip: ''
+  onlyOneNewRow: ''
+  pre: ''
+  selectMeasurementLimit: ''
+  useVersionTip: ''
+  versionTips: ''
 page:
   '403': 403 Page
   '404': 404 Page
@@ -356,6 +367,8 @@ search:
   emptyTip: Clear the page?
   deleteTemplateTip: Do you want to delete common statements
   object: Objects
+  export1000RowTip: ''
+  templateNameRepeatTip: ''
 searchIotdb:
   aggregate: Aggregation Functions
   sum: Sum
@@ -676,6 +689,7 @@ dataTrend:
   trendTemplate: Trend{time}
   saveTrend: Save Trend
   noDataTip: There is no data available within the current time range
+  pointOverTip: ''
 calculate:
   namePlaceholder: Please enter a name
   descPlaceholder: Please enter a description
@@ -711,6 +725,8 @@ calculate:
   expressionTip: >-
     Supports the use of operators and functions (excluding aggregation
     functions), e.g., root.sgcc.wf03.wt01.temperature + 1; see detailed rules in
+  batchImportTitle: ''
+  batchImportViewTitle: ''
 alarm:
   alarmName: Alarm Name
   alarmNamePlaceholder: Enter alarm name
@@ -745,6 +761,9 @@ alarm:
   durationRule: Please select the duration unit
   newSuccess: New alarm created successfully
   editSuccess: Alarm edited successfully
+  batchImportAlarm: ''
+  errorLinkTip: ''
+  noAuthOperate: ''
 auth:
   roleDetail: Role Details
   havingRole: Owned Roles
@@ -833,11 +852,39 @@ auth:
   systemInfo: System Information
   systemTitle: Timecho Real-Time Database Extension
   systemTitleWorkbench: TimechoDB Visual Console - Workbench
-  versionTitle: Version：{version}
   editUserSuccess: Edited Successfully
   docTip: >-
     Please refer to the document for specific instructions on the meaning of
     permissions
+  relational:
+    ALTER: ''
+    ALTERDesc: ''
+    CREATE: ''
+    CREATEDesc: ''
+    DELETE: ''
+    DELETEDesc: ''
+    DROP: ''
+    DROPDesc: ''
+    INSERT: ''
+    INSERTDesc: ''
+    MANAGE_ROLE: ''
+    MANAGE_USER: ''
+    SELECT: ''
+    SELECTDesc: ''
+    addScope: ''
+    all: ''
+    allDesc: ''
+    allScope: ''
+    canGrant: ''
+    dataScope: ''
+    deleteDataAuthTip: ''
+    desc: ''
+    editTip: ''
+    isEnable: ''
+    scope: ''
+    selectPrivilegeTip: ''
+    selectedScope: ''
+    type: ''
 error:
   403Tip: Sorry, you do not have permission to access this page
   goHome: Back to Home
@@ -878,6 +925,7 @@ login:
   serverError: Internal server error. Please contact the administrator
   layoutTip: Are you sure you want to log out?
   resetPwdLogin: Password has been changed. Please log in again
+  versionTip: ''
 alarmEnum:
   change0: Alarm on Transition to 0
   change1: Alarm on Transition to 1
@@ -1083,6 +1131,14 @@ iotdbConfig:
   searchPlaceholder: Please enter search content
   nodeEffect: Node Effective
   allEffect: All  Effective
+  cofigEffective: ''
+  configContent: ''
+  configDesc: ''
+  configFile: ''
+  configList: ''
+  confitTitle: ''
+  continueTip: ''
+  nodeTip: ''
 aiAnalysis:
   visualization: AI Visualization
   modelManagement: Model Management
@@ -1093,7 +1149,7 @@ aiAnalysis:
   modelType: Model Type
   state: State
   modelConfig: Model Config
-  noConfigs: null
+  noConfigs: ''
   viewConfig: View Config
   importModelFile: Drag the file here, or
   importModelNameHover: >-
@@ -1113,6 +1169,65 @@ aiAnalysis:
   modelNameExist: The name is already taken, please change it
   batchDelete: Are you sure you want to delete these models?
   singleDelete: Are you sure you want to delete the model?
+  all: ''
+  anomalyDetection: ''
+  anomalyPoint: ''
+  anomalyRatio: ''
+  anomalyRatioTip: ''
+  anomalyValue: ''
+  business: ''
+  cannotDel: ''
+  category: ''
+  chooseDatabaseAndTable: ''
+  chooseDevice: ''
+  chooseMeasurement: ''
+  custom: ''
+  dataSetTimeRange: ''
+  databasePlaceholeder: ''
+  detectionTime: ''
+  docTip: ''
+  enableTip: ''
+  fineTuning: ''
+  fineTuningData: ''
+  fineTuningDataPlaceholder: ''
+  fineTuningModel: ''
+  fineTuningModelPlaceholder: ''
+  fineTuningSuccess: ''
+  forecast: ''
+  forecast96: ''
+  forecastData: ''
+  forecastResult: ''
+  forecastStart: ''
+  forecastTip: ''
+  forecastValue: ''
+  measurementExist: ''
+  measurementPlaceholder: ''
+  modelSelect: ''
+  modelSelectPlaceholder: ''
+  moreParam: ''
+  newName: ''
+  normalValue: ''
+  pleaseInputPercent: ''
+  rawValue: ''
+  saveToIoTDB: ''
+  sourceModel: ''
+  sourceModelPlaceholder: ''
+  sourceName: ''
+  sqlConfrimTip: ''
+  superParam: ''
+  tablePlaceholder: ''
+  time: ''
+  total: ''
+  writeBack: ''
+  writeBackSourceDatabase: ''
+  writeBackSourceMeasurement: ''
+  writeBackSourceTable: ''
+  writeBackSourceTags: ''
+  writeBackTargetDatabase: ''
+  writeBackTargetMeasurement: ''
+  writeBackTargetTable: ''
+  writeBackTargetTags: ''
+  writeBackUnchangedTips: ''
 dataManage:
   schema: Schema
   dbSchema: Database Structure
@@ -1133,7 +1248,11 @@ dataManage:
   tableName: Table Name
   comment: Remarks
   tableNamePlaceholder: Please enter table name
-  tableNameTip: Case insensitive. Names can contain special characters like ~!\"%`. Names containing special characters or Chinese characters must be enclosed in double quotes "". When naming tables, the outermost double quotes will not appear in the actual table name.
+  tableNameTip: >-
+    Case insensitive. Names can contain special characters like ~!\"%`. Names
+    containing special characters or Chinese characters must be enclosed in
+    double quotes "". When naming tables, the outermost double quotes will not
+    appear in the actual table name.
   commentPlaceholder: Please enter remarks
   columns: Number of Columns
   columnName: Column Name
@@ -1149,7 +1268,11 @@ dataManage:
   columnsSelected: Selected Columns
   addDatabase: Add Database
   databaseName: Database Name
-  databaseNameTip: Case insensitive. Names containing underscores (_), numbers (not at beginning), or English letters can be created directly. Names containing special characters (like `), Chinese characters, or starting with numbers must be enclosed in double quotes "".
+  databaseNameTip: >-
+    Case insensitive. Names containing underscores (_), numbers (not at
+    beginning), or English letters can be created directly. Names containing
+    special characters (like `), Chinese characters, or starting with numbers
+    must be enclosed in double quotes "".
   databaseNamePlaceholder: Please enter database name
   databaseNameLength: Maximum 64 characters allowed. Please re-enter.
   databaseNameExist: Database already exists. Please re-enter.
@@ -1161,7 +1284,9 @@ dataManage:
   ttlInvalidNumber: Please enter a valid non-negative integer TTL
   addDatabaseSuccess: Database created successfully
   ttlUpdated: TTL updated
-  delDbSingleTip: This will delete the database and all its contained tables and data. Proceed?
+  delDbSingleTip: >-
+    This will delete the database and all its contained tables and data.
+    Proceed?
   delTableSingleTip: This will delete the table and all its data. Proceed?
   delTableBatchTip: This will delete these tables and all their data. Proceed?
   delColumnSingleTip: This will delete the column and all its data. Proceed?
@@ -1177,3 +1302,86 @@ dataManage:
   columnDeleted: Column deleted
   oneColumnRequired: Please add at least one column
   inputIndexColumnName: Please enter column name for column {index}
+  categoryInputPlaceholder: ''
+  categoryTip1: ''
+  categoryTip2: ''
+  categoryTip3: ''
+  categoryTip4: ''
+  columnNameTip: ''
+  datatypeInputPlaceholder: ''
+  tableNameLength: ''
+tableFunctions:
+  ABS: ''
+  ACOS: ''
+  APPROX_COUNT_DISTINCT: ''
+  ASIN: ''
+  ATAN: ''
+  AVG: ''
+  CEIL: ''
+  COS: ''
+  COSH: ''
+  COUNT: ''
+  COUNT_IF: ''
+  Concat: ''
+  DEGREES: ''
+  DIFF: ''
+  E: ''
+  EXP: ''
+  EXTREME: ''
+  Endswith: ''
+  FIRST_BY: ''
+  FLOOR: ''
+  First: ''
+  LAST_BY: ''
+  LN: ''
+  LOG10: ''
+  Last: ''
+  Length: ''
+  Lower: ''
+  MAX_BY: ''
+  MIN_BY: ''
+  MODE: ''
+  Max: ''
+  Min: ''
+  PI: ''
+  RADIANS: ''
+  ROUND: ''
+  Replace: ''
+  SIGN: ''
+  SIN: ''
+  SINH: ''
+  SQRT: ''
+  STDDEV: ''
+  STDDEV_POP: ''
+  STDDEV_SAMP: ''
+  SUM: ''
+  Startswith: ''
+  StrCmp: ''
+  Strops: ''
+  Substring: ''
+  TAN: ''
+  TANH: ''
+  Trim: ''
+  Upper: ''
+  VARIANCE: ''
+  VAR_POP: ''
+  VAR_SAMP: ''
+  aggregateFunctions: ''
+  cast: ''
+  compareFunctions: ''
+  constantFunctions: ''
+  convertFunctions: ''
+  format: ''
+  greatest: ''
+  least: ''
+  mathFunctions: ''
+  regexp_like: ''
+  stringFunctions: ''
+  trendFunctions: ''
+  try_cast: ''
+tableMeasurement:
+  addSuccess: ''
+  limitReached: ''
+  measurementSelect: ''
+  measurementSelectPlaceholder: ''
+  measurementSelected: ''
