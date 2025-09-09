@@ -500,7 +500,8 @@ const diskChartOptions = (diskMemoryChartData: MetricDiskRes): ECOption =>
       right: 40,
       top: 20,
       bottom: 20,
-      containLabel: true,
+      outerBoundsMode: 'same',
+      outerBoundsContain: 'axisLabel',
     },
     barWidth: 30,
     yAxis: {

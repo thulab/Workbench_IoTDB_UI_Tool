@@ -216,13 +216,13 @@ function handleNext() {
     if (!isModel) return;
 
     if (modelId.value.length < 2 || modelId.value.length > 64) {
-      ElMessage.error({ message: t('aiAnalysis.modelNameRuleError'), grouping: true });
+      ElMessage.error({ message: t('common.formRuleLength'), grouping: true });
       return;
     }
 
     const checkModelId = /^[0-9a-zA-Z_]+$/.test(modelId.value);
     if (!checkModelId) {
-      ElMessage.error({ message: t('aiAnalysis.modelNameRuleError'), grouping: true });
+      ElMessage.error({ message: t('aiAnalysis.inputFormatErrorTip'), grouping: true });
       return;
     }
 

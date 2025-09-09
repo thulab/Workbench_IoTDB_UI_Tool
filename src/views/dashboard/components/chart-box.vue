@@ -36,7 +36,8 @@ onMounted(() => {
       left: '20px',
       right: '20px',
       bottom: '44px',
-      containLabel: true,
+      outerBoundsMode: 'same',
+      outerBoundsContain: 'axisLabel',
     },
     xAxis: {
       type: 'category',

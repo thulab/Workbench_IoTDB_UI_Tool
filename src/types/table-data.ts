@@ -112,6 +112,8 @@ export interface TagFilter {
 }
 
 export interface SelectedMeasurement {
+  database: string;
+  tableName: string;
   device: TagFilter[];
   condition: string;
   measurement: string;

@@ -27,9 +27,17 @@
         </el-select>
       </base-form-item>
       <base-form-item :label="`${t('aiAnalysis.writeBackTargetDatabase')}：`" prop="database">
+        <template #label>
+          {{ t('aiAnalysis.writeBackTargetDatabase') }}：
+          <el-tooltip effect="light" :content="t('dataManage.databaseNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+        </template>
         <el-input v-model="formData.database" :placeholder="t('common.placeHolder')" :id="`write-back-modal-database`" />
       </base-form-item>
       <base-form-item :label="`${t('aiAnalysis.writeBackTargetTable')}：`" prop="table">
+        <template #label>
+          {{ t('aiAnalysis.writeBackTargetTable') }}：
+          <el-tooltip effect="light" :content="t('dataManage.tableNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
+        </template>
         <el-input v-model="formData.table" :placeholder="t('common.placeHolder')" :id="`write-back-modal-table`" />
       </base-form-item>
       <base-form-item :label="`${t('aiAnalysis.writeBackTargetTags')}：`" prop="tags">
@@ -65,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance, FormRules } from 'element-plus';
+import type { FormInstance, FormItemRule, FormRules } from 'element-plus';
 import type { TagFilter, WriteBackTableFrom } from '@/types';
 
 const props = withDefaults(
@@ -99,6 +107,32 @@ const formData = reactive<WriteBackTableFrom>({
   fieldName: props.fieldName,
   modelId: '',
 });
+
+const validateName: FormItemRule['validator'] = (rule, value, callback) => {
+  // 情况1：简单名称（字母开头，可包含下划线和数字）
+  const simplePattern = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+  // 情况2：需要引号包裹的名称（包含特殊字符、中文或以数字开头）
+  const needsQuotesPattern = /^".*"$/;
+  // 特殊字符正则（包括中文、数字开头和各种特殊符号）
+  const specialCharsPattern = /[`~!@#$%^&*()+=|{}':;',[\]<>/?\\]|[\u4e00-\u9fa5]|^[0-9]/;
+  if (simplePattern.test(value)) {
+    callback();
+  } else if (specialCharsPattern.test(value) && !needsQuotesPattern.test(value)) {
+    // 包含特殊字符但未用引号包裹
+    callback(new Error(t('dataManage.specialCharsNeedQuotes')));
+  } else if (needsQuotesPattern.test(value)) {
+    // 检查引号内是否为空
+    const unquoted = value.slice(1, -1);
+    if (unquoted === '') {
+      callback(new Error(t('dataManage.emptyQuotedName')));
+    } else {
+      callback();
+    }
+  } else {
+    // 其他非法格式
+    callback(new Error(t('dataManage.invalidNameFormat')));
+  }
+};
 const formRules = reactive<FormRules>({
   database: [
     {
@@ -106,11 +140,53 @@ const formRules = reactive<FormRules>({
       message: t('common.formRuleEmptyOperateShort'),
       trigger: 'blur',
     },
+    {
+      max: 64,
+      message: () => t('dataManage.databaseNameLength'),
+      trigger: 'blur',
+    },
+    {
+      validator: (rule, value, callback) => {
+        // 情况1：简单名称（字母开头，可包含下划线和数字）
+        const simplePattern = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+        // 情况2：需要引号包裹的名称（包含特殊字符、中文或以数字开头）
+        const needsQuotesPattern = /^".*"$/;
+        // 特殊字符正则（包括中文、数字开头和各种特殊符号）
+        const specialCharsPattern = /[`~!@#$%^&*()+=|{}':;',[\]<>/?\\]|[\u4e00-\u9fa5]|^[0-9]/;
+        if (simplePattern.test(value)) {
+          callback();
+        } else if (specialCharsPattern.test(value) && !needsQuotesPattern.test(value)) {
+          // 包含特殊字符但未用引号包裹
+          callback(new Error(t('dataManage.specialCharsNeedQuotes'))); // Add i18n key
+        } else if (needsQuotesPattern.test(value)) {
+          // 检查引号内是否为空
+          const unquoted = value.slice(1, -1);
+          if (unquoted === '') {
+            callback(new Error(t('dataManage.emptyQuotedName'))); // Add i18n key
+          } else {
+            callback();
+          }
+        } else {
+          // 其他非法格式
+          callback(new Error(t('dataManage.invalidNameFormat'))); // Add i18n key
+        }
+      },
+      trigger: 'blur',
+    },
   ],
   table: [
     {
       required: true,
       message: t('common.formRuleEmptyOperateShort'),
+      trigger: 'blur',
+    },
+    {
+      max: 100,
+      message: () => t('dataManage.tableNameLength'),
+      trigger: 'blur',
+    },
+    {
+      validator: validateName,
       trigger: 'blur',
     },
   ],

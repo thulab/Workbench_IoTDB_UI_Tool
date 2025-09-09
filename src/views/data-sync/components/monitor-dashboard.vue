@@ -212,7 +212,8 @@ const lineChartOptions = (optionData: PipeMonitorData[], dataUnit: string, chart
       left: '3%',
       right: 40,
       bottom: 20,
-      containLabel: true,
+      outerBoundsMode: 'same',
+      outerBoundsContain: 'axisLabel',
     },
     legend: {
       type: 'scroll',

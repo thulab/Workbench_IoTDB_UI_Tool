@@ -183,7 +183,7 @@ watch(
     font-weight: 400;
     line-height: 18px;
     color: #424561;
-    width: 168px;
+    width: 160px;
     display: inline-flex;
   }
 }

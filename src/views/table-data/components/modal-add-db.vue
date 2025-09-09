@@ -67,7 +67,13 @@ const rules = reactive<FormRules>({
     },
     {
       validator: (rule, value, callback) => {
-        if (value && databaseNames.value.some((name) => name.toLocaleLowerCase() === value.toLocaleLowerCase())) {
+        if (
+          value &&
+          databaseNames.value.some(
+            (name) =>
+              name.toLocaleLowerCase() === value.toLocaleLowerCase() || name.toLocaleLowerCase() === `"${value.toLocaleLowerCase()}"` || value.toLocaleLowerCase() === `"${name.toLocaleLowerCase()}"`,
+          )
+        ) {
           callback(new Error(t('dataManage.databaseNameExist')));
         }
 

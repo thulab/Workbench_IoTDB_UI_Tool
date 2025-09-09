@@ -204,7 +204,8 @@ const diskIOChartOptions = (categoryList: string[], valueList: number[]) =>
       left: 20,
       right: 40,
       bottom: 20,
-      containLabel: true,
+      outerBoundsMode: 'same',
+      outerBoundsContain: 'axisLabel',
     },
     xAxis: {
       type: 'category',

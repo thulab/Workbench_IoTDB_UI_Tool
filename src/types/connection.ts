@@ -36,6 +36,7 @@ export interface PrometheusDetail {
 
 export interface SavePrometheusDetail {
   id: number | string;
+  model: string;
   prometheusUrlMaster: string;
   prometheusUsernameMaster?: string;
   prometheusPasswordMaster?: string;

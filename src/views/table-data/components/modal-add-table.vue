@@ -167,7 +167,13 @@ const tableNames = computed(() => {
 });
 
 const validateName: FormItemRule['validator'] = (rule, value, callback) => {
-  if (value && tableNames.value.some((name) => name.toLocaleLowerCase() === value.toLocaleLowerCase())) {
+  if (
+    value &&
+    tableNames.value.some(
+      (name) =>
+        name.toLocaleLowerCase() === value.toLocaleLowerCase() || name.toLocaleLowerCase() === `"${value.toLocaleLowerCase()}"` || value.toLocaleLowerCase() === `"${name.toLocaleLowerCase()}"`,
+    )
+  ) {
     callback(new Error(t('dataManage.tableNameExist')));
   }
 

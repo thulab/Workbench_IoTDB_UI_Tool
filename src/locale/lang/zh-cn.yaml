@@ -84,6 +84,7 @@ common:
   formRuleEmptyOperateShort: 请输入内容后操作
   formRuleMinLength: 请输入至少{length}个字符
   formRuleMaxLength: 请输入不超过{length}个字符
+  formRuleLength: 输入长度不符合要求
   formRuleFormat: 请输入正确格式，只可以包含（{allow}）
   chooseFile: 选择文件
   fileImport: 文件导入
@@ -1033,7 +1034,7 @@ aiAnalysis:
   importModelFile: 将文件拖到此处，或
   importModelNameHover: >-
     模型名称：模型的全局唯一标识，不可重复。模型名称具备以下约束：<br/> 1. 允许出现标识符 [ 0-9 a-z A-Z _ ]
-    （字母，数字，下划线）<br/> 2. 长度限制为 2-64 字符<br/> 3. 大小写敏感
+    （字母，数字（非开头），下划线（非开头））<br/> 2. 长度限制为 2-64 字符<br/> 3. 大小写敏感
   configYaml: config.yaml
   importModelRule: 文件格式不正确，目前仅支持上传.pt和.yaml文件
   importModelTip: 模型包由1个.pt文件和1个.yaml文件构成，必须同时上传这2个文件。上传后，文件将自动重命名为 model.pt 和 config.yaml
@@ -1082,6 +1083,9 @@ aiAnalysis:
   databasePlaceholeder: 请选择数据库
   tablePlaceholder: 请选择表
   measurementPlaceholder: 请选择测点
+  fineTuningDatabasePlaceholeder: 请选择需要微调的数据库
+  fineTuningTablePlaceholder: 请选择需要微调的表
+  fineTuningMeasurementPlaceholder: 请选择需要微调的字段
   dataSetTimeRange: 数据集时间
   fineTuningDataPlaceholder: 请选择需要微调的测点
   moreParam: 更多参数
@@ -1100,6 +1104,7 @@ aiAnalysis:
   writeBackTargetTags: 目标设备
   writeBackUnchangedTips: 目标数据库、表、设备、测点与原始测点相同，若不修改，将会覆盖原始测点数据，是否继续？
   forecastTip: 当前版本 AINode 暂不支持异常检测功能，请期待后续版本
+  inputFormatErrorTip: 输入包含不支持的字符类型
 dataManage:
   schema: 结构
   dbSchema: 数据库结构
@@ -1182,3 +1187,4 @@ tableMeasurement:
   measurementSelected: 所选测点
   limitReached: 已达到最大测点选择数量
   addSuccess: '{count} 个测点添加成功'
+  devicePlaceholder: 请输入设备内容

@@ -29,13 +29,8 @@ common:
   create: Create
   import: Import
   export: Export
-  exportTip: >-
-    Excel format supports a maximum download size of 2GB, CSV has no limit and
-    is recommended for export
-  exportTipAll: >-
-    This export operation is for exporting search results. Excel format supports
-    a maximum download size of 2GB, CSV has no limit and is recommended for
-    export
+  exportTip: Excel format supports a maximum download size of 2GB, CSV has no limit and is recommended for export
+  exportTipAll: This export operation is for exporting search results. Excel format supports a maximum download size of 2GB, CSV has no limit and is recommended for export
   exportCSV: Export CSV
   exportXLSX: Export XLSX
   placeHolder: Please Enter
@@ -98,11 +93,9 @@ common:
   importResultTip: '{successNum} data imported successfully, {errorNum} data failed to import'
   importTip: To avoid format errors, it is recommended to use a text editor to view
   searchTipLimit100: Only 100 search results are displayed, please search precisely if needed
-  searchAllTipLimit100: >-
-    Keyword search only displays 100 search results, please search precisely if
-    needed
-  'yes': 'Yes'
-  'no': 'No'
+  searchAllTipLimit100: Keyword search only displays 100 search results, please search precisely if needed
+  yes: Yes
+  no: No
   master: Master
   slave: Backup
   errorDetail: Error Details
@@ -133,9 +126,7 @@ common:
   uploadError: Upload Failed
   fileTypeError: File Type Error
   fileSizeError: File size cannot exceed {size}MB!
-  websockerVersionTip: >-
-    Your browser does not support WebSocket, please upgrade to a more recent
-    browser version!
+  websockerVersionTip: Your browser does not support WebSocket, please upgrade to a more recent browser version!
   test: Test
   continueTip: The current content is incomplete, do you want to continue?
   unsaveTip: The current content has not been saved, do you want to continue?
@@ -170,20 +161,19 @@ common:
   zoom: Amplify
   revoke: Revoke
   restore: Restore
-  viewLink: >-
-    https://www.timecho.com/docs/UserGuide/latest/User-Manual/Operator-and-Expression.html
+  viewLink: https://www.timecho.com/docs/UserGuide/latest/User-Manual/Operator-and-Expression.html
   comingSoon: Coming Soon
-  confirmAndContinue: ''
-  formRuleFormat: ''
-  formRuleMaxLength: ''
-  formRuleMinLength: ''
-  importTableResultTip: ''
-  importTableSuccessTip: ''
-  onlyOneNewRow: ''
-  pre: ''
-  selectMeasurementLimit: ''
-  useVersionTip: ''
-  versionTips: ''
+  confirmAndContinue: Confirm and Continue
+  formRuleFormat: Please enter the correct format. Only ({allow}) are allowed
+  formRuleMaxLength: Please enter no more than {length} characters
+  formRuleMinLength: Please enter at least {length} characters
+  importTableResultTip: Total {total} tables imported, {successNum} succeeded, {errorNum} failed
+  importTableSuccessTip: Import successful! Total {total} tables
+  onlyOneNewRow: Please save before adding a new one
+  pre: Previous
+  selectMeasurementLimit: The system supports selecting a maximum of {limit} measurement at the same time
+  useVersionTip: This function is for {version} and above
+  versionTips: Compatible with IoTDB V2.0 and above
 page:
   '403': 403 Page
   '404': 404 Page
@@ -212,16 +202,12 @@ page:
 measurement:
   databaseTitle: Database
   searchPlaceholder: Please enter search content
-  deleteDatabaseTip: >-
-    This operation will delete all measurements and data in the database, do you
-    want to delete?
+  deleteDatabaseTip: This operation will delete all measurements and data in the database, do you want to delete?
   newDataBase: New Database
   databaseName: Database Name
   databaseNamePlaceholder: Please enter the database name
   databaseTTL: Data Retention Time
-  databaseTTLTip: >-
-    Time-to-Live (TTL), after which the system will automatically delete the
-    data. Leaving this blank represents permanent storage.
+  databaseTTLTip: Time-to-Live (TTL), after which the system will automatically delete the data. Leaving this blank represents permanent storage.
   databaseTTLRule: TTL can only be a positive integer
   databaseTTLSaveMaxRule: TTL cannot exceed 9007199254740992
   databaseTTLSaveUnitRule: TTL and TTL unit must be specified together
@@ -242,12 +228,8 @@ measurement:
   measurementAlias: Alias
   tag: Tag
   tagDetail: Tag Details
-  tagTip: >-
-    The label input format is "key=value". If multiple labels are entered,
-    please use ";" to cut them
-  descriptionTip: >-
-    Only supports input of uppercase and lowercase letters, numbers,
-    underscores, UNICODE Chinese characters, special characters and real numbers
+  tagTip: The label input format is "key=value". If multiple labels are entered, please use ";" to cut them
+  descriptionTip: Only supports input of uppercase and lowercase letters, numbers, underscores, UNICODE Chinese characters, special characters and real numbers
     need to be quoted with backticks
   aliasPlaceholder: Please enter the measurement alias
   tagPlaceholder: Please enter the tag
@@ -256,9 +238,7 @@ measurement:
   compression: Compression
   addMeasurement: Add Measurement
   deviceRuleEmptyTip: Device name cannot be empty
-  deviceRuleTip: >-
-    Please enter the correct format, can only consist of letters, numbers,
-    underscores, and UNICODE Chinese characters
+  deviceRuleTip: Please enter the correct format, can only consist of letters, numbers, underscores, and UNICODE Chinese characters
   deleteMeasurementSingle: Are you sure you want to delete the measurement?
   deleteMeasurementBatch: Are you sure you want to delete these measurements?
   measurementDescription: Description
@@ -308,9 +288,7 @@ measurement:
   goAlarmTip: This data type does not support creating alarm
   goTrendTip: This data type does not support view trend
   calculateMeasurement: Calculated Series
-  deleteMeasurementTip: >-
-    This operation will delete all measurements and data in the database, do you
-    want to delete?
+  deleteMeasurementTip: This operation will delete all measurements and data in the database, do you want to delete?
   databaseModel: Data Model
   databaseModelDoc: Guide to the IoTDB Tree Data Structure
   viewData: View Data
@@ -328,9 +306,7 @@ search:
   timeInterval: Sampling Period
   inputNumberPlaceholder: Please enter a positive integer
   aggregation: Aggregation Strategy
-  export1000Tip: >-
-    By default, a maximum of 1000 rows and 100 columns are displayed, please
-    export to view more
+  export1000Tip: By default, a maximum of 1000 rows and 100 columns are displayed, please export to view more
   aggregationPlaceholder: Please select an Aggregation Strategy
   searchTime: Query Time
   quickActions: Quick Actions
@@ -345,9 +321,7 @@ search:
   newName: New Name
   nameRuleTip: Please confirm after filling in the name
   newNameTip: New name is empty, please re-enter
-  nameRepeatTip: >-
-    The new name cannot be the same as the old name. Please enter a different
-    name
+  nameRepeatTip: The new name cannot be the same as the old name. Please enter a different name
   deleteTabTip: Deletion is not allowed when there is only one tab open
   batchImportData: Batch Import Data
   databaseSelectPlaceholder: Please select a database
@@ -367,31 +341,21 @@ search:
   emptyTip: Clear the page?
   deleteTemplateTip: Do you want to delete common statements
   object: Objects
-  export1000RowTip: ''
-  templateNameRepeatTip: ''
+  export1000RowTip: By default, a maximum of 1000 rows are displayed, please export to view more
+  templateNameRepeatTip: This template name already exists, please enter a different name
 searchIotdb:
   aggregate: Aggregation Functions
   sum: Sum
   count: Count Data Points
   avg: Average. Calculates the average value of the data points.
-  extreme: >-
-    Extreme Value. Returns the value with the largest absolute value. If the
-    largest absolute values of positive and negative are equal, it returns the
+  extreme: Extreme Value. Returns the value with the largest absolute value. If the largest absolute values of positive and negative are equal, it returns the
     positive value.
   maxValue: Maximum Value. Finds the maximum value among the data points.
   minValue: Minimum Value. Finds the minimum value among the data points.
-  firstValue: >-
-    First Value. Returns the value with the smallest timestamp (i.e., the
-    earliest value).
-  lastValue: >-
-    Last Value. Returns the value with the largest timestamp (i.e., the latest
-    value).
-  maxTime: >-
-    Max Timestamp. Finds the timestamp associated with the latest data point in
-    the time series.
-  minTime: >-
-    Min Timestamp. Finds the timestamp associated with the earliest data point
-    in the time series.
+  firstValue: First Value. Returns the value with the smallest timestamp (i.e., the earliest value).
+  lastValue: Last Value. Returns the value with the largest timestamp (i.e., the latest value).
+  maxTime: Max Timestamp. Finds the timestamp associated with the latest data point in the time series.
+  minTime: Min Timestamp. Finds the timestamp associated with the earliest data point in the time series.
   math: Math Functions
   sin: Sine Function
   cos: Cosine Function
@@ -415,16 +379,12 @@ searchIotdb:
   sqrt: Square Root Function
   comparison: Comparison Functions
   onOff: Returns true if ts_value >= threshold; otherwise, returns false.
-  inRange: >-
-    Returns true if ts_value is within the range [lower, upper]; otherwise,
-    returns false.
+  inRange: Returns true if ts_value is within the range [lower, upper]; otherwise, returns false.
   logical: String Processing Functions
   stringContains: Checks if string contains s
   stringMatches: Checks if string matches the regex
   length: Returns the length of the string
-  locate: >-
-    Gets the position of the first occurrence of target in the input sequence,
-    returns -1 if not contained
+  locate: Gets the position of the first occurrence of target in the input sequence, returns -1 if not contained
   startsWith: Checks if the string starts with a specified prefix
   endsWith: Checks if the string ends with a specified suffix
   concat: Concatenates strings with target
@@ -432,87 +392,47 @@ searchIotdb:
   upper: Convert the string to uppercase
   lower: Convert the string to lowercase
   trim: Remove leading and trailing spaces from the string
-  strcmp: >-
-    Compare two input sequences. Returns 0 if the values are the same, a
-    negative number if the value of sequence 1 is smaller than sequence 2, and a
+  strcmp: Compare two input sequences. Returns 0 if the values are the same, a negative number if the value of sequence 1 is smaller than sequence 2, and a
     positive number if the value of sequence 1 is larger than sequence 2
   conversion: Data Type Conversion Function
   cast: Convert data to the type specified by the type parameter
   constant: Constant Sequence Generation Function
-  const: >-
-    Output a user-specified constant sequence based on input attributes value
-    and type
-  pi: >-
-    Value of the constant sequence: the double value of π, the ratio of the
-    circumference of a circle to its diameter, equivalent to Math.PI in the Java
-    standard library
-  e: >-
-    Value of the constant sequence: the double value of e, the base of natural
-    logarithms, equivalent to Math.E in the Java standard library
+  const: Output a user-specified constant sequence based on input attributes value and type
+  pi: 'Value of the constant sequence: the double value of π, the ratio of the circumference of a circle to its diameter, equivalent to Math.PI in the Java
+    standard library'
+  e: 'Value of the constant sequence: the double value of e, the base of natural logarithms, equivalent to Math.E in the Java standard library'
   selection: Selection Function
-  topK: >-
-    Return the k data points with the highest values in a time series. If there
-    are more than k data points with equal maximum values, return the one with
-    the smallest timestamp
-  bottomK: >-
-    Return the k data points with the lowest values in a time series. If there
-    are more than k data points with equal minimum values, return the one with
+  topK: Return the k data points with the highest values in a time series. If there are more than k data points with equal maximum values, return the one with the
+    smallest timestamp
+  bottomK: Return the k data points with the lowest values in a time series. If there are more than k data points with equal minimum values, return the one with
     the smallest timestamp
   continuousInterval: Interval Query Function
-  zeroDuration: >-
-    Return the start time and duration of consecutive false (0) values in a time
-    series. The duration t (in ms) satisfies t >= min && t <= max
-  nonZeroDuration: >-
-    Return the start time and duration of consecutive non-false (non-0) values
-    in a time series. The duration t (in ms) satisfies t >= min && t <= max
-  zeroCount: >-
-    Return the start time and the number of data points following it with
-    consecutive false (0) values. The number of data points n satisfies n >= min
-    && n <= max
-  nonZeroCount: >-
-    Return the start time and the number of data points following it with
-    consecutive non-false (non-0) values. The number of data points n satisfies
+  zeroDuration: Return the start time and duration of consecutive false (0) values in a time series. The duration t (in ms) satisfies t >= min && t <= max
+  nonZeroDuration: Return the start time and duration of consecutive non-false (non-0) values in a time series. The duration t (in ms) satisfies t >= min && t <= max
+  zeroCount: Return the start time and the number of data points following it with consecutive false (0) values. The number of data points n satisfies n >= min &&
+    n <= max
+  nonZeroCount: Return the start time and the number of data points following it with consecutive non-false (non-0) values. The number of data points n satisfies
     n >= min && n <= max
   variationTrend: Trend Calculation Function
-  timeDifference: >-
-    Calculate the difference between the timestamp of a data point and the
-    timestamp of the previous data point in a sequence. The first data point
+  timeDifference: Calculate the difference between the timestamp of a data point and the timestamp of the previous data point in a sequence. The first data point
     within the range has no corresponding result output
-  difference: >-
-    Calculate the difference between the value of a data point and the value of
-    the previous data point in a sequence. The first data point within the range
-    has no corresponding result output
-  nonNegativeDifference: >-
-    Calculate the absolute difference between the value of a data point and the
-    value of the previous data point in a sequence. The first data point within
-    the range has no corresponding result output
-  derivative: >-
-    Calculate the rate of change of a data point relative to the previous data
-    point in a sequence, equivalent to DIFFERENCE / TIME_DIFFERENCE. The first
+  difference: Calculate the difference between the value of a data point and the value of the previous data point in a sequence. The first data point within the
+    range has no corresponding result output
+  nonNegativeDifference: Calculate the absolute difference between the value of a data point and the value of the previous data point in a sequence. The first
     data point within the range has no corresponding result output
-  nonNegativeDerivative: >-
-    Calculate the absolute rate of change of a data point relative to the
-    previous data point in a sequence, equivalent to NON_NEGATIVE_DIFFERENCE /
-    TIME_DIFFERENCE. The first data point within the range has no corresponding
-    result output
-  diff: >-
-    Calculate the difference between the value of a data point and the value of
-    the previous data point in a sequence. The first data point has no
+  derivative: Calculate the rate of change of a data point relative to the previous data point in a sequence, equivalent to DIFFERENCE / TIME_DIFFERENCE. The
+    first data point within the range has no corresponding result output
+  nonNegativeDerivative: Calculate the absolute rate of change of a data point relative to the previous data point in a sequence, equivalent to
+    NON_NEGATIVE_DIFFERENCE / TIME_DIFFERENCE. The first data point within the range has no corresponding result output
+  diff: Calculate the difference between the value of a data point and the value of the previous data point in a sequence. The first data point has no
     corresponding result output, and the output value is null
   sample: Sampling Function
   equalSizeBucketRandomSample: Return random sampling of equal-sized buckets that meet the sampling ratio
-  equalSizeBucketAggSample: >-
-    Return aggregated sampling of equal-sized buckets that meet the sampling
-    ratio
+  equalSizeBucketAggSample: Return aggregated sampling of equal-sized buckets that meet the sampling ratio
   equalSizeBucketM4Sample: Return M4 sampling of equal-sized buckets that meet the sampling ratio
-  equalSizeBucketOutlierSample: >-
-    Return outlier sampling of equal-sized buckets that meet the sampling ratio
-    and the number of samples within the bucket
-  m4: >-
-    Return the first point (first), last point (last), bottom point (minimum),
-    and top point (maximum) within each window. Before outputting aggregated
-    points within a window, M4 sorts them in increasing order of timestamps and
-    removes duplicates
+  equalSizeBucketOutlierSample: Return outlier sampling of equal-sized buckets that meet the sampling ratio and the number of samples within the bucket
+  m4: Return the first point (first), last point (last), bottom point (minimum), and top point (maximum) within each window. Before outputting aggregated points
+    within a window, M4 sorts them in increasing order of timestamps and removes duplicates
 dashboard:
   systemInfo: System Information
   masterSystemInfo: Master System Information
@@ -579,42 +499,25 @@ dataSync:
   batchDelete: Are you sure you want to delete these tasks?
   singleDelete: Are you sure you want to delete the task?
   taskDetail: Task Details
-  taskNameContentPlaceholder: >-
-    Please enter letters, numbers, Chinese characters, or underscores. Other
-    characters should be enclosed in backticks, e.g., `Data Sync-1`
+  taskNameContentPlaceholder: Please enter letters, numbers, Chinese characters, or underscores. Other characters should be enclosed in backticks, e.g., `Data Sync-1`
   dataExtraction: Data Extraction
   syncMeasurement: Sync Measurements
-  syncMeasurementPlaceholder: >-
-    Use backticks to enclose illegal characters or illegal path nodes, e.g.,
-    root.`a{'@'}b`
+  syncMeasurementPlaceholder: Use backticks to enclose illegal characters or illegal path nodes, e.g., root.`a{'@'}b`
   all: Global
   prefix: Prefix Path
-  pathTip: >-
-    The path prefix does not need to form a complete path. For example, entering
-    'root.database' will synchronize data within 'root.database*.**'. Note that
-    root.__system will not be synchronized.
+  pathTip: The path prefix does not need to form a complete path. For example, entering 'root.database' will synchronize data within 'root.database*.**'. Note
+    that root.__system will not be synchronized.
   pathPlaceholder: Please enter the prefix path
   reforward: Secondary Forwarding
-  reforwardTip: >-
-    Forward data sent by other synchronization tasks to this database. For
-    example, if there are two synchronization tasks A->B and B->C, selecting
-    secondary forwarding for B->C will also send data from A to C. Please note
-    that when building a bidirectional active-active cluster, set this parameter
-    to "No" to avoid endless data looping.
+  reforwardTip: Forward data sent by other synchronization tasks to this database. For example, if there are two synchronization tasks A->B and B->C, selecting
+    secondary forwarding for B->C will also send data from A to C. Please note that when building a bidirectional active-active cluster, set this parameter to
+    "No" to avoid endless data looping.
   historyData: Historical Data
-  historyDataTip: >-
-    Data written to the database before creating the task is called historical
-    data. Please note that historical data and real-time data cannot be both
-    closed!
+  historyDataTip: Data written to the database before creating the task is called historical data. Please note that historical data and real-time data cannot be both closed!
   realTime: Real-Time Data
-  realTimeTip: >-
-    Data written to the database after creating the task is called real-time
-    data. Please note that real-time data and historical data cannot be both
-    closed!
+  realTimeTip: Data written to the database after creating the task is called real-time data. Please note that real-time data and historical data cannot be both closed!
   triggerMode: Sending Mode
-  triggerModeReal: >-
-    Real-Time Mode: In this mode, the task only uses real-time mode for data
-    sending.
+  triggerModeReal: 'Real-Time Mode: In this mode, the task only uses real-time mode for data sending.'
   triggerModeBatch: 'Batch Mode: In this mode, the task only uses batch mode for data sending.'
   realMode: Real-Time Mode
   batchMode: Batch Mode
@@ -622,14 +525,10 @@ dataSync:
   sendPlugin: Send Plugin
   sendPluginNamePlaceholder: Please enter the send plugin name
   sendPluginParams: Plugin Parameters
-  sendPluginParamsTip: >-
-    Please enter plugin parameters, e.g., 'connector.send_alarm_url' =
-    'http://192.20.10.31:9091/api/alarm/addRecords'
+  sendPluginParamsTip: Please enter plugin parameters, e.g., 'connector.send_alarm_url' = 'http://192.20.10.31:9091/api/alarm/addRecords'
   targetInfo: Target Information
-  targetInfoTip: >-
-    Please ensure that the target endpoint has created all the points from the
-    sending endpoint or has enabled automatic metadata creation; otherwise, it
-    may result in failure!
+  targetInfoTip: Please ensure that the target endpoint has created all the points from the sending endpoint or has enabled automatic metadata creation;
+    otherwise, it may result in failure!
   targetInfoIp: Please enter the IP address
   targetInfoHost: Please enter the port number
   logSendBatch: Batch Sending Mode
@@ -648,13 +547,9 @@ dataSync:
   targetVersionTip: Please enter version V1.1.x or higher
   targetVersionPlaceholder: Please enter the target endpoint version
   overTime: Timeout duration
-  overTimeTip: >-
-    Timeout duration for the handshake request between the sender and the target
-    endpoint during the initial connection attempt
+  overTimeTip: Timeout duration for the handshake request between the sender and the target endpoint during the initial connection attempt
   overTimePlaceholder: Please enter the target endpoint timeout duration
-  modeTip: >-
-    Historical data and real-time data states cannot be both turned off; please
-    modify and retry the operation
+  modeTip: Historical data and real-time data states cannot be both turned off; please modify and retry the operation
   processorPluginTip: Plugin parameters cannot contain 'processor'
   connectorPluginTip: Plugin parameters cannot contain 'connector'
   memory: Memory
@@ -670,26 +565,18 @@ dataTrend:
   commonTemplates: Favorites
   deleteTemplateTip: Do you want to delete common trends
   measurementEmptyTip: Please add measurements and select them first
-  trendTip: >-
-    Up to {tip}  data points can be plotted. If the limit is exceeded, the
-    system will automatically adjust.
-  overTip: >-
-    Exceeding the maximum number of plotted measurements, it has been
-    automatically adjusted for display
+  trendTip: Up to {tip}  data points can be plotted. If the limit is exceeded, the system will automatically adjust.
+  overTip: Exceeding the maximum number of plotted measurements, it has been automatically adjusted for display
   timeTip: End time must be greater than start time. Please try again
-  booleanTip: >-
-    Boolean type supports only the latest value calculation; please modify the
-    sampling strategy to view the trend
-  measurementTip: >-
-    {measurement} measurements exceed the maximum number of plotted
-    measurements, it has been automatically adjusted for display.
+  booleanTip: Boolean type supports only the latest value calculation; please modify the sampling strategy to view the trend
+  measurementTip: '{measurement} measurements exceed the maximum number of plotted measurements, it has been automatically adjusted for display.'
   choosedMeasurement: Selected
   overMeasurementTip: A maximum of 10 measurements can be displayed at the same time
   number10Tip: Only input positive integers in the range of 1-10
   trendTemplate: Trend{time}
   saveTrend: Save Trend
   noDataTip: There is no data available within the current time range
-  pointOverTip: ''
+  pointOverTip: A maximum of 10 marks are supported. Please delete some and try again
 calculate:
   namePlaceholder: Please enter a name
   descPlaceholder: Please enter a description
@@ -716,17 +603,13 @@ calculate:
   viewNamePlaceholder: Enter view name
   calculateDescPlaceholder: Enter calculation description
   viewDescPlaceholder: Enter view description
-  descTip: >-
-    Data type is generated based on the expression calculation logic; encoding
-    and compression methods are null.
+  descTip: Data type is generated based on the expression calculation logic; encoding and compression methods are null.
   resultMeasurementPlaceholder: Enter result measurement name
   calculateExpression: Calculation expression
   viewExpression: View expression
-  expressionTip: >-
-    Supports the use of operators and functions (excluding aggregation
-    functions), e.g., root.sgcc.wf03.wt01.temperature + 1; see detailed rules in
-  batchImportTitle: ''
-  batchImportViewTitle: ''
+  expressionTip: Supports the use of operators and functions (excluding aggregation functions), e.g., root.sgcc.wf03.wt01.temperature + 1; see detailed rules in
+  batchImportTitle: Batch Import Calculation
+  batchImportViewTitle: Batch Import View
 alarm:
   alarmName: Alarm Name
   alarmNamePlaceholder: Enter alarm name
@@ -761,16 +644,14 @@ alarm:
   durationRule: Please select the duration unit
   newSuccess: New alarm created successfully
   editSuccess: Alarm edited successfully
-  batchImportAlarm: ''
-  errorLinkTip: ''
-  noAuthOperate: ''
+  batchImportAlarm: Batch Import Alert
+  errorLinkTip: There is an error in the current batch creation of alerts. {link} Error Information
+  noAuthOperate: No permission to view the original sequence
 auth:
   roleDetail: Role Details
   havingRole: Owned Roles
   detail: Permission Details
-  removeAuthTip: >-
-    Please be careful: removing parent path permissions will also remove the
-    child path permissions included.
+  removeAuthTip: 'Please be careful: removing parent path permissions will also remove the child path permissions included.'
   path: Path
   pathName: Path Name
   addPath: Add Path
@@ -786,9 +667,7 @@ auth:
   exactPath: Exact Path
   exactPathPlaceholder: Enter an exact path
   pathMode: Path Mode
-  pathModePlaceholder: >-
-    Enter a sequential path, support fuzzy matching using "**," for example,
-    "root.ln.d1.**"
+  pathModePlaceholder: Enter a sequential path, support fuzzy matching using "**," for example, "root.ln.d1.**"
   pathModeTip: Support using "**" for fuzzy matching. "**" represents one or more levels
   pathEndTip: The path cannot end with a period or asterisk
   pathEmptyRule: Path cannot be empty
@@ -797,9 +676,7 @@ auth:
   roleName: Role Name
   roleNamePlaceholder: Enter role name
   roleNameLength: Character length should not be less than 4. Please re-enter
-  roleNameExg: >-
-    Invalid format. Please enter uppercase and lowercase letters, numbers, and
-    special characters (!{'@'}#$%^&*()_+-=)
+  roleNameExg: Invalid format. Please enter uppercase and lowercase letters, numbers, and special characters (!{'@'}#$%^&*()_+-=)
   roleExist: This role already exists. Please enter another role name
   addUser: Add User
   userName: Username
@@ -809,20 +686,14 @@ auth:
   confirmPwd: Confirm Password
   confirmPwdAgain: Please re-enter the password
   userNameLength: Character length should not be less than 4. Please re-enter
-  userNameExg: >-
-    Invalid format. Please enter uppercase and lowercase letters, numbers, and
-    special characters (!{'@'}#$%^&*()_+-=).
+  userNameExg: Invalid format. Please enter uppercase and lowercase letters, numbers, and special characters (!{'@'}#$%^&*()_+-=).
   userExist: This user already exists. Please re-enter
   pwdLength: Character length should not be less than 4. Please re-enter
-  pwdExg: >-
-    Invalid format. Please enter uppercase and lowercase letters, numbers, and
-    special characters (!{'@'}#$%^&*()_+-=)
+  pwdExg: Invalid format. Please enter uppercase and lowercase letters, numbers, and special characters (!{'@'}#$%^&*()_+-=)
   pwdUnSame: Passwords do not match. Please re-enter
   userSuccess: User created successfully
   roleList: Role List
-  deleteRoleTip: >-
-    Deleting the role will immediately remove related user permissions. Are you
-    sure you want to delete this role?
+  deleteRoleTip: Deleting the role will immediately remove related user permissions. Are you sure you want to delete this role?
   noRole: No roles available
   userList: User List
   deleteUserTip: Are you sure you want to delete this user?
@@ -830,61 +701,49 @@ auth:
   resetPwd: Reset Password
   resetPwdSuccess: Password reset successful
   layout: Log Out
-  enterpriseTip: >-
-    This feature is only available in the Enterprise version. Please contact
-    sales
+  enterpriseTip: This feature is only available in the Enterprise version. Please contact sales
   oldPwd: Old Password
   oldPwdTip: Enter the old password
   inputPwd: Enter Password
-  oldPwdReg: >-
-    Invalid format. Please enter uppercase and lowercase letters, numbers, and
-    special characters (!{'@'}#$%^&*()_+-=)
-  systemDetail: >-
-    Timecho Real-Time Database Extension includes functionalities such as
-    measurement management, querying, visualization, and permission management,
-    assisting users in intuitively managing cross-instance operations,
-    simplifying database tasks, and efficiently performing operational tasks.
-  systemDetailWorkbench: >-
-    Timecho Workbench includes functionalities such as measurement management,
-    querying, visualization, and permission management, assisting users in
-    intuitively managing cross-instance operations, simplifying database tasks,
-    and efficiently performing operational tasks.
+  oldPwdReg: Invalid format. Please enter uppercase and lowercase letters, numbers, and special characters (!{'@'}#$%^&*()_+-=)
+  systemDetail: Timecho Real-Time Database Extension includes functionalities such as measurement management, querying, visualization, and permission management,
+    assisting users in intuitively managing cross-instance operations, simplifying database tasks, and efficiently performing operational tasks.
+  systemDetailWorkbench: Timecho Workbench includes functionalities such as measurement management, querying, visualization, and permission management, assisting
+    users in intuitively managing cross-instance operations, simplifying database tasks, and efficiently performing operational tasks.
   systemInfo: System Information
   systemTitle: Timecho Real-Time Database Extension
   systemTitleWorkbench: TimechoDB Visual Console - Workbench
   editUserSuccess: Edited Successfully
-  docTip: >-
-    Please refer to the document for specific instructions on the meaning of
-    permissions
+  docTip: Please refer to the document for specific instructions on the meaning of permissions
   relational:
-    ALTER: ''
-    ALTERDesc: ''
-    CREATE: ''
-    CREATEDesc: ''
-    DELETE: ''
-    DELETEDesc: ''
-    DROP: ''
-    DROPDesc: ''
-    INSERT: ''
-    INSERTDesc: ''
-    MANAGE_ROLE: ''
-    MANAGE_USER: ''
-    SELECT: ''
-    SELECTDesc: ''
-    addScope: ''
-    all: ''
-    allDesc: ''
-    allScope: ''
-    canGrant: ''
-    dataScope: ''
-    deleteDataAuthTip: ''
-    desc: ''
-    editTip: ''
-    isEnable: ''
-    scope: ''
-    selectPrivilegeTip: ''
-    selectedScope: ''
-    type: ''
+    ALTER: Alter
+    ALTERDesc: Allow modifying the definition of any database/table within the permission scope
+    CREATE: Create
+    CREATEDesc: Allow creating any database/table within the permission scope
+    DELETE: Delete
+    DELETEDesc: Allow deleting data from databases/tables within the permission scope
+    DROP: Drop
+    DROPDesc: Allow deleting any database/table within the permission scope
+    INSERT: Insert
+    INSERTDesc: Allow inserting/updating data in databases/tables within the permission scope
+    MANAGE_ROLE: Role Management
+    MANAGE_USER: User Management
+    SELECT: Select
+    SELECTDesc: Allow querying data of databases/tables within the permission scope
+    addScope: Add Permission Scope
+    all: All
+    allDesc: Obtain full operation permissions within the permission scope
+    allScope: Global Permissions
+    canGrant: Transferable (Yes/No)
+    dataScope: Data Permissions
+    deleteDataAuthTip: Are you sure you want to delete this data permission?
+    desc: Description
+    editTip: This permission is owned by a role. To modify it, please edit the role permissions
+    isEnable: Enable/Disable
+    scope: Permission Scopes
+    selectPrivilegeTip: Please select the permissions to grant
+    selectedScope: Selected Scope
+    type: Permission Types
 error:
   403Tip: Sorry, you do not have permission to access this page
   goHome: Back to Home
@@ -925,7 +784,7 @@ login:
   serverError: Internal server error. Please contact the administrator
   layoutTip: Are you sure you want to log out?
   resetPwdLogin: Password has been changed. Please log in again
-  versionTip: ''
+  versionTip: The current system only supports databases of version 2.0 and above. Please update and try again
 alarmEnum:
   change0: Alarm on Transition to 0
   change1: Alarm on Transition to 1
@@ -958,15 +817,9 @@ connection:
   slaveInfo: Backup Cluster Information
   connection: Connect Instance
   iotdbSuccess: IoTDB Connection Successful
-  allSuccess: >-
-    Master and backup IoTDB clusters connected successfully. Master and backup
-    clusters' Prometheus connected successfully.
-  masterSuccess: >-
-    Master and backup IoTDB clusters connected successfully. Master clusters'
-    Prometheus connected successfully.
-  slaveSuccess: >-
-    Master and backup IoTDB clusters connected successfully. Backup clusters'
-    Prometheus connected successfully.
+  allSuccess: Master and backup IoTDB clusters connected successfully. Master and backup clusters' Prometheus connected successfully.
+  masterSuccess: Master and backup IoTDB clusters connected successfully. Master clusters' Prometheus connected successfully.
+  slaveSuccess: Master and backup IoTDB clusters connected successfully. Backup clusters' Prometheus connected successfully.
   singleSuccess: IoTDB and Prometheus Connection Successful
   pwdEmptyTip: Please enter password
   prometheusSuccess: Prometheus Connection Successful
@@ -976,9 +829,7 @@ connection:
   ipTip: Host or IP Address
   portTip: Port
   prometheus: Prometheus
-  prometheusTip: >-
-    Configuring Prometheus allows you to view some monitoring information in the
-    interface. We recommend configuring and using it.
+  prometheusTip: Configuring Prometheus allows you to view some monitoring information in the interface. We recommend configuring and using it.
   slaveError: Backup Cluster is in an abnormal state. Please check and try again
   masterError: Main Cluster is in an abnormal state. Please check and try again
   deleteTip: Do you want to delete this instance?
@@ -986,9 +837,7 @@ connection:
   connectionManagement: Instance Management
   connectionList: Instance List
   flowTip: Instance Flowchart
-  connectionIpTip: >-
-    This address corresponds to the 'dn_rpc_address' field content in the
-    'iotdb-datanode.properties' file under the 'IoTDB-conf' folder.
+  connectionIpTip: This address corresponds to the 'dn_rpc_address' field content in the 'iotdb-datanode.properties' file under the 'IoTDB-conf' folder.
   prometheusUsernameTip: prometheus username
   prometheusPasswordTip: prometheus password
   prometheusUsername: username
@@ -999,16 +848,12 @@ connection:
   treeModel: Tree Model
   tableModel: Table Model
   defaultModelTip: >
-    Tree Model: Manages measurement points as objects, where each point
-    corresponds to a time series. The point names can be split to form a tree
-    directory structure, providing a one-to-one mapping with the physical world,
-    making read/write operations simple and intuitive.
+    Tree Model: Manages measurement points as objects, where each point corresponds to a time series. The point names can be split to form a tree directory
+    structure, providing a one-to-one mapping with the physical world, making read/write operations simple and intuitive.
 
 
-    Table Model: It is recommended to create a table for each type of device.
-    Physical quantity collections of the same device type share common
-    characteristics (e.g., collecting temperature and humidity data), enabling
-    flexible and rich data analysis.
+    Table Model: It is recommended to create a table for each type of device. Physical quantity collections of the same device type share common characteristics
+    (e.g., collecting temperature and humidity data), enabling flexible and rich data analysis.
 
 
     For more model details, refer to: {link}
@@ -1059,10 +904,8 @@ spectrum:
   analysisMethodNoneTip: Please load this pattern
   compressParams: Compression
   compressParamsPlaceholder: Enter a compression ratio
-  compressParamsTip: >-
-    The compression ratio can be set between (0,1], representing the proportion
-    of energy retained during lossy compression. By default, no compression is
-    applied.
+  compressParamsTip: The compression ratio can be set between (0,1], representing the proportion of energy retained during lossy compression. By default, no
+    compression is applied.
   cursor: Cursor
   cursorTitle: Cursor Value
   harmonicFrequency: Harmonics
@@ -1071,9 +914,7 @@ spectrum:
   paramsTitle: Settings
   returnResult: Results
   sqlInput: Data Selection
-  analysisMethodTip: >-
-    If not available, please load the prefered analysis pattern before use. For
-    detailed instructions, refer to the {doc}
+  analysisMethodTip: If not available, please load the prefered analysis pattern before use. For detailed instructions, refer to the {doc}
   real: Real Part
   imag: Imaginary Part
   abs: Magnitude
@@ -1081,9 +922,7 @@ spectrum:
   modulationFrequency: Modulation Frequency
   expandingFold: Amplification Factor
   dwt: DWT
-  dwtTip: >-
-    Note: If you choose wavelet transform, the selected measurement point data
-    must be an integer power of 2
+  dwtTip: 'Note: If you choose wavelet transform, the selected measurement point data must be an integer power of 2'
   filterType: Type
   filterTypePlaceholder: Select the type
   filterCoefficient: Coefficient
@@ -1105,16 +944,10 @@ spectrum:
   importTitle: Import Comparison Fragments
   importSuccessTip: Comparison fragment imported successfully
   importFailedTip: Comparison fragment import failed
-  importedFailureStatus: >-
-    A total of {total} data points was imported, with {success} successful and
-    {failure} failed | A total of {total} data points was imported, with
-    {success} successful and {failure} failed | A total of {total} data points
-    were imported, with {success} successful and {failure} failed
+  importedFailureStatus: A total of {total} data points was imported, with {success} successful and {failure} failed | A total of {total} data points was
+    imported, with {success} successful and {failure} failed | A total of {total} data points were imported, with {success} successful and {failure} failed
   distance: Similarity
-  distanceTip: >-
-    Used to measure the similarity between the compared fragments and the
-    results, with a value range of 0-100, the higher the value, the higher the
-    similarity.
+  distanceTip: Used to measure the similarity between the compared fragments and the results, with a value range of 0-100, the higher the value, the higher the similarity.
   ascByDistance: Similarity ASC
   descByDistance: Similarity DESC
   ascByTime: Time ASC
@@ -1131,14 +964,14 @@ iotdbConfig:
   searchPlaceholder: Please enter search content
   nodeEffect: Node Effective
   allEffect: All  Effective
-  cofigEffective: ''
-  configContent: ''
-  configDesc: ''
-  configFile: ''
-  configList: ''
-  confitTitle: ''
-  continueTip: ''
-  nodeTip: ''
+  cofigEffective: Activation Method
+  configContent: Configuration Content
+  configDesc: Configuration Description
+  configFile: Configuration File Path
+  configList: Configuration List
+  confitTitle: Configuration Name
+  continueTip: The current configuration content has not been confirmed. Refreshing may overwrite it. Do you want to continue?
+  nodeTip: The current node status is abnormal. Please restore it and try again
 aiAnalysis:
   visualization: AI Visualization
   modelManagement: Model Management
@@ -1149,85 +982,83 @@ aiAnalysis:
   modelType: Model Type
   state: State
   modelConfig: Model Config
-  noConfigs: ''
+  noConfigs: None
   viewConfig: View Config
   importModelFile: Drag the file here, or
-  importModelNameHover: >-
-    Model name The globally unique identifier of the model, which cannot be
-    repeated. The model name has the following constraints:<br/> 1. Identifiers
-    [0-9 a-z A-Z _] (letters, numbers, underscores) are allowed<br/> 2. The
-    length is limited to 2-64 characters<br/> 3. Case sensitive
+  importModelNameHover: Model name The globally unique identifier of the model, which cannot be repeated. The model name has the following constraints:<br/> 1.
+    Identifiers [0-9 a-z A-Z _] (letters, numbers, underscores) are allowed<br/> 2. The length is limited to 2-64 characters<br/> 3. Case sensitive
   configYaml: config.yaml
   importModelRule: Incorrect file format, currently only .csv and .xlsx files are supported
-  importModelTip: >-
-    The model package consists of 1 .pt file and 1 .yaml file, and these two
-    files must be uploaded at the same time. Once uploaded, the files will be
-    automatically renamed to model.pt and config.yaml
+  importModelTip: The model package consists of 1 .pt file and 1 .yaml file, and these two files must be uploaded at the same time. Once uploaded, the files will
+    be automatically renamed to model.pt and config.yaml
   importSuccessTip: The model and configuration files have been imported successfully
   importErrorTip: The model and configuration file import failed
   modelNameRuleError: The name does not comply with the specification, please change it.
   modelNameExist: The name is already taken, please change it
   batchDelete: Are you sure you want to delete these models?
   singleDelete: Are you sure you want to delete the model?
-  all: ''
-  anomalyDetection: ''
-  anomalyPoint: ''
-  anomalyRatio: ''
-  anomalyRatioTip: ''
-  anomalyValue: ''
-  business: ''
-  cannotDel: ''
-  category: ''
-  chooseDatabaseAndTable: ''
-  chooseDevice: ''
-  chooseMeasurement: ''
-  custom: ''
-  dataSetTimeRange: ''
-  databasePlaceholeder: ''
-  detectionTime: ''
-  docTip: ''
-  enableTip: ''
-  fineTuning: ''
-  fineTuningData: ''
-  fineTuningDataPlaceholder: ''
-  fineTuningModel: ''
-  fineTuningModelPlaceholder: ''
-  fineTuningSuccess: ''
-  forecast: ''
-  forecast96: ''
-  forecastData: ''
-  forecastResult: ''
-  forecastStart: ''
-  forecastTip: ''
-  forecastValue: ''
-  measurementExist: ''
-  measurementPlaceholder: ''
-  modelSelect: ''
-  modelSelectPlaceholder: ''
-  moreParam: ''
-  newName: ''
-  normalValue: ''
-  pleaseInputPercent: ''
-  rawValue: ''
-  saveToIoTDB: ''
-  sourceModel: ''
-  sourceModelPlaceholder: ''
-  sourceName: ''
-  sqlConfrimTip: ''
-  superParam: ''
-  tablePlaceholder: ''
-  time: ''
-  total: ''
-  writeBack: ''
-  writeBackSourceDatabase: ''
-  writeBackSourceMeasurement: ''
-  writeBackSourceTable: ''
-  writeBackSourceTags: ''
-  writeBackTargetDatabase: ''
-  writeBackTargetMeasurement: ''
-  writeBackTargetTable: ''
-  writeBackTargetTags: ''
-  writeBackUnchangedTips: ''
+  all: All
+  anomalyDetection: Anomaly Detectio
+  anomalyPoint: Anomaly Point
+  anomalyRatio: Anomaly Ratio
+  anomalyRatioTip: Anomaly ratio refers to the percentage of abnormal measurement among the selected measurement, with a default of 1%. The algorithm will try to
+    mark approximately 1% of data points as abnormal. This ratio is not precisely guaranteed, and the actual identified results will vary with data
+    characteristics and distribution.
+  anomalyValue: Abnormal Value
+  business: Business Scenario
+  cannotDel: Built-in models cannot be deleted
+  category: Model Type
+  chooseDatabaseAndTable: Please select a database and table
+  chooseDevice: Please select a Device
+  chooseMeasurement: Please select a Measurement
+  custom: Custom
+  dataSetTimeRange: Dataset Time Range
+  databasePlaceholeder: Please select a database
+  detectionTime: Detection Time
+  docTip: For detailed model descriptions, please refer to the documentation
+  enableTip: No AI node or related functions are connected. Please connect to view
+  fineTuning: One-click Fine-tuning
+  fineTuningData: Fine-tuning Dataset
+  fineTuningDataPlaceholder: Please select the measurement to be fine-tuned
+  fineTuningModel: Fine-tuned Model Name
+  fineTuningModelPlaceholder: Please enter the name of the fine-tuned model
+  fineTuningSuccess: Fine-tuning task submitted successfully
+  forecast: Prediction
+  forecast96: The current model predicts 96 future points by default
+  forecastData: Prediction Data Range
+  forecastResult: Measurement Prediction Result
+  forecastStart: Prediction Start Time
+  forecastTip: The current version of AINode does not support anomaly detection yet. Please stay tuned for future versions
+  forecastValue: Predicted Value
+  measurementExist: The new measurement name already exists. Data will be inserted into this measurementt. If you confirm to continue, please click "Confirm and Continue".
+  measurementPlaceholder: Please select a measurement
+  modelSelect: Model Selection
+  modelSelectPlaceholder: Please select a model
+  moreParam: More Parameters
+  newName: New Measurement Name
+  normalValue: Normal Value
+  pleaseInputPercent: Please enter a percentage
+  rawValue: Actual Value
+  saveToIoTDB: Write Data Back to IoTDB
+  sourceModel: Original Model Name
+  sourceModelPlaceholder: Please select the original model name
+  sourceName: Original Measurement
+  sqlConfrimTip: Saved successfully. Please click the Query button to view the results
+  superParam: Hyperparameters
+  tablePlaceholder: Please select a table
+  time: Time
+  total: Total {total} points
+  writeBack: Data Write-back
+  writeBackSourceDatabase: Database
+  writeBackSourceMeasurement: Measurement
+  writeBackSourceTable: Table
+  writeBackSourceTags: Device
+  writeBackTargetDatabase: Target Database
+  writeBackTargetMeasurement: Target Measurement
+  writeBackTargetTable: Target Table
+  writeBackTargetTags: Target Device
+  writeBackUnchangedTips: The target database, table, device, and measurement are the same as the original measurement. If not modified, the original measurement
+    data will be overwritten. Do you want to continue?
 dataManage:
   schema: Schema
   dbSchema: Database Structure
@@ -1248,11 +1079,8 @@ dataManage:
   tableName: Table Name
   comment: Remarks
   tableNamePlaceholder: Please enter table name
-  tableNameTip: >-
-    Case insensitive. Names can contain special characters like ~!\"%`. Names
-    containing special characters or Chinese characters must be enclosed in
-    double quotes "". When naming tables, the outermost double quotes will not
-    appear in the actual table name.
+  tableNameTip: Case insensitive. Names can contain special characters like ~!\"%`. Names containing special characters or Chinese characters must be enclosed in
+    double quotes "". When naming tables, the outermost double quotes will not appear in the actual table name.
   commentPlaceholder: Please enter remarks
   columns: Number of Columns
   columnName: Column Name
@@ -1268,11 +1096,8 @@ dataManage:
   columnsSelected: Selected Columns
   addDatabase: Add Database
   databaseName: Database Name
-  databaseNameTip: >-
-    Case insensitive. Names containing underscores (_), numbers (not at
-    beginning), or English letters can be created directly. Names containing
-    special characters (like `), Chinese characters, or starting with numbers
-    must be enclosed in double quotes "".
+  databaseNameTip: Case insensitive. Names containing underscores (_), numbers (not at beginning), or English letters can be created directly. Names containing
+    special characters (like `), Chinese characters, or starting with numbers must be enclosed in double quotes "".
   databaseNamePlaceholder: Please enter database name
   databaseNameLength: Maximum 64 characters allowed. Please re-enter.
   databaseNameExist: Database already exists. Please re-enter.
@@ -1284,9 +1109,7 @@ dataManage:
   ttlInvalidNumber: Please enter a valid non-negative integer TTL
   addDatabaseSuccess: Database created successfully
   ttlUpdated: TTL updated
-  delDbSingleTip: >-
-    This will delete the database and all its contained tables and data.
-    Proceed?
+  delDbSingleTip: This will delete the database and all its contained tables and data. Proceed?
   delTableSingleTip: This will delete the table and all its data. Proceed?
   delTableBatchTip: This will delete these tables and all their data. Proceed?
   delColumnSingleTip: This will delete the column and all its data. Proceed?
@@ -1302,86 +1125,93 @@ dataManage:
   columnDeleted: Column deleted
   oneColumnRequired: Please add at least one column
   inputIndexColumnName: Please enter column name for column {index}
-  categoryInputPlaceholder: ''
-  categoryTip1: ''
-  categoryTip2: ''
-  categoryTip3: ''
-  categoryTip4: ''
-  columnNameTip: ''
-  datatypeInputPlaceholder: ''
-  tableNameLength: ''
+  categoryInputPlaceholder: Please enter the column category
+  categoryTip1: 'Time Column (TIME): Each time series table must have a time column named time, with the data type TIMESTAMP.'
+  categoryTip2: 'Tag Column (TAG): Unique identifiers (composite primary key) for devices, ranging from 0 to multiple.'
+  categoryTip3: 'Attribute Column (ATTRIBUTE): Supplementary descriptions of devices, not changing over time.'
+  categoryTip4: 'Field Column (FIELD): A device can collect 1 to multiple data points, with values changing over time.'
+  columnNameTip: 'Column name characteristics: Case-insensitive; can contain special characters such as ~!"%`; column names containing special characters or
+    Chinese characters must be enclosed in double quotes ("") when created. The outermost double quotes ("") will not be included in the actual column name. If
+    the column name itself needs to contain a double quote ("), it must be represented by two double quotes ("").'
+  datatypeInputPlaceholder: Please enter the data type
+  tableNameLength: The character length cannot exceed 100，please enter a different name
 tableFunctions:
-  ABS: ''
-  ACOS: ''
-  APPROX_COUNT_DISTINCT: ''
-  ASIN: ''
-  ATAN: ''
-  AVG: ''
-  CEIL: ''
-  COS: ''
-  COSH: ''
-  COUNT: ''
-  COUNT_IF: ''
-  Concat: ''
-  DEGREES: ''
-  DIFF: ''
-  E: ''
-  EXP: ''
-  EXTREME: ''
-  Endswith: ''
-  FIRST_BY: ''
-  FLOOR: ''
-  First: ''
-  LAST_BY: ''
-  LN: ''
-  LOG10: ''
-  Last: ''
-  Length: ''
-  Lower: ''
-  MAX_BY: ''
-  MIN_BY: ''
-  MODE: ''
-  Max: ''
-  Min: ''
-  PI: ''
-  RADIANS: ''
-  ROUND: ''
-  Replace: ''
-  SIGN: ''
-  SIN: ''
-  SINH: ''
-  SQRT: ''
-  STDDEV: ''
-  STDDEV_POP: ''
-  STDDEV_SAMP: ''
-  SUM: ''
-  Startswith: ''
-  StrCmp: ''
-  Strops: ''
-  Substring: ''
-  TAN: ''
-  TANH: ''
-  Trim: ''
-  Upper: ''
-  VARIANCE: ''
-  VAR_POP: ''
-  VAR_SAMP: ''
-  aggregateFunctions: ''
-  cast: ''
-  compareFunctions: ''
-  constantFunctions: ''
-  convertFunctions: ''
-  format: ''
-  greatest: ''
-  least: ''
-  mathFunctions: ''
-  regexp_like: ''
-  stringFunctions: ''
-  trendFunctions: ''
-  try_cast: ''
+  ABS: Absolute Value Function
+  ACOS: Arccosine Function
+  APPROX_COUNT_DISTINCT: 'APPROX_COUNT_DISTINCT(x[,maxStandardError]): Provides an approximation of COUNT(DISTINCT x) and returns the approximate number of distinct input values'
+  ASIN: Arcsine Function
+  ATAN: Arctangent Function
+  AVG: Average
+  CEIL: Round Up Function
+  COS: Cosine Function
+  COSH: Hyperbolic Cosine Function
+  COUNT: Count Data Points
+  COUNT_IF: 'COUNT_IF (exp): Used to count the number of records that satisfy the specified boolean expression; exp must be a boolean-type expression'
+  Concat: Concatenates strings with target
+  DEGREES: Convert to Degrees Function
+  DIFF: Calculate the difference between the value of a data point and the value of the previous data point in a sequence. The first data point has no
+    corresponding result output, and the output value is null
+  E: 'Value of the constant sequence: the double value of e, the base of natural logarithms, equivalent to Math.E in the Java standard library'
+  EXP: Exponential Function
+  EXTREME: 'Value with the Maximum Absolute Value: If the maximum absolute values of positive and negative values are equal, the positive value is returned'
+  Endswith: Checks if the string ends with a specified suffix
+  FIRST_BY: 'FIRST_BY(x, y): Returns the value of x in the same row when y is the first non-NULL value'
+  FLOOR: Round Down Function
+  First: Get the value with the smallest non-NULL timestamp
+  LAST_BY: 'LAST_BY(x, y): Returns the value of x in the same row when y is the last non-NULL value'
+  LN: Natural Logarithm Function
+  LOG10: Logarithm Base 10 Function
+  Last: Get the value with the largest non-NULL timestamp
+  Length: Returns the length of the string
+  Lower: Convert the string to lowercase
+  MAX_BY: 'MAX_BY(x, y): Returns the value of x when y (the second input of the binary pair) is at its maximum'
+  MIN_BY: 'MIN_BY(x, y): Returns the value of x when y (the second input of the binary pair) is at its minimum'
+  MODE: Mode
+  Max: Calculate Maximum Value
+  Min: Calculate Minimum Value
+  PI: 'Value of the constant sequence: the double value of π, the ratio of the circumference of a circle to its diameter, equivalent to Math.PI in the Java
+    standard library'
+  RADIANS: Convert to Radians Function
+  ROUND: Round Function
+  Replace: Remove all instances of "search" from a string, or replace all instances of "search" in a string with "replace"
+  SIGN: Sign Function
+  SIN: Sine Function
+  SINH: Hyperbolic Sine Function
+  SQRT: Square Root Function
+  STDDEV: Sample Standard Deviation
+  STDDEV_POP: Population Standard Deviation
+  STDDEV_SAMP: Sample Standard Deviation
+  SUM: Sum
+  Startswith: Checks if the string starts with a specified prefix
+  StrCmp: Compare two input sequences. Returns 0 if the values are the same, a negative number if the value of sequence 1 is smaller than sequence 2, and a
+    positive number if the value of sequence 1 is larger than sequence 2
+  Strops: Return the starting position of the first occurrence of a substring in a string
+  Substring: Extract characters from a specified position to the end of the string, or extract a substring of specified length starting from a specified position
+    in a string
+  TAN: Tangent Function
+  TANH: Hyperbolic Tangent Function
+  Trim: Remove leading and trailing spaces from the string
+  Upper: Convert the string to uppercase
+  VARIANCE: Sample Variance
+  VAR_POP: Population Variance
+  VAR_SAMP: Sample Variance
+  aggregateFunctions: Aggregation Functions
+  cast: Convert data to the type specified by the type parameter
+  compareFunctions: Comparison Functions
+  constantFunctions: Constant Sequence Generation Function
+  convertFunctions: Data Type Conversion Function
+  format: Format String
+  greatest: Maximum value in the parameter list
+  least: Minimum value in the parameter list
+  mathFunctions: Math Functions
+  regexp_like: Evaluate if a string contains a regex pattern
+  stringFunctions: String Processing Functions
+  trendFunctions: Trend Calculation Function
+  try_cast: Convert data to the type specified by the type parameter
 tableMeasurement:
-  addSuccess: ''
-  limitReached: ''
-  measurementSelect: ''
-  measurementSelectPlaceholder: ''
-  measurementSelected: ''
+  addSuccess: '{count} measurement added successfully'
+  limitReached: The maximum number of measurement selected has been reached
+  measurementSelect: Select measurement
+  measurementSelectPlaceholder: Please select a measurement
+  measurementSelected: Selected measurement
+  devicePlaceholder: Please input device content

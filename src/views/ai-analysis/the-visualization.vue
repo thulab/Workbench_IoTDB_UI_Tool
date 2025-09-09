@@ -1,155 +1,149 @@
 <template>
   <coming-soon-container :is-show="locale !== 'en'">
-    <version-container :is-show="showAuthMenu" :versiton-tip="'2.0.5'">
-      <active-container :is-show="connectionIsActive">
-        <el-container class="visualization-wrapper">
-          <el-header class="p-0 p-l-30 p-r-16" style="height: auto">
-            <div class="search-form-box" style="margin-bottom: 2px">
-              <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-                <div class="m-b-16 flex-align-center" style="height: 36px">
-                  <base-form-item :label="`${t('aiAnalysis.business')}：`" prop="type" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
-                    <el-radio-group v-model="searchFormData.type" id="business-type" @change="handleChangeType">
-                      <el-radio :value="0" id="business-type-0">{{ t('aiAnalysis.forecast') }}</el-radio>
-                      <el-tooltip effect="light" trigger="hover" :disabled="!connectionStore.isTableModel" :content="t('aiAnalysis.forecastTip')">
-                        <el-radio :value="1" :disabled="connectionStore.isTableModel" id="business-type-1">{{ t('aiAnalysis.anomalyDetection') }}</el-radio>
-                      </el-tooltip>
-                      <el-radio :value="2" id="business-type-2">{{ t('aiAnalysis.custom') }}</el-radio>
-                    </el-radio-group>
-                  </base-form-item>
-                  <base-form-item
-                    v-if="searchFormData.type !== 2"
-                    :label="`${t('aiAnalysis.modelSelect')}：`"
-                    prop="method"
-                    class="m-r-12"
-                    :label-width="locale === 'en' ? '' : '96px'"
-                    :rules="requiredRules"
+    <active-container :is-show="connectionIsActive">
+      <el-container class="visualization-wrapper">
+        <el-header class="p-0 p-l-30 p-r-16" style="height: auto">
+          <div class="search-form-box" style="margin-bottom: 2px">
+            <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
+              <div class="m-b-16 flex-align-center" style="height: 36px">
+                <base-form-item :label="`${t('aiAnalysis.business')}：`" prop="type" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
+                  <el-radio-group v-model="searchFormData.type" id="business-type" @change="handleChangeType">
+                    <el-radio :value="0" id="business-type-0">{{ t('aiAnalysis.forecast') }}</el-radio>
+                    <el-tooltip effect="light" trigger="hover" :disabled="!connectionStore.isTableModel" :content="t('aiAnalysis.forecastTip')">
+                      <el-radio :value="1" :disabled="connectionStore.isTableModel" id="business-type-1">{{ t('aiAnalysis.anomalyDetection') }}</el-radio>
+                    </el-tooltip>
+                    <el-radio :value="2" id="business-type-2">{{ t('aiAnalysis.custom') }}</el-radio>
+                  </el-radio-group>
+                </base-form-item>
+                <base-form-item
+                  v-if="searchFormData.type !== 2"
+                  :label="`${t('aiAnalysis.modelSelect')}：`"
+                  prop="method"
+                  class="m-r-12"
+                  :label-width="locale === 'en' ? '' : '96px'"
+                  :rules="requiredRules"
+                >
+                  <el-select
+                    v-model="searchFormData.method"
+                    id="search-method"
+                    style="width: 400px"
+                    :multiple="searchFormData.type === 0"
+                    :multiple-limit="5"
+                    collapse-tags
+                    :placeholder="t('common.selectPlaceholder')"
                   >
-                    <el-select
-                      v-model="searchFormData.method"
-                      id="search-method"
-                      style="width: 400px"
-                      :multiple="searchFormData.type === 0"
-                      :multiple-limit="5"
-                      collapse-tags
-                      :placeholder="t('common.selectPlaceholder')"
-                    >
-                      <el-option
-                        v-for="item in modelOptions"
-                        :key="item.modelId"
-                        :label="`${item.modelId} (${item.modelType})`"
-                        :disabled="item.state !== 'ACTIVE'"
-                        :value="item.modelId"
-                        :id="`search-method-${item.modelId}`"
-                      />
-                    </el-select>
-                  </base-form-item>
-                  <el-button v-if="searchFormData.type !== 2" link :disabled="!enableAINode" @click="$router.push({ name: 'ModelManagement' })">
-                    <el-icon :size="24"><i-custom-edit /></el-icon>
+                    <el-option
+                      v-for="item in modelOptions"
+                      :key="item.modelId"
+                      :label="`${item.modelId} (${item.modelType})`"
+                      :disabled="item.state !== 'ACTIVE'"
+                      :value="item.modelId"
+                      :id="`search-method-${item.modelId}`"
+                    />
+                  </el-select>
+                </base-form-item>
+                <el-button v-if="searchFormData.type !== 2" link :disabled="!enableAINode" @click="$router.push({ name: 'ModelManagement' })">
+                  <el-icon :size="24"><i-custom-edit /></el-icon>
+                </el-button>
+                <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('aiAnalysis.docTip')" popper-class="tooltip-box-width">
+                  <el-button link class="m-l-4" @click="handleDoc" id="user-path-doc">
+                    <el-icon size="24"><i-custom-model-doc /></el-icon>
                   </el-button>
-                  <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('aiAnalysis.docTip')" popper-class="tooltip-box-width">
-                    <el-button link class="m-l-4" @click="handleDoc" id="user-path-doc">
-                      <el-icon size="24"><i-custom-model-doc /></el-icon>
-                    </el-button>
-                  </el-tooltip>
-                </div>
-                <div class="search-form-row-box">
-                  <div v-if="searchFormData.type !== 2">
-                    <template v-if="connectionStore.isTableModel">
-                      <base-form-item
-                        prop="database"
-                        style="margin-bottom: 16px"
-                        :label="`${t('measurement.measurementChoose')}：`"
-                        :label-width="locale === 'en' ? '' : '96px'"
-                        :rules="requiredRules"
-                      >
-                        <el-button type="primary" @click="handleSelectMeasurement">{{ t('tableMeasurement.measurementSelect') }}</el-button>
-                        <span v-if="searchFormData.database" class="m-l-[24px]">
+                </el-tooltip>
+              </div>
+              <div class="search-form-row-box">
+                <div v-if="searchFormData.type !== 2">
+                  <template v-if="connectionStore.isTableModel">
+                    <base-form-item prop="database" style="margin-bottom: 16px" :label="`${t('measurement.measurementChoose')}：`" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
+                      <el-button type="primary" @click="handleSelectMeasurement">{{ t('tableMeasurement.measurementSelect') }}</el-button>
+                      <!-- <span v-if="searchFormData.database" class="m-l-[24px]">
                           {{ t('measurement.databaseTitle') }}：
                           <span class="c-[#656A85]">{{ searchFormData.database }}</span>
                         </span>
                         <span v-if="searchFormData.table" class="m-l-[24px]">
                           {{ t('dataManage.table') }}：
                           <span class="c-[#656A85]">{{ searchFormData.table }}</span>
-                        </span>
-                      </base-form-item>
-                    </template>
-                    <template v-else>
-                      <base-form-item prop="measurement" style="margin-bottom: 16px" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
-                        <template #label>
-                          {{ t('measurement.measurementChoose') }}：
-                          <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
-                            <template #content>
-                              {{ t('common.searchTipLimit100') }}
-                            </template>
-                            <i-custom-question />
-                          </el-tooltip>
-                        </template>
-                        <timeseries-select-single
-                          id="search-path"
-                          v-model="searchFormData.measurement"
-                          :selectWidth="230"
-                          :itemWidth="200"
-                          show-suffix
-                          :disabled-path="disabledPath"
-                          @handle-change-path="handleChangePath"
-                        />
-                      </base-form-item>
-                    </template>
-                    <template v-if="searchFormData.type === 0">
-                      <base-form-item style="margin-bottom: 16px" :label="`${t('aiAnalysis.forecastStart')}：`" :rules="requiredRules">
-                        <el-date-picker v-model="searchFormData.forecastStart" type="datetime" :prefix-icon="ICustomCalender" id="search-datetime" :clearable="false" style="width: 164px" />
-                      </base-form-item>
-                      <base-form-item style="margin-bottom: 16px" :label="`${t('aiAnalysis.forecastData')}：`">
-                        <span style="font-size: 12px; color: #131926; font-weight: 300; line-height: 28px">{{ t('aiAnalysis.forecast96') }}</span>
-                      </base-form-item>
-                    </template>
-                    <template v-else-if="searchFormData.type === 1">
-                      <base-form-item :label="`${t('aiAnalysis.detectionTime')}：`" prop="datetimerange" :rules="requiredRules">
-                        <el-date-picker
-                          v-model="searchFormData.datetimerange"
-                          type="datetimerange"
-                          range-separator="-"
-                          unlink-panels
-                          :disabled-date="disabledDate"
-                          :shortcuts="shortcutsDaterange"
-                          :clearable="false"
-                          :prefix-icon="ICustomCalender"
-                          :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
-                          id="search-datetimerange"
-                        />
-                      </base-form-item>
-                      <base-form-item :label="`${t('aiAnalysis.anomalyRatio')}：`" v-if="searchFormData.method === 'stray'" class="m-r-0">
-                        <template #label>
-                          {{ t('aiAnalysis.anomalyRatio') }}：
-                          <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
-                            <template #content>
-                              {{ t('aiAnalysis.anomalyRatioTip') }}
-                            </template>
-                            <i-custom-question />
-                          </el-tooltip>
-                        </template>
-                        <el-input-number v-model="searchFormData.anomalyRatio" :min="1" :max="99" :controls="false" :placeholder="t('aiAnalysis.pleaseInputPercent')" style="width: 104px" />
-                        %
-                      </base-form-item>
-                    </template>
-                  </div>
-                  <div v-else>
-                    <base-form-item label="SQL：" prop="sql" class="el-form-item-not-mandatory" style="margin-bottom: 16px">
-                      <el-button type="primary" :disabled="!enableAINode" link id="search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
+                        </span> -->
                     </base-form-item>
-                  </div>
-                  <div class="search-form-buttons" style="margin-bottom: 16px">
-                    <el-button @click="handleReset" :disabled="!enableAINode" id="search-reset">{{ t('common.reset') }}</el-button>
-                    <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="canQuery" popper-class="tooltip-box-width">
-                      <el-button :disabled="!canQuery" type="primary" @click="handleSearch()" id="search-search">
-                        {{ t('common.query') }}
-                      </el-button>
-                    </el-tooltip>
-                  </div>
+                  </template>
+                  <template v-else>
+                    <base-form-item prop="measurement" style="margin-bottom: 16px" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
+                      <template #label>
+                        {{ t('measurement.measurementChoose') }}：
+                        <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
+                          <template #content>
+                            {{ t('common.searchTipLimit100') }}
+                          </template>
+                          <i-custom-question />
+                        </el-tooltip>
+                      </template>
+                      <timeseries-select-single
+                        id="search-path"
+                        v-model="searchFormData.measurement"
+                        :selectWidth="230"
+                        :itemWidth="200"
+                        show-suffix
+                        :disabled-path="disabledPath"
+                        @handle-change-path="handleChangePath"
+                      />
+                    </base-form-item>
+                  </template>
+                  <template v-if="searchFormData.type === 0">
+                    <base-form-item style="margin-bottom: 16px" :label="`${t('aiAnalysis.forecastStart')}：`" :rules="requiredRules">
+                      <el-date-picker v-model="searchFormData.forecastStart" type="datetime" :prefix-icon="ICustomCalender" id="search-datetime" :clearable="false" style="width: 164px" />
+                    </base-form-item>
+                    <base-form-item style="margin-bottom: 16px" :label="`${t('aiAnalysis.forecastData')}：`">
+                      <span style="font-size: 12px; color: #131926; font-weight: 300; line-height: 28px">{{ t('aiAnalysis.forecast96') }}</span>
+                    </base-form-item>
+                  </template>
+                  <template v-else-if="searchFormData.type === 1">
+                    <base-form-item :label="`${t('aiAnalysis.detectionTime')}：`" prop="datetimerange" :rules="requiredRules">
+                      <el-date-picker
+                        v-model="searchFormData.datetimerange"
+                        type="datetimerange"
+                        range-separator="-"
+                        unlink-panels
+                        :disabled-date="disabledDate"
+                        :shortcuts="shortcutsDaterange"
+                        :clearable="false"
+                        :prefix-icon="ICustomCalender"
+                        :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
+                        id="search-datetimerange"
+                      />
+                    </base-form-item>
+                    <base-form-item :label="`${t('aiAnalysis.anomalyRatio')}：`" v-if="searchFormData.method === 'stray'" class="m-r-0">
+                      <template #label>
+                        {{ t('aiAnalysis.anomalyRatio') }}：
+                        <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
+                          <template #content>
+                            {{ t('aiAnalysis.anomalyRatioTip') }}
+                          </template>
+                          <i-custom-question />
+                        </el-tooltip>
+                      </template>
+                      <el-input-number v-model="searchFormData.anomalyRatio" :min="1" :max="99" :controls="false" :placeholder="t('aiAnalysis.pleaseInputPercent')" style="width: 104px" />
+                      %
+                    </base-form-item>
+                  </template>
                 </div>
-              </el-form>
-            </div>
-          </el-header>
+                <div v-else>
+                  <base-form-item label="SQL：" prop="sql" class="el-form-item-not-mandatory" style="margin-bottom: 16px">
+                    <el-button type="primary" :disabled="!enableAINode" link id="search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
+                  </base-form-item>
+                </div>
+                <div class="search-form-buttons" style="margin-bottom: 16px">
+                  <el-button @click="handleReset" :disabled="!enableAINode" id="search-reset">{{ t('common.reset') }}</el-button>
+                  <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="canQuery" popper-class="tooltip-box-width">
+                    <el-button :disabled="!canQuery" type="primary" @click="handleSearch()" id="search-search">
+                      {{ t('common.query') }}
+                    </el-button>
+                  </el-tooltip>
+                </div>
+              </div>
+            </el-form>
+          </div>
+        </el-header>
+        <version-container :is-show="showAuthMenu" :versiton-tip="'2.0.5'">
           <auth-container :is-auth="canUseModel && canReadWriteData && enableAINode" :content="enableAINode ? 'common.dataAndModelAuth' : 'aiAnalysis.enableTip'" style="height: 100%; width: 100%">
             <el-main class="p-0 position-relative" style="height: 100%">
               <el-container class="position-absolute p-x-16" style="height: 100%; width: 100%; z-index: 1000" v-if="searchFormData.type === 2">
@@ -302,39 +296,41 @@
               </el-container>
             </el-main>
           </auth-container>
-          <modal-sql v-model:visible="sqlVisible" :sql-value="sqlValue" @handleConfirm="handleConfirmSql" />
+        </version-container>
 
-          <modal-write-back
-            v-if="!connectionStore.isTableModel"
-            v-model:visible="writeBackVisible"
-            :old-name="copySearchFormData.measurement"
-            :name-list="[copySearchFormData.measurement]"
-            :save-loading="writeBackLoading"
-            :model-id-list="copySearchFormData.type === 0 ? (copySearchFormData.method as string[]) : ([copySearchFormData.method] as string[])"
-            @handleSave="handleWriteBackSuccess"
-          />
-          <modal-write-back-table
-            v-if="connectionStore.isTableModel"
-            v-model:visible="writeBackVisible"
-            :database="copySearchFormData?.database || ''"
-            :table="copySearchFormData?.table || ''"
-            :model-id-list="(copySearchFormData?.method as string[]) || []"
-            :tags="copySearchFormData.selectedMeasurement?.device"
-            :field-name="copySearchFormData.measurement"
-            :save-loading="writeBackLoading"
-            @handleSave="handleWriteBackTableSuccess"
-          />
-          <modal-table-measurement
-            v-model:visible="tableMeasurementVisible"
-            :current-database="searchFormData.database"
-            :current-table="searchFormData.table"
-            :selected-limit="1"
-            :selected-measurements="searchFormData.selectedMeasurement ? [searchFormData.selectedMeasurement] : []"
-            @confirm="handleConfirmMeasurement"
-          />
-        </el-container>
-      </active-container>
-    </version-container>
+        <modal-sql v-model:visible="sqlVisible" :sql-value="sqlValue" @handleConfirm="handleConfirmSql" />
+
+        <modal-write-back
+          v-if="!connectionStore.isTableModel"
+          v-model:visible="writeBackVisible"
+          :old-name="copySearchFormData.measurement"
+          :name-list="[copySearchFormData.measurement]"
+          :save-loading="writeBackLoading"
+          :model-id-list="copySearchFormData.type === 0 ? (copySearchFormData.method as string[]) : ([copySearchFormData.method] as string[])"
+          @handleSave="handleWriteBackSuccess"
+        />
+        <modal-write-back-table
+          v-if="connectionStore.isTableModel"
+          v-model:visible="writeBackVisible"
+          :database="copySearchFormData?.database || ''"
+          :table="copySearchFormData?.table || ''"
+          :model-id-list="(copySearchFormData?.method as string[]) || []"
+          :tags="copySearchFormData.selectedMeasurement?.device"
+          :field-name="copySearchFormData.measurement"
+          :save-loading="writeBackLoading"
+          @handleSave="handleWriteBackTableSuccess"
+        />
+        <modal-table-measurement
+          v-if="tableMeasurementVisible"
+          v-model:visible="tableMeasurementVisible"
+          :current-database="searchFormData.database"
+          :current-table="searchFormData.table"
+          :selected-limit="1"
+          :selected-measurements="searchFormData.selectedMeasurement ? [searchFormData.selectedMeasurement] : []"
+          @confirm="handleConfirmMeasurement"
+        />
+      </el-container>
+    </active-container>
   </coming-soon-container>
 </template>
 
@@ -676,6 +672,7 @@ const chartOptions = computed<ECOption>(
       },
       legend: {
         data: legend.value,
+        top: 0,
       },
       toolbox: {
         show: true,
@@ -704,7 +701,8 @@ const chartOptions = computed<ECOption>(
         left: 20,
         right: 60,
         bottom: 20,
-        containLabel: true,
+        outerBoundsMode: 'same',
+        outerBoundsContain: 'axisLabel',
       },
       connectNulls: false,
       xAxis: {
@@ -1066,6 +1064,8 @@ function handleWriteBackTableSuccess(payload: WriteBackTableFrom) {
     .then(() => {
       ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
       writeBackVisible.value = false;
+      dbStore.setFirstLoad(true);
+      dbStore.getDatabases();
     })
     .finally(() => {
       writeBackLoading.value = false;
@@ -1169,16 +1169,18 @@ const handleSelectMeasurement = () => {
   tableMeasurementVisible.value = true;
 };
 
-const handleConfirmMeasurement = (database: string, table: string, selected: SelectedMeasurement[]) => {
-  searchFormData.database = database;
-  searchFormData.table = table;
+const handleConfirmMeasurement = (selected: SelectedMeasurement[]) => {
   [searchFormData.selectedMeasurement] = selected;
   if (searchFormData.selectedMeasurement) {
     searchFormData.measurement = searchFormData.selectedMeasurement.measurement;
     searchFormData.measurementType = searchFormData.selectedMeasurement.measurementType || '';
+    searchFormData.database = searchFormData.selectedMeasurement.database;
+    searchFormData.table = searchFormData.selectedMeasurement.tableName;
   } else {
     searchFormData.measurement = '';
     searchFormData.measurementType = '';
+    searchFormData.database = '';
+    searchFormData.table = '';
   }
   tableMeasurementVisible.value = false;
 };

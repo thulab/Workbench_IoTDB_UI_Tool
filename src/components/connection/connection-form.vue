@@ -216,6 +216,7 @@ const isShowSave = computed(() => props.current !== connectionStore.connectionIn
 const { requestFn: getConnectionDetail } = useRequest(ConnectionApi.getConnectionDetail);
 const { requestFn: saveConnection } = useRequest(ConnectionApi.saveConnection);
 const { requestFn: savePrometheus } = useRequest(ConnectionApi.savePrometheus);
+const { requestFn: switchModel } = useRequest(ConnectionApi.switchModel);
 const { requestFn: testConnection } = useRequest(ConnectionApi.testConnection);
 const { requestFn: testPrometheus } = useRequest(ConnectionApi.testPrometheus);
 const { requestFn: loginByConnection } = useRequest(ConnectionApi.loginByConnection);
@@ -457,6 +458,7 @@ function handleSavePrometheus() {
   saveLoading.value = true;
   savePrometheus({
     id: formData.id,
+    model: formData.model!,
     prometheusUrlMaster: formData.masterCluster.prometheusUrl,
     prometheusUsernameMaster: formData.masterCluster.prometheusUsername,
     prometheusPasswordMaster: formData.masterCluster.prometheusPassword,
@@ -466,9 +468,15 @@ function handleSavePrometheus() {
   })
     .then(() => {
       ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
-
-      window.__isReload__ = true;
-      window.location.reload();
+      if (formData.model !== connectionStore.model) {
+        switchModel(formData.model!).then(() => {
+          window.__isReload__ = true;
+          window.location.reload();
+        });
+      } else {
+        window.__isReload__ = true;
+        window.location.reload();
+      }
     })
     .finally(() => {
       saveLoading.value = false;

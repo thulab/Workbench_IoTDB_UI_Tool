@@ -10,14 +10,14 @@
               <el-tooltip effect="light" :content="t('common.selectMeasurementLimit', { limit: 10 })" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
             </template>
             <el-button type="primary" @click="handleSelectMeasurement">{{ t('tableMeasurement.measurementSelect') }}</el-button>
-            <span v-if="searchFormData.database" class="m-l-[24px]">
+            <!-- <span v-if="searchFormData.database" class="m-l-[24px]">
               {{ t('measurement.databaseTitle') }}：
               <span class="c-[#656A85]">{{ searchFormData.database }}</span>
             </span>
             <span v-if="searchFormData.table" class="m-l-[24px]">
               {{ t('dataManage.table') }}：
               <span class="c-[#656A85]">{{ searchFormData.table }}</span>
-            </span>
+            </span> -->
           </base-form-item>
           <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules">
             <ul class="search-data-list">
@@ -166,7 +166,7 @@ import PointListTab from './components/point-list-tab.vue';
 import TemplateListTab from './components/template-list-tab.vue';
 import ModalTemplate from './components/modal-template.vue';
 import ModalTemplateRename from './components/modal-template-rename.vue';
-import { formatDevice } from '@/utils/format';
+import { formatSelectedMeasurement } from '@/utils/format';
 import type { TrendData, LineObj, TrendTemplate, SelectedMeasurement } from '@/types';
 
 interface PointData {
@@ -375,6 +375,7 @@ const chartOptions = computed<ECOption>(
       tooltip: {
         confine: true,
         trigger: 'axis',
+        backgroundColor: '#fff',
         // appendToBody: true,
         formatter: (params: Array<Record<string, any>>) => {
           let res = '';
@@ -384,7 +385,7 @@ const chartOptions = computed<ECOption>(
             const data = paramsData.find((f) => f.seriesName === item.path);
             res += `<div style="margin: 10px 0 0;">${circle}${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;margin-left:2px">${data ? data.seriesName : item.path}</span><span style="float:right;margin-left:20px;font-size:14px;color:#666;font-weight:900">${data ? data.data[1] : null}</span></div>`;
           });
-          return `<div style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0]!.axisValueLabel}</div>${res}`;
+          return `<div style="font-size:14px;color:#666;font-weight:400;line-height:1; ">${paramsData[0]!.axisValueLabel}</div>${res}`;
         },
       },
       toolbox: {
@@ -413,7 +414,8 @@ const chartOptions = computed<ECOption>(
         left: 20,
         right: 60,
         bottom: 20,
-        containLabel: true,
+        outerBoundsMode: 'same',
+        outerBoundsContain: 'axisLabel',
       },
       connectNulls: false,
       xAxis: {
@@ -671,7 +673,7 @@ const buildParams = (operate: string, measurements: SelectedMeasurement[]) => {
     operate,
     database: copySearchFormData.database || searchFormData.database,
     tableName: copySearchFormData.table || searchFormData.table,
-    fields: measurements.map((item) => ({ value: item.condition, variable: item.measurement, path: formatDevice(item.device, item.measurement) })),
+    fields: measurements.map((item) => ({ value: item.condition, variable: item.measurement, path: formatSelectedMeasurement(item), database: item.database, tableName: item.tableName })),
   });
 };
 
@@ -725,13 +727,13 @@ function dealSearchPath() {
   copySearchFormData = cloneDeep(searchFormData);
   const allCurrentPaths = pathList.value.map((item) => item.selectedMeasurement) as SelectedMeasurement[];
   const addPaths = difference(
-    copySearchFormData.selectedMeasurement.map((item) => formatDevice(item.device, item.measurement)),
-    allCurrentPaths.map((item) => formatDevice(item!.device, item!.measurement)),
+    copySearchFormData.selectedMeasurement.map((item) => formatSelectedMeasurement(item)),
+    allCurrentPaths.map((item) => formatSelectedMeasurement(item)),
   );
-  const addMeasurements = copySearchFormData.selectedMeasurement.filter((item) => addPaths.includes(formatDevice(item.device, item.measurement)));
+  const addMeasurements = copySearchFormData.selectedMeasurement.filter((item) => addPaths.includes(formatSelectedMeasurement(item)));
   const deletePaths = difference(
-    allCurrentPaths.map((item) => formatDevice(item!.device, item!.measurement)),
-    copySearchFormData.selectedMeasurement.map((item) => formatDevice(item.device, item.measurement)),
+    allCurrentPaths.map((item) => formatSelectedMeasurement(item)),
+    copySearchFormData.selectedMeasurement.map((item) => formatSelectedMeasurement(item)),
   );
   deletePaths.forEach((item) => {
     const index = pathList.value.findIndex((data) => data.path === item);
@@ -739,7 +741,7 @@ function dealSearchPath() {
       pathList.value.splice(index, 1);
     }
   });
-  const deleteMeasurements = allCurrentPaths.filter((item) => deletePaths.includes(formatDevice(item!.device, item!.measurement)));
+  const deleteMeasurements = allCurrentPaths.filter((item) => deletePaths.includes(formatSelectedMeasurement(item)));
   if (deletePaths.length > 0) {
     socketInstance.value?.send(buildParams('del', deleteMeasurements));
     deletePaths.forEach((deleteItem) => {
@@ -752,7 +754,7 @@ function dealSearchPath() {
   const existedColor = pathList.value.map((item) => item.color);
   const diffArr = difference(predefineColors, existedColor);
   addPaths.forEach((item, index) => {
-    const selectedMeasurement = copySearchFormData.selectedMeasurement.find((data) => formatDevice(data.device, data.measurement) === item);
+    const selectedMeasurement = copySearchFormData.selectedMeasurement.find((data) => formatSelectedMeasurement(data) === item);
     pathList.value.push({
       selectedMeasurement,
       path: item,
@@ -810,7 +812,13 @@ function handleSearch(unforce?: boolean) {
     // 复用 VO， variable 为 measurement，value为tags condition
     database: copySearchFormData.database,
     tableName: copySearchFormData.table,
-    fieldCondition: copySearchFormData.selectedMeasurement.map((item) => ({ variable: item.measurement, value: item.condition, path: formatDevice(item.device, item.measurement) })),
+    fieldCondition: copySearchFormData.selectedMeasurement.map((item) => ({
+      variable: item.measurement,
+      value: item.condition,
+      path: formatSelectedMeasurement(item),
+      database: item.database,
+      tableName: item.tableName,
+    })),
     startTime: start,
     endTime: end,
     groupBy: copySearchFormData.unitInterval,
@@ -911,7 +919,7 @@ function handlePlay(val: boolean) {
         socketInstance.value?.send(
           buildParams(
             'add',
-            allCurrentPaths.filter((item) => paths.includes(formatDevice(item.device, item.measurement))),
+            allCurrentPaths.filter((item) => paths.includes(formatSelectedMeasurement(item))),
           ),
         );
       });
@@ -965,11 +973,11 @@ function handleTrendTab(type: 'running' | 'history', unforce?: boolean) {
       const add = difference(cloneChecked, currentChecked);
       loading.value = true;
       if (add.length > 0) {
-        const addMeasurements = allCurrentPaths.filter((item) => add.includes(formatDevice(item.device, item.measurement)));
+        const addMeasurements = allCurrentPaths.filter((item) => add.includes(formatSelectedMeasurement(item)));
         socketInstance.value?.send(buildParams('add', addMeasurements));
       }
       if (del.length > 0) {
-        const delMeasurements = allCurrentPaths.filter((item) => del.includes(formatDevice(item.device, item.measurement)));
+        const delMeasurements = allCurrentPaths.filter((item) => del.includes(formatSelectedMeasurement(item)));
         socketInstance.value?.send(buildParams('del', delMeasurements));
         del.forEach((deleteItem) => {
           const index = chartData.value.findIndex((data) => data.path === deleteItem);
@@ -990,7 +998,7 @@ function handleOperatePath(type: 'add' | 'del' | 'detail', path: string) {
   }
   if (dataTab.value === 'running') {
     const allCurrentPaths = pathList.value.map((item) => item.selectedMeasurement) as SelectedMeasurement[];
-    const selectedMeasurement = allCurrentPaths.find((item) => formatDevice(item.device, item.measurement) === path) as SelectedMeasurement;
+    const selectedMeasurement = allCurrentPaths.find((item) => formatSelectedMeasurement(item) === path) as SelectedMeasurement;
     if (type === 'add') {
       socketInstance.value?.send(buildParams('add', [selectedMeasurement]));
     } else if (type === 'del') {
@@ -1057,7 +1065,7 @@ function handleOperateTemplate(val: string, data: TrendTemplate) {
     pathList.value = [];
     nextTick(() => {
       const templatePaths = templateData.pathList.map((item: LineObj) => item.path).join(',');
-      const searchPaths = templateData.selectedMeasurement.map((item: SelectedMeasurement) => formatDevice(item.device, item.measurement)).join(',');
+      const searchPaths = templateData.selectedMeasurement.map((item: SelectedMeasurement) => formatSelectedMeasurement(item)).join(',');
       const isSamePath = isEqual(templatePaths, searchPaths);
       if (isSamePath) {
         pathList.value = templateData.pathList.map((item: LineObj) => ({ ...item }));
@@ -1067,13 +1075,13 @@ function handleOperateTemplate(val: string, data: TrendTemplate) {
         const diffArr = difference(predefineColors, existedColor);
         const resultPath: Array<LineObj> = [];
         searchFormData.selectedMeasurement.forEach((item, index) => {
-          const i = templateData.pathList.findIndex((pathItem: LineObj) => pathItem.path === formatDevice(item.device, item.measurement));
+          const i = templateData.pathList.findIndex((pathItem: LineObj) => pathItem.path === formatSelectedMeasurement(item));
           if (i !== -1) {
             resultPath.push({ ...pathList.value[i]! });
           } else {
             resultPath.push({
               selectedMeasurement: item,
-              path: formatDevice(item.device, item.measurement),
+              path: formatSelectedMeasurement(item),
               color: diffArr[index] || predefineColors[index]!,
               width: 2,
               checked: true,
@@ -1094,13 +1102,13 @@ function handleSaveSuccess(name: string) {
   const diffArr = difference(predefineColors, existedColor);
   const resultPath: Array<LineObj> = [];
   searchFormData.selectedMeasurement.forEach((item, index) => {
-    const i = pathList.value.findIndex((pathItem) => pathItem.path === formatDevice(item.device, item.measurement));
+    const i = pathList.value.findIndex((pathItem) => pathItem.path === formatSelectedMeasurement(item));
     if (i !== -1) {
       resultPath.push({ ...pathList.value[i]! });
     } else {
       resultPath.push({
         selectedMeasurement: item,
-        path: formatDevice(item.device, item.measurement),
+        path: formatSelectedMeasurement(item),
         color: diffArr[index] || predefineColors[index]!,
         width: 2,
         checked: true,
@@ -1176,9 +1184,7 @@ const handleSelectMeasurement = () => {
   tableMeasurementVisible.value = true;
 };
 
-const handleConfirmMeasurement = (database: string, table: string, selected: SelectedMeasurement[]) => {
-  searchFormData.database = database;
-  searchFormData.table = table;
+const handleConfirmMeasurement = (selected: SelectedMeasurement[]) => {
   searchFormData.selectedMeasurement = selected;
   tableMeasurementVisible.value = false;
 };

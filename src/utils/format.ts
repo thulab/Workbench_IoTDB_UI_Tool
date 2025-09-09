@@ -46,22 +46,19 @@ export function limitMax(num: number, max: number) {
 }
 
 export function formatSelectedMeasurement(data: SelectedMeasurement) {
-  return formatDevice(data.device, data.measurement);
+  return `${data.database || ''}.${data.tableName || ''}.${data.measurement}(${formatDevice(data.device, data.measurement)})`;
 }
 
-export function formatDevice(
+function formatDevice(
   device: {
     variable: string;
     value?: string;
   }[],
-  measurement: string,
 ) {
-  return (
-    device
-      .filter((item) => item.value)
-      .map((item) => item.value)
-      .join(', ') +
-    '-' +
-    measurement
-  );
+  return device
+    .filter((item) => item.value)
+    .map((item) => item.value)
+    .join(', ');
+  // '-' +
+  // measurement
 }

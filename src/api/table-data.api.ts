@@ -22,7 +22,7 @@ class TableDataApi {
   static getTrendHistoryData(data: {
     database: string;
     tableName: string;
-    fieldCondition: { variable: string; value: string }[];
+    fieldCondition: { variable: string; value: string; database: string; tableName: string }[];
     startTime: string | number;
     endTime: string | number;
     groupBy: string;

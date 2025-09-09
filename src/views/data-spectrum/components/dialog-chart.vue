@@ -53,7 +53,8 @@ const partOption = computed<ECOption>(() => {
       right: 20,
       bottom: 10,
       top: 30,
-      containLabel: true,
+      outerBoundsMode: 'same',
+      outerBoundsContain: 'axisLabel',
     },
     xAxis: {
       type: 'time',

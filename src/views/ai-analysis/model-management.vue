@@ -1,46 +1,45 @@
 <template>
   <coming-soon-container :is-show="locale !== 'en'">
-    <version-container :is-show="showAuthMenu" :versiton-tip="'2.0.5'">
-      <active-container :is-show="connectionIsActive">
-        <el-container class="model-management-wrapper">
-          <el-header class="search-form-wrapper p-x-0" style="height: auto">
-            <el-form :model="searchFormData" label-position="left" size="default" inline @submit.prevent>
-              <base-form-item :label="`${t('aiAnalysis.modelName')}：`" prop="name">
-                <el-input v-model="searchFormData.name" :placeholder="t('aiAnalysis.modelNamePlaceholder')" @keyup.enter="handleSearch" id="model-management-search-name" style="width: 200px">
-                  <template #prefix>
-                    <i-custom-search-icon class="remote-select-search-icon" />
-                  </template>
-                </el-input>
-              </base-form-item>
-            </el-form>
-            <div class="search-form-buttons">
-              <el-button @click="handleReset" :disabled="!canUseModel || !enableAINode" id="model-management-search-reset">{{ t('common.reset') }}</el-button>
-              <auth-tooltip :is-disabled="canUseModel" :content="'common.modelAuth'">
-                <el-button type="primary" @click="handleSearch" :disabled="!canUseModel || !enableAINode" id="model-management-search-search">{{ t('common.query') }}</el-button>
-              </auth-tooltip>
-            </div>
-          </el-header>
-          <el-main class="p-0">
-            <div class="page-table-details">
-              <div class="page-table-title-box">
-                <h4 class="page-table-title">{{ t('aiAnalysis.modelList') }}</h4>
-                <div class="operate-buttons">
-                  <auth-tooltip :is-disabled="canUseModel" :content="'common.modelAuth'">
-                    <el-button type="primary" @click="handleFineTuning" :disabled="!canUseModel || !enableAINode || !connectionIsActive" id="model-management-fineTuning">
-                      {{ t('aiAnalysis.fineTuning') }}
-                    </el-button>
-                  </auth-tooltip>
-                  <auth-tooltip :is-disabled="canUseModel" :content="'common.modelAuth'">
-                    <el-button type="primary" @click="handleImport" :disabled="!canUseModel || !enableAINode" id="model-management-add">{{ t('aiAnalysis.importModel') }}</el-button>
-                  </auth-tooltip>
-                  <auth-tooltip :is-disabled="canUseModel" :content="'common.modelAuth'">
-                    <el-button type="primary" @click="handleBatchDel" :disabled="!canUseModel || multipleSelection.length === 0 || !enableAINode" id="model-management-batch-del">
-                      {{ t('common.batchDelete') }}
-                    </el-button>
-                  </auth-tooltip>
-                </div>
+    <active-container :is-show="connectionIsActive">
+      <el-container class="model-management-wrapper">
+        <el-header class="search-form-wrapper p-x-0" style="height: auto">
+          <el-form :model="searchFormData" label-position="left" size="default" inline @submit.prevent>
+            <base-form-item :label="`${t('aiAnalysis.modelName')}：`" prop="name">
+              <el-input v-model="searchFormData.name" :placeholder="t('aiAnalysis.modelNamePlaceholder')" @keyup.enter="handleSearch" id="model-management-search-name" style="width: 200px">
+                <template #prefix>
+                  <i-custom-search-icon class="remote-select-search-icon" />
+                </template>
+              </el-input>
+            </base-form-item>
+          </el-form>
+          <div class="search-form-buttons">
+            <el-button @click="handleReset" :disabled="!canUseModel || !enableAINode" id="model-management-search-reset">{{ t('common.reset') }}</el-button>
+            <auth-tooltip :is-disabled="!applyTip" :content="applyTip">
+              <el-button type="primary" @click="handleSearch" :disabled="!canUseModel || !enableAINode || !!applyTip" id="model-management-search-search">{{ t('common.query') }}</el-button>
+            </auth-tooltip>
+          </div>
+        </el-header>
+        <el-main class="p-0">
+          <div class="page-table-details">
+            <div class="page-table-title-box">
+              <h4 class="page-table-title">{{ t('aiAnalysis.modelList') }}</h4>
+              <div class="operate-buttons">
+                <auth-tooltip :is-disabled="!applyTip" :content="applyTip">
+                  <el-button type="primary" @click="handleFineTuning" :disabled="!canUseModel || !enableAINode || !connectionIsActive || !!applyTip" id="model-management-fineTuning">
+                    {{ t('aiAnalysis.fineTuning') }}
+                  </el-button>
+                </auth-tooltip>
+                <auth-tooltip :is-disabled="!applyTip" :content="applyTip">
+                  <el-button type="primary" @click="handleImport" :disabled="!canUseModel || !enableAINode || !!applyTip" id="model-management-add">{{ t('aiAnalysis.importModel') }}</el-button>
+                </auth-tooltip>
+                <auth-tooltip :is-disabled="!applyTip" :content="applyTip">
+                  <el-button type="primary" @click="handleBatchDel" :disabled="!canUseModel || multipleSelection.length === 0 || !enableAINode || !!applyTip" id="model-management-batch-del">
+                    {{ t('common.batchDelete') }}
+                  </el-button>
+                </auth-tooltip>
               </div>
-
+            </div>
+            <version-container :is-show="showAuthMenu" :versiton-tip="'2.0.5'">
               <auth-container :is-auth="canUseModel && enableAINode" :content="enableAINode ? 'common.modelAuth' : 'aiAnalysis.enableTip'" style="height: 100%; width: 100%">
                 <div class="page-table-box">
                   <el-table
@@ -121,17 +120,17 @@
                   />
                 </div>
               </auth-container>
-            </div>
-          </el-main>
+            </version-container>
+          </div>
+        </el-main>
 
-          <model-import v-model:visible="importVisible" @handle-close="handleImportClose" />
+        <model-import v-model:visible="importVisible" @handle-close="handleImportClose" />
 
-          <model-config v-model:visible="configVisible" ref="modelConfig" />
+        <model-config v-model:visible="configVisible" ref="modelConfig" />
 
-          <modal-fine-tuning v-model:visible="fineTuningVisible" v-if="fineTuningVisible" @handle-save="handleFineTuningSuccess" />
-        </el-container>
-      </active-container>
-    </version-container>
+        <modal-fine-tuning v-model:visible="fineTuningVisible" v-if="fineTuningVisible" @handle-save="handleFineTuningSuccess" />
+      </el-container>
+    </active-container>
   </coming-soon-container>
 </template>
 
@@ -191,6 +190,16 @@ function formatState(state: string) {
   }
 }
 
+const applyTip = computed(() => {
+  if (!showAuthMenu.value) {
+    return t('common.useVersionTip', { version: '2.0.5' });
+  }
+  if (!canUseModel.value) {
+    return t('common.modelAuth');
+  }
+  return '';
+});
+
 function getListData() {
   getModels(searchFormData.name).then((res) => {
     if (res.data) {
@@ -208,7 +217,9 @@ function getListData() {
 function handleSearch() {
   pagination.pageNum = 1;
   tableRef.value?.clearSelection();
-  getListData();
+  if (canUseModel.value && !applyTip.value) {
+    getListData();
+  }
 }
 
 function handleReset() {

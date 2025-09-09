@@ -1,12 +1,21 @@
 <template>
   <el-dialog :title="t('aiAnalysis.fineTuning')" v-model="dialogVisible" width="540px" align-center>
-    <el-form ref="formRef" :model="formData" :rules="formRules" :label-width="locale === 'en' ? '120px' : '120px'" label-position="right">
+    <el-form ref="formRef" :model="formData" :rules="formRules" :label-width="locale === 'en' ? '140px' : '140px'" label-position="right">
       <base-form-item :label="`${t('aiAnalysis.sourceModel')}：`" prop="rawModelId">
         <el-select v-model="formData.rawModelId" id="fine-tuning-raw" v-loading="getModelsLoading" :placeholder="t('aiAnalysis.sourceModelPlaceholder')">
           <el-option v-for="item in modelOptions" :key="item.modelId" :label="item.modelId" :value="item.modelId" />
         </el-select>
       </base-form-item>
       <base-form-item :label="`${t('aiAnalysis.fineTuningModel')}：`" prop="tunedModelId">
+        <template #label>
+          {{ t('aiAnalysis.fineTuningModel') }}：
+          <el-tooltip effect="light" placement="top" popper-class="table-tooltip-max-width">
+            <template v-slot:content>
+              <div v-html="t('aiAnalysis.importModelNameHover')"></div>
+            </template>
+            <i-custom-question
+          /></el-tooltip>
+        </template>
         <el-input v-model="formData.tunedModelId" id="fine-tuning-name" maxlength="64" :placeholder="t('aiAnalysis.fineTuningModelPlaceholder')" />
       </base-form-item>
       <base-form-item :label="`${t('aiAnalysis.fineTuningData')}：`" v-if="!connectionStore.isTableModel" prop="name">
@@ -22,7 +31,7 @@
       </base-form-item>
       <template v-else>
         <base-form-item :label="`${t('aiAnalysis.fineTuningData')}：`" prop="database">
-          <el-select v-model="formData.database" id="fine-tuning-database" :placeholder="t('aiAnalysis.databasePlaceholeder')" @change="handleDatabaseSelected" v-loading="getModelsLoading">
+          <el-select v-model="formData.database" id="fine-tuning-database" :placeholder="t('aiAnalysis.fineTuningDatabasePlaceholeder')" @change="handleDatabaseSelected" v-loading="getModelsLoading">
             <el-option v-for="item in dbStore.userTreeData" :key="item.nodeName" :label="item.nodeName" :value="item.nodeName" />
           </el-select>
         </base-form-item>
@@ -31,7 +40,7 @@
           <el-select
             v-model="formData.table"
             id="fine-tuning-table"
-            :placeholder="t('aiAnalysis.tablePlaceholder')"
+            :placeholder="t('aiAnalysis.fineTuningTablePlaceholder')"
             v-loading="getModelsLoading"
             :disabled="!formData.database"
             @change="
@@ -44,7 +53,13 @@
           </el-select>
         </base-form-item>
         <base-form-item label="" prop="measurement" class="hidden-label">
-          <el-select v-model="formData.measurement" id="fine-tuning-measurement" :placeholder="t('aiAnalysis.measurementPlaceholder')" :disabled="!formData.table" v-loading="getModelsLoading">
+          <el-select
+            v-model="formData.measurement"
+            id="fine-tuning-measurement"
+            :placeholder="t('aiAnalysis.fineTuningMeasurementPlaceholder')"
+            :disabled="!formData.table"
+            v-loading="getModelsLoading"
+          >
             <el-option
               v-for="item in currentTable?.children?.filter((item) => item.category === 'FIELD') || []"
               :key="item.nodeName"
@@ -69,7 +84,7 @@
         />
       </base-form-item>
       <div class="exits-tip" v-if="!paramsVisible">
-        <el-button link type="primary" @click="showParam">{{ t('aiAnalysis.moreParam') }}</el-button>
+        <el-button link type="primary" disabled @click="showParam">{{ t('aiAnalysis.moreParam') }}</el-button>
       </div>
       <base-form-item :label="`${t('aiAnalysis.superParam')}：`" prop="field" v-if="paramsVisible">
         <monaco-editor class="input-container" ref="inputEditor" @mounted="initContent" />
@@ -157,17 +172,17 @@ const formRules = reactive<FormRules>({
     },
     {
       min: 2,
-      message: t('common.formRuleMinLength', { length: 2 }),
+      message: t('common.formRuleLength'),
       trigger: 'blur',
     },
     {
       max: 64,
-      message: t('common.formRuleMaxLength', { length: 64 }),
+      message: t('common.formRuleLength'),
       trigger: 'blur',
     },
     {
       pattern: /^[a-zA-Z0-9-_]+$/,
-      message: t('common.formRuleFormat', { allow: '字母、数字、下划线' }),
+      message: t('aiAnalysis.inputFormatErrorTip'),
       trigger: 'blur',
     },
   ],

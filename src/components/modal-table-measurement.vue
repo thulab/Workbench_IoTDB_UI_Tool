@@ -1,23 +1,15 @@
 <!-- 表模型测点选择弹窗 -->
 <template>
-  <el-dialog v-model="dialogVisible" :title="t('measurement.measurementChoose')" width="800px" :before-close="handleClose" :close-on-click-modal="false" :close-on-press-escape="false" draggable>
+  <el-dialog v-model="dialogVisible" :title="t('measurement.measurementChoose')" width="820px" :before-close="handleClose" :close-on-click-modal="false" :close-on-press-escape="false" draggable>
     <div class="flex gap-1 modal-table-measurement-container">
       <el-scrollbar :height="450" class="bg-[#F7F8FC]">
         <!-- 左侧测点选择区域 -->
-        <div class="flex-2 flex flex-col p-[4px]">
+        <div class="flex-2 flex flex-col p-[16px]">
           <el-form :model="formData" :rules="formRules" ref="formRef" label-position="left" label-width="80px">
             <!-- 第一行：数据库和表选择 -->
             <div class="flex gap-2">
               <el-form-item :label="`${t('measurement.databaseTitle')}：`" prop="selectedDatabase" class="flex-[10]">
-                <el-select
-                  v-model="formData.selectedDatabase"
-                  filterable
-                  :disabled="internalSelectedMeasurements.length !== 0"
-                  :placeholder="t('aiAnalysis.databasePlaceholeder')"
-                  @change="handleDatabaseChange"
-                  clearable
-                  class="w-full search-select"
-                >
+                <el-select v-model="formData.selectedDatabase" filterable :placeholder="t('aiAnalysis.databasePlaceholeder')" @change="handleDatabaseChange" clearable class="w-full search-select">
                   <template #prefix>
                     <i-custom-search-icon class="remote-select-search-icon" />
                   </template>
@@ -30,7 +22,7 @@
                   filterable
                   :placeholder="t('aiAnalysis.tablePlaceholder')"
                   @change="handleTableChange"
-                  :disabled="!formData.selectedDatabase || tableOptions.length === 0 || internalSelectedMeasurements.length !== 0"
+                  :disabled="!formData.selectedDatabase || tableOptions.length === 0"
                   clearable
                   class="w-full search-select"
                 >
@@ -57,7 +49,7 @@
                   </el-select>
 
                   <span class="m-x-[8px]">：</span>
-                  <el-input v-model="tag.value" class="w-[160px] m-r-[12px]" :disabled="!availableTags.length" :placeholder="t('common.placeHolder')" />
+                  <el-input v-model="tag.value" class="w-[160px] m-r-[12px]" :disabled="!availableTags.length" :placeholder="t('tableMeasurement.devicePlaceholder')" />
                   <el-button type="primary" link :disabled="tagFilters.length <= 1" @click="removeTagFilter(index)">
                     <el-icon size="28">
                       <i-custom-tags-del />
@@ -129,6 +121,7 @@
                 :disabled="!currentTableInfo || availableMeasurements.length === 0"
                 filterable
                 multiple
+                :collapse-tags="true"
                 :multiple-limit="props.selectedLimit"
                 class="w-[320px]"
               >
@@ -146,34 +139,28 @@
       </el-scrollbar>
       <!-- 中间添加按钮 -->
       <div class="flex items-center justify-center bg-[white] flex-0">
-        <el-button type="primary" :disabled="!canAdd" @click="addMeasurements" link>
-          <i-custom-choose-measurement />
-        </el-button>
+        <!-- 选择测点超过 10 个时才提示 -->
+        <el-tooltip :content="t('common.selectMeasurementLimit', { limit: props.selectedLimit })" :disabled="canAddMeasurements" effect="light">
+          <el-button type="primary" :disabled="!canAdd || !canAddMeasurements" @click="addMeasurements" link>
+            <i-custom-choose-measurement />
+          </el-button>
+        </el-tooltip>
       </div>
 
       <!-- 右侧已选测点区域 -->
       <div class="w-[214px] flex flex-col bg-[#F7F8FC] right-panel">
-        <div class="mb-4">
-          <div class="text-sm font-medium text-gray-700 mb-2 c-[var(--el-color-primary)]">{{ t('tableMeasurement.measurementSelected') }}</div>
-
-          <div class="flex items-center">
-            <el-icon size="16" style="margin-right: 6px"><i-custom-info-warning /></el-icon>
-            <span
-              class="selected-tip"
-              v-html="
-                t('common.selectMeasurementLimit', {
-                  limit: `
-            <span>${selectedLimit}</span>
-            `,
-                })
-              "
-            ></span>
+        <div>
+          <div class="text-sm font-medium text-gray-700 mb-2 c-[var(--el-color-primary)]">
+            {{ t('tableMeasurement.measurementSelected') }}
+            <el-tooltip effect="light" :content="t('common.selectMeasurementLimit', { limit: 10 })" placement="top" popper-class="tooltip-box-width"
+              ><i-custom-question style="transform: translate(0, -80%)"
+            /></el-tooltip>
           </div>
         </div>
         <el-scrollbar max-height="400px">
-          <div v-for="(item, index) in internalSelectedMeasurements" :key="`${item.condition}-${item.measurement}`" class="flex items-center justify-between mb-2 selected-measurement-item">
+          <div v-for="(item, index) in internalSelectedMeasurements" :key="formatSelectedMeasurement(item)" class="flex items-center justify-between mb-2 selected-measurement-item">
             <div class="flex-1 flex max-w-[180px]">
-              <text-tooltip :content="formatDevice(item.device, item.measurement)"></text-tooltip>
+              <text-tooltip :content="formatSelectedMeasurement(item)"></text-tooltip>
             </div>
             <el-button link @click="removeMeasurement(index)">
               <el-icon><i-custom-close-circle /></el-icon>
@@ -199,7 +186,7 @@ import { storeToRefs } from 'pinia';
 import { useDbStore } from '@/stores';
 import { useI18n } from 'vue-i18n';
 import { TableDataApi } from '@/api';
-import { formatDevice } from '@/utils/format';
+import { formatSelectedMeasurement } from '@/utils/format';
 import type { FormInstance, TableInstance, FormRules } from 'element-plus';
 
 import type { TableTreeNodeData, SelectedMeasurement, TagFilter } from '@/types';
@@ -219,7 +206,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  confirm: [database: string, table: string, measurements: SelectedMeasurement[]];
+  confirm: [measurements: SelectedMeasurement[]];
   close: [];
 }>();
 
@@ -253,10 +240,12 @@ const currentPage = ref(1);
 const noMoreData = ref(true);
 // 计算属性
 const databaseOptions = computed(() => {
-  return treeData.value.map((db) => ({
-    value: db.nodeName,
-    label: db.nodeName,
-  }));
+  return treeData.value
+    .filter((db) => db.nodeName !== 'information_schema')
+    .map((db) => ({
+      value: db.nodeName,
+      label: db.nodeName,
+    }));
 });
 
 const tableOptions = computed(() => {
@@ -449,6 +438,11 @@ const handleDeviceSelection = (devices: Record<string, string>[]) => {
   selectedDevices.value = devices;
 };
 
+const canAddMeasurements = computed(() => {
+  const currentSelectedLength = selectedDevices.value.length * formData.selectedMeasurement.length;
+  return internalSelectedMeasurements.value.length + currentSelectedLength <= props.selectedLimit;
+});
+
 const addMeasurements = async () => {
   if (!canAdd.value) return;
   const newMeasurements: SelectedMeasurement[] = [];
@@ -474,6 +468,8 @@ const addMeasurements = async () => {
       const measurementType = availableMeasurements.value.find((m) => m.nodeName === measurement)?.datatype || '';
       if (!exists) {
         newMeasurements.push({
+          database: formData.selectedDatabase,
+          tableName: formData.selectedTable,
           condition,
           device: Object.keys(device).map((key) => ({ variable: key, value: device[key] })),
           measurement,
@@ -516,7 +512,7 @@ const handleClear = () => {
 };
 
 const handleConfirm = () => {
-  emit('confirm', formData.selectedDatabase, formData.selectedTable, internalSelectedMeasurements.value);
+  emit('confirm', internalSelectedMeasurements.value);
   handleClose();
 };
 
@@ -560,7 +556,7 @@ watch(
   }
 
   .right-panel {
-    padding: 8px 16px 8px 20px;
+    padding: 8px 16px;
   }
 
   .selected-tip {

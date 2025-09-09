@@ -392,7 +392,8 @@ const chartOptions = computed<ECOption>(
         left: 20,
         right: 60,
         bottom: 20,
-        containLabel: true,
+        outerBoundsMode: 'same',
+        outerBoundsContain: 'axisLabel',
       },
       connectNulls: false,
       xAxis: {
