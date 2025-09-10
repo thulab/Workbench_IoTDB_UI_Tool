@@ -46,7 +46,7 @@ export function limitMax(num: number, max: number) {
 }
 
 export function formatSelectedMeasurement(data: SelectedMeasurement) {
-  return `${data.database || ''}.${data.tableName || ''}.${data.measurement}(${formatDevice(data.device, data.measurement)})`;
+  return `${data.database || ''}.${data.tableName || ''}.${data.measurement}(${formatDevice(data.device)})`;
 }
 
 function formatDevice(
