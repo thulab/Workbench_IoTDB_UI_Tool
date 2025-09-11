@@ -700,10 +700,11 @@ onMounted(() => {
   const defaultCols = window.localStorage.getItem('measurementCols');
   if (!defaultCols) {
     isCheckAll.value = false;
-    checkedCols.value = ['timeseries', 'description', 'dataType'];
+    checkedCols.value = ['deviceName', 'timeseries', 'description', 'dataType'];
     isIndeterminate.value = true;
     columnList.value = [
-      { label: 'measurement.measurementName', prop: 'timeseries', width: 240 },
+      { label: 'measurement.deviceName', prop: 'deviceName', width: 180 },
+      { label: 'measurement.measurementName', prop: 'timeseries', width: 140 },
       { label: 'measurement.measurementDescription', prop: 'description', width: 160 },
       { label: 'measurement.dataType', prop: 'dataType', width: 140 },
     ];
