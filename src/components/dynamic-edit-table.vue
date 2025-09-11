@@ -40,7 +40,9 @@
                 {{ t('common.delete') }}
               </el-button>
               <el-tooltip v-if="!scope.row.editable && !canDelete" effect="light" :content="cannotDeleteTip" placement="top" popper-class="table-tooltip-max-width">
-                {{ t('common.delete') }}
+                <el-button disabled size="small" type="text">
+                  {{ t('common.delete') }}
+                </el-button>
               </el-tooltip>
               <template v-if="scope.row.editable">
                 <el-button class="edit-f" type="text" size="small" @click="handleSaveRow(scope.row)">{{ t('common.save') }}</el-button>

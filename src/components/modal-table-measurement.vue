@@ -152,7 +152,7 @@
         <div>
           <div class="text-sm font-medium text-gray-700 mb-2 c-[var(--el-color-primary)]">
             {{ t('tableMeasurement.measurementSelected') }}
-            <el-tooltip effect="light" :content="t('common.selectMeasurementLimit', { limit: 10 })" placement="top" popper-class="tooltip-box-width"
+            <el-tooltip effect="light" :content="t('common.selectMeasurementLimit', { limit: props.selectedLimit })" placement="top" popper-class="tooltip-box-width"
               ><i-custom-question style="transform: translate(0, -80%)"
             /></el-tooltip>
           </div>
