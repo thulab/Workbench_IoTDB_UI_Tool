@@ -175,8 +175,8 @@
             :show-overflow-tooltip="column.prop !== 'description'"
           >
             <template #default="{ row }">
-              <template v-if="column.prop === 'timeseries'">{{ `${row.deviceName}.${row.timeseries}` }}</template>
-              <div class="row-description-box" v-else-if="column.prop === 'alias'">
+              <!-- <template v-if="column.prop === 'timeseries'">{{ `${row.deviceName}.${row.timeseries}` }}</template> -->
+              <div class="row-description-box" v-if="column.prop === 'alias'">
                 <div class="row-description-text">
                   <text-tooltip :content="row.alias || ''" />
                 </div>
@@ -358,7 +358,8 @@ const searchPlaceholder = computed(() => (searchType.value === 'name' ? t('calcu
 const colButtonRef = ref();
 const colPopoverRef = ref();
 const allColumns = ref<Array<{ label: string; prop: string; width: number }>>([
-  { label: 'measurement.measurementName', prop: 'timeseries', width: 240 },
+  { label: 'measurement.deviceName', prop: 'deviceName', width: 180 },
+  { label: 'measurement.measurementName', prop: 'timeseries', width: 140 },
   { label: 'measurement.alias', prop: 'alias', width: 140 },
   { label: 'measurement.measurementDescription', prop: 'description', width: 160 },
   { label: 'measurement.tag', prop: 'tags', width: 120 },
@@ -371,11 +372,12 @@ const allColumns = ref<Array<{ label: string; prop: string; width: number }>>([
   { label: 'measurement.lastValueTime', prop: 'valueTime', width: 200 },
 ]);
 const isCheckAll = ref(false);
-const checkedCols = ref<string[]>(['timeseries', 'description', 'dataType']);
+const checkedCols = ref<string[]>(['deviceName', 'timeseries', 'description', 'dataType']);
 let copyCheckedCols = cloneDeep(checkedCols.value);
 const isIndeterminate = ref(true);
 const columnList = ref<Array<{ label: string; prop: string; width: number }>>([
-  { label: 'measurement.measurementName', prop: 'timeseries', width: 240 },
+  { label: 'measurement.deviceName', prop: 'deviceName', width: 180 },
+  { label: 'measurement.measurementName', prop: 'timeseries', width: 140 },
   { label: 'measurement.measurementDescription', prop: 'description', width: 160 },
   { label: 'measurement.dataType', prop: 'dataType', width: 140 },
 ]);
