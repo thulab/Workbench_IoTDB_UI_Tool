@@ -432,15 +432,16 @@ function handleImportClose(reload: boolean) {
 
 // 导出
 function handleExportData(exportType: string) {
-  let startTime = 0;
-  let endTime = 0;
+  let startTime;
+  let endTime;
   if (timeType.value === 'datetime') {
     startTime = dayjs(copySearchFormData.time).valueOf();
     endTime = startTime + 1000;
   } else {
-    startTime = dayjs(copySearchFormData.datetimerange[0]).valueOf();
-    endTime = dayjs(copySearchFormData.datetimerange[1]).valueOf();
+    startTime = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[0]).valueOf() : undefined;
+    endTime = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[1]).valueOf() : undefined;
   }
+
   exportData({
     measurements: copySearchFormData.path,
     startTime,
