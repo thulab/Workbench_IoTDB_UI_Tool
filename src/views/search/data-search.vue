@@ -43,7 +43,7 @@
               :prefix-icon="ICustomCalender"
               :start-placeholder="t('search.startTime')"
               :end-placeholder="t('search.endTime')"
-              id="data-search-datetimerange"
+              :id="['data-search-datetimerange-start', 'data-search-datetimerange-end']"
               :disabled="getListLoading"
             />
           </div>

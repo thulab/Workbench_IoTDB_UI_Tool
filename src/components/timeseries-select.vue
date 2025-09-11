@@ -14,6 +14,7 @@
     :remote-method="remoteMethod"
     :style="`width: ${selectWidth}px;`"
     :disabled="disabledSelect"
+    popper-class="overflow-popper"
     @change="handleChangePath"
   >
     <template #prefix v-if="showPrefix">

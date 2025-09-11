@@ -274,3 +274,11 @@ svg:focus {
 .el-radio {
   height: 28px;
 }
+
+.overflow-popper {
+  .el-select-dropdown__wrap {
+    .el-select-dropdown__list {
+      width: fit-content;
+    }
+  }
+}

@@ -12,6 +12,7 @@
     :disabled="disabledSelect"
     :style="`width: ${selectWidth}px;`"
     class="remote-select-box"
+    popper-class="overflow-popper"
     @change="handleChangePath"
   >
     <el-option
