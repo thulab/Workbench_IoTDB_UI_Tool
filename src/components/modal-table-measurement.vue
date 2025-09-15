@@ -159,7 +159,7 @@
         </div>
         <el-scrollbar max-height="400px">
           <div v-for="(item, index) in internalSelectedMeasurements" :key="formatSelectedMeasurement(item)" class="flex items-center justify-between mb-2 selected-measurement-item">
-            <div class="flex-1 flex max-w-[180px]">
+            <div class="flex-1 flex max-w-[180px] leading-5">
               <text-tooltip :content="formatSelectedMeasurement(item)"></text-tooltip>
             </div>
             <el-button link @click="removeMeasurement(index)">
@@ -463,8 +463,8 @@ const addMeasurements = async () => {
       })
       .join(' AND ');
     formData.selectedMeasurement.forEach((measurement) => {
-      const key = `${condition}-${measurement}`;
-      const exists = internalSelectedMeasurements.value.some((m) => `${m.condition}-${m.measurement}` === key);
+      const key = `${formData.selectedDatabase}-${formData.selectedTable}-${condition}-${measurement}`;
+      const exists = internalSelectedMeasurements.value.some((m) => `${m.database}-${m.tableName}-${m.condition}-${m.measurement}` === key);
       const measurementType = availableMeasurements.value.find((m) => m.nodeName === measurement)?.datatype || '';
       if (!exists) {
         newMeasurements.push({
