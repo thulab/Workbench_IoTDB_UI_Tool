@@ -39,7 +39,7 @@
             <div class="left-view">
               <el-row class="form-item-row" style="grid-template-columns: 1fr 1fr 1fr">
                 <el-col>
-                  <base-form-item class="form-item-width" :label="`${t('dataManage.columnName')}：`" :prop="`columns[${index}].columnName`" required :rules="tableNameRules">
+                  <base-form-item class="form-item-width" :label="`${t('dataManage.columnName')}：`" :prop="`columns[${index}].columnName`" required :rules="columnNameRules">
                     <template #label>
                       {{ t('dataManage.columnName') }}：
                       <el-tooltip effect="light" :content="t('dataManage.columnNameTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
@@ -166,7 +166,7 @@ const tableNames = computed(() => {
   return [];
 });
 
-const validateName: FormItemRule['validator'] = (rule, value, callback) => {
+const validateTableName: FormItemRule['validator'] = (rule, value, callback) => {
   if (
     value &&
     tableNames.value.some(
@@ -177,6 +177,32 @@ const validateName: FormItemRule['validator'] = (rule, value, callback) => {
     callback(new Error(t('dataManage.tableNameExist')));
   }
 
+  // 情况1：简单名称（字母开头，可包含下划线和数字）
+  const simplePattern = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+  // 情况2：需要引号包裹的名称（包含特殊字符、中文或以数字开头）
+  const needsQuotesPattern = /^".*"$/;
+  // 特殊字符正则（包括中文、数字开头和各种特殊符号）
+  const specialCharsPattern = /[`~!@#$%^&*()+=|{}':;',[\]<>/?\\]|[\u4e00-\u9fa5]|^[0-9]/;
+  if (simplePattern.test(value)) {
+    callback();
+  } else if (specialCharsPattern.test(value) && !needsQuotesPattern.test(value)) {
+    // 包含特殊字符但未用引号包裹
+    callback(new Error(t('dataManage.specialCharsNeedQuotes')));
+  } else if (needsQuotesPattern.test(value)) {
+    // 检查引号内是否为空
+    const unquoted = value.slice(1, -1);
+    if (unquoted === '') {
+      callback(new Error(t('dataManage.emptyQuotedName')));
+    } else {
+      callback();
+    }
+  } else {
+    // 其他非法格式
+    callback(new Error(t('dataManage.invalidNameFormat')));
+  }
+};
+
+const validateColumnName: FormItemRule['validator'] = (rule, value, callback) => {
   // 情况1：简单名称（字母开头，可包含下划线和数字）
   const simplePattern = /^[a-zA-Z][a-zA-Z0-9_]*$/;
   // 情况2：需要引号包裹的名称（包含特殊字符、中文或以数字开头）
@@ -214,7 +240,24 @@ const tableNameRules = ref([
     trigger: 'blur',
   },
   {
-    validator: validateName,
+    validator: validateTableName,
+    trigger: 'blur',
+  },
+]);
+
+const columnNameRules = ref([
+  {
+    required: true,
+    message: () => t('common.formRuleEmptyOperateShort'),
+    trigger: 'blur',
+  },
+  {
+    max: 100,
+    message: () => t('dataManage.tableNameLength'),
+    trigger: 'blur',
+  },
+  {
+    validator: validateColumnName,
     trigger: 'blur',
   },
 ]);
