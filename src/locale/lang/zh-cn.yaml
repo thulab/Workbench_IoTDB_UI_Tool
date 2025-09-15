@@ -421,7 +421,9 @@ tableFunctions:
   SUM: 求和
   COUNT: 计算数据点数
   COUNT_IF: COUNT_IF（exp） 用于统计满足指定布尔表达式的记录行数，exp 必须是一个布尔类型的表达式
-  APPROX_COUNT_DISTINCT: APPROX_COUNT_DISTINCT(x[,maxStandardError]) 函数提供 COUNT(DISTINCT x) 的近似值，返回不同输入值的近似个数。
+  APPROX_COUNT_DISTINCT: >-
+    APPROX_COUNT_DISTINCT(x[,maxStandardError]) 函数提供 COUNT(DISTINCT x)
+    的近似值，返回不同输入值的近似个数。
   AVG: 求平均值
   STDDEV: 求样本标准差
   STDDEV_POP: 求总体标准差
@@ -1105,6 +1107,7 @@ aiAnalysis:
   writeBackUnchangedTips: 目标数据库、表、设备、测点与原始测点相同，若不修改，将会覆盖原始测点数据，是否继续？
   forecastTip: 当前版本 AINode 暂不支持异常检测功能，请期待后续版本
   inputFormatErrorTip: 输入包含不支持的字符类型
+  tableNameTip: 表名具有以下特性：大小写不敏感，名称可包含特殊字符，如 ~!"%` 等
 dataManage:
   schema: 结构
   dbSchema: 数据库结构
