@@ -355,6 +355,7 @@ const chartOptions = computed<ECOption>(
         confine: true,
         trigger: 'axis',
         // appendToBody: true,
+        backgroundColor: '#fff',
         formatter: (params: Array<Record<string, any>>) => {
           let res = '';
           const paramsData = params;

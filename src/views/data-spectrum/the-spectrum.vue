@@ -498,7 +498,7 @@ const searchFormData = reactive<{
   times: [],
   values: [],
 });
-let copySearchFormData = cloneDeep(searchFormData);
+const copySearchFormData = ref<typeof searchFormData>(cloneDeep(searchFormData));
 const { shortcutsDaterange } = useShortcutsDate();
 
 const importVisible = ref(false);
@@ -637,7 +637,7 @@ const seriesData = computed<ECOption>(
           showAllSymbol: 'auto',
           connectNulls: false,
           symbolSize: 4,
-          name: copySearchFormData.measurement,
+          name: copySearchFormData.value.measurement,
           data: chartData.values.map((dataItem, index) => [chartData.timestamps[index], dataItem]),
           markPoint: {
             silent: true,
@@ -661,10 +661,10 @@ const seriesData = computed<ECOption>(
           },
           lineStyle: {
             width: 2,
-            color: copySearchFormData.method === 'PATTERN_MATCH' ? undefined : '#4992ff',
+            color: copySearchFormData.value.method === 'PATTERN_MATCH' ? undefined : '#4992ff',
           },
           itemStyle: {
-            color: copySearchFormData.method === 'PATTERN_MATCH' ? undefined : '#4992ff',
+            color: copySearchFormData.value.method === 'PATTERN_MATCH' ? undefined : '#4992ff',
           },
         },
       ],
@@ -672,7 +672,7 @@ const seriesData = computed<ECOption>(
 );
 
 const visualMap = computed(() => {
-  if (copySearchFormData.method !== 'PATTERN_MATCH') {
+  if (copySearchFormData.value.method !== 'PATTERN_MATCH') {
     return undefined;
   }
   return {
@@ -699,6 +699,7 @@ const chartOptions = computed<ECOption>(
       tooltip: {
         trigger: 'axis',
         confine: true,
+        backgroundColor: '#fff',
         formatter: (params: Array<Record<string, any>>) => {
           const paramsData = params;
           const circle = `<div style="z-index: 9999"><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${paramsData[0]!.color}"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${paramsData[0]!.seriesName}</span></div>`;
@@ -740,14 +741,14 @@ const chartOptions = computed<ECOption>(
       connectNulls: false,
       visualMap: visualMap.value,
       xAxis: {
-        type: copySearchFormData.method === 'PATTERN_MATCH' ? 'time' : 'value',
+        type: copySearchFormData.value.method === 'PATTERN_MATCH' ? 'time' : 'value',
         boundaryGap: false,
         show: !dataEmpty.value,
         splitLine: {
           show: false,
         },
-        min: copySearchFormData.method === 'PATTERN_MATCH' ? 'dataMin' : 0,
-        max: copySearchFormData.method === 'PATTERN_MATCH' ? 'dataMax' : xMax.value,
+        min: copySearchFormData.value.method === 'PATTERN_MATCH' ? 'dataMin' : 0,
+        max: copySearchFormData.value.method === 'PATTERN_MATCH' ? 'dataMax' : xMax.value,
       },
       yAxis: {
         type: 'value',
@@ -853,7 +854,7 @@ function handleDWTTab(val: 'type' | 'number') {
 
 function getCount() {
   const start = searchFormData.datetimerange.length === 2 ? dayjs(searchFormData.datetimerange[0]).valueOf() : undefined;
-  const end = copySearchFormData.datetimerange.length === 2 ? dayjs(searchFormData.datetimerange[1]).valueOf() : undefined;
+  const end = copySearchFormData.value.datetimerange.length === 2 ? dayjs(searchFormData.datetimerange[1]).valueOf() : undefined;
   getDataCount({
     measurement: searchFormData.measurement,
     startTime: start!,
@@ -930,7 +931,7 @@ const setOption = (option: ECOption, noMerge: boolean = false) => {
       if (params.topTarget && params.topTarget.type !== 'Line') return;
       if (currentPoint && chartData.timestamps[currentPoint]) {
         const point = [chartData.timestamps[currentPoint], chartData.values[currentPoint]];
-        const param = { componentType: 'series', seriesName: copySearchFormData.measurement, value: point };
+        const param = { componentType: 'series', seriesName: copySearchFormData.value.measurement, value: point };
 
         handleClickChart(param as echarts.ECElementEvent);
       }
@@ -1291,7 +1292,7 @@ function handleReset() {
   dataCount.value = undefined;
   sqlValue.value = '';
   searchFormData.datetimerange = [];
-  copySearchFormData = cloneDeep(searchFormData);
+  copySearchFormData.value = cloneDeep(searchFormData);
   chartData.timestamps = [];
   chartData.values = [];
   handleEmptyOperate();
@@ -1299,12 +1300,12 @@ function handleReset() {
 }
 
 function getFFT() {
-  const start = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[0]).valueOf() : undefined;
-  const end = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[1]).valueOf() : undefined;
+  const start = copySearchFormData.value.datetimerange.length === 2 ? dayjs(copySearchFormData.value.datetimerange[0]).valueOf() : undefined;
+  const end = copySearchFormData.value.datetimerange.length === 2 ? dayjs(copySearchFormData.value.datetimerange[1]).valueOf() : undefined;
   getFFTData({
-    resultType: copySearchFormData.resultType,
-    compression: copySearchFormData.compression!,
-    measurement: copySearchFormData.measurement,
+    resultType: copySearchFormData.value.resultType,
+    compression: copySearchFormData.value.compression!,
+    measurement: copySearchFormData.value.measurement,
     startTime: start,
     endTime: end,
   })
@@ -1324,12 +1325,12 @@ function getFFT() {
 }
 
 function getEnvelope() {
-  const start = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[0]).valueOf() : undefined;
-  const end = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[1]).valueOf() : undefined;
+  const start = copySearchFormData.value.datetimerange.length === 2 ? dayjs(copySearchFormData.value.datetimerange[0]).valueOf() : undefined;
+  const end = copySearchFormData.value.datetimerange.length === 2 ? dayjs(copySearchFormData.value.datetimerange[1]).valueOf() : undefined;
   getEnvelopeDemodulationData({
-    frequency: copySearchFormData.frequency || '',
-    amplification: copySearchFormData.amplification || '',
-    measurement: copySearchFormData.measurement,
+    frequency: copySearchFormData.value.frequency || '',
+    amplification: copySearchFormData.value.amplification || '',
+    measurement: copySearchFormData.value.measurement,
     startTime: start!,
     endTime: end!,
   })
@@ -1349,17 +1350,17 @@ function getEnvelope() {
 }
 
 function getDwt() {
-  const start = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[0]).valueOf() : undefined;
-  const end = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[1]).valueOf() : undefined;
-  if (!copySearchFormData.layer) {
+  const start = copySearchFormData.value.datetimerange.length === 2 ? dayjs(copySearchFormData.value.datetimerange[0]).valueOf() : undefined;
+  const end = copySearchFormData.value.datetimerange.length === 2 ? dayjs(copySearchFormData.value.datetimerange[1]).valueOf() : undefined;
+  if (!copySearchFormData.value.layer) {
     searchFormData.layer = 1;
-    copySearchFormData.layer = 1;
+    copySearchFormData.value.layer = 1;
   }
   getDWTData({
-    method: dwtTab.value === 'type' ? copySearchFormData.dwtMethod : '',
-    coef: dwtTab.value === 'number' ? copySearchFormData.coef! : '',
-    layer: copySearchFormData.layer || '',
-    measurement: copySearchFormData.measurement,
+    method: dwtTab.value === 'type' ? copySearchFormData.value.dwtMethod : '',
+    coef: dwtTab.value === 'number' ? copySearchFormData.value.coef! : '',
+    layer: copySearchFormData.value.layer || '',
+    measurement: copySearchFormData.value.measurement,
     startTime: start!,
     endTime: end!,
   })
@@ -1379,12 +1380,12 @@ function getDwt() {
 }
 
 function getPass() {
-  const start = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[0]).valueOf() : undefined;
-  const end = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[1]).valueOf() : undefined;
+  const start = copySearchFormData.value.datetimerange.length === 2 ? dayjs(copySearchFormData.value.datetimerange[0]).valueOf() : undefined;
+  const end = copySearchFormData.value.datetimerange.length === 2 ? dayjs(copySearchFormData.value.datetimerange[1]).valueOf() : undefined;
   getPassData({
-    udf: copySearchFormData.method === 'LOWPASS' ? 'low' : 'high',
-    wpass: copySearchFormData.wpass || '',
-    measurement: copySearchFormData.measurement,
+    udf: copySearchFormData.value.method === 'LOWPASS' ? 'low' : 'high',
+    wpass: copySearchFormData.value.wpass || '',
+    measurement: copySearchFormData.value.measurement,
     startTime: start!,
     endTime: end!,
   })
@@ -1421,20 +1422,22 @@ function getCustom() {
 }
 
 function getPatternMatch() {
-  const start = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[0]).valueOf() : undefined;
-  const end = copySearchFormData.datetimerange.length === 2 ? dayjs(copySearchFormData.datetimerange[1]).valueOf() : undefined;
+  const start = copySearchFormData.value.datetimerange.length === 2 ? dayjs(copySearchFormData.value.datetimerange[0]).valueOf() : undefined;
+  const end = copySearchFormData.value.datetimerange.length === 2 ? dayjs(copySearchFormData.value.datetimerange[1]).valueOf() : undefined;
   chartDialogVisible.value = false;
   getPatternMatchData({
     udf: 'pattern_match',
-    patternSeries: copySearchFormData.measurement,
+    patternSeries: copySearchFormData.value.measurement,
     patternStartTime: start!,
     patternEndTime: end!,
-    threshold: 100 - Number(copySearchFormData.distance),
-    times: copySearchFormData.partModel === 'fileUpload' ? copySearchFormData.times : undefined,
-    values: copySearchFormData.partModel === 'fileUpload' ? copySearchFormData.values : undefined,
-    partSeries: copySearchFormData.partModel === 'existing' ? copySearchFormData.partSeries : undefined,
-    partStartTime: copySearchFormData.partModel === 'existing' && copySearchFormData.partDatetimerange.length === 2 ? dayjs(copySearchFormData.partDatetimerange[0]).valueOf() : undefined,
-    partEndTime: copySearchFormData.partModel === 'existing' && copySearchFormData.partDatetimerange.length === 2 ? dayjs(copySearchFormData.partDatetimerange[1]).valueOf() : undefined,
+    threshold: 100 - Number(copySearchFormData.value.distance),
+    times: copySearchFormData.value.partModel === 'fileUpload' ? copySearchFormData.value.times : undefined,
+    values: copySearchFormData.value.partModel === 'fileUpload' ? copySearchFormData.value.values : undefined,
+    partSeries: copySearchFormData.value.partModel === 'existing' ? copySearchFormData.value.partSeries : undefined,
+    partStartTime:
+      copySearchFormData.value.partModel === 'existing' && copySearchFormData.value.partDatetimerange.length === 2 ? dayjs(copySearchFormData.value.partDatetimerange[0]).valueOf() : undefined,
+    partEndTime:
+      copySearchFormData.value.partModel === 'existing' && copySearchFormData.value.partDatetimerange.length === 2 ? dayjs(copySearchFormData.value.partDatetimerange[1]).valueOf() : undefined,
   })
     .then((res) => {
       partTimestamps.value = res.data.partTimestamps || [];
@@ -1464,19 +1467,19 @@ function getPatternMatch() {
 // 查询
 function handleSearch(unforce?: boolean) {
   if (!canReadWriteData.value) return;
-  copySearchFormData = cloneDeep(searchFormData);
+  copySearchFormData.value = cloneDeep(searchFormData);
   if (!unforce) {
     handleEmptyOperate();
   }
-  if (!copySearchFormData.method) {
+  if (!copySearchFormData.value.method) {
     ElMessage.warning({
       message: t('spectrum.applyTip'),
       grouping: true,
     });
     return;
   }
-  if (copySearchFormData.method === 'ENVELOPE') {
-    if (!copySearchFormData.measurement) {
+  if (copySearchFormData.value.method === 'ENVELOPE') {
+    if (!copySearchFormData.value.measurement) {
       ElMessage.warning({
         message: t('spectrum.applyTip'),
         grouping: true,
@@ -1484,8 +1487,8 @@ function handleSearch(unforce?: boolean) {
       return;
     }
     getEnvelope();
-  } else if (copySearchFormData.method === 'DWT') {
-    if ((dwtTab.value === 'type' && !copySearchFormData.dwtMethod) || (dwtTab.value === 'number' && !copySearchFormData.coef)) {
+  } else if (copySearchFormData.value.method === 'DWT') {
+    if ((dwtTab.value === 'type' && !copySearchFormData.value.dwtMethod) || (dwtTab.value === 'number' && !copySearchFormData.value.coef)) {
       ElMessage.warning({
         message: t('spectrum.applyTip'),
         grouping: true,
@@ -1493,8 +1496,8 @@ function handleSearch(unforce?: boolean) {
       return;
     }
     getDwt();
-  } else if (['LOWPASS', 'HIGHPASS']!.includes(copySearchFormData.method)) {
-    if (!copySearchFormData.wpass) {
+  } else if (['LOWPASS', 'HIGHPASS']!.includes(copySearchFormData.value.method)) {
+    if (!copySearchFormData.value.wpass) {
       ElMessage.warning({
         message: t('spectrum.applyTip'),
         grouping: true,
@@ -1502,7 +1505,7 @@ function handleSearch(unforce?: boolean) {
       return;
     }
     getPass();
-  } else if (copySearchFormData.method === 'custom') {
+  } else if (copySearchFormData.value.method === 'custom') {
     if (!sqlValue.value) {
       ElMessage.warning({
         message: t('spectrum.applyTip'),
@@ -1511,12 +1514,12 @@ function handleSearch(unforce?: boolean) {
       return;
     }
     getCustom();
-  } else if (copySearchFormData.method === 'PATTERN_MATCH') {
+  } else if (copySearchFormData.value.method === 'PATTERN_MATCH') {
     if (
-      (!copySearchFormData.distance && copySearchFormData.distance !== 0) ||
-      !copySearchFormData.measurement ||
-      (copySearchFormData.partModel === 'fileUpload' && !copySearchFormData.values.length) ||
-      (copySearchFormData.partModel === 'existing' && !copySearchFormData.partSeries)
+      (!copySearchFormData.value.distance && copySearchFormData.value.distance !== 0) ||
+      !copySearchFormData.value.measurement ||
+      (copySearchFormData.value.partModel === 'fileUpload' && !copySearchFormData.value.values.length) ||
+      (copySearchFormData.value.partModel === 'existing' && !copySearchFormData.value.partSeries)
     ) {
       ElMessage.warning({
         message: t('spectrum.applyTip'),
@@ -1526,7 +1529,7 @@ function handleSearch(unforce?: boolean) {
     }
     getPatternMatch();
   } else {
-    if (!copySearchFormData.measurement) {
+    if (!copySearchFormData.value.measurement) {
       ElMessage.warning({
         message: t('spectrum.applyTip'),
         grouping: true,
@@ -1656,7 +1659,7 @@ function handleSaveMatch(times: MatchItem[]) {
       saveValues.push(value);
     }
   }
-  getExportMatchDataFile(saveTimes, saveValues, copySearchFormData.measurement, copySearchFormData.measurementType).then((resp) => {
+  getExportMatchDataFile(saveTimes, saveValues, copySearchFormData.value.measurement, copySearchFormData.value.measurementType).then((resp) => {
     const url = `/api/file/download/${resp.data}`;
     window.open(url);
   });

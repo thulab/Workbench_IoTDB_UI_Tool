@@ -656,6 +656,7 @@ const chartOptions = computed<ECOption>(
       tooltip: {
         trigger: 'axis',
         // appendToBody: true,
+        backgroundColor: '#fff',
         formatter: (params: Array<Record<string, any>>) => {
           const paramsData = params;
           const x = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;"></span><span style="font-size:14px;color:#666;font-weight:400;">${formatDate(paramsData[0]!.value[0])}</span></div>`;
