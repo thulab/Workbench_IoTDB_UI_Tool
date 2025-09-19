@@ -27,7 +27,7 @@ const route = [
       icon: ICustomSystemConfig,
       activeIcon: ICustomSystemConfigActive,
       order: 40,
-      sqlDialect: 'all',
+      // sqlDialect: 'all',
     },
     children: [
       {
@@ -38,7 +38,7 @@ const route = [
           hideLine: true,
           icon: ICustomAuth,
           isAuthMenu: true,
-          sqlDialect: 'all',
+          // sqlDialect: 'all',
         },
         children: [
           {
