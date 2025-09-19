@@ -285,7 +285,7 @@ const canAdd = computed(() => {
   return (
     formData.selectedDatabase &&
     formData.selectedTable &&
-    selectedDevices.value.length > 0 &&
+    (selectedDevices.value.length > 0 || availableTags.value.length === 0) &&
     formData.selectedMeasurement &&
     formData.selectedMeasurement.length > 0 &&
     internalSelectedMeasurements.value.length < props.selectedLimit
@@ -439,7 +439,7 @@ const handleDeviceSelection = (devices: Record<string, string>[]) => {
 };
 
 const canAddMeasurements = computed(() => {
-  const currentSelectedLength = selectedDevices.value.length * formData.selectedMeasurement.length;
+  const currentSelectedLength = (availableTags.value.length === 0 ? 1 : selectedDevices.value.length) * formData.selectedMeasurement.length;
   return internalSelectedMeasurements.value.length + currentSelectedLength <= props.selectedLimit;
 });
 
@@ -452,6 +452,10 @@ const addMeasurements = async () => {
 
   //   }
   // });
+  if (selectedDevices.value.length === 0 && availableTags.value.length === 0) {
+    // 无标签，无设备，添加所有设备
+    selectedDevices.value.push({});
+  }
 
   selectedDevices.value.forEach((device) => {
     const condition = Object.keys(device)
