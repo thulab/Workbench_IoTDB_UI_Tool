@@ -244,6 +244,6 @@ export const tableFunctionTreeData = [
 ];
 
 // 表模型全局权限
-export const relationalAllScopePrivilegesEnum = ['MANAGE_USER', 'MANAGE_ROLE'];
+export const relationalAllScopePrivilegesEnum = ['SECURITY'];
 // 表模型路径权限
 export const relationalDataScopePrivilegesEnum = ['CREATE', 'DROP', 'ALTER', 'SELECT', 'INSERT', 'DELETE'];

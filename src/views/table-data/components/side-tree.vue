@@ -1,5 +1,5 @@
 <template>
-  <auth-container :is-auth="canReadWriteData" :content="'common.dataAuth'" style="height: 100%">
+  <auth-container :is-auth="true" :content="'common.dataAuth'" style="height: 100%">
     <div class="db-tree-wrapper">
       <div class="search-refresh-box">
         <el-input
@@ -128,7 +128,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { useUserStore, useDbStore } from '@/stores';
+import { useDbStore } from '@/stores';
 import { IoTDBApi } from '@/api';
 import type { ElTreeV2 } from 'element-plus';
 import { cloneDeep } from 'lodash-es';
@@ -144,7 +144,6 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 const schemaTree = ref<InstanceType<typeof ElTreeV2>>();
-const userStore = useUserStore();
 const searchText = ref('');
 const searching = ref(false);
 const currentNode = ref<TableTreeNodeData>();
@@ -155,7 +154,6 @@ const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
 const { requestFn: deleteDatabase } = useRequest(IoTDBApi.deleteDatabase);
 const { requestFn: deleteTables } = useRequest(IoTDBApi.deleteTables);
 
-const { canReadWriteData } = storeToRefs(userStore);
 const { treeData, activeKeyList } = storeToRefs(useDbStore());
 const { getDatabases, setFirstLoad, setActiveList } = useDbStore();
 

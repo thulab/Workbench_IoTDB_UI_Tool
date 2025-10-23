@@ -513,8 +513,8 @@ dashboard:
   monitorInfo: 监控信息
   masterCluster: 主集群
   slaveCluster: 备集群
-  unconfigPrometheus: 未配置Prometheus，请配置后查看
-  configPrometheusError: Prometheus配置有误，请修改后查看
+  unconfigPrometheus: 未配置监控，请配置后查看
+  configPrometheusError: 监控配置有误，请修改后查看
   cpuNum: CPU 核数
   cpuLoad: CPU 负载
   diskMemory: 磁盘空间

@@ -108,7 +108,7 @@ export const useUserStore = defineStore(
       return result;
     });
 
-    const canManageDatabase = computed(() => userAllEntityPrivileges.value.includes('MANAGE_DATABASE'));
+    const canManageDatabase = computed(() => userAllEntityPrivileges.value.includes('MANAGE_DATABASE') || userAllEntityPrivileges.value.includes('SYSTEM'));
     const canWriteSchema = computed(() => userAllEntityPrivileges.value.includes('WRITE_SCHEMA'));
     const canWriteData = computed(() => userAllEntityPrivileges.value.includes('WRITE_DATA'));
     const canReadWriteSchema = computed(() => userAllPrivileges.value.includes('READ_SCHEMA') || userAllPrivileges.value.includes('WRITE_SCHEMA'));
@@ -120,14 +120,14 @@ export const useUserStore = defineStore(
         userAllPrivileges.value.includes('READ_DATA') ||
         userAllPrivileges.value.includes('WRITE_DATA'),
     );
-    const canUsePipe = computed(() => userAllEntityPrivileges.value.includes('USE_PIPE'));
-    const canManageUser = computed(() => userAllEntityPrivileges.value.includes('MANAGE_USER'));
-    const canManageRole = computed(() => userAllEntityPrivileges.value.includes('MANAGE_ROLE'));
-    const canMaintain = computed(() => userAllEntityPrivileges.value.includes('MAINTAIN'));
-    const canUseModel = computed(() => userAllEntityPrivileges.value.includes('USE_MODEL'));
+    const canUsePipe = computed(() => userAllEntityPrivileges.value.includes('USE_PIPE') || userAllEntityPrivileges.value.includes('SYSTEM'));
+    const canManageUser = computed(() => userAllEntityPrivileges.value.includes('MANAGE_USER') || userAllEntityPrivileges.value.includes('SECURITY'));
+    const canManageRole = computed(() => userAllEntityPrivileges.value.includes('MANAGE_ROLE') || userAllEntityPrivileges.value.includes('SECURITY'));
+    const canMaintain = computed(() => userAllEntityPrivileges.value.includes('SYSTEM'));
+    const canUseModel = computed(() => userAllEntityPrivileges.value.includes('USE_MODEL') || userAllEntityPrivileges.value.includes('SYSTEM'));
 
-    const canManageUserWithTableModel = computed(() => allPrivileges.value?.tableGlobalPrivileges.some((item) => item.privilegeName === 'MANAGE_USER') || false);
-    const canManageRoleWithTableModel = computed(() => allPrivileges.value?.tableGlobalPrivileges.some((item) => item.privilegeName === 'MANAGE_ROLE') || false);
+    const canManageUserWithTableModel = computed(() => allPrivileges.value?.tableGlobalPrivileges.some((item) => item.privilegeName === 'MANAGE_USER' || item.privilegeName === 'SECURITY') || false);
+    const canManageRoleWithTableModel = computed(() => allPrivileges.value?.tableGlobalPrivileges.some((item) => item.privilegeName === 'MANAGE_ROLE' || item.privilegeName === 'SECURITY') || false);
 
     function clearUserStore() {
       userInfo.value.name = '';
