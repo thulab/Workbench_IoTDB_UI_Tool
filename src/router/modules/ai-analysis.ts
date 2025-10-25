@@ -13,20 +13,20 @@ const route = [
       activeIcon: ICustomAIAnalysis,
       order: 25,
       needVersion: '1.3.0',
-      sqlDialect: 'all',
+      sqlDialect: 'table',
     },
     children: [
       {
         path: 'visualization',
         name: 'Visualization',
         component: () => import('@/views/ai-analysis/the-visualization.vue'),
-        meta: { keepAlive: true, title: 'aiAnalysis.visualization', icon: ICustomAIAnalysis, sqlDialect: 'all' },
+        meta: { keepAlive: true, title: 'aiAnalysis.visualization', icon: ICustomAIAnalysis, sqlDialect: 'table' },
       },
       {
         path: 'model-management',
         name: 'ModelManagement',
         component: () => import('@/views/ai-analysis/model-management.vue'),
-        meta: { keepAlive: true, title: 'aiAnalysis.modelManagement', icon: ICustomModelManagement, sqlDialect: 'all' },
+        meta: { keepAlive: true, title: 'aiAnalysis.modelManagement', icon: ICustomModelManagement, sqlDialect: 'table' },
       },
     ],
   },

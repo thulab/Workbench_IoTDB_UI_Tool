@@ -123,7 +123,7 @@ export const useUserStore = defineStore(
     const canUsePipe = computed(() => userAllEntityPrivileges.value.includes('USE_PIPE') || userAllEntityPrivileges.value.includes('SYSTEM'));
     const canManageUser = computed(() => userAllEntityPrivileges.value.includes('MANAGE_USER') || userAllEntityPrivileges.value.includes('SECURITY'));
     const canManageRole = computed(() => userAllEntityPrivileges.value.includes('MANAGE_ROLE') || userAllEntityPrivileges.value.includes('SECURITY'));
-    const canMaintain = computed(() => userAllEntityPrivileges.value.includes('SYSTEM'));
+    const canMaintain = computed(() => userAllEntityPrivileges.value.includes('MAINTAIN') || userAllEntityPrivileges.value.includes('SYSTEM'));
     const canUseModel = computed(() => userAllEntityPrivileges.value.includes('USE_MODEL') || userAllEntityPrivileges.value.includes('SYSTEM'));
 
     const canManageUserWithTableModel = computed(() => allPrivileges.value?.tableGlobalPrivileges.some((item) => item.privilegeName === 'MANAGE_USER' || item.privilegeName === 'SECURITY') || false);
