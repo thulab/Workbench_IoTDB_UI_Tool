@@ -2,15 +2,15 @@ import { Layout } from '@/router/constant-routes';
 // 采用raw加载svg文件，v-html渲染
 import ICustomSystemConfig from '@/assets/icons/system-config.svg?raw';
 import ICustomSystemConfigActive from '@/assets/icons/system-config-active.svg?raw';
-// import ICustomAuth from '@/assets/icons/auth.svg?raw';
-// import ICustomAuthUser from '@/assets/icons/auth-user.svg?raw';
+import ICustomAuth from '@/assets/icons/auth.svg?raw';
+import ICustomAuthUser from '@/assets/icons/auth-user.svg?raw';
 import ICustomTrend from '@/assets/icons/trend.svg?raw';
 // import ICustomTrendActive from '@/assets/icons/trend-active.svg?raw';
 import ICustomCalculate from '@/assets/icons/calculate.svg?raw';
 import ICustomCalculateActive from '@/assets/icons/calculate-active.svg?raw';
-// import ICustomAuthRole from '@/assets/icons/auth-role.svg?raw';
+import ICustomAuthRole from '@/assets/icons/auth-role.svg?raw';
 // import ICustomLogManagement from '@/assets/icons/log-management.svg?raw';
-// import ICustomAuditLog from '@/assets/icons/audit-log.svg?raw';
+import ICustomAuditLog from '@/assets/icons/audit-log.svg?raw';
 import ICustomIotdbConfig from '@/assets/icons/iotdb-config.svg?raw';
 // import ICustomWhiteList from '@/assets/icons/white-list.svg?raw';
 import ICustomVisualization from '@/assets/icons/visualization.svg?raw';
@@ -27,68 +27,68 @@ const route = [
       icon: ICustomSystemConfig,
       activeIcon: ICustomSystemConfigActive,
       order: 40,
-      // sqlDialect: 'all',
+      sqlDialect: 'all',
     },
     children: [
-      // {
-      //   path: 'auth',
-      //   redirect: { name: 'UserManagement' },
-      //   meta: {
-      //     title: 'page.auth',
-      //     hideLine: true,
-      //     icon: ICustomAuth,
-      //     isAuthMenu: true,
-      //     // sqlDialect: 'all',
-      //   },
-      //   children: [
-      //     {
-      //       path: 'user',
-      //       name: 'UserManagement',
-      //       component: () => import('@/views/auth/user-detail.vue'),
-      //       meta: {
-      //         keepAlive: true,
-      //         title: 'page.user',
-      //         icon: ICustomAuthUser,
-      //         isAuthMenu: true,
-      //       },
-      //     },
-      //     {
-      //       path: 'table-user',
-      //       name: 'TableUserManagement',
-      //       component: () => import('@/views/auth/table-user-detail.vue'),
-      //       meta: {
-      //         sqlDialect: 'table',
-      //         keepAlive: true,
-      //         title: 'page.user',
-      //         icon: ICustomAuthUser,
-      //         isAuthMenu: true,
-      //       },
-      //     },
-      //     {
-      //       path: 'role',
-      //       name: 'RoleManagement',
-      //       component: () => import('@/views/auth/role-detail.vue'),
-      //       meta: {
-      //         keepAlive: true,
-      //         title: 'page.role',
-      //         icon: ICustomAuthRole,
-      //         isAuthMenu: true,
-      //       },
-      //     },
-      //     {
-      //       path: 'table-role',
-      //       name: 'TableRoleManagement',
-      //       component: () => import('@/views/auth/table-role-detail.vue'),
-      //       meta: {
-      //         sqlDialect: 'table',
-      //         keepAlive: true,
-      //         title: 'page.role',
-      //         icon: ICustomAuthRole,
-      //         isAuthMenu: true,
-      //       },
-      //     },
-      //   ],
-      // },
+      {
+        path: 'auth',
+        redirect: { name: 'UserManagement' },
+        meta: {
+          title: 'page.auth',
+          hideLine: true,
+          icon: ICustomAuth,
+          isAuthMenu: true,
+          sqlDialect: 'all',
+        },
+        children: [
+          {
+            path: 'user',
+            name: 'UserManagement',
+            component: () => import('@/views/auth/user-detail.vue'),
+            meta: {
+              keepAlive: true,
+              title: 'page.user',
+              icon: ICustomAuthUser,
+              isAuthMenu: true,
+            },
+          },
+          {
+            path: 'table-user',
+            name: 'TableUserManagement',
+            component: () => import('@/views/auth/table-user-detail.vue'),
+            meta: {
+              sqlDialect: 'table',
+              keepAlive: true,
+              title: 'page.user',
+              icon: ICustomAuthUser,
+              isAuthMenu: true,
+            },
+          },
+          {
+            path: 'role',
+            name: 'RoleManagement',
+            component: () => import('@/views/auth/role-detail.vue'),
+            meta: {
+              keepAlive: true,
+              title: 'page.role',
+              icon: ICustomAuthRole,
+              isAuthMenu: true,
+            },
+          },
+          {
+            path: 'table-role',
+            name: 'TableRoleManagement',
+            component: () => import('@/views/auth/table-role-detail.vue'),
+            meta: {
+              sqlDialect: 'table',
+              keepAlive: true,
+              title: 'page.role',
+              icon: ICustomAuthRole,
+              isAuthMenu: true,
+            },
+          },
+        ],
+      },
       // {
       //   path: 'log',
       //   redirect: { name: 'AuditLog' },
@@ -107,16 +107,16 @@ const route = [
       //     },
       //   ],
       // },
-      // {
-      //   path: 'audit',
-      //   name: 'AuditLog',
-      //   component: () => import('@/views/log-management/the-audit.vue'),
-      //   meta: {
-      //     keepAlive: true,
-      //     title: 'page.auditLog',
-      //     icon: ICustomAuditLog,
-      //   },
-      // },
+      {
+        path: 'audit',
+        name: 'AuditLog',
+        component: () => import('@/views/log-management/the-audit.vue'),
+        meta: {
+          keepAlive: true,
+          title: 'page.auditLog',
+          icon: ICustomAuditLog,
+        },
+      },
       {
         path: 'config',
         name: 'IoTDBConfig',
