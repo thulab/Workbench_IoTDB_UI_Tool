@@ -56,6 +56,12 @@ export interface IoTDBUserAo {
  */
 export interface IoTDBUserVo {
   /**
+   * 用户ID
+   * @type {number}
+   * @memberof IoTDBUserVo
+   */
+  userId?: number;
+  /**
    * 用户名
    * @type {string}
    * @memberof IoTDBUserVo

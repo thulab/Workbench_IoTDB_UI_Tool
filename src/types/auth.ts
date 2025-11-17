@@ -1,5 +1,6 @@
 import type { SinglePrivilegeVo } from './relational-privileges';
 export interface DBUser {
+  userId: number;
   name: string;
   password: string;
   isManager: 0 | 1;

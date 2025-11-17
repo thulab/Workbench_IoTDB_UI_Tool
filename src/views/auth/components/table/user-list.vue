@@ -18,7 +18,7 @@
           <i-custom-user-manager v-if="item.isManager" />
           <i-custom-user-normal v-else />
         </el-icon>
-        <text-tooltip :content="item.name!" />
+        <text-tooltip :content="t(item.name + (item.userId != null ? ` (${item.userId})` : ''))" />
       </span>
       <auth-tooltip :is-disabled="canManageUser || userName === item.name" :content="'common.userAuth'">
         <div class="item-edit-box" :style="{ cursor: !(canManageUser || userName === item.name) ? 'not-allowed' : 'pointer' }" :id="`auth-user-${i}-edit`" @click="handleEdit(item.name!)">
