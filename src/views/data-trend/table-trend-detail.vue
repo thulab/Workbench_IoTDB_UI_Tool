@@ -671,8 +671,6 @@ const onResize = debounce(() => {
 const buildParams = (operate: string, measurements: SelectedMeasurement[]) => {
   return JSON.stringify({
     operate,
-    database: copySearchFormData.database || searchFormData.database,
-    tableName: copySearchFormData.table || searchFormData.table,
     fields: measurements.map((item) => ({ value: item.condition, variable: item.measurement, path: formatSelectedMeasurement(item), database: item.database, tableName: item.tableName })),
   });
 };
