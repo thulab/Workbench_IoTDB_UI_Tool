@@ -87,6 +87,7 @@ common:
   importFormat: Import Format
   downloadTemplate: Download Template
   clickUpload: Click to Upload
+  clickUploadTS: Trust Store
   clickReupload: Click to Re-upload
   uploading: Uploading File
   importSuccessTip: Import successful! A total of {total} data
@@ -776,6 +777,8 @@ login:
   userNameTip: Username cannot be empty
   userNameLengthTip: Username must be at least 4 characters
   pwdTip: Password cannot be empty
+  trustStorePwdTip: Trust store password cannot be empty
+  trustStoreTip: Trust store must be uploaded
   pwdLengthTip: Password must be at least 4 characters
   captchaEmptyTip: Verification code cannot be empty
   captchaErrorTip: Incorrect verification code
@@ -808,6 +811,12 @@ alarmEnum:
   level4: Level 4
   level5: Level 5
 connection:
+  useSsl: SSL
+  enableSsl: Enable
+  disableSsl: Disable
+  trustStore: Trust Store
+  trustStorePassword: Password
+  tspPlaceholder: Trust Store Password
   detail: Instance Details
   type: Connection Type
   name: Instance Name

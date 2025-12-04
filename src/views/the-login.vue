@@ -62,6 +62,28 @@
               </template> -->
             </el-input>
           </el-form-item>
+          <el-row v-if="loginForm.useSsl">
+            <el-col :span="12">
+              <el-form-item prop="file">
+                <el-upload
+                  :limit="1"
+                  :auto-upload="false"
+                  :show-file-list="true"
+                  class="m-l-[0] m-r-[8px] el-input el-input__wrapper"
+                  :on-change="handleUploadChange"
+                  :on-remove="handleUploadRemove"
+                  :http-request="customUpload"
+                >
+                  <div>{{ uploadFileInfo ? '' : t('common.clickUploadTS') }}</div>
+                </el-upload>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item prop="trustStorePassword">
+                <el-input v-model="loginForm.trustStorePassword" :placeholder="t('connection.tspPlaceholder')" show-password autocomplete="off" />
+              </el-form-item>
+            </el-col>
+          </el-row>
           <el-form-item prop="model">
             <el-radio-group v-model="loginForm.model" @change="(val) => handleChangeDefaultModel(val as 'tree' | 'table')" id="connection-modal-type">
               <el-radio value="tree" id="connection-modal-type-0">{{ t('connection.treeModel') }}</el-radio>
@@ -95,7 +117,7 @@
 
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
-import type { FormInstance, FormRules, FormItemRule } from 'element-plus';
+import type { FormInstance, FormRules, FormItemRule, UploadProps } from 'element-plus';
 import { UserApi, ConnectionApi } from '@/api';
 import { useUserStore } from '@/stores';
 import useAppStore from '@/stores/app';
@@ -115,12 +137,16 @@ const loginForm = reactive<{
   user: string;
   password: string;
   model: 'tree' | 'table';
+  useSsl: boolean;
+  trustStorePassword: string;
   captcha: string;
 }>({
   connection: '',
   user: '',
   password: '',
   model: 'tree',
+  useSsl: false,
+  trustStorePassword: '',
   captcha: '',
 });
 const pwdType = ref('password');
@@ -142,6 +168,17 @@ const { requestFn: logout } = useRequest(UserApi.logout);
 const { requestFn: loginCaptcha } = useRequest(UserApi.loginCaptcha);
 const { requestFn: getConnectionList } = useRequest(ConnectionApi.getConnectionList);
 const { requestFn: getConnectionDetail } = useRequest(ConnectionApi.getConnectionDetail);
+
+const uploadFileInfo = ref<File>();
+const handleUploadChange: UploadProps['onChange'] = (uploadFile) => {
+  uploadFileInfo.value = uploadFile.raw;
+};
+const handleUploadRemove: UploadProps['onRemove'] = () => {
+  uploadFileInfo.value = undefined;
+};
+const customUpload: UploadProps['httpRequest'] = () => {
+  return new Promise(() => {});
+};
 
 const validateuser: FormItemRule['validator'] = (rule, value, callback) => {
   if (value === '') {
@@ -173,6 +210,20 @@ const validateCaptcha = (rule: any, value: string, callback: any) => {
   return callback();
 };
 
+const validateTSpassword: FormItemRule['validator'] = (rule, value, callback) => {
+  if (value === '') {
+    return callback(new Error(t('login.trustStorePwdTip')));
+  }
+  return callback();
+};
+
+const validateTSFile: FormItemRule['validator'] = (rule, value, callback) => {
+  if (!uploadFileInfo.value) {
+    return callback(new Error(t('login.trustStoreTip')));
+  }
+  return callback();
+};
+
 const rules = reactive<FormRules>({
   connection: [
     {
@@ -199,6 +250,20 @@ const rules = reactive<FormRules>({
     {
       required: true,
       validator: validateCaptcha,
+      trigger: 'blur',
+    },
+  ],
+  trustStorePassword: [
+    {
+      required: true,
+      validator: validateTSpassword,
+      trigger: 'blur',
+    },
+  ],
+  file: [
+    {
+      required: true,
+      validator: validateTSFile,
       trigger: 'blur',
     },
   ],
@@ -265,6 +330,7 @@ function getDetail(id: number) {
   getConnectionDetail(id)
     .then((res) => {
       loginForm.model = res.data.model || 'tree';
+      loginForm.useSsl = res.data.useSsl || false;
     })
     .finally(() => {});
 }
@@ -295,7 +361,7 @@ const submitForm = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
       loading.value = true;
-      login(loginForm.user, loginForm.password, +loginForm.connection, loginForm.model)
+      login(loginForm.user, loginForm.password, +loginForm.connection, loginForm.model, loginForm.useSsl, loginForm.trustStorePassword, uploadFileInfo.value)
         .then(async () => {
           await userStore.setUser(loginForm.user);
           if (window.sessionStorage.getItem('iotdbVersion')?.indexOf('1.') === 0) {
@@ -400,7 +466,7 @@ watch(locale, () => {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  margin: 30px 0 40px;
+  margin: 30px 0 20px;
 
   .timecho-logo {
     width: 37px;
@@ -472,7 +538,6 @@ watch(locale, () => {
 
 .login-button {
   width: 100%;
-  margin-top: 24px;
   border-radius: 4px;
   height: 36px !important;
   font-size: 14px !important;

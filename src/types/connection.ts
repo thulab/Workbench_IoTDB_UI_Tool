@@ -22,6 +22,8 @@ export interface ConnectionDetail {
   password?: string;
   masterCluster: ConnectionClusterData;
   slaveCluster?: ConnectionClusterData | null;
+  useSsl?: true | false;
+  trustStorePassword?: string;
 }
 
 export interface PrometheusDetail {

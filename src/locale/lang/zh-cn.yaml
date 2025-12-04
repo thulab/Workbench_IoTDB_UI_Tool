@@ -94,6 +94,7 @@ common:
   downloadTemplate: 模板下载
   clickUpload: 点击上传
   clickReupload: 点击重新上传
+  clickUploadTS: 点击上传证书
   uploading: 文件导入中
   importSuccessTip: 导入成功！共{total}条数据
   importTableSuccessTip: 导入成功！共 {total} 个表
@@ -829,6 +830,8 @@ login:
   userNameTip: 用户名不能为空
   userNameLengthTip: 用户名必须大于等于4位
   pwdTip: 密码不能为空
+  trustStorePwdTip: 证书密码不能为空
+  trustStoreTip: 必须上传证书文件
   pwdLengthTip: 密码必须大于等于4位
   captchaEmptyTip: 验证码不能为空
   captchaErrorTip: 验证码输入错误
@@ -861,6 +864,12 @@ alarmEnum:
   level4: 四级
   level5: 五级
 connection:
+  useSsl: 是否启用 SSL
+  enableSsl: 启用 SSL
+  disableSsl: 关闭 SSL
+  trustStore: 证书
+  trustStorePassword: 密码
+  tspPlaceholder: 请输入证书密码
   detail: 实例详情
   type: 连接类型
   name: 实例名称

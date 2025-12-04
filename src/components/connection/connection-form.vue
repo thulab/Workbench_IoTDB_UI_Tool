@@ -114,6 +114,48 @@
             <el-radio value="table" id="connection-modal-type-1">{{ t('connection.tableModel') }}</el-radio>
           </el-radio-group>
         </base-form-item>
+        <base-form-item :label="`${t('connection.useSsl')}：`" prop="name" class="base-form-box">
+          <el-switch
+            v-model="formData.useSsl"
+            @change="
+              (val) => {
+                if (!val) {
+                  formData.trustStorePassword = '';
+                  uploadFileInfo = undefined;
+                }
+              }
+            "
+            inline-prompt
+            size="default"
+            style="--el-switch-on-color: #495ad4; --el-switch-off-color: #f0f1fa"
+            :style="{ color: formData.useSsl ? '#fff' : '#424561' }"
+            :class="[{ 'switch-off': !formData.useSsl }]"
+            :active-text="t('connection.enableSsl')"
+            :inactive-text="t('connection.disableSsl')"
+          />
+        </base-form-item>
+        <el-row v-if="formData.useSsl" class="p-r-28">
+          <el-col :span="15">
+            <el-form-item class="p-l-[7px] el-input" :label="`${t('connection.trustStore')}：`" label-position="right" prop="file" :error="errorTS">
+              <el-upload
+                :limit="1"
+                :auto-upload="false"
+                :show-file-list="true"
+                class="m-l-[0] m-r-[8px] upload-ts"
+                :on-change="handleUploadChange"
+                :on-remove="handleUploadRemove"
+                :http-request="customUpload"
+              >
+                <div class="el-input__wrapper">{{ t('common.clickUploadTS') }}</div>
+              </el-upload>
+            </el-form-item>
+          </el-col>
+          <el-col :span="9">
+            <base-form-item :label="`${t('connection.trustStorePassword')}：`" label-width="50px" label-position="right" :error="errorTSPwd">
+              <el-input v-model="formData.trustStorePassword" :placeholder="t('connection.tspPlaceholder')" show-password autocomplete="off" class="trust-store-password-input" />
+            </base-form-item>
+          </el-col>
+        </el-row>
       </el-form>
     </el-scrollbar>
     <div class="connection-form-buttons">
@@ -130,7 +172,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormInstance } from 'element-plus';
+import type { FormInstance, UploadProps } from 'element-plus';
 import { cloneDeep, isEqual, assign } from 'lodash-es';
 import { useRoute, useRouter } from 'vue-router';
 import { ConnectionApi } from '@/api';
@@ -168,6 +210,16 @@ const requiredRules = ref([
     trigger: 'blur',
   },
 ]);
+const uploadFileInfo = ref<File>();
+const handleUploadChange: UploadProps['onChange'] = (uploadFile) => {
+  uploadFileInfo.value = uploadFile.raw;
+};
+const handleUploadRemove: UploadProps['onRemove'] = () => {
+  uploadFileInfo.value = undefined;
+};
+const customUpload: UploadProps['httpRequest'] = () => {
+  return new Promise(() => {});
+};
 const formData = reactive<ConnectionDetail>({
   id: '',
   type: 0,
@@ -187,9 +239,13 @@ const formData = reactive<ConnectionDetail>({
     prometheusUsername: '',
     prometheusPassword: '',
   },
+  useSsl: false,
+  trustStorePassword: '',
 });
 let sourceData = cloneDeep(formData);
 const errorPwd = ref('');
+const errorTS = ref('');
+const errorTSPwd = ref('');
 const testLoading = ref(false);
 const connectLoading = ref(false);
 const saveLoading = ref(false);
@@ -228,6 +284,8 @@ function handleChangeDefaultModel(model: 'tree' | 'table') {
 function handleChangeType(type: 0 | 1 | 2) {
   formRef.value?.resetFields();
   errorPwd.value = '';
+  errorTS.value = '';
+  errorTSPwd.value = '';
   formData.id = editType.value === 'add' ? '' : formData.id;
   formData.type = type;
   formData.name = '';
@@ -248,6 +306,9 @@ function handleChangeType(type: 0 | 1 | 2) {
           prometheusUsername: '',
           prometheusPassword: '',
         };
+  formData.useSsl = false;
+  formData.trustStorePassword = '';
+  uploadFileInfo.value = undefined;
   handleChangeDefaultModel('tree');
 }
 
@@ -278,6 +339,9 @@ function getDetail(id: number) {
   editType.value = 'edit';
   resetOperateLoading();
   errorPwd.value = '';
+  errorTS.value = '';
+  errorTSPwd.value = '';
+  uploadFileInfo.value = undefined;
   detailLoading.value = true;
   // handleChangeType(0);
   getConnectionDetail(id)
@@ -285,6 +349,8 @@ function getDetail(id: number) {
       assign(formData, res.data);
       formData.model = res.data.model || 'tree';
       formData.password = '';
+      formData.trustStorePassword = '';
+      formData.useSsl = res.data.useSsl;
       sourceData = cloneDeep(formData);
     })
     .finally(() => {
@@ -306,6 +372,9 @@ function handleReset() {
     } else {
       formData.slaveCluster = null;
     }
+    formData.useSsl = sourceData.useSsl;
+    formData.trustStorePassword = '';
+    uploadFileInfo.value = undefined;
   } else {
     handleChangeType(0);
   }
@@ -313,7 +382,11 @@ function handleReset() {
 
 function handleTestConnnection() {
   testLoading.value = true;
-  testConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id })
+  // if (formData.useSsl && !uploadFileInfo.value) {
+  //   testLoading.value = false;
+  //   return;
+  // }
+  testConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id }, uploadFileInfo.value)
     .then(() => {
       let successMsg = t('connection.iotdbSuccess');
       if (formData.type === 2) {
@@ -344,10 +417,21 @@ function handleTestLogin() {
         errorPwd.value = t('connection.pwdEmptyTip');
         return;
       }
+      if (formData.useSsl) {
+        if (!formData.trustStorePassword) {
+          errorTSPwd.value = t('connection.pwdEmptyTip');
+        }
+        if (!uploadFileInfo.value) {
+          errorTS.value = t('login.trustStoreTip');
+        }
+        return;
+      }
       errorPwd.value = '';
+      errorTS.value = '';
+      errorTSPwd.value = '';
 
       connectLoading.value = true;
-      loginByConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id })
+      loginByConnection({ ...formData, id: editType.value === 'add' ? '' : formData.id }, uploadFileInfo.value)
         .then((res) => {
           formData.id = res.data;
           userStore.setUser(formData.username);
@@ -423,6 +507,7 @@ function handleTestPrometheus() {
 }
 
 function handleTest() {
+  let checkValid = true;
   formRef.value?.validate((valid) => {
     if (valid) {
       // 验证当前登陆的Prometheus
@@ -432,11 +517,24 @@ function handleTest() {
       }
       if (!formData.password) {
         errorPwd.value = t('connection.pwdEmptyTip');
-      } else {
-        errorPwd.value = '';
-        // 测试连接
-        handleTestConnnection();
+        checkValid = false;
       }
+      if (formData.useSsl) {
+        if (!formData.trustStorePassword) {
+          errorTSPwd.value = t('connection.pwdEmptyTip');
+          checkValid = false;
+        }
+        if (!uploadFileInfo.value) {
+          errorTS.value = t('login.trustStoreTip');
+          checkValid = false;
+        }
+      }
+      if (!checkValid) return;
+      errorPwd.value = '';
+      errorTS.value = '';
+      errorTSPwd.value = '';
+      // 测试连接
+      handleTestConnnection();
     }
   });
 }
@@ -528,6 +626,14 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
+.trust-store-password-input {
+  padding-right: 8px;
+}
+
+.upload-ts {
+  flex: 1;
+}
+
 .connection-operate-buttons {
   display: flex;
   justify-content: space-between;

@@ -29,7 +29,7 @@ class ConnectionApi {
     if (data.slaveCluster && data.slaveCluster.prometheusPassword) {
       data.slaveCluster.prometheusPassword = encodeAES(data.slaveCluster.prometheusPassword);
     }
-    return http.post('/connection/saveOrUpdateConnection', { ...data, password: '' });
+    return http.post('/connection/saveOrUpdateConnection', { ...data, password: '', trustStorePassword: '' });
   }
 
   // 保存Prometheus
@@ -44,16 +44,28 @@ class ConnectionApi {
   }
 
   // 测试连接实例
-  static testConnection(payload: ConnectionDetail): globalThis.HttpResponseP {
+  static testConnection(payload: ConnectionDetail, file?: File): globalThis.HttpResponseP {
     const data = cloneDeep(payload);
-    data.password = encodeAES(data.password);
+    if (data.password) {
+      data.password = encodeAES(data.password);
+    }
     if (data.masterCluster && data.masterCluster.prometheusPassword) {
       data.masterCluster.prometheusPassword = encodeAES(data.masterCluster.prometheusPassword);
     }
     if (data.slaveCluster && data.slaveCluster.prometheusPassword) {
       data.slaveCluster.prometheusPassword = encodeAES(data.slaveCluster.prometheusPassword);
     }
-    return http.post('/connection/testConnection', data);
+    if (payload.useSsl) {
+      data.trustStorePassword = encodeAES(data.trustStorePassword);
+      const form = new FormData();
+      form.append('connectionInfo', new Blob([JSON.stringify(data)], { type: 'application/json' }));
+      if (file) {
+        form.append('trustStore', file, file.name);
+      }
+      return http.post('/connection/testConnection', form);
+    } else {
+      return http.post('/connection/testConnection', data);
+    }
   }
 
   // 测试Prometheus
@@ -69,16 +81,28 @@ class ConnectionApi {
   }
 
   // 登录保存连接实例
-  static loginByConnection(payload: ConnectionDetail): globalThis.HttpResponseP<number> {
+  static loginByConnection(payload: ConnectionDetail, file?: File): globalThis.HttpResponseP<number> {
     const data = cloneDeep(payload);
-    data.password = encodeAES(data.password);
+    if (data.password) {
+      data.password = encodeAES(data.password);
+    }
     if (data.masterCluster && data.masterCluster.prometheusPassword) {
       data.masterCluster.prometheusPassword = encodeAES(data.masterCluster.prometheusPassword);
     }
     if (data.slaveCluster && data.slaveCluster.prometheusPassword) {
       data.slaveCluster.prometheusPassword = encodeAES(data.slaveCluster.prometheusPassword);
     }
-    return http.post('/loginAndSave', data);
+    if (payload.useSsl) {
+      data.trustStorePassword = encodeAES(data.trustStorePassword);
+      const form = new FormData();
+      form.append('connectionInfo', new Blob([JSON.stringify(data)], { type: 'application/json' }));
+      if (file) {
+        form.append('trustStore', file, file.name);
+      }
+      return http.post('/loginAndSave', form);
+    } else {
+      return http.post('/loginAndSave', data);
+    }
   }
 
   // 更改主备集群
