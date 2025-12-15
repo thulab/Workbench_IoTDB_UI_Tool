@@ -47,6 +47,7 @@ export type Measurement = {
   id: string;
   label: string;
   color: string;
+  details: SelectedMeasurement;
   values: DataPoint[];
 };
 

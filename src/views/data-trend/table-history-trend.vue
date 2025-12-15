@@ -1,7 +1,12 @@
 <template>
   <div class="history-trend-page-container">
     <div class="database-list-wrapper">
-      <TableSideTree namespace="history" />
+      <TableSideTree
+        namespace="history"
+        @updateSelectedMeasurements="(list) => handleSelectedMeasurementsUpdate({ selectedMeasurements: list })"
+        @delete-measurement="handleDeleteMeasurement"
+        @double-click-measurement="createGroup"
+      />
     </div>
     <div class="trend-details-wrapper">
       <TrendGraphArea
@@ -25,6 +30,7 @@ import TrendGraphArea from './components/trend-graph-area.vue';
 import MarkerTableArea from './components/marker-table-area.vue';
 import TimelineArea from './components/timeline-area.vue';
 import type { TimeRange, GroupState, ChartGroupInput, Measurement, ChartMarker } from '@/types/trend';
+import type { SelectedMeasurement } from '@/types';
 
 const globalTimeRange = ref<TimeRange>({
   start: Date.now() - 12 * 3600 * 1000,
@@ -35,13 +41,13 @@ const pendingRange = ref<TimeRange>({ ...globalTimeRange.value });
 const isFetching = ref(false);
 let fetchTimer: ReturnType<typeof setTimeout> | null = null;
 
-const measurementList: Measurement[] = []; // 所有左侧测点
-const measurementMap = new Map(measurementList.map((item) => [item.id, item]));
+const measurementList = ref<Measurement[]>([]); // 所有左侧测点
+const measurementMap = new Map(measurementList.value.map((item) => [item.id, item]));
 const groups = ref<GroupState[]>([]); // 测点的分组信息
 const resolvedGroups = computed<ChartGroupInput[]>(() =>
   groups.value.map((group) => ({
     id: group.id,
-    members: group.measurementIds.map((measurementId) => measurementMap.get(measurementId)).filter(Boolean) as typeof measurementList,
+    members: group.measurementIds.map((measurementId) => measurementMap.get(measurementId)).filter(Boolean) as Measurement[],
   })),
 );
 
@@ -63,6 +69,58 @@ function createInitialMarkers(range: TimeRange = globalTimeRange.value): ChartMa
       timestamp: range.start + span * 0.7,
     },
   ];
+}
+
+function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: SelectedMeasurement[] }) {
+  measurementList.value = payload.selectedMeasurements.map((item) => {
+    let deviceName = '';
+    for (const curTag of item.device ?? []) {
+      deviceName += `${curTag.value}.`;
+    }
+    if (deviceName.endsWith('.')) {
+      deviceName = deviceName.slice(0, -1);
+    }
+
+    // random color
+    const color = `#${Math.floor(Math.random() * 0xffffff)
+      .toString(16)
+      .padStart(6, '0')}`;
+
+    const label = `${item.database}.${item.tableName}.${deviceName}.${item.measurement}`;
+    return {
+      id: label,
+      label,
+      color,
+      details: item,
+      values: [],
+    } as unknown as Measurement;
+  });
+  measurementMap.clear();
+  measurementList.value.forEach((item) => {
+    measurementMap.set(item.id, item);
+  });
+
+  console.log('Updated measurementList:', measurementList.value);
+}
+
+function handleDeleteMeasurement(fullpath: string) {
+  measurementList.value = measurementList.value.filter((item) => {
+    return item.label !== fullpath;
+  });
+  measurementMap.clear();
+  measurementList.value.forEach((item) => {
+    measurementMap.set(item.id, item);
+  });
+
+  console.log('Updated measurementList:', measurementList.value);
+}
+
+function createGroup(fullpath: string) {
+  const groupLen = groups.value.length;
+  groups.value.push({
+    id: `${groupLen + 1}`,
+    measurementIds: [fullpath],
+  });
 }
 
 function updateMarker(payload: { id: string; timestamp: number }) {

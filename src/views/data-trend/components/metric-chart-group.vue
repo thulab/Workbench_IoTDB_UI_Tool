@@ -55,6 +55,12 @@ const emit = defineEmits<{
   'marker-change': [payload: { id: string; timestamp: number }];
 }>();
 
+const fetchedData = computed(() => {
+  const result = props.group.members;
+  // fetch data
+  return result;
+});
+
 const markerHandles = computed(() => {
   const width = getInnerWidth();
   const span = props.range.end - props.range.start || 1;
@@ -159,43 +165,43 @@ function buildOption(): ECOption {
         lineStyle: { color: 'rgba(122, 129, 154, 0.15)' },
       },
     },
-    // series: filteredSeries.value.map((series, index) => ({
-    //   name: series.label,
-    //   type: 'line',
-    //   smooth: true,
-    //   showSymbol: false,
-    //   sampling: 'lttb',
-    //   lineStyle: {
-    //     width: 2,
-    //     color: series.color,
-    //   },
-    //   areaStyle: {
-    //     color: `${series.color}33`,
-    //   },
-    //   data: series.values.map((point) => [point.timestamp, point.value]),
-    //   markLine:
-    //     index === 0
-    //       ? {
-    //         symbol: 'none',
-    //         silent: true,
-    //         label: { color: '#fff', fontSize: 11 },
-    //         data: markerLines.value as unknown as echarts.MarkLineComponentOption['data'],
-    //       }
-    //       : undefined,
-    // })),
-    series: [
-      {
-        type: 'line',
-        name: '示例数据',
-        smooth: true,
-        showSymbol: false,
-        data: [],
-        lineStyle: {
-          width: 2,
-          color: '#5470C6',
-        },
+    series: fetchedData.value.map((series, index) => ({
+      name: series.label,
+      type: 'line',
+      smooth: true,
+      showSymbol: false,
+      sampling: 'lttb',
+      lineStyle: {
+        width: 2,
+        color: series.color,
       },
-    ],
+      areaStyle: {
+        color: `${series.color}33`,
+      },
+      data: series.values.map((point) => [point.timestamp, point.value]),
+      // markLine:
+      //   index === 0
+      //     ? {
+      //       symbol: 'none',
+      //       silent: true,
+      //       label: { color: '#fff', fontSize: 11 },
+      //       data: props.markers as unknown as ECOption['data'],
+      //     }
+      //     : undefined,
+    })),
+    // series: [
+    //   {
+    //     type: 'line',
+    //     name: '示例数据',
+    //     smooth: true,
+    //     showSymbol: false,
+    //     data: [],
+    //     lineStyle: {
+    //       width: 2,
+    //       color: '#5470C6',
+    //     },
+    //   },
+    // ],
   };
 }
 
@@ -248,6 +254,7 @@ watch(
 
 .chart-area {
   width: 100%;
+  height: 400px;
 }
 
 .marker-overlay {

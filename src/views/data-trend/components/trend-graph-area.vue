@@ -1,5 +1,5 @@
 <template>
-  <div class="trend-graph-area-wrapper">
+  <div class="trend-graph-area-wrapper" ref="wrapperRef">
     <div class="operate-button-row">
       <div v-if="!props.isRunning">
         <div>
@@ -70,6 +70,10 @@ import { today, getOneIntervalNow } from '@/utils/date';
 import type { DateModelType } from 'element-plus';
 import { VideoPlay, VideoPause } from '@element-plus/icons-vue';
 
+const wrapperRef = ref<HTMLElement | null>(null);
+const wrapperHeight = ref(0);
+let observer: ResizeObserver | null = null;
+
 const props = withDefaults(
   defineProps<{
     isRunning: boolean;
@@ -82,13 +86,23 @@ const props = withDefaults(
 );
 
 const chartHeight = computed(() => {
-  if (props.measurementGroupInfo.length === 0) {
-    return props.isRunning ? 800 : 690;
+  if (wrapperRef.value) {
+    const availableHeight = wrapperHeight.value - 130; // 减去操作按钮行的高度
+    const groupCount = props.measurementGroupInfo.length || 1; // 至少有
+    if (groupCount > 3) {
+      return Math.floor(availableHeight / 3);
+    } else {
+      return Math.floor(availableHeight / groupCount);
+    }
   }
-  if (props.measurementGroupInfo.length > 3) {
-    return 240;
-  }
-  return props.isRunning ? 800 : 690 / props.measurementGroupInfo.length;
+  // if (props.measurementGroupInfo.length === 0) {
+  //   return props.isRunning ? 800 : 690;
+  // }
+  // if (props.measurementGroupInfo.length > 3) {
+  //   return 240;
+  // }
+  // return props.isRunning ? 800 : 690 / props.measurementGroupInfo.length;
+  return 230;
 });
 
 const emit = defineEmits<{
@@ -120,14 +134,33 @@ function handleChangeTime(value: [DateModelType, DateModelType]) {
 function updateMarker(payload: { id: string; timestamp: number }) {
   emit('marker-change', payload);
 }
+
+onMounted(() => {
+  if (wrapperRef.value) {
+    observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        wrapperHeight.value = entry.contentRect.height;
+      }
+    });
+    observer.observe(wrapperRef.value);
+  }
+});
+
+onBeforeUnmount(() => {
+  if (observer && wrapperRef.value) {
+    observer.unobserve(wrapperRef.value);
+    observer = null;
+  }
+});
 </script>
 
 <style>
 .trend-graph-area-wrapper {
   width: 100%;
-  min-height: 760px;
+  flex: 1;
+  overflow: auto;
   box-sizing: border-box;
-  padding: 0 16px;
+  padding: 15px 16px 0;
 }
 
 .operate-button-row {

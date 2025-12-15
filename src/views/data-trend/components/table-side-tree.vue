@@ -41,7 +41,7 @@
       >
         <!-- eslint-disable-next-line vue/no-unused-vars -->
         <template #default="{ node, data }">
-          <div class="node-text" :id="`tree-node-content-${data.parentName || data.nodeName}`">
+          <div class="node-text" :id="`tree-node-content-${data.parentName || data.nodeName}`" @dblclick.stop="handleNodeDoubleClick(data)">
             <el-icon size="18" color="var(--el-color-primary)" class="m-r-[4px]">
               <i-custom-tree-db v-if="data.nodeType === 'DATABASE'" />
               <i-custom-table v-else-if="data.nodeType === 'TABLE'" />
@@ -162,6 +162,9 @@ const props = withDefaults(
 const emit = defineEmits<{
   (event: 'handleNodeClick', nodeInfo: TableTreeNodeData): void;
   (event: 'updateDetail'): void;
+  (event: 'updateSelectedMeasurements', payload: SelectedMeasurement[]): void;
+  (event: 'deleteMeasurement', fullPath: string): void;
+  (event: 'doubleClickMeasurement', fullPath: string): void;
 }>();
 
 const { t } = useI18n();
@@ -259,6 +262,7 @@ const handleConfirmMeasurement = (selected: SelectedMeasurement[]) => {
   addMeasurementsOfDbTbIntoTree();
   saveToStorage();
   tableMeasurementVisible.value = false;
+  emit('updateSelectedMeasurements', selectedMeasurements.value);
 };
 
 function addMeasurementsOfDbTbIntoTree() {
@@ -298,6 +302,12 @@ function handleAddMeasurements(database: string, table: string) {
   tableMeasurementVisible.value = true;
 }
 
+function handleNodeDoubleClick(data: TableTreeNodeData) {
+  if (data.nodeType === 'DEVICE-MEASUREMENT') {
+    emit('doubleClickMeasurement', `${data.database}.${data.parentName}.${data.nodeName}`);
+  }
+}
+
 function handleDeleteMeasurements(nodeInfo: TableTreeNodeData) {
   if (!selectedMeasurementsData.value) return;
   for (const dbNode of selectedMeasurementsData.value) {
@@ -306,8 +316,13 @@ function handleDeleteMeasurements(nodeInfo: TableTreeNodeData) {
         if (tbNode.nodeName === nodeInfo.parentName) {
           tbNode.children = tbNode.children?.filter((child) => child.id !== nodeInfo.id);
           selectedMeasurementsData.value = [...selectedMeasurementsData.value];
-          modalTableMeasurementRef.value?.removeMeasurement(Number(nodeInfo.id.split('-').pop()));
+          modalTableMeasurementRef.value?.removeMeasurement(Number(nodeInfo.id?.split('-').pop()));
           saveToStorage();
+          const last = String(nodeInfo.id).split('-').pop();
+          const index = last ? Number(last) : -1;
+          if (index >= 0 && !Number.isNaN(index)) {
+            emit('deleteMeasurement', `${nodeInfo.database}.${nodeInfo.parentName}.${nodeInfo.nodeName}`);
+          }
           return;
         }
       }

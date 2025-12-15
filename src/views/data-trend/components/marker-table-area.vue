@@ -1,6 +1,6 @@
 <template>
   <div class="marker-table-area-wrapper">
-    <el-table :data="tableData" border style="width: 100%" :height="props.isRunning ? '250px' : '180px'">
+    <el-table :data="tableData" border style="width: 100%" :height="props.isRunning ? '145px' : '110px'" size="small">
       <el-table-column prop="name" label="测点名称"></el-table-column>
       <el-table-column prop="x1" label="X1"></el-table-column>
       <el-table-column prop="x2" label="X2"></el-table-column>
@@ -42,6 +42,6 @@ const tableData: MeasurementMarkerData[] = [
 .marker-table-area-wrapper {
   width: 100%;
   box-sizing: border-box;
-  padding: 0 25px;
+  padding: 15px 25px;
 }
 </style>

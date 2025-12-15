@@ -331,7 +331,7 @@ watch(
 .full-data-wrapper {
   position: relative;
   width: 100%;
-  height: 100px;
+  height: 70px;
 }
 
 .full-data-timeline-chart {
