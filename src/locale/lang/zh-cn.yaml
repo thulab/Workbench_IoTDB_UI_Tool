@@ -184,6 +184,8 @@ page:
   data: 数据
   alarm: 告警
   trend: 趋势
+  runningTrend: 实时趋势
+  historyTrend: 历史趋势
   spectrum: 分析
   visualization: 可视化
   dashboard: 首页

@@ -49,7 +49,7 @@ export interface TableTreeNodeData {
   columnName?: string;
   category?: string;
   datatype?: string;
-  nodeType: 'DATABASE' | 'TABLE' | 'COLUMN' | 'TAG' | 'FIELD' | 'ATTRIBUTE' | 'TIME' | 'TABLEDATA';
+  nodeType: 'DATABASE' | 'TABLE' | 'COLUMN' | 'TAG' | 'FIELD' | 'ATTRIBUTE' | 'TIME' | 'TABLEDATA' | 'DEVICE-MEASUREMENT';
   children?: TableTreeNodeData[];
 }
 

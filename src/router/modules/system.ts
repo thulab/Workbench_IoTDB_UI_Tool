@@ -154,6 +154,28 @@ const route = [
     },
     children: [
       {
+        path: 'table-running-trend',
+        name: 'TableRunningTrend',
+        component: () => import('@/views/data-trend/table-running-trend.vue'),
+        meta: {
+          sqlDialect: 'table',
+          keepAlive: true,
+          title: 'page.runningTrend',
+          icon: ICustomTrend,
+        },
+      },
+      {
+        path: 'table-history-trend',
+        name: 'TableHistoryTrend',
+        component: () => import('@/views/data-trend/table-history-trend.vue'),
+        meta: {
+          sqlDialect: 'table',
+          keepAlive: true,
+          title: 'page.historyTrend',
+          icon: ICustomTrend,
+        },
+      },
+      {
         path: 'detail',
         name: 'TrendDetail',
         component: () => import('@/views/data-trend/trend-detail.vue'),

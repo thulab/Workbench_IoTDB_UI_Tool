@@ -15,3 +15,13 @@ export interface TableHistoryTrendResponse {
   abnormal: string[];
   changeAuto: string[];
 }
+
+export type TimeRange = {
+  start: number;
+  end: number;
+};
+
+export interface RangeHandle {
+  id: 'start' | 'end';
+  x: number;
+}

@@ -182,6 +182,8 @@ page:
   data: Data
   alarm: Alarm
   trend: Trend
+  runningTrend: Real-Time Trend
+  historyTrend: Historical Trend
   dashboard: Home
   dataSync: Data Sync
   measurement: Measurement
