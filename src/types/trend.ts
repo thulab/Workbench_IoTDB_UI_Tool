@@ -25,3 +25,32 @@ export interface RangeHandle {
   id: 'start' | 'end';
   x: number;
 }
+
+export type ChartMarker = {
+  id: string;
+  label: string;
+  color: string;
+  timestamp: number;
+};
+
+export type GroupState = {
+  id: string;
+  measurementIds: string[];
+};
+
+export type DataPoint = {
+  timestamp: number;
+  value: number;
+};
+
+export type Measurement = {
+  id: string;
+  label: string;
+  color: string;
+  values: DataPoint[];
+};
+
+export type ChartGroupInput = {
+  id: string;
+  members: Measurement[];
+};
