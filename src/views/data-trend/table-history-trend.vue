@@ -1,7 +1,7 @@
 <template>
   <div class="history-trend-page-container">
     <div class="database-list-wrapper">
-      <TableSideTree />
+      <TableSideTree namespace="history" />
     </div>
     <div class="trend-details-wrapper">
       <TrendGraphArea />

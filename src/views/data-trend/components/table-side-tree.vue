@@ -9,6 +9,7 @@
           id="measurement-tree-input"
           @keyup.enter="handleSearch"
           class="measurement-tree-search-input"
+          clearable
         />
         <!-- <el-button
           link
@@ -28,7 +29,7 @@
       </div>
       <el-tree-v2
         ref="schemaTree"
-        :data="selectedMeasurementsDataTree"
+        :data="filteredTreeData"
         style="background-color: #fff; overflow-y: auto"
         :props="treeProps"
         :indent="8"
@@ -54,8 +55,9 @@
               </div>
               <el-tag v-else-if="data.nodeType === 'ATTRIBUTE'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Attr</el-tag>
               <el-tag v-else-if="data.nodeType === 'FIELD'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Field</el-tag>
+              <el-tag v-else-if="data.nodeType === 'DEVICE-MEASUREMENT'" disable-transitions type="success" effect="plain" class="tree-column-type-tag" style="width: auto">M</el-tag>
             </el-icon>
-            <text-tooltip :content="data.nodeName + (data.comment ? ` (${data.comment})` : '')" />
+            <span class="node-label" :title="data.nodeName + (data.comment ? ` (${data.comment})` : '')"> {{ data.nodeName }}{{ data.comment ? ` (${data.comment})` : '' }} </span>
           </div>
           <!-- <el-dropdown v-if="data.nodeType === 'DATABASE'" trigger="click" @command="handleDatabaseOptionClick($event, data)">
             <span class="lang-icon m-r-20" @click.stop>
@@ -141,14 +143,21 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { useDbStore } from '@/stores';
-// import { IoTDBApi } from '@/api';
 import type { ElTreeV2 } from 'element-plus';
 import { cloneDeep } from 'lodash-es';
 import ModalTableMeasurement from './modal-table-measurement.vue';
 import ModalAddDb from '../../table-data/components/modal-add-db.vue';
 import ModalAddTable from '../../table-data/components/modal-add-table.vue';
-// import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import type { TableTreeNodeData, SelectedMeasurement } from '@/types';
+
+const props = withDefaults(
+  defineProps<{
+    namespace?: string;
+  }>(),
+  {
+    namespace: 'default',
+  },
+);
 
 const emit = defineEmits<{
   (event: 'handleNodeClick', nodeInfo: TableTreeNodeData): void;
@@ -183,10 +192,72 @@ const treeProps = {
   children: 'children',
 };
 
+function getStorageKey() {
+  return `measurement-tree-${props.namespace}`;
+}
+
+function saveToStorage() {
+  const dataToSave: Record<string, SelectedMeasurement[]> = {};
+  selectedMeasurementsData.value.forEach((dbNode) => {
+    dbNode.children?.forEach((tbNode) => {
+      if (tbNode.children && tbNode.children.length > 0) {
+        const key = `${dbNode.nodeName}.${tbNode.nodeName}`;
+        const measurements = tbNode.children.map((child, index) => {
+          return selectedMeasurements.value[index] || { device: [], measurement: child.nodeName };
+        });
+        dataToSave[key] = measurements;
+      }
+    });
+  });
+  window.sessionStorage.setItem(getStorageKey(), JSON.stringify(dataToSave));
+}
+
+function loadFromStorage(): Record<string, SelectedMeasurement[]> {
+  const saved = window.sessionStorage.getItem(getStorageKey());
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch {
+      return {};
+    }
+  }
+  return {};
+}
+
+const filteredTreeData = computed(() => {
+  if (!searchText.value.trim()) {
+    return selectedMeasurementsData.value;
+  }
+  const keyword = searchText.value.toLowerCase();
+  return filterTreeData(selectedMeasurementsData.value, keyword);
+});
+
+function filterTreeData(data: TableTreeNodeData[], keyword: string): TableTreeNodeData[] {
+  const result: TableTreeNodeData[] = [];
+  data.forEach((node) => {
+    const nodeCopy = cloneDeep(node);
+    const isMatch = node.nodeName.toLowerCase().includes(keyword);
+    if (node.children && node.children.length > 0) {
+      const filteredChildren = filterTreeData(node.children, keyword);
+      if (filteredChildren.length > 0) {
+        nodeCopy.children = filteredChildren;
+        result.push(nodeCopy);
+      } else if (isMatch) {
+        nodeCopy.children = [];
+        result.push(nodeCopy);
+      }
+    } else if (isMatch) {
+      result.push(nodeCopy);
+    }
+  });
+  return result;
+}
+
 const handleConfirmMeasurement = (selected: SelectedMeasurement[]) => {
   selectedMeasurements.value = selected;
   console.log('Selected Measurements:', selectedMeasurements.value);
   addMeasurementsOfDbTbIntoTree();
+  saveToStorage();
   tableMeasurementVisible.value = false;
 };
 
@@ -204,7 +275,7 @@ function addMeasurementsOfDbTbIntoTree() {
             }
             deviceName = deviceName.slice(0, -1);
             tbNode.children.push({
-              id: `${index}`,
+              id: `${props.namespace}-${selectedDatabase.value}-${selectedTable.value}-${index}`,
               nodeName: `${deviceName}.${meas.measurement}`,
               nodeType: 'DEVICE-MEASUREMENT',
               parentName: tbNode.nodeName,
@@ -235,7 +306,8 @@ function handleDeleteMeasurements(nodeInfo: TableTreeNodeData) {
         if (tbNode.nodeName === nodeInfo.parentName) {
           tbNode.children = tbNode.children?.filter((child) => child.id !== nodeInfo.id);
           selectedMeasurementsData.value = [...selectedMeasurementsData.value];
-          modalTableMeasurementRef.value?.removeMeasurement(Number(nodeInfo.id));
+          modalTableMeasurementRef.value?.removeMeasurement(Number(nodeInfo.id.split('-').pop()));
+          saveToStorage();
           return;
         }
       }
@@ -276,13 +348,15 @@ const setDefaultTreeExpandKeys = async () => {
 
 function initSelectedMeasurementsData() {
   selectedMeasurementsData.value = [];
+  const savedData = loadFromStorage();
+
   const result: TableTreeNodeData[] = [];
   treeData.value.forEach((dbNode) => {
     if (dbNode.nodeName === 'information_schema') {
       return;
     }
     const dbCopy: TableTreeNodeData = {
-      id: dbNode.id,
+      id: `${props.namespace}-${dbNode.id}`,
       nodeName: dbNode.nodeName,
       nodeType: dbNode.nodeType,
       children: [],
@@ -290,13 +364,32 @@ function initSelectedMeasurementsData() {
     if (dbNode.children) {
       dbNode.children.forEach((tableNode) => {
         const tableCopy: TableTreeNodeData = {
-          id: tableNode.id,
+          id: `${props.namespace}-${tableNode.id}`,
           nodeName: tableNode.nodeName,
           nodeType: tableNode.nodeType,
           parentName: dbNode.nodeName,
           database: dbNode.nodeName,
           children: [],
         };
+
+        const key = `${dbNode.nodeName}.${tableNode.nodeName}`;
+        const savedMeasurements = savedData[key] || [];
+        savedMeasurements.forEach((meas, index) => {
+          let deviceName = '';
+          for (const curTag of meas.device) {
+            deviceName += `${curTag.value}.`;
+          }
+          deviceName = deviceName.slice(0, -1);
+          tableCopy.children?.push({
+            id: `${props.namespace}-${dbNode.nodeName}-${tableNode.nodeName}-${index}`,
+            nodeName: `${deviceName}.${meas.measurement}`,
+            nodeType: 'DEVICE-MEASUREMENT',
+            parentName: tableNode.nodeName,
+            database: dbNode.nodeName,
+            children: [],
+          });
+        });
+
         dbCopy.children?.push(tableCopy);
       });
     }
@@ -304,42 +397,6 @@ function initSelectedMeasurementsData() {
   });
   selectedMeasurementsData.value = result;
 }
-
-const selectedMeasurementsDataTree = computed(() => {
-  return selectedMeasurementsData.value;
-});
-
-// function filterTreeData(): TableTreeNodeData[] {
-//   const searchTextLower = searchText.value.toLowerCase();
-
-//   const filterNode = (node: TableTreeNodeData): TableTreeNodeData | null => {
-//     const nodeCopy = cloneDeep(node);
-//     nodeCopy.children = [];
-
-//     const isCurrentMatch = node.nodeName.toLowerCase().includes(searchTextLower);
-
-//     if (node.children) {
-//       node.children.forEach((child) => {
-//         const filteredChild = filterNode(child);
-//         if (filteredChild) {
-//           nodeCopy.children?.push(filteredChild);
-//         }
-//       });
-//     }
-
-//     return isCurrentMatch || (nodeCopy.children && nodeCopy.children.length > 0) ? nodeCopy : null;
-//   };
-
-//   const result: TableTreeNodeData[] = [];
-//   treeData.value.forEach((dbNode) => {
-//     const filteredNode = filterNode(dbNode);
-//     if (filteredNode) {
-//       result.push(filteredNode);
-//     }
-//   });
-
-//   return result;
-// }
 
 onMounted(() => {
   setDefaultTreeExpandKeys();
@@ -357,84 +414,7 @@ function handleRefresh() {
   emit('updateDetail');
 }
 
-// function handleAddDB() {
-//   modalAddDbVisible.value = true;
-// }
-
-// 删除数据库
-// function handleDelDb(dbNode: TableTreeNodeData) {
-//   ElMessageBox.confirm(t('dataManage.delDbSingleTip'), t('common.notice'), {
-//     confirmButtonText: t('common.confirm'),
-//     cancelButtonText: t('common.cancel'),
-//     confirmButtonClass: 'mesaurement-table-del-confirm',
-//     cancelButtonClass: 'mesaurement-table-del-cancel',
-//     type: 'warning',
-//     icon: ICustomMessageWarning,
-//   }).then(() => {
-//     deleteDatabase(dbNode.nodeName).then(() => {
-//       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
-//       setFirstLoad(true);
-//       if (currentNodeShow.value?.database === currentNode.value?.nodeName) {
-//         setDefaultTreeExpandKeys();
-//       } else {
-//         handleRefresh();
-//       }
-//     });
-//   });
-// }
-
-// function handleDelTable(tableNode: TableTreeNodeData) {
-//   ElMessageBox.confirm(t('dataManage.delTableSingleTip'), t('common.notice'), {
-//     confirmButtonText: t('common.confirm'),
-//     cancelButtonText: t('common.cancel'),
-//     confirmButtonClass: 'mesaurement-table-del-confirm',
-//     cancelButtonClass: 'mesaurement-table-del-cancel',
-//     type: 'warning',
-//     icon: ICustomMessageWarning,
-//   }).then(() => {
-//     const delTableList = tableNode?.nodeName ? [tableNode.nodeName] : [];
-//     deleteTables(tableNode.database!, delTableList).then(() => {
-//       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
-//       setFirstLoad(true);
-//       if (currentNodeShow.value?.nodeName === currentNode.value?.nodeName) {
-//         setActiveList([`${currentNodeShow.value?.database}`]);
-//         setDefaultTreeExpandKeys();
-//       } else {
-//         handleRefresh();
-//       }
-//     });
-//   });
-// }
-
-// function handleDatabaseOptionClick(command: string, node: TableTreeNodeData) {
-//   currentNode.value = node;
-//   if (command === 'dbSchema') {
-//     currentNodeShow.value = cloneDeep(node);
-//     emit('handleNodeClick', currentNode.value);
-//   } else if (command === 'addTable') {
-//     showAddTableDialog(currentNode.value, 'addTable');
-//   } else if (command === 'dbDelete') {
-//     handleDelDb(node);
-//   }
-// }
-
-// function handleTableOptionClick(command: string, node: TableTreeNodeData) {
-//   currentNode.value = cloneDeep(node);
-//   if (command === 'tableData') {
-//     currentNodeShow.value = cloneDeep(node);
-//     currentNode.value.nodeType = 'TABLEDATA';
-//     emit('handleNodeClick', currentNode.value);
-//   } else if (command === 'tableSchema') {
-//     currentNodeShow.value = cloneDeep(node);
-//     emit('handleNodeClick', currentNode.value);
-//   } else if (command === 'addCloumn') {
-//     showAddTableDialog(currentNode.value, 'addColumn');
-//   } else if (command === 'tableDelete') {
-//     handleDelTable(node);
-//   }
-// }
-
-function handleSelectNode(payload: { [key: string]: any }) {
+function handleSelectNode(payload: Record<string, unknown>) {
   const data = payload as TableTreeNodeData;
   if (data && data.id && (data.nodeType === 'DATABASE' || data.nodeType === 'TABLE')) {
     currentNode.value = data;
@@ -447,9 +427,18 @@ watch(
   () => treeData.value,
   () => {
     setDefaultTreeExpandKeys();
+    initSelectedMeasurementsData();
   },
 );
+defineExpose({
+  getSelectedMeasurements: () => loadFromStorage(),
+  clearAllMeasurements: () => {
+    window.sessionStorage.removeItem(getStorageKey());
+    initSelectedMeasurementsData();
+  },
+});
 </script>
+
 <style lang="scss" scoped>
 .button-style {
   border: none;
@@ -481,6 +470,13 @@ watch(
   align-items: center;
   width: 100px;
   padding-right: 8px;
+  flex: 1;
+}
+
+.node-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   flex: 1;
 }
 

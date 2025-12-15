@@ -1,7 +1,7 @@
 <template>
   <div class="running-trend-page-container">
     <div class="database-list-wrapper">
-      <TableSideTree />
+      <TableSideTree namespace="running" />
     </div>
     <div>
       <TrendGraphArea />

@@ -185,17 +185,17 @@ const route = [
           icon: ICustomTrend,
         },
       },
-      {
-        path: 'table-detail',
-        name: 'TableTrendDetail',
-        component: () => import('@/views/data-trend/table-trend-detail.vue'),
-        meta: {
-          sqlDialect: 'table',
-          keepAlive: true,
-          title: 'page.trend',
-          icon: ICustomTrend,
-        },
-      },
+      // {
+      //   path: 'table-detail',
+      //   name: 'TableTrendDetail',
+      //   component: () => import('@/views/data-trend/table-trend-detail.vue'),
+      //   meta: {
+      //     sqlDialect: 'table',
+      //     keepAlive: true,
+      //     title: 'page.trend',
+      //     icon: ICustomTrend,
+      //   },
+      // },
       {
         path: 'spectrum',
         name: 'SpectrumDetail',
