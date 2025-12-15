@@ -1,5 +1,5 @@
 <template>
-  <version-container :is-show="showAuthMenu" :versiton-tip="'1.2.1'">
+  <version-container :is-show="showAuthMenu" :versionTip="'1.2.1'">
     <el-container class="data-sync-detail-wrapper" v-if="showMain">
       <el-header class="search-form-wrapper p-x-0" style="height: auto">
         <el-form :model="searchFormData" label-position="left" size="default" inline @submit.prevent>
