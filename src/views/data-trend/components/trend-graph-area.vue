@@ -44,6 +44,10 @@
           :markers="markers"
           :height="chartHeight"
           :loading="props.loading"
+          :need-fetch-data="props.needFetchGroupsId?.includes(group.id)"
+          :can-delete="props.measurementGroupInfo.length > 1"
+          @drop="handleMeasurementDrop"
+          @delete-group="handleDeleteGroup"
           @marker-change="updateMarker"
         />
         <MetricChartGroup
@@ -54,6 +58,8 @@
           :markers="markers"
           :height="chartHeight"
           :loading="props.loading"
+          :need-fetch-data="false"
+          :can-delete="false"
           @marker-change="updateMarker"
         />
       </div>
@@ -81,6 +87,7 @@ const props = withDefaults(
     markers: ChartMarker[];
     measurementGroupInfo: ChartGroupInput[];
     loading?: boolean;
+    needFetchGroupsId?: string[];
   }>(),
   {},
 );
@@ -95,19 +102,14 @@ const chartHeight = computed(() => {
       return Math.floor(availableHeight / groupCount);
     }
   }
-  // if (props.measurementGroupInfo.length === 0) {
-  //   return props.isRunning ? 800 : 690;
-  // }
-  // if (props.measurementGroupInfo.length > 3) {
-  //   return 240;
-  // }
-  // return props.isRunning ? 800 : 690 / props.measurementGroupInfo.length;
   return 230;
 });
 
 const emit = defineEmits<{
   'global-time-change': [payload: TimeRange];
   'marker-change': [payload: { id: string; timestamp: number }];
+  'merge-into-group': [payload: { groupId: string; measurementPath: string }];
+  'delete-group': [payload: { groupId: string }];
 }>();
 
 const { t } = useI18n();
@@ -133,6 +135,14 @@ function handleChangeTime(value: [DateModelType, DateModelType]) {
 
 function updateMarker(payload: { id: string; timestamp: number }) {
   emit('marker-change', payload);
+}
+
+function handleMeasurementDrop(payload: { groupId: string; measurementPath: string }) {
+  emit('merge-into-group', payload);
+}
+
+function handleDeleteGroup(payload: { groupId: string }) {
+  emit('delete-group', payload);
 }
 
 onMounted(() => {

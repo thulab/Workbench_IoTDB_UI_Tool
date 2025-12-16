@@ -4,8 +4,8 @@
       <TableSideTree
         namespace="history"
         @updateSelectedMeasurements="(list) => handleSelectedMeasurementsUpdate({ selectedMeasurements: list })"
-        @delete-measurement="handleDeleteMeasurement"
-        @double-click-measurement="createGroup"
+        @deleteMeasurement="handleDeleteMeasurement"
+        @doubleClickMeasurement="createGroup"
       />
     </div>
     <div class="trend-details-wrapper">
@@ -15,8 +15,11 @@
         :range="visibleRange"
         :markers="markers"
         :measurement-group-info="resolvedGroups"
+        :needFetchGroupsId="needFetchGroupsId"
         @marker-change="updateMarker"
         @global-time-change="handleGlobalTimeChange"
+        @merge-into-group="mergeGroup"
+        @delete-group="deleteGroup"
       />
       <TimelineArea :range="pendingRange" :full-range="globalTimeRange" @update:range="updateRange" />
       <MarkerTableArea :is-running="false" />
@@ -50,6 +53,7 @@ const resolvedGroups = computed<ChartGroupInput[]>(() =>
     members: group.measurementIds.map((measurementId) => measurementMap.get(measurementId)).filter(Boolean) as Measurement[],
   })),
 );
+const needFetchGroupsId = ref<string[]>([]);
 
 const markers = ref<ChartMarker[]>(createInitialMarkers(globalTimeRange.value));
 
@@ -121,6 +125,24 @@ function createGroup(fullpath: string) {
     id: `${groupLen + 1}`,
     measurementIds: [fullpath],
   });
+  needFetchGroupsId.value = [];
+  needFetchGroupsId.value.push(`${groupLen + 1}`);
+}
+
+function mergeGroup(payload: { groupId: string; measurementPath: string }) {
+  const group = groups.value.find((g) => g.id === payload.groupId);
+  if (group && !group.measurementIds.includes(payload.measurementPath)) {
+    group.measurementIds.push(payload.measurementPath);
+    needFetchGroupsId.value = [];
+    needFetchGroupsId.value.push(payload.groupId);
+    console.log('Merged measurement', payload.measurementPath, 'into group:', payload.groupId);
+  }
+}
+
+function deleteGroup(payload: { groupId: string }) {
+  groups.value = groups.value.filter((g) => g.id !== payload.groupId);
+  console.log('Deleted group:', payload.groupId);
+  needFetchGroupsId.value = [];
 }
 
 function updateMarker(payload: { id: string; timestamp: number }) {
@@ -132,6 +154,9 @@ function updateMarker(payload: { id: string; timestamp: number }) {
 function handleGlobalTimeChange(payload: TimeRange) {
   globalTimeRange.value.start = payload.start;
   globalTimeRange.value.end = payload.end;
+  needFetchGroupsId.value = [];
+  needFetchGroupsId.value = groups.value.map((g) => g.id);
+  markers.value = createInitialMarkers();
 }
 
 function updateRange(range: TimeRange) {
@@ -175,6 +200,8 @@ watch(
       ...marker,
       timestamp: Math.min(Math.max(marker.timestamp, range.start), range.end),
     }));
+    needFetchGroupsId.value = [];
+    needFetchGroupsId.value = groups.value.map((g) => g.id);
   },
   { deep: true },
 );

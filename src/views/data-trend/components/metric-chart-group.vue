@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <button class="close-button">
+  <div @drop="handleDrop" @dragover.prevent>
+    <button class="close-button" :disabled="!props.canDelete" @click="handleDeleteGroup" :style="props.canDelete ? 'cursor: pointer' : ''">
       <el-icon size="20"><i-custom-close /></el-icon>
     </button>
     <div ref="stageRef" class="stage-wrapper">
@@ -24,7 +24,12 @@
 
 <script lang="ts" setup>
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
-import type { TimeRange, ChartMarker, ChartGroupInput } from '@/types/trend';
+import type { TimeRange, ChartMarker, ChartGroupInput, Measurement, DataPoint } from '@/types/trend';
+import { TableDataApi } from '@/api';
+import { formatSelectedMeasurement } from '@/utils/format';
+
+const { t } = useI18n();
+const { requestFn: getHistoryTrend } = useRequest(TableDataApi.getTrendHistoryData);
 
 const GRID_LEFT = 64;
 const GRID_RIGHT = 32;
@@ -43,23 +48,24 @@ const props = withDefaults(
     index: number;
     loading?: boolean;
     height?: number | string;
+    needFetchData?: boolean;
+    canDelete?: boolean;
   }>(),
   {
     loading: false,
+    needFetchData: true,
+    canDelete: false,
   },
 );
 
+const measurementsData = ref<Measurement[]>([]);
+
 const emit = defineEmits<{
   // remove: [payload: { groupId: string; measurementId: string }]
-  // drop: [payload: ChartGroupEvent]
+  drop: [payload: { groupId: string; measurementPath: string }];
   'marker-change': [payload: { id: string; timestamp: number }];
+  'delete-group': [payload: { groupId: string }];
 }>();
-
-const fetchedData = computed(() => {
-  const result = props.group.members;
-  // fetch data
-  return result;
-});
 
 const markerHandles = computed(() => {
   const width = getInnerWidth();
@@ -76,6 +82,64 @@ const markerHandles = computed(() => {
     };
   });
 });
+
+function fetchHistoryData(measurement: Measurement) {
+  getHistoryTrend({
+    database: measurement.details.database,
+    tableName: measurement.details.tableName,
+    fieldCondition: [
+      {
+        variable: measurement.details.measurement,
+        value: measurement.details.condition,
+        database: measurement.details.database,
+        tableName: measurement.details.tableName,
+        path: formatSelectedMeasurement(measurement.details),
+      } as any,
+    ],
+    startTime: props.range.start,
+    endTime: props.range.end,
+    groupBy: 'origin',
+    aggregateFun: 'last',
+  }).then((res) => {
+    // process data
+    const normalData = res.data?.normal || [];
+    const transformedData: DataPoint[] = [];
+    if (normalData[0]) {
+      const point = normalData[0];
+      const valueLen = point.values.length;
+      for (let i = 0; i < valueLen; i++) {
+        const timestamp = point.timestamps[i];
+        const value = point.values[i];
+        transformedData.push({ timestamp: timestamp as number, value: Number(value) });
+      }
+    }
+    measurementsData.value.push({
+      ...measurement,
+      values: transformedData,
+    });
+    if (!normalData.length) {
+      ElMessage.warning({ message: `测点 ${measurement.label} 在 ${t('dataTrend.noDataTip')}`, grouping: true });
+    }
+    const overPath = res.data?.changeAuto || [];
+    if (overPath.length) {
+      const paths = overPath.join(',');
+      ElMessage.warning({ message: t('dataTrend.measurementTip', { measurement: paths }), grouping: true });
+    }
+  });
+}
+
+function handleDrop(event: DragEvent) {
+  event.preventDefault();
+  event.stopPropagation();
+  const measurementFullPath = event.dataTransfer?.getData('text/plain');
+  if (measurementFullPath) {
+    emit('drop', { groupId: props.group.id, measurementPath: measurementFullPath });
+  }
+}
+
+function handleDeleteGroup() {
+  emit('delete-group', { groupId: props.group.id });
+}
 
 function onMarkerPointerDown(markerId: string, event: PointerEvent) {
   if (props.loading) return;
@@ -165,7 +229,7 @@ function buildOption(): ECOption {
         lineStyle: { color: 'rgba(122, 129, 154, 0.15)' },
       },
     },
-    series: fetchedData.value.map((series, index) => ({
+    series: measurementsData.value.map((series, index) => ({
       name: series.label,
       type: 'line',
       smooth: true,
@@ -237,6 +301,38 @@ onUnmounted(() => {
 watch(
   () => props.range,
   () => {
+    if (!props.needFetchData) {
+      console.log('No need to fetch data for group', props.group.id);
+      return;
+    }
+    console.log('Fetching data for group', props.group.id);
+    measurementsData.value = [];
+    for (const measurement of props.group.members) {
+      fetchHistoryData(measurement);
+    }
+  },
+  { deep: true },
+);
+
+watch(
+  () => props.group,
+  (newGroup) => {
+    if (!props.needFetchData) {
+      console.log('No need to fetch data for group', newGroup.id);
+      return;
+    }
+    console.log('Fetching data for group', newGroup.id);
+    measurementsData.value = [];
+    for (const measurement of newGroup.members) {
+      fetchHistoryData(measurement);
+    }
+  },
+  { immediate: true, deep: true },
+);
+
+watch(
+  () => measurementsData.value,
+  () => {
     if (chart) {
       chart.setOption(buildOption());
     }
@@ -247,7 +343,6 @@ watch(
 
 <style>
 .close-button {
-  cursor: pointer;
   background-color: transparent;
   border: none;
 }

@@ -41,7 +41,13 @@
       >
         <!-- eslint-disable-next-line vue/no-unused-vars -->
         <template #default="{ node, data }">
-          <div class="node-text" :id="`tree-node-content-${data.parentName || data.nodeName}`" @dblclick.stop="handleNodeDoubleClick(data)">
+          <div
+            class="node-text"
+            :id="`tree-node-content-${data.parentName || data.nodeName}`"
+            :draggable="data.nodeType === 'DEVICE-MEASUREMENT'"
+            @dblclick.stop="handleNodeDoubleClick(data)"
+            @dragstart="handleNodeDragStart($event, data)"
+          >
             <el-icon size="18" color="var(--el-color-primary)" class="m-r-[4px]">
               <i-custom-tree-db v-if="data.nodeType === 'DATABASE'" />
               <i-custom-table v-else-if="data.nodeType === 'TABLE'" />
@@ -305,6 +311,16 @@ function handleAddMeasurements(database: string, table: string) {
 function handleNodeDoubleClick(data: TableTreeNodeData) {
   if (data.nodeType === 'DEVICE-MEASUREMENT') {
     emit('doubleClickMeasurement', `${data.database}.${data.parentName}.${data.nodeName}`);
+  }
+}
+
+function handleNodeDragStart(event: DragEvent, data: TableTreeNodeData) {
+  if (data.nodeType === 'DEVICE-MEASUREMENT') {
+    const measurementFullPath = `${data.database}.${data.parentName}.${data.nodeName}`;
+    event.dataTransfer?.setData('text/plain', measurementFullPath);
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'copy';
+    }
   }
 }
 
