@@ -10,10 +10,12 @@
         :range="visibleRange"
         :markers="markers"
         :measurement-group-info="resolvedGroups"
+        :needFetchGroupsId="needFetchGroupsId"
+        :templateList="templateList"
         @marker-change="updateMarker"
         @global-time-change="handleGlobalTimeChange"
       />
-      <MarkerTableArea :is-running="true" />
+      <MarkerTableArea :is-running="true" :marker-datas="markerDatas" />
     </div>
   </div>
 </template>
@@ -22,7 +24,8 @@
 import TableSideTree from './components/table-side-tree.vue';
 import TrendGraphArea from './components/trend-graph-area.vue';
 import MarkerTableArea from './components/marker-table-area.vue';
-import type { TimeRange, GroupState, ChartGroupInput, Measurement, ChartMarker } from '@/types/trend';
+import type { TimeRange, GroupState, ChartGroupInput, Measurement, ChartMarker, MeasurementMarkerData } from '@/types/trend';
+import type { TrendTemplate } from '@/types';
 
 const globalTimeRange = ref<TimeRange>({
   start: Date.now() - 12 * 3600 * 1000,
@@ -43,7 +46,11 @@ const resolvedGroups = computed<ChartGroupInput[]>(() =>
   })),
 );
 
+const needFetchGroupsId = ref<string[]>([]);
+const templateList = ref<TrendTemplate[]>([]);
+
 const markers = ref<ChartMarker[]>(createInitialMarkers(globalTimeRange.value));
+const markerDatas = ref<MeasurementMarkerData[]>([]);
 
 function createInitialMarkers(range: TimeRange = globalTimeRange.value): ChartMarker[] {
   const span = Math.max(range.end - range.start, 1);

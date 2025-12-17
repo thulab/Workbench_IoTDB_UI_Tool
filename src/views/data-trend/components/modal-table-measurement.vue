@@ -267,8 +267,6 @@ const currentTableInfo = computed(() => {
   //   return db?.children?.find((table) => table.nodeName === formData.selectedTable && table.nodeType === 'TABLE');
   // }
   // return null;
-  console.log('props.currentDatabase', props.currentDatabase);
-  console.log('props.currentTable', props.currentTable);
   if (props.currentDatabase && props.currentTable) {
     const db = treeData.value.find((d) => d.nodeName === props.currentDatabase);
     return db?.children?.find((table) => table.nodeName === props.currentTable && table.nodeType === 'TABLE');

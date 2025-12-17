@@ -2,6 +2,7 @@
   <div class="history-trend-page-container">
     <div class="database-list-wrapper">
       <TableSideTree
+        ref="sideTreeRef"
         namespace="history"
         @updateSelectedMeasurements="(list) => handleSelectedMeasurementsUpdate({ selectedMeasurements: list })"
         @deleteMeasurement="handleDeleteMeasurement"
@@ -10,19 +11,36 @@
     </div>
     <div class="trend-details-wrapper">
       <TrendGraphArea
+        ref="trendGraphRef"
         :is-running="false"
         :loading="isFetching"
-        :range="visibleRange"
+        :range="trendStore.visibleTimeRange"
         :markers="markers"
         :measurement-group-info="resolvedGroups"
         :needFetchGroupsId="needFetchGroupsId"
+        :templateList="templateList"
         @marker-change="updateMarker"
         @global-time-change="handleGlobalTimeChange"
         @merge-into-group="mergeGroup"
         @delete-group="deleteGroup"
+        @delete-measurement="deleteMeasurement"
+        @marker-value-change="handleMarkerValueChange"
+        @save-template="handleSaveTemplate"
+        @handle-operate="handleOperateTemplate"
+        @get-query-list="getTemplateList"
       />
-      <TimelineArea :range="pendingRange" :full-range="globalTimeRange" @update:range="updateRange" />
-      <MarkerTableArea :is-running="false" />
+      <TimelineArea
+        ref="timelineAreaRef"
+        :range="trendStore.pendingTimeRange"
+        :full-range="trendStore.globalTimeRange"
+        :all-measurement-info="visibleMeasurementsSet"
+        :need-fetch-measurement-id="needFetchMeasurementsId"
+        :need-delete-measurements-id="needDeleteMeasurementsId"
+        @update:range="updateRange"
+        @clear-need-fetch-measurements="clearNeedFetchMeasurements"
+        @clear-need-delete-measurements="clearNeedDeleteMeasurements"
+      />
+      <MarkerTableArea :is-running="false" :marker-datas="markerDatas" />
     </div>
   </div>
 </template>
@@ -32,18 +50,24 @@ import TableSideTree from './components/table-side-tree.vue';
 import TrendGraphArea from './components/trend-graph-area.vue';
 import MarkerTableArea from './components/marker-table-area.vue';
 import TimelineArea from './components/timeline-area.vue';
-import type { TimeRange, GroupState, ChartGroupInput, Measurement, ChartMarker } from '@/types/trend';
-import type { SelectedMeasurement } from '@/types';
+import type { TimeRange, GroupState, ChartGroupInput, Measurement, ChartMarker, MeasurementMarkerData } from '@/types/trend';
+import type { SelectedMeasurement, TrendTemplate } from '@/types';
+import dayjs from 'dayjs';
+import { SearchApi } from '@/api';
+import { useTableHistoryTrendStore } from '@/stores/trend';
+import type { TimelineExpose } from './components/timeline-area.vue';
 
-const globalTimeRange = ref<TimeRange>({
-  start: Date.now() - 12 * 3600 * 1000,
-  end: Date.now(),
-});
-const visibleRange = ref<TimeRange>({ ...globalTimeRange.value });
-const pendingRange = ref<TimeRange>({ ...globalTimeRange.value });
+const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTemplate);
+const { requestFn: getTrendTemplate /** loading */ } = useRequest(SearchApi.getTrendTemplate);
+
+const trendStore = useTableHistoryTrendStore();
+const { t } = useI18n();
 const isFetching = ref(false);
 let fetchTimer: ReturnType<typeof setTimeout> | null = null;
 
+const sideTreeRef = ref<InstanceType<typeof TableSideTree>>();
+const timelineAreaRef = ref<TimelineExpose | null>(null);
+const trendGraphRef = ref<InstanceType<typeof TrendGraphArea>>();
 const measurementList = ref<Measurement[]>([]); // 所有左侧测点
 const measurementMap = new Map(measurementList.value.map((item) => [item.id, item]));
 const groups = ref<GroupState[]>([]); // 测点的分组信息
@@ -53,11 +77,24 @@ const resolvedGroups = computed<ChartGroupInput[]>(() =>
     members: group.measurementIds.map((measurementId) => measurementMap.get(measurementId)).filter(Boolean) as Measurement[],
   })),
 );
+const visibleMeasurementCountMap = ref<Map<string, number>>(new Map());
 const needFetchGroupsId = ref<string[]>([]);
+const needFetchMeasurementsId = ref<string[]>([]);
+const needDeleteMeasurementsId = ref<string[]>([]);
+const visibleMeasurementsSet = computed<Measurement[]>(() => {
+  return measurementList.value.filter((item) => visibleMeasurementCountMap.value.has(item.id));
+});
 
-const markers = ref<ChartMarker[]>(createInitialMarkers(globalTimeRange.value));
+const markers = ref<ChartMarker[]>(createInitialMarkers());
+const markerDatas = ref<MeasurementMarkerData[]>([]);
 
-function createInitialMarkers(range: TimeRange = globalTimeRange.value): ChartMarker[] {
+const templateList = ref<TrendTemplate[]>([]);
+
+function handleMarkerValueChange(payload: MeasurementMarkerData[]) {
+  markerDatas.value = payload;
+}
+
+function createInitialMarkers(range: TimeRange = trendStore.globalTimeRange): ChartMarker[] {
   const span = Math.max(range.end - range.start, 1);
   return [
     {
@@ -76,35 +113,38 @@ function createInitialMarkers(range: TimeRange = globalTimeRange.value): ChartMa
 }
 
 function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: SelectedMeasurement[] }) {
-  measurementList.value = payload.selectedMeasurements.map((item) => {
-    let deviceName = '';
-    for (const curTag of item.device ?? []) {
-      deviceName += `${curTag.value}.`;
-    }
-    if (deviceName.endsWith('.')) {
-      deviceName = deviceName.slice(0, -1);
-    }
-
-    // random color
-    const color = `#${Math.floor(Math.random() * 0xffffff)
-      .toString(16)
-      .padStart(6, '0')}`;
-
-    const label = `${item.database}.${item.tableName}.${deviceName}.${item.measurement}`;
-    return {
-      id: label,
-      label,
-      color,
-      details: item,
-      values: [],
-    } as unknown as Measurement;
+  const newMeasurements = payload.selectedMeasurements.filter((item) => {
+    return !measurementList.value.find((m) => m.id === `${item.database}.${item.tableName}.${item.device?.map((d) => d.value).join('.')}.${item.measurement}`);
   });
+  measurementList.value.push(
+    ...newMeasurements.map((item) => {
+      let deviceName = '';
+      for (const curTag of item.device ?? []) {
+        deviceName += `${curTag.value}.`;
+      }
+      if (deviceName.endsWith('.')) {
+        deviceName = deviceName.slice(0, -1);
+      }
+
+      // random color
+      const color = `#${Math.floor(Math.random() * 0xffffff)
+        .toString(16)
+        .padStart(6, '0')}`;
+
+      const label = `${item.database}.${item.tableName}.${deviceName}.${item.measurement}`;
+      return {
+        id: label,
+        label,
+        color,
+        details: item,
+        values: [],
+      } as unknown as Measurement;
+    }),
+  );
   measurementMap.clear();
   measurementList.value.forEach((item) => {
     measurementMap.set(item.id, item);
   });
-
-  console.log('Updated measurementList:', measurementList.value);
 }
 
 function handleDeleteMeasurement(fullpath: string) {
@@ -115,56 +155,116 @@ function handleDeleteMeasurement(fullpath: string) {
   measurementList.value.forEach((item) => {
     measurementMap.set(item.id, item);
   });
-
-  console.log('Updated measurementList:', measurementList.value);
 }
 
 function createGroup(fullpath: string) {
-  const groupLen = groups.value.length;
+  const groupId = crypto.randomUUID?.() ?? Math.random().toString(36).slice(2);
   groups.value.push({
-    id: `${groupLen + 1}`,
+    id: groupId,
     measurementIds: [fullpath],
   });
+  if (!visibleMeasurementCountMap.value.has(fullpath)) {
+    visibleMeasurementCountMap.value.set(fullpath, 1);
+    needFetchMeasurementsId.value.push(fullpath);
+  } else {
+    visibleMeasurementCountMap.value.set(fullpath, visibleMeasurementCountMap.value.get(fullpath)! + 1);
+  }
   needFetchGroupsId.value = [];
-  needFetchGroupsId.value.push(`${groupLen + 1}`);
+  needFetchGroupsId.value.push(groupId);
 }
 
 function mergeGroup(payload: { groupId: string; measurementPath: string }) {
   const group = groups.value.find((g) => g.id === payload.groupId);
   if (group && !group.measurementIds.includes(payload.measurementPath)) {
     group.measurementIds.push(payload.measurementPath);
+    if (!visibleMeasurementCountMap.value.has(payload.measurementPath)) {
+      visibleMeasurementCountMap.value.set(payload.measurementPath, 1);
+      needFetchMeasurementsId.value.push(payload.measurementPath);
+    } else {
+      visibleMeasurementCountMap.value.set(payload.measurementPath, visibleMeasurementCountMap.value.get(payload.measurementPath)! + 1);
+    }
     needFetchGroupsId.value = [];
     needFetchGroupsId.value.push(payload.groupId);
-    console.log('Merged measurement', payload.measurementPath, 'into group:', payload.groupId);
+    setStorage();
   }
 }
 
 function deleteGroup(payload: { groupId: string }) {
+  const group = groups.value.find((g) => g.id === payload.groupId);
+  if (group) {
+    group.measurementIds.forEach((measurementId) => {
+      if (visibleMeasurementCountMap.value.has(measurementId)) {
+        const count = visibleMeasurementCountMap.value.get(measurementId)! - 1;
+        if (count <= 0) {
+          visibleMeasurementCountMap.value.delete(measurementId);
+          needDeleteMeasurementsId.value.push(measurementId);
+          trendGraphRef.value?.deleteMeasurementMarkerDataByName(measurementId);
+        } else {
+          visibleMeasurementCountMap.value.set(measurementId, count);
+        }
+      }
+    });
+  }
   groups.value = groups.value.filter((g) => g.id !== payload.groupId);
-  console.log('Deleted group:', payload.groupId);
   needFetchGroupsId.value = [];
+
+  setStorage();
+}
+
+function deleteMeasurement(payload: { groupId: string; measurementPath: string }) {
+  const group = groups.value.find((g) => g.id === payload.groupId);
+  if (group) {
+    group.measurementIds = group.measurementIds.filter((id) => id !== payload.measurementPath);
+    if (visibleMeasurementCountMap.value.has(payload.measurementPath)) {
+      const count = visibleMeasurementCountMap.value.get(payload.measurementPath)! - 1;
+      if (count <= 0) {
+        visibleMeasurementCountMap.value.delete(payload.measurementPath);
+        needDeleteMeasurementsId.value.push(payload.measurementPath);
+        trendGraphRef.value?.deleteMeasurementMarkerDataByName(payload.measurementPath);
+      } else {
+        visibleMeasurementCountMap.value.set(payload.measurementPath, count);
+      }
+    }
+    needFetchGroupsId.value = [];
+    needFetchGroupsId.value.push(payload.groupId);
+
+    setStorage();
+  }
+}
+
+function clearNeedFetchMeasurements() {
+  needFetchMeasurementsId.value = [];
+}
+
+function clearNeedDeleteMeasurements() {
+  needDeleteMeasurementsId.value = [];
 }
 
 function updateMarker(payload: { id: string; timestamp: number }) {
-  const range = visibleRange.value;
+  const range = trendStore.visibleTimeRange;
   const clamped = Math.min(Math.max(payload.timestamp, range.start), range.end);
   markers.value = markers.value.map((marker) => (marker.id === payload.id ? { ...marker, timestamp: clamped } : marker));
+
+  setStorage();
 }
 
 function handleGlobalTimeChange(payload: TimeRange) {
-  globalTimeRange.value.start = payload.start;
-  globalTimeRange.value.end = payload.end;
+  trendStore.setGlobalTimeRange(payload);
+  trendStore.setVisibleTimeRange(payload);
+  trendStore.setPendingTimeRange(payload);
   needFetchGroupsId.value = [];
   needFetchGroupsId.value = groups.value.map((g) => g.id);
   markers.value = createInitialMarkers();
+
+  setStorage();
 }
 
 function updateRange(range: TimeRange) {
   const nextRange = {
-    start: Math.max(range.start, globalTimeRange.value.start),
-    end: Math.min(range.end, globalTimeRange.value.end),
+    start: Math.max(range.start, trendStore.globalTimeRange.start),
+    end: Math.min(range.end, trendStore.globalTimeRange.end),
   };
-  pendingRange.value = nextRange;
+  trendStore.setPendingTimeRange(nextRange);
   triggerSimulatedFetch(nextRange);
 }
 
@@ -175,26 +275,186 @@ function triggerSimulatedFetch(nextRange: TimeRange) {
   }
   fetchTimer = setTimeout(() => {
     markers.value = createInitialMarkers(nextRange);
-    visibleRange.value = nextRange;
+    trendStore.setVisibleTimeRange(nextRange);
     isFetching.value = false;
     fetchTimer = null;
   }, 650);
 }
 
+function getTemplateList() {
+  // TODO: filterText
+  getTrendTemplate('', '').then((res) => {
+    const data = res.data || [];
+    templateList.value = data.filter((item: TrendTemplate) => item.type === 'new-table-history');
+  });
+}
+
+function handleSaveTemplate(name: string) {
+  trendGraphRef.value?.setSaveTemplateLoading(true);
+  const groupInfoToSave = groups.value.map((group) => ({
+    id: group.id,
+    members: group.measurementIds.map((measurementId) => measurementMap.get(measurementId)).filter(Boolean) as Measurement[],
+  }));
+  const data = JSON.stringify({
+    type: 'table-history',
+    globalTimeRange: [dayjs(trendStore.globalTimeRange.start).valueOf(), dayjs(trendStore.globalTimeRange.end).valueOf()],
+    localTimeRange: [dayjs(trendStore.visibleTimeRange.start).valueOf(), dayjs(trendStore.visibleTimeRange.end).valueOf()],
+    visibleGroupInfo: groupInfoToSave,
+    selectedMeasurements: measurementList.value,
+  });
+  upsertTrendTemplate({
+    id: '',
+    type: 'new-table-history',
+    name,
+    template: data,
+  })
+    .then(() => {
+      ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
+      trendGraphRef.value?.setTemplateVisible(false);
+      getTemplateList();
+    })
+    .finally(() => {
+      trendGraphRef.value?.setSaveTemplateLoading(false);
+    });
+}
+
+function handleOperateTemplate(payload: { action: string; data: TrendTemplate }) {
+  if (payload.action === 'rename') {
+    trendGraphRef.value?.setRenameData({
+      id: +payload.data.id,
+      name: payload.data.name,
+      type: payload.data.type,
+      template: payload.data.template,
+    });
+    trendGraphRef.value?.setRenameVisible(true);
+    trendGraphRef.value?.setSaveTemplateLoading(false);
+  } else {
+    const templateData = JSON.parse(payload.data.template);
+    trendStore.setGlobalTimeRange({
+      start: templateData.globalTimeRange[0],
+      end: templateData.globalTimeRange[1],
+    });
+    trendStore.setVisibleTimeRange({
+      start: templateData.localTimeRange[0],
+      end: templateData.localTimeRange[1],
+    });
+    trendStore.setPendingTimeRange({
+      start: templateData.localTimeRange[0],
+      end: templateData.localTimeRange[1],
+    });
+    measurementList.value = templateData.selectedMeasurements;
+    measurementMap.clear();
+    measurementList.value.forEach((item: Measurement) => {
+      measurementMap.set(item.id, item);
+    });
+    groups.value = templateData.visibleGroupInfo.map((group: ChartGroupInput) => ({
+      id: group.id,
+      measurementIds: group.members.map((member: Measurement) => member.id),
+    }));
+    console.log('Loaded Groups:', groups.value);
+    visibleMeasurementCountMap.value = new Map();
+    groups.value.forEach((group) => {
+      group.measurementIds.forEach((measurementId) => {
+        if (!visibleMeasurementCountMap.value.has(measurementId)) {
+          visibleMeasurementCountMap.value.set(measurementId, 1);
+        } else {
+          visibleMeasurementCountMap.value.set(measurementId, visibleMeasurementCountMap.value.get(measurementId)! + 1);
+        }
+      });
+    });
+    needFetchMeasurementsId.value = measurementList.value.map((m) => m.id);
+    needFetchGroupsId.value = [];
+    needFetchGroupsId.value = groups.value.map((g) => g.id);
+    markers.value = createInitialMarkers(trendStore.visibleTimeRange);
+    sideTreeRef.value?.restoreSelectedMeasurements(convertMeasurementListToSelectedMeasurements(measurementList.value));
+  }
+}
+
+function setStorage() {
+  const storageData = {
+    globalTimeRange: trendStore.globalTimeRange,
+    visibleRange: trendStore.visibleTimeRange,
+    pendingRange: trendStore.pendingTimeRange,
+    groups: groups.value,
+    measurements: measurementList.value,
+    markers: markers.value,
+    visibleMeasurementCounts: Array.from(visibleMeasurementCountMap.value.entries()),
+  };
+  window.sessionStorage.setItem('newTableDataHistoryTrendStorage', JSON.stringify(storageData));
+}
+
+function convertMeasurementListToSelectedMeasurements(list: Measurement[]): SelectedMeasurement[] {
+  return list.map((item) => item.details).filter(Boolean) as SelectedMeasurement[];
+}
+
+function restoreData() {
+  const storageData = window.sessionStorage.getItem('newTableDataHistoryTrendStorage');
+  if (storageData) {
+    try {
+      const parsed = JSON.parse(storageData);
+      trendStore.setGlobalTimeRange(parsed.globalTimeRange);
+      trendStore.setVisibleTimeRange(parsed.visibleRange);
+      trendStore.setPendingTimeRange(parsed.pendingRange);
+      trendGraphRef.value?.setSelectedDateTime([trendStore.globalTimeRange.start, trendStore.globalTimeRange.end]);
+      groups.value = parsed.groups;
+      measurementList.value = parsed.measurements;
+      markers.value = parsed.markers?.length ? parsed.markers : createInitialMarkers(trendStore.globalTimeRange);
+      measurementMap.clear();
+      measurementList.value.forEach((item) => {
+        measurementMap.set(item.id, item);
+      });
+
+      if (Array.isArray(parsed.visibleMeasurementCounts)) {
+        visibleMeasurementCountMap.value = new Map(parsed.visibleMeasurementCounts);
+      } else {
+        visibleMeasurementCountMap.value = new Map();
+        groups.value.forEach((group) => {
+          group.measurementIds.forEach((measurementId) => {
+            if (!visibleMeasurementCountMap.value.has(measurementId)) {
+              visibleMeasurementCountMap.value.set(measurementId, 1);
+            } else {
+              visibleMeasurementCountMap.value.set(measurementId, visibleMeasurementCountMap.value.get(measurementId)! + 1);
+            }
+          });
+        });
+      }
+
+      needFetchGroupsId.value = [];
+      needFetchMeasurementsId.value = [];
+      needDeleteMeasurementsId.value = [];
+
+      nextTick(() => {
+        trendGraphRef.value?.restoreChartData();
+        timelineAreaRef.value?.restoreData();
+      });
+    } catch (e) {
+      console.error('Failed to parse storage data:', e);
+    }
+  }
+}
+
+onMounted(() => {
+  if (window.sessionStorage.getItem('newTableDataHistoryTrendStorage')) {
+    restoreData();
+  } else {
+    window.sessionStorage.setItem('newTableDataHistoryTrendStorage', '');
+  }
+  getTemplateList();
+});
+
 watch(
-  globalTimeRange,
-  (newVal) => {
-    pendingRange.value = { ...newVal };
-    visibleRange.value = { ...newVal };
+  () => trendStore.globalTimeRange,
+  () => {
+    setStorage();
   },
   { deep: true },
 );
 
 watch(
-  () => visibleRange.value,
+  () => trendStore.visibleTimeRange,
   (range) => {
     if (!isFetching.value) {
-      pendingRange.value = range;
+      trendStore.setPendingTimeRange(range);
     }
     markers.value = markers.value.map((marker) => ({
       ...marker,
@@ -202,6 +462,15 @@ watch(
     }));
     needFetchGroupsId.value = [];
     needFetchGroupsId.value = groups.value.map((g) => g.id);
+    setStorage();
+  },
+  { deep: true },
+);
+
+watch(
+  () => trendStore.pendingTimeRange,
+  () => {
+    setStorage();
   },
   { deep: true },
 );

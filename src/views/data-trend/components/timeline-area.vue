@@ -34,29 +34,37 @@
 
 <script lang="ts" setup>
 import ICustomCalender from '~icons/custom/calender.svg';
-import type { TimeRange, RangeHandle } from '@/types/trend';
+import type { TimeRange, RangeHandle, Measurement, DataPoint } from '@/types/trend';
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
 import { ArrowLeft, ArrowRight } from '@element-plus/icons-vue';
+import { TableDataApi } from '@/api';
+import { formatSelectedMeasurement } from '@/utils/format';
+import { useTableHistoryTrendStore } from '@/stores/trend';
+
+const trendStore = useTableHistoryTrendStore();
 
 const GRID_LEFT = 64;
 const GRID_RIGHT = 32;
 
+const { requestFn: getHistoryTrend } = useRequest(TableDataApi.getTrendHistoryData);
+
 const props = defineProps<{
-  // allGroupInfo: ChartGroupInput[]
-  // fullData: Measurement[]
-  fullRange: TimeRange;
-  range: TimeRange;
+  allMeasurementInfo: Measurement[];
+  needFetchMeasurementId: string[];
+  needDeleteMeasurementsId: string[];
 }>();
 
 const emit = defineEmits<{
   'update:range': [payload: TimeRange];
+  'clear-need-fetch-measurements': [];
+  'clear-need-delete-measurements': [];
 }>();
 
 const disabledDate = computed(() => {
-  return (time: number) => time < props.fullRange.start || time > props.fullRange.end;
+  return (time: number) => time < trendStore.globalTimeRange.start || time > trendStore.globalTimeRange.end;
 });
-const startTime = ref<Date | null>(props.range.start ? new Date(props.range.start) : null);
-const endTime = ref<Date | null>(props.range.end ? new Date(props.range.end) : null);
+const startTime = ref<Date | null>(trendStore.pendingTimeRange.start ? new Date(trendStore.pendingTimeRange.start) : null);
+const endTime = ref<Date | null>(trendStore.pendingTimeRange.end ? new Date(trendStore.pendingTimeRange.end) : null);
 const timelineChartRef = ref<HTMLDivElement | null>(null);
 const timelineWrapperRef = ref<HTMLDivElement | null>(null);
 let timelineChart: echarts.ECharts | null = null;
@@ -99,10 +107,89 @@ const handleRightPos = computed(() => {
 //   });
 // });
 
+const fullDataSet = ref<Measurement[]>([]);
+
+watch(
+  () => props.allMeasurementInfo,
+  () => {
+    if (props.needFetchMeasurementId.length > 0) {
+      const toFetchIds = [...props.needFetchMeasurementId];
+      toFetchIds.forEach((id) => {
+        const measurement = props.allMeasurementInfo.find((m) => m.id === id);
+        if (measurement) {
+          fetchFullRangeHistoryData(measurement);
+        }
+      });
+      emit('clear-need-fetch-measurements');
+    }
+    if (props.needDeleteMeasurementsId.length > 0) {
+      const toDeleteIds = new Set(props.needDeleteMeasurementsId);
+      fullDataSet.value = fullDataSet.value.filter((m) => !toDeleteIds.has(m.id));
+      emit('clear-need-delete-measurements');
+    }
+  },
+  { deep: true, immediate: true },
+);
+
+watch(
+  () => fullDataSet.value,
+  () => {
+    if (timelineChart) {
+      timelineChart.setOption(buildTimelineChartOption(), true);
+    }
+  },
+  { deep: true },
+);
+
+function fetchFullRangeHistoryData(measurement: Measurement) {
+  getHistoryTrend({
+    database: measurement.details.database,
+    tableName: measurement.details.tableName,
+    fieldCondition: [
+      {
+        variable: measurement.details.measurement,
+        value: measurement.details.condition,
+        database: measurement.details.database,
+        tableName: measurement.details.tableName,
+        path: formatSelectedMeasurement(measurement.details),
+      },
+    ],
+    startTime: trendStore.globalTimeRange.start,
+    endTime: trendStore.globalTimeRange.end,
+    groupBy: 'origin',
+    aggregateFun: 'last',
+  }).then((res) => {
+    // process data
+    const normalData = res.data?.normal || [];
+    const transformedData: DataPoint[] = [];
+    if (normalData[0]) {
+      const point = normalData[0];
+      const valueLen = point.values.length;
+      for (let i = 0; i < valueLen; i++) {
+        const timestamp = point.timestamps[i];
+        const value = point.values[i];
+        transformedData.push({ timestamp: timestamp as number, value: Number(value) });
+      }
+    }
+    fullDataSet.value.push({
+      ...measurement,
+      values: transformedData,
+    });
+    if (!normalData.length) {
+      // ElMessage.warning({ message: `测点 ${measurement.label} 在 ${t('dataTrend.noDataTip')}`, grouping: true });
+    }
+    const overPath = res.data?.changeAuto || [];
+    if (overPath.length) {
+      // const paths = overPath.join(',');
+      // ElMessage.warning({ message: t('dataTrend.measurementTip', { measurement: paths }), grouping: true });
+    }
+  });
+}
+
 function updateRangePercent() {
-  const span = props.fullRange.end - props.fullRange.start;
-  rangeStartPercent.value = ((props.range.start - props.fullRange.start) / span) * 100;
-  rangeEndPercent.value = ((props.range.end - props.fullRange.start) / span) * 100;
+  const span = trendStore.globalTimeRange.end - trendStore.globalTimeRange.start;
+  rangeStartPercent.value = ((trendStore.pendingTimeRange.start - trendStore.globalTimeRange.start) / span) * 100;
+  rangeEndPercent.value = ((trendStore.pendingTimeRange.end - trendStore.globalTimeRange.start) / span) * 100;
 }
 
 function updateContainerWidth() {
@@ -117,7 +204,7 @@ function onStartTimeSelected(date: Date | null) {
   const selectedTs = date.getTime();
   emit('update:range', {
     start: selectedTs,
-    end: props.range.end,
+    end: trendStore.pendingTimeRange.end,
   });
 }
 
@@ -125,7 +212,7 @@ function onEndTimeSelected(date: Date | null) {
   if (!date) return;
   const selectedTs = date.getTime();
   emit('update:range', {
-    start: props.range.start,
+    start: trendStore.pendingTimeRange.start,
     end: selectedTs,
   });
 }
@@ -167,9 +254,9 @@ function onSliderBlockMove(event: PointerEvent) {
   rangeStartPercent.value = newStartPercent;
   rangeEndPercent.value = newEndPercent;
 
-  const span = props.fullRange.end - props.fullRange.start;
-  const startTs = props.fullRange.start + (rangeStartPercent.value / 100) * span;
-  const endTs = props.fullRange.start + (rangeEndPercent.value / 100) * span;
+  const span = trendStore.globalTimeRange.end - trendStore.globalTimeRange.start;
+  const startTs = trendStore.globalTimeRange.start + (rangeStartPercent.value / 100) * span;
+  const endTs = trendStore.globalTimeRange.start + (rangeEndPercent.value / 100) * span;
 
   emit('update:range', {
     start: startTs,
@@ -202,9 +289,9 @@ function onSliderPointerMove(event: PointerEvent) {
     rangeEndPercent.value = Math.max(percent, rangeStartPercent.value);
   }
 
-  const span = props.fullRange.end - props.fullRange.start;
-  const startTs = props.fullRange.start + (rangeStartPercent.value / 100) * span;
-  const endTs = props.fullRange.start + (rangeEndPercent.value / 100) * span;
+  const span = trendStore.globalTimeRange.end - trendStore.globalTimeRange.start;
+  const startTs = trendStore.globalTimeRange.start + (rangeStartPercent.value / 100) * span;
+  const endTs = trendStore.globalTimeRange.start + (rangeEndPercent.value / 100) * span;
   startTime.value = new Date(startTs);
   endTime.value = new Date(endTs);
 
@@ -227,8 +314,8 @@ function buildTimelineChartOption(): ECOption {
     tooltip: { show: false },
     xAxis: {
       type: 'time',
-      min: props.fullRange.start,
-      max: props.fullRange.end,
+      min: trendStore.globalTimeRange.start,
+      max: trendStore.globalTimeRange.end,
       splitNumber: 4,
       axisLabel: {
         color: '#8d95a5',
@@ -253,10 +340,17 @@ function buildTimelineChartOption(): ECOption {
       show: false,
       splitLine: { show: false },
     },
-    series: {
-      // TODO: 传入趋势图中所有测点在完整时间范围内的数据
+    series: fullDataSet.value.map((measurement) => ({
+      name: measurement.label,
       type: 'line',
-    },
+      smooth: true,
+      data: measurement.values.map((point) => [point.timestamp, point.value]),
+      showSymbol: false,
+      lineStyle: {
+        width: 1.5,
+        color: measurement.color,
+      },
+    })),
   };
 }
 
@@ -281,6 +375,33 @@ function disposeTimelineChart() {
   }
 }
 
+function setStorage() {
+  const storageData = {
+    fullDataSet: fullDataSet.value,
+  };
+  window.sessionStorage.setItem('timelineAreaChart', JSON.stringify(storageData));
+}
+
+const restoreData = () => {
+  const storageData = window.sessionStorage.getItem('timelineAreaChart');
+  if (storageData) {
+    try {
+      const parsedData = JSON.parse(storageData);
+      fullDataSet.value = parsedData.fullDataSet || [];
+    } catch (error) {
+      console.error('Error parsing timeline area chart data from sessionStorage:', error);
+    }
+  }
+};
+
+export interface TimelineExpose {
+  restoreData: () => void;
+}
+
+defineExpose<TimelineExpose>({
+  restoreData,
+});
+
 onMounted(() => {
   initTimelineChart();
 });
@@ -290,10 +411,18 @@ onUnmounted(() => {
 });
 
 watch(
-  () => props.fullRange,
+  () => fullDataSet.value,
   () => {
-    startTime.value = props.range.start ? new Date(props.range.start) : null;
-    endTime.value = props.range.end ? new Date(props.range.end) : null;
+    setStorage();
+  },
+  { deep: true },
+);
+
+watch(
+  () => trendStore.globalTimeRange,
+  () => {
+    startTime.value = trendStore.pendingTimeRange.start ? new Date(trendStore.pendingTimeRange.start) : null;
+    endTime.value = trendStore.pendingTimeRange.end ? new Date(trendStore.pendingTimeRange.end) : null;
     updateContainerWidth();
     if (timelineChart) {
       timelineChart.setOption(buildTimelineChartOption());
@@ -303,10 +432,10 @@ watch(
 );
 
 watch(
-  () => props.range,
+  () => trendStore.pendingTimeRange,
   () => {
-    startTime.value = props.range.start ? new Date(props.range.start) : null;
-    endTime.value = props.range.end ? new Date(props.range.end) : null;
+    startTime.value = trendStore.pendingTimeRange.start ? new Date(trendStore.pendingTimeRange.start) : null;
+    endTime.value = trendStore.pendingTimeRange.end ? new Date(trendStore.pendingTimeRange.end) : null;
     updateRangePercent();
   },
   { deep: true },
@@ -380,7 +509,7 @@ watch(
 .range-slider-fill {
   position: absolute;
   top: 0;
-  bottom: 25px;
+  bottom: 19px;
   background: rgb(226 226 226 / 15%);
   border: 1px solid rgb(94 94 94);
 
@@ -393,7 +522,7 @@ watch(
   position: absolute;
   margin-left: -2px;
   top: 0;
-  bottom: 25px;
+  bottom: 19px;
   width: 1px;
   padding: 0;
   cursor: ew-resize;

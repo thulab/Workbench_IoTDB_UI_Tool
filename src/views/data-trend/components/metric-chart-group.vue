@@ -1,8 +1,18 @@
 <template>
   <div @drop="handleDrop" @dragover.prevent>
-    <button class="close-button" :disabled="!props.canDelete" @click="handleDeleteGroup" :style="props.canDelete ? 'cursor: pointer' : ''">
-      <el-icon size="20"><i-custom-close /></el-icon>
-    </button>
+    <div style="display: flex">
+      <button class="close-button" :disabled="!props.canDelete" @click="handleDeleteGroup" :style="props.canDelete ? 'cursor: pointer' : ''">
+        <el-icon size="20"><i-custom-close /></el-icon>
+      </button>
+      <div style="display: flex">
+        <div v-for="measurement in measurementsData" class="measurement-row" :key="measurement.label">
+          <div>{{ measurement.label }}</div>
+          <button class="close-button" :disabled="measurementsData.length <= 1" @click="handleDeleteMeasurement(measurement.label)" :style="measurementsData.length > 1 ? 'cursor: pointer' : ''">
+            <el-icon size="20"><i-custom-close /></el-icon>
+          </button>
+        </div>
+      </div>
+    </div>
     <div ref="stageRef" class="stage-wrapper">
       <div ref="trendChartRef" class="chart-area" :style="{ height: typeof props.height === 'number' ? props.height + 'px' : props.height }"></div>
       <div class="marker-overlay" :class="{ 'marker-overlay--disabled': props.loading }">
@@ -24,9 +34,12 @@
 
 <script lang="ts" setup>
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
-import type { TimeRange, ChartMarker, ChartGroupInput, Measurement, DataPoint } from '@/types/trend';
+import type { ChartMarker, ChartGroupInput, Measurement, DataPoint, MeasurementMarkerData } from '@/types/trend';
 import { TableDataApi } from '@/api';
 import { formatSelectedMeasurement } from '@/utils/format';
+import { useTableHistoryTrendStore } from '@/stores/trend';
+
+const trendStore = useTableHistoryTrendStore();
 
 const { t } = useI18n();
 const { requestFn: getHistoryTrend } = useRequest(TableDataApi.getTrendHistoryData);
@@ -34,6 +47,8 @@ const { requestFn: getHistoryTrend } = useRequest(TableDataApi.getTrendHistoryDa
 const GRID_LEFT = 64;
 const GRID_RIGHT = 32;
 const layoutTick = ref(0);
+const isRefresh = ref(false);
+// const isFetchingData = ref(false);
 const trendChartRef = ref<HTMLDivElement | null>(null);
 const stageRef = ref<HTMLElement | null>(null);
 let chart: echarts.ECharts | null = null;
@@ -43,7 +58,6 @@ let draggingId: string | null = null;
 const props = withDefaults(
   defineProps<{
     group: ChartGroupInput;
-    range: TimeRange;
     markers: ChartMarker[];
     index: number;
     loading?: boolean;
@@ -53,25 +67,65 @@ const props = withDefaults(
   }>(),
   {
     loading: false,
-    needFetchData: true,
+    // Default to false to avoid unexpected refetch on restore when parent forgets to pass the prop.
+    needFetchData: false,
     canDelete: false,
   },
 );
 
 const measurementsData = ref<Measurement[]>([]);
+const markerValues = ref<MeasurementMarkerData[]>([]);
+
+function updateMarkerValues() {
+  markerValues.value = measurementsData.value.map((measurement) => {
+    const x1Marker = props.markers.find((marker) => marker.label === 'X1');
+    const x2Marker = props.markers.find((marker) => marker.label === 'X2');
+    const y1Value = x1Marker ? nearestDataPoint(measurement, x1Marker.timestamp).value : NaN;
+    const y2Value = x2Marker ? nearestDataPoint(measurement, x2Marker.timestamp).value : NaN;
+    return {
+      name: measurement.label,
+      x1: x1Marker ? x1Marker.timestamp : NaN,
+      x2: x2Marker ? x2Marker.timestamp : NaN,
+      x2_x1: x1Marker && x2Marker ? x2Marker.timestamp - x1Marker.timestamp : NaN,
+      y1: y1Value,
+      y2: y2Value,
+      y2_y1: !isNaN(y1Value) && !isNaN(y2Value) ? y2Value - y1Value : NaN,
+    };
+  });
+}
 
 const emit = defineEmits<{
-  // remove: [payload: { groupId: string; measurementId: string }]
   drop: [payload: { groupId: string; measurementPath: string }];
   'marker-change': [payload: { id: string; timestamp: number }];
   'delete-group': [payload: { groupId: string }];
+  'marker-value-change': [payload: MeasurementMarkerData[]];
+  'delete-measurement': [payload: { groupId: string; measurementPath: string }];
 }>();
 
 const markerHandles = computed(() => {
+  // Re-compute positions when the chart/container is resized.
+  // This matters on Windows multi-monitor setups where moving the window can
+  // change effective CSS pixel sizes (per-monitor DPI) without changing marker timestamps.
+  const tmp = layoutTick.value;
+  if (tmp) {
+    const width = getInnerWidth();
+    const span = trendStore.visibleTimeRange.end - trendStore.visibleTimeRange.start || 1;
+    return props.markers.map((marker) => {
+      const ratio = (marker.timestamp - trendStore.visibleTimeRange.start) / span;
+      const clamped = Math.min(Math.max(ratio, 0), 1);
+      const left = GRID_LEFT + clamped * width;
+      return {
+        id: marker.id,
+        label: marker.label,
+        color: marker.color,
+        left: `${left}px`,
+      };
+    });
+  }
   const width = getInnerWidth();
-  const span = props.range.end - props.range.start || 1;
+  const span = trendStore.visibleTimeRange.end - trendStore.visibleTimeRange.start || 1;
   return props.markers.map((marker) => {
-    const ratio = (marker.timestamp - props.range.start) / span;
+    const ratio = (marker.timestamp - trendStore.visibleTimeRange.start) / span;
     const clamped = Math.min(Math.max(ratio, 0), 1);
     const left = GRID_LEFT + clamped * width;
     return {
@@ -83,7 +137,26 @@ const markerHandles = computed(() => {
   });
 });
 
+function nearestDataPoint(measurement: Measurement, timestamp: number): DataPoint {
+  const values = measurement.values;
+  if (values.length === 0) return { timestamp, value: 0 };
+  let left = 0;
+  let right = values.length - 1;
+  while (left < right) {
+    const mid = Math.floor((left + right) / 2);
+    const midPoint = values[mid];
+    if (!midPoint) break;
+    if (midPoint.timestamp < timestamp) left = mid + 1;
+    else right = mid;
+  }
+  const fallback = values[values.length - 1] ?? { timestamp, value: 0 };
+  const candidate = values[left] ?? fallback;
+  const previous = values[left - 1] ?? candidate;
+  return Math.abs(candidate.timestamp - timestamp) < Math.abs(previous.timestamp - timestamp) ? candidate : previous;
+}
+
 function fetchHistoryData(measurement: Measurement) {
+  console.log('Fetching data for group:' + props.group.id + '  measurement:', measurement);
   getHistoryTrend({
     database: measurement.details.database,
     tableName: measurement.details.tableName,
@@ -94,10 +167,10 @@ function fetchHistoryData(measurement: Measurement) {
         database: measurement.details.database,
         tableName: measurement.details.tableName,
         path: formatSelectedMeasurement(measurement.details),
-      } as any,
+      },
     ],
-    startTime: props.range.start,
-    endTime: props.range.end,
+    startTime: trendStore.visibleTimeRange.start,
+    endTime: trendStore.visibleTimeRange.end,
     groupBy: 'origin',
     aggregateFun: 'last',
   }).then((res) => {
@@ -117,11 +190,11 @@ function fetchHistoryData(measurement: Measurement) {
       ...measurement,
       values: transformedData,
     });
-    if (!normalData.length) {
+    if (!normalData.length && !isRefresh.value) {
       ElMessage.warning({ message: `测点 ${measurement.label} 在 ${t('dataTrend.noDataTip')}`, grouping: true });
     }
     const overPath = res.data?.changeAuto || [];
-    if (overPath.length) {
+    if (overPath.length && !isRefresh.value) {
       const paths = overPath.join(',');
       ElMessage.warning({ message: t('dataTrend.measurementTip', { measurement: paths }), grouping: true });
     }
@@ -141,6 +214,10 @@ function handleDeleteGroup() {
   emit('delete-group', { groupId: props.group.id });
 }
 
+function handleDeleteMeasurement(measurementLabel: string) {
+  emit('delete-measurement', { groupId: props.group.id, measurementPath: measurementLabel });
+}
+
 function onMarkerPointerDown(markerId: string, event: PointerEvent) {
   if (props.loading) return;
   event.preventDefault();
@@ -156,7 +233,7 @@ function onMarkerMove(event: PointerEvent) {
   const rawOffset = event.clientX - rect.left - GRID_LEFT;
   const offset = Math.min(Math.max(rawOffset, 0), usable);
   const ratio = offset / usable;
-  const timestamp = props.range.start + ratio * (props.range.end - props.range.start);
+  const timestamp = trendStore.visibleTimeRange.start + ratio * (trendStore.visibleTimeRange.end - trendStore.visibleTimeRange.start);
   emit('marker-change', { id: draggingId, timestamp });
 }
 
@@ -200,8 +277,8 @@ function buildOption(): ECOption {
     },
     xAxis: {
       type: 'time',
-      min: props.range.start,
-      max: props.range.end,
+      min: trendStore.visibleTimeRange.start,
+      max: trendStore.visibleTimeRange.end,
       splitNumber: 4,
       axisLine: { lineStyle: { color: '#444b63' } },
       axisLabel: {
@@ -289,8 +366,34 @@ function disposeChart() {
   chart = null;
 }
 
+function setStorage() {
+  const storageData = {
+    measurementsData: measurementsData.value,
+  };
+  window.sessionStorage.setItem('newTableHistoryTrend' + props.group.id, JSON.stringify(storageData));
+}
+
+const restoreData = () => {
+  const storageData = window.sessionStorage.getItem('newTableHistoryTrend' + props.group.id);
+  if (storageData) {
+    try {
+      const parsed = JSON.parse(storageData);
+      measurementsData.value = parsed.measurementsData || [];
+    } catch (e) {
+      console.error('Failed to parse storage data:', e);
+    }
+  }
+};
+
+defineExpose({
+  restoreData,
+});
+
 onMounted(() => {
   initChart();
+  // if (!window.sessionStorage.getItem('newTableHistoryTrend' + props.group.id)) {
+  //   window.sessionStorage.setItem('newTableHistoryTrend' + props.group.id, '');
+  // }
 });
 
 onUnmounted(() => {
@@ -299,16 +402,26 @@ onUnmounted(() => {
 });
 
 watch(
-  () => props.range,
+  () => trendStore.visibleTimeRange,
   () => {
-    if (!props.needFetchData) {
-      console.log('No need to fetch data for group', props.group.id);
+    if (props.group.id === 'default') {
+      if (chart) {
+        chart.setOption(buildOption(), true);
+      }
       return;
     }
-    console.log('Fetching data for group', props.group.id);
+    if (!props.needFetchData) {
+      return;
+    }
     measurementsData.value = [];
-    for (const measurement of props.group.members) {
-      fetchHistoryData(measurement);
+    if (!isRefresh.value) {
+      isRefresh.value = true;
+      for (const measurement of props.group.members) {
+        fetchHistoryData(measurement);
+      }
+      nextTick(() => {
+        isRefresh.value = false;
+      });
     }
   },
   { deep: true },
@@ -318,13 +431,17 @@ watch(
   () => props.group,
   (newGroup) => {
     if (!props.needFetchData) {
-      console.log('No need to fetch data for group', newGroup.id);
       return;
     }
-    console.log('Fetching data for group', newGroup.id);
     measurementsData.value = [];
-    for (const measurement of newGroup.members) {
-      fetchHistoryData(measurement);
+    if (!isRefresh.value) {
+      isRefresh.value = true;
+      for (const measurement of newGroup.members) {
+        fetchHistoryData(measurement);
+      }
+      nextTick(() => {
+        isRefresh.value = false;
+      });
     }
   },
   { immediate: true, deep: true },
@@ -333,9 +450,30 @@ watch(
 watch(
   () => measurementsData.value,
   () => {
+    setStorage();
+    updateMarkerValues();
     if (chart) {
-      chart.setOption(buildOption());
+      chart.setOption(buildOption(), true);
     }
+  },
+  { deep: true },
+);
+
+watch(
+  () => markerValues.value,
+  (newValues) => {
+    emit('marker-value-change', newValues);
+  },
+  { deep: true },
+);
+
+watch(
+  () => props.markers,
+  () => {
+    // if (chart) {
+    //   chart.setOption(buildOption());
+    // }
+    updateMarkerValues();
   },
   { deep: true },
 );
@@ -393,5 +531,12 @@ watch(
 
 .stage-wrapper {
   position: relative;
+}
+
+.measurement-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: small;
 }
 </style>

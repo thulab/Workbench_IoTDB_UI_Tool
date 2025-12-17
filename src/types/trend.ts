@@ -55,3 +55,13 @@ export type ChartGroupInput = {
   id: string;
   members: Measurement[];
 };
+
+export type MeasurementMarkerData = {
+  name: string;
+  x1: number;
+  x2: number;
+  x2_x1: number;
+  y1: number;
+  y2: number;
+  y2_y1: number;
+};

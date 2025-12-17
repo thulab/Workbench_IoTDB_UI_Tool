@@ -271,6 +271,7 @@ const handleConfirmMeasurement = (selected: SelectedMeasurement[]) => {
   emit('updateSelectedMeasurements', selectedMeasurements.value);
 };
 
+// selectedMeasurements -> selectedMeasurementsData
 function addMeasurementsOfDbTbIntoTree() {
   if (!selectedMeasurementsData.value) return;
   for (const dbNode of selectedMeasurementsData.value) {
@@ -278,22 +279,24 @@ function addMeasurementsOfDbTbIntoTree() {
       for (const tbNode of dbNode.children || []) {
         if (tbNode.nodeName === selectedTable.value) {
           tbNode.children = [];
-          for (const [index, meas] of selectedMeasurements.value.entries()) {
+          for (const meas of selectedMeasurements.value) {
             let deviceName = '';
             for (const curTag of meas.device) {
               deviceName += `${curTag.value}.`;
             }
             deviceName = deviceName.slice(0, -1);
             tbNode.children.push({
-              id: `${props.namespace}-${selectedDatabase.value}-${selectedTable.value}-${index}`,
-              nodeName: `${deviceName}.${meas.measurement}`,
+              id:
+                deviceName === ''
+                  ? `${props.namespace}-${selectedDatabase.value}-${selectedTable.value}-${meas.measurement}`
+                  : `${props.namespace}-${selectedDatabase.value}-${selectedTable.value}-${deviceName}-${meas.measurement}`,
+              nodeName: deviceName === '' ? meas.measurement : `${deviceName}.${meas.measurement}`,
               nodeType: 'DEVICE-MEASUREMENT',
               parentName: tbNode.nodeName,
               database: dbNode.nodeName,
               children: [],
             });
           }
-          console.log('Updated Data:', selectedMeasurementsData.value);
           selectedMeasurementsData.value = [...selectedMeasurementsData.value];
           return;
         }
@@ -454,6 +457,61 @@ function handleSelectNode(payload: Record<string, unknown>) {
   }
 }
 
+function findTableNode(tree: TableTreeNodeData[], database: string, tableName: string): TableTreeNodeData | null {
+  for (const dbNode of tree) {
+    if (dbNode.nodeType === 'DATABASE' && dbNode.nodeName === database && dbNode.children) {
+      for (const tableNode of dbNode.children) {
+        if (tableNode.nodeType === 'TABLE' && tableNode.nodeName === tableName) {
+          return tableNode;
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function restoreTemplateData(measurements: SelectedMeasurement[]) {
+  for (const m of measurements) {
+    const tableNode = findTableNode(selectedMeasurementsData.value, m.database, m.tableName);
+
+    if (!tableNode) continue;
+
+    if (!tableNode.children) {
+      tableNode.children = [];
+    }
+
+    let deviceName = '';
+    for (const curTag of m.device) {
+      deviceName += `${curTag.value}.`;
+    }
+    deviceName = deviceName.slice(0, -1);
+
+    // 去重：防止重复插入
+    const exists = tableNode.children.some((child) => child.nodeType === 'DEVICE-MEASUREMENT' && child.nodeName === (deviceName === '' ? m.measurement : `${deviceName}.${m.measurement}`));
+
+    if (exists) continue;
+
+    tableNode.children.push({
+      id: deviceName === '' ? `${props.namespace}-${m.database}-${m.tableName}-${m.measurement}` : `${props.namespace}-${m.database}-${m.tableName}-${deviceName}-${m.measurement}`,
+      nodeName: deviceName === '' ? m.measurement : `${deviceName}.${m.measurement}`,
+      database: m.database,
+      parentName: m.tableName,
+      nodeType: 'DEVICE-MEASUREMENT',
+    });
+  }
+}
+
+const restoreSelectedMeasurements = (measurements: SelectedMeasurement[]) => {
+  selectedMeasurements.value = measurements;
+  console.log('Selected Measurements:', selectedMeasurements.value);
+  restoreTemplateData(measurements);
+  console.log('Restored Data:', selectedMeasurementsData.value);
+
+  saveToStorage();
+  initSelectedMeasurementsData();
+  emit('updateSelectedMeasurements', selectedMeasurements.value);
+};
+
 watch(
   () => treeData.value,
   () => {
@@ -461,7 +519,9 @@ watch(
     initSelectedMeasurementsData();
   },
 );
+
 defineExpose({
+  restoreSelectedMeasurements,
   getSelectedMeasurements: () => loadFromStorage(),
   clearAllMeasurements: () => {
     window.sessionStorage.removeItem(getStorageKey());
