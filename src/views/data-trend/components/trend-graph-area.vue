@@ -371,7 +371,7 @@ onBeforeUnmount(() => {
 
 <style lang="scss" scoped>
 .template-select {
-  width: 200px;
+  width: 260px;
   margin-left: 8px;
 }
 </style>
@@ -418,9 +418,9 @@ onBeforeUnmount(() => {
 .template-select-dropdown .template-option-content {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 8px 12px;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .template-select-dropdown .template-option-text {
@@ -428,6 +428,7 @@ onBeforeUnmount(() => {
   align-items: center;
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .template-select-dropdown .template-option-text svg {
@@ -446,19 +447,21 @@ onBeforeUnmount(() => {
 }
 
 .template-select-dropdown .template-option-actions {
-  display: none;
-  align-items: center;
-  gap: 4px;
-  margin-left: 8px;
-}
-
-.template-select-dropdown .el-select-dropdown__item:hover .template-option-actions {
   display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .template-select-dropdown .item-edit-box,
 .template-select-dropdown .item-delete-box {
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
 }
 
 .template-select-dropdown .item-edit-box svg,
@@ -472,18 +475,12 @@ onBeforeUnmount(() => {
   display: none;
 }
 
-.template-select-dropdown .item-edit-box:hover .item-edit {
-  display: none;
-}
-
-.template-select-dropdown .item-edit-box:hover .item-edit-active {
-  display: block;
-}
-
+.template-select-dropdown .item-edit-box:hover .item-edit,
 .template-select-dropdown .item-delete-box:hover .item-delete {
   display: none;
 }
 
+.template-select-dropdown .item-edit-box:hover .item-edit-active,
 .template-select-dropdown .item-delete-box:hover .item-delete-active {
   display: block;
 }
