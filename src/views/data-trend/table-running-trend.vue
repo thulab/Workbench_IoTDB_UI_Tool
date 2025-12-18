@@ -130,7 +130,6 @@ function handleGlobalTimeChange(payload: TimeRange) {
 }
 
 function getTemplateList() {
-  // TODO: filterText
   getTrendTemplate('', '').then((res) => {
     const data = res.data || [];
     templateList.value = data.filter((item: TrendTemplate) => item.type === 'new-table-running');

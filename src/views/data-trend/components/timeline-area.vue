@@ -8,10 +8,10 @@
     </div>
     <div ref="timelineWrapperRef" class="full-data-wrapper">
       <div ref="timelineChartRef" class="full-data-timeline-chart"></div>
-      <button class="flip-page-button flip-page-button-left">
+      <button class="flip-page-button flip-page-button-left" @click="handlePageDown">
         <el-icon color="white" size="15"><ArrowLeft /></el-icon>
       </button>
-      <button class="flip-page-button flip-page-button-right">
+      <button class="flip-page-button flip-page-button-right" @click="handlePageUp">
         <el-icon color="white" size="15"><ArrowRight /></el-icon>
       </button>
       <div class="range-slider">
@@ -108,6 +108,36 @@ const handleRightPos = computed(() => {
 // });
 
 const fullDataSet = ref<Measurement[]>([]);
+
+function handlePageUp() {
+  // const span = trendStore.globalTimeRange.end - trendStore.globalTimeRange.start;
+  const visibleSpan = trendStore.pendingTimeRange.end - trendStore.pendingTimeRange.start;
+  let newStart = trendStore.pendingTimeRange.start + visibleSpan;
+  let newEnd = trendStore.pendingTimeRange.end + visibleSpan;
+  if (newEnd > trendStore.globalTimeRange.end) {
+    newEnd = trendStore.globalTimeRange.end;
+    newStart = newEnd - visibleSpan;
+  }
+  emit('update:range', {
+    start: newStart,
+    end: newEnd,
+  });
+}
+
+function handlePageDown() {
+  // const span = trendStore.globalTimeRange.end - trendStore.globalTimeRange.start;
+  const visibleSpan = trendStore.pendingTimeRange.end - trendStore.pendingTimeRange.start;
+  let newStart = trendStore.pendingTimeRange.start - visibleSpan;
+  let newEnd = trendStore.pendingTimeRange.end - visibleSpan;
+  if (newStart < trendStore.globalTimeRange.start) {
+    newStart = trendStore.globalTimeRange.start;
+    newEnd = newStart + visibleSpan;
+  }
+  emit('update:range', {
+    start: newStart,
+    end: newEnd,
+  });
+}
 
 watch(
   () => props.allMeasurementInfo,
