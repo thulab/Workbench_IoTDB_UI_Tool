@@ -566,6 +566,7 @@ dataTrend:
   trendAttribute: Style
   pointAttribute: Cursor
   commonTemplates: Favorites
+  selectCommonTrend: Select Common Trend
   deleteTemplateTip: Do you want to delete common trends
   measurementEmptyTip: Please add measurements and select them first
   trendTip: Up to {tip}  data points can be plotted. If the limit is exceeded, the system will automatically adjust.

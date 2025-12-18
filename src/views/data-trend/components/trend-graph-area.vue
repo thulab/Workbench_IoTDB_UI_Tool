@@ -33,45 +33,34 @@
         >
           <el-icon size="30"><i-custom-sql-save /></el-icon>
         </button>
-        <button
-          ref="templateButtonRef"
-          v-click-outside="onClickOutside"
-          class="operate-button"
-          :disabled="props.templateList?.length <= 0"
-          :style="props.templateList?.length === 0 ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
+        <el-select
+          v-model="selectedTemplateId"
+          :placeholder="t('dataTrend.selectCommonTrend')"
+          class="template-select"
+          popper-class="template-select-dropdown"
+          clearable
+          @change="handleTemplateChange"
+          @clear="handleTemplateReset"
         >
-          <el-icon size="30"><i-custom-template /></el-icon>
-        </button>
-        <el-popover ref="popoverRef" :virtual-ref="templateButtonRef" trigger="click" virtual-triggering width="300">
-          <el-input :placeholder="t('search.templatePlaceholder')" v-model="templateFilterText" size="small" @input="getQueryList" :id="`trend-template-search`" style="padding: 2px 2px 0">
-            <template #suffix>
-              <i-custom-search-icon />
-            </template>
-          </el-input>
-          <ul class="template-list">
-            <template v-if="templateList.length">
-              <li v-for="item in templateList" :key="item.id" :id="`trend-template-${item.id}`" class="template-item-box" @click="(e) => handleSelect(item, e)">
-                <div class="template-item-text-box">
-                  <i-custom-template />
-                  <text-tooltip :content="item.name" class-name="template-item-text" />
-                </div>
-                <div class="item-edit-box" :id="`trend-template-rename-${item.id}`" @click="handleSqlCommand('rename', item)">
+          <el-option v-for="item in props.templateList" :key="item.id" :label="item.name" :value="item.id" :id="`trend-template-${item.id}`">
+            <div class="template-option-content">
+              <div class="template-option-text">
+                <i-custom-template />
+                <span class="template-name">{{ item.name }}</span>
+              </div>
+              <div class="template-option-actions">
+                <div class="item-edit-box" :id="`trend-template-rename-${item.id}`" @click.stop="handleSqlCommand('rename', item)">
                   <i-custom-edit class="item-edit" />
                   <i-custom-edit class="item-edit-active" />
                 </div>
-
-                <div class="item-delete-box" :id="`trend-template-delete-${item.id}`" @click="handleSqlCommand('delete', item)">
+                <div class="item-delete-box" :id="`trend-template-delete-${item.id}`" @click.stop="handleSqlCommand('delete', item)">
                   <i-custom-delete class="item-delete" />
                   <i-custom-delete-active class="item-delete-active" />
                 </div>
-              </li>
-            </template>
-            <div class="list-empty-wrapper" v-else>
-              <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
-              <span class="data-empty-text">{{ t('common.noData') }}</span>
+              </div>
             </div>
-          </ul>
-        </el-popover>
+          </el-option>
+        </el-select>
       </div>
     </div>
     <div>
@@ -128,31 +117,18 @@ import ICustomCalender from '~icons/custom/calender.svg';
 import type { TimeRange, ChartMarker, ChartGroupInput, MeasurementMarkerData } from '@/types/trend';
 import dayjs from 'dayjs';
 import { today } from '@/utils/date';
-import type { DateModelType, PopoverInstance } from 'element-plus';
+import type { DateModelType } from 'element-plus';
 import { VideoPlay, VideoPause } from '@element-plus/icons-vue';
 import { SearchApi } from '@/api';
 import type { TrendTemplate } from '@/types';
 import { ref } from 'vue';
-import { ClickOutside as vClickOutside } from 'element-plus';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import { useTableHistoryTrendStore } from '@/stores/trend';
 
 const trendStore = useTableHistoryTrendStore();
-
 const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTemplate);
 const { requestFn: delTrendTemplate } = useRequest(SearchApi.delTrendTemplate);
-
-const templateFilterText = ref('');
-// const templateList = ref<TrendTemplate[]>([]);
-
-const templateButtonRef = ref();
-const popoverRef = ref<PopoverInstance>();
-const onClickOutside = () => {
-  if (popoverRef.value) {
-    popoverRef.value.hide();
-  }
-};
-
+const selectedTemplateId = ref<number | string>('');
 const renameData = reactive<{
   id: number | string;
   name: string;
@@ -210,6 +186,7 @@ const emit = defineEmits<{
   'save-template': [payload: string];
   'handle-operate': [payload: { action: string; data: TrendTemplate }];
   'get-query-list': [payload: string];
+  'reset-trend': [];
 }>();
 
 const { t } = useI18n();
@@ -256,6 +233,10 @@ const restoreChartData = () => {
   });
 };
 
+const resetSelectedTemplate = () => {
+  selectedTemplateId.value = '';
+};
+
 defineExpose({
   deleteMeasurementMarkerDataByName,
   setSaveTemplateLoading,
@@ -264,6 +245,7 @@ defineExpose({
   setRenameVisible,
   setSelectedDateTime,
   restoreChartData,
+  resetSelectedTemplate,
 });
 
 function handleChangeTime(value: [DateModelType, DateModelType]) {
@@ -298,41 +280,23 @@ function handleRenameSuccess(name: string) {
     .then(() => {
       ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
       renameVisible.value = false;
-      emit('get-query-list', templateFilterText.value);
+      emit('get-query-list', '');
     })
     .finally(() => {
       saveTemplateLoading.value = false;
     });
 }
 
-function getQueryList() {
-  // Placeholder for fetching template list based on templateFilterText
-  // This function should update the template list displayed in the popover
-  emit('get-query-list', templateFilterText.value);
+function handleTemplateChange(templateId: number | string) {
+  const selectedTemplate = props.templateList.find((item) => item.id === templateId);
+  if (selectedTemplate) {
+    emit('handle-operate', { action: 'open', data: selectedTemplate });
+  }
 }
 
-const canStopPropagation = (e: HTMLElement): boolean => {
-  const { classList } = e;
-
-  if (
-    classList.contains('item-edit-box') ||
-    classList.contains('item-delete-box') ||
-    classList.contains('item-edit') ||
-    classList.contains('item-delete') ||
-    classList.contains('item-edit-active') ||
-    classList.contains('item-delete-active')
-  ) {
-    return true;
-  }
-  if ((e.tagName === 'path' || e.tagName === 'g') && e.parentElement) {
-    return canStopPropagation(e.parentElement);
-  }
-  return false;
-};
-
-function handleSelect(data: TrendTemplate, e: MouseEvent) {
-  if (canStopPropagation(e.target as HTMLElement)) return;
-  emit('handle-operate', { action: 'open', data });
+function handleTemplateReset() {
+  selectedTemplateId.value = '';
+  emit('reset-trend');
 }
 
 const handleSqlCommand = (val: string, data: TrendTemplate) => {
@@ -350,7 +314,7 @@ const handleSqlCommand = (val: string, data: TrendTemplate) => {
           type: 'success',
           message: `${t('common.deleteSuccess')}`,
         });
-        getQueryList();
+        emit('get-query-list', '');
       });
     });
   } else {
@@ -406,133 +370,9 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
-.template-list {
-  overflow-y: auto;
-  height: calc(100% - 46px);
-  margin: 16px 2px 0;
-
-  .template-item-box {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 24px;
-    font-size: 12px;
-    font-weight: 300;
-    line-height: 1.2;
-    color: #656a85;
-    cursor: pointer;
-
-    .template-item-text-box {
-      display: flex;
-      align-items: center;
-
-      /* width: 160px; */
-
-      svg {
-        margin-right: 8px;
-        width: 24px;
-        height: 24px;
-        flex: 0 0 24px;
-      }
-    }
-
-    .item-delete-box {
-      position: absolute;
-      top: 4px;
-      right: 4px;
-      display: none;
-
-      svg {
-        width: 16px;
-        height: 16px;
-      }
-
-      .item-delete-active {
-        display: none;
-      }
-
-      &:hover {
-        .item-delete {
-          display: none;
-        }
-
-        .item-delete-active {
-          display: block;
-        }
-      }
-    }
-
-    .item-edit-box {
-      position: absolute;
-      top: 4px;
-      right: 20px;
-      display: none;
-
-      svg {
-        width: 16px;
-        height: 16px;
-      }
-
-      .item-edit-active {
-        display: none;
-
-        :deep(path) {
-          fill: #495ad4 !important;
-        }
-      }
-
-      &:hover {
-        .item-edit {
-          display: none;
-        }
-
-        .item-edit-active {
-          display: block;
-        }
-      }
-    }
-
-    &:hover {
-      background-color: #f7f8fc;
-      color: #495ad4;
-
-      .item-delete-box {
-        display: block;
-      }
-
-      .item-edit-box {
-        display: block;
-      }
-    }
-
-    .more-icon {
-      cursor: pointer;
-      margin-left: 12px;
-      font-size: 14px;
-
-      svg {
-        // transform: rotate(90deg);
-      }
-
-      svg:focus {
-        outline: none;
-      }
-    }
-  }
-
-  .template-box-empty {
-    padding: 0 8px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 40px;
-    font-size: 12px;
-    font-weight: 300;
-    line-height: 12px;
-    color: #656a85;
-  }
+.template-select {
+  width: 200px;
+  margin-left: 8px;
 }
 </style>
 
@@ -558,6 +398,7 @@ onBeforeUnmount(() => {
 
 .operate-button-group {
   display: flex;
+  align-items: center;
 }
 
 .operate-button {
@@ -567,5 +408,87 @@ onBeforeUnmount(() => {
   cursor: pointer;
   display: flex;
   align-items: center;
+}
+
+.template-select-dropdown .el-select-dropdown__item {
+  height: auto;
+  padding: 0;
+}
+
+.template-select-dropdown .template-option-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  width: 100%;
+}
+
+.template-select-dropdown .template-option-text {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.template-select-dropdown .template-option-text svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+
+.template-select-dropdown .template-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: #656a85;
+}
+
+.template-select-dropdown .template-option-actions {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+.template-select-dropdown .el-select-dropdown__item:hover .template-option-actions {
+  display: flex;
+}
+
+.template-select-dropdown .item-edit-box,
+.template-select-dropdown .item-delete-box {
+  cursor: pointer;
+}
+
+.template-select-dropdown .item-edit-box svg,
+.template-select-dropdown .item-delete-box svg {
+  width: 16px;
+  height: 16px;
+}
+
+.template-select-dropdown .item-edit-active,
+.template-select-dropdown .item-delete-active {
+  display: none;
+}
+
+.template-select-dropdown .item-edit-box:hover .item-edit {
+  display: none;
+}
+
+.template-select-dropdown .item-edit-box:hover .item-edit-active {
+  display: block;
+}
+
+.template-select-dropdown .item-delete-box:hover .item-delete {
+  display: none;
+}
+
+.template-select-dropdown .item-delete-box:hover .item-delete-active {
+  display: block;
+}
+
+.template-select-dropdown .el-select-dropdown__item:hover .template-name {
+  color: #495ad4;
 }
 </style>

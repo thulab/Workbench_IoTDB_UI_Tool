@@ -621,6 +621,7 @@ dataTrend:
   trendAttribute: 样式
   pointAttribute: 光标
   commonTemplates: 常用
+  selectCommonTrend: 请选择常用趋势
   deleteTemplateTip: 是否删除常用趋势
   measurementEmptyTip: 请先添加测点并选中
   trendTip: 最大绘制{tip}个点，超出后系统将自动调整
