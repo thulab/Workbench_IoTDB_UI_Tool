@@ -10,6 +10,18 @@
       />
     </div>
     <div class="trend-details-wrapper">
+      <OperateButtonRow
+        ref="operateButtonRowRef"
+        :isRunning="true"
+        :templateList="templateList"
+        :canOperate="resolvedGroups.length > 0"
+        @global-time-change="handleGlobalTimeChange"
+        @save-template="handleSaveTemplate"
+        @handle-operate="handleOperateTemplate"
+        @get-query-list="getTemplateList"
+        @running-play="handlePlay(true)"
+        @running-pause="handlePlay(false)"
+      />
       <TrendGraphArea
         ref="trendGraphRef"
         :is-running="true"
@@ -18,19 +30,12 @@
         :markers="markers"
         :measurement-group-info="resolvedGroups"
         :needFetchGroupsId="needFetchGroupsId"
-        :templateList="templateList"
         :realTimeData="realTimeData"
         @marker-change="updateMarker"
-        @global-time-change="handleGlobalTimeChange"
         @merge-into-group="mergeGroup"
         @delete-group="deleteGroup"
         @delete-measurement="deleteMeasurement"
-        @running-play="handlePlay(true)"
-        @running-pause="handlePlay(false)"
         @marker-value-change="handleMarkerValueChange"
-        @save-template="handleSaveTemplate"
-        @handle-operate="handleOperateTemplate"
-        @get-query-list="getTemplateList"
       />
       <MarkerTableArea :is-running="true" :marker-datas="markerDatas" v-if="!runningTrendStore.isPlaying" />
     </div>
@@ -41,6 +46,7 @@
 import TableSideTree from './components/table-side-tree.vue';
 import TrendGraphArea from './components/trend-graph-area.vue';
 import MarkerTableArea from './components/marker-table-area.vue';
+import OperateButtonRow from './components/operate-button-row.vue';
 import type { TimeRange, GroupState, ChartGroupInput, Measurement, ChartMarker, MeasurementMarkerData } from '@/types/trend';
 import type { TrendTemplate, SelectedMeasurement, TrendData } from '@/types';
 import { useUserStore, useConnectionStore } from '@/stores';
@@ -67,6 +73,7 @@ const { t } = useI18n();
 
 const sideTreeRef = ref<InstanceType<typeof TableSideTree>>();
 const trendGraphRef = ref<InstanceType<typeof TrendGraphArea>>();
+const operateButtonRowRef = ref<InstanceType<typeof OperateButtonRow>>();
 const measurementList = ref<Measurement[]>([]); // 所有左侧测点
 const measurementMap = new Map(measurementList.value.map((item) => [item.id, item]));
 const groups = ref<GroupState[]>([]); // 测点的分组信息
@@ -137,7 +144,7 @@ function getTemplateList() {
 }
 
 function handleSaveTemplate(name: string) {
-  trendGraphRef.value?.setSaveTemplateLoading(true);
+  operateButtonRowRef.value?.setSaveTemplateLoading(true);
   const groupInfoToSave = groups.value.map((group) => ({
     id: group.id,
     members: group.measurementIds.map((measurementId) => measurementMap.get(measurementId)).filter(Boolean) as Measurement[],
@@ -155,24 +162,24 @@ function handleSaveTemplate(name: string) {
   })
     .then(() => {
       ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
-      trendGraphRef.value?.setTemplateVisible(false);
+      operateButtonRowRef.value?.setTemplateVisible(false);
       getTemplateList();
     })
     .finally(() => {
-      trendGraphRef.value?.setSaveTemplateLoading(false);
+      operateButtonRowRef.value?.setSaveTemplateLoading(false);
     });
 }
 
 function handleOperateTemplate(payload: { action: string; data: TrendTemplate }) {
   if (payload.action === 'rename') {
-    trendGraphRef.value?.setRenameData({
+    operateButtonRowRef.value?.setRenameData({
       id: +payload.data.id,
       name: payload.data.name,
       type: payload.data.type,
       template: payload.data.template,
     });
-    trendGraphRef.value?.setRenameVisible(true);
-    trendGraphRef.value?.setSaveTemplateLoading(false);
+    operateButtonRowRef.value?.setRenameVisible(true);
+    operateButtonRowRef.value?.setSaveTemplateLoading(false);
   } else {
     const templateData = JSON.parse(payload.data.template);
     measurementList.value = templateData.selectedMeasurements;

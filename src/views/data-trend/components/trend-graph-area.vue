@@ -1,6 +1,6 @@
 <template>
   <div class="trend-graph-area-wrapper" ref="wrapperRef">
-    <div class="operate-button-row">
+    <!-- <div class="operate-button-row">
       <div v-if="!props.isRunning">
         <div>
           时间范围：
@@ -74,7 +74,7 @@
           </el-option>
         </el-select>
       </div>
-    </div>
+    </div> -->
     <div>
       <el-scrollbar height="100%">
         <div>
@@ -120,47 +120,47 @@
         </div>
       </el-scrollbar>
     </div>
-    <modal-template v-model:visible="templateVisible" :name-list="nameList" :save-loading="saveTemplateLoading" @handleSave="handleSaveSuccess" />
-    <modal-template-rename v-model:visible="renameVisible" :old-name="renameData.name" :name-list="nameList" :save-loading="saveTemplateLoading" @handleSave="handleRenameSuccess" />
+    <!-- <modal-template v-model:visible="templateVisible" :name-list="nameList" :save-loading="saveTemplateLoading" @handleSave="handleSaveSuccess" />
+    <modal-template-rename v-model:visible="renameVisible" :old-name="renameData.name" :name-list="nameList" :save-loading="saveTemplateLoading" @handleSave="handleRenameSuccess" /> -->
   </div>
 </template>
 
 <script lang="ts" setup>
 import MetricChartGroup from './metric-chart-group.vue';
-import ModalTemplate from './modal-template.vue';
-import ModalTemplateRename from './modal-template-rename.vue';
-import ICustomCalender from '~icons/custom/calender.svg';
-import type { TimeRange, ChartMarker, ChartGroupInput, MeasurementMarkerData } from '@/types/trend';
-import dayjs from 'dayjs';
-import { today } from '@/utils/date';
-import type { DateModelType } from 'element-plus';
-import { VideoPlay, VideoPause } from '@element-plus/icons-vue';
-import { SearchApi } from '@/api';
-import type { TrendTemplate, TrendData } from '@/types';
+// import ModalTemplate from './modal-template.vue';
+// import ModalTemplateRename from './modal-template-rename.vue';
+// import ICustomCalender from '~icons/custom/calender.svg';
+import type { ChartMarker, ChartGroupInput, MeasurementMarkerData } from '@/types/trend';
+// import dayjs from 'dayjs';
+// import { today } from '@/utils/date';
+// import type { DateModelType } from 'element-plus';
+// import { VideoPlay, VideoPause } from '@element-plus/icons-vue';
+// import { SearchApi } from '@/api';
+import type { TrendData } from '@/types';
 import { ref } from 'vue';
-import ICustomMessageWarning from '~icons/custom/message-warning.svg';
+// import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import { useTableHistoryTrendStore } from '@/stores/trend';
 
 const trendStore = useTableHistoryTrendStore();
-const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTemplate);
-const { requestFn: delTrendTemplate } = useRequest(SearchApi.delTrendTemplate);
+// const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTemplate);
+// const { requestFn: delTrendTemplate } = useRequest(SearchApi.delTrendTemplate);
 const selectedTemplateId = ref<number | string>('');
-const renameData = reactive<{
-  id: number | string;
-  name: string;
-  type: string;
-  template: string;
-}>({
-  id: '',
-  name: '',
-  type: '',
-  template: '',
-});
+// const renameData = reactive<{
+//   id: number | string;
+//   name: string;
+//   type: string;
+//   template: string;
+// }>({
+//   id: '',
+//   name: '',
+//   type: '',
+//   template: '',
+// });
 
-const nameList = ref<string[]>([]);
-const templateVisible = ref(false);
-const renameVisible = ref(false);
-const saveTemplateLoading = ref(false);
+// const nameList = ref<string[]>([]);
+// const templateVisible = ref(false);
+// const renameVisible = ref(false);
+// const saveTemplateLoading = ref(false);
 const wrapperRef = ref<HTMLElement | null>(null);
 const wrapperHeight = ref(0);
 let observer: ResizeObserver | null = null;
@@ -174,7 +174,7 @@ const props = withDefaults(
     measurementGroupInfo: ChartGroupInput[];
     loading?: boolean;
     needFetchGroupsId?: string[];
-    templateList: TrendTemplate[];
+    // templateList: TrendTemplate[];
     realTimeData?: TrendData[];
   }>(),
   {},
@@ -196,28 +196,28 @@ const chartHeight = computed(() => {
 });
 
 const emit = defineEmits<{
-  'global-time-change': [payload: TimeRange];
+  // 'global-time-change': [payload: TimeRange];
   'marker-change': [payload: { id: string; timestamp: number }];
   'merge-into-group': [payload: { groupId: string; measurementPath: string }];
   'delete-group': [payload: { groupId: string }];
   'delete-measurement': [payload: { groupId: string; measurementPath: string }];
   'marker-value-change': [payload: MeasurementMarkerData[]];
-  'save-template': [payload: string];
-  'handle-operate': [payload: { action: string; data: TrendTemplate }];
-  'get-query-list': [payload: string];
-  'reset-trend': [];
-  'running-play': [];
-  'running-pause': [];
+  // 'save-template': [payload: string];
+  // 'handle-operate': [payload: { action: string; data: TrendTemplate }];
+  // 'get-query-list': [payload: string];
+  // 'reset-trend': [];
+  // 'running-play': [];
+  // 'running-pause': [];
 }>();
 
-const { t } = useI18n();
-const { shortcutsDaterange } = useShortcutsDate();
-const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
-const selectedDateTime = reactive<{
-  value: [DateModelType, DateModelType];
-}>({
-  value: [new Date(trendStore.visibleTimeRange.start), new Date(trendStore.visibleTimeRange.end)],
-});
+// const { t } = useI18n();
+// const { shortcutsDaterange } = useShortcutsDate();
+// const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
+// const selectedDateTime = reactive<{
+//   value: [DateModelType, DateModelType];
+// }>({
+//   value: [new Date(trendStore.visibleTimeRange.start), new Date(trendStore.visibleTimeRange.end)],
+// });
 const measurementsMarkerData = ref<MeasurementMarkerData[]>([]);
 
 const deleteMeasurementMarkerDataByName = (name: string) => {
@@ -225,28 +225,28 @@ const deleteMeasurementMarkerDataByName = (name: string) => {
   measurementsMarkerData.value.splice(index, 1);
 };
 
-const setSaveTemplateLoading = (loading: boolean) => {
-  saveTemplateLoading.value = loading;
-};
+// const setSaveTemplateLoading = (loading: boolean) => {
+//   saveTemplateLoading.value = loading;
+// };
 
-const setTemplateVisible = (visible: boolean) => {
-  templateVisible.value = visible;
-};
+// const setTemplateVisible = (visible: boolean) => {
+//   templateVisible.value = visible;
+// };
 
-const setRenameData = (data: { id: number | string; name: string; type: string; template: string }) => {
-  renameData.id = data.id;
-  renameData.name = data.name;
-  renameData.type = data.type;
-  renameData.template = data.template;
-};
+// const setRenameData = (data: { id: number | string; name: string; type: string; template: string }) => {
+//   renameData.id = data.id;
+//   renameData.name = data.name;
+//   renameData.type = data.type;
+//   renameData.template = data.template;
+// };
 
-const setRenameVisible = (visible: boolean) => {
-  renameVisible.value = visible;
-};
+// const setRenameVisible = (visible: boolean) => {
+//   renameVisible.value = visible;
+// };
 
-const setSelectedDateTime = (value: [DateModelType, DateModelType]) => {
-  selectedDateTime.value = value;
-};
+// const setSelectedDateTime = (value: [DateModelType, DateModelType]) => {
+//   selectedDateTime.value = value;
+// };
 
 const restoreChartData = () => {
   Object.values(chartRefs.value).forEach((chartRef) => {
@@ -260,24 +260,24 @@ const resetSelectedTemplate = () => {
 
 defineExpose({
   deleteMeasurementMarkerDataByName,
-  setSaveTemplateLoading,
-  setTemplateVisible,
-  setRenameData,
-  setRenameVisible,
-  setSelectedDateTime,
+  // setSaveTemplateLoading,
+  // setTemplateVisible,
+  // setRenameData,
+  // setRenameVisible,
+  // setSelectedDateTime,
   restoreChartData,
   resetSelectedTemplate,
 });
 
-function handleRunningPlay() {
-  isPlaying.value = true;
-  emit('running-play');
-}
+// function handleRunningPlay() {
+//   isPlaying.value = true;
+//   emit('running-play');
+// }
 
-function handleRunningPause() {
-  isPlaying.value = false;
-  emit('running-pause');
-}
+// function handleRunningPause() {
+//   isPlaying.value = false;
+//   emit('running-pause');
+// }
 
 function convertPath(original: string): string {
   const firstParen = original.indexOf('(');
@@ -306,79 +306,79 @@ function filteredRealTimeData(group: ChartGroupInput): TrendData[] {
   return result;
 }
 
-function handleChangeTime(value: [DateModelType, DateModelType]) {
-  const start = dayjs(value[0]).valueOf();
-  const end = dayjs(value[1]).valueOf();
-  if (start >= end) {
-    ElMessage.warning({
-      message: t('dataTrend.timeTip'),
-      grouping: true,
-    });
-  }
-  emit('global-time-change', { start, end });
-}
+// function handleChangeTime(value: [DateModelType, DateModelType]) {
+//   const start = dayjs(value[0]).valueOf();
+//   const end = dayjs(value[1]).valueOf();
+//   if (start >= end) {
+//     ElMessage.warning({
+//       message: t('dataTrend.timeTip'),
+//       grouping: true,
+//     });
+//   }
+//   emit('global-time-change', { start, end });
+// }
 
-function handleSaveTemplate() {
-  saveTemplateLoading.value = false;
-  templateVisible.value = true;
-}
+// function handleSaveTemplate() {
+//   saveTemplateLoading.value = false;
+//   templateVisible.value = true;
+// }
 
-function handleSaveSuccess(name: string) {
-  emit('save-template', name);
-}
+// function handleSaveSuccess(name: string) {
+//   emit('save-template', name);
+// }
 
-function handleRenameSuccess(name: string) {
-  saveTemplateLoading.value = true;
-  upsertTrendTemplate({
-    id: renameData.id,
-    type: renameData.type,
-    name,
-    template: renameData.template,
-  })
-    .then(() => {
-      ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
-      renameVisible.value = false;
-      emit('get-query-list', '');
-    })
-    .finally(() => {
-      saveTemplateLoading.value = false;
-    });
-}
+// function handleRenameSuccess(name: string) {
+//   saveTemplateLoading.value = true;
+//   upsertTrendTemplate({
+//     id: renameData.id,
+//     type: renameData.type,
+//     name,
+//     template: renameData.template,
+//   })
+//     .then(() => {
+//       ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
+//       renameVisible.value = false;
+//       emit('get-query-list', '');
+//     })
+//     .finally(() => {
+//       saveTemplateLoading.value = false;
+//     });
+// }
 
-function handleTemplateChange(templateId: number | string) {
-  const selectedTemplate = props.templateList.find((item) => item.id === templateId);
-  if (selectedTemplate) {
-    emit('handle-operate', { action: 'open', data: selectedTemplate });
-  }
-}
+// function handleTemplateChange(templateId: number | string) {
+//   const selectedTemplate = props.templateList.find((item) => item.id === templateId);
+//   if (selectedTemplate) {
+//     emit('handle-operate', { action: 'open', data: selectedTemplate });
+//   }
+// }
 
-function handleTemplateReset() {
-  selectedTemplateId.value = '';
-  emit('reset-trend');
-}
+// function handleTemplateReset() {
+//   selectedTemplateId.value = '';
+//   emit('reset-trend');
+// }
 
-const handleSqlCommand = (val: string, data: TrendTemplate) => {
-  if (val === 'delete') {
-    ElMessageBox.confirm(`${t('dataTrend.deleteTemplateTip')}：${data.name}`, t('common.notice'), {
-      confirmButtonText: t('common.confirm'),
-      cancelButtonText: t('common.cancel'),
-      confirmButtonClass: `del-trend-template-confirm`,
-      cancelButtonClass: `del-trend-template-cancel`,
-      type: 'warning',
-      icon: ICustomMessageWarning,
-    }).then(() => {
-      delTrendTemplate(+data.id).then(() => {
-        ElMessage({
-          type: 'success',
-          message: `${t('common.deleteSuccess')}`,
-        });
-        emit('get-query-list', '');
-      });
-    });
-  } else {
-    emit('handle-operate', { action: val, data });
-  }
-};
+// const handleSqlCommand = (val: string, data: TrendTemplate) => {
+//   if (val === 'delete') {
+//     ElMessageBox.confirm(`${t('dataTrend.deleteTemplateTip')}：${data.name}`, t('common.notice'), {
+//       confirmButtonText: t('common.confirm'),
+//       cancelButtonText: t('common.cancel'),
+//       confirmButtonClass: `del-trend-template-confirm`,
+//       cancelButtonClass: `del-trend-template-cancel`,
+//       type: 'warning',
+//       icon: ICustomMessageWarning,
+//     }).then(() => {
+//       delTrendTemplate(+data.id).then(() => {
+//         ElMessage({
+//           type: 'success',
+//           message: `${t('common.deleteSuccess')}`,
+//         });
+//         emit('get-query-list', '');
+//       });
+//     });
+//   } else {
+//     emit('handle-operate', { action: val, data });
+//   }
+// };
 
 function handleMarkerValueChange(payload: MeasurementMarkerData[]) {
   payload.forEach((newData) => {
@@ -447,7 +447,7 @@ onBeforeUnmount(() => {
   padding: 15px 16px;
 }
 
-.operate-button-row {
+/* .operate-button-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -545,5 +545,5 @@ onBeforeUnmount(() => {
 
 .template-select-dropdown .el-select-dropdown__item:hover .template-name {
   color: #495ad4;
-}
+} */
 </style>

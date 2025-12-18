@@ -9,7 +9,20 @@
         @doubleClickMeasurement="createGroup"
       />
     </div>
+
     <div class="trend-details-wrapper">
+      <div>
+        <OperateButtonRow
+          ref="operateButtonRowRef"
+          :isRunning="false"
+          :templateList="templateList"
+          :canOperate="resolvedGroups.length > 0"
+          @global-time-change="handleGlobalTimeChange"
+          @save-template="handleSaveTemplate"
+          @handle-operate="handleOperateTemplate"
+          @get-query-list="getTemplateList"
+        />
+      </div>
       <TrendGraphArea
         ref="trendGraphRef"
         :is-running="false"
@@ -18,16 +31,11 @@
         :markers="markers"
         :measurement-group-info="resolvedGroups"
         :needFetchGroupsId="needFetchGroupsId"
-        :templateList="templateList"
         @marker-change="updateMarker"
-        @global-time-change="handleGlobalTimeChange"
         @merge-into-group="mergeGroup"
         @delete-group="deleteGroup"
         @delete-measurement="deleteMeasurement"
         @marker-value-change="handleMarkerValueChange"
-        @save-template="handleSaveTemplate"
-        @handle-operate="handleOperateTemplate"
-        @get-query-list="getTemplateList"
       />
       <TimelineArea
         ref="timelineAreaRef"
@@ -50,6 +58,7 @@ import TableSideTree from './components/table-side-tree.vue';
 import TrendGraphArea from './components/trend-graph-area.vue';
 import MarkerTableArea from './components/marker-table-area.vue';
 import TimelineArea from './components/timeline-area.vue';
+import OperateButtonRow from './components/operate-button-row.vue';
 import type { TimeRange, GroupState, ChartGroupInput, Measurement, ChartMarker, MeasurementMarkerData } from '@/types/trend';
 import type { SelectedMeasurement, TrendTemplate } from '@/types';
 import dayjs from 'dayjs';
@@ -68,6 +77,7 @@ let fetchTimer: ReturnType<typeof setTimeout> | null = null;
 const sideTreeRef = ref<InstanceType<typeof TableSideTree>>();
 const timelineAreaRef = ref<TimelineExpose | null>(null);
 const trendGraphRef = ref<InstanceType<typeof TrendGraphArea>>();
+const operateButtonRowRef = ref<InstanceType<typeof OperateButtonRow>>();
 const measurementList = ref<Measurement[]>([]); // 所有左侧测点
 const measurementMap = new Map(measurementList.value.map((item) => [item.id, item]));
 const groups = ref<GroupState[]>([]); // 测点的分组信息
@@ -307,7 +317,7 @@ function getTemplateList() {
 }
 
 function handleSaveTemplate(name: string) {
-  trendGraphRef.value?.setSaveTemplateLoading(true);
+  operateButtonRowRef.value?.setSaveTemplateLoading(true);
   const groupInfoToSave = groups.value.map((group) => ({
     id: group.id,
     members: group.measurementIds.map((measurementId) => measurementMap.get(measurementId)).filter(Boolean) as Measurement[],
@@ -327,24 +337,24 @@ function handleSaveTemplate(name: string) {
   })
     .then(() => {
       ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
-      trendGraphRef.value?.setTemplateVisible(false);
+      operateButtonRowRef.value?.setTemplateVisible(false);
       getTemplateList();
     })
     .finally(() => {
-      trendGraphRef.value?.setSaveTemplateLoading(false);
+      operateButtonRowRef.value?.setSaveTemplateLoading(false);
     });
 }
 
 function handleOperateTemplate(payload: { action: string; data: TrendTemplate }) {
   if (payload.action === 'rename') {
-    trendGraphRef.value?.setRenameData({
+    operateButtonRowRef.value?.setRenameData({
       id: +payload.data.id,
       name: payload.data.name,
       type: payload.data.type,
       template: payload.data.template,
     });
-    trendGraphRef.value?.setRenameVisible(true);
-    trendGraphRef.value?.setSaveTemplateLoading(false);
+    operateButtonRowRef.value?.setRenameVisible(true);
+    operateButtonRowRef.value?.setSaveTemplateLoading(false);
   } else {
     const templateData = JSON.parse(payload.data.template);
     trendStore.setGlobalTimeRange({
@@ -412,7 +422,7 @@ function restoreData() {
       trendStore.setGlobalTimeRange(parsed.globalTimeRange);
       trendStore.setVisibleTimeRange(parsed.visibleRange);
       trendStore.setPendingTimeRange(parsed.pendingRange);
-      trendGraphRef.value?.setSelectedDateTime([trendStore.globalTimeRange.start, trendStore.globalTimeRange.end]);
+      operateButtonRowRef.value?.setSelectedDateTime([trendStore.globalTimeRange.start, trendStore.globalTimeRange.end]);
       groups.value = parsed.groups;
       measurementList.value = parsed.measurements;
       markers.value = parsed.markers?.length ? parsed.markers : createInitialMarkers(trendStore.globalTimeRange);
