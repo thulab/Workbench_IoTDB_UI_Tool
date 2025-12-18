@@ -15,7 +15,7 @@
     </div>
     <div ref="stageRef" class="stage-wrapper">
       <div ref="trendChartRef" class="chart-area" :style="{ height: typeof props.height === 'number' ? props.height + 'px' : props.height }"></div>
-      <div v-if="!props.isRunning || !props.isPlaying" class="marker-overlay" :class="{ 'marker-overlay--disabled': props.loading }">
+      <div v-if="!props.isRunning || !runningTrendStore.isPlaying" class="marker-overlay" :class="{ 'marker-overlay--disabled': props.loading }">
         <button
           v-for="handle in markerHandles"
           :key="handle.id"
@@ -60,7 +60,6 @@ let draggingId: string | null = null;
 const props = withDefaults(
   defineProps<{
     isRunning: boolean;
-    isPlaying?: boolean;
     group: ChartGroupInput;
     markers: ChartMarker[];
     index: number;
@@ -99,6 +98,25 @@ function updateMarkerValues() {
   });
 }
 
+function updateRunningMarkerValues() {
+  if (!props.realTimeData) return;
+  markerValues.value = props.realTimeData.map((measurement) => {
+    const x1Marker = props.markers.find((marker) => marker.label === 'X1');
+    const x2Marker = props.markers.find((marker) => marker.label === 'X2');
+    const y1Value = x1Marker ? nearestRunningDataPoint(measurement.path, x1Marker.timestamp).value : NaN;
+    const y2Value = x2Marker ? nearestRunningDataPoint(measurement.path, x2Marker.timestamp).value : NaN;
+    return {
+      name: measurement.path,
+      x1: x1Marker ? x1Marker.timestamp : NaN,
+      x2: x2Marker ? x2Marker.timestamp : NaN,
+      x2_x1: x1Marker && x2Marker ? x2Marker.timestamp - x1Marker.timestamp : NaN,
+      y1: y1Value,
+      y2: y2Value,
+      y2_y1: !isNaN(y1Value) && !isNaN(y2Value) ? y2Value - y1Value : NaN,
+    };
+  });
+}
+
 const emit = defineEmits<{
   drop: [payload: { groupId: string; measurementPath: string }];
   'marker-change': [payload: { id: string; timestamp: number }];
@@ -112,11 +130,13 @@ const markerHandles = computed(() => {
   // This matters on Windows multi-monitor setups where moving the window can
   // change effective CSS pixel sizes (per-monitor DPI) without changing marker timestamps.
   const tmp = layoutTick.value;
+  const start = props.isRunning ? runningTrendStore.visibleTimeRange.start : trendStore.visibleTimeRange.start;
+  const end = props.isRunning ? runningTrendStore.visibleTimeRange.end : trendStore.visibleTimeRange.end;
   if (tmp) {
     const width = getInnerWidth();
-    const span = trendStore.visibleTimeRange.end - trendStore.visibleTimeRange.start || 1;
+    const span = end - start || 1;
     return props.markers.map((marker) => {
-      const ratio = (marker.timestamp - trendStore.visibleTimeRange.start) / span;
+      const ratio = (marker.timestamp - start) / span;
       const clamped = Math.min(Math.max(ratio, 0), 1);
       const left = GRID_LEFT + clamped * width;
       return {
@@ -128,9 +148,9 @@ const markerHandles = computed(() => {
     });
   }
   const width = getInnerWidth();
-  const span = trendStore.visibleTimeRange.end - trendStore.visibleTimeRange.start || 1;
+  const span = end - start || 1;
   return props.markers.map((marker) => {
-    const ratio = (marker.timestamp - trendStore.visibleTimeRange.start) / span;
+    const ratio = (marker.timestamp - start) / span;
     const clamped = Math.min(Math.max(ratio, 0), 1);
     const left = GRID_LEFT + clamped * width;
     return {
@@ -141,6 +161,53 @@ const markerHandles = computed(() => {
     };
   });
 });
+
+function nearestRunningDataPoint(path: string, timestamp: number): DataPoint {
+  const series = props.realTimeData?.find((s) => s.path === path);
+  if (!series || series.values.length === 0) return { timestamp, value: 0 };
+  const values = series.values;
+  const timestamps = series.timestamps;
+  return nearestDataPointFromArrays(timestamps, values, timestamp);
+}
+
+function nearestDataPointFromArrays(timestamps: number[], values: string[], target: number): DataPoint {
+  const len = timestamps.length;
+  if (len === 0) {
+    return { timestamp: target, value: 0 };
+  }
+
+  let left = 0;
+  let right = len - 1;
+
+  // 二分查找第一个 >= target 的位置
+  while (left < right) {
+    const mid = Math.floor((left + right) / 2);
+
+    if (Number(timestamps[mid]) < target) {
+      left = mid + 1;
+    } else {
+      right = mid;
+    }
+  }
+
+  // left 是第一个 >= target 的索引
+  const idx = left;
+
+  // 边界处理
+  if (idx === 0) {
+    return {
+      timestamp: Number(timestamps[0]),
+      value: Number(values[0]),
+    };
+  }
+
+  const prevIdx = idx - 1;
+
+  const currDiff = Math.abs(Number(timestamps[idx]) - target);
+  const prevDiff = Math.abs(Number(timestamps[prevIdx]) - target);
+
+  return currDiff < prevDiff ? { timestamp: Number(timestamps[idx]), value: Number(values[idx]) } : { timestamp: Number(timestamps[prevIdx]), value: Number(values[prevIdx]) };
+}
 
 function nearestDataPoint(measurement: Measurement, timestamp: number): DataPoint {
   const values = measurement.values;
@@ -161,7 +228,6 @@ function nearestDataPoint(measurement: Measurement, timestamp: number): DataPoin
 }
 
 function fetchHistoryData(measurement: Measurement) {
-  console.log('Fetching data for group:' + props.group.id + '  measurement:', measurement);
   getHistoryTrend({
     database: measurement.details.database,
     tableName: measurement.details.tableName,
@@ -238,7 +304,9 @@ function onMarkerMove(event: PointerEvent) {
   const rawOffset = event.clientX - rect.left - GRID_LEFT;
   const offset = Math.min(Math.max(rawOffset, 0), usable);
   const ratio = offset / usable;
-  const timestamp = trendStore.visibleTimeRange.start + ratio * (trendStore.visibleTimeRange.end - trendStore.visibleTimeRange.start);
+  const start = props.isRunning ? runningTrendStore.visibleTimeRange.start : trendStore.visibleTimeRange.start;
+  const end = props.isRunning ? runningTrendStore.visibleTimeRange.end : trendStore.visibleTimeRange.end;
+  const timestamp = start + ratio * (end - start);
   emit('marker-change', { id: draggingId, timestamp });
 }
 
@@ -270,14 +338,13 @@ function buildOption(): ECOption {
       axisPointer: {
         type: 'line',
         lineStyle: {
-          color: '#91a3ff',
           width: 1,
           type: 'dashed',
         },
       },
       valueFormatter: (value) => {
         const numeric = typeof value === 'number' ? value : Number(value ?? 0);
-        return numeric.toFixed(2);
+        return numeric.toFixed(4);
       },
     },
     xAxis: {
@@ -317,6 +384,7 @@ function buildOption(): ECOption {
       smooth: true,
       showSymbol: false,
       sampling: 'lttb',
+      color: series.color,
       lineStyle: {
         width: 2,
         color: series.color,
@@ -366,14 +434,14 @@ function buildRunningOption(): ECOption {
       axisPointer: {
         type: 'line',
         lineStyle: {
-          color: '#91a3ff',
+          // color: '#91a3ff',
           width: 1,
           type: 'dashed',
         },
       },
       valueFormatter: (value) => {
         const numeric = typeof value === 'number' ? value : Number(value ?? 0);
-        return numeric.toFixed(2);
+        return numeric.toFixed(4);
       },
     },
     xAxis: {
@@ -415,13 +483,19 @@ function buildRunningOption(): ECOption {
         smooth: true,
         showSymbol: false,
         sampling: 'lttb',
+        color: findColorByMeasurementPath(series.path),
         lineStyle: {
           width: 2,
-          color: '#7a819a',
+          color: findColorByMeasurementPath(series.path),
         },
         data: series.values.map((point, index) => [series.timestamps[index], point]),
       })) || [],
   };
+}
+
+function findColorByMeasurementPath(path: string): string {
+  const measurement = props.group.members.find((m) => m.label === path);
+  return measurement ? measurement.color : '#7a819a';
 }
 
 function initChart() {
@@ -546,6 +620,16 @@ watch(
   { deep: true },
 );
 
+// watch(
+//   () => runningTrendStore.isPlaying,
+//   (newVal) => {
+//     if (!props.isRunning || newVal) {
+//       return;
+//     }
+//     updateRunningMarkerValues();
+//   }
+// )
+
 watch(
   () => props.realTimeData,
   () => {
@@ -574,9 +658,9 @@ watch(
 watch(
   () => markerValues.value,
   (newValues) => {
-    if (props.isRunning) {
-      return;
-    }
+    // if (props.isRunning) {
+    //   return;
+    // }
     emit('marker-value-change', newValues);
   },
   { deep: true },
@@ -585,12 +669,16 @@ watch(
 watch(
   () => props.markers,
   () => {
-    if (props.isRunning) {
-      return;
-    }
+    // if (props.isRunning) {
+    //   return;
+    // }
     // if (chart) {
     //   chart.setOption(buildOption());
     // }
+    if (props.isRunning) {
+      updateRunningMarkerValues();
+      return;
+    }
     updateMarkerValues();
   },
   { deep: true },

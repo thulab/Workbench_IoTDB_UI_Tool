@@ -1,6 +1,6 @@
 <template>
   <div class="marker-table-area-wrapper">
-    <el-table :data="props.markerDatas" border style="width: 100%" :height="props.isRunning ? '145px' : '110px'" size="small">
+    <el-table :data="convertedMarkerDatas" border style="width: 100%" :height="props.isRunning ? '145px' : '110px'" size="small">
       <el-table-column prop="name" label="测点名称"></el-table-column>
       <el-table-column prop="x1" label="X1"></el-table-column>
       <el-table-column prop="x2" label="X2"></el-table-column>
@@ -14,6 +14,7 @@
 
 <script lang="ts" setup>
 import type { MeasurementMarkerData } from '@/types/trend';
+import dayjs from 'dayjs';
 
 const props = withDefaults(
   defineProps<{
@@ -22,6 +23,20 @@ const props = withDefaults(
   }>(),
   {},
 );
+
+const convertedMarkerDatas = computed(() => {
+  return props.markerDatas.map((marker) => {
+    return {
+      ...marker,
+      y1: marker.y1.toFixed(4),
+      y2: marker.y2.toFixed(4),
+      x1: dayjs(marker.x1).format('YYYY-MM-DD HH:mm:ss'),
+      x2: dayjs(marker.x2).format('YYYY-MM-DD HH:mm:ss'),
+      x2_x1: ((marker.x2 - marker.x1) / 1000).toFixed(2) + ' 秒',
+      y2_y1: (marker.y2 - marker.y1).toFixed(4),
+    };
+  });
+});
 </script>
 
 <style>

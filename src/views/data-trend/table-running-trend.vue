@@ -2,6 +2,7 @@
   <div class="running-trend-page-container">
     <div class="database-list-wrapper">
       <TableSideTree
+        ref="sideTreeRef"
         namespace="running"
         @updateSelectedMeasurements="(list) => handleSelectedMeasurementsUpdate({ selectedMeasurements: list })"
         @deleteMeasurement="handleDeleteMeasurement"
@@ -10,9 +11,10 @@
     </div>
     <div class="trend-details-wrapper">
       <TrendGraphArea
+        ref="trendGraphRef"
         :is-running="true"
         :loading="isFetching"
-        :range="visibleRange"
+        :range="runningTrendStore.visibleTimeRange"
         :markers="markers"
         :measurement-group-info="resolvedGroups"
         :needFetchGroupsId="needFetchGroupsId"
@@ -25,8 +27,12 @@
         @delete-measurement="deleteMeasurement"
         @running-play="handlePlay(true)"
         @running-pause="handlePlay(false)"
+        @marker-value-change="handleMarkerValueChange"
+        @save-template="handleSaveTemplate"
+        @handle-operate="handleOperateTemplate"
+        @get-query-list="getTemplateList"
       />
-      <MarkerTableArea :is-running="true" :marker-datas="markerDatas" v-if="!loading" />
+      <MarkerTableArea :is-running="true" :marker-datas="markerDatas" v-if="!runningTrendStore.isPlaying" />
     </div>
   </div>
 </template>
@@ -41,18 +47,26 @@ import { useUserStore, useConnectionStore } from '@/stores';
 import { useTableRunningTrendStore } from '@/stores/trend';
 import { formatSelectedMeasurement } from '@/utils/format';
 import dayjs from 'dayjs';
+import { SearchApi } from '@/api';
 
 const runningTrendStore = useTableRunningTrendStore();
 
-const globalTimeRange = ref<TimeRange>({
-  start: Date.now() - 12 * 3600 * 1000,
-  end: Date.now(),
-});
-const visibleRange = ref<TimeRange>({ ...globalTimeRange.value });
-const pendingRange = ref<TimeRange>({ ...globalTimeRange.value });
+// const globalTimeRange = ref<TimeRange>({
+//   start: Date.now() - 12 * 3600 * 1000,
+//   end: Date.now(),
+// });
+// const visibleRange = ref<TimeRange>({ ...globalTimeRange.value });
+// const pendingRange = ref<TimeRange>({ ...globalTimeRange.value });
 const isFetching = ref(false);
 // let fetchTimer: ReturnType<typeof setTimeout> | null = null;
 
+const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTemplate);
+const { requestFn: getTrendTemplate /** loading */ } = useRequest(SearchApi.getTrendTemplate);
+
+const { t } = useI18n();
+
+const sideTreeRef = ref<InstanceType<typeof TableSideTree>>();
+const trendGraphRef = ref<InstanceType<typeof TrendGraphArea>>();
 const measurementList = ref<Measurement[]>([]); // 所有左侧测点
 const measurementMap = new Map(measurementList.value.map((item) => [item.id, item]));
 const groups = ref<GroupState[]>([]); // 测点的分组信息
@@ -69,7 +83,7 @@ const visibleMeasurementCountMap = ref<Map<string, number>>(new Map());
 const needFetchGroupsId = ref<string[]>([]);
 const templateList = ref<TrendTemplate[]>([]);
 
-const markers = ref<ChartMarker[]>(createInitialMarkers(globalTimeRange.value));
+const markers = ref<ChartMarker[]>(createInitialMarkers());
 const markerDatas = ref<MeasurementMarkerData[]>([]);
 
 const { socketInstance, initWebsocket } = useWebsocket('/api/relational/trendData', handleData, false);
@@ -78,12 +92,12 @@ const userName = computed(() => userStore.userInfo.name);
 const connectionStore = useConnectionStore();
 const connectionId = computed(() => connectionStore.connectionInfo.data.id);
 const connectionType = computed(() => (connectionStore.connectionIsMaster ? 0 : 1));
-const loading = ref(true);
 const realTimeData = ref<TrendData[]>([]);
 const minDataTime = ref(-1);
 
-function createInitialMarkers(range: TimeRange = globalTimeRange.value): ChartMarker[] {
+function createInitialMarkers(range: TimeRange = runningTrendStore.visibleTimeRange): ChartMarker[] {
   const span = Math.max(range.end - range.start, 1);
+  console.log('init markers with time range:', dayjs(range.start).format('YYYY-MM-DD HH:mm:ss'), ' - ', dayjs(range.end).format('YYYY-MM-DD HH:mm:ss'));
   return [
     {
       id: 'marker-1',
@@ -101,14 +115,99 @@ function createInitialMarkers(range: TimeRange = globalTimeRange.value): ChartMa
 }
 
 function updateMarker(payload: { id: string; timestamp: number }) {
-  const range = visibleRange.value;
+  const range = runningTrendStore.visibleTimeRange;
   const clamped = Math.min(Math.max(payload.timestamp, range.start), range.end);
   markers.value = markers.value.map((marker) => (marker.id === payload.id ? { ...marker, timestamp: clamped } : marker));
 }
 
+function handleMarkerValueChange(payload: MeasurementMarkerData[]) {
+  markerDatas.value = payload;
+}
+
 function handleGlobalTimeChange(payload: TimeRange) {
-  globalTimeRange.value.start = payload.start;
-  globalTimeRange.value.end = payload.end;
+  // globalTimeRange.value.start = payload.start;
+  // globalTimeRange.value.end = payload.end;
+}
+
+function getTemplateList() {
+  // TODO: filterText
+  getTrendTemplate('', '').then((res) => {
+    const data = res.data || [];
+    templateList.value = data.filter((item: TrendTemplate) => item.type === 'new-table-running');
+  });
+}
+
+function handleSaveTemplate(name: string) {
+  trendGraphRef.value?.setSaveTemplateLoading(true);
+  const groupInfoToSave = groups.value.map((group) => ({
+    id: group.id,
+    members: group.measurementIds.map((measurementId) => measurementMap.get(measurementId)).filter(Boolean) as Measurement[],
+  }));
+  const data = JSON.stringify({
+    type: 'new-table-running',
+    visibleGroupInfo: groupInfoToSave,
+    selectedMeasurements: measurementList.value,
+  });
+  upsertTrendTemplate({
+    id: '',
+    type: 'new-table-running',
+    name,
+    template: data,
+  })
+    .then(() => {
+      ElMessage.success({ message: t('common.saveSuccess'), grouping: true });
+      trendGraphRef.value?.setTemplateVisible(false);
+      getTemplateList();
+    })
+    .finally(() => {
+      trendGraphRef.value?.setSaveTemplateLoading(false);
+    });
+}
+
+function handleOperateTemplate(payload: { action: string; data: TrendTemplate }) {
+  if (payload.action === 'rename') {
+    trendGraphRef.value?.setRenameData({
+      id: +payload.data.id,
+      name: payload.data.name,
+      type: payload.data.type,
+      template: payload.data.template,
+    });
+    trendGraphRef.value?.setRenameVisible(true);
+    trendGraphRef.value?.setSaveTemplateLoading(false);
+  } else {
+    const templateData = JSON.parse(payload.data.template);
+    measurementList.value = templateData.selectedMeasurements;
+    measurementMap.clear();
+    measurementList.value.forEach((item: Measurement) => {
+      measurementMap.set(item.id, item);
+    });
+    groups.value = templateData.visibleGroupInfo.map((group: ChartGroupInput) => ({
+      id: group.id,
+      measurementIds: group.members.map((member: Measurement) => member.id),
+    }));
+    console.log('Loaded Groups:', groups.value);
+    visibleMeasurementCountMap.value = new Map();
+    groups.value.forEach((group) => {
+      group.measurementIds.forEach((measurementId) => {
+        if (!visibleMeasurementCountMap.value.has(measurementId)) {
+          visibleMeasurementCountMap.value.set(measurementId, 1);
+        } else {
+          visibleMeasurementCountMap.value.set(measurementId, visibleMeasurementCountMap.value.get(measurementId)! + 1);
+        }
+      });
+    });
+
+    // needFetchMeasurementsId.value = measurementList.value.map((m) => m.id);
+    // needFetchGroupsId.value = [];
+    // needFetchGroupsId.value = groups.value.map((g) => g.id);
+    // markers.value = createInitialMarkers(trendStore.visibleTimeRange);
+    sideTreeRef.value?.restoreSelectedMeasurements(convertMeasurementListToSelectedMeasurements(measurementList.value));
+    runningTrendStore.setIsPlaying(true);
+  }
+}
+
+function convertMeasurementListToSelectedMeasurements(list: Measurement[]): SelectedMeasurement[] {
+  return list.map((item) => item.details).filter(Boolean) as SelectedMeasurement[];
 }
 
 function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: SelectedMeasurement[] }) {
@@ -144,6 +243,7 @@ function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: Selec
   measurementList.value.forEach((item) => {
     measurementMap.set(item.id, item);
   });
+  setStorage();
 }
 
 function handleDeleteMeasurement(fullpath: string) {
@@ -203,7 +303,7 @@ function deleteGroup(payload: { groupId: string }) {
         if (count <= 0) {
           visibleMeasurementCountMap.value.delete(measurementId);
           // needDeleteMeasurementsId.value.push(measurementId);
-          // trendGraphRef.value?.deleteMeasurementMarkerDataByName(measurementId);
+          trendGraphRef.value?.deleteMeasurementMarkerDataByName(measurementId);
           deletePathFromWebSocket(measurementId);
         } else {
           visibleMeasurementCountMap.value.set(measurementId, count);
@@ -226,7 +326,7 @@ function deleteMeasurement(payload: { groupId: string; measurementPath: string }
       if (count <= 0) {
         visibleMeasurementCountMap.value.delete(payload.measurementPath);
         // needDeleteMeasurementsId.value.push(payload.measurementPath);
-        // trendGraphRef.value?.deleteMeasurementMarkerDataByName(payload.measurementPath);
+        trendGraphRef.value?.deleteMeasurementMarkerDataByName(payload.measurementPath);
         deletePathFromWebSocket(payload.measurementPath);
       } else {
         visibleMeasurementCountMap.value.set(payload.measurementPath, count);
@@ -300,7 +400,7 @@ function handleData(data: any) {
     data: TrendData[];
     operate: string;
   } = JSON.parse(data) || [];
-  if (loading.value && jsonData.operate === 'get') {
+  if (runningTrendStore.isPlaying && jsonData.operate === 'get') {
     const minTime = dayjs().subtract(10, 'minute').valueOf();
     if (realTimeData.value.length === 0) {
       minDataTime.value = dayjs().valueOf();
@@ -339,6 +439,7 @@ function handleData(data: any) {
     });
     const min = minTime > minDataTime.value ? minTime : minDataTime.value;
     runningTrendStore.setMin(min);
+    runningTrendStore.setVisibleTimeRange({ start: min, end: dayjs().valueOf() });
   }
 }
 
@@ -362,8 +463,10 @@ function handlePlay(val: boolean) {
         data.timestamps.push(data.timestamps[data.timestamps.length - 1]! + 1);
       }
     });
+  } else {
+    runningTrendStore.setVisibleTimeRange({ start: runningTrendStore.min, end: dayjs().valueOf() });
   }
-  loading.value = val;
+  runningTrendStore.setIsPlaying(val);
 }
 
 function init() {
@@ -438,7 +541,7 @@ function restoreData() {
         });
       }
       if (visibleMeasurementCountMap.value.size > 0) {
-        loading.value = true;
+        runningTrendStore.setIsPlaying(true);
       }
       if (socketInstance.value && socketInstance.value.readyState === 1) {
         console.log('restoreData() send SET_CONNECT 1');
@@ -505,6 +608,7 @@ onMounted(() => {
       socketInstance.value.close();
     }
   });
+  getTemplateList();
 });
 
 onUnmounted(() => {
@@ -514,13 +618,25 @@ onUnmounted(() => {
 });
 
 watch(
-  globalTimeRange,
+  () => runningTrendStore.isPlaying,
   (newVal) => {
-    pendingRange.value = { ...newVal };
-    visibleRange.value = { ...newVal };
+    if (!newVal) {
+      markers.value = createInitialMarkers(runningTrendStore.visibleTimeRange);
+      console.log('update markers timestamp:', dayjs(markers.value[0]?.timestamp).format('YYYY-MM-DD HH:mm:ss'), ' - ', dayjs(markers.value[1]?.timestamp).format('YYYY-MM-DD HH:mm:ss'));
+    }
+    // updateRunningMarkerValues();
   },
-  { deep: true },
+  { deep: true, immediate: true },
 );
+
+// watch(
+//   globalTimeRange,
+//   (newVal) => {
+//     pendingRange.value = { ...newVal };
+//     visibleRange.value = { ...newVal };
+//   },
+//   { deep: true },
+// );
 
 watch(
   () => connectionStore.connectionIsMaster,
@@ -529,67 +645,8 @@ watch(
       if (socketInstance.value) {
         socketInstance.value.close();
       }
-      // if (!canReadWriteData.value) {
-      //   //setOption(chartOptions.value);
-      //   return;
-      // }
       initWebsocket(() => {
         restoreData();
-        // if (window.sessionStorage.getItem('tableDataTrendStorage')) {
-        //   const storageData = JSON.parse(window.sessionStorage.getItem('tableDataTrendStorage') as string);
-        //   searchFormData.database = storageData.database;
-        //   searchFormData.table = storageData.table;
-        //   searchFormData.selectedMeasurement = storageData.selectedMeasurement || [];
-        //   if (searchFormData.selectedMeasurement?.length) {
-        //     searchFormData.datetimerange = storageData.datetimerange;
-        //     searchFormData.unitInterval = storageData.unitInterval;
-        //     searchFormData.aggregation = storageData.aggregation;
-        //     dataTab.value = storageData.dataTab;
-        //     pathList.value = storageData.pathList;
-        //     pointLineData.value = storageData.pointLineData.map((item: MarkPointLine) => ({
-        //       ...item,
-        //       label: {
-        //         formatter: () => `D${item.group}-${item.order}`,
-        //         position: 'end',
-        //         offset: [0, item.order * 10],
-        //       },
-        //     }));
-        //     markPointCount.value = storageData.markPointCount;
-        //     pointList.value = storageData.pointList;
-        //     activeNameSide.value = storageData.activeNameSide;
-        //     loading.value = dataTab.value === 'running';
-        //   }
-        //   if (socketInstance.value && socketInstance.value.readyState === 1) {
-        //     socketInstance.value?.send(
-        //       JSON.stringify({
-        //         operate: 'SET_CONNECT',
-        //         connectionId: connectionId.value,
-        //         user: userName.value,
-        //         type: connectionType.value,
-        //       }),
-        //     );
-        //     if (searchFormData.selectedMeasurement.length) {
-        //       socketInstance.value?.send(buildParams('add', searchFormData.selectedMeasurement));
-        //     }
-        //   } else {
-        //     socketInstance.value?.addEventListener('open', () => {
-        //       socketInstance.value?.send(
-        //         JSON.stringify({
-        //           operate: 'SET_CONNECT',
-        //           connectionId: connectionId.value,
-        //           user: userName.value,
-        //           type: connectionType.value,
-        //         }),
-        //       );
-        //       if (searchFormData.selectedMeasurement.length) {
-        //         socketInstance.value?.send(buildParams('add', searchFormData.selectedMeasurement));
-        //       }
-        //     });
-        //   }
-        //   setOption(chartOptions.value, true);
-        //   handleSearch(false);
-        //   return;
-        // }
         init();
       });
     }

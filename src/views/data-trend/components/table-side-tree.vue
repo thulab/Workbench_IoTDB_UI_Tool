@@ -263,8 +263,19 @@ function filterTreeData(data: TableTreeNodeData[], keyword: string): TableTreeNo
 }
 
 const handleConfirmMeasurement = (selected: SelectedMeasurement[]) => {
-  selectedMeasurements.value = selected;
-  console.log('Selected Measurements:', selectedMeasurements.value);
+  console.log('Before Confirmed Measurements:', selectedMeasurements.value);
+  console.log(selectedMeasurementsData.value);
+  for (const meas of selected) {
+    if (
+      selectedMeasurements.value.findIndex(
+        (m) =>
+          m.database === meas.database && m.tableName === meas.tableName && m.device.map((d) => d.value).join('.') === meas.device.map((d) => d.value).join('.') && m.measurement === meas.measurement,
+      ) === -1
+    ) {
+      selectedMeasurements.value.push(meas);
+    }
+  }
+  // selectedMeasurements.value = selected;
   addMeasurementsOfDbTbIntoTree();
   saveToStorage();
   tableMeasurementVisible.value = false;
@@ -430,6 +441,8 @@ function initSelectedMeasurementsData() {
     result.push(dbCopy);
   });
   selectedMeasurementsData.value = result;
+  console.log('here selectedMeasurementsData:', selectedMeasurementsData.value);
+  console.log('here selectedMeasurements:', selectedMeasurements.value);
 }
 
 onMounted(() => {
@@ -503,10 +516,7 @@ function restoreTemplateData(measurements: SelectedMeasurement[]) {
 
 const restoreSelectedMeasurements = (measurements: SelectedMeasurement[]) => {
   selectedMeasurements.value = measurements;
-  console.log('Selected Measurements:', selectedMeasurements.value);
   restoreTemplateData(measurements);
-  console.log('Restored Data:', selectedMeasurementsData.value);
-
   saveToStorage();
   initSelectedMeasurementsData();
   emit('updateSelectedMeasurements', selectedMeasurements.value);

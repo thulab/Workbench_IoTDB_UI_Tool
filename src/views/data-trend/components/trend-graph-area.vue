@@ -298,8 +298,9 @@ function convertPath(original: string): string {
 function filteredRealTimeData(group: ChartGroupInput): TrendData[] {
   const result: TrendData[] = [];
   for (const item of props.realTimeData || []) {
-    if (group.members.some((measurement) => measurement.label === convertPath(item.path))) {
-      result.push(item);
+    const convertedPath = convertPath(item.path);
+    if (group.members.some((measurement) => measurement.label === convertedPath)) {
+      result.push({ ...item, path: convertedPath });
     }
   }
   return result;

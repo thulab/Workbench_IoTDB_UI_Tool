@@ -145,6 +145,7 @@ function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: Selec
   measurementList.value.forEach((item) => {
     measurementMap.set(item.id, item);
   });
+  setStorage();
 }
 
 function handleDeleteMeasurement(fullpath: string) {
@@ -171,6 +172,7 @@ function createGroup(fullpath: string) {
   }
   needFetchGroupsId.value = [];
   needFetchGroupsId.value.push(groupId);
+  setStorage();
 }
 
 function mergeGroup(payload: { groupId: string; measurementPath: string }) {
@@ -296,7 +298,7 @@ function handleSaveTemplate(name: string) {
     members: group.measurementIds.map((measurementId) => measurementMap.get(measurementId)).filter(Boolean) as Measurement[],
   }));
   const data = JSON.stringify({
-    type: 'table-history',
+    type: 'new-table-history',
     globalTimeRange: [dayjs(trendStore.globalTimeRange.start).valueOf(), dayjs(trendStore.globalTimeRange.end).valueOf()],
     localTimeRange: [dayjs(trendStore.visibleTimeRange.start).valueOf(), dayjs(trendStore.visibleTimeRange.end).valueOf()],
     visibleGroupInfo: groupInfoToSave,

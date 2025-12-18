@@ -24,11 +24,19 @@ export const useTableHistoryTrendStore = defineStore('tableHistoryTrend', {
 export const useTableRunningTrendStore = defineStore('tableRunningTrend', {
   state: () => ({
     min: -1,
+    isPlaying: true,
+    visibleTimeRange: { start: Date.now() - 12 * 3600 * 1000, end: Date.now() } as TimeRange,
   }),
 
   actions: {
     setMin(value: number) {
       this.min = value;
+    },
+    setIsPlaying(value: boolean) {
+      this.isPlaying = value;
+    },
+    setVisibleTimeRange(range: TimeRange) {
+      this.visibleTimeRange = range;
     },
   },
 });
