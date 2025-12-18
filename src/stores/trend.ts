@@ -21,4 +21,14 @@ export const useTableHistoryTrendStore = defineStore('tableHistoryTrend', {
   },
 });
 
-export default useTableHistoryTrendStore;
+export const useTableRunningTrendStore = defineStore('tableRunningTrend', {
+  state: () => ({
+    min: -1,
+  }),
+
+  actions: {
+    setMin(value: number) {
+      this.min = value;
+    },
+  },
+});

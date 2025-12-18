@@ -19,10 +19,22 @@
         </div>
       </div>
       <div class="operate-button-group">
-        <button v-if="props.isRunning" class="operate-button">
+        <button
+          @click="handleRunningPlay"
+          v-if="props.isRunning"
+          class="operate-button"
+          :disabled="props.measurementGroupInfo.length === 0"
+          :style="props.measurementGroupInfo.length === 0 ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
+        >
           <el-icon size="22"><VideoPlay /></el-icon>
         </button>
-        <button v-if="props.isRunning" class="operate-button">
+        <button
+          @click="handleRunningPause"
+          v-if="props.isRunning"
+          class="operate-button"
+          :disabled="props.measurementGroupInfo.length === 0"
+          :style="props.measurementGroupInfo.length === 0 ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
+        >
           <el-icon size="22"><VideoPause /></el-icon>
         </button>
         <button
@@ -79,6 +91,7 @@
         <div>
           <MetricChartGroup
             v-for="(group, index) in props.measurementGroupInfo"
+            :isRunning="props.isRunning"
             :ref="(el) => el && chartRefs[group.id] === el"
             :id="group.id"
             :key="group.id"
@@ -90,6 +103,7 @@
             :loading="props.loading"
             :need-fetch-data="props.needFetchGroupsId?.includes(group.id)"
             :can-delete="props.measurementGroupInfo.length > 1"
+            :realTimeData="filteredRealTimeData(group)"
             @drop="handleMeasurementDrop"
             @delete-group="handleDeleteGroup"
             @marker-change="updateMarker"
@@ -98,6 +112,7 @@
           />
           <MetricChartGroup
             v-if="props.measurementGroupInfo.length === 0"
+            :isRunning="props.isRunning"
             :group="{ id: 'default', members: [] }"
             :index="0"
             :range="trendStore.visibleTimeRange"
@@ -131,7 +146,7 @@ import { today } from '@/utils/date';
 import type { DateModelType, PopoverInstance } from 'element-plus';
 import { VideoPlay, VideoPause } from '@element-plus/icons-vue';
 import { SearchApi } from '@/api';
-import type { TrendTemplate } from '@/types';
+import type { TrendTemplate, TrendData } from '@/types';
 import { ref } from 'vue';
 import { ClickOutside as vClickOutside } from 'element-plus';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
@@ -181,6 +196,7 @@ const props = withDefaults(
     loading?: boolean;
     needFetchGroupsId?: string[];
     templateList: TrendTemplate[];
+    realTimeData?: TrendData[];
   }>(),
   {},
 );
@@ -210,6 +226,8 @@ const emit = defineEmits<{
   'save-template': [payload: string];
   'handle-operate': [payload: { action: string; data: TrendTemplate }];
   'get-query-list': [payload: string];
+  'running-play': [];
+  'running-pause': [];
 }>();
 
 const { t } = useI18n();
@@ -265,6 +283,47 @@ defineExpose({
   setSelectedDateTime,
   restoreChartData,
 });
+
+function handleRunningPlay() {
+  emit('running-play');
+}
+
+function handleRunningPause() {
+  emit('running-pause');
+}
+
+function convertPath(original: string): string {
+  const firstParen = original.indexOf('(');
+  const lastParen = original.indexOf(')');
+  if (firstParen === -1 || lastParen === -1 || lastParen <= firstParen) {
+    return original;
+  }
+  const prefix = original.slice(0, firstParen);
+  const lastDotIndex = prefix.lastIndexOf('.');
+  const dbTb = prefix.slice(0, lastDotIndex);
+  const measurement = prefix.slice(lastDotIndex + 1);
+  const devices = original.slice(firstParen + 1, lastParen).split(', ');
+  const device = devices.join('.');
+  const processed = `${dbTb}.${device}.${measurement}`;
+  console.log('prefix:', prefix);
+  console.log('dbTb:', dbTb);
+  console.log('measurement:', measurement);
+  console.log('device:', device);
+
+  // const processed = original.slice(0, firstParen + 1) + original.slice(firstParen + 1, lastParen).replace(/,/g, '.') + original.slice(lastParen);
+  console.log('converted path from', original, 'to', processed);
+  return processed;
+}
+
+function filteredRealTimeData(group: ChartGroupInput): TrendData[] {
+  const result: TrendData[] = [];
+  for (const item of props.realTimeData || []) {
+    if (group.members.some((measurement) => measurement.label === convertPath(item.path))) {
+      result.push(item);
+    }
+  }
+  return result;
+}
 
 function handleChangeTime(value: [DateModelType, DateModelType]) {
   const start = dayjs(value[0]).valueOf();

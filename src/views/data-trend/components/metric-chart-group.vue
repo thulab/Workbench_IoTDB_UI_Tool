@@ -5,9 +5,9 @@
         <el-icon size="20"><i-custom-close /></el-icon>
       </button>
       <div style="display: flex">
-        <div v-for="measurement in measurementsData" class="measurement-row" :key="measurement.label">
+        <div v-for="measurement in props.group.members" class="measurement-row" :key="measurement.label">
           <div>{{ measurement.label }}</div>
-          <button class="close-button" :disabled="measurementsData.length <= 1" @click="handleDeleteMeasurement(measurement.label)" :style="measurementsData.length > 1 ? 'cursor: pointer' : ''">
+          <button class="close-button" :disabled="props.group.members.length <= 1" @click="handleDeleteMeasurement(measurement.label)" :style="props.group.members.length > 1 ? 'cursor: pointer' : ''">
             <el-icon size="20"><i-custom-close /></el-icon>
           </button>
         </div>
@@ -37,9 +37,11 @@ import { echarts, type ECOption } from '@/plugins/echarts-plugin';
 import type { ChartMarker, ChartGroupInput, Measurement, DataPoint, MeasurementMarkerData } from '@/types/trend';
 import { TableDataApi } from '@/api';
 import { formatSelectedMeasurement } from '@/utils/format';
-import { useTableHistoryTrendStore } from '@/stores/trend';
+import { useTableHistoryTrendStore, useTableRunningTrendStore } from '@/stores/trend';
+import type { TrendData } from '@/types';
 
 const trendStore = useTableHistoryTrendStore();
+const runningTrendStore = useTableRunningTrendStore();
 
 const { t } = useI18n();
 const { requestFn: getHistoryTrend } = useRequest(TableDataApi.getTrendHistoryData);
@@ -57,6 +59,7 @@ let draggingId: string | null = null;
 
 const props = withDefaults(
   defineProps<{
+    isRunning: boolean;
     group: ChartGroupInput;
     markers: ChartMarker[];
     index: number;
@@ -64,6 +67,7 @@ const props = withDefaults(
     height?: number | string;
     needFetchData?: boolean;
     canDelete?: boolean;
+    realTimeData?: TrendData[];
   }>(),
   {
     loading: false,
@@ -346,6 +350,79 @@ function buildOption(): ECOption {
   };
 }
 
+function buildRunningOption(): ECOption {
+  return {
+    backgroundColor: 'transparent',
+    grid: {
+      left: GRID_LEFT,
+      right: GRID_RIGHT,
+      bottom: 0,
+      top: 0,
+    },
+    animation: false,
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'line',
+        lineStyle: {
+          color: '#91a3ff',
+          width: 1,
+          type: 'dashed',
+        },
+      },
+      valueFormatter: (value) => {
+        const numeric = typeof value === 'number' ? value : Number(value ?? 0);
+        return numeric.toFixed(2);
+      },
+    },
+    xAxis: {
+      type: 'time',
+      min: runningTrendStore.min > 0 ? runningTrendStore.min : undefined,
+      // splitNumber: 4,
+      axisLine: { lineStyle: { color: '#444b63' } },
+      axisLabel: {
+        color: '#7a819a',
+        interval: 'auto',
+        formatter: (value: number) =>
+          new Date(value).toLocaleTimeString('zh-CN', {
+            // year: '2-digit',
+            // month: '2-digit',
+            // day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+          }),
+      },
+      splitLine: {
+        show: true,
+        lineStyle: { color: 'rgba(122, 129, 154, 0.2)', type: 'dashed' },
+      },
+    },
+    yAxis: {
+      type: 'value',
+      scale: true,
+      axisLine: { show: true, lineStyle: { color: '#444b63' } },
+      axisLabel: { color: '#7a819a' },
+      splitLine: {
+        lineStyle: { color: 'rgba(122, 129, 154, 0.15)' },
+      },
+    },
+    series:
+      props.realTimeData?.map((series) => ({
+        name: series.path,
+        type: 'line',
+        smooth: true,
+        showSymbol: false,
+        sampling: 'lttb',
+        lineStyle: {
+          width: 2,
+          color: '#7a819a',
+        },
+        data: series.values.map((point, index) => [series.timestamps[index], point]),
+      })) || [],
+  };
+}
+
 function initChart() {
   if (!trendChartRef.value) return;
   chart = echarts.init(trendChartRef.value);
@@ -404,6 +481,9 @@ onUnmounted(() => {
 watch(
   () => trendStore.visibleTimeRange,
   () => {
+    if (props.isRunning) {
+      return;
+    }
     if (props.group.id === 'default') {
       if (chart) {
         chart.setOption(buildOption(), true);
@@ -430,6 +510,9 @@ watch(
 watch(
   () => props.group,
   (newGroup) => {
+    if (props.isRunning) {
+      return;
+    }
     if (!props.needFetchData) {
       return;
     }
@@ -450,6 +533,9 @@ watch(
 watch(
   () => measurementsData.value,
   () => {
+    if (props.isRunning) {
+      return;
+    }
     setStorage();
     updateMarkerValues();
     if (chart) {
@@ -460,8 +546,36 @@ watch(
 );
 
 watch(
+  () => props.realTimeData,
+  () => {
+    if (!props.isRunning) {
+      return;
+    }
+    if (chart) {
+      chart.setOption(buildRunningOption(), true);
+    }
+  },
+  { deep: true },
+);
+
+watch(
+  () => runningTrendStore.min,
+  () => {
+    if (!props.isRunning) {
+      return;
+    }
+    if (chart) {
+      chart.setOption(buildRunningOption(), true);
+    }
+  },
+);
+
+watch(
   () => markerValues.value,
   (newValues) => {
+    if (props.isRunning) {
+      return;
+    }
     emit('marker-value-change', newValues);
   },
   { deep: true },
@@ -470,6 +584,9 @@ watch(
 watch(
   () => props.markers,
   () => {
+    if (props.isRunning) {
+      return;
+    }
     // if (chart) {
     //   chart.setOption(buildOption());
     // }
