@@ -91,6 +91,7 @@
         <div>
           <MetricChartGroup
             v-for="(group, index) in props.measurementGroupInfo"
+            :isPlaying="isPlaying"
             :isRunning="props.isRunning"
             :ref="(el) => el && chartRefs[group.id] === el"
             :id="group.id"
@@ -187,6 +188,8 @@ const saveTemplateLoading = ref(false);
 const wrapperRef = ref<HTMLElement | null>(null);
 const wrapperHeight = ref(0);
 let observer: ResizeObserver | null = null;
+
+const isPlaying = ref(false);
 
 const props = withDefaults(
   defineProps<{
@@ -285,10 +288,12 @@ defineExpose({
 });
 
 function handleRunningPlay() {
+  isPlaying.value = true;
   emit('running-play');
 }
 
 function handleRunningPause() {
+  isPlaying.value = false;
   emit('running-pause');
 }
 
@@ -305,13 +310,6 @@ function convertPath(original: string): string {
   const devices = original.slice(firstParen + 1, lastParen).split(', ');
   const device = devices.join('.');
   const processed = `${dbTb}.${device}.${measurement}`;
-  console.log('prefix:', prefix);
-  console.log('dbTb:', dbTb);
-  console.log('measurement:', measurement);
-  console.log('device:', device);
-
-  // const processed = original.slice(0, firstParen + 1) + original.slice(firstParen + 1, lastParen).replace(/,/g, '.') + original.slice(lastParen);
-  console.log('converted path from', original, 'to', processed);
   return processed;
 }
 

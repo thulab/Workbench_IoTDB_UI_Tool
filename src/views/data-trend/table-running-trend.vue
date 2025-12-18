@@ -26,7 +26,7 @@
         @running-play="handlePlay(true)"
         @running-pause="handlePlay(false)"
       />
-      <MarkerTableArea :is-running="true" :marker-datas="markerDatas" />
+      <MarkerTableArea :is-running="true" :marker-datas="markerDatas" v-if="!loading" />
     </div>
   </div>
 </template>
@@ -339,13 +339,6 @@ function handleData(data: any) {
     });
     const min = minTime > minDataTime.value ? minTime : minDataTime.value;
     runningTrendStore.setMin(min);
-    // setOption({
-    //   legend: legendSelected.value,
-    //   series: seriesData.value.series,
-    //   xAxis: { min, show: true },
-    // });
-    console.log('realTimeData:', realTimeData.value);
-    console.log('min:', min);
   }
 }
 

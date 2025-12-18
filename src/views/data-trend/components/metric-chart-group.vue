@@ -15,7 +15,7 @@
     </div>
     <div ref="stageRef" class="stage-wrapper">
       <div ref="trendChartRef" class="chart-area" :style="{ height: typeof props.height === 'number' ? props.height + 'px' : props.height }"></div>
-      <div class="marker-overlay" :class="{ 'marker-overlay--disabled': props.loading }">
+      <div v-if="!props.isRunning || !props.isPlaying" class="marker-overlay" :class="{ 'marker-overlay--disabled': props.loading }">
         <button
           v-for="handle in markerHandles"
           :key="handle.id"
@@ -60,6 +60,7 @@ let draggingId: string | null = null;
 const props = withDefaults(
   defineProps<{
     isRunning: boolean;
+    isPlaying?: boolean;
     group: ChartGroupInput;
     markers: ChartMarker[];
     index: number;
