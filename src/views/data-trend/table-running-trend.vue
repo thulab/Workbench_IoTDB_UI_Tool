@@ -253,6 +253,18 @@ function handleDeleteMeasurement(fullpath: string) {
   measurementList.value.forEach((item) => {
     measurementMap.set(item.id, item);
   });
+  for (const group of groups.value) {
+    group.measurementIds = group.measurementIds.filter((id) => {
+      return id !== fullpath;
+    });
+    if (group.measurementIds.length === 0) {
+      groups.value = groups.value.filter((g) => g.id !== group.id);
+    }
+  }
+  trendGraphRef.value?.deleteMeasurementMarkerDataByName(fullpath);
+  deletePathFromWebSocket(fullpath);
+  console.log('current groups after delete measurement:', groups.value);
+  setStorage();
 }
 
 function createGroup(fullpath: string) {

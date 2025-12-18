@@ -378,6 +378,15 @@ function buildOption(): ECOption {
         lineStyle: { color: 'rgba(122, 129, 154, 0.15)' },
       },
     },
+    toolbox: {
+      show: true,
+      feature: {
+        saveAsImage: {
+          title: t('common.export'),
+          icon: 'path://M18,12V7H7v16h11v-5 M24,15H13 M21,18l3-3l-3-3',
+        },
+      },
+    },
     series: measurementsData.value.map((series, index) => ({
       name: series.label,
       type: 'line',

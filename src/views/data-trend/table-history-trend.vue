@@ -1,5 +1,5 @@
 <template>
-  <div class="history-trend-page-container">
+  <div class="relative w-full h-full flex flex-col">
     <div class="database-list-wrapper">
       <TableSideTree
         ref="sideTreeRef"
@@ -156,6 +156,22 @@ function handleDeleteMeasurement(fullpath: string) {
   measurementList.value.forEach((item) => {
     measurementMap.set(item.id, item);
   });
+  needFetchGroupsId.value = [];
+  for (const group of groups.value) {
+    group.measurementIds = group.measurementIds.filter((id) => {
+      return id !== fullpath;
+    });
+    if (group.measurementIds.length === 0) {
+      groups.value = groups.value.filter((g) => g.id !== group.id);
+    } else {
+      needFetchGroupsId.value.push(group.id);
+    }
+  }
+  visibleMeasurementCountMap.value.delete(fullpath);
+  trendGraphRef.value?.deleteMeasurementMarkerDataByName(fullpath);
+  needDeleteMeasurementsId.value.push(fullpath);
+  console.log('current groups after delete measurement:', groups.value);
+  setStorage();
 }
 
 function createGroup(fullpath: string) {
@@ -284,7 +300,6 @@ function triggerSimulatedFetch(nextRange: TimeRange) {
 }
 
 function getTemplateList() {
-  // TODO: filterText
   getTrendTemplate('', '').then((res) => {
     const data = res.data || [];
     templateList.value = data.filter((item: TrendTemplate) => item.type === 'new-table-history');
