@@ -9,7 +9,7 @@
         @doubleClickMeasurement="createGroup"
       />
     </div>
-    <div class="flex-1 ml-8px bg-white rounded-6px p-[4px_16px_16px] flex flex-col">
+    <div class="flex-1 ml-8px bg-white rounded-6px p-[4px_16px_16px] flex flex-col min-w-0">
       <OperateButtonRow
         ref="operateButtonRowRef"
         :isRunning="true"
@@ -36,7 +36,7 @@
         @delete-measurement="deleteMeasurement"
         @marker-value-change="handleMarkerValueChange"
       />
-      <MarkerTableArea :is-running="true" :marker-datas="markerDatas" v-if="!runningTrendStore.isPlaying" />
+      <MarkerTableArea :is-running="true" :marker-datas="runningTrendStore.isPlaying ? emptyMarkerDatas : markerDatas" />
     </div>
   </div>
 </template>
@@ -82,6 +82,7 @@ const templateList = ref<TrendTemplate[]>([]);
 
 const markers = ref<ChartMarker[]>(createInitialMarkers());
 const markerDatas = ref<MeasurementMarkerData[]>([]);
+const emptyMarkerDatas = computed<MeasurementMarkerData[]>(() => []);
 
 const { socketInstance, initWebsocket } = useWebsocket('/api/relational/trendData', handleData, false);
 const userStore = useUserStore();
@@ -194,7 +195,29 @@ function handleOperateTemplate(payload: { action: string; data: TrendTemplate })
     // markers.value = createInitialMarkers(trendStore.visibleTimeRange);
     sideTreeRef.value?.restoreSelectedMeasurements(convertMeasurementListToSelectedMeasurements(measurementList.value));
     runningTrendStore.setIsPlaying(true);
+    for (const measurementId of visibleMeasurementCountMap.value.keys()) {
+      if (realTimeData.value.find((data) => convertPath(data.path) === measurementId)) {
+        continue;
+      }
+      addPathToWebSocket(measurementId);
+    }
   }
+}
+
+function convertPath(original: string): string {
+  const firstParen = original.indexOf('(');
+  const lastParen = original.indexOf(')');
+  if (firstParen === -1 || lastParen === -1 || lastParen <= firstParen) {
+    return original;
+  }
+  const prefix = original.slice(0, firstParen);
+  const lastDotIndex = prefix.lastIndexOf('.');
+  const dbTb = prefix.slice(0, lastDotIndex);
+  const measurement = prefix.slice(lastDotIndex + 1);
+  const devices = original.slice(firstParen + 1, lastParen).split(', ');
+  const device = devices.join('.');
+  const processed = `${dbTb}.${device}.${measurement}`;
+  return processed;
 }
 
 function convertMeasurementListToSelectedMeasurements(list: Measurement[]): SelectedMeasurement[] {

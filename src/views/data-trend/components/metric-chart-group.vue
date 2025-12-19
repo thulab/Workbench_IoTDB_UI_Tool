@@ -357,7 +357,7 @@ function buildOption(): ECOption {
       type: 'time',
       min: trendStore.visibleTimeRange.start,
       max: trendStore.visibleTimeRange.end,
-      splitNumber: 5,
+      splitNumber: 4,
       axisLine: { lineStyle: { color: `rgba(101, 106, 133, 1)` } },
       axisLabel: {
         color: '#7a819a',
@@ -403,7 +403,7 @@ function buildOption(): ECOption {
       sampling: 'lttb',
       color: series.color,
       lineStyle: {
-        width: 2,
+        width: 1,
         color: series.color,
       },
       data: series.values.map((point) => [point.timestamp, point.value]),

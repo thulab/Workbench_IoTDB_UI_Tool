@@ -121,6 +121,7 @@ const selectedDateTime = reactive<{
 }>({
   value: [new Date(trendStore.globalTimeRange.start), new Date(trendStore.globalTimeRange.end)],
 });
+
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 const { t } = useI18n();
 const { shortcutsDaterange } = useShortcutsDate();
@@ -258,6 +259,14 @@ const handleSqlCommand = (val: string, data: TrendTemplate) => {
     emit('handle-operate', { action: val, data });
   }
 };
+
+watch(
+  () => trendStore.globalTimeRange,
+  (newVal) => {
+    setSelectedDateTime([new Date(newVal.start), new Date(newVal.end)]);
+  },
+  { immediate: true },
+);
 </script>
 
 <style lang="scss" scoped>

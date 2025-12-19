@@ -184,6 +184,19 @@ function fetchFullRangeHistoryData(measurement: Measurement) {
         transformedData.push({ timestamp: timestamp as number, value: Number(value) });
       }
     }
+    if (fullDataSet.value.find((m) => m.id === measurement.id)) {
+      // update existing measurement data
+      fullDataSet.value = fullDataSet.value.map((m) => {
+        if (m.id === measurement.id) {
+          return {
+            ...m,
+            values: transformedData,
+          };
+        }
+        return m;
+      });
+      return;
+    }
     fullDataSet.value.push({
       ...measurement,
       values: transformedData,
@@ -315,6 +328,7 @@ function onSliderPointerMove(event: PointerEvent) {
 }
 
 function buildTimelineChartOption(): ECOption {
+  console.log('buildTimelineChartOption called with fullDataSet:', fullDataSet.value);
   return {
     backgroundColor: 'transparent',
     animation: false,
@@ -349,12 +363,15 @@ function buildTimelineChartOption(): ECOption {
         lineStyle: { color: 'rgba(122, 129, 154, 0.2)', type: 'dashed' },
       },
     },
-    yAxis: {
+    yAxis: fullDataSet.value.map((measurement) => ({
+      alignTicks: false,
+      id: measurement.id,
       type: 'value',
       show: false,
       splitLine: { show: false },
-    },
+    })),
     series: fullDataSet.value.map((measurement) => ({
+      yAxisId: measurement.id,
       name: measurement.label,
       type: 'line',
       smooth: true,
