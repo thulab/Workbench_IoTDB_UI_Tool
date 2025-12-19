@@ -357,6 +357,10 @@ function deleteMeasurement(payload: { groupId: string; measurementPath: string }
   const group = groups.value.find((g) => g.id === payload.groupId);
   if (group) {
     group.measurementIds = group.measurementIds.filter((id) => id !== payload.measurementPath);
+    if (group.measurementIds.length === 0) {
+      groups.value = groups.value.filter((g) => g.id !== payload.groupId);
+    }
+
     if (visibleMeasurementCountMap.value.has(payload.measurementPath)) {
       const count = visibleMeasurementCountMap.value.get(payload.measurementPath)! - 1;
       if (count <= 0) {
