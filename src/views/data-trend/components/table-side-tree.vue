@@ -278,8 +278,6 @@ function filterTreeData(data: TableTreeNodeData[], keyword: string): TableTreeNo
 }
 
 const handleConfirmMeasurement = (selected: SelectedMeasurement[]) => {
-  console.log('Before Confirmed Measurements:', selectedMeasurements.value);
-  console.log(selectedMeasurementsData.value);
   for (const meas of selected) {
     if (
       selectedMeasurements.value.findIndex(
@@ -475,8 +473,6 @@ function initSelectedMeasurementsData() {
 
   selectedMeasurementsData.value = result;
   selectedMeasurements.value = restoredMeasurements;
-  console.log('here selectedMeasurementsData:', selectedMeasurementsData.value);
-  console.log('here selectedMeasurements:', selectedMeasurements.value);
 }
 
 onMounted(() => {

@@ -252,6 +252,10 @@ const handleSqlCommand = (val: string, data: TrendTemplate) => {
           type: 'success',
           message: `${t('common.deleteSuccess')}`,
         });
+        // 如果当前下拉框选中的模板正是被删除的这个，则清空选择并重置趋势
+        if (selectedTemplateId.value === data.id) {
+          handleTemplateReset();
+        }
         emit('get-query-list', '');
       });
     });
@@ -274,9 +278,20 @@ watch(
   width: 260px;
   margin-left: 16px;
 }
-</style>
 
-<style>
+:deep(.template-select .el-select__caret) {
+  display: none;
+}
+
+:deep(.template-select .el-select__wrapper),
+:deep(.template-select .el-input__wrapper) {
+  background-image: url('../../../assets/icons/search-icon.svg');
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px 18px;
+  padding-right: 32px;
+}
+
 .save-button {
   border: 1px solid #dfe1ed;
 }

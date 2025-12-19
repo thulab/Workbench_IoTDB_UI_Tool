@@ -95,7 +95,6 @@ const minDataTime = ref(-1);
 
 function createInitialMarkers(range: TimeRange = runningTrendStore.visibleTimeRange): ChartMarker[] {
   const span = Math.max(range.end - range.start, 1);
-  console.log('init markers with time range:', dayjs(range.start).format('YYYY-MM-DD HH:mm:ss'), ' - ', dayjs(range.end).format('YYYY-MM-DD HH:mm:ss'));
   return [
     {
       id: 'marker-1',
@@ -177,7 +176,6 @@ function handleOperateTemplate(payload: { action: string; data: TrendTemplate })
       id: group.id,
       measurementIds: group.members.map((member: Measurement) => member.id),
     }));
-    console.log('Loaded Groups:', groups.value);
     visibleMeasurementCountMap.value = new Map();
     groups.value.forEach((group) => {
       group.measurementIds.forEach((measurementId) => {
@@ -311,7 +309,6 @@ function handleDeleteMeasurement(fullpath: string) {
   }
   trendGraphRef.value?.deleteMeasurementMarkerDataByName(fullpath);
   deletePathFromWebSocket(fullpath);
-  console.log('current groups after delete measurement:', groups.value);
   setStorage();
 }
 
@@ -321,7 +318,6 @@ function createGroup(fullpath: string) {
     id: groupId,
     measurementIds: [fullpath],
   });
-  console.log('current groups:', groups.value);
   if (!visibleMeasurementCountMap.value.has(fullpath)) {
     visibleMeasurementCountMap.value.set(fullpath, 1);
     // needFetchMeasurementsId.value.push(fullpath);
@@ -350,7 +346,6 @@ function mergeGroup(payload: { groupId: string; measurementPath: string }) {
     // needFetchGroupsId.value.push(payload.groupId);
     setStorage();
   }
-  console.log('current groups:', groups.value);
 }
 
 function deleteGroup(payload: { groupId: string }) {
@@ -534,7 +529,6 @@ function handlePlay(val: boolean) {
 
 function init() {
   if (socketInstance.value && socketInstance.value.readyState === 1) {
-    console.log('init() send SET_CONNECT 1');
     socketInstance.value?.send(
       JSON.stringify({
         operate: 'SET_CONNECT',
@@ -545,7 +539,6 @@ function init() {
     );
   } else {
     socketInstance.value?.addEventListener('open', () => {
-      console.log('init() send SET_CONNECT 2');
       socketInstance.value?.send(
         JSON.stringify({
           operate: 'SET_CONNECT',
@@ -569,7 +562,11 @@ function setStorage() {
     // markers: markers.value,
     visibleMeasurementCounts: Array.from(visibleMeasurementCountMap.value.entries()),
   };
-  window.sessionStorage.setItem('newTableDataRunningTrendStorage', JSON.stringify(storageData));
+  try {
+    window.sessionStorage.setItem('newTableDataRunningTrendStorage', JSON.stringify(storageData));
+  } catch (e) {
+    console.warn('Failed to save running trend page state to sessionStorage:', e);
+  }
 }
 
 function restoreData() {
@@ -685,7 +682,6 @@ watch(
   (newVal) => {
     if (!newVal) {
       markers.value = createInitialMarkers(runningTrendStore.visibleTimeRange);
-      console.log('update markers timestamp:', dayjs(markers.value[0]?.timestamp).format('YYYY-MM-DD HH:mm:ss'), ' - ', dayjs(markers.value[1]?.timestamp).format('YYYY-MM-DD HH:mm:ss'));
     }
     // updateRunningMarkerValues();
   },

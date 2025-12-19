@@ -2,7 +2,7 @@
 <template>
   <el-dialog v-model="dialogVisible" :title="t('measurement.measurementChoose')" width="630px" :before-close="handleClose" :close-on-click-modal="false" :close-on-press-escape="false" draggable>
     <div class="flex gap-1 modal-table-measurement-container">
-      <el-scrollbar :height="450" class="bg-[#F7F8FC]">
+      <el-scrollbar max-height="450" class="bg-[#F7F8FC]">
         <!-- 左侧测点选择区域 -->
         <div class="flex-2 flex flex-col p-[16px]">
           <el-form :model="formData" :rules="formRules" ref="formRef" label-position="left" label-width="80px">
@@ -35,34 +35,38 @@
             </div> -->
 
             <!-- 第二行：标签键值对输入 -->
-            <el-form-item :label="`${t('measurement.device')}：`" required props="selectedTags">
-              <div class="flex flex-col gap-2">
-                <div v-for="(tag, index) in tagFilters" :key="index" class="flex items-center">
-                  <el-select v-model="tag.variable" :disabled="!availableTags.length" :placeholder="t('common.selectPlaceholder')" class="w-[80px]">
-                    <el-option
-                      v-for="option in availableTags"
-                      :disabled="!canChoice(option, index)"
-                      :key="option.nodeName"
-                      :label="option.nodeName + (option.comment ? ` (${option.comment})` : '')"
-                      :value="option.nodeName!"
-                    />
-                  </el-select>
-
-                  <span class="m-x-[8px]">：</span>
-                  <el-input v-model="tag.value" class="w-[160px] m-r-[12px]" :disabled="!availableTags.length" :placeholder="t('tableMeasurement.devicePlaceholder')" />
-                  <el-button type="primary" link :disabled="tagFilters.length <= 1" @click="removeTagFilter(index)">
-                    <el-icon size="28">
+            <el-form-item :label="`${t('measurement.device')}：`" required props="selectedTags" class="device-form-item">
+              <div class="device-filter-container">
+                <div class="device-filter-inputs">
+                  <el-scrollbar max-height="80" class="device-filter-scroll">
+                    <div v-for="(tag, index) in tagFilters" :key="index" class="device-filter-row flex items-center flex-1">
+                      <el-select v-model="tag.variable" :disabled="!availableTags.length" :placeholder="t('common.selectPlaceholder')" class="w-[140px] flex-shrink-0">
+                        <el-option
+                          v-for="option in availableTags"
+                          :disabled="!canChoice(option, index)"
+                          :key="option.nodeName"
+                          :label="option.nodeName + (option.comment ? ` (${option.comment})` : '')"
+                          :value="option.nodeName!"
+                        />
+                      </el-select>
+                      <span class="m-x-[8px]">：</span>
+                      <el-input v-model="tag.value" class="flex-1" :disabled="!availableTags.length" :placeholder="t('tableMeasurement.devicePlaceholder')" />
+                    </div>
+                  </el-scrollbar>
+                </div>
+                <div class="device-filter-actions">
+                  <el-button type="primary" link :disabled="tagFilters.length <= 1" @click="removeTagFilter(tagFilters.length - 1)">
+                    <el-icon size="20">
                       <i-custom-tags-del />
                     </el-icon>
                   </el-button>
                   <el-button type="primary" link :disabled="tagFilters.length >= availableTags.length" @click="addTagFilter">
-                    <el-icon size="28">
+                    <el-icon size="20">
                       <i-custom-tags-add />
                     </el-icon>
                   </el-button>
-
-                  <el-button type="primary" link @click="searchDevices" v-if="index === tagFilters.length - 1">
-                    <el-icon size="28">
+                  <el-button type="primary" link @click="searchDevices">
+                    <el-icon size="20">
                       <i-custom-tags-query />
                     </el-icon>
                   </el-button>
@@ -75,7 +79,7 @@
               border
               ref="deviceTableRef"
               :data="deviceTableData"
-              style="max-width: 500px"
+              style="width: 100%"
               :height="260"
               :max-height="260"
               v-loading="searchLoading"
@@ -123,8 +127,11 @@
                 multiple
                 :collapse-tags="true"
                 :multiple-limit="props.selectedLimit"
-                class="w-[320px]"
+                class="w-full search-select"
               >
+                <template #prefix>
+                  <i-custom-search-icon class="remote-select-search-icon" />
+                </template>
                 <el-option
                   v-for="measurement in availableMeasurements"
                   :key="measurement.nodeName"
@@ -171,9 +178,8 @@
 
     <template #footer>
       <div class="flex justify-end gap-3">
-        <!-- <el-button @click="handleClear">{{ t('common.clear') }}</el-button> -->
+        <el-button @click="handleClear">{{ t('common.clear') }}</el-button>
         <el-button @click="handleClose">{{ t('common.cancel') }}</el-button>
-        <!-- <el-button type="primary" @click="handleConfirm" :disabled="internalSelectedMeasurements.length === 0">{{ t('common.confirm') }}</el-button> -->
         <el-button type="primary" @click="handleConfirm" :disabled="!canAdd">{{ t('common.confirm') }}</el-button>
       </div>
     </template>
@@ -512,16 +518,16 @@ defineExpose({
   removeMeasurement,
 });
 
-// const handleClear = () => {
-//   formRef.value?.resetFields();
-//   internalSelectedMeasurements.value = [];
-//   formData.selectedMeasurement = [];
-//   selectedDevices.value = [];
-//   tagFilters.value = [{ variable: '', value: '' }];
-//   deviceTableData.value = [];
-//   noMoreData.value = false;
-//   currentPage.value = 1;
-// };
+const handleClear = () => {
+  formRef.value?.resetFields();
+  internalSelectedMeasurements.value = [];
+  formData.selectedMeasurement = [];
+  selectedDevices.value = [];
+  tagFilters.value = [{ variable: '', value: '' }];
+  deviceTableData.value = [];
+  noMoreData.value = false;
+  currentPage.value = 1;
+};
 
 const handleConfirm = () => {
   addMeasurements();
@@ -561,12 +567,60 @@ watch(
 
 <style lang="scss">
 .modal-table-measurement-container {
-  height: 400px;
   min-height: 400px;
   justify-content: space-evenly;
 
+  .device-form-item {
+    .el-form-item__content {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .device-filter-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  .device-filter-inputs {
+    flex: 1;
+  }
+
+  .device-filter-scroll {
+    width: 100%;
+    max-height: 80px;
+    overflow-x: hidden;
+  }
+
+  .device-filter-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .device-filter-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .device-filter-actions {
+    display: flex;
+    align-items: center;
+    margin-left: 12px;
+    gap: 4px;
+  }
+
+  .device-filter-actions .el-button {
+    padding: 0;
+  }
+
   .el-table--border .el-table__cell {
     border-right: 0;
+  }
+
+  .el-table__header-wrapper thead tr th {
+    background-color: #f0f2f7;
+    font-weight: 500;
   }
 
   .right-panel {

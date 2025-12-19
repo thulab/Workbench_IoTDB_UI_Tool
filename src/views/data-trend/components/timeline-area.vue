@@ -408,19 +408,57 @@ function disposeTimelineChart() {
 
 function setStorage() {
   const storageData = {
-    fullDataSet: fullDataSet.value,
+    measurements: fullDataSet.value.map((measurement) => ({
+      id: measurement.id,
+      label: measurement.label,
+      details: measurement.details,
+    })),
+    globalTimeRange: {
+      start: trendStore.globalTimeRange.start,
+      end: trendStore.globalTimeRange.end,
+    },
+    visibleTimeRange: {
+      start: trendStore.pendingTimeRange.start,
+      end: trendStore.pendingTimeRange.end,
+    },
   };
-  window.sessionStorage.setItem('timelineAreaChart', JSON.stringify(storageData));
+  try {
+    window.sessionStorage.setItem('timelineAreaChart', JSON.stringify(storageData));
+  } catch (error) {
+    console.warn('Failed to save timeline area config to sessionStorage:', error);
+  }
 }
 
 const restoreData = () => {
   const storageData = window.sessionStorage.getItem('timelineAreaChart');
-  if (storageData) {
-    try {
-      const parsedData = JSON.parse(storageData);
-      fullDataSet.value = parsedData.fullDataSet || [];
-    } catch (error) {
-      console.error('Error parsing timeline area chart data from sessionStorage:', error);
+  fullDataSet.value = [];
+  const allMeasurements = props.allMeasurementInfo;
+
+  if (!storageData) {
+    for (const measurement of allMeasurements) {
+      fetchFullRangeHistoryData(measurement);
+    }
+    return;
+  }
+
+  try {
+    const parsedData = JSON.parse(storageData);
+    const storedMeasurementIds: string[] = Array.isArray(parsedData.measurements)
+      ? parsedData.measurements.map((item: { id?: string }) => item.id).filter((id: string | undefined): id is string => Boolean(id))
+      : [];
+
+    const idsToUse = storedMeasurementIds.length > 0 ? storedMeasurementIds : allMeasurements.map((item) => item.id);
+
+    for (const id of idsToUse) {
+      const measurement = allMeasurements.find((item) => item.id === id);
+      if (measurement) {
+        fetchFullRangeHistoryData(measurement);
+      }
+    }
+  } catch (error) {
+    console.error('Error parsing timeline area chart data from sessionStorage:', error);
+    for (const measurement of allMeasurements) {
+      fetchFullRangeHistoryData(measurement);
     }
   }
 };
