@@ -360,7 +360,8 @@ function buildOption(): ECOption {
       splitNumber: 4,
       axisLine: { lineStyle: { color: `rgba(101, 106, 133, 1)` } },
       axisLabel: {
-        color: '#7a819a',
+        color: '#424561',
+        fontSize: 12,
         interval: 'auto',
         formatter: (value: number) =>
           new Date(value).toLocaleTimeString('zh-CN', {
@@ -379,10 +380,10 @@ function buildOption(): ECOption {
     yAxis: {
       type: 'value',
       scale: true,
-      axisLine: { show: false, lineStyle: { color: '#444b63' } },
-      axisLabel: { color: '#7a819a' },
+      axisLine: { show: false, lineStyle: { color: '#dfe1ed' } },
+      axisLabel: { color: '#424561', fontSize: 12 },
       splitLine: {
-        lineStyle: { color: 'rgba(122, 129, 154, 0.15)' },
+        lineStyle: { color: '#dfe1ed' },
       },
       boundaryGap: ['5%', '5%'],
     },
@@ -464,7 +465,8 @@ function buildRunningOption(): ECOption {
       // splitNumber: 4,
       axisLine: { lineStyle: { color: '#444b63' } },
       axisLabel: {
-        color: '#7a819a',
+        color: '#424561',
+        fontSize: 12,
         interval: 'auto',
         formatter: (value: number) =>
           new Date(value).toLocaleTimeString('zh-CN', {
@@ -484,8 +486,8 @@ function buildRunningOption(): ECOption {
     yAxis: {
       type: 'value',
       scale: true,
-      axisLine: { show: false, lineStyle: { color: '#444b63' } },
-      axisLabel: { color: '#dfe1ed' },
+      axisLine: { show: false, lineStyle: { color: '#dfe1ed' } },
+      axisLabel: { color: '#424561', fontSize: 12 },
       splitLine: {
         lineStyle: { color: 'rgba(122, 129, 154, 0.15)' },
       },

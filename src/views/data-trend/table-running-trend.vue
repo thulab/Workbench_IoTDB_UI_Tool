@@ -80,6 +80,9 @@ const visibleMeasurementCountMap = ref<Map<string, number>>(new Map());
 const needFetchGroupsId = ref<string[]>([]);
 const templateList = ref<TrendTemplate[]>([]);
 
+const usedColors = ref<Set<string>>(new Set());
+const predefineColors = ['#4992ff', '#7cffb2', '#fddd60', '#ff6e76', '#58d9f9', '#05c091', '#ff8a45', '#8d48e3', '#dd79ff', '#8AC211'];
+
 const markers = ref<ChartMarker[]>(createInitialMarkers());
 const markerDatas = ref<MeasurementMarkerData[]>([]);
 const emptyMarkerDatas = computed<MeasurementMarkerData[]>(() => []);
@@ -269,10 +272,12 @@ function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: Selec
         deviceName = deviceName.slice(0, -1);
       }
 
-      // random color
-      const color = `#${Math.floor(Math.random() * 0xffffff)
-        .toString(16)
-        .padStart(6, '0')}`;
+      const color =
+        predefineColors.find((c) => !usedColors.value.has(c)) ||
+        `#${Math.floor(Math.random() * 0xffffff)
+          .toString(16)
+          .padStart(6, '0')}`;
+      usedColors.value.add(color);
 
       const label = `${item.database}.${item.tableName}.${deviceName}.${item.measurement}`;
       return {
@@ -292,6 +297,7 @@ function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: Selec
 }
 
 function handleDeleteMeasurement(fullpath: string) {
+  usedColors.value.delete(measurementList.value.find((item) => item.label === fullpath)?.color || '');
   measurementList.value = measurementList.value.filter((item) => {
     return item.label !== fullpath;
   });
@@ -396,28 +402,6 @@ function deleteMeasurement(payload: { groupId: string; measurementPath: string }
     setStorage();
   }
 }
-
-// function updateRange(range: TimeRange) {
-//   const nextRange = {
-//     start: Math.max(range.start, globalTimeRange.value.start),
-//     end: Math.min(range.end, globalTimeRange.value.end),
-//   }
-//   pendingRange.value = nextRange
-//   triggerSimulatedFetch(nextRange)
-// }
-
-// function triggerSimulatedFetch(nextRange: TimeRange) {
-//   isFetching.value = true
-//   if (fetchTimer) {
-//     clearTimeout(fetchTimer)
-//   }
-//   fetchTimer = setTimeout(() => {
-//     markers.value = createInitialMarkers(nextRange)
-//     visibleRange.value = nextRange
-//     isFetching.value = false
-//     fetchTimer = null
-//   }, 650)
-// }
 
 const buildParams = (operate: string, measurements: SelectedMeasurement[]) => {
   return JSON.stringify({

@@ -100,6 +100,9 @@ const markerDatas = ref<MeasurementMarkerData[]>([]);
 
 const templateList = ref<TrendTemplate[]>([]);
 
+const usedColors = ref<Set<string>>(new Set());
+const predefineColors = ['#4992ff', '#7cffb2', '#fddd60', '#ff6e76', '#58d9f9', '#05c091', '#ff8a45', '#8d48e3', '#dd79ff', '#8AC211'];
+
 function handleMarkerValueChange(payload: MeasurementMarkerData[]) {
   markerDatas.value = payload;
 }
@@ -136,10 +139,12 @@ function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: Selec
         deviceName = deviceName.slice(0, -1);
       }
 
-      // random color
-      const color = `#${Math.floor(Math.random() * 0xffffff)
-        .toString(16)
-        .padStart(6, '0')}`;
+      const color =
+        predefineColors.find((c) => !usedColors.value.has(c)) ||
+        `#${Math.floor(Math.random() * 0xffffff)
+          .toString(16)
+          .padStart(6, '0')}`;
+      usedColors.value.add(color);
 
       const label = `${item.database}.${item.tableName}.${deviceName}.${item.measurement}`;
       return {
@@ -159,6 +164,7 @@ function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: Selec
 }
 
 function handleDeleteMeasurement(fullpath: string) {
+  usedColors.value.delete(measurementList.value.find((item) => item.label === fullpath)?.color || '');
   measurementList.value = measurementList.value.filter((item) => {
     return item.label !== fullpath;
   });

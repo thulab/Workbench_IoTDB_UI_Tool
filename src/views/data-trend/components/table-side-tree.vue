@@ -126,10 +126,10 @@
             </template>
           </el-dropdown> -->
           <el-button v-if="data.nodeType === 'TABLE'" class="button-style" @click.stop="handleAddMeasurements(data.database, data.nodeName)">
-            <el-icon size="20"><i-custom-add /></el-icon>
+            <el-icon size="20"><i-custom-add-border2 /></el-icon>
           </el-button>
           <el-button v-if="data.nodeType === 'DEVICE-MEASUREMENT'" class="button-style" @click.stop="handleDeleteMeasurements(data)">
-            <el-icon size="20"><i-custom-close /></el-icon>
+            <el-icon size="20"><i-custom-delete /></el-icon>
           </el-button>
         </template>
       </el-tree-v2>
