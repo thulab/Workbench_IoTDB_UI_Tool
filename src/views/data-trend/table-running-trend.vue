@@ -1,6 +1,6 @@
 <template>
-  <div class="running-trend-page-container">
-    <div class="database-list-wrapper">
+  <div class="relative w-full h-full flex">
+    <div class="w-256px bg-white flex-shrink-0 rounded-6px">
       <TableSideTree
         ref="sideTreeRef"
         namespace="running"
@@ -9,13 +9,12 @@
         @doubleClickMeasurement="createGroup"
       />
     </div>
-    <div class="trend-details-wrapper">
+    <div class="flex-1 ml-8px bg-white rounded-6px p-[4px_16px_16px] flex flex-col">
       <OperateButtonRow
         ref="operateButtonRowRef"
         :isRunning="true"
         :templateList="templateList"
         :canOperate="resolvedGroups.length > 0"
-        @global-time-change="handleGlobalTimeChange"
         @save-template="handleSaveTemplate"
         @handle-operate="handleOperateTemplate"
         @get-query-list="getTemplateList"
@@ -57,14 +56,7 @@ import { SearchApi } from '@/api';
 
 const runningTrendStore = useTableRunningTrendStore();
 
-// const globalTimeRange = ref<TimeRange>({
-//   start: Date.now() - 12 * 3600 * 1000,
-//   end: Date.now(),
-// });
-// const visibleRange = ref<TimeRange>({ ...globalTimeRange.value });
-// const pendingRange = ref<TimeRange>({ ...globalTimeRange.value });
 const isFetching = ref(false);
-// let fetchTimer: ReturnType<typeof setTimeout> | null = null;
 
 const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTemplate);
 const { requestFn: getTrendTemplate /** loading */ } = useRequest(SearchApi.getTrendTemplate);
@@ -84,9 +76,7 @@ const resolvedGroups = computed<ChartGroupInput[]>(() =>
   })),
 );
 const visibleMeasurementCountMap = ref<Map<string, number>>(new Map());
-// const visibleMeasurementsSet = computed<Measurement[]>(() => {
-//   return measurementList.value.filter((item) => visibleMeasurementCountMap.value.has(item.id));
-// });
+
 const needFetchGroupsId = ref<string[]>([]);
 const templateList = ref<TrendTemplate[]>([]);
 
@@ -109,13 +99,13 @@ function createInitialMarkers(range: TimeRange = runningTrendStore.visibleTimeRa
     {
       id: 'marker-1',
       label: 'X1',
-      color: '#ff9478',
+      color: 'rgba(212, 48, 48, 1)',
       timestamp: range.start + span * 0.25,
     },
     {
       id: 'marker-2',
       label: 'X2',
-      color: '#59d5ff',
+      color: 'rgba(212, 48, 48, 1)',
       timestamp: range.start + span * 0.7,
     },
   ];
@@ -129,11 +119,6 @@ function updateMarker(payload: { id: string; timestamp: number }) {
 
 function handleMarkerValueChange(payload: MeasurementMarkerData[]) {
   markerDatas.value = payload;
-}
-
-function handleGlobalTimeChange(payload: TimeRange) {
-  // globalTimeRange.value.start = payload.start;
-  // globalTimeRange.value.end = payload.end;
 }
 
 function getTemplateList() {
@@ -372,6 +357,10 @@ function deleteMeasurement(payload: { groupId: string; measurementPath: string }
   const group = groups.value.find((g) => g.id === payload.groupId);
   if (group) {
     group.measurementIds = group.measurementIds.filter((id) => id !== payload.measurementPath);
+    if (group.measurementIds.length === 0) {
+      groups.value = groups.value.filter((g) => g.id !== payload.groupId);
+    }
+
     if (visibleMeasurementCountMap.value.has(payload.measurementPath)) {
       const count = visibleMeasurementCountMap.value.get(payload.measurementPath)! - 1;
       if (count <= 0) {
@@ -707,40 +696,3 @@ watch(
   },
 );
 </script>
-
-<style>
-.database-list-wrapper {
-  width: 240px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  background-color: #fff;
-  border-radius: 6px;
-  box-sizing: border-box;
-}
-
-.running-trend-page-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-}
-
-.trend-details-wrapper {
-  width: calc(100% - 256px);
-  margin-left: 256px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  background-color: #fff;
-  border-radius: 6px;
-
-  :deep(.el-scrollbar__view) {
-    height: 100%;
-  }
-}
-</style>
