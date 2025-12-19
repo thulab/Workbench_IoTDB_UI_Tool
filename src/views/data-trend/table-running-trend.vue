@@ -198,7 +198,40 @@ function handleOperateTemplate(payload: { action: string; data: TrendTemplate })
 }
 
 function convertMeasurementListToSelectedMeasurements(list: Measurement[]): SelectedMeasurement[] {
-  return list.map((item) => item.details).filter(Boolean) as SelectedMeasurement[];
+  return list
+    .map((item) => {
+      if (item.details) {
+        return item.details;
+      }
+      // 如果 details 为空，尝试从 id 和 label 解析信息
+      const parts = item.label.split('.');
+      if (parts.length >= 3) {
+        const database = parts[0];
+        const tableName = parts[1];
+        const measurement = parts[parts.length - 1];
+        const deviceParts = parts.slice(2, parts.length - 1);
+        const device = deviceParts.map((value) => ({ value }));
+
+        return {
+          database,
+          tableName,
+          device,
+          condition: '',
+          measurement,
+          measurementType: '',
+        } as SelectedMeasurement;
+      }
+      // 如果无法解析，返回一个基本的 SelectedMeasurement
+      return {
+        database: '',
+        tableName: '',
+        device: [],
+        condition: '',
+        measurement: item.label,
+        measurementType: '',
+      } as SelectedMeasurement;
+    })
+    .filter(Boolean) as SelectedMeasurement[];
 }
 
 function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: SelectedMeasurement[] }) {

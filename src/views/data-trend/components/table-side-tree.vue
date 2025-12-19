@@ -211,8 +211,23 @@ function saveToStorage() {
     dbNode.children?.forEach((tbNode) => {
       if (tbNode.children && tbNode.children.length > 0) {
         const key = `${dbNode.nodeName}.${tbNode.nodeName}`;
-        const measurements = tbNode.children.map((child, index) => {
-          return selectedMeasurements.value[index] || { device: [], measurement: child.nodeName };
+        const measurements: SelectedMeasurement[] = [];
+        tbNode.children.forEach((child) => {
+          // 从 selectedMeasurements 中找到对应的测点数据
+          const deviceName = child.nodeName.includes('.') ? child.nodeName.substring(0, child.nodeName.lastIndexOf('.')) : '';
+          const measurementName = child.nodeName.includes('.') ? child.nodeName.substring(child.nodeName.lastIndexOf('.') + 1) : child.nodeName;
+
+          const matchedMeasurement = selectedMeasurements.value.find((m) => {
+            return m.database === dbNode.nodeName && m.tableName === tbNode.nodeName && m.device.map((d) => d.value).join('.') === deviceName && m.measurement === measurementName;
+          });
+
+          if (matchedMeasurement) {
+            measurements.push(matchedMeasurement);
+          } else {
+            // 如果找不到匹配的，使用默认结构
+            const device = deviceName ? deviceName.split('.').map((value) => ({ value })) : [];
+            measurements.push({ device, measurement: measurementName });
+          }
         });
         dataToSave[key] = measurements;
       }
@@ -346,13 +361,19 @@ function handleDeleteMeasurements(nodeInfo: TableTreeNodeData) {
         if (tbNode.nodeName === nodeInfo.parentName) {
           tbNode.children = tbNode.children?.filter((child) => child.id !== nodeInfo.id);
           selectedMeasurementsData.value = [...selectedMeasurementsData.value];
+
+          // 同时从 selectedMeasurements 中删除对应的测点
+          const deviceName = nodeInfo.nodeName.includes('.') ? nodeInfo.nodeName.substring(0, nodeInfo.nodeName.lastIndexOf('.')) : '';
+          const measurementName = nodeInfo.nodeName.includes('.') ? nodeInfo.nodeName.substring(nodeInfo.nodeName.lastIndexOf('.') + 1) : nodeInfo.nodeName;
+
+          selectedMeasurements.value = selectedMeasurements.value.filter((m) => {
+            return !(m.database === nodeInfo.database && m.tableName === nodeInfo.parentName && m.device.map((d) => d.value).join('.') === deviceName && m.measurement === measurementName);
+          });
+
           modalTableMeasurementRef.value?.removeMeasurement(Number(nodeInfo.id?.split('-').pop()));
           saveToStorage();
-          const last = String(nodeInfo.id).split('-').pop();
-          const index = last ? Number(last) : -1;
-          if (index >= 0 && !Number.isNaN(index)) {
-            emit('deleteMeasurement', `${nodeInfo.database}.${nodeInfo.parentName}.${nodeInfo.nodeName}`);
-          }
+
+          emit('deleteMeasurement', `${nodeInfo.database}.${nodeInfo.parentName}.${nodeInfo.nodeName}`);
           return;
         }
       }
@@ -395,6 +416,9 @@ function initSelectedMeasurementsData() {
   selectedMeasurementsData.value = [];
   const savedData = loadFromStorage();
 
+  // 恢复 selectedMeasurements 数组
+  const restoredMeasurements: SelectedMeasurement[] = [];
+
   const result: TableTreeNodeData[] = [];
   treeData.value.forEach((dbNode) => {
     if (dbNode.nodeName === 'information_schema') {
@@ -433,6 +457,14 @@ function initSelectedMeasurementsData() {
             database: dbNode.nodeName,
             children: [],
           });
+
+          // 添加到恢复的测点列表中
+          restoredMeasurements.push({
+            database: dbNode.nodeName,
+            tableName: tableNode.nodeName,
+            device: meas.device,
+            measurement: meas.measurement,
+          });
         });
 
         dbCopy.children?.push(tableCopy);
@@ -440,7 +472,9 @@ function initSelectedMeasurementsData() {
     }
     result.push(dbCopy);
   });
+
   selectedMeasurementsData.value = result;
+  selectedMeasurements.value = restoredMeasurements;
   console.log('here selectedMeasurementsData:', selectedMeasurementsData.value);
   console.log('here selectedMeasurements:', selectedMeasurements.value);
 }
@@ -515,10 +549,26 @@ function restoreTemplateData(measurements: SelectedMeasurement[]) {
 }
 
 const restoreSelectedMeasurements = (measurements: SelectedMeasurement[]) => {
+  // 先清空现有的测点数据
+  selectedMeasurements.value = [];
+
+  // 清空现有树结构中的测点，但保留数据库和表结构
+  selectedMeasurementsData.value.forEach((dbNode) => {
+    if (dbNode.children) {
+      dbNode.children.forEach((tbNode) => {
+        tbNode.children = [];
+      });
+    }
+  });
+
+  // 设置新的测点数据
   selectedMeasurements.value = measurements;
   restoreTemplateData(measurements);
   saveToStorage();
-  initSelectedMeasurementsData();
+
+  // 确保数据结构更新
+  selectedMeasurementsData.value = [...selectedMeasurementsData.value];
+
   emit('updateSelectedMeasurements', selectedMeasurements.value);
 };
 
@@ -526,7 +576,10 @@ watch(
   () => treeData.value,
   () => {
     setDefaultTreeExpandKeys();
-    initSelectedMeasurementsData();
+    // 只有在 selectedMeasurementsData 为空时才初始化，避免覆盖模板恢复的数据
+    if (selectedMeasurementsData.value.length === 0) {
+      initSelectedMeasurementsData();
+    }
   },
 );
 
