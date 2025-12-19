@@ -1,21 +1,27 @@
 <template>
-  <div @drop="handleDrop" @dragover.prevent>
-    <div style="display: flex">
-      <button class="close-button" :disabled="!props.canDelete" @click="handleDeleteGroup" :style="props.canDelete ? 'cursor: pointer' : ''">
+  <div @drop="handleDrop" @dragover.prevent class="graph-border rounded-[2px] mt-4px border-box pb-9px">
+    <div class="flex items-center mb-7px mt-2px">
+      <button
+        class="bg-transparent border-none mr-16px p-0! flex items-center"
+        :disabled="!props.canDelete"
+        @click="handleDeleteGroup"
+        :style="props.canDelete ? 'cursor: pointer' : 'cursor: not-allowed'"
+      >
         <el-icon size="20"><i-custom-close /></el-icon>
       </button>
-      <div style="display: flex">
-        <div v-for="measurement in props.group.members" class="measurement-row" :key="measurement.label">
-          <div>{{ measurement.label }}</div>
-          <button class="close-button" :disabled="props.group.members.length <= 1" @click="handleDeleteMeasurement(measurement.label)" :style="props.group.members.length > 1 ? 'cursor: pointer' : ''">
-            <el-icon size="20"><i-custom-close /></el-icon>
+      <div class="flex items-center">
+        <div v-for="measurement in props.group.members" class="flex items-center mr-27px" :key="measurement.label">
+          <div class="w-12px h-12px rounded-[2px] mr-8px" :style="`background: ${measurement.color}`"></div>
+          <div class="text-12px mr-11px">{{ measurement.label }}</div>
+          <button class="bg-transparent border-none p-0! flex items-center cursor-pointer" @click="handleDeleteMeasurement(measurement.label)">
+            <el-icon size="16"><i-custom-close /></el-icon>
           </button>
         </div>
       </div>
     </div>
-    <div ref="stageRef" class="stage-wrapper">
-      <div ref="trendChartRef" class="chart-area" :style="{ height: typeof props.height === 'number' ? props.height + 'px' : props.height }"></div>
-      <div v-if="!props.isRunning || !runningTrendStore.isPlaying" class="marker-overlay" :class="{ 'marker-overlay--disabled': props.loading }">
+    <div ref="stageRef" class="relative">
+      <div ref="trendChartRef" class="w-full h-full" :class="{ 'opacity-50': props.loading }" :style="{ height: typeof props.height === 'number' ? props.height + 'px' : props.height }"></div>
+      <div v-if="!props.isRunning || !runningTrendStore.isPlaying" class="absolute inset-0 pointer-events-none" :class="{ 'opacity-50': props.loading }">
         <button
           v-for="handle in markerHandles"
           :key="handle.id"
@@ -25,7 +31,7 @@
           :disabled="props.loading"
           @pointerdown="(event) => onMarkerPointerDown(handle.id, event)"
         >
-          <span :style="{ background: handle.color }">{{ handle.label }}</span>
+          <!-- <span :style="{ background: handle.color }">{{ handle.label }}</span> -->
         </button>
       </div>
     </div>
@@ -46,8 +52,8 @@ const runningTrendStore = useTableRunningTrendStore();
 const { t } = useI18n();
 const { requestFn: getHistoryTrend } = useRequest(TableDataApi.getTrendHistoryData);
 
-const GRID_LEFT = 64;
-const GRID_RIGHT = 32;
+const GRID_LEFT = 34;
+const GRID_RIGHT = 38;
 const layoutTick = ref(0);
 const isRefresh = ref(false);
 // const isFetchingData = ref(false);
@@ -351,8 +357,8 @@ function buildOption(): ECOption {
       type: 'time',
       min: trendStore.visibleTimeRange.start,
       max: trendStore.visibleTimeRange.end,
-      splitNumber: 4,
-      axisLine: { lineStyle: { color: '#444b63' } },
+      splitNumber: 5,
+      axisLine: { lineStyle: { color: `rgba(101, 106, 133, 1)` } },
       axisLabel: {
         color: '#7a819a',
         interval: 'auto',
@@ -372,11 +378,13 @@ function buildOption(): ECOption {
     },
     yAxis: {
       type: 'value',
-      axisLine: { show: true, lineStyle: { color: '#444b63' } },
+      scale: true,
+      axisLine: { show: false, lineStyle: { color: '#444b63' } },
       axisLabel: { color: '#7a819a' },
       splitLine: {
         lineStyle: { color: 'rgba(122, 129, 154, 0.15)' },
       },
+      boundaryGap: ['5%', '5%'],
     },
     toolbox: {
       show: true,
@@ -390,16 +398,13 @@ function buildOption(): ECOption {
     series: measurementsData.value.map((series, index) => ({
       name: series.label,
       type: 'line',
-      smooth: true,
+      smooth: false,
       showSymbol: false,
       sampling: 'lttb',
       color: series.color,
       lineStyle: {
         width: 2,
         color: series.color,
-      },
-      areaStyle: {
-        color: `${series.color}33`,
       },
       data: series.values.map((point) => [point.timestamp, point.value]),
       // markLine:
@@ -472,29 +477,39 @@ function buildRunningOption(): ECOption {
           }),
       },
       splitLine: {
-        show: true,
+        show: false,
         lineStyle: { color: 'rgba(122, 129, 154, 0.2)', type: 'dashed' },
       },
     },
     yAxis: {
       type: 'value',
       scale: true,
-      axisLine: { show: true, lineStyle: { color: '#444b63' } },
-      axisLabel: { color: '#7a819a' },
+      axisLine: { show: false, lineStyle: { color: '#444b63' } },
+      axisLabel: { color: '#dfe1ed' },
       splitLine: {
         lineStyle: { color: 'rgba(122, 129, 154, 0.15)' },
+      },
+      splitNumber: 7,
+    },
+    toolbox: {
+      show: props.isRunning && props.realTimeData?.length! > 0 && !runningTrendStore.isPlaying,
+      feature: {
+        saveAsImage: {
+          title: t('common.export'),
+          icon: 'path://M18,12V7H7v16h11v-5 M24,15H13 M21,18l3-3l-3-3',
+        },
       },
     },
     series:
       props.realTimeData?.map((series) => ({
         name: series.path,
         type: 'line',
-        smooth: true,
+        smooth: false,
         showSymbol: false,
         sampling: 'lttb',
         color: findColorByMeasurementPath(series.path),
         lineStyle: {
-          width: 2,
+          width: 1,
           color: findColorByMeasurementPath(series.path),
         },
         data: series.values.map((point, index) => [series.timestamps[index], point]),
@@ -695,9 +710,8 @@ watch(
 </script>
 
 <style>
-.close-button {
-  background-color: transparent;
-  border: none;
+.graph-border {
+  border: 1px solid rgb(223 225 237 / 100%);
 }
 
 .chart-area {
@@ -719,7 +733,7 @@ watch(
   position: absolute;
   top: 4px;
   width: 0;
-  height: calc(100% - 24px);
+  height: calc(100% - 25px);
   border-left: 1.5px dashed rgb(255 255 255 / 40%);
   pointer-events: auto;
   background: none;
@@ -742,10 +756,6 @@ watch(
   color: #0d101a;
   padding: 2px 6px;
   border-radius: 999px;
-}
-
-.stage-wrapper {
-  position: relative;
 }
 
 .measurement-row {

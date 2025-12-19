@@ -1,7 +1,7 @@
 <template>
-  <div class="operate-button-row">
+  <div class="flex items-center mt-6px mb-2px">
     <div v-if="!props.isRunning">
-      <div>
+      <div class="text-14px">
         时间范围：
         <el-date-picker
           v-model="selectedDateTime.value"
@@ -17,15 +17,32 @@
         />
       </div>
     </div>
-    <div class="operate-button-group">
-      <button @click="handleRunningPlay" v-if="props.isRunning" class="operate-button" :disabled="!props.canOperate" :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'">
-        <el-icon size="22"><VideoPlay /></el-icon>
+    <div class="flex items-center">
+      <button
+        @click="handleRunningPlay"
+        v-if="props.isRunning && !runningTrendStore.isPlaying"
+        class="w-24px h-24px p-0! flex items-center justify-center bg-[#495AD4] border-0 rounded-4px"
+        :disabled="!props.canOperate"
+        :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
+      >
+        <i-custom-play-transparent />
       </button>
-      <button @click="handleRunningPause" v-if="props.isRunning" class="operate-button" :disabled="!props.canOperate" :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'">
-        <el-icon size="22"><VideoPause /></el-icon>
+      <button
+        @click="handleRunningPause"
+        v-if="props.isRunning && runningTrendStore.isPlaying"
+        class="w-24px h-24px p-0! flex items-center justify-center bg-[#495AD4] border-0 rounded-4px"
+        :disabled="!props.canOperate"
+        :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
+      >
+        <i-custom-pause-transparent />
       </button>
-      <button @click="handleSaveTemplate" class="operate-button" :disabled="!props.canOperate" :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'">
-        <el-icon size="30"><i-custom-sql-save /></el-icon>
+      <button
+        @click="handleSaveTemplate"
+        class="save-button h-24px w-24px box-border p-0! bg-white cursor-pointer rounded-[4px] flex justify-center items-center ml-16px"
+        :disabled="!props.canOperate"
+        :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
+      >
+        <i-custom-save-template />
       </button>
       <el-select
         v-model="selectedTemplateId"
@@ -67,11 +84,10 @@ import ModalTemplate from './modal-template.vue';
 import ModalTemplateRename from './modal-template-rename.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
-import { VideoPlay, VideoPause } from '@element-plus/icons-vue';
 import type { DateModelType } from 'element-plus';
 import type { TimeRange } from '@/types/trend';
 import type { TrendTemplate } from '@/types';
-import { useTableHistoryTrendStore } from '@/stores/trend';
+import { useTableHistoryTrendStore, useTableRunningTrendStore } from '@/stores/trend';
 import { today } from '@/utils/date';
 import dayjs from 'dayjs';
 
@@ -98,11 +114,12 @@ const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTempl
 const { requestFn: delTrendTemplate } = useRequest(SearchApi.delTrendTemplate);
 
 const trendStore = useTableHistoryTrendStore();
+const runningTrendStore = useTableRunningTrendStore();
 
 const selectedDateTime = reactive<{
   value: [DateModelType, DateModelType];
 }>({
-  value: [new Date(trendStore.visibleTimeRange.start), new Date(trendStore.visibleTimeRange.end)],
+  value: [new Date(trendStore.globalTimeRange.start), new Date(trendStore.globalTimeRange.end)],
 });
 const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
 const { t } = useI18n();
@@ -246,11 +263,15 @@ const handleSqlCommand = (val: string, data: TrendTemplate) => {
 <style lang="scss" scoped>
 .template-select {
   width: 260px;
-  margin-left: 8px;
+  margin-left: 16px;
 }
 </style>
 
 <style>
+.save-button {
+  border: 1px solid #dfe1ed;
+}
+
 .operate-button-row {
   display: flex;
   justify-content: space-between;
@@ -264,12 +285,15 @@ const handleSqlCommand = (val: string, data: TrendTemplate) => {
 }
 
 .operate-button {
-  width: 40px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
   border: none;
-  background: transparent;
   cursor: pointer;
   display: flex;
   align-items: center;
+  background: #495ad4;
+  border-radius: 4px;
 }
 
 .template-select-dropdown .el-select-dropdown__item {

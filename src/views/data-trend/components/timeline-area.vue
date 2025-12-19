@@ -1,32 +1,38 @@
 <template>
-  <div class="timeline-area-wrapper">
-    <div class="date-picker-row">
-      选框时间：
+  <div>
+    <div class="flex mt-16px mb-4px items-center">
       <el-date-picker v-model="startTime" type="datetime" placeholder="Select start date and time" @change="onStartTimeSelected" :prefix-icon="ICustomCalender" :disabled-date="disabledDate" />
-      <div style="flex-grow: 1"></div>
+      <div class="flex-grow text-center text-[14px]">数据选取窗口</div>
       <el-date-picker v-model="endTime" type="datetime" placeholder="Select end date and time" @change="onEndTimeSelected" :prefix-icon="ICustomCalender" :disabled-date="disabledDate" />
     </div>
-    <div ref="timelineWrapperRef" class="full-data-wrapper">
-      <div ref="timelineChartRef" class="full-data-timeline-chart"></div>
-      <button class="flip-page-button flip-page-button-left" @click="handlePageDown">
-        <el-icon color="white" size="15"><ArrowLeft /></el-icon>
+    <div ref="timelineWrapperRef" class="relative w-full h-40px">
+      <div ref="timelineChartRef" class="w-full h-40px"></div>
+      <button class="flip-button cursor-pointer absolute top-0 h-full w-20px rounded-[2px] bg-white p-0!" @click="handlePageDown">
+        <el-icon color="rgba(160, 163, 184, 1)" size="20"><ArrowLeft /></el-icon>
       </button>
-      <button class="flip-page-button flip-page-button-right" @click="handlePageUp">
-        <el-icon color="white" size="15"><ArrowRight /></el-icon>
+      <button class="flip-button cursor-pointer absolute top-0 right-0 h-full w-20px rounded-[2px] bg-white p-0!" @click="handlePageUp">
+        <el-icon color="rgba(160, 163, 184, 1)" size="20"><ArrowRight /></el-icon>
       </button>
-      <div class="range-slider">
+      <div class="absolute inset-0 pointer-events-none mx-[24px]">
+        <div class="timeline-outline absolute w-full h-full bg-transparent rounded-[2px] box-border"></div>
         <div
-          class="range-slider-fill"
+          class="range-slider-fill absolute h-full rounded-[2px] pointer-events-auto box-border bg-[rgb(73_90_212_/_20%)]"
           :style="{
             left: handleLeftPos + 'px',
-            right: containerWidth - handleRightPos + 'px',
+            right: containerWidth - handleRightPos - 48 + 'px',
           }"
           @pointerdown="(e) => onSliderBlockPointerDown(e)"
         ></div>
-        <button class="range-slider-handle" :style="{ left: handleLeftPos + 'px' }" @pointerdown="(e) => onSliderPointerDown({ id: 'start', x: 0 }, e)" type="button"></button>
-        <button class="range-slider-handle" :style="{ left: handleRightPos + 'px' }" @pointerdown="(e) => onSliderPointerDown({ id: 'end', x: 0 }, e)" type="button"></button>
-        <!-- <span :style="{ position: 'absolute', left: handleLeftPos + 'px' }">{{ startTimeLabel }}</span>
-        <span :style="{ position: 'absolute', left: handleRightPos + 'px' }">{{ endTimeLabel }}</span> -->
+        <div
+          class="bg-transparent absolute h-full w-[2px] p-0 cursor-ew-resize pointer-events-auto"
+          :style="{ left: handleLeftPos + 'px' }"
+          @pointerdown="(e) => onSliderPointerDown({ id: 'start', x: 0 }, e)"
+        ></div>
+        <div
+          class="bg-transparent absolute h-full w-[2px] p-0 cursor-ew-resize pointer-events-auto"
+          :style="{ left: handleRightPos + 'px' }"
+          @pointerdown="(e) => onSliderPointerDown({ id: 'end', x: 0 }, e)"
+        ></div>
       </div>
     </div>
   </div>
@@ -43,8 +49,8 @@ import { useTableHistoryTrendStore } from '@/stores/trend';
 
 const trendStore = useTableHistoryTrendStore();
 
-const GRID_LEFT = 64;
-const GRID_RIGHT = 32;
+const GRID_LEFT = 24; // 64
+const GRID_RIGHT = 24; // 32
 
 const { requestFn: getHistoryTrend } = useRequest(TableDataApi.getTrendHistoryData);
 
@@ -78,35 +84,12 @@ const percentXStart = ref(0);
 const percentXEnd = ref(0);
 const handleLeftPos = computed(() => {
   if (!timelineWrapperRef.value) return 0;
-  return (rangeStartPercent.value * (containerWidth.value - 96)) / 100 + 64;
+  return (rangeStartPercent.value * (containerWidth.value - (GRID_LEFT + GRID_RIGHT))) / 100;
 });
 const handleRightPos = computed(() => {
   if (!timelineWrapperRef.value) return containerWidth.value;
-  return (rangeEndPercent.value * (containerWidth.value - 96)) / 100 + 64;
+  return (rangeEndPercent.value * (containerWidth.value - (GRID_LEFT + GRID_RIGHT))) / 100;
 });
-// const startTimeLabel = computed(() => {
-//   const span = props.fullRange.end - props.fullRange.start;
-//   const startTs = props.fullRange.start + (rangeStartPercent.value / 100) * span;
-//   return new Date(startTs).toLocaleTimeString('zh-CN', {
-//     year: '2-digit',
-//     month: '2-digit',
-//     day: '2-digit',
-//     hour: '2-digit',
-//     minute: '2-digit',
-//   });
-// });
-// const endTimeLabel = computed(() => {
-//   const span = props.fullRange.end - props.fullRange.start;
-//   const endTs = props.fullRange.start + (rangeEndPercent.value / 100) * span;
-//   return new Date(endTs).toLocaleTimeString('zh-CN', {
-//     year: '2-digit',
-//     month: '2-digit',
-//     day: '2-digit',
-//     hour: '2-digit',
-//     minute: '2-digit',
-//   });
-// });
-
 const fullDataSet = ref<Measurement[]>([]);
 
 function handlePageUp() {
@@ -267,8 +250,8 @@ function onSliderBlockUp() {
 function onSliderBlockMove(event: PointerEvent) {
   if (!timelineWrapperRef.value) return;
   const rect = timelineWrapperRef.value.getBoundingClientRect();
-  const offsetX = event.clientX - rect.left - 64;
-  const percent = Math.min(Math.max((offsetX / (rect.width - 96)) * 100, 0), 100);
+  const offsetX = event.clientX - rect.left - GRID_LEFT;
+  const percent = Math.min(Math.max((offsetX / (rect.width - (GRID_LEFT + GRID_RIGHT))) * 100, 0), 100);
   const rangeSpan = rangeEndPercent.value - rangeStartPercent.value;
   let newStartPercent = percent - (percentXStart.value / 100) * rangeSpan;
   let newEndPercent = percent + (percentXEnd.value / 100) * rangeSpan;
@@ -310,8 +293,8 @@ function onSliderPointerUp() {
 function onSliderPointerMove(event: PointerEvent) {
   if (!draggingHandle || !timelineWrapperRef.value) return;
   const rect = timelineWrapperRef.value.getBoundingClientRect();
-  const offsetX = event.clientX - rect.left - 64;
-  const percent = Math.min(Math.max((offsetX / (rect.width - 96)) * 100, 0), 100);
+  const offsetX = event.clientX - rect.left - GRID_LEFT;
+  const percent = Math.min(Math.max((offsetX / (rect.width - (GRID_LEFT + GRID_RIGHT))) * 100, 0), 100);
 
   if (draggingHandle.id === 'start') {
     rangeStartPercent.value = Math.min(percent, rangeEndPercent.value);
@@ -344,6 +327,7 @@ function buildTimelineChartOption(): ECOption {
     tooltip: { show: false },
     xAxis: {
       type: 'time',
+      show: false,
       min: trendStore.globalTimeRange.start,
       max: trendStore.globalTimeRange.end,
       splitNumber: 4,
@@ -454,6 +438,9 @@ watch(
     startTime.value = trendStore.pendingTimeRange.start ? new Date(trendStore.pendingTimeRange.start) : null;
     endTime.value = trendStore.pendingTimeRange.end ? new Date(trendStore.pendingTimeRange.end) : null;
     updateContainerWidth();
+    for (const measurement of props.allMeasurementInfo) {
+      fetchFullRangeHistoryData(measurement);
+    }
     if (timelineChart) {
       timelineChart.setOption(buildTimelineChartOption());
     }
@@ -473,98 +460,15 @@ watch(
 </script>
 
 <style scoped>
-.timeline-area-wrapper {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0 16px;
+.flip-button {
+  border: 1px solid rgb(223 225 237 / 100%);
 }
 
-.date-picker-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  padding: 0 28px 0 12px;
-  align-items: center;
-}
-
-.full-data-wrapper {
-  position: relative;
-  width: 100%;
-  height: 70px;
-}
-
-.full-data-timeline-chart {
-  width: 100%;
-  height: 100%;
-}
-
-.flip-page-button {
-  position: absolute;
-  top: 30%;
-  background: rgb(0 0 0 / 40%);
-  border-radius: 50%;
-  width: 26px;
-  height: 26px;
-  border: 0;
-  align-items: center;
-  cursor: pointer;
-
-  /* transform: translateY(-50%);
-  background: rgb(0 0 0 / 40%);
-  border: none;
-  border-radius: 4px;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: white; */
-}
-
-.flip-page-button-left {
-  left: 31px;
-}
-
-.flip-page-button-right {
-  right: 0;
-}
-
-.range-slider {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+.timeline-outline {
+  border: 1px solid rgb(223 225 237 / 100%);
 }
 
 .range-slider-fill {
-  position: absolute;
-  top: 0;
-  bottom: 19px;
-  background: rgb(226 226 226 / 15%);
-  border: 1px solid rgb(94 94 94);
-
-  /* border-left: 2px solid rgb(118 131 255 / 80%);
-  border-right: 2px solid rgb(118 131 255 / 80%); */
-  pointer-events: auto;
-}
-
-.range-slider-handle {
-  position: absolute;
-  margin-left: -2px;
-  top: 0;
-  bottom: 19px;
-  width: 1px;
-  padding: 0;
-  cursor: ew-resize;
-  pointer-events: auto;
-
-  /* margin-left: -6px;
-  background: aqua;
-  border: none;
-  cursor: ew-resize;
-  pointer-events: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center; */
+  border: 1px solid rgb(73 90 212 / 100%);
 }
 </style>

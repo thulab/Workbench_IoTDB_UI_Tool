@@ -1,6 +1,6 @@
 <template>
-  <div class="relative w-full h-full flex flex-col">
-    <div class="database-list-wrapper">
+  <div class="relative w-full h-full flex">
+    <div class="w-256px bg-white flex-shrink-0 rounded-6px">
       <TableSideTree
         ref="sideTreeRef"
         namespace="history"
@@ -10,7 +10,7 @@
       />
     </div>
 
-    <div class="trend-details-wrapper">
+    <div class="flex-1 ml-8px bg-white rounded-6px p-[4px_16px_16px] flex flex-col">
       <div>
         <OperateButtonRow
           ref="operateButtonRowRef"
@@ -110,13 +110,13 @@ function createInitialMarkers(range: TimeRange = trendStore.globalTimeRange): Ch
     {
       id: 'marker-1',
       label: 'X1',
-      color: '#ff9478',
+      color: 'rgba(212, 48, 48, 1)',
       timestamp: range.start + span * 0.25,
     },
     {
       id: 'marker-2',
       label: 'X2',
-      color: '#59d5ff',
+      color: 'rgba(212, 48, 48, 1)',
       timestamp: range.start + span * 0.7,
     },
   ];
@@ -159,6 +159,7 @@ function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: Selec
 }
 
 function handleDeleteMeasurement(fullpath: string) {
+  console.log('Deleting measurement:', fullpath);
   measurementList.value = measurementList.value.filter((item) => {
     return item.label !== fullpath;
   });
@@ -177,7 +178,9 @@ function handleDeleteMeasurement(fullpath: string) {
       needFetchGroupsId.value.push(group.id);
     }
   }
+  console.log('needFetchGroupsId after delete measurement:', needFetchGroupsId.value);
   visibleMeasurementCountMap.value.delete(fullpath);
+  console.log('Deleting measurement markers for:', fullpath);
   trendGraphRef.value?.deleteMeasurementMarkerDataByName(fullpath);
   needDeleteMeasurementsId.value.push(fullpath);
   console.log('current groups after delete measurement:', groups.value);
@@ -361,10 +364,12 @@ function handleOperateTemplate(payload: { action: string; data: TrendTemplate })
       start: templateData.globalTimeRange[0],
       end: templateData.globalTimeRange[1],
     });
+    console.log('global time range:', dayjs(templateData.globalTimeRange[0]).format('YYYY-MM-DD HH:mm:ss'), dayjs(templateData.globalTimeRange[1]).format('YYYY-MM-DD HH:mm:ss'));
     trendStore.setVisibleTimeRange({
       start: templateData.localTimeRange[0],
       end: templateData.localTimeRange[1],
     });
+    console.log('visible time range:', dayjs(templateData.localTimeRange[0]).format('YYYY-MM-DD HH:mm:ss'), dayjs(templateData.localTimeRange[1]).format('YYYY-MM-DD HH:mm:ss'));
     trendStore.setPendingTimeRange({
       start: templateData.localTimeRange[0],
       end: templateData.localTimeRange[1],
@@ -513,7 +518,7 @@ watch(
   flex-direction: column;
 }
 
-.database-list-wrapper {
+/* .database-list-wrapper {
   width: 240px;
   position: absolute;
   top: 0;
@@ -522,11 +527,16 @@ watch(
   background-color: #fff;
   border-radius: 6px;
   box-sizing: border-box;
-}
+} */
 
 .trend-details-wrapper {
-  width: calc(100% - 256px);
-  margin-left: 256px;
+  width: 1472px;
+  height: 1040px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 6px;
+
+  /* margin-left: 256px;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -536,6 +546,6 @@ watch(
 
   :deep(.el-scrollbar__view) {
     height: 100%;
-  }
+  } */
 }
 </style>
