@@ -159,7 +159,6 @@ function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: Selec
 }
 
 function handleDeleteMeasurement(fullpath: string) {
-  console.log('Deleting measurement:', fullpath);
   measurementList.value = measurementList.value.filter((item) => {
     return item.label !== fullpath;
   });
@@ -178,12 +177,9 @@ function handleDeleteMeasurement(fullpath: string) {
       needFetchGroupsId.value.push(group.id);
     }
   }
-  console.log('needFetchGroupsId after delete measurement:', needFetchGroupsId.value);
   visibleMeasurementCountMap.value.delete(fullpath);
-  console.log('Deleting measurement markers for:', fullpath);
   trendGraphRef.value?.deleteMeasurementMarkerDataByName(fullpath);
   needDeleteMeasurementsId.value.push(fullpath);
-  console.log('current groups after delete measurement:', groups.value);
   setStorage();
 }
 
@@ -368,12 +364,10 @@ function handleOperateTemplate(payload: { action: string; data: TrendTemplate })
       start: templateData.globalTimeRange[0],
       end: templateData.globalTimeRange[1],
     });
-    console.log('global time range:', dayjs(templateData.globalTimeRange[0]).format('YYYY-MM-DD HH:mm:ss'), dayjs(templateData.globalTimeRange[1]).format('YYYY-MM-DD HH:mm:ss'));
     trendStore.setVisibleTimeRange({
       start: templateData.localTimeRange[0],
       end: templateData.localTimeRange[1],
     });
-    console.log('visible time range:', dayjs(templateData.localTimeRange[0]).format('YYYY-MM-DD HH:mm:ss'), dayjs(templateData.localTimeRange[1]).format('YYYY-MM-DD HH:mm:ss'));
     trendStore.setPendingTimeRange({
       start: templateData.localTimeRange[0],
       end: templateData.localTimeRange[1],
@@ -387,7 +381,6 @@ function handleOperateTemplate(payload: { action: string; data: TrendTemplate })
       id: group.id,
       measurementIds: group.members.map((member: Measurement) => member.id),
     }));
-    console.log('Loaded Groups:', groups.value);
     visibleMeasurementCountMap.value = new Map();
     groups.value.forEach((group) => {
       group.measurementIds.forEach((measurementId) => {
@@ -416,7 +409,11 @@ function setStorage() {
     markers: markers.value,
     visibleMeasurementCounts: Array.from(visibleMeasurementCountMap.value.entries()),
   };
-  window.sessionStorage.setItem('newTableDataHistoryTrendStorage', JSON.stringify(storageData));
+  try {
+    window.sessionStorage.setItem('newTableDataHistoryTrendStorage', JSON.stringify(storageData));
+  } catch (e) {
+    console.warn('Failed to save history trend page state to sessionStorage:', e);
+  }
 }
 
 function convertMeasurementListToSelectedMeasurements(list: Measurement[]): SelectedMeasurement[] {

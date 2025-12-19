@@ -544,20 +544,40 @@ function disposeChart() {
 
 function setStorage() {
   const storageData = {
-    measurementsData: measurementsData.value,
+    measurements: measurementsData.value.map((measurement) => ({
+      id: measurement.id,
+      label: measurement.label,
+      details: measurement.details,
+    })),
+    visibleTimeRange: {
+      start: trendStore.visibleTimeRange.start,
+      end: trendStore.visibleTimeRange.end,
+    },
   };
-  window.sessionStorage.setItem('newTableHistoryTrend' + props.group.id, JSON.stringify(storageData));
+  try {
+    window.sessionStorage.setItem('newTableHistoryTrend' + props.group.id, JSON.stringify(storageData));
+  } catch (e) {
+    console.warn('Failed to save history trend config to sessionStorage:', e);
+  }
 }
 
 const restoreData = () => {
   const storageData = window.sessionStorage.getItem('newTableHistoryTrend' + props.group.id);
-  if (storageData) {
-    try {
-      const parsed = JSON.parse(storageData);
-      measurementsData.value = parsed.measurementsData || [];
-    } catch (e) {
-      console.error('Failed to parse storage data:', e);
+  if (!storageData) {
+    return;
+  }
+  try {
+    const parsed = JSON.parse(storageData);
+    const measurements: Measurement[] = Array.isArray(parsed.measurements) ? parsed.measurements : Array.isArray(parsed.measurementsData) ? parsed.measurementsData : [];
+    if (measurements.length === 0) {
+      return;
     }
+    measurementsData.value = measurements.map((measurement) => ({
+      ...measurement,
+      values: [],
+    }));
+  } catch (e) {
+    console.error('Failed to parse storage data:', e);
   }
 };
 
