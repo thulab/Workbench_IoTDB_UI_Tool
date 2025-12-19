@@ -10,7 +10,7 @@
       />
     </div>
 
-    <div class="flex-1 ml-8px bg-white rounded-6px p-[4px_16px_16px] flex flex-col">
+    <div class="flex-1 ml-8px bg-white rounded-6px p-[4px_16px_16px] flex flex-col min-w-0">
       <div>
         <OperateButtonRow
           ref="operateButtonRowRef"
