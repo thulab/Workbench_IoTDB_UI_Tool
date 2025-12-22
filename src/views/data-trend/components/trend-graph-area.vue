@@ -130,6 +130,9 @@ defineExpose({
 });
 
 function convertPath(original: string): string {
+  if (!props.isTable) {
+    return original;
+  }
   const firstParen = original.indexOf('(');
   const lastParen = original.indexOf(')');
   if (firstParen === -1 || lastParen === -1 || lastParen <= firstParen) {

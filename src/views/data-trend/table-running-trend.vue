@@ -565,7 +565,6 @@ function restoreData() {
         runningTrendStore.setIsPlaying(true);
       }
       if (socketInstance.value && socketInstance.value.readyState === 1) {
-        console.log('restoreData() send SET_CONNECT 1');
         socketInstance.value?.send(
           JSON.stringify({
             operate: 'SET_CONNECT',
@@ -584,7 +583,6 @@ function restoreData() {
         }
       } else {
         socketInstance.value?.addEventListener('open', () => {
-          console.log('restoreData() send SET_CONNECT 2');
           socketInstance.value?.send(
             JSON.stringify({
               operate: 'SET_CONNECT',

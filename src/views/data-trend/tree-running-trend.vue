@@ -5,77 +5,59 @@
     </div>
 
     <div class="flex-1 ml-8px bg-white rounded-6px p-[4px_16px_16px] flex flex-col min-w-0">
-      <div>
-        <OperateButtonRow
-          ref="operateButtonRowRef"
-          :isTable="false"
-          :isRunning="false"
-          :templateList="templateList"
-          :canOperate="resolvedGroups.length > 0"
-          @global-time-change="handleGlobalTimeChange"
-          @save-template="handleSaveTemplate"
-          @handle-operate="handleOperateTemplate"
-          @get-query-list="getTemplateList"
-        />
-      </div>
+      <OperateButtonRow
+        ref="operateButtonRowRef"
+        :isTable="false"
+        :isRunning="true"
+        :templateList="templateList"
+        :canOperate="resolvedGroups.length > 0"
+        @save-template="handleSaveTemplate"
+        @handle-operate="handleOperateTemplate"
+        @get-query-list="getTemplateList"
+        @running-play="handlePlay(true)"
+        @running-pause="handlePlay(false)"
+      />
       <TrendGraphArea
         ref="trendGraphRef"
         :isTable="false"
-        :is-running="false"
+        :is-running="true"
         :loading="isFetching"
-        :range="trendStore.visibleTimeRange"
+        :range="runningTrendStore.visibleTimeRange"
         :markers="markers"
         :measurement-group-info="resolvedGroups"
-        :needFetchGroupsId="needFetchGroupsId"
+        :realTimeData="realTimeData"
         @marker-change="updateMarker"
         @merge-into-group="mergeGroup"
         @delete-group="deleteGroup"
         @delete-measurement="deleteMeasurement"
         @marker-value-change="handleMarkerValueChange"
       />
-      <TimelineArea
-        ref="timelineAreaRef"
-        :isTable="false"
-        :range="trendStore.pendingTimeRange"
-        :full-range="trendStore.globalTimeRange"
-        :all-measurement-info="measurementList"
-        :need-fetch-measurement-id="needFetchMeasurementsId"
-        :need-delete-measurements-id="needDeleteMeasurementsId"
-        @update:range="updateRange"
-        @clear-need-fetch-measurements="clearNeedFetchMeasurements"
-        @clear-need-delete-measurements="clearNeedDeleteMeasurements"
-      />
-      <MarkerTableArea :is-running="false" :marker-datas="markerDatas" />
+      <MarkerTableArea :is-running="false" :marker-datas="runningTrendStore.isPlaying ? emptyMarkerDatas : markerDatas" />
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import SideTree from '../data-trend/components/side-tree.vue';
-import OperateButtonRow from './components/operate-button-row.vue';
 import TrendGraphArea from './components/trend-graph-area.vue';
-import TimelineArea from './components/timeline-area.vue';
-import type { TimelineExpose } from './components/timeline-area.vue';
 import MarkerTableArea from './components/marker-table-area.vue';
+import OperateButtonRow from './components/operate-button-row.vue';
 import { storeToRefs } from 'pinia';
-import { useUserStore } from '@/stores';
+import { useUserStore, useConnectionStore } from '@/stores';
 import type { GroupState, ChartGroupInput, Measurement, TimeRange, ChartMarker, MeasurementMarkerData } from '@/types/trend';
-import type { TrendTemplate } from '@/types';
-import { useTreeHistoryTrendStore } from '@/stores/trend.store';
+import type { TrendTemplate, TrendData } from '@/types';
+import { useTreeRunningTrendStore } from '@/stores/trend.store';
 import { SearchApi } from '@/api';
 import dayjs from 'dayjs';
 
 const userStore = useUserStore();
 const { canReadWriteSchema } = storeToRefs(userStore);
 const currentNode = ref('root');
-const storageKey = 'newTreeDataHistoryTrendStorage';
+const storageKey = 'newTreeDataRunningTrendStorage';
 
 const measurementList = ref<Measurement[]>([]); // 所有被添加的测点列表
 const measurementMap = new Map(measurementList.value.map((item) => [item.id, item]));
 const visibleMeasurementCountMap = ref<Map<string, number>>(new Map()); // 所有可见测点的数量统计
-const needFetchMeasurementsId = ref<string[]>([]); // 时间轴中需要新加载的测点
-const needDeleteMeasurementsId = ref<string[]>([]); // 时间轴中需要删除的测点
-const needFetchGroupsId = ref<string[]>([]); // 趋势图中需要新加载的分组
 const usedColors = ref<Set<string>>(new Set());
 const predefineColors = ['#4992ff', '#7cffb2', '#fddd60', '#ff6e76', '#58d9f9', '#05c091', '#ff8a45', '#8d48e3', '#dd79ff', '#8AC211'];
 const groups = ref<GroupState[]>([]); // 测点的分组信息
@@ -88,18 +70,24 @@ const resolvedGroups = computed<ChartGroupInput[]>(() =>
 
 const operateButtonRowRef = ref<InstanceType<typeof OperateButtonRow>>();
 const templateList = ref<TrendTemplate[]>([]);
-const trendStore = useTreeHistoryTrendStore();
+const runningTrendStore = useTreeRunningTrendStore();
 const markers = ref<ChartMarker[]>(createInitialMarkers());
 const markerDatas = ref<MeasurementMarkerData[]>([]);
+const emptyMarkerDatas = computed<MeasurementMarkerData[]>(() => []);
 const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTemplate);
 const { requestFn: getTrendTemplate /** loading */ } = useRequest(SearchApi.getTrendTemplate);
 const { t } = useI18n();
 
-const trendGraphRef = ref<InstanceType<typeof TrendGraphArea>>();
+const { socketInstance, initWebsocket } = useWebsocket('/api/trendData', handleData, false);
+const userName = computed(() => userStore.userInfo.name);
+const connectionStore = useConnectionStore();
+const connectionId = computed(() => connectionStore.connectionInfo.data.id);
+const connectionType = computed(() => (connectionStore.connectionIsMaster ? 0 : 1));
+const realTimeData = ref<TrendData[]>([]);
+const minDataTime = ref(-1);
 
-const timelineAreaRef = ref<TimelineExpose | null>(null);
+const trendGraphRef = ref<InstanceType<typeof TrendGraphArea>>();
 const isFetching = ref(false);
-let fetchTimer: ReturnType<typeof setTimeout> | null = null;
 
 // ========== 侧边栏所需函数 ==========
 
@@ -127,6 +115,7 @@ function addToMeasurementListIfNotExist(fullPath: string) {
 }
 
 function createGroup(fullPath: string) {
+  console.log('Create group for measurement:', fullPath);
   addToMeasurementListIfNotExist(fullPath);
 
   const groupId = crypto.randomUUID?.() ?? Math.random().toString(36).slice(2);
@@ -136,50 +125,22 @@ function createGroup(fullPath: string) {
   });
   if (!visibleMeasurementCountMap.value.has(fullPath)) {
     visibleMeasurementCountMap.value.set(fullPath, 1);
-    needFetchMeasurementsId.value.push(fullPath);
+    addPathToWebSocket(fullPath);
   } else {
     visibleMeasurementCountMap.value.set(fullPath, visibleMeasurementCountMap.value.get(fullPath)! + 1);
   }
-  needFetchGroupsId.value = [];
-  needFetchGroupsId.value.push(groupId);
+
+  console.log(measurementList.value);
+
   setStorage();
 }
 
 // ========== 操作按钮行所需函数 ==========
 
-function handleGlobalTimeChange(payload: TimeRange) {
-  trendStore.setGlobalTimeRange(payload);
-  trendStore.setVisibleTimeRange(payload);
-  trendStore.setPendingTimeRange(payload);
-  needFetchGroupsId.value = [];
-  needFetchGroupsId.value = groups.value.map((g) => g.id);
-  markers.value = createInitialMarkers();
-
-  setStorage();
-}
-
-function createInitialMarkers(range: TimeRange = trendStore.globalTimeRange): ChartMarker[] {
-  const span = Math.max(range.end - range.start, 1);
-  return [
-    {
-      id: 'marker-1',
-      label: 'X1',
-      color: '#D43030',
-      timestamp: range.start + span * 0.25,
-    },
-    {
-      id: 'marker-2',
-      label: 'X2',
-      color: '#D43030',
-      timestamp: range.start + span * 0.7,
-    },
-  ];
-}
-
 function getTemplateList() {
   getTrendTemplate('', '').then((res) => {
     const data = res.data || [];
-    templateList.value = data.filter((item: TrendTemplate) => item.type === 'new-tree-history');
+    templateList.value = data.filter((item: TrendTemplate) => item.type === 'new-tree-running');
   });
 }
 
@@ -190,15 +151,13 @@ function handleSaveTemplate(name: string) {
     members: group.measurementIds.map((measurementId) => measurementMap.get(measurementId)).filter(Boolean) as Measurement[],
   }));
   const data = JSON.stringify({
-    type: 'new-tree-history',
-    globalTimeRange: [dayjs(trendStore.globalTimeRange.start).valueOf(), dayjs(trendStore.globalTimeRange.end).valueOf()],
-    localTimeRange: [dayjs(trendStore.visibleTimeRange.start).valueOf(), dayjs(trendStore.visibleTimeRange.end).valueOf()],
+    type: 'new-tree-running',
     visibleGroupInfo: groupInfoToSave,
     selectedMeasurements: measurementList.value,
   });
   upsertTrendTemplate({
     id: '',
-    type: 'new-tree-history',
+    type: 'new-tree-running',
     name,
     template: data,
   })
@@ -224,18 +183,6 @@ function handleOperateTemplate(payload: { action: string; data: TrendTemplate })
     operateButtonRowRef.value?.setSaveTemplateLoading(false);
   } else {
     const templateData = JSON.parse(payload.data.template);
-    trendStore.setGlobalTimeRange({
-      start: templateData.globalTimeRange[0],
-      end: templateData.globalTimeRange[1],
-    });
-    trendStore.setVisibleTimeRange({
-      start: templateData.localTimeRange[0],
-      end: templateData.localTimeRange[1],
-    });
-    trendStore.setPendingTimeRange({
-      start: templateData.localTimeRange[0],
-      end: templateData.localTimeRange[1],
-    });
     measurementList.value = templateData.selectedMeasurements;
     measurementMap.clear();
     measurementList.value.forEach((item: Measurement) => {
@@ -255,22 +202,134 @@ function handleOperateTemplate(payload: { action: string; data: TrendTemplate })
         }
       });
     });
-    needFetchMeasurementsId.value = measurementList.value.map((m) => m.id);
-    needFetchGroupsId.value = [];
-    needFetchGroupsId.value = groups.value.map((g) => g.id);
-    markers.value = createInitialMarkers(trendStore.visibleTimeRange);
+    runningTrendStore.setIsPlaying(true);
+    for (const measurementId of visibleMeasurementCountMap.value.keys()) {
+      if (realTimeData.value.find((data) => data.path === measurementId)) {
+        continue;
+      }
+      addPathToWebSocket(measurementId);
+    }
   }
 }
 
-// ========== 趋势图所需函数 ==========
-
-function updateMarker(payload: { id: string; timestamp: number }) {
-  const range = trendStore.visibleTimeRange;
-  const clamped = Math.min(Math.max(payload.timestamp, range.start), range.end);
-  markers.value = markers.value.map((marker) => (marker.id === payload.id ? { ...marker, timestamp: clamped } : marker));
-
-  setStorage();
+function init() {
+  if (socketInstance.value && socketInstance.value.readyState === 1) {
+    socketInstance.value?.send(
+      JSON.stringify({
+        operate: 'SET_CONNECT',
+        connectionId: connectionId.value,
+        user: userName.value,
+        type: connectionType.value,
+      }),
+    );
+  } else {
+    socketInstance.value?.addEventListener('open', () => {
+      socketInstance.value?.send(
+        JSON.stringify({
+          operate: 'SET_CONNECT',
+          connectionId: connectionId.value,
+          user: userName.value,
+          type: connectionType.value,
+        }),
+      );
+    });
+  }
 }
+
+function handlePlay(val: boolean) {
+  if (val) {
+    if (!socketInstance.value || socketInstance.value.readyState > 1) {
+      initWebsocket(() => {
+        socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: measurementList.value.map((m) => m.id) }));
+      });
+    }
+    realTimeData.value.forEach((data) => {
+      if (data.timestamps.length > 0) {
+        data.values.push('');
+        data.timestamps.push(data.timestamps[data.timestamps.length - 1]! + 1);
+      }
+    });
+  } else {
+    runningTrendStore.setVisibleTimeRange({ start: runningTrendStore.min, end: dayjs().valueOf() });
+  }
+  runningTrendStore.setIsPlaying(val);
+}
+
+function addPathToWebSocket(path: string) {
+  if (socketInstance.value && socketInstance.value.readyState === 1) {
+    socketInstance.value.send(JSON.stringify({ operate: 'add', paths: [path] }));
+  }
+}
+
+function handleData(data: any) {
+  // 处理通过 WebSocket 接收到的数据
+  // 这里可以根据实际数据结构进行解析和处理
+  const jsonData: {
+    data: TrendData[];
+    operate: string;
+  } = JSON.parse(data) || [];
+  if (runningTrendStore.isPlaying && jsonData.operate === 'get') {
+    const minTime = dayjs().subtract(10, 'minute').valueOf();
+    if (realTimeData.value.length === 0) {
+      minDataTime.value = dayjs().valueOf();
+    }
+    jsonData.data.forEach((item) => {
+      const index = realTimeData.value.findIndex((f) => f.path === item.path);
+      if (index !== -1) {
+        const originData = realTimeData.value[index]!;
+        const endTimestamp = originData.timestamps[originData.timestamps.length - 1]!;
+        const reversedTimestamps = item.timestamps.reverse();
+        const reversedValues = item.values.reverse();
+
+        for (const [i, time] of reversedTimestamps.entries()) {
+          if (time > endTimestamp) {
+            originData.timestamps.push(...reversedTimestamps.slice(i));
+            originData.values.push(...reversedValues.slice(i));
+            break; // 找到目标位置后立即终止循环
+          }
+        }
+
+        // 有效的数据索引（10 分钟内的）
+        const effectiveIndex = originData.timestamps.findIndex((time) => time >= minTime);
+        if (effectiveIndex > 0) {
+          originData.timestamps.splice(0, effectiveIndex);
+          originData.values.splice(0, effectiveIndex);
+        }
+        realTimeData.value.splice(index, 1, { ...originData });
+      } else {
+        const dataItem = {
+          path: item.path,
+          timestamps: item.timestamps.reverse(),
+          values: item.values.reverse(),
+        };
+        realTimeData.value.push(dataItem);
+      }
+    });
+    const min = minTime > minDataTime.value ? minTime : minDataTime.value;
+    runningTrendStore.setMin(min);
+    runningTrendStore.setVisibleTimeRange({ start: min, end: dayjs().valueOf() });
+  }
+}
+
+function createInitialMarkers(range: TimeRange = runningTrendStore.visibleTimeRange): ChartMarker[] {
+  const span = Math.max(range.end - range.start, 1);
+  return [
+    {
+      id: 'marker-1',
+      label: 'X1',
+      color: '#D43030',
+      timestamp: range.start + span * 0.25,
+    },
+    {
+      id: 'marker-2',
+      label: 'X2',
+      color: '#D43030',
+      timestamp: range.start + span * 0.7,
+    },
+  ];
+}
+
+// ========== 趋势图所需函数 ==========
 
 function mergeGroup(payload: { groupId: string; measurementPath: string }) {
   addToMeasurementListIfNotExist(payload.measurementPath);
@@ -279,12 +338,10 @@ function mergeGroup(payload: { groupId: string; measurementPath: string }) {
     group.measurementIds.push(payload.measurementPath);
     if (!visibleMeasurementCountMap.value.has(payload.measurementPath)) {
       visibleMeasurementCountMap.value.set(payload.measurementPath, 1);
-      needFetchMeasurementsId.value.push(payload.measurementPath);
+      addPathToWebSocket(payload.measurementPath);
     } else {
       visibleMeasurementCountMap.value.set(payload.measurementPath, visibleMeasurementCountMap.value.get(payload.measurementPath)! + 1);
     }
-    needFetchGroupsId.value = [];
-    needFetchGroupsId.value.push(payload.groupId);
     setStorage();
   }
 }
@@ -294,8 +351,8 @@ function deleteMeasurementInfoIfUnused(measurementId: string) {
     const count = visibleMeasurementCountMap.value.get(measurementId)! - 1;
     if (count <= 0) {
       visibleMeasurementCountMap.value.delete(measurementId);
-      needDeleteMeasurementsId.value.push(measurementId);
       trendGraphRef.value?.deleteMeasurementMarkerDataByName(measurementId);
+      deletePathFromWebSocket(measurementId);
       usedColors.value.delete(measurementMap.get(measurementId)?.color || '');
       measurementList.value = measurementList.value.filter((m) => m.id !== measurementId);
       measurementMap.delete(measurementId);
@@ -313,7 +370,7 @@ function deleteGroup(payload: { groupId: string }) {
     });
   }
   groups.value = groups.value.filter((g) => g.id !== payload.groupId);
-  needFetchGroupsId.value = [];
+
   setStorage();
 }
 
@@ -325,64 +382,39 @@ function deleteMeasurement(payload: { groupId: string; measurementPath: string }
       groups.value = groups.value.filter((g) => g.id !== payload.groupId);
     }
     deleteMeasurementInfoIfUnused(payload.measurementPath);
-    needFetchGroupsId.value = [];
-    needFetchGroupsId.value.push(payload.groupId);
+
     setStorage();
   }
+}
+
+function deletePathFromWebSocket(path: string) {
+  if (socketInstance.value && socketInstance.value.readyState === 1) {
+    socketInstance.value.send(JSON.stringify({ operate: 'del', paths: [path] }));
+  }
+}
+
+function updateMarker(payload: { id: string; timestamp: number }) {
+  const range = runningTrendStore.visibleTimeRange;
+  const clamped = Math.min(Math.max(payload.timestamp, range.start), range.end);
+  markers.value = markers.value.map((marker) => (marker.id === payload.id ? { ...marker, timestamp: clamped } : marker));
 }
 
 function handleMarkerValueChange(payload: MeasurementMarkerData[]) {
   markerDatas.value = payload;
 }
 
-// ========== 时间轴所需函数 ==========
-
-function updateRange(range: TimeRange) {
-  const nextRange = {
-    start: Math.max(range.start, trendStore.globalTimeRange.start),
-    end: Math.min(range.end, trendStore.globalTimeRange.end),
-  };
-  trendStore.setPendingTimeRange(nextRange);
-  triggerSimulatedFetch(nextRange);
-}
-
-function triggerSimulatedFetch(nextRange: TimeRange) {
-  isFetching.value = true;
-  if (fetchTimer) {
-    clearTimeout(fetchTimer);
-  }
-  fetchTimer = setTimeout(() => {
-    markers.value = createInitialMarkers(nextRange);
-    trendStore.setVisibleTimeRange(nextRange);
-    isFetching.value = false;
-    fetchTimer = null;
-  }, 650);
-}
-
-function clearNeedFetchMeasurements() {
-  needFetchMeasurementsId.value = [];
-}
-
-function clearNeedDeleteMeasurements() {
-  needDeleteMeasurementsId.value = [];
-}
-
 // ========== 数据缓存相关函数 ==========
 
 function setStorage() {
   const storageData = {
-    globalTimeRange: trendStore.globalTimeRange,
-    visibleRange: trendStore.visibleTimeRange,
-    pendingRange: trendStore.pendingTimeRange,
     groups: groups.value,
     measurements: measurementList.value,
-    markers: markers.value,
     visibleMeasurementCounts: Array.from(visibleMeasurementCountMap.value.entries()),
   };
   try {
     window.sessionStorage.setItem(storageKey, JSON.stringify(storageData));
   } catch (e) {
-    console.warn('Failed to save history trend page state to sessionStorage:', e);
+    console.warn('Failed to save running trend page state to sessionStorage:', e);
   }
 }
 
@@ -391,13 +423,8 @@ function restoreData() {
   if (storageData) {
     try {
       const parsed = JSON.parse(storageData);
-      trendStore.setGlobalTimeRange(parsed.globalTimeRange);
-      trendStore.setVisibleTimeRange(parsed.visibleRange);
-      trendStore.setPendingTimeRange(parsed.pendingRange);
-      operateButtonRowRef.value?.setSelectedDateTime([trendStore.globalTimeRange.start, trendStore.globalTimeRange.end]);
       groups.value = parsed.groups;
       measurementList.value = parsed.measurements;
-      markers.value = parsed.markers?.length ? parsed.markers : createInitialMarkers(trendStore.globalTimeRange);
       measurementMap.clear();
       measurementList.value.forEach((item) => {
         measurementMap.set(item.id, item);
@@ -417,15 +444,36 @@ function restoreData() {
           });
         });
       }
-
-      needFetchGroupsId.value = [];
-      needFetchMeasurementsId.value = [];
-      needDeleteMeasurementsId.value = [];
-
-      nextTick(() => {
-        trendGraphRef.value?.restoreChartData();
-        timelineAreaRef.value?.restoreData();
-      });
+      if (visibleMeasurementCountMap.value.size > 0) {
+        runningTrendStore.setIsPlaying(true);
+      }
+      if (socketInstance.value && socketInstance.value.readyState === 1) {
+        socketInstance.value?.send(
+          JSON.stringify({
+            operate: 'SET_CONNECT',
+            connectionId: connectionId.value,
+            user: userName.value,
+            type: connectionType.value,
+          }),
+        );
+        if (visibleMeasurementCountMap.value.size > 0) {
+          socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: measurementList.value.map((m) => m.label) }));
+        }
+      } else {
+        socketInstance.value?.addEventListener('open', () => {
+          socketInstance.value?.send(
+            JSON.stringify({
+              operate: 'SET_CONNECT',
+              connectionId: connectionId.value,
+              user: userName.value,
+              type: connectionType.value,
+            }),
+          );
+          if (visibleMeasurementCountMap.value.size > 0) {
+            socketInstance.value?.send(JSON.stringify({ operate: 'add', paths: measurementList.value.map((m) => m.label) }));
+          }
+        });
+      }
     } catch (e) {
       console.error('Failed to parse storage data:', e);
     }
@@ -440,41 +488,47 @@ onMounted(() => {
   } else {
     window.sessionStorage.setItem(storageKey, '');
   }
+  window.addEventListener('beforeunload', () => {
+    if (socketInstance.value) {
+      socketInstance.value.close();
+    }
+  });
   getTemplateList();
+});
+
+onUnmounted(() => {
+  if (socketInstance.value) {
+    socketInstance.value.close();
+  }
 });
 
 // ========== 监控函数 ==========
 
 watch(
-  () => trendStore.globalTimeRange,
-  () => {
-    setStorage();
-  },
-  { deep: true },
-);
-
-watch(
-  () => trendStore.visibleTimeRange,
-  (range) => {
-    if (!isFetching.value) {
-      trendStore.setPendingTimeRange(range);
+  () => runningTrendStore.isPlaying,
+  (newVal) => {
+    if (!newVal) {
+      markers.value = createInitialMarkers(runningTrendStore.visibleTimeRange);
     }
-    markers.value = markers.value.map((marker) => ({
-      ...marker,
-      timestamp: Math.min(Math.max(marker.timestamp, range.start), range.end),
-    }));
-    needFetchGroupsId.value = [];
-    needFetchGroupsId.value = groups.value.map((g) => g.id);
-    setStorage();
   },
-  { deep: true },
+  { deep: true, immediate: true },
 );
 
 watch(
-  () => trendStore.pendingTimeRange,
-  () => {
-    setStorage();
+  () => connectionStore.connectionIsMaster,
+  (val, old) => {
+    if (val !== old && (val === true || val === false)) {
+      if (socketInstance.value) {
+        socketInstance.value.close();
+      }
+      initWebsocket(() => {
+        restoreData();
+        init();
+      });
+    }
   },
-  { deep: true },
+  {
+    immediate: true,
+  },
 );
 </script>

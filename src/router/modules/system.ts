@@ -176,6 +176,16 @@ const route = [
         },
       },
       {
+        path: 'tree-running-trend',
+        name: 'TreeRunningTrend',
+        component: () => import('@/views/data-trend/tree-running-trend.vue'),
+        meta: {
+          keepAlive: true,
+          title: 'page.runningTrend',
+          icon: ICustomTrend,
+        },
+      },
+      {
         path: 'tree-history-trend',
         name: 'TreeHistoryTrend',
         component: () => import('@/views/data-trend/tree-history-trend.vue'),
