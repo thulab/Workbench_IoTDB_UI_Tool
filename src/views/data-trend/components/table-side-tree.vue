@@ -48,7 +48,7 @@
             @dblclick.stop="handleNodeDoubleClick(data)"
             @dragstart="handleNodeDragStart($event, data)"
           >
-            <el-icon size="18" color="var(--el-color-primary)" class="m-r-[4px]">
+            <el-icon size="18" color="var(--el-color-primary)" :class="data.nodeType === 'DEVICE-MEASUREMENT' ? 'm-l-[-18px]' : 'm-r-[4px]'">
               <i-custom-tree-db v-if="data.nodeType === 'DATABASE'" />
               <i-custom-table v-else-if="data.nodeType === 'TABLE'" />
               <div v-else-if="data.nodeType === 'TIME'" class="tree-column-icon-container">
@@ -61,7 +61,7 @@
               </div>
               <el-tag v-else-if="data.nodeType === 'ATTRIBUTE'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Attr</el-tag>
               <el-tag v-else-if="data.nodeType === 'FIELD'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Field</el-tag>
-              <el-tag v-else-if="data.nodeType === 'DEVICE-MEASUREMENT'" disable-transitions type="success" effect="plain" class="tree-column-type-tag" style="width: auto">M</el-tag>
+              <!-- <el-tag v-else-if="data.nodeType === 'DEVICE-MEASUREMENT'" disable-transitions type="success" effect="plain" class="tree-column-type-tag" style="width: auto">M</el-tag> -->
             </el-icon>
             <span class="node-label" :title="data.nodeName + (data.comment ? ` (${data.comment})` : '')"> {{ data.nodeName }}{{ data.comment ? ` (${data.comment})` : '' }} </span>
           </div>
