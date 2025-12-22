@@ -86,12 +86,13 @@ import ICustomCalender from '~icons/custom/calender.svg';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import type { TimeRange } from '@/types/trend';
 import type { TrendTemplate } from '@/types';
-import { useTableHistoryTrendStore, useTableRunningTrendStore } from '@/stores/trend.store';
+import { useTableHistoryTrendStore, useTableRunningTrendStore, useTreeHistoryTrendStore, useTreeRunningTrendStore } from '@/stores/trend.store';
 import { today } from '@/utils/date';
 import dayjs from 'dayjs';
 
 const props = withDefaults(
   defineProps<{
+    isTable: boolean;
     isRunning: boolean;
     canOperate: boolean; // props.measurementGroupInfo.length === 0
     templateList: TrendTemplate[];
@@ -112,8 +113,8 @@ const emit = defineEmits<{
 const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTemplate);
 const { requestFn: delTrendTemplate } = useRequest(SearchApi.delTrendTemplate);
 
-const trendStore = useTableHistoryTrendStore();
-const runningTrendStore = useTableRunningTrendStore();
+const trendStore = props.isTable ? useTableHistoryTrendStore() : useTreeHistoryTrendStore();
+const runningTrendStore = props.isTable ? useTableRunningTrendStore() : useTreeRunningTrendStore();
 
 const selectedDateTime = reactive<{
   value: [number, number] | [string, string] | [Date, Date];

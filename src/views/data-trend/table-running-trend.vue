@@ -12,6 +12,7 @@
     <div class="flex-1 ml-8px bg-white rounded-6px p-[4px_16px_16px] flex flex-col min-w-0">
       <OperateButtonRow
         ref="operateButtonRowRef"
+        :isTable="true"
         :isRunning="true"
         :templateList="templateList"
         :canOperate="resolvedGroups.length > 0"
@@ -23,6 +24,7 @@
       />
       <TrendGraphArea
         ref="trendGraphRef"
+        :isTable="true"
         :is-running="true"
         :loading="isFetching"
         :range="runningTrendStore.visibleTimeRange"

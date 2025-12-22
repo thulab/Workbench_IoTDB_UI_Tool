@@ -5,6 +5,7 @@
         <div>
           <MetricChartGroup
             v-for="(group, index) in props.measurementGroupInfo"
+            :isTable="props.isTable"
             :isPlaying="isPlaying"
             :isRunning="props.isRunning"
             :ref="(el) => el && chartRefs[group.id] === el"
@@ -27,6 +28,7 @@
           />
           <MetricChartGroup
             v-if="props.measurementGroupInfo.length === 0"
+            :isTable="props.isTable"
             :isRunning="props.isRunning"
             :group="{ id: 'default', members: [] }"
             :index="0"
@@ -53,9 +55,8 @@ import MetricChartGroup from './metric-chart-group.vue';
 import type { ChartMarker, ChartGroupInput, MeasurementMarkerData } from '@/types/trend';
 import type { TrendData } from '@/types';
 import { ref } from 'vue';
-import { useTableHistoryTrendStore } from '@/stores/trend.store';
+import { useTableHistoryTrendStore, useTreeHistoryTrendStore } from '@/stores/trend.store';
 
-const trendStore = useTableHistoryTrendStore();
 const selectedTemplateId = ref<number | string>('');
 
 const wrapperRef = ref<HTMLElement | null>(null);
@@ -66,6 +67,7 @@ const isPlaying = ref(false);
 
 const props = withDefaults(
   defineProps<{
+    isTable: boolean;
     isRunning: boolean;
     markers: ChartMarker[];
     measurementGroupInfo: ChartGroupInput[];
@@ -75,6 +77,8 @@ const props = withDefaults(
   }>(),
   {},
 );
+
+const trendStore = props.isTable ? useTableHistoryTrendStore() : useTreeHistoryTrendStore();
 
 const chartRefs = ref<Record<string, InstanceType<typeof MetricChartGroup>>>({});
 

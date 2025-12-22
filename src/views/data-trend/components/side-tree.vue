@@ -1,0 +1,823 @@
+<template>
+  <auth-container :is-auth="canReadWriteSchema" :content="'common.schemaAuth'" style="height: 100%">
+    <div class="measurement-tree-wrapper">
+      <div class="search-refresh-box">
+        <el-input
+          :placeholder="t('measurement.searchPlaceholder')"
+          v-model="searchText"
+          :disabled="searching"
+          id="measurement-tree-input"
+          @keyup.enter="handleSearch"
+          class="measurement-tree-search-input"
+        />
+
+        <!-- <el-button link @click="handleRefresh()" :disabled="searching" id="measurement-tree-refresh" class="svg-button-hover-color m-l-16">
+          <i-custom-border-refresh style="width: 24px; height: 24px" />
+        </el-button> -->
+      </div>
+
+      <div class="measurement-tree-box" v-loading="initialLoading || searchLoading">
+        <template v-if="treeData && treeData.length">
+          <virtualized-tree
+            ref="measurementTree"
+            :data="treeData"
+            :props="treeProps"
+            :indent="8"
+            :item-size="28"
+            :height="treeHeight"
+            :expand-on-click-node="true"
+            :default-expanded-keys="expandNodes"
+            @node-click="handleNodeClick"
+            @node-expand="handleNodeClick"
+            @node-collapse="handleNodeCollapse"
+          >
+            <!-- eslint-disable-next-line vue/no-unused-vars -->
+            <template #default="{ data }">
+              <div
+                v-if="data.nodeType !== 'PAGE'"
+                class="node-text"
+                :id="`tree-node-content-${data.nodePath}`"
+                :draggable="data.nodeType === 'TIMESERIES'"
+                @dblclick.stop="handleNodeDoubleClick(data)"
+                @dragstart="handleNodeDragStart($event, data)"
+              >
+                <el-icon size="16" v-if="data.nodeType === 'DATABASE' && data.node !== 'root'"><i-custom-DB /></el-icon>
+                <el-icon size="16" v-if="data.nodeType === 'TIMESERIES'"><i-custom-TS /></el-icon>
+                <span class="m-l-4" v-html="highlightNode(data.node)"></span>
+              </div>
+              <!-- eslint-disable-next-line vue/max-len -->
+              <!-- <i-custom-more v-if="data.nodeType !== 'PAGE'" :id="`tree-node-dropdown-${data.nodePath}`" class="more-icon svg-button-hover-color" @click="(e: MouseEvent) => handleClickMore(e, data)" /> -->
+              <div class="tree-node-operation-buttons" v-if="data.nodeType === 'PAGE'">
+                <el-button type="primary" @click="(e) => handleNext(e, data)" :id="`tree-node-${data.nodePath}-more`" class="svg-button-hover-color">
+                  {{ t('common.viewMore') }}
+                </el-button>
+                <el-button @click="(e) => handleAll(e, data)" :id="`tree-node-${data.nodePath}-all`" class="svg-button-hover-color">
+                  {{ t('common.viewAll') }}
+                </el-button>
+              </div>
+            </template>
+          </virtualized-tree>
+        </template>
+        <div class="list-empty-wrapper" v-else>
+          <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
+          <span class="data-empty-text">{{ t('common.noData') }}</span>
+        </div>
+      </div>
+
+      <context-menu v-show="isShowContextMenu" ref="contextMenuRef" :clicked-node-data="clickedNodeData" @handle-command="(val) => handleCommand(val, clickedNodeData)" />
+
+      <modal-database v-model:visible="databaseVisible" @handleSave="handleRefresh()" />
+      <modal-measurement v-model:visible="measurementVisible" :device-name="currentDatabase" @handleSave="(path: string) => handleOperate('add', { path, type: 'MEASUREMENT' })" />
+    </div>
+  </auth-container>
+</template>
+
+<script setup lang="ts">
+import type { TreeNode, TreeNodeData } from 'element-plus/es/components/tree-v2/src/types';
+import { debounce, cloneDeep } from 'lodash-es';
+import { StorageApi } from '@/api';
+// import useMenuStore from '@/stores/menu';
+import VirtualizedTree from '@/components/tree-v2/virtualized-tree.vue';
+import ICustomMessageWarning from '~icons/custom/message-warning.svg';
+import ContextMenu from '../../measurement-management/components/context-menu.vue';
+import ModalDatabase from '../../measurement-management/components/modal-database.vue';
+import ModalMeasurement from '../../measurement-management/components/modal-measurement.vue';
+import type { TreeNodeData as StorageDeviceTreeNodeData, TreeEventPayload } from '@/types';
+
+const treeProps = {
+  value: 'nodePath',
+  label: 'nodePath',
+  children: 'pageChildren',
+};
+
+const props = defineProps<{
+  canReadWriteSchema: boolean;
+  currentNode: string;
+}>();
+
+const emit = defineEmits<{
+  (event: 'handleChangeNode', path: string, type: string, searchText: string): void;
+  (event: 'doubleClickMeasurement', fullPath: string): void;
+}>();
+
+const pageSize = 10;
+
+const { t } = useI18n();
+// const menuStore = useMenuStore();
+// const isCollapse = computed((): boolean => menuStore.isCollapse);
+const searchText = ref('');
+const measurementTree = ref<InstanceType<typeof VirtualizedTree>>();
+const databaseVisible = ref(false);
+const measurementVisible = ref(false);
+const currentDatabase = ref('');
+const initialLoading = ref(false);
+const expandNode = ref('root');
+const expandNodes = ref(['root']);
+const isShowContextMenu = ref(false);
+// const contextMenuRef = ref<InstanceType<typeof ContextMenu>>();
+const contextMenuTimer = ref();
+
+const addPaths = ref<string[]>([]);
+const clickedNodeData = reactive<StorageDeviceTreeNodeData>({
+  node: '',
+  nodePath: '',
+  parentPath: '',
+  nodeType: '',
+});
+// 216+16 菜单宽度+MainPaddingLeft  39 下拉框宽度的一半 = 267
+// 40+16+39 = 95
+// const insertWidth = computed(() => (isCollapse.value ? 95 : 267));
+const loadingNode: StorageDeviceTreeNodeData = {
+  node: '',
+  nodePath: 'loading',
+  nodeType: 'loading',
+  parentPath: '',
+};
+
+// DATABASE, SG INTERNAL, INTERNAL, DEVICE, TIMESERIES
+const treeData = ref<Array<StorageDeviceTreeNodeData>>([
+  {
+    node: 'root',
+    nodePath: 'root',
+    nodeType: 'DATABASE',
+    parentPath: '',
+    children: [cloneDeep(loadingNode)],
+    pageChildren: [],
+  },
+]);
+const isSearchResult = ref(false);
+const searchResults = ref<Array<Array<StorageDeviceTreeNodeData>>>([]);
+const searching = ref(false);
+const searchLoading = ref(false);
+const dealingStatus = ref(false);
+
+const { requestFn: getNextNodeInfos } = useRequest(StorageApi.getNextNodeInfos);
+const { requestFn: deletePaths } = useRequest(StorageApi.deletePaths);
+
+const treeHeight = ref(document.body.clientHeight - 48 - 100);
+
+const onResize = debounce(() => {
+  // 48 header
+  // 100 = 32(padding)+60(search)+8(scrollbar)
+  treeHeight.value = document.body.clientHeight - 48 - 100;
+}, 500);
+
+// function nodeTextWidth(node: TreeNode, data: TreeNodeData) {
+//   // 44 = 24 展开收缩 + 16 右侧更多操作 + 4 文字与操作icon间距
+//   // 8 缩进大小
+//   // 根据类型 减去 icon 大小
+//   let width = 240 - 44 - ((+node.level || 1) - 1) * 8;
+//   if ((data.nodeType === 'DATABASE' && data.node !== 'root') || data.nodeType === 'TIMESERIES') {
+//     width -= 16;
+//   }
+//   return width;
+// }
+
+function handleNodeDoubleClick(data: TreeNodeData) {
+  if (data.nodeType === 'TIMESERIES') {
+    console.log(data);
+    emit('doubleClickMeasurement', `${data.nodePath}`);
+  }
+}
+
+function handleNodeDragStart(event: DragEvent, data: TreeNodeData) {
+  if (data.nodeType === 'TIMESERIES') {
+    event.dataTransfer?.setData('text/plain', data.nodePath);
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'copy';
+    }
+  }
+}
+
+function highlightNode(node: string) {
+  if (node.includes(searchText.value)) {
+    return node.replace(new RegExp(searchText.value, 'gi'), `<span class="highlight">${searchText.value}</span>`);
+  }
+  return node;
+}
+
+function fillChildLoading(data: StorageDeviceTreeNodeData[]) {
+  data.forEach((item) => {
+    if (!item.children && item.nodeType !== 'TIMESERIES') {
+      item.pageChildren = [
+        {
+          ...loadingNode,
+          parentPath: item.nodePath,
+        },
+      ];
+    }
+  });
+  return data;
+}
+
+function getTreeData() {
+  initialLoading.value = true;
+  treeData.value = [];
+  getNextNodeInfos('root')
+    .then((res) => {
+      const data = res.data || [];
+      const rootTotal = Math.ceil(data.length / pageSize);
+      const cloneData = fillChildLoading(cloneDeep(data));
+      treeData.value = [
+        {
+          node: 'root',
+          nodePath: 'root',
+          nodeType: 'DATABASE',
+          parentPath: '',
+          children: cloneDeep(cloneData),
+          pageChildren: cloneData.slice(0, 1 * pageSize),
+          pageNum: 1,
+          totalPage: rootTotal,
+        },
+      ];
+      if (rootTotal > 1) {
+        treeData.value[0]!.pageChildren?.push({
+          node: 'root',
+          nodePath: 'root__PAGE',
+          nodeType: 'PAGE',
+          parentPath: '',
+          pageNum: 1,
+          totalPage: rootTotal,
+        });
+      }
+    })
+    .finally(() => {
+      initialLoading.value = false;
+      measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
+      expandNodes.value = ['root'];
+      measurementTree.value?.virtualizedTreeRef?.setExpandedKeys(['root']);
+    });
+}
+
+// 递归源数据查找节点添加pagechildren
+function recursionFindCurrentByOrigin(path: string, data: Array<StorageDeviceTreeNodeData>) {
+  const result = data.find((item) => item.nodePath === path);
+  if (result) return result;
+  for (let i = 0; i < data.length; i++) {
+    const item = data[i]!;
+    if (path.startsWith(`${item.nodePath}.`)) {
+      return recursionFindCurrentByOrigin(path, item.children!);
+    }
+  }
+  return result;
+}
+
+// 递归查找节点添加children
+function recursionFindParent(path: string, data: Array<StorageDeviceTreeNodeData>) {
+  const result = data.find((item) => item.nodePath === path);
+  if (result) return result;
+  for (let i = 0; i < data.length; i++) {
+    const item = data[i]!;
+    if (path.startsWith(`${item.nodePath}.`)) {
+      return recursionFindParent(path, item.pageChildren!);
+    }
+  }
+  return result;
+}
+// 填充 loading
+function fillTreeLoading(nodes: Array<StorageDeviceTreeNodeData>) {
+  nodes.forEach((node) => {
+    if (node && !node.pageChildren && node.children && node.children.length > 0) {
+      const dataPathTotal = Math.ceil(node.children.length / pageSize);
+      node.pageChildren = node.children.slice(0, 1 * pageSize);
+      node.pageNum = 1;
+      node.totalPage = dataPathTotal;
+      if (dataPathTotal > 1) {
+        node.pageChildren?.push({
+          node: node.node,
+          nodePath: `${node.nodePath}__PAGE`,
+          nodeType: 'PAGE',
+          parentPath: node.parentPath || '',
+          pageNum: 1,
+          totalPage: dataPathTotal,
+        });
+      }
+    }
+    if (node.children) {
+      fillTreeLoading(node.children);
+    }
+  });
+}
+
+// function fillNodePage(node: StorageDeviceTreeNodeData) {
+//   if (node && node.pageChildren && node.pageChildren.length === 1 && node.pageChildren[0]!.nodePath === 'loading' && node.children && node.children.length > 0) {
+//     const dataPathTotal = Math.ceil(node.children.length / pageSize);
+//     node.pageChildren = node.children.slice(0, 1 * pageSize);
+//     node.pageNum = 1;
+//     node.totalPage = dataPathTotal;
+//     if (dataPathTotal > 1) {
+//       node.pageChildren?.push({
+//         node: node.node,
+//         nodePath: `${node.nodePath}__PAGE`,
+//         nodeType: 'PAGE',
+//         parentPath: node.parentPath || '',
+//         pageNum: 1,
+//         totalPage: dataPathTotal,
+//       });
+//     }
+//   }
+// }
+
+// function fillTreePage(nodes: Array<StorageDeviceTreeNodeData>) {
+//   nodes.forEach((node) => {
+//     if (node && node.pageChildren && node.pageChildren.length === 1 && node.pageChildren[0]!.nodePath === 'loading' && node.children && node.children.length > 0) {
+//       const dataPathTotal = Math.ceil(node.children.length / pageSize);
+//       node.pageChildren = node.children.slice(0, 1 * pageSize);
+//       node.pageNum = 1;
+//       node.totalPage = dataPathTotal;
+//       if (dataPathTotal > 1) {
+//         node.pageChildren?.push({
+//           node: node.node,
+//           nodePath: `${node.nodePath}__PAGE`,
+//           nodeType: 'PAGE',
+//           parentPath: node.parentPath || '',
+//           pageNum: 1,
+//           totalPage: dataPathTotal,
+//         });
+//       }
+//     }
+//   });
+// }
+
+// 获取搜索结果合并树
+function mergeAndUpdateData(data: Array<StorageDeviceTreeNodeData>) {
+  data.forEach((item) => {
+    if (item.children) {
+      let node = recursionFindCurrentByOrigin(item.nodePath, treeData.value);
+      if (!node) {
+        node = recursionFindCurrentByOrigin(item.parentPath, treeData.value);
+        if (node) {
+          if (!node.children) {
+            node.children = [];
+          }
+          node?.children?.push(item);
+        }
+        return;
+      }
+      mergeAndUpdateData(item.children);
+    } else {
+      const node = recursionFindCurrentByOrigin(item.parentPath, treeData.value);
+      node?.children?.push(item);
+    }
+  });
+}
+
+function internalDealData(dealingData: Array<StorageDeviceTreeNodeData>) {
+  if (treeData.value.length === 0) {
+    treeData.value = dealingData;
+  } else {
+    // 合并处理 找到父节点，合并children 还是 父节点追加 children
+    mergeAndUpdateData(dealingData);
+  }
+  if (!searchResults.value.length) {
+    dealingStatus.value = false;
+  } else {
+    internalDealData(searchResults.value.pop()!);
+  }
+}
+
+function getFirstChilds(childData: Array<StorageDeviceTreeNodeData>) {
+  const result: Array<string> = [];
+  const data = childData || treeData;
+  if (data.length === 0) return result;
+  result.push(data[0]!.nodePath);
+  if (data[0]!.children && data[0]!.children.length > 0) {
+    result.push(...getFirstChilds(data[0]!.children));
+  }
+  return result;
+}
+
+function handleDealData() {
+  if (!dealingStatus.value && searchResults.value.length) {
+    dealingStatus.value = true;
+    const dealingData: Array<StorageDeviceTreeNodeData> = searchResults.value.pop()!;
+    internalDealData(dealingData);
+    nextTick(() => {
+      const firstChilds = getFirstChilds(treeData.value);
+      expandNodes.value = firstChilds;
+      measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
+      measurementTree.value?.virtualizedTreeRef?.setExpandedKeys(firstChilds);
+    });
+  }
+}
+
+function handleData(data: string) {
+  searchLoading.value = false;
+  if (data === 'all_done') {
+    searching.value = false;
+    // console.log('all_done', treeData.value);
+  } else {
+    // console.log('Received data:', JSON.parse(data));
+    const childrenData = JSON.parse(data).children || [];
+    const rootTotal = Math.ceil(childrenData.length / pageSize);
+    fillTreeLoading(childrenData);
+    const dealData = [
+      {
+        node: 'root',
+        nodePath: 'root',
+        nodeType: 'DATABASE',
+        parentPath: '',
+        children: cloneDeep(childrenData),
+        pageChildren: childrenData.slice(0, 1 * pageSize),
+        pageNum: 1,
+        totalPage: rootTotal,
+      },
+    ];
+    if (rootTotal > 1) {
+      dealData[0]!.pageChildren?.push({
+        node: 'root',
+        nodePath: 'root__PAGE',
+        nodeType: 'PAGE',
+        parentPath: '',
+        pageNum: 1,
+        totalPage: rootTotal,
+      });
+    }
+    searchResults.value.push(dealData);
+    handleDealData();
+  }
+}
+
+function expandNodeByKey() {
+  if (addPaths.value.length > 0) {
+    const current = addPaths.value.splice(0, 1)[0];
+    if (current) {
+      const node = measurementTree.value?.virtualizedTreeRef?.getNode(current);
+      if (node) {
+        measurementTree.value?.virtualizedTreeRef?.expandNode(node);
+        nextTick(() => {
+          expandNodeByKey();
+        });
+      } else {
+        addPaths.value.unshift(current);
+      }
+    }
+  }
+}
+
+async function subscribeToSSE() {
+  try {
+    searchLoading.value = true;
+    treeData.value = [];
+    StorageApi.getSSEData(searchText.value, handleData);
+  } catch (error) {
+    searchLoading.value = false;
+    console.error('Error subscribing to SSE:', error);
+  }
+}
+
+function handleSearch() {
+  if (searchText.value.trim()) {
+    searching.value = true;
+    isSearchResult.value = true;
+    subscribeToSSE();
+  } else {
+    isSearchResult.value = false;
+    getTreeData();
+  }
+  emit('handleChangeNode', 'root', 'DATABASE', searchText.value);
+}
+
+function handleRefresh(unforce?: boolean) {
+  if (unforce) {
+    handleSearch();
+  } else {
+    searchText.value = '';
+    emit('handleChangeNode', 'root', 'DATABASE', searchText.value);
+    isSearchResult.value = false;
+    getTreeData();
+  }
+}
+
+async function handleOperate(Operate: 'add' | 'delete', payload: TreeEventPayload) {
+  if (Operate === 'delete') {
+    const parentPath = payload.path.substring(0, payload.path.lastIndexOf('.'));
+    const item = recursionFindCurrentByOrigin(payload.path, treeData.value);
+    const parent = recursionFindCurrentByOrigin(parentPath, treeData.value);
+    const pageItem = recursionFindParent(payload.path, treeData.value);
+    const pageParent = recursionFindParent(parentPath, treeData.value);
+
+    if (item && parent) {
+      // 从 parent 的 children 中删除 item
+      const index = parent.children!.findIndex((child) => child.nodePath === item.nodePath);
+      if (index >= 0) {
+        parent.children!.splice(index, 1);
+      }
+    }
+    if (pageItem && pageParent) {
+      const pageIndex = pageParent.pageChildren!.findIndex((child) => child.nodePath === pageItem.nodePath);
+      if (pageIndex >= 0) {
+        pageParent.pageChildren!.splice(pageIndex, 1);
+      }
+    }
+    nextTick(() => {
+      measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
+    });
+    if (expandNode.value === payload.path) {
+      // 从 expandNodes 中删除 item
+      const index = expandNodes.value.findIndex((node) => node === payload.path);
+      if (index >= 0) {
+        expandNodes.value.splice(index, 1);
+      }
+      if (expandNodes.value.length === 0) {
+        expandNodes.value = [pageParent?.nodePath || 'root'];
+      }
+      emit('handleChangeNode', pageParent?.nodePath || 'root', pageParent?.nodeType || 'DATABASE', searchText.value);
+    }
+  }
+
+  if (Operate === 'add') {
+    // 将 payload.path 按 . 拆分成数组。 比如 root.a1.b1 结果是 ['root','root.a1','root.a1.b1']
+    const pathArr = payload.path.split('.');
+    let fullPath = 'root';
+    pathArr.forEach(async (path, index) => {
+      if (index === 0 || (index === pathArr.length - 1 && payload.type === 'MEASUREMENT')) return;
+      fullPath = `${fullPath}.${path}`;
+      pathArr[index] = fullPath;
+    });
+    addPaths.value = pathArr;
+    addPaths.value.splice(0, 1);
+    if (addPaths.value.length > 0) {
+      if (!isSearchResult.value) {
+        const item = recursionFindCurrentByOrigin(addPaths.value[0]!, treeData.value);
+        const pageItem = recursionFindParent(addPaths.value[0]!, treeData.value);
+        if (item) {
+          item.children = [cloneDeep(loadingNode)];
+          item.pageChildren = [cloneDeep(loadingNode)];
+        }
+        if (pageItem) {
+          pageItem.children = [cloneDeep(loadingNode)];
+          pageItem.pageChildren = [cloneDeep(loadingNode)];
+        }
+        nextTick(() => {
+          measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
+        });
+      }
+      expandNodeByKey();
+    }
+  }
+}
+
+// function handleClickMore(e: MouseEvent, key: string) {
+//   if (contextMenuTimer.value) {
+//     clearTimeout(contextMenuTimer.value);
+//     contextMenuTimer.value = undefined;
+//   }
+//   const data: TreeNodeData = measurementTree.value?.virtualizedTreeRef?.getNode(key)?.data as TreeNodeData;
+//   if (data.nodeType === 'PAGE' || data.nodePath === 'root.__system' || data.nodePath.startsWith('root.__system.')) return;
+//   clickedNodeData.node = data.node;
+//   clickedNodeData.nodePath = data.nodePath;
+//   clickedNodeData.nodeType = data.nodeType;
+//   clickedNodeData.parentPath = data.parentPath;
+//   isShowContextMenu.value = true;
+//   let y = e.clientY - 52;
+//   let x = e.clientX - insertWidth.value;
+//   if (x < 0) x = 0;
+//   if (document.body.clientHeight - y < 150) y = document.body.clientHeight - 150;
+//   contextMenuRef.value!.$el.style.inset = `${y}px auto auto ${x}px`;
+// }
+
+function handleCommand(val: string, data: TreeNodeData) {
+  if (val === 'database') {
+    databaseVisible.value = true;
+  } else if (val === 'measurement') {
+    currentDatabase.value = data.nodePath;
+    measurementVisible.value = true;
+  } else {
+    ElMessageBox.confirm(data.nodeType !== 'TIMESERIES' ? t('measurement.deleteMeasurementTip') : t('measurement.deleteMeasurementSingle'), t('common.notice'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
+      confirmButtonClass: 'del-tree-node-confirm',
+      cancelButtonClass: 'del-tree-node-cancel',
+      type: 'warning',
+      icon: ICustomMessageWarning,
+    }).then(() => {
+      deletePaths(data.nodePath, data.nodeType).then(() => {
+        ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
+        handleOperate('delete', { path: data.nodePath, type: data.nodeType });
+      });
+    });
+  }
+}
+
+function handleNodeCollapse(data: TreeNodeData, node: TreeNode) {
+  if (data.nodeType === 'PAGE') {
+    expandNode.value = node.parent?.data.nodePath;
+    measurementTree.value?.virtualizedTreeRef?.expandNode(node.parent!);
+  }
+}
+
+function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
+  if (data.nodeType === 'PAGE' || data.nodeType === 'TIMESERIES') {
+    e?.stopPropagation();
+    return;
+  }
+  if (data.nodePath === expandNode.value && (!data.pageChildren || data.pageChildren[0]!.nodeType !== 'loading')) return;
+  // if (['DATABASE', 'TIMESERIES']!.includes(data.nodeType)) {
+  if (props.currentNode !== data.nodePath) {
+    emit('handleChangeNode', data.nodePath, data.nodeType, searchText.value);
+  }
+  // }
+  expandNode.value = data.nodePath;
+  // expandNodes.value = [data.nodeParent, data.nodePath];
+  if (isSearchResult.value) {
+    if ((data.pageChildren && data.pageChildren.length === 0) || data.pageChildren[0]!.nodeType === 'loading') {
+      const originTreeData = cloneDeep(recursionFindCurrentByOrigin(data.nodePath, treeData.value)?.children || []);
+      const dataPathTotal = Math.ceil(originTreeData.length / pageSize);
+      data.pageChildren = originTreeData.slice(0, 1 * pageSize);
+      data.pageNum = 1;
+      data.totalPage = dataPathTotal;
+      if (dataPathTotal > 1) {
+        data.pageChildren?.push({
+          node: data.node,
+          nodePath: `${data.nodePath}__PAGE`,
+          nodeType: 'PAGE',
+          parentPath: data.parentPath || '',
+          pageNum: 1,
+          totalPage: dataPathTotal,
+        });
+      }
+      measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
+    }
+    return;
+  }
+  const children = measurementTree.value?.virtualizedTreeRef?.getNode(data.nodePath)?.children;
+  if ((!children || (children[0]!.data as TreeNodeData).nodeType !== 'loading') && data.pageChildren[0]!.nodeType !== 'loading') {
+    return;
+  }
+  getNextNodeInfos(data.nodePath).then((res) => {
+    const list = res.data || [];
+    // 展示点开操作查看的data 都在pageChildren 属性，需找到对应的children 上追加子节点
+    const originTreeData = recursionFindCurrentByOrigin(data.nodePath, treeData.value)!;
+    const cloneData = fillChildLoading(cloneDeep(list));
+    originTreeData.children = cloneDeep(cloneData);
+    const dataPathTotal = Math.ceil(cloneData.length / pageSize);
+
+    data.pageChildren = cloneData.slice(0, 1 * pageSize);
+    data.pageNum = 1;
+    data.totalPage = dataPathTotal;
+    if (dataPathTotal > 1) {
+      data.pageChildren?.push({
+        node: data.node,
+        nodePath: `${data.nodePath}__PAGE`,
+        nodeType: 'PAGE',
+        parentPath: data.parentPath || '',
+        pageNum: 1,
+        totalPage: dataPathTotal,
+      });
+    }
+    measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
+    measurementTree.value?.virtualizedTreeRef?.expandNode(node);
+    nextTick(() => {
+      if (addPaths.value.length > 0) {
+        expandNodeByKey();
+      }
+    });
+  });
+}
+
+// 查看更多--下一页
+function handleNext(e: MouseEvent, data: TreeNodeData) {
+  e.stopPropagation();
+  const originTreeData = recursionFindCurrentByOrigin(`${data.parentPath ? `${data.parentPath}.` : ''}${data.node}`, treeData.value)!;
+  const currentTreeData = recursionFindParent(`${data.parentPath ? `${data.parentPath}.` : ''}${data.node}`, treeData.value)!;
+  currentTreeData.pageChildren!.pop();
+  currentTreeData.pageChildren = currentTreeData.pageChildren?.concat(originTreeData.children!.slice(data.pageNum * pageSize, (data.pageNum + 1) * pageSize));
+  currentTreeData.pageNum = data.pageNum + 1;
+  let currentTotalPage = currentTreeData.totalPage!;
+  if (isSearchResult.value) {
+    currentTotalPage = Math.ceil(originTreeData.children!.length / pageSize);
+  }
+  if (currentTreeData.pageNum! < currentTotalPage) {
+    currentTreeData.pageChildren!.push({
+      node: data.node,
+      nodePath: `${data.nodePath}__PAGE`,
+      nodeType: 'PAGE',
+      parentPath: data.parentPath || '',
+      pageNum: currentTreeData.pageNum || 1,
+      totalPage: currentTotalPage,
+    });
+  }
+  measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
+}
+
+// 查看全部
+function handleAll(e: MouseEvent, data: TreeNodeData) {
+  e.stopPropagation();
+  const originTreeData = recursionFindCurrentByOrigin(`${data.parentPath ? `${data.parentPath}.` : ''}${data.node}`, treeData.value)!;
+  const currentTreeData = recursionFindParent(`${data.parentPath ? `${data.parentPath}.` : ''}${data.node}`, treeData.value)!;
+  currentTreeData.pageChildren!.pop();
+  currentTreeData.pageChildren = currentTreeData.pageChildren?.concat(originTreeData.children!.slice(data.pageNum * pageSize));
+  measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
+}
+
+function onMouseDown() {
+  contextMenuTimer.value = setTimeout(() => {
+    isShowContextMenu.value = false;
+  }, 200);
+}
+
+// function handleScroll(scrollLeft: number) {
+//   const iconList = document.querySelectorAll('.more-icon');
+//   iconList.forEach((icon: any) => {
+//     icon.style.left = scrollLeft;
+//   });
+// }
+
+onMounted(() => {
+  window.addEventListener('resize', onResize);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', onResize);
+});
+
+watch(
+  () => isShowContextMenu.value,
+  (newVal) => {
+    if (newVal) {
+      document.addEventListener('mousedown', onMouseDown);
+    } else {
+      document.removeEventListener('mousedown', onMouseDown);
+    }
+  },
+);
+
+watch(
+  () => props.canReadWriteSchema,
+  (val) => {
+    if (val) {
+      isSearchResult.value = false;
+      getTreeData();
+    }
+  },
+  {
+    immediate: true,
+  },
+);
+
+defineExpose({ handleRefresh, handleOperate });
+</script>
+<style lang="scss" scoped>
+.measurement-tree-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.search-refresh-box {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.measurement-tree-box {
+  flex: 1;
+
+  // overflow: hidden;
+}
+
+.node-text {
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  padding-right: 8px;
+}
+
+.el-tree-node:focus {
+  color: #495ad4;
+}
+
+.more-icon {
+  padding: 0 8px 0 4px;
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  left: 212px;
+  background-color: #fff;
+}
+
+:deep(.el-tree-node__content:hover),
+:deep(.el-tree-node:focus) {
+  .more-icon {
+    background-color: #f7f8fc !important;
+  }
+}
+
+.tree-node-operation-buttons {
+  display: flex;
+
+  :deep(.el-button) {
+    height: 20px !important;
+  }
+}
+
+.tree-type {
+  color: #495ad4;
+  font-size: 12px;
+  font-weight: bold;
+}
+</style>

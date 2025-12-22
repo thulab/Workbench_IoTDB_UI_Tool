@@ -41,16 +41,14 @@
 <script lang="ts" setup>
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
 import type { ChartMarker, ChartGroupInput, Measurement, DataPoint, MeasurementMarkerData } from '@/types/trend';
-import { TableDataApi } from '@/api';
+import { TableDataApi, SearchApi } from '@/api';
 import { formatSelectedMeasurement } from '@/utils/format';
-import { useTableHistoryTrendStore, useTableRunningTrendStore } from '@/stores/trend.store';
+import { useTableHistoryTrendStore, useTableRunningTrendStore, useTreeHistoryTrendStore, useTreeRunningTrendStore } from '@/stores/trend.store';
 import type { TrendData } from '@/types';
-
-const trendStore = useTableHistoryTrendStore();
-const runningTrendStore = useTableRunningTrendStore();
 
 const { t } = useI18n();
 const { requestFn: getHistoryTrend } = useRequest(TableDataApi.getTrendHistoryData);
+const { requestFn: getTreeHistoryTrend } = useRequest(SearchApi.getHistoryTrend);
 
 const GRID_LEFT = 34;
 const GRID_RIGHT = 38;
@@ -64,6 +62,7 @@ let draggingId: string | null = null;
 
 const props = withDefaults(
   defineProps<{
+    isTable: boolean;
     isRunning: boolean;
     group: ChartGroupInput;
     markers: ChartMarker[];
@@ -81,6 +80,9 @@ const props = withDefaults(
     canDelete: false,
   },
 );
+
+const trendStore = props.isTable ? useTableHistoryTrendStore() : useTreeHistoryTrendStore();
+const runningTrendStore = props.isTable ? useTableRunningTrendStore() : useTreeRunningTrendStore();
 
 const measurementsData = ref<Measurement[]>([]);
 const markerValues = ref<MeasurementMarkerData[]>([]);
@@ -232,7 +234,8 @@ function nearestDataPoint(measurement: Measurement, timestamp: number): DataPoin
   return Math.abs(candidate.timestamp - timestamp) < Math.abs(previous.timestamp - timestamp) ? candidate : previous;
 }
 
-function fetchHistoryData(measurement: Measurement) {
+function getTableHistoryData(measurement: Measurement) {
+  if (!measurement.details) return;
   getHistoryTrend({
     database: measurement.details.database,
     tableName: measurement.details.tableName,
@@ -275,6 +278,52 @@ function fetchHistoryData(measurement: Measurement) {
       ElMessage.warning({ message: t('dataTrend.measurementTip', { measurement: paths }), grouping: true });
     }
   });
+}
+
+function getTreeHistoryData(measurement: Measurement) {
+  console.log('measurement', measurement);
+  getTreeHistoryTrend({
+    paths: [measurement.label],
+    startTime: trendStore.globalTimeRange.start,
+    endTime: trendStore.globalTimeRange.end,
+    groupBy: 'origin',
+    aggregateFun: 'last_value',
+  }).then((res) => {
+    // process data
+    const normalData = res.data?.normal || [];
+    console.log('normalData', normalData);
+    const transformedData: DataPoint[] = [];
+    if (normalData[0]) {
+      const point = normalData[0];
+      const valueLen = point.values.length;
+      for (let i = 0; i < valueLen; i++) {
+        const timestamp = point.timestamps[i];
+        const value = point.values[i];
+        transformedData.push({ timestamp: timestamp as number, value: Number(value) });
+      }
+    }
+    measurementsData.value.push({
+      ...measurement,
+      values: transformedData,
+    });
+    if (!normalData.length && !isRefresh.value) {
+      ElMessage.warning({ message: `测点 ${measurement.label} 在 ${t('dataTrend.noDataTip')}`, grouping: true });
+    }
+    const overPath = res.data?.changeAuto || [];
+    if (overPath.length && !isRefresh.value) {
+      const paths = overPath.join(',');
+      ElMessage.warning({ message: t('dataTrend.measurementTip', { measurement: paths }), grouping: true });
+    }
+    console.log('measurementsData', measurementsData.value);
+  });
+}
+
+function fetchHistoryData(measurement: Measurement) {
+  if (props.isTable) {
+    getTableHistoryData(measurement);
+    return;
+  }
+  getTreeHistoryData(measurement);
 }
 
 function handleDrop(event: DragEvent) {

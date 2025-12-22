@@ -14,6 +14,7 @@
       <div>
         <OperateButtonRow
           ref="operateButtonRowRef"
+          :isTable="true"
           :isRunning="false"
           :templateList="templateList"
           :canOperate="resolvedGroups.length > 0"
@@ -25,6 +26,7 @@
       </div>
       <TrendGraphArea
         ref="trendGraphRef"
+        :isTable="true"
         :is-running="false"
         :loading="isFetching"
         :range="trendStore.visibleTimeRange"
@@ -39,6 +41,7 @@
       />
       <TimelineArea
         ref="timelineAreaRef"
+        :isTable="true"
         :range="trendStore.pendingTimeRange"
         :full-range="trendStore.globalTimeRange"
         :all-measurement-info="visibleMeasurementsSet"

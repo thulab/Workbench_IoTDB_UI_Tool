@@ -42,11 +42,9 @@
 import ICustomCalender from '~icons/custom/calender.svg';
 import type { TimeRange, RangeHandle, Measurement, DataPoint } from '@/types/trend';
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
-import { TableDataApi } from '@/api';
+import { TableDataApi, SearchApi } from '@/api';
 import { formatSelectedMeasurement } from '@/utils/format';
-import { useTableHistoryTrendStore } from '@/stores/trend.store';
-
-const trendStore = useTableHistoryTrendStore();
+import { useTableHistoryTrendStore, useTreeHistoryTrendStore } from '@/stores/trend.store';
 
 const GRID_LEFT = 24; // 64
 const GRID_RIGHT = 24; // 32
@@ -54,12 +52,16 @@ const GRID_RIGHT = 24; // 32
 const { t } = useI18n();
 
 const { requestFn: getHistoryTrend } = useRequest(TableDataApi.getTrendHistoryData);
+const { requestFn: getTreeHistoryTrend } = useRequest(SearchApi.getHistoryTrend);
 
 const props = defineProps<{
+  isTable: boolean;
   allMeasurementInfo: Measurement[];
   needFetchMeasurementId: string[];
   needDeleteMeasurementsId: string[];
 }>();
+
+const trendStore = props.isTable ? useTableHistoryTrendStore() : useTreeHistoryTrendStore();
 
 const emit = defineEmits<{
   'update:range': [payload: TimeRange];
@@ -155,7 +157,8 @@ watch(
   { deep: true },
 );
 
-function fetchFullRangeHistoryData(measurement: Measurement) {
+function fetchTableFullRangeHistoryData(measurement: Measurement) {
+  if (!measurement.details) return;
   getHistoryTrend({
     database: measurement.details.database,
     tableName: measurement.details.tableName,
@@ -211,6 +214,62 @@ function fetchFullRangeHistoryData(measurement: Measurement) {
       // ElMessage.warning({ message: t('dataTrend.measurementTip', { measurement: paths }), grouping: true });
     }
   });
+}
+
+function fetchTreeFullRangeHistoryData(measurement: Measurement) {
+  getTreeHistoryTrend({
+    paths: [measurement.label],
+    startTime: trendStore.globalTimeRange.start,
+    endTime: trendStore.globalTimeRange.end,
+    groupBy: 'origin',
+    aggregateFun: 'last_value',
+  }).then((res) => {
+    // process data
+    const normalData = res.data?.normal || [];
+    const transformedData: DataPoint[] = [];
+    if (normalData[0]) {
+      const point = normalData[0];
+      const valueLen = point.values.length;
+      for (let i = 0; i < valueLen; i++) {
+        const timestamp = point.timestamps[i];
+        const value = point.values[i];
+        transformedData.push({ timestamp: timestamp as number, value: Number(value) });
+      }
+    }
+    if (fullDataSet.value.find((m) => m.id === measurement.id)) {
+      // update existing measurement data
+      fullDataSet.value = fullDataSet.value.map((m) => {
+        if (m.id === measurement.id) {
+          return {
+            ...m,
+            values: transformedData,
+          };
+        }
+        return m;
+      });
+      return;
+    }
+    fullDataSet.value.push({
+      ...measurement,
+      values: transformedData,
+    });
+    if (!normalData.length) {
+      // ElMessage.warning({ message: `测点 ${measurement.label} 在 ${t('dataTrend.noDataTip')}`, grouping: true });
+    }
+    const overPath = res.data?.changeAuto || [];
+    if (overPath.length) {
+      // const paths = overPath.join(',');
+      // ElMessage.warning({ message: t('dataTrend.measurementTip', { measurement: paths }), grouping: true });
+    }
+  });
+}
+
+function fetchFullRangeHistoryData(measurement: Measurement) {
+  if (props.isTable) {
+    fetchTableFullRangeHistoryData(measurement);
+    return;
+  }
+  fetchTreeFullRangeHistoryData(measurement);
 }
 
 function updateRangePercent() {

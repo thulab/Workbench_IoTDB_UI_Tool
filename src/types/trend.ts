@@ -47,7 +47,7 @@ export type Measurement = {
   id: string;
   label: string;
   color: string;
-  details: SelectedMeasurement;
+  details: SelectedMeasurement | null;
   values: DataPoint[];
 };
 
