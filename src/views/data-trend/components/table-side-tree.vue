@@ -225,8 +225,20 @@ function saveToStorage() {
             measurements.push(matchedMeasurement);
           } else {
             // 如果找不到匹配的，使用默认结构
-            const device = deviceName ? deviceName.split('.').map((value) => ({ value })) : [];
-            measurements.push({ device, measurement: measurementName });
+            // const device = deviceName ? deviceName.split('.').map((value) => ({ value })) : [];
+            // measurements.push({ device, measurement: measurementName });
+            measurements.push({
+              database: dbNode.nodeName,
+              tableName: tbNode.nodeName,
+              device: deviceName
+                ? deviceName.split('.').map((value) => ({
+                    variable: '',
+                    value,
+                  }))
+                : [],
+              condition: '',
+              measurement: measurementName,
+            });
           }
         });
         dataToSave[key] = measurements;
@@ -461,6 +473,7 @@ function initSelectedMeasurementsData() {
             database: dbNode.nodeName,
             tableName: tableNode.nodeName,
             device: meas.device,
+            condition: meas.condition,
             measurement: meas.measurement,
           });
         });
@@ -492,7 +505,7 @@ function handleRefresh() {
 }
 
 function handleSelectNode(payload: Record<string, unknown>) {
-  const data = payload as TableTreeNodeData;
+  const data = payload as unknown as TableTreeNodeData;
   if (data && data.id && (data.nodeType === 'DATABASE' || data.nodeType === 'TABLE')) {
     currentNode.value = data;
     currentNodeShow.value = cloneDeep(data);
