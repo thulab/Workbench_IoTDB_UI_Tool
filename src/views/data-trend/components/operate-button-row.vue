@@ -296,30 +296,6 @@ watch(
   border: 1px solid #dfe1ed;
 }
 
-.operate-button-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.operate-button-group {
-  display: flex;
-  align-items: center;
-}
-
-.operate-button {
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  background: #495ad4;
-  border-radius: 4px;
-}
-
 .template-select-dropdown .el-select-dropdown__item {
   height: auto;
   padding: 0;

@@ -25,7 +25,7 @@
         <button
           v-for="handle in markerHandles"
           :key="handle.id"
-          class="marker-overlay-handle"
+          class="absolute top-1 w-0 h-[calc(100%-25px)] border-l-[1.5px] border-l-dashed border-l-white/40 pointer-events-auto bg-transparent border-t-0 border-r-0 border-b-0 cursor-ew-resize disabled:pointer-events-none disabled:border-l-white/25"
           type="button"
           :style="{ left: handle.left, borderColor: handle.color }"
           :disabled="props.loading"
@@ -56,7 +56,6 @@ const GRID_LEFT = 34;
 const GRID_RIGHT = 38;
 const layoutTick = ref(0);
 const isRefresh = ref(false);
-// const isFetchingData = ref(false);
 const trendChartRef = ref<HTMLDivElement | null>(null);
 const stageRef = ref<HTMLElement | null>(null);
 let chart: echarts.ECharts | null = null;
@@ -408,29 +407,7 @@ function buildOption(): ECOption {
         color: series.color,
       },
       data: series.values.map((point) => [point.timestamp, point.value]),
-      // markLine:
-      //   index === 0
-      //     ? {
-      //       symbol: 'none',
-      //       silent: true,
-      //       label: { color: '#fff', fontSize: 11 },
-      //       data: props.markers as unknown as ECOption['data'],
-      //     }
-      //     : undefined,
     })),
-    // series: [
-    //   {
-    //     type: 'line',
-    //     name: '示例数据',
-    //     smooth: true,
-    //     showSymbol: false,
-    //     data: [],
-    //     lineStyle: {
-    //       width: 2,
-    //       color: '#5470C6',
-    //     },
-    //   },
-    // ],
   };
 }
 
@@ -462,7 +439,6 @@ function buildRunningOption(): ECOption {
     xAxis: {
       type: 'time',
       min: runningTrendStore.min > 0 ? runningTrendStore.min : undefined,
-      // splitNumber: 4,
       axisLine: { lineStyle: { color: '#444b63' } },
       axisLabel: {
         color: '#424561',
@@ -470,9 +446,6 @@ function buildRunningOption(): ECOption {
         interval: 'auto',
         formatter: (value: number) =>
           new Date(value).toLocaleTimeString('zh-CN', {
-            // year: '2-digit',
-            // month: '2-digit',
-            // day: '2-digit',
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
@@ -589,9 +562,6 @@ defineExpose({
 
 onMounted(() => {
   initChart();
-  // if (!window.sessionStorage.getItem('newTableHistoryTrend' + props.group.id)) {
-  //   window.sessionStorage.setItem('newTableHistoryTrend' + props.group.id, '');
-  // }
 });
 
 onUnmounted(() => {
@@ -666,16 +636,6 @@ watch(
   { deep: true },
 );
 
-// watch(
-//   () => runningTrendStore.isPlaying,
-//   (newVal) => {
-//     if (!props.isRunning || newVal) {
-//       return;
-//     }
-//     updateRunningMarkerValues();
-//   }
-// )
-
 watch(
   () => props.realTimeData,
   () => {
@@ -704,9 +664,6 @@ watch(
 watch(
   () => markerValues.value,
   (newValues) => {
-    // if (props.isRunning) {
-    //   return;
-    // }
     emit('marker-value-change', newValues);
   },
   { deep: true },
@@ -715,12 +672,6 @@ watch(
 watch(
   () => props.markers,
   () => {
-    // if (props.isRunning) {
-    //   return;
-    // }
-    // if (chart) {
-    //   chart.setOption(buildOption());
-    // }
     if (props.isRunning) {
       updateRunningMarkerValues();
       return;
@@ -741,36 +692,7 @@ watch(
   height: 400px;
 }
 
-.marker-overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.marker-overlay--disabled {
-  opacity: 0.5;
-}
-
-.marker-overlay-handle {
-  position: absolute;
-  top: 4px;
-  width: 0;
-  height: calc(100% - 25px);
-  border-left: 1.5px dashed rgb(255 255 255 / 40%);
-  pointer-events: auto;
-  background: none;
-  border-top: none;
-  border-right: none;
-  border-bottom: none;
-  cursor: ew-resize;
-}
-
-.marker-overlay-handle:disabled {
-  pointer-events: none;
-  border-left: 1.5px dashed rgb(255 255 255 / 25%);
-}
-
-.marker-overlay-handle span {
+/* .marker-overlay-handle span {
   position: absolute;
   top: -12px;
   left: -20px;
@@ -778,12 +700,5 @@ watch(
   color: #0d101a;
   padding: 2px 6px;
   border-radius: 999px;
-}
-
-.measurement-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 4px;
-  font-size: small;
-}
+} */
 </style>

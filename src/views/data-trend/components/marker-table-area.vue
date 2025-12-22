@@ -38,11 +38,3 @@ const convertedMarkerDatas = computed(() => {
   });
 });
 </script>
-
-<style>
-.marker-table-area-wrapper {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 15px 25px;
-}
-</style>

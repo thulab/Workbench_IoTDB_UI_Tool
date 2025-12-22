@@ -95,28 +95,13 @@ const chartHeight = computed(() => {
 });
 
 const emit = defineEmits<{
-  // 'global-time-change': [payload: TimeRange];
   'marker-change': [payload: { id: string; timestamp: number }];
   'merge-into-group': [payload: { groupId: string; measurementPath: string }];
   'delete-group': [payload: { groupId: string }];
   'delete-measurement': [payload: { groupId: string; measurementPath: string }];
   'marker-value-change': [payload: MeasurementMarkerData[]];
-  // 'save-template': [payload: string];
-  // 'handle-operate': [payload: { action: string; data: TrendTemplate }];
-  // 'get-query-list': [payload: string];
-  // 'reset-trend': [];
-  // 'running-play': [];
-  // 'running-pause': [];
 }>();
 
-// const { t } = useI18n();
-// const { shortcutsDaterange } = useShortcutsDate();
-// const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
-// const selectedDateTime = reactive<{
-//   value: [DateModelType, DateModelType];
-// }>({
-//   value: [new Date(trendStore.visibleTimeRange.start), new Date(trendStore.visibleTimeRange.end)],
-// });
 const measurementsMarkerData = ref<MeasurementMarkerData[]>([]);
 
 const deleteMeasurementMarkerDataByName = (name: string) => {
@@ -214,21 +199,8 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style lang="scss" scoped>
-.template-select {
-  width: 260px;
-  margin-left: 8px;
-}
-</style>
-
 <style>
 .el-scrollbar__wrap {
   overflow-x: hidden;
-}
-
-.trend-graph-area-wrapper {
-  width: 100%;
-  flex: 1;
-  overflow: auto;
 }
 </style>

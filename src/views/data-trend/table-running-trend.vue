@@ -190,10 +190,6 @@ function handleOperateTemplate(payload: { action: string; data: TrendTemplate })
       });
     });
 
-    // needFetchMeasurementsId.value = measurementList.value.map((m) => m.id);
-    // needFetchGroupsId.value = [];
-    // needFetchGroupsId.value = groups.value.map((g) => g.id);
-    // markers.value = createInitialMarkers(trendStore.visibleTimeRange);
     sideTreeRef.value?.restoreSelectedMeasurements(convertMeasurementListToSelectedMeasurements(measurementList.value));
     runningTrendStore.setIsPlaying(true);
     for (const measurementId of visibleMeasurementCountMap.value.keys()) {
@@ -326,13 +322,10 @@ function createGroup(fullpath: string) {
   });
   if (!visibleMeasurementCountMap.value.has(fullpath)) {
     visibleMeasurementCountMap.value.set(fullpath, 1);
-    // needFetchMeasurementsId.value.push(fullpath);
     addPathToWebSocket(fullpath);
   } else {
     visibleMeasurementCountMap.value.set(fullpath, visibleMeasurementCountMap.value.get(fullpath)! + 1);
   }
-  // needFetchGroupsId.value = [];
-  // needFetchGroupsId.value.push(groupId);
 
   setStorage();
 }
@@ -343,13 +336,10 @@ function mergeGroup(payload: { groupId: string; measurementPath: string }) {
     group.measurementIds.push(payload.measurementPath);
     if (!visibleMeasurementCountMap.value.has(payload.measurementPath)) {
       visibleMeasurementCountMap.value.set(payload.measurementPath, 1);
-      // needFetchMeasurementsId.value.push(payload.measurementPath);
       addPathToWebSocket(payload.measurementPath);
     } else {
       visibleMeasurementCountMap.value.set(payload.measurementPath, visibleMeasurementCountMap.value.get(payload.measurementPath)! + 1);
     }
-    // needFetchGroupsId.value = [];
-    // needFetchGroupsId.value.push(payload.groupId);
     setStorage();
   }
 }
@@ -362,7 +352,6 @@ function deleteGroup(payload: { groupId: string }) {
         const count = visibleMeasurementCountMap.value.get(measurementId)! - 1;
         if (count <= 0) {
           visibleMeasurementCountMap.value.delete(measurementId);
-          // needDeleteMeasurementsId.value.push(measurementId);
           trendGraphRef.value?.deleteMeasurementMarkerDataByName(measurementId);
           deletePathFromWebSocket(measurementId);
         } else {
@@ -372,7 +361,6 @@ function deleteGroup(payload: { groupId: string }) {
     });
   }
   groups.value = groups.value.filter((g) => g.id !== payload.groupId);
-  // needFetchGroupsId.value = [];
 
   setStorage();
 }
@@ -389,15 +377,12 @@ function deleteMeasurement(payload: { groupId: string; measurementPath: string }
       const count = visibleMeasurementCountMap.value.get(payload.measurementPath)! - 1;
       if (count <= 0) {
         visibleMeasurementCountMap.value.delete(payload.measurementPath);
-        // needDeleteMeasurementsId.value.push(payload.measurementPath);
         trendGraphRef.value?.deleteMeasurementMarkerDataByName(payload.measurementPath);
         deletePathFromWebSocket(payload.measurementPath);
       } else {
         visibleMeasurementCountMap.value.set(payload.measurementPath, count);
       }
     }
-    // needFetchGroupsId.value = [];
-    // needFetchGroupsId.value.push(payload.groupId);
 
     setStorage();
   }
@@ -533,17 +518,12 @@ function init() {
       );
     });
   }
-  // setOption(chartOptions.value);
 }
 
 function setStorage() {
   const storageData = {
-    // globalTimeRange: trendStore.globalTimeRange,
-    // visibleRange: trendStore.visibleTimeRange,
-    // pendingRange: trendStore.pendingTimeRange,
     groups: groups.value,
     measurements: measurementList.value,
-    // markers: markers.value,
     visibleMeasurementCounts: Array.from(visibleMeasurementCountMap.value.entries()),
   };
   try {
@@ -558,13 +538,8 @@ function restoreData() {
   if (storageData) {
     try {
       const parsed = JSON.parse(storageData);
-      // trendStore.setGlobalTimeRange(parsed.globalTimeRange);
-      // trendStore.setVisibleTimeRange(parsed.visibleRange);
-      // trendStore.setPendingTimeRange(parsed.pendingRange);
-      // trendGraphRef.value?.setSelectedDateTime([trendStore.globalTimeRange.start, trendStore.globalTimeRange.end]);
       groups.value = parsed.groups;
       measurementList.value = parsed.measurements;
-      // markers.value = parsed.markers?.length ? parsed.markers : createInitialMarkers(trendStore.globalTimeRange);
       measurementMap.clear();
       measurementList.value.forEach((item) => {
         measurementMap.set(item.id, item);
@@ -626,15 +601,6 @@ function restoreData() {
           }
         });
       }
-
-      // needFetchGroupsId.value = [];
-      // needFetchMeasurementsId.value = [];
-      // needDeleteMeasurementsId.value = [];
-
-      // nextTick(() => {
-      //   trendGraphRef.value?.restoreChartData();
-      //   timelineAreaRef.value?.restoreData();
-      // });
     } catch (e) {
       console.error('Failed to parse storage data:', e);
     }
@@ -667,19 +633,9 @@ watch(
     if (!newVal) {
       markers.value = createInitialMarkers(runningTrendStore.visibleTimeRange);
     }
-    // updateRunningMarkerValues();
   },
   { deep: true, immediate: true },
 );
-
-// watch(
-//   globalTimeRange,
-//   (newVal) => {
-//     pendingRange.value = { ...newVal };
-//     visibleRange.value = { ...newVal };
-//   },
-//   { deep: true },
-// );
 
 watch(
   () => connectionStore.connectionIsMaster,

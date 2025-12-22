@@ -2,9 +2,9 @@
 <template>
   <el-dialog v-model="dialogVisible" :title="t('measurement.measurementChoose')" width="630px" :before-close="handleClose" :close-on-click-modal="false" :close-on-press-escape="false" draggable>
     <div class="flex gap-1 modal-table-measurement-container">
-      <el-scrollbar max-height="450" class="bg-[#F7F8FC]">
+      <el-scrollbar max-height="450" class="pt-[6px]">
         <!-- 左侧测点选择区域 -->
-        <div class="flex-2 flex flex-col p-[16px]">
+        <div class="flex-2 flex flex-col">
           <el-form :model="formData" :rules="formRules" ref="formRef" label-position="left" label-width="80px">
             <!-- 第一行：数据库和表选择 -->
             <!-- <div class="flex gap-2">
@@ -56,17 +56,17 @@
                 </div>
                 <div class="device-filter-actions">
                   <el-button type="primary" link :disabled="tagFilters.length <= 1" @click="removeTagFilter(tagFilters.length - 1)">
-                    <el-icon size="20">
+                    <el-icon size="24">
                       <i-custom-tags-del />
                     </el-icon>
                   </el-button>
                   <el-button type="primary" link :disabled="tagFilters.length >= availableTags.length" @click="addTagFilter">
-                    <el-icon size="20">
+                    <el-icon size="24">
                       <i-custom-tags-add />
                     </el-icon>
                   </el-button>
                   <el-button type="primary" link @click="searchDevices">
-                    <el-icon size="20">
+                    <el-icon size="24">
                       <i-custom-tags-query />
                     </el-icon>
                   </el-button>
@@ -78,6 +78,7 @@
             <el-table
               border
               ref="deviceTableRef"
+              class="device-table"
               :data="deviceTableData"
               style="width: 100%"
               :height="260"
@@ -566,8 +567,12 @@ watch(
 </script>
 
 <style lang="scss">
+.device-table th.el-table__cell {
+  font-weight: 700 !important;
+}
+
 .modal-table-measurement-container {
-  min-height: 400px;
+  min-height: 380px;
   justify-content: space-evenly;
 
   .device-form-item {

@@ -40,7 +40,7 @@
         node-key="id"
       >
         <!-- eslint-disable-next-line vue/no-unused-vars -->
-        <template #default="{ node, data }">
+        <template #default="{ data }">
           <div
             class="node-text"
             :id="`tree-node-content-${data.parentName || data.nodeName}`"

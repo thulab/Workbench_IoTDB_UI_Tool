@@ -328,7 +328,6 @@ function onSliderPointerMove(event: PointerEvent) {
 }
 
 function buildTimelineChartOption(): ECOption {
-  console.log('buildTimelineChartOption called with fullDataSet:', fullDataSet.value);
   return {
     backgroundColor: 'transparent',
     animation: false,
