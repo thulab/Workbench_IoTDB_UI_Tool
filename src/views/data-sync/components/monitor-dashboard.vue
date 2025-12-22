@@ -1,5 +1,5 @@
 <template>
-  <version-container :is-show="showAuthMenu" :versiton-tip="'1.3.0'">
+  <version-container :is-show="showAuthMenu" :versionTip="'1.3.0'">
     <template #otherTip>
       <div class="monitor-dashboard-operate-left">
         <el-button link class="monitor-dashboard-close-btn svg-button-hover-color" id="monitor-dashboard-close-btn" @click="handleClose">

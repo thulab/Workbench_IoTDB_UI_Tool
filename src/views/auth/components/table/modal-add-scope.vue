@@ -91,7 +91,7 @@
                 <template v-if="$index !== 0 && privilegeData[0]!.isEnable">
                   <el-checkbox :checked="true" disabled></el-checkbox>
                 </template>
-                <el-checkbox v-else v-model="item.isEnable" />
+                <el-checkbox v-else v-model="item.isEnable" @change="handleEnableChanged(item)" />
               </template>
             </el-table-column>
             <el-table-column :label="t('auth.relational.canGrant')" align="center" width="100" prop="canGrant">
@@ -245,6 +245,25 @@ const handleConfirm = () => {
     });
   } else {
     savePrivilege();
+  }
+};
+
+const handleEnableChanged = (item: { type: string; isEnable: boolean; canGrant: boolean }) => {
+  if (item.type === 'all' && item.isEnable) {
+    privilegeData.forEach((privilege) => {
+      privilege.isEnable = true;
+    });
+  } else if (item.type === 'all' && !item.isEnable) {
+    privilegeData.forEach((privilege) => {
+      privilege.isEnable = false;
+      privilege.canGrant = false;
+    });
+  } else {
+    if (!item.isEnable) {
+      privilegeData[0]!.isEnable = false;
+      privilegeData[0]!.canGrant = false;
+      item.canGrant = false;
+    }
   }
 };
 

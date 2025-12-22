@@ -39,7 +39,7 @@
                 </auth-tooltip>
               </div>
             </div>
-            <version-container :is-show="showAuthMenu" :versiton-tip="'2.0.5'">
+            <version-container :is-show="showAuthMenu" :versionTip="'2.0.5'">
               <auth-container :is-auth="canUseModel && enableAINode" :content="enableAINode ? 'common.modelAuth' : 'aiAnalysis.enableTip'" style="height: 100%; width: 100%">
                 <div class="page-table-box">
                   <el-table

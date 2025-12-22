@@ -3,7 +3,7 @@
     <div v-if="isShow === false" class="auth-tip-container">
       <slot name="otherTip"></slot>
       <img src="@/assets/auth-tip.png" alt="" class="auth-tip-img" />
-      <span class="auth-tip-text">{{ t('common.versionTip', { version: versitonTip || '1.3.0' }) }}</span>
+      <span class="auth-tip-text">{{ t('common.versionTip', { version: versionTip || '1.3.0' }) }}</span>
     </div>
     <slot v-if="isShow"></slot>
   </el-container>
@@ -12,7 +12,7 @@
 <script setup lang="ts">
 defineProps<{
   isShow: boolean;
-  versitonTip?: string;
+  versionTip?: string;
 }>();
 const { t } = useI18n();
 </script>

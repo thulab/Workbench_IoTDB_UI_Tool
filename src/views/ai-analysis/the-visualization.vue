@@ -143,7 +143,7 @@
             </el-form>
           </div>
         </el-header>
-        <version-container :is-show="showAuthMenu" :versiton-tip="'2.0.5'">
+        <version-container :is-show="showAuthMenu" :versionTip="connectionStore.isTableModel ? '2.0.5' : '2.0.5 或 2.0.8'">
           <auth-container :is-auth="canUseModel && canReadWriteData && enableAINode" :content="enableAINode ? 'common.dataAndModelAuth' : 'aiAnalysis.enableTip'" style="height: 100%; width: 100%">
             <el-main class="p-0 position-relative" style="height: 100%">
               <el-container class="position-absolute p-x-16" style="height: 100%; width: 100%; z-index: 1000" v-if="searchFormData.type === 2">
@@ -366,7 +366,15 @@ const modelList = ref<Array<Model>>([]);
 const connectionStore = useConnectionStore();
 const dbStore = useDbStore();
 
-const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '2.0.5'));
+const showAuthMenu = computed(() => {
+  // 2.0.5 以上可以使用 AINode
+  const canUse = iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '2.0.5');
+  // 树模型不支持 2.0.6 和 2.0.7 版，需更新至 2.0.8
+  if (!connectionStore.isTableModel && (connectionStore.connectionInfo.currentVersion?.startsWith('2.0.6') || connectionStore.connectionInfo.currentVersion?.startsWith('2.0.7'))) {
+    return false;
+  }
+  return canUse;
+});
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
 const { enableAINode } = storeToRefs(connectionStore);
 let defaultMethod = ['sundial'];
@@ -925,7 +933,7 @@ function getCustom() {
     });
 }
 
-const realMotheds = computed<string[]>(() => {
+const realMotheds = () => {
   if (copySearchFormData.type === 0) {
     return copySearchFormData.method as string[];
   }
@@ -933,7 +941,7 @@ const realMotheds = computed<string[]>(() => {
     return [copySearchFormData.method] as string[];
   }
   return [];
-});
+};
 
 // 查询
 function handleSearch() {
@@ -966,7 +974,7 @@ function handleSearch() {
           return;
         }
         rawData.value = res.data.raw;
-        realMotheds.value.forEach((key: string) => {
+        realMotheds().forEach((key: string) => {
           analysisData.value.push({
             modelId: key,
             data: res.data.analysis[key]!,
