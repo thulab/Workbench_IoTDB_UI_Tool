@@ -3,14 +3,14 @@
     <el-container class="details-wrapper" style="height: 100%">
       <el-main class="p-16">
         <div style="display: flex; flex-direction: column; height: 100%" v-loading="loading">
-          <div class="module-box-wrapper m-b-16" v-if="!canMaintain">
+          <div class="module-box-wrapper m-b-16" v-if="!canSystemInfo">
             <div class="module-title-wrapper">
               <h4 class="module-title">{{ t('dashboard.systemInfo') }}</h4>
             </div>
-            <auth-container :is-auth="canMaintain" :content="'common.maintainAuth'" style="flex: 1" />
+            <auth-container :is-auth="canSystemInfo" :content="'common.maintainAuth'" style="flex: 1" />
           </div>
 
-          <div class="module-box-wrapper m-b-16" v-if="canMaintain">
+          <div class="module-box-wrapper m-b-16" v-if="canSystemInfo">
             <div class="module-title-wrapper">
               <h4 class="module-title">{{ slaveData ? t('dashboard.masterSystemInfo') : t('dashboard.systemInfo') }}</h4>
               <p class="module-details">
@@ -76,7 +76,7 @@
                 <li class="system-info-item">
                   <el-icon size="24"><i-custom-storage-num /></el-icon>
                   <span class="module-label-text">{{ t('measurement.databaseNum') }}：</span>
-                  <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.databaseNum, '-') : t('common.noAuth') }}</span>
+                  <span class="module-content-text">{{ toThousands(systemNumberData.databaseNum, '-') || t('common.noAuth') }}</span>
                 </li>
                 <li class="system-info-item" v-if="connectionStore.connectionInfo.data.model === 'tree'">
                   <el-icon size="24"><i-custom-device-num /></el-icon>
@@ -91,7 +91,7 @@
                 <li class="system-info-item" v-if="connectionStore.connectionInfo.data.model === 'table'">
                   <el-icon size="24"><i-custom-table2 /></el-icon>
                   <span class="module-label-text">{{ t('measurement.tableNum') }}：</span>
-                  <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.measurementNum, '-') : t('common.noAuth') }}</span>
+                  <span class="module-content-text">{{ toThousands(systemNumberData.measurementNum, '-') || t('common.noAuth') }}</span>
                 </li>
               </el-row>
             </ul>
@@ -152,7 +152,7 @@
             </div>
           </div>
 
-          <div class="module-box-wrapper m-b-16" v-if="canMaintain && slaveData">
+          <div class="module-box-wrapper m-b-16" v-if="canSystemInfo && slaveData">
             <div class="module-title-wrapper">
               <h4 class="module-title">{{ t('dashboard.slaveSystemInfo') }}</h4>
               <p class="module-details">
@@ -217,7 +217,7 @@
                 <li class="system-info-item">
                   <el-icon size="24"><i-custom-storage-num /></el-icon>
                   <span class="module-label-text">{{ t('measurement.databaseNum') }}：</span>
-                  <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.databaseNum, '-') : t('common.noAuth') }}</span>
+                  <span class="module-content-text">{{ toThousands(systemNumberData.databaseNum, '-') || t('common.noAuth') }}</span>
                 </li>
                 <li class="system-info-item" v-if="connectionStore.connectionInfo.data.model === 'tree'">
                   <el-icon size="24"><i-custom-device-num /></el-icon>
@@ -232,7 +232,7 @@
                 <li class="system-info-item" v-if="connectionStore.connectionInfo.data.model === 'table'">
                   <el-icon size="24"><i-custom-table2 /></el-icon>
                   <span class="module-label-text">{{ t('measurement.tableNum') }}：</span>
-                  <span class="module-content-text">{{ canReadWriteSchema ? toThousands(systemNumberData.measurementNum, '-') : t('common.noAuth') }}</span>
+                  <span class="module-content-text">{{ toThousands(systemNumberData.measurementNum, '-') || t('common.noAuth') }}</span>
                 </li>
               </el-row>
             </ul>
@@ -296,14 +296,14 @@
           <div class="module-box-wrapper monitor-info-wrapper">
             <div class="module-title-wrapper">
               <h4 class="module-title">{{ t('dashboard.monitorInfo') }}</h4>
-              <p class="module-details" v-if="canMaintain && showPrometheus">
+              <p class="module-details" v-if="canSystemInfo && showPrometheus">
                 <span class="module-label-text">{{ `${t('dashboard.deadTime')}：` }}</span>
                 <span class="module-content-text m-r-16">{{ monitorTime }}</span>
                 <el-button link @click="handleRefreshMonitor" id="dashboard-monitor-refresh" class="svg-button-hover-color"><i-custom-refresh style="width: 24px; height: 24px" /></el-button>
               </p>
             </div>
 
-            <auth-container :is-auth="canMaintain" :content="'common.maintainAuth'" style="flex: 1">
+            <auth-container :is-auth="canSystemInfo" :content="'common.maintainAuth'" style="flex: 1">
               <div v-if="showPrometheus">
                 <div class="search-form-box">
                   <ul class="search-cluster-list" v-if="slaveData">
@@ -388,7 +388,7 @@ const { t, locale } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
 const connectionStore = useConnectionStore();
-const { enablePrometheus, configurePrometheus, canReadWriteSchema, canMaintain } = storeToRefs(userStore);
+const { enablePrometheus, configurePrometheus, canReadWriteSchema, canMaintain, canSystemInfo } = storeToRefs(userStore);
 const showPrometheus = computed(() => enablePrometheus.value && configurePrometheus.value);
 const tableRef = ref<InstanceType<typeof ElTable>>();
 const slaveTableRef = ref<InstanceType<typeof ElTable>>();
@@ -578,6 +578,8 @@ function getSystemData() {
       currentNodeType.value = '';
       clearTimeout(refreshInterval.value);
       getMonitorData();
+    } else {
+      getMonitorData();
     }
   });
 }
@@ -593,9 +595,11 @@ function handleFetch() {
 // 刷新系统
 function handleRefreshSystem() {
   clearTimeout(refreshInterval.value);
-  getSystemData().then(() => {
-    handleFetch();
-  });
+  getSystemData()
+    .then(() => {})
+    .finally(() => {
+      handleFetch();
+    });
 }
 
 // 刷新监控
@@ -672,7 +676,7 @@ onMounted(() => {
   }
 });
 watch(
-  () => canMaintain.value,
+  () => canSystemInfo.value,
   (val) => {
     if (val) {
       getSystemData();

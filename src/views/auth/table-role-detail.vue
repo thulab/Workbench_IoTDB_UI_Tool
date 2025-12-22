@@ -47,16 +47,16 @@
             </div>
             <div class="detail-user-list">
               <span class="fs-[14px] m-r-[24px]">{{ t('auth.relational.allScope') }}：</span>
-              <template v-if="!formData.canManageRole">
+              <template v-if="!canManageRole">
                 <span class="flex items-center !m-r-[24px]">
-                  <i-custom-correct class="m-r-8" />
+                  <!-- <i-custom-correct class="m-r-8" /> -->
                   {{ t('auth.relational.MANAGE_USER') }}
                 </span>
               </template>
               <el-checkbox :disabled="!canManageRole" v-else v-model="formData.canManageUser" @change="handleAllScopeChange('MANAGE_USER')">{{ t('auth.relational.MANAGE_USER') }}</el-checkbox>
-              <template v-if="!formData.canManageRole">
+              <template v-if="!canManageRole">
                 <span class="flex items-center !m-r-[24px]">
-                  <i-custom-correct class="m-r-8" />
+                  <!-- <i-custom-correct class="m-r-8" /> -->
                   {{ t('auth.relational.MANAGE_ROLE') }}
                 </span>
               </template>

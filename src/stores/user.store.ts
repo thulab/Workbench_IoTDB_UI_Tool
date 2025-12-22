@@ -5,6 +5,7 @@ import { UserApi, DashboardApi } from '@/api';
 import { useRouter } from 'vue-router';
 import { useConnectionStore } from './connection.store';
 import type { LoginUserPrivileges, PrivilegesEnum } from '@/types';
+import { iotdbShowAuth } from '@/utils/auth';
 
 const { requestFn: getLoginUserPrivileges } = useRequest(UserApi.getLoginUserPrivileges);
 const { requestFn: getPrivilegesEnum } = useRequest(UserApi.getPrivilegesEnum);
@@ -125,6 +126,7 @@ export const useUserStore = defineStore(
     const canManageRole = computed(() => userAllEntityPrivileges.value.includes('MANAGE_ROLE') || userAllEntityPrivileges.value.includes('SECURITY'));
     const canMaintain = computed(() => userAllEntityPrivileges.value.includes('MAINTAIN') || userAllEntityPrivileges.value.includes('SYSTEM'));
     const canUseModel = computed(() => userAllEntityPrivileges.value.includes('USE_MODEL') || userAllEntityPrivileges.value.includes('SYSTEM'));
+    const canSystemInfo = computed(() => canMaintain.value || (connectionStore.isTableModel && !iotdbShowAuth(connectionStore.connectionInfo.currentVersion!, '2.0.7')));
 
     const canManageUserWithTableModel = computed(() => allPrivileges.value?.tableGlobalPrivileges.some((item) => item.privilegeName === 'MANAGE_USER' || item.privilegeName === 'SECURITY') || false);
     const canManageRoleWithTableModel = computed(() => allPrivileges.value?.tableGlobalPrivileges.some((item) => item.privilegeName === 'MANAGE_ROLE' || item.privilegeName === 'SECURITY') || false);
@@ -229,6 +231,7 @@ export const useUserStore = defineStore(
       setUser,
       clearUserStore,
       canUseModel,
+      canSystemInfo,
     };
   },
   {

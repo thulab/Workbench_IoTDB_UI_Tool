@@ -100,7 +100,7 @@ const rules = reactive<FormRules>({
       trigger: 'blur',
     },
     {
-      min: 4,
+      min: 12,
       max: 32,
       message: () => t('auth.pwdLength'),
       trigger: 'blur',

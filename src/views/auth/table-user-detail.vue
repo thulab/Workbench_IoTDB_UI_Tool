@@ -55,24 +55,29 @@
             </div>
             <div class="detail-role-list">
               <span class="fs-[14px] m-r-[24px]">{{ t('auth.relational.allScope') }}：</span>
-              <template v-if="!formData.canManageUser || isManager">
+              <template v-if="isManager">
                 <span class="flex items-center !m-r-[24px]">
                   <i-custom-correct class="m-r-8" />
                   {{ t('auth.relational.MANAGE_USER') }}
                 </span>
               </template>
-              <el-checkbox :disabled="!canManageUser || isManager" v-else v-model="formData.canManageUser" @change="handleAllScopeChange('MANAGE_USER')">{{
-                t('auth.relational.MANAGE_USER')
-              }}</el-checkbox>
-              <template v-if="!formData.canManageUser || isManager">
+              <el-tooltip v-else :content="t('auth.relational.editTip')" :disabled="!formData.canManageUserByRole" effect="light" placement="top">
+                <el-checkbox :disabled="!canManageUser || isManager || !!formData.canManageUserByRole" v-model="formData.canManageUser" @change="handleAllScopeChange('MANAGE_USER')">{{
+                  t('auth.relational.MANAGE_USER')
+                }}</el-checkbox>
+              </el-tooltip>
+
+              <template v-if="isManager">
                 <span class="flex items-center !m-r-[24px]">
                   <i-custom-correct class="m-r-8" />
                   {{ t('auth.relational.MANAGE_ROLE') }}
                 </span>
               </template>
-              <el-checkbox :disabled="!canManageUser || isManager" v-else v-model="formData.canManageRole" @change="handleAllScopeChange('MANAGE_ROLE')">{{
-                t('auth.relational.MANAGE_ROLE')
-              }}</el-checkbox>
+              <el-tooltip v-else :content="t('auth.relational.editTip')" :disabled="!formData.canManageRoleByRole" effect="light" placement="top">
+                <el-checkbox :disabled="!canManageUser || isManager || !!formData.canManageRoleByRole" v-model="formData.canManageRole" @change="handleAllScopeChange('MANAGE_ROLE')">{{
+                  t('auth.relational.MANAGE_ROLE')
+                }}</el-checkbox>
+              </el-tooltip>
             </div>
             <div class="detail-role-list">
               <span class="fs-[14px]">{{ t('auth.relational.dataScope') }}：</span>
@@ -105,12 +110,12 @@
                 <el-table-column :label="t('common.operation')" align="center" v-if="canEdit" width="194" fixed="right">
                   <template #default="{ row, $index }">
                     <el-tooltip :content="t('auth.relational.editTip')" :disabled="!row.role" effect="light" placement="top">
-                      <el-button link @click="handleEditRow($index)" :disabled="row.role" :class="'svg-button-hover-color'">
+                      <el-button link @click="handleEditRow($index)" :disabled="!!row.role" :class="'svg-button-hover-color'">
                         <el-icon size="21"><i-custom-edit /></el-icon>
                       </el-button>
                     </el-tooltip>
                     <el-tooltip :content="t('auth.relational.editTip')" :disabled="!row.role" effect="light" placement="top">
-                      <el-button link @click="handleDeleteRow($index)" :disabled="row.role" :class="'svg-button-hover-color'">
+                      <el-button link @click="handleDeleteRow($index)" :disabled="!!row.role" :class="'svg-button-hover-color'">
                         <el-icon size="21"><i-custom-close /></el-icon>
                       </el-button>
                     </el-tooltip>
@@ -206,7 +211,7 @@ const { requestFn: revokeGlobalPrivilege, loading: revokeGlobalPrivilegeLoading 
 
 const { requestFn: revokeRoleFromUser, loading: revokeRoleFromUserLoading } = useRequest(RelationalPrivilegesApi.revokeRoleFromUser);
 
-const { requestFn: updateDataPrivilege, loading: updateDataPrivilegeLoading } = useRequest(RelationalPrivilegesApi.updateDataPrivilegeByRoleName);
+const { requestFn: updateDataPrivilege, loading: updateDataPrivilegeLoading } = useRequest(RelationalPrivilegesApi.updateDataPrivilegeByUserName);
 
 const anyLoading = computed(() => {
   return (
@@ -223,6 +228,8 @@ const anyLoading = computed(() => {
 const formData = ref({
   canManageUser: false,
   canManageRole: false,
+  canManageUserByRole: false,
+  canManageRoleByRole: false,
 });
 
 const tableData = computed<DataPrivilege[]>(() => {
@@ -247,8 +254,9 @@ function getDetail() {
     loading.value = true;
     Promise.allSettled([getRoleNames(currentUser.value.name), getDataPrivileges(currentUser.value.name), getGlobalPrivileges(currentUser.value.name)]).finally(() => {
       formData.value.canManageRole = globalPrivileges.value.some((item) => item.privilegeName === 'MANAGE_ROLE');
+      formData.value.canManageRoleByRole = globalPrivileges.value.some((item) => item.privilegeName === 'MANAGE_ROLE' && !!item.role);
       formData.value.canManageUser = globalPrivileges.value.some((item) => item.privilegeName === 'MANAGE_USER');
-
+      formData.value.canManageUserByRole = globalPrivileges.value.some((item) => item.privilegeName === 'MANAGE_USER' && !!item.role);
       loading.value = false;
     });
   }
@@ -297,6 +305,7 @@ function addRole() {
 function handleAddRoleConfirm(roleNames: string[]) {
   bindRoleVisible.value = false;
   getRoleNames(currentUser.value!.name!);
+  getDetail();
 }
 function handleDeleteRole(index: number) {
   ElMessageBox.confirm(t('auth.deleteRole'), t('common.notice'), {
@@ -313,6 +322,7 @@ function handleDeleteRole(index: number) {
     }).then(() => {
       ElMessage.success({ message: t('common.deleteSuccess'), grouping: true });
       selectRoleList.value.splice(index, 1);
+      getDetail();
     });
   });
 }

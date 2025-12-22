@@ -732,7 +732,7 @@ auth:
   roleName: 角色名
   roleNamePlaceholder: 请输入角色名
   roleNameLength: 字符长度不小于4，请重新输入
-  roleNameExg: 格式不符，请输入大小写字母、数字、特殊字符（!{'@'}#$%^&*()_+-=）
+  roleNameExg: 请输入大小写字母、数字、特殊字符（!{'@'}#$%^&*()_+-=）
   roleExist: 该角色已存在，请重新输入
   addUser: 新建用户
   userName: 用户名
@@ -742,10 +742,10 @@ auth:
   confirmPwd: 确认密码
   confirmPwdAgain: 请再次输入密码
   userNameLength: 字符长度不小于4，请重新输入
-  userNameExg: 格式不符，请输入大小写字母、数字、特殊字符（!{'@'}#$%^&*()_+-=）
+  userNameExg: 请输入大小写字母、数字、特殊字符（!{'@'}#$%^&*()_+-=）
   userExist: 该用户已存在，请重新输入
   pwdLength: 字符长度不小于12，请重新输入
-  pwdExg: 格式不符，请输入大小写字母、数字、特殊字符（!{'@'}#$%^&*()_+-=）
+  pwdExg: 请输入大小写字母、数字、特殊字符（!{'@'}#$%^&*()_+-=）
   pwdUnSame: 密码不一致，请重新输入
   userSuccess: 新建用户成功
   roleList: 角色列表
@@ -763,7 +763,7 @@ auth:
   oldPwd: 原始密码
   oldPwdTip: 请输入原始密码
   inputPwd: 输入密码
-  oldPwdReg: 格式不符，请输入大小写字母、数字、特殊字符（!{'@'}#$%^&*()_+-=）
+  oldPwdReg: 请输入大小写字母、数字、特殊字符（!{'@'}#$%^&*()_+-=）
   systemTitle: IoTDB实时扩展组件
   systemTitleWorkbench: 可视化控制台（Workbench）V{version}
   systemDetail: 实时库涵盖了测点管理、查询、可视化、告警、权限等功能，旨在帮助用户更直观的进行跨实例管理，更简单的完成数据库操作，更高效的进行运维操作
@@ -792,7 +792,7 @@ auth:
     CREATEDesc: 允许在权限范围内创建任意数据库/表
     DROPDesc: 允许在权限范围内删除任意数据库/表
     ALTERDesc: 允许在权限范围内修改任意数据库/表的定义
-    SELECTDesc: 允许在权限范围内查询数据库/表的数据
+    SELECTDesc: 允许在权限范围内查询数据库/表中的数据
     INSERTDesc: 允许在权限范围内插入/更新数据库/表中的数据
     DELETEDesc: 允许在权限范围内删除数据库/表中的数据
     selectPrivilegeTip: 请选择需要授予的权限

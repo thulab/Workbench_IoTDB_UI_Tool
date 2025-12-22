@@ -100,7 +100,7 @@ class StorageApi {
 
   // 删除物理量
   static deleteMeasurements(measurementList: string[]): globalThis.HttpResponseP {
-    return http.post('/schema/deleteMeasurements', { measurementList });
+    return http.post('/schema/deleteMeasurements', { measurements: measurementList });
   }
 
   // 导入物理量
