@@ -126,7 +126,6 @@
 </template>
 
 <script setup lang="ts">
-import type { DateModelType } from 'element-plus';
 import { storeToRefs } from 'pinia';
 import { DataSyncApi } from '@/api';
 import { useUserStore, useConnectionStore } from '@/stores';
@@ -176,7 +175,7 @@ const multipleSelection = ref<SynchronListData[]>([]);
 const editType = ref('add');
 const editVisible = ref(false);
 const editData = ref('');
-const editTime = ref<DateModelType>('');
+const editTime = ref<number | string>('');
 const errorMessageVisible = ref(false);
 const editErrorMessage = ref('');
 const showMain = ref(true);

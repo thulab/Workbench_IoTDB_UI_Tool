@@ -220,14 +220,14 @@ const searchFormData = reactive<{
   database: string;
   table: string;
   selectedMeasurement: SelectedMeasurement[];
-  datetimerange: [DateModelType, DateModelType];
+  datetimerange: [number, number] | [string, string] | [Date, Date];
   unitInterval: string;
   aggregation: string;
 }>({
   database: '',
   table: '',
   selectedMeasurement: [],
-  datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
+  datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [number, number] | [string, string] | [Date, Date],
   unitInterval: 'auto',
   aggregation: 'last',
 });
@@ -683,7 +683,7 @@ function handleReset(force?: boolean) {
     searchFormData.table = '';
     searchFormData.selectedMeasurement = [];
   }
-  searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
+  searchFormData.datetimerange = getOneIntervalNow(7) as [number, number] | [string, string] | [Date, Date];
   searchFormData.unitInterval = 'auto';
   searchFormData.aggregation = 'last';
   chartData.value = [];
@@ -705,7 +705,7 @@ function handleChangeAggregation(val: string) {
   }
 }
 
-function handleChangeTime(value: [DateModelType, DateModelType]) {
+function handleChangeTime(value: [number, number] | [string, string] | [Date, Date]) {
   const start = dayjs(value[0]).valueOf();
   const end = dayjs(value[1]).valueOf();
   if (start >= end) {

@@ -103,7 +103,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance, DateModelType, FormRules } from 'element-plus';
+import type { FormInstance, FormRules } from 'element-plus';
 import MonacoEditor from '@/components/monaco-editor/monaco-editor.vue';
 import { useConnectionStore, useDbStore } from '@/stores';
 import { AIAnalysisApi } from '@/api';
@@ -145,7 +145,7 @@ const formData = reactive<{
   field: string;
   params: string;
   database?: string;
-  timeRange: [DateModelType, DateModelType] | [];
+  timeRange: [number, number] | [string, string] | [Date, Date] | [];
   table?: string;
   measurement?: string;
 }>({

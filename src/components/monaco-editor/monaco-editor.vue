@@ -34,7 +34,7 @@ const initEditor = () => {
   });
   editorLoader.init().then((monacoInstance: typeof import('monaco-editor')) => {
     // 仅在 init 后设置语言服务配置，避免提前加载英文包
-    monacoInstance.languages.typescript.typescriptDefaults.setEagerModelSync(true);
+    monacoInstance.typescript.typescriptDefaults.setEagerModelSync(true);
     monacoEditor.value = monacoInstance.editor.create(monacoContainer.value!, {
       value: '',
       language: props.language,

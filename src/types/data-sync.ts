@@ -6,7 +6,7 @@ export interface SynchronListData {
   targetAddress: string;
   state: string;
   exceptionMessage: string;
-  creationTime: DateModelType;
+  creationTime: number;
 }
 
 export interface SynchronFormData {
@@ -15,9 +15,9 @@ export interface SynchronFormData {
   path: string;
   reforward: boolean;
   isSynchronHistory: boolean;
-  datetimerange: [DateModelType, DateModelType];
-  startTime: DateModelType;
-  endTime: DateModelType;
+  datetimerange: [number, number] | [string, string] | [Date, Date];
+  startTime: number | string;
+  endTime: number | string;
   isSynchronRealTime: boolean;
   triggerMode: string;
   processorPluginType: string;
@@ -42,8 +42,8 @@ export interface SynchronData {
   path: string;
   reforward: boolean;
   isSynchronHistory: boolean;
-  startTime: DateModelType;
-  endTime: DateModelType;
+  startTime: number | string;
+  endTime: number | string;
   isSynchronRealTime: boolean;
   triggerMode: string;
   isCustomProcessorPlugin: boolean;

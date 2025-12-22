@@ -396,7 +396,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import type { FormInstance, DateModelType } from 'element-plus';
+import type { FormInstance } from 'element-plus';
 import dayjs from 'dayjs';
 import { debounce, cloneDeep } from 'lodash-es';
 import { vElementSize } from '@vueuse/components';
@@ -467,14 +467,14 @@ const searchFormData = reactive<{
   compression: string | number | undefined;
   frequency: string | number | undefined;
   amplification: string | number | undefined;
-  datetimerange: [DateModelType, DateModelType] | [];
+  datetimerange: [number, number] | [string, string] | [Date, Date] | [];
   dwtMethod: string;
   coef: string | undefined;
   layer: string | number | undefined;
   wpass: string | number | undefined;
   partModel: 'existing' | 'fileUpload';
   partSeries: string;
-  partDatetimerange: [DateModelType, DateModelType] | [];
+  partDatetimerange: [number, number] | [string, string] | [Date, Date] | [];
   times: string[];
   values: string[];
   distance: string | number | undefined;

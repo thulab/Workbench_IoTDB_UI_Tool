@@ -1,15 +1,15 @@
-import { ToolsView, EdgeView } from '@antv/x6';
+import { ToolItem, EdgeView } from '@antv/x6';
 import { createApp, h } from 'vue';
 import Tooltip from './tooltip.vue';
 
 const app = ref();
 
-class TooltipTool extends ToolsView.ToolItem<EdgeView, TooltipToolOptions> {
+class TooltipTool extends ToolItem<EdgeView, TooltipToolOptions> {
   private knob!: HTMLDivElement;
 
   render() {
     if (!this.knob) {
-      this.knob = ToolsView.createElement('div', false) as HTMLDivElement;
+      this.knob = document.createElement('div') as HTMLDivElement;
       this.knob.style.position = 'absolute';
       this.container.appendChild(this.knob);
     }
@@ -83,7 +83,7 @@ TooltipTool.config({
   isSVGElement: false,
 });
 
-export interface TooltipToolOptions extends ToolsView.ToolItem.Options {
+export interface TooltipToolOptions extends ToolItem {
   tooltip?: string;
 }
 export default TooltipTool;

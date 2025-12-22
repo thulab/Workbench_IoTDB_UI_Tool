@@ -305,7 +305,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormInstance, SingleOrRange, DateModelType, FormItemRule } from 'element-plus';
+import type { FormInstance, FormItemRule } from 'element-plus';
 import { DataSyncApi } from '@/api';
 import { today, todayNow, formatDate } from '@/utils/date';
 import ICustomCalender from '~icons/custom/calender.svg';
@@ -315,7 +315,7 @@ const props = defineProps<{
   visible: boolean;
   editType: string;
   editData: string;
-  editTime: DateModelType;
+  editTime: number | string;
 }>();
 
 const emit = defineEmits<{
@@ -401,9 +401,9 @@ const formData = ref<SynchronFormData>({
   path: '',
   reforward: true,
   isSynchronHistory: true,
-  startTime: '' as DateModelType,
-  endTime: '' as DateModelType,
-  datetimerange: [new Date('1970-1-1').getTime(), todayNow()] as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
+  startTime: '',
+  endTime: '',
+  datetimerange: [new Date('1970-1-1').getTime(), todayNow()],
   isSynchronRealTime: true,
   triggerMode: 'stream',
   // 处理
@@ -483,7 +483,7 @@ function handleResetForm() {
     formData.value.path = '';
     formData.value.reforward = true;
     formData.value.isSynchronHistory = true;
-    formData.value.datetimerange = [new Date('1970-1-1').getTime(), props.editTime];
+    formData.value.datetimerange = [new Date('1970-1-1').getTime(), props.editTime as number];
     formData.value.startTime = new Date('1970-1-1').getTime();
     formData.value.endTime = props.editTime;
     formData.value.isSynchronRealTime = true;
@@ -526,7 +526,7 @@ function getSelectDetail() {
     formData.value = {
       ...res.data,
       path: res.data.whole ? '' : res.data.path.substring(5),
-      datetimerange: res.data.startTime && res.data.endTime ? [res.data.startTime, res.data.endTime] : [new Date('1970-1-1').getTime(), props.editTime || todayNow()],
+      datetimerange: res.data.startTime && res.data.endTime ? ([res.data.startTime, res.data.endTime] as [number, number]) : [new Date('1970-1-1').getTime(), (props.editTime as number) || todayNow()],
       processorPluginType: res.data.isCustomProcessorPlugin ? 'custom' : res.data.processorPlugin,
       processorPluginName: res.data.isCustomProcessorPlugin ? res.data.processorPlugin : '',
       connectorPluginType: res.data.isCustomConnectorPlugin ? 'custom' : res.data.connectorPlugin,

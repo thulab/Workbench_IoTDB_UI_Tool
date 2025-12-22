@@ -169,7 +169,7 @@ const searchFormData = reactive({
   asc: '',
   alarmName: '',
   measurements: [] as string[],
-  createtimerange: null as unknown as [DateModelType, DateModelType],
+  createtimerange: null as unknown as [number, number] | [string, string] | [Date, Date],
   alarmLevel: '',
   status: 0,
   createStartTime: null as unknown as DateModelType,

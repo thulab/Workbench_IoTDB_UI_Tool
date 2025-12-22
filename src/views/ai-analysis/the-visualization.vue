@@ -385,7 +385,7 @@ const searchFormData = reactive<{
   measurement: string;
   measurementType: string;
   method: string | string[];
-  datetimerange: [DateModelType, DateModelType];
+  datetimerange: [number, number] | [string, string] | [Date, Date];
   forecastStart: DateModelType;
   anomalyRatio: number | undefined;
   orderBy: string;
@@ -397,7 +397,7 @@ const searchFormData = reactive<{
   measurement: '',
   measurementType: '',
   method: defaultMethod,
-  datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
+  datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [number, number] | [string, string] | [Date, Date],
   forecastStart: todayNow() as DateModelType,
   anomalyRatio: 1,
   orderBy: 'ascending',
@@ -882,7 +882,7 @@ function handleReset() {
   searchFormData.method = '';
   searchFormData.measurementType = '';
   searchFormData.method = defaultMethod;
-  searchFormData.datetimerange = getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType];
+  searchFormData.datetimerange = getOneIntervalNow(7) as SingleOrRange<DateModelType> as [number, number] | [string, string] | [Date, Date];
   searchFormData.forecastStart = todayNow() as DateModelType;
   searchFormData.anomalyRatio = 1;
   searchFormData.orderBy = 'ascending';

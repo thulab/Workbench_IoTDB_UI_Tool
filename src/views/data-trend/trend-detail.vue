@@ -135,7 +135,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
-import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
+import type { FormInstance } from 'element-plus';
 import dayjs from 'dayjs';
 import { debounce, cloneDeep, difference, isEqual } from 'lodash-es';
 import { vElementSize } from '@vueuse/components';
@@ -202,12 +202,12 @@ const tip = ref('<span style="font-weight: 700; color: #495AD4; margin: 0 4px;">
 const minDataTime = ref(-1);
 const searchFormData = reactive<{
   path: string[];
-  datetimerange: [DateModelType, DateModelType];
+  datetimerange: [number, number] | [string, string];
   unitInterval: string;
   aggregation: string;
 }>({
   path: [],
-  datetimerange: getOneIntervalNow(7) as SingleOrRange<DateModelType> as [DateModelType, DateModelType],
+  datetimerange: getOneIntervalNow(7),
   unitInterval: 'auto',
   aggregation: 'last_value',
 });
@@ -657,7 +657,7 @@ function handleReset(force?: boolean) {
   if (force) {
     searchFormData.path = [];
   }
-  searchFormData.datetimerange = getOneIntervalNow(7) as [DateModelType, DateModelType];
+  searchFormData.datetimerange = getOneIntervalNow(7);
   searchFormData.unitInterval = 'auto';
   searchFormData.aggregation = 'last_value';
   chartData.value = [];
@@ -679,7 +679,7 @@ function handleChangeAggregation(val: string) {
   }
 }
 
-function handleChangeTime(value: [DateModelType, DateModelType]) {
+function handleChangeTime(value: [number, number] | [string, string] | [Date, Date]) {
   const start = dayjs(value[0]).valueOf();
   const end = dayjs(value[1]).valueOf();
   if (start >= end) {

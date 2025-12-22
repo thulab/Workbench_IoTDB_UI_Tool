@@ -1,7 +1,7 @@
 <template>
-  <div class="flex items-center mt-6px mb-2px">
+  <div class="flex items-center mt-[6px] mb-[2px]">
     <div v-if="!props.isRunning">
-      <div class="text-14px">
+      <div class="text-[14px]">
         {{ t('dataTrend.timeRange') }}：
         <el-date-picker
           v-model="selectedDateTime.value"
@@ -21,7 +21,7 @@
       <button
         @click="handleRunningPlay"
         v-if="props.isRunning && !runningTrendStore.isPlaying"
-        class="w-24px h-24px p-0! flex items-center justify-center bg-[#495AD4] border-0 rounded-4px"
+        class="w-[24px] h-[24px] p-[0]! flex items-center justify-center bg-[#495AD4] border-0 rounded-[4px]"
         :disabled="!props.canOperate"
         :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
       >
@@ -30,7 +30,7 @@
       <button
         @click="handleRunningPause"
         v-if="props.isRunning && runningTrendStore.isPlaying"
-        class="w-24px h-24px p-0! flex items-center justify-center bg-[#495AD4] border-0 rounded-4px"
+        class="w-[24px] h-[24px] p-[0]! flex items-center justify-center bg-[#495AD4] border-0 rounded-[4px]"
         :disabled="!props.canOperate"
         :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
       >
@@ -38,7 +38,7 @@
       </button>
       <button
         @click="handleSaveTemplate"
-        class="save-button h-24px w-24px box-border p-0! bg-white cursor-pointer rounded-[4px] flex justify-center items-center ml-16px"
+        class="save-button h-[24px] w-[24px] box-border p-[0]! bg-white cursor-pointer rounded-[4px] flex justify-center items-center ml-[16px]"
         :disabled="!props.canOperate"
         :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
       >
@@ -84,7 +84,6 @@ import ModalTemplate from './modal-template.vue';
 import ModalTemplateRename from './modal-template-rename.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
-import type { DateModelType } from 'element-plus';
 import type { TimeRange } from '@/types/trend';
 import type { TrendTemplate } from '@/types';
 import { useTableHistoryTrendStore, useTableRunningTrendStore } from '@/stores/trend.store';
@@ -117,7 +116,7 @@ const trendStore = useTableHistoryTrendStore();
 const runningTrendStore = useTableRunningTrendStore();
 
 const selectedDateTime = reactive<{
-  value: [DateModelType, DateModelType];
+  value: [number, number] | [string, string] | [Date, Date];
 }>({
   value: [new Date(trendStore.globalTimeRange.start), new Date(trendStore.globalTimeRange.end)],
 });
@@ -157,7 +156,7 @@ const setRenameVisible = (visible: boolean) => {
   renameVisible.value = visible;
 };
 
-const setSelectedDateTime = (value: [DateModelType, DateModelType]) => {
+const setSelectedDateTime = (value: [number, number] | [string, string] | [Date, Date]) => {
   selectedDateTime.value = value;
 };
 
@@ -176,7 +175,7 @@ defineExpose({
   setRenameData,
 });
 
-function handleChangeTime(value: [DateModelType, DateModelType]) {
+function handleChangeTime(value: [number, number] | [string, string] | [Date, Date]) {
   const start = dayjs(value[0]).valueOf();
   const end = dayjs(value[1]).valueOf();
   if (start >= end) {
