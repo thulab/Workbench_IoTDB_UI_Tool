@@ -8,10 +8,10 @@
     <div ref="timelineWrapperRef" class="relative w-full h-40px">
       <div ref="timelineChartRef" class="w-full h-40px"></div>
       <button class="flip-button cursor-pointer absolute top-0 h-full w-20px rounded-[2px] bg-white p-0!" @click="handlePageDown">
-        <el-icon color="rgba(160, 163, 184, 1)" size="20"><ArrowLeft /></el-icon>
+        <i-custom-arrow-left-trend />
       </button>
       <button class="flip-button cursor-pointer absolute top-0 right-0 h-full w-20px rounded-[2px] bg-white p-0!" @click="handlePageUp">
-        <el-icon color="rgba(160, 163, 184, 1)" size="20"><ArrowRight /></el-icon>
+        <i-custom-arrow-right-trend />
       </button>
       <div class="absolute inset-0 pointer-events-none mx-[24px]">
         <div class="timeline-outline absolute w-full h-full bg-transparent rounded-[2px] box-border"></div>
@@ -42,7 +42,6 @@
 import ICustomCalender from '~icons/custom/calender.svg';
 import type { TimeRange, RangeHandle, Measurement, DataPoint } from '@/types/trend';
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
-import { ArrowLeft, ArrowRight } from '@element-plus/icons-vue';
 import { TableDataApi } from '@/api';
 import { formatSelectedMeasurement } from '@/utils/format';
 import { useTableHistoryTrendStore } from '@/stores/trend';
