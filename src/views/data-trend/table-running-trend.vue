@@ -49,7 +49,7 @@ import OperateButtonRow from './components/operate-button-row.vue';
 import type { TimeRange, GroupState, ChartGroupInput, Measurement, ChartMarker, MeasurementMarkerData } from '@/types/trend';
 import type { TrendTemplate, SelectedMeasurement, TrendData } from '@/types';
 import { useUserStore, useConnectionStore } from '@/stores';
-import { useTableRunningTrendStore } from '@/stores/trend';
+import { useTableRunningTrendStore } from '@/stores/trend.store';
 import { formatSelectedMeasurement } from '@/utils/format';
 import dayjs from 'dayjs';
 import { SearchApi } from '@/api';
@@ -102,13 +102,13 @@ function createInitialMarkers(range: TimeRange = runningTrendStore.visibleTimeRa
     {
       id: 'marker-1',
       label: 'X1',
-      color: 'rgba(212, 48, 48, 1)',
+      color: '#D43030',
       timestamp: range.start + span * 0.25,
     },
     {
       id: 'marker-2',
       label: 'X2',
-      color: 'rgba(212, 48, 48, 1)',
+      color: '#D43030',
       timestamp: range.start + span * 0.7,
     },
   ];

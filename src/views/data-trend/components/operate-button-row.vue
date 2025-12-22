@@ -2,7 +2,7 @@
   <div class="flex items-center mt-6px mb-2px">
     <div v-if="!props.isRunning">
       <div class="text-14px">
-        时间范围：
+        {{ t('dataTrend.timeRange') }}：
         <el-date-picker
           v-model="selectedDateTime.value"
           type="datetimerange"
@@ -87,7 +87,7 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import type { DateModelType } from 'element-plus';
 import type { TimeRange } from '@/types/trend';
 import type { TrendTemplate } from '@/types';
-import { useTableHistoryTrendStore, useTableRunningTrendStore } from '@/stores/trend';
+import { useTableHistoryTrendStore, useTableRunningTrendStore } from '@/stores/trend.store';
 import { today } from '@/utils/date';
 import dayjs from 'dayjs';
 

@@ -501,7 +501,7 @@ function getMonitorData() {
       if (monitorDatanodeRef.value) {
         monitorDatanodeRef.value?.getInitial();
       } else {
-        getMonitorData();
+        setTimeout(getMonitorData, 500);
       }
     });
   } else if (currentNodeType.value === 'ConfigNode') {
@@ -510,7 +510,7 @@ function getMonitorData() {
       if (monitorConfignodeRef.value) {
         monitorConfignodeRef.value?.getInitial();
       } else {
-        getMonitorData();
+        setTimeout(getMonitorData, 500);
       }
     });
   } else {
@@ -519,7 +519,7 @@ function getMonitorData() {
       if (monitorAllRef.value) {
         monitorAllRef.value?.getInitial();
       } else {
-        getMonitorData();
+        setTimeout(getMonitorData, 500);
       }
     });
   }

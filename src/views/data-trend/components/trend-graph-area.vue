@@ -53,7 +53,7 @@ import MetricChartGroup from './metric-chart-group.vue';
 import type { ChartMarker, ChartGroupInput, MeasurementMarkerData } from '@/types/trend';
 import type { TrendData } from '@/types';
 import { ref } from 'vue';
-import { useTableHistoryTrendStore } from '@/stores/trend';
+import { useTableHistoryTrendStore } from '@/stores/trend.store';
 
 const trendStore = useTableHistoryTrendStore();
 const selectedTemplateId = ref<number | string>('');

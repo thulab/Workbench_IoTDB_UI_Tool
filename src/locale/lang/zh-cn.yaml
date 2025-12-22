@@ -636,6 +636,8 @@ dataTrend:
   number10Tip: 只支持输入1-10范围内的正整数
   trendTemplate: 趋势{time}
   saveTrend: 保存常用
+  dataSelectWindow: 数据选取窗口
+  timeRange: 时间范围
 calculate:
   namePlaceholder: 请输入名称
   descPlaceholder: 请输入描述

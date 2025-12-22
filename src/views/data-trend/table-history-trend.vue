@@ -63,7 +63,7 @@ import type { TimeRange, GroupState, ChartGroupInput, Measurement, ChartMarker, 
 import type { SelectedMeasurement, TrendTemplate } from '@/types';
 import dayjs from 'dayjs';
 import { SearchApi } from '@/api';
-import { useTableHistoryTrendStore } from '@/stores/trend';
+import { useTableHistoryTrendStore } from '@/stores/trend.store';
 import type { TimelineExpose } from './components/timeline-area.vue';
 
 const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTemplate);
@@ -113,13 +113,13 @@ function createInitialMarkers(range: TimeRange = trendStore.globalTimeRange): Ch
     {
       id: 'marker-1',
       label: 'X1',
-      color: 'rgba(212, 48, 48, 1)',
+      color: '#D43030',
       timestamp: range.start + span * 0.25,
     },
     {
       id: 'marker-2',
       label: 'X2',
-      color: 'rgba(212, 48, 48, 1)',
+      color: '#D43030',
       timestamp: range.start + span * 0.7,
     },
   ];

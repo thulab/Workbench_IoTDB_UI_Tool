@@ -43,7 +43,7 @@ import { echarts, type ECOption } from '@/plugins/echarts-plugin';
 import type { ChartMarker, ChartGroupInput, Measurement, DataPoint, MeasurementMarkerData } from '@/types/trend';
 import { TableDataApi } from '@/api';
 import { formatSelectedMeasurement } from '@/utils/format';
-import { useTableHistoryTrendStore, useTableRunningTrendStore } from '@/stores/trend';
+import { useTableHistoryTrendStore, useTableRunningTrendStore } from '@/stores/trend.store';
 import type { TrendData } from '@/types';
 
 const trendStore = useTableHistoryTrendStore();
@@ -357,7 +357,7 @@ function buildOption(): ECOption {
       min: trendStore.visibleTimeRange.start,
       max: trendStore.visibleTimeRange.end,
       splitNumber: 4,
-      axisLine: { lineStyle: { color: `rgba(101, 106, 133, 1)` } },
+      axisLine: { lineStyle: { color: `#656A85` } },
       axisLabel: {
         color: '#424561',
         fontSize: 12,
@@ -372,17 +372,17 @@ function buildOption(): ECOption {
           }),
       },
       splitLine: {
-        show: true,
-        lineStyle: { color: 'rgba(122, 129, 154, 0.2)', type: 'dashed' },
+        show: false,
+        lineStyle: { color: '#DFE1ED', type: 'dashed' },
       },
     },
     yAxis: {
       type: 'value',
       scale: true,
-      axisLine: { show: false, lineStyle: { color: '#dfe1ed' } },
+      axisLine: { show: false, lineStyle: { color: '#DFE1ED' } },
       axisLabel: { color: '#424561', fontSize: 12 },
       splitLine: {
-        lineStyle: { color: '#dfe1ed' },
+        lineStyle: { color: '#DFE1ED' },
       },
       boundaryGap: ['5%', '5%'],
     },
@@ -439,7 +439,7 @@ function buildRunningOption(): ECOption {
     xAxis: {
       type: 'time',
       min: runningTrendStore.min > 0 ? runningTrendStore.min : undefined,
-      axisLine: { lineStyle: { color: '#444b63' } },
+      axisLine: { lineStyle: { color: '#444B63' } },
       axisLabel: {
         color: '#424561',
         fontSize: 12,
@@ -453,7 +453,6 @@ function buildRunningOption(): ECOption {
       },
       splitLine: {
         show: false,
-        lineStyle: { color: 'rgba(122, 129, 154, 0.2)', type: 'dashed' },
       },
     },
     yAxis: {
@@ -462,7 +461,7 @@ function buildRunningOption(): ECOption {
       axisLine: { show: false, lineStyle: { color: '#dfe1ed' } },
       axisLabel: { color: '#424561', fontSize: 12 },
       splitLine: {
-        lineStyle: { color: 'rgba(122, 129, 154, 0.15)' },
+        lineStyle: { color: '#DFE1ED' },
       },
       splitNumber: 7,
     },
@@ -684,7 +683,7 @@ watch(
 
 <style>
 .graph-border {
-  border: 1px solid rgb(223 225 237 / 100%);
+  border: 1px solid #dfe1ed;
 }
 
 .chart-area {

@@ -581,6 +581,8 @@ dataTrend:
   saveTrend: Save Trend
   noDataTip: There is no data available within the current time range
   pointOverTip: A maximum of 10 marks are supported. Please delete some and try again
+  dataSelectWindow: Data Selection Window
+  timeRange: Time Range
 calculate:
   namePlaceholder: Please enter a name
   descPlaceholder: Please enter a description

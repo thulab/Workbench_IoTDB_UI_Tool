@@ -2,7 +2,7 @@
   <div>
     <div class="flex mt-16px mb-4px items-center">
       <el-date-picker v-model="startTime" type="datetime" placeholder="Select start date and time" @change="onStartTimeSelected" :prefix-icon="ICustomCalender" :disabled-date="disabledDate" />
-      <div class="flex-grow text-center text-[14px]">数据选取窗口</div>
+      <div class="flex-grow text-center text-[14px]">{{ t('dataTrend.dataSelectWindow') }}</div>
       <el-date-picker v-model="endTime" type="datetime" placeholder="Select end date and time" @change="onEndTimeSelected" :prefix-icon="ICustomCalender" :disabled-date="disabledDate" />
     </div>
     <div ref="timelineWrapperRef" class="relative w-full h-40px">
@@ -16,7 +16,7 @@
       <div class="absolute inset-0 pointer-events-none mx-[24px]">
         <div class="timeline-outline absolute w-full h-full bg-transparent rounded-[2px] box-border"></div>
         <div
-          class="range-slider-fill absolute h-full rounded-[2px] pointer-events-auto box-border bg-[rgb(73_90_212_/_20%)]"
+          class="range-slider-fill absolute h-full rounded-[2px] pointer-events-auto box-border bg-[#495AD420]"
           :style="{
             left: handleLeftPos + 'px',
             right: containerWidth - handleRightPos - 48 + 'px',
@@ -44,12 +44,14 @@ import type { TimeRange, RangeHandle, Measurement, DataPoint } from '@/types/tre
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
 import { TableDataApi } from '@/api';
 import { formatSelectedMeasurement } from '@/utils/format';
-import { useTableHistoryTrendStore } from '@/stores/trend';
+import { useTableHistoryTrendStore } from '@/stores/trend.store';
 
 const trendStore = useTableHistoryTrendStore();
 
 const GRID_LEFT = 24; // 64
 const GRID_RIGHT = 24; // 32
+
+const { t } = useI18n();
 
 const { requestFn: getHistoryTrend } = useRequest(TableDataApi.getTrendHistoryData);
 
@@ -356,10 +358,6 @@ function buildTimelineChartOption(): ECOption {
           }),
       },
       axisLine: { lineStyle: { color: '#4b5168' } },
-      splitLine: {
-        show: true,
-        lineStyle: { color: 'rgba(122, 129, 154, 0.2)', type: 'dashed' },
-      },
     },
     yAxis: fullDataSet.value.map((measurement) => ({
       alignTicks: false,
@@ -514,14 +512,14 @@ watch(
 
 <style scoped>
 .flip-button {
-  border: 1px solid rgb(223 225 237 / 100%);
+  border: 1px solid #dfe1ed;
 }
 
 .timeline-outline {
-  border: 1px solid rgb(223 225 237 / 100%);
+  border: 1px solid #dfe1ed;
 }
 
 .range-slider-fill {
-  border: 1px solid rgb(73 90 212 / 100%);
+  border: 1px solid #495ad4;
 }
 </style>
