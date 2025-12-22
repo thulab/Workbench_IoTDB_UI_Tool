@@ -121,9 +121,9 @@ export default defineConfig(({ mode }) => {
       },
     },
     // 使用 public 下的 monaco 最小化版本，避免 Vite 预扫描/打包 ESM 版本，减少体积
-    optimizeDeps: {
-      exclude: ['monaco-editor'],
-    },
+    // optimizeDeps: {
+    //   exclude: ['monaco-editor'],
+    // },
     server: {
       host: true,
       port: 8080,

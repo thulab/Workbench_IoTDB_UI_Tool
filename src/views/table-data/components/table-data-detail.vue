@@ -534,7 +534,7 @@ defineExpose({
   font-weight: 700;
   line-height: 21px;
   color: #495ad4;
-  padding: 0 6px 16px;
+  padding: 8px;
   border-bottom: 1px solid #dfe1ed;
   display: flex;
   align-items: center;
@@ -544,7 +544,7 @@ defineExpose({
 .page-container {
   background-color: #fff;
   border-radius: 6px;
-  padding: 16px;
+  padding: 8px;
   width: 100%;
   height: 100%;
   display: flex;
@@ -597,7 +597,7 @@ defineExpose({
 }
 
 .page-table-details {
-  padding: 8px 16px;
+  padding: 8px;
   border-radius: 2px;
   background: #f7f8fc;
   display: flex;

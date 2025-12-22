@@ -1800,7 +1800,7 @@ watch(
   border-radius: 6px;
   background: #fff;
   box-sizing: border-box;
-  padding: 26px 16px 16px 30px;
+  padding: 8px;
 }
 
 .search-form-box {
@@ -1957,11 +1957,11 @@ watch(
 }
 
 .path-list-wrapper {
-  margin-left: 16px;
+  margin-left: 8px;
   background-color: #f7f8fc;
   border-radius: 2px;
   box-sizing: border-box;
-  padding: 12px 16px;
+  padding: 8px;
   position: relative;
   transition: all 0.3s ease;
 }

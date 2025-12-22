@@ -455,7 +455,7 @@ watch(
 }
 
 .role-details-wrapper {
-  margin-left: 16px;
+  margin-left: 8px;
   background-color: #fff;
   border-radius: 6px;
 }

@@ -340,7 +340,7 @@ watch(
 
 <style lang="scss" scoped>
 .page-table-details {
-  padding: 16px 16px 10px;
+  padding: 8px 8px 10px;
   border-radius: 2px;
   background: #f7f8fc;
   box-sizing: border-box;

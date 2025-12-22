@@ -481,7 +481,7 @@ watch(
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #dfe1ed;
-  padding: 0 16px;
+  padding: 0 8px;
   box-sizing: border-box;
 
   .detail-title-text {

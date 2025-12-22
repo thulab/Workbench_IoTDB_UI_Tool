@@ -406,7 +406,7 @@ defineExpose({
   display: flex;
   flex-direction: column;
   height: calc(100% - 32px);
-  padding: 16px;
+  padding: 8px;
 }
 
 .info-title {
@@ -468,7 +468,7 @@ defineExpose({
 }
 
 .storage-table-box {
-  padding: 16px;
+  padding: 8px;
   background-color: #f7f8fc;
 }
 

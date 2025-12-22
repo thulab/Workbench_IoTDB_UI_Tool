@@ -499,7 +499,7 @@ watch(activiteSql, (newVal, oldVal) => {
 }
 
 .sql-search-wrapper {
-  width: calc(100% - 316px);
+  width: calc(100% - 308px);
   height: 100%;
   background-color: #fff;
   border-radius: 6px;
@@ -515,7 +515,7 @@ watch(activiteSql, (newVal, oldVal) => {
 
   :deep(.el-tabs__header) {
     margin: 0;
-    padding-right: 16px;
+    padding-right: 8px;
   }
 
   :deep(.el-tabs__content) {
@@ -572,7 +572,7 @@ watch(activiteSql, (newVal, oldVal) => {
   height: 100%;
   background-color: #fff;
   border-radius: 6px;
-  padding: 10px 16px;
+  padding: 10px 8px;
   box-sizing: border-box;
 
   .operate-link {

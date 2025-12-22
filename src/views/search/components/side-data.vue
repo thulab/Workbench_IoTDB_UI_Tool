@@ -181,7 +181,7 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .search_div {
-  padding: 20px 0;
+  padding: 8px 0;
   background: #fff;
 
   &.maxheight {

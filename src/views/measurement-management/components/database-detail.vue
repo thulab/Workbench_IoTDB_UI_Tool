@@ -759,7 +759,7 @@ watch(
 .database-info-box {
   display: flex;
   justify-content: space-between;
-  padding: 8px 16px;
+  padding: 8px;
 }
 
 .database-info-list {
@@ -791,14 +791,14 @@ watch(
   font-weight: 700;
   line-height: 21px;
   color: #495ad4;
-  padding: 14px 0 6px 16px;
+  padding: 14px 0 6px 8px;
   border-bottom: 1px solid #dfe1ed;
 }
 
 .search-form-container {
   display: flex;
   justify-content: space-between;
-  padding: 16px;
+  padding: 8px;
 
   .search-form-box {
     display: flex;
@@ -813,8 +813,8 @@ watch(
 }
 
 .storage-table-box {
-  margin: 0 16px 16px;
-  padding: 16px;
+  margin: 0 8px 8px;
+  padding: 8px;
   background-color: #f7f8fc;
 }
 
@@ -824,8 +824,8 @@ watch(
 
 .batch-operate {
   background: #f0f1fa;
-  padding: 6px 16px;
-  margin: 0 16px 10px;
+  padding: 6px 8px;
+  margin: 0 8px 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -850,7 +850,7 @@ watch(
   }
 
   .edit-box {
-    flex: 0 0 16px;
+    flex: 0 0 8px;
     cursor: pointer;
 
     svg {

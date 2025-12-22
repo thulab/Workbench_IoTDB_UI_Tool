@@ -119,14 +119,14 @@ function handleChangeDefaultModel(model: 'tree' | 'table') {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 48px;
-  padding: 0 15px;
-  background-color: var(--el-bg-color);
-  border-bottom: 1px solid var(--el-border-color-extra-light);
+  height: 40px;
+  padding: 0 8px;
+  background-color: #f7f8fc;
+  border-bottom: 0;
 
   .header-lf {
     .collapse-icon {
-      margin-right: 20px;
+      margin-right: 12px;
       font-size: 22px;
       cursor: pointer;
     }

@@ -19,7 +19,6 @@
   },
   "scripts": {
     "dev": "vite",
-    "predev": "npm run prepare:monaco",
     "dev:historian": "vite --mode historian",
     "dev:workbench": "vite --mode workbench",
     "build": "run-p type-check \"build-only {@}\" --",
@@ -36,13 +35,7 @@
     "lint:oxlint": "oxlint . --fix -D correctness --ignore-path .prettierignore",
     "lint:eslint": "eslint . --fix",
     "format": "prettier --write src/",
-    "prepare": "husky",
-    "prepare:monaco": "node scripts/prepare-offline-monaco.mjs",
-    "prebuild": "npm run prepare:monaco",
-    "predev:historian": "npm run prepare:monaco",
-    "predev:workbench": "npm run prepare:monaco",
-    "prebuild:historian": "npm run prepare:monaco",
-    "prebuild:workbench": "npm run prepare:monaco"
+    "prepare": "husky"
   },
   "dependencies": {
     "@alova/adapter-axios": "^2.0.17",

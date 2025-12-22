@@ -2,9 +2,9 @@
   <coming-soon-container :is-show="locale !== 'en'">
     <active-container :is-show="connectionIsActive">
       <el-container class="model-management-wrapper">
-        <el-header class="search-form-wrapper p-x-0" style="height: auto">
+        <el-header class="search-form-wrapper p-[8px]" style="height: 44px">
           <el-form :model="searchFormData" label-position="left" size="default" inline @submit.prevent>
-            <base-form-item :label="`${t('aiAnalysis.modelName')}：`" prop="name">
+            <base-form-item :label="`${t('aiAnalysis.modelName')}：`" style="margin-bottom: 0 !important" prop="name">
               <el-input v-model="searchFormData.name" :placeholder="t('aiAnalysis.modelNamePlaceholder')" @keyup.enter="handleSearch" id="model-management-search-name" style="width: 200px">
                 <template #prefix>
                   <i-custom-search-icon class="remote-select-search-icon" />
@@ -12,7 +12,7 @@
               </el-input>
             </base-form-item>
           </el-form>
-          <div class="search-form-buttons">
+          <div class="search-form-buttons m-b-0">
             <el-button @click="handleReset" :disabled="!canUseModel || !enableAINode" id="model-management-search-reset">{{ t('common.reset') }}</el-button>
             <auth-tooltip :is-disabled="!applyTip" :content="applyTip">
               <el-button type="primary" @click="handleSearch" :disabled="!canUseModel || !enableAINode || !!applyTip" id="model-management-search-search">{{ t('common.query') }}</el-button>
@@ -312,11 +312,11 @@ watch(
   border-radius: 6px;
   background: #fff;
   box-sizing: border-box;
-  padding: 26px 16px 16px 14px;
+  padding: 0;
 }
 
 .page-table-details {
-  padding: 16px 16px 10px;
+  padding: 8px 8px 10px;
   height: 100%;
   box-sizing: border-box;
   display: flex;

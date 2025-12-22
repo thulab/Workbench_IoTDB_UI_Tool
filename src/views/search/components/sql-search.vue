@@ -415,7 +415,7 @@ defineExpose({ insertContent });
 </style>
 <style lang="scss" scoped>
 .sql-input-area {
-  padding: 0 16px;
+  padding: 0 8px;
   margin-bottom: 8px;
   border-radius: 0 0 6px 6px;
   background-color: #fff;
@@ -424,7 +424,7 @@ defineExpose({ insertContent });
 .sql-title-box {
   display: flex;
   justify-content: space-between;
-  padding: 12px 0 15px;
+  padding: 8px 0;
 }
 
 .sql-title-text {
@@ -472,7 +472,7 @@ defineExpose({ insertContent });
 .run-result-title-box {
   display: flex;
   align-items: center;
-  padding: 12px 0 12px 16px;
+  padding: 8px 0 8px 8px;
   margin-bottom: 12px;
   border-bottom: 1px solid #dfe1ed;
 
@@ -492,14 +492,14 @@ defineExpose({ insertContent });
 }
 
 .tabs {
-  padding: 8px 16px;
+  padding: 8px;
 }
 
 .tabs-nav-list {
   margin-bottom: 8px;
 
   :deep(.el-tabs__content) {
-    padding: 16px;
+    padding: 8px;
     background-color: #f7f8fc;
     box-sizing: border-box;
   }

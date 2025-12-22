@@ -380,7 +380,7 @@ watch(
 }
 
 .role-details-wrapper {
-  margin-left: 16px;
+  margin-left: 8px;
   background-color: #fff;
   border-radius: 6px;
 }
@@ -392,7 +392,7 @@ watch(
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #dfe1ed;
-  padding: 0 16px;
+  padding: 0 8px;
   box-sizing: border-box;
 
   .detail-title-text {
@@ -419,9 +419,9 @@ watch(
 }
 
 .table-list-box {
-  margin: 4px 16px;
+  margin: 4px 8px;
   background-color: #f7f8fc;
-  padding: 16px;
+  padding: 8px;
 
   .table-box-title {
     font-size: 14px;
@@ -455,7 +455,7 @@ watch(
 }
 
 .detail-user-list {
-  margin: 12px 16px;
+  margin: 12px 8px;
   font-size: 14px;
   color: #131926;
   display: flex;

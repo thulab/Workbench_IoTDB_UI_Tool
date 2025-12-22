@@ -106,6 +106,58 @@
         </div>
       </div>
     </div>
+    <script>
+      // 获取当前语言
+      const getLanguage = () => {
+        const htmlLang = localStorage.lang;
+        return htmlLang || 'zh-CN';
+      };
+
+      // 简化为 zh-CN 或 en
+      const normalizeLanguage = (lang) => {
+        if (lang.startsWith('zh') || lang === 'cn') {
+          return 'zh-CN';
+        }
+        return 'en';
+      };
+
+      // 加载对应语言的脚本
+      const loadLanguageScript = (lang) => {
+        const script = document.createElement('script');
+
+        // 根据语言选择不同的脚本
+        let scriptSrc = '';
+        switch (lang) {
+          case 'zh-CN':
+            scriptSrc = '/assets/monaco/esm/nls.messages.zh-cn.js';
+            break;
+          case 'en':
+          default:
+            scriptSrc = '/assets/monaco/esm/nls.messages.js';
+            break;
+        }
+
+        script.src = scriptSrc;
+        script.onload = () => {
+          console.log(`load ${lang} language pack`);
+        };
+        script.onerror = () => {
+          console.error(`Failed to load ${lang} language pack`);
+          // Load default language
+          if (lang !== 'en') {
+            loadLanguageScript('en');
+          }
+        };
+
+        document.head.appendChild(script);
+      };
+
+      // 页面加载时执行
+      document.addEventListener('DOMContentLoaded', () => {
+        const language = normalizeLanguage(getLanguage());
+        loadLanguageScript(language);
+      });
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

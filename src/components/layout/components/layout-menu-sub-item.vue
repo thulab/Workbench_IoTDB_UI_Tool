@@ -9,14 +9,14 @@
             <i v-if="isCollapse && subItem.activeIcon && rootMenu?.activeIndex?.indexOf(subItem.path) == 0" v-html="subItem.activeIcon"></i>
             <i v-else v-html="subItem.icon"></i>
           </el-icon>
-          <span :id="subItem.path" :style="{ 'font-size': locale === 'en' ? '12px' : '14px' }">{{ subItem.title }}</span>
+          <span :id="subItem.path" :style="{ 'font-size': '12px' }">{{ subItem.title }}</span>
         </template>
         <layout-menu-sub-item :menu-list="subItem.children" :show-auth-menu="showAuthMenu" />
       </el-sub-menu>
     </template>
     <template v-else>
       <el-divider v-if="subItem.showTopLine" />
-      <el-menu-item :id="subItem.path" :index="subItem.path" :style="{ 'font-size': locale === 'en' ? '12px' : '14px' }">
+      <el-menu-item :id="subItem.path" :index="subItem.path" :style="{ 'font-size': '12px' }">
         <el-icon v-if="subItem.icon">
           <i v-if="isCollapse && subItem.activeIcon && subItem.path === rootMenu?.activeIndex" v-html="subItem.activeIcon"></i>
           <i v-else v-html="subItem.icon"></i>
@@ -49,8 +49,6 @@ const props = defineProps<{
   menuList: globalThis.MenuOptions[];
   showAuthMenu?: boolean;
 }>();
-
-const { locale } = useI18n();
 
 const showVersionMenu = (version: string) => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, version);
 
@@ -86,12 +84,15 @@ const menus = computed<globalThis.MenuOptions[]>(() => {
 }
 
 .el-menu-item {
+  height: 30px !important;
+  line-height: 30px !important;
+
   .el-icon {
     font-size: 30px;
   }
 
   &.is-active {
-    background-color: #f7f8fc !important;
+    background-color: #f0f1fa !important;
   }
 
   &.is-active::before {
@@ -119,7 +120,7 @@ const menus = computed<globalThis.MenuOptions[]>(() => {
   .el-menu-item {
     padding: 0;
     height: 30px;
-    margin: 5px;
+    margin: 0 5px;
     border-radius: 4px;
 
     &.is-active {
@@ -187,7 +188,7 @@ const menus = computed<globalThis.MenuOptions[]>(() => {
     }
 
     &.is-active {
-      background-color: #f7f8fc !important;
+      background-color: #f0f1fa !important;
 
       &::before {
         position: absolute;
