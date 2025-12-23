@@ -8,7 +8,7 @@
         <layout-header v-show="!contentFullScreen" />
         <layout-tabs v-if="showTabs" />
       </el-header>
-      <el-main :class="route.name === 'Dashboard' ? 'p-0' : ''">
+      <el-main class="p-0">
         <section class="main-box">
           <router-view v-slot="{ Component, route }">
             <transition appear :name="(route.meta.transition as string) || 'fade-transform'" mode="out-in">
@@ -32,7 +32,6 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
 import cacheRouter from '@/router/cacheRouter';
 import useAppStore from '@/stores/app';
 import { storeToRefs } from 'pinia';
@@ -41,7 +40,6 @@ import LayoutHeader from './layout-header.vue';
 import LayoutTabs from './layout-tabs.vue';
 // import LayoutFooter from './layout-footer.vue';
 
-const route = useRoute();
 const appStore = useAppStore();
 
 const { contentFullScreen, showTabs, routerViewLoading } = storeToRefs(appStore);
@@ -74,11 +72,11 @@ onMounted(() => {});
 
   .el-main {
     box-sizing: border-box;
-    padding: 16px;
+    padding: 0;
 
     // 防止切换出现横向滚动条
     overflow-x: hidden;
-    background: #f0f1fa; // var(--el-bg-color-page);
+    background: #f7f8fc; // var(--el-bg-color-page);
 
     .main-box {
       box-sizing: border-box;

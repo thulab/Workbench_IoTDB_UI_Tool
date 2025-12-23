@@ -410,7 +410,7 @@ watch(
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #dfe1ed;
-  padding: 0 16px;
+  padding: 0 8px;
   box-sizing: border-box;
 
   .detail-title-text {
@@ -437,7 +437,7 @@ watch(
 }
 
 .detail-role-list {
-  margin: 12px 16px;
+  margin: 12px 8px;
   display: flex;
   font-size: 14px;
   align-items: center;
@@ -465,7 +465,7 @@ watch(
 }
 
 .details-wrapper {
-  margin-left: 16px;
+  margin-left: 8px;
   background-color: #fff;
   border-radius: 6px;
 
@@ -481,7 +481,7 @@ watch(
 .table-list-box {
   margin-top: 32px;
   background-color: #f7f8fc;
-  padding: 8px 16px 16px;
+  padding: 8px;
 
   .table-box-title {
     font-size: 14px;

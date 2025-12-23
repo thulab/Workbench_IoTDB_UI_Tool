@@ -1,21 +1,21 @@
 <template>
   <el-scrollbar>
     <el-container class="details-wrapper" style="height: 100%">
-      <el-main class="p-16">
+      <el-main class="p-0">
         <div style="display: flex; flex-direction: column; height: 100%" v-loading="loading">
-          <div class="module-box-wrapper m-b-16" v-if="!canSystemInfo">
+          <div class="module-box-wrapper m-b-8" v-if="!canSystemInfo">
             <div class="module-title-wrapper">
               <h4 class="module-title">{{ t('dashboard.systemInfo') }}</h4>
             </div>
             <auth-container :is-auth="canSystemInfo" :content="'common.maintainAuth'" style="flex: 1" />
           </div>
 
-          <div class="module-box-wrapper m-b-16" v-if="canSystemInfo">
+          <div class="module-box-wrapper m-b-8" v-if="canSystemInfo">
             <div class="module-title-wrapper">
               <h4 class="module-title">{{ slaveData ? t('dashboard.masterSystemInfo') : t('dashboard.systemInfo') }}</h4>
               <p class="module-details">
                 <span class="module-label-text">{{ `${t('dashboard.deadTime')}：` }}</span>
-                <span class="module-content-text m-r-16">{{ systemTime }}</span>
+                <span class="module-content-text m-r-8">{{ systemTime }}</span>
                 <el-button link @click="() => handleRefreshSystem()" id="dashboard-system-refresh" class="svg-button-hover-color"><i-custom-refresh style="width: 24px; height: 24px" /></el-button>
               </p>
             </div>
@@ -726,7 +726,7 @@ onUnmounted(() => {
 .module-box-wrapper {
   border-radius: 6px;
   background: #fff;
-  padding: 16px;
+  padding: 8px;
   box-sizing: border-box;
 }
 

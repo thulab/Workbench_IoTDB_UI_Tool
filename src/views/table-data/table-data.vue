@@ -64,8 +64,8 @@ function handleUpdateDetail() {
 }
 
 .database-details-wrapper {
-  width: calc(100% - 256px);
-  margin-left: 256px;
+  width: calc(100% - 248px);
+  margin-left: 248px;
   height: 100%;
   background-color: #fff;
   border-radius: 6px;

@@ -530,7 +530,7 @@ onUnmounted(() => {
   border-radius: 6px;
   background: #fff;
   box-sizing: border-box;
-  padding: 26px 16px 16px 14px;
+  padding: 12px 8px 8px;
 
   :deep(.el-scrollbar__view) {
     height: 100%;

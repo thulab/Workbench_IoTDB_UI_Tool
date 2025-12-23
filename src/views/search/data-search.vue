@@ -557,7 +557,7 @@ watch(
 .page-container {
   background-color: #fff;
   border-radius: 6px;
-  padding: 16px;
+  padding: 8px;
   width: 100%;
   height: 100%;
   display: flex;
@@ -610,7 +610,7 @@ watch(
 }
 
 .page-table-details {
-  padding: 8px 16px;
+  padding: 8px;
   border-radius: 2px;
   background: #f7f8fc;
   display: flex;

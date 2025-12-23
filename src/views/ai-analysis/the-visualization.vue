@@ -2,7 +2,7 @@
   <coming-soon-container :is-show="locale !== 'en'">
     <active-container :is-show="connectionIsActive">
       <el-container class="visualization-wrapper">
-        <el-header class="p-0 p-l-30 p-r-16" style="height: auto">
+        <el-header class="p-[8px]" style="height: auto">
           <div class="search-form-box" style="margin-bottom: 2px">
             <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
               <div class="m-b-16 flex-align-center" style="height: 36px">
@@ -1293,7 +1293,7 @@ watch(
   border-radius: 6px;
   background: #fff;
   box-sizing: border-box;
-  padding: 26px 0 16px;
+  padding: 0;
 }
 
 .search-form-box {
@@ -1449,7 +1449,7 @@ watch(
 }
 
 .path-list-wrapper {
-  margin-left: 16px;
+  margin-left: 8px;
   background-color: #f7f8fc;
   border-radius: 2px;
   box-sizing: border-box;
@@ -1564,7 +1564,7 @@ watch(
 }
 
 .page-table-details {
-  padding: 8px 16px;
+  padding: 8px;
   border-radius: 2px;
   background: #f7f8fc;
   display: flex;

@@ -1288,7 +1288,7 @@ onUnmounted(() => {
   border-radius: 6px;
   background: #fff;
   box-sizing: border-box;
-  padding: 26px 16px 16px 30px;
+  padding: 12px 8px 8px;
 }
 
 .search-form-box {
@@ -1369,7 +1369,7 @@ onUnmounted(() => {
 }
 
 .path-list-wrapper {
-  margin-left: 16px;
+  margin-left: 8px;
   padding: 14px 16px 0;
   background-color: #f7f8fc;
   border-radius: 2px;

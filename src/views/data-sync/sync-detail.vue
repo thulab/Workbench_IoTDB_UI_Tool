@@ -328,11 +328,11 @@ watch(
   border-radius: 6px;
   background: #fff;
   box-sizing: border-box;
-  padding: 26px 16px 16px 14px;
+  padding: 12px 8px 8px;
 }
 
 .page-table-details {
-  padding: 16px 16px 10px;
+  padding: 8px 8px 10px;
   height: 100%;
   box-sizing: border-box;
   display: flex;

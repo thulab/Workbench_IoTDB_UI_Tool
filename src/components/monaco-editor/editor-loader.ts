@@ -1,12 +1,26 @@
-import loader from '@monaco-editor/loader';
+import * as monaco from 'monaco-editor';
+import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
+import CssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
+import HtmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
+import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
-// 完全依赖 public/assets/monaco/vs (monaco-editor/min) 静态资源；不再打包 ESM workers
-// 不引入 runtime monaco 与 worker，避免重复体积；语言配置通过 loader.config 与组件内动态设置。
+globalThis.self.MonacoEnvironment = {
+  getWorker(_: any, label: string) {
+    if (label === 'json') {
+      return new JsonWorker();
+    }
+    if (label === 'css' || label === 'scss' || label === 'less') {
+      return new CssWorker();
+    }
+    if (label === 'html' || label === 'handlebars' || label === 'razor') {
+      return new HtmlWorker();
+    }
+    if (label === 'typescript' || label === 'javascript') {
+      return new TsWorker();
+    }
+    return new EditorWorker();
+  },
+};
 
-// Offline: point loader to locally copied 'vs' folder under public/assets/monaco/vs (prepared by script)
-loader.config({
-  paths: { vs: '/assets/monaco/vs' },
-  'vs/nls': { availableLanguages: { '*': 'zh-cn' } },
-});
-
-export default loader;
+monaco.typescript.typescriptDefaults.setEagerModelSync(true);

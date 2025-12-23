@@ -1,17 +1,17 @@
 <template>
-  <div class="menu" :style="{ width: isCollapse ? '40px' : '216px' }">
+  <div class="menu" :style="{ width: isCollapse ? '40px' : '184px' }">
     <div class="logo flex-align-center" :style="{ paddingLeft: isCollapse ? '6px' : '14px' }" id="layout-menu-logo" @click="handleDashboard">
-      <el-icon alt="logo" v-if="isCollapse"><i-custom-logo /></el-icon>
+      <el-icon alt="logo" v-if="isCollapse"><i-custom-logo-timecho /></el-icon>
       <el-icon class="title" v-if="!isCollapse">
-        <i-custom-timecho-logo-white-en v-if="locale === 'en'" />
-        <i-custom-timecho-logo-white v-else />
+        <i-custom-timecho-logo-en v-if="locale === 'en'" />
+        <i-custom-timecho-logo v-else />
       </el-icon>
     </div>
-    <div class="connection-box" :style="{ padding: isCollapse ? '0 0 0 5px' : '0 16px 0 10px' }">
+    <div class="connection-box" :style="{ padding: isCollapse ? '0 0 0 5px' : '0 4px 0 4px' }">
       <div class="connection-divider"></div>
       <div class="flex-align-center" style="height: 40px">
-        <el-icon size="30" :style="{ marginLeft: isCollapse ? '0' : '-4px' }"><i-custom-connection /></el-icon>
-        <div v-if="!isCollapse" class="connection-info flex-align-center" :style="{ 'font-size': locale === 'en' ? '12px' : '14px' }">
+        <el-icon size="30" :style="{ marginLeft: '0' }"><i-custom-connection /></el-icon>
+        <div v-if="!isCollapse" class="connection-info flex-align-center" :style="{ 'font-size': '12px' }">
           <span class="connection-name">{{ connectionName }}</span>
           <el-icon size="20" class="svg-button-hover-color" style="cursor: pointer" id="layout-menu-connection" @click="handleToggleConnection"><i-custom-toggle /></el-icon>
         </div>
@@ -201,25 +201,25 @@ watch(locale, () => {
   --el-menu-active-color: #131926;
   --el-menu-text-color: #131926;
   --el-menu-hover-text-color: #131926;
-  --el-menu-bg-color: #fff;
-  --el-menu-hover-bg-color: #f7f8fc;
-  --el-menu-item-height: 40px;
+  --el-menu-bg-color: #f7f8fc;
+  --el-menu-hover-bg-color: #f0f1fa;
+  --el-menu-item-height: 30px;
   --el-menu-sub-item-height: var(--el-menu-item-height);
   --el-menu-horizontal-sub-item-height: 36px;
   --el-menu-item-font-size: var(--el-font-size-base);
   --el-menu-item-hover-fill: var(--el-color-primary-light-9);
   --el-menu-border-color: var(--el-border-color);
-  --el-menu-base-level-padding: 20px;
+  --el-menu-base-level-padding: 4px;
   --el-menu-level-padding: 27px;
-  --el-menu-icon-width: 24px;
+  --el-menu-icon-width: 30px;
 
   .el-menu--collapse {
-    --el-menu-base-level-padding: 8px;
+    --el-menu-base-level-padding: 4px;
 
     &:deep(.el-menu-tooltip__trigger) {
       width: 30px !important;
       height: 30px !important;
-      padding: 0 3px !important;
+      padding: 0 !important;
     }
   }
 
@@ -227,7 +227,7 @@ watch(locale, () => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #fff;
+  background: var(--el-menu-bg-color);
   transition: all 0.3s ease;
 
   :deep(.el-divider--horizontal) {
@@ -237,10 +237,10 @@ watch(locale, () => {
 
   .logo {
     box-sizing: border-box;
-    height: 48px;
+    height: 40px;
     border-bottom: 0 solid #1d1e26;
     box-shadow: 0;
-    background-color: var(--el-color-primary);
+    background-color: var(--el-menu-bg-color);
     cursor: pointer;
 
     .el-icon {
@@ -263,7 +263,7 @@ watch(locale, () => {
 
   .connection-box {
     box-sizing: border-box;
-    background-color: #fff;
+    background-color: var(--el-menu-bg-color);
     position: relative;
 
     .connection-divider {
@@ -277,7 +277,7 @@ watch(locale, () => {
     }
 
     .connection-info {
-      margin: 0 0 0 8px;
+      margin: 0 0 0 6px;
 
       // font-size: 12px;
       line-height: 21px;
@@ -313,7 +313,7 @@ watch(locale, () => {
 
       .cluster-active {
         background-color: #495ad4;
-        color: #fff;
+        color: var(--el-menu-bg-color);
       }
     }
 
