@@ -10,6 +10,15 @@
         <div class="flex items-center fit-content pb-[10px]">
           <div v-for="measurement in props.group.members" class="flex items-center mr-27px" :key="measurement.label">
             <div class="w-12px h-12px rounded-[2px] mr-8px" :style="`background: ${measurement.color}`"></div>
+            <el-tooltip
+              v-if="!props.isRunning && measurementCondition.get(measurement.id) === 3"
+              class="box-item"
+              effect="light"
+              placement="top"
+              :content="t('dataTrend.measurementTip', { measurement: '' })"
+            >
+              <el-icon size="12" class="mr-[2px]"><i-custom-warning-yellow /></el-icon>
+            </el-tooltip>
             <div class="text-12px mr-11px">{{ measurement.label }}</div>
             <button class="bg-transparent border-none p-0! flex items-center cursor-pointer" @click="handleDeleteMeasurement(measurement.label)">
               <el-icon size="16"><i-custom-close /></el-icon>
@@ -18,7 +27,12 @@
         </div>
       </el-scrollbar>
       <div class="pb-[5px] w-[24px] ml-[10px] mr-[5px]">
-        <button class="bg-transparent border-none mr-16px p-0! flex items-center cursor-pointer" @click="exportImage">
+        <button
+          class="bg-transparent border-none mr-16px p-0! flex items-center"
+          @click="exportImage"
+          :disabled="props.group.members.length === 0"
+          :style="props.group.members.length === 0 ? 'cursor: not-allowed; opacity: 0.5;' : 'cursor: pointer; opacity: 1;'"
+        >
           <el-icon size="24"><i-custom-export /></el-icon>
         </button>
       </div>
@@ -90,6 +104,13 @@ const runningTrendStore = props.isTable ? useTableRunningTrendStore() : useTreeR
 
 const measurementsData = ref<Measurement[]>([]);
 const markerValues = ref<MeasurementMarkerData[]>([]);
+
+// const measurementCondition = defineModel('measurementCondition', {
+//   type: Map,
+//   default: () => new Map<string, number>(),
+// });
+
+const measurementCondition = reactive(new Map(props.group.members.map((m) => [m.id, 1])));
 
 function updateMarkerValues() {
   markerValues.value = measurementsData.value.map((measurement) => {
@@ -273,13 +294,16 @@ function getTableHistoryData(measurement: Measurement) {
       ...measurement,
       values: transformedData,
     });
+    measurementCondition.set(measurement.id, 1);
     if (!normalData.length && !isRefresh.value) {
-      ElMessage.warning({ message: `测点 ${measurement.label} 在 ${t('dataTrend.noDataTip')}`, grouping: true });
+      // ElMessage.warning({ message: `测点 ${measurement.label} 在 ${t('dataTrend.noDataTip')}`, grouping: true });
+      measurementCondition.set(measurement.id, 2);
     }
     const overPath = res.data?.changeAuto || [];
     if (overPath.length && !isRefresh.value) {
-      const paths = overPath.join(',');
-      ElMessage.warning({ message: t('dataTrend.measurementTip', { measurement: paths }), grouping: true });
+      // const paths = overPath.join(',');
+      // ElMessage.warning({ message: t('dataTrend.measurementTip', { measurement: paths }), grouping: true });
+      measurementCondition.set(measurement.id, 3);
     }
   });
 }
@@ -310,13 +334,16 @@ function getTreeHistoryData(measurement: Measurement) {
       ...measurement,
       values: transformedData,
     });
+    measurementCondition.set(measurement.id, 1);
     if (!normalData.length && !isRefresh.value) {
-      ElMessage.warning({ message: `测点 ${measurement.label} 在 ${t('dataTrend.noDataTip')}`, grouping: true });
+      // ElMessage.warning({ message: `测点 ${measurement.label} 在 ${t('dataTrend.noDataTip')}`, grouping: true });
+      measurementCondition.set(measurement.id, 2);
     }
     const overPath = res.data?.changeAuto || [];
     if (overPath.length && !isRefresh.value) {
-      const paths = overPath.join(',');
-      ElMessage.warning({ message: t('dataTrend.measurementTip', { measurement: paths }), grouping: true });
+      // const paths = overPath.join(',');
+      // ElMessage.warning({ message: t('dataTrend.measurementTip', { measurement: paths }), grouping: true });
+      measurementCondition.set(measurement.id, 3);
     }
     console.log('measurementsData', measurementsData.value);
   });
@@ -536,7 +563,7 @@ function buildRunningOption(): ECOption {
       splitNumber: 7,
     },
     toolbox: {
-      show: props.isRunning && props.realTimeData?.length! > 0 && !runningTrendStore.isPlaying,
+      show: false,
       feature: {
         saveAsImage: {
           title: t('common.export'),

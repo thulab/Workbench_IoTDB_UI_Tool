@@ -314,7 +314,7 @@ watch(
   background-image: url('../../../assets/icons/search-icon.svg');
   background-repeat: no-repeat;
   background-position: right 12px center;
-  background-size: 18px 18px;
+  background-size: 20px 20px;
   padding-right: 32px;
 }
 

@@ -4,7 +4,7 @@
       <SideTree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" :current-node="currentNode" @doubleClickMeasurement="createGroup" />
     </div>
 
-    <div class="flex-1 ml-8px bg-white rounded-6px p-[4px_16px_16px] flex flex-col min-w-0">
+    <div class="flex-1 ml-8px bg-white rounded-6px p-[0px_8px_8px] flex flex-col min-w-0">
       <OperateButtonRow
         ref="operateButtonRowRef"
         :isTable="false"
@@ -340,6 +340,7 @@ function handleResetGraphArea() {
   const temp = groups.value.flatMap((group) => group.measurementIds);
   for (const measurement of temp) {
     deletePathFromWebSocket(measurement);
+    trendGraphRef.value?.deleteMeasurementMarkerDataByName(measurement);
   }
   realTimeData.value = [];
   groups.value = [];
@@ -414,6 +415,7 @@ function deleteMeasurement(payload: { groupId: string; measurementPath: string }
 function deletePathFromWebSocket(path: string) {
   if (socketInstance.value && socketInstance.value.readyState === 1) {
     socketInstance.value.send(JSON.stringify({ operate: 'del', paths: [path] }));
+    realTimeData.value = realTimeData.value.filter((data) => data.path !== path);
   }
 }
 
@@ -500,6 +502,7 @@ function restoreData() {
         });
       }
       operateButtonRowRef.value?.setSelectedTemplateId(parsed.selectedTemplateId || '');
+      setStorage();
     } catch (e) {
       console.error('Failed to parse storage data:', e);
     }

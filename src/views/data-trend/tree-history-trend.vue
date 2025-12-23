@@ -4,7 +4,7 @@
       <SideTree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" :current-node="currentNode" @doubleClickMeasurement="createGroup" />
     </div>
 
-    <div class="flex-1 ml-8px bg-white rounded-6px p-[4px_16px_16px] flex flex-col min-w-0">
+    <div class="flex-1 ml-8px bg-white rounded-6px p-[0px_8px_8px] flex flex-col min-w-0">
       <div>
         <OperateButtonRow
           ref="operateButtonRowRef"
@@ -274,6 +274,9 @@ function handleResetGraphArea() {
   measurementList.value = [];
   measurementMap.clear();
   needDeleteMeasurementsId.value = groups.value.flatMap((group) => group.measurementIds);
+  for (const measurementId of needDeleteMeasurementsId.value) {
+    trendGraphRef.value?.deleteMeasurementMarkerDataByName(measurementId);
+  }
   groups.value = [];
   visibleMeasurementCountMap.value.clear();
   needFetchMeasurementsId.value = [];
@@ -452,6 +455,7 @@ function restoreData() {
         trendGraphRef.value?.restoreChartData();
         timelineAreaRef.value?.restoreData();
         operateButtonRowRef.value?.setSelectedTemplateId(parsed.selectedTemplateId || '');
+        setStorage();
       });
     } catch (e) {
       console.error('Failed to parse storage data:', e);

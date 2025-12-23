@@ -10,7 +10,7 @@
         @resetGraph="handleResetGraphArea"
       />
     </div>
-    <div class="flex-1 ml-8px bg-white rounded-6px p-[4px_16px_16px] flex flex-col min-w-0">
+    <div class="flex-1 ml-8px bg-white rounded-6px p-[0px_8px_8px] flex flex-col min-w-0">
       <OperateButtonRow
         ref="operateButtonRowRef"
         :isTable="true"
@@ -132,6 +132,7 @@ function handleResetGraphArea() {
   const temp = groups.value.flatMap((group) => group.measurementIds);
   for (const measurement of temp) {
     deletePathFromWebSocket(measurement);
+    trendGraphRef.value?.deleteMeasurementMarkerDataByName(measurement);
   }
   realTimeData.value = [];
   groups.value = [];
@@ -444,6 +445,7 @@ function deletePathFromWebSocket(path: string) {
         measurementList.value.filter((member) => member.id === path).map((member) => member.details as SelectedMeasurement),
       ),
     );
+    realTimeData.value = realTimeData.value.filter((data) => convertPath(data.path) !== path);
   }
 }
 
@@ -628,6 +630,7 @@ function restoreData() {
         });
       }
       operateButtonRowRef.value?.setSelectedTemplateId(parsed.selectedTemplateId || '');
+      setStorage();
     } catch (e) {
       console.error('Failed to parse storage data:', e);
     }
