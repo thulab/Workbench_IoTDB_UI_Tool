@@ -583,6 +583,8 @@ dataTrend:
   pointOverTip: A maximum of 10 marks are supported. Please delete some and try again
   dataSelectWindow: Data Selection Window
   timeRange: Time Range
+  groupMaxWarning: A maximum of 5 groups can be created. Please delete some and try again.
+  measurementMaxWarning: A maximum of 10 measurements can be added to each group. Please delete some and try again.
 calculate:
   namePlaceholder: Please enter a name
   descPlaceholder: Please enter a description

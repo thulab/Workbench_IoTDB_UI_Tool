@@ -7,6 +7,7 @@
         @updateSelectedMeasurements="(list) => handleSelectedMeasurementsUpdate({ selectedMeasurements: list })"
         @deleteMeasurement="handleDeleteMeasurement"
         @doubleClickMeasurement="createGroup"
+        @resetGraph="handleResetGraphArea"
       />
     </div>
 
@@ -22,6 +23,7 @@
           @save-template="handleSaveTemplate"
           @handle-operate="handleOperateTemplate"
           @get-query-list="getTemplateList"
+          @reset-graph="handleResetGraphArea"
         />
       </div>
       <TrendGraphArea
@@ -128,6 +130,17 @@ function createInitialMarkers(range: TimeRange = trendStore.globalTimeRange): Ch
   ];
 }
 
+function handleResetGraphArea() {
+  needDeleteMeasurementsId.value = groups.value.flatMap((group) => group.measurementIds);
+  groups.value = [];
+  visibleMeasurementCountMap.value.clear();
+  needFetchMeasurementsId.value = [];
+  needFetchGroupsId.value = [];
+  markerDatas.value = [];
+  operateButtonRowRef.value?.setSelectedTemplateId('');
+  setStorage();
+}
+
 function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: SelectedMeasurement[] }) {
   const newMeasurements = payload.selectedMeasurements.filter((item) => {
     return !measurementList.value.find((m) => m.id === `${item.database}.${item.tableName}.${item.device?.map((d) => d.value).join('.')}.${item.measurement}`);
@@ -193,6 +206,10 @@ function handleDeleteMeasurement(fullpath: string) {
 }
 
 function createGroup(fullpath: string) {
+  if (groups.value.length >= 5) {
+    ElMessage.warning({ message: t('dataTrend.groupMaxWarning'), grouping: true });
+    return;
+  }
   const groupId = crypto.randomUUID?.() ?? Math.random().toString(36).slice(2);
   groups.value.push({
     id: groupId,
@@ -212,6 +229,10 @@ function createGroup(fullpath: string) {
 function mergeGroup(payload: { groupId: string; measurementPath: string }) {
   const group = groups.value.find((g) => g.id === payload.groupId);
   if (group && !group.measurementIds.includes(payload.measurementPath)) {
+    if (group.measurementIds.length >= 10) {
+      ElMessage.warning({ message: t('dataTrend.measurementMaxWarning'), grouping: true });
+      return;
+    }
     group.measurementIds.push(payload.measurementPath);
     if (!visibleMeasurementCountMap.value.has(payload.measurementPath)) {
       visibleMeasurementCountMap.value.set(payload.measurementPath, 1);
@@ -405,6 +426,7 @@ function handleOperateTemplate(payload: { action: string; data: TrendTemplate })
     needFetchGroupsId.value = groups.value.map((g) => g.id);
     markers.value = createInitialMarkers(trendStore.visibleTimeRange);
     sideTreeRef.value?.restoreSelectedMeasurements(convertMeasurementListToSelectedMeasurements(measurementList.value));
+    setStorage();
   }
 }
 
@@ -417,6 +439,7 @@ function setStorage() {
     measurements: measurementList.value,
     markers: markers.value,
     visibleMeasurementCounts: Array.from(visibleMeasurementCountMap.value.entries()),
+    selectedTemplateId: operateButtonRowRef.value?.getSelectedTemplateId() || '',
   };
   try {
     window.sessionStorage.setItem('newTableDataHistoryTrendStorage', JSON.stringify(storageData));
@@ -501,6 +524,7 @@ function restoreData() {
       nextTick(() => {
         trendGraphRef.value?.restoreChartData();
         timelineAreaRef.value?.restoreData();
+        operateButtonRowRef.value?.setSelectedTemplateId(parsed.selectedTemplateId || '');
       });
     } catch (e) {
       console.error('Failed to parse storage data:', e);

@@ -16,6 +16,7 @@
         @get-query-list="getTemplateList"
         @running-play="handlePlay(true)"
         @running-pause="handlePlay(false)"
+        @reset-graph="handleResetGraphArea"
       />
       <TrendGraphArea
         ref="trendGraphRef"
@@ -115,7 +116,11 @@ function addToMeasurementListIfNotExist(fullPath: string) {
 }
 
 function createGroup(fullPath: string) {
-  console.log('Create group for measurement:', fullPath);
+  if (groups.value.length >= 5) {
+    ElMessage.warning({ message: t('dataTrend.groupMaxWarning'), grouping: true });
+    return;
+  }
+
   addToMeasurementListIfNotExist(fullPath);
 
   const groupId = crypto.randomUUID?.() ?? Math.random().toString(36).slice(2);
@@ -129,8 +134,6 @@ function createGroup(fullPath: string) {
   } else {
     visibleMeasurementCountMap.value.set(fullPath, visibleMeasurementCountMap.value.get(fullPath)! + 1);
   }
-
-  console.log(measurementList.value);
 
   setStorage();
 }
@@ -209,6 +212,7 @@ function handleOperateTemplate(payload: { action: string; data: TrendTemplate })
       }
       addPathToWebSocket(measurementId);
     }
+    setStorage();
   }
 }
 
@@ -329,12 +333,32 @@ function createInitialMarkers(range: TimeRange = runningTrendStore.visibleTimeRa
   ];
 }
 
+function handleResetGraphArea() {
+  usedColors.value.clear();
+  measurementList.value = [];
+  measurementMap.clear();
+  const temp = groups.value.flatMap((group) => group.measurementIds);
+  for (const measurement of temp) {
+    deletePathFromWebSocket(measurement);
+  }
+  realTimeData.value = [];
+  groups.value = [];
+  visibleMeasurementCountMap.value.clear();
+  markerDatas.value = [];
+  operateButtonRowRef.value?.setSelectedTemplateId('');
+  setStorage();
+}
+
 // ========== 趋势图所需函数 ==========
 
 function mergeGroup(payload: { groupId: string; measurementPath: string }) {
   addToMeasurementListIfNotExist(payload.measurementPath);
   const group = groups.value.find((g) => g.id === payload.groupId);
   if (group && !group.measurementIds.includes(payload.measurementPath)) {
+    if (group.measurementIds.length >= 10) {
+      ElMessage.warning({ message: t('dataTrend.measurementMaxWarning'), grouping: true });
+      return;
+    }
     group.measurementIds.push(payload.measurementPath);
     if (!visibleMeasurementCountMap.value.has(payload.measurementPath)) {
       visibleMeasurementCountMap.value.set(payload.measurementPath, 1);
@@ -410,6 +434,7 @@ function setStorage() {
     groups: groups.value,
     measurements: measurementList.value,
     visibleMeasurementCounts: Array.from(visibleMeasurementCountMap.value.entries()),
+    selectedTemplateId: operateButtonRowRef.value?.getSelectedTemplateId() || '',
   };
   try {
     window.sessionStorage.setItem(storageKey, JSON.stringify(storageData));
@@ -474,6 +499,7 @@ function restoreData() {
           }
         });
       }
+      operateButtonRowRef.value?.setSelectedTemplateId(parsed.selectedTemplateId || '');
     } catch (e) {
       console.error('Failed to parse storage data:', e);
     }

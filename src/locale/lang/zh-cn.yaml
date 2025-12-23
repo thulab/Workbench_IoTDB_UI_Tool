@@ -638,6 +638,10 @@ dataTrend:
   saveTrend: 保存常用
   dataSelectWindow: 数据选取窗口
   timeRange: 时间范围
+  groupMaxWarning: 系统最多支持同时选择5个分组
+  measurementMaxWarning: 系统最多支持每组同时选择10个测点
+  resetGraphTip: 是否确认清空趋势图？
+  resetMeasurementTip: 是否确认清空所选测点？
 calculate:
   namePlaceholder: 请输入名称
   descPlaceholder: 请输入描述

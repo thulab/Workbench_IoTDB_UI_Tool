@@ -37,6 +37,14 @@
         <i-custom-pause-transparent />
       </button>
       <button
+        @click="handleResetGraph"
+        class="save-button h-[24px] w-[24px] box-border p-[0]! bg-white cursor-pointer rounded-[4px] flex justify-center items-center ml-[16px]"
+        :disabled="!props.canOperate"
+        :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
+      >
+        <i-custom-refresh />
+      </button>
+      <button
         @click="handleSaveTemplate"
         class="save-button h-[24px] w-[24px] box-border p-[0]! bg-white cursor-pointer rounded-[4px] flex justify-center items-center ml-[16px]"
         :disabled="!props.canOperate"
@@ -44,16 +52,8 @@
       >
         <i-custom-save-template />
       </button>
-      <el-select
-        v-model="selectedTemplateId"
-        :placeholder="t('dataTrend.selectCommonTrend')"
-        class="template-select"
-        popper-class="template-select-dropdown"
-        clearable
-        @change="handleTemplateChange"
-        @clear="handleTemplateReset"
-      >
-        <el-option v-for="item in props.templateList" :key="item.id" :label="item.name" :value="item.id" :id="`trend-template-${item.id}`">
+      <el-select v-model="selectedTemplateId" :placeholder="t('dataTrend.selectCommonTrend')" class="template-select" popper-class="template-select-dropdown" clearable @clear="handleTemplateReset">
+        <el-option v-for="item in props.templateList" :key="item.id" :label="item.name" :value="item.id" :id="`trend-template-${item.id}`" @click="handleTemplateChange(item.id)">
           <div class="template-option-content">
             <div class="template-option-text">
               <i-custom-template />
@@ -108,6 +108,7 @@ const emit = defineEmits<{
   'handle-operate': [payload: { action: string; data: TrendTemplate }];
   'get-query-list': [payload: string];
   'reset-trend': [];
+  'reset-graph': [];
 }>();
 
 const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTemplate);
@@ -168,13 +169,34 @@ const setRenameData = (data: { id: number | string; name: string; type: string; 
   renameData.template = data.template;
 };
 
+const setSelectedTemplateId = (id: number | string) => {
+  selectedTemplateId.value = id;
+};
+
+const getSelectedTemplateId = () => selectedTemplateId.value;
+
 defineExpose({
   setSaveTemplateLoading,
   setTemplateVisible,
   setRenameVisible,
   setSelectedDateTime,
   setRenameData,
+  setSelectedTemplateId,
+  getSelectedTemplateId,
 });
+
+function handleResetGraph() {
+  ElMessageBox.confirm(t('dataTrend.resetGraphTip'), t('common.warmTip'), {
+    type: 'warning',
+    icon: ICustomMessageWarning,
+  })
+    .then(() => {
+      emit('reset-graph');
+    })
+    .catch(() => {
+      // do nothing on cancel
+    });
+}
 
 function handleChangeTime(value: [number, number] | [string, string] | [Date, Date]) {
   const start = dayjs(value[0]).valueOf();
@@ -246,19 +268,23 @@ const handleSqlCommand = (val: string, data: TrendTemplate) => {
       cancelButtonClass: `del-trend-template-cancel`,
       type: 'warning',
       icon: ICustomMessageWarning,
-    }).then(() => {
-      delTrendTemplate(+data.id).then(() => {
-        ElMessage({
-          type: 'success',
-          message: `${t('common.deleteSuccess')}`,
+    })
+      .then(() => {
+        delTrendTemplate(+data.id).then(() => {
+          ElMessage({
+            type: 'success',
+            message: `${t('common.deleteSuccess')}`,
+          });
+          // 如果当前下拉框选中的模板正是被删除的这个，则清空选择并重置趋势
+          if (selectedTemplateId.value === data.id) {
+            handleTemplateReset();
+          }
+          emit('get-query-list', '');
         });
-        // 如果当前下拉框选中的模板正是被删除的这个，则清空选择并重置趋势
-        if (selectedTemplateId.value === data.id) {
-          handleTemplateReset();
-        }
-        emit('get-query-list', '');
+      })
+      .catch(() => {
+        // do nothing on cancel
       });
-    });
   } else {
     emit('handle-operate', { action: val, data });
   }

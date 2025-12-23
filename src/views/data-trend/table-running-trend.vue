@@ -7,6 +7,7 @@
         @updateSelectedMeasurements="(list) => handleSelectedMeasurementsUpdate({ selectedMeasurements: list })"
         @deleteMeasurement="handleDeleteMeasurement"
         @doubleClickMeasurement="createGroup"
+        @resetGraph="handleResetGraphArea"
       />
     </div>
     <div class="flex-1 ml-8px bg-white rounded-6px p-[4px_16px_16px] flex flex-col min-w-0">
@@ -21,6 +22,7 @@
         @get-query-list="getTemplateList"
         @running-play="handlePlay(true)"
         @running-pause="handlePlay(false)"
+        @reset-graph="handleResetGraphArea"
       />
       <TrendGraphArea
         ref="trendGraphRef"
@@ -126,6 +128,20 @@ function handleMarkerValueChange(payload: MeasurementMarkerData[]) {
   markerDatas.value = payload;
 }
 
+function handleResetGraphArea() {
+  const temp = groups.value.flatMap((group) => group.measurementIds);
+  for (const measurement of temp) {
+    deletePathFromWebSocket(measurement);
+  }
+  realTimeData.value = [];
+  groups.value = [];
+  visibleMeasurementCountMap.value.clear();
+  needFetchGroupsId.value = [];
+  markerDatas.value = [];
+  operateButtonRowRef.value?.setSelectedTemplateId('');
+  setStorage();
+}
+
 function getTemplateList() {
   getTrendTemplate('', '').then((res) => {
     const data = res.data || [];
@@ -200,6 +216,7 @@ function handleOperateTemplate(payload: { action: string; data: TrendTemplate })
       }
       addPathToWebSocket(measurementId);
     }
+    setStorage();
   }
 }
 
@@ -317,6 +334,10 @@ function handleDeleteMeasurement(fullpath: string) {
 }
 
 function createGroup(fullpath: string) {
+  if (groups.value.length >= 5) {
+    ElMessage.warning({ message: t('dataTrend.groupMaxWarning'), grouping: true });
+    return;
+  }
   const groupId = crypto.randomUUID?.() ?? Math.random().toString(36).slice(2);
   groups.value.push({
     id: groupId,
@@ -335,6 +356,10 @@ function createGroup(fullpath: string) {
 function mergeGroup(payload: { groupId: string; measurementPath: string }) {
   const group = groups.value.find((g) => g.id === payload.groupId);
   if (group && !group.measurementIds.includes(payload.measurementPath)) {
+    if (group.measurementIds.length >= 10) {
+      ElMessage.warning({ message: t('dataTrend.measurementMaxWarning'), grouping: true });
+      return;
+    }
     group.measurementIds.push(payload.measurementPath);
     if (!visibleMeasurementCountMap.value.has(payload.measurementPath)) {
       visibleMeasurementCountMap.value.set(payload.measurementPath, 1);
@@ -527,6 +552,7 @@ function setStorage() {
     groups: groups.value,
     measurements: measurementList.value,
     visibleMeasurementCounts: Array.from(visibleMeasurementCountMap.value.entries()),
+    selectedTemplateId: operateButtonRowRef.value?.getSelectedTemplateId() || '',
   };
   try {
     window.sessionStorage.setItem('newTableDataRunningTrendStorage', JSON.stringify(storageData));
@@ -601,6 +627,7 @@ function restoreData() {
           }
         });
       }
+      operateButtonRowRef.value?.setSelectedTemplateId(parsed.selectedTemplateId || '');
     } catch (e) {
       console.error('Failed to parse storage data:', e);
     }

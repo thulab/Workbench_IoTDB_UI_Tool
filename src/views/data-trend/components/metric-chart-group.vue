@@ -1,22 +1,26 @@
 <template>
   <div @drop="handleDrop" @dragover.prevent class="graph-border rounded-[2px] mt-4px border-box pb-9px">
-    <div class="flex items-center mb-7px mt-2px">
-      <button
-        class="bg-transparent border-none mr-16px p-0! flex items-center"
-        :disabled="!props.canDelete"
-        @click="handleDeleteGroup"
-        :style="props.canDelete ? 'cursor: pointer' : 'cursor: not-allowed'"
-      >
-        <el-icon size="20"><i-custom-close /></el-icon>
-      </button>
-      <div class="flex items-center">
-        <div v-for="measurement in props.group.members" class="flex items-center mr-27px" :key="measurement.label">
-          <div class="w-12px h-12px rounded-[2px] mr-8px" :style="`background: ${measurement.color}`"></div>
-          <div class="text-12px mr-11px">{{ measurement.label }}</div>
-          <button class="bg-transparent border-none p-0! flex items-center cursor-pointer" @click="handleDeleteMeasurement(measurement.label)">
-            <el-icon size="16"><i-custom-close /></el-icon>
-          </button>
+    <div class="flex items-center mt-2px">
+      <div class="pb-[10px]">
+        <button class="bg-transparent border-none mr-16px p-0! flex items-center cursor-pointer" @click="handleDeleteGroup">
+          <el-icon size="20"><i-custom-close /></el-icon>
+        </button>
+      </div>
+      <el-scrollbar class="flex-1">
+        <div class="flex items-center fit-content pb-[10px]">
+          <div v-for="measurement in props.group.members" class="flex items-center mr-27px" :key="measurement.label">
+            <div class="w-12px h-12px rounded-[2px] mr-8px" :style="`background: ${measurement.color}`"></div>
+            <div class="text-12px mr-11px">{{ measurement.label }}</div>
+            <button class="bg-transparent border-none p-0! flex items-center cursor-pointer" @click="handleDeleteMeasurement(measurement.label)">
+              <el-icon size="16"><i-custom-close /></el-icon>
+            </button>
+          </div>
         </div>
+      </el-scrollbar>
+      <div class="pb-[5px] w-[24px] ml-[10px] mr-[5px]">
+        <button class="bg-transparent border-none mr-16px p-0! flex items-center cursor-pointer" @click="exportImage">
+          <el-icon size="24"><i-custom-export /></el-icon>
+        </button>
       </div>
     </div>
     <div ref="stageRef" class="relative">
@@ -51,7 +55,7 @@ const { requestFn: getHistoryTrend } = useRequest(TableDataApi.getTrendHistoryDa
 const { requestFn: getTreeHistoryTrend } = useRequest(SearchApi.getHistoryTrend);
 
 const GRID_LEFT = 34;
-const GRID_RIGHT = 38;
+const GRID_RIGHT = 10;
 const layoutTick = ref(0);
 const isRefresh = ref(false);
 const trendChartRef = ref<HTMLDivElement | null>(null);
@@ -335,6 +339,23 @@ function handleDrop(event: DragEvent) {
   }
 }
 
+function exportImage() {
+  console.log('exportImage');
+  if (chart) {
+    const imgData = chart.getDataURL({
+      type: 'png',
+      pixelRatio: 3,
+      backgroundColor: '#ffffff',
+    });
+    const link = document.createElement('a');
+    link.href = imgData;
+    link.download = `trend-group-${props.index + 1}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+}
+
 function handleDeleteGroup() {
   emit('delete-group', { groupId: props.group.id });
 }
@@ -384,7 +405,7 @@ function buildOption(): ECOption {
       left: GRID_LEFT,
       right: GRID_RIGHT,
       bottom: 0,
-      top: 0,
+      top: 9,
     },
     animation: false,
     tooltip: {
@@ -436,7 +457,7 @@ function buildOption(): ECOption {
       boundaryGap: ['5%', '5%'],
     },
     toolbox: {
-      show: true,
+      show: false,
       feature: {
         saveAsImage: {
           title: t('common.export'),

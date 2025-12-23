@@ -11,6 +11,14 @@
           class="measurement-tree-search-input"
           clearable
         />
+        <button
+          @click="handleResetMeasurements"
+          class="reset-button h-[24px] w-[24px] box-border p-[0]! bg-white cursor-pointer rounded-[4px] flex justify-center items-center ml-[16px]"
+          :disabled="selectedMeasurements.length === 0"
+          :style="selectedMeasurements.length === 0 ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
+        >
+          <i-custom-refresh />
+        </button>
         <!-- <el-button
           link
           @click="
@@ -155,6 +163,7 @@ import ModalTableMeasurement from './modal-table-measurement.vue';
 import ModalAddDb from '../../table-data/components/modal-add-db.vue';
 import ModalAddTable from '../../table-data/components/modal-add-table.vue';
 import type { TableTreeNodeData, SelectedMeasurement } from '@/types';
+import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 
 const props = withDefaults(
   defineProps<{
@@ -171,6 +180,7 @@ const emit = defineEmits<{
   (event: 'updateSelectedMeasurements', payload: SelectedMeasurement[]): void;
   (event: 'deleteMeasurement', fullPath: string): void;
   (event: 'doubleClickMeasurement', fullPath: string): void;
+  (event: 'reset-graph'): void;
 }>();
 
 const { t } = useI18n();
@@ -258,6 +268,23 @@ function loadFromStorage(): Record<string, SelectedMeasurement[]> {
     }
   }
   return {};
+}
+
+function handleResetMeasurements() {
+  ElMessageBox.confirm(t('dataTrend.resetMeasurementTip'), t('common.warmTip'), {
+    type: 'warning',
+    icon: ICustomMessageWarning,
+  })
+    .then(() => {
+      selectedMeasurements.value = [];
+      selectedMeasurementsData.value = [];
+      saveToStorage();
+      initSelectedMeasurementsData();
+      emit('reset-graph');
+    })
+    .catch(() => {
+      // do nothing on cancel
+    });
 }
 
 const filteredTreeData = computed(() => {
@@ -603,6 +630,10 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
+.reset-button {
+  border: 1px solid #dfe1ed;
+}
+
 .button-style {
   border: none;
   padding-right: 0 !important;
