@@ -1,51 +1,47 @@
 <template>
-  <div class="w-full flex-1 overflow-auto" ref="wrapperRef">
+  <div class="w-full flex-1 overflow-y-auto" style="overflow-x: hidden" ref="wrapperRef">
     <div>
-      <el-scrollbar>
-        <div>
-          <MetricChartGroup
-            v-for="(group, index) in props.measurementGroupInfo"
-            :isTable="props.isTable"
-            :isPlaying="isPlaying"
-            :isRunning="props.isRunning"
-            :ref="(el) => el && chartRefs[group.id] === el"
-            :id="group.id"
-            :key="group.id"
-            :group="group"
-            :index="index"
-            :range="trendStore.visibleTimeRange"
-            :markers="props.markers"
-            :height="chartHeight"
-            :loading="props.loading"
-            :need-fetch-data="props.needFetchGroupsId?.includes(group.id)"
-            :can-delete="props.measurementGroupInfo.length > 1"
-            :realTimeData="filteredRealTimeData(group)"
-            @drop="handleMeasurementDrop"
-            @delete-group="handleDeleteGroup"
-            @marker-change="updateMarker"
-            @marker-value-change="handleMarkerValueChange"
-            @delete-measurement="handleDeleteMeasurement"
-          />
-          <MetricChartGroup
-            v-if="props.measurementGroupInfo.length === 0"
-            :isTable="props.isTable"
-            :isRunning="props.isRunning"
-            :group="{ id: 'default', members: [] }"
-            :index="0"
-            :range="trendStore.visibleTimeRange"
-            :markers="props.markers"
-            :height="chartHeight"
-            :loading="props.loading"
-            :need-fetch-data="false"
-            :can-delete="false"
-            @drop="handleMeasurementDrop"
-            @delete-group="handleDeleteGroup"
-            @marker-change="updateMarker"
-            @marker-value-change="handleMarkerValueChange"
-            @delete-measurement="handleDeleteMeasurement"
-          />
-        </div>
-      </el-scrollbar>
+      <MetricChartGroup
+        v-for="(group, index) in props.measurementGroupInfo"
+        :isTable="props.isTable"
+        :isPlaying="isPlaying"
+        :isRunning="props.isRunning"
+        :ref="(el) => el && chartRefs[group.id] === el"
+        :id="group.id"
+        :key="group.id"
+        :group="group"
+        :index="index"
+        :range="trendStore.visibleTimeRange"
+        :markers="props.markers"
+        :height="chartHeight"
+        :loading="props.loading"
+        :need-fetch-data="props.needFetchGroupsId?.includes(group.id)"
+        :can-delete="props.measurementGroupInfo.length > 1"
+        :realTimeData="filteredRealTimeData(group)"
+        @drop="handleMeasurementDrop"
+        @delete-group="handleDeleteGroup"
+        @marker-change="updateMarker"
+        @marker-value-change="handleMarkerValueChange"
+        @delete-measurement="handleDeleteMeasurement"
+      />
+      <MetricChartGroup
+        v-if="props.measurementGroupInfo.length === 0"
+        :isTable="props.isTable"
+        :isRunning="props.isRunning"
+        :group="{ id: 'default', members: [] }"
+        :index="0"
+        :range="trendStore.visibleTimeRange"
+        :markers="props.markers"
+        :height="chartHeight"
+        :loading="props.loading"
+        :need-fetch-data="false"
+        :can-delete="false"
+        @drop="handleMeasurementDrop"
+        @delete-group="handleDeleteGroup"
+        @marker-change="updateMarker"
+        @marker-value-change="handleMarkerValueChange"
+        @delete-measurement="handleDeleteMeasurement"
+      />
     </div>
   </div>
 </template>
