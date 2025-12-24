@@ -148,33 +148,64 @@ function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: Selec
   const newMeasurements = payload.selectedMeasurements.filter((item) => {
     return !measurementList.value.find((m) => m.id === `${item.database}.${item.tableName}.${item.device?.map((d) => d.value).join('.')}.${item.measurement}`);
   });
-  measurementList.value.push(
-    ...newMeasurements.map((item) => {
-      let deviceName = '';
-      for (const curTag of item.device ?? []) {
-        deviceName += `${curTag.value}.`;
-      }
-      if (deviceName.endsWith('.')) {
-        deviceName = deviceName.slice(0, -1);
-      }
+  for (const item of newMeasurements) {
+    let deviceName = '';
+    for (const curTag of item.device ?? []) {
+      deviceName += `${curTag.value}.`;
+    }
+    if (deviceName.endsWith('.')) {
+      deviceName = deviceName.slice(0, -1);
+    }
 
-      const color =
-        predefineColors.find((c) => !usedColors.value.has(c)) ||
-        `#${Math.floor(Math.random() * 0xffffff)
+    // 串行查找可用颜色
+    let color = predefineColors.find((c) => !usedColors.value.has(c));
+    if (!color) {
+      // 生成随机颜色，确保不重复
+      do {
+        color = `#${Math.floor(Math.random() * 0xffffff)
           .toString(16)
           .padStart(6, '0')}`;
-      usedColors.value.add(color);
+      } while (usedColors.value.has(color)); // 检查是否已使用
+    }
 
-      const label = `${item.database}.${item.tableName}.${deviceName}.${item.measurement}`;
-      return {
-        id: label,
-        label,
-        color,
-        details: item,
-        values: [],
-      } as unknown as Measurement;
-    }),
-  );
+    usedColors.value.add(color);
+
+    const label = `${item.database}.${item.tableName}.${deviceName}.${item.measurement}`;
+    measurementList.value.push({
+      id: label,
+      label,
+      color,
+      details: item,
+      values: [],
+    });
+  }
+  // measurementList.value.push(
+  //   ...newMeasurements.map((item) => {
+  //     let deviceName = '';
+  //     for (const curTag of item.device ?? []) {
+  //       deviceName += `${curTag.value}.`;
+  //     }
+  //     if (deviceName.endsWith('.')) {
+  //       deviceName = deviceName.slice(0, -1);
+  //     }
+
+  //     const color =
+  //       predefineColors.find((c) => !usedColors.value.has(c)) ||
+  //       `#${Math.floor(Math.random() * 0xffffff)
+  //         .toString(16)
+  //         .padStart(6, '0')}`;
+  //     usedColors.value.add(color);
+
+  //     const label = `${item.database}.${item.tableName}.${deviceName}.${item.measurement}`;
+  //     return {
+  //       id: label,
+  //       label,
+  //       color,
+  //       details: item,
+  //       values: [],
+  //     } as unknown as Measurement;
+  //   }),
+  // );
   measurementMap.clear();
   measurementList.value.forEach((item) => {
     measurementMap.set(item.id, item);
