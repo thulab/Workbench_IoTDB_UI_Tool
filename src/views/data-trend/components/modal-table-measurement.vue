@@ -298,8 +298,9 @@ const canAdd = computed(() => {
     formData.selectedTable &&
     (selectedDevices.value.length > 0 || availableTags.value.length === 0) &&
     formData.selectedMeasurement &&
-    formData.selectedMeasurement.length > 0 &&
-    internalSelectedMeasurements.value.length < props.selectedLimit
+    formData.selectedMeasurement.length > 0
+    // &&
+    // internalSelectedMeasurements.value.length < props.selectedLimit
   );
 });
 
