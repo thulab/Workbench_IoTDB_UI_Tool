@@ -328,21 +328,22 @@ const handleConfirmMeasurement = (selected: SelectedMeasurement[]) => {
     }
   }
   // selectedMeasurements.value = selected;
-  addMeasurementsOfDbTbIntoTree();
+  const filteredMeasurements = selectedMeasurements.value.filter((m) => m.database === selectedDatabase.value && m.tableName === selectedTable.value);
+  addMeasurementsOfDbTbIntoTree(filteredMeasurements);
   saveToStorage();
   tableMeasurementVisible.value = false;
-  emit('updateSelectedMeasurements', selectedMeasurements.value);
+  emit('updateSelectedMeasurements', filteredMeasurements);
 };
 
 // selectedMeasurements -> selectedMeasurementsData
-function addMeasurementsOfDbTbIntoTree() {
+function addMeasurementsOfDbTbIntoTree(selectedMeasurementsOfSingleDbTb?: SelectedMeasurement[]) {
   if (!selectedMeasurementsData.value) return;
   for (const dbNode of selectedMeasurementsData.value) {
     if (dbNode.nodeName === selectedDatabase.value) {
       for (const tbNode of dbNode.children || []) {
         if (tbNode.nodeName === selectedTable.value) {
           tbNode.children = [];
-          for (const meas of selectedMeasurements.value) {
+          for (const meas of selectedMeasurementsOfSingleDbTb || []) {
             let deviceName = '';
             for (const curTag of meas.device) {
               deviceName += `${curTag.value}.`;

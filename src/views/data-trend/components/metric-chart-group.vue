@@ -8,7 +8,7 @@
       </div>
       <el-scrollbar class="flex-1">
         <div class="flex items-center fit-content pb-[10px]">
-          <div v-for="measurement in props.group.members" class="flex items-center mr-27px" :key="measurement.label">
+          <div v-for="measurement in props.group.members" class="flex items-center mr-27px flex-shrink-0" :key="measurement.label">
             <div class="w-12px h-12px rounded-[2px] mr-8px" :style="`background: ${measurement.color}`"></div>
             <el-tooltip
               v-if="!props.isRunning && (measurementCondition.get(measurement.id) === 2 || measurementCondition.get(measurement.id) === 3)"
