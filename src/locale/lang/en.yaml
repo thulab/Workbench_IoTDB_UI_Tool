@@ -585,6 +585,7 @@ dataTrend:
   timeRange: Time Range
   groupMaxWarning: A maximum of 5 groups can be created. Please delete some and try again.
   measurementMaxWarning: A maximum of 10 measurements can be added to each group. Please delete some and try again.
+  dataTypeTip: Only measurements with data type INT32 / INT64 / FLOAT / DOUBLE are supported.
 calculate:
   namePlaceholder: Please enter a name
   descPlaceholder: Please enter a description

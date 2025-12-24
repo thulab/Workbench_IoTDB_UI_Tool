@@ -37,7 +37,8 @@
                 v-if="data.nodeType !== 'PAGE'"
                 class="node-text"
                 :id="`tree-node-content-${data.nodePath}`"
-                :draggable="data.nodeType === 'TIMESERIES'"
+                :draggable="data.nodeType === 'TIMESERIES' && validDataType.includes(fetchedMeasurementDataType.get(data.nodePath) || '')"
+                :style="{ opacity: data.nodeType === 'TIMESERIES' && !validDataType.includes(fetchedMeasurementDataType.get(data.nodePath) || '') ? '50%' : '100%' }"
                 @dblclick.stop="handleNodeDoubleClick(data)"
                 @dragstart="handleNodeDragStart($event, data)"
               >
@@ -133,6 +134,8 @@ const loadingNode: StorageDeviceTreeNodeData = {
   nodeType: 'loading',
   parentPath: '',
 };
+const validDataType = ['INT32', 'INT64', 'FLOAT', 'DOUBLE'];
+const fetchedMeasurementDataType = reactive<Map<string, string>>(new Map());
 
 // DATABASE, SG INTERNAL, INTERNAL, DEVICE, TIMESERIES
 const treeData = ref<Array<StorageDeviceTreeNodeData>>([
@@ -153,6 +156,7 @@ const dealingStatus = ref(false);
 
 const { requestFn: getNextNodeInfos } = useRequest(StorageApi.getNextNodeInfos);
 const { requestFn: deletePaths } = useRequest(StorageApi.deletePaths);
+const { requestFn: getMeasurementsInfo } = useRequest(StorageApi.getMeasurementsInfo);
 
 const treeHeight = ref(document.body.clientHeight - 48 - 100);
 
@@ -175,8 +179,14 @@ const onResize = debounce(() => {
 
 function handleNodeDoubleClick(data: TreeNodeData) {
   if (data.nodeType === 'TIMESERIES') {
-    console.log(data);
-    emit('doubleClickMeasurement', `${data.nodePath}`);
+    getMeasurementsInfo(data.nodePath).then((res) => {
+      const dataType = res.data.dataType;
+      if (dataType && validDataType.includes(dataType)) {
+        emit('doubleClickMeasurement', `${data.nodePath}`);
+      } else {
+        ElMessage.warning({ message: t('dataTrend.dataTypeTip'), grouping: true });
+      }
+    });
   }
 }
 
@@ -647,6 +657,17 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
   }
   getNextNodeInfos(data.nodePath).then((res) => {
     const list = res.data || [];
+    for (const item of list) {
+      if (item.nodeType === 'TIMESERIES' && !fetchedMeasurementDataType.has(item.nodePath)) {
+        getMeasurementsInfo(item.nodePath).then((infoRes) => {
+          const dataType = infoRes.data.dataType;
+          if (dataType) {
+            fetchedMeasurementDataType.set(item.nodePath, dataType);
+          }
+        });
+      }
+    }
+
     // 展示点开操作查看的data 都在pageChildren 属性，需找到对应的children 上追加子节点
     const originTreeData = recursionFindCurrentByOrigin(data.nodePath, treeData.value)!;
     const cloneData = fillChildLoading(cloneDeep(list));
