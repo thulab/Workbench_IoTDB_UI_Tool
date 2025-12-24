@@ -143,7 +143,7 @@ const route = [
   {
     path: '/trend',
     component: Layout,
-    redirect: { name: 'TrendDetail' },
+    redirect: { name: 'TreeHistoryTrend' },
     meta: {
       title: 'page.visualization',
       icon: ICustomVisualization,
@@ -195,16 +195,16 @@ const route = [
           icon: ICustomTrend,
         },
       },
-      {
-        path: 'detail',
-        name: 'TrendDetail',
-        component: () => import('@/views/data-trend/trend-detail.vue'),
-        meta: {
-          keepAlive: true,
-          title: 'page.trend',
-          icon: ICustomTrend,
-        },
-      },
+      // {
+      //   path: 'detail',
+      //   name: 'TrendDetail',
+      //   component: () => import('@/views/data-trend/trend-detail.vue'),
+      //   meta: {
+      //     keepAlive: true,
+      //     title: 'page.trend',
+      //     icon: ICustomTrend,
+      //   },
+      // },
       // {
       //   path: 'table-detail',
       //   name: 'TableTrendDetail',

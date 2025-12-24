@@ -23,6 +23,7 @@
         @running-play="handlePlay(true)"
         @running-pause="handlePlay(false)"
         @reset-graph="handleResetGraphArea"
+        @reset-trend="setStorage"
       />
       <TrendGraphArea
         ref="trendGraphRef"
@@ -189,11 +190,16 @@ function handleOperateTemplate(payload: { action: string; data: TrendTemplate })
     operateButtonRowRef.value?.setSaveTemplateLoading(false);
   } else {
     const templateData = JSON.parse(payload.data.template);
-    measurementList.value = templateData.selectedMeasurements;
+    // measurementList.value = templateData.selectedMeasurements;
+    const measurementsToAdd = templateData.selectedMeasurements.filter((item: Measurement) => {
+      return !measurementList.value.find((m) => m.id === item.id);
+    });
+    handleSelectedMeasurementsUpdate({ selectedMeasurements: measurementsToAdd.map((m: Measurement) => m.details) });
     measurementMap.clear();
     measurementList.value.forEach((item: Measurement) => {
       measurementMap.set(item.id, item);
     });
+    trendGraphRef.value?.clearAllMeasurementMarkerData();
     groups.value = templateData.visibleGroupInfo.map((group: ChartGroupInput) => ({
       id: group.id,
       measurementIds: group.members.map((member: Measurement) => member.id),
@@ -309,6 +315,7 @@ function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: Selec
   measurementList.value.forEach((item) => {
     measurementMap.set(item.id, item);
   });
+  console.log('measurementList.value', measurementList.value);
   setStorage();
 }
 

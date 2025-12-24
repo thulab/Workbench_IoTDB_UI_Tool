@@ -437,10 +437,10 @@ const loadDevice = async (page: number = 1) => {
 
 const searchDevices = async () => {
   // 先验证表单
-  const isValid = await formRef.value?.validateField(['selectedDatabase', 'selectedTable', 'selectedTags']).catch(() => false);
-  if (!isValid) {
-    return;
-  }
+  // const isValid = await formRef.value?.validateField(['selectedDatabase', 'selectedTable', 'selectedTags']).catch(() => false);
+  // if (!isValid) {
+  //   return;
+  // }
   noMoreData.value = false;
   await loadDevice(1);
 };
@@ -494,14 +494,14 @@ const addMeasurements = async () => {
     });
   });
 
-  if (newMeasurements.length !== 0) {
-    if (internalSelectedMeasurements.value.length + newMeasurements.length > props.selectedLimit) {
-      ElMessage.warning(t('common.selectMeasurementLimit', { limit: props.selectedLimit }));
-      return;
-    }
-  } else {
-    return;
-  }
+  // if (newMeasurements.length !== 0) {
+  //   if (internalSelectedMeasurements.value.length + newMeasurements.length > props.selectedLimit) {
+  //     ElMessage.warning(t('common.selectMeasurementLimit', { limit: props.selectedLimit }));
+  //     return;
+  //   }
+  // } else {
+  //   return;
+  // }
 
   internalSelectedMeasurements.value.push(...newMeasurements);
   ElMessage.success(t('tableMeasurement.addSuccess', { count: newMeasurements.length }));

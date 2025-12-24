@@ -113,6 +113,10 @@ const deleteMeasurementMarkerDataByName = (name: string) => {
   measurementsMarkerData.value.splice(index, 1);
 };
 
+const clearAllMeasurementMarkerData = () => {
+  measurementsMarkerData.value = [];
+};
+
 const restoreChartData = () => {
   Object.values(chartRefs.value).forEach((chartRef) => {
     chartRef.restoreData();
@@ -127,6 +131,7 @@ defineExpose({
   deleteMeasurementMarkerDataByName,
   restoreChartData,
   resetSelectedTemplate,
+  clearAllMeasurementMarkerData,
 });
 
 function convertPath(original: string): string {

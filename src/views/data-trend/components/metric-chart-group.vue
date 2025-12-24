@@ -11,11 +11,11 @@
           <div v-for="measurement in props.group.members" class="flex items-center mr-27px" :key="measurement.label">
             <div class="w-12px h-12px rounded-[2px] mr-8px" :style="`background: ${measurement.color}`"></div>
             <el-tooltip
-              v-if="!props.isRunning && measurementCondition.get(measurement.id) === 3"
+              v-if="!props.isRunning && (measurementCondition.get(measurement.id) === 2 || measurementCondition.get(measurement.id) === 3)"
               class="box-item"
               effect="light"
               placement="top"
-              :content="t('dataTrend.measurementTip', { measurement: '' })"
+              :content="measurementCondition.get(measurement.id) === 3 ? t('dataTrend.measurementTip', { measurement: '' }) : t('dataTrend.noDataTip')"
             >
               <el-icon size="12" class="mr-[2px]"><i-custom-warning-yellow /></el-icon>
             </el-tooltip>
@@ -295,7 +295,7 @@ function getTableHistoryData(measurement: Measurement) {
       values: transformedData,
     });
     measurementCondition.set(measurement.id, 1);
-    if (!normalData.length && !isRefresh.value) {
+    if (normalData[0]?.values.length === 0 && !isRefresh.value) {
       // ElMessage.warning({ message: `测点 ${measurement.label} 在 ${t('dataTrend.noDataTip')}`, grouping: true });
       measurementCondition.set(measurement.id, 2);
     }
@@ -309,17 +309,15 @@ function getTableHistoryData(measurement: Measurement) {
 }
 
 function getTreeHistoryData(measurement: Measurement) {
-  console.log('measurement', measurement);
   getTreeHistoryTrend({
     paths: [measurement.label],
-    startTime: trendStore.globalTimeRange.start,
-    endTime: trendStore.globalTimeRange.end,
+    startTime: trendStore.visibleTimeRange.start,
+    endTime: trendStore.visibleTimeRange.end,
     groupBy: 'origin',
     aggregateFun: 'last_value',
   }).then((res) => {
     // process data
     const normalData = res.data?.normal || [];
-    console.log('normalData', normalData);
     const transformedData: DataPoint[] = [];
     if (normalData[0]) {
       const point = normalData[0];
@@ -335,7 +333,7 @@ function getTreeHistoryData(measurement: Measurement) {
       values: transformedData,
     });
     measurementCondition.set(measurement.id, 1);
-    if (!normalData.length && !isRefresh.value) {
+    if (normalData[0]?.values.length === 0 && !isRefresh.value) {
       // ElMessage.warning({ message: `测点 ${measurement.label} 在 ${t('dataTrend.noDataTip')}`, grouping: true });
       measurementCondition.set(measurement.id, 2);
     }
@@ -345,7 +343,6 @@ function getTreeHistoryData(measurement: Measurement) {
       // ElMessage.warning({ message: t('dataTrend.measurementTip', { measurement: paths }), grouping: true });
       measurementCondition.set(measurement.id, 3);
     }
-    console.log('measurementsData', measurementsData.value);
   });
 }
 
@@ -436,6 +433,7 @@ function buildOption(): ECOption {
     },
     animation: false,
     tooltip: {
+      confine: true,
       trigger: 'axis',
       axisPointer: {
         type: 'line',
@@ -476,8 +474,9 @@ function buildOption(): ECOption {
     yAxis: {
       type: 'value',
       scale: true,
+      minInterval: 1,
       axisLine: { show: false, lineStyle: { color: '#DFE1ED' } },
-      axisLabel: { color: '#424561', fontSize: 12 },
+      axisLabel: { color: '#424561', fontSize: 12, hideOverlap: true },
       splitLine: {
         lineStyle: { color: '#DFE1ED' },
       },
@@ -519,6 +518,7 @@ function buildRunningOption(): ECOption {
     },
     animation: false,
     tooltip: {
+      confine: true,
       trigger: 'axis',
       axisPointer: {
         type: 'line',
@@ -556,7 +556,7 @@ function buildRunningOption(): ECOption {
       type: 'value',
       scale: true,
       axisLine: { show: false, lineStyle: { color: '#dfe1ed' } },
-      axisLabel: { color: '#424561', fontSize: 12 },
+      axisLabel: { color: '#424561', fontSize: 12, hideOverlap: true },
       splitLine: {
         lineStyle: { color: '#DFE1ED' },
       },

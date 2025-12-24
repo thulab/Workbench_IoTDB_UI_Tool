@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-table :data="convertedMarkerDatas" border class="h-148px! mt-16px" size="small">
+    <el-table :data="convertedMarkerDatas" border class="h-148px! mt-16px" size="small" :table-layout="'auto'">
       <el-table-column prop="name" label="测点名称"></el-table-column>
       <el-table-column prop="x1" label="X1"></el-table-column>
       <el-table-column prop="x2" label="X2"></el-table-column>
