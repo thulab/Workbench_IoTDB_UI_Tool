@@ -7,7 +7,7 @@
         @updateSelectedMeasurements="(list) => handleSelectedMeasurementsUpdate({ selectedMeasurements: list })"
         @deleteMeasurement="handleDeleteMeasurement"
         @doubleClickMeasurement="createGroup"
-        @resetGraph="handleResetGraphArea"
+        @resetMeasurement="handleResetMeasurement"
       />
     </div>
     <div class="flex-1 ml-8px bg-white rounded-6px p-[0px_8px_8px] flex flex-col min-w-0">
@@ -127,6 +127,13 @@ function updateMarker(payload: { id: string; timestamp: number }) {
 
 function handleMarkerValueChange(payload: MeasurementMarkerData[]) {
   markerDatas.value = payload;
+}
+
+function handleResetMeasurement() {
+  measurementList.value = [];
+  measurementMap.clear();
+  usedColors.value.clear();
+  handleResetGraphArea();
 }
 
 function handleResetGraphArea() {

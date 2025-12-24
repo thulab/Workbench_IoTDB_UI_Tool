@@ -516,8 +516,13 @@ const removeMeasurement = (index: number) => {
   internalSelectedMeasurements.value.splice(index, 1);
 };
 
+const clearMeasurements = () => {
+  internalSelectedMeasurements.value = [];
+};
+
 defineExpose({
   removeMeasurement,
+  clearMeasurements,
 });
 
 const handleClear = () => {
@@ -533,6 +538,7 @@ const handleClear = () => {
 
 const handleConfirm = () => {
   addMeasurements();
+  console.log('internalSelectedMeasurements:', internalSelectedMeasurements.value);
   emit('confirm', internalSelectedMeasurements.value);
   handleClose();
 };

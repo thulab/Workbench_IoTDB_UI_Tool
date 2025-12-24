@@ -180,7 +180,7 @@ const emit = defineEmits<{
   (event: 'updateSelectedMeasurements', payload: SelectedMeasurement[]): void;
   (event: 'deleteMeasurement', fullPath: string): void;
   (event: 'doubleClickMeasurement', fullPath: string): void;
-  (event: 'reset-graph'): void;
+  (event: 'reset-measurement'): void;
 }>();
 
 const { t } = useI18n();
@@ -276,11 +276,12 @@ function handleResetMeasurements() {
     icon: ICustomMessageWarning,
   })
     .then(() => {
+      modalTableMeasurementRef.value?.clearMeasurements();
       selectedMeasurements.value = [];
       selectedMeasurementsData.value = [];
       saveToStorage();
       initSelectedMeasurementsData();
-      emit('reset-graph');
+      emit('reset-measurement');
     })
     .catch(() => {
       // do nothing on cancel

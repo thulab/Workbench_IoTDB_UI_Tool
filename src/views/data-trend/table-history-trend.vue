@@ -7,7 +7,7 @@
         @updateSelectedMeasurements="(list) => handleSelectedMeasurementsUpdate({ selectedMeasurements: list })"
         @deleteMeasurement="handleDeleteMeasurement"
         @doubleClickMeasurement="createGroup"
-        @resetGraph="handleResetGraphArea"
+        @resetMeasurement="handleResetMeasurement"
       />
     </div>
 
@@ -129,6 +129,13 @@ function createInitialMarkers(range: TimeRange = trendStore.globalTimeRange): Ch
       timestamp: range.start + span * 0.7,
     },
   ];
+}
+
+function handleResetMeasurement() {
+  measurementList.value = [];
+  measurementMap.clear();
+  usedColors.value.clear();
+  handleResetGraphArea();
 }
 
 function handleResetGraphArea() {
