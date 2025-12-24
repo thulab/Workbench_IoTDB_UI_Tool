@@ -347,7 +347,9 @@ function addMeasurementsOfDbTbIntoTree(selectedMeasurementsOfSingleDbTb?: Select
           for (const meas of selectedMeasurementsOfSingleDbTb || []) {
             let deviceName = '';
             for (const curTag of meas.device) {
-              deviceName += `${curTag.value}.`;
+              if (curTag.value) {
+                deviceName += `${curTag.value}.`;
+              }
             }
             deviceName = deviceName.slice(0, -1);
             tbNode.children.push({

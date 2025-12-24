@@ -294,7 +294,9 @@ function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: Selec
   for (const item of newMeasurements) {
     let deviceName = '';
     for (const curTag of item.device ?? []) {
-      deviceName += `${curTag.value}.`;
+      if (curTag.value) {
+        deviceName += `${curTag.value}.`;
+      }
     }
     if (deviceName.endsWith('.')) {
       deviceName = deviceName.slice(0, -1);
