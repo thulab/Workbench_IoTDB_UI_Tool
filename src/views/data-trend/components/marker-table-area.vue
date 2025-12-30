@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-table :data="convertedMarkerDatas" border class="h-148px! mt-16px" size="small" :table-layout="'auto'">
-      <el-table-column prop="name" label="测点名称"></el-table-column>
+      <el-table-column prop="name" :label="t('dataTrend.measurementName')"></el-table-column>
       <el-table-column prop="x1" label="X1"></el-table-column>
       <el-table-column prop="x2" label="X2"></el-table-column>
       <el-table-column prop="x2_x1" label="X2 - X1"></el-table-column>
@@ -15,6 +15,8 @@
 <script lang="ts" setup>
 import type { MeasurementMarkerData } from '@/types/trend';
 import dayjs from 'dayjs';
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{

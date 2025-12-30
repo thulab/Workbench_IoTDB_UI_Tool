@@ -48,9 +48,7 @@
           :style="{ left: handle.left, borderColor: handle.color }"
           :disabled="props.loading"
           @pointerdown="(event) => onMarkerPointerDown(handle.id, event)"
-        >
-          <!-- <span :style="{ background: handle.color }">{{ handle.label }}</span> -->
-        </button>
+        ></button>
       </div>
     </div>
   </div>
@@ -104,12 +102,6 @@ const runningTrendStore = props.isTable ? useTableRunningTrendStore() : useTreeR
 
 const measurementsData = ref<Measurement[]>([]);
 const markerValues = ref<MeasurementMarkerData[]>([]);
-
-// const measurementCondition = defineModel('measurementCondition', {
-//   type: Map,
-//   default: () => new Map<string, number>(),
-// });
-
 const measurementCondition = reactive(new Map(props.group.members.map((m) => [m.id, 1])));
 
 function updateMarkerValues() {
@@ -296,13 +288,10 @@ function getTableHistoryData(measurement: Measurement) {
     });
     measurementCondition.set(measurement.id, 1);
     if (normalData[0]?.values.length === 0 && !isRefresh.value) {
-      // ElMessage.warning({ message: `测点 ${measurement.label} 在 ${t('dataTrend.noDataTip')}`, grouping: true });
       measurementCondition.set(measurement.id, 2);
     }
     const overPath = res.data?.changeAuto || [];
     if (overPath.length && !isRefresh.value) {
-      // const paths = overPath.join(',');
-      // ElMessage.warning({ message: t('dataTrend.measurementTip', { measurement: paths }), grouping: true });
       measurementCondition.set(measurement.id, 3);
     }
   });
@@ -334,13 +323,10 @@ function getTreeHistoryData(measurement: Measurement) {
     });
     measurementCondition.set(measurement.id, 1);
     if (normalData[0]?.values.length === 0 && !isRefresh.value) {
-      // ElMessage.warning({ message: `测点 ${measurement.label} 在 ${t('dataTrend.noDataTip')}`, grouping: true });
       measurementCondition.set(measurement.id, 2);
     }
     const overPath = res.data?.changeAuto || [];
     if (overPath.length && !isRefresh.value) {
-      // const paths = overPath.join(',');
-      // ElMessage.warning({ message: t('dataTrend.measurementTip', { measurement: paths }), grouping: true });
       measurementCondition.set(measurement.id, 3);
     }
   });
@@ -523,7 +509,6 @@ function buildRunningOption(): ECOption {
       axisPointer: {
         type: 'line',
         lineStyle: {
-          // color: '#91a3ff',
           width: 1,
           type: 'dashed',
         },
@@ -787,14 +772,4 @@ watch(
   width: 100%;
   height: 400px;
 }
-
-/* .marker-overlay-handle span {
-  position: absolute;
-  top: -12px;
-  left: -20px;
-  font-size: 11px;
-  color: #0d101a;
-  padding: 2px 6px;
-  border-radius: 999px;
-} */
 </style>

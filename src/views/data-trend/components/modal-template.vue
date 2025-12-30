@@ -46,9 +46,6 @@ const formRules = reactive<FormRules>({
         if (!value || !value.trim()) {
           return callback(new Error(t('search.nameRuleTip')));
         }
-        // if (value && props.nameList.some((item) => item === value)) {
-        //   return callback(new Error(t('search.templateNameRepeatTip')));
-        // }
         return callback();
       },
       trigger: 'blur',

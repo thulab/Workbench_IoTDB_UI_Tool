@@ -166,17 +166,6 @@ const onResize = debounce(() => {
   treeHeight.value = document.body.clientHeight - 48 - 100;
 }, 500);
 
-// function nodeTextWidth(node: TreeNode, data: TreeNodeData) {
-//   // 44 = 24 展开收缩 + 16 右侧更多操作 + 4 文字与操作icon间距
-//   // 8 缩进大小
-//   // 根据类型 减去 icon 大小
-//   let width = 240 - 44 - ((+node.level || 1) - 1) * 8;
-//   if ((data.nodeType === 'DATABASE' && data.node !== 'root') || data.nodeType === 'TIMESERIES') {
-//     width -= 16;
-//   }
-//   return width;
-// }
-
 function handleNodeDoubleClick(data: TreeNodeData) {
   if (data.nodeType === 'TIMESERIES') {
     getMeasurementsInfo(data.nodePath).then((res) => {
@@ -309,46 +298,6 @@ function fillTreeLoading(nodes: Array<StorageDeviceTreeNodeData>) {
   });
 }
 
-// function fillNodePage(node: StorageDeviceTreeNodeData) {
-//   if (node && node.pageChildren && node.pageChildren.length === 1 && node.pageChildren[0]!.nodePath === 'loading' && node.children && node.children.length > 0) {
-//     const dataPathTotal = Math.ceil(node.children.length / pageSize);
-//     node.pageChildren = node.children.slice(0, 1 * pageSize);
-//     node.pageNum = 1;
-//     node.totalPage = dataPathTotal;
-//     if (dataPathTotal > 1) {
-//       node.pageChildren?.push({
-//         node: node.node,
-//         nodePath: `${node.nodePath}__PAGE`,
-//         nodeType: 'PAGE',
-//         parentPath: node.parentPath || '',
-//         pageNum: 1,
-//         totalPage: dataPathTotal,
-//       });
-//     }
-//   }
-// }
-
-// function fillTreePage(nodes: Array<StorageDeviceTreeNodeData>) {
-//   nodes.forEach((node) => {
-//     if (node && node.pageChildren && node.pageChildren.length === 1 && node.pageChildren[0]!.nodePath === 'loading' && node.children && node.children.length > 0) {
-//       const dataPathTotal = Math.ceil(node.children.length / pageSize);
-//       node.pageChildren = node.children.slice(0, 1 * pageSize);
-//       node.pageNum = 1;
-//       node.totalPage = dataPathTotal;
-//       if (dataPathTotal > 1) {
-//         node.pageChildren?.push({
-//           node: node.node,
-//           nodePath: `${node.nodePath}__PAGE`,
-//           nodeType: 'PAGE',
-//           parentPath: node.parentPath || '',
-//           pageNum: 1,
-//           totalPage: dataPathTotal,
-//         });
-//       }
-//     }
-//   });
-// }
-
 // 获取搜索结果合并树
 function mergeAndUpdateData(data: Array<StorageDeviceTreeNodeData>) {
   data.forEach((item) => {
@@ -415,9 +364,7 @@ function handleData(data: string) {
   searchLoading.value = false;
   if (data === 'all_done') {
     searching.value = false;
-    // console.log('all_done', treeData.value);
   } else {
-    // console.log('Received data:', JSON.parse(data));
     const childrenData = JSON.parse(data).children || [];
     const rootTotal = Math.ceil(childrenData.length / pageSize);
     fillTreeLoading(childrenData);
@@ -568,25 +515,6 @@ async function handleOperate(Operate: 'add' | 'delete', payload: TreeEventPayloa
   }
 }
 
-// function handleClickMore(e: MouseEvent, key: string) {
-//   if (contextMenuTimer.value) {
-//     clearTimeout(contextMenuTimer.value);
-//     contextMenuTimer.value = undefined;
-//   }
-//   const data: TreeNodeData = measurementTree.value?.virtualizedTreeRef?.getNode(key)?.data as TreeNodeData;
-//   if (data.nodeType === 'PAGE' || data.nodePath === 'root.__system' || data.nodePath.startsWith('root.__system.')) return;
-//   clickedNodeData.node = data.node;
-//   clickedNodeData.nodePath = data.nodePath;
-//   clickedNodeData.nodeType = data.nodeType;
-//   clickedNodeData.parentPath = data.parentPath;
-//   isShowContextMenu.value = true;
-//   let y = e.clientY - 52;
-//   let x = e.clientX - insertWidth.value;
-//   if (x < 0) x = 0;
-//   if (document.body.clientHeight - y < 150) y = document.body.clientHeight - 150;
-//   contextMenuRef.value!.$el.style.inset = `${y}px auto auto ${x}px`;
-// }
-
 function handleCommand(val: string, data: TreeNodeData) {
   if (val === 'database') {
     databaseVisible.value = true;
@@ -623,13 +551,10 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
     return;
   }
   if (data.nodePath === expandNode.value && (!data.pageChildren || data.pageChildren[0]!.nodeType !== 'loading')) return;
-  // if (['DATABASE', 'TIMESERIES']!.includes(data.nodeType)) {
   if (props.currentNode !== data.nodePath) {
     emit('handleChangeNode', data.nodePath, data.nodeType, searchText.value);
   }
-  // }
   expandNode.value = data.nodePath;
-  // expandNodes.value = [data.nodeParent, data.nodePath];
   if (isSearchResult.value) {
     if ((data.pageChildren && data.pageChildren.length === 0) || data.pageChildren[0]!.nodeType === 'loading') {
       const originTreeData = cloneDeep(recursionFindCurrentByOrigin(data.nodePath, treeData.value)?.children || []);
@@ -738,13 +663,6 @@ function onMouseDown() {
   }, 200);
 }
 
-// function handleScroll(scrollLeft: number) {
-//   const iconList = document.querySelectorAll('.more-icon');
-//   iconList.forEach((icon: any) => {
-//     icon.style.left = scrollLeft;
-//   });
-// }
-
 onMounted(() => {
   window.addEventListener('resize', onResize);
 });
@@ -795,8 +713,6 @@ defineExpose({ handleRefresh, handleOperate });
 
 .measurement-tree-box {
   flex: 1;
-
-  // overflow: hidden;
 }
 
 .node-text {

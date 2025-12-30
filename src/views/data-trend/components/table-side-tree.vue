@@ -19,21 +19,6 @@
         >
           <i-custom-refresh />
         </button>
-        <!-- <el-button
-          link
-          @click="
-            setFirstLoad(true);
-            handleRefresh();
-          "
-          :disabled="searching"
-          id="db-tree-refresh"
-          class="svg-button-hover-color m-l-16"
-        >
-          <i-custom-border-refresh style="width: 24px; height: 24px" />
-        </el-button>
-        <el-button link @click="handleAddDB()" :disabled="searching" id="db-tree-add-db" class="svg-button-hover-color m-l-16">
-          <i-custom-add-db-border style="width: 24px; height: 24px" />
-        </el-button> -->
       </div>
       <el-tree-v2
         ref="schemaTree"
@@ -49,7 +34,6 @@
         @node-collapse="handleNodeCollapse"
         node-key="id"
       >
-        <!-- eslint-disable-next-line vue/no-unused-vars -->
         <template #default="{ data }">
           <div
             class="node-text"
@@ -71,70 +55,9 @@
               </div>
               <el-tag v-else-if="data.nodeType === 'ATTRIBUTE'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Attr</el-tag>
               <el-tag v-else-if="data.nodeType === 'FIELD'" disable-transitions type="primary" effect="dark" class="tree-column-type-tag">Field</el-tag>
-              <!-- <el-tag v-else-if="data.nodeType === 'DEVICE-MEASUREMENT'" disable-transitions type="success" effect="plain" class="tree-column-type-tag" style="width: auto">M</el-tag> -->
             </el-icon>
             <span class="node-label" :title="data.nodeName + (data.comment ? ` (${data.comment})` : '')"> {{ data.nodeName }}{{ data.comment ? ` (${data.comment})` : '' }} </span>
           </div>
-          <!-- <el-dropdown v-if="data.nodeType === 'DATABASE'" trigger="click" @command="handleDatabaseOptionClick($event, data)">
-            <span class="lang-icon m-r-20" @click.stop>
-              <el-icon size="24" class="svg-button-hover-color"><i-custom-more /></el-icon>
-            </span>
-            <template #dropdown>
-              <el-dropdown-menu class="operate-dropdown">
-                <el-dropdown-item command="dbSchema">
-                  <div class="node-text">
-                    <i-custom-structure class="m-r-8" />
-                    <span>{{ t('dataManage.dbSchema') }}</span>
-                  </div>
-                </el-dropdown-item>
-                <el-dropdown-item command="addTable" :disabled="data.database === 'information_schema'">
-                  <div class="node-text">
-                    <i-custom-add-border2-active class="m-r-8" />
-                    <span>{{ t('dataManage.addTable') }}</span>
-                  </div>
-                </el-dropdown-item>
-                <el-dropdown-item command="dbDelete" :disabled="data.database === 'information_schema'">
-                  <div class="node-text">
-                    <i-custom-delete-active class="m-r-8" />
-                    <span>{{ t('dataManage.deleteDb') }}</span>
-                  </div>
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown> -->
-          <!-- <el-dropdown v-if="data.nodeType === 'TABLE'" trigger="click" @command="handleTableOptionClick($event, data)">
-            <span class="lang-icon m-r-20" @click.stop>
-              <el-icon size="24" class="svg-button-hover-color"><i-custom-more /></el-icon>
-            </span>
-            <template #dropdown>
-              <el-dropdown-menu class="operate-dropdown">
-                <el-dropdown-item command="tableSchema">
-                  <div class="node-text">
-                    <i-custom-structure class="m-r-8" />
-                    <span>{{ t('dataManage.tableSchema') }}</span>
-                  </div>
-                </el-dropdown-item>
-                <el-dropdown-item command="tableData">
-                  <div class="node-text">
-                    <i-custom-data class="m-r-8" />
-                    <span>{{ t('dataManage.tableData') }}</span>
-                  </div>
-                </el-dropdown-item>
-                <el-dropdown-item command="addCloumn" :disabled="data.database === 'information_schema'">
-                  <div class="node-text">
-                    <i-custom-add-border2-active class="m-r-8" />
-                    <span>{{ t('dataManage.newColumn') }}</span>
-                  </div>
-                </el-dropdown-item>
-                <el-dropdown-item command="tableDelete" :disabled="data.database === 'information_schema'">
-                  <div class="node-text">
-                    <i-custom-delete-active class="m-r-8" />
-                    <span>{{ t('dataManage.deleteTable') }}</span>
-                  </div>
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown> -->
           <el-button v-if="data.nodeType === 'TABLE'" class="button-style" @click.stop="handleAddMeasurements(data.database, data.nodeName)">
             <el-icon size="20"><i-custom-add-border2 /></el-icon>
           </el-button>
@@ -193,12 +116,9 @@ const currentNode = ref<TableTreeNodeData>();
 const currentNodeShow = ref<TableTreeNodeData>();
 const modalAddDbVisible = ref(false);
 const treeHeight = ref(document.body.clientHeight - 150);
-// const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
-// const { requestFn: deleteDatabase } = useRequest(IoTDBApi.deleteDatabase);
-// const { requestFn: deleteTables } = useRequest(IoTDBApi.deleteTables);
 
-const { treeData /*, activeKeyList */ } = storeToRefs(useDbStore());
-const { getDatabases /* setFirstLoad, setActiveList */ } = useDbStore();
+const { treeData } = storeToRefs(useDbStore());
+const { getDatabases } = useDbStore();
 
 const selectedMeasurementsData = ref<TableTreeNodeData[]>([]);
 const tableMeasurementVisible = ref(false);
@@ -239,8 +159,6 @@ function saveToStorage() {
             measurements.push(matchedMeasurement);
           } else {
             // 如果找不到匹配的，使用默认结构
-            // const device = deviceName ? deviceName.split('.').map((value) => ({ value })) : [];
-            // measurements.push({ device, measurement: measurementName });
             measurements.push({
               database: dbNode.nodeName,
               tableName: tbNode.nodeName,
@@ -342,7 +260,6 @@ const handleConfirmMeasurement = (selected: SelectedMeasurement[]) => {
       selectedMeasurements.value.push(meas);
     }
   }
-  // selectedMeasurements.value = selected;
   const filteredMeasurements = selectedMeasurements.value.filter((m) => m.database === selectedDatabase.value && m.tableName === selectedTable.value);
   addMeasurementsOfDbTbIntoTree(filteredMeasurements);
   expandDbTableNode(selectedDatabase.value, selectedTable.value);
@@ -437,35 +354,8 @@ function handleDeleteMeasurements(nodeInfo: TableTreeNodeData) {
   }
 }
 
-// function showAddTableDialog(nodeInfo: TableTreeNodeData, addType: string) {
-//   if (addTableDialog.value) {
-//     addTableDialog.value?.open(nodeInfo, addType);
-//   }
-// }
-
 const setDefaultTreeExpandKeys = async () => {
   await getDatabases();
-  // if (treeData.value && treeData.value.length) {
-  //   let activeNode = treeData.value[0]!;
-  //   if (activeKeyList.value.length) {
-  //     if (activeKeyList.value.length === 2) {
-  //       const activeDb = treeData.value.find((node) => node.id === activeKeyList.value[0]);
-  //       const activeTable = activeDb?.children?.find((node) => node.id === activeKeyList.value[1]);
-  //       if (activeTable) activeNode = activeTable;
-  //     } else {
-  //       const activeDb = treeData.value.find((node) => node.id === activeKeyList.value[0]);
-  //       if (activeDb) activeNode = activeDb;
-  //     }
-  //   }
-  //   currentNode.value = activeNode;
-  //   if (currentNodeShow?.value?.id !== activeNode.id) {
-  //     currentNodeShow.value = activeNode;
-  //     emit('handleNodeClick', activeNode);
-  //     setTimeout(() => {
-  //       schemaTree.value?.setExpandedKeys(activeKeyList.value);
-  //     }, 300);
-  //   }
-  // }
 };
 
 function initSelectedMeasurementsData() {

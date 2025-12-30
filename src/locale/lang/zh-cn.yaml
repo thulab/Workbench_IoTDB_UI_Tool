@@ -643,6 +643,7 @@ dataTrend:
   resetGraphTip: 是否确认清空趋势图？
   resetMeasurementTip: 是否确认清空所选测点？
   dataTypeTip: 仅支持查看数值类型（INT32 / INT64 / FLOAT / DOUBLE）的测点趋势
+  measurementName: 测点名称
 calculate:
   namePlaceholder: 请输入名称
   descPlaceholder: 请输入描述

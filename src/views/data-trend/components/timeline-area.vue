@@ -205,14 +205,6 @@ function fetchTableFullRangeHistoryData(measurement: Measurement) {
       ...measurement,
       values: transformedData,
     });
-    if (!normalData.length) {
-      // ElMessage.warning({ message: `测点 ${measurement.label} 在 ${t('dataTrend.noDataTip')}`, grouping: true });
-    }
-    const overPath = res.data?.changeAuto || [];
-    if (overPath.length) {
-      // const paths = overPath.join(',');
-      // ElMessage.warning({ message: t('dataTrend.measurementTip', { measurement: paths }), grouping: true });
-    }
   });
 }
 
@@ -253,14 +245,6 @@ function fetchTreeFullRangeHistoryData(measurement: Measurement) {
       ...measurement,
       values: transformedData,
     });
-    if (!normalData.length) {
-      // ElMessage.warning({ message: `测点 ${measurement.label} 在 ${t('dataTrend.noDataTip')}`, grouping: true });
-    }
-    const overPath = res.data?.changeAuto || [];
-    if (overPath.length) {
-      // const paths = overPath.join(',');
-      // ElMessage.warning({ message: t('dataTrend.measurementTip', { measurement: paths }), grouping: true });
-    }
   });
 }
 

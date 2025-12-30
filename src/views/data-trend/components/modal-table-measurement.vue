@@ -6,35 +6,7 @@
         <!-- 左侧测点选择区域 -->
         <div class="flex-2 flex flex-col">
           <el-form :model="formData" :rules="formRules" ref="formRef" label-position="left" label-width="80px">
-            <!-- 第一行：数据库和表选择 -->
-            <!-- <div class="flex gap-2">
-              <el-form-item :label="`${t('measurement.databaseTitle')}：`" prop="selectedDatabase" class="flex-[10]">
-                <el-select v-model="formData.selectedDatabase" filterable :placeholder="t('aiAnalysis.databasePlaceholeder')" @change="handleDatabaseChange" clearable class="w-full search-select">
-                  <template #prefix>
-                    <i-custom-search-icon class="remote-select-search-icon" />
-                  </template>
-                  <el-option v-for="db in databaseOptions" :key="db.value" :label="db.label" :value="db.value" />
-                </el-select>
-              </el-form-item>
-              <el-form-item :label="`${t('dataManage.table')}：`" label-width="40px" prop="selectedTable" class="flex-[8]">
-                <el-select
-                  v-model="formData.selectedTable"
-                  filterable
-                  :placeholder="t('aiAnalysis.tablePlaceholder')"
-                  @change="handleTableChange"
-                  :disabled="!formData.selectedDatabase || tableOptions.length === 0"
-                  clearable
-                  class="w-full search-select"
-                >
-                  <template #prefix>
-                    <i-custom-search-icon class="remote-select-search-icon" />
-                  </template>
-                  <el-option v-for="table in tableOptions" :key="table.value" :label="table.label" :value="table.value" />
-                </el-select>
-              </el-form-item>
-            </div> -->
-
-            <!-- 第二行：标签键值对输入 -->
+            <!-- 标签键值对输入 -->
             <el-form-item :label="`${t('measurement.device')}：`" required props="selectedTags" class="device-form-item">
               <div class="device-filter-container">
                 <div class="device-filter-inputs">
@@ -145,36 +117,6 @@
           </el-form>
         </div>
       </el-scrollbar>
-      <!-- 中间添加按钮 -->
-      <!-- <div class="flex items-center justify-center bg-[white] flex-0">
-        <el-tooltip :content="t('common.selectMeasurementLimit', { limit: props.selectedLimit })" :disabled="canAddMeasurements" effect="light">
-          <el-button type="primary" :disabled="!canAdd || !canAddMeasurements" @click="addMeasurements" link>
-            <i-custom-choose-measurement />
-          </el-button>
-        </el-tooltip>
-      </div> -->
-
-      <!-- 右侧已选测点区域 -->
-      <!-- <div class="w-[214px] flex flex-col bg-[#F7F8FC] right-panel">
-        <div>
-          <div class="text-sm font-medium text-gray-700 mb-2 c-[var(--el-color-primary)]">
-            {{ t('tableMeasurement.measurementSelected') }}
-            <el-tooltip effect="light" :content="t('common.selectMeasurementLimit', { limit: props.selectedLimit })" placement="top" popper-class="tooltip-box-width"
-              ><i-custom-question style="transform: translate(0, -80%)"
-            /></el-tooltip>
-          </div>
-        </div>
-        <el-scrollbar max-height="400px">
-          <div v-for="(item, index) in internalSelectedMeasurements" :key="formatSelectedMeasurement(item)" class="flex items-center justify-between mb-2 selected-measurement-item">
-            <div class="flex-1 flex max-w-[180px] leading-5">
-              <text-tooltip :content="formatSelectedMeasurement(item)"></text-tooltip>
-            </div>
-            <el-button link @click="removeMeasurement(index)">
-              <el-icon><i-custom-close-circle /></el-icon>
-            </el-button>
-          </div>
-        </el-scrollbar>
-      </div> -->
     </div>
 
     <template #footer>
@@ -192,7 +134,6 @@ import { storeToRefs } from 'pinia';
 import { useDbStore } from '@/stores';
 import { useI18n } from 'vue-i18n';
 import { TableDataApi } from '@/api';
-// import { formatSelectedMeasurement } from '@/utils/format';
 import type { FormInstance, TableInstance, FormRules } from 'element-plus';
 
 import type { TableTreeNodeData, SelectedMeasurement, TagFilter } from '@/types';
@@ -244,36 +185,8 @@ const { requestFn: getDevices, loading: searchLoading } = useRequest(TableDataAp
 
 const currentPage = ref(1);
 const noMoreData = ref(true);
-// 计算属性
-// const databaseOptions = computed(() => {
-//   return treeData.value
-//     .filter((db) => db.nodeName !== 'information_schema')
-//     .map((db) => ({
-//       value: db.nodeName,
-//       label: db.nodeName,
-//     }));
-// });
-
-// const tableOptions = computed(() => {
-//   if (!formData.selectedDatabase) return [];
-
-//   const db = treeData.value.find((d) => d.nodeName === formData.selectedDatabase);
-//   return (
-//     db?.children
-//       ?.filter((table) => table.nodeType === 'TABLE')
-//       .map((table) => ({
-//         value: table.nodeName,
-//         label: table.nodeName + (table.comment ? ` (${table.comment})` : ''),
-//       })) || []
-//   );
-// });
 
 const currentTableInfo = computed(() => {
-  // if (formData.selectedDatabase && formData.selectedTable) {
-  //   const db = treeData.value.find((d) => d.nodeName === formData.selectedDatabase);
-  //   return db?.children?.find((table) => table.nodeName === formData.selectedTable && table.nodeType === 'TABLE');
-  // }
-  // return null;
   if (props.currentDatabase && props.currentTable) {
     const db = treeData.value.find((d) => d.nodeName === props.currentDatabase);
     return db?.children?.find((table) => table.nodeName === props.currentTable && table.nodeType === 'TABLE');
@@ -294,13 +207,11 @@ const availableMeasurements = computed(() => {
 
 const canAdd = computed(() => {
   return (
-    formData.selectedDatabase &&
-    formData.selectedTable &&
-    (selectedDevices.value.length > 0 || availableTags.value.length === 0) &&
-    formData.selectedMeasurement &&
+    formData.selectedDatabase && // 数据库已选择
+    formData.selectedTable && // 表已选择
+    (selectedDevices.value.length > 0 || availableTags.value.length === 0) && // 有设备的情况下设备已选择
+    formData.selectedMeasurement && // 测点已选择
     formData.selectedMeasurement.length > 0
-    // &&
-    // internalSelectedMeasurements.value.length < props.selectedLimit
   );
 });
 
@@ -359,27 +270,6 @@ const initModal = async () => {
   });
 };
 
-// const handleDatabaseChange = () => {
-//   // 清空表选择和相关状态
-//   formData.selectedTable = '';
-//   deviceTableData.value = [];
-//   selectedDevices.value = [];
-//   formData.selectedMeasurement = [];
-// };
-
-// const handleTableChange = () => {
-//   // 清空相关状态
-//   deviceTableData.value = [];
-//   selectedDevices.value = [];
-//   if (availableTags.value.length === 0) {
-//     tagFilters.value = [{ variable: '', value: '' }];
-//   } else {
-//     tagFilters.value = [{ variable: availableTags.value[0]!.nodeName, value: '' }];
-//   }
-
-//   formData.selectedMeasurement = [];
-// };
-
 const canChoice = (option: TableTreeNodeData, index: number) => {
   // 获取除了当前 index 外的其他选项项的 key
   const keys = tagFilters.value.map((tag, i) => (i !== index ? tag.variable : '')).filter((key) => key);
@@ -437,11 +327,6 @@ const loadDevice = async (page: number = 1) => {
 };
 
 const searchDevices = async () => {
-  // 先验证表单
-  // const isValid = await formRef.value?.validateField(['selectedDatabase', 'selectedTable', 'selectedTags']).catch(() => false);
-  // if (!isValid) {
-  //   return;
-  // }
   noMoreData.value = false;
   await loadDevice(1);
 };
@@ -450,20 +335,10 @@ const handleDeviceSelection = (devices: Record<string, string>[]) => {
   selectedDevices.value = devices;
 };
 
-// const canAddMeasurements = computed(() => {
-//   const currentSelectedLength = (availableTags.value.length === 0 ? 1 : selectedDevices.value.length) * formData.selectedMeasurement.length;
-//   return internalSelectedMeasurements.value.length + currentSelectedLength <= props.selectedLimit;
-// });
-
 const addMeasurements = async () => {
   if (!canAdd.value) return;
   const newMeasurements: SelectedMeasurement[] = [];
 
-  // formData.selectedMeasurement.forEach((measurement) => {
-  //   if (!availableMeasurements.value.some((m) => m.nodeName === measurement)) {
-
-  //   }
-  // });
   if (selectedDevices.value.length === 0 && availableTags.value.length === 0) {
     // 无标签，无设备，添加所有设备
     selectedDevices.value.push({});
@@ -495,21 +370,8 @@ const addMeasurements = async () => {
     });
   });
 
-  // if (newMeasurements.length !== 0) {
-  //   if (internalSelectedMeasurements.value.length + newMeasurements.length > props.selectedLimit) {
-  //     ElMessage.warning(t('common.selectMeasurementLimit', { limit: props.selectedLimit }));
-  //     return;
-  //   }
-  // } else {
-  //   return;
-  // }
-
   internalSelectedMeasurements.value.push(...newMeasurements);
   ElMessage.success(t('tableMeasurement.addSuccess', { count: newMeasurements.length }));
-
-  // 清空选择
-  // selectedDevices.value = [];
-  // formData.selectedMeasurement = '';
 };
 
 const removeMeasurement = (index: number) => {

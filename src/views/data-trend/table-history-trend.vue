@@ -188,33 +188,6 @@ function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: Selec
       values: [],
     });
   }
-  // measurementList.value.push(
-  //   ...newMeasurements.map((item) => {
-  //     let deviceName = '';
-  //     for (const curTag of item.device ?? []) {
-  //       deviceName += `${curTag.value}.`;
-  //     }
-  //     if (deviceName.endsWith('.')) {
-  //       deviceName = deviceName.slice(0, -1);
-  //     }
-
-  //     const color =
-  //       predefineColors.find((c) => !usedColors.value.has(c)) ||
-  //       `#${Math.floor(Math.random() * 0xffffff)
-  //         .toString(16)
-  //         .padStart(6, '0')}`;
-  //     usedColors.value.add(color);
-
-  //     const label = `${item.database}.${item.tableName}.${deviceName}.${item.measurement}`;
-  //     return {
-  //       id: label,
-  //       label,
-  //       color,
-  //       details: item,
-  //       values: [],
-  //     } as unknown as Measurement;
-  //   }),
-  // );
   measurementMap.clear();
   measurementList.value.forEach((item) => {
     measurementMap.set(item.id, item);
@@ -448,7 +421,6 @@ function handleOperateTemplate(payload: { action: string; data: TrendTemplate })
       start: templateData.localTimeRange[0],
       end: templateData.localTimeRange[1],
     });
-    // measurementList.value = templateData.selectedMeasurements;
     const measurementsToAdd = templateData.selectedMeasurements.filter((item: Measurement) => {
       return !measurementList.value.find((m) => m.id === item.id);
     });

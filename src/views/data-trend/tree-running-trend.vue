@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts" setup>
-import SideTree from '../data-trend/components/side-tree.vue';
+import SideTree from './components/tree-side-tree.vue';
 import TrendGraphArea from './components/trend-graph-area.vue';
 import MarkerTableArea from './components/marker-table-area.vue';
 import OperateButtonRow from './components/operate-button-row.vue';
@@ -104,7 +104,6 @@ function addToMeasurementListIfNotExist(fullPath: string) {
       .padStart(6, '0')}`;
   usedColors.value.add(allocatedColor);
 
-  // 暂时不用 details 字段看后面有没有需要
   const newMeasurement: Measurement = {
     id: fullPath,
     label: fullPath,
@@ -189,7 +188,6 @@ function handleOperateTemplate(payload: { action: string; data: TrendTemplate })
     operateButtonRowRef.value?.setSaveTemplateLoading(false);
   } else {
     const templateData = JSON.parse(payload.data.template);
-    // measurementList.value = templateData.selectedMeasurements;
     const measurementsToAdd = templateData.selectedMeasurements.filter((item: Measurement) => {
       return !measurementList.value.find((m) => m.id === item.id);
     });
