@@ -267,6 +267,9 @@ function createGroup(fullpath: string) {
   needFetchGroupsId.value = [];
   needFetchGroupsId.value.push(groupId);
   setStorage();
+  setTimeout(() => {
+    trendGraphRef.value?.scrollToBottom();
+  }, 1000);
 }
 
 function mergeGroup(payload: { groupId: string; measurementPath: string }) {

@@ -150,6 +150,9 @@ function createGroup(fullPath: string) {
   needFetchGroupsId.value = [];
   needFetchGroupsId.value.push(groupId);
   setStorage();
+  setTimeout(() => {
+    trendGraphRef.value?.scrollToBottom();
+  }, 1000);
 }
 
 // ========== 操作按钮行所需函数 ==========

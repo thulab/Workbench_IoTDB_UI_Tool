@@ -135,8 +135,10 @@ function createGroup(fullPath: string) {
   } else {
     visibleMeasurementCountMap.value.set(fullPath, visibleMeasurementCountMap.value.get(fullPath)! + 1);
   }
-
   setStorage();
+  setTimeout(() => {
+    trendGraphRef.value?.scrollToBottom();
+  }, 1000);
 }
 
 // ========== 操作按钮行所需函数 ==========

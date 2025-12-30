@@ -397,8 +397,10 @@ function createGroup(fullpath: string) {
   } else {
     visibleMeasurementCountMap.value.set(fullpath, visibleMeasurementCountMap.value.get(fullpath)! + 1);
   }
-
   setStorage();
+  setTimeout(() => {
+    trendGraphRef.value?.scrollToBottom();
+  }, 1000);
 }
 
 function mergeGroup(payload: { groupId: string; measurementPath: string }) {

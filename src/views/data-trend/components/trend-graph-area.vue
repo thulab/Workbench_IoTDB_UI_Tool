@@ -123,11 +123,21 @@ const resetSelectedTemplate = () => {
   selectedTemplateId.value = '';
 };
 
+const scrollToBottom = () => {
+  if (wrapperRef.value) {
+    wrapperRef.value.scrollTo({
+      top: wrapperRef.value.scrollHeight,
+      behavior: 'smooth',
+    });
+  }
+};
+
 defineExpose({
   deleteMeasurementMarkerDataByName,
   restoreChartData,
   resetSelectedTemplate,
   clearAllMeasurementMarkerData,
+  scrollToBottom,
 });
 
 function convertPath(original: string): string {

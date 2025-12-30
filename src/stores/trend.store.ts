@@ -1,11 +1,13 @@
 import { defineStore } from 'pinia';
 import type { TimeRange } from '@/types/trend';
 
+const SEVEN_DAYS_MS = 7 * 24 * 3600 * 1000;
+
 export const useTreeHistoryTrendStore = defineStore('treeHistoryTrend', {
   state: () => ({
-    globalTimeRange: { start: Date.now() - 12 * 3600 * 1000, end: Date.now() } as TimeRange,
-    visibleTimeRange: { start: Date.now() - 12 * 3600 * 1000, end: Date.now() } as TimeRange,
-    pendingTimeRange: { start: Date.now() - 12 * 3600 * 1000, end: Date.now() } as TimeRange,
+    globalTimeRange: { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() } as TimeRange,
+    visibleTimeRange: { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() } as TimeRange,
+    pendingTimeRange: { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() } as TimeRange,
   }),
 
   actions: {
@@ -25,7 +27,7 @@ export const useTreeRunningTrendStore = defineStore('treeRunningTrend', {
   state: () => ({
     min: -1,
     isPlaying: true,
-    visibleTimeRange: { start: Date.now() - 12 * 3600 * 1000, end: Date.now() } as TimeRange,
+    visibleTimeRange: { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() } as TimeRange,
   }),
 
   actions: {
@@ -43,9 +45,9 @@ export const useTreeRunningTrendStore = defineStore('treeRunningTrend', {
 
 export const useTableHistoryTrendStore = defineStore('tableHistoryTrend', {
   state: () => ({
-    globalTimeRange: { start: Date.now() - 12 * 3600 * 1000, end: Date.now() } as TimeRange,
-    visibleTimeRange: { start: Date.now() - 12 * 3600 * 1000, end: Date.now() } as TimeRange,
-    pendingTimeRange: { start: Date.now() - 12 * 3600 * 1000, end: Date.now() } as TimeRange,
+    globalTimeRange: { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() } as TimeRange,
+    visibleTimeRange: { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() } as TimeRange,
+    pendingTimeRange: { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() } as TimeRange,
   }),
 
   actions: {
@@ -65,7 +67,7 @@ export const useTableRunningTrendStore = defineStore('tableRunningTrend', {
   state: () => ({
     min: -1,
     isPlaying: true,
-    visibleTimeRange: { start: Date.now() - 12 * 3600 * 1000, end: Date.now() } as TimeRange,
+    visibleTimeRange: { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() } as TimeRange,
   }),
 
   actions: {
