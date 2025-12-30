@@ -355,7 +355,6 @@ function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: Selec
   measurementList.value.forEach((item) => {
     measurementMap.set(item.id, item);
   });
-  console.log('measurementList.value', measurementList.value);
   setStorage();
 }
 

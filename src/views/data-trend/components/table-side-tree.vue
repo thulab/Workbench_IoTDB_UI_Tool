@@ -45,6 +45,8 @@
         :height="treeHeight"
         :expand-on-click-node="true"
         @current-change="handleSelectNode"
+        @node-expand="handleNodeExpand"
+        @node-collapse="handleNodeCollapse"
         node-key="id"
       >
         <!-- eslint-disable-next-line vue/no-unused-vars -->
@@ -195,7 +197,7 @@ const treeHeight = ref(document.body.clientHeight - 150);
 // const { requestFn: deleteDatabase } = useRequest(IoTDBApi.deleteDatabase);
 // const { requestFn: deleteTables } = useRequest(IoTDBApi.deleteTables);
 
-const { treeData, activeKeyList } = storeToRefs(useDbStore());
+const { treeData /*, activeKeyList */ } = storeToRefs(useDbStore());
 const { getDatabases /* setFirstLoad, setActiveList */ } = useDbStore();
 
 const selectedMeasurementsData = ref<TableTreeNodeData[]>([]);
@@ -204,6 +206,8 @@ const selectedDatabase = ref<string>('');
 const selectedTable = ref<string>('');
 const selectedMeasurements = ref<SelectedMeasurement[]>([]);
 const modalTableMeasurementRef = ref<InstanceType<typeof ModalTableMeasurement>>();
+
+const currentExpandedKeys = ref<Set<string>>(new Set());
 
 const treeProps = {
   value: 'id',
@@ -296,6 +300,16 @@ const filteredTreeData = computed(() => {
   return filterTreeData(selectedMeasurementsData.value, keyword);
 });
 
+async function expandDbTableNode(database: string, tableName: string) {
+  await nextTick();
+  const dbNode = selectedMeasurementsData.value.find((n) => n.nodeType === 'DATABASE' && n.nodeName === database);
+  const tableNode = dbNode?.children?.find((n) => n.nodeType === 'TABLE' && n.nodeName === tableName);
+  if (tableNode && tableNode.id) {
+    currentExpandedKeys.value.add(tableNode.id);
+    schemaTree.value?.setExpandedKeys(Array.from(currentExpandedKeys.value));
+  }
+}
+
 function filterTreeData(data: TableTreeNodeData[], keyword: string): TableTreeNodeData[] {
   const result: TableTreeNodeData[] = [];
   data.forEach((node) => {
@@ -331,6 +345,7 @@ const handleConfirmMeasurement = (selected: SelectedMeasurement[]) => {
   // selectedMeasurements.value = selected;
   const filteredMeasurements = selectedMeasurements.value.filter((m) => m.database === selectedDatabase.value && m.tableName === selectedTable.value);
   addMeasurementsOfDbTbIntoTree(filteredMeasurements);
+  expandDbTableNode(selectedDatabase.value, selectedTable.value);
   saveToStorage();
   tableMeasurementVisible.value = false;
   emit('updateSelectedMeasurements', filteredMeasurements);
@@ -430,27 +445,27 @@ function handleDeleteMeasurements(nodeInfo: TableTreeNodeData) {
 
 const setDefaultTreeExpandKeys = async () => {
   await getDatabases();
-  if (treeData.value && treeData.value.length) {
-    let activeNode = treeData.value[0]!;
-    if (activeKeyList.value.length) {
-      if (activeKeyList.value.length === 2) {
-        const activeDb = treeData.value.find((node) => node.id === activeKeyList.value[0]);
-        const activeTable = activeDb?.children?.find((node) => node.id === activeKeyList.value[1]);
-        if (activeTable) activeNode = activeTable;
-      } else {
-        const activeDb = treeData.value.find((node) => node.id === activeKeyList.value[0]);
-        if (activeDb) activeNode = activeDb;
-      }
-    }
-    currentNode.value = activeNode;
-    if (currentNodeShow?.value?.id !== activeNode.id) {
-      currentNodeShow.value = activeNode;
-      emit('handleNodeClick', activeNode);
-      setTimeout(() => {
-        schemaTree.value?.setExpandedKeys(activeKeyList.value);
-      }, 300);
-    }
-  }
+  // if (treeData.value && treeData.value.length) {
+  //   let activeNode = treeData.value[0]!;
+  //   if (activeKeyList.value.length) {
+  //     if (activeKeyList.value.length === 2) {
+  //       const activeDb = treeData.value.find((node) => node.id === activeKeyList.value[0]);
+  //       const activeTable = activeDb?.children?.find((node) => node.id === activeKeyList.value[1]);
+  //       if (activeTable) activeNode = activeTable;
+  //     } else {
+  //       const activeDb = treeData.value.find((node) => node.id === activeKeyList.value[0]);
+  //       if (activeDb) activeNode = activeDb;
+  //     }
+  //   }
+  //   currentNode.value = activeNode;
+  //   if (currentNodeShow?.value?.id !== activeNode.id) {
+  //     currentNodeShow.value = activeNode;
+  //     emit('handleNodeClick', activeNode);
+  //     setTimeout(() => {
+  //       schemaTree.value?.setExpandedKeys(activeKeyList.value);
+  //     }, 300);
+  //   }
+  // }
 };
 
 function initSelectedMeasurementsData() {
@@ -533,6 +548,18 @@ function handleSearch() {
 
 function handleRefresh() {
   emit('updateDetail');
+}
+
+function handleNodeExpand(payload: Record<string, unknown>) {
+  const data = payload as unknown as TableTreeNodeData;
+  if (!data || !data.id) return;
+  currentExpandedKeys.value.add(data.id);
+}
+
+function handleNodeCollapse(payload: Record<string, unknown>) {
+  const data = payload as unknown as TableTreeNodeData;
+  if (!data || !data.id) return;
+  currentExpandedKeys.value.delete(data.id);
 }
 
 function handleSelectNode(payload: Record<string, unknown>) {

@@ -538,7 +538,6 @@ const handleClear = () => {
 
 const handleConfirm = () => {
   addMeasurements();
-  console.log('internalSelectedMeasurements:', internalSelectedMeasurements.value);
   emit('confirm', internalSelectedMeasurements.value);
   handleClose();
 };
