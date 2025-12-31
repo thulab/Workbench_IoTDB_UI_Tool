@@ -684,7 +684,7 @@ watch(
 watch(
   () => props.index,
   () => {
-    if (props.index === 1) {
+    if (props.index === 1 || props.index === 0) {
       if (chart) {
         chart.setOption(buildOption(), true);
       }
