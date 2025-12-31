@@ -10,7 +10,7 @@
         :id="group.id"
         :key="group.id"
         :group="group"
-        :index="index"
+        :index="props.measurementGroupInfo.length - 1 - index"
         :range="trendStore.visibleTimeRange"
         :markers="props.markers"
         :height="chartHeight"

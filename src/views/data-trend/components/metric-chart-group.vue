@@ -434,6 +434,7 @@ function buildOption(): ECOption {
       },
     },
     xAxis: {
+      show: props.index === 0,
       type: 'time',
       min: trendStore.visibleTimeRange.start,
       max: trendStore.visibleTimeRange.end,
@@ -519,6 +520,7 @@ function buildRunningOption(): ECOption {
       },
     },
     xAxis: {
+      show: props.index === 0,
       type: 'time',
       min: runningTrendStore.min > 0 ? runningTrendStore.min : undefined,
       axisLine: { lineStyle: { color: '#444B63' } },
@@ -677,6 +679,17 @@ watch(
     }
   },
   { deep: true },
+);
+
+watch(
+  () => props.index,
+  () => {
+    if (props.index === 1) {
+      if (chart) {
+        chart.setOption(buildOption(), true);
+      }
+    }
+  },
 );
 
 watch(

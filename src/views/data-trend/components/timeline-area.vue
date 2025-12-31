@@ -5,18 +5,18 @@
       <div class="flex-grow text-center text-[14px]">{{ t('dataTrend.dataSelectWindow') }}</div>
       <el-date-picker v-model="endTime" type="datetime" placeholder="Select end date and time" @change="onEndTimeSelected" :prefix-icon="ICustomCalender" :disabled-date="disabledDate" />
     </div>
-    <div ref="timelineWrapperRef" class="relative w-full h-40px">
-      <div ref="timelineChartRef" class="w-full h-40px"></div>
-      <button class="flip-button cursor-pointer absolute top-0 h-full w-20px rounded-[2px] bg-white p-0!" @click="handlePageDown">
+    <div ref="timelineWrapperRef" class="relative w-full h-60px">
+      <div ref="timelineChartRef" class="w-full h-60px"></div>
+      <button class="flip-button cursor-pointer absolute top-0 h-40px w-20px rounded-[2px] bg-white p-0!" @click="handlePageDown">
         <i-custom-arrow-left-trend />
       </button>
-      <button class="flip-button cursor-pointer absolute top-0 right-0 h-full w-20px rounded-[2px] bg-white p-0!" @click="handlePageUp">
+      <button class="flip-button cursor-pointer absolute top-0 right-0 h-40px w-20px rounded-[2px] bg-white p-0!" @click="handlePageUp">
         <i-custom-arrow-right-trend />
       </button>
       <div class="absolute inset-0 pointer-events-none mx-[24px]">
-        <div class="timeline-outline absolute w-full h-full bg-transparent rounded-[2px] box-border"></div>
+        <div class="timeline-outline absolute w-full h-40px bg-transparent rounded-[2px] box-border"></div>
         <div
-          class="range-slider-fill absolute h-full rounded-[2px] pointer-events-auto box-border bg-[#495AD420]"
+          class="range-slider-fill absolute h-40px rounded-[2px] pointer-events-auto box-border bg-[#495AD420]"
           :style="{
             left: handleLeftPos + 'px',
             right: containerWidth - handleRightPos - 48 + 'px',
@@ -382,15 +382,17 @@ function buildTimelineChartOption(): ECOption {
       bottom: 0,
     },
     tooltip: { show: false },
-    xAxis: {
+    xAxis: fullDataSet.value.map((measurement, index) => ({
       type: 'time',
-      show: false,
+      show: index === 0,
       min: trendStore.globalTimeRange.start,
       max: trendStore.globalTimeRange.end,
       splitNumber: 4,
       axisLabel: {
-        color: '#8d95a5',
+        color: '#424561',
+        fontSize: 12,
         interval: 'auto',
+        hideOverlap: true,
         formatter: (value: number) =>
           new Date(value).toLocaleTimeString('zh-CN', {
             year: '2-digit',
@@ -400,9 +402,12 @@ function buildTimelineChartOption(): ECOption {
             minute: '2-digit',
           }),
       },
-      axisLine: { lineStyle: { color: '#4b5168' } },
-    },
-    yAxis: fullDataSet.value.map((measurement) => ({
+      axisLine: {
+        show: false,
+        lineStyle: { color: '#444B63' },
+      },
+    })),
+    yAxis: fullDataSet.value.map((measurement, index) => ({
       alignTicks: false,
       id: measurement.id,
       type: 'value',
