@@ -392,7 +392,6 @@ function buildTimelineChartOption(): ECOption {
         color: '#424561',
         fontSize: 12,
         interval: 'auto',
-        hideOverlap: true,
         formatter: (value: number) =>
           new Date(value).toLocaleTimeString('zh-CN', {
             year: '2-digit',
