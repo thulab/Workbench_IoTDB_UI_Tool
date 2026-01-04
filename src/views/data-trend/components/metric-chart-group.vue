@@ -686,6 +686,10 @@ watch(
   () => {
     if (props.index === 1 || props.index === 0) {
       if (chart) {
+        if (props.isRunning) {
+          chart.setOption(buildRunningOption(), true);
+          return;
+        }
         chart.setOption(buildOption(), true);
       }
     }
