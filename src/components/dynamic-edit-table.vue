@@ -36,11 +36,16 @@
           </el-table-column>
           <el-table-column fixed="right" width="200" align="center" label="操作">
             <template #default="scope">
-              <el-button v-if="!scope.row.editable && canDelete" class="edit-f" type="text" size="small" @click="$emit('deleteRow', scope.row)">
+              <el-button v-if="!scope.row.editable && canDelete" :disabled="isSystemDatabase" class="edit-f" type="text" size="small" @click="$emit('deleteRow', scope.row)">
                 {{ t('common.delete') }}
               </el-button>
-              <el-tooltip v-if="!scope.row.editable && !canDelete" effect="light" :content="cannotDeleteTip" placement="top" popper-class="table-tooltip-max-width">
-                <el-button disabled size="small" type="text">
+              <template v-else-if="!scope.row.editable && !canDelete && isSystemDatabase">
+                <el-button :disabled="true" size="small" type="text">
+                  {{ t('common.delete') }}
+                </el-button>
+              </template>
+              <el-tooltip v-else-if="!scope.row.editable && !canDelete" effect="light" :content="cannotDeleteTip" placement="top" popper-class="table-tooltip-max-width">
+                <el-button :disabled="true" size="small" type="text">
                   {{ t('common.delete') }}
                 </el-button>
               </el-tooltip>
@@ -122,6 +127,8 @@ const emit = defineEmits<{
   (event: 'deleteRow', row: Record<string, any>): void;
   (event: 'saveRow', row: Record<string, any>): void;
 }>();
+
+const isSystemDatabase = computed(() => props.currentNode?.database === 'information_schema');
 
 const { t } = useI18n();
 const currentPageVM = useVModel(props, 'currentPage');
@@ -244,6 +251,12 @@ function handleSizeChange() {
 .edit-f {
   cursor: pointer;
   padding-right: 3px;
+}
+
+.stand-table :deep(.el-button.is-disabled.el-button--text) {
+  color: #9bb5ff !important;
+  opacity: 1 !important;
+  cursor: not-allowed;
 }
 
 .tag_content {

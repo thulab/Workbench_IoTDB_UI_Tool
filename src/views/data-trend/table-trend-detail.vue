@@ -207,6 +207,7 @@ const { t, locale } = useI18n();
 const userStore = useUserStore();
 const userName = computed(() => userStore.userInfo.name);
 const { canReadWriteData } = storeToRefs(userStore);
+const hasTableModelPrivilege = userStore.hasTableModelPrivilege;
 const connectionStore = useConnectionStore();
 const connectionId = computed(() => connectionStore.connectionInfo.data.id);
 const connectionType = computed(() => (connectionStore.connectionIsMaster ? 0 : 1));
@@ -435,8 +436,19 @@ const chartOptions = computed<ECOption>(
 const { requestFn: getHistoryTrend } = useRequest(TableDataApi.getTrendHistoryData);
 const { requestFn: upsertTrendTemplate } = useRequest(SearchApi.upsertTrendTemplate);
 
+const canTableSelect = computed(() => {
+  if (!connectionStore.isTableModel) return false;
+  const measurements = searchFormData.selectedMeasurement;
+  if (!measurements.length) return false;
+  return measurements.every((item) => hasTableModelPrivilege('SELECT', item.database, item.tableName));
+});
+
 const applyTip = computed(() => {
-  if (!canReadWriteData.value) {
+  if (connectionStore.isTableModel) {
+    if (searchFormData.selectedMeasurement.length && !canTableSelect.value) {
+      return t('common.needQueryDataPermission');
+    }
+  } else if (!canReadWriteData.value) {
     return t('common.dataAuth');
   }
   if (searchFormData.selectedMeasurement.length === 0) {
@@ -449,6 +461,9 @@ const applyTip = computed(() => {
 });
 
 const applyTipDisabled = computed(() => {
+  if (connectionStore.isTableModel) {
+    return canTableSelect.value && searchFormData.selectedMeasurement.length > 0 && searchFormData.selectedMeasurement.length <= 10;
+  }
   if (canReadWriteData.value && searchFormData.selectedMeasurement.length > 0 && searchFormData.selectedMeasurement.length <= 10) {
     return true;
   }
@@ -677,7 +692,10 @@ const buildParams = (operate: string, measurements: SelectedMeasurement[]) => {
 
 // 重置
 function handleReset(force?: boolean) {
-  socketInstance.value?.send(buildParams('del', searchFormData.selectedMeasurement));
+  const delMeasurements = pathList.value.map((item) => item.selectedMeasurement).filter(Boolean) as SelectedMeasurement[];
+  if (delMeasurements.length) {
+    socketInstance.value?.send(buildParams('del', delMeasurements));
+  }
   if (force) {
     searchFormData.database = '';
     searchFormData.table = '';
@@ -694,6 +712,7 @@ function handleReset(force?: boolean) {
   chartHistoryData.value.length = 0;
   pathList.value = [];
   copySearchFormData = cloneDeep(searchFormData);
+  window.sessionStorage.setItem('tableDataTrendStorage', '');
   setOption(chartOptions.value, true);
 }
 
@@ -1184,6 +1203,8 @@ const handleSelectMeasurement = () => {
 
 const handleConfirmMeasurement = (selected: SelectedMeasurement[]) => {
   searchFormData.selectedMeasurement = selected;
+  searchFormData.database = selected[0]?.database || '';
+  searchFormData.table = selected[0]?.tableName || '';
   tableMeasurementVisible.value = false;
 };
 

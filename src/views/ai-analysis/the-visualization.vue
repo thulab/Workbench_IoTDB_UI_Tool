@@ -128,12 +128,14 @@
                 </div>
                 <div v-else>
                   <base-form-item label="SQL：" prop="sql" class="el-form-item-not-mandatory" style="margin-bottom: 16px">
-                    <el-button type="primary" :disabled="!enableAINode" link id="search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
+                    <el-button type="primary" link id="search-sql" style="text-decoration: underline" @click="handleSql" :disabled="!connectionStore.isTableModel">
+                      {{ t('search.sqlInput') }}
+                    </el-button>
                   </base-form-item>
                 </div>
                 <div class="search-form-buttons" style="margin-bottom: 16px">
-                  <el-button @click="handleReset" :disabled="!enableAINode" id="search-reset">{{ t('common.reset') }}</el-button>
-                  <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="canQuery" popper-class="tooltip-box-width">
+                  <el-button @click="handleReset" id="search-reset">{{ t('common.reset') }}</el-button>
+                  <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="canQuery || !applyTip" popper-class="tooltip-box-width">
                     <el-button :disabled="!canQuery" type="primary" @click="handleSearch()" id="search-search">
                       {{ t('common.query') }}
                     </el-button>
@@ -144,7 +146,11 @@
           </div>
         </el-header>
         <version-container :is-show="showAuthMenu" :versionTip="connectionStore.isTableModel ? '2.0.5' : '2.0.5 或 2.0.8'">
-          <auth-container :is-auth="canUseModel && canReadWriteData && enableAINode" :content="enableAINode ? 'common.dataAndModelAuth' : 'aiAnalysis.enableTip'" style="height: 100%; width: 100%">
+          <auth-container
+            :is-auth="(canUseModel && canReadWriteData && enableAINode) || connectionStore.isTableModel"
+            :content="enableAINode ? 'common.dataAndModelAuth' : 'aiAnalysis.enableTip'"
+            style="height: 100%; width: 100%"
+          >
             <el-main class="p-0 position-relative" style="height: 100%">
               <el-container class="position-absolute p-x-16" style="height: 100%; width: 100%; z-index: 1000" v-if="searchFormData.type === 2">
                 <el-main class="page-table-details">
@@ -219,8 +225,19 @@
                     >
                       <div class="flex-justify-between p-b-4">
                         <span class="detail-total">{{ t('aiAnalysis.total', { total: sortedData.length }) }}</span>
-                        <el-dropdown class="more-icon m-r-8" :disabled="!canReadWriteData || !canQuery" @command="(val) => handleCommandDown(val)" id="visualization-save-dropdown">
-                          <el-button link type="primary" class="export-button" id="visualization-download" :disabled="!canReadWriteData || !allTableData.length">
+                        <el-dropdown
+                          class="more-icon m-r-8"
+                          :disabled="connectionStore.isTableModel ? !canTableDownload || !allTableData.length : !canReadWriteData || !allTableData.length"
+                          @command="(val) => handleCommandDown(val)"
+                          id="visualization-save-dropdown"
+                        >
+                          <el-button
+                            link
+                            type="primary"
+                            class="export-button"
+                            id="visualization-download"
+                            :disabled="connectionStore.isTableModel ? !canTableDownload || !allTableData.length : !canReadWriteData || !allTableData.length"
+                          >
                             {{ t('spectrum.download') }}
                             <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                           </el-button>
@@ -333,7 +350,6 @@
     </active-container>
   </coming-soon-container>
 </template>
-
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import type { FormInstance, SingleOrRange, DateModelType } from 'element-plus';
@@ -357,6 +373,7 @@ const { t, locale } = useI18n();
 
 const userStore = useUserStore();
 const { canReadWriteData, canWriteData, canUseModel } = storeToRefs(userStore);
+const hasTableModelPrivilege = userStore.hasTableModelPrivilege;
 const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
 const modelList = ref<Array<Model>>([]);
@@ -490,6 +507,9 @@ const notComplete = computed(() => {
 });
 
 const applyTip = computed(() => {
+  if (connectionStore.isTableModel) {
+    return '';
+  }
   if (!canReadWriteData.value || !canUseModel.value) {
     return t('common.dataAndModelAuth');
   }
@@ -499,7 +519,18 @@ const applyTip = computed(() => {
   return t('spectrum.applyTip');
 });
 
+const tableModelMeasurementReady = computed(() => connectionStore.isTableModel && searchFormData.type !== 2 && !!searchFormData.measurement && !notComplete.value);
+const canTableDownload = computed(() => hasTableModelPrivilege('SELECT', searchFormData.database, searchFormData.table));
+
 const canQuery = computed(() => {
+  if (connectionStore.isTableModel) {
+    if (sqlValue.value) {
+      return true;
+    }
+    if (tableModelMeasurementReady.value) {
+      return true;
+    }
+  }
   if (canReadWriteData.value && canUseModel.value && !notComplete.value && enableAINode.value && ((searchFormData.method && searchFormData.method.length) || sqlValue.value)) {
     return true;
   }
@@ -743,6 +774,10 @@ const { requestFn: getCustomExportId } = useRequest(AIAnalysisApi.getCustomExpor
 const formatterTime = (row: SearchDataItem) => formatDate(row.time);
 
 function handleChangeType(val: string | number | boolean | undefined) {
+  if (val === 2) {
+    searchFormData.method = '';
+    return;
+  }
   if (val === 0 && modelOptions.value.find((item) => item.modelId === 'Timer')) {
     searchFormData.method = 'Timer';
   } else if (modelOptions.value.length > 0) {
@@ -850,25 +885,30 @@ const onResize = debounce(() => {
 }, 50);
 
 function getModelList() {
-  if (!canUseModel.value || !enableAINode.value) {
-    defaultMethod = [];
-    searchFormData.method = defaultMethod;
-    return;
+  if (!connectionStore.isTableModel) {
+    if (!canUseModel.value || !enableAINode.value) {
+      defaultMethod = [];
+      searchFormData.method = searchFormData.type === 2 ? '' : defaultMethod;
+      return;
+    }
   }
   getModels('')
     .then((res) => {
       modelList.value = res.data || [];
       if (modelList.value.some((m) => m.modelId === 'sundial')) {
         defaultMethod = ['sundial'];
-        searchFormData.method = defaultMethod;
       } else {
         defaultMethod = [modelList.value.filter((item) => ANOMALY_DETECTION_TYPES.indexOf(item.modelType) === -1 && item.category !== 'USER-DEFINED')[0]!.modelId || ''];
+      }
+      if (searchFormData.type !== 2) {
         searchFormData.method = defaultMethod;
+      } else {
+        searchFormData.method = '';
       }
     })
     .catch(() => {
       defaultMethod = [];
-      searchFormData.method = defaultMethod;
+      searchFormData.method = searchFormData.type === 2 ? '' : defaultMethod;
     });
 }
 
@@ -945,7 +985,9 @@ const realMotheds = () => {
 
 // 查询
 function handleSearch() {
-  if (!canReadWriteData.value) return;
+  if (!connectionStore.isTableModel) {
+    if (!canReadWriteData.value) return;
+  }
   searchFormData.orderBy = 'ascending';
   copySearchFormData = cloneDeep(searchFormData);
   filterCondition.value = 'all';
@@ -1205,7 +1247,7 @@ function setStorage() {
   );
 }
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('beforeunload', () => {
     if (!window.__isReload__) {
       setStorage();
@@ -1219,6 +1261,9 @@ onMounted(() => {
     }
   });
   dbStore.getDatabases();
+  if (userStore.userInfo.name && (!canUseModel.value || !enableAINode.value)) {
+    await userStore.loadPrivileges(true);
+  }
   getModelList();
 });
 

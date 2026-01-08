@@ -123,6 +123,7 @@ common:
   userAuth: 需“用户管理”权限
   roleAuth: 需“角色管理”权限
   modelAuth: 需“AI使用”权限
+  needQueryDataPermission: 需“查询数据”权限
   apply: 应用
   auto: 自动
   origin: 原始值
@@ -176,6 +177,7 @@ common:
     https://www.timecho.com/docs/zh/UserGuide/latest/User-Manual/Operator-and-Expression.html
   comingSoon: 敬请期待
   onlyOneNewRow: 请保存后再新增
+  systemTableViewOnly: 系统表仅支持查看
   versionTips: 适配 IoTDB V2.0 及以上版本
 page:
   '403': 403页面
@@ -1133,6 +1135,11 @@ dataManage:
   dbSchema: 数据库结构
   addTable: 新增表
   deleteDb: 删除数据库
+  needCreatePrivilege: 需"创建"权限
+  needDropPrivilege: 需"删除"权限
+  needAlterPrivilege: 需"修改"权限
+  needInsertPrivilege: 需"插入/更新数据"权限
+  needDeleteDataPrivilege: 需"删除数据"权限
   tableSchema: 查看表结构
   tableData: 查看数据
   newColumn: 新增列

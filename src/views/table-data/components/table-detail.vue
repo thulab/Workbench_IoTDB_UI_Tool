@@ -12,9 +12,30 @@
         <li class="database-info-item" id="device-total-li">
           <span class="database-info-item-label" id="measurement-total-span">{{ t('dataManage.ttl') }}：</span>
           {{ localCurrentNode?.ttl ? `${localCurrentNode?.ttl} ms` : 'INF' }}
-          <el-icon size="24" class="m-r-6 svg-button-hover-color" style="cursor: pointer" @click="handleEditTableTTL()">
-            <i-custom-edit />
-          </el-icon>
+          <template v-if="isSystemDatabase">
+            <el-tooltip effect="light" :content="t('common.systemTableViewOnly')" placement="top" :disabled="false">
+              <span>
+                <el-icon size="24" class="m-r-6 svg-button-hover-color" :style="{ cursor: 'not-allowed', opacity: 0.4 }" @click.stop>
+                  <i-custom-edit />
+                </el-icon>
+              </span>
+            </el-tooltip>
+          </template>
+          <template v-else>
+            <auth-tooltip :is-disabled="canAlterTable" content="dataManage.needAlterPrivilege">
+              <span>
+                <el-icon
+                  size="24"
+                  class="m-r-6 svg-button-hover-color"
+                  :class="{ 'edit-disabled': !canAlterTable }"
+                  :style="{ cursor: canAlterTable ? 'pointer' : 'not-allowed' }"
+                  @click="handleEditTableTTL"
+                >
+                  <i-custom-edit />
+                </el-icon>
+              </span>
+            </auth-tooltip>
+          </template>
         </li>
         <li class="database-info-item" id="measurement-total-li">
           <span class="database-info-item-label" id="measurement-total-span">{{ t('dataManage.columns') }}：</span>
@@ -41,31 +62,73 @@
       </div>
 
       <div class="search-form-buttons">
-        <el-button type="primary" id="table-add" @click="showAddTableDialog">
-          {{ t('common.add') }}
-        </el-button>
-        <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
-          <el-button class="m-l-16" :disabled="!canReadWriteData" @click="handleImport" id="table-data-import">
-            {{ t('common.import') }}
+        <template v-if="isSystemDatabase">
+          <el-tooltip effect="light" :content="t('common.systemTableViewOnly')" placement="top" :disabled="false">
+            <span>
+              <el-button type="primary" id="table-add" :disabled="true" @click="showAddTableDialog">
+                {{ t('common.add') }}
+              </el-button>
+            </span>
+          </el-tooltip>
+
+          <el-tooltip effect="light" :content="t('common.systemTableViewOnly')" placement="top" :disabled="false">
+            <span>
+              <el-button class="m-l-16" :disabled="true" @click="handleImport" id="table-data-import">
+                {{ t('common.import') }}
+              </el-button>
+            </span>
+          </el-tooltip>
+        </template>
+        <template v-else>
+          <auth-tooltip :is-disabled="canAlterTable" content="dataManage.needAlterPrivilege">
+            <span>
+              <el-button type="primary" id="table-add" :disabled="!canAlterTable" @click="showAddTableDialog">
+                {{ t('common.add') }}
+              </el-button>
+            </span>
+          </auth-tooltip>
+
+          <auth-tooltip :is-disabled="canAlterTable" content="dataManage.needAlterPrivilege">
+            <span>
+              <el-button class="m-l-16" :disabled="!canAlterTable" @click="handleImport" id="table-data-import">
+                {{ t('common.import') }}
+              </el-button>
+            </span>
+          </auth-tooltip>
+        </template>
+
+        <el-dropdown class="m-x-16" @command="(val) => handleCommandDown(val)" id="mesaurement-download-dropdown">
+          <el-button :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" id="mesaurement-download">
+            {{ t('common.export') }}
+            <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
           </el-button>
-        </auth-tooltip>
-        <auth-tooltip :is-disabled="canReadWriteData" :content="'common.schemaAuth'">
-          <el-dropdown class="m-x-16" :disabled="!canReadWriteData || !(columnDataFilter.length > 0)" @command="(val) => handleCommandDown(val)" id="mesaurement-download-dropdown">
-            <el-button :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" :disabled="!canReadWriteData || !(columnDataFilter.length > 0)" id="mesaurement-download">
-              {{ t('common.export') }}
-              <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
-            </el-button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="csv" id="mesaurement-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
-                <el-dropdown-item command="xlsx" id="mesaurement-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-        </auth-tooltip>
-        <el-button type="primary" id="mesaurement-batch-del" @click="handleDelRow('batch', null)" :disabled="columnsSelection.length === 0">
-          {{ t('common.batchDelete') }}
-        </el-button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="csv" id="mesaurement-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
+              <el-dropdown-item command="xlsx" id="mesaurement-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+
+        <template v-if="isSystemDatabase">
+          <el-tooltip effect="light" :content="t('common.systemTableViewOnly')" placement="top" :disabled="false">
+            <span>
+              <el-button type="primary" id="mesaurement-batch-del" @click="handleDelRow('batch', null)" :disabled="true">
+                {{ t('common.batchDelete') }}
+              </el-button>
+            </span>
+          </el-tooltip>
+        </template>
+        <template v-else>
+          <auth-tooltip :is-disabled="canAlterTable" content="dataManage.needAlterPrivilege">
+            <span>
+              <el-button type="primary" id="mesaurement-batch-del" @click="handleDelRow('batch', null)" :disabled="columnsSelection.length === 0 || !canAlterTable">
+                {{ t('common.batchDelete') }}
+              </el-button>
+            </span>
+          </auth-tooltip>
+        </template>
+
         <el-button link @click="handleRefresh" id="mesaurement-refresh" class="svg-button-hover-color">
           <i-custom-refresh style="width: 24px; height: 24px" />
         </el-button>
@@ -92,10 +155,14 @@
               <div class="row-description-text">
                 <text-tooltip :content="row.comment && row.comment !== 'null' ? row.comment : '-'" />
               </div>
-              <div class="edit-box flex-align-center" @click="handleEditTableComment(row)" v-if="!isSystemDatabase">
-                <i-custom-edit-normal class="edit-icon" />
-                <i-custom-edit-active class="edit-icon-active" />
-              </div>
+              <auth-tooltip :is-disabled="canAlterColumnRow(row.columnName)" content="dataManage.needAlterPrivilege" v-if="!isSystemDatabase">
+                <span>
+                  <div class="edit-box flex-align-center" :class="{ 'edit-disabled': !canAlterColumnRow(row.columnName) }" @click="handleEditTableComment(row)">
+                    <i-custom-edit-normal class="edit-icon" />
+                    <i-custom-edit-active class="edit-icon-active" />
+                  </div>
+                </span>
+              </auth-tooltip>
             </div>
           </template>
         </el-table-column>
@@ -112,18 +179,31 @@
         </el-table-column>
         <el-table-column :label="t('common.operation')" width="240" align="center" fixed="right">
           <template #default="{ row }">
-            <el-tooltip
-              v-if="row.category === 'TAG' || row.category === 'TIME'"
-              effect="light"
-              :content="`${row.category === 'TIME' ? 'TIME' : 'TAG'}列暂不支持删除`"
-              placement="top"
-              popper-class="table-tooltip-max-width"
-            >
-              {{ t('common.delete') }}
-            </el-tooltip>
-            <el-button v-else type="primary" link size="small" @click="handleDelRow('row', row)" :id="`mesaurement-table-${row.columnName}-del`">
+            <!-- information_schema 下：所有列统一禁用，淡蓝色，无悬浮提示 -->
+            <el-button v-if="isSystemDatabase" type="primary" link size="small" :disabled="true" :id="`mesaurement-table-${row.columnName}-del`">
               {{ t('common.delete') }}
             </el-button>
+
+            <!-- 其他库 -->
+            <template v-else>
+              <el-tooltip
+                v-if="row.category === 'TAG' || row.category === 'TIME'"
+                effect="light"
+                :content="`${row.category === 'TIME' ? 'TIME' : 'TAG'}列暂不支持删除`"
+                placement="top"
+                popper-class="table-tooltip-max-width"
+              >
+                {{ t('common.delete') }}
+              </el-tooltip>
+
+              <auth-tooltip v-else :is-disabled="canAlterColumnRow(row.columnName)" content="dataManage.needAlterPrivilege">
+                <span>
+                  <el-button type="primary" link size="small" @click="handleDelRow('row', row)" :disabled="!canAlterColumnRow(row.columnName)" :id="`mesaurement-table-${row.columnName}-del`">
+                    {{ t('common.delete') }}
+                  </el-button>
+                </span>
+              </auth-tooltip>
+            </template>
           </template>
         </el-table-column>
         <template #empty>
@@ -177,9 +257,8 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { useTableHeight } from '@/composition-api';
-import { storeToRefs } from 'pinia';
 import { IoTDBApi } from '@/api';
-import { useDbStore, useUserStore } from '@/stores';
+import { useDbStore, useUserStore, useConnectionStore } from '@/stores';
 import SqlPreview from '@/components/sql-preview.vue';
 import ModalAddTable from './modal-add-table.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
@@ -208,7 +287,7 @@ const currentColumn = ref<ColumnVOS>();
 const currentPage = ref(1);
 const pageSize = ref(10);
 const userStore = useUserStore();
-const { canReadWriteData } = storeToRefs(userStore);
+const connectionStore = useConnectionStore();
 const importVisible = ref(false);
 const modalTtlVisible = ref(false);
 const localCurrentNode = ref<TableTreeNodeData>({ ...props.currentNode });
@@ -220,6 +299,26 @@ const { getDatabases, setFirstLoad, setActiveList } = useDbStore();
 const isSystemDatabase = computed(() => {
   return props.currentNode?.parentName === 'information_schema';
 });
+
+const canAlterTable = computed(() => {
+  if (isSystemDatabase.value) return false;
+  const dbName = props.currentNode?.database || props.currentNode?.parentName;
+  const tableName = props.currentNode?.nodeName;
+  if (connectionStore.isTableModel) {
+    return userStore.hasTableModelPrivilege('ALTER', dbName, tableName);
+  }
+  return userStore.canWriteSchema;
+});
+
+function canAlterColumnRow(columnName?: string) {
+  if (isSystemDatabase.value) return false;
+  const dbName = props.currentNode?.database || props.currentNode?.parentName;
+  const tableName = props.currentNode?.nodeName;
+  if (connectionStore.isTableModel) {
+    return userStore.hasTableModelPrivilege('ALTER', dbName, tableName);
+  }
+  return userStore.canWriteSchema;
+}
 
 function showAddTableDialog() {
   if (addTableDialog.value) {
@@ -306,10 +405,12 @@ onMounted(() => {
 });
 
 function handleEditTableTTL() {
+  if (!canAlterTable.value) return;
   modalTtlVisible.value = true;
 }
 
 function handleEditTableComment(row: ColumnVOS) {
+  if (!canAlterColumnRow(row.columnName)) return;
   currentColumn.value = row;
   modalCommentVisible.value = true;
 }
@@ -324,6 +425,10 @@ function handleRefresh() {
 }
 
 function handleDelRow(type: string, row: TableTreeNodeData | null) {
+  if (isSystemDatabase.value) return;
+  if (type === 'batch' && !canAlterTable.value) return;
+  if (type === 'row' && (!row || !canAlterColumnRow(row.columnName))) return;
+
   ElMessageBox.confirm(type === 'batch' ? `${t('dataManage.delColumnBatchTip')}` : `${t('dataManage.delColumnSingleTip')}`, t('common.notice'), {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),

@@ -23,9 +23,11 @@
         >
           <i-custom-border-refresh style="width: 24px; height: 24px" />
         </el-button>
-        <el-button link @click="handleAddDB()" :disabled="searching" id="db-tree-add-db" class="svg-button-hover-color m-l-16">
-          <i-custom-add-db-border style="width: 24px; height: 24px" />
-        </el-button>
+        <auth-tooltip :is-disabled="canCreateDatabaseWithTableModel" content="dataManage.needCreatePrivilege">
+          <el-button link @click="handleAddDB()" :disabled="disableAddDbButton" id="db-tree-add-db" class="svg-button-hover-color m-l-16">
+            <i-custom-add-db-border style="width: 24px; height: 24px" />
+          </el-button>
+        </auth-tooltip>
       </div>
       <el-tree-v2
         ref="schemaTree"
@@ -70,17 +72,35 @@
                     <span>{{ t('dataManage.dbSchema') }}</span>
                   </div>
                 </el-dropdown-item>
-                <el-dropdown-item command="addTable" :disabled="data.database === 'information_schema'">
-                  <div class="node-text">
-                    <i-custom-add-border2-active class="m-r-8" />
-                    <span>{{ t('dataManage.addTable') }}</span>
-                  </div>
+                <el-dropdown-item command="addTable" :disabled="isInformationSchemaNode(data) || !canCreateTable(data)">
+                  <el-tooltip
+                    placement="top-start"
+                    effect="light"
+                    trigger="hover"
+                    :content="t('dataManage.needCreatePrivilege')"
+                    :disabled="canCreateTable(data) || isInformationSchemaNode(data)"
+                    popper-class="tooltip-box-width"
+                  >
+                    <div class="node-text">
+                      <i-custom-add-border2-active class="m-r-8" />
+                      <span>{{ t('dataManage.addTable') }}</span>
+                    </div>
+                  </el-tooltip>
                 </el-dropdown-item>
-                <el-dropdown-item command="dbDelete" :disabled="data.database === 'information_schema'">
-                  <div class="node-text">
-                    <i-custom-delete-active class="m-r-8" />
-                    <span>{{ t('dataManage.deleteDb') }}</span>
-                  </div>
+                <el-dropdown-item command="dbDelete" :disabled="isInformationSchemaNode(data) || !canDropDatabase(data)">
+                  <el-tooltip
+                    placement="top-start"
+                    effect="light"
+                    trigger="hover"
+                    :content="t('dataManage.needDropPrivilege')"
+                    :disabled="canDropDatabase(data) || isInformationSchemaNode(data)"
+                    popper-class="tooltip-box-width"
+                  >
+                    <div class="node-text">
+                      <i-custom-delete-active class="m-r-8" />
+                      <span>{{ t('dataManage.deleteDb') }}</span>
+                    </div>
+                  </el-tooltip>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -97,23 +117,50 @@
                     <span>{{ t('dataManage.tableSchema') }}</span>
                   </div>
                 </el-dropdown-item>
-                <el-dropdown-item command="tableData">
-                  <div class="node-text">
-                    <i-custom-data class="m-r-8" />
-                    <span>{{ t('dataManage.tableData') }}</span>
-                  </div>
+                <el-dropdown-item command="tableData" :disabled="!isInformationSchemaNode(data) && !canViewTableData(data)">
+                  <el-tooltip
+                    placement="top-start"
+                    effect="light"
+                    trigger="hover"
+                    :content="t('common.needQueryDataPermission')"
+                    :disabled="isInformationSchemaNode(data) || canViewTableData(data)"
+                    popper-class="tooltip-box-width"
+                  >
+                    <div class="node-text">
+                      <i-custom-data class="m-r-8" />
+                      <span>{{ t('dataManage.tableData') }}</span>
+                    </div>
+                  </el-tooltip>
                 </el-dropdown-item>
-                <el-dropdown-item command="addCloumn" :disabled="data.database === 'information_schema'">
-                  <div class="node-text">
-                    <i-custom-add-border2-active class="m-r-8" />
-                    <span>{{ t('dataManage.newColumn') }}</span>
-                  </div>
+                <el-dropdown-item command="addCloumn" :disabled="isInformationSchemaNode(data) || !canAlterColumn(data)">
+                  <el-tooltip
+                    placement="top-start"
+                    effect="light"
+                    trigger="hover"
+                    :content="t('dataManage.needAlterPrivilege')"
+                    :disabled="canAlterColumn(data) || isInformationSchemaNode(data)"
+                    popper-class="tooltip-box-width"
+                  >
+                    <div class="node-text">
+                      <i-custom-add-border2-active class="m-r-8" />
+                      <span>{{ t('dataManage.newColumn') }}</span>
+                    </div>
+                  </el-tooltip>
                 </el-dropdown-item>
-                <el-dropdown-item command="tableDelete" :disabled="data.database === 'information_schema'">
-                  <div class="node-text">
-                    <i-custom-delete-active class="m-r-8" />
-                    <span>{{ t('dataManage.deleteTable') }}</span>
-                  </div>
+                <el-dropdown-item command="tableDelete" :disabled="isInformationSchemaNode(data) || !canDropTable(data)">
+                  <el-tooltip
+                    placement="top-start"
+                    effect="light"
+                    trigger="hover"
+                    :content="t('dataManage.needDropPrivilege')"
+                    :disabled="canDropTable(data) || isInformationSchemaNode(data)"
+                    popper-class="tooltip-box-width"
+                  >
+                    <div class="node-text">
+                      <i-custom-delete-active class="m-r-8" />
+                      <span>{{ t('dataManage.deleteTable') }}</span>
+                    </div>
+                  </el-tooltip>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -128,7 +175,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { useDbStore } from '@/stores';
+import { useDbStore, useConnectionStore, useUserStore } from '@/stores';
 import { IoTDBApi } from '@/api';
 import type { ElTreeV2 } from 'element-plus';
 import { cloneDeep } from 'lodash-es';
@@ -154,14 +201,60 @@ const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
 const { requestFn: deleteDatabase } = useRequest(IoTDBApi.deleteDatabase);
 const { requestFn: deleteTables } = useRequest(IoTDBApi.deleteTables);
 
-const { treeData, activeKeyList } = storeToRefs(useDbStore());
-const { getDatabases, setFirstLoad, setActiveList } = useDbStore();
+const dbStore = useDbStore();
+const { treeData, activeKeyList } = storeToRefs(dbStore);
+const { getDatabases, setFirstLoad, setActiveList } = dbStore;
+
+const userStore = useUserStore();
+const { canCreateDatabaseWithTableModel, canManageDatabase, canWriteSchema, canReadWriteData } = storeToRefs(userStore);
+const connectionStore = useConnectionStore();
+const { isTableModel } = storeToRefs(connectionStore);
+
+const disableAddDbButton = computed(() => searching.value || !canCreateDatabaseWithTableModel.value);
+
+function canDropDatabase(node?: TableTreeNodeData) {
+  if (!node) return false;
+  if (isTableModel.value) return userStore.hasTableModelPrivilege('DROP', node.nodeName);
+  return canManageDatabase.value;
+}
+
+function canDropTable(node?: TableTreeNodeData) {
+  if (!node) return false;
+  const dbName = node.database || node.parentName || '';
+  if (isTableModel.value) return userStore.hasTableModelPrivilege('DROP', dbName, node.nodeName);
+  return canWriteSchema.value;
+}
+
+function canCreateTable(node?: TableTreeNodeData) {
+  if (!node) return false;
+  if (isTableModel.value) return userStore.hasTableModelPrivilege('CREATE', node.nodeName);
+  return canWriteSchema.value;
+}
+
+function canAlterColumn(node?: TableTreeNodeData) {
+  if (!node) return false;
+  const dbName = node.database || node.parentName || '';
+  if (isTableModel.value) return userStore.hasTableModelPrivilege('ALTER', dbName, node.nodeName);
+  return canWriteSchema.value;
+}
+
+function canViewTableData(node?: TableTreeNodeData) {
+  if (!node) return false;
+  if (isInformationSchemaNode(node)) return true;
+  const dbName = node.database || node.parentName || '';
+  if (isTableModel.value) return userStore.hasTableModelPrivilege('SELECT', dbName, node.nodeName);
+  return canReadWriteData.value;
+}
 
 const treeProps = {
   value: 'id',
   label: 'nodeName',
   children: 'children',
 };
+
+function isInformationSchemaNode(node?: TableTreeNodeData) {
+  return node?.nodeName === 'information_schema' || node?.database === 'information_schema' || node?.parentName === 'information_schema';
+}
 
 function showAddTableDialog(nodeInfo: TableTreeNodeData, addType: string) {
   if (addTableDialog.value) {

@@ -46,12 +46,8 @@
           </el-form>
         </div>
         <div class="search-form-buttons">
-          <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
-            <el-button @click="handleReset(true)" :disabled="getListLoading || !canReadWriteData" id="data-search-reset">{{ t('common.reset') }}</el-button>
-          </auth-tooltip>
-          <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
-            <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="data-search-search">{{ getListLoading ? t('common.cancelQuery') : t('common.query') }}</el-button>
-          </auth-tooltip>
+          <el-button @click="handleReset(true)" :disabled="getListLoading" id="data-search-reset">{{ t('common.reset') }}</el-button>
+          <el-button type="primary" @click="handleSearch" id="data-search-search">{{ getListLoading ? t('common.cancelQuery') : t('common.query') }}</el-button>
         </div>
       </div>
     </el-header>
@@ -66,50 +62,89 @@
           </span>
         </h4>
         <div class="page-detail-buttons">
-          <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
-            <el-button type="primary" :disabled="!canReadWriteData" @click="handleInsert" id="data-search-search">{{ t('dataManage.dataInsert') }}</el-button>
-          </auth-tooltip>
-          <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
-            <el-button class="m-l-16" :disabled="!canReadWriteData" @click="handleImport" id="table-data-import">
-              {{ t('common.import') }}
+          <template v-if="isInformationSchemaDatabase">
+            <el-tooltip effect="light" :content="t('common.systemTableViewOnly')" placement="top" :disabled="false">
+              <span>
+                <el-button type="primary" :disabled="true" @click="handleInsert" id="data-search-search">
+                  {{ t('dataManage.dataInsert') }}
+                </el-button>
+              </span>
+            </el-tooltip>
+
+            <el-tooltip effect="light" :content="t('common.systemTableViewOnly')" placement="top" :disabled="false">
+              <span>
+                <el-button class="m-l-16" :disabled="true" @click="handleImport" id="table-data-import">
+                  {{ t('common.import') }}
+                </el-button>
+              </span>
+            </el-tooltip>
+          </template>
+          <template v-else>
+            <auth-tooltip :is-disabled="canInsertData" content="dataManage.needInsertPrivilege">
+              <span>
+                <el-button type="primary" :disabled="!canInsertData" @click="handleInsert" id="data-search-search">
+                  {{ t('dataManage.dataInsert') }}
+                </el-button>
+              </span>
+            </auth-tooltip>
+
+            <auth-tooltip :is-disabled="canInsertData" content="dataManage.needInsertPrivilege">
+              <span>
+                <el-button class="m-l-16" :disabled="!canInsertData" @click="handleImport" id="table-data-import">
+                  {{ t('common.import') }}
+                </el-button>
+              </span>
+            </auth-tooltip>
+          </template>
+          <el-dropdown class="m-x-16" @command="(val) => handleCommandDown(val)" id="mesaurement-download-dropdown">
+            <el-button :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" id="mesaurement-download">
+              {{ t('common.export') }}
+              <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
             </el-button>
-          </auth-tooltip>
-          <auth-tooltip :is-disabled="canReadWriteData" :content="'common.schemaAuth'">
-            <el-dropdown class="m-x-16" :disabled="!canReadWriteData || !(tableData.length > 0)" @command="(val) => handleCommandDown(val)" id="mesaurement-download-dropdown">
-              <el-button :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" :disabled="!canReadWriteData || !(tableData.length > 0)" id="mesaurement-download">
-                {{ t('common.export') }}
-                <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
-              </el-button>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item command="csv" id="mesaurement-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
-                  <el-dropdown-item command="xlsx" id="mesaurement-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </auth-tooltip>
-          <auth-tooltip :is-disabled="canWriteData" :content="'common.dataAuthAnother'">
-            <el-button type="primary" :disabled="selectedRows.length === 0 || !selectedAllColumns" @click="handleBatchDelete" id="data-search-search">{{ t('common.batchDelete') }}</el-button>
-          </auth-tooltip>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="csv" id="mesaurement-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
+                <el-dropdown-item command="xlsx" id="mesaurement-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+          <template v-if="isInformationSchemaDatabase">
+            <el-tooltip effect="light" :content="t('common.systemTableViewOnly')" placement="top" :disabled="false">
+              <span>
+                <el-button type="primary" :disabled="true" id="data-search-search">
+                  {{ t('common.batchDelete') }}
+                </el-button>
+              </span>
+            </el-tooltip>
+          </template>
+          <template v-else>
+            <auth-tooltip :is-disabled="canDeleteDataPermission" :content="'dataManage.needDeleteDataPrivilege'">
+              <span>
+                <el-button type="primary" :disabled="!canDeleteDataPermission || selectedRows.length === 0" @click="handleBatchDelete" id="data-search-search">
+                  {{ t('common.batchDelete') }}
+                </el-button>
+              </span>
+            </auth-tooltip>
+          </template>
         </div>
       </div>
 
-      <auth-container :is-auth="canReadWriteData" style="height: 100%" :content="'common.dataAuth'">
+      <auth-container :is-auth="canViewData" style="height: 100%" :content="'common.needQueryDataPermission'">
         <div v-loading="getListLoading">
           <dynamic-edit-table
             ref="dynamicEditTableRef"
             :show-select="true"
             :columns="columns"
-            :table-info="currentNode"
+            :current-node="currentNode"
             :table-data="tableDataPagination"
             :height="maxTableHeight"
             :max-height="maxTableHeight"
             v-model:current-page="pagination.pageNum"
             v-model:page-size="pagination.pageSize"
             :total="tableData.length"
-            :can-delete="selectedAllColumns"
+            :can-delete="!isInformationSchemaDatabase && canDeleteDataPermission"
             :show-pagination="true"
-            :cannot-delete-tip="t('dataManage.cannotDeleteTip')"
+            :cannot-delete-tip="isInformationSchemaDatabase ? t('common.systemTableViewOnly') : t('dataManage.needDeleteDataPrivilege')"
             @selected-change="handleSelectChange"
             @delete-row="handleDeleteRow"
             @save-row="handleSave"
@@ -133,7 +168,7 @@ import { cloneDeep } from 'lodash-es';
 import { useTableHeight, useShortcutsDate } from '@/composition-api';
 import { TableDataApi, IoTDBApi } from '@/api';
 import { todayNow, formatDate } from '@/utils/date';
-import { useUserStore, useDbStore } from '@/stores';
+import { useUserStore, useDbStore, useConnectionStore } from '@/stores';
 import DynamicEditTable from '@/components/dynamic-edit-table.vue';
 import SqlPreview from '@/components/sql-preview.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
@@ -151,9 +186,34 @@ const dynamicEditTableRef = ref<InstanceType<typeof DynamicEditTable>>();
 const { t, locale } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
+const connectionStore = useConnectionStore();
+const { isTableModel } = storeToRefs(connectionStore);
 const { canReadWriteData, canWriteData } = storeToRefs(userStore);
 const { maxTableHeight } = useTableHeight(440);
 const { getDatabases } = useDbStore();
+
+const canQueryData = computed(() => {
+  if (isTableModel.value) {
+    return userStore.hasTableModelPrivilege('SELECT', props.currentNode.database!, props.currentNode.nodeName);
+  }
+  return canReadWriteData.value;
+});
+
+const canViewData = computed(() => isInformationSchemaDatabase.value || canQueryData.value);
+
+const canInsertData = computed(() => {
+  if (isTableModel.value) {
+    return userStore.hasTableModelPrivilege('INSERT', props.currentNode.database!, props.currentNode.nodeName);
+  }
+  return canWriteData.value;
+});
+
+const canDeleteDataPermission = computed(() => {
+  if (isTableModel.value) {
+    return userStore.hasTableModelPrivilege('DELETE', props.currentNode.database!, props.currentNode.nodeName);
+  }
+  return canWriteData.value;
+});
 
 const searchFormRef = ref<FormInstance>();
 const firstLoad = ref(true);
@@ -167,20 +227,7 @@ const searchFormData = reactive({
   // asc: 'asc',
 });
 
-const copySearchFormData = ref<any>();
-
-const selectedAllColumns = computed(() => {
-  if (!props.currentNode?.children) {
-    return false;
-  }
-  if (copySearchFormData.value.columns?.length === 0 || !copySearchFormData.value.columns?.length) {
-    return true;
-  }
-  // 如果选择的列数等于当前节点的子节点数量，则全选
-  // 这里加1是因为time列是默认的第一列
-  // 如果没有选择列，则默认全选
-  return !!props.currentNode?.children?.length && copySearchFormData.value.columns?.length === props.currentNode.children.length - 1;
-});
+const copySearchFormData = ref<any>(cloneDeep(searchFormData));
 
 const { shortcutsDaterange } = useShortcutsDate();
 
@@ -207,6 +254,8 @@ const getListLoading = ref(false);
 
 const columnsSelected = ref<string[]>([]);
 
+const isInformationSchemaDatabase = computed(() => props.currentNode?.database === 'information_schema');
+
 const tableDataPagination = computed(() => tableData.value.slice(((pagination.pageNum || 1) - 1) * pagination.pageSize, (pagination.pageNum || 1) * pagination.pageSize));
 
 function handleAppendSql(sql: string) {
@@ -221,12 +270,13 @@ const { requestFn: exportTableDataId } = useRequest(IoTDBApi.exportTableDataId);
 let controller = new AbortController();
 
 function getListData() {
+  if (!canViewData.value) return;
   firstLoad.value = false;
   columns.value = [];
   tableData.value = [];
 
-  const startTime = copySearchFormData.value.datetimerange.length === 2 ? dayjs(copySearchFormData.value.datetimerange[0]).valueOf() : undefined;
-  const endTime = copySearchFormData.value.datetimerange.length === 2 ? dayjs(copySearchFormData.value.datetimerange[1]).valueOf() : undefined;
+  const startTime = copySearchFormData.value?.datetimerange?.length === 2 ? dayjs(copySearchFormData.value.datetimerange[0]).valueOf() : undefined;
+  const endTime = copySearchFormData.value?.datetimerange?.length === 2 ? dayjs(copySearchFormData.value.datetimerange[1]).valueOf() : undefined;
 
   searchDetailInfos.value.status = undefined;
   searchDetailInfos.value.queryTime = '';
@@ -287,7 +337,7 @@ function getListData() {
 function handleChangePath(columnsVal: string[]) {
   columnsSelected.value = columnsVal;
   searchFormData.columns = columnsVal;
-  if (firstLoad.value) {
+  if (firstLoad.value && canViewData.value) {
     getListData();
   }
 }
@@ -299,8 +349,8 @@ function handleImport() {
 
 // 导出
 function handleExportData(exportType: string) {
-  const startTime = copySearchFormData.value.datetimerange.length === 2 ? dayjs(copySearchFormData.value.datetimerange[0]).valueOf() : undefined;
-  const endTime = copySearchFormData.value.datetimerange.length === 2 ? dayjs(copySearchFormData.value.datetimerange[1]).valueOf() : undefined;
+  const startTime = copySearchFormData.value?.datetimerange?.length === 2 ? dayjs(copySearchFormData.value.datetimerange[0]).valueOf() : undefined;
+  const endTime = copySearchFormData.value?.datetimerange?.length === 2 ? dayjs(copySearchFormData.value.datetimerange[1]).valueOf() : undefined;
 
   exportTableDataId({
     database: props.currentNode.database!,
@@ -333,11 +383,15 @@ function handleReset(force?: boolean) {
   searchFormData.time = todayNow();
   searchFormData.datetimerange = [];
   pagination.pageNum = 1;
+
   if (force) {
     copySearchFormData.value = cloneDeep(searchFormData);
     getListLoading.value = false;
     window.sessionStorage.setItem('dataSearchStorage', '');
-    getListData();
+
+    if (canViewData.value) {
+      getListData();
+    }
   }
 }
 
@@ -348,6 +402,7 @@ function handleSearch() {
   //   return;
   // }
   // errorDeviceTip.value = '';
+  if (!canViewData.value) return;
   if (getListLoading.value) {
     controller.abort();
     return;
@@ -487,7 +542,7 @@ onBeforeUnmount(() => {
 });
 
 watch(
-  () => canReadWriteData.value,
+  () => canViewData.value,
   (val) => {
     if (val) {
       firstLoad.value = true;

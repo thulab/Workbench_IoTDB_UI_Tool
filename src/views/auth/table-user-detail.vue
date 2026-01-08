@@ -2,7 +2,7 @@
   <version-container :is-show="showAuthMenu">
     <el-container>
       <el-aside width="240px" class="list-wrapper">
-        <user-list ref="listRef" :can-manage-user="canManageUser" :user-name="userName" @handle-select="(val) => (currentUser = val)" />
+        <user-list ref="listRef" :can-manage-user="effectiveCanManageUser" :user-name="userName" @handle-select="(val) => (currentUser = val)" />
       </el-aside>
       <el-container class="details-wrapper">
         <el-main class="p-0" v-loading="loading">
@@ -24,16 +24,16 @@
                 >
                   {{ item }}
                 </el-tag>
-                <auth-tooltip :is-disabled="canManageRole" :content="'common.roleAuth'">
+                <auth-tooltip :is-disabled="effectiveCanManageRole" :content="'common.roleAuth'">
                   <div>
-                    <el-button link :disabled="!currentUser || !canManageRole" v-if="!isEdit" @click="operationType = 'edit'" id="auth-role-edit">
+                    <el-button link :disabled="!currentUser || !effectiveCanManageRole" v-if="!isEdit" @click="operationType = 'edit'" id="auth-role-edit">
                       <el-icon size="24px"><i-custom-edit /></el-icon>
                     </el-button>
                     <template v-else>
-                      <el-button link :disabled="!canManageRole" @click="addRole" id="auth-user-add-role" :class="['m-l-8', 'p-0', !canManageUser ? '' : 'svg-button-hover-color']">
+                      <el-button link :disabled="!effectiveCanManageRole" @click="addRole" id="auth-user-add-role" :class="['m-l-8', 'p-0', !effectiveCanManageRole ? '' : 'svg-button-hover-color']">
                         <el-icon size="24px"><i-custom-user-role-add /></el-icon>
                       </el-button>
-                      <el-button :disabled="!canManageRole" @click="operationType = 'view'" id="auth-user-add-role-exit" :class="['m-l-8', 'p-0']"> {{ t('common.exitEdit') }} </el-button>
+                      <el-button :disabled="!effectiveCanManageRole" @click="operationType = 'view'" id="auth-user-add-role-exit" :class="['m-l-8', 'p-0']"> {{ t('common.exitEdit') }} </el-button>
                     </template>
                   </div>
                 </auth-tooltip>
@@ -62,9 +62,12 @@
                 </span>
               </template>
               <el-tooltip v-else :content="t('auth.relational.editTip')" :disabled="!formData.canManageUserByRole" effect="light" placement="top">
-                <el-checkbox :disabled="!canManageUser || isManager || !!formData.canManageUserByRole" v-model="formData.canManageUser" @change="handleAllScopeChange('MANAGE_USER')">{{
-                  t('auth.relational.MANAGE_USER')
-                }}</el-checkbox>
+                <el-checkbox
+                  :disabled="!canManageUser || isManager || !!formData.canManageUserByRole || (isSelfUser && selfRevokedManageUser)"
+                  v-model="formData.canManageUser"
+                  @change="handleAllScopeChange('MANAGE_USER')"
+                  >{{ t('auth.relational.MANAGE_USER') }}</el-checkbox
+                >
               </el-tooltip>
 
               <template v-if="isManager">
@@ -74,9 +77,12 @@
                 </span>
               </template>
               <el-tooltip v-else :content="t('auth.relational.editTip')" :disabled="!formData.canManageRoleByRole" effect="light" placement="top">
-                <el-checkbox :disabled="!canManageUser || isManager || !!formData.canManageRoleByRole" v-model="formData.canManageRole" @change="handleAllScopeChange('MANAGE_ROLE')">{{
-                  t('auth.relational.MANAGE_ROLE')
-                }}</el-checkbox>
+                <el-checkbox
+                  :disabled="!canManageRole || isManager || !!formData.canManageRoleByRole || (isSelfUser && selfRevokedManageRole)"
+                  v-model="formData.canManageRole"
+                  @change="handleAllScopeChange('MANAGE_ROLE')"
+                  >{{ t('auth.relational.MANAGE_ROLE') }}</el-checkbox
+                >
               </el-tooltip>
             </div>
             <div class="detail-role-list">
@@ -123,7 +129,7 @@
                 </el-table-column>
               </el-table>
 
-              <el-button v-if="canManageUser && !isManager" style="width: 100%" class="m-t-24 svg-button-hover-color" @click="handleAddRow" id="auth-role-path">
+              <el-button v-if="effectiveCanManageUser && !isManager" style="width: 100%" class="m-t-24 svg-button-hover-color" @click="handleAddRow" id="auth-role-path">
                 <i-custom-add class="m-r-4" />
                 {{ t('auth.relational.addScope') }}
               </el-button>
@@ -231,6 +237,24 @@ const formData = ref({
   canManageUserByRole: false,
   canManageRoleByRole: false,
 });
+const hasGlobalPrivilegesLoaded = ref(false);
+const isSelfUser = computed(() => currentUser.value?.name === userName.value);
+const effectiveCanManageUser = computed(() => {
+  if (!canManageUser.value) return false;
+  if (isSelfUser.value && hasGlobalPrivilegesLoaded.value) {
+    return formData.value.canManageUser;
+  }
+  return true;
+});
+const effectiveCanManageRole = computed(() => {
+  if (!canManageRole.value) return false;
+  if (isSelfUser.value && hasGlobalPrivilegesLoaded.value) {
+    return formData.value.canManageRole;
+  }
+  return true;
+});
+const selfRevokedManageUser = ref(false);
+const selfRevokedManageRole = ref(false);
 
 const tableData = computed<DataPrivilege[]>(() => {
   return dataPrivileges.value.map((item) => {
@@ -252,11 +276,25 @@ const tableData = computed<DataPrivilege[]>(() => {
 function getDetail() {
   if (currentUser.value && currentUser.value.name) {
     loading.value = true;
-    Promise.allSettled([getRoleNames(currentUser.value.name), getDataPrivileges(currentUser.value.name), getGlobalPrivileges(currentUser.value.name)]).finally(() => {
+    hasGlobalPrivilegesLoaded.value = false;
+    const requests: Promise<unknown>[] = [];
+    if (canManageRole.value) {
+      requests.push(getRoleNames(currentUser.value.name));
+    } else {
+      selectRoleList.value = [];
+    }
+    if (canManageUser.value || isSelfUser.value) {
+      requests.push(getDataPrivileges(currentUser.value.name));
+    } else {
+      dataPrivileges.value = [];
+    }
+    requests.push(getGlobalPrivileges(currentUser.value.name));
+    Promise.allSettled(requests).finally(() => {
       formData.value.canManageRole = globalPrivileges.value.some((item) => item.privilegeName === 'MANAGE_ROLE');
       formData.value.canManageRoleByRole = globalPrivileges.value.some((item) => item.privilegeName === 'MANAGE_ROLE' && !!item.role);
       formData.value.canManageUser = globalPrivileges.value.some((item) => item.privilegeName === 'MANAGE_USER');
       formData.value.canManageUserByRole = globalPrivileges.value.some((item) => item.privilegeName === 'MANAGE_USER' && !!item.role);
+      hasGlobalPrivilegesLoaded.value = true;
       loading.value = false;
     });
   }
@@ -302,7 +340,7 @@ function handleDeleteRow(index: number) {
 function addRole() {
   bindRoleVisible.value = true;
 }
-function handleAddRoleConfirm(roleNames: string[]) {
+function handleAddRoleConfirm(_roleNames: string[]) {
   bindRoleVisible.value = false;
   getRoleNames(currentUser.value!.name!);
   getDetail();
@@ -341,6 +379,12 @@ function calcColumnWidth(child: string) {
   return 7 * 16 + 8;
 }
 
+const refreshSelfGlobalPrivileges = () => {
+  if (isSelfUser.value) {
+    userStore.loadPrivileges(true);
+  }
+};
+
 const handleAllScopeChange = (auth: string) => {
   const isGrant = auth === 'MANAGE_USER' ? formData.value.canManageUser : formData.value.canManageRole;
   if (isGrant) {
@@ -350,6 +394,7 @@ const handleAllScopeChange = (auth: string) => {
       grantOption: true,
     }).then(() => {
       ElMessage.success({ message: t('common.editSuccess'), grouping: true });
+      refreshSelfGlobalPrivileges();
     });
   } else {
     revokeGlobalPrivilege({
@@ -357,6 +402,15 @@ const handleAllScopeChange = (auth: string) => {
       privilegeName: auth,
     }).then(() => {
       ElMessage.success({ message: t('common.editSuccess'), grouping: true });
+      if (isSelfUser.value) {
+        if (auth === 'MANAGE_USER') {
+          selfRevokedManageUser.value = true;
+          listRef.value?.getList();
+        } else if (auth === 'MANAGE_ROLE') {
+          selfRevokedManageRole.value = true;
+        }
+      }
+      refreshSelfGlobalPrivileges();
     });
   }
 };
@@ -370,6 +424,35 @@ function handleDoc() {
 }
 
 watch(
+  () => formData.value.canManageUser,
+  (val) => {
+    if (val) {
+      selfRevokedManageUser.value = false;
+    }
+  },
+);
+
+watch(
+  () => formData.value.canManageRole,
+  (val) => {
+    if (val) {
+      selfRevokedManageRole.value = false;
+    }
+  },
+);
+
+watch(
+  () => isSelfUser.value,
+  (val) => {
+    if (!val) {
+      selfRevokedManageUser.value = false;
+      selfRevokedManageRole.value = false;
+    }
+  },
+  { immediate: true },
+);
+
+watch(
   () => currentUser.value,
   (val, old) => {
     if (val !== old) {
@@ -379,6 +462,7 @@ watch(
       addScopeVisible.value = false;
       bindRoleVisible.value = false;
       selectRoleList.value = [];
+      hasGlobalPrivilegesLoaded.value = false;
       loading.value = true;
       if (val) {
         getDetail();
@@ -387,6 +471,7 @@ watch(
         selectRoleList.value = [];
         dataPrivileges.value = [];
         globalPrivileges.value = [];
+        hasGlobalPrivilegesLoaded.value = false;
       }
     }
   },

@@ -80,11 +80,24 @@ const {
   initData: [],
 });
 const { requestFn: deleteUser } = useRequest(RelationalPrivilegesApi.deleteUser);
+const initialized = ref(false);
 
 // 获取用户
 function getList(name?: string) {
   getUserList().then(() => {
-    current.value = name && list.value.some((item) => item.name === name) ? name : list.value[0]?.name || '';
+    if (name && list.value.some((item) => item.name === name)) {
+      current.value = name;
+    } else if (!initialized.value && props.userName) {
+      const self = list.value.find((item) => item.name === props.userName);
+      if (self?.name) {
+        current.value = self.name;
+        initialized.value = true;
+        return;
+      }
+    } else if (!current.value) {
+      current.value = list.value[0]?.name || '';
+    }
+    initialized.value = true;
   });
 }
 

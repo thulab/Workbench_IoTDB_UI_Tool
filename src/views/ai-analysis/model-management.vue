@@ -1,6 +1,6 @@
 <template>
   <coming-soon-container :is-show="locale !== 'en'">
-    <active-container :is-show="connectionIsActive">
+    <active-container :is-show="connectionIsActiveBoolean">
       <el-container class="model-management-wrapper">
         <el-header class="search-form-wrapper p-[8px]" style="height: 44px">
           <el-form :model="searchFormData" label-position="left" size="default" inline @submit.prevent>
@@ -12,10 +12,12 @@
               </el-input>
             </base-form-item>
           </el-form>
-          <div class="search-form-buttons m-b-0">
-            <el-button @click="handleReset" :disabled="!canUseModel || !enableAINode" id="model-management-search-reset">{{ t('common.reset') }}</el-button>
+          <div class="search-form-buttons">
+            <el-button @click="handleReset" :disabled="!isTableModel && (!canUseModel || !enableAINode)" id="model-management-search-reset">{{ t('common.reset') }}</el-button>
             <auth-tooltip :is-disabled="!applyTip" :content="applyTip">
-              <el-button type="primary" @click="handleSearch" :disabled="!canUseModel || !enableAINode || !!applyTip" id="model-management-search-search">{{ t('common.query') }}</el-button>
+              <el-button type="primary" @click="handleSearch" :disabled="!isTableModel && (!canUseModel || !enableAINode || !!applyTip)" id="model-management-search-search">{{
+                t('common.query')
+              }}</el-button>
             </auth-tooltip>
           </div>
         </el-header>
@@ -25,22 +27,38 @@
               <h4 class="page-table-title">{{ t('aiAnalysis.modelList') }}</h4>
               <div class="operate-buttons">
                 <auth-tooltip :is-disabled="!applyTip" :content="applyTip">
-                  <el-button type="primary" @click="handleFineTuning" :disabled="!canUseModel || !enableAINode || !connectionIsActive || !!applyTip" id="model-management-fineTuning">
+                  <el-button
+                    type="primary"
+                    @click="handleFineTuning"
+                    :disabled="!isTableModel && (!canUseModel || !enableAINode || !connectionIsActive || !!applyTip)"
+                    id="model-management-fineTuning"
+                  >
                     {{ t('aiAnalysis.fineTuning') }}
                   </el-button>
                 </auth-tooltip>
                 <auth-tooltip :is-disabled="!applyTip" :content="applyTip">
-                  <el-button type="primary" @click="handleImport" :disabled="!canUseModel || !enableAINode || !!applyTip" id="model-management-add">{{ t('aiAnalysis.importModel') }}</el-button>
+                  <el-button type="primary" @click="handleImport" :disabled="!isTableModel && (!canUseModel || !enableAINode || !!applyTip)" id="model-management-add">{{
+                    t('aiAnalysis.importModel')
+                  }}</el-button>
                 </auth-tooltip>
                 <auth-tooltip :is-disabled="!applyTip" :content="applyTip">
-                  <el-button type="primary" @click="handleBatchDel" :disabled="!canUseModel || multipleSelection.length === 0 || !enableAINode || !!applyTip" id="model-management-batch-del">
+                  <el-button
+                    type="primary"
+                    @click="handleBatchDel"
+                    :disabled="multipleSelection.length === 0 || (!isTableModel && (!canUseModel || !enableAINode || !!applyTip))"
+                    id="model-management-batch-del"
+                  >
                     {{ t('common.batchDelete') }}
                   </el-button>
                 </auth-tooltip>
               </div>
             </div>
             <version-container :is-show="showAuthMenu" :versionTip="'2.0.5'">
-              <auth-container :is-auth="canUseModel && enableAINode" :content="enableAINode ? 'common.modelAuth' : 'aiAnalysis.enableTip'" style="height: 100%; width: 100%">
+              <auth-container
+                :is-auth="isTableModel || (enableAINode && canUseModel)"
+                :content="!enableAINode ? 'aiAnalysis.enableTip' : isTableModel ? '' : 'common.modelAuth'"
+                style="height: 100%; width: 100%"
+              >
                 <div class="page-table-box">
                   <el-table
                     :data="tableDataPagination"
@@ -74,18 +92,18 @@
                       </template>
                     </el-table-column>
                     <!-- <el-table-column :label="t('aiAnalysis.modelConfig')" v-if="false" prop="configs" width="160" align="center" show-overflow-tooltip>
-                      <template #default="{ row }">
-                        <div class="flex justify-center items-center">
-                          <div v-if="row.configs === ''">{{ t('aiAnalysis.noConfigs') }}</div>
-                          <div v-else>
-                            <el-button v-if="row.state === 'ACTIVE'" type="primary" link size="small" @click="handleViewConfig(row)" :id="`model-management-table-${row.name}-del`">
-                              {{ t('aiAnalysis.viewConfig') }}
-                            </el-button>
-                            <div v-else>{{ t('aiAnalysis.viewConfig') }}</div>
-                          </div>
+                    <template #default="{ row }">
+                      <div class="flex justify-center items-center">
+                        <div v-if="row.configs === ''">{{ t('aiAnalysis.noConfigs') }}</div>
+                        <div v-else>
+                          <el-button v-if="row.state === 'ACTIVE'" type="primary" link size="small" @click="handleViewConfig(row)" :id="`model-management-table-${row.name}-del`">
+                            {{ t('aiAnalysis.viewConfig') }}
+                          </el-button>
+                          <div v-else>{{ t('aiAnalysis.viewConfig') }}</div>
                         </div>
-                      </template>
-                    </el-table-column> -->
+                      </div>
+                    </template>
+                  </el-table-column> -->
                     <el-table-column :label="t('common.operation')" width="180" align="center" fixed="right">
                       <template #default="{ row }">
                         <div>
@@ -93,8 +111,8 @@
                             {{ t('common.delete') }}
                           </el-button>
                           <el-tooltip effect="light" :content="t('aiAnalysis.cannotDel')" v-else>
-                            <el-button link disabled> {{ t('common.delete') }}</el-button></el-tooltip
-                          >
+                            <el-button link disabled> {{ t('common.delete') }}</el-button>
+                          </el-tooltip>
                         </div>
                       </template>
                     </el-table-column>
@@ -136,7 +154,7 @@
 
 <script lang="ts" setup>
 import type { ElTable } from 'element-plus';
-import { reactive, ref, computed } from 'vue';
+import { reactive, ref, computed, watch } from 'vue';
 import { useUserStore, useConnectionStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 import { AIAnalysisApi } from '@/api';
@@ -152,10 +170,11 @@ const { t, locale } = useI18n();
 const userStore = useUserStore();
 const { canUseModel } = storeToRefs(userStore);
 const connectionStore = useConnectionStore();
-const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
+const { enableAINode, connectionIsActive, isTableModel } = storeToRefs(connectionStore);
+
+const connectionIsActiveBoolean = computed(() => !!connectionIsActive.value);
 
 const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '2.0.5'));
-const { enableAINode } = storeToRefs(connectionStore);
 const importVisible = ref(false);
 const configVisible = ref(false);
 const fineTuningVisible = ref(false);
@@ -191,6 +210,9 @@ function formatState(state: string) {
 }
 
 const applyTip = computed(() => {
+  if (isTableModel.value) {
+    return '';
+  }
   if (!showAuthMenu.value) {
     return t('common.useVersionTip', { version: '2.0.5' });
   }
@@ -217,9 +239,7 @@ function getListData() {
 function handleSearch() {
   pagination.pageNum = 1;
   tableRef.value?.clearSelection();
-  if (canUseModel.value && !applyTip.value) {
-    getListData();
-  }
+  getListData();
 }
 
 function handleReset() {
@@ -295,11 +315,9 @@ function handleBatchDel() {
 }
 
 watch(
-  () => connectionIsActive.value && canUseModel.value && enableAINode.value,
-  (val) => {
-    if (val) {
-      handleSearch();
-    }
+  [() => connectionIsActiveBoolean.value, () => showAuthMenu.value],
+  () => {
+    handleSearch();
   },
   {
     immediate: true,
@@ -335,6 +353,10 @@ watch(
     line-height: 21px;
     color: #495ad4;
   }
+}
+
+.permission-alert {
+  margin: 0 0 12px;
 }
 
 .stop-error-button {

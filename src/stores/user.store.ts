@@ -131,6 +131,61 @@ export const useUserStore = defineStore(
     const canManageUserWithTableModel = computed(() => allPrivileges.value?.tableGlobalPrivileges.some((item) => item.privilegeName === 'MANAGE_USER' || item.privilegeName === 'SECURITY') || false);
     const canManageRoleWithTableModel = computed(() => allPrivileges.value?.tableGlobalPrivileges.some((item) => item.privilegeName === 'MANAGE_ROLE' || item.privilegeName === 'SECURITY') || false);
 
+    const tableAnyScopeTokens = ['ANY', '*', '*.*', '*.**', 'SYSTEM', 'ALL'];
+
+    function hasTableModelPrivilege(privilegeName: string, database?: string, tableName?: string) {
+      const wanted = (privilegeName || '').toUpperCase();
+      if (!wanted) return false;
+
+      const normalizeScope = (s?: string) => (s || '').replace(/["\s]/g, '');
+
+      const globalPrivileges = allPrivileges.value?.tableGlobalPrivileges || [];
+      const hasGlobal = globalPrivileges.some((p) => {
+        const pName = (p.privilegeName || '').toUpperCase();
+        return pName === wanted || pName === 'ALL';
+      });
+      if (hasGlobal) return true;
+
+      const dbScope = normalizeScope(database).toUpperCase();
+      const dbAnyTableScope = dbScope ? `${dbScope}.*` : '';
+      const dbAnyTableScopeDeep = dbScope ? `${dbScope}.**` : '';
+      const tableScope = database && tableName ? normalizeScope(`${database}.${tableName}`).toUpperCase() : '';
+
+      const hasWantedPrivilege = (dataPrivileges?: Array<{ privilegeName?: string }>) =>
+        (dataPrivileges || []).some((p) => {
+          const pName = (p.privilegeName || '').toUpperCase();
+          return pName === wanted || pName === 'ALL';
+        });
+
+      const dataPrivileges = allPrivileges.value?.tableDataPrivileges || [];
+
+      return dataPrivileges.some((item) => {
+        const scope = normalizeScope(item.scope).toUpperCase();
+        const scopeMatch =
+          tableAnyScopeTokens.includes(scope) || (dbScope && (scope === dbScope || scope === dbAnyTableScope || scope === dbAnyTableScopeDeep)) || (tableScope && scope === tableScope);
+        if (!scopeMatch) return false;
+
+        return hasWantedPrivilege(item.dataPrivileges);
+      });
+    }
+
+    const canCreateDatabaseWithTableModel = computed(() => {
+      const globalPrivileges = allPrivileges.value?.tableGlobalPrivileges || [];
+      const hasGlobalCreate = globalPrivileges.some((item) => item.privilegeName?.toUpperCase() === 'CREATE');
+      if (hasGlobalCreate) return true;
+      const anyScopeTokens = ['ANY', '*', '*.*', '*.**', 'SYSTEM', 'ALL'];
+      return (allPrivileges.value?.tableDataPrivileges || []).some((item) => {
+        const normalizedScope = (item.scope || '').replace(/["\s]/g, '').toUpperCase();
+        if (!normalizedScope) return false;
+        const isAnyScope = anyScopeTokens.includes(normalizedScope);
+        if (!isAnyScope) return false;
+        return (item.dataPrivileges || []).some((privilege) => privilege.privilegeName?.toUpperCase() === 'CREATE');
+      });
+    });
+
+    // 表模型-查看数据权限
+    const canViewDataWithTableModel = computed(() => hasTableModelPrivilege('SELECT'));
+
     function clearUserStore() {
       userInfo.value.name = '';
       allPrivileges.value = undefined;
@@ -227,6 +282,9 @@ export const useUserStore = defineStore(
       canManageRole,
       canManageUserWithTableModel,
       canManageRoleWithTableModel,
+      canCreateDatabaseWithTableModel,
+      canViewDataWithTableModel,
+      hasTableModelPrivilege,
       canMaintain,
       setUser,
       clearUserStore,

@@ -159,6 +159,7 @@ common:
   viewAll: View All
   modelAuth: Requires "USE_MODEL" permission
   dataAndModelAuth: 需“AI使用”以及“读数据”或“读写数据”权限
+  needQueryDataPermission: Requires "Query Data" permission
   zoom: Amplify
   revoke: Revoke
   restore: Restore
@@ -174,6 +175,7 @@ common:
   pre: Previous
   selectMeasurementLimit: The system supports selecting a maximum of {limit} measurement at the same time
   useVersionTip: This function is for {version} and above
+  systemTableViewOnly: System tables are view-only
   versionTips: Compatible with IoTDB V2.0 and above
 page:
   '403': 403 Page
@@ -1082,6 +1084,11 @@ dataManage:
   dbSchema: Database Structure
   addTable: Add Table
   deleteDb: Delete Database
+  needCreatePrivilege: Requires "CREATE" privilege
+  needDropPrivilege: Requires "DROP" privilege
+  needAlterPrivilege: Requires "ALTER" privilege
+  needInsertPrivilege: Requires "INSERT/UPDATE" privilege
+  needDeleteDataPrivilege: Requires "DELETE data" privilege
   tableSchema: View Table Structure
   tableData: View Data
   newColumn: Add Column

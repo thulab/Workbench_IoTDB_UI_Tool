@@ -3,14 +3,14 @@
     <el-container class="details-wrapper" style="height: 100%">
       <el-main class="p-0">
         <div style="display: flex; flex-direction: column; height: 100%" v-loading="loading">
-          <div class="module-box-wrapper m-b-8" v-if="!canSystemInfo">
+          <div class="module-box-wrapper m-b-16" v-if="!canSystemInfo">
             <div class="module-title-wrapper">
               <h4 class="module-title">{{ t('dashboard.systemInfo') }}</h4>
             </div>
             <auth-container :is-auth="canSystemInfo" :content="'common.maintainAuth'" style="flex: 1" />
           </div>
 
-          <div class="module-box-wrapper m-b-8" v-if="canSystemInfo">
+          <div class="module-box-wrapper m-b-16" v-if="canSystemInfo">
             <div class="module-title-wrapper">
               <h4 class="module-title">{{ slaveData ? t('dashboard.masterSystemInfo') : t('dashboard.systemInfo') }}</h4>
               <p class="module-details">
