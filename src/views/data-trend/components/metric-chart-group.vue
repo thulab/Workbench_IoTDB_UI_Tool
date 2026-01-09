@@ -43,9 +43,9 @@
         <button
           v-for="handle in markerHandles"
           :key="handle.id"
-          class="absolute top-1 w-0 h-[calc(100%-25px)] border-l-[1.5px] border-l-dashed border-l-white/40 pointer-events-auto bg-transparent border-t-0 border-r-0 border-b-0 cursor-ew-resize disabled:pointer-events-none disabled:border-l-white/25"
+          class="absolute top-1 w-0 border-l-[1.5px] border-l-dashed border-l-white/40 pointer-events-auto bg-transparent border-t-0 border-r-0 border-b-0 cursor-ew-resize disabled:pointer-events-none disabled:border-l-white/25"
           type="button"
-          :style="{ left: handle.left, borderColor: handle.color }"
+          :style="{ left: handle.left, borderColor: handle.color, height: props.index === 0 ? `calc(100% - 25px)` : `100%` }"
           :disabled="props.loading"
           @pointerdown="(event) => onMarkerPointerDown(handle.id, event)"
         ></button>
@@ -106,10 +106,13 @@ const measurementCondition = reactive(new Map(props.group.members.map((m) => [m.
 
 function updateMarkerValues() {
   markerValues.value = measurementsData.value.map((measurement) => {
+    const avgInterval = trendStore.measurementAverageInterval.get(measurement.label) || 0;
     const x1Marker = props.markers.find((marker) => marker.label === 'X1');
     const x2Marker = props.markers.find((marker) => marker.label === 'X2');
-    const y1Value = x1Marker ? nearestDataPoint(measurement, x1Marker.timestamp).value : NaN;
-    const y2Value = x2Marker ? nearestDataPoint(measurement, x2Marker.timestamp).value : NaN;
+    const nearestPoint1 = nearestDataPoint(measurement, x1Marker ? x1Marker.timestamp : 0);
+    const nearestPoint2 = nearestDataPoint(measurement, x2Marker ? x2Marker.timestamp : 0);
+    const y1Value = x1Marker ? (Math.abs(nearestPoint1.timestamp - x1Marker.timestamp) <= 2 * avgInterval ? nearestPoint1.value : NaN) : NaN;
+    const y2Value = x2Marker ? (Math.abs(nearestPoint2.timestamp - x2Marker.timestamp) <= 2 * avgInterval ? nearestPoint2.value : NaN) : NaN;
     return {
       name: measurement.label,
       x1: x1Marker ? x1Marker.timestamp : NaN,
@@ -125,10 +128,13 @@ function updateMarkerValues() {
 function updateRunningMarkerValues() {
   if (!props.realTimeData) return;
   markerValues.value = props.realTimeData.map((measurement) => {
+    const avgInterval = runningTrendStore.measurementAverageInterval.get(measurement.path) || 0;
     const x1Marker = props.markers.find((marker) => marker.label === 'X1');
     const x2Marker = props.markers.find((marker) => marker.label === 'X2');
-    const y1Value = x1Marker ? nearestRunningDataPoint(measurement.path, x1Marker.timestamp).value : NaN;
-    const y2Value = x2Marker ? nearestRunningDataPoint(measurement.path, x2Marker.timestamp).value : NaN;
+    const nearestPoint1 = nearestRunningDataPoint(measurement.path, x1Marker ? x1Marker.timestamp : 0);
+    const nearestPoint2 = nearestRunningDataPoint(measurement.path, x2Marker ? x2Marker.timestamp : 0);
+    const y1Value = x1Marker ? (Math.abs(nearestPoint1.timestamp - x1Marker.timestamp) <= 2 * avgInterval ? nearestPoint1.value : NaN) : NaN;
+    const y2Value = x2Marker ? (Math.abs(nearestPoint2.timestamp - x2Marker.timestamp) <= 2 * avgInterval ? nearestPoint2.value : NaN) : NaN;
     return {
       name: measurement.path,
       x1: x1Marker ? x1Marker.timestamp : NaN,
@@ -281,6 +287,13 @@ function getTableHistoryData(measurement: Measurement) {
         const value = point.values[i];
         transformedData.push({ timestamp: timestamp as number, value: Number(value) });
       }
+      if (valueLen >= 1) {
+        const totalInterval = (point.timestamps[valueLen - 1] as number) - (point.timestamps[0] as number);
+        const averageInterval = totalInterval / valueLen;
+        trendStore.updateMeasurementAverageInterval(measurement.label, averageInterval);
+      } else {
+        trendStore.updateMeasurementAverageInterval(measurement.label, -1);
+      }
     }
     measurementsData.value.push({
       ...measurement,
@@ -315,6 +328,13 @@ function getTreeHistoryData(measurement: Measurement) {
         const timestamp = point.timestamps[i];
         const value = point.values[i];
         transformedData.push({ timestamp: timestamp as number, value: Number(value) });
+      }
+      if (valueLen >= 1) {
+        const totalInterval = (point.timestamps[valueLen - 1] as number) - (point.timestamps[0] as number);
+        const averageInterval = totalInterval / valueLen;
+        trendStore.updateMeasurementAverageInterval(measurement.label, averageInterval);
+      } else {
+        trendStore.updateMeasurementAverageInterval(measurement.label, -1);
       }
     }
     measurementsData.value.push({

@@ -8,6 +8,7 @@ export const useTreeHistoryTrendStore = defineStore('treeHistoryTrend', {
     globalTimeRange: { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() } as TimeRange,
     visibleTimeRange: { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() } as TimeRange,
     pendingTimeRange: { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() } as TimeRange,
+    measurementAverageInterval: new Map<string, number>(),
   }),
 
   actions: {
@@ -19,6 +20,9 @@ export const useTreeHistoryTrendStore = defineStore('treeHistoryTrend', {
     },
     setPendingTimeRange(range: TimeRange) {
       this.pendingTimeRange = range;
+    },
+    updateMeasurementAverageInterval(measurement: string, interval: number) {
+      this.measurementAverageInterval.set(measurement, interval);
     },
   },
 });
@@ -28,6 +32,7 @@ export const useTreeRunningTrendStore = defineStore('treeRunningTrend', {
     min: -1,
     isPlaying: true,
     visibleTimeRange: { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() } as TimeRange,
+    measurementAverageInterval: new Map<string, number>(),
   }),
 
   actions: {
@@ -40,6 +45,9 @@ export const useTreeRunningTrendStore = defineStore('treeRunningTrend', {
     setVisibleTimeRange(range: TimeRange) {
       this.visibleTimeRange = range;
     },
+    updateMeasurementAverageInterval(measurement: string, interval: number) {
+      this.measurementAverageInterval.set(measurement, interval);
+    },
   },
 });
 
@@ -48,6 +56,7 @@ export const useTableHistoryTrendStore = defineStore('tableHistoryTrend', {
     globalTimeRange: { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() } as TimeRange,
     visibleTimeRange: { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() } as TimeRange,
     pendingTimeRange: { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() } as TimeRange,
+    measurementAverageInterval: new Map<string, number>(),
   }),
 
   actions: {
@@ -60,6 +69,9 @@ export const useTableHistoryTrendStore = defineStore('tableHistoryTrend', {
     setPendingTimeRange(range: TimeRange) {
       this.pendingTimeRange = range;
     },
+    updateMeasurementAverageInterval(measurement: string, interval: number) {
+      this.measurementAverageInterval.set(measurement, interval);
+    },
   },
 });
 
@@ -68,6 +80,7 @@ export const useTableRunningTrendStore = defineStore('tableRunningTrend', {
     min: -1,
     isPlaying: true,
     visibleTimeRange: { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() } as TimeRange,
+    measurementAverageInterval: new Map<string, number>(),
   }),
 
   actions: {
@@ -79,6 +92,9 @@ export const useTableRunningTrendStore = defineStore('tableRunningTrend', {
     },
     setVisibleTimeRange(range: TimeRange) {
       this.visibleTimeRange = range;
+    },
+    updateMeasurementAverageInterval(measurement: string, interval: number) {
+      this.measurementAverageInterval.set(measurement, interval);
     },
   },
 });

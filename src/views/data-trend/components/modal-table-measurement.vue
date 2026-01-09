@@ -291,8 +291,8 @@ const removeTagFilter = (index: number) => {
 const loadDevice = async (page: number = 1) => {
   await getDevices(
     {
-      database: formData.selectedDatabase,
-      tableName: formData.selectedTable,
+      database: props.currentDatabase!,
+      tableName: props.currentTable!,
       conditions: tagFilters.value.reduce(
         (acc, tag) => {
           if (tag.variable && tag.value) {
@@ -415,10 +415,19 @@ const handleScroll = ({ scrollTop }: { scrollTop: number }) => {
 // 监听props变化
 watch(
   dialogVisible,
-  (val) => {
-    if (val) {
-      initModal();
+  async (val) => {
+    if (!val) return;
+
+    // initModal 内部会异步拉取数据库/树数据；这里必须等待完成后再读取 availableTags
+    await initModal();
+    await nextTick();
+
+    if (availableTags.value.length === 0) {
+      tagFilters.value = [{ variable: '', value: '' }];
+    } else {
+      tagFilters.value = [{ variable: availableTags.value[0]!.nodeName, value: '' }];
     }
+    await searchDevices();
   },
   { immediate: true },
 );
