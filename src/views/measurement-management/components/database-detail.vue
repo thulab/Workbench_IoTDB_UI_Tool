@@ -154,6 +154,7 @@
     <auth-container :is-auth="canReadWriteSchemaByPath" :content="'common.schemaAuth'" style="flex: 1; overflow: auto">
       <div class="storage-table-box">
         <el-table
+          border
           :data="tableData.measurements"
           v-loading="loading"
           style="width: 100%"
@@ -269,7 +270,7 @@
           v-if="totalCount > 0"
           v-model:currentPage="pagination.pageNum"
           v-model:page-size="pagination.pageSize"
-          class="m-t-20 measurement-table-pagination"
+          class="measurement-table-pagination m-t-20"
           popper-class="measurement-table-pagination-popper"
           layout="prev, pager, next, sizes, jumper"
           background

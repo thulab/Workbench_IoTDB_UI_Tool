@@ -81,6 +81,7 @@
       <auth-container :is-auth="canUsePipe" :content="'common.pipeAuth'" style="height: 100%">
         <div class="page-table-box">
           <el-table
+            border
             :data="tableData.list"
             v-loading="loading"
             style="width: 100%"

@@ -77,6 +77,7 @@
 
       <auth-container :is-auth="canReadWriteData" style="height: 100%" :content="'common.dataAuth'">
         <el-table
+          border
           :data="tableData"
           v-loading="getListLoading"
           style="width: 100%"

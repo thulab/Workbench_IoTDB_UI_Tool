@@ -1,10 +1,11 @@
 <template>
   <div class="search_div max-height">
-    <el-input class="m-b-8 filter-input" v-model="filterMeasurementText" :placeholder="t('measurement.measurementNamePlaceholder')" @input="getMeasurementList" id="calculate-modal-input-measurement">
+    <el-input class="filter-input m-b-8" v-model="filterMeasurementText" :placeholder="t('measurement.measurementNamePlaceholder')" @input="getMeasurementList" id="calculate-modal-input-measurement">
       <!-- <template #suffix><i-ep-search /></template> -->
     </el-input>
 
     <el-table
+      border
       v-if="measurementList && measurementList.length > 0"
       :data="measurementList"
       :show-header="false"

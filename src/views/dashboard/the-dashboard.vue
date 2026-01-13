@@ -98,6 +98,7 @@
 
             <div class="table-box-wrapper">
               <el-table
+                border
                 :data="tableData"
                 ref="tableRef"
                 style="width: 100%"
@@ -239,6 +240,7 @@
 
             <div class="table-box-wrapper">
               <el-table
+                border
                 :data="slaveTableData"
                 ref="slaveTableRef"
                 style="width: 100%"

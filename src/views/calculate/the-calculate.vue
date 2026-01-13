@@ -65,6 +65,7 @@
           <auth-container :is-auth="canReadWriteSchema" :content="'common.schemaAuth'" style="height: 100%">
             <div class="page-table-box">
               <el-table
+                border
                 :data="tableData.list"
                 v-loading="loading"
                 style="width: 100%"

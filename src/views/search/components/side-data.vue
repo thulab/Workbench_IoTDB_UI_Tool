@@ -58,6 +58,7 @@
       <el-button @click="handleReset" id="sql-search-data-reset">{{ t('common.reset') }}</el-button>
     </div>
     <el-table
+      border
       v-if="measurementList && measurementList.length > 0"
       :data="measurementList"
       :max-height="maxTableHeight"

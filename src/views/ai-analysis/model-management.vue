@@ -61,6 +61,7 @@
               >
                 <div class="page-table-box">
                   <el-table
+                    border
                     :data="tableDataPagination"
                     v-loading="loading"
                     style="width: 100%"

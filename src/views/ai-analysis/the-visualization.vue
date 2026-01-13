@@ -5,7 +5,7 @@
         <el-header class="p-[8px]" style="height: auto">
           <div class="search-form-box" style="margin-bottom: 2px">
             <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-              <div class="m-b-16 flex-align-center" style="height: 36px">
+              <div class="flex-align-center m-b-16" style="height: 36px">
                 <base-form-item :label="`${t('aiAnalysis.business')}：`" prop="type" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
                   <el-radio-group v-model="searchFormData.type" id="business-type" @change="handleChangeType">
                     <el-radio :value="0" id="business-type-0">{{ t('aiAnalysis.forecast') }}</el-radio>
@@ -152,7 +152,7 @@
             style="height: 100%; width: 100%"
           >
             <el-main class="p-0 position-relative" style="height: 100%">
-              <el-container class="position-absolute p-x-16" style="height: 100%; width: 100%; z-index: 1000" v-if="searchFormData.type === 2">
+              <el-container class="p-x-16 position-absolute" style="height: 100%; width: 100%; z-index: 1000" v-if="searchFormData.type === 2">
                 <el-main class="page-table-details">
                   <div class="page-info-box">
                     <span></span>
@@ -220,10 +220,10 @@
                     </el-main>
                     <el-aside
                       width="352px"
-                      class="p-x-16 m-l-16 position-relative p-t-8"
+                      class="m-l-16 p-x-16 p-t-8 position-relative"
                       style="display: flex; flex-direction: column; background-color: #f7f8fc; padding-bottom: 10px !important; overflow: hidden"
                     >
-                      <div class="flex-justify-between p-b-4">
+                      <div class="p-b-4 flex-justify-between">
                         <span class="detail-total">{{ t('aiAnalysis.total', { total: sortedData.length }) }}</span>
                         <el-dropdown
                           class="more-icon m-r-8"
@@ -265,7 +265,7 @@
                         </template>
                       </el-dropdown>
 
-                      <el-table height="100%" :data="paginatedData" @sort-change="handleSortChange" :cell-style="handleCellStyle">
+                      <el-table border height="100%" :data="paginatedData" @sort-change="handleSortChange" :cell-style="handleCellStyle">
                         <el-table-column
                           prop="time"
                           :label="t('aiAnalysis.time')"

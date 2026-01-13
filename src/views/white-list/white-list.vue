@@ -34,6 +34,7 @@
 
           <div class="table-box">
             <el-table
+              border
               :data="tableData"
               v-loading="loading"
               style="width: 100%"
