@@ -846,7 +846,7 @@ watch(
   justify-content: center;
 
   .row-description-text {
-    max-width: 120px;
+    max-width: 100%;
     display: flex;
   }
 
