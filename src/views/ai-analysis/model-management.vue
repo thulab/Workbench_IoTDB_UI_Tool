@@ -12,7 +12,7 @@
               </el-input>
             </base-form-item>
           </el-form>
-          <div class="search-form-buttons">
+          <div class="search-form-buttons m-b-0">
             <el-button @click="handleReset" :disabled="!isTableModel && (!canUseModel || !enableAINode)" id="model-management-search-reset">{{ t('common.reset') }}</el-button>
             <auth-tooltip :is-disabled="!applyTip" :content="applyTip">
               <el-button type="primary" @click="handleSearch" :disabled="!isTableModel && (!canUseModel || !enableAINode || !!applyTip)" id="model-management-search-search">{{
