@@ -127,7 +127,7 @@ const connectionStore = useConnectionStore();
 const userStore = useUserStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
 const { canReadWriteData } = storeToRefs(userStore);
-const { maxTableHeight } = useTableHeight(315);
+const { maxTableHeight } = useTableHeight(215);
 const defaultSort = ref<Sort>({ prop: 'time', order: 'descending' });
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({

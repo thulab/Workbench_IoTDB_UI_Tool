@@ -162,7 +162,7 @@ const monitorTipDisabled = computed(() => {
   }
   return false;
 });
-const { maxTableHeight } = useTableHeight(300);
+const { maxTableHeight } = useTableHeight(215);
 const searchFormData = reactive({
   name: '',
 });

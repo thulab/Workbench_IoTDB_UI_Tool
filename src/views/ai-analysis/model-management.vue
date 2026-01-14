@@ -186,7 +186,7 @@ const pagination = reactive({
   pageSize: 10,
   pageNum: 1,
 });
-const { maxTableHeight } = useTableHeight(300);
+const { maxTableHeight } = useTableHeight(200);
 const tableData = ref<Model[]>([]);
 const totalCount = ref(0);
 const multipleSelection = ref<Model[]>([]);

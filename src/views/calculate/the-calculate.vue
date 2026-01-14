@@ -162,7 +162,7 @@ const userStore = useUserStore();
 const { canWriteSchema, canReadWriteSchema, userAllPrivileges, userAllEntityPrivileges, userAllPathPrivileges } = storeToRefs(userStore);
 const connectionStore = useConnectionStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
-const { maxTableHeight } = useTableHeight(300);
+const { maxTableHeight } = useTableHeight(215);
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({
   name: '',

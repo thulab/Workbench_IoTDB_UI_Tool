@@ -138,7 +138,7 @@ const { t, locale } = useI18n();
 const userStore = useUserStore();
 const connectionStore = useConnectionStore();
 const { canReadWriteData } = storeToRefs(userStore);
-const { maxTableHeight } = useTableHeight(280);
+const { maxTableHeight } = useTableHeight(210);
 const { elementWidth } = useElementWidth(446);
 
 const searchFormRef = ref<FormInstance>();

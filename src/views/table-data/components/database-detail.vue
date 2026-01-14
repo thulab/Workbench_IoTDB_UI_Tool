@@ -16,7 +16,7 @@
             <span>
               <el-icon
                 size="24"
-                class="m-r-6 svg-button-hover-color"
+                class="svg-button-hover-color m-r-6"
                 :class="{ 'edit-disabled': !canAlterDatabase }"
                 :style="{ cursor: canAlterDatabase ? 'pointer' : 'not-allowed' }"
                 @click="handleEditDbTTL"
@@ -271,7 +271,7 @@ const searchKeyword = ref((route.query.databaseSearch as string) || '');
 const databaseInfos = ref<TableDatabaseInfo | null>(null);
 const searchType = ref('tableName');
 const searchPlaceholder = computed(() => (searchType.value === 'tableName' ? t('dataManage.tableNamePlaceholder') : t('dataManage.commentPlaceholder')));
-const { maxTableHeight } = useTableHeight(410);
+const { maxTableHeight } = useTableHeight(340);
 const modalTtlVisible = ref(false);
 const modalCommentVisible = ref(false);
 const currentTable = ref<TableVO>();

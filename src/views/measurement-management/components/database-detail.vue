@@ -331,7 +331,7 @@ const route = useRoute();
 const userStore = useUserStore();
 const { canManageDatabase, canWriteSchema, userAllEntityPrivileges, userAllPathPrivileges } = storeToRefs(userStore);
 
-const { maxTableHeight } = useTableHeight(370);
+const { maxTableHeight } = useTableHeight(285);
 const searchKeyword = ref((route.query.measurement as string) || '');
 const databaseInfos = ref<DatabaseInfo>({
   groupName: '',
@@ -817,6 +817,9 @@ watch(
   margin: 0 8px 8px;
   padding: 8px;
   background-color: #f7f8fc;
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 10px);
 }
 
 :deep(.el-select-v2__selection) {

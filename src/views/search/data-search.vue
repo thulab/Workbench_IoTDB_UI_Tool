@@ -206,7 +206,7 @@ const { t, locale } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
 const { canReadWriteData, canWriteData } = storeToRefs(userStore);
-const { maxTableHeight } = useTableHeight(330);
+const { maxTableHeight } = useTableHeight(250);
 const { elementWidth } = useElementWidth(446);
 
 const searchFormRef = ref<FormInstance>();
