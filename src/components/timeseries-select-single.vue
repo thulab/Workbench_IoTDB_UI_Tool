@@ -13,6 +13,7 @@
     :style="`width: ${selectWidth}px;`"
     class="remote-select-box"
     popper-class="overflow-popper"
+    :popper-style="`width: ${itemWidth}px !important;`"
     @change="handleChangePath"
   >
     <el-option

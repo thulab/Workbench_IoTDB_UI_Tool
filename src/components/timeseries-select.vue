@@ -15,6 +15,7 @@
     :style="`width: ${selectWidth}px;`"
     :disabled="disabledSelect"
     popper-class="overflow-popper"
+    :popper-style="`width: ${itemWidth}px !important;`"
     @change="handleChangePath"
   >
     <template #prefix v-if="showPrefix">

@@ -3,9 +3,9 @@
     <active-container :is-show="connectionIsActive">
       <el-container class="visualization-wrapper">
         <el-header class="p-[8px]" style="height: auto">
-          <div class="search-form-box" style="margin-bottom: 2px">
+          <div style="margin-bottom: 2px">
             <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-              <div class="flex-align-center m-b-16" style="height: 36px">
+              <div class="flex" style="height: 36px">
                 <base-form-item :label="`${t('aiAnalysis.business')}：`" prop="type" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
                   <el-radio-group v-model="searchFormData.type" id="business-type" @change="handleChangeType">
                     <el-radio :value="0" id="business-type-0">{{ t('aiAnalysis.forecast') }}</el-radio>
@@ -80,66 +80,69 @@
                       <timeseries-select-single
                         id="search-path"
                         v-model="searchFormData.measurement"
-                        :selectWidth="230"
-                        :itemWidth="200"
+                        :select-width="230"
+                        :item-width="elementWidth"
                         show-suffix
                         :disabled-path="disabledPath"
                         @handle-change-path="handleChangePath"
                       />
                     </base-form-item>
                   </template>
-                  <template v-if="searchFormData.type === 0">
-                    <base-form-item style="margin-bottom: 16px" :label="`${t('aiAnalysis.forecastStart')}：`" :rules="requiredRules">
-                      <el-date-picker v-model="searchFormData.forecastStart" type="datetime" :prefix-icon="ICustomCalender" id="search-datetime" :clearable="false" style="width: 164px" />
-                    </base-form-item>
-                    <base-form-item style="margin-bottom: 16px" :label="`${t('aiAnalysis.forecastData')}：`">
-                      <span style="font-size: 12px; color: #131926; font-weight: 300; line-height: 28px">{{ t('aiAnalysis.forecast96') }}</span>
-                    </base-form-item>
-                  </template>
-                  <template v-else-if="searchFormData.type === 1">
-                    <base-form-item :label="`${t('aiAnalysis.detectionTime')}：`" prop="datetimerange" :rules="requiredRules">
-                      <el-date-picker
-                        v-model="searchFormData.datetimerange"
-                        type="datetimerange"
-                        range-separator="-"
-                        unlink-panels
-                        :disabled-date="disabledDate"
-                        :shortcuts="shortcutsDaterange"
-                        :clearable="false"
-                        :prefix-icon="ICustomCalender"
-                        :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
-                        id="search-datetimerange"
-                      />
-                    </base-form-item>
-                    <base-form-item :label="`${t('aiAnalysis.anomalyRatio')}：`" v-if="searchFormData.method === 'stray'" class="m-r-0">
-                      <template #label>
-                        {{ t('aiAnalysis.anomalyRatio') }}：
-                        <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
-                          <template #content>
-                            {{ t('aiAnalysis.anomalyRatioTip') }}
-                          </template>
-                          <i-custom-question />
-                        </el-tooltip>
+                  <div class="search-form-wrapper">
+                    <div class="flex-1">
+                      <template v-if="searchFormData.type === 0">
+                        <base-form-item :label="`${t('aiAnalysis.forecastStart')}：`" :rules="requiredRules">
+                          <el-date-picker v-model="searchFormData.forecastStart" type="datetime" :prefix-icon="ICustomCalender" id="search-datetime" :clearable="false" style="width: 164px" />
+                        </base-form-item>
+                        <base-form-item :label="`${t('aiAnalysis.forecastData')}：`">
+                          <span style="font-size: 12px; color: #131926; font-weight: 300">{{ t('aiAnalysis.forecast96') }}</span>
+                        </base-form-item>
                       </template>
-                      <el-input-number v-model="searchFormData.anomalyRatio" :min="1" :max="99" :controls="false" :placeholder="t('aiAnalysis.pleaseInputPercent')" style="width: 104px" />
-                      %
-                    </base-form-item>
-                  </template>
-                </div>
-                <div v-else>
-                  <base-form-item label="SQL：" prop="sql" class="el-form-item-not-mandatory" style="margin-bottom: 16px">
-                    <el-button type="primary" link id="search-sql" style="text-decoration: underline" @click="handleSql" :disabled="!connectionStore.isTableModel">
-                      {{ t('search.sqlInput') }}
-                    </el-button>
-                  </base-form-item>
-                </div>
-                <div class="search-form-buttons" style="margin-bottom: 16px">
-                  <el-button @click="handleReset" id="search-reset">{{ t('common.reset') }}</el-button>
-                  <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="canQuery || !applyTip" popper-class="tooltip-box-width">
-                    <el-button :disabled="!canQuery" type="primary" @click="handleSearch()" id="search-search">
-                      {{ t('common.query') }}
-                    </el-button>
-                  </el-tooltip>
+                      <template v-else-if="searchFormData.type === 1">
+                        <base-form-item :label="`${t('aiAnalysis.detectionTime')}：`" prop="datetimerange" :rules="requiredRules">
+                          <el-date-picker
+                            v-model="searchFormData.datetimerange"
+                            type="datetimerange"
+                            range-separator="-"
+                            unlink-panels
+                            :disabled-date="disabledDate"
+                            :shortcuts="shortcutsDaterange"
+                            :clearable="false"
+                            :prefix-icon="ICustomCalender"
+                            :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
+                            id="search-datetimerange"
+                          />
+                        </base-form-item>
+                        <base-form-item :label="`${t('aiAnalysis.anomalyRatio')}：`" v-if="searchFormData.method === '_Stray'" class="m-r-0">
+                          <template #label>
+                            {{ t('aiAnalysis.anomalyRatio') }}：
+                            <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
+                              <template #content>
+                                {{ t('aiAnalysis.anomalyRatioTip') }}
+                              </template>
+                              <i-custom-question />
+                            </el-tooltip>
+                          </template>
+                          <el-input-number v-model="searchFormData.anomalyRatio" :min="1" :max="99" :controls="false" :placeholder="t('aiAnalysis.pleaseInputPercent')" style="width: 104px" />
+                          %
+                        </base-form-item>
+                      </template>
+                      <div v-else>
+                        <base-form-item label="SQL：" prop="sql" class="el-form-item-not-mandatory">
+                          <el-button type="primary" :disabled="!enableAINode" link id="search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
+                        </base-form-item>
+                      </div>
+                    </div>
+
+                    <div class="search-form-buttons">
+                      <el-button @click="handleReset" :disabled="!enableAINode" id="search-reset">{{ t('common.reset') }}</el-button>
+                      <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="canQuery" popper-class="tooltip-box-width">
+                        <el-button :disabled="!canQuery" type="primary" @click="handleSearch()" id="search-search">
+                          {{ t('common.query') }}
+                        </el-button>
+                      </el-tooltip>
+                    </div>
+                  </div>
                 </div>
               </div>
             </el-form>
@@ -435,6 +438,7 @@ const minValue = ref(0);
 const currentPage = ref(1);
 
 const { maxTableHeight } = useTableHeight(390);
+const { elementWidth } = useElementWidth(390);
 
 const { maxTableHeight: maxCustomTableHeight } = useTableHeight(324);
 

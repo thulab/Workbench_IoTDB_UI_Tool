@@ -3,7 +3,7 @@
     <el-header class="p-0" style="height: auto">
       <div class="search-form-box" style="margin-bottom: 18px" :style="{ marginBottom: searchFormData.method !== 'PATTERN_MATCH' ? '18px' : '14px' }">
         <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-          <div class="m-b-16 flex-align-center" style="height: 36px" :style="{ marginBottom: searchFormData.method !== 'PATTERN_MATCH' ? '16px' : '12px !important' }">
+          <div class="flex-align-center m-b-16" style="height: 36px" :style="{ marginBottom: searchFormData.method !== 'PATTERN_MATCH' ? '16px' : '12px !important' }">
             <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
               <template #label>
                 {{ t('spectrum.analysisMethod') }}：
@@ -119,8 +119,8 @@
                 <timeseries-select-single
                   id="spectrum-search-path"
                   v-model="searchFormData.measurement"
-                  :selectWidth="230"
-                  :itemWidth="200"
+                  :select-width="230"
+                  :item-width="elementWidth - 400"
                   show-suffix
                   :disabled-path="disabledPathDTW"
                   @handle-change-path="handleChangePath"
@@ -161,8 +161,8 @@
                 <timeseries-select-single
                   id="spectrum-search-path"
                   v-model="searchFormData.measurement"
-                  :selectWidth="230"
-                  :itemWidth="200"
+                  :select-width="230"
+                  :item-width="elementWidth"
                   show-suffix
                   :disabled-path="disabledPath"
                   @handle-change-path="handleChangePath"
@@ -225,8 +225,8 @@
                     v-if="searchFormData.partModel === 'existing'"
                     id="spectrum-search-path"
                     v-model="searchFormData.partSeries"
-                    :selectWidth="230"
-                    :itemWidth="200"
+                    :select-width="230"
+                    :item-width="elementWidth - 200"
                     show-suffix
                     :disabled-path="disabledPathDTW"
                     @handle-change-path="handleChangePath"
@@ -257,7 +257,7 @@
                 <el-button type="primary" :disabled="!partTimestamps.length" class="detail-part-icon" @click="handleDetailPart" id="detail-part">
                   <el-icon size="30"><i-custom-detail-eye /></el-icon>
                 </el-button>
-                <base-form-item :label="`${t('spectrum.distance')}：`" :rules="requiredRules" prop="distance" class="m-r-0 m-l-12">
+                <base-form-item :label="`${t('spectrum.distance')}：`" :rules="requiredRules" prop="distance" class="m-l-12 m-r-0">
                   <template #label>
                     {{ t('spectrum.distance') }}：
                     <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
@@ -456,6 +456,9 @@ const userStore = useUserStore();
 const { canReadWriteData } = storeToRefs(userStore);
 const chartContainer = ref<HTMLElement | null>(null);
 let chartInstance: echarts.ECharts;
+
+const { elementWidth } = useElementWidth(390);
+
 const methodList = ref<Array<FunctionData>>([]);
 const dwtTab = ref<'type' | 'number'>('type');
 const searchFormRef = ref<FormInstance>();

@@ -276,9 +276,12 @@ svg:focus {
 }
 
 .overflow-popper {
+  width: auto !important;
+
   .el-select-dropdown__wrap {
     .el-select-dropdown__list {
       width: fit-content;
+      min-width: 100%;
     }
   }
 }
