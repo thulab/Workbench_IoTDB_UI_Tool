@@ -3,7 +3,7 @@
     <el-scrollbar :max-height="maxHeight" v-loading="loading">
       <div class="table-list-box m-t-8">
         <h4 class="table-box-title">{{ t('common.allSituation') }}</h4>
-        <el-table :data="entityTableData" style="width: 100%" border>
+        <el-table border :data="entityTableData" style="width: 100%">
           <el-table-column :label="t('common.allChoose')" align="center" width="90" fixed="left">
             <template #default="{ row }">
               <el-icon size="21">
@@ -25,7 +25,7 @@
 
       <div class="table-list-box" v-if="name !== 'root'">
         <h4 class="table-box-title">{{ t('auth.path') }}</h4>
-        <el-table :data="tableData" style="width: 100%" tooltip-effect="light" border>
+        <el-table border :data="tableData" style="width: 100%" tooltip-effect="light">
           <el-table-column :label="t('auth.pathName')" prop="path" align="center" width="193" show-overflow-tooltip />
           <el-table-column :label="t('common.allChoose')" align="center" width="193">
             <template #default="{ row }">

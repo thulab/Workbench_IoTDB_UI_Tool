@@ -55,7 +55,7 @@
                   </el-tooltip>
                 </div>
               </div>
-              <el-table :data="entityTableData" style="width: 100%">
+              <el-table border :data="entityTableData" style="width: 100%">
                 <el-table-column :label="t('common.allChoose')" align="center" width="60">
                   <template #default="{ row }">
                     <el-icon v-if="!isEdit" class="moveDown3" size="21">
@@ -114,7 +114,7 @@
                   </el-tooltip>
                 </div>
               </div>
-              <el-table :data="tableData" style="width: 100%" tooltip-effect="light" :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
+              <el-table border :data="tableData" style="width: 100%" tooltip-effect="light" :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
                 <el-table-column :label="t('auth.pathName')" align="center" min-width="193" prop="path" show-overflow-tooltip />
                 <el-table-column :label="t('common.allChoose')" align="center" width="60">
                   <template #default="{ row, $index }">
@@ -182,7 +182,7 @@
                   </template>
                 </el-table-column>
               </el-table>
-              <el-button style="width: 100%" class="m-t-24 svg-button-hover-color" @click="handleAddRow" v-if="canEdit && isEdit" id="auth-user-path">
+              <el-button style="width: 100%" class="svg-button-hover-color m-t-24" @click="handleAddRow" v-if="canEdit && isEdit" id="auth-user-path">
                 <i-custom-add class="m-r-4" />
                 {{ t('auth.addPath') }}
               </el-button>

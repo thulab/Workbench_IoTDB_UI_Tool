@@ -102,7 +102,7 @@
       </div>
       <div class="upload-result-box" v-else-if="activeStep === 2">
         <p>{{ t('measurement.importedFailureStatus', { total: uploadDetail.length, success: uploadResult.successNum, failure: uploadResult.failNum }, uploadDetail.length) }}</p>
-        <el-table class="upload-result-table" :data="uploadDetail" style="width: 100%" size="small" max-height="210">
+        <el-table border class="upload-result-table" :data="uploadDetail" style="width: 100%" size="small" max-height="210">
           <el-table-column type="index" :label="t('measurement.num')" width="60" align="center" />
           <el-table-column prop="file.name" :label="t('measurement.fileName')" show-overflow-tooltip width="400" />
           <el-table-column prop="importStatus" :label="t('common.status')" width="60" align="center">
@@ -123,13 +123,13 @@
       <p class="error-info-tip" v-if="activeStep === 2 && (uploadStatus === 'error' || uploadStatus === 'partial')">{{ t('common.importTip') }}</p>
     </div>
 
-    <div class="m-t-12 operate-buttons" style="text-align: right" v-if="activeStep === 0">
+    <div class="operate-buttons m-t-12" style="text-align: right" v-if="activeStep === 0">
       <el-button type="primary" :disabled="!uploadFileInfos || uploadFileInfos.length === 0" @click="handleNext" id="data-search-import-next">{{ t('common.next') }}</el-button>
     </div>
 
-    <div class="m-t-12 operate-buttons" style="height: 28px" v-if="activeStep === 1"></div>
+    <div class="operate-buttons m-t-12" style="height: 28px" v-if="activeStep === 1"></div>
 
-    <div class="m-t-12 operate-buttons" style="text-align: center" v-if="activeStep === 2">
+    <div class="operate-buttons m-t-12" style="text-align: center" v-if="activeStep === 2">
       <el-button type="primary" @click="handleClose" id="data-search-import-close">{{ t('common.finish') }}</el-button>
     </div>
   </el-dialog>

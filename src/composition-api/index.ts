@@ -1,9 +1,10 @@
 import useRequest from './base/useRequest';
 import useTable from './base/useTable';
+import useElementWidth from './base/useElementWidth';
 import useTableHeight from './base/useTableHeight';
 import useShortcutsDate from './base/useShortcutsDate';
 import { useDataTypeIcon } from './base/useDataTypeIcon';
 import useWebsocket from './business/useWebsocket';
 import { useLangSwitched, useLangSwitch } from './base/useLangSwitched';
 
-export { useRequest, useTable, useTableHeight, useDataTypeIcon, useWebsocket, useLangSwitched, useLangSwitch, useShortcutsDate };
+export { useRequest, useTable, useTableHeight, useDataTypeIcon, useWebsocket, useLangSwitched, useLangSwitch, useShortcutsDate, useElementWidth };

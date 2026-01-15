@@ -15,7 +15,7 @@
           <template v-if="isSystemDatabase">
             <el-tooltip effect="light" :content="t('common.systemTableViewOnly')" placement="top" :disabled="false">
               <span>
-                <el-icon size="24" class="m-r-6 svg-button-hover-color" :style="{ cursor: 'not-allowed', opacity: 0.4 }" @click.stop>
+                <el-icon size="24" class="svg-button-hover-color m-r-6" :style="{ cursor: 'not-allowed', opacity: 0.4 }" @click.stop>
                   <i-custom-edit />
                 </el-icon>
               </span>
@@ -26,7 +26,7 @@
               <span>
                 <el-icon
                   size="24"
-                  class="m-r-6 svg-button-hover-color"
+                  class="svg-button-hover-color m-r-6"
                   :class="{ 'edit-disabled': !canAlterTable }"
                   :style="{ cursor: canAlterTable ? 'pointer' : 'not-allowed' }"
                   @click="handleEditTableTTL"
@@ -275,7 +275,7 @@ const { t, locale } = useI18n();
 const route = useRoute();
 const searchKeyword = ref((route.query.databaseSearch as string) || '');
 const searchType = ref('columnName');
-const { maxTableHeight } = useTableHeight(420);
+const { maxTableHeight } = useTableHeight(335);
 const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
 const columnsSelection = ref<TableTreeNodeData[]>([]);
 const { requestFn: deleteColumns } = useRequest(IoTDBApi.deleteColumns);

@@ -47,7 +47,7 @@
                   </el-tooltip>
                 </div>
               </div>
-              <el-table :data="[authData.entityPrivileges]" style="width: 100%" border>
+              <el-table border :data="[authData.entityPrivileges]" style="width: 100%">
                 <el-table-column :label="t('common.allChoose')" align="center" width="90" fixed="left">
                   <template #default="{ row }">
                     <el-icon v-if="isView" size="21">
@@ -85,7 +85,7 @@
                   </el-tooltip>
                 </div>
               </div>
-              <el-table :data="authData.pathPrivileges" style="width: 100%" tooltip-effect="light" border :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
+              <el-table border :data="authData.pathPrivileges" style="width: 100%" tooltip-effect="light" :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
                 <el-table-column :label="t('auth.pathName')" prop="path" align="center" min-width="193" show-overflow-tooltip />
                 <el-table-column :label="t('common.allChoose')" align="center" width="193">
                   <template #default="{ row, $index }">
@@ -131,7 +131,7 @@
                 </el-table-column>
               </el-table>
 
-              <el-button v-if="!isView" style="width: 100%" class="m-t-24 svg-button-hover-color" @click="handleAddRow" id="auth-role-path">
+              <el-button v-if="!isView" style="width: 100%" class="svg-button-hover-color m-t-24" @click="handleAddRow" id="auth-role-path">
                 <i-custom-add class="m-r-4" />
                 {{ t('auth.addPath') }}
               </el-button>

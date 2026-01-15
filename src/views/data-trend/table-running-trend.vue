@@ -512,6 +512,14 @@ function handleData(data: any) {
         };
         realTimeData.value.push(dataItem);
       }
+      const measurementIndex = realTimeData.value.findIndex((f) => f.path === item.path);
+      const valueLen = realTimeData.value[measurementIndex]?.values.length;
+      if (valueLen && valueLen > 0) {
+        const firstTimestamp = realTimeData.value[measurementIndex]?.timestamps[0]!;
+        const lastTimestamp = realTimeData.value[measurementIndex]?.timestamps[valueLen - 1]!;
+        const averageInterval = Math.abs(lastTimestamp - firstTimestamp) / valueLen;
+        runningTrendStore.updateMeasurementAverageInterval(convertPath(item.path), averageInterval);
+      }
     });
     const min = minTime > minDataTime.value ? minTime : minDataTime.value;
     runningTrendStore.setMin(min);

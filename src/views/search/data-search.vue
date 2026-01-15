@@ -1,82 +1,88 @@
 <template>
   <el-container class="page-container">
-    <el-header class="search-form-wrapper p-0" style="height: auto">
+    <el-header class="p-0" style="height: auto">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-        <base-form-item prop="path">
+        <base-form-item prop="path" class="form-item-last">
           <template #label>
             {{ t('measurement.measurementChoose') }}：
             <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
           </template>
-          <timeseries-select v-model="searchFormData.path" :disabled-select="getListLoading" id="data-search-path" />
+          <timeseries-select v-model="searchFormData.path" :item-width="elementWidth" :disabled-select="getListLoading" id="data-search-path" />
         </base-form-item>
         <br />
-        <el-form-item :label="`${t('search.searchTime')}：`" prop="time">
-          <div class="search-time-wrapper">
-            <ul class="search-time-list">
-              <li :class="['search-time-type', { 'search-time-active': timeType === 'datetime' }]" id="data-search-type-datetime" @click="handleTimeType('datetime')">{{ t('search.datetime') }}</li>
-              <li :class="['search-time-type', { 'search-time-active': timeType === 'datetimerange' }]" id="data-search-type-datetimerange" @click="handleTimeType('datetimerange')">
-                {{ t('search.datetimerange') }}
-              </li>
-            </ul>
-            <el-input type="hidden" />
-            <el-date-picker
-              v-if="timeType === 'datetime'"
-              v-model="searchFormData.time"
-              type="datetime"
-              :placeholder="t('common.selectPlaceholder')"
-              :disabled-date="disabledDate"
-              :shortcuts="shortcutsDate"
-              :clearable="false"
-              :prefix-icon="ICustomCalender"
-              id="data-search-datetime"
-              :disabled="getListLoading"
-            />
-            <el-date-picker
-              v-else
-              v-model="searchFormData.datetimerange"
-              type="datetimerange"
-              range-separator="-"
-              unlink-panels
-              :disabled-date="disabledDate"
-              :shortcuts="shortcutsDaterange"
-              :clearable="false"
-              :prefix-icon="ICustomCalender"
-              :start-placeholder="t('search.startTime')"
-              :end-placeholder="t('search.endTime')"
-              :id="['data-search-datetimerange-start', 'data-search-datetimerange-end']"
-              :disabled="getListLoading"
-            />
-          </div>
-        </el-form-item>
-        <el-form-item prop="timeInterval">
-          <template #label>
-            {{ t('search.timeInterval') }}：
-            <el-tooltip effect="light" :content="t('search.inputNumberPlaceholder')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
-          </template>
-          <el-input type="hidden" />
-          <el-input v-model.number="searchFormData.timeInterval" style="width: 110px" placeholder="" @input="handleInputInterval" id="data-search-timeInterval" :disabled="getListLoading">
-            <template #append>
-              <el-select v-model="searchFormData.unitInterval" style="width: 56px" placeholder="" id="data-search-unitInterval" :disabled="getListLoading">
-                <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-unitInterval-select-${item.value}`" />
+        <div class="search-form-wrapper">
+          <div class="flex-1">
+            <el-form-item :label="`${t('search.searchTime')}：`" prop="time">
+              <div class="search-time-wrapper">
+                <ul class="search-time-list">
+                  <li :class="['search-time-type', { 'search-time-active': timeType === 'datetime' }]" id="data-search-type-datetime" @click="handleTimeType('datetime')">
+                    {{ t('search.datetime') }}
+                  </li>
+                  <li :class="['search-time-type', { 'search-time-active': timeType === 'datetimerange' }]" id="data-search-type-datetimerange" @click="handleTimeType('datetimerange')">
+                    {{ t('search.datetimerange') }}
+                  </li>
+                </ul>
+                <el-input type="hidden" />
+                <el-date-picker
+                  v-if="timeType === 'datetime'"
+                  v-model="searchFormData.time"
+                  type="datetime"
+                  :placeholder="t('common.selectPlaceholder')"
+                  :disabled-date="disabledDate"
+                  :shortcuts="shortcutsDate"
+                  :clearable="false"
+                  :prefix-icon="ICustomCalender"
+                  id="data-search-datetime"
+                  :disabled="getListLoading"
+                />
+                <el-date-picker
+                  v-else
+                  v-model="searchFormData.datetimerange"
+                  type="datetimerange"
+                  range-separator="-"
+                  unlink-panels
+                  :disabled-date="disabledDate"
+                  :shortcuts="shortcutsDaterange"
+                  :clearable="false"
+                  :prefix-icon="ICustomCalender"
+                  :start-placeholder="t('search.startTime')"
+                  :end-placeholder="t('search.endTime')"
+                  :id="['data-search-datetimerange-start', 'data-search-datetimerange-end']"
+                  :disabled="getListLoading"
+                />
+              </div>
+            </el-form-item>
+            <el-form-item prop="timeInterval">
+              <template #label>
+                {{ t('search.timeInterval') }}：
+                <el-tooltip effect="light" :content="t('search.inputNumberPlaceholder')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
+              </template>
+              <el-input type="hidden" />
+              <el-input v-model.number="searchFormData.timeInterval" style="width: 110px" placeholder="" @input="handleInputInterval" id="data-search-timeInterval" :disabled="getListLoading">
+                <template #append>
+                  <el-select v-model="searchFormData.unitInterval" style="width: 56px" placeholder="" id="data-search-unitInterval" :disabled="getListLoading">
+                    <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-unitInterval-select-${item.value}`" />
+                  </el-select>
+                </template>
+              </el-input>
+            </el-form-item>
+            <el-form-item :label="`${t('search.aggregation')}：`" prop="aggregation" class="form-item-last">
+              <el-input type="hidden" />
+              <el-select v-model="searchFormData.aggregation" :style="{ width: locale === 'en' ? '120px' : '80px' }" clearable id="data-search-aggregation" :disabled="getListLoading">
+                <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-aggregation-select-${item.value}`" />
               </el-select>
-            </template>
-          </el-input>
-        </el-form-item>
-        <el-form-item :label="`${t('search.aggregation')}：`" prop="aggregation" class="form-item-last">
-          <el-input type="hidden" />
-          <el-select v-model="searchFormData.aggregation" :style="{ width: locale === 'en' ? '120px' : '80px' }" clearable id="data-search-aggregation" :disabled="getListLoading">
-            <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-aggregation-select-${item.value}`" />
-          </el-select>
-        </el-form-item>
+            </el-form-item>
+          </div>
+          <div class="search-form-buttons">
+            <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
+              <el-button @click="handleReset(true)" :disabled="getListLoading || !canReadWriteData" id="data-search-reset">{{ t('common.reset') }}</el-button>
+            </auth-tooltip>
+            <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
+              <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="data-search-search">{{ getListLoading ? t('common.cancelQuery') : t('common.query') }}</el-button>
+            </auth-tooltip>
+          </div>
+        </div>
       </el-form>
-      <div class="search-form-buttons">
-        <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
-          <el-button @click="handleReset(true)" :disabled="getListLoading || !canReadWriteData" id="data-search-reset">{{ t('common.reset') }}</el-button>
-        </auth-tooltip>
-        <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
-          <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="data-search-search">{{ getListLoading ? t('common.cancelQuery') : t('common.query') }}</el-button>
-        </auth-tooltip>
-      </div>
     </el-header>
 
     <el-main class="page-table-details">
@@ -200,7 +206,8 @@ const { t, locale } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
 const { canReadWriteData, canWriteData } = storeToRefs(userStore);
-const { maxTableHeight } = useTableHeight(330);
+const { maxTableHeight } = useTableHeight(250);
+const { elementWidth } = useElementWidth(446);
 
 const searchFormRef = ref<FormInstance>();
 const firstLoad = ref(true);

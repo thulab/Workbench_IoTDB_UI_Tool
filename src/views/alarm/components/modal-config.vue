@@ -25,8 +25,8 @@
               id="alarm-config-modal-measurement"
               ref="timeseriesSelectSingleRef"
               v-model="formData.measurement"
-              :selectWidth="locale === 'en' ? 248 : 316"
-              :itemWidth="198"
+              :select-width="locale === 'en' ? 248 : 316"
+              :item-width="198"
               :key="dialogKey"
               :filter-system="true"
               :is-show-view-btn="false"
@@ -39,7 +39,7 @@
           </base-form-item>
         </el-col>
         <el-col :span="12">
-          <base-form-item :label="`${t('measurement.dataType')}：`" prop="measurementType" class="m-l-45 type-input-disabled">
+          <base-form-item :label="`${t('measurement.dataType')}：`" prop="measurementType" class="type-input-disabled m-l-45">
             <el-input v-model="formData.measurementType" disabled style="width: 80px" id="alarm-config-modal-measurementType" />
           </base-form-item>
         </el-col>

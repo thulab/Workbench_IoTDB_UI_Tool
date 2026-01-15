@@ -167,7 +167,7 @@ const codeEditorHeight = computed(() => {
   return height;
 });
 
-const { maxTableHeight } = useTableHeight(codeEditorHeight.value + 410, undefined, 200);
+const { maxTableHeight } = useTableHeight(codeEditorHeight.value + 370, undefined, 200);
 
 const pagination = reactive({
   pageSize: 10,

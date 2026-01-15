@@ -54,6 +54,7 @@
           <auth-container :is-auth="canUsePipe" :content="'common.pipeAuth'" style="height: 100%">
             <div class="page-table-box">
               <el-table
+                border
                 :data="tableDataPagination"
                 v-loading="loading"
                 style="width: 100%"
@@ -71,7 +72,7 @@
                 <el-table-column :label="t('dataSync.address')" prop="targetAddress" min-width="160" align="center" show-overflow-tooltip />
                 <el-table-column :label="t('dataSync.status')" prop="state" width="160" align="center" show-overflow-tooltip>
                   <template #default="{ row }">
-                    <div class="flex justify-center items-center">
+                    <div class="flex items-center justify-center">
                       <el-icon v-if="row.state === 'stopped'" size="16" class="m-t-4"><i-custom-sync-stopped /></el-icon>
                       <el-icon v-else size="16" class="m-t-4"><i-custom-sync-running /></el-icon>
                       <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('common.errorDetail')" :disabled="!row.exceptionMessage" popper-class="tooltip-box-width">
@@ -161,7 +162,7 @@ const monitorTipDisabled = computed(() => {
   }
   return false;
 });
-const { maxTableHeight } = useTableHeight(300);
+const { maxTableHeight } = useTableHeight(215);
 const searchFormData = reactive({
   name: '',
 });

@@ -9,6 +9,8 @@
           </template>
           <timeseries-select
             v-model="searchFormData.path"
+            :select-width="230"
+            :item-width="elementWidth"
             :disabled-path="(item: MeasurementDataItem) => ['TEXT', 'BOOLEAN', 'TIMESTAMP', 'DATE', 'STRING', 'BLOB']!.includes(item.dataType)"
             id="statistic-search-path"
           />
@@ -77,6 +79,7 @@
 
       <auth-container :is-auth="canReadWriteData" style="height: 100%" :content="'common.dataAuth'">
         <el-table
+          border
           :data="tableData"
           v-loading="getListLoading"
           style="width: 100%"
@@ -135,7 +138,8 @@ const { t, locale } = useI18n();
 const userStore = useUserStore();
 const connectionStore = useConnectionStore();
 const { canReadWriteData } = storeToRefs(userStore);
-const { maxTableHeight } = useTableHeight(280);
+const { maxTableHeight } = useTableHeight(210);
+const { elementWidth } = useElementWidth(446);
 
 const searchFormRef = ref<FormInstance>();
 const pagination = reactive({

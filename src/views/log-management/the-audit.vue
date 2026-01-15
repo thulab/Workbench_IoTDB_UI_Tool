@@ -52,6 +52,7 @@
           <auth-container :is-auth="canReadWriteData" style="height: calc(100% - 36px)" :content="'common.dataAuth'">
             <div class="page-table-box">
               <el-table
+                border
                 :data="tableData.list"
                 v-loading="loading"
                 style="width: 100%"
@@ -126,7 +127,7 @@ const connectionStore = useConnectionStore();
 const userStore = useUserStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
 const { canReadWriteData } = storeToRefs(userStore);
-const { maxTableHeight } = useTableHeight(315);
+const { maxTableHeight } = useTableHeight(215);
 const defaultSort = ref<Sort>({ prop: 'time', order: 'descending' });
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({

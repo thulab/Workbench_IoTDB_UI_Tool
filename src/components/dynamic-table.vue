@@ -1,8 +1,9 @@
 <template>
   <div class="stand-table">
-    <div class="flex row">
+    <div class="row flex">
       <div class="border_table flex-1" :style="{ maxWidth: totalColumnPage > 1 ? 'calc(100% - 70px)' : '100%' }">
         <el-table
+          border
           :data="tableData"
           style="width: 100%"
           :height="tableHeight"

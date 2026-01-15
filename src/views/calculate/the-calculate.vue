@@ -65,6 +65,7 @@
           <auth-container :is-auth="canReadWriteSchema" :content="'common.schemaAuth'" style="height: 100%">
             <div class="page-table-box">
               <el-table
+                border
                 :data="tableData.list"
                 v-loading="loading"
                 style="width: 100%"
@@ -161,7 +162,7 @@ const userStore = useUserStore();
 const { canWriteSchema, canReadWriteSchema, userAllPrivileges, userAllEntityPrivileges, userAllPathPrivileges } = storeToRefs(userStore);
 const connectionStore = useConnectionStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
-const { maxTableHeight } = useTableHeight(300);
+const { maxTableHeight } = useTableHeight(215);
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({
   name: '',

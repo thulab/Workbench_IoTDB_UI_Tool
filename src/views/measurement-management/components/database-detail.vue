@@ -154,6 +154,7 @@
     <auth-container :is-auth="canReadWriteSchemaByPath" :content="'common.schemaAuth'" style="flex: 1; overflow: auto">
       <div class="storage-table-box">
         <el-table
+          border
           :data="tableData.measurements"
           v-loading="loading"
           style="width: 100%"
@@ -269,7 +270,7 @@
           v-if="totalCount > 0"
           v-model:currentPage="pagination.pageNum"
           v-model:page-size="pagination.pageSize"
-          class="m-t-20 measurement-table-pagination"
+          class="measurement-table-pagination m-t-20"
           popper-class="measurement-table-pagination-popper"
           layout="prev, pager, next, sizes, jumper"
           background
@@ -330,7 +331,7 @@ const route = useRoute();
 const userStore = useUserStore();
 const { canManageDatabase, canWriteSchema, userAllEntityPrivileges, userAllPathPrivileges } = storeToRefs(userStore);
 
-const { maxTableHeight } = useTableHeight(370);
+const { maxTableHeight } = useTableHeight(285);
 const searchKeyword = ref((route.query.measurement as string) || '');
 const databaseInfos = ref<DatabaseInfo>({
   groupName: '',
@@ -816,6 +817,9 @@ watch(
   margin: 0 8px 8px;
   padding: 8px;
   background-color: #f7f8fc;
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 10px);
 }
 
 :deep(.el-select-v2__selection) {
@@ -845,7 +849,7 @@ watch(
   justify-content: center;
 
   .row-description-text {
-    max-width: 120px;
+    max-width: 100%;
     display: flex;
   }
 
