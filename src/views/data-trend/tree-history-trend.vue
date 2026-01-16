@@ -1,10 +1,13 @@
 <template>
   <div class="flex h-full w-full relative">
-    <div :style="{ width: sideTreeWidth + 'px' }" class="rounded-6px bg-white flex-shrink-0">
-      <div style="position: absolute; left: 0; right: 0">
+    <div :style="{ width: sideTreeWidth + 'px', position: 'relative' }" class="rounded-6px bg-white flex-shrink-0">
+      <div
+        :style="{ height: '100%', width: '4px', backgroundColor: 'transparent', position: 'absolute', left: sideTreeWidth + 'px', cursor: 'ew-resize' }"
+        @pointerdown="(e) => onSliderPointerDown(e)"
+      ></div>
+      <div style="position: relative">
         <SideTree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" :current-node="currentNode" @doubleClickMeasurement="createGroup" />
       </div>
-      <div style="height: 100%; width: 4px; background-color: transparent; position: absolute; right: -2px; cursor: ew-resize" @pointerdown="(e) => onSliderPointerDown(e)"></div>
     </div>
 
     <div class="ml-8px p-[0px_8px_8px] rounded-6px bg-white flex flex-1 flex-col min-w-0">
@@ -37,6 +40,7 @@
         @delete-group="deleteGroup"
         @delete-measurement="deleteMeasurement"
         @marker-value-change="handleMarkerValueChange"
+        @update-range="updateRange"
       />
       <TimelineArea
         ref="timelineAreaRef"
@@ -116,7 +120,7 @@ function onSliderPointerDown(event: PointerEvent) {
 
   function onPointerMove(e: PointerEvent) {
     const deltaX = e.clientX - startX;
-    const newWidth = Math.max(200, startWidth + deltaX);
+    const newWidth = Math.min(Math.max(200, startWidth + deltaX), 600);
     if (measurementSideTree.value) {
       sideTreeWidth.value = newWidth;
     }

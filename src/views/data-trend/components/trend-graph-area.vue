@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full flex-1 overflow-y-auto" style="overflow-x: hidden" ref="wrapperRef">
+  <div class="flex-1 w-full overflow-y-auto" style="overflow-x: hidden" ref="wrapperRef">
     <div>
       <MetricChartGroup
         v-for="(group, index) in props.measurementGroupInfo"
@@ -23,6 +23,7 @@
         @marker-change="updateMarker"
         @marker-value-change="handleMarkerValueChange"
         @delete-measurement="handleDeleteMeasurement"
+        @update-range="handleUpdateTimeRange"
       />
       <MetricChartGroup
         v-if="props.measurementGroupInfo.length === 0"
@@ -100,6 +101,7 @@ const emit = defineEmits<{
   'delete-group': [payload: { groupId: string }];
   'delete-measurement': [payload: { groupId: string; measurementPath: string }];
   'marker-value-change': [payload: MeasurementMarkerData[]];
+  'update-range': [payload: { start: number; end: number }];
 }>();
 
 const measurementsMarkerData = ref<MeasurementMarkerData[]>([]);
@@ -196,6 +198,10 @@ function handleDeleteGroup(payload: { groupId: string }) {
 
 function handleDeleteMeasurement(payload: { groupId: string; measurementPath: string }) {
   emit('delete-measurement', payload);
+}
+
+function handleUpdateTimeRange(payload: { start: number; end: number }) {
+  emit('update-range', payload);
 }
 
 onMounted(() => {

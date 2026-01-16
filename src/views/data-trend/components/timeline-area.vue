@@ -7,12 +7,16 @@
     </div>
     <div ref="timelineWrapperRef" class="h-60px w-full relative">
       <div ref="timelineChartRef" class="h-60px w-full"></div>
-      <button class="flip-button rounded-[2px] bg-white h-40px w-20px cursor-pointer top-0 absolute p-0!" @click="handlePageDown">
-        <i-custom-arrow-left-trend />
-      </button>
-      <button class="flip-button rounded-[2px] bg-white h-40px w-20px cursor-pointer right-0 top-0 absolute p-0!" @click="handlePageUp">
-        <i-custom-arrow-right-trend />
-      </button>
+      <el-tooltip :content="t('common.previousPage')" effect="light" placement="top">
+        <button class="flip-button rounded-[2px] bg-white h-40px w-20px cursor-pointer top-0 absolute p-0!" @click="handlePageDown">
+          <i-custom-arrow-left-trend />
+        </button>
+      </el-tooltip>
+      <el-tooltip :content="t('common.nextPage')" effect="light" placement="top">
+        <button class="flip-button rounded-[2px] bg-white h-40px w-20px cursor-pointer right-0 top-0 absolute p-0!" @click="handlePageUp">
+          <i-custom-arrow-right-trend />
+        </button>
+      </el-tooltip>
       <div class="mx-[24px] pointer-events-none inset-0 absolute">
         <div class="timeline-outline rounded-[2px] bg-transparent h-40px w-full box-border absolute"></div>
         <div
@@ -384,14 +388,6 @@ function buildTimelineChartOption(): ECOption {
         color: '#424561',
         fontSize: 12,
         interval: 'auto',
-        formatter: (value: number) =>
-          new Date(value).toLocaleTimeString('zh-CN', {
-            year: '2-digit',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-          }),
       },
       axisLine: {
         show: false,

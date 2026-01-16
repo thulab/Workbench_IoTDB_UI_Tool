@@ -2,7 +2,7 @@
   <div @drop="handleDrop" @dragover.prevent class="graph-border border-box mt-4px pb-9px rounded-[2px]">
     <div class="mt-2px flex items-center">
       <div class="pb-[10px]">
-        <button class="mr-16px border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteGroup">
+        <button class="ml-10px mr-16px border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteGroup">
           <el-icon size="20"><i-custom-close /></el-icon>
         </button>
       </div>
@@ -26,15 +26,17 @@
           </div>
         </div>
       </el-scrollbar>
-      <div class="ml-[10px] mr-[5px] pb-[5px] w-[24px]">
-        <button
-          class="mr-16px border-none bg-transparent flex items-center p-0!"
-          @click="exportImage"
-          :disabled="props.group.members.length === 0"
-          :style="props.group.members.length === 0 ? 'cursor: not-allowed; opacity: 0.5;' : 'cursor: pointer; opacity: 1;'"
-        >
-          <el-icon size="24"><i-custom-export /></el-icon>
-        </button>
+      <div class="mr-[10px] pb-[5px] flex">
+        <el-tooltip :content="t('common.export')" effect="light" placement="top">
+          <button
+            class="border-none bg-transparent flex items-center p-0!"
+            @click="exportImage"
+            :disabled="props.group.members.length === 0"
+            :style="props.group.members.length === 0 ? 'cursor: not-allowed; opacity: 0.5;' : 'cursor: pointer; opacity: 1;'"
+          >
+            <el-icon size="24"><i-custom-export /></el-icon>
+          </button>
+        </el-tooltip>
       </div>
     </div>
     <div ref="stageRef" class="relative">
@@ -153,6 +155,7 @@ const emit = defineEmits<{
   'delete-group': [payload: { groupId: string }];
   'marker-value-change': [payload: MeasurementMarkerData[]];
   'delete-measurement': [payload: { groupId: string; measurementPath: string }];
+  'update-range': [payload: { start: number; end: number }];
 }>();
 
 const markerHandles = computed(() => {
@@ -370,7 +373,6 @@ function handleDrop(event: DragEvent) {
 }
 
 function exportImage() {
-  console.log('exportImage');
   if (chart) {
     const imgData = chart.getDataURL({
       type: 'png',
@@ -448,10 +450,6 @@ function buildOption(): ECOption {
           type: 'dashed',
         },
       },
-      valueFormatter: (value) => {
-        const numeric = typeof value === 'number' ? value : Number(value ?? 0);
-        return numeric.toFixed(4);
-      },
     },
     xAxis: {
       show: props.index === 0,
@@ -464,14 +462,6 @@ function buildOption(): ECOption {
         color: '#424561',
         fontSize: 12,
         interval: 'auto',
-        formatter: (value: number) =>
-          new Date(value).toLocaleTimeString('zh-CN', {
-            year: '2-digit',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-          }),
       },
       splitLine: {
         show: false,
@@ -487,7 +477,11 @@ function buildOption(): ECOption {
       splitLine: {
         lineStyle: { color: '#DFE1ED' },
       },
+      splitNumber: 2,
       boundaryGap: ['5%', '5%'],
+    },
+    brush: {
+      toolbox: [],
     },
     toolbox: {
       show: false,
@@ -534,10 +528,6 @@ function buildRunningOption(): ECOption {
           type: 'dashed',
         },
       },
-      valueFormatter: (value) => {
-        const numeric = typeof value === 'number' ? value : Number(value ?? 0);
-        return numeric.toFixed(4);
-      },
     },
     xAxis: {
       show: props.index === 0,
@@ -548,12 +538,6 @@ function buildRunningOption(): ECOption {
         color: '#424561',
         fontSize: 12,
         interval: 'auto',
-        formatter: (value: number) =>
-          new Date(value).toLocaleTimeString('zh-CN', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-          }),
       },
       splitLine: {
         show: false,
@@ -567,7 +551,7 @@ function buildRunningOption(): ECOption {
       splitLine: {
         lineStyle: { color: '#DFE1ED' },
       },
-      splitNumber: 7,
+      splitNumber: 2,
     },
     toolbox: {
       show: false,
@@ -604,6 +588,37 @@ function initChart() {
   if (!trendChartRef.value) return;
   chart = echarts.init(trendChartRef.value);
   chart.setOption(buildOption());
+  chart.on('brushEnd', function (params) {
+    const XAxisRange = (params as any).areas[0].range[0];
+    if (!XAxisRange || !stageRef.value) return;
+    const startX = XAxisRange[0];
+    const endX = XAxisRange[1];
+    const rect = stageRef.value.getBoundingClientRect();
+    const usable = Math.max(rect.width - GRID_LEFT - GRID_RIGHT, 1);
+    const start = props.isRunning ? runningTrendStore.visibleTimeRange.start : trendStore.visibleTimeRange.start;
+    const end = props.isRunning ? runningTrendStore.visibleTimeRange.end : trendStore.visibleTimeRange.end;
+
+    const rawOffsetStart = startX - GRID_LEFT;
+    const offsetStart = Math.min(Math.max(rawOffsetStart, 0), usable);
+    const ratioStart = offsetStart / usable;
+    const timestampStart = start + ratioStart * (end - start);
+
+    const rawOffsetEnd = endX - GRID_LEFT;
+    const offsetEnd = Math.min(Math.max(rawOffsetEnd, 0), usable);
+    const ratioEnd = offsetEnd / usable;
+    const timestampEnd = start + ratioEnd * (end - start);
+
+    emit('update-range', { start: timestampStart, end: timestampEnd });
+  });
+  chart.on('finished', () => {
+    chart?.dispatchAction({
+      type: 'takeGlobalCursor',
+      key: 'brush',
+      brushOption: {
+        brushType: 'rect',
+      },
+    });
+  });
   ro = new ResizeObserver(() => {
     chart?.resize();
     layoutTick.value += 1;
