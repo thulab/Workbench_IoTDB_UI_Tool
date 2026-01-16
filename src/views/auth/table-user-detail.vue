@@ -1,8 +1,12 @@
 <template>
   <version-container :is-show="showAuthMenu">
     <el-container>
-      <el-aside width="240px" class="list-wrapper">
+      <el-aside :width="sideWidth + 'px'" class="list-wrapper" style="position: relative">
         <user-list ref="listRef" :can-manage-user="effectiveCanManageUser" :user-name="userName" @handle-select="(val) => (currentUser = val)" />
+        <div
+          :style="{ height: '100%', width: '4px', backgroundColor: 'transparent', position: 'absolute', top: '0px', right: '0px', cursor: 'ew-resize' }"
+          @pointerdown="(e) => onSliderPointerDown(e)"
+        ></div>
       </el-aside>
       <el-container class="details-wrapper">
         <el-main class="p-0" v-loading="loading">
@@ -129,7 +133,7 @@
                 </el-table-column>
               </el-table>
 
-              <el-button v-if="effectiveCanManageUser && !isManager" style="width: 100%" class="m-t-24 svg-button-hover-color" @click="handleAddRow" id="auth-role-path">
+              <el-button v-if="effectiveCanManageUser && !isManager" style="width: 100%" class="svg-button-hover-color m-t-24" @click="handleAddRow" id="auth-role-path">
                 <i-custom-add class="m-r-4" />
                 {{ t('auth.relational.addScope') }}
               </el-button>
@@ -170,6 +174,8 @@ const addScopeVisible = ref(false);
 const bindRoleVisible = ref(false);
 const previewVisible = ref(false);
 const previewRole = ref<string | undefined>(undefined);
+
+const sideWidth = ref<number>(240);
 
 // const { maxTableHeight } = useTableHeight(540);
 // const minHeight = computed(() => {
@@ -272,6 +278,26 @@ const tableData = computed<DataPrivilege[]>(() => {
     } as DataPrivilege;
   });
 });
+
+function onSliderPointerDown(event: PointerEvent) {
+  event.preventDefault();
+  const startX = event.clientX;
+  const startWidth = sideWidth.value || 240;
+
+  function onPointerMove(e: PointerEvent) {
+    const deltaX = e.clientX - startX;
+    const newWidth = Math.min(Math.max(200, startWidth + deltaX), 600);
+    sideWidth.value = newWidth;
+  }
+
+  function onPointerUp() {
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerup', onPointerUp);
+  }
+
+  window.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('pointerup', onPointerUp);
+}
 
 function getDetail() {
   if (currentUser.value && currentUser.value.name) {

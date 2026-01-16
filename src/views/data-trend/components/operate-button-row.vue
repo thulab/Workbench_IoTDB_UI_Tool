@@ -4,7 +4,7 @@
       <div class="text-[14px]">
         {{ t('dataTrend.timeRange') }}：
         <el-date-picker
-          style="min-width: min-content"
+          style="--el-date-editor-width: 330px"
           v-model="selectedDateTime.value"
           type="datetimerange"
           range-separator="-"

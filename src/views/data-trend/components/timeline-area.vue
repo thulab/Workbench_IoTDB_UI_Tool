@@ -1,9 +1,9 @@
 <template>
   <div>
     <div class="mb-4px mt-16px flex items-center">
-      <el-date-picker v-model="startTime" type="datetime" placeholder="Select start date and time" @change="onStartTimeSelected" :prefix-icon="ICustomCalender" :disabled-date="disabledDate" />
+      <!-- <el-date-picker style="--el-date-editor-width: 160px" v-model="startTime" type="datetime" :clearable="false" placeholder="Select start date and time" @change="onStartTimeSelected" :prefix-icon="ICustomCalender" :disabled-date="disabledDate" /> -->
       <div class="text-[14px] text-center flex-grow">{{ t('dataTrend.dataSelectWindow') }}</div>
-      <el-date-picker v-model="endTime" type="datetime" placeholder="Select end date and time" @change="onEndTimeSelected" :prefix-icon="ICustomCalender" :disabled-date="disabledDate" />
+      <!-- <el-date-picker style="--el-date-editor-width: 160px"v-model="endTime" type="datetime" :clearable="false" placeholder="Select end date and time" @change="onEndTimeSelected" :prefix-icon="ICustomCalender" :disabled-date="disabledDate" /> -->
     </div>
     <div ref="timelineWrapperRef" class="h-60px w-full relative">
       <div ref="timelineChartRef" class="h-60px w-full"></div>
@@ -17,6 +17,29 @@
           <i-custom-arrow-right-trend />
         </button>
       </el-tooltip>
+      <div class="flex w-full items-center bottom-[-7px] absolute">
+        <el-date-picker
+          style="--el-date-editor-width: 160px"
+          v-model="startTime"
+          type="datetime"
+          :clearable="false"
+          placeholder="Select start date and time"
+          @change="onStartTimeSelected"
+          :prefix-icon="ICustomCalender"
+          :disabled-date="disabledDate"
+        />
+        <div class="text-[14px] text-center flex-grow"></div>
+        <el-date-picker
+          style="--el-date-editor-width: 160px"
+          v-model="endTime"
+          type="datetime"
+          :clearable="false"
+          placeholder="Select end date and time"
+          @change="onEndTimeSelected"
+          :prefix-icon="ICustomCalender"
+          :disabled-date="disabledDate"
+        />
+      </div>
       <div class="mx-[24px] pointer-events-none inset-0 absolute">
         <div class="timeline-outline rounded-[2px] bg-transparent h-40px w-full box-border absolute"></div>
         <div
