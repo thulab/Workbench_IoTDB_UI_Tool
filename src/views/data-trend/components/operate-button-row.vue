@@ -1,9 +1,10 @@
 <template>
-  <div class="flex items-center mt-[6px] mb-[2px]">
+  <div class="mb-[2px] mt-[6px] flex items-center">
     <div v-if="!props.isRunning">
       <div class="text-[14px]">
         {{ t('dataTrend.timeRange') }}：
         <el-date-picker
+          style="min-width: min-content"
           v-model="selectedDateTime.value"
           type="datetimerange"
           range-separator="-"
@@ -21,7 +22,7 @@
       <button
         @click="handleRunningPlay"
         v-if="props.isRunning && !runningTrendStore.isPlaying"
-        class="w-[24px] h-[24px] p-[0]! flex items-center justify-center bg-[#495AD4] border-0 rounded-[4px]"
+        class="border-0 rounded-[4px] bg-[#495AD4] flex h-[24px] w-[24px] items-center justify-center p-[0]!"
         :disabled="!props.canOperate"
         :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
       >
@@ -30,7 +31,7 @@
       <button
         @click="handleRunningPause"
         v-if="props.isRunning && runningTrendStore.isPlaying"
-        class="w-[24px] h-[24px] p-[0]! flex items-center justify-center bg-[#495AD4] border-0 rounded-[4px]"
+        class="border-0 rounded-[4px] bg-[#495AD4] flex h-[24px] w-[24px] items-center justify-center p-[0]!"
         :disabled="!props.canOperate"
         :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
       >
@@ -38,7 +39,7 @@
       </button>
       <button
         @click="handleResetGraph"
-        class="save-button h-[24px] w-[24px] box-border p-[0]! bg-white cursor-pointer rounded-[4px] flex justify-center items-center ml-[16px]"
+        class="save-button ml-[16px] rounded-[4px] bg-white flex h-[24px] w-[24px] cursor-pointer items-center box-border justify-center p-[0]!"
         :disabled="!props.canOperate"
         :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
       >
@@ -46,7 +47,7 @@
       </button>
       <button
         @click="handleSaveTemplate"
-        class="save-button h-[24px] w-[24px] box-border p-[0]! bg-white cursor-pointer rounded-[4px] flex justify-center items-center ml-[16px]"
+        class="save-button ml-[16px] rounded-[4px] bg-white flex h-[24px] w-[24px] cursor-pointer items-center box-border justify-center p-[0]!"
         :disabled="!props.canOperate"
         :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
       >

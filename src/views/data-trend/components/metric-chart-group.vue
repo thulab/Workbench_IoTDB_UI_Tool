@@ -1,15 +1,15 @@
 <template>
-  <div @drop="handleDrop" @dragover.prevent class="graph-border rounded-[2px] mt-4px border-box pb-9px">
-    <div class="flex items-center mt-2px">
+  <div @drop="handleDrop" @dragover.prevent class="graph-border border-box mt-4px pb-9px rounded-[2px]">
+    <div class="mt-2px flex items-center">
       <div class="pb-[10px]">
-        <button class="bg-transparent border-none mr-16px p-0! flex items-center cursor-pointer" @click="handleDeleteGroup">
+        <button class="mr-16px border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteGroup">
           <el-icon size="20"><i-custom-close /></el-icon>
         </button>
       </div>
       <el-scrollbar class="flex-1">
-        <div class="flex items-center fit-content pb-[10px]">
-          <div v-for="measurement in props.group.members" class="flex items-center mr-27px flex-shrink-0" :key="measurement.label">
-            <div class="w-12px h-12px rounded-[2px] mr-8px" :style="`background: ${measurement.color}`"></div>
+        <div class="fit-content pb-[10px] flex items-center">
+          <div v-for="measurement in props.group.members" class="mr-27px flex flex-shrink-0 items-center" :key="measurement.label">
+            <div class="mr-8px rounded-[2px] h-12px w-12px" :style="`background: ${measurement.color}`"></div>
             <el-tooltip
               v-if="!props.isRunning && (measurementCondition.get(measurement.id) === 2 || measurementCondition.get(measurement.id) === 3)"
               class="box-item"
@@ -20,15 +20,15 @@
               <el-icon size="12" class="mr-[2px]"><i-custom-warning-yellow /></el-icon>
             </el-tooltip>
             <div class="text-12px mr-11px">{{ measurement.label }}</div>
-            <button class="bg-transparent border-none p-0! flex items-center cursor-pointer" @click="handleDeleteMeasurement(measurement.label)">
+            <button class="border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteMeasurement(measurement.label)">
               <el-icon size="16"><i-custom-close /></el-icon>
             </button>
           </div>
         </div>
       </el-scrollbar>
-      <div class="pb-[5px] w-[24px] ml-[10px] mr-[5px]">
+      <div class="ml-[10px] mr-[5px] pb-[5px] w-[24px]">
         <button
-          class="bg-transparent border-none mr-16px p-0! flex items-center"
+          class="mr-16px border-none bg-transparent flex items-center p-0!"
           @click="exportImage"
           :disabled="props.group.members.length === 0"
           :style="props.group.members.length === 0 ? 'cursor: not-allowed; opacity: 0.5;' : 'cursor: pointer; opacity: 1;'"
@@ -38,12 +38,12 @@
       </div>
     </div>
     <div ref="stageRef" class="relative">
-      <div ref="trendChartRef" class="w-full h-full" :class="{ 'opacity-50': props.loading }" :style="{ height: typeof props.height === 'number' ? props.height + 'px' : props.height }"></div>
-      <div v-if="!props.isRunning || !runningTrendStore.isPlaying" class="absolute inset-0 pointer-events-none" :class="{ 'opacity-50': props.loading }">
+      <div ref="trendChartRef" class="h-full w-full" :class="{ 'opacity-50': props.loading }" :style="{ height: typeof props.height === 'number' ? props.height + 'px' : props.height }"></div>
+      <div v-if="!props.isRunning || !runningTrendStore.isPlaying" class="pointer-events-none inset-0 absolute" :class="{ 'opacity-50': props.loading }">
         <button
           v-for="handle in markerHandles"
           :key="handle.id"
-          class="absolute top-1 w-0 border-l-[1.5px] border-l-dashed border-l-white/40 pointer-events-auto bg-transparent border-t-0 border-r-0 border-b-0 cursor-ew-resize disabled:pointer-events-none disabled:border-l-white/25"
+          class="border-b-0 border-l-[1px] border-r-0 border-t-0 border-l-white/40 border-l-dashed bg-transparent w-0 cursor-ew-resize pointer-events-auto top-1 absolute disabled:border-l-white/25 disabled:pointer-events-none"
           type="button"
           :style="{ left: handle.left, borderColor: handle.color, height: props.index === 0 ? `calc(100% - 25px)` : `100%` }"
           :disabled="props.loading"

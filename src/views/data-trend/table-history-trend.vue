@@ -1,17 +1,20 @@
 <template>
-  <div class="relative w-full h-full flex">
-    <div class="w-256px bg-white flex-shrink-0 rounded-6px">
-      <TableSideTree
-        ref="sideTreeRef"
-        namespace="history"
-        @updateSelectedMeasurements="(list) => handleSelectedMeasurementsUpdate({ selectedMeasurements: list })"
-        @deleteMeasurement="handleDeleteMeasurement"
-        @doubleClickMeasurement="createGroup"
-        @resetMeasurement="handleResetMeasurement"
-      />
+  <div class="flex h-full w-full relative">
+    <div :style="{ width: sideTreeWidth + 'px' }" class="rounded-6px bg-white flex-shrink-0 relative">
+      <div style="position: absolute; left: 0; right: 0">
+        <TableSideTree
+          ref="sideTreeRef"
+          namespace="history"
+          @updateSelectedMeasurements="(list) => handleSelectedMeasurementsUpdate({ selectedMeasurements: list })"
+          @deleteMeasurement="handleDeleteMeasurement"
+          @doubleClickMeasurement="createGroup"
+          @resetMeasurement="handleResetMeasurement"
+        />
+      </div>
+      <div style="height: 100%; width: 4px; background-color: transparent; position: absolute; right: -2px; cursor: ew-resize" @pointerdown="(e) => onSliderPointerDown(e)"></div>
     </div>
 
-    <div class="flex-1 ml-8px bg-white rounded-6px p-[0px_8px_8px] flex flex-col min-w-0">
+    <div class="ml-8px p-[0px_8px_8px] rounded-6px bg-white flex flex-1 flex-col min-w-0">
       <div>
         <OperateButtonRow
           ref="operateButtonRowRef"
@@ -108,6 +111,30 @@ const templateList = ref<TrendTemplate[]>([]);
 
 const usedColors = ref<Set<string>>(new Set());
 const predefineColors = ['#4992ff', '#7cffb2', '#fddd60', '#ff6e76', '#58d9f9', '#05c091', '#ff8a45', '#8d48e3', '#dd79ff', '#8AC211'];
+
+const sideTreeWidth = ref<number>(256);
+
+function onSliderPointerDown(event: PointerEvent) {
+  event.preventDefault();
+  const startX = event.clientX;
+  const startWidth = sideTreeRef.value?.$el.offsetWidth || 256;
+
+  function onPointerMove(e: PointerEvent) {
+    const deltaX = e.clientX - startX;
+    const newWidth = Math.max(200, startWidth + deltaX);
+    if (sideTreeRef.value) {
+      sideTreeWidth.value = newWidth;
+    }
+  }
+
+  function onPointerUp() {
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerup', onPointerUp);
+  }
+
+  window.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('pointerup', onPointerUp);
+}
 
 function handleMarkerValueChange(payload: MeasurementMarkerData[]) {
   markerDatas.value = payload;

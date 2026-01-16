@@ -1,38 +1,30 @@
 <template>
   <div>
-    <div class="flex mt-16px mb-4px items-center">
+    <div class="mb-4px mt-16px flex items-center">
       <el-date-picker v-model="startTime" type="datetime" placeholder="Select start date and time" @change="onStartTimeSelected" :prefix-icon="ICustomCalender" :disabled-date="disabledDate" />
-      <div class="flex-grow text-center text-[14px]">{{ t('dataTrend.dataSelectWindow') }}</div>
+      <div class="text-[14px] text-center flex-grow">{{ t('dataTrend.dataSelectWindow') }}</div>
       <el-date-picker v-model="endTime" type="datetime" placeholder="Select end date and time" @change="onEndTimeSelected" :prefix-icon="ICustomCalender" :disabled-date="disabledDate" />
     </div>
-    <div ref="timelineWrapperRef" class="relative w-full h-60px">
-      <div ref="timelineChartRef" class="w-full h-60px"></div>
-      <button class="flip-button cursor-pointer absolute top-0 h-40px w-20px rounded-[2px] bg-white p-0!" @click="handlePageDown">
+    <div ref="timelineWrapperRef" class="h-60px w-full relative">
+      <div ref="timelineChartRef" class="h-60px w-full"></div>
+      <button class="flip-button rounded-[2px] bg-white h-40px w-20px cursor-pointer top-0 absolute p-0!" @click="handlePageDown">
         <i-custom-arrow-left-trend />
       </button>
-      <button class="flip-button cursor-pointer absolute top-0 right-0 h-40px w-20px rounded-[2px] bg-white p-0!" @click="handlePageUp">
+      <button class="flip-button rounded-[2px] bg-white h-40px w-20px cursor-pointer right-0 top-0 absolute p-0!" @click="handlePageUp">
         <i-custom-arrow-right-trend />
       </button>
-      <div class="absolute inset-0 pointer-events-none mx-[24px]">
-        <div class="timeline-outline absolute w-full h-40px bg-transparent rounded-[2px] box-border"></div>
+      <div class="mx-[24px] pointer-events-none inset-0 absolute">
+        <div class="timeline-outline rounded-[2px] bg-transparent h-40px w-full box-border absolute"></div>
         <div
-          class="range-slider-fill absolute h-40px rounded-[2px] pointer-events-auto box-border bg-[#495AD420]"
+          class="range-slider-fill rounded-[2px] bg-[#495AD420] h-40px pointer-events-auto box-border absolute"
           :style="{
             left: handleLeftPos + 'px',
             right: containerWidth - handleRightPos - 48 + 'px',
           }"
           @pointerdown="(e) => onSliderBlockPointerDown(e)"
         ></div>
-        <div
-          class="bg-transparent absolute h-full w-[2px] p-0 cursor-ew-resize pointer-events-auto"
-          :style="{ left: handleLeftPos + 'px' }"
-          @pointerdown="(e) => onSliderPointerDown({ id: 'start', x: 0 }, e)"
-        ></div>
-        <div
-          class="bg-transparent absolute h-full w-[2px] p-0 cursor-ew-resize pointer-events-auto"
-          :style="{ left: handleRightPos + 'px' }"
-          @pointerdown="(e) => onSliderPointerDown({ id: 'end', x: 0 }, e)"
-        ></div>
+        <div class="drag-button" :style="{ left: handleLeftPos + 'px' }" @pointerdown="(e) => onSliderPointerDown({ id: 'start', x: 0 }, e)">...</div>
+        <div class="drag-button ml-[-12px]" :style="{ left: handleRightPos + 'px' }" @pointerdown="(e) => onSliderPointerDown({ id: 'end', x: 0 }, e)">...</div>
       </div>
     </div>
   </div>
@@ -560,6 +552,9 @@ watch(
 <style scoped>
 .flip-button {
   border: 1px solid #dfe1ed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .timeline-outline {
@@ -568,5 +563,22 @@ watch(
 
 .range-slider-fill {
   border: 1px solid #495ad4;
+}
+
+.drag-button {
+  position: absolute;
+  height: 40px;
+  width: 12px;
+  cursor: ew-resize;
+  pointer-events: auto;
+  border: #495ad4 1px solid;
+  background-color: #495ad4;
+  writing-mode: vertical-lr;
+  font-weight: 400;
+  font-size: 25px;
+  line-height: 1;
+  color: white;
+  display: flex;
+  justify-content: center;
 }
 </style>

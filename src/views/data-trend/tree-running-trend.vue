@@ -1,10 +1,13 @@
 <template>
-  <div class="relative w-full h-full flex">
-    <div class="w-256px bg-white flex-shrink-0 rounded-6px">
-      <SideTree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" :current-node="currentNode" @doubleClickMeasurement="createGroup" />
+  <div class="flex h-full w-full relative">
+    <div :style="{ width: sideTreeWidth + 'px' }" class="rounded-6px bg-white flex-shrink-0">
+      <div style="position: absolute; left: 0; right: 0">
+        <SideTree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" :current-node="currentNode" @doubleClickMeasurement="createGroup" />
+      </div>
+      <div style="height: 100%; width: 4px; background-color: transparent; position: absolute; right: -2px; cursor: ew-resize" @pointerdown="(e) => onSliderPointerDown(e)"></div>
     </div>
 
-    <div class="flex-1 ml-8px bg-white rounded-6px p-[0px_8px_8px] flex flex-col min-w-0">
+    <div class="ml-8px p-[0px_8px_8px] rounded-6px bg-white flex flex-1 flex-col min-w-0">
       <OperateButtonRow
         ref="operateButtonRowRef"
         :isTable="false"
@@ -90,6 +93,31 @@ const minDataTime = ref(-1);
 
 const trendGraphRef = ref<InstanceType<typeof TrendGraphArea>>();
 const isFetching = ref(false);
+
+const measurementSideTree = ref<InstanceType<typeof SideTree> | null>(null);
+const sideTreeWidth = ref<number>(256);
+
+function onSliderPointerDown(event: PointerEvent) {
+  event.preventDefault();
+  const startX = event.clientX;
+  const startWidth = measurementSideTree.value?.$el.offsetWidth || 256;
+
+  function onPointerMove(e: PointerEvent) {
+    const deltaX = e.clientX - startX;
+    const newWidth = Math.max(200, startWidth + deltaX);
+    if (measurementSideTree.value) {
+      sideTreeWidth.value = newWidth;
+    }
+  }
+
+  function onPointerUp() {
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerup', onPointerUp);
+  }
+
+  window.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('pointerup', onPointerUp);
+}
 
 // ========== 侧边栏所需函数 ==========
 
