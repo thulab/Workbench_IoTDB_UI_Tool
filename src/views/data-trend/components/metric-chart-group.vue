@@ -610,15 +610,17 @@ function initChart() {
 
     emit('update-range', { start: timestampStart, end: timestampEnd });
   });
-  chart.on('finished', () => {
-    chart?.dispatchAction({
-      type: 'takeGlobalCursor',
-      key: 'brush',
-      brushOption: {
-        brushType: 'rect',
-      },
+  if (!props.isRunning && props.group.members.length > 0) {
+    chart.on('finished', () => {
+      chart?.dispatchAction({
+        type: 'takeGlobalCursor',
+        key: 'brush',
+        brushOption: {
+          brushType: 'rect',
+        },
+      });
     });
-  });
+  }
   ro = new ResizeObserver(() => {
     chart?.resize();
     layoutTick.value += 1;
