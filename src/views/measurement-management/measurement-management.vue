@@ -1,10 +1,13 @@
 <template>
   <div class="database-page-container">
-    <div class="database-list-wrapper">
-      <side-tree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" :current-node="currentNode" @handle-change-node="handleChangeNode" />
+    <div class="database-list-wrapper" :style="{ width: sideTreeWidth + 'px' }">
+      <div style="position: absolute; left: 0; right: 0">
+        <side-tree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" :current-node="currentNode" @handle-change-node="handleChangeNode" />
+      </div>
+      <div style="height: 100%; width: 4px; background-color: transparent; position: absolute; right: -2px; cursor: ew-resize" @pointerdown="(e) => onSliderPointerDown(e)"></div>
     </div>
 
-    <div class="database-details-wrapper" :key="renderKey">
+    <div class="database-details-wrapper" :style="{ width: `calc(100% - ${sideTreeWidth}px - 8px)`, marginLeft: sideTreeWidth + 8 + 'px' }" :key="renderKey">
       <database-detail
         v-if="currentNodeType !== 'TIMESERIES'"
         :current-node-type="currentNodeType"
@@ -34,6 +37,27 @@ const currentNode = ref('root');
 const currentNodeType = ref('DATABASE');
 const currentSearchText = ref('');
 const renderKey = ref(0);
+const sideTreeWidth = ref<number>(240);
+
+function onSliderPointerDown(event: PointerEvent) {
+  event.preventDefault();
+  const startX = event.clientX;
+  const startWidth = sideTreeWidth.value || 240;
+
+  function onPointerMove(e: PointerEvent) {
+    const deltaX = e.clientX - startX;
+    const newWidth = Math.min(Math.max(200, startWidth + deltaX), 600);
+    sideTreeWidth.value = newWidth;
+  }
+
+  function onPointerUp() {
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerup', onPointerUp);
+  }
+
+  window.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('pointerup', onPointerUp);
+}
 
 function handleChangeNode(path: string, type: string, searchText: string) {
   if (type === 'loading') return;
@@ -68,7 +92,6 @@ function handleSaveMeasurement(path: string) {
 }
 
 .database-list-wrapper {
-  width: 240px;
   position: absolute;
   top: 0;
   left: 0;
@@ -79,7 +102,6 @@ function handleSaveMeasurement(path: string) {
 }
 
 .database-details-wrapper {
-  width: calc(100% - 248px);
   margin-left: 248px;
   height: 100%;
   background-color: #fff;

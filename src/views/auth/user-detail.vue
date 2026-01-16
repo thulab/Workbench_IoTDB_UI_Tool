@@ -1,8 +1,9 @@
 <template>
   <version-container :is-show="showAuthMenu">
     <el-container>
-      <el-aside width="240px" class="list-wrapper">
+      <el-aside :width="sideWidth + 'px'" class="list-wrapper" style="position: relative">
         <list ref="listRef" :can-manage-user="canManageUser" :user-name="userName" @handle-select="(val) => (currentUser = val)" />
+        <div style="height: 100%; width: 4px; background-color: transparent; position: absolute; top: 0; right: -2px; cursor: ew-resize" @pointerdown="(e) => onSliderPointerDown(e)"></div>
       </el-aside>
       <el-container class="details-wrapper">
         <el-main class="p-0" v-loading="loading || roleLoading">
@@ -237,6 +238,7 @@ const currentUser = ref<DBUser>();
 const pathVisible = ref(false);
 const addRoleVisible = ref(false);
 const previewRoleVisible = ref(false);
+const sideWidth = ref<number>(240);
 // const { maxTableHeight } = useTableHeight(540);
 // const minHeight = computed(() => {
 //   if (maxTableHeight.value < 300) {
@@ -303,6 +305,26 @@ const entityTableData = computed(() => {
   }
   return [result];
 });
+
+function onSliderPointerDown(event: PointerEvent) {
+  event.preventDefault();
+  const startX = event.clientX;
+  const startWidth = sideWidth.value || 240;
+
+  function onPointerMove(e: PointerEvent) {
+    const deltaX = e.clientX - startX;
+    const newWidth = Math.min(Math.max(200, startWidth + deltaX), 600);
+    sideWidth.value = newWidth;
+  }
+
+  function onPointerUp() {
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerup', onPointerUp);
+  }
+
+  window.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('pointerup', onPointerUp);
+}
 
 /**
  * 将角色的路径权限合并到一起
