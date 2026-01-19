@@ -124,7 +124,7 @@
                   sortable="custom"
                   :sort-orders="['ascending', 'descending', null]"
                   width="120"
-                  align="left"
+                  align="center"
                   show-overflow-tooltip
                   label-class-name="table-sort-column-box"
                 >
