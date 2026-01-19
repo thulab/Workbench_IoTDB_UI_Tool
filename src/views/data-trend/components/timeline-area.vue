@@ -2,7 +2,7 @@
   <div>
     <div class="mb-4px mt-16px flex items-center">
       <!-- <el-date-picker style="--el-date-editor-width: 160px" v-model="startTime" type="datetime" :clearable="false" placeholder="Select start date and time" @change="onStartTimeSelected" :prefix-icon="ICustomCalender" :disabled-date="disabledDate" /> -->
-      <div class="text-[14px] text-center flex-grow">{{ t('dataTrend.dataSelectWindow') }}</div>
+      <div class="text-[12px] text-center flex-grow">{{ t('dataTrend.dataSelectWindow') }}</div>
       <!-- <el-date-picker style="--el-date-editor-width: 160px"v-model="endTime" type="datetime" :clearable="false" placeholder="Select end date and time" @change="onEndTimeSelected" :prefix-icon="ICustomCalender" :disabled-date="disabledDate" /> -->
     </div>
     <div ref="timelineWrapperRef" class="h-60px w-full relative">

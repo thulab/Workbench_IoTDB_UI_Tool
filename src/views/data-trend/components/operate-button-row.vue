@@ -1,7 +1,7 @@
 <template>
   <div class="mb-[2px] mt-[6px] flex items-center">
     <div v-if="!props.isRunning">
-      <div class="text-[14px]">
+      <div class="text-[12px]">
         {{ t('dataTrend.timeRange') }}：
         <el-date-picker
           style="--el-date-editor-width: 330px"

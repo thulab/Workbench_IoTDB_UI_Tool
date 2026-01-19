@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-table :data="convertedMarkerDatas" border class="mt-16px h-148px!" size="small" :table-layout="'auto'">
+    <el-table :data="convertedMarkerDatas" border class="text-[12px] mt-16px h-148px! marker-table" size="small" :table-layout="'auto'">
       <el-table-column prop="name" :label="t('dataTrend.measurementName')" :show-overflow-tooltip="{ effect: 'light' }"></el-table-column>
       <el-table-column prop="x1" label="X1" :show-overflow-tooltip="{ effect: 'light' }"></el-table-column>
       <el-table-column prop="x2" label="X2" :show-overflow-tooltip="{ effect: 'light' }"></el-table-column>
@@ -40,3 +40,9 @@ const convertedMarkerDatas = computed(() => {
   });
 });
 </script>
+
+<style scoped>
+.marker-table :deep(th.el-table__cell) {
+  font-size: 12px;
+}
+</style>
