@@ -73,6 +73,7 @@
     "useCssVars": true,
     "useDark": true,
     "useDataTypeIcon": true,
+    "useElementWidth": true,
     "useI18n": true,
     "useId": true,
     "useLangSwitch": true,

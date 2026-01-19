@@ -297,6 +297,13 @@ function getTableHistoryData(measurement: Measurement) {
       } else {
         trendStore.updateMeasurementAverageInterval(measurement.label, -1);
       }
+      if (valueLen >= 1) {
+        const totalInterval = (point.timestamps[valueLen - 1] as number) - (point.timestamps[0] as number);
+        const averageInterval = totalInterval / valueLen;
+        trendStore.updateMeasurementAverageInterval(measurement.label, averageInterval);
+      } else {
+        trendStore.updateMeasurementAverageInterval(measurement.label, -1);
+      }
     }
     measurementsData.value.push({
       ...measurement,
@@ -331,6 +338,13 @@ function getTreeHistoryData(measurement: Measurement) {
         const timestamp = point.timestamps[i];
         const value = point.values[i];
         transformedData.push({ timestamp: timestamp as number, value: Number(value) });
+      }
+      if (valueLen >= 1) {
+        const totalInterval = (point.timestamps[valueLen - 1] as number) - (point.timestamps[0] as number);
+        const averageInterval = totalInterval / valueLen;
+        trendStore.updateMeasurementAverageInterval(measurement.label, averageInterval);
+      } else {
+        trendStore.updateMeasurementAverageInterval(measurement.label, -1);
       }
       if (valueLen >= 1) {
         const totalInterval = (point.timestamps[valueLen - 1] as number) - (point.timestamps[0] as number);
