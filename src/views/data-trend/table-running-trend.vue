@@ -637,6 +637,10 @@ function restoreData() {
       const parsed = JSON.parse(storageData);
       groups.value = parsed.groups;
       measurementList.value = parsed.measurements;
+      usedColors.value.clear();
+      measurementList.value.forEach((m: Measurement) => {
+        usedColors.value.add(m.color);
+      });
       measurementMap.clear();
       measurementList.value.forEach((item) => {
         measurementMap.set(item.id, item);

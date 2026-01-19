@@ -560,6 +560,10 @@ function restoreData() {
       operateButtonRowRef.value?.setSelectedDateTime([trendStore.globalTimeRange.start, trendStore.globalTimeRange.end]);
       groups.value = parsed.groups;
       measurementList.value = parsed.measurements;
+      usedColors.value.clear();
+      measurementList.value.forEach((m: Measurement) => {
+        usedColors.value.add(m.color);
+      });
       markers.value = parsed.markers?.length ? parsed.markers : createInitialMarkers(trendStore.globalTimeRange);
       measurementMap.clear();
       measurementList.value.forEach((item) => {
