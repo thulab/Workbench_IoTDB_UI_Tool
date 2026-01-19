@@ -1,30 +1,34 @@
 <template>
   <div class="flex-1 w-full overflow-y-auto" style="overflow-x: hidden" ref="wrapperRef">
     <div>
-      <MetricChartGroup
-        v-for="(group, index) in props.measurementGroupInfo"
-        :isTable="props.isTable"
-        :isPlaying="isPlaying"
-        :isRunning="props.isRunning"
-        :ref="(el) => el && chartRefs[group.id] === el"
-        :id="group.id"
-        :key="group.id"
-        :group="group"
-        :index="props.measurementGroupInfo.length - 1 - index"
-        :range="trendStore.visibleTimeRange"
-        :markers="props.markers"
-        :height="chartHeight"
-        :loading="props.loading"
-        :need-fetch-data="props.needFetchGroupsId?.includes(group.id)"
-        :can-delete="props.measurementGroupInfo.length > 1"
-        :realTimeData="filteredRealTimeData(group)"
-        @drop="handleMeasurementDrop"
-        @delete-group="handleDeleteGroup"
-        @marker-change="updateMarker"
-        @marker-value-change="handleMarkerValueChange"
-        @delete-measurement="handleDeleteMeasurement"
-        @update-range="handleUpdateTimeRange"
-      />
+      <draggable v-model="draggableData" item-key="id" @end="handleDragEnd">
+        <template #item="{ element, index }">
+          <MetricChartGroup
+            class="item"
+            :isTable="props.isTable"
+            :isPlaying="isPlaying"
+            :isRunning="props.isRunning"
+            :ref="(el) => el && chartRefs[element.group.id] === el"
+            :id="element.group.id"
+            :key="element.group.id"
+            :group="element.group"
+            :index="draggableData.length - 1 - index"
+            :range="trendStore.visibleTimeRange"
+            :markers="props.markers"
+            :height="chartHeight"
+            :loading="props.loading"
+            :need-fetch-data="props.needFetchGroupsId?.includes(element.group.id)"
+            :can-delete="props.measurementGroupInfo.length > 1"
+            :realTimeData="filteredRealTimeData(element.group)"
+            @drop="handleMeasurementDrop"
+            @delete-group="handleDeleteGroup"
+            @marker-change="updateMarker"
+            @marker-value-change="handleMarkerValueChange"
+            @delete-measurement="handleDeleteMeasurement"
+            @update-range="handleUpdateTimeRange"
+          />
+        </template>
+      </draggable>
       <MetricChartGroup
         v-if="props.measurementGroupInfo.length === 0"
         :isTable="props.isTable"
@@ -51,8 +55,9 @@
 import MetricChartGroup from './metric-chart-group.vue';
 import type { ChartMarker, ChartGroupInput, MeasurementMarkerData } from '@/types/trend';
 import type { TrendData } from '@/types';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useTableHistoryTrendStore, useTreeHistoryTrendStore } from '@/stores/trend.store';
+import draggable from 'vuedraggable';
 
 const selectedTemplateId = ref<number | string>('');
 
@@ -74,6 +79,13 @@ const props = withDefaults(
   }>(),
   {},
 );
+const draggableData = ref<
+  {
+    id: string;
+    index: number;
+    group: ChartGroupInput;
+  }[]
+>([]);
 
 const trendStore = props.isTable ? useTableHistoryTrendStore() : useTreeHistoryTrendStore();
 
@@ -102,6 +114,7 @@ const emit = defineEmits<{
   'delete-measurement': [payload: { groupId: string; measurementPath: string }];
   'marker-value-change': [payload: MeasurementMarkerData[]];
   'update-range': [payload: { start: number; end: number }];
+  'update-order': [payload: number[]];
 }>();
 
 const measurementsMarkerData = ref<MeasurementMarkerData[]>([]);
@@ -172,6 +185,11 @@ function filteredRealTimeData(group: ChartGroupInput): TrendData[] {
   return result;
 }
 
+function handleDragEnd() {
+  const newOrder = draggableData.value.map((item) => item.index);
+  emit('update-order', newOrder);
+}
+
 function handleMarkerValueChange(payload: MeasurementMarkerData[]) {
   payload.forEach((newData) => {
     const index = measurementsMarkerData.value.findIndex((item) => item.name === newData.name);
@@ -221,6 +239,18 @@ onBeforeUnmount(() => {
     observer = null;
   }
 });
+
+watch(
+  () => props.measurementGroupInfo,
+  (newVal) => {
+    draggableData.value = newVal.map((item, index) => ({
+      id: item.id,
+      index,
+      group: item as ChartGroupInput,
+    }));
+  },
+  { immediate: true },
+);
 </script>
 
 <style>

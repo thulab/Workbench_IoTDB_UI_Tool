@@ -43,6 +43,7 @@
         @delete-group="deleteGroup"
         @delete-measurement="deleteMeasurement"
         @marker-value-change="handleMarkerValueChange"
+        @update-order="updateOrder"
       />
       <MarkerTableArea :is-running="true" :marker-datas="runningTrendStore.isPlaying ? emptyMarkerDatas : markerDatas" />
     </div>
@@ -149,6 +150,18 @@ function updateMarker(payload: { id: string; timestamp: number }) {
   const range = runningTrendStore.visibleTimeRange;
   const clamped = Math.min(Math.max(payload.timestamp, range.start), range.end);
   markers.value = markers.value.map((marker) => (marker.id === payload.id ? { ...marker, timestamp: clamped } : marker));
+}
+
+function updateOrder(newOrder: number[]) {
+  const newGroupsOrder: GroupState[] = [];
+  for (const index of newOrder) {
+    const group = groups.value[index];
+    if (group) {
+      newGroupsOrder.push(group);
+    }
+  }
+  groups.value = [...newGroupsOrder];
+  setStorage();
 }
 
 function handleMarkerValueChange(payload: MeasurementMarkerData[]) {

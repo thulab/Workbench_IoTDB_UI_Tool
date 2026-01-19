@@ -181,6 +181,7 @@ function handleNodeDoubleClick(data: TreeNodeData) {
 
 function handleNodeDragStart(event: DragEvent, data: TreeNodeData) {
   if (data.nodeType === 'TIMESERIES') {
+    event.dataTransfer?.setData('application/drag-source', 'measurement-list');
     event.dataTransfer?.setData('text/plain', data.nodePath);
     if (event.dataTransfer) {
       event.dataTransfer.effectAllowed = 'copy';

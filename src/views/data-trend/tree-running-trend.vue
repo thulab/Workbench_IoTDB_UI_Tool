@@ -39,6 +39,7 @@
         @delete-group="deleteGroup"
         @delete-measurement="deleteMeasurement"
         @marker-value-change="handleMarkerValueChange"
+        @update-order="updateOrder"
       />
       <MarkerTableArea :is-running="false" :marker-datas="runningTrendStore.isPlaying ? emptyMarkerDatas : markerDatas" />
     </div>
@@ -398,6 +399,18 @@ function handleResetGraphArea() {
 }
 
 // ========== 趋势图所需函数 ==========
+
+function updateOrder(newOrder: number[]) {
+  const newGroupsOrder: GroupState[] = [];
+  for (const index of newOrder) {
+    const group = groups.value[index];
+    if (group) {
+      newGroupsOrder.push(group);
+    }
+  }
+  groups.value = [...newGroupsOrder];
+  setStorage();
+}
 
 function mergeGroup(payload: { groupId: string; measurementPath: string }) {
   addToMeasurementListIfNotExist(payload.measurementPath);

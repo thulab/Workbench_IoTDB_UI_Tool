@@ -41,6 +41,7 @@
         @delete-measurement="deleteMeasurement"
         @marker-value-change="handleMarkerValueChange"
         @update-range="updateRange"
+        @update-order="updateOrder"
       />
       <TimelineArea
         ref="timelineAreaRef"
@@ -413,6 +414,18 @@ function updateRange(range: TimeRange) {
   };
   trendStore.setPendingTimeRange(nextRange);
   triggerSimulatedFetch(nextRange);
+}
+
+function updateOrder(newOrder: number[]) {
+  const newGroupsOrder: GroupState[] = [];
+  for (const index of newOrder) {
+    const group = groups.value[index];
+    if (group) {
+      newGroupsOrder.push(group);
+    }
+  }
+  groups.value = [...newGroupsOrder];
+  setStorage();
 }
 
 function triggerSimulatedFetch(nextRange: TimeRange) {

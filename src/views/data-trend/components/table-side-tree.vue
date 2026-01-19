@@ -13,7 +13,7 @@
         />
         <button
           @click="handleResetMeasurements"
-          class="reset-button h-[24px] w-[24px] box-border p-[0]! bg-white cursor-pointer rounded-[4px] flex justify-center items-center ml-[16px]"
+          class="reset-button ml-[16px] rounded-[4px] bg-white flex h-[24px] w-[24px] cursor-pointer items-center box-border justify-center p-[0]!"
           :disabled="selectedMeasurements.length === 0"
           :style="selectedMeasurements.length === 0 ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
         >
@@ -319,6 +319,7 @@ function handleNodeDoubleClick(data: TableTreeNodeData) {
 function handleNodeDragStart(event: DragEvent, data: TableTreeNodeData) {
   if (data.nodeType === 'DEVICE-MEASUREMENT') {
     const measurementFullPath = `${data.database}.${data.parentName}.${data.nodeName}`;
+    event.dataTransfer?.setData('application/drag-source', 'measurement-list');
     event.dataTransfer?.setData('text/plain', measurementFullPath);
     if (event.dataTransfer) {
       event.dataTransfer.effectAllowed = 'copy';

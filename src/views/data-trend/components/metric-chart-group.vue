@@ -366,6 +366,10 @@ function fetchHistoryData(measurement: Measurement) {
 function handleDrop(event: DragEvent) {
   event.preventDefault();
   event.stopPropagation();
+  const source = event.dataTransfer?.getData('application/drag-source');
+  if (source !== 'measurement-list') {
+    return;
+  }
   const measurementFullPath = event.dataTransfer?.getData('text/plain');
   if (measurementFullPath) {
     emit('drop', { groupId: props.group.id, measurementPath: measurementFullPath });
@@ -721,14 +725,12 @@ watch(
 watch(
   () => props.index,
   () => {
-    if (props.index === 1 || props.index === 0) {
-      if (chart) {
-        if (props.isRunning) {
-          chart.setOption(buildRunningOption(), true);
-          return;
-        }
-        chart.setOption(buildOption(), true);
+    if (chart) {
+      if (props.isRunning) {
+        chart.setOption(buildRunningOption(), true);
+        return;
       }
+      chart.setOption(buildOption(), true);
     }
   },
 );
