@@ -326,8 +326,8 @@ function onSliderBlockUp() {
 function onSliderBlockMove(event: PointerEvent) {
   if (!timelineWrapperRef.value) return;
   const rect = timelineWrapperRef.value.getBoundingClientRect();
-  const offsetX = event.clientX - rect.left - GRID_LEFT;
-  const percent = Math.min(Math.max((offsetX / (rect.width - (GRID_LEFT + GRID_RIGHT))) * 100, 0), 100);
+  const offsetX = event.clientX - rect.left - GRID_LEFT - 12;
+  const percent = Math.min(Math.max((offsetX / (rect.width - (GRID_LEFT + GRID_RIGHT + 24))) * 100, 0), 100);
   const rangeSpan = rangeEndPercent.value - rangeStartPercent.value;
   let newStartPercent = percent - (percentXStart.value / 100) * rangeSpan;
   let newEndPercent = percent + (percentXEnd.value / 100) * rangeSpan;
@@ -400,8 +400,8 @@ function buildTimelineChartOption(): ECOption {
     backgroundColor: 'transparent',
     animation: false,
     grid: {
-      left: GRID_LEFT,
-      right: GRID_RIGHT,
+      left: GRID_LEFT + 12,
+      right: GRID_RIGHT + 12,
       top: 10,
       bottom: 0,
     },
