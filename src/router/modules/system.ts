@@ -4,7 +4,9 @@ import ICustomSystemConfig from '@/assets/icons/system-config.svg?raw';
 import ICustomSystemConfigActive from '@/assets/icons/system-config-active.svg?raw';
 import ICustomAuth from '@/assets/icons/auth.svg?raw';
 import ICustomAuthUser from '@/assets/icons/auth-user.svg?raw';
-import ICustomTrend from '@/assets/icons/trend.svg?raw';
+// import ICustomTrend from '@/assets/icons/trend.svg?raw';
+import ICustomHistoryTrend from '@/assets/icons/history-trend.svg?raw';
+import ICustomRunningTrend from '@/assets/icons/running-trend.svg?raw';
 // import ICustomTrendActive from '@/assets/icons/trend-active.svg?raw';
 import ICustomCalculate from '@/assets/icons/calculate.svg?raw';
 import ICustomCalculateActive from '@/assets/icons/calculate-active.svg?raw';
@@ -161,7 +163,7 @@ const route = [
           sqlDialect: 'table',
           keepAlive: true,
           title: 'page.runningTrend',
-          icon: ICustomTrend,
+          icon: ICustomRunningTrend,
         },
       },
       {
@@ -172,7 +174,7 @@ const route = [
           sqlDialect: 'table',
           keepAlive: true,
           title: 'page.historyTrend',
-          icon: ICustomTrend,
+          icon: ICustomHistoryTrend,
         },
       },
       {
@@ -182,7 +184,7 @@ const route = [
         meta: {
           keepAlive: true,
           title: 'page.runningTrend',
-          icon: ICustomTrend,
+          icon: ICustomRunningTrend,
         },
       },
       {
@@ -192,7 +194,7 @@ const route = [
         meta: {
           keepAlive: true,
           title: 'page.historyTrend',
-          icon: ICustomTrend,
+          icon: ICustomHistoryTrend,
         },
       },
       // {
