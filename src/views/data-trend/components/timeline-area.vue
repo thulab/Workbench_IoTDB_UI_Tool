@@ -50,8 +50,8 @@
           }"
           @pointerdown="(e) => onSliderBlockPointerDown(e)"
         ></div>
-        <div class="drag-button" :style="{ left: handleLeftPos + 'px' }" @pointerdown="(e) => onSliderPointerDown({ id: 'start', x: 0 }, e)">...</div>
-        <div class="drag-button ml-[-12px]" :style="{ left: handleRightPos + 'px' }" @pointerdown="(e) => onSliderPointerDown({ id: 'end', x: 0 }, e)">...</div>
+        <div class="drag-button ml-[-12px]" :style="{ left: handleLeftPos + 'px' }" @pointerdown="(e) => onSliderPointerDown({ id: 'start', x: 0 }, e)">...</div>
+        <div class="drag-button" :style="{ left: handleRightPos + 'px' }" @pointerdown="(e) => onSliderPointerDown({ id: 'end', x: 0 }, e)">...</div>
       </div>
     </div>
   </div>
@@ -106,11 +106,11 @@ const percentXStart = ref(0);
 const percentXEnd = ref(0);
 const handleLeftPos = computed(() => {
   if (!timelineWrapperRef.value) return 0;
-  return (rangeStartPercent.value * (containerWidth.value - (GRID_LEFT + GRID_RIGHT))) / 100;
+  return (rangeStartPercent.value * (containerWidth.value - (GRID_LEFT + GRID_RIGHT + 24))) / 100 + 12;
 });
 const handleRightPos = computed(() => {
   if (!timelineWrapperRef.value) return containerWidth.value;
-  return (rangeEndPercent.value * (containerWidth.value - (GRID_LEFT + GRID_RIGHT))) / 100;
+  return (rangeEndPercent.value * (containerWidth.value - (GRID_LEFT + GRID_RIGHT + 24))) / 100 + 12;
 });
 const fullDataSet = ref<Measurement[]>([]);
 
@@ -369,8 +369,13 @@ function onSliderPointerUp() {
 function onSliderPointerMove(event: PointerEvent) {
   if (!draggingHandle || !timelineWrapperRef.value) return;
   const rect = timelineWrapperRef.value.getBoundingClientRect();
-  const offsetX = event.clientX - rect.left - GRID_LEFT;
-  const percent = Math.min(Math.max((offsetX / (rect.width - (GRID_LEFT + GRID_RIGHT))) * 100, 0), 100);
+  let offsetX = event.clientX - rect.left - GRID_LEFT;
+  if (draggingHandle.id === 'end') {
+    offsetX += 12;
+  } else {
+    offsetX -= 12;
+  }
+  const percent = Math.min(Math.max((offsetX / (rect.width - (GRID_LEFT + GRID_RIGHT + 24))) * 100, 0), 100);
 
   if (draggingHandle.id === 'start') {
     rangeStartPercent.value = Math.min(percent, rangeEndPercent.value);

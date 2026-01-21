@@ -2,12 +2,12 @@
   <div>
     <el-table :data="convertedMarkerDatas" border class="text-[12px] mt-16px h-148px! marker-table" size="small" :table-layout="'auto'">
       <el-table-column prop="name" :label="t('dataTrend.measurementName')" :show-overflow-tooltip="{ effect: 'light' }"></el-table-column>
-      <el-table-column prop="x1" label="X1" :show-overflow-tooltip="{ effect: 'light' }"></el-table-column>
-      <el-table-column prop="x2" label="X2" :show-overflow-tooltip="{ effect: 'light' }"></el-table-column>
-      <el-table-column prop="x2_x1" label="X2 - X1" :show-overflow-tooltip="{ effect: 'light' }"></el-table-column>
-      <el-table-column prop="y1" label="Y1" :show-overflow-tooltip="{ effect: 'light' }"></el-table-column>
-      <el-table-column prop="y2" label="Y2" :show-overflow-tooltip="{ effect: 'light' }"></el-table-column>
-      <el-table-column prop="y2_y1" label="Y2 - Y1" :show-overflow-tooltip="{ effect: 'light' }"></el-table-column>
+      <el-table-column prop="x1" label="X1" :show-overflow-tooltip="{ effect: 'light' }" width="150%"></el-table-column>
+      <el-table-column prop="x2" label="X2" :show-overflow-tooltip="{ effect: 'light' }" width="150%"></el-table-column>
+      <el-table-column prop="x2_x1" label="X2 - X1" :show-overflow-tooltip="{ effect: 'light' }" width="100%"></el-table-column>
+      <el-table-column prop="y1" label="Y1" :show-overflow-tooltip="{ effect: 'light' }" width="100%"></el-table-column>
+      <el-table-column prop="y2" label="Y2" :show-overflow-tooltip="{ effect: 'light' }" width="100%"></el-table-column>
+      <el-table-column prop="y2_y1" label="Y2 - Y1" :show-overflow-tooltip="{ effect: 'light' }" width="100%"></el-table-column>
     </el-table>
   </div>
 </template>
