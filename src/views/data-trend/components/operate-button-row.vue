@@ -43,7 +43,7 @@
         :disabled="!props.canOperate"
         :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
       >
-        <i-custom-refresh />
+        <i-custom-delete />
       </button>
       <button
         @click="handleSaveTemplate"

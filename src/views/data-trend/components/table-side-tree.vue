@@ -17,7 +17,7 @@
           :disabled="selectedMeasurements.length === 0"
           :style="selectedMeasurements.length === 0 ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
         >
-          <i-custom-refresh />
+          <i-custom-delete />
         </button>
       </div>
       <el-tree-v2
@@ -59,7 +59,7 @@
             <span class="node-label" :title="data.nodeName + (data.comment ? ` (${data.comment})` : '')"> {{ data.nodeName }}{{ data.comment ? ` (${data.comment})` : '' }} </span>
           </div>
           <el-button v-if="data.nodeType === 'TABLE'" class="button-style" @click.stop="handleAddMeasurements(data.database, data.nodeName)">
-            <el-icon size="20"><i-custom-add-border2 /></el-icon>
+            <el-icon size="20"><i-custom-add-circle /></el-icon>
           </el-button>
           <el-button v-if="data.nodeType === 'DEVICE-MEASUREMENT'" class="button-style" @click.stop="handleDeleteMeasurements(data)">
             <el-icon size="20"><i-custom-delete /></el-icon>

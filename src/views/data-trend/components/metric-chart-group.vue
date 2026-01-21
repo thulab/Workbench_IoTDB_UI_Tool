@@ -3,7 +3,7 @@
     <div class="mt-2px flex items-center">
       <div class="pb-[10px]">
         <button class="ml-10px mr-16px border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteGroup">
-          <el-icon size="20"><i-custom-close /></el-icon>
+          <el-icon size="20"><i-custom-close-circle /></el-icon>
         </button>
       </div>
       <el-scrollbar class="flex-1">
