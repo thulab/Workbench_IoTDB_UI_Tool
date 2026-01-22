@@ -2,8 +2,8 @@
   <div @drop="handleDrop" @dragover.prevent class="graph-border border-box mt-4px pb-9px rounded-[2px]">
     <div class="mt-2px flex items-center">
       <div class="pb-[10px]">
-        <button class="ml-10px mr-16px border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteGroup">
-          <el-icon size="20"><i-custom-close-circle /></el-icon>
+        <button class="ml-27px mr-16px border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteGroup">
+          <el-icon size="15"><i-custom-close-circle /></el-icon>
         </button>
       </div>
       <el-scrollbar class="flex-1">
@@ -47,7 +47,7 @@
           :key="handle.id"
           class="border-b-0 border-l-[1px] border-r-0 border-t-0 border-l-white/40 border-l-dashed bg-transparent w-0 cursor-ew-resize pointer-events-auto top-1 absolute disabled:border-l-white/25 disabled:pointer-events-none"
           type="button"
-          :style="{ left: handle.left, borderColor: handle.color, height: props.index === 0 ? `calc(100% - 25px)` : `100%` }"
+          :style="{ left: handle.left, borderColor: handle.color, height: props.index === 0 ? `calc(100% - 29px)` : `calc(100% - 15px)`, top: '10px' }"
           :disabled="props.loading"
           @pointerdown="(event) => onMarkerPointerDown(handle.id, event)"
         ></button>
@@ -475,7 +475,7 @@ function buildOption(): ECOption {
       min: trendStore.visibleTimeRange.start,
       max: trendStore.visibleTimeRange.end,
       splitNumber: 4,
-      axisLine: { lineStyle: { color: `#656A85` } },
+      axisLine: { lineStyle: { color: `#656A85`, width: 1 } },
       axisLabel: {
         color: '#424561',
         fontSize: 12,
@@ -490,10 +490,10 @@ function buildOption(): ECOption {
       type: 'value',
       scale: true,
       minInterval: 1,
-      axisLine: { show: false, lineStyle: { color: '#DFE1ED' } },
-      axisLabel: { color: '#424561', fontSize: 12, hideOverlap: true },
+      axisLine: { show: true, lineStyle: { color: '#656A85', width: 1 } },
+      axisLabel: { color: '#424561', fontSize: 12, hideOverlap: true, margin: 3 },
       splitLine: {
-        lineStyle: { color: '#DFE1ED' },
+        lineStyle: { color: '#DFE1ED', width: 1 },
       },
       splitNumber: 2,
       boundaryGap: ['5%', '5%'],
