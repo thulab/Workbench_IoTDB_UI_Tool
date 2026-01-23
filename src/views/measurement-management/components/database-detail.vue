@@ -46,7 +46,7 @@
             <i-custom-search-icon class="remote-select-search-icon" @click="handleRefresh" />
           </template>
           <template #prepend>
-            <el-select v-model="searchType" style="width: 88px" placeholder="" id="measurement-search-type" class="measurement-search-type-select">
+            <el-select v-model="searchType" style="width: 88px" placeholder="" id="measurement-search-type" class="measurement-search-type-select deep-color-select">
               <el-option :label="t('measurement.measurementName2')" value="name" id="measurement-search-type-name" />
               <el-option :label="t('measurement.measurementDescription2')" value="description" id="measurement-search-type-description" />
             </el-select>

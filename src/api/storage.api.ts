@@ -69,8 +69,8 @@ class StorageApi {
   }
 
   // 模糊匹配物理量
-  static getMeasurementAllObjList(keyword: string): globalThis.HttpResponseP<{ measurements: MeasurementDataItem[] }> {
-    return http.post('/schema/getMeasurementsByFuzzyV2', { keyword, size: 100 });
+  static getMeasurementAllObjList(keyword: string, isByDesc: boolean = false): globalThis.HttpResponseP<{ measurements: MeasurementDataItem[] }> {
+    return http.post(isByDesc ? '/schema/getMeasurementsByDesc' : '/schema/getMeasurementsByFuzzyV2', { keyword, size: 100 });
   }
 
   // 根据路径和关键词查物理量
