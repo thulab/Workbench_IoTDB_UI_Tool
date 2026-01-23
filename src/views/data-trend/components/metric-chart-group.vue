@@ -499,7 +499,10 @@ function buildOption(): ECOption {
       boundaryGap: ['5%', '5%'],
     },
     brush: {
-      toolbox: [],
+      brushStyle: {
+        borderWidth: 0,
+        color: '#495AD433',
+      },
     },
     toolbox: {
       show: false,
@@ -608,7 +611,7 @@ function initChart() {
   chart = echarts.init(trendChartRef.value);
   chart.setOption(buildOption());
   chart.on('brushEnd', function (params) {
-    const XAxisRange = (params as any).areas[0].range[0];
+    const XAxisRange = (params as any).areas[0].range;
     if (!XAxisRange || !stageRef.value) return;
     const startX = XAxisRange[0];
     const endX = XAxisRange[1];
@@ -635,7 +638,7 @@ function initChart() {
         type: 'takeGlobalCursor',
         key: 'brush',
         brushOption: {
-          brushType: 'rect',
+          brushType: 'lineX',
         },
       });
     });
