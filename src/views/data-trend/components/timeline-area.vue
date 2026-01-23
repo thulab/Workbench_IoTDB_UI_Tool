@@ -45,8 +45,16 @@
           }"
           @pointerdown="(e) => onSliderBlockPointerDown(e)"
         ></div>
-        <div class="drag-button ml-[-12px]" :style="{ left: handleLeftPos + 'px' }" @pointerdown="(e) => onSliderPointerDown({ id: 'start', x: 0 }, e)">...</div>
-        <div class="drag-button" :style="{ left: handleRightPos + 'px' }" @pointerdown="(e) => onSliderPointerDown({ id: 'end', x: 0 }, e)">...</div>
+        <div
+          class="drag-button"
+          :style="{ left: handleLeftPos + 'px', width: dragButtonWidth + 'px', marginLeft: -dragButtonWidth + 'px' }"
+          @pointerdown="(e) => onSliderPointerDown({ id: 'start', x: 0 }, e)"
+        >
+          <i-custom-slash /><i-custom-slash /><i-custom-slash />
+        </div>
+        <div class="drag-button" :style="{ left: handleRightPos + 'px', width: dragButtonWidth + 'px' }" @pointerdown="(e) => onSliderPointerDown({ id: 'end', x: 0 }, e)">
+          <i-custom-slash /><i-custom-slash /><i-custom-slash />
+        </div>
       </div>
     </div>
   </div>
@@ -94,6 +102,7 @@ let timelineChart: echarts.ECharts | null = null;
 let timelineChartRo: ResizeObserver | undefined;
 let draggingHandle: RangeHandle | null = null;
 
+const dragButtonWidth = 14;
 const containerWidth = ref(0);
 const rangeStartPercent = ref(0);
 const rangeEndPercent = ref(100);
@@ -101,11 +110,11 @@ const percentXStart = ref(0);
 const percentXEnd = ref(0);
 const handleLeftPos = computed(() => {
   if (!timelineWrapperRef.value) return 0;
-  return (rangeStartPercent.value * (containerWidth.value - (GRID_LEFT + GRID_RIGHT + 24))) / 100 + 12;
+  return (rangeStartPercent.value * (containerWidth.value - (GRID_LEFT + GRID_RIGHT + 2 * dragButtonWidth))) / 100 + dragButtonWidth;
 });
 const handleRightPos = computed(() => {
   if (!timelineWrapperRef.value) return containerWidth.value;
-  return (rangeEndPercent.value * (containerWidth.value - (GRID_LEFT + GRID_RIGHT + 24))) / 100 + 12;
+  return (rangeEndPercent.value * (containerWidth.value - (GRID_LEFT + GRID_RIGHT + 2 * dragButtonWidth))) / 100 + dragButtonWidth;
 });
 const fullDataSet = ref<Measurement[]>([]);
 
@@ -321,8 +330,8 @@ function onSliderBlockUp() {
 function onSliderBlockMove(event: PointerEvent) {
   if (!timelineWrapperRef.value) return;
   const rect = timelineWrapperRef.value.getBoundingClientRect();
-  const offsetX = event.clientX - rect.left - GRID_LEFT - 12;
-  const percent = Math.min(Math.max((offsetX / (rect.width - (GRID_LEFT + GRID_RIGHT + 24))) * 100, 0), 100);
+  const offsetX = event.clientX - rect.left - GRID_LEFT - dragButtonWidth;
+  const percent = Math.min(Math.max((offsetX / (rect.width - (GRID_LEFT + GRID_RIGHT + 2 * dragButtonWidth))) * 100, 0), 100);
   const rangeSpan = rangeEndPercent.value - rangeStartPercent.value;
   let newStartPercent = percent - (percentXStart.value / 100) * rangeSpan;
   let newEndPercent = percent + (percentXEnd.value / 100) * rangeSpan;
@@ -364,13 +373,13 @@ function onSliderPointerUp() {
 function onSliderPointerMove(event: PointerEvent) {
   if (!draggingHandle || !timelineWrapperRef.value) return;
   const rect = timelineWrapperRef.value.getBoundingClientRect();
-  let offsetX = event.clientX - rect.left - GRID_LEFT;
+  let offsetX = event.clientX - rect.left - GRID_LEFT - dragButtonWidth;
   if (draggingHandle.id === 'end') {
-    offsetX += 12;
+    offsetX += dragButtonWidth;
   } else {
-    offsetX -= 12;
+    offsetX -= dragButtonWidth;
   }
-  const percent = Math.min(Math.max((offsetX / (rect.width - (GRID_LEFT + GRID_RIGHT + 24))) * 100, 0), 100);
+  const percent = Math.min(Math.max((offsetX / (rect.width - (GRID_LEFT + GRID_RIGHT + 2 * dragButtonWidth))) * 100, 0), 100);
 
   if (draggingHandle.id === 'start') {
     rangeStartPercent.value = Math.min(percent, rangeEndPercent.value);
@@ -395,8 +404,8 @@ function buildTimelineChartOption(): ECOption {
     backgroundColor: 'transparent',
     animation: false,
     grid: {
-      left: GRID_LEFT + 12,
-      right: GRID_RIGHT + 12,
+      left: GRID_LEFT + dragButtonWidth,
+      right: GRID_RIGHT + dragButtonWidth,
       top: 10,
       bottom: 0,
     },
@@ -587,7 +596,6 @@ watch(
 .drag-button {
   position: absolute;
   height: 40px;
-  width: 12px;
   cursor: ew-resize;
   pointer-events: auto;
   border: #495ad4 1px solid;
@@ -599,5 +607,7 @@ watch(
   color: white;
   display: flex;
   justify-content: center;
+  border-radius: 2px;
+  align-items: center;
 }
 </style>
