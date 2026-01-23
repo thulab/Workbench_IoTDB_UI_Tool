@@ -59,10 +59,10 @@
             <span class="node-label" :title="data.nodeName + (data.comment ? ` (${data.comment})` : '')"> {{ data.nodeName }}{{ data.comment ? ` (${data.comment})` : '' }} </span>
           </div>
           <el-button v-if="data.nodeType === 'TABLE'" class="button-style" @click.stop="handleAddMeasurements(data.database, data.nodeName)">
-            <el-icon size="20"><i-custom-add-circle /></el-icon>
+            <el-icon size="16"><i-custom-add-circle /></el-icon>
           </el-button>
           <el-button v-if="data.nodeType === 'DEVICE-MEASUREMENT'" class="button-style" @click.stop="handleDeleteMeasurements(data)">
-            <el-icon size="20"><i-custom-delete /></el-icon>
+            <el-icon size="16"><i-custom-delete /></el-icon>
           </el-button>
         </template>
       </el-tree-v2>
@@ -560,8 +560,8 @@ defineExpose({
   border: none;
   padding-right: 0 !important;
   padding-left: 0 !important;
-  min-width: 30px !important;
-  margin-right: 5px;
+  min-width: 0 !important;
+  margin-right: 7px;
   background-color: transparent;
 }
 
@@ -579,7 +579,7 @@ defineExpose({
 }
 
 .node-text {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
   line-height: 1.5;
   display: flex;
