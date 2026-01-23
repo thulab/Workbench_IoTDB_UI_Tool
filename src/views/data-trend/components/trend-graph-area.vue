@@ -29,24 +29,17 @@
           />
         </template>
       </draggable>
-      <MetricChartGroup
-        v-if="props.measurementGroupInfo.length === 0"
-        :isTable="props.isTable"
-        :isRunning="props.isRunning"
-        :group="{ id: 'default', members: [] }"
-        :index="0"
-        :range="trendStore.visibleTimeRange"
-        :markers="props.markers"
-        :height="chartHeight"
-        :loading="props.loading"
-        :need-fetch-data="false"
-        :can-delete="false"
-        @drop="handleMeasurementDrop"
-        @delete-group="handleDeleteGroup"
-        @marker-change="updateMarker"
-        @marker-value-change="handleMarkerValueChange"
-        @delete-measurement="handleDeleteMeasurement"
-      />
+    </div>
+    <div v-if="props.measurementGroupInfo.length === 0" class="flex flex-col items-center justify-center" :style="{ marginTop: tipMarginTop + 'px' }">
+      <div class="tip-row flex">
+        <img src="@/assets/table-trend-step-1.png" alt="" />
+        <img src="@/assets/table-trend-step-2.png" alt="" />
+        <img src="@/assets/table-trend-step-3.png" alt="" />
+      </div>
+      <div class="tip-row flex">
+        <img src="@/assets/table-trend-step-4.png" alt="" />
+        <img src="@/assets/table-trend-step-5.png" alt="" />
+      </div>
     </div>
   </div>
 </template>
@@ -90,6 +83,18 @@ const draggableData = ref<
 const trendStore = props.isTable ? useTableHistoryTrendStore() : useTreeHistoryTrendStore();
 
 const chartRefs = ref<Record<string, InstanceType<typeof MetricChartGroup>>>({});
+
+const tipMarginTop = computed(() => {
+  let result = 100;
+  const h = wrapperHeight.value;
+  if (h) {
+    result = (h - 340) / 2;
+    if (result < 0) {
+      result = 0;
+    }
+  }
+  return result;
+});
 
 const chartHeight = computed(() => {
   let result = 240;
@@ -256,5 +261,12 @@ watch(
 <style>
 .el-scrollbar__wrap {
   overflow-x: hidden;
+}
+
+.tip-row {
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  width: 750px;
 }
 </style>
