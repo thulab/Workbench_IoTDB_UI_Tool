@@ -1,6 +1,6 @@
 <template>
-  <div class="pb-8px pt-8px flex flex-row h-full w-full relative">
-    <div :style="{ width: sideTreeWidth + 'px' }" class="rounded-6px bg-white flex-shrink-0 relative">
+  <div class="flex flex-row h-full w-full relative">
+    <div :style="{ width: sideTreeWidth + 'px' }" class="mb-8px mt-8px rounded-6px bg-white flex-shrink-0 relative">
       <div style="position: absolute; left: 0; right: 0">
         <TableSideTree
           ref="sideTreeRef"
@@ -13,8 +13,8 @@
       </div>
       <div style="height: 100%; width: 4px; background-color: transparent; position: absolute; right: -2px; cursor: ew-resize" @pointerdown="(e) => onSliderPointerDown(e)"></div>
     </div>
-    <div class="ml-8px mr-8px flex flex-col min-w-0">
-      <div class="p-[0px_16px_8px] rounded-6px bg-white flex flex-col min-w-0" style="height: calc(100% - 121px)">
+    <div class="ml-8px mr-8px mt-8px flex flex-1 flex-col min-w-0" :style="{ marginBottom: tableCollapse ? '0' : '8px' }">
+      <div class="p-[0px_16px_8px] rounded-6px bg-white flex flex-col min-w-0" :style="{ height: tableCollapse ? 'calc(100% - 28px)' : 'calc(100% - 129px)' }">
         <OperateButtonRow
           ref="operateButtonRowRef"
           :isTable="true"
@@ -47,8 +47,8 @@
           @update-order="updateOrder"
         />
       </div>
-      <div class="mt-8px p-[8px_16px_8px_0px] rounded-6px bg-white flex-col min-w-0">
-        <MarkerTableArea :is-running="true" :marker-datas="runningTrendStore.isPlaying ? emptyMarkerDatas : markerDatas" />
+      <div class="mt-8px rounded-6px bg-white flex-col min-w-0" :style="{ padding: tableCollapse ? '0px' : '8px 16px 8px 0px' }">
+        <MarkerTableArea :is-running="true" :marker-datas="runningTrendStore.isPlaying ? emptyMarkerDatas : markerDatas" @table-collapse="handleTableCollapse" @table-expand="handleTableExpand" />
       </div>
     </div>
   </div>
@@ -110,6 +110,15 @@ const realTimeData = ref<TrendData[]>([]);
 const minDataTime = ref(-1);
 
 const sideTreeWidth = ref<number>(256);
+const tableCollapse = ref<boolean>(false);
+
+function handleTableCollapse() {
+  tableCollapse.value = true;
+}
+
+function handleTableExpand() {
+  tableCollapse.value = false;
+}
 
 function onSliderPointerDown(event: PointerEvent) {
   event.preventDefault();

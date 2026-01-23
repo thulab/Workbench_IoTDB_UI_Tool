@@ -1,6 +1,6 @@
 <template>
-  <div class="pb-8px pt-8px flex flex-row h-full w-full relative">
-    <div :style="{ width: sideTreeWidth + 'px' }" class="rounded-6px bg-white flex-shrink-0 relative">
+  <div class="flex flex-row h-full w-full relative">
+    <div :style="{ width: sideTreeWidth + 'px' }" class="mb-8px mt-8px rounded-6px bg-white flex-shrink-0 relative">
       <div style="position: absolute; left: 0; right: 0">
         <TableSideTree
           ref="sideTreeRef"
@@ -14,8 +14,8 @@
       <div style="height: 100%; width: 4px; background-color: transparent; position: absolute; right: -2px; cursor: ew-resize" @pointerdown="(e) => onSliderPointerDown(e)"></div>
     </div>
 
-    <div class="ml-8px mr-8px flex flex-col min-w-0">
-      <div class="p-[0px_16px_8px] rounded-6px bg-white flex flex-col min-w-0" style="height: calc(100% - 121px)">
+    <div class="ml-8px mr-8px mt-8px flex flex-1 flex-col min-w-0" :style="{ marginBottom: tableCollapse ? '0' : '8px' }">
+      <div class="p-[0px_16px_8px] rounded-6px bg-white flex flex-col min-w-0" :style="{ height: tableCollapse ? 'calc(100% - 28px)' : 'calc(100% - 129px)' }">
         <div>
           <OperateButtonRow
             ref="operateButtonRowRef"
@@ -61,8 +61,8 @@
           @clear-need-delete-measurements="clearNeedDeleteMeasurements"
         />
       </div>
-      <div class="mt-8px p-[8px_16px_8px_0px] rounded-6px bg-white flex-col min-w-0">
-        <MarkerTableArea :is-running="false" :marker-datas="markerDatas" />
+      <div class="mt-8px rounded-6px bg-white flex-col min-w-0" :style="{ padding: tableCollapse ? '0px' : '8px 16px 8px 0px' }">
+        <MarkerTableArea :is-running="false" :marker-datas="markerDatas" @table-collapse="handleTableCollapse" @table-expand="handleTableExpand" />
       </div>
     </div>
   </div>
@@ -119,6 +119,15 @@ const usedColors = ref<Set<string>>(new Set());
 const predefineColors = ['#4992ff', '#7cffb2', '#fddd60', '#ff6e76', '#58d9f9', '#05c091', '#ff8a45', '#8d48e3', '#dd79ff', '#8AC211'];
 
 const sideTreeWidth = ref<number>(256);
+const tableCollapse = ref<boolean>(false);
+
+function handleTableCollapse() {
+  tableCollapse.value = true;
+}
+
+function handleTableExpand() {
+  tableCollapse.value = false;
+}
 
 function onSliderPointerDown(event: PointerEvent) {
   event.preventDefault();
