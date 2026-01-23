@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-full w-full relative">
+  <div class="pb-8px pt-8px flex flex-row h-full w-full relative">
     <div :style="{ width: sideTreeWidth + 'px' }" class="rounded-6px bg-white flex-shrink-0 relative">
       <div style="position: absolute; left: 0; right: 0">
         <TableSideTree
@@ -13,39 +13,43 @@
       </div>
       <div style="height: 100%; width: 4px; background-color: transparent; position: absolute; right: -2px; cursor: ew-resize" @pointerdown="(e) => onSliderPointerDown(e)"></div>
     </div>
-    <div class="ml-8px p-[0px_8px_8px] rounded-6px bg-white flex flex-1 flex-col min-w-0">
-      <OperateButtonRow
-        ref="operateButtonRowRef"
-        :isTable="true"
-        :isRunning="true"
-        :templateList="templateList"
-        :canOperate="resolvedGroups.length > 0"
-        @save-template="handleSaveTemplate"
-        @handle-operate="handleOperateTemplate"
-        @get-query-list="getTemplateList"
-        @running-play="handlePlay(true)"
-        @running-pause="handlePlay(false)"
-        @reset-graph="handleResetGraphArea"
-        @reset-trend="setStorage"
-      />
-      <TrendGraphArea
-        ref="trendGraphRef"
-        :isTable="true"
-        :is-running="true"
-        :loading="isFetching"
-        :range="runningTrendStore.visibleTimeRange"
-        :markers="markers"
-        :measurement-group-info="resolvedGroups"
-        :needFetchGroupsId="needFetchGroupsId"
-        :realTimeData="realTimeData"
-        @marker-change="updateMarker"
-        @merge-into-group="mergeGroup"
-        @delete-group="deleteGroup"
-        @delete-measurement="deleteMeasurement"
-        @marker-value-change="handleMarkerValueChange"
-        @update-order="updateOrder"
-      />
-      <MarkerTableArea :is-running="true" :marker-datas="runningTrendStore.isPlaying ? emptyMarkerDatas : markerDatas" />
+    <div class="ml-8px mr-8px flex flex-col min-w-0">
+      <div class="p-[0px_16px_8px] rounded-6px bg-white flex flex-col min-w-0" style="height: calc(100% - 121px)">
+        <OperateButtonRow
+          ref="operateButtonRowRef"
+          :isTable="true"
+          :isRunning="true"
+          :templateList="templateList"
+          :canOperate="resolvedGroups.length > 0"
+          @save-template="handleSaveTemplate"
+          @handle-operate="handleOperateTemplate"
+          @get-query-list="getTemplateList"
+          @running-play="handlePlay(true)"
+          @running-pause="handlePlay(false)"
+          @reset-graph="handleResetGraphArea"
+          @reset-trend="setStorage"
+        />
+        <TrendGraphArea
+          ref="trendGraphRef"
+          :isTable="true"
+          :is-running="true"
+          :loading="isFetching"
+          :range="runningTrendStore.visibleTimeRange"
+          :markers="markers"
+          :measurement-group-info="resolvedGroups"
+          :needFetchGroupsId="needFetchGroupsId"
+          :realTimeData="realTimeData"
+          @marker-change="updateMarker"
+          @merge-into-group="mergeGroup"
+          @delete-group="deleteGroup"
+          @delete-measurement="deleteMeasurement"
+          @marker-value-change="handleMarkerValueChange"
+          @update-order="updateOrder"
+        />
+      </div>
+      <div class="mt-8px p-[8px_16px_8px_0px] rounded-6px bg-white flex-col min-w-0">
+        <MarkerTableArea :is-running="true" :marker-datas="runningTrendStore.isPlaying ? emptyMarkerDatas : markerDatas" />
+      </div>
     </div>
   </div>
 </template>

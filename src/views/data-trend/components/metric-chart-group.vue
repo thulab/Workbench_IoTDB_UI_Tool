@@ -1,13 +1,13 @@
 <template>
   <div @drop="handleDrop" @dragover.prevent class="graph-border border-box mt-4px pb-9px rounded-[2px]">
-    <div class="mt-2px flex items-center">
-      <div class="pb-[10px]">
-        <button class="ml-27px mr-16px border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteGroup">
+    <div class="pb-[8px] flex items-center">
+      <div class="">
+        <button class="ml-27px mr-28px border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteGroup">
           <el-icon size="15"><i-custom-close-circle /></el-icon>
         </button>
       </div>
       <el-scrollbar class="flex-1">
-        <div class="fit-content pb-[10px] flex items-center">
+        <div class="fit-content flex items-center">
           <div v-for="measurement in props.group.members" class="mr-27px flex flex-shrink-0 items-center" :key="measurement.label">
             <div class="mr-8px rounded-[2px] h-12px w-12px" :style="`background: ${measurement.color}`"></div>
             <el-tooltip
@@ -21,12 +21,12 @@
             </el-tooltip>
             <div class="text-12px mr-11px">{{ measurement.label }}</div>
             <button class="border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteMeasurement(measurement.label)">
-              <el-icon size="16"><i-custom-close /></el-icon>
+              <el-icon size="16" color="#A0A3B8"><i-custom-close /></el-icon>
             </button>
           </div>
         </div>
       </el-scrollbar>
-      <div class="mr-[10px] pb-[5px] flex">
+      <div class="mr-[10px] flex">
         <el-tooltip :content="t('common.export')" effect="light" placement="top">
           <button
             class="border-none bg-transparent flex items-center p-0!"
@@ -34,12 +34,12 @@
             :disabled="props.group.members.length === 0"
             :style="props.group.members.length === 0 ? 'cursor: not-allowed; opacity: 0.5;' : 'cursor: pointer; opacity: 1;'"
           >
-            <el-icon size="24"><i-custom-export /></el-icon>
+            <el-icon><i-custom-export-trend /></el-icon>
           </button>
         </el-tooltip>
       </div>
     </div>
-    <div ref="stageRef" class="relative">
+    <div ref="stageRef" class="mt-[-2px] relative">
       <div ref="trendChartRef" class="h-full w-full" :class="{ 'opacity-50': props.loading }" :style="{ height: typeof props.height === 'number' ? props.height + 'px' : props.height }"></div>
       <div v-if="!props.isRunning || !runningTrendStore.isPlaying" class="pointer-events-none inset-0 absolute" :class="{ 'opacity-50': props.loading }">
         <button
@@ -551,7 +551,7 @@ function buildRunningOption(): ECOption {
       show: props.index === 0,
       type: 'time',
       min: runningTrendStore.min > 0 ? runningTrendStore.min : undefined,
-      axisLine: { lineStyle: { color: '#444B63' } },
+      axisLine: { lineStyle: { color: '#656A85', width: 1 } },
       axisLabel: {
         color: '#424561',
         fontSize: 12,
@@ -564,12 +564,13 @@ function buildRunningOption(): ECOption {
     yAxis: {
       type: 'value',
       scale: true,
-      axisLine: { show: false, lineStyle: { color: '#dfe1ed' } },
-      axisLabel: { color: '#424561', fontSize: 12, hideOverlap: true },
+      axisLine: { show: true, lineStyle: { color: '#656A85', width: 1 } },
+      axisLabel: { color: '#424561', fontSize: 12, hideOverlap: true, margin: 3 },
       splitLine: {
-        lineStyle: { color: '#DFE1ED' },
+        lineStyle: { color: '#DFE1ED', width: 1 },
       },
       splitNumber: 2,
+      boundaryGap: ['5%', '5%'],
     },
     toolbox: {
       show: false,
@@ -835,7 +836,7 @@ watch(
 
 <style>
 .graph-border {
-  border: 1px solid #dfe1ed;
+  border: 1px solid transparent;
 }
 
 .chart-area {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div ref="timelineWrapperRef" class="h-60px w-full relative">
+    <div ref="timelineWrapperRef" class="mt-[17px] h-72px w-full relative">
       <div ref="timelineChartRef" class="h-60px w-full"></div>
       <el-tooltip :content="t('common.previousPage')" effect="light" placement="top">
         <button class="flip-button rounded-[2px] bg-white h-40px w-20px cursor-pointer top-0 absolute p-0!" @click="handlePageDown">
@@ -12,7 +12,7 @@
           <i-custom-arrow-right-trend />
         </button>
       </el-tooltip>
-      <div class="flex w-full items-center bottom-[-11px] absolute">
+      <div class="flex w-full items-center bottom-0 absolute">
         <el-date-picker
           style="--el-date-editor-width: 160px"
           v-model="startTime"
@@ -414,7 +414,7 @@ function buildTimelineChartOption(): ECOption {
       },
       axisLine: {
         show: false,
-        lineStyle: { color: '#444B63' },
+        lineStyle: { color: '#DFE1ED' },
       },
     })),
     yAxis: fullDataSet.value.map((measurement, index) => ({

@@ -1,6 +1,9 @@
 <template>
-  <div>
-    <el-table :data="convertedMarkerDatas" border class="text-[12px] mt-16px h-148px! marker-table" size="small" :table-layout="'auto'">
+  <div class="flex">
+    <button class="flex items-start">
+      <i-custom-collapse />
+    </button>
+    <el-table :data="convertedMarkerDatas" border class="text-[12px] h-105px! marker-table" size="small" :table-layout="'auto'" :header-cell-style="{ textAlign: 'center' }">
       <el-table-column prop="name" :label="t('dataTrend.measurementName')" :show-overflow-tooltip="{ effect: 'light' }"></el-table-column>
       <el-table-column prop="x1" label="X1" :show-overflow-tooltip="{ effect: 'light' }" width="150%"></el-table-column>
       <el-table-column prop="x2" label="X2" :show-overflow-tooltip="{ effect: 'light' }" width="150%"></el-table-column>

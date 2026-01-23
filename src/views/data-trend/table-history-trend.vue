@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-full w-full relative">
+  <div class="pb-8px pt-8px flex flex-row h-full w-full relative">
     <div :style="{ width: sideTreeWidth + 'px' }" class="rounded-6px bg-white flex-shrink-0 relative">
       <div style="position: absolute; left: 0; right: 0">
         <TableSideTree
@@ -14,52 +14,56 @@
       <div style="height: 100%; width: 4px; background-color: transparent; position: absolute; right: -2px; cursor: ew-resize" @pointerdown="(e) => onSliderPointerDown(e)"></div>
     </div>
 
-    <div class="ml-8px p-[0px_8px_8px] rounded-6px bg-white flex flex-1 flex-col min-w-0">
-      <div>
-        <OperateButtonRow
-          ref="operateButtonRowRef"
+    <div class="ml-8px mr-8px flex flex-col min-w-0">
+      <div class="p-[0px_16px_8px] rounded-6px bg-white flex flex-col min-w-0" style="height: calc(100% - 121px)">
+        <div>
+          <OperateButtonRow
+            ref="operateButtonRowRef"
+            :isTable="true"
+            :isRunning="false"
+            :templateList="templateList"
+            :canOperate="resolvedGroups.length > 0"
+            @global-time-change="handleGlobalTimeChange"
+            @save-template="handleSaveTemplate"
+            @handle-operate="handleOperateTemplate"
+            @get-query-list="getTemplateList"
+            @reset-graph="handleResetGraphArea"
+            @reset-trend="setStorage"
+          />
+        </div>
+        <TrendGraphArea
+          ref="trendGraphRef"
           :isTable="true"
-          :isRunning="false"
-          :templateList="templateList"
-          :canOperate="resolvedGroups.length > 0"
-          @global-time-change="handleGlobalTimeChange"
-          @save-template="handleSaveTemplate"
-          @handle-operate="handleOperateTemplate"
-          @get-query-list="getTemplateList"
-          @reset-graph="handleResetGraphArea"
-          @reset-trend="setStorage"
+          :is-running="false"
+          :loading="isFetching"
+          :range="trendStore.visibleTimeRange"
+          :markers="markers"
+          :measurement-group-info="resolvedGroups"
+          :needFetchGroupsId="needFetchGroupsId"
+          @marker-change="updateMarker"
+          @merge-into-group="mergeGroup"
+          @delete-group="deleteGroup"
+          @delete-measurement="deleteMeasurement"
+          @marker-value-change="handleMarkerValueChange"
+          @update-range="updateRange"
+          @update-order="updateOrder"
+        />
+        <TimelineArea
+          ref="timelineAreaRef"
+          :isTable="true"
+          :range="trendStore.pendingTimeRange"
+          :full-range="trendStore.globalTimeRange"
+          :all-measurement-info="visibleMeasurementsSet"
+          :need-fetch-measurement-id="needFetchMeasurementsId"
+          :need-delete-measurements-id="needDeleteMeasurementsId"
+          @update:range="updateRange"
+          @clear-need-fetch-measurements="clearNeedFetchMeasurements"
+          @clear-need-delete-measurements="clearNeedDeleteMeasurements"
         />
       </div>
-      <TrendGraphArea
-        ref="trendGraphRef"
-        :isTable="true"
-        :is-running="false"
-        :loading="isFetching"
-        :range="trendStore.visibleTimeRange"
-        :markers="markers"
-        :measurement-group-info="resolvedGroups"
-        :needFetchGroupsId="needFetchGroupsId"
-        @marker-change="updateMarker"
-        @merge-into-group="mergeGroup"
-        @delete-group="deleteGroup"
-        @delete-measurement="deleteMeasurement"
-        @marker-value-change="handleMarkerValueChange"
-        @update-range="updateRange"
-        @update-order="updateOrder"
-      />
-      <TimelineArea
-        ref="timelineAreaRef"
-        :isTable="true"
-        :range="trendStore.pendingTimeRange"
-        :full-range="trendStore.globalTimeRange"
-        :all-measurement-info="visibleMeasurementsSet"
-        :need-fetch-measurement-id="needFetchMeasurementsId"
-        :need-delete-measurements-id="needDeleteMeasurementsId"
-        @update:range="updateRange"
-        @clear-need-fetch-measurements="clearNeedFetchMeasurements"
-        @clear-need-delete-measurements="clearNeedDeleteMeasurements"
-      />
-      <MarkerTableArea :is-running="false" :marker-datas="markerDatas" />
+      <div class="mt-8px p-[8px_16px_8px_0px] rounded-6px bg-white flex-col min-w-0">
+        <MarkerTableArea :is-running="false" :marker-datas="markerDatas" />
+      </div>
     </div>
   </div>
 </template>
