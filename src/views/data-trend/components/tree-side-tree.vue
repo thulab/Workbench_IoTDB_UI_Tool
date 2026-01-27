@@ -707,7 +707,7 @@ defineExpose({ handleRefresh, handleOperate });
 }
 
 .search-refresh-box {
-  padding: 8px;
+  padding: 16px;
   display: flex;
   align-items: center;
 }
@@ -719,7 +719,7 @@ defineExpose({ handleRefresh, handleOperate });
 .node-text {
   font-size: 12px;
   font-weight: 300;
-  line-height: 1.5;
+  line-height: 24px;
   display: flex;
   align-items: center;
   padding-right: 8px;

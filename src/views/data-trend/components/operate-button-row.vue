@@ -2,9 +2,10 @@
   <div class="mb-[2px] mt-[10px] flex items-center">
     <div v-if="!props.isRunning">
       <div class="text-[12px]">
-        {{ t('dataTrend.timeRange') }}：
+        <span style="color: #131926; font-weight: 400">{{ t('dataTrend.timeRange') }}：</span>
         <el-date-picker
-          style="--el-date-editor-width: 330px"
+          class="date-picker"
+          style="--el-date-editor-width: 310px"
           v-model="selectedDateTime.value"
           type="datetimerange"
           range-separator="-"
@@ -314,8 +315,8 @@ watch(
 :deep(.template-select .el-input__wrapper) {
   background-image: url('../../../assets/icons/search-icon.svg');
   background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 20px 20px;
+  background-position: right 4px center;
+  background-size: 24px 24px;
   padding-right: 32px;
 }
 
@@ -400,5 +401,9 @@ watch(
 
 .template-select-dropdown .el-select-dropdown__item:hover .template-name {
   color: #495ad4;
+}
+
+.date-picker :deep(.el-input__inner) {
+  color: #656a85;
 }
 </style>

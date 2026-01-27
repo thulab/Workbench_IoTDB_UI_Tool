@@ -10,7 +10,15 @@
       <button class="flex cursor-pointer items-start" @click="handleCollapse">
         <i-custom-collapse />
       </button>
-      <el-table :data="convertedMarkerDatas" border class="text-[12px] h-105px! marker-table" size="small" :table-layout="'auto'" :header-cell-style="{ textAlign: 'center' }">
+      <el-table
+        :data="convertedMarkerDatas"
+        border
+        class="text-[12px] h-105px! marker-table"
+        size="small"
+        :table-layout="'auto'"
+        :header-cell-style="{ textAlign: 'center', color: '#424561', fontWeight: '700' }"
+        :cell-style="{ color: '#656A85', fontWeight: '300' }"
+      >
         <el-table-column prop="name" :label="t('dataTrend.measurementName')" :show-overflow-tooltip="{ effect: 'light' }"></el-table-column>
         <el-table-column prop="x1" label="X1" :show-overflow-tooltip="{ effect: 'light' }" width="150%"></el-table-column>
         <el-table-column prop="x2" label="X2" :show-overflow-tooltip="{ effect: 'light' }" width="150%"></el-table-column>

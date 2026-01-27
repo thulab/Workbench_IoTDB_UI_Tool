@@ -19,7 +19,7 @@
             >
               <el-icon size="12" class="mr-[2px]"><i-custom-warning-yellow /></el-icon>
             </el-tooltip>
-            <div class="text-12px mr-11px">{{ measurement.label }}</div>
+            <div class="text-12px mr-11px" style="color: #424561">{{ measurement.label }}</div>
             <button class="border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteMeasurement(measurement.label)">
               <el-icon size="16" color="#A0A3B8"><i-custom-close /></el-icon>
             </button>
@@ -480,6 +480,7 @@ function buildOption(): ECOption {
         color: '#424561',
         fontSize: 12,
         interval: 'auto',
+        fontWeight: 300,
       },
       splitLine: {
         show: false,
@@ -491,7 +492,7 @@ function buildOption(): ECOption {
       scale: true,
       minInterval: 1,
       axisLine: { show: true, lineStyle: { color: '#656A85', width: 1 } },
-      axisLabel: { color: '#424561', fontSize: 12, hideOverlap: true, margin: 3 },
+      axisLabel: { color: '#424561', fontSize: 12, hideOverlap: true, margin: 3, fontWeight: 300 },
       splitLine: {
         lineStyle: { color: '#DFE1ED', width: 1 },
       },
@@ -559,6 +560,7 @@ function buildRunningOption(): ECOption {
         color: '#424561',
         fontSize: 12,
         interval: 'auto',
+        fontWeight: 300,
       },
       splitLine: {
         show: false,
@@ -568,7 +570,7 @@ function buildRunningOption(): ECOption {
       type: 'value',
       scale: true,
       axisLine: { show: true, lineStyle: { color: '#656A85', width: 1 } },
-      axisLabel: { color: '#424561', fontSize: 12, hideOverlap: true, margin: 3 },
+      axisLabel: { color: '#424561', fontSize: 12, hideOverlap: true, margin: 3, fontWeight: 300 },
       splitLine: {
         lineStyle: { color: '#DFE1ED', width: 1 },
       },

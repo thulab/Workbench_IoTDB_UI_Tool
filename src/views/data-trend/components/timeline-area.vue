@@ -12,7 +12,7 @@
           <i-custom-arrow-right-trend />
         </button>
       </el-tooltip>
-      <div class="flex w-full items-center bottom-0 absolute">
+      <div class="date-picker-row flex w-full items-center bottom-0 absolute">
         <el-date-picker
           style="--el-date-editor-width: 160px"
           v-model="startTime"
@@ -420,6 +420,7 @@ function buildTimelineChartOption(): ECOption {
         color: '#424561',
         fontSize: 12,
         interval: 'auto',
+        fontWeight: 300,
       },
       axisLine: {
         show: false,
@@ -609,5 +610,9 @@ watch(
   justify-content: center;
   border-radius: 2px;
   align-items: center;
+}
+
+.date-picker-row :deep(.el-input__inner) {
+  color: #656a85;
 }
 </style>

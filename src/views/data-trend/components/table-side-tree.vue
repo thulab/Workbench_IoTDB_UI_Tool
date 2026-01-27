@@ -573,15 +573,15 @@ defineExpose({
 }
 
 .search-refresh-box {
-  padding: 8px;
+  padding: 16px 8px 16px 16px;
   display: flex;
   align-items: center;
 }
 
 .node-text {
   font-size: 12px;
-  font-weight: 400;
-  line-height: 1.5;
+  font-weight: 300;
+  line-height: 24px;
   display: flex;
   align-items: center;
   width: 100px;
