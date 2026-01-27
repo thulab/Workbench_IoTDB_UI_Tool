@@ -2,7 +2,7 @@
   <div>
     <div v-if="isCollapse" class="relative">
       <div class="rounded-[6px] bg-white h-[12px] w-full"></div>
-      <div class="rounded-[2px] bg-white flex h-[12px] w-[40px] cursor-pointer items-center top-0 justify-center absolute" @click="handleExpand">
+      <div class="rounded-[2px] bg-white flex h-[12px] w-[40px] cursor-pointer items-center top-0 justify-center absolute overflow-hidden" @click="handleExpand">
         <i-custom-arrow-up />
       </div>
     </div>
