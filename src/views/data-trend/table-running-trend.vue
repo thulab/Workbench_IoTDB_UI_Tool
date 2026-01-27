@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-row h-full w-full relative">
-    <div :style="{ width: sideTreeWidth + 'px' }" class="mb-8px mt-8px rounded-6px bg-white flex-shrink-0 relative">
+    <div :style="{ width: sideTreeWidth + 'px' }" class="rounded-6px bg-white flex-shrink-0 relative">
       <div style="position: absolute; left: 0; right: 0">
         <TableSideTree
           ref="sideTreeRef"
@@ -13,8 +13,8 @@
       </div>
       <div style="height: 100%; width: 4px; background-color: transparent; position: absolute; right: -2px; cursor: ew-resize" @pointerdown="(e) => onSliderPointerDown(e)"></div>
     </div>
-    <div class="ml-8px mr-8px mt-8px flex flex-1 flex-col min-w-0" :style="{ marginBottom: tableCollapse ? '0' : '8px' }">
-      <div class="p-[0px_16px_8px] rounded-6px bg-white flex flex-col min-w-0" :style="{ height: tableCollapse ? 'calc(100% - 28px)' : 'calc(100% - 129px)' }">
+    <div class="ml-8px flex flex-1 flex-col min-w-0">
+      <div class="p-[0px_16px_8px] rounded-6px bg-white flex flex-col min-w-0" :style="{ height: tableCollapse ? 'calc(100% - 20px)' : 'calc(100% - 121px)' }">
         <OperateButtonRow
           ref="operateButtonRowRef"
           :isTable="true"

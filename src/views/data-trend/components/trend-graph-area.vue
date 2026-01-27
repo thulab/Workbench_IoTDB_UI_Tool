@@ -31,14 +31,51 @@
       </draggable>
     </div>
     <div v-if="props.measurementGroupInfo.length === 0" class="flex flex-col items-center justify-center" :style="{ marginTop: tipMarginTop + 'px' }">
-      <div class="tip-row flex">
-        <img src="@/assets/table-trend-step-1.png" alt="" />
-        <img src="@/assets/table-trend-step-2.png" alt="" />
-        <img src="@/assets/table-trend-step-3.png" alt="" />
-      </div>
-      <div class="tip-row flex">
-        <img src="@/assets/table-trend-step-4.png" alt="" />
-        <img src="@/assets/table-trend-step-5.png" alt="" />
+      <div class="flex flex-wrap gap-[40px]" :style="{ maxWidth: props.isTable ? '800px' : '550px' }">
+        <div v-if="props.isTable" class="tip-box">
+          <div class="tip-title">Tip 1</div>
+          <div class="tip-content">
+            <span>{{ $t('dataTrend.step1p1') }}</span>
+            <span class="tip-highlight">{{ $t('dataTrend.step1p2') }}</span>
+            <span>{{ $t('dataTrend.step1p3') }}</span>
+          </div>
+          <img src="@/assets/add-meas-step.svg" alt="" />
+        </div>
+        <div class="tip-box">
+          <div class="tip-title">{{ props.isTable ? 'Tip 2' : 'Tip 1' }}</div>
+          <div class="tip-content">
+            <span class="tip-highlight" style="margin-left: 0">{{ $t('dataTrend.step2p1') }}</span>
+            <span>{{ $t('dataTrend.step2p2') }}</span>
+          </div>
+          <img src="@/assets/click-meas-step.svg" alt="" />
+        </div>
+        <div class="tip-box">
+          <div class="tip-title">{{ props.isTable ? 'Tip 3' : 'Tip 2' }}</div>
+          <div class="tip-content">
+            <span>{{ $t('dataTrend.step3p1') }}</span>
+            <span class="tip-highlight">{{ $t('dataTrend.step3p2') }}</span>
+            <span>{{ $t('dataTrend.step3p3') }}</span>
+          </div>
+          <img src="@/assets/drag-meas-step.svg" alt="" />
+        </div>
+        <div class="tip-box">
+          <div class="tip-title">{{ props.isTable ? 'Tip 4' : 'Tip 3' }}</div>
+          <div class="tip-content">
+            <span>{{ $t('dataTrend.step4p1') }}</span>
+            <span class="tip-highlight">{{ $t('dataTrend.step4p2') }}</span>
+            <span>{{ $t('dataTrend.step4p3') }}</span>
+          </div>
+          <img src="@/assets/select-data-step.svg" alt="" />
+        </div>
+        <div class="tip-box">
+          <div class="tip-title">{{ props.isTable ? 'Tip 5' : 'Tip 4' }}</div>
+          <div class="tip-content">
+            <span>{{ $t('dataTrend.step5p1') }}</span>
+            <span class="tip-highlight">{{ $t('dataTrend.step5p2') }}</span>
+            <span>{{ $t('dataTrend.step5p3') }}</span>
+          </div>
+          <img src="@/assets/drag-order-step.svg" alt="" />
+        </div>
       </div>
     </div>
   </div>
@@ -88,7 +125,7 @@ const tipMarginTop = computed(() => {
   let result = 100;
   const h = wrapperHeight.value;
   if (h) {
-    result = (h - 340) / 2;
+    result = (h - 450) / 2;
     if (result < 0) {
       result = 0;
     }
@@ -263,10 +300,30 @@ watch(
   overflow-x: hidden;
 }
 
-.tip-row {
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 12px;
-  width: 750px;
+.tip-box {
+  width: 234px;
+}
+
+.tip-title {
+  color: #495ad4;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 23.17px;
+}
+
+.tip-content {
+  color: #131926;
+  font-size: 14px;
+  font-weight: 400;
+  margin-top: 6px;
+  line-height: 20.27px;
+  height: 57px;
+}
+
+.tip-highlight {
+  color: #495ad4;
+  font-weight: 500;
+  margin-left: 4px;
+  margin-right: 4px;
 }
 </style>
