@@ -1,7 +1,7 @@
 <template>
-  <div class="mt-8px flex-1 w-full overflow-y-auto" style="overflow-x: hidden" ref="wrapperRef">
+  <div class="mt-10px flex-1 w-full overflow-y-auto" style="overflow-x: hidden" ref="wrapperRef">
     <div>
-      <draggable v-model="draggableData" item-key="id" @end="handleDragEnd">
+      <draggable v-model="draggableData" item-key="id" @end="handleDragEnd" filter=".el-scrollbar__bar" :prevent-on-filter="false">
         <template #item="{ element, index }">
           <MetricChartGroup
             class="item"
