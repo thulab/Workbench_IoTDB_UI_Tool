@@ -1,5 +1,5 @@
 <template>
-  <div @drop="handleDrop" @dragover.prevent class="graph-border border-box mt-4px pb-9px rounded-[2px]">
+  <div @drop="handleDrop" @dragover.prevent class="graph-border border-box mt-4px pb-22px rounded-[2px]">
     <div class="pb-[8px] flex items-center">
       <div class="">
         <button class="ml-27px mr-28px border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteGroup">
@@ -26,7 +26,7 @@
           </div>
         </div>
       </el-scrollbar>
-      <div class="mr-[10px] flex">
+      <div class="ml-[30px] mr-[10px] flex">
         <el-tooltip :content="t('common.export')" effect="light" placement="top">
           <button
             class="border-none bg-transparent flex items-center p-0!"
@@ -475,7 +475,7 @@ function buildOption(): ECOption {
       min: trendStore.visibleTimeRange.start,
       max: trendStore.visibleTimeRange.end,
       splitNumber: 4,
-      axisLine: { lineStyle: { color: `#656A85`, width: 1 } },
+      axisLine: { lineStyle: { color: `#656A85`, width: 1 }, onZero: false },
       axisLabel: {
         color: '#424561',
         fontSize: 12,
@@ -486,6 +486,7 @@ function buildOption(): ECOption {
         show: false,
         lineStyle: { color: '#DFE1ED', type: 'dashed' },
       },
+      position: 'bottom',
     },
     yAxis: {
       type: 'value',
@@ -555,7 +556,7 @@ function buildRunningOption(): ECOption {
       show: props.index === 0,
       type: 'time',
       min: runningTrendStore.min > 0 ? runningTrendStore.min : undefined,
-      axisLine: { lineStyle: { color: '#656A85', width: 1 } },
+      axisLine: { lineStyle: { color: '#656A85', width: 1 }, onZero: false },
       axisLabel: {
         color: '#424561',
         fontSize: 12,
@@ -565,6 +566,7 @@ function buildRunningOption(): ECOption {
       splitLine: {
         show: false,
       },
+      position: 'bottom',
     },
     yAxis: {
       type: 'value',

@@ -139,11 +139,11 @@ const chartHeight = computed(() => {
   if (h) {
     const groupCount = props.measurementGroupInfo.length || 1; // 至少有
     if (groupCount >= 3) {
-      result = Math.floor((h - 84) / 3);
+      result = Math.floor((h - 124) / 3);
     } else if (groupCount === 2) {
-      result = Math.floor((h - 58) / groupCount);
+      result = Math.floor((h - 84) / groupCount);
     } else {
-      result = h - 30;
+      result = h - 44;
     }
   }
   return result - 9;
