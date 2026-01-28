@@ -1,6 +1,6 @@
 <template>
   <div class="header">
-    <div class="header-lf flex justify-center items-center">
+    <div class="header-lf flex items-center justify-center">
       <el-icon class="collapse-icon" id="layout-header-collapse" @click="menuStore.setCollapse()">
         <i-custom-nav-open v-if="isCollapse" />
         <i-custom-nav-close v-else />
@@ -15,7 +15,7 @@
         </transition-group>
       </el-breadcrumb>
     </div>
-    <div class="header-ri flex justify-center items-center">
+    <div class="header-ri flex items-center justify-center">
       <!-- eslint-disable-next-line vue/no-constant-condition -->
       <el-dropdown @command="handleChangeDefaultModel" v-show="true">
         <span class="lang-icon lang-icon-color m-r-20">
@@ -121,7 +121,7 @@ function handleChangeDefaultModel(model: 'tree' | 'table') {
   justify-content: space-between;
   height: 40px;
   padding: 0 8px;
-  background-color: #f7f8fc;
+  background-color: white;
   border-bottom: 0;
 
   .header-lf {

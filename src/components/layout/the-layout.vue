@@ -72,14 +72,15 @@ onMounted(() => {});
 
   .el-main {
     box-sizing: border-box;
-    padding: 0;
+    padding: 8px;
 
     // 防止切换出现横向滚动条
     overflow-x: hidden;
-    background: #f7f8fc; // var(--el-bg-color-page);
+    background: #f0f1fa; // var(--el-bg-color-page);
 
     .main-box {
       box-sizing: border-box;
+      padding: 8px;
       width: 100%;
       height: 100%;
 
