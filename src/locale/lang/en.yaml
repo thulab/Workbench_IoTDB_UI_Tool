@@ -596,7 +596,7 @@ dataTrend:
   step2p2: the measurement to add a trend group
   step3p1: Left click and
   step3p2: drag
-  step3p3: the measurement into the trend group
+  step3p3: to add a measurement into a trend group
   step4p1: Left click and
   step4p2: select
   step4p3: graph area, effect will synchronize to all groups
