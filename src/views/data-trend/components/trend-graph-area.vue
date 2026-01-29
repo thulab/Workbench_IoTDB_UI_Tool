@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-10px flex-1 w-full overflow-y-auto" style="overflow-x: hidden" ref="wrapperRef">
+  <div class="pt-[6px] flex-1 w-full overflow-y-auto" style="overflow-x: hidden" ref="wrapperRef">
     <div>
       <draggable v-model="draggableData" item-key="id" @end="handleDragEnd" filter=".el-scrollbar__bar" :prevent-on-filter="false">
         <template #item="{ element, index }">
@@ -125,7 +125,7 @@ const tipMarginTop = computed(() => {
   let result = 100;
   const h = wrapperHeight.value;
   if (h) {
-    result = (h - 450) / 2;
+    result = (h - 470) / 2;
     if (result < 0) {
       result = 0;
     }
@@ -139,11 +139,11 @@ const chartHeight = computed(() => {
   if (h) {
     const groupCount = props.measurementGroupInfo.length || 1; // 至少有
     if (groupCount >= 3) {
-      result = Math.floor((h - 124) / 3);
+      result = Math.floor((h - 123) / 3);
     } else if (groupCount === 2) {
-      result = Math.floor((h - 84) / groupCount);
+      result = Math.floor((h - 82) / groupCount);
     } else {
-      result = h - 44;
+      result = h - 41;
     }
   }
   return result - 9;

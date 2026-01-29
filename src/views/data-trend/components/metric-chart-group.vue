@@ -1,5 +1,5 @@
 <template>
-  <div @drop="handleDrop" @dragover.prevent class="graph-border border-box mt-4px pb-22px rounded-[2px]">
+  <div @drop="handleDrop" @dragover.prevent class="graph-border border-box mt-[10px] pb-[9px] rounded-[2px]" :style="{ paddingBottom: props.index === 0 ? '9px' : '15px' }">
     <div class="pb-[8px] flex items-center">
       <div class="">
         <button class="ml-27px mr-28px border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteGroup">
@@ -69,7 +69,7 @@ const { requestFn: getHistoryTrend } = useRequest(TableDataApi.getTrendHistoryDa
 const { requestFn: getTreeHistoryTrend } = useRequest(SearchApi.getHistoryTrend);
 
 const GRID_LEFT = 34;
-const GRID_RIGHT = 10;
+const GRID_RIGHT = 0;
 const layoutTick = ref(0);
 const isRefresh = ref(false);
 const trendChartRef = ref<HTMLDivElement | null>(null);

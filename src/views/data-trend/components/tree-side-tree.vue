@@ -758,4 +758,8 @@ defineExpose({ handleRefresh, handleOperate });
   font-size: 12px;
   font-weight: bold;
 }
+
+.measurement-tree-search-input :deep(.el-input__inner) {
+  color: #656a85;
+}
 </style>

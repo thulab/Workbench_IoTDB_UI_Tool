@@ -14,7 +14,7 @@
       <div style="height: 100%; width: 4px; background-color: transparent; position: absolute; right: -2px; cursor: ew-resize" @pointerdown="(e) => onSliderPointerDown(e)"></div>
     </div>
     <div class="ml-8px flex flex-1 flex-col min-w-0">
-      <div class="p-[0px_16px_8px] rounded-6px bg-white flex flex-col min-w-0" :style="{ height: tableCollapse ? 'calc(100% - 20px)' : 'calc(100% - 129px)' }">
+      <div class="p-[0px_16px_8px] rounded-6px bg-white flex flex-col min-w-0" :style="{ height: tableCollapse ? 'calc(100% - 20px)' : 'calc(100% - 116px)' }">
         <OperateButtonRow
           ref="operateButtonRowRef"
           :isTable="true"

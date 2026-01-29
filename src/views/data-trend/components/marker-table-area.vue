@@ -7,13 +7,13 @@
       </div>
     </div>
     <div v-if="!isCollapse" class="flex">
-      <button class="flex cursor-pointer items-start" @click="handleCollapse">
+      <button class="mr-[1px] flex cursor-pointer items-start" @click="handleCollapse">
         <i-custom-collapse />
       </button>
       <el-table
         :data="convertedMarkerDatas"
         border
-        class="text-[12px] h-105px! marker-table"
+        class="text-[12px] h-92px! marker-table"
         size="small"
         :table-layout="'auto'"
         :header-cell-style="{ textAlign: 'center', color: '#424561', fontWeight: '700' }"
@@ -22,10 +22,10 @@
         <el-table-column prop="name" :label="t('dataTrend.measurementName')" :show-overflow-tooltip="{ effect: 'light' }"></el-table-column>
         <el-table-column prop="x1" label="X1" :show-overflow-tooltip="{ effect: 'light' }" width="150%"></el-table-column>
         <el-table-column prop="x2" label="X2" :show-overflow-tooltip="{ effect: 'light' }" width="150%"></el-table-column>
-        <el-table-column prop="x2_x1" label="X2 - X1" :show-overflow-tooltip="{ effect: 'light' }" width="100%"></el-table-column>
+        <el-table-column prop="x2_x1" label="X2-X1" :show-overflow-tooltip="{ effect: 'light' }" width="100%"></el-table-column>
         <el-table-column prop="y1" label="Y1" :show-overflow-tooltip="{ effect: 'light' }" width="100%"></el-table-column>
         <el-table-column prop="y2" label="Y2" :show-overflow-tooltip="{ effect: 'light' }" width="100%"></el-table-column>
-        <el-table-column prop="y2_y1" label="Y2 - Y1" :show-overflow-tooltip="{ effect: 'light' }" width="100%"></el-table-column>
+        <el-table-column prop="y2_y1" label="Y2-Y1" :show-overflow-tooltip="{ effect: 'light' }" width="100%"></el-table-column>
       </el-table>
     </div>
   </div>
@@ -80,5 +80,11 @@ const emit = defineEmits<{
 <style scoped>
 .marker-table :deep(th.el-table__cell) {
   font-size: 12px;
+  padding: 2px 0;
+}
+
+.marker-table :deep(td.el-table__cell) {
+  font-size: 12px;
+  padding: 2px 0;
 }
 </style>

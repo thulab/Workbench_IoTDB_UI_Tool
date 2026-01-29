@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div ref="timelineWrapperRef" class="mt-[17px] h-72px w-full relative">
-      <div ref="timelineChartRef" class="h-60px w-full"></div>
+    <div ref="timelineWrapperRef" class="mt-[8px] h-72px w-full relative">
+      <div ref="timelineChartRef" class="h-66px w-full"></div>
       <el-tooltip :content="t('common.previousPage')" effect="light" placement="top">
         <button class="flip-button rounded-[2px] bg-white h-40px w-20px cursor-pointer top-0 absolute p-0!" @click="handlePageDown">
           <i-custom-arrow-left-trend />
@@ -14,7 +14,7 @@
       </el-tooltip>
       <div class="date-picker-row flex w-full items-center bottom-0 absolute">
         <el-date-picker
-          style="--el-date-editor-width: 160px"
+          style="--el-date-editor-width: 168px"
           v-model="startTime"
           type="datetime"
           :clearable="false"
@@ -25,7 +25,7 @@
         />
         <div class="text-[14px] text-center flex-grow"></div>
         <el-date-picker
-          style="--el-date-editor-width: 160px"
+          style="--el-date-editor-width: 168px"
           v-model="endTime"
           type="datetime"
           :clearable="false"
@@ -421,6 +421,7 @@ function buildTimelineChartOption(): ECOption {
         fontSize: 12,
         interval: 'auto',
         fontWeight: 300,
+        lineHeight: 17.38,
       },
       axisLine: {
         show: false,

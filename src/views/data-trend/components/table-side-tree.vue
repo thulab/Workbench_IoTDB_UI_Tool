@@ -616,4 +616,8 @@ defineExpose({
     outline: none;
   }
 }
+
+.measurement-tree-search-input :deep(.el-input__inner) {
+  color: #656a85;
+}
 </style>

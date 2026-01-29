@@ -2,10 +2,10 @@
   <div class="mb-[2px] mt-[10px] flex items-center">
     <div v-if="!props.isRunning">
       <div class="text-[12px]">
-        <span style="color: #131926; font-weight: 400">{{ t('dataTrend.timeRange') }}：</span>
+        <span style="color: #131926; font-weight: 400; margin-right: 4px">{{ t('dataTrend.timeRange') }}：</span>
         <el-date-picker
           class="date-picker"
-          style="--el-date-editor-width: 310px"
+          style="--el-date-editor-width: 303px"
           v-model="selectedDateTime.value"
           type="datetimerange"
           range-separator="-"
@@ -303,7 +303,7 @@ watch(
 
 <style lang="scss" scoped>
 .template-select {
-  width: 260px;
+  width: 236px;
   margin-left: 16px;
 }
 
