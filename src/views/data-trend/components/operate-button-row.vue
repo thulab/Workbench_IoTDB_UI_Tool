@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-[2px] mt-[10px] flex items-center">
+  <div class="mb-[6px] mt-[10px] flex items-center">
     <div v-if="!props.isRunning">
       <div class="text-[12px]">
         <span style="color: #131926; font-weight: 400; margin-right: 4px">{{ t('dataTrend.timeRange') }}：</span>
