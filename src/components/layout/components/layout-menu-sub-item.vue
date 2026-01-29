@@ -1,7 +1,6 @@
 <template>
   <template v-for="subItem in menus" :key="subItem.path">
     <template v-if="subItem.children && subItem.children.length > 0">
-      <el-divider v-if="!subItem.hideLine" />
       <el-sub-menu :index="subItem.path">
         <template #title>
           <el-icon v-if="subItem.icon">
@@ -15,7 +14,6 @@
       </el-sub-menu>
     </template>
     <template v-else>
-      <el-divider v-if="subItem.showTopLine" />
       <el-menu-item :id="subItem.path" :index="subItem.path" :style="{ 'font-size': '12px' }">
         <el-icon v-if="subItem.icon">
           <i v-if="isCollapse && subItem.activeIcon && subItem.path === rootMenu?.activeIndex" v-html="subItem.activeIcon"></i>
@@ -92,7 +90,7 @@ const menus = computed<globalThis.MenuOptions[]>(() => {
   }
 
   &.is-active {
-    background-color: #f0f1fa !important;
+    background-color: #f7f8fc !important;
   }
 
   &.is-active::before {
@@ -120,7 +118,7 @@ const menus = computed<globalThis.MenuOptions[]>(() => {
   .el-menu-item {
     padding: 0;
     height: 30px;
-    margin: 0 5px;
+    margin: 0 4px;
     border-radius: 4px;
 
     &.is-active {
@@ -168,6 +166,17 @@ const menus = computed<globalThis.MenuOptions[]>(() => {
 }
 
 .el-menu--popup {
+  .el-sub-menu {
+    --el-menu-item-height: 30px;
+    --el-menu-sub-item-height: var(--el-menu-item-height);
+    --el-menu-horizontal-sub-item-height: 36px;
+
+    i {
+      width: 19px;
+      margin-right: 10px;
+    }
+  }
+
   .el-menu-item {
     background-color: #fff;
 
@@ -188,7 +197,7 @@ const menus = computed<globalThis.MenuOptions[]>(() => {
     }
 
     &.is-active {
-      background-color: #f0f1fa !important;
+      background-color: #f7f8fc !important;
 
       &::before {
         position: absolute;

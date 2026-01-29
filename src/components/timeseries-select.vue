@@ -3,7 +3,7 @@
     :class="['remote-select-box', disabledSelect ? 'remote-select-disabled-box' : '']"
     v-model="model"
     :id="id"
-    :placeholder="t(placeholder)"
+    :placeholder="t(computedPlaceholder)"
     filterable
     remote
     clearable
@@ -21,6 +21,15 @@
     <template #prefix v-if="showPrefix">
       <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
     </template>
+    <!-- Select All / Invert Selection Controls -->
+    <div class="select-controls" v-if="measurementList.length > 0">
+      <el-button :type="isAllSelected ? 'primary' : 'default'" size="small" :disabled="disabledSelect" @click.stop="handleSelectAll" class="control-button">
+        {{ t('measurement.selectAll') }}
+      </el-button>
+      <el-button type="default" size="small" :disabled="disabledSelect" @click.stop="handleInvertSelection" class="control-button">
+        {{ t('measurement.invertSelection') }}
+      </el-button>
+    </div>
     <el-option
       v-for="item in measurementList"
       :key="item.timeseries"
@@ -79,17 +88,22 @@ const props = withDefaults(
     selectWidth?: number;
     itemWidth?: number;
     isShowType?: boolean;
+    isByDesc?: boolean;
   }>(),
   {
-    placeholder: 'measurement.measurementNameSelectPlaceholder',
     isShowViewBtn: true,
     viewText: 'dataTrend.choosedMeasurement',
     showPrefix: true,
     selectWidth: 336,
     itemWidth: 284,
     isShowType: false,
+    isByDesc: true,
   },
 );
+
+const computedPlaceholder = computed(() => {
+  return props.placeholder || (props.isByDesc ? 'measurement.descriptionSelectPlaceholder' : 'measurement.measurementNameSelectPlaceholder');
+});
 
 const emit = defineEmits<{
   (event: 'update:modelValue', vals: string[]): void;
@@ -106,7 +120,7 @@ const { requestFn: getMeasurement } = useRequest(StorageApi.getMeasurementAllObj
 let lastMeasurementQuery = '';
 const remoteMethod = debounce((query: string) => {
   lastMeasurementQuery = query;
-  getMeasurement(lastMeasurementQuery).then((res) => {
+  getMeasurement(lastMeasurementQuery, props.isByDesc).then((res) => {
     if (lastMeasurementQuery === query) {
       let measurements = res.data?.measurements || [];
       if (props.filterSystem) {
@@ -123,6 +137,34 @@ function handleDelete(index: number) {
 
 function handleChangePath(vals: string[]) {
   emit('handleChangePath', vals, measurementList.value);
+}
+
+// Get enabled options (not disabled by disabledPath)
+const enabledOptions = computed(() => {
+  return measurementList.value.filter((item) => !props.disabledPath || !props.disabledPath(item)).map((item) => item.timeseries);
+});
+
+const isAllSelected = computed(() => {
+  const options = enabledOptions.value;
+  if (!options.length) return false;
+  const selectedSet = new Set(model.value);
+  return options.every((item) => selectedSet.has(item));
+});
+
+function handleSelectAll() {
+  if (isAllSelected.value) {
+    model.value = [];
+  } else {
+    model.value = [...enabledOptions.value];
+  }
+  handleChangePath(model.value);
+}
+
+function handleInvertSelection() {
+  const selectedSet = new Set(model.value);
+  const newSelection = enabledOptions.value.filter((item) => !selectedSet.has(item));
+  model.value = newSelection;
+  handleChangePath(model.value);
 }
 
 defineExpose({
@@ -238,6 +280,32 @@ defineExpose({
     flex: 0 0 58px;
     height: 18px;
     margin-right: 10px;
+  }
+}
+
+.select-controls {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #ebedf0;
+  gap: 8px;
+
+  .control-button {
+    font-size: 12px;
+    padding: 0 8px;
+    height: 28px;
+    line-height: 28px;
+
+    &:disabled {
+      color: #b8c1d6;
+      cursor: not-allowed;
+    }
+  }
+
+  :deep(.el-divider--vertical) {
+    height: 16px;
+    margin: 0 4px;
+    background-color: #ebedf0;
   }
 }
 </style>

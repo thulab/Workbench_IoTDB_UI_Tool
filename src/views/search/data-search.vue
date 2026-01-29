@@ -2,12 +2,17 @@
   <el-container class="page-container">
     <el-header class="p-0" style="height: auto">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-        <base-form-item prop="path" class="form-item-last">
-          <template #label>
-            {{ t('measurement.measurementChoose') }}：
-            <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
-          </template>
-          <timeseries-select v-model="searchFormData.path" :item-width="elementWidth" :disabled-select="getListLoading" id="data-search-path" />
+        <base-form-item prop="path" class="form-item-last no-label">
+          <div class="select-container">
+            <el-select v-model="searchFormData.selectType" class="custom-select deep-color-select" :style="{ width: locale === 'zh-cn' ? '90px' : '170px' }">
+              <el-option value="name" :label="t('measurement.measurementName')" />
+              <el-option value="desc" :label="t('measurement.measurementDescription')" />
+            </el-select>
+            <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width">
+              <i-custom-question class="question-mark-overlay" />
+            </el-tooltip>
+          </div>
+          <timeseries-select :is-by-desc="searchFormData.selectType === 'desc'" v-model="searchFormData.path" :item-width="elementWidth" :disabled-select="getListLoading" id="data-search-path" />
         </base-form-item>
         <br />
         <div class="search-form-wrapper">
@@ -236,6 +241,7 @@ const searchFormData = reactive({
   unitInterval: 's',
   aggregation: '',
   asc: 'asc',
+  selectType: 'name',
 });
 let copySearchFormData = cloneDeep(searchFormData);
 
@@ -574,6 +580,12 @@ watch(
   .el-button:focus-visible {
     outline: none;
   }
+
+  .no-label {
+    :deep(.el-form-item__label) {
+      display: none;
+    }
+  }
 }
 
 .search-time-wrapper {
@@ -690,5 +702,47 @@ watch(
   font-weight: 300;
   line-height: 24px;
   color: #424561;
+}
+
+.select-container {
+  position: relative;
+  display: inline-flex;
+  height: 28px !important;
+  margin-right: -1px;
+
+  .question-mark-overlay {
+    position: absolute;
+    right: 22px;
+    top: 30%;
+    transform: translateY(-50%);
+    color: #ccc;
+    font-size: 14px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    z-index: 10;
+
+    &:hover {
+      color: #409eff;
+    }
+  }
+}
+
+.el-form-item__label {
+  right: 0 !important;
+}
+
+:deep(.custom-select) {
+  .el-select__wrapper {
+    height: 20px;
+    border: 1px solid #e4e7ed;
+    background-color: #f0f1fa;
+    box-shadow: none;
+    border-radius: 1px 0 0 1px;
+
+    &.is-focused {
+      border-color: #e4e7ed !important;
+      box-shadow: none !important;
+    }
+  }
 }
 </style>

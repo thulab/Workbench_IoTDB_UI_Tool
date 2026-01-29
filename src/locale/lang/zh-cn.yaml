@@ -230,7 +230,10 @@ measurement:
   measurement: 测点
   measurementName: 测点名称
   measurementNamePlaceholder: 请输入测点名称
-  measurementNameSelectPlaceholder: 请选择测点
+  measurementNameSelectPlaceholder: 请选择测点名称
+  descriptionSelectPlaceholder: 请选择测点描述
+  selectAll: 全选
+  invertSelection: 反选
   alias: 别名
   measurementAlias: 测点别名
   tag: 标签

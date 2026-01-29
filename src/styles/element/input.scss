@@ -285,3 +285,23 @@ svg:focus {
     }
   }
 }
+
+.deep-color-select {
+  .el-select__input-wrapper {
+    font-size: 12px !important;
+    color: #131926 !important;
+    font-weight: 400 !important;
+  }
+
+  .el-select__placeholder {
+    font-size: 12px !important;
+    color: #131926 !important;
+    font-weight: 400 !important;
+  }
+
+  .el-select__selection-text {
+    font-size: 12px !important;
+    color: #131926 !important;
+    font-weight: 400 !important;
+  }
+}

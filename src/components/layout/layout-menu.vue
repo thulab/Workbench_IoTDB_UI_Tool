@@ -8,15 +8,14 @@
       </el-icon>
     </div>
     <div class="connection-box" :style="{ padding: isCollapse ? '0 0 0 5px' : '0 4px 0 4px' }">
-      <div class="connection-divider"></div>
-      <div class="flex-align-center" style="height: 40px">
+      <div class="flex-align-center" style="height: 30px">
         <el-icon size="30" :style="{ marginLeft: '0' }"><i-custom-connection /></el-icon>
         <div v-if="!isCollapse" class="connection-info flex-align-center" :style="{ 'font-size': '12px' }">
           <span class="connection-name">{{ connectionName }}</span>
           <el-icon size="20" class="svg-button-hover-color" style="cursor: pointer" id="layout-menu-connection" @click="handleToggleConnection"><i-custom-toggle /></el-icon>
         </div>
       </div>
-      <div v-if="!isCollapse" class="flex-align-center" style="height: 36px">
+      <div v-if="!isCollapse" class="flex-align-center" style="height: 30px">
         <div class="connection-host-box flex-align-center">
           <el-icon size="30" style="margin-right: 4px" v-if="connectionStore.connectionInfo.data.type !== 2">
             <i-custom-menu-connection-stand-alone v-if="connectionStore.connectionInfo.data.type === 0" />
@@ -201,8 +200,8 @@ watch(locale, () => {
   --el-menu-active-color: #131926;
   --el-menu-text-color: #131926;
   --el-menu-hover-text-color: #131926;
-  --el-menu-bg-color: #f7f8fc;
-  --el-menu-hover-bg-color: #f0f1fa;
+  --el-menu-bg-color: white;
+  --el-menu-hover-bg-color: #f7f8fc;
   --el-menu-item-height: 30px;
   --el-menu-sub-item-height: var(--el-menu-item-height);
   --el-menu-horizontal-sub-item-height: 36px;
@@ -265,16 +264,6 @@ watch(locale, () => {
     box-sizing: border-box;
     background-color: var(--el-menu-bg-color);
     position: relative;
-
-    .connection-divider {
-      width: 100%;
-      margin: 0;
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      height: 1px;
-      background-color: #a0a3b8;
-    }
 
     .connection-info {
       margin: 0 0 0 6px;
