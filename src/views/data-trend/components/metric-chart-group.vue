@@ -69,7 +69,7 @@ const { requestFn: getHistoryTrend } = useRequest(TableDataApi.getTrendHistoryDa
 const { requestFn: getTreeHistoryTrend } = useRequest(SearchApi.getHistoryTrend);
 
 const GRID_LEFT = 34;
-const GRID_RIGHT = 0;
+const GRID_RIGHT = 10;
 const layoutTick = ref(0);
 const isRefresh = ref(false);
 const trendChartRef = ref<HTMLDivElement | null>(null);
