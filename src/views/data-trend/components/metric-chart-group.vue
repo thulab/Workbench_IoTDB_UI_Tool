@@ -1,7 +1,7 @@
 <template>
   <div @drop="handleDrop" @dragover.prevent class="graph-border border-box mt-[10px] pb-[9px] rounded-[2px]" :style="{ paddingBottom: props.index === 0 ? '9px' : '15px' }">
-    <div class="pb-[8px] flex items-center">
-      <div class="">
+    <div class="upper-area pb-[8px] flex items-center">
+      <div>
         <button class="ml-27px mr-28px border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteGroup">
           <el-icon size="15"><i-custom-close-circle /></el-icon>
         </button>
@@ -492,19 +492,21 @@ function buildOption(): ECOption {
       type: 'value',
       scale: true,
       minInterval: 1,
-      axisLine: { show: true, lineStyle: { color: '#656A85', width: 1 } },
+      axisLine: { show: true, lineStyle: { color: '#656A85', width: 1 }, onZero: false },
       axisLabel: { color: '#424561', fontSize: 12, hideOverlap: true, margin: 3, fontWeight: 300 },
       splitLine: {
         lineStyle: { color: '#DFE1ED', width: 1 },
       },
       splitNumber: 2,
       boundaryGap: ['5%', '5%'],
+      offset: 1,
     },
     brush: {
       brushStyle: {
         borderWidth: 0,
         color: '#495AD433',
       },
+      xAxisIndex: 0,
     },
     toolbox: {
       show: false,

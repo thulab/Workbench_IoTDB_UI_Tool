@@ -1,14 +1,14 @@
 <template>
   <div>
     <div v-if="isCollapse" class="relative">
-      <div class="rounded-[6px] bg-white h-[12px] w-full"></div>
-      <div class="rounded-[2px] bg-white flex h-[12px] w-[40px] cursor-pointer items-center top-0 justify-center absolute overflow-hidden" @click="handleExpand">
-        <i-custom-arrow-up />
+      <div class="rounded-[6px] bg-white h-[18px] w-full"></div>
+      <div class="rounded-[6px] bg-white flex h-[18px] w-[40px] cursor-pointer items-center top-0 justify-center absolute overflow-hidden" @click="handleExpand">
+        <i-custom-expand />
       </div>
     </div>
     <div v-if="!isCollapse" class="flex">
       <button class="mr-[1px] flex cursor-pointer items-start" @click="handleCollapse">
-        <i-custom-collapse />
+        <i-custom-expand style="transform: rotate(180deg)" />
       </button>
       <el-table
         :data="convertedMarkerDatas"

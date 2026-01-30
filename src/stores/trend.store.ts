@@ -24,6 +24,12 @@ export const useTreeHistoryTrendStore = defineStore('treeHistoryTrend', {
     updateMeasurementAverageInterval(measurement: string, interval: number) {
       this.measurementAverageInterval.set(measurement, interval);
     },
+    initializeState() {
+      this.globalTimeRange = { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() };
+      this.visibleTimeRange = { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() };
+      this.pendingTimeRange = { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() };
+      this.measurementAverageInterval.clear();
+    },
   },
 });
 
@@ -71,6 +77,12 @@ export const useTableHistoryTrendStore = defineStore('tableHistoryTrend', {
     },
     updateMeasurementAverageInterval(measurement: string, interval: number) {
       this.measurementAverageInterval.set(measurement, interval);
+    },
+    initializeState() {
+      this.globalTimeRange = { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() };
+      this.visibleTimeRange = { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() };
+      this.pendingTimeRange = { start: Date.now() - SEVEN_DAYS_MS, end: Date.now() };
+      this.measurementAverageInterval.clear();
     },
   },
 });
