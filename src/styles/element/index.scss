@@ -16,10 +16,7 @@
   --el-border-color: #dfe1ed;
   --el-text-color-placeholder: #656a85;
   --el-disabled-bg-color: #f7f8fc;
-}
-
-.menu {
-  // --el-menu-item-font-size: 12px !important;--el-menu-item-font-size--el-menu-item-font-size--el-menu-item-font-size--el-menu-item-font-size--el-menu-item-font-size--el-menu-item-font-size--el-menu-item-font-size--el-menu-item-font-size--el-menu-item-font-size
+  --el-font-size-base: 12px;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -60,4 +57,10 @@
   --el-tree-node-hover-bg-color: #f7f8fc !important;
   --el-tree-text-color: #131926 !important;
   --el-tree-expand-icon-color: #495ad4 !important;
+}
+
+body {
+  .el-checkbox {
+    --el-checkbox-font-size: 12px;
+  }
 }

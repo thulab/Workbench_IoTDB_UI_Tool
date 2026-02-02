@@ -119,12 +119,12 @@ function calcColumnWidth(child: PrivilegeEnum) {
   }
 
   .table-list-box {
-    margin-top: 32px;
+    margin-top: 0;
     background-color: #f7f8fc;
     padding: 8px 16px 16px;
 
     .table-box-title {
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 700;
       line-height: 21px;
       color: #495ad4;

@@ -1,7 +1,7 @@
 <template>
   <version-container :is-show="showAuthMenu">
     <el-container>
-      <el-aside :width="sideWidth + 'px'" class="list-wrapper" style="position: relative">
+      <el-aside :width="sideWidth + 'px'" class="list-wrapper overflow-hidden" style="position: relative">
         <list ref="listRef" :can-manage-user="canManageUser" :user-name="userName" @handle-select="(val) => (currentUser = val)" />
         <div style="height: 100%; width: 4px; background-color: transparent; position: absolute; top: 0; right: -2px; cursor: ew-resize" @pointerdown="(e) => onSliderPointerDown(e)"></div>
       </el-aside>
@@ -45,7 +45,7 @@
                 </span>
               </h4>
             </div>
-            <div class="table-list-box m-x-16">
+            <div class="table-list-box m-x-[8px]">
               <div class="flex-justify-between">
                 <h4 class="table-box-title">{{ t('common.allSituation') }}</h4>
                 <div class="header-operate-buttons">
@@ -104,7 +104,7 @@
                 </el-table-column>
               </el-table>
             </div>
-            <div class="table-list-box m-x-16 m-b-16" v-if="canEdit">
+            <div class="table-list-box m-x-[8px] m-b-[8px]" v-if="canEdit">
               <div class="flex-justify-between">
                 <h4 class="table-box-title">{{ t('auth.path') }}</h4>
                 <div class="header-operate-buttons">
@@ -183,14 +183,14 @@
                   </template>
                 </el-table-column>
               </el-table>
-              <el-button style="width: 100%" class="svg-button-hover-color m-t-24" @click="handleAddRow" v-if="canEdit && isEdit" id="auth-user-path">
+              <el-button style="width: 100%" class="svg-button-hover-color m-t-[8px]" @click="handleAddRow" v-if="canEdit && isEdit" id="auth-user-path">
                 <i-custom-add class="m-r-4" />
                 {{ t('auth.addPath') }}
               </el-button>
             </div>
           </el-scrollbar>
         </el-main>
-        <el-footer v-if="canEdit && isEdit">
+        <el-footer v-if="canEdit && isEdit" style="height: 36px">
           <div class="operate-buttons">
             <el-button @click="handleReset('edit')" id="auth-user-reset">{{ t('common.reset') }}</el-button>
             <el-button type="primary" @click="handleSave" :loading="saveLoading" id="auth-user-save">{{ t('common.apply') }}</el-button>
@@ -637,11 +637,11 @@ watch(
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #dfe1ed;
-  padding: 0 16px;
+  padding: 0 8px;
   box-sizing: border-box;
 
   .detail-title-text {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 21px;
     color: #495ad4;
@@ -664,9 +664,9 @@ watch(
 }
 
 .detail-role-list {
-  margin: 12px 16px;
+  margin: 8px;
   display: flex;
-  font-size: 14px;
+  font-size: 12px;
   align-items: center;
 
   .el-tag {
@@ -706,12 +706,12 @@ watch(
 }
 
 .table-list-box {
-  margin-top: 32px;
+  margin-top: 8px;
   background-color: #f7f8fc;
-  padding: 8px 16px 16px;
+  padding: 8px;
 
   .table-box-title {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 21px;
     color: #495ad4;
@@ -729,6 +729,6 @@ watch(
 
 .operate-buttons {
   text-align: right;
-  margin-top: 24px;
+  margin-top: 0;
 }
 </style>

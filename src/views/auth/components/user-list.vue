@@ -3,49 +3,50 @@
     <h4>{{ t('auth.userList') }}</h4>
     <div class="operate-buttons">
       <auth-tooltip :is-disabled="canManageUser" :content="'common.userAuth'">
-        <el-button link :disabled="!canManageUser" class="m-r-8 border-refresh-icon svg-button-hover-color" @click="getList()" id="auth-user-refresh"><i-custom-refresh /></el-button>
+        <el-button link :disabled="!canManageUser" class="border-refresh-icon svg-button-hover-color m-r-8" @click="getList()" id="auth-user-refresh"><i-custom-refresh /></el-button>
       </auth-tooltip>
       <auth-tooltip :is-disabled="canManageUser" :content="'common.userAuth'">
         <el-button link :disabled="!canManageUser" style="margin: 0" @click="handleAdd" id="auth-user-add"><i-custom-user-add /></el-button>
       </auth-tooltip>
     </div>
   </div>
-
-  <ul class="list-box" v-loading="loading">
-    <li v-for="(item, i) in list" :key="item.name" :class="['item-box', current === item.name ? 'item-box-active' : '']" :id="`auth-user-${i}`" @click="(e) => handleSelect(item.name, e)">
-      <span class="item-text">
-        <el-icon size="30">
-          <i-custom-user-manager v-if="item.isManager" />
-          <i-custom-user-normal v-else />
-        </el-icon>
-        <text-tooltip :content="t(item.name + (item.userId != null ? ` (${item.userId})` : ''))" />
-      </span>
-      <auth-tooltip :is-disabled="canManageUser || userName === item.name" :content="'common.userAuth'">
-        <div class="item-edit-box" :style="{ cursor: !(canManageUser || userName === item.name) ? 'not-allowed' : 'pointer' }" :id="`auth-user-${i}-edit`" @click="handleEdit(item.name)">
-          <i-custom-edit class="item-edit" />
-          <i-custom-edit class="item-edit-active" />
-        </div>
-      </auth-tooltip>
-      <popconfirm
-        v-if="item.isManager === 0 && userName !== item.name"
-        :confirm-button-text="t('common.confirm')"
-        :cancel-button-text="t('common.cancel')"
-        width="160px"
-        :title="t('auth.deleteUserTip')"
-        :icon="ICustomError"
-        :cancel-button-id="`auth-user-${i}-del-cancel`"
-        :confirm-button-id="`auth-user-${i}-del-confirm`"
-        @confirm="handleDelete(item.name)"
-      >
-        <template #reference>
-          <div class="item-delete-box" :id="`auth-user-${i}-del`">
-            <i-custom-delete class="item-delete" />
-            <i-custom-delete-active class="item-delete-active" />
+  <el-scrollbar class="list-box">
+    <ul v-loading="loading">
+      <li v-for="(item, i) in list" :key="item.name" :class="['item-box', current === item.name ? 'item-box-active' : '']" :id="`auth-user-${i}`" @click="(e) => handleSelect(item.name, e)">
+        <span class="item-text">
+          <el-icon size="30">
+            <i-custom-user-manager v-if="item.isManager" />
+            <i-custom-user-normal v-else />
+          </el-icon>
+          <text-tooltip :content="t(item.name + (item.userId != null ? ` (${item.userId})` : ''))" />
+        </span>
+        <auth-tooltip :is-disabled="canManageUser || userName === item.name" :content="'common.userAuth'">
+          <div class="item-edit-box" :style="{ cursor: !(canManageUser || userName === item.name) ? 'not-allowed' : 'pointer' }" :id="`auth-user-${i}-edit`" @click="handleEdit(item.name)">
+            <i-custom-edit class="item-edit" />
+            <i-custom-edit class="item-edit-active" />
           </div>
-        </template>
-      </popconfirm>
-    </li>
-  </ul>
+        </auth-tooltip>
+        <popconfirm
+          v-if="item.isManager === 0 && userName !== item.name"
+          :confirm-button-text="t('common.confirm')"
+          :cancel-button-text="t('common.cancel')"
+          width="160px"
+          :title="t('auth.deleteUserTip')"
+          :icon="ICustomError"
+          :cancel-button-id="`auth-user-${i}-del-cancel`"
+          :confirm-button-id="`auth-user-${i}-del-confirm`"
+          @confirm="handleDelete(item.name)"
+        >
+          <template #reference>
+            <div class="item-delete-box" :id="`auth-user-${i}-del`">
+              <i-custom-delete class="item-delete" />
+              <i-custom-delete-active class="item-delete-active" />
+            </div>
+          </template>
+        </popconfirm>
+      </li>
+    </ul>
+  </el-scrollbar>
   <modal-reset-password :title="t('auth.editUser')" :success-tip="t('auth.editUserSuccess')" :user-name="editUser" v-model:visible="modalVisible" />
   <modal-user v-model:visible="modalUserVisible" :user-list="list" @handle-save="(name) => getList(name)" />
 </template>
@@ -171,10 +172,10 @@ defineExpose({ getList });
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 16px 26px;
+  padding: 8px;
 
   h4 {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 20px;
     color: #495ad4;
@@ -199,8 +200,7 @@ defineExpose({ getList });
 }
 
 .list-box {
-  height: calc(100% - 70px);
-  overflow-y: auto;
+  height: calc(100% - 44px);
 }
 
 .item-box {
@@ -211,7 +211,7 @@ defineExpose({ getList });
   font-size: 12px;
   font-weight: 300;
   color: #131926;
-  padding-left: 16px;
+  padding-left: 0;
   box-sizing: border-box;
   cursor: pointer;
   position: relative;

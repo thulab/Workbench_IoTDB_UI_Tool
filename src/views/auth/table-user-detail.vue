@@ -1,9 +1,12 @@
 <template>
   <version-container :is-show="showAuthMenu">
     <el-container>
-      <el-aside :width="sideWidth + 'px'" class="list-wrapper" style="position: relative">
+      <el-aside :width="sideWidth + 'px'" class="list-wrapper overflow-hidden" style="position: relative">
         <user-list ref="listRef" :can-manage-user="effectiveCanManageUser" :user-name="userName" @handle-select="(val) => (currentUser = val)" />
-        <div style="height: 100%; width: 4px; background-color: transparent; position: absolute; top: 0; right: -2px; cursor: ew-resize" @pointerdown="(e) => onSliderPointerDown(e)"></div>
+        <div
+          style="height: 100%; width: 4px; background-color: transparent; position: absolute; top: 0; right: 0; transform: translateX(2px); cursor: ew-resize"
+          @pointerdown="(e) => onSliderPointerDown(e)"
+        ></div>
       </el-aside>
       <el-container class="details-wrapper">
         <el-main class="p-0" v-loading="loading">
@@ -109,8 +112,10 @@
                     :width="calcColumnWidth(col)"
                   >
                     <template #default="{ row }">
-                      <i-custom-with-grant style="transform: translateY(3px)" v-if="row.grantedPrivileges.includes(col)" />
-                      <i-custom-correct style="transform: translateY(3px)" v-else-if="row.privileges.includes(col)" />
+                      <span class="flex items-center justify-center">
+                        <i-custom-with-grant style="transform: translateY(3px)" v-if="row.grantedPrivileges.includes(col)" />
+                        <i-custom-correct style="transform: translateY(3px)" v-else-if="row.privileges.includes(col)" />
+                      </span>
                     </template>
                   </el-table-column>
                 </el-table-column>
@@ -130,7 +135,7 @@
                 </el-table-column>
               </el-table>
 
-              <el-button v-if="effectiveCanManageUser && !isManager" style="width: 100%" class="svg-button-hover-color m-t-24" @click="handleAddRow" id="auth-role-path">
+              <el-button v-if="effectiveCanManageUser && !isManager" style="width: 100%" class="svg-button-hover-color m-t-[8px]" @click="handleAddRow" id="auth-role-path">
                 <i-custom-add class="m-r-4" />
                 {{ t('auth.relational.addScope') }}
               </el-button>
@@ -522,7 +527,7 @@ watch(
   box-sizing: border-box;
 
   .detail-title-text {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 21px;
     color: #495ad4;
@@ -545,9 +550,9 @@ watch(
 }
 
 .detail-role-list {
-  margin: 12px 8px;
+  margin: 8px;
   display: flex;
-  font-size: 14px;
+  font-size: 12px;
   align-items: center;
 
   .el-tag {
@@ -587,12 +592,12 @@ watch(
 }
 
 .table-list-box {
-  margin-top: 32px;
+  margin-top: 0;
   background-color: #f7f8fc;
   padding: 8px;
 
   .table-box-title {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 21px;
     color: #495ad4;

@@ -66,7 +66,7 @@
                 class="data-sync-modal-history-switch"
               />
             </base-form-item>
-            <base-form-item v-if="formData.isSynchronHistory" :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules" class="m-l-24 form-item-label-short">
+            <base-form-item v-if="formData.isSynchronHistory" :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules" class="form-item-label-short m-l-24">
               <el-date-picker
                 v-model="formData.datetimerange"
                 type="datetimerange"
@@ -188,7 +188,7 @@
                   >
                     <el-icon size="26"><i-custom-add-border /></el-icon>
                   </el-button>
-                  <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost(index)" :id="`target-ip-del${index}`" class="m-l-6 svg-button-hover-color">
+                  <el-button link v-if="index !== 0 && editType !== 'view'" @click="handleDelHost(index)" :id="`target-ip-del${index}`" class="svg-button-hover-color m-l-6">
                     <el-icon size="26"><i-custom-delete /></el-icon>
                   </el-button>
                 </div>
@@ -223,7 +223,7 @@
                       <el-tooltip effect="light" :content="t('dataSync.waitTimeTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                     </template>
                     <el-input v-model.number="formData.logSendBatchWaitTime" :placeholder="t('dataSync.waitTimePlaceholder')" id="data-sync-modal-time" style="width: 304px" />
-                    <span class="m-l-8 form-item-unit">s</span>
+                    <span class="form-item-unit m-l-8">s</span>
                   </base-form-item>
                 </div>
                 <div class="flex-align-center">
@@ -233,7 +233,7 @@
                       <el-tooltip effect="light" :content="t('dataSync.batchSizeTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                     </template>
                     <el-input v-model.number="formData.logSendBatchSize" :placeholder="t('dataSync.batchSizePlaceholder')" id="data-sync-modal-size" style="width: 304px" />
-                    <span class="m-l-8 form-item-unit">byte</span>
+                    <span class="form-item-unit m-l-8">byte</span>
                   </base-form-item>
                 </div>
               </div>
@@ -266,7 +266,7 @@
                   <el-tooltip effect="light" :content="t('dataSync.overTimeTip')" placement="top" popper-class="table-tooltip-max-width"><i-custom-question /></el-tooltip>
                 </template>
                 <el-input v-model.number="formData.targetOverTime" :placeholder="t('dataSync.overTimePlaceholder')" id="data-sync-modal-time-over" style="width: 200px" />
-                <span class="m-l-8 form-item-unit">ms</span>
+                <span class="form-item-unit m-l-8">ms</span>
               </base-form-item>
             </div>
           </template>
@@ -836,7 +836,7 @@ watch(
   .form-label {
     height: 28px !important;
     color: #424561 !important;
-    font-size: 14px !important;
+    font-size: 12px !important;
     font-weight: 400 !important;
     line-height: 21px !important;
     display: inline-flex;

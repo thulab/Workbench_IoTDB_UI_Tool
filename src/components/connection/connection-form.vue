@@ -136,12 +136,12 @@
         </base-form-item>
         <el-row v-if="formData.useSsl" class="p-r-28">
           <el-col :span="15">
-            <el-form-item class="p-l-[7px] el-input" :label="`${t('connection.trustStore')}：`" label-position="right" prop="file" :error="errorTS">
+            <el-form-item class="el-input p-l-[7px]" :label="`${t('connection.trustStore')}：`" label-position="right" prop="file" :error="errorTS">
               <el-upload
                 :limit="1"
                 :auto-upload="false"
                 :show-file-list="true"
-                class="m-l-[0] m-r-[8px] upload-ts"
+                class="upload-ts m-l-[0] m-r-[8px]"
                 :on-change="handleUploadChange"
                 :on-remove="handleUploadRemove"
                 :http-request="customUpload"
@@ -663,7 +663,7 @@ defineExpose({
   .form-label {
     height: 28px !important;
     color: #424561 !important;
-    font-size: 14px !important;
+    font-size: 12px !important;
     font-weight: 400 !important;
     line-height: 21px !important;
     display: inline-flex;
