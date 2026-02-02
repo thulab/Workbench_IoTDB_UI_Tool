@@ -2,120 +2,118 @@
 <template>
   <el-dialog v-model="dialogVisible" :title="t('measurement.measurementChoose')" width="630px" :before-close="handleClose" :close-on-click-modal="false" :close-on-press-escape="false" draggable>
     <div class="modal-table-measurement-container flex gap-1">
-      <el-scrollbar max-height="450">
-        <!-- 左侧测点选择区域 -->
-        <div class="flex-2 flex flex-col">
-          <el-form :model="formData" :rules="formRules" ref="formRef" label-position="left">
-            <!-- 标签键值对输入 -->
-            <el-form-item :label="`${t('measurement.device')}：`" required props="selectedTags" class="device-form-item">
-              <div class="device-filter-container">
-                <div class="device-filter-inputs">
-                  <el-scrollbar max-height="80" class="device-filter-scroll">
-                    <div v-for="(tag, index) in tagFilters" :key="index" class="device-filter-row flex flex-1 items-center">
-                      <el-select v-model="tag.variable" :disabled="!availableTags.length" :placeholder="t('common.selectPlaceholder')" class="flex-shrink-0 w-[140px]">
-                        <el-option
-                          v-for="option in availableTags"
-                          :disabled="!canChoice(option, index)"
-                          :key="option.nodeName"
-                          :label="option.nodeName + (option.comment ? ` (${option.comment})` : '')"
-                          :value="option.nodeName!"
-                        />
-                      </el-select>
-                      <span class="m-x-[8px]">：</span>
-                      <el-input v-model="tag.value" class="flex-1" :disabled="!availableTags.length" :placeholder="t('tableMeasurement.devicePlaceholder')" />
-                    </div>
-                  </el-scrollbar>
-                </div>
-                <div class="device-filter-actions">
-                  <el-button type="primary" link :disabled="tagFilters.length <= 1" @click="removeTagFilter(tagFilters.length - 1)">
-                    <el-icon size="24">
-                      <i-custom-tags-del />
-                    </el-icon>
-                  </el-button>
-                  <el-button type="primary" link :disabled="tagFilters.length >= availableTags.length" @click="addTagFilter">
-                    <el-icon size="24">
-                      <i-custom-tags-add />
-                    </el-icon>
-                  </el-button>
-                  <el-button type="primary" link @click="searchDevices">
-                    <el-icon size="24">
-                      <i-custom-tags-query />
-                    </el-icon>
-                  </el-button>
-                </div>
-              </div>
-              <!-- 第三行：设备表格 -->
-              <el-table
-                border
-                ref="deviceTableRef"
-                class="device-table m-t-[8px]"
-                :data="deviceTableData"
-                style="width: 100%"
-                :height="260"
-                :max-height="260"
-                v-loading="searchLoading"
-                tooltip-effect="light"
-                :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
-                @selection-change="handleDeviceSelection"
-                @scroll="handleScroll"
-              >
-                <el-table-column fixed="left" type="selection" width="50" v-if="deviceColumns.length" max-width="50" align="center" />
-                <el-table-column
-                  :key="item.prop"
-                  :prop="item.prop"
-                  v-for="item of deviceColumns"
-                  min-width="180px"
-                  :width="`${item.width}px`"
-                  :align="item.align"
-                  :fixed="item.fixed"
-                  :sortable="item.sortable"
-                  :sort-orders="['ascending', 'descending']"
-                  show-overflow-tooltip
-                >
-                  <template #header>
-                    <span :class="item.sortable ? '' : 'flex-header'"><text-tooltip :content="item.label" /></span>
-                  </template>
-                  <template #default="scope">
-                    <span>{{ scope.row[item.prop] ? scope.row[item.prop] : '-' }}</span>
-                  </template>
-                </el-table-column>
-                <slot name="append-column"></slot>
-                <template #empty>
-                  <div class="table-empty-wrapper">
-                    <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
-                    <span class="data-empty-text">{{ t('common.noData') }}</span>
+      <!-- 左侧测点选择区域 -->
+      <div class="flex-2 flex flex-col">
+        <el-form :model="formData" :rules="formRules" ref="formRef" label-position="left">
+          <!-- 标签键值对输入 -->
+          <el-form-item :label="`${t('measurement.device')}：`" required props="selectedTags" class="device-form-item">
+            <div class="device-filter-container">
+              <div class="device-filter-inputs">
+                <el-scrollbar max-height="80" class="device-filter-scroll">
+                  <div v-for="(tag, index) in tagFilters" :key="index" class="device-filter-row flex flex-1 items-center">
+                    <el-select v-model="tag.variable" :disabled="!availableTags.length" :placeholder="t('common.selectPlaceholder')" class="flex-shrink-0 w-[140px]">
+                      <el-option
+                        v-for="option in availableTags"
+                        :disabled="!canChoice(option, index)"
+                        :key="option.nodeName"
+                        :label="option.nodeName + (option.comment ? ` (${option.comment})` : '')"
+                        :value="option.nodeName!"
+                      />
+                    </el-select>
+                    <span class="m-x-[8px]">：</span>
+                    <el-input v-model="tag.value" class="flex-1" :disabled="!availableTags.length" :placeholder="t('tableMeasurement.devicePlaceholder')" />
                   </div>
-                </template>
-              </el-table>
-            </el-form-item>
-
-            <!-- 第四行：测点选择 -->
-            <el-form-item prop="selectedMeasurement" class="m-t-[8px]" :label="`${t('measurement.measurement')}：`">
-              <el-select
-                v-model="formData.selectedMeasurement"
-                :placeholder="t('aiAnalysis.chooseMeasurement')"
-                :disabled="!currentTableInfo || availableMeasurements.length === 0"
-                filterable
-                multiple
-                :collapse-tags="true"
-                :multiple-limit="props.selectedLimit"
-                class="search-select w-full"
+                </el-scrollbar>
+              </div>
+              <div class="device-filter-actions">
+                <el-button type="primary" link :disabled="tagFilters.length <= 1" @click="removeTagFilter(tagFilters.length - 1)">
+                  <el-icon size="24">
+                    <i-custom-tags-del />
+                  </el-icon>
+                </el-button>
+                <el-button type="primary" link :disabled="tagFilters.length >= availableTags.length" @click="addTagFilter">
+                  <el-icon size="24">
+                    <i-custom-tags-add />
+                  </el-icon>
+                </el-button>
+                <el-button type="primary" link @click="searchDevices">
+                  <el-icon size="24">
+                    <i-custom-tags-query />
+                  </el-icon>
+                </el-button>
+              </div>
+            </div>
+            <!-- 第三行：设备表格 -->
+            <el-table
+              border
+              ref="deviceTableRef"
+              class="device-table m-t-[8px]"
+              :data="deviceTableData"
+              style="width: 100%"
+              :height="260"
+              :max-height="260"
+              v-loading="searchLoading"
+              tooltip-effect="light"
+              :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
+              @selection-change="handleDeviceSelection"
+              @scroll="handleScroll"
+            >
+              <el-table-column fixed="left" type="selection" width="50" v-if="deviceColumns.length" max-width="50" align="center" />
+              <el-table-column
+                :key="item.prop"
+                :prop="item.prop"
+                v-for="item of deviceColumns"
+                min-width="180px"
+                :width="`${item.width}px`"
+                :align="item.align"
+                :fixed="item.fixed"
+                :sortable="item.sortable"
+                :sort-orders="['ascending', 'descending']"
+                show-overflow-tooltip
               >
-                <template #prefix>
-                  <i-custom-search-icon class="remote-select-search-icon" />
+                <template #header>
+                  <span :class="item.sortable ? '' : 'flex-header'"><text-tooltip :content="item.label" /></span>
                 </template>
-                <el-option
-                  v-for="measurement in availableMeasurements"
-                  :key="measurement.nodeName"
-                  :disabled="!props.supportedTypes.includes(measurement.datatype || '')"
-                  :label="measurement.nodeName + (measurement.comment ? ` (${measurement.comment})` : '')"
-                  :value="measurement.nodeName!"
-                />
-              </el-select>
-            </el-form-item>
-          </el-form>
-        </div>
-      </el-scrollbar>
+                <template #default="scope">
+                  <span>{{ scope.row[item.prop] ? scope.row[item.prop] : '-' }}</span>
+                </template>
+              </el-table-column>
+              <slot name="append-column"></slot>
+              <template #empty>
+                <div class="table-empty-wrapper">
+                  <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
+                  <span class="data-empty-text">{{ t('common.noData') }}</span>
+                </div>
+              </template>
+            </el-table>
+          </el-form-item>
+
+          <!-- 第四行：测点选择 -->
+          <el-form-item prop="selectedMeasurement" class="m-t-[8px]" :label="`${t('measurement.measurement')}：`">
+            <el-select
+              v-model="formData.selectedMeasurement"
+              :placeholder="t('aiAnalysis.chooseMeasurement')"
+              :disabled="!currentTableInfo || availableMeasurements.length === 0"
+              filterable
+              multiple
+              :collapse-tags="true"
+              :multiple-limit="props.selectedLimit"
+              class="search-select w-full"
+            >
+              <template #prefix>
+                <i-custom-search-icon class="remote-select-search-icon" />
+              </template>
+              <el-option
+                v-for="measurement in availableMeasurements"
+                :key="measurement.nodeName"
+                :disabled="!props.supportedTypes.includes(measurement.datatype || '')"
+                :label="measurement.nodeName + (measurement.comment ? ` (${measurement.comment})` : '')"
+                :value="measurement.nodeName!"
+              />
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </div>
     </div>
 
     <template #footer>
