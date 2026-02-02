@@ -31,7 +31,7 @@
 
       <div class="sql-search-aside">
         <div v-if="codeMirrorReady">
-          <h4 style="font-size: 14px; font-weight: 700; color: #495ad4; margin: 0 0 12px">{{ t('search.quickActions') }}</h4>
+          <h4 style="font-size: 12px; font-weight: 700; color: #495ad4; margin: 0 0 12px">{{ t('search.quickActions') }}</h4>
           <el-tabs v-model="activeNameSide" class="tabs-nav-aside">
             <el-tab-pane :label="t('measurement.measurement')" name="data">
               <side-table-schema @get-function="getFunction" />
@@ -116,7 +116,7 @@ const nameDialogVisible = ref(false);
 const renameDialogVisible = ref(false);
 const saveTipDialogVisible = ref(false);
 
-const { maxTableHeight: tabHeight } = useTableHeight(125);
+const { maxTableHeight: tabHeight } = useTableHeight(100);
 
 const activiteSql = ref<string>(`_${dayjs().format('YYYY-MM-DD HH:mm:ss:SSS')}`);
 
@@ -185,7 +185,7 @@ const operatingLink = computed(() => {
   if (activeNameSide.value === 'function') {
     link += 'UserGuide/latest-Table/SQL-Manual/Basis-Function.html';
   } else {
-    link += 'UserGuide/latest-Table/SQL-Manual/overview.html';
+    link += 'UserGuide/latest-Table/SQL-Manual/overview_timecho.html';
   }
   return link;
 });
@@ -513,9 +513,13 @@ watch(activiteSql, (newVal, oldVal) => {
 
 .sql-tab-box {
   width: 100%;
+  height: 100%;
   position: relative;
+  padding-bottom: 8px;
 
   .sql-tab-list {
+    height: 100%;
+
     // width: calc(100% - 40px);
   }
 

@@ -58,7 +58,7 @@ function getFunction(node: Node) {
   background: #fff;
 
   &.max-height {
-    height: calc(100vh - 240px);
+    height: calc(100vh - 172px);
     overflow: auto;
   }
 }

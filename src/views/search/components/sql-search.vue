@@ -50,7 +50,7 @@
   </div>
   <div>
     <div class="run-result-title-box">
-      <h4 style="font-size: 14px; font-weight: 700; line-height: 20px; color: #495ad4">{{ t('search.runResult') }}</h4>
+      <h4 style="font-size: 12px; font-weight: 700; line-height: 20px; color: #495ad4">{{ t('search.runResult') }}</h4>
       <span class="run-result-tip">
         <i-custom-info-warning />
         {{ connectionStore.isTableModel ? t('search.export1000RowTip') : t('search.export1000Tip') }}
@@ -105,10 +105,10 @@
             <dynamic-table
               v-if="item"
               ref="standTable"
+              class="dynamic-table"
               :columns="item"
               :table-data="tableDataPagination[index]!.list || []"
               :max-height="maxTableHeight"
-              :height="maxTableHeight"
               v-model:current-page="pageNums[index]"
               v-model:page-size="pagination.pageSize"
               :total="total[index]"
@@ -167,7 +167,7 @@ const codeEditorHeight = computed(() => {
   return height;
 });
 
-const { maxTableHeight } = useTableHeight(codeEditorHeight.value + 370, undefined, 200);
+const { maxTableHeight } = useTableHeight(codeEditorHeight.value + 336, undefined, 200);
 
 const pagination = reactive({
   pageSize: 10,
@@ -432,7 +432,7 @@ defineExpose({ insertContent });
   align-items: center;
 
   span {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 20px;
     color: #495ad4;
@@ -572,5 +572,9 @@ defineExpose({ insertContent });
   .sql-export-button.el-button:focus {
     color: #656a85 !important;
   }
+}
+
+.dynamic-table :deep(th.el-table__cell) {
+  font-size: 12px;
 }
 </style>

@@ -8,7 +8,7 @@
 
     <ul class="sql-list">
       <template v-if="sqlList.length">
-        <el-scrollbar :max-height="'calc(100vh - 250px)'">
+        <el-scrollbar :max-height="'calc(100vh - 220px)'">
           <li v-for="item in sqlList" :key="item.id" :id="`sql-template-${item.id}`" class="sql-item-box" @click="(e) => handleSelect(item, e)">
             <div class="sql-item-text-box">
               <i-custom-template />
@@ -131,7 +131,7 @@ defineExpose({ getQueryList });
   background: #fff;
 
   &.maxheight {
-    height: calc(100vh - 240px);
+    height: calc(100vh - 210px);
   }
 }
 

@@ -1,15 +1,6 @@
 <template>
   <div class="search_div max-height">
-    <el-tree-v2
-      ref="schemaTree"
-      :data="treeData"
-      style="background-color: #fff; overflow-y: auto"
-      :props="treeProps"
-      :indent="8"
-      :item-size="28"
-      :height="maxTableHeight"
-      :expand-on-click-node="false"
-    >
+    <el-tree-v2 ref="schemaTree" :data="treeData" style="background-color: #fff" :props="treeProps" :indent="8" :item-size="28" :height="maxTableHeight" :expand-on-click-node="false">
       <!-- eslint-disable-next-line vue/no-unused-vars -->
       <template #default="{ node, data }">
         <div class="node-text" :id="`tree-node-content-${data.parentName || data.nodeName}`" @dblclick="(event) => handleNodeClick(data.nodeName, event)">
@@ -40,7 +31,7 @@ import { useDbStore } from '@/stores';
 import { type ElTreeV2 } from 'element-plus';
 import type { TableTreeNodeData } from '@/types';
 
-const { maxTableHeight } = useTableHeight(220);
+const { maxTableHeight } = useTableHeight(184);
 
 const emit = defineEmits(['get-function']);
 
