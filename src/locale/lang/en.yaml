@@ -589,20 +589,15 @@ dataTrend:
   measurementMaxWarning: A maximum of 10 measurements can be added to each group. Please delete some and try again.
   dataTypeTip: Only measurements with data type INT32 / INT64 / FLOAT / DOUBLE are supported.
   measurementName: Measurement
-  step1p1: Click the
-  step1p2: add
-  step1p3: icon to add meeasurements
-  step2p1: Double click
-  step2p2: the measurement to add a trend group
-  step3p1: Left click and
-  step3p2: drag
-  step3p3: to add a measurement into a trend group
-  step4p1: Left click and
-  step4p2: select
-  step4p3: graph area, effect will synchronize to all groups
-  step5p1: Left click on the graph area to
-  step5p2: adjust
-  step5p3: the order of the trend group
+  step1: Click the <span class='tip-highlight'>{target}</span> icon to add meeasurements
+  step2: <span class='tip-highlight'>{target}</span> the measurement to add a trend group
+  step3: Left click and <span class='tip-highlight'>{target}</span> to add a measurement into a trend group
+  step4: Left click and <span class='tip-highlight'>{target}</span> graph area, effect will synchronize to all groups
+  step5: Left click on the graph area to <span class='tip-highlight'>{target}</span> the order of the trend group
+  add: add
+  doubleClick: Double click
+  drag: drag
+  select: select
 calculate:
   namePlaceholder: Please enter a name
   descPlaceholder: Please enter a description

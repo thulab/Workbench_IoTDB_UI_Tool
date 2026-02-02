@@ -649,20 +649,15 @@ dataTrend:
   resetMeasurementTip: 是否确认清空所选测点？
   dataTypeTip: 仅支持查看数值类型（INT32 / INT64 / FLOAT / DOUBLE）的测点趋势
   measurementName: 测点名称
-  step1p1: 点击表右侧
-  step1p2: 新增
-  step1p3: 图标，添加测点
-  step2p1: 双击
-  step2p2: 测点，可新建趋势框
-  step3p1: 鼠标左键
-  step3p2: 拖动
-  step3p3: 测点至趋势框中，可新增测点
-  step4p1: 左键
-  step4p2: 框选
-  step4p3: 趋势图范围，将自动放大并同步至所有趋势图
-  step5p1: 左键按住趋势图图例区域，可上下
-  step5p2: 拖动
-  step5p3: 趋势框调整位置
+  step1: 点击表右侧 <span class='tip-highlight'>{target}</span> 图标，添加测点
+  step2: <span class='tip-highlight'>{target}</span> 测点，可新建趋势框
+  step3: 鼠标左键 <span class='tip-highlight'>{target}</span> 测点至趋势框中，可新增测点
+  step4: 左键 <span class='tip-highlight'>{target}</span> 趋势图范围，将自动放大并同步至所有趋势图
+  step5: 左键按住趋势图图例区域，可上下 <span class='tip-highlight'>{target}</span> 趋势框调整位置
+  add: 新增
+  doubleClick: 双击
+  drag: 拖动
+  select: 框选
 calculate:
   namePlaceholder: 请输入名称
   descPlaceholder: 请输入描述

@@ -1,6 +1,35 @@
 <template>
-  <div class="flex-1 w-full overflow-y-auto" style="overflow-x: hidden" ref="wrapperRef">
-    <div>
+  <div class="flex-1 w-full overflow-y-auto" style="overflow-x: hidden" ref="wrapperRef" :style="{ display: props.measurementGroupInfo.length === 0 ? 'flex' : '' }">
+    <div v-if="props.measurementGroupInfo.length === 0" class="flex flex-1 items-center justify-center">
+      <div ref="tipRef" class="gap-[40px] grid" :style="{ gridTemplateColumns: props.isTable ? 'repeat(3, minmax(0, 1fr))' : 'repeat(2, minmax(0, 1fr))' }">
+        <div v-if="props.isTable" class="tip-box">
+          <div class="tip-title">Tip 1</div>
+          <div class="tip-content" v-html="$t('dataTrend.step1', { target: $t('dataTrend.add') })"></div>
+          <img src="@/assets/add-meas-step.svg" alt="" />
+        </div>
+        <div class="tip-box">
+          <div class="tip-title">{{ props.isTable ? 'Tip 2' : 'Tip 1' }}</div>
+          <div class="tip-content" v-html="$t('dataTrend.step2', { target: $t('dataTrend.doubleClick') })"></div>
+          <img src="@/assets/click-meas-step.svg" alt="" />
+        </div>
+        <div class="tip-box">
+          <div class="tip-title">{{ props.isTable ? 'Tip 3' : 'Tip 2' }}</div>
+          <div class="tip-content" v-html="$t('dataTrend.step3', { target: $t('dataTrend.add') })"></div>
+          <img src="@/assets/drag-meas-step.svg" alt="" />
+        </div>
+        <div class="tip-box">
+          <div class="tip-title">{{ props.isTable ? 'Tip 4' : 'Tip 3' }}</div>
+          <div class="tip-content" v-html="$t('dataTrend.step4', { target: $t('dataTrend.drag') })"></div>
+          <img src="@/assets/select-data-step.svg" alt="" />
+        </div>
+        <div class="tip-box">
+          <div class="tip-title">{{ props.isTable ? 'Tip 5' : 'Tip 4' }}</div>
+          <div class="tip-content" v-html="$t('dataTrend.step5', { target: $t('dataTrend.drag') })"></div>
+          <img src="@/assets/drag-order-step.svg" alt="" />
+        </div>
+      </div>
+    </div>
+    <div v-else>
       <draggable v-model="draggableData" item-key="id" @end="handleDragEnd" handle=".upper-area" filter=".el-scrollbar__bar" :prevent-on-filter="false">
         <template #item="{ element, index }">
           <MetricChartGroup
@@ -29,54 +58,6 @@
           />
         </template>
       </draggable>
-    </div>
-    <div v-if="props.measurementGroupInfo.length === 0" class="flex flex-col items-center justify-center" :style="{ marginTop: tipMarginTop + 'px' }">
-      <div class="flex flex-wrap gap-[40px]" :style="{ maxWidth: props.isTable ? '800px' : '550px' }">
-        <div v-if="props.isTable" class="tip-box">
-          <div class="tip-title">Tip 1</div>
-          <div class="tip-content">
-            <span>{{ $t('dataTrend.step1p1') }}</span>
-            <span class="tip-highlight">{{ $t('dataTrend.step1p2') }}</span>
-            <span>{{ $t('dataTrend.step1p3') }}</span>
-          </div>
-          <img src="@/assets/add-meas-step.svg" alt="" />
-        </div>
-        <div class="tip-box">
-          <div class="tip-title">{{ props.isTable ? 'Tip 2' : 'Tip 1' }}</div>
-          <div class="tip-content">
-            <span class="tip-highlight" style="margin-left: 0">{{ $t('dataTrend.step2p1') }}</span>
-            <span>{{ $t('dataTrend.step2p2') }}</span>
-          </div>
-          <img src="@/assets/click-meas-step.svg" alt="" />
-        </div>
-        <div class="tip-box">
-          <div class="tip-title">{{ props.isTable ? 'Tip 3' : 'Tip 2' }}</div>
-          <div class="tip-content">
-            <span>{{ $t('dataTrend.step3p1') }}</span>
-            <span class="tip-highlight">{{ $t('dataTrend.step3p2') }}</span>
-            <span>{{ $t('dataTrend.step3p3') }}</span>
-          </div>
-          <img src="@/assets/drag-meas-step.svg" alt="" />
-        </div>
-        <div class="tip-box">
-          <div class="tip-title">{{ props.isTable ? 'Tip 4' : 'Tip 3' }}</div>
-          <div class="tip-content">
-            <span>{{ $t('dataTrend.step4p1') }}</span>
-            <span class="tip-highlight">{{ $t('dataTrend.step4p2') }}</span>
-            <span>{{ $t('dataTrend.step4p3') }}</span>
-          </div>
-          <img src="@/assets/select-data-step.svg" alt="" />
-        </div>
-        <div class="tip-box">
-          <div class="tip-title">{{ props.isTable ? 'Tip 5' : 'Tip 4' }}</div>
-          <div class="tip-content">
-            <span>{{ $t('dataTrend.step5p1') }}</span>
-            <span class="tip-highlight">{{ $t('dataTrend.step5p2') }}</span>
-            <span>{{ $t('dataTrend.step5p3') }}</span>
-          </div>
-          <img src="@/assets/drag-order-step.svg" alt="" />
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -120,18 +101,6 @@ const draggableData = ref<
 const trendStore = props.isTable ? useTableHistoryTrendStore() : useTreeHistoryTrendStore();
 
 const chartRefs = ref<Record<string, InstanceType<typeof MetricChartGroup>>>({});
-
-const tipMarginTop = computed(() => {
-  let result = 100;
-  const h = wrapperHeight.value;
-  if (h) {
-    result = (h - 470) / 2;
-    if (result < 0) {
-      result = 0;
-    }
-  }
-  return result;
-});
 
 const chartHeight = computed(() => {
   let result = 240;
@@ -283,6 +252,14 @@ onBeforeUnmount(() => {
 });
 
 watch(
+  () => wrapperRef.value?.clientWidth,
+  (newVal) => {
+    wrapperRef.value?.style.setProperty('--tw', newVal ? `${newVal / 5}px` : '0px');
+  },
+  { immediate: true, deep: true },
+);
+
+watch(
   () => props.measurementGroupInfo,
   (newVal) => {
     draggableData.value = newVal.map((item, index) => ({
@@ -301,7 +278,11 @@ watch(
 }
 
 .tip-box {
-  width: 234px;
+  width: clamp(156px, var(--tw), 280px);
+
+  img {
+    width: clamp(156px, var(--tw), 280px);
+  }
 }
 
 .tip-title {
@@ -309,6 +290,8 @@ watch(
   font-size: 16px;
   font-weight: 700;
   line-height: 23.17px;
+  box-sizing: border-box;
+  width: clamp(200px, var(--tw), 280px);
 }
 
 .tip-content {
@@ -318,12 +301,11 @@ watch(
   margin-top: 6px;
   line-height: 20.27px;
   height: 57px;
+  width: clamp(200px, var(--tw), 280px);
 }
 
 .tip-highlight {
   color: #495ad4;
   font-weight: 500;
-  margin-left: 4px;
-  margin-right: 4px;
 }
 </style>
