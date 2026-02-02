@@ -1,15 +1,15 @@
 <!-- 表模型测点选择弹窗 -->
 <template>
   <el-dialog v-model="dialogVisible" :title="t('measurement.measurementChoose')" width="820px" :before-close="handleClose" :close-on-click-modal="false" :close-on-press-escape="false" draggable>
-    <div class="flex gap-1 modal-table-measurement-container">
+    <div class="modal-table-measurement-container flex gap-1">
       <el-scrollbar :height="450" class="bg-[#F7F8FC]">
         <!-- 左侧测点选择区域 -->
-        <div class="flex-2 flex flex-col p-[16px]">
+        <div class="flex-2 p-[16px] flex flex-col">
           <el-form :model="formData" :rules="formRules" ref="formRef" label-position="left" label-width="80px">
             <!-- 第一行：数据库和表选择 -->
             <div class="flex gap-2">
               <el-form-item :label="`${t('measurement.databaseTitle')}：`" prop="selectedDatabase" class="flex-[10]">
-                <el-select v-model="formData.selectedDatabase" filterable :placeholder="t('aiAnalysis.databasePlaceholeder')" @change="handleDatabaseChange" clearable class="w-full search-select">
+                <el-select v-model="formData.selectedDatabase" filterable :placeholder="t('aiAnalysis.databasePlaceholeder')" @change="handleDatabaseChange" clearable class="search-select w-full">
                   <template #prefix>
                     <i-custom-search-icon class="remote-select-search-icon" />
                   </template>
@@ -24,7 +24,7 @@
                   @change="handleTableChange"
                   :disabled="!formData.selectedDatabase || tableOptions.length === 0"
                   clearable
-                  class="w-full search-select"
+                  class="search-select w-full"
                 >
                   <template #prefix>
                     <i-custom-search-icon class="remote-select-search-icon" />
@@ -49,7 +49,7 @@
                   </el-select>
 
                   <span class="m-x-[8px]">：</span>
-                  <el-input v-model="tag.value" class="w-[160px] m-r-[12px]" :disabled="!availableTags.length" :placeholder="t('tableMeasurement.devicePlaceholder')" />
+                  <el-input v-model="tag.value" class="m-r-[12px] w-[160px]" :disabled="!availableTags.length" :placeholder="t('tableMeasurement.devicePlaceholder')" />
                   <el-button type="primary" link :disabled="tagFilters.length <= 1" @click="removeTagFilter(index)">
                     <el-icon size="28">
                       <i-custom-tags-del />
@@ -138,7 +138,7 @@
         </div>
       </el-scrollbar>
       <!-- 中间添加按钮 -->
-      <div class="flex items-center justify-center bg-[white] flex-0">
+      <div class="flex-0 bg-[white] flex items-center justify-center">
         <!-- 选择测点超过 10 个时才提示 -->
         <el-tooltip :content="t('common.selectMeasurementLimit', { limit: props.selectedLimit })" :disabled="canAddMeasurements" effect="light">
           <el-button type="primary" :disabled="!canAdd || !canAddMeasurements" @click="addMeasurements" link>
@@ -148,18 +148,18 @@
       </div>
 
       <!-- 右侧已选测点区域 -->
-      <div class="w-[214px] flex flex-col bg-[#F7F8FC] right-panel">
+      <div class="right-panel bg-[#F7F8FC] flex flex-col w-[214px]">
         <div>
-          <div class="text-sm font-medium text-gray-700 mb-2 c-[var(--el-color-primary)]">
+          <div class="text-[12px] text-gray-700 c-[var(--el-color-primary)] font-medium mb-2 flex">
             {{ t('tableMeasurement.measurementSelected') }}
-            <el-tooltip effect="light" :content="t('common.selectMeasurementLimit', { limit: props.selectedLimit })" placement="top" popper-class="tooltip-box-width"
-              ><i-custom-question style="transform: translate(0, -80%)"
-            /></el-tooltip>
+            <el-tooltip effect="light" :content="t('common.selectMeasurementLimit', { limit: props.selectedLimit })" placement="top" popper-class="tooltip-box-width">
+              <i-custom-question style="transform: translate(0, -50%)" />
+            </el-tooltip>
           </div>
         </div>
         <el-scrollbar max-height="400px">
-          <div v-for="(item, index) in internalSelectedMeasurements" :key="formatSelectedMeasurement(item)" class="flex items-center justify-between mb-2 selected-measurement-item">
-            <div class="flex-1 flex max-w-[180px] leading-5">
+          <div v-for="(item, index) in internalSelectedMeasurements" :key="formatSelectedMeasurement(item)" class="selected-measurement-item mb-2 flex items-center justify-between">
+            <div class="leading-5 flex flex-1 max-w-[180px]">
               <text-tooltip :content="formatSelectedMeasurement(item)"></text-tooltip>
             </div>
             <el-button link @click="removeMeasurement(index)">
@@ -171,7 +171,7 @@
     </div>
 
     <template #footer>
-      <div class="flex justify-end gap-3">
+      <div class="flex gap-3 justify-end">
         <el-button @click="handleClear">{{ t('common.clear') }}</el-button>
 
         <el-button @click="handleClose">{{ t('common.cancel') }}</el-button>
