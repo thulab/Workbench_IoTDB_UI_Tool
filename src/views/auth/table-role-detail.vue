@@ -50,7 +50,7 @@
               </el-tooltip>
             </div>
             <div class="detail-user-list">
-              <span class="fs-[14px] m-r-[24px]">{{ t('auth.relational.allScope') }}：</span>
+              <span class="fs-[12px] m-r-[24px]">{{ t('auth.relational.allScope') }}：</span>
               <template v-if="!canManageRole">
                 <span class="flex items-center !m-r-[24px]">
                   <!-- <i-custom-correct class="m-r-8" /> -->
@@ -67,7 +67,7 @@
               <el-checkbox :disabled="!canManageRole" v-else v-model="formData.canManageRole" @change="handleAllScopeChange('MANAGE_ROLE')">{{ t('auth.relational.MANAGE_ROLE') }}</el-checkbox>
             </div>
             <div class="detail-user-list">
-              <span class="fs-[14px]">{{ t('auth.relational.dataScope') }}：</span>
+              <span class="fs-[12px]">{{ t('auth.relational.dataScope') }}：</span>
             </div>
             <div class="table-list-box">
               <el-table :data="tableData" style="width: 100%" v-loading="anyLoading" tooltip-effect="light" border :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">

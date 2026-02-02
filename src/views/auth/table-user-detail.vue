@@ -58,7 +58,7 @@
               </el-tooltip>
             </div>
             <div class="detail-role-list">
-              <span class="fs-[14px] m-r-[24px]">{{ t('auth.relational.allScope') }}：</span>
+              <span class="fs-[12px] m-r-[24px]">{{ t('auth.relational.allScope') }}：</span>
               <template v-if="isManager">
                 <span class="flex items-center !m-r-[24px]">
                   <i-custom-correct class="m-r-8" />
@@ -90,7 +90,7 @@
               </el-tooltip>
             </div>
             <div class="detail-role-list">
-              <span class="fs-[14px]">{{ t('auth.relational.dataScope') }}：</span>
+              <span class="fs-[12px]">{{ t('auth.relational.dataScope') }}：</span>
             </div>
             <div class="table-list-box">
               <el-table :data="tableData" style="width: 100%" v-loading="anyLoading" tooltip-effect="light" border :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
@@ -592,7 +592,7 @@ watch(
 }
 
 .table-list-box {
-  margin-top: 0;
+  margin: 0 8px;
   background-color: #f7f8fc;
   padding: 8px;
 

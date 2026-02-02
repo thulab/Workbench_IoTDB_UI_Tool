@@ -2,7 +2,7 @@
   <el-dialog :title="title" v-model="dialogVisible" width="1024px" class="preview-role-modal" align-center :close-on-click-modal="true" id="auth-preview-modal-user">
     <el-scrollbar :max-height="maxHeight" v-loading="dataPrivilegesLoading || globalPrivilegesLoading">
       <div class="detail-user-list m-b-[12px] flex items-center">
-        <span class="fs-[14px] m-r-[24px]">{{ t('auth.relational.allScope') }}：</span>
+        <span class="fs-[12px] m-r-[24px]">{{ t('auth.relational.allScope') }}：</span>
         <template v-if="formData.canManageUser">
           <span class="flex items-center !m-r-[24px]">
             <i-custom-correct class="m-r-8" />
@@ -17,7 +17,7 @@
         <el-checkbox disabled v-model="formData.canManageRole" class="!m-l-0" v-else>{{ t('auth.relational.MANAGE_ROLE') }}</el-checkbox>
       </div>
       <div class="detail-user-list">
-        <span class="fs-[14px]">{{ t('auth.relational.dataScope') }}：</span>
+        <span class="fs-[12px]">{{ t('auth.relational.dataScope') }}：</span>
       </div>
       <div class="table-list-box">
         <div class="flex-justify-between">
