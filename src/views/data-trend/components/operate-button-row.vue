@@ -23,24 +23,24 @@
       <button
         @click="handleRunningPlay"
         v-if="props.isRunning && !runningTrendStore.isPlaying"
-        class="border-0 rounded-[4px] bg-[#495AD4] flex h-[24px] w-[24px] items-center justify-center p-[0]!"
+        class="button-border rounded-[24px] flex h-[24px] w-[24px] items-center justify-center p-[0]!"
         :disabled="!props.canOperate"
         :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
       >
-        <i-custom-play-transparent />
+        <i-custom-play-round />
       </button>
       <button
         @click="handleRunningPause"
         v-if="props.isRunning && runningTrendStore.isPlaying"
-        class="border-0 rounded-[4px] bg-[#495AD4] flex h-[24px] w-[24px] items-center justify-center p-[0]!"
+        class="button-border rounded-[24px] flex h-[24px] w-[24px] items-center justify-center p-[0]!"
         :disabled="!props.canOperate"
         :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
       >
-        <i-custom-pause-transparent />
+        <i-custom-pause-round />
       </button>
       <button
         @click="handleResetGraph"
-        class="save-button ml-[16px] rounded-[4px] bg-white flex h-[24px] w-[24px] cursor-pointer items-center box-border justify-center p-[0]!"
+        class="button-border ml-[16px] rounded-[4px] bg-white flex h-[24px] w-[24px] cursor-pointer items-center box-border justify-center p-[0]!"
         :disabled="!props.canOperate"
         :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
       >
@@ -48,7 +48,7 @@
       </button>
       <button
         @click="handleSaveTemplate"
-        class="save-button ml-[16px] rounded-[4px] bg-white flex h-[24px] w-[24px] cursor-pointer items-center box-border justify-center p-[0]!"
+        class="button-border ml-[16px] rounded-[4px] bg-white flex h-[24px] w-[24px] cursor-pointer items-center box-border justify-center p-[0]!"
         :disabled="!props.canOperate"
         :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
       >
@@ -320,7 +320,7 @@ watch(
   padding-right: 32px;
 }
 
-.save-button {
+.button-border {
   border: 1px solid #dfe1ed;
 }
 
