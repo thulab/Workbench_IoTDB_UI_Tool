@@ -424,7 +424,7 @@ watch(locale, () => {
   display: flex;
   align-items: center;
   min-width: 1440px;
-  min-height: 640px;
+  min-height: 700px;
 }
 
 .login-side-img {
