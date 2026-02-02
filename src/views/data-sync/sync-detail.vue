@@ -347,7 +347,7 @@ watch(
   margin: 0 0 12px;
 
   .page-table-title {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 21px;
     color: #495ad4;

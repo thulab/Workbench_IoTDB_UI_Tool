@@ -1,245 +1,143 @@
 <template>
-  <el-container class="data-spectrum-wrapper">
-    <el-header class="p-0" style="height: auto">
-      <div class="search-form-box" style="margin-bottom: 18px" :style="{ marginBottom: searchFormData.method !== 'PATTERN_MATCH' ? '18px' : '14px' }">
-        <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-          <div class="flex-align-center m-b-16" style="height: 36px" :style="{ marginBottom: searchFormData.method !== 'PATTERN_MATCH' ? '16px' : '12px !important' }">
-            <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
-              <template #label>
-                {{ t('spectrum.analysisMethod') }}：
-                <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
-                  <template #content>
-                    <p style="color: #131926; font-weight: 300" v-html="t('spectrum.analysisMethodTip', { doc: methodDocLink })"></p>
-                  </template>
-                  <i-custom-question />
-                </el-tooltip>
-              </template>
-              <el-select v-model="searchFormData.method" id="spectrum-search-method" style="width: 230px" :placeholder="t('spectrum.analysisMethodPlaceholder')" @change="handleChangeMethod">
-                <el-option
-                  v-for="item in methodOptions"
-                  :key="item.functionName"
-                  :label="item.name"
-                  :value="item.functionName"
-                  :id="`spectrum-search-method-${item.functionName}`"
-                  :disabled="!item.enable"
-                >
-                  <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('spectrum.analysisMethodNoneTip')" popper-class="tooltip-box-width" :disabled="item.enable">
-                    {{ item.name }}
+  <el-scrollbar style="width: 100%">
+    <el-container
+      class="data-spectrum-wrapper"
+      style="height: calc(100vh - 56px)"
+      :style="{
+        minWidth: searchFormData.method === 'PATTERN_MATCH' ? '1316px' : 'auto',
+      }"
+    >
+      <el-header class="p-0" style="height: auto">
+        <div class="search-form-box" style="margin-bottom: 8px" :style="{ marginBottom: searchFormData.method !== 'PATTERN_MATCH' ? '8px' : '8px' }">
+          <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
+            <div class="flex-align-center m-b-[8px]" style="height: 36px" :style="{ marginBottom: searchFormData.method !== 'PATTERN_MATCH' ? '8px' : '8px !important' }">
+              <base-form-item :label="`${t('spectrum.analysisMethod')}：`" prop="method" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
+                <template #label>
+                  {{ t('spectrum.analysisMethod') }}：
+                  <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
+                    <template #content>
+                      <p style="color: #131926; font-weight: 300" v-html="t('spectrum.analysisMethodTip', { doc: methodDocLink })"></p>
+                    </template>
+                    <i-custom-question />
                   </el-tooltip>
-                </el-option>
-              </el-select>
-            </base-form-item>
-            <div class="search-method-params-box" v-if="searchFormData.method && searchFormData.method !== 'custom' && searchFormData.method !== 'PATTERN_MATCH'">
-              <span class="params-title">{{ t('spectrum.paramsTitle') }}</span>
-              <template v-if="searchFormData.method === 'FFT'">
-                <base-form-item :label="`${t('spectrum.returnResult')}：`" prop="resultType">
-                  <el-select v-model="searchFormData.resultType" :style="{ width: locale === 'en' ? '110px' : '84px' }" id="spectrum-search-resultType">
-                    <el-option v-for="item in resultList" :key="item.value" :label="item.name" :value="item.value" :id="`spectrum-search-resultType-${item.value}`" />
-                  </el-select>
-                </base-form-item>
-                <base-form-item :label="`${t('spectrum.compressParams')}：`" prop="compression" class="m-r-0">
-                  <template #label>
-                    {{ t('spectrum.compressParams') }}：
-                    <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width" :content="t('spectrum.compressParamsTip')"><i-custom-question /></el-tooltip>
-                  </template>
-                  <el-input
-                    v-model="searchFormData.compression"
-                    :style="{ width: locale === 'en' ? '150px' : '120px' }"
-                    :placeholder="t('spectrum.compressParamsPlaceholder')"
-                    id="spectrum-search-compression"
-                    @change="handleInputCompression"
-                  />
-                </base-form-item>
-              </template>
-              <template v-if="searchFormData.method === 'ENVELOPE'">
-                <base-form-item :label="`${t('spectrum.modulationFrequency')}：`" prop="frequency">
-                  <el-input v-model.number="searchFormData.frequency" style="width: 120px" id="spectrum-search-frequency" @change="handleInputFrequency" />
-                </base-form-item>
-                <base-form-item :label="`${t('spectrum.expandingFold')}：`" prop="amplification" class="m-r-0">
-                  <el-input v-model.number="searchFormData.amplification" style="width: 120px" id="spectrum-search-expandingFold" @change="handleInputAmplification" />
-                </base-form-item>
-              </template>
-              <template v-if="searchFormData.method === 'DWT'">
-                <ul class="search-data-list">
-                  <li :class="['search-data-type', { 'search-data-active': dwtTab === 'type' }]" id="spectrum-search-dwt-tab-type" @click="handleDWTTab('type')">{{ t('spectrum.filterType') }}</li>
-                  <li :class="['search-data-type', { 'search-data-active': dwtTab === 'number' }]" id="spectrum-search-dwt-tab-number" @click="handleDWTTab('number')">
-                    {{ t('spectrum.filterCoefficient') }}
-                  </li>
-                </ul>
-                <base-form-item label="" prop="dwtMethod" v-if="dwtTab === 'type'">
-                  <el-select
-                    v-model="searchFormData.dwtMethod"
-                    :style="{ width: locale === 'en' ? '110px' : '96px' }"
-                    id="spectrum-search-dwt-method"
-                    :placeholder="t('spectrum.filterTypePlaceholder')"
+                </template>
+                <el-select v-model="searchFormData.method" id="spectrum-search-method" style="width: 230px" :placeholder="t('spectrum.analysisMethodPlaceholder')" @change="handleChangeMethod">
+                  <el-option
+                    v-for="item in methodOptions"
+                    :key="item.functionName"
+                    :label="item.name"
+                    :value="item.functionName"
+                    :id="`spectrum-search-method-${item.functionName}`"
+                    :disabled="!item.enable"
                   >
-                    <el-option v-for="item in dwtMethodList" :key="item.value" :label="item.name" :value="item.value" :id="`spectrum-search-dwt-method-${item.value}`" />
-                  </el-select>
-                </base-form-item>
-                <base-form-item label="" prop="coef" v-if="dwtTab === 'number'">
-                  <el-input v-model="searchFormData.coef" :style="{ width: locale === 'en' ? '110px' : '96px' }" id="spectrum-search-dwt-number" :placeholder="t('spectrum.paramsPlaceholder')" />
-                </base-form-item>
-                <base-form-item :label="`${t('spectrum.transformationNumbers')}：`" prop="layer" class="m-r-0">
-                  <el-input
-                    v-model.number="searchFormData.layer"
-                    :style="{ width: locale === 'en' ? '110px' : '84px' }"
-                    id="spectrum-search-dwt-layer"
-                    :placeholder="t('spectrum.paramsPlaceholder')"
-                    @change="handleInputLayer"
-                  />
-                </base-form-item>
-              </template>
-              <template v-if="['LOWPASS', 'HIGHPASS']!.includes(searchFormData.method)">
-                <base-form-item prop="wpass" :rules="requiredRules" class="form-item-last">
-                  <template #label>
-                    {{ t('spectrum.cutoffFrequency') }}：
-                    <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width" :content="t('spectrum.cutoffFrequencyTip')"><i-custom-question /></el-tooltip>
-                  </template>
-                  <el-input
-                    v-model="searchFormData.wpass"
-                    :style="{ width: locale === 'en' ? '110px' : '96px' }"
-                    id="spectrum-search-wpass"
-                    :placeholder="t('spectrum.paramsPlaceholder')"
-                    @change="handleInputWpass"
-                  />
-                </base-form-item>
-              </template>
-            </div>
-            <div class="search-method-params-box" v-else-if="searchFormData.method === 'PATTERN_MATCH'">
-              <base-form-item prop="measurement" :label-width="locale === 'en' ? '' : '110px'" :rules="requiredRules">
-                <template #label>
-                  {{ t('spectrum.pending') }}：
-                  <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
-                    <template #content>
-                      {{ t('common.searchTipLimit100') }}
+                    <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('spectrum.analysisMethodNoneTip')" popper-class="tooltip-box-width" :disabled="item.enable">
+                      {{ item.name }}
+                    </el-tooltip>
+                  </el-option>
+                </el-select>
+              </base-form-item>
+              <div class="search-method-params-box" v-if="searchFormData.method && searchFormData.method !== 'custom' && searchFormData.method !== 'PATTERN_MATCH'">
+                <span class="params-title">{{ t('spectrum.paramsTitle') }}</span>
+                <template v-if="searchFormData.method === 'FFT'">
+                  <base-form-item :label="`${t('spectrum.returnResult')}：`" prop="resultType">
+                    <el-select v-model="searchFormData.resultType" :style="{ width: locale === 'en' ? '110px' : '84px' }" id="spectrum-search-resultType">
+                      <el-option v-for="item in resultList" :key="item.value" :label="item.name" :value="item.value" :id="`spectrum-search-resultType-${item.value}`" />
+                    </el-select>
+                  </base-form-item>
+                  <base-form-item :label="`${t('spectrum.compressParams')}：`" prop="compression" class="m-r-0">
+                    <template #label>
+                      {{ t('spectrum.compressParams') }}：
+                      <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width" :content="t('spectrum.compressParamsTip')"><i-custom-question /></el-tooltip>
                     </template>
-                    <i-custom-question />
-                  </el-tooltip>
+                    <el-input
+                      v-model="searchFormData.compression"
+                      :style="{ width: locale === 'en' ? '150px' : '120px' }"
+                      :placeholder="t('spectrum.compressParamsPlaceholder')"
+                      id="spectrum-search-compression"
+                      @change="handleInputCompression"
+                    />
+                  </base-form-item>
                 </template>
-                <timeseries-select-single
-                  id="spectrum-search-path"
-                  v-model="searchFormData.measurement"
-                  :select-width="230"
-                  :item-width="elementWidth - 400"
-                  show-suffix
-                  :disabled-path="disabledPathDTW"
-                  @handle-change-path="handleChangePath"
-                />
-              </base-form-item>
-              <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules" class="form-item-last">
-                <el-date-picker
-                  v-model="searchFormData.datetimerange"
-                  type="datetimerange"
-                  range-separator="-"
-                  unlink-panels
-                  :disabled-date="disabledDate"
-                  :shortcuts="shortcutsDaterange"
-                  :clearable="false"
-                  :prefix-icon="ICustomCalender"
-                  :start-placeholder="t('search.startTime')"
-                  :end-placeholder="t('search.endTime')"
-                  id="spectrum-search-datetimerange"
-                  @change="handleChangeTime"
-                />
-              </base-form-item>
-            </div>
-          </div>
-          <div class="search-form-row-box">
-            <div v-if="searchFormData.method !== 'custom' && searchFormData.method !== 'PATTERN_MATCH'">
-              <base-form-item prop="measurement" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
-                <template #label>
-                  {{ t('measurement.measurementChoose') }}：
-                  <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
-                    <template #content>
-                      {{ t('common.searchTipLimit100') }}
-                      <br />
-                      {{ t('spectrum.dwtTip') }}
-                    </template>
-                    <i-custom-question />
-                  </el-tooltip>
+                <template v-if="searchFormData.method === 'ENVELOPE'">
+                  <base-form-item :label="`${t('spectrum.modulationFrequency')}：`" prop="frequency">
+                    <el-input v-model.number="searchFormData.frequency" style="width: 120px" id="spectrum-search-frequency" @change="handleInputFrequency" />
+                  </base-form-item>
+                  <base-form-item :label="`${t('spectrum.expandingFold')}：`" prop="amplification" class="m-r-0">
+                    <el-input v-model.number="searchFormData.amplification" style="width: 120px" id="spectrum-search-expandingFold" @change="handleInputAmplification" />
+                  </base-form-item>
                 </template>
-                <timeseries-select-single
-                  id="spectrum-search-path"
-                  v-model="searchFormData.measurement"
-                  :select-width="230"
-                  :item-width="elementWidth"
-                  show-suffix
-                  :disabled-path="disabledPath"
-                  @handle-change-path="handleChangePath"
-                />
-              </base-form-item>
-              <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules" :class="[searchFormData.method === 'DWT' ? '' : 'form-item-last']">
-                <el-date-picker
-                  v-model="searchFormData.datetimerange"
-                  type="datetimerange"
-                  range-separator="-"
-                  unlink-panels
-                  :disabled-date="disabledDate"
-                  :shortcuts="shortcutsDaterange"
-                  :clearable="false"
-                  :prefix-icon="ICustomCalender"
-                  :start-placeholder="t('search.startTime')"
-                  :end-placeholder="t('search.endTime')"
-                  id="spectrum-search-datetimerange"
-                  @change="handleChangeTime"
-                />
-              </base-form-item>
-              <base-form-item :label="`${t('spectrum.dataCount')}：`" v-if="searchFormData.method === 'DWT'" class="m-r-0">
-                {{ dataCount || dataCount === 0 ? dataCount : '-' }}
-              </base-form-item>
-            </div>
-            <div v-else-if="searchFormData.method === 'PATTERN_MATCH'">
-              <div class="search-method-params-box m-r-12" style="display: inline-block">
-                <base-form-item
-                  prop="measurement"
-                  :label-width="locale === 'en' ? '' : '92px'"
-                  :rules="requiredRules"
-                  :style="{ marginRight: searchFormData.partModel === 'fileUpload' ? '0 !important' : '24px' }"
-                >
-                  <template #label>{{ t('spectrum.segment') }}：</template>
-                  <ul class="switch-list">
-                    <li
-                      :class="['switch-type', { 'switch-active': searchFormData.partModel === 'existing' }]"
-                      id="data-search-type-datetime"
-                      @click="
-                        () => {
-                          searchFormData.partModel = 'existing';
-                        }
-                      "
-                    >
-                      {{ t('spectrum.existing') }}
-                    </li>
-                    <li
-                      :class="['switch-type', { 'switch-active': searchFormData.partModel === 'fileUpload' }]"
-                      id="data-search-type-datetimerange"
-                      @click="
-                        () => {
-                          searchFormData.partModel = 'fileUpload';
-                        }
-                      "
-                    >
-                      {{ t('spectrum.fileUpload') }}
+                <template v-if="searchFormData.method === 'DWT'">
+                  <ul class="search-data-list">
+                    <li :class="['search-data-type', { 'search-data-active': dwtTab === 'type' }]" id="spectrum-search-dwt-tab-type" @click="handleDWTTab('type')">{{ t('spectrum.filterType') }}</li>
+                    <li :class="['search-data-type', { 'search-data-active': dwtTab === 'number' }]" id="spectrum-search-dwt-tab-number" @click="handleDWTTab('number')">
+                      {{ t('spectrum.filterCoefficient') }}
                     </li>
                   </ul>
+                  <base-form-item label="" prop="dwtMethod" v-if="dwtTab === 'type'">
+                    <el-select
+                      v-model="searchFormData.dwtMethod"
+                      :style="{ width: locale === 'en' ? '110px' : '96px' }"
+                      id="spectrum-search-dwt-method"
+                      :placeholder="t('spectrum.filterTypePlaceholder')"
+                    >
+                      <el-option v-for="item in dwtMethodList" :key="item.value" :label="item.name" :value="item.value" :id="`spectrum-search-dwt-method-${item.value}`" />
+                    </el-select>
+                  </base-form-item>
+                  <base-form-item label="" prop="coef" v-if="dwtTab === 'number'">
+                    <el-input v-model="searchFormData.coef" :style="{ width: locale === 'en' ? '110px' : '96px' }" id="spectrum-search-dwt-number" :placeholder="t('spectrum.paramsPlaceholder')" />
+                  </base-form-item>
+                  <base-form-item :label="`${t('spectrum.transformationNumbers')}：`" prop="layer" class="m-r-0">
+                    <el-input
+                      v-model.number="searchFormData.layer"
+                      :style="{ width: locale === 'en' ? '110px' : '84px' }"
+                      id="spectrum-search-dwt-layer"
+                      :placeholder="t('spectrum.paramsPlaceholder')"
+                      @change="handleInputLayer"
+                    />
+                  </base-form-item>
+                </template>
+                <template v-if="['LOWPASS', 'HIGHPASS']!.includes(searchFormData.method)">
+                  <base-form-item prop="wpass" :rules="requiredRules" class="form-item-last">
+                    <template #label>
+                      {{ t('spectrum.cutoffFrequency') }}：
+                      <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width" :content="t('spectrum.cutoffFrequencyTip')"><i-custom-question /></el-tooltip>
+                    </template>
+                    <el-input
+                      v-model="searchFormData.wpass"
+                      :style="{ width: locale === 'en' ? '110px' : '96px' }"
+                      id="spectrum-search-wpass"
+                      :placeholder="t('spectrum.paramsPlaceholder')"
+                      @change="handleInputWpass"
+                    />
+                  </base-form-item>
+                </template>
+              </div>
+              <div class="search-method-params-box" v-else-if="searchFormData.method === 'PATTERN_MATCH'">
+                <base-form-item prop="measurement" :label-width="locale === 'en' ? '' : '110px'" :rules="requiredRules">
+                  <template #label>
+                    {{ t('spectrum.pending') }}：
+                    <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
+                      <template #content>
+                        {{ t('common.searchTipLimit100') }}
+                      </template>
+                      <i-custom-question />
+                    </el-tooltip>
+                  </template>
                   <timeseries-select-single
-                    v-if="searchFormData.partModel === 'existing'"
                     id="spectrum-search-path"
-                    v-model="searchFormData.partSeries"
+                    v-model="searchFormData.measurement"
                     :select-width="230"
-                    :item-width="elementWidth - 200"
+                    :item-width="elementWidth - 400"
                     show-suffix
                     :disabled-path="disabledPathDTW"
                     @handle-change-path="handleChangePath"
                   />
-
-                  <el-button type="primary" v-else @click="handleImport">
-                    {{ t('spectrum.fileUpload') }}
-                  </el-button>
                 </base-form-item>
-                <base-form-item v-if="searchFormData.partModel === 'existing'" :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules" class="form-item-last">
+                <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules" class="form-item-last">
                   <el-date-picker
-                    v-model="searchFormData.partDatetimerange"
+                    v-model="searchFormData.datetimerange"
                     type="datetimerange"
+                    class="w-[300px!important]"
                     range-separator="-"
                     unlink-panels
                     :disabled-date="disabledDate"
@@ -253,145 +151,272 @@
                   />
                 </base-form-item>
               </div>
-              <div style="display: inline-block">
-                <el-button type="primary" :disabled="!partTimestamps.length" class="detail-part-icon" @click="handleDetailPart" id="detail-part">
-                  <el-icon size="30"><i-custom-detail-eye /></el-icon>
-                </el-button>
-                <base-form-item :label="`${t('spectrum.distance')}：`" :rules="requiredRules" prop="distance" class="m-l-12 m-r-0">
+            </div>
+            <div class="search-form-row-box">
+              <div v-if="searchFormData.method !== 'custom' && searchFormData.method !== 'PATTERN_MATCH'">
+                <base-form-item prop="measurement" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
                   <template #label>
-                    {{ t('spectrum.distance') }}：
+                    {{ t('measurement.measurementChoose') }}：
                     <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
                       <template #content>
-                        {{ t('spectrum.distanceTip') }}
+                        {{ t('common.searchTipLimit100') }}
+                        <br />
+                        {{ t('spectrum.dwtTip') }}
                       </template>
                       <i-custom-question />
                     </el-tooltip>
                   </template>
-                  <el-input
-                    v-model="searchFormData.distance"
-                    :style="{ width: locale === 'en' ? '110px' : '84px' }"
-                    id="spectrum-search-distance"
-                    :placeholder="t('spectrum.paramsPlaceholder')"
-                    @change="handleInputDistance"
+                  <timeseries-select-single
+                    id="spectrum-search-path"
+                    v-model="searchFormData.measurement"
+                    :select-width="230"
+                    :item-width="elementWidth"
+                    show-suffix
+                    :disabled-path="disabledPath"
+                    @handle-change-path="handleChangePath"
                   />
                 </base-form-item>
+                <base-form-item :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules" :class="[searchFormData.method === 'DWT' ? '' : 'form-item-last']">
+                  <el-date-picker
+                    v-model="searchFormData.datetimerange"
+                    type="datetimerange"
+                    class="w-[300px!important]"
+                    range-separator="-"
+                    unlink-panels
+                    :disabled-date="disabledDate"
+                    :shortcuts="shortcutsDaterange"
+                    :clearable="false"
+                    :prefix-icon="ICustomCalender"
+                    :start-placeholder="t('search.startTime')"
+                    :end-placeholder="t('search.endTime')"
+                    id="spectrum-search-datetimerange"
+                    @change="handleChangeTime"
+                  />
+                </base-form-item>
+                <base-form-item :label="`${t('spectrum.dataCount')}：`" v-if="searchFormData.method === 'DWT'" class="m-r-0">
+                  {{ dataCount || dataCount === 0 ? dataCount : '-' }}
+                </base-form-item>
+              </div>
+              <div v-else-if="searchFormData.method === 'PATTERN_MATCH'">
+                <div class="search-method-params-box m-r-12" style="display: inline-block">
+                  <base-form-item
+                    prop="measurement"
+                    :label-width="locale === 'en' ? '' : '92px'"
+                    :rules="requiredRules"
+                    :style="{ marginRight: searchFormData.partModel === 'fileUpload' ? '0 !important' : '24px' }"
+                  >
+                    <template #label>{{ t('spectrum.segment') }}：</template>
+                    <ul class="switch-list">
+                      <li
+                        :class="['switch-type', { 'switch-active': searchFormData.partModel === 'existing' }]"
+                        id="data-search-type-datetime"
+                        @click="
+                          () => {
+                            searchFormData.partModel = 'existing';
+                          }
+                        "
+                      >
+                        {{ t('spectrum.existing') }}
+                      </li>
+                      <li
+                        :class="['switch-type', { 'switch-active': searchFormData.partModel === 'fileUpload' }]"
+                        id="data-search-type-datetimerange"
+                        @click="
+                          () => {
+                            searchFormData.partModel = 'fileUpload';
+                          }
+                        "
+                      >
+                        {{ t('spectrum.fileUpload') }}
+                      </li>
+                    </ul>
+                    <timeseries-select-single
+                      v-if="searchFormData.partModel === 'existing'"
+                      id="spectrum-search-path"
+                      v-model="searchFormData.partSeries"
+                      :select-width="230"
+                      :item-width="elementWidth - 200"
+                      show-suffix
+                      :disabled-path="disabledPathDTW"
+                      @handle-change-path="handleChangePath"
+                    />
+
+                    <el-button type="primary" v-else @click="handleImport">
+                      {{ t('spectrum.fileUpload') }}
+                    </el-button>
+                  </base-form-item>
+                  <base-form-item v-if="searchFormData.partModel === 'existing'" :label="`${t('common.datetimerange')}：`" prop="datetimerange" :rules="requiredRules" class="form-item-last">
+                    <el-date-picker
+                      v-model="searchFormData.partDatetimerange"
+                      type="datetimerange"
+                      range-separator="-"
+                      unlink-panels
+                      :disabled-date="disabledDate"
+                      :shortcuts="shortcutsDaterange"
+                      :clearable="false"
+                      :prefix-icon="ICustomCalender"
+                      :start-placeholder="t('search.startTime')"
+                      :end-placeholder="t('search.endTime')"
+                      id="spectrum-search-datetimerange"
+                      @change="handleChangeTime"
+                    />
+                  </base-form-item>
+                </div>
+                <div style="display: inline-block">
+                  <el-button type="primary" :disabled="!partTimestamps.length" class="detail-part-icon" @click="handleDetailPart" id="detail-part">
+                    <el-icon size="30"><i-custom-detail-eye /></el-icon>
+                  </el-button>
+                  <base-form-item :label="`${t('spectrum.distance')}：`" :rules="requiredRules" prop="distance" class="m-l-12 m-r-0">
+                    <template #label>
+                      {{ t('spectrum.distance') }}：
+                      <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
+                        <template #content>
+                          {{ t('spectrum.distanceTip') }}
+                        </template>
+                        <i-custom-question />
+                      </el-tooltip>
+                    </template>
+                    <el-input
+                      v-model="searchFormData.distance"
+                      :style="{ width: locale === 'en' ? '110px' : '84px' }"
+                      id="spectrum-search-distance"
+                      :placeholder="t('spectrum.paramsPlaceholder')"
+                      @change="handleInputDistance"
+                    />
+                  </base-form-item>
+                </div>
+              </div>
+
+              <div v-if="searchFormData.method === 'custom'">
+                <base-form-item :label="`${t('spectrum.sqlInput')}：`" prop="sql" :label-width="locale === 'en' ? '' : '96px'" class="el-form-item-not-mandatory">
+                  <el-button type="primary" link id="spectrum-search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
+                </base-form-item>
+              </div>
+              <div class="search-form-buttons" :style="{ marginBottom: searchFormData.method === 'PATTERN_MATCH' ? '4px' : '0' }">
+                <el-button @click="handleReset" id="spectrum-search-reset">{{ t('common.reset') }}</el-button>
+                <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="applyTipDisabled" popper-class="tooltip-box-width">
+                  <el-button :disabled="!applyTipDisabled" type="primary" @click="handleSearch()" id="spectrum-search-search">
+                    {{ t('common.apply') }}
+                  </el-button>
+                </el-tooltip>
+                <el-button :disabled="saveTemplateDisabled" @click="handleSaveTemplate" id="spectrum-search-save-template">{{ t('common.save') }}</el-button>
               </div>
             </div>
-
-            <div v-if="searchFormData.method === 'custom'">
-              <base-form-item :label="`${t('spectrum.sqlInput')}：`" prop="sql" :label-width="locale === 'en' ? '' : '96px'" class="el-form-item-not-mandatory">
-                <el-button type="primary" link id="spectrum-search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
-              </base-form-item>
-            </div>
-            <div class="search-form-buttons" :style="{ marginBottom: searchFormData.method === 'PATTERN_MATCH' ? '4px' : '0' }">
-              <el-button @click="handleReset" id="spectrum-search-reset">{{ t('common.reset') }}</el-button>
-              <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="applyTipDisabled" popper-class="tooltip-box-width">
-                <el-button :disabled="!applyTipDisabled" type="primary" @click="handleSearch()" id="spectrum-search-search">
-                  {{ t('common.apply') }}
+          </el-form>
+        </div>
+      </el-header>
+      <el-main class="p-0">
+        <el-container class="chart-detail-wrapper">
+          <el-main class="p-0" style="position: relative">
+            <div ref="chartContainer" class="chart-container" :style="{ height: searchFormData.method === 'PATTERN_MATCH' ? 'calc(100%)' : 'calc(100% - 30px)' }" v-element-size="onResize"></div>
+            <div class="flex-align-center" style="margin-top: 2px" v-if="searchFormData.method !== 'PATTERN_MATCH'">
+              <el-button
+                type="primary"
+                :plain="clickedOperate !== 'cursor'"
+                class="cursor-button"
+                id="spectrum-cursor"
+                style="height: 24px !important"
+                :disabled="dataEmpty"
+                :class="dataEmpty ? 'disable-cursor' : ''"
+                @click="handleClickOperate('cursor')"
+              >
+                {{ t('spectrum.cursor') }}
+              </el-button>
+              <div class="chart-operate-box">
+                <el-button
+                  type="primary"
+                  id="spectrum-harmonicFrequency"
+                  color="#00B3AA"
+                  :disabled="disableFrequency"
+                  :plain="clickedOperate !== 'frequency'"
+                  :class="disableFrequency ? 'disable-frequency' : ''"
+                  @click="handleClickOperate('frequency')"
+                >
+                  {{ t('spectrum.harmonicFrequency') }}
+                </el-button>
+                <el-input-number
+                  v-model="harmonicFrequency"
+                  :min="1"
+                  :max="99"
+                  step-strictly
+                  id="spectrum-harmonicFrequency-input"
+                  :disabled="dataEmpty || drawedStatus.frequency"
+                  :controls="false"
+                  :value-on-clear="1"
+                />
+              </div>
+              <div class="chart-operate-box">
+                <el-button
+                  type="primary"
+                  :plain="clickedOperate !== 'sideband'"
+                  id="spectrum-sideband"
+                  color="#6738BD"
+                  :disabled="disableSideband"
+                  :class="disableSideband ? 'disable-sideband' : ''"
+                  @click="handleClickOperate('sideband')"
+                >
+                  {{ t('spectrum.sideband') }}
+                </el-button>
+                <el-input-number
+                  v-model="sideband"
+                  :min="1"
+                  :max="99"
+                  step-strictly
+                  id="spectrum-sideband-input"
+                  :disabled="dataEmpty || drawedStatus.sideband"
+                  :controls="false"
+                  :value-on-clear="1"
+                />
+              </div>
+              <el-tooltip effect="light" :content="t('common.clearAll')" placement="top" popper-class="tooltip-box-width">
+                <el-button
+                  link
+                  :class="['cursor-button-clear', 'm-l-8', dataEmpty ? '' : 'svg-button-hover-color']"
+                  id="spectrum-cursor-clear"
+                  :disabled="dataEmpty"
+                  @click="() => handleEmptyOperate()"
+                >
+                  <el-icon size="18" color="#fff"><i-custom-delete /></el-icon>
                 </el-button>
               </el-tooltip>
-              <el-button :disabled="saveTemplateDisabled" @click="handleSaveTemplate" id="spectrum-search-save-template">{{ t('common.save') }}</el-button>
             </div>
-          </div>
-        </el-form>
-      </div>
-    </el-header>
-    <el-main class="p-0">
-      <el-container class="chart-detail-wrapper">
-        <el-main class="p-0" style="position: relative">
-          <div ref="chartContainer" class="chart-container" :style="{ height: searchFormData.method === 'PATTERN_MATCH' ? 'calc(100%)' : 'calc(100% - 30px)' }" v-element-size="onResize"></div>
-          <div class="flex-align-center" style="margin-top: 2px" v-if="searchFormData.method !== 'PATTERN_MATCH'">
-            <el-button
-              type="primary"
-              :plain="clickedOperate !== 'cursor'"
-              class="cursor-button"
-              id="spectrum-cursor"
-              style="height: 24px !important"
-              :disabled="dataEmpty"
-              :class="dataEmpty ? 'disable-cursor' : ''"
-              @click="handleClickOperate('cursor')"
-            >
-              {{ t('spectrum.cursor') }}
-            </el-button>
-            <div class="chart-operate-box">
-              <el-button
-                type="primary"
-                id="spectrum-harmonicFrequency"
-                color="#00B3AA"
-                :disabled="disableFrequency"
-                :plain="clickedOperate !== 'frequency'"
-                :class="disableFrequency ? 'disable-frequency' : ''"
-                @click="handleClickOperate('frequency')"
-              >
-                {{ t('spectrum.harmonicFrequency') }}
-              </el-button>
-              <el-input-number
-                v-model="harmonicFrequency"
-                :min="1"
-                :max="99"
-                step-strictly
-                id="spectrum-harmonicFrequency-input"
-                :disabled="dataEmpty || drawedStatus.frequency"
-                :controls="false"
-                :value-on-clear="1"
-              />
-            </div>
-            <div class="chart-operate-box">
-              <el-button
-                type="primary"
-                :plain="clickedOperate !== 'sideband'"
-                id="spectrum-sideband"
-                color="#6738BD"
-                :disabled="disableSideband"
-                :class="disableSideband ? 'disable-sideband' : ''"
-                @click="handleClickOperate('sideband')"
-              >
-                {{ t('spectrum.sideband') }}
-              </el-button>
-              <el-input-number v-model="sideband" :min="1" :max="99" step-strictly id="spectrum-sideband-input" :disabled="dataEmpty || drawedStatus.sideband" :controls="false" :value-on-clear="1" />
-            </div>
-            <el-tooltip effect="light" :content="t('common.clearAll')" placement="top" popper-class="tooltip-box-width">
-              <el-button link :class="['cursor-button-clear', 'm-l-8', dataEmpty ? '' : 'svg-button-hover-color']" id="spectrum-cursor-clear" :disabled="dataEmpty" @click="() => handleEmptyOperate()">
-                <el-icon size="18" color="#fff"><i-custom-delete /></el-icon>
-              </el-button>
-            </el-tooltip>
-          </div>
-        </el-main>
-        <el-aside width="350px" class="path-list-wrapper" style="display: flex; flex-direction: column">
-          <el-tabs v-model="activeNameSide" stretch class="tabs-nav-aside">
-            <el-tab-pane :label="searchFormData.method !== 'PATTERN_MATCH' ? t('dataTrend.pointAttribute') : t('spectrum.match')" name="point">
-              <point-list-tab
-                v-if="searchFormData.method !== 'PATTERN_MATCH'"
-                :point-list="pointList"
-                :point-line-data="pointLineData"
-                :point-checked-data="pointCheckedData"
-                @handleDelPoint="handleDelPoint"
-              />
-              <match-list-tab v-else v-model:model-value="matchList" @handle-check-change="handleCheckChange" @handle-save="handleSaveMatch" />
-            </el-tab-pane>
-            <el-tab-pane :label="t('dataTrend.commonTemplates')" class="p-t-16" name="template">
-              <template-list-tab ref="templateListRef" :source="'spectrum'" @handle-operate="handleOperateTemplate" />
-            </el-tab-pane>
-          </el-tabs>
-        </el-aside>
-      </el-container>
-    </el-main>
+          </el-main>
+          <el-aside width="350px" class="path-list-wrapper" style="display: flex; flex-direction: column">
+            <el-tabs v-model="activeNameSide" stretch class="tabs-nav-aside">
+              <el-tab-pane :label="searchFormData.method !== 'PATTERN_MATCH' ? t('dataTrend.pointAttribute') : t('spectrum.match')" name="point">
+                <point-list-tab
+                  v-if="searchFormData.method !== 'PATTERN_MATCH'"
+                  :point-list="pointList"
+                  :point-line-data="pointLineData"
+                  :point-checked-data="pointCheckedData"
+                  @handleDelPoint="handleDelPoint"
+                />
+                <match-list-tab v-else v-model:model-value="matchList" @handle-check-change="handleCheckChange" @handle-save="handleSaveMatch" />
+              </el-tab-pane>
+              <el-tab-pane :label="t('dataTrend.commonTemplates')" class="p-t-16" name="template">
+                <template-list-tab ref="templateListRef" :source="'spectrum'" @handle-operate="handleOperateTemplate" />
+              </el-tab-pane>
+            </el-tabs>
+          </el-aside>
+        </el-container>
+      </el-main>
 
-    <modal-sql v-model:visible="sqlVisible" :sql-value="sqlValue" @handleConfirm="handleConfirmSql" />
+      <modal-sql v-model:visible="sqlVisible" :sql-value="sqlValue" @handleConfirm="handleConfirmSql" />
 
-    <modal-template v-model:visible="templateVisible" :name-list="nameList" :source="'spectrum'" :save-loading="saveTemplateLoading" @handleSave="handleSaveSuccess" />
+      <modal-template v-model:visible="templateVisible" :name-list="nameList" :source="'spectrum'" :save-loading="saveTemplateLoading" @handleSave="handleSaveSuccess" />
 
-    <modal-template-rename
-      v-model:visible="renameVisible"
-      :old-name="renameData.name"
-      :name-list="nameList"
-      :source="'spectrum'"
-      :save-loading="saveTemplateLoading"
-      @handleSave="handleRenameSuccess"
-    />
-    <modal-import v-model:visible="importVisible" :data-type="searchFormData.measurementType" @handle-close="handleImportClose" />
-    <dialog-chart v-if="copySearchFormData.method === 'PATTERN_MATCH'" v-model:visible="chartDialogVisible" :times="partTimestamps" :values="partValues" />
-  </el-container>
+      <modal-template-rename
+        v-model:visible="renameVisible"
+        :old-name="renameData.name"
+        :name-list="nameList"
+        :source="'spectrum'"
+        :save-loading="saveTemplateLoading"
+        @handleSave="handleRenameSuccess"
+      />
+      <modal-import v-model:visible="importVisible" :data-type="searchFormData.measurementType" @handle-close="handleImportClose" />
+      <dialog-chart v-if="copySearchFormData.method === 'PATTERN_MATCH'" v-model:visible="chartDialogVisible" :times="partTimestamps" :values="partValues" />
+    </el-container>
+  </el-scrollbar>
 </template>
 
 <script setup lang="ts">
@@ -1672,7 +1697,7 @@ function setStorage() {
   window.sessionStorage.setItem(
     'dataSpectrumStorage',
     JSON.stringify({
-      ...copySearchFormData,
+      ...unref(copySearchFormData),
       dwtTab: dwtTab.value,
       clickedOperate: clickedOperate.value,
       markPointCount: markPointCount.value,
@@ -1804,6 +1829,7 @@ watch(
   background: #fff;
   box-sizing: border-box;
   padding: 8px;
+  flex: 1;
 }
 
 .search-form-box {
