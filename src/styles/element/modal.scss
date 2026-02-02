@@ -5,7 +5,7 @@
 
 .el-dialog__title {
   font-size: 12px !important;
-  font-weight: 400 !important;
+  font-weight: 700 !important;
   line-height: 21px !important;
   color: #424561 !important;
   display: inline-block;
@@ -14,8 +14,8 @@
 .el-dialog__headerbtn {
   width: 24px !important;
   height: 24px !important;
-  top: 16px !important;
-  right: 16px !important;
+  top: 8px !important;
+  right: 8px !important;
 
   .el-dialog__close {
     font-size: 20px !important;
@@ -23,7 +23,7 @@
 }
 
 .el-dialog__body {
-  padding: 8px 0 !important;
+  padding: 8px 0 0 !important;
 }
 
 .el-dialog__footer {
@@ -41,7 +41,7 @@
 }
 
 .el-message-box__close {
-  right: 12px;
+  right: 8px;
 }
 
 .el-message-box__title {
@@ -54,7 +54,7 @@
 .el-message-box__headerbtn {
   width: 24px !important;
   height: 24px !important;
-  top: 12px !important;
+  top: 8px !important;
   right: 0 !important;
   font-size: 20px !important;
 }
