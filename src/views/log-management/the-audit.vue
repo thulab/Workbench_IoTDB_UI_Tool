@@ -24,32 +24,35 @@
               </template>
             </el-input>
           </base-form-item>
-          <base-form-item :label="`${t('log.timeRange')}：`" prop="time">
-            <el-date-picker
-              v-model="searchFormData.time"
-              type="datetimerange"
-              range-separator="-"
-              unlink-panels
-              :clearable="false"
-              :shortcuts="shortcutsDaterange"
-              :disabled-date="disabledDate"
-              :prefix-icon="ICustomCalender"
-              :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
-              id="audit-search-time"
-            />
-          </base-form-item>
+          <div class="flex justify-between">
+            <base-form-item :label="`${t('log.timeRange')}：`" prop="time">
+              <el-date-picker
+                v-model="searchFormData.time"
+                type="datetimerange"
+                class="w-[300px!important]"
+                range-separator="-"
+                unlink-panels
+                :clearable="false"
+                :shortcuts="shortcutsDaterange"
+                :disabled-date="disabledDate"
+                :prefix-icon="ICustomCalender"
+                :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
+                id="audit-search-time"
+              />
+            </base-form-item>
+            <div class="search-form-buttons">
+              <el-button @click="handleReset" id="audit-search-reset">{{ t('common.reset') }}</el-button>
+              <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
+                <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="audit-search-search">{{ t('common.query') }}</el-button>
+              </auth-tooltip>
+            </div>
+          </div>
         </el-form>
-        <div class="search-form-buttons">
-          <el-button @click="handleReset" id="audit-search-reset">{{ t('common.reset') }}</el-button>
-          <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
-            <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="audit-search-search">{{ t('common.query') }}</el-button>
-          </auth-tooltip>
-        </div>
       </el-header>
       <el-main class="p-0">
         <div class="page-table-details">
           <h4 class="page-table-title">{{ t('log.auditList') }}</h4>
-          <auth-container :is-auth="canReadWriteData" style="height: calc(100% - 36px)" :content="'common.dataAuth'">
+          <auth-container :is-auth="canReadWriteData" class="flex-1" :content="'common.dataAuth'">
             <div class="page-table-box">
               <el-table
                 border
@@ -127,7 +130,7 @@ const connectionStore = useConnectionStore();
 const userStore = useUserStore();
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
 const { canReadWriteData } = storeToRefs(userStore);
-const { maxTableHeight } = useTableHeight(215);
+const { maxTableHeight } = useTableHeight(240);
 const defaultSort = ref<Sort>({ prop: 'time', order: 'descending' });
 const searchFormRef = ref<FormInstance>();
 const searchFormData = reactive({
@@ -241,11 +244,11 @@ watch(
   box-sizing: border-box;
 
   .page-table-title {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 21px;
     color: #495ad4;
-    margin-bottom: 15px;
+    margin-bottom: 8px;
   }
 }
 
@@ -262,7 +265,7 @@ watch(
   line-height: 21px;
   font-weight: 300;
   color: #131926;
-  padding: 12px 0;
+  padding: 8px 0;
   max-height: 300px;
   overflow-y: auto;
   white-space: pre-wrap;

@@ -373,7 +373,7 @@ watch(locale, () => {
   margin: 12px 0;
 
   .page-table-title {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 21px;
     color: #495ad4;
