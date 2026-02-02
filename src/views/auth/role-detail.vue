@@ -28,7 +28,7 @@
                 </auth-tooltip>
               </div>
             </div>
-            <div class="detail-title-box">
+            <div class="detail-title-box h-[36px!important]">
               <h4 class="detail-title-text">
                 {{ t('auth.detail') }}
                 <span class="tip-text">
@@ -37,7 +37,7 @@
                 </span>
               </h4>
             </div>
-            <div class="table-list-box">
+            <div class="table-list-box m-t-[8px!important]">
               <div class="flex-justify-between">
                 <h4 class="table-box-title">{{ t('common.allSituation') }}</h4>
                 <div class="header-operate-buttons">
@@ -132,7 +132,7 @@
                 </el-table-column>
               </el-table>
 
-              <el-button v-if="!isView" style="width: 100%" class="svg-button-hover-color m-t-24" @click="handleAddRow" id="auth-role-path">
+              <el-button v-if="!isView" style="width: 100%" class="svg-button-hover-color m-t-[8px]" @click="handleAddRow" id="auth-role-path">
                 <i-custom-add class="m-r-4" />
                 {{ t('auth.addPath') }}
               </el-button>
@@ -140,7 +140,7 @@
           </el-scrollbar>
         </el-main>
 
-        <el-footer v-if="!isView">
+        <el-footer v-if="!isView" style="height: 36px">
           <div class="operate-buttons">
             <el-button @click="handleReset('edit')" id="auth-role-reset">{{ t('common.reset') }}</el-button>
             <el-button type="primary" @click="handleSave" :loading="saveLoading" id="auth-role-save">{{ t('common.apply') }}</el-button>
@@ -489,11 +489,11 @@ watch(
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #dfe1ed;
-  padding: 0 16px;
+  padding: 0 8px;
   box-sizing: border-box;
 
   .detail-title-text {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 21px;
     color: #495ad4;
@@ -516,12 +516,12 @@ watch(
 }
 
 .table-list-box {
-  margin: 32px 16px 0;
+  margin: 0 8px;
   background-color: #f7f8fc;
-  padding: 8px 16px 16px;
+  padding: 8px;
 
   .table-box-title {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 21px;
     color: #495ad4;
@@ -548,12 +548,12 @@ watch(
 
 .operate-buttons {
   text-align: right;
-  margin-top: 24px;
+  margin-top: 0;
 }
 
 .detail-user-list {
-  margin: 12px 16px;
-  font-size: 14px;
+  margin: 8px;
+  font-size: 12px;
   color: #131926;
   display: flex;
   align-items: center;

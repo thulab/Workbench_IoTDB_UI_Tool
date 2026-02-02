@@ -69,7 +69,7 @@
                   :limit="1"
                   :auto-upload="false"
                   :show-file-list="true"
-                  class="m-l-[0] m-r-[8px] el-input el-input__wrapper"
+                  class="el-input el-input__wrapper m-l-[0] m-r-[8px]"
                   :on-change="handleUploadChange"
                   :on-remove="handleUploadRemove"
                   :http-request="customUpload"
@@ -424,7 +424,7 @@ watch(locale, () => {
   display: flex;
   align-items: center;
   min-width: 1440px;
-  min-height: 640px;
+  min-height: 700px;
 }
 
 .login-side-img {
@@ -540,7 +540,7 @@ watch(locale, () => {
   width: 100%;
   border-radius: 4px;
   height: 36px !important;
-  font-size: 14px !important;
+  font-size: 12px !important;
 }
 
 .right-text {

@@ -13,32 +13,34 @@
     </div>
   </div>
 
-  <auth-container :is-auth="canManageRole" class="role-list-box" :content="'common.roleAuth'" style="height: calc(100% - 70px)">
-    <ul class="list-box" v-loading="loading">
-      <template v-if="list.length">
-        <li v-for="(item, i) in list" :key="item" :class="['item-box', current === item ? 'item-box-active' : '']" :id="`auth-role-${i}`" @click="(e) => handleSelect(item, e)">
-          <span class="item-text"><text-tooltip :content="item" /></span>
-          <popconfirm
-            :confirm-button-text="t('common.confirm')"
-            :cancel-button-text="t('common.cancel')"
-            :title="t('auth.deleteRoleTip')"
-            :icon="ICustomError"
-            width="300"
-            :cancel-button-id="`auth-role-${i}-del-cancel`"
-            :confirm-button-id="`auth-role-${i}-del-confirm`"
-            @confirm="handleDelete(item)"
-          >
-            <template #reference>
-              <div class="item-delete-box" :id="`auth-role-${i}-del`">
-                <i-custom-delete class="item-delete" />
-                <i-custom-delete-active class="item-delete-active" />
-              </div>
-            </template>
-          </popconfirm>
-        </li>
-      </template>
-      <li v-else class="item-box-empty">{{ t('auth.noRole') }}</li>
-    </ul>
+  <auth-container :is-auth="canManageRole" class="role-list-box" :content="'common.roleAuth'">
+    <el-scrollbar class="list-box">
+      <ul v-loading="loading">
+        <template v-if="list.length">
+          <li v-for="(item, i) in list" :key="item" :class="['item-box', current === item ? 'item-box-active' : '']" :id="`auth-role-${i}`" @click="(e) => handleSelect(item, e)">
+            <span class="item-text"><text-tooltip :content="item" /></span>
+            <popconfirm
+              :confirm-button-text="t('common.confirm')"
+              :cancel-button-text="t('common.cancel')"
+              :title="t('auth.deleteRoleTip')"
+              :icon="ICustomError"
+              width="300"
+              :cancel-button-id="`auth-role-${i}-del-cancel`"
+              :confirm-button-id="`auth-role-${i}-del-confirm`"
+              @confirm="handleDelete(item)"
+            >
+              <template #reference>
+                <div class="item-delete-box" :id="`auth-role-${i}-del`">
+                  <i-custom-delete class="item-delete" />
+                  <i-custom-delete-active class="item-delete-active" />
+                </div>
+              </template>
+            </popconfirm>
+          </li>
+        </template>
+        <li v-else class="item-box-empty">{{ t('auth.noRole') }}</li>
+      </ul>
+    </el-scrollbar>
   </auth-container>
 
   <modal-role v-model:visible="dialogVisible" :list="list" @handle-save="(name) => getList(name)" />
@@ -145,10 +147,10 @@ defineExpose({ getList });
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 16px 26px;
+  padding: 8px;
 
   h4 {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 20px;
     color: #495ad4;
@@ -173,19 +175,18 @@ defineExpose({ getList });
 }
 
 .list-box {
-  height: calc(100% - 70px);
-  overflow-y: auto;
+  height: calc(100% - 44px);
 }
 
 .item-box {
   width: 100%;
-  height: 36px;
+  height: 30px;
   display: flex;
   align-items: center;
   font-size: 12px;
   font-weight: 300;
   color: #131926;
-  padding-left: 16px;
+  padding-left: 8px;
   box-sizing: border-box;
   cursor: pointer;
   position: relative;
@@ -198,7 +199,7 @@ defineExpose({ getList });
 
   .item-delete-box {
     position: absolute;
-    top: 10px;
+    top: 8px;
     right: 4px;
     display: none;
 

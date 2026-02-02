@@ -143,10 +143,10 @@ defineExpose({ getList });
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 16px 26px;
+  padding: 8px;
 
   h4 {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 20px;
     color: #495ad4;
@@ -177,13 +177,13 @@ defineExpose({ getList });
 
 .item-box {
   width: 100%;
-  height: 36px;
+  height: 30px;
   display: flex;
   align-items: center;
   font-size: 12px;
   font-weight: 300;
   color: #131926;
-  padding-left: 16px;
+  padding-left: 8px;
   box-sizing: border-box;
   cursor: pointer;
   position: relative;
@@ -196,7 +196,7 @@ defineExpose({ getList });
 
   .item-delete-box {
     position: absolute;
-    top: 10px;
+    top: 8px;
     right: 4px;
     display: none;
 

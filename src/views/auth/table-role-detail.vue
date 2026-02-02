@@ -1,9 +1,12 @@
 <template>
   <version-container :is-show="showAuthMenu">
     <el-container>
-      <el-aside :width="sideWidth + 'px'" class="role-list-wrapper" style="position: relative">
+      <el-aside :width="sideWidth + 'px'" class="role-list-wrapper overflow-hidden" style="position: relative">
         <role-list :can-manage-role="canManageRole" @handleSelect="(val) => (currentRole = val)" />
-        <div style="height: 100%; width: 4px; background-color: transparent; position: absolute; top: 0; right: -2px; cursor: ew-resize" @pointerdown="(e) => onSliderPointerDown(e)"></div>
+        <div
+          style="height: 100%; width: 4px; background-color: transparent; position: absolute; top: 0; right: 0; transform: translateX(2px); cursor: ew-resize"
+          @pointerdown="(e) => onSliderPointerDown(e)"
+        ></div>
       </el-aside>
       <el-container class="role-details-wrapper">
         <el-main class="p-0" v-loading="loading">
@@ -47,7 +50,7 @@
               </el-tooltip>
             </div>
             <div class="detail-user-list">
-              <span class="fs-[14px] m-r-[24px]">{{ t('auth.relational.allScope') }}：</span>
+              <span class="fs-[12px] m-r-[24px]">{{ t('auth.relational.allScope') }}：</span>
               <template v-if="!canManageRole">
                 <span class="flex items-center !m-r-[24px]">
                   <!-- <i-custom-correct class="m-r-8" /> -->
@@ -64,7 +67,7 @@
               <el-checkbox :disabled="!canManageRole" v-else v-model="formData.canManageRole" @change="handleAllScopeChange('MANAGE_ROLE')">{{ t('auth.relational.MANAGE_ROLE') }}</el-checkbox>
             </div>
             <div class="detail-user-list">
-              <span class="fs-[14px]">{{ t('auth.relational.dataScope') }}：</span>
+              <span class="fs-[12px]">{{ t('auth.relational.dataScope') }}：</span>
             </div>
             <div class="table-list-box">
               <el-table :data="tableData" style="width: 100%" v-loading="anyLoading" tooltip-effect="light" border :tooltip-options="{ popperClass: 'table-tooltip-max-width' }">
@@ -83,8 +86,10 @@
                     :width="calcColumnWidth(col)"
                   >
                     <template #default="{ row }">
-                      <i-custom-with-grant style="transform: translateY(3px)" v-if="row.grantedPrivileges.includes(col)" />
-                      <i-custom-correct style="transform: translateY(3px)" v-else-if="row.privileges.includes(col)" />
+                      <span class="flex items-center justify-center">
+                        <i-custom-with-grant style="transform: translateY(3px)" v-if="row.grantedPrivileges.includes(col)" />
+                        <i-custom-correct style="transform: translateY(3px)" v-else-if="row.privileges.includes(col)" />
+                      </span>
                     </template>
                   </el-table-column>
                 </el-table-column>
@@ -100,7 +105,7 @@
                 </el-table-column>
               </el-table>
 
-              <el-button v-if="canManageRole" style="width: 100%" class="svg-button-hover-color m-t-24" @click="handleAddRow" id="auth-role-path">
+              <el-button v-if="canManageRole" style="width: 100%" class="svg-button-hover-color m-t-[8px]" @click="handleAddRow" id="auth-role-path">
                 <i-custom-add class="m-r-4" />
                 {{ t('auth.relational.addScope') }}
               </el-button>
@@ -419,7 +424,7 @@ watch(
   box-sizing: border-box;
 
   .detail-title-text {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 21px;
     color: #495ad4;
@@ -442,12 +447,12 @@ watch(
 }
 
 .table-list-box {
-  margin: 4px 8px;
+  margin: 0 8px;
   background-color: #f7f8fc;
   padding: 8px;
 
   .table-box-title {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 21px;
     color: #495ad4;
@@ -478,8 +483,8 @@ watch(
 }
 
 .detail-user-list {
-  margin: 12px 8px;
-  font-size: 14px;
+  margin: 8px;
+  font-size: 12px;
   color: #131926;
   display: flex;
   line-height: 28px;

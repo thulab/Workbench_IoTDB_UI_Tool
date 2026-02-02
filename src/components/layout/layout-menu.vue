@@ -34,7 +34,7 @@
         <layout-menu-sub-item :menu-list="menuList" :show-auth-menu="true" />
       </el-menu>
     </el-scrollbar>
-    <div class="p-[16px] text-center" v-if="!isCollapse">
+    <div class="p-[8px] text-center" v-if="!isCollapse">
       <!-- 固定在底部 -->
       <span class="logo-version">{{ t('common.versionTips') }}</span>
     </div>

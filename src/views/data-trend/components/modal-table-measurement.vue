@@ -1,18 +1,18 @@
 <!-- 表模型测点选择弹窗 -->
 <template>
   <el-dialog v-model="dialogVisible" :title="t('measurement.measurementChoose')" width="630px" :before-close="handleClose" :close-on-click-modal="false" :close-on-press-escape="false" draggable>
-    <div class="flex gap-1 modal-table-measurement-container">
-      <el-scrollbar max-height="450" class="pt-[6px]">
+    <div class="modal-table-measurement-container flex gap-1">
+      <el-scrollbar max-height="450">
         <!-- 左侧测点选择区域 -->
         <div class="flex-2 flex flex-col">
-          <el-form :model="formData" :rules="formRules" ref="formRef" label-position="left" label-width="80px">
+          <el-form :model="formData" :rules="formRules" ref="formRef" label-position="left">
             <!-- 标签键值对输入 -->
             <el-form-item :label="`${t('measurement.device')}：`" required props="selectedTags" class="device-form-item">
               <div class="device-filter-container">
                 <div class="device-filter-inputs">
                   <el-scrollbar max-height="80" class="device-filter-scroll">
-                    <div v-for="(tag, index) in tagFilters" :key="index" class="device-filter-row flex items-center flex-1">
-                      <el-select v-model="tag.variable" :disabled="!availableTags.length" :placeholder="t('common.selectPlaceholder')" class="w-[140px] flex-shrink-0">
+                    <div v-for="(tag, index) in tagFilters" :key="index" class="device-filter-row flex flex-1 items-center">
+                      <el-select v-model="tag.variable" :disabled="!availableTags.length" :placeholder="t('common.selectPlaceholder')" class="flex-shrink-0 w-[140px]">
                         <el-option
                           v-for="option in availableTags"
                           :disabled="!canChoice(option, index)"
@@ -44,54 +44,53 @@
                   </el-button>
                 </div>
               </div>
+              <!-- 第三行：设备表格 -->
+              <el-table
+                border
+                ref="deviceTableRef"
+                class="device-table m-t-[8px]"
+                :data="deviceTableData"
+                style="width: 100%"
+                :height="260"
+                :max-height="260"
+                v-loading="searchLoading"
+                tooltip-effect="light"
+                :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
+                @selection-change="handleDeviceSelection"
+                @scroll="handleScroll"
+              >
+                <el-table-column fixed="left" type="selection" width="50" v-if="deviceColumns.length" max-width="50" align="center" />
+                <el-table-column
+                  :key="item.prop"
+                  :prop="item.prop"
+                  v-for="item of deviceColumns"
+                  min-width="180px"
+                  :width="`${item.width}px`"
+                  :align="item.align"
+                  :fixed="item.fixed"
+                  :sortable="item.sortable"
+                  :sort-orders="['ascending', 'descending']"
+                  show-overflow-tooltip
+                >
+                  <template #header>
+                    <span :class="item.sortable ? '' : 'flex-header'"><text-tooltip :content="item.label" /></span>
+                  </template>
+                  <template #default="scope">
+                    <span>{{ scope.row[item.prop] ? scope.row[item.prop] : '-' }}</span>
+                  </template>
+                </el-table-column>
+                <slot name="append-column"></slot>
+                <template #empty>
+                  <div class="table-empty-wrapper">
+                    <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
+                    <span class="data-empty-text">{{ t('common.noData') }}</span>
+                  </div>
+                </template>
+              </el-table>
             </el-form-item>
 
-            <!-- 第三行：设备表格 -->
-            <el-table
-              border
-              ref="deviceTableRef"
-              class="device-table"
-              :data="deviceTableData"
-              style="width: 100%"
-              :height="260"
-              :max-height="260"
-              v-loading="searchLoading"
-              tooltip-effect="light"
-              :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
-              @selection-change="handleDeviceSelection"
-              @scroll="handleScroll"
-            >
-              <el-table-column fixed="left" type="selection" width="50" v-if="deviceColumns.length" max-width="50" align="center" />
-              <el-table-column
-                :key="item.prop"
-                :prop="item.prop"
-                v-for="item of deviceColumns"
-                min-width="180px"
-                :width="`${item.width}px`"
-                :align="item.align"
-                :fixed="item.fixed"
-                :sortable="item.sortable"
-                :sort-orders="['ascending', 'descending']"
-                show-overflow-tooltip
-              >
-                <template #header>
-                  <span :class="item.sortable ? '' : 'flex-header'"><text-tooltip :content="item.label" /></span>
-                </template>
-                <template #default="scope">
-                  <span>{{ scope.row[item.prop] ? scope.row[item.prop] : '-' }}</span>
-                </template>
-              </el-table-column>
-              <slot name="append-column"></slot>
-              <template #empty>
-                <div class="table-empty-wrapper">
-                  <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
-                  <span class="data-empty-text">{{ t('common.noData') }}</span>
-                </div>
-              </template>
-            </el-table>
-
             <!-- 第四行：测点选择 -->
-            <el-form-item prop="selectedMeasurement" class="m-t-[16px]" :label="`${t('measurement.measurement')}：`">
+            <el-form-item prop="selectedMeasurement" class="m-t-[8px]" :label="`${t('measurement.measurement')}：`">
               <el-select
                 v-model="formData.selectedMeasurement"
                 :placeholder="t('aiAnalysis.chooseMeasurement')"
@@ -100,7 +99,7 @@
                 multiple
                 :collapse-tags="true"
                 :multiple-limit="props.selectedLimit"
-                class="w-full search-select"
+                class="search-select w-full"
               >
                 <template #prefix>
                   <i-custom-search-icon class="remote-select-search-icon" />
@@ -120,7 +119,7 @@
     </div>
 
     <template #footer>
-      <div class="flex justify-end gap-3">
+      <div class="flex gap-3 justify-end">
         <el-button @click="handleClear">{{ t('common.clear') }}</el-button>
         <el-button @click="handleClose">{{ t('common.cancel') }}</el-button>
         <el-button type="primary" @click="handleConfirm" :disabled="!canAdd">{{ t('common.confirm') }}</el-button>
@@ -449,7 +448,6 @@ watch(
 }
 
 .modal-table-measurement-container {
-  min-height: 380px;
   justify-content: space-evenly;
 
   .device-form-item {

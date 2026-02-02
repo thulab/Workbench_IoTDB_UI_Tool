@@ -305,9 +305,9 @@ watch(
     }
   }
 
-  .operate-buttons {
-    margin-bottom: -24px;
-  }
+  // .operate-buttons {
+  //    margin-bottom: -24px;
+  //  }
 }
 
 .upload-file-list-wrapper {
