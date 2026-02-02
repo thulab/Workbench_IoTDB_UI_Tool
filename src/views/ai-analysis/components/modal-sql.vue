@@ -19,6 +19,7 @@
         :style="{
           height: `410px`,
           backgroundColor: '#F7F8FC',
+          marginBottom: '8px',
         }"
         ref="codeEditorRef"
       />

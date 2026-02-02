@@ -2,7 +2,7 @@
   <coming-soon-container :is-show="locale !== 'en'">
     <active-container :is-show="connectionIsActive">
       <el-container class="visualization-wrapper">
-        <el-header class="p-[8px]" style="height: auto">
+        <el-header class="p-[8px] p-b-0" style="height: auto">
           <div style="margin-bottom: 2px">
             <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
               <div class="flex" style="height: 36px">
@@ -51,19 +51,13 @@
                   </el-button>
                 </el-tooltip>
               </div>
-              <div class="search-form-row-box">
+              <div class="search-form-row-box"></div>
+
+              <div class="search-form-wrapper flex items-center justify-center">
                 <div v-if="searchFormData.type !== 2">
                   <template v-if="connectionStore.isTableModel">
                     <base-form-item prop="database" style="margin-bottom: 16px" :label="`${t('measurement.measurementChoose')}：`" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
                       <el-button type="primary" @click="handleSelectMeasurement">{{ t('tableMeasurement.measurementSelect') }}</el-button>
-                      <!-- <span v-if="searchFormData.database" class="m-l-[24px]">
-                          {{ t('measurement.databaseTitle') }}：
-                          <span class="c-[#656A85]">{{ searchFormData.database }}</span>
-                        </span>
-                        <span v-if="searchFormData.table" class="m-l-[24px]">
-                          {{ t('dataManage.table') }}：
-                          <span class="c-[#656A85]">{{ searchFormData.table }}</span>
-                        </span> -->
                     </base-form-item>
                   </template>
                   <template v-else>
@@ -88,61 +82,59 @@
                       />
                     </base-form-item>
                   </template>
-                  <div class="search-form-wrapper">
-                    <div class="flex-1">
-                      <template v-if="searchFormData.type === 0">
-                        <base-form-item :label="`${t('aiAnalysis.forecastStart')}：`" :rules="requiredRules">
-                          <el-date-picker v-model="searchFormData.forecastStart" type="datetime" :prefix-icon="ICustomCalender" id="search-datetime" :clearable="false" style="width: 164px" />
-                        </base-form-item>
-                        <base-form-item :label="`${t('aiAnalysis.forecastData')}：`">
-                          <span style="font-size: 12px; color: #131926; font-weight: 300">{{ t('aiAnalysis.forecast96') }}</span>
-                        </base-form-item>
-                      </template>
-                      <template v-else-if="searchFormData.type === 1">
-                        <base-form-item :label="`${t('aiAnalysis.detectionTime')}：`" prop="datetimerange" :rules="requiredRules">
-                          <el-date-picker
-                            v-model="searchFormData.datetimerange"
-                            type="datetimerange"
-                            range-separator="-"
-                            unlink-panels
-                            :disabled-date="disabledDate"
-                            :shortcuts="shortcutsDaterange"
-                            :clearable="false"
-                            :prefix-icon="ICustomCalender"
-                            :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
-                            id="search-datetimerange"
-                          />
-                        </base-form-item>
-                        <base-form-item :label="`${t('aiAnalysis.anomalyRatio')}：`" v-if="searchFormData.method === '_Stray'" class="m-r-0">
-                          <template #label>
-                            {{ t('aiAnalysis.anomalyRatio') }}：
-                            <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
-                              <template #content>
-                                {{ t('aiAnalysis.anomalyRatioTip') }}
-                              </template>
-                              <i-custom-question />
-                            </el-tooltip>
+                </div>
+                <div class="flex-1">
+                  <template v-if="searchFormData.type === 0">
+                    <base-form-item :label="`${t('aiAnalysis.forecastStart')}：`" :rules="requiredRules">
+                      <el-date-picker v-model="searchFormData.forecastStart" type="datetime" :prefix-icon="ICustomCalender" id="search-datetime" :clearable="false" style="width: 164px" />
+                    </base-form-item>
+                    <base-form-item :label="`${t('aiAnalysis.forecastData')}：`">
+                      <span style="font-size: 12px; color: #131926; font-weight: 300">{{ t('aiAnalysis.forecast96') }}</span>
+                    </base-form-item>
+                  </template>
+                  <template v-else-if="searchFormData.type === 1">
+                    <base-form-item :label="`${t('aiAnalysis.detectionTime')}：`" prop="datetimerange" :rules="requiredRules">
+                      <el-date-picker
+                        v-model="searchFormData.datetimerange"
+                        type="datetimerange"
+                        range-separator="-"
+                        unlink-panels
+                        :disabled-date="disabledDate"
+                        :shortcuts="shortcutsDaterange"
+                        :clearable="false"
+                        :prefix-icon="ICustomCalender"
+                        :default-time="[new Date(2024, 3, 28, 0, 0, 0), new Date(2024, 3, 28, 23, 59, 59)]"
+                        id="search-datetimerange"
+                      />
+                    </base-form-item>
+                    <base-form-item :label="`${t('aiAnalysis.anomalyRatio')}：`" v-if="searchFormData.method === '_Stray'" class="m-r-0">
+                      <template #label>
+                        {{ t('aiAnalysis.anomalyRatio') }}：
+                        <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
+                          <template #content>
+                            {{ t('aiAnalysis.anomalyRatioTip') }}
                           </template>
-                          <el-input-number v-model="searchFormData.anomalyRatio" :min="1" :max="99" :controls="false" :placeholder="t('aiAnalysis.pleaseInputPercent')" style="width: 104px" />
-                          %
-                        </base-form-item>
+                          <i-custom-question />
+                        </el-tooltip>
                       </template>
-                      <div v-else>
-                        <base-form-item label="SQL：" prop="sql" class="el-form-item-not-mandatory">
-                          <el-button type="primary" :disabled="!enableAINode" link id="search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
-                        </base-form-item>
-                      </div>
-                    </div>
-
-                    <div class="search-form-buttons">
-                      <el-button @click="handleReset" :disabled="!enableAINode" id="search-reset">{{ t('common.reset') }}</el-button>
-                      <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="canQuery" popper-class="tooltip-box-width">
-                        <el-button :disabled="!canQuery" type="primary" @click="handleSearch()" id="search-search">
-                          {{ t('common.query') }}
-                        </el-button>
-                      </el-tooltip>
-                    </div>
+                      <el-input-number v-model="searchFormData.anomalyRatio" :min="1" :max="99" :controls="false" :placeholder="t('aiAnalysis.pleaseInputPercent')" style="width: 104px" />
+                      %
+                    </base-form-item>
+                  </template>
+                  <div v-else>
+                    <base-form-item label="SQL：" prop="sql" class="el-form-item-not-mandatory">
+                      <el-button type="primary" :disabled="!enableAINode" link id="search-sql" style="text-decoration: underline" @click="handleSql">{{ t('search.sqlInput') }}</el-button>
+                    </base-form-item>
                   </div>
+                </div>
+
+                <div class="search-form-buttons">
+                  <el-button @click="handleReset" :disabled="!enableAINode" id="search-reset">{{ t('common.reset') }}</el-button>
+                  <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="canQuery" popper-class="tooltip-box-width">
+                    <el-button :disabled="!canQuery" type="primary" @click="handleSearch()" id="search-search">
+                      {{ t('common.query') }}
+                    </el-button>
+                  </el-tooltip>
                 </div>
               </div>
             </el-form>
@@ -155,7 +147,7 @@
             style="height: 100%; width: 100%"
           >
             <el-main class="p-0 position-relative" style="height: 100%">
-              <el-container class="p-x-16 position-absolute" style="height: 100%; width: 100%; z-index: 1000" v-if="searchFormData.type === 2">
+              <el-container class="p-x-[8px] position-absolute" style="height: 100%; width: 100%; z-index: 1000" v-if="searchFormData.type === 2">
                 <el-main class="page-table-details">
                   <div class="page-info-box">
                     <span></span>
@@ -190,32 +182,6 @@
                 </el-main>
               </el-container>
               <el-container class="p-0 position-absolute" style="height: 100%; width: 100%" :style="{ opacity: searchFormData.type === 2 ? 0 : 1 }">
-                <!--
-              <el-header class="p-0">
-                <h4 class="info-title">
-                  <span v-if="searchFormData.type !== 2">
-                    <span class="m-r-4">{{ searchFormData.measurement }}</span>
-                    {{ t('aiAnalysis.forecastResult') }}
-                  </span>
-                  <span v-else></span>
-                  <div class="search-form-buttons p-r-8">
-                    <el-dropdown class="more-icon m-l-12" :disabled="!canReadWriteData || !canQuery" @command="(val) => handleCommandDown(val)" id="visualization-save-dropdown">
-                      <el-button :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" id="visualization-download" :disabled="!canReadWriteData">
-                        {{ searchFormData.type === 0 ? t('common.save') : t('common.export') }}
-                        <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
-                      </el-button>
-                      <template #dropdown>
-                        <el-dropdown-menu>
-                          <el-dropdown-item command="csv" id="visualization-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
-                          <el-dropdown-item command="xlsx" id="visualization-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
-                          <el-dropdown-item v-if="searchFormData.type === 0" command="saveToIoTDB" id="visualization-saveToIoTDB">{{ t('aiAnalysis.saveToIoTDB') }}</el-dropdown-item>
-                        </el-dropdown-menu>
-                      </template>
-                    </el-dropdown>
-                  </div>
-                </h4>
-              </el-header>
-              -->
                 <el-main class="chart-detail-wrapper">
                   <el-container style="height: 100%">
                     <el-main class="p-0" style="position: relative">
@@ -223,7 +189,7 @@
                     </el-main>
                     <el-aside
                       width="352px"
-                      class="m-l-16 p-x-16 p-t-8 position-relative"
+                      class="m-l-[8px] p-x-[8px] p-t-[8px] position-relative"
                       style="display: flex; flex-direction: column; background-color: #f7f8fc; padding-bottom: 10px !important; overflow: hidden"
                     >
                       <div class="p-b-4 flex-justify-between">
@@ -269,16 +235,8 @@
                       </el-dropdown>
 
                       <el-table border height="100%" :data="paginatedData" @sort-change="handleSortChange" :cell-style="handleCellStyle">
-                        <el-table-column
-                          prop="time"
-                          :label="t('aiAnalysis.time')"
-                          sortable="custom"
-                          :sort-orders="['ascending', 'descending']"
-                          :formatter="formatterTime"
-                          show-overflow-tooltip
-                          width="170"
-                        />
-                        <el-table-column prop="value" v-if="copySearchFormData.type === 1" :label="copySearchFormData.measurement" show-overflow-tooltip width="150">
+                        <el-table-column prop="time" :label="t('aiAnalysis.time')" sortable="custom" :sort-orders="['ascending', 'descending']" :formatter="formatterTime" show-overflow-tooltip />
+                        <el-table-column prop="value" v-if="copySearchFormData.type === 1" :label="copySearchFormData.measurement" show-overflow-tooltip>
                           <template #header="{ column }">
                             <span class="flex-header"><text-tooltip :content="column.label" /></span>
                           </template>
@@ -288,7 +246,7 @@
                           </template>
                         </el-table-column>
                         <template v-else>
-                          <el-table-column prop="value" v-for="item in copySearchFormData.method" :key="item" :label="item + t('aiAnalysis.forecastValue')" show-overflow-tooltip width="100">
+                          <el-table-column prop="value" v-for="item in copySearchFormData.method" :key="item" :label="item + t('aiAnalysis.forecastValue')" show-overflow-tooltip>
                             <template #header="{ column }">
                               <span class="flex-header"><text-tooltip :content="column.label" /></span>
                             </template>
@@ -702,13 +660,13 @@ const chartOptions = computed<ECOption>(
         backgroundColor: '#fff',
         formatter: (params: Array<Record<string, any>>) => {
           const paramsData = params;
-          const x = `<div style="margin: 10px 0 0;"><span style="font-size:14px;color:#666;font-weight:900;"></span><span style="font-size:14px;color:#666;font-weight:400;">${formatDate(paramsData[0]!.value[0])}</span></div>`;
+          const x = `<div style="margin: 10px 0 0;"><span style="font-size:12px;color:#666;font-weight:900;"></span><span style="font-size:12px;color:#666;font-weight:400;">${formatDate(paramsData[0]!.value[0])}</span></div>`;
           let circle = '';
           paramsData.forEach((item) => {
             if (copySearchFormData.type === 1) {
-              circle += `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${item.value[1]}</span></div>`;
+              circle += `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${item.color}"></span><span style="font-size:12px;color:#666;font-weight:400;line-height:1;">${item.value[1]}</span></div>`;
             } else {
-              circle += `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${item.color}"></span><span style="font-size:14px;color:#666;font-weight:400;margin-left:2px">${item.seriesName}: </span><span style="font-size:14px;color:#666;font-weight:400;line-height:1;">${parseFloat(Number(item.value[1]).toFixed(4))}</span></div>`;
+              circle += `<div><span style="display:inline-block;margin-right:10px;border-radius:10px;width:10px;height:10px;background-color: ${item.color}"></span><span style="font-size:12px;color:#666;font-weight:400;margin-left:2px">${item.seriesName}: </span><span style="font-size:12px;color:#666;font-weight:400;line-height:1;">${parseFloat(Number(item.value[1]).toFixed(4))}</span></div>`;
             }
           });
           return `${x}${circle}`;
@@ -1366,7 +1324,8 @@ watch(
   margin-left: 12px;
   display: inline-flex;
   flex-wrap: nowrap;
-  align-self: end;
+  align-self: center;
+  margin-bottom: 0;
 }
 
 .search-method-params-box {
@@ -1378,7 +1337,7 @@ watch(
 
   .params-title {
     margin: 0 24px 0 12px;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 400;
     line-height: 21px;
     color: #495ad4;
@@ -1413,7 +1372,7 @@ watch(
 
 .chart-detail-wrapper {
   width: 100%;
-  padding: 8px 16px 0 30px;
+  padding: 0 8px 8px;
 }
 
 .chart-container {
@@ -1515,7 +1474,7 @@ watch(
 
   :deep(.el-tabs__header) {
     margin: 0;
-    font-size: 14px;
+    font-size: 12px;
     line-height: 21px;
     font-weight: 400;
   }
@@ -1559,11 +1518,11 @@ watch(
 }
 
 .collapse-title {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
   line-height: 17px;
   color: #495ad4;
-  margin: 14px 5px 0;
+  margin: 12px 5px 0;
 }
 
 .trend-tip {
@@ -1576,19 +1535,8 @@ watch(
   font-weight: 300;
 }
 
-.info-title {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 21px;
-  color: #495ad4;
-  padding: 0 10px 6px 30px;
-  border-bottom: 1px solid #dfe1ed;
-}
-
 .detail-pager {
-  padding-top: 14px;
+  padding-top: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1608,7 +1556,7 @@ watch(
 .filter-btn {
   position: absolute;
   z-index: 2;
-  right: 14px;
+  right: 12px;
   top: 46px;
 }
 
@@ -1619,10 +1567,11 @@ watch(
   display: flex;
   flex: 1;
   flex-direction: column;
+  margin-bottom: 8px;
 
   .page-info-title {
     display: flex;
-    font-size: 14px;
+    font-size: 12px;
     line-height: 20px;
     color: #495ad4;
 
@@ -1646,7 +1595,7 @@ watch(
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 }
 

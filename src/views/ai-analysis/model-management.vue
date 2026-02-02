@@ -2,7 +2,7 @@
   <coming-soon-container :is-show="locale !== 'en'">
     <active-container :is-show="connectionIsActiveBoolean">
       <el-container class="model-management-wrapper">
-        <el-header class="search-form-wrapper p-[8px]" style="height: 44px">
+        <el-header class="search-form-wrapper p-[8px] p-b-0" style="height: 44px">
           <el-form :model="searchFormData" label-position="left" size="default" inline @submit.prevent>
             <base-form-item :label="`${t('aiAnalysis.modelName')}：`" style="margin-bottom: 0 !important" prop="name">
               <el-input v-model="searchFormData.name" :placeholder="t('aiAnalysis.modelNamePlaceholder')" @keyup.enter="handleSearch" id="model-management-search-name" style="width: 200px">
@@ -21,7 +21,7 @@
             </auth-tooltip>
           </div>
         </el-header>
-        <el-main class="p-0">
+        <el-main class="p-[8px]">
           <div class="page-table-details">
             <div class="page-table-title-box">
               <h4 class="page-table-title">{{ t('aiAnalysis.modelList') }}</h4>
@@ -129,7 +129,7 @@
                     v-if="totalCount > 0"
                     v-model:currentPage="pagination.pageNum"
                     v-model:page-size="pagination.pageSize"
-                    class="m-t-20"
+                    class="m-t-[8px]"
                     layout="prev, pager, next, sizes, jumper"
                     background
                     :page-sizes="[10, 20, 50, 100]"
@@ -186,7 +186,7 @@ const pagination = reactive({
   pageSize: 10,
   pageNum: 1,
 });
-const { maxTableHeight } = useTableHeight(200);
+const { maxTableHeight } = useTableHeight(204);
 const tableData = ref<Model[]>([]);
 const totalCount = ref(0);
 const multipleSelection = ref<Model[]>([]);
@@ -335,10 +335,10 @@ watch(
 }
 
 .page-table-details {
-  padding: 8px 8px 10px;
-  height: 100%;
+  padding: 8px;
   box-sizing: border-box;
   display: flex;
+  flex: 1;
   flex-direction: column;
 }
 
@@ -346,10 +346,10 @@ watch(
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 0 0 12px;
+  margin: 0 0 8px;
 
   .page-table-title {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 21px;
     color: #495ad4;
