@@ -53,7 +53,7 @@ function onSliderPointerDown(event: PointerEvent) {
 
   function onPointerMove(e: PointerEvent) {
     const deltaX = e.clientX - startX;
-    const newWidth = Math.min(Math.max(200, startWidth + deltaX), 600);
+    const newWidth = Math.min(Math.max(200, startWidth + deltaX), 310);
     sideTreeWidth.value = newWidth;
   }
 

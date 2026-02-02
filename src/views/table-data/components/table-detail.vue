@@ -135,12 +135,12 @@
       </div>
     </div>
 
-    <div class="storage-table-box">
+    <div class="storage-table-box flex-1">
       <el-table
+        class="storage-table"
         :data="tableDataPagination"
         style="width: 100%"
-        :height="maxTableHeight"
-        :max-height="maxTableHeight"
+        :height="'calc(100% - 8px)'"
         tooltip-effect="light"
         ref="tableRef"
         :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
@@ -256,7 +256,7 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import { useTableHeight } from '@/composition-api';
+// import { useTableHeight } from '@/composition-api';
 import { IoTDBApi } from '@/api';
 import { useDbStore, useUserStore, useConnectionStore } from '@/stores';
 import SqlPreview from '@/components/sql-preview.vue';
@@ -275,7 +275,7 @@ const { t, locale } = useI18n();
 const route = useRoute();
 const searchKeyword = ref((route.query.databaseSearch as string) || '');
 const searchType = ref('columnName');
-const { maxTableHeight } = useTableHeight(335);
+// const { maxTableHeight } = useTableHeight(312);
 const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
 const columnsSelection = ref<TableTreeNodeData[]>([]);
 const { requestFn: deleteColumns } = useRequest(IoTDBApi.deleteColumns);
@@ -510,12 +510,12 @@ defineExpose({
 .database-detail-wrapper {
   display: flex;
   flex-direction: column;
-  height: calc(100% - 32px);
+  height: 100%;
   padding: 8px;
 }
 
 .info-title {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 21px;
   color: #495ad4;
@@ -558,7 +558,7 @@ defineExpose({
 .search-form-container {
   display: flex;
   justify-content: space-between;
-  padding: 16px 0;
+  padding-bottom: 8px;
 
   .search-form-box {
     display: flex;
@@ -573,7 +573,7 @@ defineExpose({
 }
 
 .storage-table-box {
-  padding: 8px;
+  padding: 8px 8px 0;
   background-color: #f7f8fc;
 }
 
@@ -620,5 +620,9 @@ defineExpose({
   .el-pagination {
     padding: 4px 5px 0;
   }
+}
+
+.storage-table :deep(th.el-table__cell) {
+  font-size: 12px;
 }
 </style>

@@ -137,12 +137,12 @@
       </div>
     </div>
 
-    <div class="storage-table-box">
+    <div class="storage-table-box flex-1">
       <el-table
+        class="storage-table"
         :data="tableDataPagination"
         style="width: 100%"
-        :height="maxTableHeight"
-        :max-height="maxTableHeight"
+        :height="'calc(100% - 8px)'"
         tooltip-effect="light"
         ref="tableRef"
         :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
@@ -245,7 +245,7 @@
 import { useRoute } from 'vue-router';
 import { IoTDBApi } from '@/api';
 import { storeToRefs } from 'pinia';
-import { useTableHeight } from '@/composition-api';
+// import { useTableHeight } from '@/composition-api';
 import { useDbStore, useUserStore, useConnectionStore } from '@/stores';
 import SqlPreview from '@/components/sql-preview.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
@@ -271,7 +271,6 @@ const searchKeyword = ref((route.query.databaseSearch as string) || '');
 const databaseInfos = ref<TableDatabaseInfo | null>(null);
 const searchType = ref('tableName');
 const searchPlaceholder = computed(() => (searchType.value === 'tableName' ? t('dataManage.tableNamePlaceholder') : t('dataManage.commentPlaceholder')));
-const { maxTableHeight } = useTableHeight(340);
 const modalTtlVisible = ref(false);
 const modalCommentVisible = ref(false);
 const currentTable = ref<TableVO>();
@@ -285,6 +284,7 @@ const connectionStore = useConnectionStore();
 const { isTableModel } = storeToRefs(connectionStore);
 const { canWriteSchema } = storeToRefs(userStore);
 const importVisible = ref(false);
+// const { maxTableHeight } = useTableHeight(304);
 
 const { getDatabases, setFirstLoad, setActiveList } = useDbStore();
 const isInformationSchemaDatabase = computed(() => {
@@ -489,12 +489,12 @@ defineExpose({
 .database-detail-wrapper {
   display: flex;
   flex-direction: column;
-  height: calc(100% - 32px);
+  height: 100%;
   padding: 8px;
 }
 
 .info-title {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 21px;
   color: #495ad4;
@@ -537,7 +537,7 @@ defineExpose({
 .search-form-container {
   display: flex;
   justify-content: space-between;
-  padding: 16px 0;
+  padding-bottom: 8px;
 
   .search-form-box {
     display: flex;
@@ -552,7 +552,7 @@ defineExpose({
 }
 
 .storage-table-box {
-  padding: 8px;
+  padding: 8px 8px 0;
   background-color: #f7f8fc;
 }
 
@@ -599,5 +599,9 @@ defineExpose({
   .el-pagination {
     padding: 4px 5px 0;
   }
+}
+
+.storage-table :deep(th.el-table__cell) {
+  font-size: 12px;
 }
 </style>

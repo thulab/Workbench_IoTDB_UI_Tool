@@ -32,7 +32,7 @@
       <el-tree-v2
         ref="schemaTree"
         :data="filterTreeData()"
-        style="background-color: #fff; overflow-y: auto"
+        style="background-color: #fff"
         :props="treeProps"
         :indent="8"
         :item-size="28"
@@ -196,7 +196,7 @@ const searching = ref(false);
 const currentNode = ref<TableTreeNodeData>();
 const currentNodeShow = ref<TableTreeNodeData>();
 const modalAddDbVisible = ref(false);
-const treeHeight = ref(document.body.clientHeight - 150);
+const treeHeight = ref(document.body.clientHeight - 116);
 const addTableDialog = ref<InstanceType<typeof ModalAddTable>>();
 const { requestFn: deleteDatabase } = useRequest(IoTDBApi.deleteDatabase);
 const { requestFn: deleteTables } = useRequest(IoTDBApi.deleteTables);
@@ -442,7 +442,7 @@ watch(
 }
 
 .node-text {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
   line-height: 1.5;
   display: flex;

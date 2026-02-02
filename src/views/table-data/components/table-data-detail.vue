@@ -10,9 +10,9 @@
     <el-header class="search-form-wrapper p-0" style="height: auto">
       <div style="display: flex; align-items: center; width: 100%">
         <div style="flex: 1">
-          <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
+          <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline class="el-form-wrapper">
             <div style="display: flex; align-items: center">
-              <base-form-item prop="path" :label="t('dataManage.columnName')">
+              <base-form-item prop="path" :label="`${t('dataManage.columnName')}：`">
                 <columns-select
                   v-model="searchFormData.columns"
                   :disabled-select="getListLoading"
@@ -132,6 +132,7 @@
       <auth-container :is-auth="canViewData" style="height: 100%" :content="'common.needQueryDataPermission'">
         <div v-loading="getListLoading">
           <dynamic-edit-table
+            class="dynamic-edit-table"
             ref="dynamicEditTableRef"
             :show-select="true"
             :columns="columns"
@@ -183,13 +184,15 @@ const props = defineProps<{
 const sqlPreviewRef = ref<InstanceType<typeof SqlPreview>>();
 const dynamicEditTableRef = ref<InstanceType<typeof DynamicEditTable>>();
 
+const windowWidth = ref(window.innerWidth);
+
 const { t, locale } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
 const connectionStore = useConnectionStore();
 const { isTableModel } = storeToRefs(connectionStore);
 const { canReadWriteData, canWriteData } = storeToRefs(userStore);
-const { maxTableHeight } = useTableHeight(440);
+const { maxTableHeight } = useTableHeight(windowWidth.value >= 1440 ? 380 : 388);
 const { getDatabases } = useDbStore();
 
 const canQueryData = computed(() => {
@@ -585,7 +588,7 @@ defineExpose({
 
 <style lang="scss" scoped>
 .info-title {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 21px;
   color: #495ad4;
@@ -661,7 +664,7 @@ defineExpose({
 
   .page-info-title {
     display: flex;
-    font-size: 14px;
+    font-size: 12px;
     line-height: 20px;
     color: #495ad4;
 
@@ -725,5 +728,13 @@ defineExpose({
   font-weight: 300;
   line-height: 24px;
   color: #424561;
+}
+
+.dynamic-edit-table :deep(th.el-table__cell) {
+  font-size: 12px;
+}
+
+.el-form-wrapper :deep(.el-form-item__label) {
+  font-size: 12px;
 }
 </style>

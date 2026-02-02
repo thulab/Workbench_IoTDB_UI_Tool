@@ -88,7 +88,7 @@ defineExpose({
 .sql-statement {
   border-radius: 2px;
   height: 100px;
-  margin: 16px 0 0 !important;
+  margin: 8px 0 0 !important;
   position: relative;
   white-space: pre;
   line-height: 1.5;
