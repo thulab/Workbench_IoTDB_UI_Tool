@@ -6,7 +6,7 @@
         <i-custom-expand />
       </div>
     </div>
-    <div v-if="!isCollapse" class="flex">
+    <div v-if="!isCollapse" class="flex" ref="tableRef">
       <button class="mr-[1px] flex cursor-pointer items-start" @click="handleCollapse">
         <i-custom-expand style="transform: rotate(180deg)" />
       </button>
@@ -19,13 +19,13 @@
         :header-cell-style="{ textAlign: 'center', color: '#424561', fontWeight: '700' }"
         :cell-style="{ color: '#656A85', fontWeight: '300' }"
       >
-        <el-table-column prop="name" :label="t('dataTrend.measurementName')" :show-overflow-tooltip="{ effect: 'light' }" width="300" min-width="300"></el-table-column>
-        <el-table-column prop="x1" label="X1" :show-overflow-tooltip="{ effect: 'light' }" min-width="150"></el-table-column>
-        <el-table-column prop="x2" label="X2" :show-overflow-tooltip="{ effect: 'light' }" min-width="150"></el-table-column>
-        <el-table-column prop="x2_x1" label="X2-X1" :show-overflow-tooltip="{ effect: 'light' }" min-width="150"></el-table-column>
-        <el-table-column prop="y1" label="Y1" :show-overflow-tooltip="{ effect: 'light' }" min-width="150"></el-table-column>
-        <el-table-column prop="y2" label="Y2" :show-overflow-tooltip="{ effect: 'light' }" min-width="150"></el-table-column>
-        <el-table-column prop="y2_y1" label="Y2-Y1" :show-overflow-tooltip="{ effect: 'light' }" min-width="150"></el-table-column>
+        <el-table-column prop="name" :label="t('dataTrend.measurementName')" :show-overflow-tooltip="{ effect: 'light' }" :width="2 * singleCellWidth"></el-table-column>
+        <el-table-column prop="x1" label="X1" :show-overflow-tooltip="{ effect: 'light' }" :width="singleCellWidth"></el-table-column>
+        <el-table-column prop="x2" label="X2" :show-overflow-tooltip="{ effect: 'light' }" :width="singleCellWidth"></el-table-column>
+        <el-table-column prop="x2_x1" label="X2-X1" :show-overflow-tooltip="{ effect: 'light' }" :width="singleCellWidth"></el-table-column>
+        <el-table-column prop="y1" label="Y1" :show-overflow-tooltip="{ effect: 'light' }" :width="singleCellWidth"></el-table-column>
+        <el-table-column prop="y2" label="Y2" :show-overflow-tooltip="{ effect: 'light' }" :width="singleCellWidth"></el-table-column>
+        <el-table-column prop="y2_y1" label="Y2-Y1" :show-overflow-tooltip="{ effect: 'light' }" :width="singleCellWidth"></el-table-column>
       </el-table>
     </div>
   </div>
@@ -46,6 +46,15 @@ const props = withDefaults(
 );
 
 const isCollapse = ref(false);
+
+const tableRef = ref<HTMLElement | null>(null);
+const tableWidth = ref(0);
+let observer: ResizeObserver | null = null;
+
+const singleCellWidth = computed(() => {
+  const totalColumns = 8;
+  return (tableWidth.value - 25) / totalColumns;
+});
 
 const convertedMarkerDatas = computed(() => {
   return props.markerDatas.map((marker) => {
@@ -75,6 +84,23 @@ const emit = defineEmits<{
   'table-collapse': [];
   'table-expand': [];
 }>();
+
+onMounted(() => {
+  if (tableRef.value) {
+    observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        tableWidth.value = entry.contentRect.width;
+      }
+    });
+    observer.observe(tableRef.value);
+  }
+});
+
+onBeforeUnmount(() => {
+  if (observer && tableRef.value) {
+    observer.unobserve(tableRef.value);
+  }
+});
 </script>
 
 <style scoped>
