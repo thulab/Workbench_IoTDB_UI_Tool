@@ -191,6 +191,7 @@ function handleResetGraphArea() {
   needFetchGroupsId.value = [];
   operateButtonRowRef.value?.setSelectedTemplateId('');
   trendStore.initializeState();
+  markers.value = createInitialMarkers();
   setStorage();
 }
 
