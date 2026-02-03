@@ -115,7 +115,7 @@
         <template v-if="isInformationSchemaDatabase">
           <el-tooltip effect="light" :content="t('common.systemTableViewOnly')" placement="top" :disabled="false">
             <span>
-              <el-button type="primary" id="mesaurement-batch-del" @click="handleDelRow('batch', null)" :disabled="true">
+              <el-button class="mr-[16px]" type="primary" id="mesaurement-batch-del" @click="handleDelRow('batch', null)" :disabled="true">
                 {{ t('common.batchDelete') }}
               </el-button>
             </span>
@@ -124,7 +124,7 @@
         <template v-else>
           <auth-tooltip :is-disabled="canDropTables" content="dataManage.needDropPrivilege">
             <span>
-              <el-button type="primary" id="mesaurement-batch-del" @click="handleDelRow('batch', null)" :disabled="!multipleSelection.length || !canDropTables">
+              <el-button class="mr-[16px]" type="primary" id="mesaurement-batch-del" @click="handleDelRow('batch', null)" :disabled="!multipleSelection.length || !canDropTables">
                 {{ t('common.batchDelete') }}
               </el-button>
             </span>
