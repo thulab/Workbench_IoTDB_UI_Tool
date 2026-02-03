@@ -135,12 +135,12 @@
       </div>
     </div>
 
-    <div class="storage-table-box flex-1">
+    <div class="storage-table-box">
       <el-table
         class="storage-table"
         :data="tableDataPagination"
         style="width: 100%"
-        :height="'calc(100% - 8px)'"
+        :height="reactiveTableHeight.value"
         tooltip-effect="light"
         ref="tableRef"
         :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
@@ -256,7 +256,7 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-// import { useTableHeight } from '@/composition-api';
+import { useTableHeight } from '@/composition-api';
 import { IoTDBApi } from '@/api';
 import { useDbStore, useUserStore, useConnectionStore } from '@/stores';
 import SqlPreview from '@/components/sql-preview.vue';
@@ -293,6 +293,25 @@ const modalTtlVisible = ref(false);
 const localCurrentNode = ref<TableTreeNodeData>({ ...props.currentNode });
 const orderBy = ref('');
 const order = ref('');
+const screenWidth = ref(window.innerWidth);
+window.addEventListener('resize', () => {
+  screenWidth.value = window.innerWidth;
+});
+const reactiveTableHeight = computed(() => {
+  if (screenWidth.value < 1440) {
+    if (total.value < 10) {
+      return useTableHeight(311).maxTableHeight;
+    } else {
+      return useTableHeight(346).maxTableHeight;
+    }
+  } else {
+    if (total.value < 10) {
+      return useTableHeight(303).maxTableHeight;
+    } else {
+      return useTableHeight(338).maxTableHeight;
+    }
+  }
+});
 
 const { getDatabases, setFirstLoad, setActiveList } = useDbStore();
 
@@ -573,7 +592,7 @@ defineExpose({
 }
 
 .storage-table-box {
-  padding: 8px 8px 0;
+  padding: 8px;
   background-color: #f7f8fc;
 }
 
@@ -614,11 +633,10 @@ defineExpose({
 .paination {
   display: flex;
   justify-content: center;
-  margin-top: 10px;
 
   // padding: 10px 0px;
   .el-pagination {
-    padding: 4px 5px 0;
+    padding: 8px 5px 0;
   }
 }
 

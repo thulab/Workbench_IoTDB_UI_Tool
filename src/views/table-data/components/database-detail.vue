@@ -137,12 +137,12 @@
       </div>
     </div>
 
-    <div class="storage-table-box flex-1">
+    <div class="storage-table-box">
       <el-table
         class="storage-table"
         :data="tableDataPagination"
         style="width: 100%"
-        :height="'calc(100% - 8px)'"
+        :height="reactiveTableHeight.value"
         tooltip-effect="light"
         ref="tableRef"
         :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
@@ -245,7 +245,7 @@
 import { useRoute } from 'vue-router';
 import { IoTDBApi } from '@/api';
 import { storeToRefs } from 'pinia';
-// import { useTableHeight } from '@/composition-api';
+import { useTableHeight } from '@/composition-api';
 import { useDbStore, useUserStore, useConnectionStore } from '@/stores';
 import SqlPreview from '@/components/sql-preview.vue';
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
@@ -284,7 +284,25 @@ const connectionStore = useConnectionStore();
 const { isTableModel } = storeToRefs(connectionStore);
 const { canWriteSchema } = storeToRefs(userStore);
 const importVisible = ref(false);
-// const { maxTableHeight } = useTableHeight(304);
+const screenWidth = ref(window.innerWidth);
+window.addEventListener('resize', () => {
+  screenWidth.value = window.innerWidth;
+});
+const reactiveTableHeight = computed(() => {
+  if (screenWidth.value < 1440) {
+    if (total.value < 10) {
+      return useTableHeight(311).maxTableHeight;
+    } else {
+      return useTableHeight(336).maxTableHeight;
+    }
+  } else {
+    if (total.value < 10) {
+      return useTableHeight(303).maxTableHeight;
+    } else {
+      return useTableHeight(328).maxTableHeight;
+    }
+  }
+});
 
 const { getDatabases, setFirstLoad, setActiveList } = useDbStore();
 const isInformationSchemaDatabase = computed(() => {
@@ -552,7 +570,7 @@ defineExpose({
 }
 
 .storage-table-box {
-  padding: 8px 8px 0;
+  padding: 8px;
   background-color: #f7f8fc;
 }
 
@@ -593,11 +611,10 @@ defineExpose({
 .paination {
   display: flex;
   justify-content: center;
-  margin-top: 10px;
 
   // padding: 10px 0px;
   .el-pagination {
-    padding: 4px 5px 0;
+    padding: 8px 5px 0;
   }
 }
 
