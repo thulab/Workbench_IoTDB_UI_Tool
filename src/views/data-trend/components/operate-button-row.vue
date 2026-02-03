@@ -27,7 +27,7 @@
         :disabled="!props.canOperate"
         :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
       >
-        <i-custom-play-round />
+        <i-custom-play-without-border />
       </button>
       <button
         @click="handleRunningPause"
@@ -36,7 +36,7 @@
         :disabled="!props.canOperate"
         :style="!props.canOperate ? 'cursor:not-allowed;opacity:0.5' : 'cursor:pointer'"
       >
-        <i-custom-pause-round />
+        <i-custom-pause-without-border />
       </button>
       <button
         @click="handleResetGraph"
