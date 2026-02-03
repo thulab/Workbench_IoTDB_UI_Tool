@@ -1,8 +1,8 @@
 <template>
-  <div @drop="handleDrop" @dragover.prevent class="graph-border border-box mt-[10px] pb-[9px] rounded-[2px]" :style="{ paddingBottom: props.index === 0 ? '9px' : '15px' }">
+  <div @drop="handleDrop" @dragover.prevent class="graph-border border-box special-padding mt-[10px] pb-[9px] rounded-[2px]">
     <div class="upper-area pb-[8px] flex items-center">
       <div>
-        <button class="ml-27px mr-28px border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteGroup">
+        <button class="ml-10px mr-28px border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteGroup">
           <el-icon size="15"><i-custom-close-circle /></el-icon>
         </button>
       </div>
@@ -493,7 +493,13 @@ function buildOption(): ECOption {
       scale: true,
       minInterval: 1,
       axisLine: { show: true, lineStyle: { color: '#656A85', width: 1 }, onZero: false },
-      axisLabel: { color: '#424561', fontSize: 12, hideOverlap: true, margin: 3, fontWeight: 300 },
+      axisLabel: {
+        color: '#424561',
+        fontSize: 12,
+        hideOverlap: true,
+        margin: 3,
+        fontWeight: 300,
+      },
       splitLine: {
         lineStyle: { color: '#DFE1ED', width: 1 },
       },
@@ -851,5 +857,15 @@ watch(
 .chart-area {
   width: 100%;
   height: 400px;
+}
+
+.special-padding {
+  padding-bottom: 14px;
+}
+
+@media (width <= 1440px) {
+  .special-padding {
+    padding-bottom: 2px;
+  }
 }
 </style>

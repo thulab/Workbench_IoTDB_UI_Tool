@@ -102,17 +102,24 @@ const trendStore = props.isTable ? useTableHistoryTrendStore() : useTreeHistoryT
 
 const chartRefs = ref<Record<string, InstanceType<typeof MetricChartGroup>>>({});
 
+const isSmallScreen = ref(false);
+const mediaQuery = window.matchMedia('(max-width: 1440px)');
+
+const update = () => {
+  isSmallScreen.value = mediaQuery.matches;
+};
+
 const chartHeight = computed(() => {
   let result = 240;
   const h = wrapperHeight.value;
   if (h) {
     const groupCount = props.measurementGroupInfo.length || 1; // 至少有
     if (groupCount >= 3) {
-      result = Math.floor((h - 123) / 3);
+      result = Math.floor((h - (isSmallScreen.value ? 82 : 123)) / 3);
     } else if (groupCount === 2) {
-      result = Math.floor((h - 82) / groupCount);
+      result = Math.floor((h - (isSmallScreen.value ? 54 : 82)) / groupCount);
     } else {
-      result = h - 41;
+      result = h - (isSmallScreen.value ? 27 : 41);
     }
   }
   return result - 9;
@@ -242,6 +249,8 @@ onMounted(() => {
     });
     observer.observe(wrapperRef.value);
   }
+  update();
+  mediaQuery.addEventListener('change', update);
 });
 
 onBeforeUnmount(() => {
@@ -249,6 +258,10 @@ onBeforeUnmount(() => {
     observer.unobserve(wrapperRef.value);
     observer = null;
   }
+});
+
+onUnmounted(() => {
+  mediaQuery.removeEventListener('change', update);
 });
 
 watch(
