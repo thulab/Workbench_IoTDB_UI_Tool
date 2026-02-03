@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-1 w-full overflow-y-auto" style="overflow-x: hidden" ref="wrapperRef" :style="{ display: props.measurementGroupInfo.length === 0 ? 'flex' : '' }">
+  <div class="flex flex-1 flex-col min-h-0 w-full overflow-y-auto" style="overflow-x: hidden" ref="wrapperRef" :style="{ display: props.measurementGroupInfo.length === 0 ? 'flex' : '' }">
     <div v-if="props.measurementGroupInfo.length === 0" class="flex flex-1 items-center justify-center">
       <div ref="tipRef" class="gap-[40px] grid" :style="{ gridTemplateColumns: props.isTable ? 'repeat(3, minmax(0, 1fr))' : 'repeat(2, minmax(0, 1fr))' }">
         <div v-if="props.isTable" class="tip-box">

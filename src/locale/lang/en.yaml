@@ -598,6 +598,7 @@ dataTrend:
   doubleClick: Double click
   drag: drag
   select: select
+  runningTableTip: Please click the pause button at the top left to stop the real-time trend and view the value at the cursor position.
 calculate:
   namePlaceholder: Please enter a name
   descPlaceholder: Please enter a description

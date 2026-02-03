@@ -18,14 +18,15 @@
         :table-layout="'auto'"
         :header-cell-style="{ textAlign: 'center', color: '#424561', fontWeight: '700' }"
         :cell-style="{ color: '#656A85', fontWeight: '300' }"
+        :empty-text="props.isRunning ? t('dataTrend.runningTableTip') : '暂无数据'"
       >
-        <el-table-column prop="name" :label="t('dataTrend.measurementName')" :show-overflow-tooltip="{ effect: 'light' }" :width="2 * singleCellWidth"></el-table-column>
-        <el-table-column prop="x1" label="T1" :show-overflow-tooltip="{ effect: 'light' }" :width="singleCellWidth"></el-table-column>
-        <el-table-column prop="x2" label="T2" :show-overflow-tooltip="{ effect: 'light' }" :width="singleCellWidth"></el-table-column>
-        <el-table-column prop="x2_x1" label="T2 - T1" :show-overflow-tooltip="{ effect: 'light' }" :width="singleCellWidth"></el-table-column>
-        <el-table-column prop="y1" label="V1" :show-overflow-tooltip="{ effect: 'light' }" :width="singleCellWidth"></el-table-column>
-        <el-table-column prop="y2" label="V2" :show-overflow-tooltip="{ effect: 'light' }" :width="singleCellWidth"></el-table-column>
-        <el-table-column prop="y2_y1" label="V2 - V1" :show-overflow-tooltip="{ effect: 'light' }" :width="singleCellWidth"></el-table-column>
+        <el-table-column prop="name" :label="t('dataTrend.measurementName')" :show-overflow-tooltip="{ effect: 'light' }" :width="2 * singleCellWidth" align="center"></el-table-column>
+        <el-table-column prop="x1" label="T1" :show-overflow-tooltip="{ effect: 'light' }" :width="singleCellWidth" align="center"></el-table-column>
+        <el-table-column prop="x2" label="T2" :show-overflow-tooltip="{ effect: 'light' }" :width="singleCellWidth" align="center"></el-table-column>
+        <el-table-column prop="x2_x1" label="T2 - T1" :show-overflow-tooltip="{ effect: 'light' }" :width="singleCellWidth" align="center"></el-table-column>
+        <el-table-column prop="y1" label="V1" :show-overflow-tooltip="{ effect: 'light' }" :width="singleCellWidth" align="center"></el-table-column>
+        <el-table-column prop="y2" label="V2" :show-overflow-tooltip="{ effect: 'light' }" :width="singleCellWidth" align="center"></el-table-column>
+        <el-table-column prop="y2_y1" label="V2 - V1" :show-overflow-tooltip="{ effect: 'light' }" :width="singleCellWidth" align="center"></el-table-column>
       </el-table>
     </div>
   </div>

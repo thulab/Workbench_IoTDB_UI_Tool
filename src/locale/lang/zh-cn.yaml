@@ -658,6 +658,7 @@ dataTrend:
   doubleClick: 双击
   drag: 拖动
   select: 框选
+  runningTableTip: 请点击左上方暂停按钮停止实时趋势，查看光标所在位置数值。
 calculate:
   namePlaceholder: 请输入名称
   descPlaceholder: 请输入描述
