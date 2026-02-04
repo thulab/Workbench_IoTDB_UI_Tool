@@ -138,8 +138,8 @@
             :columns="columns"
             :current-node="currentNode"
             :table-data="tableDataPagination"
-            :height="maxTableHeight"
-            :max-height="maxTableHeight"
+            :height="reactiveTableHeight.value"
+            :max-height="reactiveTableHeight.value"
             v-model:current-page="pagination.pageNum"
             v-model:page-size="pagination.pageSize"
             :total="tableData.length"
@@ -184,16 +184,33 @@ const props = defineProps<{
 const sqlPreviewRef = ref<InstanceType<typeof SqlPreview>>();
 const dynamicEditTableRef = ref<InstanceType<typeof DynamicEditTable>>();
 
-const windowWidth = ref(window.innerWidth);
-
 const { t, locale } = useI18n();
 const route = useRoute();
 const userStore = useUserStore();
 const connectionStore = useConnectionStore();
 const { isTableModel } = storeToRefs(connectionStore);
 const { canReadWriteData, canWriteData } = storeToRefs(userStore);
-const { maxTableHeight } = useTableHeight(windowWidth.value >= 1440 ? 380 : 388);
 const { getDatabases } = useDbStore();
+
+const screenWidth = ref(window.innerWidth);
+window.addEventListener('resize', () => {
+  screenWidth.value = window.innerWidth;
+});
+const reactiveTableHeight = computed(() => {
+  if (screenWidth.value < 1440) {
+    if (tableData.value.length < 10) {
+      return useTableHeight(376).maxTableHeight;
+    } else {
+      return useTableHeight(371).maxTableHeight;
+    }
+  } else {
+    if (tableData.value.length < 10) {
+      return useTableHeight(368).maxTableHeight;
+    } else {
+      return useTableHeight(363).maxTableHeight;
+    }
+  }
+});
 
 const canQueryData = computed(() => {
   if (isTableModel.value) {

@@ -1,6 +1,6 @@
 <template>
   <div class="stand-table">
-    <div class="flex row">
+    <div class="row flex">
       <div class="border_table flex-1" :style="{ maxWidth: totalColumnPage > 1 ? 'calc(100% - 70px)' : '100%' }">
         <el-table
           :data="currentTableData"
@@ -293,11 +293,10 @@ function handleSizeChange() {
 .paination {
   display: flex;
   justify-content: center;
-  margin-top: 10px;
 
   // padding: 10px 0px;
   .el-pagination {
-    padding: 4px 5px 0;
+    padding: 8px 5px 0;
   }
 }
 
