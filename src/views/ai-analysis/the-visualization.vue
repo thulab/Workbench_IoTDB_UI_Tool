@@ -53,15 +53,15 @@
               </div>
               <div class="search-form-row-box"></div>
 
-              <div class="search-form-wrapper flex items-center justify-center">
+              <div class="search-form-wrapper flex justify-center">
                 <div v-if="searchFormData.type !== 2">
                   <template v-if="connectionStore.isTableModel">
-                    <base-form-item prop="database" style="margin-bottom: 16px" :label="`${t('measurement.measurementChoose')}：`" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
+                    <base-form-item prop="database" :label="`${t('measurement.measurementChoose')}：`" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
                       <el-button type="primary" @click="handleSelectMeasurement">{{ t('tableMeasurement.measurementSelect') }}</el-button>
                     </base-form-item>
                   </template>
                   <template v-else>
-                    <base-form-item prop="measurement" style="margin-bottom: 16px" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
+                    <base-form-item prop="measurement" :label-width="locale === 'en' ? '' : '96px'" :rules="requiredRules">
                       <template #label>
                         {{ t('measurement.measurementChoose') }}：
                         <el-tooltip effect="light" placement="top" popper-class="tooltip-box-width">
@@ -128,7 +128,7 @@
                   </div>
                 </div>
 
-                <div class="search-form-buttons">
+                <div>
                   <el-button @click="handleReset" :disabled="!enableAINode" id="search-reset">{{ t('common.reset') }}</el-button>
                   <el-tooltip placement="top-start" effect="light" trigger="hover" :content="applyTip" :disabled="canQuery" popper-class="tooltip-box-width">
                     <el-button :disabled="!canQuery" type="primary" @click="handleSearch()" id="search-search">
