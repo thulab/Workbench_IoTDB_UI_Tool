@@ -7,7 +7,7 @@
       </div>
       <span class="m-l-8">{{ t('dataManage.data') }}</span>
     </h4>
-    <el-header class="search-form-wrapper p-0" style="height: auto">
+    <el-header class="search-form-wrapper p-0" style="height: auto; margin-top: 8px">
       <div style="display: flex; align-items: center; width: 100%">
         <div style="flex: 1">
           <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline class="el-form-wrapper">
@@ -199,15 +199,15 @@ window.addEventListener('resize', () => {
 const reactiveTableHeight = computed(() => {
   if (screenWidth.value < 1440) {
     if (tableData.value.length < 10) {
-      return useTableHeight(377).maxTableHeight;
+      return useTableHeight(361).maxTableHeight;
     } else {
-      return useTableHeight(371).maxTableHeight;
+      return useTableHeight(355).maxTableHeight;
     }
   } else {
     if (tableData.value.length < 10) {
-      return useTableHeight(369).maxTableHeight;
+      return useTableHeight(353).maxTableHeight;
     } else {
-      return useTableHeight(363).maxTableHeight;
+      return useTableHeight(347).maxTableHeight;
     }
   }
 });
@@ -609,11 +609,10 @@ defineExpose({
   font-weight: 700;
   line-height: 21px;
   color: #495ad4;
-  padding: 8px;
+  padding-bottom: 6px;
   border-bottom: 1px solid #dfe1ed;
   display: flex;
   align-items: center;
-  margin-bottom: 16px;
 }
 
 .page-container {
