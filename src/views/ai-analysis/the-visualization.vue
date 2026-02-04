@@ -323,7 +323,7 @@ import { today, getOneIntervalNow, todayNow, formatDate } from '@/utils/date';
 import { useUserStore, useConnectionStore, useDbStore } from '@/stores';
 import { parse } from 'yaml';
 import { iotdbShowAuth } from '@/utils/auth';
-import ModalTableMeasurement from '@/components/modal-table-measurement.vue';
+import ModalTableMeasurement from './components/modal-table-measurement.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalSql from './components/modal-sql.vue';
 import ModalWriteBack from './components/modal-write-back.vue';
