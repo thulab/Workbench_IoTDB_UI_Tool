@@ -85,7 +85,13 @@
       </div>
 
       <!-- 添加列按钮 -->
-      <el-button style="width: 100%" :class="['m-t-16', existEmpty ? '' : 'svg-button-hover-color']" :disabled="existEmpty || !canAddColumn" @click="addColumn" id="measurement-modal-collapse-add">
+      <el-button
+        style="width: 100%"
+        :class="['m-t-8 m-b-8', existEmpty ? '' : 'svg-button-hover-color']"
+        :disabled="existEmpty || !canAddColumn"
+        @click="addColumn"
+        id="measurement-modal-collapse-add"
+      >
         <i-custom-add-border2 class="m-r-4" />
         {{ t('dataManage.addCloumn') }}({{ formData.columns.length }}/10)
       </el-button>
