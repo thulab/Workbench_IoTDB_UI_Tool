@@ -2,7 +2,7 @@
   <div @drop="handleDrop" @dragover.prevent class="graph-border border-box special-padding mt-[10px] pb-[9px] rounded-[2px]">
     <div class="upper-area pb-[8px] flex items-center">
       <div>
-        <button class="ml-10px mr-28px border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteGroup">
+        <button class="ml-26px mr-28px border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteGroup">
           <el-icon size="15"><i-custom-close-circle /></el-icon>
         </button>
       </div>
