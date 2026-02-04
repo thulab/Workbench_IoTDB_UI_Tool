@@ -2,8 +2,8 @@
   <coming-soon-container :is-show="locale !== 'en'">
     <active-container :is-show="connectionIsActiveBoolean">
       <el-container class="model-management-wrapper">
-        <el-header class="search-form-wrapper p-[8px] p-b-0" style="height: 44px">
-          <el-form :model="searchFormData" label-position="left" size="default" inline @submit.prevent>
+        <el-header class="search-form-wrapper p-[8px] p-b-0 flex items-center" style="height: 42px">
+          <el-form :model="searchFormData" label-position="left" size="default" @submit.prevent>
             <base-form-item :label="`${t('aiAnalysis.modelName')}：`" style="margin-bottom: 0 !important" prop="name">
               <el-input v-model="searchFormData.name" :placeholder="t('aiAnalysis.modelNamePlaceholder')" @keyup.enter="handleSearch" id="model-management-search-name" style="width: 200px">
                 <template #prefix>
@@ -65,8 +65,8 @@
                     :data="tableDataPagination"
                     v-loading="loading"
                     style="width: 100%"
-                    :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
-                    :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+                    :height="totalCount > 0 ? reactiveTableHeight.value : reactiveTableHeight.value + 48"
+                    :max-height="totalCount > 0 ? reactiveTableHeight.value : reactiveTableHeight.value + 48"
                     tooltip-effect="light"
                     :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
                     :row-key="(row) => row.modelId"
@@ -186,7 +186,17 @@ const pagination = reactive({
   pageSize: 10,
   pageNum: 1,
 });
-const { maxTableHeight } = useTableHeight(204);
+const screenWidth = ref(window.innerWidth);
+window.addEventListener('resize', () => {
+  screenWidth.value = window.innerWidth;
+});
+const reactiveTableHeight = computed(() => {
+  if (screenWidth.value < 1440) {
+    return useTableHeight(212).maxTableHeight;
+  } else {
+    return useTableHeight(204).maxTableHeight;
+  }
+});
 const tableData = ref<Model[]>([]);
 const totalCount = ref(0);
 const multipleSelection = ref<Model[]>([]);
