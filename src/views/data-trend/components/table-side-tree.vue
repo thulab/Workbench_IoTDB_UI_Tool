@@ -573,7 +573,7 @@ defineExpose({
 }
 
 .search-refresh-box {
-  padding: 16px 8px 16px 16px;
+  padding: 10px 8px 10px 10px;
   display: flex;
   align-items: center;
 }
