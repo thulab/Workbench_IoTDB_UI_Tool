@@ -199,13 +199,13 @@ window.addEventListener('resize', () => {
 const reactiveTableHeight = computed(() => {
   if (screenWidth.value < 1440) {
     if (tableData.value.length < 10) {
-      return useTableHeight(376).maxTableHeight;
+      return useTableHeight(377).maxTableHeight;
     } else {
       return useTableHeight(371).maxTableHeight;
     }
   } else {
     if (tableData.value.length < 10) {
-      return useTableHeight(368).maxTableHeight;
+      return useTableHeight(369).maxTableHeight;
     } else {
       return useTableHeight(363).maxTableHeight;
     }

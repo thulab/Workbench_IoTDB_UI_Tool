@@ -71,9 +71,9 @@
 
           <!-- 第三行：设备表格 -->
           <el-table
-            
             ref="deviceTableRef"
-             highlight-current-row border 
+            highlight-current-row
+            border
             :data="deviceTableData"
             style="max-width: 533px; margin-left: 80px"
             :height="260"
@@ -464,6 +464,7 @@ const handleConfirm = () => {
     measurementType: availableMeasurements.value.find((m) => m.nodeName === formData.selectedMeasurement[0])?.datatype || '',
   });
   emit('confirm', internalSelectedMeasurements.value);
+  ElMessage.success(t('tableMeasurement.addSuccess', { count: internalSelectedMeasurements.value.length }));
   handleClose();
 };
 
