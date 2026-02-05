@@ -1,4 +1,13 @@
 <template>
+  <div class="select-container">
+    <el-select v-model="searchFormData.selectType" class="custom-select deep-color-select" :style="{ width: locale === 'zh-cn' ? '90px' : '170px' }">
+      <el-option value="name" :label="t('search.measurementName')" />
+      <el-option value="desc" :label="t('search.measurementDescription')" />
+    </el-select>
+    <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width">
+      <i-custom-question class="question-mark-overlay" />
+    </el-tooltip>
+  </div>
   <el-select
     :class="['remote-select-box', disabledSelect ? 'remote-select-disabled-box' : '']"
     v-model="model"
@@ -88,7 +97,6 @@ const props = withDefaults(
     selectWidth?: number;
     itemWidth?: number;
     isShowType?: boolean;
-    isByDesc?: boolean;
   }>(),
   {
     isShowViewBtn: true,
@@ -97,12 +105,13 @@ const props = withDefaults(
     selectWidth: 336,
     itemWidth: 284,
     isShowType: false,
-    isByDesc: true,
   },
 );
 
+const { locale } = useI18n();
+
 const computedPlaceholder = computed(() => {
-  return props.placeholder || (props.isByDesc ? 'measurement.descriptionSelectPlaceholder' : 'measurement.measurementNameSelectPlaceholder');
+  return props.placeholder || (searchFormData.selectType === 'desc' ? 'measurement.descriptionSelectPlaceholder' : 'measurement.measurementNameSelectPlaceholder');
 });
 
 const emit = defineEmits<{
@@ -115,12 +124,16 @@ const model = useVModel(props, 'modelValue');
 const dialogVisible = ref(false);
 const measurementList = ref<MeasurementDataItem[]>([]);
 
+const searchFormData = reactive({
+  selectType: 'name', // 新增字段，控制选择类型
+});
+
 const { requestFn: getMeasurement } = useRequest(StorageApi.getMeasurementAllObjList);
 
 let lastMeasurementQuery = '';
 const remoteMethod = debounce((query: string) => {
   lastMeasurementQuery = query;
-  getMeasurement(lastMeasurementQuery, props.isByDesc).then((res) => {
+  getMeasurement(lastMeasurementQuery, searchFormData.selectType === 'desc').then((res) => {
     if (lastMeasurementQuery === query) {
       let measurements = res.data?.measurements || [];
       if (props.filterSystem) {
@@ -306,6 +319,44 @@ defineExpose({
     height: 16px;
     margin: 0 4px;
     background-color: #ebedf0;
+  }
+}
+
+.select-container {
+  position: relative;
+  display: inline-flex;
+  height: 28px !important;
+  margin-right: -1px;
+
+  .question-mark-overlay {
+    position: absolute;
+    right: 22px;
+    top: 30%;
+    transform: translateY(-50%);
+    color: #ccc;
+    font-size: 14px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    z-index: 10;
+
+    &:hover {
+      color: #409eff;
+    }
+  }
+}
+
+:deep(.custom-select) {
+  .el-select__wrapper {
+    height: 20px;
+    border: 1px solid #e4e7ed;
+    background-color: #f0f1fa;
+    box-shadow: none !important;
+    border-radius: 1px 0 0 1px;
+
+    &.is-focused {
+      border-color: #e4e7ed !important;
+      box-shadow: none !important;
+    }
   }
 }
 </style>

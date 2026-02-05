@@ -348,6 +348,8 @@ search:
   object: Objects
   export1000RowTip: By default, a maximum of 1000 rows are displayed, please export to view more
   templateNameRepeatTip: This template name already exists, please enter a different name
+  measurementName: Measurement Name
+  measurementDescription: Measurement Description
 searchIotdb:
   aggregate: Aggregation Functions
   sum: Sum

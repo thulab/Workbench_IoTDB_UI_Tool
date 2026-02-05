@@ -3,16 +3,7 @@
     <el-header class="p-0" style="height: auto">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
         <base-form-item prop="path" class="form-item-last no-label">
-          <div class="select-container">
-            <el-select v-model="searchFormData.selectType" class="custom-select deep-color-select" :style="{ width: locale === 'zh-cn' ? '90px' : '170px' }">
-              <el-option value="name" :label="t('measurement.measurementName')" />
-              <el-option value="desc" :label="t('measurement.measurementDescription')" />
-            </el-select>
-            <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width">
-              <i-custom-question class="question-mark-overlay" />
-            </el-tooltip>
-          </div>
-          <timeseries-select :is-by-desc="searchFormData.selectType === 'desc'" v-model="searchFormData.path" :item-width="elementWidth" :disabled-select="getListLoading" id="data-search-path" />
+          <timeseries-select v-model="searchFormData.path" :item-width="elementWidth" :disabled-select="getListLoading" id="data-search-path" />
         </base-form-item>
         <br />
         <div class="search-form-wrapper">

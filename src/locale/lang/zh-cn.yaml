@@ -345,6 +345,8 @@ search:
   runRepeatTip: 查询正在运行中，请勿重复操作
   emptyTip: 是否清空页面
   object: 对象
+  measurementName: 测点名称
+  measurementDescription: 测点描述
 searchIotdb:
   aggregate: 聚合函数
   sum: 求和

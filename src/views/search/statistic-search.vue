@@ -2,11 +2,11 @@
   <el-container class="page-container">
     <el-header class="search-form-wrapper p-0" style="height: auto">
       <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline :disabled="getListLoading">
-        <base-form-item prop="path" :rules="requiredRules">
-          <template #label>
+        <base-form-item class="no-label is-required">
+          <!-- <template #label>
             {{ t('measurement.measurementChoose') }}：
             <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
-          </template>
+          </template> -->
           <timeseries-select
             v-model="searchFormData.path"
             :select-width="230"
@@ -156,13 +156,13 @@ const copySearchFormData = reactive({
 });
 const { shortcutsDaterange } = useShortcutsDate();
 
-const requiredRules = ref([
-  {
-    required: true,
-    message: () => t('common.formRuleEmptyOperateShort'),
-    trigger: 'blur',
-  },
-]);
+// const requiredRules = ref([
+//   {
+//     required: true,
+//     message: () => t('common.formRuleEmptyOperateShort'),
+//     trigger: 'blur',
+//   },
+// ]);
 const disabledDate = (time: number) => time < new Date('1970-1-1').getTime();
 const getListLoading = ref(false);
 const timestamp = ref(0);
@@ -343,6 +343,15 @@ watch(
 </script>
 
 <style lang="scss" scoped>
+.page-container {
+  .no-label {
+    :deep(.el-form-item__label) {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+  }
+}
+
 .page-table-details {
   padding: 8px 8px 10px;
   border-radius: 2px;
