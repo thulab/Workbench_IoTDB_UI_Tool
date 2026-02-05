@@ -83,8 +83,8 @@
           :data="tableData"
           v-loading="getListLoading"
           style="width: 100%"
-          :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
-          :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+          :height="totalCount > 0 ? reactiveTableHeight.value : reactiveTableHeight.value + 34"
+          :max-height="totalCount > 0 ? reactiveTableHeight.value : reactiveTableHeight.value + 34"
           tooltip-effect="light"
           ref="tableRef"
           :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
@@ -110,7 +110,7 @@
           v-if="totalCount > 0"
           v-model:currentPage="pagination.pageNum"
           v-model:page-size="pagination.pageSize"
-          class="m-t-20"
+          class="m-t-8"
           layout="prev, pager, next, sizes, jumper"
           background
           :page-sizes="[10, 20, 50, 100]"
@@ -138,8 +138,18 @@ const { t, locale } = useI18n();
 const userStore = useUserStore();
 const connectionStore = useConnectionStore();
 const { canReadWriteData } = storeToRefs(userStore);
-const { maxTableHeight } = useTableHeight(210);
 const { elementWidth } = useElementWidth(446);
+const screenWidth = ref(window.innerWidth);
+window.addEventListener('resize', () => {
+  screenWidth.value = window.innerWidth;
+});
+const reactiveTableHeight = computed(() => {
+  if (screenWidth.value < 1440) {
+    return useTableHeight(214).maxTableHeight;
+  } else {
+    return useTableHeight(206).maxTableHeight;
+  }
+});
 
 const searchFormRef = ref<FormInstance>();
 const pagination = reactive({

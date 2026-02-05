@@ -58,8 +58,8 @@
                 :data="tableDataPagination"
                 v-loading="loading"
                 style="width: 100%"
-                :height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
-                :max-height="totalCount > 0 ? maxTableHeight : maxTableHeight + 48"
+                :height="totalCount > 0 ? reactiveTableHeight.value : reactiveTableHeight.value + 35"
+                :max-height="totalCount > 0 ? reactiveTableHeight.value : reactiveTableHeight.value + 35"
                 tooltip-effect="light"
                 :tooltip-options="{ popperClass: 'table-tooltip-max-width' }"
                 ref="tableRef"
@@ -105,7 +105,7 @@
                 v-if="totalCount > 0"
                 v-model:currentPage="pagination.pageNum"
                 v-model:page-size="pagination.pageSize"
-                class="m-t-20"
+                class="m-t-8"
                 layout="prev, pager, next, sizes, jumper"
                 background
                 :page-sizes="[10, 20, 50, 100]"
@@ -162,7 +162,17 @@ const monitorTipDisabled = computed(() => {
   }
   return false;
 });
-const { maxTableHeight } = useTableHeight(215);
+const screenWidth = ref(window.innerWidth);
+window.addEventListener('resize', () => {
+  screenWidth.value = window.innerWidth;
+});
+const reactiveTableHeight = computed(() => {
+  if (screenWidth.value < 1440) {
+    return useTableHeight(212).maxTableHeight; // 212
+  } else {
+    return useTableHeight(204).maxTableHeight;
+  }
+});
 const searchFormData = reactive({
   name: '',
 });
