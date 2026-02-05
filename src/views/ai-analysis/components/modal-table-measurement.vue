@@ -74,7 +74,8 @@
             ref="deviceTableRef"
             highlight-current-row
             border
-            :data="deviceTableData"
+            row-key="id"
+            :data="tableData"
             style="max-width: 533px; margin-left: 80px"
             :height="260"
             :max-height="260"
@@ -84,6 +85,11 @@
             @scroll="handleScroll"
             @current-change="handleSingleDeviceSelected"
           >
+            <el-table-column width="40px">
+              <template #default="{ row }">
+                <el-checkbox :model-value="row.id === currentRowKey" @change="handleCheckboxChange(row)"></el-checkbox>
+              </template>
+            </el-table-column>
             <!-- <el-table-column fixed="left" type="selection" width="50" v-if="deviceColumns.length" max-width="50" align="center" /> -->
             <el-table-column
               :key="item.prop"
@@ -188,6 +194,8 @@ const formRef = ref<FormInstance>();
 const deviceTableRef = ref<TableInstance>();
 const databaseItemRef = ref(); // 数据库表单项引用
 const tableItemRef = ref(); // 新增表单项引用
+const currentRowKey = ref<string | number | null>(null);
+const ignoreKeys = new Set(['id']);
 
 // 响应式数据
 const formData = reactive({
@@ -199,6 +207,12 @@ const formData = reactive({
 });
 const tagFilters = ref<TagFilter[]>([{ variable: '', value: '' }]);
 const deviceTableData = ref<Record<string, string>[]>([]);
+const tableData = computed(() =>
+  deviceTableData.value.map((row, index) => ({
+    ...row,
+    id: index, // 给每行数据添加唯一的 id 属性
+  })),
+);
 const singleSelectedDevice = ref<Record<string, string> | null>(null);
 const internalSelectedMeasurements = ref<SelectedMeasurement[]>([]);
 
@@ -289,6 +303,13 @@ const deviceColumns = computed<globalThis.DynamicTableColumn[]>(() => {
 // 方法
 const handleSingleDeviceSelected = (currentRow: Record<string, string>) => {
   singleSelectedDevice.value = currentRow;
+  currentRowKey.value = currentRow.id;
+};
+
+const handleCheckboxChange = (row: Record<string, string>) => {
+  currentRowKey.value = row.id;
+  singleSelectedDevice.value = row;
+  deviceTableRef.value?.setCurrentRow(row);
 };
 
 const handleClose = () => {
@@ -314,7 +335,7 @@ const initModal = async () => {
     internalSelectedMeasurements.value = [...props.selectedMeasurements];
     formData.selectedMeasurement = props.selectedMeasurements.map((m) => m.measurement);
     const selectedDevice = props.selectedMeasurements[0]?.device;
-    for (const row of deviceTableData.value) {
+    for (const row of tableData.value) {
       let match = true;
       if (selectedDevice) {
         for (const tag of selectedDevice) {
@@ -446,6 +467,7 @@ const handleConfirm = () => {
     tableName: formData.selectedTable,
     condition: singleSelectedDevice.value
       ? Object.keys(singleSelectedDevice.value)
+          .filter((key) => !ignoreKeys.has(key))
           .map((key) => {
             if (singleSelectedDevice.value![key]) {
               return `"${key}"='${singleSelectedDevice.value![key]}'`;
@@ -455,10 +477,12 @@ const handleConfirm = () => {
           .join(' AND ')
       : '',
     device: singleSelectedDevice.value
-      ? Object.keys(singleSelectedDevice.value).map((key) => ({
-          variable: key,
-          value: singleSelectedDevice.value![key],
-        }))
+      ? Object.keys(singleSelectedDevice.value)
+          .filter((key) => !ignoreKeys.has(key))
+          .map((key) => ({
+            variable: key,
+            value: singleSelectedDevice.value![key],
+          }))
       : [],
     measurement: formData.selectedMeasurement[0] || '',
     measurementType: availableMeasurements.value.find((m) => m.nodeName === formData.selectedMeasurement[0])?.datatype || '',
@@ -484,6 +508,7 @@ watch(
       await initModal();
       if (singleSelectedDevice.value) {
         deviceTableRef.value?.setCurrentRow(singleSelectedDevice.value);
+        currentRowKey.value = singleSelectedDevice.value.id;
       }
     }
   },
