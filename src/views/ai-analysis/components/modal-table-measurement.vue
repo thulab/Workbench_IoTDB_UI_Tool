@@ -163,6 +163,11 @@ import type { FormInstance, TableInstance, FormRules } from 'element-plus';
 
 import type { TableTreeNodeData, SelectedMeasurement, TagFilter } from '@/types';
 
+interface TableRow extends Record<string, string> {
+  id: string;
+  [key: string]: any;
+}
+
 const props = withDefaults(
   defineProps<{
     currentDatabase?: string;
@@ -208,10 +213,13 @@ const formData = reactive({
 const tagFilters = ref<TagFilter[]>([{ variable: '', value: '' }]);
 const deviceTableData = ref<Record<string, string>[]>([]);
 const tableData = computed(() =>
-  deviceTableData.value.map((row, index) => ({
-    ...row,
-    id: index, // 给每行数据添加唯一的 id 属性
-  })),
+  deviceTableData.value.map(
+    (row, index) =>
+      ({
+        ...row,
+        id: index.toString(), // 给每行数据添加唯一的 id 属性
+      }) as TableRow,
+  ),
 );
 const singleSelectedDevice = ref<Record<string, string> | null>(null);
 const internalSelectedMeasurements = ref<SelectedMeasurement[]>([]);
@@ -303,11 +311,11 @@ const deviceColumns = computed<globalThis.DynamicTableColumn[]>(() => {
 // 方法
 const handleSingleDeviceSelected = (currentRow: Record<string, string>) => {
   singleSelectedDevice.value = currentRow;
-  currentRowKey.value = currentRow.id;
+  currentRowKey.value = currentRow.id ?? null;
 };
 
 const handleCheckboxChange = (row: Record<string, string>) => {
-  currentRowKey.value = row.id;
+  currentRowKey.value = row.id ?? null;
   singleSelectedDevice.value = row;
   deviceTableRef.value?.setCurrentRow(row);
 };
@@ -508,7 +516,7 @@ watch(
       await initModal();
       if (singleSelectedDevice.value) {
         deviceTableRef.value?.setCurrentRow(singleSelectedDevice.value);
-        currentRowKey.value = singleSelectedDevice.value.id;
+        currentRowKey.value = singleSelectedDevice.value.id ?? null;
       }
     }
   },
