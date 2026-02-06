@@ -267,7 +267,7 @@ onUnmounted(() => {
 watch(
   () => wrapperRef.value?.clientWidth,
   (newVal) => {
-    wrapperRef.value?.style.setProperty('--tw', newVal ? `${newVal / 5}px` : '0px');
+    wrapperRef.value?.style.setProperty('--tw', newVal ? `${newVal / 7}px` : '0px');
   },
   { immediate: true, deep: true },
 );
@@ -291,7 +291,7 @@ watch(
 }
 
 .tip-box {
-  width: clamp(156px, var(--tw), 280px);
+  width: clamp(200px, var(--tw), 280px);
 
   img {
     width: clamp(156px, var(--tw), 280px);
