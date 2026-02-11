@@ -44,7 +44,7 @@
         />
       </div>
       <div class="mt-8px rounded-6px bg-white flex-col min-w-0" :style="{ padding: tableCollapse ? '0px' : '8px 16px 8px 0px' }">
-        <MarkerTableArea :is-running="false" :marker-datas="runningTrendStore.isPlaying ? emptyMarkerDatas : markerDatas" @table-collapse="handleTableCollapse" @table-expand="handleTableExpand" />
+        <MarkerTableArea :is-running="true" :marker-datas="runningTrendStore.isPlaying ? emptyMarkerDatas : markerDatas" @table-collapse="handleTableCollapse" @table-expand="handleTableExpand" />
       </div>
     </div>
   </div>
