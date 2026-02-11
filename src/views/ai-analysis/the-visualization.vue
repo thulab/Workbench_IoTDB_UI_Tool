@@ -234,7 +234,7 @@
                         </template>
                       </el-dropdown>
 
-                      <el-table border height="100%" :data="paginatedData" @sort-change="handleSortChange" :cell-style="handleCellStyle">
+                      <el-table border height="100%" :data="paginatedData" @sort-change="handleSortChange" :cell-style="handleCellStyle" ref="predictTableRef">
                         <el-table-column prop="time" :label="t('aiAnalysis.time')" sortable="custom" :sort-orders="['ascending', 'descending']" :formatter="formatterTime" show-overflow-tooltip />
                         <el-table-column prop="value" v-if="copySearchFormData.type === 1" :label="copySearchFormData.measurement" show-overflow-tooltip>
                           <template #header="{ column }">
@@ -395,12 +395,15 @@ const minValue = ref(0);
 
 const currentPage = ref(1);
 
-const { maxTableHeight } = useTableHeight(390);
+// const { maxTableHeight } = useTableHeight(390);
 const { elementWidth } = useElementWidth(390);
 
 const { maxTableHeight: maxCustomTableHeight } = useTableHeight(324);
 
-const pageSize = computed(() => Math.floor(maxTableHeight.value / 40));
+let predictTableObserver: ResizeObserver | null = null;
+const predictTableRef = ref<any>(null);
+const predictTableHeight = ref(0);
+const pageSize = computed(() => Math.floor(predictTableHeight.value / 40) - 1);
 const filterCondition = ref('all');
 
 const tableMeasurementVisible = ref(false);
@@ -1227,10 +1230,18 @@ onMounted(async () => {
     await userStore.loadPrivileges(true);
   }
   getModelList();
+  const el = predictTableRef.value?.$el as HTMLElement;
+  predictTableObserver = new ResizeObserver((entries) => {
+    predictTableHeight.value = entries[0]!.contentRect.height;
+  });
+  if (el) {
+    predictTableObserver.observe(el);
+  }
 });
 
 onBeforeUnmount(() => {
   setStorage();
+  predictTableObserver?.disconnect();
 });
 
 onUnmounted(() => {
