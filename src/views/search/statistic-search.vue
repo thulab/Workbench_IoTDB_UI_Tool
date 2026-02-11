@@ -145,9 +145,9 @@ window.addEventListener('resize', () => {
 });
 const reactiveTableHeight = computed(() => {
   if (screenWidth.value < 1440) {
-    return useTableHeight(214).maxTableHeight;
-  } else {
     return useTableHeight(206).maxTableHeight;
+  } else {
+    return useTableHeight(198).maxTableHeight;
   }
 });
 
@@ -372,7 +372,7 @@ watch(
   flex-direction: column;
 
   .page-info-title {
-    font-size: 14px;
+    font-size: 12px;
     line-height: 21px;
     color: #495ad4;
     font-weight: 700;
@@ -382,7 +382,7 @@ watch(
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
   }
 }
 </style>
