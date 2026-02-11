@@ -89,6 +89,8 @@ const emit = defineEmits<{
 onMounted(() => {
   if (tableRef.value) {
     observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width;
+      if (width === undefined || width <= 0) return;
       for (const entry of entries) {
         tableWidth.value = entry.contentRect.width;
       }
