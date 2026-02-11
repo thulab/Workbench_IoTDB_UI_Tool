@@ -1,7 +1,7 @@
 <template>
   <version-container :is-show="showAuthMenu">
     <el-container>
-      <el-aside :width="sideWidth + 'px'" class="role-list-wrapper" style="position: relative">
+      <el-aside :width="sideWidth + 'px'" class="role-list-wrapper overflow-hidden" style="position: relative">
         <role-list :can-manage-role="canManageRole" @handleSelect="(val) => (currentRole = val)" />
         <div style="height: 100%; width: 4px; background-color: transparent; position: absolute; top: 0; right: -2px; cursor: ew-resize" @pointerdown="(e) => onSliderPointerDown(e)"></div>
       </el-aside>
