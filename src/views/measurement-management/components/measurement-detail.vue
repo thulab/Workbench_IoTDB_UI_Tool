@@ -140,7 +140,7 @@ const pageText = appType === 1 ? t('measurement.calculateMeasurement') : t('meas
 const userStore = useUserStore();
 const { userAllEntityPrivileges, userAllPathPrivileges } = storeToRefs(userStore);
 
-const { maxTableHeight } = useTableHeight(350);
+const { maxTableHeight } = useTableHeight(334);
 const measurementInfos = ref<MeasurementData>({
   timeseries: '',
   node: '',
@@ -338,7 +338,7 @@ watch(
 .measurement-info-box {
   display: flex;
   justify-content: space-between;
-  padding: 8px 16px;
+  padding: 8px;
 }
 
 .measurement-info-list {
@@ -370,7 +370,7 @@ watch(
   font-weight: 700;
   line-height: 21px;
   color: #495ad4;
-  padding: 14px 0 6px 16px;
+  padding: 14px 0 6px 8px;
   border-bottom: 1px solid #dfe1ed;
 }
 
@@ -416,8 +416,8 @@ watch(
 }
 
 .measurement-table-details {
-  margin: 12px 16px 16px;
-  padding: 16px;
+  margin: 8px;
+  padding: 8px;
   background-color: #f7f8fc;
 }
 </style>

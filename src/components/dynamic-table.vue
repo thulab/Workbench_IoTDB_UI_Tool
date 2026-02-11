@@ -207,11 +207,11 @@ function handleSizeChange() {
 .paination {
   display: flex;
   justify-content: center;
-  margin-top: 10px;
+  margin-top: 8px;
 
   // padding: 10px 0px;
   .el-pagination {
-    padding: 4px 5px 0;
+    padding: 0 5px;
   }
 }
 

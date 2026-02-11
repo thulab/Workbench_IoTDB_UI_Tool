@@ -270,7 +270,7 @@
           v-if="totalCount > 0"
           v-model:currentPage="pagination.pageNum"
           v-model:page-size="pagination.pageSize"
-          class="measurement-table-pagination m-t-20"
+          class="measurement-table-pagination m-t-8"
           popper-class="measurement-table-pagination-popper"
           layout="prev, pager, next, sizes, jumper"
           background
