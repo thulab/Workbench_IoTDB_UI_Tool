@@ -579,13 +579,14 @@ function buildRunningOption(): ECOption {
     yAxis: {
       type: 'value',
       scale: true,
-      axisLine: { show: true, lineStyle: { color: '#656A85', width: 1 } },
+      axisLine: { show: true, lineStyle: { color: '#656A85', width: 1 }, onZero: false },
       axisLabel: { color: '#424561', fontSize: 12, hideOverlap: true, margin: 3, fontWeight: 300 },
       splitLine: {
         lineStyle: { color: '#DFE1ED', width: 1 },
       },
       splitNumber: 2,
       boundaryGap: ['5%', '5%'],
+      offset: 1,
     },
     toolbox: {
       show: false,
