@@ -55,7 +55,7 @@
             </el-row>
             <el-row>
               <el-col :span="24">
-                <base-form-item :prop="`measurementList[${index}].description`" class="m-r-0 el-form-item-not-mandatory" :label-width="locale === 'en' ? '108px' : '92px'">
+                <base-form-item :prop="`measurementList[${index}].description`" class="el-form-item-not-mandatory m-r-0" :label-width="locale === 'en' ? '108px' : '92px'">
                   <template #label>{{ t('measurement.measurementAlias') }}：</template>
                   <el-input v-model="item.alias" :placeholder="t('measurement.aliasPlaceholder')" :id="`measurement-modal-collapse-${index}-description`" maxlength="100" show-word-limit />
                 </base-form-item>
@@ -63,7 +63,7 @@
             </el-row>
             <el-row>
               <el-col :span="24">
-                <base-form-item :prop="`measurementList[${index}].description`" class="m-r-0 el-form-item-not-mandatory" :label-width="locale === 'en' ? '108px' : '92px'">
+                <base-form-item :prop="`measurementList[${index}].description`" class="el-form-item-not-mandatory m-r-0" :label-width="locale === 'en' ? '108px' : '92px'">
                   <template #label>
                     {{ t('measurement.measurementDescription') }}：
                     <el-tooltip effect="light" :content="t('measurement.descriptionTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
@@ -80,7 +80,7 @@
             </el-row>
             <el-row>
               <el-col :span="24">
-                <base-form-item :prop="`measurementList[${index}].description`" class="m-r-0 el-form-item-not-mandatory" :label-width="locale === 'en' ? '108px' : '92px'">
+                <base-form-item :prop="`measurementList[${index}].description`" class="el-form-item-not-mandatory m-r-0" :label-width="locale === 'en' ? '108px' : '92px'">
                   <template #label>
                     {{ t('measurement.tag') }}：
                     <el-tooltip effect="light" :content="t('measurement.tagTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
@@ -91,7 +91,7 @@
             </el-row>
             <el-row>
               <el-col :span="8">
-                <base-form-item :label="`${t('measurement.dataType')}：`" :prop="`measurementList[${index}].dataType`" :rules="requiredRules">
+                <base-form-item :label="`${t('measurement.dataType')}：`" :prop="`measurementList[${index}].dataType`" :rules="requiredRules" :label-width="locale === 'en' ? '108px' : '92px'">
                   <el-select v-model="item.dataType" @change="(val) => handleChangeRowDataType(val, item, index)" :id="`measurement-modal-collapse-${index}-dataType`">
                     <el-option v-for="dtype in dataTypeOptions" :key="dtype" :label="dtype" :value="dtype" :id="`measurement-modal-collapse-${index}-dataType-select-${dtype}`" />
                   </el-select>
@@ -116,7 +116,7 @@
         </el-collapse>
       </el-scrollbar>
 
-      <el-button style="width: 100%" :class="['m-t-16', existEmpty ? '' : 'svg-button-hover-color']" :disabled="existEmpty" @click="handleAddRow" id="measurement-modal-collapse-add">
+      <el-button style="width: 100%" :class="['m-t-16 m-b-16', existEmpty ? '' : 'svg-button-hover-color']" :disabled="existEmpty" @click="handleAddRow" id="measurement-modal-collapse-add">
         <i-custom-add class="m-r-4" />
         {{ t('measurement.addMeasurement') }}
       </el-button>

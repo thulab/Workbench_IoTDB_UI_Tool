@@ -629,7 +629,7 @@ watch(
 
   .page-info-title {
     display: flex;
-    font-size: 14px;
+    font-size: 12px;
     line-height: 20px;
     color: #495ad4;
 

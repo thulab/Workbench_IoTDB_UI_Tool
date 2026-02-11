@@ -101,13 +101,13 @@ const treeDataOptions = (detailData: ModelData, width: number | 'auto') =>
       formatter: (params: object) => {
         const { data } = params as unknown as { data: ModelData };
         if (data.nodeType === 'database' || data.nodeType === 'internal') {
-          return `<h4 style="font-size: 14px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;margin-right: 24px;"><el-icon size="24"><i-custom-device-num /></el-icon><span style="color: #131926;">${t('measurement.deviceNum')}：</span>${data.deviceCount || data.deviceCount === 0 ? data.deviceCount : '-'}</p><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;"><el-icon size="24"><i-custom-measure-num /></el-icon><span style="color: #131926;">${t('measurement.measurementNum')}：</span>${data.timeseriesCount || data.timeseriesCount === 0 ? data.timeseriesCount : '-'}</p>`;
+          return `<h4 style="font-size: 12px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;margin-right: 24px;"><el-icon size="24"><i-custom-device-num /></el-icon><span style="color: #131926;">${t('measurement.deviceNum')}：</span>${data.deviceCount || data.deviceCount === 0 ? data.deviceCount : '-'}</p><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;"><el-icon size="24"><i-custom-measure-num /></el-icon><span style="color: #131926;">${t('measurement.measurementNum')}：</span>${data.timeseriesCount || data.timeseriesCount === 0 ? data.timeseriesCount : '-'}</p>`;
         }
         if (data.nodeType === 'device' || data.nodeType === 'database_device') {
-          return `<h4 style="font-size: 14px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;"><el-icon size="24"><i-custom-measure-num /></el-icon><span style="color: #131926;">${t('measurement.measurementNum')}：</span>${data.timeseriesCount || data.timeseriesCount === 0 ? data.timeseriesCount : '-'}</p>`;
+          return `<h4 style="font-size: 12px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4><p style="display: inline-flex; align-items: center;font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85;"><el-icon size="24"><i-custom-measure-num /></el-icon><span style="color: #131926;">${t('measurement.measurementNum')}：</span>${data.timeseriesCount || data.timeseriesCount === 0 ? data.timeseriesCount : '-'}</p>`;
         }
         if (data.nodeType === 'timeseries') {
-          return `<h4 style="font-size: 14px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4>
+          return `<h4 style="font-size: 12px;line-height: 14px;font-weight: 400;color: #495AD4;margin-bottom: 12px;">${data.node}</h4>
                   <p style="font-size: 12px;line-height: 12px;font-weight: 400;color: #656A85; margin-bottom: 8px; white-space: normal; word-break: break-all;">
                     <span style="color: #131926;">${t('measurement.dataType')}：</span>${data.dataType || '-'}
                   </p>
@@ -485,7 +485,7 @@ watch(
   box-sizing: border-box;
 
   .detail-title-text {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 21px;
     color: #495ad4;

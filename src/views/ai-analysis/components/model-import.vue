@@ -304,7 +304,8 @@ watch(
   margin: 20px 0;
 
   .select-item-label {
-    font-size: 14px;
+    margin-right: 20px;
+    font-size: 12px;
     font-weight: 400;
     line-height: 21px;
     color: #424561;

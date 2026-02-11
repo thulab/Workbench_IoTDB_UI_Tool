@@ -300,20 +300,19 @@ watch(
 
 .tip-title {
   color: #495ad4;
-  font-size: 16px;
+  font-size: 12px;
   font-weight: 700;
-  line-height: 23.17px;
   box-sizing: border-box;
   width: clamp(200px, var(--tw), 280px);
 }
 
 .tip-content {
   color: #131926;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
   margin-top: 6px;
   line-height: 20.27px;
-  height: 57px;
+  height: 52px;
   width: clamp(200px, var(--tw), 280px);
 }
 

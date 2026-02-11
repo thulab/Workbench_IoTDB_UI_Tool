@@ -738,7 +738,7 @@ onUnmounted(() => {
   align-items: center;
 
   .module-title {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 21px;
     color: #495ad4;
@@ -811,7 +811,7 @@ onUnmounted(() => {
   }
 
   .search-from-label {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 400;
     line-height: 21px;
     color: #424561;

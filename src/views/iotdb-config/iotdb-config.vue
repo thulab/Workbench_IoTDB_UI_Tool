@@ -12,9 +12,9 @@
       <el-container class="p-0" style="width: 100%; height: 100%">
         <el-main class="editor-wrapper">
           <div class="editor-box">
-            <div class="flex-justify-between m-b-6">
+            <div class="m-b-6 flex-justify-between">
               <h4 class="editor-title">{{ t('common.edit') }}</h4>
-              <div class="flex-justify-between node-select-box">
+              <div class="node-select-box flex-justify-between">
                 <span class="search-from-label">{{ t('dashboard.node') }}：</span>
                 <el-select v-model="currentNode" :placeholder="t('common.all')" style="width: 280px" @change="handleChangeNode" id="iotdb-config-select-node">
                   <el-option
@@ -52,7 +52,7 @@
             </div>
           </div>
           <div class="preview-box m-l-16">
-            <div class="flex-justify-between m-b-6">
+            <div class="m-b-6 flex-justify-between">
               <h4 class="editor-title">{{ t('iotdbConfig.template') }}</h4>
             </div>
             <monaco-editor class="output-container" ref="outputEditor" :read-only="true" />
@@ -331,7 +331,7 @@ watch(locale, () => {
   box-sizing: border-box;
 
   .detail-title-text {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 21px;
     color: #495ad4;
@@ -347,7 +347,7 @@ watch(locale, () => {
 }
 
 .editor-title {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 24px;
   color: #495ad4;

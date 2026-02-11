@@ -305,7 +305,7 @@ watch(
     :deep(.el-tabs__item) {
       width: 105px;
       padding: 0;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 400;
       line-height: 21px;
       height: 27px;
@@ -324,6 +324,6 @@ watch(
 }
 
 .dialog-footer {
-  margin-top: -24px;
+  margin-top: 0;
 }
 </style>

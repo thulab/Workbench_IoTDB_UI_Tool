@@ -30,7 +30,7 @@ const { t } = useI18n();
   }
 
   .data-empty-text {
-    font-size: 14px;
+    font-size: 12px;
     color: #131926;
     line-height: 21px;
   }

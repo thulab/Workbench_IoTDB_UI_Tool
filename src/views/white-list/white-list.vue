@@ -266,7 +266,7 @@ watch(
   }
 
   .data-empty-text {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 400;
     line-height: 21px;
     color: #131926;
