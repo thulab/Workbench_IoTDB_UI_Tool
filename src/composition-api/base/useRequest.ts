@@ -20,6 +20,7 @@ interface Opt<T> {
 
 const showError = (message: string, code?: number) => {
   if (!message) return;
+  if (message.includes('305: Can not borrow client for node null')) return;
   // 有code 并且在toastErrorCode中 或者 code不包含-的
   if (code && alertErrorCode.includes(code) && !window.__errBoxShowing__) {
     window.__errBoxShowing__ = true;
