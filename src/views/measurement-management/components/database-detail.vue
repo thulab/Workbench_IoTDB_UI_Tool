@@ -238,10 +238,22 @@
                   link
                   size="small"
                   :disabled="currentDatabase === 'root.__system' || row.dataType === 'TEXT'"
-                  @click="handleRowTrend(row)"
-                  :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-trend`"
+                  @click="handleRowRunningTrend(row)"
+                  :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-running-trend`"
                 >
-                  {{ t('page.trend') }}
+                  {{ t('page.runningTrend') }}
+                </el-button>
+              </el-tooltip>
+              <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('measurement.goTrendTip')" :disabled="row.dataType !== 'TEXT'" popper-class="tooltip-box-width">
+                <el-button
+                  type="primary"
+                  link
+                  size="small"
+                  :disabled="currentDatabase === 'root.__system' || row.dataType === 'TEXT'"
+                  @click="handleRowHistoryTrend(row)"
+                  :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-history-trend`"
+                >
+                  {{ t('page.historyTrend') }}
                 </el-button>
               </el-tooltip>
               <auth-tooltip :is-disabled="rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)" :content="'common.schemaAuthAnother'">
@@ -651,9 +663,18 @@ function handleRowAlarm(row: MeasurementItem) {
   });
 }
 
-function handleRowTrend(row: MeasurementItem) {
+function handleRowRunningTrend(row: MeasurementItem) {
   router.push({
     name: 'TreeRunningTrend',
+    query: {
+      measurement: `${row.deviceName}.${row.timeseries}`,
+    },
+  });
+}
+
+function handleRowHistoryTrend(row: MeasurementItem) {
+  router.push({
+    name: 'TreeHistoryTrend',
     query: {
       measurement: `${row.deviceName}.${row.timeseries}`,
     },

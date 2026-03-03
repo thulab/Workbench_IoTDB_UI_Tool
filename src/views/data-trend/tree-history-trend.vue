@@ -78,7 +78,9 @@ import type { TrendTemplate } from '@/types';
 import { useTreeHistoryTrendStore } from '@/stores/trend.store';
 import { SearchApi } from '@/api';
 import dayjs from 'dayjs';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
 const userStore = useUserStore();
 const { canReadWriteSchema } = storeToRefs(userStore);
 const currentNode = ref('root');
@@ -539,10 +541,15 @@ function restoreData() {
 // ========== 生命周期函数 ==========
 
 onMounted(() => {
-  if (window.sessionStorage.getItem(storageKey)) {
-    restoreData();
+  if (route.query.measurement) {
+    createGroup(route.query.measurement as string);
+    trendStore.initializeState();
   } else {
-    window.sessionStorage.setItem(storageKey, '');
+    if (window.sessionStorage.getItem(storageKey)) {
+      restoreData();
+    } else {
+      window.sessionStorage.setItem(storageKey, '');
+    }
   }
   getTemplateList();
 });
