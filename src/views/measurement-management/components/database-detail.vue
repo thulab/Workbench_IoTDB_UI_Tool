@@ -232,30 +232,23 @@
                   {{ t('page.alarm') }}
                 </el-button>
               </el-tooltip>
-              <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('measurement.goTrendTip')" :disabled="row.dataType !== 'TEXT'" popper-class="tooltip-box-width">
+              <el-dropdown class="m-l-[12px] m-r-[12px]" :disabled="currentDatabase === 'root.__system' || row.dataType === 'TEXT'" @command="(val) => handleTrendCommandDown(val)" id="trend-dropdown">
                 <el-button
                   type="primary"
                   link
                   size="small"
                   :disabled="currentDatabase === 'root.__system' || row.dataType === 'TEXT'"
-                  @click="handleRowRunningTrend(row)"
                   :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-running-trend`"
                 >
-                  {{ t('page.runningTrend') }}
+                  {{ t('page.trend') }}
                 </el-button>
-              </el-tooltip>
-              <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('measurement.goTrendTip')" :disabled="row.dataType !== 'TEXT'" popper-class="tooltip-box-width">
-                <el-button
-                  type="primary"
-                  link
-                  size="small"
-                  :disabled="currentDatabase === 'root.__system' || row.dataType === 'TEXT'"
-                  @click="handleRowHistoryTrend(row)"
-                  :id="`mesaurement-table-${row.deviceName}.${row.timeseries}-history-trend`"
-                >
-                  {{ t('page.historyTrend') }}
-                </el-button>
-              </el-tooltip>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item :command="{ type: 'running', row }" id="mesaurement-download-csv">{{ t('page.runningTrend') }}</el-dropdown-item>
+                    <el-dropdown-item :command="{ type: 'history', row }" id="mesaurement-download-xlsx">{{ t('page.historyTrend') }}</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
               <auth-tooltip :is-disabled="rowCanWriteSchemaByPath(`${row.deviceName}.${row.timeseries}`)" :content="'common.schemaAuthAnother'">
                 <el-button
                   type="primary"
@@ -606,6 +599,14 @@ function handleExportData(exportType: string) {
 // 下载
 function handleCommandDown(val: string) {
   handleExportData(val);
+}
+
+function handleTrendCommandDown(payload: { type: string; row: MeasurementItem }) {
+  if (payload.type === 'running') {
+    handleRowRunningTrend(payload.row);
+  } else if (payload.type === 'history') {
+    handleRowHistoryTrend(payload.row);
+  }
 }
 
 // 新增测点
