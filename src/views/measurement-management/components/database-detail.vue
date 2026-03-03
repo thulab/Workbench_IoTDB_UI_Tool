@@ -653,7 +653,7 @@ function handleRowAlarm(row: MeasurementItem) {
 
 function handleRowTrend(row: MeasurementItem) {
   router.push({
-    name: 'TrendDetail',
+    name: 'TreeRunningTrend',
     query: {
       measurement: `${row.deviceName}.${row.timeseries}`,
     },
