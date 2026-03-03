@@ -276,7 +276,7 @@ const availableMeasurements = computed(() => {
 });
 
 const canAdd = computed(() => {
-  return formData.selectedDatabase && formData.selectedTable && singleSelectedDevice.value && formData.selectedMeasurement && formData.selectedMeasurement.length > 0;
+  return formData.selectedDatabase && formData.selectedTable && (tableData.value.length === 0 || singleSelectedDevice.value) && formData.selectedMeasurement && formData.selectedMeasurement.length > 0;
 });
 
 // 表单验证规则
@@ -310,8 +310,10 @@ const deviceColumns = computed<globalThis.DynamicTableColumn[]>(() => {
 
 // 方法
 const handleSingleDeviceSelected = (currentRow: Record<string, string>) => {
-  singleSelectedDevice.value = currentRow;
-  currentRowKey.value = currentRow.id ?? null;
+  if (currentRow && currentRow.id) {
+    singleSelectedDevice.value = currentRow;
+    currentRowKey.value = currentRow.id ?? null;
+  }
 };
 
 const handleCheckboxChange = (row: Record<string, string>) => {
@@ -371,22 +373,23 @@ const initModal = async () => {
 
 const handleDatabaseChange = () => {
   // 清空表选择和相关状态
-  formData.selectedTable = '';
-  deviceTableData.value = [];
-  singleSelectedDevice.value = null;
   formData.selectedMeasurement = [];
+  singleSelectedDevice.value = null;
+  currentRowKey.value = null;
+  deviceTableData.value = [];
+  formData.selectedTable = '';
 };
 
 const handleTableChange = () => {
   // 清空相关状态
   deviceTableData.value = [];
   singleSelectedDevice.value = null;
+  currentRowKey.value = null;
   if (availableTags.value.length === 0) {
     tagFilters.value = [{ variable: '', value: '' }];
   } else {
     tagFilters.value = [{ variable: availableTags.value[0]!.nodeName, value: '' }];
   }
-
   searchDevices();
   formData.selectedMeasurement = [];
 };
@@ -439,7 +442,9 @@ const loadDevice = async (page: number = 1) => {
     }
     if (page === 1) {
       currentPage.value = 1;
-      deviceTableData.value = data;
+      deviceTableData.value = [...data];
+      singleSelectedDevice.value = null;
+      currentRowKey.value = null;
     } else {
       currentPage.value = page;
       deviceTableData.value.push(...data);
@@ -462,6 +467,7 @@ const handleClear = () => {
   internalSelectedMeasurements.value = [];
   formData.selectedMeasurement = [];
   singleSelectedDevice.value = null;
+  currentRowKey.value = null;
   tagFilters.value = [{ variable: '', value: '' }];
   deviceTableData.value = [];
   noMoreData.value = false;
