@@ -273,10 +273,23 @@ function recursionFindParent(path: string, data: Array<StorageDeviceTreeNodeData
 }
 // 填充 loading
 function fillTreeLoading(nodes: Array<StorageDeviceTreeNodeData>) {
-  nodes.forEach((node) => {
+  nodes.forEach(async (node) => {
     if (node && !node.pageChildren && node.children && node.children.length > 0) {
       const dataPathTotal = Math.ceil(node.children.length / pageSize);
       node.pageChildren = node.children.slice(0, 1 * pageSize);
+      const tasks = node.pageChildren.map((item) => {
+        return async () => {
+          if (item.nodeType === 'TIMESERIES' && !fetchedMeasurementDataType.has(item.nodePath)) {
+            const infoRes = await getMeasurementsInfo(item.nodePath);
+            const dataType = infoRes.data.dataType;
+            if (dataType) {
+              fetchedMeasurementDataType.set(item.nodePath, dataType);
+            }
+          }
+          return Promise.resolve();
+        };
+      });
+      promisePool(tasks, 10);
       node.pageNum = 1;
       node.totalPage = dataPathTotal;
       if (dataPathTotal > 1) {
