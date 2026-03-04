@@ -27,8 +27,8 @@
             :height="treeHeight"
             :expand-on-click-node="true"
             :default-expanded-keys="expandNodes"
-            @node-click="handleNodeClick"
-            @node-expand="handleNodeClick"
+            @node-click="(data: TreeNodeData, node: TreeNode, e: MouseEvent) => handleNodeClick(data, node, e, 'click')"
+            @node-expand="(data: TreeNodeData, node: TreeNode, e: MouseEvent) => handleNodeClick(data, node, e, 'expand')"
             @node-collapse="handleNodeCollapse"
             @handle-click-more="handleClickMore"
           >
@@ -584,8 +584,8 @@ function handleNodeCollapse(data: TreeNodeData, node: TreeNode) {
   }
 }
 
-function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
-  if (data.nodeType === 'PAGE') {
+function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent, source: 'click' | 'expand') {
+  if (data.nodeType === 'PAGE' || source === 'click') {
     e?.stopPropagation();
     return;
   }
