@@ -25,10 +25,10 @@
             :indent="8"
             :item-size="28"
             :height="treeHeight"
-            :expand-on-click-node="false"
+            :expand-on-click-node="true"
             :default-expanded-keys="expandNodes"
-            @node-click="handleNodeClick"
-            @node-expand="handleNodeClick"
+            @node-click="(data: TreeNodeData, node: TreeNode, e: MouseEvent) => handleNodeClick(data, node, e, 'click')"
+            @node-expand="(data: TreeNodeData, node: TreeNode, e: MouseEvent) => handleNodeClick(data, node, e, 'expand')"
             @node-collapse="handleNodeCollapse"
           >
             <!-- eslint-disable-next-line vue/no-unused-vars -->
@@ -570,8 +570,8 @@ async function promisePool(tasks: Array<() => Promise<any>>, maxConcurrency: num
   return results;
 }
 
-async function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
-  if (data.nodeType === 'PAGE' || data.nodeType === 'TIMESERIES') {
+async function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent, source: 'click' | 'expand') {
+  if (data.nodeType === 'PAGE' || data.nodeType === 'TIMESERIES' || source === 'click') {
     e?.stopPropagation();
     return;
   }
