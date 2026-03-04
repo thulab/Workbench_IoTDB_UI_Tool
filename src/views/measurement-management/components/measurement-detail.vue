@@ -71,11 +71,19 @@
             {{ t('measurement.viewAlarm') }}
           </el-button>
         </el-tooltip>
-        <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('measurement.goTrendTip')" :disabled="measurementInfos.dataType !== 'TEXT'" popper-class="tooltip-box-width">
-          <el-button size="small" :disabled="measurementInfos.dataType === 'TEXT'" @click="handleTrend" :id="`${currentMeasurement}-trend`">
-            {{ t('measurement.viewTrend') }}
+        <el-dropdown class="m-l-[12px] m-r-[12px]" :disabled="measurementInfos.dataType === 'TEXT'" @command="(val) => handleTrendCommandDown(val)" id="trend-dropdown">
+          <el-button size="small" :disabled="measurementInfos.dataType === 'TEXT'" :id="`${currentMeasurement}-trend`">
+            <el-tooltip placement="top-start" effect="light" :content="t('measurement.goTrendTip')" :disabled="measurementInfos.dataType !== 'TEXT'" popper-class="tooltip-box-width">
+              {{ t('measurement.viewTrend') }}
+            </el-tooltip>
           </el-button>
-        </el-tooltip>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="running" id="mesaurement-download-csv">{{ t('page.runningTrend') }}</el-dropdown-item>
+              <el-dropdown-item command="history" id="mesaurement-download-xlsx">{{ t('page.historyTrend') }}</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
         <auth-tooltip :is-disabled="rowCanWriteSchemaByPath(currentMeasurement)" :content="'common.schemaAuthAnother'">
           <el-button size="small" :disabled="!rowCanWriteSchemaByPath(currentMeasurement)" @click="handleDelMeasurement" :id="`mesaurement-table-${currentMeasurement}-del`">
             {{ t('common.delete') }}
@@ -279,13 +287,22 @@ function handleAlarm() {
   });
 }
 
-function handleTrend() {
-  router.push({
-    name: 'TrendDetail',
-    query: {
-      measurement: props.currentMeasurement,
-    },
-  });
+function handleTrendCommandDown(type: string) {
+  if (type === 'running') {
+    router.push({
+      name: 'TreeRunningTrend',
+      query: {
+        measurement: props.currentMeasurement,
+      },
+    });
+  } else if (type === 'history') {
+    router.push({
+      name: 'TreeHistoryTrend',
+      query: {
+        measurement: props.currentMeasurement,
+      },
+    });
+  }
 }
 
 function handleDelMeasurement() {
