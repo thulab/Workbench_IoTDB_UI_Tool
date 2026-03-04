@@ -608,19 +608,6 @@ async function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent
 
   const res = await getNextNodeInfos(data.nodePath);
   const list = res.data || [];
-  const tasks = list.map((item, i) => {
-    return async () => {
-      if (item.nodeType === 'TIMESERIES' && !fetchedMeasurementDataType.has(item.nodePath)) {
-        const infoRes = await getMeasurementsInfo(item.nodePath);
-        const dataType = infoRes.data.dataType;
-        if (dataType) {
-          fetchedMeasurementDataType.set(item.nodePath, dataType);
-        }
-      }
-      return Promise.resolve();
-    };
-  });
-  promisePool(tasks, 10);
 
   // 展示点开操作查看的data 都在pageChildren 属性，需找到对应的children 上追加子节点
   const originTreeData = recursionFindCurrentByOrigin(data.nodePath, treeData.value)!;
@@ -629,6 +616,15 @@ async function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent
   const dataPathTotal = Math.ceil(cloneData.length / pageSize);
 
   data.pageChildren = cloneData.slice(0, 1 * pageSize);
+  for (const child of data.pageChildren) {
+    if (child.nodeType === 'TIMESERIES' && !fetchedMeasurementDataType.has(child.nodePath)) {
+      const infoRes = await getMeasurementsInfo(child.nodePath);
+      const dataType = infoRes.data.dataType;
+      if (dataType) {
+        fetchedMeasurementDataType.set(child.nodePath, dataType);
+      }
+    }
+  }
   data.pageNum = 1;
   data.totalPage = dataPathTotal;
   if (dataPathTotal > 1) {
@@ -651,12 +647,22 @@ async function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent
 }
 
 // 查看更多--下一页
-function handleNext(e: MouseEvent, data: TreeNodeData) {
+async function handleNext(e: MouseEvent, data: TreeNodeData) {
   e.stopPropagation();
   const originTreeData = recursionFindCurrentByOrigin(`${data.parentPath ? `${data.parentPath}.` : ''}${data.node}`, treeData.value)!;
   const currentTreeData = recursionFindParent(`${data.parentPath ? `${data.parentPath}.` : ''}${data.node}`, treeData.value)!;
   currentTreeData.pageChildren!.pop();
-  currentTreeData.pageChildren = currentTreeData.pageChildren?.concat(originTreeData.children!.slice(data.pageNum * pageSize, (data.pageNum + 1) * pageSize));
+  const toAddChildren = originTreeData.children!.slice(data.pageNum! * pageSize, (data.pageNum! + 1) * pageSize);
+  currentTreeData.pageChildren = currentTreeData.pageChildren?.concat(toAddChildren);
+  for (const child of toAddChildren) {
+    if (child.nodeType === 'TIMESERIES' && !fetchedMeasurementDataType.has(child.nodePath)) {
+      const infoRes = await getMeasurementsInfo(child.nodePath);
+      const dataType = infoRes.data.dataType;
+      if (dataType) {
+        fetchedMeasurementDataType.set(child.nodePath, dataType);
+      }
+    }
+  }
   currentTreeData.pageNum = data.pageNum + 1;
   let currentTotalPage = currentTreeData.totalPage!;
   if (isSearchResult.value) {
@@ -676,12 +682,26 @@ function handleNext(e: MouseEvent, data: TreeNodeData) {
 }
 
 // 查看全部
-function handleAll(e: MouseEvent, data: TreeNodeData) {
+async function handleAll(e: MouseEvent, data: TreeNodeData) {
   e.stopPropagation();
   const originTreeData = recursionFindCurrentByOrigin(`${data.parentPath ? `${data.parentPath}.` : ''}${data.node}`, treeData.value)!;
   const currentTreeData = recursionFindParent(`${data.parentPath ? `${data.parentPath}.` : ''}${data.node}`, treeData.value)!;
   currentTreeData.pageChildren!.pop();
-  currentTreeData.pageChildren = currentTreeData.pageChildren?.concat(originTreeData.children!.slice(data.pageNum * pageSize));
+  const toAddChildren = originTreeData.children!.slice(data.pageNum! * pageSize);
+  const tasks = toAddChildren.map((item) => {
+    return async () => {
+      if (item.nodeType === 'TIMESERIES' && !fetchedMeasurementDataType.has(item.nodePath)) {
+        const infoRes = await getMeasurementsInfo(item.nodePath);
+        const dataType = infoRes.data.dataType;
+        if (dataType) {
+          fetchedMeasurementDataType.set(item.nodePath, dataType);
+        }
+      }
+      return Promise.resolve();
+    };
+  });
+  promisePool(tasks, 10);
+  currentTreeData.pageChildren = currentTreeData.pageChildren?.concat(toAddChildren);
   measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
 }
 
