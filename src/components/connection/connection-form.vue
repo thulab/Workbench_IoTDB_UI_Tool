@@ -443,10 +443,14 @@ function handleTestLogin() {
           window.sessionStorage.setItem('dataSearchStorage', '');
           window.sessionStorage.setItem('statisticSearchStorage', '');
           window.sessionStorage.setItem('sqlSearchStorage', '');
-          window.sessionStorage.setItem('dataTrendStorage', '');
+          // window.sessionStorage.setItem('dataTrendStorage', '');
           window.sessionStorage.setItem('dataSpectrumStorage', '');
           window.sessionStorage.setItem('configStorage', '');
           window.sessionStorage.setItem('aiVisualizationStorage', '');
+          window.sessionStorage.setItem('newTreeDataRunningTrendStorage', '');
+          window.sessionStorage.setItem('newTreeDataHistoryTrendStorage', '');
+          window.sessionStorage.setItem('newTableDataRunningTrendStorage', '');
+          window.sessionStorage.setItem('newTableDataHistoryTrendStorage', '');
           if (route.name === 'Login') {
             router.push({ name: 'Dashboard' });
           } else {

@@ -90,10 +90,14 @@ function handleDashboard() {
   window.sessionStorage.setItem('dataSearchStorage', '');
   window.sessionStorage.setItem('statisticSearchStorage', '');
   window.sessionStorage.setItem('sqlSearchStorage', '');
-  window.sessionStorage.setItem('dataTrendStorage', '');
+  // window.sessionStorage.setItem('dataTrendStorage', '');
   window.sessionStorage.setItem('dataSpectrumStorage', '');
   window.sessionStorage.setItem('configStorage', '');
   window.sessionStorage.setItem('aiVisualizationStorage', '');
+  window.sessionStorage.setItem('newTreeDataRunningTrendStorage', '');
+  window.sessionStorage.setItem('newTreeDataHistoryTrendStorage', '');
+  window.sessionStorage.setItem('newTableDataRunningTrendStorage', '');
+  window.sessionStorage.setItem('newTableDataHistoryTrendStorage', '');
   nextTick(() => {
     window.location.href = `${HOME_URL}?switch=1`;
   });
