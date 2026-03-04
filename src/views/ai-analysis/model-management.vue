@@ -26,20 +26,18 @@
             <div class="page-table-title-box">
               <h4 class="page-table-title">{{ t('aiAnalysis.modelList') }}</h4>
               <div class="operate-buttons">
-                <auth-tooltip :is-disabled="!applyTip" :content="applyTip">
+                <auth-tooltip :is-disabled="!fineTuningTip" :content="fineTuningTip">
                   <el-button
                     type="primary"
                     @click="handleFineTuning"
-                    :disabled="!isTableModel && (!canUseModel || !enableAINode || !connectionIsActive || !!applyTip)"
+                    :disabled="!isTableModel && (!canUseModel || !enableAINode || !connectionIsActive || !!fineTuningTip)"
                     id="model-management-fineTuning"
                   >
                     {{ t('aiAnalysis.fineTuning') }}
                   </el-button>
                 </auth-tooltip>
                 <auth-tooltip :is-disabled="!applyTip" :content="applyTip">
-                  <el-button type="primary" @click="handleImport" :disabled="!isTableModel && (!canUseModel || !enableAINode || !!applyTip)" id="model-management-add">{{
-                    t('aiAnalysis.importModel')
-                  }}</el-button>
+                  <el-button type="primary" @click="handleImport" :disabled="true" id="model-management-add">{{ t('aiAnalysis.importModel') }}</el-button>
                 </auth-tooltip>
                 <auth-tooltip :is-disabled="!applyTip" :content="applyTip">
                   <el-button
@@ -53,7 +51,7 @@
                 </auth-tooltip>
               </div>
             </div>
-            <version-container :is-show="showAuthMenu" :versionTip="'2.0.5'">
+            <version-container :is-show="showAuthMenu" :versionTip="'2.0.8'">
               <auth-container
                 :is-auth="isTableModel || (enableAINode && canUseModel)"
                 :content="!enableAINode ? 'aiAnalysis.enableTip' : isTableModel ? '' : 'common.modelAuth'"
@@ -73,7 +71,7 @@
                     ref="tableRef"
                     @selection-change="handleSelectionChange"
                   >
-                    <el-table-column type="selection" :reserve-selection="true" :selectable="(row) => !row.modelType.startsWith('内置模型')" width="55" />
+                    <el-table-column type="selection" :reserve-selection="true" :selectable="(row) => row.category !== 'BUILT-IN'" width="55" />
                     <el-table-column :label="t('aiAnalysis.modelName')" prop="modelId" min-width="180" align="center" show-overflow-tooltip />
                     <el-table-column :label="t('aiAnalysis.category')" prop="categoryString" min-width="160" align="center" show-overflow-tooltip>
                       <template #default="{ row }">
@@ -160,6 +158,7 @@ import { useUserStore, useConnectionStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 import { AIAnalysisApi } from '@/api';
 import { iotdbShowAuth } from '@/utils/auth';
+import { standardizeModel } from '@/utils/ai-model';
 import type { Model } from '@/types';
 
 import ICustomMessageWarning from '~icons/custom/message-warning.svg';
@@ -175,7 +174,7 @@ const { enableAINode, connectionIsActive, isTableModel } = storeToRefs(connectio
 
 const connectionIsActiveBoolean = computed(() => !!connectionIsActive.value);
 
-const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '2.0.5'));
+const showAuthMenu = computed(() => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '2.0.8'));
 const importVisible = ref(false);
 const configVisible = ref(false);
 const fineTuningVisible = ref(false);
@@ -209,7 +208,8 @@ const { requestFn: getModels, loading } = useRequest(AIAnalysisApi.getModels);
 const { requestFn: batchDeleteModel } = useRequest(AIAnalysisApi.batchDeleteModel);
 
 function formatState(state: string) {
-  switch (state) {
+  const upperState = state.toUpperCase();
+  switch (upperState) {
     case 'ACTIVE':
       return 'success';
     case 'INACTIVE':
@@ -221,6 +221,21 @@ function formatState(state: string) {
 }
 
 const applyTip = computed(() => {
+  // 版本号小于 2.0.8 则提示升级
+  if (!showAuthMenu.value) {
+    return t('common.versionTip', { version: '2.0.8' });
+  }
+  if (isTableModel.value) {
+    return '';
+  }
+  if (!canUseModel.value) {
+    return t('common.modelAuth');
+  }
+  return '';
+});
+
+// 一键微调按钮的提示
+const fineTuningTip = computed(() => {
   if (isTableModel.value) {
     return '';
   }
@@ -234,14 +249,23 @@ const applyTip = computed(() => {
 });
 
 function getListData() {
+  // 如果没有启用 AINode，则不发送请求
+  if (!enableAINode.value) {
+    tableData.value = [];
+    totalCount.value = 0;
+    return;
+  }
+
+  // 版本号小于 2.0.8 则不发送请求
+  if (!showAuthMenu.value) {
+    tableData.value = [];
+    totalCount.value = 0;
+    return;
+  }
+
   getModels(searchFormData.name).then((res) => {
     if (res.data) {
-      tableData.value = res.data
-        .filter((item) => searchFormData.name === '' || item.modelId.toLowerCase().includes(searchFormData.name.toLowerCase()))
-        .map((item) => {
-          item.configs = item.configs || '';
-          return item;
-        });
+      tableData.value = res.data.filter((item) => searchFormData.name === '' || item.modelId.toLowerCase().includes(searchFormData.name.toLowerCase())).map((item) => standardizeModel(item));
     }
     totalCount.value = tableData.value.length;
   });
@@ -326,7 +350,7 @@ function handleBatchDel() {
 }
 
 watch(
-  [() => connectionIsActiveBoolean.value, () => showAuthMenu.value],
+  [() => connectionIsActiveBoolean.value, () => showAuthMenu.value, () => enableAINode.value],
   () => {
     handleSearch();
   },
@@ -350,6 +374,7 @@ watch(
   display: flex;
   flex: 1;
   flex-direction: column;
+  height: 100%;
 }
 
 .page-table-title-box {

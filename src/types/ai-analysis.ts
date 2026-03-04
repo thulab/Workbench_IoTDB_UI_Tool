@@ -5,7 +5,7 @@ export interface Model {
   categoryString: string;
   state: string;
   stateString: string;
-  configs: string;
+  // configs 字段已移除，后端不再返回
 }
 export interface SearchCondition {
   // 业务场景(预测：BUILT_IN_FORECAST；异常检测：BUILT_IN_ANOMALY_DETECTION；自定义：USER_DEFINED)

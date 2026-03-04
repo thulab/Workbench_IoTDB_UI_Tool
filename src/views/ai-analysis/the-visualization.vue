@@ -140,7 +140,7 @@
             </el-form>
           </div>
         </el-header>
-        <version-container :is-show="showAuthMenu" :versionTip="connectionStore.isTableModel ? '2.0.5' : '2.0.5 或 2.0.8'">
+        <version-container :is-show="showAuthMenu" :versionTip="'2.0.8'">
           <auth-container
             :is-auth="(canUseModel && canReadWriteData && enableAINode) || connectionStore.isTableModel"
             :content="enableAINode ? 'common.dataAndModelAuth' : 'aiAnalysis.enableTip'"
@@ -321,8 +321,8 @@ import { AIAnalysisApi, TableDataApi } from '@/api';
 import { echarts, type ECOption } from '@/plugins/echarts-plugin';
 import { today, getOneIntervalNow, todayNow, formatDate } from '@/utils/date';
 import { useUserStore, useConnectionStore, useDbStore } from '@/stores';
-import { parse } from 'yaml';
 import { iotdbShowAuth } from '@/utils/auth';
+import { standardizeModel } from '@/utils/ai-model';
 import ModalTableMeasurement from './components/modal-table-measurement.vue';
 import ICustomCalender from '~icons/custom/calender.svg';
 import ModalSql from './components/modal-sql.vue';
@@ -345,12 +345,8 @@ const connectionStore = useConnectionStore();
 const dbStore = useDbStore();
 
 const showAuthMenu = computed(() => {
-  // 2.0.5 以上可以使用 AINode
-  const canUse = iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '2.0.5');
-  // 树模型不支持 2.0.6 和 2.0.7 版，需更新至 2.0.8
-  if (!connectionStore.isTableModel && (connectionStore.connectionInfo.currentVersion?.startsWith('2.0.6') || connectionStore.connectionInfo.currentVersion?.startsWith('2.0.7'))) {
-    return false;
-  }
+  // 2.0.8 以上可以使用 AINode
+  const canUse = iotdbShowAuth(connectionStore.connectionInfo.currentVersion, '2.0.8');
   return canUse;
 });
 const connectionIsActive = computed(() => typeof connectionStore.connectionIsActive === 'boolean');
@@ -472,15 +468,25 @@ const notComplete = computed(() => {
 });
 
 const applyTip = computed(() => {
+  if (!showAuthMenu.value) {
+    return t('common.versionTip', { version: '2.0.8' });
+  }
   if (connectionStore.isTableModel) {
+    // 如果还没有选择测点，不显示提示
+    if (!searchFormData.measurement) {
+      return t('spectrum.applyTip');
+    }
+
     return '';
   }
   if (!canReadWriteData.value || !canUseModel.value) {
     return t('common.dataAndModelAuth');
   }
-  if (!showAuthMenu.value) {
-    return t('common.useVersionTip', { version: '2.0.5' });
+  // 如果还没有选择测点，显示原有提示
+  if (!searchFormData.measurement) {
+    return t('spectrum.applyTip');
   }
+
   return t('spectrum.applyTip');
 });
 
@@ -488,6 +494,10 @@ const tableModelMeasurementReady = computed(() => connectionStore.isTableModel &
 const canTableDownload = computed(() => hasTableModelPrivilege('SELECT', searchFormData.database, searchFormData.table));
 
 const canQuery = computed(() => {
+  if (!showAuthMenu.value) {
+    return false;
+  }
+
   if (connectionStore.isTableModel) {
     if (sqlValue.value) {
       return true;
@@ -518,20 +528,8 @@ const modelOptions = computed(() => {
 });
 
 const allowedTypes = computed(() => {
-  let result: string[] = ['INT32', 'INT64', 'FLOAT', 'DOUBLE'];
-  const current = modelOptions.value.find((item) => item.modelId === searchFormData.method);
-  if (current && current.configs) {
-    let output = '';
-    current.configs.split(']').forEach((line) => {
-      if (line) {
-        output += `${line.replace(':[', ': [')}]\n`;
-      }
-    });
-    const data = parse(output);
-    if (data && data.inputDataType && data.inputDataType.length) {
-      result = data.inputDataType;
-    }
-  }
+  // configs 字段已移除，使用默认支持的数据类型
+  const result: string[] = ['INT32', 'INT64', 'FLOAT', 'DOUBLE'];
   return result;
 });
 
@@ -857,9 +855,18 @@ function getModelList() {
       return;
     }
   }
+
+  if (!showAuthMenu.value) {
+    defaultMethod = [];
+    searchFormData.method = searchFormData.type === 2 ? '' : defaultMethod;
+    modelList.value = [];
+    return;
+  }
+
   getModels('')
     .then((res) => {
-      modelList.value = res.data || [];
+      // 标准化数据格式，兼容后端返回的小写字段
+      modelList.value = (res.data || []).map((item) => standardizeModel(item));
       if (modelList.value.some((m) => m.modelId === 'sundial')) {
         defaultMethod = ['sundial'];
       } else {
@@ -975,7 +982,7 @@ function handleSearch() {
     };
     search(query)
       .then((res) => {
-        if ((!res.data.raw || res.data.raw.length === 0) && (!res.data.analysis || res.data.analysis[0]!.length === 0)) {
+        if ((!res.data.raw || res.data.raw.length === 0) && (!res.data.analysis || Object.keys(res.data.analysis).length === 0)) {
           ElMessage.warning({ message: t('dataTrend.noDataTip'), grouping: true });
           setOption(chartOptions.value, true);
           return;

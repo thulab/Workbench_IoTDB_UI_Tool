@@ -108,6 +108,7 @@ import MonacoEditor from '@/components/monaco-editor/monaco-editor.vue';
 import { useConnectionStore, useDbStore } from '@/stores';
 import { AIAnalysisApi } from '@/api';
 import { getStartAndEnd } from '@/utils/date';
+import { standardizeModel } from '@/utils/ai-model';
 import ICustomCalender from '~icons/custom/calender.svg';
 import type { Model, MeasurementDataItem } from '@/types';
 
@@ -273,7 +274,8 @@ function handleDatabaseSelected() {
 
 onMounted(() => {
   getModels('').then((res) => {
-    modelList.value = res.data.filter((item) => item.state === 'ACTIVE') || [];
+    // 标准化数据格式，兼容后端返回的小写字段，并过滤出激活状态的模型
+    modelList.value = (res.data || []).map((item) => standardizeModel(item)).filter((item) => item.state === 'ACTIVE');
   });
   dbStore.getDatabases();
 });
