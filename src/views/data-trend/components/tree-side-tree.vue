@@ -25,7 +25,7 @@
             :indent="8"
             :item-size="28"
             :height="treeHeight"
-            :expand-on-click-node="true"
+            :expand-on-click-node="false"
             :default-expanded-keys="expandNodes"
             @node-click="handleNodeClick"
             @node-expand="handleNodeClick"
@@ -168,14 +168,11 @@ const onResize = debounce(() => {
 
 function handleNodeDoubleClick(data: TreeNodeData) {
   if (data.nodeType === 'TIMESERIES') {
-    getMeasurementsInfo(data.nodePath).then((res) => {
-      const dataType = res.data.dataType;
-      if (dataType && validDataType.includes(dataType)) {
-        emit('doubleClickMeasurement', `${data.nodePath}`);
-      } else {
-        ElMessage.warning({ message: t('dataTrend.dataTypeTip'), grouping: true });
-      }
-    });
+    if (validDataType.includes(fetchedMeasurementDataType.get(data.nodePath) || '')) {
+      emit('doubleClickMeasurement', `${data.nodePath}`);
+    } else {
+      ElMessage.warning({ message: t('dataTrend.dataTypeTip'), grouping: true });
+    }
   }
 }
 
@@ -546,7 +543,34 @@ function handleNodeCollapse(data: TreeNodeData, node: TreeNode) {
   }
 }
 
-function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
+async function promisePool(tasks: Array<() => Promise<any>>, maxConcurrency: number) {
+  const results = new Array(tasks.length);
+  let currentIndex = 0;
+
+  async function worker() {
+    while (true) {
+      const index = currentIndex++;
+      if (index >= tasks.length) break;
+
+      const task = tasks[index];
+      if (!task) break;
+
+      try {
+        results[index] = await task();
+      } catch (error) {
+        results[index] = Promise.reject(error);
+      }
+    }
+  }
+
+  // 创建最多 maxConcurrency 个 worker
+  const workers = Array.from({ length: Math.min(maxConcurrency, tasks.length) }, () => worker());
+
+  await Promise.all(workers);
+  return results;
+}
+
+async function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
   if (data.nodeType === 'PAGE' || data.nodeType === 'TIMESERIES') {
     e?.stopPropagation();
     return;
@@ -581,45 +605,48 @@ function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
   if ((!children || (children[0]!.data as TreeNodeData).nodeType !== 'loading') && data.pageChildren[0]!.nodeType !== 'loading') {
     return;
   }
-  getNextNodeInfos(data.nodePath).then((res) => {
-    const list = res.data || [];
-    for (const item of list) {
+
+  const res = await getNextNodeInfos(data.nodePath);
+  const list = res.data || [];
+  const tasks = list.map((item, i) => {
+    return async () => {
       if (item.nodeType === 'TIMESERIES' && !fetchedMeasurementDataType.has(item.nodePath)) {
-        getMeasurementsInfo(item.nodePath).then((infoRes) => {
-          const dataType = infoRes.data.dataType;
-          if (dataType) {
-            fetchedMeasurementDataType.set(item.nodePath, dataType);
-          }
-        });
+        const infoRes = await getMeasurementsInfo(item.nodePath);
+        const dataType = infoRes.data.dataType;
+        if (dataType) {
+          fetchedMeasurementDataType.set(item.nodePath, dataType);
+        }
       }
-    }
+      return Promise.resolve();
+    };
+  });
+  await promisePool(tasks, 10);
 
-    // 展示点开操作查看的data 都在pageChildren 属性，需找到对应的children 上追加子节点
-    const originTreeData = recursionFindCurrentByOrigin(data.nodePath, treeData.value)!;
-    const cloneData = fillChildLoading(cloneDeep(list));
-    originTreeData.children = cloneDeep(cloneData);
-    const dataPathTotal = Math.ceil(cloneData.length / pageSize);
+  // 展示点开操作查看的data 都在pageChildren 属性，需找到对应的children 上追加子节点
+  const originTreeData = recursionFindCurrentByOrigin(data.nodePath, treeData.value)!;
+  const cloneData = fillChildLoading(cloneDeep(list));
+  originTreeData.children = cloneDeep(cloneData);
+  const dataPathTotal = Math.ceil(cloneData.length / pageSize);
 
-    data.pageChildren = cloneData.slice(0, 1 * pageSize);
-    data.pageNum = 1;
-    data.totalPage = dataPathTotal;
-    if (dataPathTotal > 1) {
-      data.pageChildren?.push({
-        node: data.node,
-        nodePath: `${data.nodePath}__PAGE`,
-        nodeType: 'PAGE',
-        parentPath: data.parentPath || '',
-        pageNum: 1,
-        totalPage: dataPathTotal,
-      });
-    }
-    measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
-    measurementTree.value?.virtualizedTreeRef?.expandNode(node);
-    nextTick(() => {
-      if (addPaths.value.length > 0) {
-        expandNodeByKey();
-      }
+  data.pageChildren = cloneData.slice(0, 1 * pageSize);
+  data.pageNum = 1;
+  data.totalPage = dataPathTotal;
+  if (dataPathTotal > 1) {
+    data.pageChildren?.push({
+      node: data.node,
+      nodePath: `${data.nodePath}__PAGE`,
+      nodeType: 'PAGE',
+      parentPath: data.parentPath || '',
+      pageNum: 1,
+      totalPage: dataPathTotal,
     });
+  }
+  measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
+  measurementTree.value?.virtualizedTreeRef?.expandNode(node);
+  nextTick(() => {
+    if (addPaths.value.length > 0) {
+      expandNodeByKey();
+    }
   });
 }
 
