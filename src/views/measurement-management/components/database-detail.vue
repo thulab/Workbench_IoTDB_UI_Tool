@@ -360,6 +360,7 @@ const editAlias = ref('');
 const editTags = ref('');
 const searchType = ref('name');
 const searchPlaceholder = computed(() => (searchType.value === 'name' ? t('calculate.namePlaceholder') : t('calculate.descPlaceholder')));
+const isGettingListData = ref(false);
 
 const colButtonRef = ref();
 const colPopoverRef = ref();
@@ -502,6 +503,8 @@ function handleConfirmCol() {
 
 // 列表接口
 function getListData() {
+  if (isGettingListData.value) return;
+  isGettingListData.value = true;
   getMeasurementsInfosByFuzzy({
     dataBaseOrDevice: 'database',
     pathName: props.currentDatabase,
@@ -527,6 +530,7 @@ function getListData() {
         }
       });
     }
+    isGettingListData.value = false;
   });
 }
 
