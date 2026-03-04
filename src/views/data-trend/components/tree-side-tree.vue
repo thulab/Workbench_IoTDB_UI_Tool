@@ -620,7 +620,7 @@ async function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent
       return Promise.resolve();
     };
   });
-  await promisePool(tasks, 10);
+  promisePool(tasks, 10);
 
   // 展示点开操作查看的data 都在pageChildren 属性，需找到对应的children 上追加子节点
   const originTreeData = recursionFindCurrentByOrigin(data.nodePath, treeData.value)!;
