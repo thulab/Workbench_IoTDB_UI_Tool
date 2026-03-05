@@ -383,7 +383,7 @@ function handleDealData() {
         promisePool(tasks, 10);
         loadedFirstBatchTimeseries.value = true;
       }
-      if (searching.value && !expandedForTheFirstTime.value) {
+      if (!expandedForTheFirstTime.value) {
         const firstChilds = getFirstChilds(treeData.value);
         expandNodes.value = firstChilds;
         measurementTree.value?.virtualizedTreeRef?.setExpandedKeys(firstChilds);

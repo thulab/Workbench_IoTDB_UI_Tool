@@ -373,7 +373,7 @@ function handleDealData() {
     internalDealData(dealingData);
     nextTick(() => {
       measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
-      if (searching.value && !expandedForTheFirstTime.value) {
+      if (!expandedForTheFirstTime.value) {
         const firstChilds = getFirstChilds(treeData.value);
         expandNodes.value = firstChilds;
         measurementTree.value?.virtualizedTreeRef?.setExpandedKeys(firstChilds);
