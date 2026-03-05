@@ -304,6 +304,7 @@ measurement:
   treeDatabase: DB
   treeTimeseries: TS
 search:
+  resultExceedLimitTip: The number of search results is large, only the first 10000 are displayed. Please enter more precise search criteria to narrow down the results if needed.
   datetime: Timestamp
   datetimerange: Time Range
   startTime: Start Time

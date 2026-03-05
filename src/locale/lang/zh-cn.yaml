@@ -301,6 +301,7 @@ measurement:
   treeDatabase: '@:measurement.databaseTitle'
   treeTimeseries: '@:measurement.measurement'
 search:
+  resultExceedLimitTip: 搜索结果数量较多，当前仅展示前 10000 条，建议输入更精确的搜索条件以缩小范围。
   datetime: 时间点
   datetimerange: 时间段
   startTime: 开始时间

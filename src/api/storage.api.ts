@@ -16,6 +16,7 @@ import type {
   TreeNodeData,
   DatabaseInfo,
 } from '@/types';
+import { ElMessage } from 'element-plus';
 
 // 数据库
 class StorageApi {
@@ -137,7 +138,7 @@ class StorageApi {
   }
 
   //  存储组信息
-  static async getSSEData(searchText: string, handleData: (data: any) => void) {
+  static async getSSEData(searchText: string, handleData: (data: any) => void, warningContent: string) {
     fetchEventSource(`/api/sse/searchSchemaTree?path=${searchText}`, {
       async onopen(response) {
         if (response.ok && response.headers.get('content-type') === 'text/event-stream') {
@@ -152,6 +153,10 @@ class StorageApi {
       onmessage(msg) {
         if (msg.event === 'Error') {
           console.log('onmessage Error:', msg.data);
+        }
+        if (msg.event === 'exceed_limit') {
+          console.log('exceed limit:', msg.data);
+          ElMessage.warning(warningContent);
         } else {
           handleData(msg.data);
         }

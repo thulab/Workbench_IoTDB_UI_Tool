@@ -441,7 +441,7 @@ async function subscribeToSSE() {
   try {
     searchLoading.value = true;
     treeData.value = [];
-    StorageApi.getSSEData(searchText.value, handleData);
+    StorageApi.getSSEData(searchText.value, handleData, t('search.resultExceedLimitTip'));
   } catch (error) {
     searchLoading.value = false;
     console.error('Error subscribing to SSE:', error);
