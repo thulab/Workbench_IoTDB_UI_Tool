@@ -109,6 +109,7 @@ const expandNodes = ref(['root']);
 const isShowContextMenu = ref(false);
 const contextMenuRef = ref<InstanceType<typeof ContextMenu>>();
 const contextMenuTimer = ref();
+const expandedForTheFirstTime = ref(false);
 
 const addPaths = ref<string[]>([]);
 const clickedNodeData = reactive<StorageDeviceTreeNodeData>({
@@ -371,10 +372,13 @@ function handleDealData() {
     const dealingData: Array<StorageDeviceTreeNodeData> = searchResults.value.pop()!;
     internalDealData(dealingData);
     nextTick(() => {
-      const firstChilds = getFirstChilds(treeData.value);
-      expandNodes.value = firstChilds;
       measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
-      measurementTree.value?.virtualizedTreeRef?.setExpandedKeys(firstChilds);
+      if (searching.value && !expandedForTheFirstTime.value) {
+        const firstChilds = getFirstChilds(treeData.value);
+        expandNodes.value = firstChilds;
+        measurementTree.value?.virtualizedTreeRef?.setExpandedKeys(firstChilds);
+        expandedForTheFirstTime.value = true;
+      }
     });
   }
 }
@@ -448,6 +452,7 @@ function handleSearch() {
   if (searchText.value.trim()) {
     searching.value = true;
     isSearchResult.value = true;
+    expandedForTheFirstTime.value = false;
     subscribeToSSE();
   } else {
     isSearchResult.value = false;

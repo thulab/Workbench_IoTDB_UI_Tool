@@ -154,6 +154,7 @@ const searchResults = ref<Array<Array<StorageDeviceTreeNodeData>>>([]);
 const searching = ref(false);
 const searchLoading = ref(false);
 const dealingStatus = ref(false);
+const expandedForTheFirstTime = ref(false);
 
 const { requestFn: getNextNodeInfos } = useRequest(StorageApi.getNextNodeInfos);
 const { requestFn: deletePaths } = useRequest(StorageApi.deletePaths);
@@ -365,8 +366,6 @@ function handleDealData() {
     const dealingData: Array<StorageDeviceTreeNodeData> = searchResults.value.pop()!;
     internalDealData(dealingData);
     nextTick(() => {
-      const firstChilds = getFirstChilds(treeData.value);
-      expandNodes.value = firstChilds;
       if (!loadedFirstBatchTimeseries.value) {
         const expandedTimeseries = getExpandedTimeseries(expandNodes.value, treeData.value);
         const tasks = expandedTimeseries.map((item) => {
@@ -384,8 +383,13 @@ function handleDealData() {
         promisePool(tasks, 10);
         loadedFirstBatchTimeseries.value = true;
       }
+      if (searching.value && !expandedForTheFirstTime.value) {
+        const firstChilds = getFirstChilds(treeData.value);
+        expandNodes.value = firstChilds;
+        measurementTree.value?.virtualizedTreeRef?.setExpandedKeys(firstChilds);
+        expandedForTheFirstTime.value = true;
+      }
       measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
-      measurementTree.value?.virtualizedTreeRef?.setExpandedKeys(firstChilds);
     });
   }
 }
@@ -457,6 +461,7 @@ function handleSearch() {
   if (searchText.value.trim()) {
     searching.value = true;
     loadedFirstBatchTimeseries.value = false;
+    expandedForTheFirstTime.value = false;
     isSearchResult.value = true;
     subscribeToSSE();
   } else {
