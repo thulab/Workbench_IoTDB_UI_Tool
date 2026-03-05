@@ -327,7 +327,8 @@ function mergeAndUpdateData(data: Array<StorageDeviceTreeNodeData>) {
           if (!node.children) {
             node.children = [];
           }
-          node?.children?.push(item);
+          node.children.push(item);
+          node?.pageChildren?.push(item);
         }
         return;
       }

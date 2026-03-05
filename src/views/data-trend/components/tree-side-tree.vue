@@ -117,6 +117,7 @@ const expandNodes = ref(['root']);
 const isShowContextMenu = ref(false);
 // const contextMenuRef = ref<InstanceType<typeof ContextMenu>>();
 const contextMenuTimer = ref();
+const loadedFirstBatchTimeseries = ref(false);
 
 const addPaths = ref<string[]>([]);
 const clickedNodeData = reactive<StorageDeviceTreeNodeData>({
@@ -277,19 +278,6 @@ function fillTreeLoading(nodes: Array<StorageDeviceTreeNodeData>) {
     if (node && !node.pageChildren && node.children && node.children.length > 0) {
       const dataPathTotal = Math.ceil(node.children.length / pageSize);
       node.pageChildren = node.children.slice(0, 1 * pageSize);
-      const tasks = node.pageChildren.map((item) => {
-        return async () => {
-          if (item.nodeType === 'TIMESERIES' && !fetchedMeasurementDataType.has(item.nodePath)) {
-            const infoRes = await getMeasurementsInfo(item.nodePath);
-            const dataType = infoRes.data.dataType;
-            if (dataType) {
-              fetchedMeasurementDataType.set(item.nodePath, dataType);
-            }
-          }
-          return Promise.resolve();
-        };
-      });
-      promisePool(tasks, 10);
       node.pageNum = 1;
       node.totalPage = dataPathTotal;
       if (dataPathTotal > 1) {
@@ -321,6 +309,7 @@ function mergeAndUpdateData(data: Array<StorageDeviceTreeNodeData>) {
             node.children = [];
           }
           node?.children?.push(item);
+          node?.pageChildren?.push(item);
         }
         return;
       }
@@ -357,6 +346,19 @@ function getFirstChilds(childData: Array<StorageDeviceTreeNodeData>) {
   return result;
 }
 
+function getExpandedTimeseries(expandedKeys: Array<string>, data: Array<StorageDeviceTreeNodeData>) {
+  const result: Array<string> = [];
+  data.forEach((item) => {
+    if (item.nodeType === 'TIMESERIES' && expandedKeys.includes(item.parentPath)) {
+      result.push(item.nodePath);
+    }
+    if (item.pageChildren && item.pageChildren.length > 0) {
+      result.push(...getExpandedTimeseries(expandedKeys, item.pageChildren));
+    }
+  });
+  return result;
+}
+
 function handleDealData() {
   if (!dealingStatus.value && searchResults.value.length) {
     dealingStatus.value = true;
@@ -365,6 +367,23 @@ function handleDealData() {
     nextTick(() => {
       const firstChilds = getFirstChilds(treeData.value);
       expandNodes.value = firstChilds;
+      if (!loadedFirstBatchTimeseries.value) {
+        const expandedTimeseries = getExpandedTimeseries(expandNodes.value, treeData.value);
+        const tasks = expandedTimeseries.map((item) => {
+          return async () => {
+            if (!fetchedMeasurementDataType.has(item)) {
+              const infoRes = await getMeasurementsInfo(item);
+              const dataType = infoRes.data.dataType;
+              if (dataType) {
+                fetchedMeasurementDataType.set(item, dataType);
+              }
+            }
+            return Promise.resolve();
+          };
+        });
+        promisePool(tasks, 10);
+        loadedFirstBatchTimeseries.value = true;
+      }
       measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
       measurementTree.value?.virtualizedTreeRef?.setExpandedKeys(firstChilds);
     });
@@ -437,6 +456,7 @@ async function subscribeToSSE() {
 function handleSearch() {
   if (searchText.value.trim()) {
     searching.value = true;
+    loadedFirstBatchTimeseries.value = false;
     isSearchResult.value = true;
     subscribeToSSE();
   } else {
@@ -612,6 +632,19 @@ async function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent
       }
       measurementTree.value?.virtualizedTreeRef?.setData(treeData.value);
     }
+    const tasks = data.pageChildren.map((item: StorageDeviceTreeNodeData) => {
+      return async () => {
+        if (item.nodeType === 'TIMESERIES' && !fetchedMeasurementDataType.has(item.nodePath)) {
+          const infoRes = await getMeasurementsInfo(item.nodePath);
+          const dataType = infoRes.data.dataType;
+          if (dataType) {
+            fetchedMeasurementDataType.set(item.nodePath, dataType);
+          }
+        }
+        return Promise.resolve();
+      };
+    });
+    promisePool(tasks, 10);
     return;
   }
   const children = measurementTree.value?.virtualizedTreeRef?.getNode(data.nodePath)?.children;
@@ -629,15 +662,19 @@ async function handleNodeClick(data: TreeNodeData, node: TreeNode, e: MouseEvent
   const dataPathTotal = Math.ceil(cloneData.length / pageSize);
 
   data.pageChildren = cloneData.slice(0, 1 * pageSize);
-  for (const child of data.pageChildren) {
-    if (child.nodeType === 'TIMESERIES' && !fetchedMeasurementDataType.has(child.nodePath)) {
-      const infoRes = await getMeasurementsInfo(child.nodePath);
-      const dataType = infoRes.data.dataType;
-      if (dataType) {
-        fetchedMeasurementDataType.set(child.nodePath, dataType);
+  const tasks = data.pageChildren.map((item: StorageDeviceTreeNodeData) => {
+    return async () => {
+      if (item.nodeType === 'TIMESERIES' && !fetchedMeasurementDataType.has(item.nodePath)) {
+        const infoRes = await getMeasurementsInfo(item.nodePath);
+        const dataType = infoRes.data.dataType;
+        if (dataType) {
+          fetchedMeasurementDataType.set(item.nodePath, dataType);
+        }
       }
-    }
-  }
+      return Promise.resolve();
+    };
+  });
+  promisePool(tasks, 10);
   data.pageNum = 1;
   data.totalPage = dataPathTotal;
   if (dataPathTotal > 1) {
