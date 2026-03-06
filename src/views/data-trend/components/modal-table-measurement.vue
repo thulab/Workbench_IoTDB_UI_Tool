@@ -343,11 +343,9 @@ const addMeasurements = async () => {
 
   selectedDevices.value.forEach((device) => {
     const condition = Object.keys(device)
+      .filter((key) => device[key])
       .map((key) => {
-        if (device[key]) {
-          return `"${key}"='${device[key]}'`;
-        }
-        return `"${key}"=null`;
+        return `"${key}"='${device[key]}'`;
       })
       .join(' AND ');
     formData.selectedMeasurement.forEach((measurement) => {
