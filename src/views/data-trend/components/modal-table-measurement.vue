@@ -3,8 +3,8 @@
   <el-dialog v-model="dialogVisible" :title="t('measurement.measurementChoose')" width="630px" :before-close="handleClose" :close-on-click-modal="false" :close-on-press-escape="false" draggable>
     <div class="modal-table-measurement-container flex gap-1">
       <!-- 左侧测点选择区域 -->
-      <div class="flex-2 flex flex-col">
-        <el-form :model="formData" :rules="formRules" ref="formRef" label-position="left">
+      <div class="flex-2 flex flex-col w-full">
+        <el-form :model="formData" :rules="formRules" ref="formRef" label-position="left" label-width="60px">
           <!-- 标签键值对输入 -->
           <el-form-item :label="`${t('measurement.device')}：`" required props="selectedTags" class="device-form-item">
             <div class="device-filter-container">

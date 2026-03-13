@@ -918,7 +918,7 @@ connection:
   masterPrometheusSuccess: 主集群Prometheus连接成功
   slavePrometheusSuccess: 备集群Prometheus连接成功
   ipTip: 请输入数据库Host或IP
-  connectionIpTip: 此地址为IoTDB-conf文件夹下iotdb-datanode.properties文件中dn_rpc_address字段内容
+  connectionIpTip: 此地址为IoTDB-conf文件夹下iotdb-system.properties文件中dn_rpc_address字段内容
   portTip: 请输入端口号
   prometheus: Prometheus 信息
   prometheusTip: 配置prometheus可在界面查看部分监控信息，推荐您进行配置使用
