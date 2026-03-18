@@ -451,6 +451,8 @@ function handleTestLogin() {
           window.sessionStorage.setItem('newTreeDataHistoryTrendStorage', '');
           window.sessionStorage.setItem('newTableDataRunningTrendStorage', '');
           window.sessionStorage.setItem('newTableDataHistoryTrendStorage', '');
+          window.sessionStorage.setItem('measurement-tree-history', '');
+          window.sessionStorage.setItem('measurement-tree-running', '');
           if (route.name === 'Login') {
             router.push({ name: 'Dashboard' });
           } else {
