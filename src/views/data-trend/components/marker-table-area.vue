@@ -61,12 +61,12 @@ const convertedMarkerDatas = computed(() => {
   return props.markerDatas.map((marker) => {
     return {
       ...marker,
-      y1: isNaN(marker.y1) ? '' : marker.y1.toFixed(4),
-      y2: isNaN(marker.y2) ? '' : marker.y2.toFixed(4),
+      y1: isNaN(marker.y1) ? 'null' : marker.y1.toFixed(4),
+      y2: isNaN(marker.y2) ? 'null' : marker.y2.toFixed(4),
       x1: dayjs(marker.x1).format('YYYY-MM-DD HH:mm:ss'),
       x2: dayjs(marker.x2).format('YYYY-MM-DD HH:mm:ss'),
       x2_x1: ((marker.x2 - marker.x1) / 1000).toFixed(2) + ' 秒',
-      y2_y1: isNaN(marker.y2) || isNaN(marker.y1) ? '' : (marker.y2 - marker.y1).toFixed(4),
+      y2_y1: isNaN(marker.y2) || isNaN(marker.y1) ? 'null' : (marker.y2 - marker.y1).toFixed(4),
     };
   });
 });
