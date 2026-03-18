@@ -341,7 +341,11 @@ function convertMeasurementListToSelectedMeasurements(list: Measurement[]): Sele
 
 function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: SelectedMeasurement[] }) {
   const newMeasurements = payload.selectedMeasurements.filter((item) => {
-    return !measurementList.value.find((m) => m.id === `${item.database}.${item.tableName}.${item.device?.map((d) => d.value).join('.')}.${item.measurement}`);
+    return !measurementList.value.find(
+      (m) =>
+        m.id ===
+        (item.device.length === 0 ? `${item.database}.${item.tableName}.${item.measurement}` : `${item.database}.${item.tableName}.${item.device?.map((d) => d.value).join('.')}.${item.measurement}`),
+    );
   });
   for (const item of newMeasurements) {
     let deviceName = '';
