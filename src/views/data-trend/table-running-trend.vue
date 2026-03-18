@@ -371,7 +371,7 @@ function handleSelectedMeasurementsUpdate(payload: { selectedMeasurements: Selec
 
     usedColors.value.add(color);
 
-    const label = `${item.database}.${item.tableName}.${deviceName}.${item.measurement}`;
+    const label = deviceName === '' ? `${item.database}.${item.tableName}.${item.measurement}` : `${item.database}.${item.tableName}.${deviceName}.${item.measurement}`;
     measurementList.value.push({
       id: label,
       label,
