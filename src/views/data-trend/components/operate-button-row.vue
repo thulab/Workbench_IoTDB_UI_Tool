@@ -89,7 +89,6 @@ import ICustomMessageWarning from '~icons/custom/message-warning.svg';
 import type { TimeRange } from '@/types/trend';
 import type { TrendTemplate } from '@/types';
 import { useTableHistoryTrendStore, useTableRunningTrendStore, useTreeHistoryTrendStore, useTreeRunningTrendStore } from '@/stores/trend.store';
-import { today } from '@/utils/date';
 import dayjs from 'dayjs';
 
 const props = withDefaults(
@@ -125,7 +124,7 @@ const selectedDateTime = reactive<{
   value: [new Date(trendStore.globalTimeRange.start), new Date(trendStore.globalTimeRange.end)],
 });
 
-const disabledDate = (time: number) => time > today() || time < new Date('1970-1-1').getTime();
+const disabledDate = (time: number) => time < new Date('1970-1-1').getTime();
 const { t } = useI18n();
 const { shortcutsDaterange } = useShortcutsDate();
 
