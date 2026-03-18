@@ -398,7 +398,7 @@ function initSelectedMeasurementsData() {
           deviceName = deviceName.slice(0, -1);
           tableCopy.children?.push({
             id: `${props.namespace}-${dbNode.nodeName}-${tableNode.nodeName}-${index}`,
-            nodeName: `${deviceName}.${meas.measurement}`,
+            nodeName: deviceName === '' ? meas.measurement : `${deviceName}.${meas.measurement}`,
             nodeType: 'DEVICE-MEASUREMENT',
             parentName: tableNode.nodeName,
             database: dbNode.nodeName,
