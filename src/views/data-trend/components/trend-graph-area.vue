@@ -37,7 +37,7 @@
             :isTable="props.isTable"
             :isPlaying="isPlaying"
             :isRunning="props.isRunning"
-            :ref="(el) => el && chartRefs[element.group.id] === el"
+            :ref="(el) => setChartRef(el, element.group.id)"
             :id="element.group.id"
             :key="element.group.id"
             :group="element.group"
@@ -66,7 +66,7 @@
 import MetricChartGroup from './metric-chart-group.vue';
 import type { ChartMarker, ChartGroupInput, MeasurementMarkerData } from '@/types/trend';
 import type { TrendData } from '@/types';
-import { ref, watch } from 'vue';
+import { ref, watch, type ComponentPublicInstance } from 'vue';
 import { useTableHistoryTrendStore, useTreeHistoryTrendStore } from '@/stores/trend.store';
 import draggable from 'vuedraggable';
 
@@ -165,12 +165,36 @@ const scrollToBottom = () => {
   }
 };
 
+const checkNeedRenewTimeRange = (): boolean => {
+  for (const chartRef of Object.values(chartRefs.value)) {
+    if (chartRef && chartRef.getHasData()) {
+      return false;
+    }
+  }
+  const start = Date.now() - 7 * 24 * 3600 * 1000;
+  const end = Date.now();
+  if (trendStore.globalTimeRange.start !== start || trendStore.globalTimeRange.end !== end) {
+    console.log('Initializing time range to last 7 days');
+    trendStore.initializeState();
+  }
+  return true;
+};
+
+const setChartRef = (el: Element | ComponentPublicInstance | null, id: string) => {
+  if (el) {
+    chartRefs.value[id] = el as InstanceType<typeof MetricChartGroup>;
+  } else {
+    delete chartRefs.value[id];
+  }
+};
+
 defineExpose({
   deleteMeasurementMarkerDataByName,
   restoreChartData,
   resetSelectedTemplate,
   clearAllMeasurementMarkerData,
   scrollToBottom,
+  checkNeedRenewTimeRange,
 });
 
 function convertPath(original: string): string {

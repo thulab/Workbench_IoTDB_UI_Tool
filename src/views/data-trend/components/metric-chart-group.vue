@@ -106,6 +106,10 @@ const measurementsData = ref<Measurement[]>([]);
 const markerValues = ref<MeasurementMarkerData[]>([]);
 const measurementCondition = reactive(new Map(props.group.members.map((m) => [m.id, 1])));
 
+const groupHasData = computed(() => {
+  return measurementsData.value.some((m) => m.values.length > 0);
+});
+
 function updateMarkerValues() {
   markerValues.value = measurementsData.value.map((measurement) => {
     const avgInterval = trendStore.measurementAverageInterval.get(measurement.label) || 0;
@@ -711,8 +715,13 @@ const restoreData = () => {
   }
 };
 
+const getHasData = () => {
+  return groupHasData.value;
+};
+
 defineExpose({
   restoreData,
+  getHasData,
 });
 
 onMounted(() => {

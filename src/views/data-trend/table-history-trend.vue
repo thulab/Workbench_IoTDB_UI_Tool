@@ -255,6 +255,12 @@ function handleDeleteMeasurement(fullpath: string) {
     });
     if (group.measurementIds.length === 0) {
       groups.value = groups.value.filter((g) => g.id !== group.id);
+      nextTick(() => {
+        const needRenew = trendGraphRef.value?.checkNeedRenewTimeRange();
+        if (needRenew) {
+          markers.value = createInitialMarkers();
+        }
+      });
     } else {
       needFetchGroupsId.value.push(group.id);
     }
@@ -326,6 +332,12 @@ function deleteGroup(payload: { groupId: string }) {
     });
   }
   groups.value = groups.value.filter((g) => g.id !== payload.groupId);
+  nextTick(() => {
+    const needRenew = trendGraphRef.value?.checkNeedRenewTimeRange();
+    if (needRenew) {
+      markers.value = createInitialMarkers();
+    }
+  });
   needFetchGroupsId.value = [];
 
   setStorage();
@@ -337,6 +349,12 @@ function deleteMeasurement(payload: { groupId: string; measurementPath: string }
     group.measurementIds = group.measurementIds.filter((id) => id !== payload.measurementPath);
     if (group.measurementIds.length === 0) {
       groups.value = groups.value.filter((g) => g.id !== payload.groupId);
+      nextTick(() => {
+        const needRenew = trendGraphRef.value?.checkNeedRenewTimeRange();
+        if (needRenew) {
+          markers.value = createInitialMarkers();
+        }
+      });
     }
 
     if (visibleMeasurementCountMap.value.has(payload.measurementPath)) {
