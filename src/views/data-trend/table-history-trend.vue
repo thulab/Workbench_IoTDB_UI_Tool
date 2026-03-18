@@ -15,9 +15,10 @@
     </div>
 
     <div class="ml-8px flex flex-1 flex-col min-w-0">
-      <div class="p-[0px_16px_8px] rounded-6px bg-white flex flex-col min-w-0" :style="{ height: tableCollapse ? 'calc(100% - 26px)' : 'calc(100% - 116px)' }">
+      <div class="p-[0px_16px_8px_0px] rounded-6px bg-white flex flex-col min-w-0" :style="{ height: tableCollapse ? 'calc(100% - 26px)' : 'calc(100% - 116px)' }">
         <div>
           <OperateButtonRow
+            class="pl-[16px]"
             ref="operateButtonRowRef"
             :isTable="true"
             :isRunning="false"
@@ -49,6 +50,7 @@
           @update-order="updateOrder"
         />
         <TimelineArea
+          class="pl-[16px]"
           ref="timelineAreaRef"
           :isTable="true"
           :range="trendStore.pendingTimeRange"

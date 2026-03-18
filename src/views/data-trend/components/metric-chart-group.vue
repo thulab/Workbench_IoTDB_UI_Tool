@@ -2,7 +2,7 @@
   <div @drop="handleDrop" @dragover.prevent class="graph-border border-box special-padding mt-[10px] pb-[9px] rounded-[2px]">
     <div class="upper-area pb-[8px] flex items-center">
       <div>
-        <button class="ml-26px mr-28px border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteGroup">
+        <button class="ml-40px mr-28px border-none bg-transparent flex cursor-pointer items-center p-0!" @click="handleDeleteGroup">
           <el-icon size="15"><i-custom-close-circle /></el-icon>
         </button>
       </div>
@@ -68,7 +68,7 @@ const { t } = useI18n();
 const { requestFn: getHistoryTrend } = useRequest(TableDataApi.getTrendHistoryData);
 const { requestFn: getTreeHistoryTrend } = useRequest(SearchApi.getHistoryTrend);
 
-const GRID_LEFT = 34;
+const GRID_LEFT = 48;
 const GRID_RIGHT = 10;
 const layoutTick = ref(0);
 const isRefresh = ref(false);
@@ -503,6 +503,8 @@ function buildOption(): ECOption {
         hideOverlap: true,
         margin: 3,
         fontWeight: 300,
+        width: GRID_LEFT - 4,
+        overflow: 'truncate',
       },
       splitLine: {
         lineStyle: { color: '#DFE1ED', width: 1 },
@@ -510,6 +512,9 @@ function buildOption(): ECOption {
       splitNumber: 2,
       boundaryGap: ['5%', '5%'],
       offset: 1,
+      tooltip: {
+        show: true,
+      },
     },
     brush: {
       brushStyle: {
