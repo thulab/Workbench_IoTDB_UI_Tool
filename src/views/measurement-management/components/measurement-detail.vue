@@ -101,6 +101,7 @@
     <auth-container :is-auth="rowReadWriteDataByPath(currentMeasurement)" :content="'common.dataAuth'" style="flex: 1; overflow: auto">
       <div class="measurement-table-details" v-loading="loading">
         <dynamic-table
+          v-if="columns.length > 0"
           :columns="columns"
           :table-data="tableDataPagination"
           :height="convertedMaxTableHeight"
