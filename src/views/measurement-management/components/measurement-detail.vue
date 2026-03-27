@@ -6,7 +6,7 @@
       </div>
       {{ t('measurement.info') }}
     </h4>
-    <div class="measurement-info-box" v-loading="infoLoading">
+    <div ref="measurementInfoBoxRef" class="measurement-info-box" v-loading="infoLoading">
       <ul class="measurement-info-list">
         <li class="measurement-info-item" id="timeseries-name-li">
           <span class="measurement-info-item-label" id="timeseries-name-span">{{ t('measurement.measurementName') }}：</span>
@@ -103,8 +103,8 @@
         <dynamic-table
           :columns="columns"
           :table-data="tableDataPagination"
-          :height="maxTableHeight"
-          :max-height="maxTableHeight"
+          :height="convertedMaxTableHeight"
+          :max-height="convertedMaxTableHeight"
           v-model:current-page="pagination.pageNum"
           v-model:page-size="pagination.pageSize"
           :total="tableData.length"
@@ -148,7 +148,19 @@ const pageText = appType === 1 ? t('measurement.calculateMeasurement') : t('meas
 const userStore = useUserStore();
 const { userAllEntityPrivileges, userAllPathPrivileges } = storeToRefs(userStore);
 
-const { maxTableHeight } = useTableHeight(334);
+const { maxTableHeight } = useTableHeight(258);
+const convertedMaxTableHeight = computed(() => {
+  const dataLength = tableData.value.length;
+  let resultHeight = maxTableHeight.value;
+  if (dataLength < 10) {
+    resultHeight = resultHeight - 14;
+  }
+  if (measurementInfoBoxHeight.value > 70) {
+    resultHeight = resultHeight - 32;
+  }
+  return resultHeight;
+});
+
 const measurementInfos = ref<MeasurementData>({
   timeseries: '',
   node: '',
@@ -162,6 +174,11 @@ const measurementInfos = ref<MeasurementData>({
   latestTime: '',
 });
 const descriptionVisible = ref(false);
+
+const measurementInfoBoxRef = ref<HTMLElement>();
+const measurementInfoBoxHeight = ref(0);
+let measurementInfoBoxObserver: ResizeObserver | null = null;
+
 const columns = ref<globalThis.DynamicTableColumn[]>([]);
 const tableData = ref<Record<string, any>[]>([]);
 const pagination = reactive({
@@ -320,6 +337,17 @@ function handleDelMeasurement() {
     });
   });
 }
+
+onMounted(() => {
+  measurementInfoBoxObserver = new ResizeObserver((entries) => {
+    measurementInfoBoxHeight.value = measurementInfoBoxRef.value?.clientHeight || 0;
+  });
+  measurementInfoBoxObserver.observe(measurementInfoBoxRef.value as HTMLElement);
+});
+
+onBeforeUnmount(() => {
+  measurementInfoBoxObserver?.disconnect();
+});
 
 watch(
   () => props.currentMeasurement && canReadWriteSchemaByPath.value,
