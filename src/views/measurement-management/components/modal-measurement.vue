@@ -1,9 +1,9 @@
 <template>
-  <el-dialog :title="t('measurement.newMeasurement')" v-model="dialogVisible" width="748px" :close-on-click-modal="false" id="measurement-modal-measurement">
+  <el-dialog :title="t('measurement.newMeasurement')" v-model="dialogVisible" width="748px" :close-on-click-modal="false" id="measurement-modal-measurement" data-testid="measurement-modal">
     <el-form ref="formRef" :model="formData" label-position="left">
       <el-scrollbar :max-height="400" :min-height="152" class="measurement-list-box">
         <el-collapse accordion v-model="activeName">
-          <el-collapse-item v-for="(item, index) in formData.measurementList" :key="index" :name="`measurement_${index}`">
+          <el-collapse-item v-for="(item, index) in formData.measurementList" :key="index" :name="`measurement_${index}`" :data-testid="`measurement-modal-row-${index}`">
             <template #title>
               <el-row class="collapse-title-box">
                 <el-col :span="12">
@@ -17,7 +17,13 @@
                 </el-col>
                 <el-col :span="4">
                   <div class="operate-box">
-                    <el-button link :disabled="existEmpty" @click="(e) => handleCopyRow(item, e)" :id="`measurement-modal-collapse-${index}-copy`" :class="existEmpty ? '' : 'svg-button-hover-color'">
+                    <el-button
+                      link
+                      :disabled="existEmpty || reachMeasurementRowLimit"
+                      @click="(e) => handleCopyRow(item, e)"
+                      :id="`measurement-modal-collapse-${index}-copy`"
+                      :class="existEmpty || reachMeasurementRowLimit ? '' : 'svg-button-hover-color'"
+                    >
                       <i-custom-copy />
                     </el-button>
                     <el-button link :class="['m-x-12', 'svg-button-hover-color']" @click="(e) => handleDelRow(index, e)" :id="`measurement-modal-collapse-${index}-del`">
@@ -38,12 +44,13 @@
                 >
                   <div class="measurement-name-box">
                     <div class="measurement-input-group">
-                      <el-input :value="`${deviceName}.`" disabled class="measurement-input-prepend" style="width: 128px" id="measurement-modal-input-deviceName" />
+                      <el-input :value="`${deviceName}.`" disabled class="measurement-input-prepend" style="width: 128px" id="measurement-modal-input-deviceName" :data-testid="`measurement-modal-row-${index}-device`" />
                       <el-input
                         v-model="item.timeseries"
                         :placeholder="t('measurement.measurementNamePlaceholder')"
                         class="measurement-input-box"
                         :id="`measurement-modal-collapse-${index}-timeseries`"
+                        :data-testid="`measurement-modal-row-${index}-name`"
                       />
                     </div>
                     <div class="measurement-operate">
@@ -57,7 +64,14 @@
               <el-col :span="24">
                 <base-form-item :prop="`measurementList[${index}].description`" class="el-form-item-not-mandatory m-r-0" :label-width="locale === 'en' ? '108px' : '92px'">
                   <template #label>{{ t('measurement.measurementAlias') }}：</template>
-                  <el-input v-model="item.alias" :placeholder="t('measurement.aliasPlaceholder')" :id="`measurement-modal-collapse-${index}-description`" maxlength="100" show-word-limit />
+                  <el-input
+                    v-model="item.alias"
+                    :placeholder="t('measurement.aliasPlaceholder')"
+                    :id="`measurement-modal-collapse-${index}-alias`"
+                    :data-testid="`measurement-modal-row-${index}-alias`"
+                    maxlength="100"
+                    show-word-limit
+                  />
                 </base-form-item>
               </el-col>
             </el-row>
@@ -72,6 +86,7 @@
                     v-model="item.description"
                     :placeholder="t('measurement.measurementDescriptionPlaceholder')"
                     :id="`measurement-modal-collapse-${index}-description`"
+                    :data-testid="`measurement-modal-row-${index}-description`"
                     maxlength="100"
                     show-word-limit
                   />
@@ -85,28 +100,35 @@
                     {{ t('measurement.tag') }}：
                     <el-tooltip effect="light" :content="t('measurement.tagTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
                   </template>
-                  <el-input v-model="item.tags" :placeholder="t('measurement.tagPlaceholder')" :id="`measurement-modal-collapse-${index}-description`" maxlength="100" show-word-limit />
+                  <el-input
+                    v-model="item.tags"
+                    :placeholder="t('measurement.tagPlaceholder')"
+                    :id="`measurement-modal-collapse-${index}-tags`"
+                    :data-testid="`measurement-modal-row-${index}-tags`"
+                    maxlength="100"
+                    show-word-limit
+                  />
                 </base-form-item>
               </el-col>
             </el-row>
             <el-row>
               <el-col :span="8">
                 <base-form-item :label="`${t('measurement.dataType')}：`" :prop="`measurementList[${index}].dataType`" :rules="requiredRules" :label-width="locale === 'en' ? '108px' : '92px'">
-                  <el-select v-model="item.dataType" @change="(val) => handleChangeRowDataType(val, item, index)" :id="`measurement-modal-collapse-${index}-dataType`">
+                  <el-select v-model="item.dataType" @change="(val) => handleChangeRowDataType(val, item, index)" :id="`measurement-modal-collapse-${index}-dataType`" :data-testid="`measurement-modal-row-${index}-data-type`">
                     <el-option v-for="dtype in dataTypeOptions" :key="dtype" :label="dtype" :value="dtype" :id="`measurement-modal-collapse-${index}-dataType-select-${dtype}`" />
                   </el-select>
                 </base-form-item>
               </el-col>
               <el-col :span="8">
                 <base-form-item :label="`${t('measurement.encoding')}：`" :prop="`measurementList[${index}].encoding`" :rules="requiredRules">
-                  <el-select v-model="item.encoding" :disabled="!item.dataType" :id="`measurement-modal-collapse-${index}-encoding`">
+                  <el-select v-model="item.encoding" :disabled="!item.dataType" :id="`measurement-modal-collapse-${index}-encoding`" :data-testid="`measurement-modal-row-${index}-encoding`">
                     <el-option v-for="enc in encodingOptions(item.dataType as string)" :key="enc" :label="enc" :value="enc" :id="`measurement-modal-collapse-${index}-encoding-select-${enc}`" />
                   </el-select>
                 </base-form-item>
               </el-col>
               <el-col :span="8">
                 <base-form-item :label="`${t('measurement.compression')}：`" :prop="`measurementList[${index}].compression`" :rules="requiredRules" style="margin-right: 0">
-                  <el-select v-model="item.compression" :id="`measurement-modal-collapse-${index}-compression`">
+                  <el-select v-model="item.compression" :id="`measurement-modal-collapse-${index}-compression`" :data-testid="`measurement-modal-row-${index}-compression`">
                     <el-option v-for="com in compressionOptions" :key="com" :label="com" :value="com" :id="`measurement-modal-collapse-${index}-compression-select-${com}`" />
                   </el-select>
                 </base-form-item>
@@ -116,15 +138,22 @@
         </el-collapse>
       </el-scrollbar>
 
-      <el-button style="width: 100%" :class="['m-t-16 m-b-16', existEmpty ? '' : 'svg-button-hover-color']" :disabled="existEmpty" @click="handleAddRow" id="measurement-modal-collapse-add">
+      <el-button
+        style="width: 100%"
+        :class="['m-t-16 m-b-16', existEmpty || reachMeasurementRowLimit ? '' : 'svg-button-hover-color']"
+        :disabled="existEmpty || reachMeasurementRowLimit"
+        @click="handleAddRow"
+        id="measurement-modal-collapse-add"
+        data-testid="measurement-modal-add-row"
+      >
         <i-custom-add class="m-r-4" />
         {{ t('measurement.addMeasurement') }}
       </el-button>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false" id="measurement-modal-cancel">{{ t('common.cancel') }}</el-button>
-        <el-button type="primary" :loading="saveLoading" @click="handleConfirm" id="measurement-modal-confirm">{{ t('common.confirm') }}</el-button>
+        <el-button @click="dialogVisible = false" id="measurement-modal-cancel" data-testid="measurement-modal-cancel">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="saveLoading" @click="handleConfirm" id="measurement-modal-confirm" data-testid="measurement-modal-confirm">{{ t('common.confirm') }}</el-button>
       </span>
     </template>
   </el-dialog>
@@ -161,6 +190,7 @@ const encoding: { [key: string]: string[] } = {
   TEXT: ['PLAIN', 'DICTIONARY'],
 };
 const compressionOptions = ['UNCOMPRESSED', 'SNAPPY', 'LZ4', 'GZIP', 'ZSTD', 'LZMA2'];
+const measurementRowLimit = 6;
 
 const encodingOptions = computed(() => (val: string) => encoding[val]);
 
@@ -182,6 +212,7 @@ const existEmpty = computed(() => {
   const flag = formData.measurementList.some((s) => !s.timeseries || !s.dataType || !s.encoding || !s.compression);
   return flag;
 });
+const reachMeasurementRowLimit = computed(() => formData.measurementList.length >= measurementRowLimit);
 
 const copyControl = (data: Partial<MeasurementItem>) => !data.timeseries || !data.dataType || !data.encoding || !data.compression;
 
@@ -189,7 +220,7 @@ const copyControl = (data: Partial<MeasurementItem>) => !data.timeseries || !dat
 function handleCopyRow(data: Partial<MeasurementItem>, e: MouseEvent) {
   e.preventDefault();
   e.stopPropagation();
-  if (copyControl(data)) return;
+  if (copyControl(data) || reachMeasurementRowLimit.value) return;
   formData.measurementList.push({
     // deviceName: data.deviceName,
     timeseries: `${data.timeseries}_copy`,
@@ -227,6 +258,7 @@ function handleChangeRowDataType(val: string, item: Partial<MeasurementItem>, in
 
 // 追加行
 function handleAddRow() {
+  if (reachMeasurementRowLimit.value || existEmpty.value) return;
   formData.measurementList.push({
     // deviceName: `${props.deviceName}`,
     timeseries: '',

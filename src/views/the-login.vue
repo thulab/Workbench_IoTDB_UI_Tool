@@ -1,12 +1,12 @@
 <template>
-  <div class="login-wrapper">
+  <div class="login-wrapper" data-testid="login-page">
     <div class="login-side-img">
       <img src="@/assets/login-bg.png" alt="" />
     </div>
     <div class="login-form-wrapper">
-      <div class="login-form-container" :style="{ height: isUseCaptcha ? '604px' : '550px' }">
+      <div class="login-form-container" :style="{ height: isUseCaptcha ? '604px' : '550px' }" data-testid="login-form-container">
         <!-- eslint-disable-next-line vue/no-constant-condition -->
-        <el-icon v-show="true" id="login-language" class="login-language-icon" size="30" @click="handleChangeLang"><i-custom-language-border /></el-icon>
+        <el-icon v-show="true" id="login-language" data-testid="login-language" class="login-language-icon" size="30" @click="handleChangeLang"><i-custom-language-border /></el-icon>
         <div class="login-logo-box">
           <i-custom-timecho-logo-en v-if="locale === 'en'" class="title-logo" />
           <i-custom-timecho-logo v-else class="title-logo" />
@@ -14,7 +14,7 @@
           <!-- <i-custom-logo-title class="title-logo" /> -->
         </div>
         <h5 class="login-title">{{ t('login.title') }}</h5>
-        <el-form :hide-required-asterisk="true" :model="loginForm" :rules="rules" ref="formRef" class="login-form-box">
+        <el-form :hide-required-asterisk="true" :model="loginForm" :rules="rules" ref="formRef" class="login-form-box" data-testid="login-form">
           <label><input type="password" autocomplete="new-password" hidden /></label>
           <div class="connection-box">
             <el-form-item prop="connection">
@@ -22,6 +22,7 @@
                 v-model="loginForm.connection"
                 :placeholder="t('login.connectionTip')"
                 id="login-connection"
+                data-testid="login-connection"
                 style="width: 292px"
                 fit-input-width
                 placement="bottom-start"
@@ -40,17 +41,17 @@
                 </el-option-group>
               </el-select>
             </el-form-item>
-            <el-button type="primary" class="m-l-12" id="login-connection-edit" @click="handleSelectConnection">{{ t('common.edit') }}</el-button>
+            <el-button type="primary" class="m-l-12" id="login-connection-edit" data-testid="login-connection-edit" @click="handleSelectConnection">{{ t('common.edit') }}</el-button>
           </div>
           <el-form-item prop="user">
-            <el-input v-model="loginForm.user" autocomplete="off" :placeholder="t('auth.userNamePlaceholder')" maxlength="32" @keyup.enter="submitForm" id="login-user">
+            <el-input v-model="loginForm.user" autocomplete="off" :placeholder="t('auth.userNamePlaceholder')" maxlength="32" @keyup.enter="submitForm" id="login-user" data-testid="login-user">
               <template #prefix>
                 <el-icon size="30"><i-custom-user-name /></el-icon>
               </template>
             </el-input>
           </el-form-item>
           <el-form-item prop="password">
-            <el-input :type="pwdType" v-model="loginForm.password" show-password autocomplete="off" :placeholder="t('auth.pwdPlaceholder')" @keyup.enter="submitForm" id="login-pwd">
+            <el-input :type="pwdType" v-model="loginForm.password" show-password autocomplete="off" :placeholder="t('auth.pwdPlaceholder')" @keyup.enter="submitForm" id="login-pwd" data-testid="login-password">
               <template #prefix>
                 <el-icon size="30"><i-custom-password /></el-icon>
               </template>
@@ -85,13 +86,13 @@
             </el-col>
           </el-row>
           <el-form-item prop="model">
-            <el-radio-group v-model="loginForm.model" @change="(val) => handleChangeDefaultModel(val as 'tree' | 'table')" id="connection-modal-type">
-              <el-radio value="tree" id="connection-modal-type-0">{{ t('connection.treeModel') }}</el-radio>
-              <el-radio value="table" id="connection-modal-type-1">{{ t('connection.tableModel') }}</el-radio>
+            <el-radio-group v-model="loginForm.model" @change="(val) => handleChangeDefaultModel(val as 'tree' | 'table')" id="connection-modal-type" data-testid="login-model-type">
+              <el-radio value="tree" id="connection-modal-type-0" data-testid="login-model-tree">{{ t('connection.treeModel') }}</el-radio>
+              <el-radio value="table" id="connection-modal-type-1" data-testid="login-model-table">{{ t('connection.tableModel') }}</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item prop="captcha" v-if="isUseCaptcha">
-            <el-input v-model="loginForm.captcha" autocomplete="off" :placeholder="t('login.captchaTip')" @keyup.enter="submitForm" id="login-captcha">
+            <el-input v-model="loginForm.captcha" autocomplete="off" :placeholder="t('login.captchaTip')" @keyup.enter="submitForm" id="login-captcha" data-testid="login-captcha">
               <template #prefix>
                 <el-icon size="30"><i-custom-verification-code /></el-icon>
               </template>
@@ -101,7 +102,7 @@
             </el-input>
           </el-form-item>
           <el-form-item class="m-b-0">
-            <el-button class="login-button" type="primary" :loading="loading" @click="submitForm" id="login-submit">{{ t('login.login') }}</el-button>
+            <el-button class="login-button" type="primary" :loading="loading" @click="submitForm" id="login-submit" data-testid="login-submit">{{ t('login.login') }}</el-button>
           </el-form-item>
         </el-form>
       </div>

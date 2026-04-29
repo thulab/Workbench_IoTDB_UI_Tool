@@ -1,9 +1,9 @@
 <template>
-  <div class="sql-container">
-    <div class="sql-wrapper">
+  <div class="sql-container" data-testid="sql-search-tree-page">
+    <div class="sql-wrapper" data-testid="sql-search-shell">
       <div class="sql-search-wrapper">
-        <div class="sql-tab-box">
-          <el-tabs v-model="activiteSql" editable type="card" closable class="sql-tab-list" @tab-click="handleTabClick" @tab-remove="handleTabRemove" @tab-add="handleTabAdd" id="sql-search-top-tabs">
+        <div class="sql-tab-box" data-testid="sql-search-workspace">
+          <el-tabs v-model="activiteSql" editable type="card" closable class="sql-tab-list" @tab-click="handleTabClick" @tab-remove="handleTabRemove" @tab-add="handleTabAdd" id="sql-search-top-tabs" data-testid="sql-search-top-tabs">
             <el-tab-pane v-for="(item, index) in sqlList" :key="`${item.id}_${item.queryName}`" :label="item.queryName" :name="item.id">
               <template #label>
                 <span style="font-size: 12px; line-height: 1.2; display: flex; width: 118px" :id="`sql_tab_${index}`">
@@ -29,10 +29,10 @@
         </div>
       </div>
 
-      <div class="sql-search-aside">
+      <div class="sql-search-aside" data-testid="sql-search-side-panel">
         <div v-if="codeMirrorReady">
           <h4 style="font-size: 12px; font-weight: 700; color: #495ad4; margin: 0 0 12px">{{ t('search.quickActions') }}</h4>
-          <el-tabs v-model="activeNameSide" class="tabs-nav-aside">
+          <el-tabs v-model="activeNameSide" class="tabs-nav-aside" data-testid="sql-search-side-tabs">
             <el-tab-pane :label="t('measurement.measurement')" name="data">
               <side-data @get-function="getFunction" />
             </el-tab-pane>
@@ -56,48 +56,48 @@
       </div>
     </div>
 
-    <el-dialog :title="t('search.saveTemplate')" v-model="nameDialogVisible" width="480px" align-center>
+    <el-dialog :title="t('search.saveTemplate')" v-model="nameDialogVisible" width="480px" align-center data-testid="sql-search-save-dialog">
       <el-form ref="saveFormRef" :model="saveForm" :rules="saveFormRules" label-position="left" @submit.prevent>
         <el-form-item :label="`${t('search.name')}：`" prop="sqlName">
           <el-input type="hidden" />
-          <el-input v-model="saveForm.sqlName" :placeholder="t('common.placeHolder')" maxlength="25" show-word-limit id="sql-search-modal-save" />
+          <el-input v-model="saveForm.sqlName" :placeholder="t('common.placeHolder')" maxlength="25" show-word-limit id="sql-search-modal-save" data-testid="sql-search-modal-save" />
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="handleNameCancel" id="sql-search-modal-save-cancel">{{ t('common.cancel') }}</el-button>
-          <el-button type="primary" :loading="saveLoading" @click="handleNameConfirm" id="sql-search-modal-save-confirm">{{ t('common.confirm') }}</el-button>
+          <el-button @click="handleNameCancel" id="sql-search-modal-save-cancel" data-testid="sql-search-modal-save-cancel">{{ t('common.cancel') }}</el-button>
+          <el-button type="primary" :loading="saveLoading" @click="handleNameConfirm" id="sql-search-modal-save-confirm" data-testid="sql-search-modal-save-confirm">{{ t('common.confirm') }}</el-button>
         </span>
       </template>
     </el-dialog>
 
-    <el-dialog :title="t('search.rename')" v-model="renameDialogVisible" width="480px" align-center>
+    <el-dialog :title="t('search.rename')" v-model="renameDialogVisible" width="480px" align-center data-testid="sql-search-rename-dialog">
       <el-form ref="resaveFormRef" :model="resaveForm" :rules="resaveFormRules" :label-width="locale === 'en' ? '104px' : '80px'" label-position="left">
         <el-form-item :label="`${t('search.oldName')}：`" prop="oldSqlName" class="type-input-disabled el-form-item-not-mandatory">
           <el-input type="hidden" />
-          <el-input v-model="resaveForm.oldSqlName" disabled id="sql-search-modal-resave-old" />
+          <el-input v-model="resaveForm.oldSqlName" disabled id="sql-search-modal-resave-old" data-testid="sql-search-modal-resave-old" />
         </el-form-item>
         <el-form-item :label="`${t('search.newName')}：`" prop="sqlName">
           <el-input type="hidden" />
-          <el-input v-model="resaveForm.sqlName" :placeholder="t('common.placeHolder')" maxlength="25" show-word-limit id="sql-search-modal-resave" />
+          <el-input v-model="resaveForm.sqlName" :placeholder="t('common.placeHolder')" maxlength="25" show-word-limit id="sql-search-modal-resave" data-testid="sql-search-modal-resave" />
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="renameDialogVisible = false" id="sql-search-modal-resave-cancel">{{ t('common.cancel') }}</el-button>
-          <el-button type="primary" :loading="saveLoading" @click="handleRenameConfirm" id="sql-search-modal-confirm">{{ t('common.confirm') }}</el-button>
+          <el-button @click="renameDialogVisible = false" id="sql-search-modal-resave-cancel" data-testid="sql-search-modal-resave-cancel">{{ t('common.cancel') }}</el-button>
+          <el-button type="primary" :loading="saveLoading" @click="handleRenameConfirm" id="sql-search-modal-confirm" data-testid="sql-search-modal-confirm">{{ t('common.confirm') }}</el-button>
         </span>
       </template>
     </el-dialog>
-    <el-dialog :title="t('common.notice')" v-model="saveTipDialogVisible" width="480px" align-center>
+    <el-dialog :title="t('common.notice')" v-model="saveTipDialogVisible" width="480px" align-center data-testid="sql-search-unsaved-dialog">
       <span style="line-height: 24px" class="inline-flex items-center">
         <i-custom-message-warning class="m-r-4" />
         {{ t('common.unsaveContinueTip') }}
       </span>
       <template #footer>
-        <el-button id="sql-search-modal-unsavetip-unsave" class="left" @click="handleUnsave">{{ t('common.unsave') }}</el-button>
-        <el-button @click="saveTipDialogVisible = false" id="sql-search-modal-unsavetip-cancel">{{ t('common.cancel') }}</el-button>
-        <el-button type="primary" :loading="saveLoading" @click="handleContiuneSave" id="sql-search-modal-unsavetip-confirm">{{ t('common.save') }}</el-button>
+        <el-button id="sql-search-modal-unsavetip-unsave" data-testid="sql-search-modal-unsavetip-unsave" class="left" @click="handleUnsave">{{ t('common.unsave') }}</el-button>
+        <el-button @click="saveTipDialogVisible = false" id="sql-search-modal-unsavetip-cancel" data-testid="sql-search-modal-unsavetip-cancel">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="saveLoading" @click="handleContiuneSave" id="sql-search-modal-unsavetip-confirm" data-testid="sql-search-modal-unsavetip-confirm">{{ t('common.save') }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -143,8 +143,19 @@ codeOriginal[activiteSql.value] = '';
 const sqlListRef = ref<InstanceType<typeof SideTemplate>>();
 const saveFormRef = ref<FormInstance>();
 const resaveFormRef = ref<FormInstance>();
-const saveFormRules = reactive({
-  sqlName: [{ required: true, message: () => t('search.nameRuleTip'), trigger: 'blur' }],
+const saveFormRules = reactive<FormRules>({
+  sqlName: [
+    {
+      required: true,
+      validator: (rule, value, callback) => {
+        if (!value || !value.trim()) {
+          return callback(new Error(t('search.nameRuleTip')));
+        }
+        return callback();
+      },
+      trigger: 'blur',
+    },
+  ],
 });
 const saveForm = reactive<{
   sqlName: string;
@@ -183,6 +194,31 @@ const saveSource = ref('save');
 
 const { requestFn: getSql } = useRequest(SearchApi.getSql);
 const { requestFn: saveQuery, loading: saveLoading } = useRequest(SearchApi.saveQuery);
+
+const normalizeTestIdSegment = (value: string | number) => `${value}`.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
+
+function syncTabTestIds() {
+  const tabRoot = document.getElementById('sql-search-top-tabs');
+  if (!tabRoot) return;
+
+  const addButton = tabRoot.querySelector('.el-tabs__new-tab');
+  addButton?.setAttribute('data-testid', 'sql-search-tab-add');
+
+  const tabItems = tabRoot.querySelectorAll('.el-tabs__header .el-tabs__item');
+  tabItems.forEach((tabItem, index) => {
+    const sqlItem = sqlList.value[index];
+    if (!sqlItem) return;
+
+    const idSegment = normalizeTestIdSegment(sqlItem.id);
+    tabItem.setAttribute('data-testid', `sql-search-tab-${idSegment}`);
+    tabItem.setAttribute('data-testid-index', `sql-search-tab-index-${index}`);
+    tabItem.setAttribute('data-sql-tab-index', `${index}`);
+    const closeButton = tabItem.querySelector('.is-icon-close');
+    closeButton?.setAttribute('data-testid', `sql-search-tab-close-${idSegment}`);
+    closeButton?.setAttribute('data-testid-index', `sql-search-tab-close-index-${index}`);
+    closeButton?.setAttribute('data-sql-tab-close-index', `${index}`);
+  });
+}
 
 // 获取code
 function getSqlCode() {
@@ -303,10 +339,11 @@ function handleTabRemove(targetName: TabPaneName) {
 function handleNameConfirm() {
   saveFormRef.value?.validate((valid) => {
     if (valid) {
+      const normalizedName = saveForm.sqlName.trim();
       const id = activiteSql.value.charAt(0) === '_' ? null : activiteSql.value;
       const data = {
         id,
-        queryName: saveForm.sqlName,
+        queryName: normalizedName,
         sqls: code[activiteSql.value]!,
       };
       saveQuery(data).then((res) => {
@@ -316,7 +353,7 @@ function handleNameConfirm() {
           if (saveSource.value === 'save') {
             const index = sqlList.value.findIndex((f) => `${f.id}` === activiteSql.value);
             if (index !== -1) {
-              sqlList.value.splice(index, 1, { id: `${res.data}`, queryName: saveForm.sqlName });
+              sqlList.value.splice(index, 1, { id: `${res.data}`, queryName: normalizedName });
             }
             activiteSql.value = `${res.data}`;
             sqlListRef.value?.getQueryList();
@@ -385,10 +422,11 @@ function handleNameCancel() {
 function handleRenameConfirm() {
   resaveFormRef.value?.validate((valid) => {
     if (valid) {
+      const normalizedName = resaveForm.sqlName.trim();
       const { id } = resaveForm;
       const data = {
         id,
-        queryName: resaveForm.sqlName,
+        queryName: normalizedName,
         sqls: code[id]!,
       };
       saveQuery(data).then((res) => {
@@ -397,7 +435,7 @@ function handleRenameConfirm() {
           renameDialogVisible.value = false;
           const index = sqlList.value.findIndex((f) => `${f.id}` === `${id}`);
           if (index !== -1) {
-            sqlList.value.splice(index, 1, { id: `${id}`, queryName: resaveForm.sqlName });
+            sqlList.value.splice(index, 1, { id: `${id}`, queryName: normalizedName });
           }
           sqlListRef.value?.getQueryList();
           // activiteSql.value = `${id}`;
@@ -471,6 +509,9 @@ onMounted(() => {
       codeOriginal[sql] = storageData.codeOriginal[sql];
     });
   }
+  nextTick(() => {
+    syncTabTestIds();
+  });
 });
 
 watch(activiteSql, (newVal, oldVal) => {
@@ -478,6 +519,16 @@ watch(activiteSql, (newVal, oldVal) => {
     getSqlCode();
   }
 });
+
+watch(
+  () => sqlList.value.map((item) => `${item.id}:${item.queryName}`).join('|'),
+  () => {
+    nextTick(() => {
+      syncTabTestIds();
+    });
+  },
+  { immediate: true },
+);
 </script>
 
 <style lang="scss" scoped>

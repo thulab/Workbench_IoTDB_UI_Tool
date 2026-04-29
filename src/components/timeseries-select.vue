@@ -1,6 +1,6 @@
 <template>
-  <div class="select-container">
-    <el-select v-model="searchFormData.selectType" class="custom-select deep-color-select" :style="{ width: locale === 'zh-cn' ? '90px' : '170px' }">
+  <div class="select-container" :data-testid="testIdPrefix ? `${testIdPrefix}-mode-wrapper` : undefined">
+    <el-select v-model="searchFormData.selectType" class="custom-select deep-color-select" :style="{ width: locale === 'zh-cn' ? '90px' : '170px' }" :data-testid="testIdPrefix ? `${testIdPrefix}-mode-select` : undefined">
       <el-option value="name" :label="t('search.measurementName')" />
       <el-option value="desc" :label="t('search.measurementDescription')" />
     </el-select>
@@ -12,6 +12,7 @@
     :class="['remote-select-box', disabledSelect ? 'remote-select-disabled-box' : '']"
     v-model="model"
     :id="id"
+    :data-testid="testIdPrefix ? `${testIdPrefix}-select` : undefined"
     :placeholder="t(computedPlaceholder)"
     filterable
     remote
@@ -31,11 +32,11 @@
       <el-icon class="remote-select-search-icon" size="20"><i-custom-search-icon /></el-icon>
     </template>
     <!-- Select All / Invert Selection Controls -->
-    <div class="select-controls" v-if="measurementList.length > 0">
-      <el-button :type="isAllSelected ? 'primary' : 'default'" size="small" :disabled="disabledSelect" @click.stop="handleSelectAll" class="control-button">
+    <div class="select-controls" v-if="measurementList.length > 0" :data-testid="testIdPrefix ? `${testIdPrefix}-controls` : undefined">
+      <el-button :type="isAllSelected ? 'primary' : 'default'" size="small" :disabled="disabledSelect" @click.stop="handleSelectAll" class="control-button" :data-testid="testIdPrefix ? `${testIdPrefix}-select-all` : undefined">
         {{ t('measurement.selectAll') }}
       </el-button>
-      <el-button type="default" size="small" :disabled="disabledSelect" @click.stop="handleInvertSelection" class="control-button">
+      <el-button type="default" size="small" :disabled="disabledSelect" @click.stop="handleInvertSelection" class="control-button" :data-testid="testIdPrefix ? `${testIdPrefix}-invert-selection` : undefined">
         {{ t('measurement.invertSelection') }}
       </el-button>
     </div>
@@ -45,6 +46,7 @@
       :label="item.timeseries"
       :value="item.timeseries"
       :id="`timeseries-select-${item.timeseries}`"
+      :data-testid="testIdPrefix ? `${testIdPrefix}-option-${formatTimeseriesTestId(item.timeseries)}` : undefined"
       :disabled="disabledPath ? disabledPath(item) : false"
     >
       <div class="timeseries-option-box">
@@ -62,13 +64,13 @@
       </div>
     </el-option>
   </el-select>
-  <el-button v-if="isShowViewBtn" type="primary" :disabled="!model.length" class="m-l-12" @click="() => (dialogVisible = true)">{{ t(viewText) }}</el-button>
-  <el-dialog :title="t(viewText)" v-model="dialogVisible" class="select-modal" align-center width="520px">
+  <el-button v-if="isShowViewBtn" type="primary" :disabled="!model.length" class="m-l-12" :data-testid="testIdPrefix ? `${testIdPrefix}-view-selected` : undefined" @click="() => (dialogVisible = true)">{{ t(viewText) }}</el-button>
+  <el-dialog :title="t(viewText)" v-model="dialogVisible" class="select-modal" align-center width="520px" :data-testid="testIdPrefix ? `${testIdPrefix}-selected-dialog` : undefined">
     <el-scrollbar :max-height="400">
-      <ul class="select-list">
-        <li v-for="(item, index) in model" :key="item" class="select-item">
+      <ul class="select-list" :data-testid="testIdPrefix ? `${testIdPrefix}-selected-list` : undefined">
+        <li v-for="(item, index) in model" :key="item" class="select-item" :data-testid="testIdPrefix ? `${testIdPrefix}-selected-item-${formatTimeseriesTestId(item)}` : undefined">
           <span class="select-item-text"><text-tooltip :content="item" /></span>
-          <div class="select-item-delete-box" @click="handleDelete(index)">
+          <div class="select-item-delete-box" :data-testid="testIdPrefix ? `${testIdPrefix}-selected-delete-${formatTimeseriesTestId(item)}` : undefined" @click="handleDelete(index)">
             <i-custom-delete class="select-item-delete" />
             <i-custom-delete-active class="select-item-delete-active" />
           </div>
@@ -97,6 +99,7 @@ const props = withDefaults(
     selectWidth?: number;
     itemWidth?: number;
     isShowType?: boolean;
+    testIdPrefix?: string;
   }>(),
   {
     isShowViewBtn: true,
@@ -146,6 +149,10 @@ const remoteMethod = debounce((query: string) => {
 
 function handleDelete(index: number) {
   model.value?.splice(index, 1);
+}
+
+function formatTimeseriesTestId(value: string) {
+  return value.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
 }
 
 function handleChangePath(vals: string[]) {

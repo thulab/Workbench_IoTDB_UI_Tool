@@ -1,16 +1,16 @@
 <template>
-  <el-dialog :title="t('measurement.newDataBase')" v-model="dialogVisible" width="480px" class="new-database-container" align-center :close-on-click-modal="false" id="new-database-modal-database">
+  <el-dialog :title="t('measurement.newDataBase')" v-model="dialogVisible" width="480px" class="new-database-container" align-center :close-on-click-modal="false" id="new-database-modal-database" data-testid="measurement-database-modal">
     <el-form ref="formRef" :model="formData" :rules="rules" class="source-form m-t-8" label-position="left">
       <base-form-item :label="`${t('measurement.databaseName')}：`" prop="groupName">
-        <el-input v-model="formData.groupName" :placeholder="t('measurement.databaseNamePlaceholder')" maxlength="59" show-word-limit id="new-database-modal-groupName">
+        <el-input v-model="formData.groupName" :placeholder="t('measurement.databaseNamePlaceholder')" maxlength="59" show-word-limit id="new-database-modal-groupName" data-testid="measurement-database-modal-name">
           <template #prepend>root.</template>
         </el-input>
       </base-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false" id="new-database-modal-cancel">{{ t('common.cancel') }}</el-button>
-        <el-button type="primary" :loading="saveloading" @click="handleConfirm" id="new-database-modal-confirm">{{ t('common.confirm') }}</el-button>
+        <el-button @click="dialogVisible = false" id="new-database-modal-cancel" data-testid="measurement-database-modal-cancel">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="saveloading" @click="handleConfirm" id="new-database-modal-confirm" data-testid="measurement-database-modal-confirm">{{ t('common.confirm') }}</el-button>
       </span>
     </template>
   </el-dialog>

@@ -1,6 +1,8 @@
 <template>
-  <sql-search-table v-if="connectionStore.isTableModel" />
-  <sql-search-tree v-else />
+  <div data-testid="sql-search-page">
+    <sql-search-table v-if="connectionStore.isTableModel" />
+    <sql-search-tree v-else />
+  </div>
 </template>
 
 <script lang="ts" setup>

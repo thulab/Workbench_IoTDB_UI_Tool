@@ -1,7 +1,7 @@
 <template>
-  <el-dialog :title="t('search.batchImportData')" v-model="dialogVisible" width="748px" class="new-storage-container" align-center :close-on-click-modal="false" id="data-search-modal-import">
-    <div class="import-box">
-      <el-steps :active="activeStep" align-center finish-status="success" class="import-step-box" id="data-search-import-steps">
+  <el-dialog :title="t('search.batchImportData')" v-model="dialogVisible" width="748px" class="new-storage-container" align-center :close-on-click-modal="false" id="data-search-modal-import" data-testid="data-search-import-dialog">
+    <div class="import-box" data-testid="data-search-import-shell">
+      <el-steps :active="activeStep" align-center finish-status="success" class="import-step-box" id="data-search-import-steps" data-testid="data-search-import-steps">
         <el-step :title="t('common.chooseFile')">
           <template #title>{{ t('common.chooseFile') }}</template>
         </el-step>
@@ -9,18 +9,18 @@
         <el-step :title="t('common.importResult')" />
       </el-steps>
 
-      <div class="select-file-box" v-if="activeStep === 0">
+      <div class="select-file-box" v-if="activeStep === 0" data-testid="data-search-import-step-choose">
         <div class="select-item-box" style="align-items: center">
           <span class="select-item-label">{{ t('common.importFormat') }}：</span>
-          <el-radio-group v-model="importFormat" :disabled="uploadFileInfos && uploadFileInfos?.length > 0">
-            <el-radio :value="0">TsFile</el-radio>
-            <el-radio :value="1">CSV</el-radio>
-            <el-radio :value="2">XLSX</el-radio>
+          <el-radio-group v-model="importFormat" :disabled="uploadFileInfos && uploadFileInfos?.length > 0" data-testid="data-search-import-format-group">
+            <el-radio :value="0" data-testid="data-search-import-format-tsfile">TsFile</el-radio>
+            <el-radio :value="1" data-testid="data-search-import-format-csv">CSV</el-radio>
+            <el-radio :value="2" data-testid="data-search-import-format-xlsx">XLSX</el-radio>
           </el-radio-group>
         </div>
         <div v-if="importFormat !== 0" class="select-item-box m-b-10" style="align-items: center">
           <span class="select-item-label">{{ t('common.downloadTemplate') }}：</span>
-          <a href="/api/file/importDataTemplate" class="template-button" target="_blank">data _template.csv</a>
+          <a href="/api/file/importDataTemplate" class="template-button" target="_blank" data-testid="data-search-import-template-link">data _template.csv</a>
         </div>
         <div class="select-item-box">
           <span class="select-item-label" :style="{ opacity: !uploadFileInfos || uploadFileInfos?.length === 0 ? 1 : 0 }">{{ t('common.importFile') }}：</span>
@@ -41,6 +41,7 @@
             :on-remove="handleRemove"
             :http-request="customUpload"
             id="data-search-import-upload"
+            data-testid="data-search-import-upload"
           >
             <el-icon class="m-t-32" size="80" v-if="!uploadFileInfos || uploadFileInfos?.length === 0"><i-custom-upload /></el-icon>
             <div class="upload-file-list-wrapper" v-else>
@@ -73,7 +74,7 @@
         </div>
       </div>
 
-      <div class="select-result-box" v-if="activeStep === 1">
+      <div class="select-result-box" v-if="activeStep === 1" data-testid="data-search-import-step-uploading">
         <div class="upload-file-list-wrapper">
           <h4 class="upload-title">
             {{ t('common.importFile') }}:
@@ -94,13 +95,13 @@
         </div>
       </div>
 
-      <div class="select-result-box" v-if="activeStep === 2 && uploadResult.successNum === uploadDetail.length">
+      <div class="select-result-box" v-if="activeStep === 2 && uploadResult.successNum === uploadDetail.length" data-testid="data-search-import-step-success">
         <div class="success-box">
           <el-icon size="44"><i-custom-success-green /></el-icon>
           <span class="success-tip">{{ t('measurement.importedSuccessStatus', { total: uploadDetail.length, success: uploadResult.successNum }, uploadDetail.length) }}</span>
         </div>
       </div>
-      <div class="upload-result-box" v-else-if="activeStep === 2">
+      <div class="upload-result-box" v-else-if="activeStep === 2" data-testid="data-search-import-step-result">
         <p>{{ t('measurement.importedFailureStatus', { total: uploadDetail.length, success: uploadResult.successNum, failure: uploadResult.failNum }, uploadDetail.length) }}</p>
         <el-table border class="upload-result-table" :data="uploadDetail" style="width: 100%" size="small" max-height="210">
           <el-table-column type="index" :label="t('measurement.num')" width="60" align="center" />
@@ -124,13 +125,13 @@
     </div>
 
     <div class="operate-buttons m-t-12" style="text-align: right" v-if="activeStep === 0">
-      <el-button type="primary" :disabled="!uploadFileInfos || uploadFileInfos.length === 0" @click="handleNext" id="data-search-import-next">{{ t('common.next') }}</el-button>
+      <el-button type="primary" :disabled="!uploadFileInfos || uploadFileInfos.length === 0" @click="handleNext" id="data-search-import-next" data-testid="data-search-import-next">{{ t('common.next') }}</el-button>
     </div>
 
     <div class="operate-buttons m-t-12" style="height: 28px" v-if="activeStep === 1"></div>
 
     <div class="operate-buttons m-t-12" style="text-align: center" v-if="activeStep === 2">
-      <el-button type="primary" @click="handleClose" id="data-search-import-close">{{ t('common.finish') }}</el-button>
+      <el-button type="primary" @click="handleClose" id="data-search-import-close" data-testid="data-search-import-close">{{ t('common.finish') }}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -235,6 +236,7 @@ const customUpload: UploadProps['httpRequest'] = (options) => {
         })
         .finally(() => {
           if (canNext()) {
+            finalizeUploadStatus();
             activeStep.value = 2;
           }
         });
@@ -247,6 +249,7 @@ const customUpload: UploadProps['httpRequest'] = (options) => {
     })
     .finally(() => {
       if (canNext()) {
+        finalizeUploadStatus();
         activeStep.value = 2;
       }
     });
@@ -264,6 +267,18 @@ function handleNext() {
   }));
   uploadRef.value!.submit();
   activeStep.value = 1;
+}
+
+function finalizeUploadStatus() {
+  if (!uploadDetail.value.length) {
+    uploadStatus.value = '';
+  } else if (uploadResult.failNum === 0 && uploadResult.successNum === uploadDetail.value.length) {
+    uploadStatus.value = 'success';
+  } else if (uploadResult.successNum > 0 && uploadResult.failNum > 0) {
+    uploadStatus.value = 'partial';
+  } else {
+    uploadStatus.value = 'error';
+  }
 }
 
 function handleClose() {

@@ -1,5 +1,5 @@
 <template>
-  <el-scrollbar>
+  <el-scrollbar data-testid="dashboard-page">
     <el-container class="details-wrapper" style="height: 100%">
       <el-main class="p-0">
         <div style="display: flex; flex-direction: column; height: 100%" v-loading="loading">

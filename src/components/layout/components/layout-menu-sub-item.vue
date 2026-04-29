@@ -1,20 +1,20 @@
 <template>
   <template v-for="subItem in menus" :key="subItem.path">
     <template v-if="subItem.children && subItem.children.length > 0">
-      <el-sub-menu :index="subItem.path">
+      <el-sub-menu :index="subItem.path" :data-testid="`layout-submenu-${formatMenuPath(subItem.path)}`">
         <template #title>
           <el-icon v-if="subItem.icon">
             <!--  eslint-disable-next-line vue/eqeqeq -->
             <i v-if="isCollapse && subItem.activeIcon && rootMenu?.activeIndex?.indexOf(subItem.path) == 0" v-html="subItem.activeIcon"></i>
             <i v-else v-html="subItem.icon"></i>
           </el-icon>
-          <span :id="subItem.path" :style="{ 'font-size': '12px' }">{{ subItem.title }}</span>
+          <span :id="subItem.path" :data-testid="`layout-submenu-title-${formatMenuPath(subItem.path)}`" :style="{ 'font-size': '12px' }">{{ subItem.title }}</span>
         </template>
         <layout-menu-sub-item :menu-list="subItem.children" :show-auth-menu="showAuthMenu" />
       </el-sub-menu>
     </template>
     <template v-else>
-      <el-menu-item :id="subItem.path" :index="subItem.path" :style="{ 'font-size': '12px' }">
+      <el-menu-item :id="subItem.path" :index="subItem.path" :data-testid="`layout-menu-item-${formatMenuPath(subItem.path)}`" :style="{ 'font-size': '12px' }">
         <el-icon v-if="subItem.icon">
           <i v-if="isCollapse && subItem.activeIcon && subItem.path === rootMenu?.activeIndex" v-html="subItem.activeIcon"></i>
           <i v-else v-html="subItem.icon"></i>
@@ -49,6 +49,7 @@ const props = defineProps<{
 }>();
 
 const showVersionMenu = (version: string) => iotdbShowAuth(connectionStore.connectionInfo.currentVersion, version);
+const formatMenuPath = (path: string) => path.replace(/^\//, '').replace(/[/.]+/g, '-');
 
 const menus = computed<globalThis.MenuOptions[]>(() => {
   const { menuList } = props;

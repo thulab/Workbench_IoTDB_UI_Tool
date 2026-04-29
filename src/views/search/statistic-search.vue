@@ -1,8 +1,8 @@
 <template>
-  <el-container class="page-container">
+  <el-container class="page-container" data-testid="statistic-search-page">
     <el-header class="search-form-wrapper p-0" style="height: auto">
-      <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline :disabled="getListLoading">
-        <base-form-item class="no-label is-required">
+      <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline :disabled="getListLoading" data-testid="statistic-search-form">
+        <base-form-item class="no-label is-required" data-testid="statistic-search-path-field">
           <!-- <template #label>
             {{ t('measurement.measurementChoose') }}：
             <el-tooltip effect="light" :content="t('common.searchTipLimit100')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
@@ -13,6 +13,7 @@
             :item-width="elementWidth"
             :disabled-path="(item: MeasurementDataItem) => ['TEXT', 'BOOLEAN', 'TIMESTAMP', 'DATE', 'STRING', 'BLOB']!.includes(item.dataType)"
             id="statistic-search-path"
+            test-id-prefix="statistic-search-path"
           />
         </base-form-item>
         <base-form-item :label="`${t('search.searchTime')}：`" prop="datetimerange" class="form-item-last">
@@ -28,13 +29,14 @@
             :start-placeholder="t('search.startTime')"
             :end-placeholder="t('search.endTime')"
             id="statistic-search-datetimerange"
+            data-testid="statistic-search-datetimerange"
           />
         </base-form-item>
       </el-form>
-      <div class="search-form-buttons">
-        <el-button @click="handleReset" :disabled="getListLoading" id="statistic-search-reset">{{ t('common.reset') }}</el-button>
+      <div class="search-form-buttons" data-testid="statistic-search-actions">
+        <el-button @click="handleReset" :disabled="getListLoading" id="statistic-search-reset" data-testid="statistic-search-reset">{{ t('common.reset') }}</el-button>
         <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
-          <el-button :disabled="searchFormData.path.length === 0 || !canReadWriteData" type="primary" @click="handleSearch" id="statistic-search-search">
+          <el-button :disabled="searchFormData.path.length === 0 || !canReadWriteData" type="primary" @click="handleSearch" id="statistic-search-search" data-testid="statistic-search-search">
             {{ getListLoading ? t('common.cancel') : t('common.query') }}
           </el-button>
         </auth-tooltip>
@@ -42,14 +44,15 @@
     </el-header>
 
     <el-main class="page-table-details">
-      <div class="page-info-box">
+      <div class="page-info-box" data-testid="statistic-search-detail-header">
         <h4 class="page-info-title">{{ t('common.searchDetail') }}</h4>
         <div class="page-detail-buttons">
           <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
-            <el-dropdown class="m-r-16" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData" @command="(val) => handleCommandDown(val)" id="statistic-search-download-dropdown">
+            <el-dropdown class="m-r-16" :disabled="getListLoading || tableData.length === 0 || !canReadWriteData" @command="(val) => handleCommandDown(val)" id="statistic-search-download-dropdown" data-testid="statistic-search-download-dropdown">
               <el-button
                 :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']"
                 id="statistic-search-download"
+                data-testid="statistic-search-download"
                 :disabled="getListLoading || tableData.length === 0 || !canReadWriteData"
               >
                 {{ t('common.export') }}
@@ -57,8 +60,8 @@
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item command="csv" id="statistic-search-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
-                  <el-dropdown-item command="xlsx" id="statistic-search-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
+                  <el-dropdown-item command="csv" id="statistic-search-download-csv" data-testid="statistic-search-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
+                  <el-dropdown-item command="xlsx" id="statistic-search-download-xlsx" data-testid="statistic-search-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -69,6 +72,7 @@
               @click="handleSearch"
               :disabled="getListLoading || searchFormData.path.length === 0 || !canReadWriteData"
               id="statistic-search-refresh"
+              data-testid="statistic-search-refresh"
               :class="getListLoading || searchFormData.path.length === 0 || !canReadWriteData ? '' : 'svg-button-hover-color'"
             >
               <i-custom-refresh style="width: 24px; height: 24px" />
@@ -82,6 +86,7 @@
           border
           :data="tableData"
           v-loading="getListLoading"
+          data-testid="statistic-search-results-table"
           style="width: 100%"
           :height="totalCount > 0 ? reactiveTableHeight.value : reactiveTableHeight.value + 34"
           :max-height="totalCount > 0 ? reactiveTableHeight.value : reactiveTableHeight.value + 34"
@@ -99,7 +104,7 @@
           <el-table-column v-if="showAuthCol" :label="t('common.variance')" prop="variance" min-width="160" align="center" show-overflow-tooltip />
           <el-table-column :label="t('common.total')" prop="sumValue" min-width="160" align="center" show-overflow-tooltip />
           <template #empty>
-            <div class="table-empty-wrapper">
+            <div class="table-empty-wrapper" data-testid="statistic-search-empty">
               <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
               <span class="data-empty-text">{{ t('common.noData') }}</span>
             </div>
@@ -111,6 +116,7 @@
           v-model:currentPage="pagination.pageNum"
           v-model:page-size="pagination.pageSize"
           class="m-t-8"
+          data-testid="statistic-search-pagination"
           layout="prev, pager, next, sizes, jumper"
           background
           :page-sizes="[10, 20, 50, 100]"

@@ -1,5 +1,5 @@
 <template>
-  <div class="font_fmiy" ref="codeContainerRef"></div>
+  <div class="font_fmiy" ref="codeContainerRef" :data-testid="testId"></div>
 </template>
 
 <script lang="ts" setup>
@@ -14,6 +14,7 @@ import { IOTDB_EXTENSIONS as IOTDB_TABLE_EXTENSIONS } from '@/components/code-ed
 const props = defineProps<{
   modelValue: string;
   style: CSSProperties;
+  testId?: string;
 }>();
 
 const emit = defineEmits(events);
@@ -36,6 +37,10 @@ const config = shallowRef({
 const codeContainerRef = shallowRef<HTMLDivElement>();
 const state = shallowRef<EditorState>();
 const view = shallowRef<EditorView>();
+
+type TestableEditorContainer = HTMLDivElement & {
+  __cmView?: EditorView;
+};
 
 // function onCmCodeChange(content: string) {
 //   // coder.value.setValue(content);
@@ -103,6 +108,7 @@ onMounted(() => {
     state: state.value,
     parent: codeContainerRef.value!,
   });
+  (codeContainerRef.value as TestableEditorContainer).__cmView = view.value;
 
   const editorTools = getEditorTools(view.value);
   watch(
@@ -140,6 +146,9 @@ onMounted(() => {
   });
 });
 onBeforeUnmount(() => {
+  if (codeContainerRef.value) {
+    delete (codeContainerRef.value as TestableEditorContainer).__cmView;
+  }
   if (config.value.autoDestroy && view.value) {
     destroyEditorView(view.value);
   }

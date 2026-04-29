@@ -1,18 +1,18 @@
 <template>
-  <div class="menu" :style="{ width: isCollapse ? '40px' : '184px' }">
-    <div class="logo flex-align-center" :style="{ paddingLeft: isCollapse ? '6px' : '14px' }" id="layout-menu-logo" @click="handleDashboard">
+  <div class="menu" :style="{ width: isCollapse ? '40px' : '184px' }" data-testid="layout-menu">
+    <div class="logo flex-align-center" :style="{ paddingLeft: isCollapse ? '6px' : '14px' }" id="layout-menu-logo" data-testid="layout-menu-logo" @click="handleDashboard">
       <el-icon alt="logo" v-if="isCollapse"><i-custom-logo-timecho /></el-icon>
       <el-icon class="title" v-if="!isCollapse">
         <i-custom-timecho-logo-en v-if="locale === 'en'" />
         <i-custom-timecho-logo v-else />
       </el-icon>
     </div>
-    <div class="connection-box" :style="{ padding: isCollapse ? '0 0 0 5px' : '0 4px 0 4px' }">
+    <div class="connection-box" :style="{ padding: isCollapse ? '0 0 0 5px' : '0 4px 0 4px' }" data-testid="layout-menu-connection-box">
       <div class="flex-align-center" style="height: 30px">
         <el-icon size="30" :style="{ marginLeft: '0' }"><i-custom-connection /></el-icon>
         <div v-if="!isCollapse" class="connection-info flex-align-center" :style="{ 'font-size': '12px' }">
           <span class="connection-name">{{ connectionName }}</span>
-          <el-icon size="20" class="svg-button-hover-color" style="cursor: pointer" id="layout-menu-connection" @click="handleToggleConnection"><i-custom-toggle /></el-icon>
+          <el-icon size="20" class="svg-button-hover-color" style="cursor: pointer" id="layout-menu-connection" data-testid="layout-menu-connection-toggle" @click="handleToggleConnection"><i-custom-toggle /></el-icon>
         </div>
       </div>
       <div v-if="!isCollapse" class="flex-align-center" style="height: 30px">
@@ -22,8 +22,8 @@
             <i-custom-menu-connection-cluster v-if="connectionStore.connectionInfo.data.type === 1" />
           </el-icon>
           <ul class="cluster-list" v-else>
-            <li :class="['cluster-type', { 'cluster-active': clusterType === 'master' }]" id="layout-menu-connection-master" @click="handleChangeCluster('master')">{{ t('common.master') }}</li>
-            <li :class="['cluster-type', { 'cluster-active': clusterType === 'slave' }]" id="layout-menu-connection-slave" @click="handleChangeCluster('slave')">{{ t('common.slave') }}</li>
+            <li :class="['cluster-type', { 'cluster-active': clusterType === 'master' }]" id="layout-menu-connection-master" data-testid="layout-menu-connection-master" @click="handleChangeCluster('master')">{{ t('common.master') }}</li>
+            <li :class="['cluster-type', { 'cluster-active': clusterType === 'slave' }]" id="layout-menu-connection-slave" data-testid="layout-menu-connection-slave" @click="handleChangeCluster('slave')">{{ t('common.slave') }}</li>
           </ul>
           <span class="connection-host-port">{{ connectionHost }}</span>
         </div>

@@ -1,5 +1,5 @@
 <template>
-  <div class="stand-table">
+  <div class="stand-table" :data-testid="testId">
     <div class="row flex">
       <div class="border_table flex-1" :style="{ maxWidth: totalColumnPage > 1 ? 'calc(100% - 70px)' : '100%' }">
         <el-table
@@ -36,7 +36,7 @@
           </el-table-column>
           <slot name="append-column"></slot>
           <template #empty>
-            <div class="table-empty-wrapper">
+            <div class="table-empty-wrapper" :data-testid="testId ? `${testId}-empty` : undefined">
               <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
               <span class="data-empty-text">{{ t('common.noData') }}</span>
             </div>
@@ -81,6 +81,7 @@ const props = defineProps<{
   total?: number;
   batchDeleting?: boolean;
   showSelect?: boolean;
+  testId?: string;
 }>();
 const emit = defineEmits<{
   (event: 'batchDelete'): Promise<void>;

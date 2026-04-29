@@ -5,11 +5,12 @@
       <el-tooltip effect="light" :content="t('connection.prometheusTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
     </template>
     <el-col :span="19">
-      <url-input class="m-l-[8px] p-r-[16px]" v-model.trim="prometheusUrl" :placeholder="`${t('common.placeHolder')}IP:Port`" :id="`${formKey}-prometheusUrl`" />
+      <url-input class="m-l-[8px] p-r-[16px]" v-model.trim="prometheusUrl" :placeholder="`${t('common.placeHolder')}IP:Port`" :id="`${formKey}-prometheusUrl`" :data-testid="`connection-${formKey.replace(/[^a-zA-Z0-9]+/g, '-')}-prometheus-url`" />
     </el-col>
     <el-col :span="5">
       <el-switch
         v-model="enableAuth"
+        :data-testid="`connection-${formKey.replace(/[^a-zA-Z0-9]+/g, '-')}-prometheus-auth`"
         @change="
           (val) => {
             if (!val) {
@@ -35,12 +36,12 @@
   <el-row v-if="enableAuth || username" class="p-r-28">
     <el-col :span="15">
       <base-form-item :prop="formKeyUsername" class="p-l-[7px]" :label="`${t('connection.prometheusUsername')}：`" :rules="requiredRules" label-position="right">
-        <el-input class="m-l-[0] m-r-[8px]" v-model="username" :placeholder="t('connection.prometheusUsernameTip')" maxlength="32" id="connection-modal-username" />
+        <el-input class="m-l-[0] m-r-[8px]" v-model="username" :placeholder="t('connection.prometheusUsernameTip')" maxlength="32" id="connection-modal-username" :data-testid="`connection-${formKey.replace(/[^a-zA-Z0-9]+/g, '-')}-prometheus-username`" />
       </base-form-item>
     </el-col>
     <el-col :span="9">
       <base-form-item :prop="formKeyPassword" :label="`${t('connection.prometheusPassword')}：`" label-width="50px" label-position="right">
-        <el-input v-model="password" :placeholder="t('connection.prometheusPasswordTip')" show-password autocomplete="off" id="connection-modal-password" class="promethus-password-input" />
+        <el-input v-model="password" :placeholder="t('connection.prometheusPasswordTip')" show-password autocomplete="off" id="connection-modal-password" :data-testid="`connection-${formKey.replace(/[^a-zA-Z0-9]+/g, '-')}-prometheus-password`" class="promethus-password-input" />
       </base-form-item>
     </el-col>
   </el-row>

@@ -7,25 +7,26 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     id="connection-modal"
+    data-testid="connection-modal"
     :before-close="handleClose"
   >
     <el-container class="connection-wrapper" v-loading="listLoading">
       <el-aside width="240px" class="connection-list-wrapper">
-        <div class="connection-list-title">
+        <div class="connection-list-title" data-testid="connection-list-header">
           <h4>{{ t('connection.connectionList') }}</h4>
           <div>
             <el-tooltip effect="light" :content="t('common.refresh')">
-              <el-button link class="m-r-8 svg-button-hover-color" @click="handleRefresh" id="connection-side-refresh"><i-custom-border-refresh /></el-button>
+              <el-button link class="m-r-8 svg-button-hover-color" @click="handleRefresh" id="connection-side-refresh" data-testid="connection-list-refresh"><i-custom-border-refresh /></el-button>
             </el-tooltip>
             <el-tooltip effect="light" :content="t('connection.flowTip')">
-              <el-button link class="m-r-8 m-l-0 svg-button-hover-color" @click="handleGraph" id="connection-side-graph"><i-custom-graph /></el-button>
+              <el-button link class="m-r-8 m-l-0 svg-button-hover-color" @click="handleGraph" id="connection-side-graph" data-testid="connection-list-graph"><i-custom-graph /></el-button>
             </el-tooltip>
             <el-tooltip effect="light" :content="t('connection.addConnection')">
-              <el-button link style="margin: 0" @click="handleAddConnection" id="connection-side-add"><i-custom-new-connection /></el-button>
+              <el-button link style="margin: 0" @click="handleAddConnection" id="connection-side-add" data-testid="connection-list-add"><i-custom-new-connection /></el-button>
             </el-tooltip>
           </div>
         </div>
-        <el-input :placeholder="t('connection.namePlaceholder')" v-model="filterText" id="connection-list-input" @keyup.enter="handleFilter" class="connection-search-input">
+        <el-input :placeholder="t('connection.namePlaceholder')" v-model="filterText" id="connection-list-input" data-testid="connection-list-search" @keyup.enter="handleFilter" class="connection-search-input">
           <template #prefix>
             <i-custom-search-icon class="remote-select-search-icon" />
           </template>
@@ -35,12 +36,13 @@
             <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
             <span class="data-empty-text">{{ t('common.noData') }}</span>
           </div>
-          <ul class="list-box" v-else>
+          <ul class="list-box" v-else data-testid="connection-list">
             <li
               v-for="item in filterList"
               :key="item.id"
               :class="['connection-item-box', current === item.id ? 'connection-item-box-active' : '']"
               :id="`connection-item-${item.id === '' ? 'new' : item.id}`"
+              :data-testid="`connection-item-${item.id === '' ? 'new' : item.id}`"
               @click="(e) => handleSelect(item, e)"
             >
               <span class="connection-item-text" :style="{ paddingLeft: item.id !== '' ? '' : '7px' }">

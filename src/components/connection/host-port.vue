@@ -2,11 +2,11 @@
   <div class="ip-port-list">
     <div class="ip-port-item" v-for="(item, index) in hostAndPortList" :key="`${formKey}-${index}`">
       <base-form-item label="" :prop="`${formKey}[${index}].host`" :rules="requiredRules">
-        <el-input v-model.trim="item.host" :placeholder="t('connection.ipTip')" style="width: 200px" :id="`${formKey}-${index}-host`" :disabled="!isDisabled" />
+        <el-input v-model.trim="item.host" :placeholder="t('connection.ipTip')" style="width: 200px" :id="`${formKey}-${index}-host`" :data-testid="`connection-${formKey.replace(/[^a-zA-Z0-9]+/g, '-')}-${index}-host`" :disabled="!isDisabled" />
       </base-form-item>
       <span class="ip-port-divider">:</span>
       <base-form-item label="" :prop="`${formKey}[${index}].port`" :rules="requiredPortRules">
-        <el-input v-model.number="item.port" :placeholder="t('connection.portTip')" :style="{ width: locale === 'en' ? '148px' : '148px' }" :id="`${formKey}-${index}-port`" :disabled="!isDisabled" />
+        <el-input v-model.number="item.port" :placeholder="t('connection.portTip')" :style="{ width: locale === 'en' ? '148px' : '148px' }" :id="`${formKey}-${index}-port`" :data-testid="`connection-${formKey.replace(/[^a-zA-Z0-9]+/g, '-')}-${index}-port`" :disabled="!isDisabled" />
       </base-form-item>
       <template v-if="showOperate">
         <el-button
@@ -14,12 +14,13 @@
           v-if="index === 0"
           @click="handleAddHost"
           :id="`${formKey}-add`"
+          :data-testid="`connection-${formKey.replace(/[^a-zA-Z0-9]+/g, '-')}-add`"
           :class="['m-l-6', isDisabledAddHosts || !isDisabled ? '' : 'svg-button-hover-color']"
           :disabled="isDisabledAddHosts || !isDisabled"
         >
           <el-icon size="26"><i-custom-add-border /></el-icon>
         </el-button>
-        <el-button link v-if="index !== 0" @click="handleDelHost(index)" :id="`${formKey}-del`" :class="['m-l-6', !isDisabled ? '' : 'svg-button-hover-color']" :disabled="!isDisabled">
+        <el-button link v-if="index !== 0" @click="handleDelHost(index)" :id="`${formKey}-del`" :data-testid="`connection-${formKey.replace(/[^a-zA-Z0-9]+/g, '-')}-${index}-del`" :class="['m-l-6', !isDisabled ? '' : 'svg-button-hover-color']" :disabled="!isDisabled">
           <el-icon size="26"><i-custom-delete /></el-icon>
         </el-button>
       </template>

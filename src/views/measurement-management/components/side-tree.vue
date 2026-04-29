@@ -1,22 +1,23 @@
 <template>
   <auth-container :is-auth="canReadWriteSchema" :content="'common.schemaAuth'" style="height: 100%">
-    <div class="measurement-tree-wrapper">
+    <div class="measurement-tree-wrapper" data-testid="measurement-tree-wrapper">
       <div class="search-refresh-box">
         <el-input
           :placeholder="t('measurement.searchPlaceholder')"
           v-model="searchText"
           :disabled="searching"
           id="measurement-tree-input"
+          data-testid="measurement-tree-search"
           @keyup.enter="handleSearch"
           class="measurement-tree-search-input"
         />
 
-        <el-button link @click="handleRefresh()" :disabled="searching" id="measurement-tree-refresh" class="svg-button-hover-color m-l-16">
+        <el-button link @click="handleRefresh()" :disabled="searching" id="measurement-tree-refresh" data-testid="measurement-tree-refresh" class="svg-button-hover-color m-l-16">
           <i-custom-border-refresh style="width: 24px; height: 24px" />
         </el-button>
       </div>
 
-      <div class="measurement-tree-box" v-loading="initialLoading || searchLoading">
+      <div class="measurement-tree-box" v-loading="initialLoading || searchLoading" data-testid="measurement-tree-box">
         <template v-if="treeData && treeData.length">
           <virtualized-tree
             ref="measurementTree"
@@ -34,7 +35,12 @@
           >
             <!-- eslint-disable-next-line vue/no-unused-vars -->
             <template #default="{ node, data }">
-              <div v-if="data.nodeType !== 'PAGE'" class="node-text" :id="`tree-node-content-${data.nodePath}`">
+              <div
+                v-if="data.nodeType !== 'PAGE'"
+                class="node-text"
+                :id="`tree-node-content-${data.nodePath}`"
+                :data-testid="`measurement-tree-node-${data.nodePath}`"
+              >
                 <el-icon size="16" v-if="data.nodeType === 'DATABASE' && data.node !== 'root'"><i-custom-DB /></el-icon>
                 <el-icon size="16" v-if="data.nodeType === 'TIMESERIES'"><i-custom-TS /></el-icon>
                 <span class="m-l-4" v-html="highlightNode(data.node)"></span>

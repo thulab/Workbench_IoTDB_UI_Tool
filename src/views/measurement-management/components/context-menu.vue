@@ -1,18 +1,33 @@
 <template>
-  <div class="context-menu-container">
+  <div class="context-menu-container" data-testid="measurement-context-menu">
     <ul class="context-menu-box">
       <auth-tooltip v-if="isShowDatabase" :is-disabled="canManageDatabase" :content="'common.databaseAuth'">
-        <li :id="`tree-node-dropdown-new-database-${clickedNodeData.nodePath}`" :class="['context-menu-item', { 'disabled-menu': !canManageDatabase }]" @click="handleCommand('database')">
+        <li
+          :id="`tree-node-dropdown-new-database-${clickedNodeData.nodePath}`"
+          data-testid="measurement-context-menu-new-database"
+          :class="['context-menu-item', { 'disabled-menu': !canManageDatabase }]"
+          @click="handleCommand('database')"
+        >
           {{ t('measurement.newDataBase') }}
         </li>
       </auth-tooltip>
       <auth-tooltip v-if="isShowMeasurement" :is-disabled="canWriteSchemaByPath" :content="'common.schemaAuthAnother'">
-        <li :id="`tree-node-dropdown-new-measurement-${clickedNodeData.nodePath}`" :class="['context-menu-item', { 'disabled-menu': !canWriteSchemaByPath }]" @click="handleCommand('measurement')">
+        <li
+          :id="`tree-node-dropdown-new-measurement-${clickedNodeData.nodePath}`"
+          data-testid="measurement-context-menu-new-measurement"
+          :class="['context-menu-item', { 'disabled-menu': !canWriteSchemaByPath }]"
+          @click="handleCommand('measurement')"
+        >
           {{ t('measurement.newMeasurement') }}
         </li>
       </auth-tooltip>
       <el-tooltip v-if="clickedNodeData.nodePath !== 'root'" placement="top-start" effect="light" trigger="hover" :content="deleteTip" :disabled="deleteTipDisabled" popper-class="tooltip-box-width">
-        <li :id="`tree-node-dropdown-delete-${clickedNodeData.nodePath}`" :class="['context-menu-item', { 'disabled-menu': !deleteTipDisabled }]" @click="handleCommand('delete')">
+        <li
+          :id="`tree-node-dropdown-delete-${clickedNodeData.nodePath}`"
+          data-testid="measurement-context-menu-delete"
+          :class="['context-menu-item', { 'disabled-menu': !deleteTipDisabled }]"
+          @click="handleCommand('delete')"
+        >
           {{ t('common.delete') }}
         </li>
       </el-tooltip>

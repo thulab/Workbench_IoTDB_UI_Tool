@@ -1,13 +1,13 @@
 <template>
-  <div class="database-page-container">
-    <div class="database-list-wrapper" :style="{ width: sideTreeWidth + 'px' }">
+  <div class="database-page-container" data-testid="measurement-management-page">
+    <div class="database-list-wrapper" :style="{ width: sideTreeWidth + 'px' }" data-testid="measurement-management-side-panel">
       <div style="position: absolute; left: 0; right: 0">
         <side-tree ref="measurementSideTree" :can-read-write-schema="canReadWriteSchema" :current-node="currentNode" @handle-change-node="handleChangeNode" />
       </div>
       <div style="height: 100%; width: 4px; background-color: transparent; position: absolute; right: -2px; cursor: ew-resize" @pointerdown="(e) => onSliderPointerDown(e)"></div>
     </div>
 
-    <div class="database-details-wrapper" :style="{ width: `calc(100% - ${sideTreeWidth}px - 8px)`, marginLeft: sideTreeWidth + 8 + 'px' }" :key="renderKey">
+    <div class="database-details-wrapper" :style="{ width: `calc(100% - ${sideTreeWidth}px - 8px)`, marginLeft: sideTreeWidth + 8 + 'px' }" :key="renderKey" data-testid="measurement-management-detail-panel">
       <database-detail
         v-if="currentNodeType !== 'TIMESERIES'"
         :current-node-type="currentNodeType"

@@ -1,5 +1,5 @@
 <template>
-  <div class="database-detail-wrapper">
+  <div class="database-detail-wrapper" data-testid="measurement-database-detail">
     <h4 class="info-title">
       <div style="display: inline-flex; max-width: calc(100% - 100px)">
         <text-tooltip :content="currentDatabase" />

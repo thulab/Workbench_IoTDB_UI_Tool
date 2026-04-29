@@ -1,43 +1,44 @@
 <template>
-  <div class="sql-input-area">
-    <div class="sql-title-box">
+  <div class="sql-input-area" data-testid="sql-search-editor-section">
+    <div class="sql-title-box" data-testid="sql-search-toolbar">
       <div class="sql-title-text">
         <span>{{ t('search.sqlInput') }}</span>
       </div>
       <div class="sql-right-icon-box">
-        <el-button link @click="handleRevert" :disabled="code === codeOriginal" id="sql-search-operate-revert" class="svg-button-hover-color">
+        <el-button link @click="handleRevert" :disabled="code === codeOriginal" id="sql-search-operate-revert" data-testid="sql-search-revert" class="svg-button-hover-color">
           <i-custom-revert />
           {{ t('common.reset') }}
         </el-button>
-        <el-button link @click="handleSave" id="sql-search-operate-save" class="svg-button-hover-color">
+        <el-button link @click="handleSave" id="sql-search-operate-save" data-testid="sql-search-save" class="svg-button-hover-color">
           <i-custom-sql-save />
           {{ t('common.save') }}
         </el-button>
-        <el-button link :disabled="!runFlag" @click="querySqlRun()" id="sql-search-operate-run" class="svg-button-hover-color">
+        <el-button link :disabled="!runFlag" @click="querySqlRun()" id="sql-search-operate-run" data-testid="sql-search-run" class="svg-button-hover-color">
           <i-custom-run-all />
           {{ t('search.runAll') }}
         </el-button>
         <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('search.selectRunTip')" :disabled="!!selectionCode" popper-class="tooltip-max-width">
-          <el-button link :disabled="!runFlag || !selectionCode" @click="querySqlRun('part')" id="sql-search-operate-run-part" :class="!runFlag || !selectionCode ? '' : 'svg-button-hover-color'">
+          <el-button link :disabled="!runFlag || !selectionCode" @click="querySqlRun('part')" id="sql-search-operate-run-part" data-testid="sql-search-run-part" :class="!runFlag || !selectionCode ? '' : 'svg-button-hover-color'">
             <i-custom-run-part />
             {{ t('search.runPart') }}
           </el-button>
         </el-tooltip>
-        <el-button link :disabled="runFlag" @click="stopquery" id="sql-search-operate-stop" :class="runFlag ? '' : 'svg-button-hover-color'">
+        <el-button link :disabled="runFlag" @click="stopquery" id="sql-search-operate-stop" data-testid="sql-search-stop" :class="runFlag ? '' : 'svg-button-hover-color'">
           <i-custom-sql-abort />
           {{ t('common.cancel') }}
         </el-button>
-        <el-button link @click="emptyQuery" id="sql-search-operate-empty" class="svg-button-hover-color">
+        <el-button link @click="emptyQuery" id="sql-search-operate-empty" data-testid="sql-search-empty" class="svg-button-hover-color">
           <i-custom-sql-empty />
           {{ t('common.clear') }}
         </el-button>
       </div>
     </div>
 
-    <div>
+    <div data-testid="sql-search-editor">
       <code-editor
         v-show="codeMirrorReady"
         v-model:model-value="codeVal"
+        test-id="sql-search-editor-input"
         @ready="() => (codeMirrorReady = true)"
         :style="{
           height: `${codeEditorHeight}px`,
@@ -48,19 +49,19 @@
       />
     </div>
   </div>
-  <div>
-    <div class="run-result-title-box">
+  <div data-testid="sql-search-results">
+    <div class="run-result-title-box" data-testid="sql-search-results-header">
       <h4 style="font-size: 12px; font-weight: 700; line-height: 20px; color: #495ad4">{{ t('search.runResult') }}</h4>
       <span class="run-result-tip">
         <i-custom-info-warning />
         {{ connectionStore.isTableModel ? t('search.export1000RowTip') : t('search.export1000Tip') }}
       </span>
     </div>
-    <div class="tabs" v-if="tableData.list && tableData.list.length > 0">
-      <el-tabs v-model="activeName" type="card" class="tabs-nav-list" id="sql-search-result-tabs">
+    <div class="tabs" v-if="tableData.list && tableData.list.length > 0" data-testid="sql-search-results-body">
+      <el-tabs v-model="activeName" type="card" class="tabs-nav-list" id="sql-search-result-tabs" data-testid="sql-search-result-tabs">
         <el-tab-pane v-for="(item, index) of columnList" :key="index" :name="`t${index}`">
           <template #label>
-            <span>{{ t('search.runningResult') }}{{ index + 1 }}</span>
+            <span :data-testid="`sql-search-result-tab-${index}`">{{ t('search.runningResult') }}{{ index + 1 }}</span>
           </template>
           <div class="run-result-infos">
             <!-- <ul>
@@ -76,7 +77,14 @@
             </ul> -->
             <div></div>
             <div class="run-result-buttons">
-              <el-button link @click="handleCommandDown('refresh', index)" id="sql-search-refresh" class="svg-button-hover-color">
+              <el-button
+                link
+                @click="handleCommandDown('refresh', index)"
+                id="sql-search-refresh"
+                data-testid="sql-search-refresh"
+                :data-testid-index="`sql-search-refresh-${index}`"
+                class="svg-button-hover-color"
+              >
                 <i-custom-refresh />
                 {{ t('common.refresh') }}
               </el-button>
@@ -86,26 +94,36 @@
                 @command="(val) => handleCommandDown(val, index)"
                 v-show="sqlResult[index]!.status && tableDataPagination[index]!.list?.length > 0"
                 id="sql-search-download-dropdown"
+                data-testid="sql-search-download-dropdown"
+                :data-testid-index="`sql-search-download-dropdown-${index}`"
               >
-                <el-button link :class="['sql-export-button', !sqlResult[index]!.status ? '' : 'svg-button-hover-color']" :disabled="!sqlResult[index]!.status" id="sql-search-download">
+                <el-button
+                  link
+                  :class="['sql-export-button', !sqlResult[index]!.status ? '' : 'svg-button-hover-color']"
+                  :disabled="!sqlResult[index]!.status"
+                  id="sql-search-download"
+                  data-testid="sql-search-download"
+                  :data-testid-index="`sql-search-download-${index}`"
+                >
                   <i-custom-download style="transform: translate(0, 0)" />
                   {{ t('common.export') }}
                   <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question class="export-tip" /></el-tooltip>
                 </el-button>
                 <template #dropdown>
                   <el-dropdown-menu>
-                    <el-dropdown-item command="csv" id="sql-search-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
-                    <el-dropdown-item command="xlsx" id="sql-search-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
+                    <el-dropdown-item command="csv" id="sql-search-download-csv" data-testid="sql-search-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
+                    <el-dropdown-item command="xlsx" id="sql-search-download-xlsx" data-testid="sql-search-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
             </div>
           </div>
-          <div class="tab_table" v-if="sqlResult[index]!.status">
+          <div class="tab_table" v-if="sqlResult[index]!.status" :data-testid="`sql-search-result-panel-${index}`">
             <dynamic-table
               v-if="item"
               ref="standTable"
               class="dynamic-table"
+              :test-id="`sql-search-result-table-${index}`"
               :columns="item"
               :table-data="tableDataPagination[index]!.list || []"
               :max-height="maxTableHeight"
@@ -116,7 +134,7 @@
               show-pagination
             />
           </div>
-          <div class="tab_table" v-if="sqlResult[index]!.errMsg">Msg: {{ sqlResult[index]!.errMsg }}</div>
+          <div class="tab_table" v-if="sqlResult[index]!.errMsg" :data-testid="`sql-search-result-error-${index}`">Msg: {{ sqlResult[index]!.errMsg }}</div>
         </el-tab-pane>
       </el-tabs>
     </div>

@@ -12,6 +12,10 @@ node_modules
 dist
 dist-ssr
 coverage
+playwright-report
+test-results
+.playwright
+tests/e2e/reports/
 *.local
 
 /cypress/videos/

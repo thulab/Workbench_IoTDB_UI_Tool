@@ -1,25 +1,25 @@
 <template>
-  <div class="search_div max-height" v-loading="loading">
-    <el-input :placeholder="t('search.templatePlaceholder')" v-model="filterText" size="small" @input="getQueryList" id="sql-search-template-search">
+  <div class="search_div max-height" v-loading="loading" data-testid="sql-template-panel">
+    <el-input :placeholder="t('search.templatePlaceholder')" v-model="filterText" size="small" @input="getQueryList" id="sql-search-template-search" data-testid="sql-template-search">
       <template #suffix>
         <i-custom-search-icon />
       </template>
     </el-input>
 
-    <ul class="sql-list">
+    <ul class="sql-list" data-testid="sql-template-list">
       <template v-if="sqlList.length">
         <el-scrollbar :max-height="'calc(100vh - 220px)'">
-          <li v-for="item in sqlList" :key="item.id" :id="`sql-template-${item.id}`" class="sql-item-box" @click="(e) => handleSelect(item, e)">
+          <li v-for="item in sqlList" :key="item.id" :id="`sql-template-${item.id}`" :data-testid="`sql-template-item-${item.id}`" class="sql-item-box" @click="(e) => handleSelect(item, e)">
             <div class="sql-item-text-box">
               <i-custom-template />
               <text-tooltip :content="item.queryName" class-name="sql-item-text" />
             </div>
-            <div class="item-edit-box" :id="`sql-template-rename-${item.id}`" @click="handleSqlCommand('rename', item)">
+            <div class="item-edit-box" :id="`sql-template-rename-${item.id}`" :data-testid="`sql-template-rename-${item.id}`" @click="handleSqlCommand('rename', item)">
               <i-custom-edit class="item-edit" />
               <i-custom-edit class="item-edit-active" />
             </div>
 
-            <div class="item-delete-box" :id="`sql-template-delete-${item.id}`" @click="handleSqlCommand('delete', item)">
+            <div class="item-delete-box" :id="`sql-template-delete-${item.id}`" :data-testid="`sql-template-delete-${item.id}`" @click="handleSqlCommand('delete', item)">
               <i-custom-delete class="item-delete" />
               <i-custom-delete-active class="item-delete-active" />
             </div>
@@ -37,7 +37,7 @@
           </li>
         </el-scrollbar>
       </template>
-      <div class="list-empty-wrapper" v-else>
+      <div class="list-empty-wrapper" v-else data-testid="sql-template-empty">
         <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
         <span class="data-empty-text">{{ t('common.noData') }}</span>
       </div>

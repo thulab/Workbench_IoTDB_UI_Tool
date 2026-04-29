@@ -1,20 +1,20 @@
 <template>
-  <el-container class="page-container">
+  <el-container class="page-container" data-testid="data-search-page">
     <el-header class="p-0" style="height: auto">
-      <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline>
-        <base-form-item prop="path" class="form-item-last no-label">
-          <timeseries-select v-model="searchFormData.path" :item-width="elementWidth" :disabled-select="getListLoading" id="data-search-path" />
+      <el-form :model="searchFormData" ref="searchFormRef" label-position="left" size="default" inline data-testid="data-search-form">
+        <base-form-item prop="path" class="form-item-last no-label" data-testid="data-search-path-field">
+          <timeseries-select v-model="searchFormData.path" :item-width="elementWidth" :disabled-select="getListLoading" id="data-search-path" test-id-prefix="data-search-path" />
         </base-form-item>
         <br />
         <div class="search-form-wrapper">
           <div class="flex-1">
             <el-form-item :label="`${t('search.searchTime')}：`" prop="time">
               <div class="search-time-wrapper">
-                <ul class="search-time-list">
-                  <li :class="['search-time-type', { 'search-time-active': timeType === 'datetime' }]" id="data-search-type-datetime" @click="handleTimeType('datetime')">
+                <ul class="search-time-list" data-testid="data-search-time-type-list">
+                  <li :class="['search-time-type', { 'search-time-active': timeType === 'datetime' }]" id="data-search-type-datetime" data-testid="data-search-time-type-datetime" @click="handleTimeType('datetime')">
                     {{ t('search.datetime') }}
                   </li>
-                  <li :class="['search-time-type', { 'search-time-active': timeType === 'datetimerange' }]" id="data-search-type-datetimerange" @click="handleTimeType('datetimerange')">
+                  <li :class="['search-time-type', { 'search-time-active': timeType === 'datetimerange' }]" id="data-search-type-datetimerange" data-testid="data-search-time-type-datetimerange" @click="handleTimeType('datetimerange')">
                     {{ t('search.datetimerange') }}
                   </li>
                 </ul>
@@ -29,6 +29,7 @@
                   :clearable="false"
                   :prefix-icon="ICustomCalender"
                   id="data-search-datetime"
+                  data-testid="data-search-datetime"
                   :disabled="getListLoading"
                 />
                 <el-date-picker
@@ -44,6 +45,7 @@
                   :start-placeholder="t('search.startTime')"
                   :end-placeholder="t('search.endTime')"
                   :id="['data-search-datetimerange-start', 'data-search-datetimerange-end']"
+                  data-testid="data-search-datetimerange"
                   :disabled="getListLoading"
                 />
               </div>
@@ -54,27 +56,27 @@
                 <el-tooltip effect="light" :content="t('search.inputNumberPlaceholder')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
               </template>
               <el-input type="hidden" />
-              <el-input v-model.number="searchFormData.timeInterval" style="width: 110px" placeholder="" @input="handleInputInterval" id="data-search-timeInterval" :disabled="getListLoading">
+              <el-input v-model.number="searchFormData.timeInterval" style="width: 110px" placeholder="" @input="handleInputInterval" id="data-search-timeInterval" data-testid="data-search-time-interval" :disabled="getListLoading">
                 <template #append>
-                  <el-select v-model="searchFormData.unitInterval" style="width: 56px" placeholder="" id="data-search-unitInterval" :disabled="getListLoading">
-                    <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-unitInterval-select-${item.value}`" />
+                  <el-select v-model="searchFormData.unitInterval" style="width: 56px" placeholder="" id="data-search-unitInterval" data-testid="data-search-unit-interval" :disabled="getListLoading">
+                    <el-option v-for="item in timeUnits" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-unitInterval-select-${item.value}`" :data-testid="`data-search-unit-interval-option-${item.value}`" />
                   </el-select>
                 </template>
               </el-input>
             </el-form-item>
             <el-form-item :label="`${t('search.aggregation')}：`" prop="aggregation" class="form-item-last">
               <el-input type="hidden" />
-              <el-select v-model="searchFormData.aggregation" :style="{ width: locale === 'en' ? '120px' : '80px' }" clearable id="data-search-aggregation" :disabled="getListLoading">
-                <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-aggregation-select-${item.value}`" />
+              <el-select v-model="searchFormData.aggregation" :style="{ width: locale === 'en' ? '120px' : '80px' }" clearable id="data-search-aggregation" data-testid="data-search-aggregation" :disabled="getListLoading">
+                <el-option v-for="item in aggregateFunctions" :key="item.value" :value="item.value" :label="item.label" :id="`data-search-aggregation-select-${item.value}`" :data-testid="`data-search-aggregation-option-${item.value}`" />
               </el-select>
             </el-form-item>
           </div>
-          <div class="search-form-buttons">
+          <div class="search-form-buttons" data-testid="data-search-actions">
             <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
-              <el-button @click="handleReset(true)" :disabled="getListLoading || !canReadWriteData" id="data-search-reset">{{ t('common.reset') }}</el-button>
+              <el-button @click="handleReset(true)" :disabled="getListLoading || !canReadWriteData" id="data-search-reset" data-testid="data-search-reset">{{ t('common.reset') }}</el-button>
             </auth-tooltip>
             <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
-              <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="data-search-search">{{ getListLoading ? t('common.cancelQuery') : t('common.query') }}</el-button>
+              <el-button type="primary" :disabled="!canReadWriteData" @click="handleSearch" id="data-search-search" data-testid="data-search-search">{{ getListLoading ? t('common.cancelQuery') : t('common.query') }}</el-button>
             </auth-tooltip>
           </div>
         </div>
@@ -82,7 +84,7 @@
     </el-header>
 
     <el-main class="page-table-details">
-      <div class="page-info-box">
+      <div class="page-info-box" data-testid="data-search-detail-header">
         <!-- <ul class="run-result-list">
           <li class="run-result-item">
             <i-custom-query-success v-if="searchDetailInfos.status === true" />
@@ -104,10 +106,10 @@
         </h4>
         <div class="page-detail-buttons">
           <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
-            <el-button @click="handleSearch" :disabled="getListLoading || !canReadWriteData" id="data-search-refresh">{{ t('common.refresh') }}</el-button>
+            <el-button @click="handleSearch" :disabled="getListLoading || !canReadWriteData" id="data-search-refresh" data-testid="data-search-refresh">{{ t('common.refresh') }}</el-button>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canWriteData" :content="'common.dataAuthAnother'">
-            <el-button class="m-l-12" :disabled="!canWriteData || getListLoading" @click="handleImport" id="data-search-import">{{ t('common.import') }}</el-button>
+            <el-button class="m-l-12" :disabled="!canWriteData || getListLoading" @click="handleImport" id="data-search-import" data-testid="data-search-import">{{ t('common.import') }}</el-button>
           </auth-tooltip>
           <auth-tooltip :is-disabled="canReadWriteData" :content="'common.dataAuth'">
             <el-dropdown
@@ -116,15 +118,16 @@
               v-show="searchDetailInfos.status"
               @command="(val) => handleCommandDown(val)"
               id="data-search-download-dropdown"
+              data-testid="data-search-download-dropdown"
             >
-              <el-button :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" id="data-search-download" :disabled="!canReadWriteData">
+              <el-button :class="[locale === 'en' ? 'export-button' : 'export-spacing-button']" id="data-search-download" data-testid="data-search-download" :disabled="!canReadWriteData">
                 {{ t('common.export') }}
                 <el-tooltip effect="light" :content="t('common.exportTip')" placement="top" popper-class="tooltip-box-width"><i-custom-question /></el-tooltip>
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item command="csv" id="data-search-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
-                  <el-dropdown-item command="xlsx" id="data-search-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
+                  <el-dropdown-item command="csv" id="data-search-download-csv" data-testid="data-search-download-csv">{{ t('common.exportCSV') }}</el-dropdown-item>
+                  <el-dropdown-item command="xlsx" id="data-search-download-xlsx" data-testid="data-search-download-xlsx">{{ t('common.exportXLSX') }}</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -146,9 +149,10 @@
         <span class="data-empty-text">{{ t('common.noData') }}</span>
       </div> -->
       <auth-container :is-auth="canReadWriteData" style="height: 100%" :content="'common.dataAuth'">
-        <div v-loading="getListLoading">
+        <div v-loading="getListLoading" data-testid="data-search-results">
           <div v-if="searchDetailInfos.status">
             <dynamic-table
+              test-id="data-search-results-table"
               :columns="columns"
               :table-data="tableDataPagination"
               :height="maxTableHeight"
@@ -174,7 +178,7 @@
             </el-select>
           </div> -->
           </div>
-          <div class="table-error-wrapper" v-if="searchDetailInfos.errMsg">Msg: {{ searchDetailInfos.errMsg }}</div>
+          <div class="table-error-wrapper" v-if="searchDetailInfos.errMsg" data-testid="data-search-error">Msg: {{ searchDetailInfos.errMsg }}</div>
         </div>
       </auth-container>
     </el-main>

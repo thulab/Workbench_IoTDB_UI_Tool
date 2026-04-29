@@ -1,9 +1,9 @@
 <template>
   <base-form-item :label="`${t('auth.userName')}：`" prop="username" :rules="requiredUserRules" class="base-form-box">
-    <el-input v-model="username" :placeholder="t('auth.userNamePlaceholder')" maxlength="32" id="connection-modal-username" :disabled="!isDisabled" />
+    <el-input v-model="username" :placeholder="t('auth.userNamePlaceholder')" maxlength="32" id="connection-modal-username" data-testid="connection-username" :disabled="!isDisabled" />
   </base-form-item>
   <base-form-item :label="`${t('auth.pwd')}：`" prop="password" class="optional-form-item base-form-box" :error="errorPwd">
-    <el-input v-model="password" :placeholder="t('auth.pwdPlaceholder')" show-password autocomplete="off" id="connection-modal-password" :disabled="!isDisabled" />
+    <el-input v-model="password" :placeholder="t('auth.pwdPlaceholder')" show-password autocomplete="off" id="connection-modal-password" data-testid="connection-password" :disabled="!isDisabled" />
   </base-form-item>
 </template>
 

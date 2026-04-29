@@ -1,5 +1,5 @@
 <template>
-  <el-main class="connection-detail-wrapper">
+  <el-main class="connection-detail-wrapper" data-testid="connection-form">
     <div class="connection-operate-buttons">
       <h4 class="connection-detail-title">{{ t('connection.detail') }}</h4>
     </div>
@@ -7,14 +7,14 @@
       <el-form ref="formRef" :model="formData" label-position="left" :label-width="locale === 'en' ? '150px' : '150px'" :key="formKey">
         <label><input type="password" autocomplete="new-password" hidden /></label>
         <base-form-item :label="`${t('connection.type')}：`" prop="type" :rules="requiredRules" class="base-form-box">
-          <el-radio-group v-model="formData.type" @change="(val) => handleChangeType(val as 0 | 1 | 2)" :disabled="editType !== 'add' || !isShowSave" id="connection-modal-type">
-            <el-radio :value="0" id="connection-modal-type-0">{{ t('common.standAlone') }}</el-radio>
-            <el-radio :value="1" id="connection-modal-type-1">{{ t('common.cluster') }}</el-radio>
-            <el-radio :value="2" id="connection-modal-type-2">{{ t('common.doubleAlive') }}</el-radio>
+          <el-radio-group v-model="formData.type" @change="(val) => handleChangeType(val as 0 | 1 | 2)" :disabled="editType !== 'add' || !isShowSave" id="connection-modal-type" data-testid="connection-type-group">
+            <el-radio :value="0" id="connection-modal-type-0" data-testid="connection-type-standalone">{{ t('common.standAlone') }}</el-radio>
+            <el-radio :value="1" id="connection-modal-type-1" data-testid="connection-type-cluster">{{ t('common.cluster') }}</el-radio>
+            <el-radio :value="2" id="connection-modal-type-2" data-testid="connection-type-doublealive">{{ t('common.doubleAlive') }}</el-radio>
           </el-radio-group>
         </base-form-item>
         <base-form-item :label="`${t('connection.name')}：`" prop="name" :rules="requiredRules" class="base-form-box">
-          <el-input v-model="formData.name" :placeholder="t('connection.namePlaceholder')" maxlength="50" show-word-limit id="connection-modal-name" :disabled="!isShowSave" />
+          <el-input v-model="formData.name" :placeholder="t('connection.namePlaceholder')" maxlength="50" show-word-limit id="connection-modal-name" data-testid="connection-name" :disabled="!isShowSave" />
         </base-form-item>
         <!-- 单机版 -->
         <template v-if="formData.type === 0">
@@ -109,9 +109,9 @@
             {{ t('connection.defaultModel') }}：
             <el-tooltip effect="light" :content="tooltipContent" raw-content placement="top" popper-class="tooltip-box-width tooltip-box-white-space"> <i-custom-question /></el-tooltip>
           </template>
-          <el-radio-group v-model="formData.model" @change="(val) => handleChangeDefaultModel(val as 'tree' | 'table')" id="connection-modal-type">
-            <el-radio value="tree" id="connection-modal-type-0">{{ t('connection.treeModel') }}</el-radio>
-            <el-radio value="table" id="connection-modal-type-1">{{ t('connection.tableModel') }}</el-radio>
+          <el-radio-group v-model="formData.model" @change="(val) => handleChangeDefaultModel(val as 'tree' | 'table')" id="connection-modal-type" data-testid="connection-default-model-group">
+            <el-radio value="tree" id="connection-modal-type-0" data-testid="connection-default-model-tree">{{ t('connection.treeModel') }}</el-radio>
+            <el-radio value="table" id="connection-modal-type-1" data-testid="connection-default-model-table">{{ t('connection.tableModel') }}</el-radio>
           </el-radio-group>
         </base-form-item>
         <base-form-item :label="`${t('connection.useSsl')}：`" prop="name" class="base-form-box">
@@ -159,11 +159,11 @@
       </el-form>
     </el-scrollbar>
     <div class="connection-form-buttons">
-      <el-button plain @click="handleTest" id="connection-modal-test" :loading="testLoading">{{ t('common.test') }}</el-button>
+      <el-button plain @click="handleTest" id="connection-modal-test" data-testid="connection-test" :loading="testLoading">{{ t('common.test') }}</el-button>
       <div>
-        <el-button plain v-if="isShowSave" @click="handleReset" id="connection-modal-reset">{{ t('common.reset') }}</el-button>
-        <el-button type="primary" :disabled="!isCanSave" :loading="saveLoading" @click="handleSave" id="connection-modal-save">{{ t('common.save') }}</el-button>
-        <el-button type="primary" v-if="isToggle && current !== connectionStore.connectionInfo.data.id" :loading="connectLoading" id="connection-modal-login" @click="handleTestLogin">
+        <el-button plain v-if="isShowSave" @click="handleReset" id="connection-modal-reset" data-testid="connection-reset">{{ t('common.reset') }}</el-button>
+        <el-button type="primary" :disabled="!isCanSave" :loading="saveLoading" @click="handleSave" id="connection-modal-save" data-testid="connection-save">{{ t('common.save') }}</el-button>
+        <el-button type="primary" v-if="isToggle && current !== connectionStore.connectionInfo.data.id" :loading="connectLoading" id="connection-modal-login" data-testid="connection-login" @click="handleTestLogin">
           {{ t('connection.connection') }}
         </el-button>
       </div>

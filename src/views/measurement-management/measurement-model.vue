@@ -1,15 +1,15 @@
 <template>
-  <el-container class="page-container p-0">
+  <el-container class="page-container p-0" data-testid="measurement-model-page">
     <el-header class="detail-title-box">
-      <h4 class="detail-title-text">{{ t('measurement.databaseModel') }}</h4>
-      <div class="operate-buttons">
+      <h4 class="detail-title-text" data-testid="measurement-model-title">{{ t('measurement.databaseModel') }}</h4>
+      <div class="operate-buttons" data-testid="measurement-model-toolbar">
         <el-tooltip placement="top-start" effect="light" trigger="hover" :content="t('measurement.databaseModelDoc')" popper-class="tooltip-box-width">
-          <el-button link class="m-r-4" @click="handleDoc" id="measurement-tree-doc">
+          <el-button link class="m-r-4" @click="handleDoc" id="measurement-tree-doc" data-testid="measurement-model-doc">
             <el-icon size="24"><i-custom-model-doc /></el-icon>
           </el-button>
         </el-tooltip>
         <auth-tooltip :is-disabled="canReadWriteSchema" :content="'common.schemaAuth'">
-          <el-button :disabled="!canReadWriteSchema" link @click="handleRefresh" id="measurement-tree-refresh" :class="!canReadWriteSchema ? '' : 'svg-button-hover-color'">
+          <el-button :disabled="!canReadWriteSchema" link @click="handleRefresh" id="measurement-tree-refresh" data-testid="measurement-model-refresh" :class="!canReadWriteSchema ? '' : 'svg-button-hover-color'">
             <el-icon size="24"><i-custom-refresh /></el-icon>
           </el-button>
         </auth-tooltip>
@@ -18,13 +18,13 @@
     <el-main class="p-0">
       <el-scrollbar>
         <auth-container :is-auth="canReadWriteSchema" style="height: 100%" :content="'common.schemaAuth'">
-          <div class="model-container" v-loading="initialLoading">
+          <div class="model-container" v-loading="initialLoading" data-testid="measurement-model-container">
             <div v-if="treeData.children?.length === 0" class="table-empty-wrapper" style="height: 100%">
               <img src="@/assets/data-empty.png" alt="" class="data-empty-img" />
               <span class="data-empty-text">{{ t('common.noData') }}</span>
             </div>
-            <div v-else class="chart-container-box" v-loading="dataLoading">
-              <the-chart :option="realTreeOptions" :click-func="clickFunction" />
+            <div v-else class="chart-container-box" v-loading="dataLoading" data-testid="measurement-model-chart-wrapper">
+              <the-chart :option="realTreeOptions" :click-func="clickFunction" data-testid="measurement-model-chart" />
             </div>
           </div>
         </auth-container>
@@ -226,6 +226,69 @@ const treeDataOptions = (detailData: ModelData, width: number | 'auto') =>
   }) as ECOption;
 
 const realTreeOptions = computed(() => treeDataOptions(treeData.value, chartWidth.value));
+
+function flattenNodePaths(data: ModelData): string[] {
+  const paths: string[] = [];
+  const travel = (node: ModelData) => {
+    paths.push(node.nodePath);
+    if (node.children?.length) {
+      node.children.forEach((child) => travel(child));
+    }
+  };
+  travel(data);
+  return paths;
+}
+
+function findNodeByPath(data: ModelData, path: string): ModelData | null {
+  if (data.nodePath === path) {
+    return data;
+  }
+  if (data.children?.length) {
+    for (const child of data.children) {
+      const result = findNodeByPath(child, path);
+      if (result) {
+        return result;
+      }
+    }
+  }
+  return null;
+}
+
+type MeasurementModelTestBridge = {
+  getNodePaths: () => string[];
+  clickNodeByPath: (path: string) => boolean;
+  refresh: () => void;
+  isLoading: () => boolean;
+};
+
+function installMeasurementModelTestBridge() {
+  const testWindow = window as typeof window & {
+    __measurementModelTest__?: MeasurementModelTestBridge;
+  };
+
+  testWindow.__measurementModelTest__ = {
+    getNodePaths: () => flattenNodePaths(treeData.value),
+    clickNodeByPath: (path: string) => {
+      const node = findNodeByPath(treeData.value, path);
+      if (!node) {
+        return false;
+      }
+      clickFunction({ data: node });
+      return true;
+    },
+    refresh: () => {
+      handleRefresh();
+    },
+    isLoading: () => initialLoading.value || dataLoading.value || loading,
+  };
+}
+
+function uninstallMeasurementModelTestBridge() {
+  const testWindow = window as typeof window & {
+    __measurementModelTest__?: MeasurementModelTestBridge;
+  };
+  delete testWindow.__measurementModelTest__;
+}
 
 function handleDoc() {
   if (locale.value === 'en') {
@@ -471,6 +534,14 @@ watch(
     immediate: true,
   },
 );
+
+onMounted(() => {
+  installMeasurementModelTestBridge();
+});
+
+onUnmounted(() => {
+  uninstallMeasurementModelTestBridge();
+});
 </script>
 
 <style lang="scss" scoped>
