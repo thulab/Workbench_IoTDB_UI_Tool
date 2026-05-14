@@ -1,0 +1,14 @@
+{
+  "include": ["playwright.config.ts", "tests/e2e/**/*.ts"],
+  "compilerOptions": {
+    "noEmit": true,
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": ["node", "@playwright/test"],
+    "strict": false,
+    "noImplicitAny": false,
+    "skipLibCheck": true
+  }
+}

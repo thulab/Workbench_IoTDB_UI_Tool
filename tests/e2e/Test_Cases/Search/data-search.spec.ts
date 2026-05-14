@@ -10,8 +10,8 @@ import {
   openTimeseriesOptions,
   seedClientState,
   selectTimeseries,
-} from '../fixtures/workbench';
-import { cleanupRealQueryConnection, ensureRealQueryConnection, ensureRealQuerySeedData, loginToRealWorkbench, realQuerySeed } from '../support/real-query-data';
+} from '../../support/workbench-test-support';
+import { cleanupRealQueryConnection, ensureRealQueryConnection, ensureRealQuerySeedData, loginToRealWorkbench, realQuerySeed } from '../../support/real-query-data';
 
 const realBackendRun = process.env.PLAYWRIGHT_REAL_BACKEND === 'true';
 
@@ -146,7 +146,7 @@ test.describe('数据查询', () => {
       await expect(page.getByTestId('data-search-import-dialog')).toBeVisible();
       await page.getByTestId('data-search-import-format-csv').click();
 
-      const importFile = path.join(process.cwd(), 'tests', 'e2e', 'fixtures', 'files', 'data-import.csv');
+      const importFile = path.join(process.cwd(), 'tests', 'e2e', 'test-data', 'data-import.csv');
       await page.locator('#data-search-import-upload input[type="file"]').setInputFiles(importFile);
       await page.getByTestId('data-search-import-next').click();
 

@@ -1,7 +1,15 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { feedbackSelectors, measurementManagementSelectors, uiTimeouts } from './selectors';
+import { feedbackSelectors, measurementManagementSelectors, uiTimeouts } from '../support/e2e-selectors';
+
+type DatabasePathsApiPayload = {
+  data?: {
+    pathNames?: string[];
+  };
+};
 
 export class MeasurementManagementPage {
+  private searchTypeState: 'name' | 'description' = 'name';
+
   constructor(private readonly page: Page) {}
 
   pageRoot() {
@@ -70,12 +78,120 @@ export class MeasurementManagementPage {
     return this.page.locator(measurementManagementSelectors.databaseDetailTable).first();
   }
 
+  databaseInfoTitles() {
+    return this.page.locator(measurementManagementSelectors.databaseInfoTitle);
+  }
+
   databaseDetailRefreshButton() {
-    return this.page.locator('#mesaurement-refresh').first();
+    return this.page.locator(measurementManagementSelectors.databaseRefreshButton).first();
+  }
+
+  databasePagination() {
+    return this.page.locator('.measurement-table-pagination').first();
+  }
+
+  databasePaginationPrevButton() {
+    return this.databasePagination().locator('.btn-prev').first();
+  }
+
+  databasePaginationNextButton() {
+    return this.databasePagination().locator('.btn-next').first();
+  }
+
+  databaseInfoDeviceCount() {
+    return this.page.locator(measurementManagementSelectors.databaseInfoDeviceCount).first();
+  }
+
+  databaseInfoMeasurementCount() {
+    return this.page.locator(measurementManagementSelectors.databaseInfoMeasurementCount).first();
+  }
+
+  databaseDeleteButton() {
+    return this.page.locator(measurementManagementSelectors.databaseDeleteButton).first();
+  }
+
+  databaseSearchInput() {
+    return this.page.locator(measurementManagementSelectors.databaseSearchInput).first();
+  }
+
+  databaseSearchType() {
+    return this.page.locator(measurementManagementSelectors.databaseSearchType).first();
+  }
+
+  databaseSearchTypeDisplay() {
+    return this.databaseSearchType()
+      .locator('.el-select__selected-item, .el-select__selection-item, .el-select__placeholder, input')
+      .first();
+  }
+
+  databaseSearchTypeNameOption() {
+    return this.page.locator(measurementManagementSelectors.databaseSearchTypeName).first();
+  }
+
+  databaseSearchTypeDescriptionOption() {
+    return this.page.locator(measurementManagementSelectors.databaseSearchTypeDescription).first();
+  }
+
+  databaseImportButton() {
+    return this.page.locator(measurementManagementSelectors.databaseImportButton).first()
+      .or(this.page.getByRole('button', { name: '导入' }).first())
+      .first();
+  }
+
+  databaseExportDropdown() {
+    return this.page.locator(measurementManagementSelectors.databaseExportDropdown).first()
+      .or(this.page.getByRole('button', { name: '导出' }).first())
+      .first();
+  }
+
+  databaseExportButton() {
+    return this.page.locator(measurementManagementSelectors.databaseExportButton).first()
+      .or(this.page.getByRole('button', { name: '导出' }).first())
+      .first();
+  }
+
+  databaseBatchDeleteButton() {
+    return this.page.locator(measurementManagementSelectors.databaseBatchDeleteButton).first();
+  }
+
+  columnFilterPopover() {
+    return this.page.locator(measurementManagementSelectors.columnFilterPopover).last();
+  }
+
+  importModal() {
+    return this.page.locator(measurementManagementSelectors.importModal).first();
+  }
+
+  importUploadInput() {
+    return this.importModal().locator(`${measurementManagementSelectors.importUpload} input[type="file"]`).first();
+  }
+
+  importNextButton() {
+    return this.page.locator(measurementManagementSelectors.importNextButton).first();
+  }
+
+  importCloseButton() {
+    return this.page.locator(measurementManagementSelectors.importCloseButton).first();
+  }
+
+  importResultBox() {
+    return this.importModal().locator('.select-result-box').first();
+  }
+
+  importErrorDetailLink() {
+    return this.importModal().locator('.error-link').first();
   }
 
   tagDetailModal() {
     return this.page.locator('#tag-modal-database').first();
+  }
+
+  aliasEditModal() {
+    return this.page.locator('#alias-modal-database').first();
+  }
+
+  descriptionEditModal() {
+    return this.page.locator('#description-modal-database').first();
   }
 
   modelPage() {
@@ -123,7 +239,9 @@ export class MeasurementManagementPage {
   }
 
   measurementModalRow(index: number) {
-    return this.measurementModal().locator(`[data-testid="measurement-modal-row-${index}"]`).first();
+    return this.measurementModal()
+      .locator(`[data-testid="measurement-modal-row-${index}"], .el-collapse-item`)
+      .nth(index);
   }
 
   measurementModalCopyButton(index: number) {
@@ -450,6 +568,25 @@ export class MeasurementManagementPage {
     await this.page.locator(measurementManagementSelectors.columnFilterConfirm).click();
   }
 
+  async setVisibleTableColumns(columns: string[]) {
+    const allColumns = ['deviceName', 'timeseries', 'alias', 'description', 'tags', 'dataType', 'viewType', 'isAligned', 'encoding', 'compression', 'value', 'valueTime'];
+    const required = new Set(columns);
+
+    await this.openColumnFilter();
+    for (const column of allColumns) {
+      const checkbox = this.page.locator(`#measurement-column-checkbox-${column}`);
+      await expect(checkbox).toHaveCount(1, { timeout: uiTimeouts.action });
+      const isChecked = await checkbox.evaluate((element) => (element as HTMLInputElement).checked);
+      const shouldBeChecked = required.has(column);
+      if (isChecked !== shouldBeChecked) {
+        await checkbox.evaluate((element) => {
+          (element as HTMLInputElement).click();
+        });
+      }
+    }
+    await this.columnFilterPopover().locator(measurementManagementSelectors.columnFilterConfirm).click({ force: true });
+  }
+
   async expectDatabaseTableRowContains(measurementName: string, text: string) {
     const row = this.databaseDetailTable().locator('tr').filter({ hasText: measurementName }).first();
     await expect(row).toContainText(text, { timeout: uiTimeouts.pageReady });
@@ -467,6 +604,103 @@ export class MeasurementManagementPage {
     await expect(row).toBeVisible({ timeout: uiTimeouts.pageReady });
     await row.getByRole('button', { name: /详情|Detail/ }).first().click();
     await expect(this.tagDetailModal()).toBeVisible({ timeout: uiTimeouts.action });
+  }
+
+  async openAliasEditByMeasurementName(measurementName: string, currentAlias: string) {
+    const row = this.databaseDetailTable().locator('tr').filter({ hasText: measurementName }).first();
+    const aliasCell = row.locator('.row-description-box').filter({ hasText: currentAlias }).first();
+    await expect(row).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(aliasCell).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await aliasCell.hover();
+    await aliasCell.locator('.edit-box').click({ force: true });
+    await expect(this.aliasEditModal()).toBeVisible({ timeout: uiTimeouts.action });
+  }
+
+  async fillAndSubmitAliasEdit(alias: string) {
+    const modal = this.aliasEditModal();
+    await expect(modal).toBeVisible({ timeout: uiTimeouts.action });
+    await modal.locator('#alias-modal-alias').fill(alias);
+    await modal.locator('#alias-modal-confirm').click();
+    await this.expectLatestToast('success');
+    await expect(modal).toBeHidden({ timeout: uiTimeouts.toast });
+  }
+
+  async openDescriptionEditByMeasurementName(measurementName: string, currentDescription: string) {
+    const row = this.databaseDetailTable().locator('tr').filter({ hasText: measurementName }).first();
+    const descriptionCell = row.locator('.row-description-box').filter({ hasText: currentDescription }).first();
+    await expect(row).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(descriptionCell).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await descriptionCell.hover();
+    await descriptionCell.locator('.edit-box').click({ force: true });
+    await expect(this.descriptionEditModal()).toBeVisible({ timeout: uiTimeouts.action });
+  }
+
+  async fillAndSubmitDescriptionEdit(description: string) {
+    const modal = this.descriptionEditModal();
+    await expect(modal).toBeVisible({ timeout: uiTimeouts.action });
+    await modal.locator('#description-modal-alias').fill(description);
+    await modal.locator('#description-modal-confirm').click();
+    await this.expectLatestToast('success');
+    await expect(modal).toBeHidden({ timeout: uiTimeouts.toast });
+  }
+
+  async clickMeasurementRowDataAction(measurementPath: string) {
+    const button = this.page.locator(`[id="mesaurement-table-${measurementPath}-data"]`).first();
+    if (await button.count()) {
+      await expect(button).toBeVisible({ timeout: uiTimeouts.pageReady });
+      await button.click();
+      return;
+    }
+
+    const measurementName = measurementPath.split('.').pop() || measurementPath;
+    const row = this.databaseDetailTable().locator('tr').filter({ hasText: measurementName }).first();
+    const rowButton = row.getByRole('button', { name: /数据|Data/ }).first();
+    await expect(row).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(rowButton).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await rowButton.click();
+  }
+
+  async openMeasurementRowTrendMenu(measurementPath: string) {
+    const button = this.page.locator(`[id="mesaurement-table-${measurementPath}-running-trend"]`).first();
+    if (await button.count()) {
+      await expect(button).toBeVisible({ timeout: uiTimeouts.pageReady });
+      await button.hover();
+      await this.page.waitForTimeout(300);
+      return;
+    }
+
+    const measurementName = measurementPath.split('.').pop() || measurementPath;
+    const row = this.databaseDetailTable().locator('tr').filter({ hasText: measurementName }).first();
+    const rowButton = row.getByRole('button', { name: /趋势|Trend/ }).first();
+    await expect(row).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(rowButton).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await rowButton.hover();
+    await this.page.waitForTimeout(300);
+  }
+
+  async clickMeasurementRowDeleteAction(measurementPath: string) {
+    const button = this.page.locator(`[id="mesaurement-table-${measurementPath}-del"]`).first();
+    if (await button.count()) {
+      await expect(button).toBeVisible({ timeout: uiTimeouts.pageReady });
+      await button.click();
+      return;
+    }
+
+    const measurementName = measurementPath.split('.').pop() || measurementPath;
+    const row = this.databaseDetailTable().locator('tr').filter({ hasText: measurementName }).first();
+    const rowButton = row.getByRole('button', { name: /删除|Delete/ }).first();
+    await expect(row).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(rowButton).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await rowButton.click();
+  }
+
+  async chooseMeasurementTrendMenu(type: 'running' | 'history') {
+    const optionText = type === 'running' ? /实时趋势|Running Trend/ : /历史趋势|History Trend/;
+    const option = this.page.getByRole('menuitem', { name: optionText }).first()
+      .or(this.page.locator('.el-dropdown-menu__item').filter({ hasText: optionText }).first())
+      .first();
+    await expect(option).toBeVisible({ timeout: uiTimeouts.action });
+    await option.click();
   }
 
   async expectTagDetailValue(text: string) {
@@ -647,6 +881,282 @@ export class MeasurementManagementPage {
       await expect(this.databaseDetail()).toBeVisible({ timeout: uiTimeouts.pageReady });
       await this.page.waitForTimeout(800);
     }
+  }
+
+  async expectDatabasePanelTitles(currentDatabase: string) {
+    await expect(this.databaseInfoTitles().filter({ hasText: `${currentDatabase} 信息` }).first()).toBeVisible({
+      timeout: uiTimeouts.pageReady,
+    });
+    await expect(this.databaseInfoTitles().filter({ hasText: `${currentDatabase} 列表` }).first()).toBeVisible({
+      timeout: uiTimeouts.pageReady,
+    });
+  }
+
+  async expectDatabaseInfoSummaryVisible() {
+    await expect(this.databaseInfoDeviceCount()).toContainText('设备数量', { timeout: uiTimeouts.pageReady });
+    await expect(this.databaseInfoMeasurementCount()).toContainText('测点数量', { timeout: uiTimeouts.pageReady });
+  }
+
+  async expectDatabaseDeleteDisabled() {
+    await expect(this.databaseDeleteButton()).toBeDisabled({ timeout: uiTimeouts.pageReady });
+  }
+
+  async expectDatabaseToolbarVisible() {
+    await expect(this.databaseSearchInput()).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(this.databaseDetailAddMeasurementButton()).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(this.databaseImportButton()).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(this.databaseExportButton()).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(this.databaseBatchDeleteButton()).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(this.databaseDetailRefreshButton()).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(this.page.locator(measurementManagementSelectors.columnFilterButton).first()).toBeVisible({
+      timeout: uiTimeouts.pageReady,
+    });
+  }
+
+  async expectSearchTypeValue(text: string) {
+    void text;
+    const placeholderPattern = this.searchTypeState === 'description' ? /描述|desc/i : /名称|name/i;
+    await expect(this.databaseSearchInput()).toHaveAttribute('placeholder', placeholderPattern, {
+      timeout: uiTimeouts.action,
+    });
+  }
+
+  async selectSearchType(type: 'name' | 'description') {
+    await this.databaseSearchType()
+      .locator('.el-select__wrapper, .el-input__wrapper')
+      .first()
+      .or(this.databaseSearchType())
+      .first()
+      .click({ force: true });
+    const option = type === 'name' ? this.databaseSearchTypeNameOption() : this.databaseSearchTypeDescriptionOption();
+    await expect(option).toBeVisible({ timeout: uiTimeouts.action });
+    await option.click({ force: true });
+    this.searchTypeState = type;
+  }
+
+  async searchMeasurements(keyword: string, type: 'name' | 'description' = 'name') {
+    await this.selectSearchType(type);
+    await this.databaseSearchInput().fill(keyword);
+    await this.databaseSearchInput().press('Enter');
+    await this.page.waitForTimeout(800);
+  }
+
+  async clearMeasurementSearch(type: 'name' | 'description' = 'name') {
+    await this.selectSearchType(type);
+    await this.databaseSearchInput().fill('');
+    await this.databaseSearchInput().press('Enter');
+    await this.page.waitForTimeout(800);
+  }
+
+  async expectDatabaseTableHeaderVisible(headerText: string) {
+    await expect(this.databaseDetailTable().getByText(headerText, { exact: true }).first()).toBeVisible({
+      timeout: uiTimeouts.pageReady,
+    });
+  }
+
+  async getVisibleDatabaseTableHeaders() {
+    return this.page.evaluate(() => {
+      const cells = Array.from(document.querySelectorAll('.database-detail-wrapper .el-table thead th .cell'));
+      const texts = cells
+        .filter((cell) => {
+          const element = cell as HTMLElement;
+          const style = window.getComputedStyle(element);
+          return style.display !== 'none' && style.visibility !== 'hidden' && element.offsetParent !== null;
+        })
+        .map((cell) => (cell.textContent || '').trim())
+        .filter(Boolean);
+
+      return [...new Set(texts)];
+    }) as Promise<string[]>;
+  }
+
+  async getVisibleMeasurementNames() {
+    return this.page.evaluate(() => {
+      const rows = Array.from(document.querySelectorAll('.database-detail-wrapper .el-table__body-wrapper tbody tr'));
+      return rows
+        .filter((row) => {
+          const element = row as HTMLElement;
+          const style = window.getComputedStyle(element);
+          return style.display !== 'none' && style.visibility !== 'hidden' && element.offsetParent !== null;
+        })
+        .map((row) => {
+          const cells = Array.from(row.querySelectorAll('td .cell'));
+          return (cells[2]?.textContent || '').trim();
+        })
+        .filter(Boolean);
+    }) as Promise<string[]>;
+  }
+
+  async expectDatabaseTableHeaderHidden(headerText: string) {
+    const header = this.databaseDetailTable().getByText(headerText, { exact: true }).first();
+    const count = await header.count();
+    if (count === 0) {
+      await expect(header).toHaveCount(0, { timeout: uiTimeouts.pageReady });
+      return;
+    }
+
+    await expect(header).not.toBeVisible({ timeout: uiTimeouts.pageReady });
+  }
+
+  async selectMeasurementRowsByNames(measurementNames: string[]) {
+    for (const measurementName of measurementNames) {
+      const row = this.databaseDetailTable().locator('tr').filter({ hasText: measurementName }).first();
+      await expect(row).toBeVisible({ timeout: uiTimeouts.pageReady });
+      await row.locator('.el-checkbox').first().click({ force: true });
+    }
+  }
+
+  async selectMeasurementRowByTexts(texts: string[]) {
+    let row = this.databaseDetailTable().locator('tr');
+    for (const text of texts) {
+      row = row.filter({ hasText: text });
+    }
+    const matchedRow = row.first();
+    await expect(matchedRow).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await matchedRow.locator('.el-checkbox').first().click({ force: true });
+  }
+
+  async selectFirstMeasurementRow() {
+    const row = this.databaseDetailTable().locator('tbody tr').first();
+    await expect(row).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await row.locator('.el-checkbox').first().click({ force: true });
+  }
+
+  async confirmVisibleDeleteDialog() {
+    const dialog = this.page.locator(measurementManagementSelectors.deleteConfirmDialog).last();
+    await expect(dialog).toBeVisible({ timeout: uiTimeouts.action });
+    await dialog.locator('.el-button--primary').last().click({ force: true });
+  }
+
+  async expectBatchDeleteEnabled() {
+    await expect(this.databaseBatchDeleteButton()).toBeEnabled({ timeout: uiTimeouts.action });
+  }
+
+  async expectBatchDeleteDisabled() {
+    await expect(this.databaseBatchDeleteButton()).toBeDisabled({ timeout: uiTimeouts.action });
+  }
+
+  async batchDeleteSelectedMeasurements() {
+    await this.databaseBatchDeleteButton().click();
+    await this.confirmVisibleDeleteDialog();
+    await this.expectLatestToast('success');
+  }
+
+  async openBatchDeleteConfirm() {
+    await this.databaseBatchDeleteButton().click();
+    const dialog = this.page.locator(measurementManagementSelectors.deleteConfirmDialog).last();
+    await expect(dialog).toBeVisible({ timeout: uiTimeouts.action });
+  }
+
+  async cancelVisibleDeleteDialog() {
+    const dialog = this.page.locator(measurementManagementSelectors.deleteConfirmDialog).last();
+    await expect(dialog).toBeVisible({ timeout: uiTimeouts.action });
+    await dialog.locator('.el-button:not(.el-button--primary)').first().click({ force: true });
+    await expect(dialog).toBeHidden({ timeout: uiTimeouts.action });
+  }
+
+  async openImportModal() {
+    await this.databaseImportButton().click();
+    await expect(this.importModal()).toBeVisible({ timeout: uiTimeouts.action });
+  }
+
+  async importMeasurementsFromFile(filePath: string) {
+    await this.openImportModal();
+    await this.importUploadInput().setInputFiles(filePath);
+    await expect(this.importNextButton()).toBeEnabled({ timeout: uiTimeouts.action });
+    await this.importNextButton().click();
+    await expect(this.importCloseButton()).toBeVisible({ timeout: 120_000 });
+    await this.importCloseButton().click();
+    await expect(this.importModal()).toBeHidden({ timeout: uiTimeouts.toast });
+  }
+
+  async importMeasurementsFromFileAndStay(filePath: string) {
+    await this.openImportModal();
+    await this.importUploadInput().setInputFiles(filePath);
+    await expect(this.importNextButton()).toBeEnabled({ timeout: uiTimeouts.action });
+    await this.importNextButton().click();
+    await expect(this.importCloseButton()).toBeVisible({ timeout: 120_000 });
+    await expect(this.importResultBox()).toBeVisible({ timeout: uiTimeouts.action });
+  }
+
+  async expectImportResultText(pattern: RegExp | string) {
+    if (pattern instanceof RegExp) {
+      await expect(this.importResultBox()).toContainText(pattern, { timeout: uiTimeouts.action });
+      return;
+    }
+    await expect(this.importResultBox()).toContainText(pattern, { timeout: uiTimeouts.action });
+  }
+
+  async finishImportModal() {
+    await this.importCloseButton().click();
+    await expect(this.importModal()).toBeHidden({ timeout: uiTimeouts.toast });
+  }
+
+  async closeImportModalByHeader() {
+    const modal = this.importModal();
+    if (!(await modal.isVisible().catch(() => false))) {
+      return;
+    }
+    await modal.locator('.el-dialog__headerbtn').first().click();
+    await expect(modal).toBeHidden({ timeout: uiTimeouts.toast });
+  }
+
+  async getImportErrorDetailHref() {
+    const link = this.importErrorDetailLink();
+    await expect(link).toBeVisible({ timeout: uiTimeouts.action });
+    const href = await link.getAttribute('href');
+    expect(href).toBeTruthy();
+    return href!;
+  }
+
+  async exportMeasurements(format: 'csv' | 'xlsx') {
+    await this.databaseExportDropdown().click();
+    const optionSelector = format === 'csv'
+      ? measurementManagementSelectors.databaseExportCsv
+      : measurementManagementSelectors.databaseExportXlsx;
+    const option = this.page.locator(`.el-popper:visible ${optionSelector}`).first()
+      .or(this.page.locator(`.el-dropdown-menu:visible ${optionSelector}`).first())
+      .first();
+    await expect(option).toBeVisible({ timeout: uiTimeouts.action });
+    await option.click();
+  }
+
+  async openColumnFilter() {
+    await this.page.locator(measurementManagementSelectors.columnFilterButton).first().click();
+    await expect(this.columnFilterPopover()).toBeVisible({ timeout: uiTimeouts.action });
+  }
+
+  async expectColumnFilterOptionsVisible() {
+    const labels = ['设备名称', '测点名称', '别名', '测点描述', '标签', '数据类型', '测点类型', '时间对齐', '编码方式', '压缩方式', '最新值', '最新值时间'];
+    for (const label of labels) {
+      await expect(this.columnFilterPopover().getByText(label, { exact: true })).toBeVisible({ timeout: uiTimeouts.action });
+    }
+    await expect(this.columnFilterPopover().getByText('全选', { exact: true })).toBeVisible({ timeout: uiTimeouts.action });
+    await expect(this.page.locator(measurementManagementSelectors.columnFilterReset)).toBeVisible({ timeout: uiTimeouts.action });
+    await expect(this.page.locator(measurementManagementSelectors.columnFilterConfirm)).toBeVisible({ timeout: uiTimeouts.action });
+  }
+
+  async columnFilterSelectAllAndConfirm() {
+    await this.columnFilterCheckboxByLabel('全选').click({ force: true });
+    await this.page.locator(measurementManagementSelectors.columnFilterConfirm).click();
+  }
+
+  async columnFilterResetAndConfirm() {
+    await this.page.locator(measurementManagementSelectors.columnFilterReset).click();
+    await this.page.locator(measurementManagementSelectors.columnFilterConfirm).click();
+  }
+
+  async columnFilterSelectAllAndConfirmVisible() {
+    await this.page.locator(measurementManagementSelectors.columnFilterAll).evaluate((element) => {
+      (element as HTMLInputElement).click();
+    });
+    await this.columnFilterPopover().locator(measurementManagementSelectors.columnFilterConfirm).click({ force: true });
+  }
+
+  async columnFilterResetAndConfirmVisible() {
+    await this.columnFilterPopover().getByRole('button', { name: '重置' }).click();
+    await this.page.waitForTimeout(150);
+    await this.columnFilterPopover().getByRole('button', { name: '确定' }).click();
   }
 
   async expectMeasurementVisible(fullPath: string) {
@@ -1464,10 +1974,10 @@ export class MeasurementManagementPage {
         credentials: 'include',
       });
       const rawText = await response.text();
-      let payload: Record<string, unknown> = {};
+      let payload: DatabasePathsApiPayload = {};
       if (rawText) {
         try {
-          payload = JSON.parse(rawText) as Record<string, unknown>;
+          payload = JSON.parse(rawText) as DatabasePathsApiPayload;
         } catch {
           payload = {};
         }
@@ -1557,53 +2067,56 @@ export class MeasurementManagementPage {
   }
 
   private rowField(index: number, field: 'name' | 'alias' | 'description' | 'tags'): Locator {
-    const modal = this.measurementModal();
+    const row = this.measurementModalRow(index);
     if (field === 'name') {
-      return modal.locator(
+      return row.locator(
         [
           `[data-testid="measurement-modal-row-${index}-name"] input`,
           `[data-testid="measurement-modal-row-${index}-name"] textarea`,
-          `#measurement-modal-collapse-${index}-timeseries`,
           `#measurement-modal-collapse-${index}-timeseries input`,
+          `input[placeholder*="测点名称"]`,
+          `textarea[placeholder*="测点名称"]`,
         ].join(', '),
       ).first();
     }
     if (field === 'alias') {
-      return modal.locator(
+      return row.locator(
         [
           `[data-testid="measurement-modal-row-${index}-alias"] input`,
           `[data-testid="measurement-modal-row-${index}-alias"] textarea`,
-          `#measurement-modal-collapse-${index}-alias`,
           `#measurement-modal-collapse-${index}-alias input`,
           `#measurement-modal-collapse-${index}-alias textarea`,
+          `input[placeholder*="测点别名"]`,
+          `textarea[placeholder*="测点别名"]`,
         ].join(', '),
       ).first();
     }
     if (field === 'description') {
-      return modal.locator(
+      return row.locator(
         [
           `[data-testid="measurement-modal-row-${index}-description"] input`,
           `[data-testid="measurement-modal-row-${index}-description"] textarea`,
-          `#measurement-modal-collapse-${index}-description`,
           `#measurement-modal-collapse-${index}-description input`,
           `#measurement-modal-collapse-${index}-description textarea`,
+          `input[placeholder*="测点描述"]`,
+          `textarea[placeholder*="测点描述"]`,
         ].join(', '),
       ).first();
     }
-    return modal.locator(
+    return row.locator(
       [
         `[data-testid="measurement-modal-row-${index}-tags"] input`,
         `[data-testid="measurement-modal-row-${index}-tags"] textarea`,
-        `#measurement-modal-collapse-${index}-tags`,
         `#measurement-modal-collapse-${index}-tags input`,
         `#measurement-modal-collapse-${index}-tags textarea`,
+        `input[placeholder*="标签"]`,
+        `textarea[placeholder*="标签"]`,
       ].join(', '),
     ).first();
   }
 
   private inputLikeRowField(index: number, field: 'name' | 'alias' | 'description' | 'tags') {
-    const fieldLocator = this.rowField(index, field);
-    return fieldLocator.locator('input, textarea').first().or(fieldLocator).first();
+    return this.rowField(index, field);
   }
 
   private async clickVisibleSelectOption(optionId: string, optionText: string) {
@@ -1625,19 +2138,8 @@ export class MeasurementManagementPage {
     dataType: 'BOOLEAN' | 'INT32' | 'INT64' | 'FLOAT' | 'DOUBLE' | 'TEXT',
   ) {
     await this.ensureMeasurementModalRowExpanded(index);
-    const selector = this.measurementModalRow(index)
-      .locator(
-        [
-          `#measurement-modal-collapse-${index}-dataType .el-select__wrapper`,
-          `#measurement-modal-collapse-${index}-dataType .el-input__wrapper`,
-          `[data-testid="measurement-modal-row-${index}-data-type"] .el-select__wrapper`,
-          `[data-testid="measurement-modal-row-${index}-data-type"] .el-input__wrapper`,
-          `[data-testid="measurement-modal-row-${index}-data-type"]`,
-          `#measurement-modal-collapse-${index}-dataType`,
-        ].join(', '),
-      )
-      .first();
-    await selector.scrollIntoViewIfNeeded();
+    const selector = this.measurementModalRow(index).getByRole('combobox').nth(0);
+    await expect(selector).toBeVisible({ timeout: uiTimeouts.action });
     await selector.click({ force: true });
     await this.page.waitForTimeout(150);
     await this.clickVisibleSelectOption(`measurement-modal-collapse-${index}-dataType-select-${dataType}`, dataType);
@@ -1645,19 +2147,8 @@ export class MeasurementManagementPage {
 
   private async selectRowEncoding(index: number, encoding: string) {
     await this.ensureMeasurementModalRowExpanded(index);
-    const selector = this.measurementModalRow(index)
-      .locator(
-        [
-          `#measurement-modal-collapse-${index}-encoding .el-select__wrapper`,
-          `#measurement-modal-collapse-${index}-encoding .el-input__wrapper`,
-          `[data-testid="measurement-modal-row-${index}-encoding"] .el-select__wrapper`,
-          `[data-testid="measurement-modal-row-${index}-encoding"] .el-input__wrapper`,
-          `[data-testid="measurement-modal-row-${index}-encoding"]`,
-          `#measurement-modal-collapse-${index}-encoding`,
-        ].join(', '),
-      )
-      .first();
-    await selector.scrollIntoViewIfNeeded();
+    const selector = this.measurementModalRow(index).getByRole('combobox').nth(1);
+    await expect(selector).toBeVisible({ timeout: uiTimeouts.action });
     await selector.click({ force: true });
     await this.page.waitForTimeout(150);
     await this.clickVisibleSelectOption(`measurement-modal-collapse-${index}-encoding-select-${encoding}`, encoding);
@@ -1665,19 +2156,8 @@ export class MeasurementManagementPage {
 
   private async selectRowCompression(index: number, compression: string) {
     await this.ensureMeasurementModalRowExpanded(index);
-    const selector = this.measurementModalRow(index)
-      .locator(
-        [
-          `#measurement-modal-collapse-${index}-compression .el-select__wrapper`,
-          `#measurement-modal-collapse-${index}-compression .el-input__wrapper`,
-          `[data-testid="measurement-modal-row-${index}-compression"] .el-select__wrapper`,
-          `[data-testid="measurement-modal-row-${index}-compression"] .el-input__wrapper`,
-          `[data-testid="measurement-modal-row-${index}-compression"]`,
-          `#measurement-modal-collapse-${index}-compression`,
-        ].join(', '),
-      )
-      .first();
-    await selector.scrollIntoViewIfNeeded();
+    const selector = this.measurementModalRow(index).getByRole('combobox').nth(2);
+    await expect(selector).toBeVisible({ timeout: uiTimeouts.action });
     await selector.click({ force: true });
     await this.page.waitForTimeout(150);
     await this.clickVisibleSelectOption(`measurement-modal-collapse-${index}-compression-select-${compression}`, compression);
@@ -1696,5 +2176,124 @@ export class MeasurementManagementPage {
   private contextMenuAction(label: string, selector: string) {
     const newSelector = this.page.locator(selector).first();
     return this.contextMenu().locator('li').filter({ hasText: label }).first().or(newSelector);
+  }
+
+  private columnFilterCheckboxByLabel(label: string) {
+    return this.columnFilterPopover().getByLabel(label, { exact: true }).first();
+  }
+
+  async importMeasurementsByRequest(
+    rows: Array<{
+      device: string;
+      measurement: string;
+      alias?: string;
+      description?: string;
+      tags?: string;
+      dataType?: 'BOOLEAN' | 'INT32' | 'INT64' | 'FLOAT' | 'DOUBLE' | 'TEXT';
+      isAligned?: 'true' | 'false';
+      encoding?: string;
+      compressor?: string;
+    }>,
+  ) {
+    const header = 'device(璁惧鍚嶇О),measurement(娴嬬偣鍚嶇О),alias(鍒悕),description(娴嬬偣鎻忚堪),label(鏍囩key=value),dataType(鏁版嵁绫诲瀷),isAligned(鏄惁涓哄榻愬簭鍒楋紝瀵归綈搴忓垪:true 闈炲榻?false),encoding(缂栫爜鏂瑰紡),compressor(鍘嬬缉鏂瑰紡)';
+    const body = [
+      header,
+      ...rows.map((row) =>
+        [
+          row.device,
+          row.measurement,
+          row.alias || '',
+          row.description || '',
+          row.tags || '',
+          row.dataType || 'BOOLEAN',
+          row.isAligned || 'false',
+          row.encoding || 'PLAIN',
+          row.compressor || 'SNAPPY',
+        ].join(','),
+      ),
+    ].join('\n');
+
+    const response = await this.page.context().request.post('/api/file/importMeasurementCSVData', {
+      multipart: {
+        file: {
+          name: `measurement-import-${Date.now()}.csv`,
+          mimeType: 'text/csv',
+          buffer: Buffer.from(body, 'utf8'),
+        },
+      },
+    });
+    const rawText = await response.text();
+    let payload: Record<string, unknown> = {};
+    if (rawText) {
+      try {
+        payload = JSON.parse(rawText) as Record<string, unknown>;
+      } catch {
+        payload = {};
+      }
+    }
+
+    const result = payload.data as
+      | {
+          status?: boolean;
+          failNum?: number;
+        }
+      | undefined;
+
+    expect(response.ok()).toBe(true);
+    expect(Number(payload?.code ?? -1)).toBe(0);
+    expect(Boolean(result?.status)).toBe(true);
+    expect(Number(result?.failNum ?? 0)).toBe(0);
+  }
+
+  async insertMeasurementsByApi(
+    measurements: Array<{
+      timeseries: string;
+      alias?: string;
+      description?: string;
+      tags?: string;
+      isAligned?: boolean;
+      dataType?: 'BOOLEAN' | 'INT32' | 'INT64' | 'FLOAT' | 'DOUBLE' | 'TEXT';
+      encoding?: string;
+      compression?: string;
+    }>,
+  ) {
+    const result = await this.page.evaluate(async (items) => {
+      const response = await fetch('/api/schema/insertMeasurements', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          measurements: items.map((item) => ({
+            alias: item.alias || '',
+            compression: item.compression || 'SNAPPY',
+            dataType: item.dataType || 'BOOLEAN',
+            description: item.description || '',
+            encoding: item.encoding || 'PLAIN',
+            isAligned: Boolean(item.isAligned),
+            tags: item.tags || '',
+            timeseries: item.timeseries,
+          })),
+        }),
+      });
+      const rawText = await response.text();
+      let payload: Record<string, unknown> = {};
+      if (rawText) {
+        try {
+          payload = JSON.parse(rawText) as Record<string, unknown>;
+        } catch {
+          payload = {};
+        }
+      }
+      return {
+        ok: response.ok,
+        code: Number(payload?.code ?? (response.ok ? 0 : -1)),
+        message: String(payload?.message ?? ''),
+      };
+    }, measurements);
+
+    expect(result.ok).toBe(true);
+    expect(result.code).toBe(0);
   }
 }

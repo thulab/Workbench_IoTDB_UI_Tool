@@ -1,8 +1,8 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { loginThroughUi, mockWorkbenchApi, seedClientState } from '../fixtures/workbench';
-import { LoginPage } from '../pages/login-page';
-import { uiTimeouts } from '../pages/selectors';
-import { cleanupConnectionsByNames, ensureStandaloneConnectionExists, localhostConnection } from '../support/connection-api';
+import { loginThroughUi, mockWorkbenchApi, seedClientState } from '../../support/workbench-test-support';
+import { LoginPage } from '../../pages/login-page';
+import { uiTimeouts } from '../../support/e2e-selectors';
+import { cleanupConnectionsByNames, ensureStandaloneConnectionExists, localhostConnection } from '../../support/connection-api';
 
 const realBackendRun = process.env.PLAYWRIGHT_REAL_BACKEND === 'true';
 const dashboardSelectors = {
@@ -25,6 +25,17 @@ const dashboardTexts = {
   all: '全部',
   monitorUnconfigured: '未配置监控，请配置后查看',
   monitorConfigError: '监控配置有误，请修改后查看',
+} as const;
+
+const activationDetailTexts = {
+  activationExpirationTime: '激活到期时间',
+  activeDataNodeNum: 'Datanode节点数',
+  activeAiNodeNum: 'AInode节点数',
+  activeCpuNum: 'CPU',
+  activeDeviceNum: '设备数',
+  activeMeasurementNum: '序列数',
+  used: '已用',
+  allocated: '授权',
 } as const;
 
 const monitorMetrics = {
@@ -192,14 +203,50 @@ async function selectMonitorNodeByType(page: Page, nodeType: 'ConfigNode' | 'Dat
   await option.click();
 }
 
+async function expectLocatorTextNotEmpty(locator: Locator) {
+  await expect
+    .poll(async () => (await locator.innerText()).trim(), { timeout: uiTimeouts.pageReady })
+    .not.toBe('');
+}
+
+async function expectActivationDetailRow(
+  activeModal: Locator,
+  label: string,
+  options: {
+    usedValue?: 'hyphen' | 'non-empty';
+    allocatedValue?: 'non-empty';
+  } = {},
+) {
+  const { usedValue = 'non-empty', allocatedValue = 'non-empty' } = options;
+  const row = activeModal.locator('.el-table__row', { hasText: label }).first();
+  await expect(row).toBeVisible({ timeout: uiTimeouts.pageReady });
+
+  const cells = row.locator('td .cell');
+  await expect(cells).toHaveCount(3, { timeout: uiTimeouts.pageReady });
+  await expect(cells.nth(0)).toHaveText(label, { timeout: uiTimeouts.pageReady });
+
+  if (usedValue === 'hyphen') {
+    await expect(cells.nth(1)).toHaveText('-', { timeout: uiTimeouts.pageReady });
+  } else {
+    await expectLocatorTextNotEmpty(cells.nth(1));
+  }
+
+  if (allocatedValue === 'non-empty') {
+    await expectLocatorTextNotEmpty(cells.nth(2));
+  }
+}
+
 test.describe('首页', () => {
   test.beforeEach(async ({ page, request }) => {
+    // 统一设置语言，保证首页中文断言稳定。
     await seedClientState(page, { lang: realBackendRun ? 'cn' : 'en' });
     if (!realBackendRun) {
+      // Mock 场景下使用前端拦截数据，不依赖真实 Workbench。
       await mockWorkbenchApi(page, 'authenticated');
       return;
     }
 
+    // 真实环境下提前保证 localhost 实例存在。
     await ensureStandaloneConnectionExists(request, localhostConnection);
   });
 
@@ -220,7 +267,8 @@ test.describe('首页', () => {
   });
 
   if (!realBackendRun) {
-    test('Mock 场景下登录并显示工作台主框架', async ({ page }) => {
+    // Mock 分支用于本地前端调试与结构验证。
+    test('1. Mock 场景下登录并显示工作台主框架', async ({ page }) => {
       const loginPage = new LoginPage(page);
       await loginPage.goto();
       await loginThroughUi(page);
@@ -233,11 +281,12 @@ test.describe('首页', () => {
   }
 
   if (realBackendRun) {
-    test('通过连接实例 localhost 登录并进入首页', async ({ page }) => {
+    // 真实环境分支直连 127.0.0.1:9190，校验首页核心展示与监控切换。
+    test('1. 通过连接实例 localhost 登录并进入首页', async ({ page }) => {
       await loginToDashboard(page);
     });
 
-    test('首页展示系统信息模块核心字段', async ({ page }) => {
+    test('2. 首页展示系统信息模块核心字段', async ({ page }) => {
       await loginToDashboard(page);
 
       await expectContainingTexts(page, [
@@ -252,7 +301,8 @@ test.describe('首页', () => {
       ]);
     });
 
-    test('首页支持打开激活详情', async ({ page }) => {
+    // 校验“激活详情”弹窗可正常打开，并展示已用/授权表头及授权资源字段内容。
+    test('3. 首页支持打开激活详情', async ({ page }) => {
       await loginToDashboard(page);
 
       const activeButton = page.locator(`${dashboardSelectors.masterActiveButton}, ${dashboardSelectors.slaveActiveButton}`).first();
@@ -262,12 +312,26 @@ test.describe('首页', () => {
       const activeModal = page.locator(dashboardSelectors.activeModal).first();
       await expect(activeModal).toBeVisible({ timeout: uiTimeouts.pageReady });
       await expect(activeModal.getByText(dashboardTexts.activeDetail, { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
+      await expect(activeModal.getByText(activationDetailTexts.used, { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
+      await expect(activeModal.getByText(activationDetailTexts.allocated, { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
+      await expect
+        .poll(async () => activeModal.locator('.el-table__row').count(), { timeout: uiTimeouts.pageReady })
+        .toBeGreaterThanOrEqual(6);
+
+      await expectActivationDetailRow(activeModal, activationDetailTexts.activationExpirationTime, {
+        usedValue: 'hyphen',
+      });
+      await expectActivationDetailRow(activeModal, activationDetailTexts.activeDataNodeNum);
+      await expectActivationDetailRow(activeModal, activationDetailTexts.activeAiNodeNum);
+      await expectActivationDetailRow(activeModal, activationDetailTexts.activeCpuNum);
+      await expectActivationDetailRow(activeModal, activationDetailTexts.activeDeviceNum);
+      await expectActivationDetailRow(activeModal, activationDetailTexts.activeMeasurementNum);
 
       await activeModal.locator('.el-dialog__headerbtn').click();
       await expect(activeModal).toBeHidden({ timeout: uiTimeouts.action });
     });
 
-    test('监控信息默认展示全部节点指标', async ({ page }) => {
+    test('4. 监控信息默认展示全部节点指标', async ({ page }) => {
       await loginToDashboard(page);
 
       const monitorState = await getMonitorState(page);
@@ -282,7 +346,7 @@ test.describe('首页', () => {
       await expectVisibleTexts(page, monitorMetrics.all);
     });
 
-    test('监控节点下拉列表展示 ConfigNode 和 DataNode', async ({ page }) => {
+    test('5. 监控节点下拉列表展示 ConfigNode 和 DataNode', async ({ page }) => {
       await loginToDashboard(page);
 
       const monitorState = await getMonitorState(page);
@@ -300,7 +364,7 @@ test.describe('首页', () => {
       await page.keyboard.press('Escape');
     });
 
-    test('监控信息切换到 ConfigNode 后展示对应指标', async ({ page }) => {
+    test('6. 监控信息切换到 ConfigNode 后展示对应指标', async ({ page }) => {
       await loginToDashboard(page);
 
       const monitorState = await getMonitorState(page);
@@ -313,7 +377,7 @@ test.describe('首页', () => {
       await expectVisibleTexts(page, monitorMetrics.configNode);
     });
 
-    test('监控信息切换到 DataNode 后展示对应指标', async ({ page }) => {
+    test('7. 监控信息切换到 DataNode 后展示对应指标', async ({ page }) => {
       await loginToDashboard(page);
 
       const monitorState = await getMonitorState(page);

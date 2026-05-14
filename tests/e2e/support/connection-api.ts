@@ -20,6 +20,19 @@ export type ConnectionSummary = {
   model?: string;
 };
 
+async function readJsonResponse(response: Awaited<ReturnType<APIRequestContext['get']>>, requestPath: string) {
+  const rawText = await response.text();
+  if (!rawText) {
+    throw new Error(`Connection API returned empty response: ${requestPath} (status ${response.status()})`);
+  }
+
+  try {
+    return JSON.parse(rawText) as Record<string, any>;
+  } catch {
+    throw new Error(`Connection API returned non-JSON response: ${requestPath} (status ${response.status()}) => ${rawText.slice(0, 200)}`);
+  }
+}
+
 function normalizePrometheusUrl(url?: string) {
   if (!url) {
     return '';
@@ -62,14 +75,16 @@ type ConnectionDetail = {
 };
 
 export async function getConnectionListByApi(request: APIRequestContext): Promise<ConnectionSummary[]> {
-  const response = await request.get('/api/connection/getConnectionList');
-  const payload = await response.json();
+  const requestPath = '/api/connection/getConnectionList';
+  const response = await request.get(requestPath);
+  const payload = await readJsonResponse(response, requestPath);
   return Array.isArray(payload.data) ? payload.data : [];
 }
 
 export async function getConnectionDetailByApi(request: APIRequestContext, id: number | string): Promise<ConnectionDetail | null> {
-  const response = await request.get(`/api/connection/getConnectionById?id=${id}`);
-  const payload = await response.json();
+  const requestPath = `/api/connection/getConnectionById?id=${id}`;
+  const response = await request.get(requestPath);
+  const payload = await readJsonResponse(response, requestPath);
   return payload?.data || null;
 }
 

@@ -3,29 +3,32 @@ import { spawn } from 'node:child_process';
 
 const repoRoot = process.cwd();
 const reportScriptPath = path.join(repoRoot, 'tests', 'e2e', 'scripts', 'run-playwright-report.mjs');
+const tscScriptPath = path.join(repoRoot, 'node_modules', 'typescript', 'bin', 'tsc');
 const orderedModules = ['login', 'instance', 'dashboard', 'measurement', 'query'];
-const realFullModules = ['login', 'instance', 'dashboard', 'query'];
+const specialCommands = ['typecheck'];
+const realFullModules = [...orderedModules];
 const presetModuleMap = {
   full: realFullModules,
   'full-real': realFullModules,
   'full-dev': [...orderedModules],
 };
 const moduleSpecMap = {
-  login: ['tests/e2e/Instance_Login/login.spec.ts'],
-  instance: ['tests/e2e/Instance_Management/instance-management.spec.ts'],
-  dashboard: ['tests/e2e/Instance_Dashboard/dashboard.spec.ts'],
-  measurement: ['tests/e2e/Measurement_Management/measurement-management.spec.ts'],
+  login: ['tests/e2e/Test_Cases/Instance_Login/login.spec.ts'],
+  instance: ['tests/e2e/Test_Cases/Instance_Management/instance-management.spec.ts'],
+  dashboard: ['tests/e2e/Test_Cases/Instance_Dashboard/dashboard.spec.ts'],
+  measurement: ['tests/e2e/Test_Cases/Measurement_Management/measurement-management.spec.ts'],
   query: [
-    'tests/e2e/query/data-search.spec.ts',
-    'tests/e2e/query/sql-search.spec.ts',
-    'tests/e2e/query/statistic-search.spec.ts',
+    'tests/e2e/Test_Cases/Search/data-search.spec.ts',
+    'tests/e2e/Test_Cases/SQL_Search/sql-search.spec.ts',
+    'tests/e2e/Test_Cases/Search/statistic-search.spec.ts',
   ],
 };
+const runtimeTargets = new Set(['direct', 'real', '9190', 'dev', '8098']);
 
 function printUsage() {
   console.log(`Usage:
-  start.bat <module...|module1,module2,...> [report|headed] [--dry-run]
-  ./start.sh <module...|module1,module2,...> [report|headed] [--dry-run]
+  start.bat <module...|module1,module2,...> [direct|dev] [report|headed] [--dry-run]
+  ./start.sh <module...|module1,module2,...> [direct|dev] [report|headed] [--dry-run]
 
 Modules:
   login
@@ -33,28 +36,36 @@ Modules:
   dashboard
   measurement
   query
+  typecheck
   full
   full-real
   full-dev
 
 Examples:
   start.bat login
+  start.bat login direct
   start.bat login headed
-  start.bat measurement
+  start.bat measurement direct
+  start.bat measurement dev
   start.bat measurement headed
   start.bat login instance dashboard
-  start.bat login instance dashboard measurement headed
-  start.bat login,instance,dashboard,measurement headed
+  start.bat login instance dashboard measurement direct headed
+  start.bat login,instance,dashboard,measurement direct headed
   start.bat full
   start.bat full headed
   start.bat full-real headed
   start.bat full-dev headed
+  start.bat typecheck
+  start.bat typecheck --dry-run
 
 Notes:
+  direct  = connect directly to Workbench on 127.0.0.1:9190
+  dev     = open local frontend on 127.0.0.1:8098 and proxy API to 127.0.0.1:9190
   report  = generate report without headed browser mode
   headed  = open browser and generate report
-  full/full-real = run real Workbench modules on 127.0.0.1:9190
-  full-dev = include measurement module and open local frontend on 127.0.0.1:8098
+  typecheck = run TypeScript check for Playwright and tests/e2e via tsconfig.e2e.json
+  full/full-real = run all modules in direct mode on 127.0.0.1:9190
+  full-dev = run all modules in dev mode on 127.0.0.1:8098
   --dry-run = print resolved command without executing`);
 }
 
@@ -90,17 +101,45 @@ function parseArgs(argv) {
     filteredArgs.pop();
   }
 
-  if (!filteredArgs.length) {
+  let runtimeTarget = null;
+  const moduleArgs = [];
+  for (const arg of filteredArgs) {
+    const normalizedArg = arg.toLowerCase();
+    if (runtimeTargets.has(normalizedArg)) {
+      if (runtimeTarget) {
+        throw new Error(`Only one runtime target can be provided, but received "${runtimeTarget}" and "${arg}".`);
+      }
+      runtimeTarget = normalizedArg;
+      continue;
+    }
+
+    moduleArgs.push(arg);
+  }
+
+  if (!moduleArgs.length) {
     throw new Error('At least one module must be provided.');
   }
 
-  const rawModules = filteredArgs
+  const rawModules = moduleArgs
     .flatMap((arg) => arg.split(','))
     .map(normalizeModuleToken)
     .filter(Boolean);
 
   if (!rawModules.length) {
     throw new Error('At least one valid module must be provided.');
+  }
+
+  const selectedSpecialCommand = rawModules.find((moduleName) => specialCommands.includes(moduleName));
+  if (selectedSpecialCommand) {
+    if (rawModules.length > 1) {
+      throw new Error(`The "${selectedSpecialCommand}" command cannot be combined with other modules.`);
+    }
+
+    return {
+      help: false,
+      dryRun,
+      command: selectedSpecialCommand,
+    };
   }
 
   const uniqueModules = [];
@@ -110,7 +149,7 @@ function parseArgs(argv) {
     }
   }
 
-  const allowedModules = new Set([...orderedModules, ...Object.keys(presetModuleMap)]);
+  const allowedModules = new Set([...orderedModules, ...specialCommands, ...Object.keys(presetModuleMap)]);
   const invalidModules = uniqueModules.filter((moduleName) => !allowedModules.has(moduleName));
   if (invalidModules.length) {
     throw new Error(`Unsupported module(s): ${invalidModules.join(', ')}`);
@@ -122,6 +161,20 @@ function parseArgs(argv) {
   }
 
   const modules = selectedPreset ? [...presetModuleMap[selectedPreset]] : uniqueModules;
+  const resolvedRuntimeTarget =
+    runtimeTarget === 'real' || runtimeTarget === '9190'
+      ? 'direct'
+      : runtimeTarget === '8098'
+        ? 'dev'
+        : runtimeTarget;
+
+  if (selectedPreset === 'full-dev' && resolvedRuntimeTarget === 'direct') {
+    throw new Error('The "full-dev" preset cannot run in direct mode. Use "full" or "full-real" instead.');
+  }
+
+  if ((selectedPreset === 'full' || selectedPreset === 'full-real') && resolvedRuntimeTarget === 'dev') {
+    throw new Error(`The "${selectedPreset}" preset is fixed to direct mode. Use "full-dev" for local frontend mode.`);
+  }
 
   return {
     help: false,
@@ -130,6 +183,7 @@ function parseArgs(argv) {
     requestedModules: uniqueModules,
     modules,
     selectedPreset,
+    runtimeTarget: resolvedRuntimeTarget || (selectedPreset === 'full-dev' ? 'dev' : 'direct'),
   };
 }
 
@@ -171,19 +225,47 @@ function buildCommandArgs(config) {
   ];
 }
 
-function buildRuntimeEnv(modules) {
+function buildRuntimeConfig(runtimeTarget) {
   const env = { ...process.env };
 
-  if (modules.includes('measurement')) {
-    env.CONFIG_API_PROXY = env.CONFIG_API_PROXY || 'http://127.0.0.1:9190';
-    env.PLAYWRIGHT_BASE_URL = env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:8098';
-    env.PLAYWRIGHT_PORT = env.PLAYWRIGHT_PORT || '8098';
-    env.PLAYWRIGHT_SERVER_MODE = env.PLAYWRIGHT_SERVER_MODE || 'dev';
+  if (runtimeTarget === 'dev') {
+    env.PLAYWRIGHT_REAL_BACKEND = 'true';
+    env.CONFIG_API_PROXY = 'http://127.0.0.1:9190';
+    env.PLAYWRIGHT_REAL_BASE_URL = 'http://127.0.0.1:9190';
+    env.PLAYWRIGHT_BASE_URL = 'http://127.0.0.1:8098';
+    env.PLAYWRIGHT_PORT = '8098';
+    env.PLAYWRIGHT_SERVER_MODE = 'dev';
     env.PLAYWRIGHT_FORCE_WEBSERVER = 'true';
     delete env.PLAYWRIGHT_SKIP_WEBSERVER;
+    return {
+      env,
+      runtimeTarget,
+      baseURL: env.PLAYWRIGHT_BASE_URL,
+      apiProxy: env.CONFIG_API_PROXY,
+      webServer: 'enabled',
+    };
   }
 
-  return env;
+  env.PLAYWRIGHT_REAL_BACKEND = 'true';
+  env.PLAYWRIGHT_REAL_BASE_URL = 'http://127.0.0.1:9190';
+  env.PLAYWRIGHT_BASE_URL = 'http://127.0.0.1:9190';
+  env.PLAYWRIGHT_PORT = '9190';
+  env.PLAYWRIGHT_SKIP_WEBSERVER = 'true';
+  delete env.PLAYWRIGHT_FORCE_WEBSERVER;
+  delete env.PLAYWRIGHT_SERVER_MODE;
+  delete env.CONFIG_API_PROXY;
+
+  return {
+    env,
+    runtimeTarget,
+    baseURL: env.PLAYWRIGHT_BASE_URL,
+    apiProxy: 'none',
+    webServer: 'disabled',
+  };
+}
+
+function buildTypecheckCommandArgs() {
+  return [tscScriptPath, '-p', 'tsconfig.e2e.json', '--noEmit'];
 }
 
 async function runCommand(commandArgs, runtimeEnv) {
@@ -208,9 +290,26 @@ try {
     process.exit(1);
   }
 
+  if (parsed.command === 'typecheck') {
+    const commandArgs = buildTypecheckCommandArgs();
+
+    console.log();
+    console.log('[E2E] command=typecheck');
+
+    if (parsed.dryRun) {
+      console.log('[E2E] dry-run=true');
+      console.log(`[E2E] command=node ${commandArgs.join(' ')}`);
+      process.exit(0);
+    }
+
+    console.log();
+    const exitCode = await runCommand(commandArgs, process.env);
+    process.exit(exitCode);
+  }
+
   const specs = buildSpecList(parsed.modules);
   const reportKey = buildReportKey(parsed.modules, parsed.mode, parsed.selectedPreset);
-  const runtimeEnv = buildRuntimeEnv(parsed.modules);
+  const runtime = buildRuntimeConfig(parsed.runtimeTarget);
   const commandArgs = buildCommandArgs({
     specs,
     reportKey,
@@ -220,22 +319,21 @@ try {
   console.log();
   console.log(`[E2E] modules=${parsed.requestedModules.join(',')}`);
   console.log(`[E2E] mode=${parsed.mode}`);
+  console.log(`[E2E] target=${runtime.runtimeTarget}`);
+  console.log(`[E2E] baseURL=${runtime.baseURL}`);
   console.log(`[E2E] reportKey=${reportKey}`);
   console.log(`[E2E] specs=${specs.join(', ')}`);
 
   if (parsed.dryRun) {
     console.log('[E2E] dry-run=true');
-    if (parsed.modules.includes('measurement')) {
-      console.log(`[E2E] baseURL=${runtimeEnv.PLAYWRIGHT_BASE_URL}`);
-      console.log(`[E2E] apiProxy=${runtimeEnv.CONFIG_API_PROXY}`);
-      console.log(`[E2E] webServer=${runtimeEnv.PLAYWRIGHT_FORCE_WEBSERVER}`);
-    }
+    console.log(`[E2E] apiProxy=${runtime.apiProxy}`);
+    console.log(`[E2E] webServer=${runtime.webServer}`);
     console.log(`[E2E] command=node ${commandArgs.join(' ')}`);
     process.exit(0);
   }
 
   console.log();
-  const exitCode = await runCommand(commandArgs, runtimeEnv);
+  const exitCode = await runCommand(commandArgs, runtime.env);
   process.exit(exitCode);
 } catch (error) {
   console.error();

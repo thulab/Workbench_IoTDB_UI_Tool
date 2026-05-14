@@ -1,6 +1,6 @@
-import { expect, type Page } from '@playwright/test';
-import { gotoLogin } from '../fixtures/workbench';
-import { loginSelectors, shellSelectors, uiTimeouts } from './selectors';
+import { expect, type Locator, type Page } from '@playwright/test';
+import { gotoLogin } from '../support/workbench-test-support';
+import { loginSelectors, shellSelectors, uiTimeouts } from '../support/e2e-selectors';
 
 const dashboardLandingTexts = {
   home: '首页',
@@ -46,6 +46,26 @@ export class LoginPage {
     return this.page.locator(loginSelectors.validationError);
   }
 
+  latestErrorToast() {
+    return this.page.locator('.el-message--error').last();
+  }
+
+  connectionValidationError() {
+    return this.formItemErrorFor(this.connectionSelect());
+  }
+
+  userValidationError() {
+    return this.formItemErrorFor(this.userInput());
+  }
+
+  passwordValidationError() {
+    return this.formItemErrorFor(this.passwordInput());
+  }
+
+  private formItemErrorFor(field: Locator) {
+    return field.locator('xpath=ancestor::*[contains(@class,"el-form-item")][1]').locator(loginSelectors.validationError).first();
+  }
+
   async goto() {
     await gotoLogin(this.page);
   }
@@ -64,21 +84,28 @@ export class LoginPage {
 
   async selectConnectionByName(name: string) {
     await this.connectionSelect().click({ force: true });
-    const dropdown = this.page.locator('.el-select-dropdown').filter({
-      has: this.page.locator('.el-select-dropdown__item'),
-    }).last();
+    const dropdown = this.page
+      .locator('.el-select-dropdown')
+      .filter({
+        has: this.page.locator('.el-select-dropdown__item'),
+      })
+      .last();
     await expect(dropdown).toBeVisible({ timeout: uiTimeouts.action });
     const option = dropdown.locator('.el-select-dropdown__item').filter({ hasText: name }).first();
     await expect(option).toBeVisible({ timeout: uiTimeouts.action });
     await option.click();
   }
 
-  async login(options: { connectionName: string; username?: string; password: string }) {
-    await this.selectConnectionByName(options.connectionName);
+  async login(options: { connectionName?: string; username?: string; password?: string }) {
+    if (options.connectionName !== undefined) {
+      await this.selectConnectionByName(options.connectionName);
+    }
     if (options.username !== undefined) {
       await this.userInput().fill(options.username);
     }
-    await this.passwordInput().fill(options.password);
+    if (options.password !== undefined) {
+      await this.passwordInput().fill(options.password);
+    }
     await this.submitButton().click();
   }
 

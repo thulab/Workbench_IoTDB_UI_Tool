@@ -1,5 +1,5 @@
 import { expect, type Page, type Route } from '@playwright/test';
-import { uiTimeouts } from '../pages/selectors';
+import { uiTimeouts } from './e2e-selectors';
 
 type MockMode = 'login' | 'authenticated';
 

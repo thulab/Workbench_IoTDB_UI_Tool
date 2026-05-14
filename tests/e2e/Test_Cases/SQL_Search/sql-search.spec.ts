@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { appendSqlText, fillSqlEditor, getActiveSqlEditorText, getOpenedUrls, getSqlQueryRequests, gotoLogin, gotoSqlSearch, loginThroughUi, mockWorkbenchApi, seedClientState, selectSqlText } from '../fixtures/workbench';
-import { cleanupRealQueryConnection, ensureRealQueryConnection, ensureRealQuerySeedData, loginToRealWorkbench, realQuerySeed } from '../support/real-query-data';
+import { appendSqlText, fillSqlEditor, getActiveSqlEditorText, getOpenedUrls, getSqlQueryRequests, gotoLogin, gotoSqlSearch, loginThroughUi, mockWorkbenchApi, seedClientState, selectSqlText } from '../../support/workbench-test-support';
+import { cleanupRealQueryConnection, ensureRealQueryConnection, ensureRealQuerySeedData, loginToRealWorkbench, realQuerySeed } from '../../support/real-query-data';
 
 const realBackendRun = process.env.PLAYWRIGHT_REAL_BACKEND === 'true';
 

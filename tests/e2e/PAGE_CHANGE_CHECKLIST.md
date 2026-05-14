@@ -4,8 +4,7 @@
 
 适用于以下自动化范围：
 
-- `tests/e2e/Instance_Login`
-- `tests/e2e/Instance_Management`
+- `tests/e2e/Test_Cases`
 - 依赖登录与实例管理前置条件的其他真实场景
 
 ## 一、页面改动前先确认
@@ -50,7 +49,7 @@
 
 ## 三、测试层维护顺序
 
-1. 先改 `tests/e2e/pages/selectors.ts`
+1. 先改 `tests/e2e/support/e2e-selectors.ts`
 2. 再改 `tests/e2e/pages/login-page.ts`
 3. 再改 `tests/e2e/pages/instance-management-page.ts`
 4. 最后再改具体 `spec.ts` 断言
@@ -89,7 +88,7 @@ npm.cmd run test:e2e:dashboard:real:report
 
 ### 1. 点击不到元素
 
-- 优先检查 `selectors.ts` 是否失效
+- 优先检查 `e2e-selectors.ts` 是否失效
 - 检查元素是否被新的包裹层覆盖
 - 检查是否需要 `force: true`
 

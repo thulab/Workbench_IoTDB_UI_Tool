@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { getOpenedUrls, gotoLogin, gotoStatisticSearch, loginThroughUi, mockWorkbenchApi, openTimeseriesOptions, seedClientState, seedSessionStorage, selectTimeseries } from '../fixtures/workbench';
-import { cleanupRealQueryConnection, ensureRealQueryConnection, ensureRealQuerySeedData, loginToRealWorkbench, realQuerySeed } from '../support/real-query-data';
+import { getOpenedUrls, gotoLogin, gotoStatisticSearch, loginThroughUi, mockWorkbenchApi, openTimeseriesOptions, seedClientState, seedSessionStorage, selectTimeseries } from '../../support/workbench-test-support';
+import { cleanupRealQueryConnection, ensureRealQueryConnection, ensureRealQuerySeedData, loginToRealWorkbench, realQuerySeed } from '../../support/real-query-data';
 
 const realBackendRun = process.env.PLAYWRIGHT_REAL_BACKEND === 'true';
 

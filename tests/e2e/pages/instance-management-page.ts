@@ -1,5 +1,5 @@
 import { expect, type Page } from '@playwright/test';
-import { feedbackSelectors, instanceManagementSelectors, uiTimeouts } from './selectors';
+import { feedbackSelectors, instanceManagementSelectors, uiTimeouts } from '../support/e2e-selectors';
 
 export class InstanceManagementPage {
   constructor(private readonly page: Page) {}
@@ -60,20 +60,36 @@ export class InstanceManagementPage {
     return this.form().locator(instanceManagementSelectors.password).first();
   }
 
+  connectionInfoLabel() {
+    return this.form().locator('.ip-port-box .form-label').filter({ hasText: '实例信息' }).first();
+  }
+
+  connectionInfoTooltipIcon() {
+    return this.connectionInfoLabel().locator('svg').first();
+  }
+
   prometheusUrlInput() {
     return this.form().locator(instanceManagementSelectors.prometheusUrl).first();
   }
 
+  prometheusSection() {
+    return this.form().locator('.el-form-item').filter({ hasText: 'Prometheus 信息' }).first();
+  }
+
+  prometheusTooltipIcon() {
+    return this.prometheusSection().locator('svg').first();
+  }
+
   prometheusAuthToggle() {
-    return this.page.locator(instanceManagementSelectors.prometheusAuth).first();
+    return this.prometheusSection().locator('.el-switch').first();
   }
 
   prometheusUsernameInput() {
-    return this.page.locator(instanceManagementSelectors.prometheusUsername).first();
+    return this.form().getByPlaceholder('请输入Prometheus用户名').first();
   }
 
   prometheusPasswordInput() {
-    return this.page.locator(instanceManagementSelectors.prometheusPassword).first();
+    return this.form().getByPlaceholder('请输入Prometheus密码').first();
   }
 
   standaloneType() {
@@ -82,6 +98,14 @@ export class InstanceManagementPage {
 
   defaultTreeModel() {
     return this.page.locator(instanceManagementSelectors.defaultTreeModel).first();
+  }
+
+  defaultModelSection() {
+    return this.form().locator('.el-form-item').filter({ hasText: '默认模型' }).first();
+  }
+
+  defaultModelTooltipIcon() {
+    return this.defaultModelSection().locator('svg').first();
   }
 
   validationErrors() {
@@ -94,6 +118,10 @@ export class InstanceManagementPage {
 
   confirmDialog() {
     return this.page.locator(instanceManagementSelectors.confirmDialog);
+  }
+
+  tooltipPopper() {
+    return this.page.locator('.el-popper').filter({ has: this.page.locator('.el-tooltip__popper, .el-popper__arrow') }).last();
   }
 
   itemById(id: number | string | 'new') {
@@ -130,20 +158,49 @@ export class InstanceManagementPage {
     await expect(this.modal()).toBeHidden();
   }
 
+  fieldErrorForInput(input: ReturnType<InstanceManagementPage['connectionNameInput']>) {
+    return input.locator('xpath=ancestor::*[contains(@class,"el-form-item")][1]//*[contains(@class,"el-form-item__error")]').first();
+  }
+
   async fillStandaloneConnection(options: { name: string; host: string; port: string; username?: string; password?: string }) {
     await this.connectionNameInput().fill(options.name);
     await this.hostInput().fill(options.host);
     await this.portInput().fill(options.port);
-    await this.usernameInput().fill(options.username || 'root');
+    await this.usernameInput().fill(options.username ?? 'root');
     if (options.password !== undefined) {
       await this.passwordInput().fill(options.password);
     }
   }
 
   async fillPrometheusCredentials(username: string, password: string) {
-    await this.prometheusAuthToggle().click();
+    const authToggle = this.prometheusAuthToggle();
+    const checked = await authToggle.locator('input').isChecked().catch(() => false);
+    if (!checked) {
+      await authToggle.click();
+    }
     await this.prometheusUsernameInput().fill(username);
     await this.prometheusPasswordInput().fill(password);
+  }
+
+  async fillPrometheusConfig(options: { url?: string; username?: string; password?: string }) {
+    if (options.url !== undefined) {
+      await this.prometheusUrlInput().fill(options.url);
+    }
+
+    if (options.username !== undefined || options.password !== undefined) {
+      const authToggle = this.prometheusAuthToggle();
+      const checked = await authToggle.locator('input').isChecked().catch(() => false);
+      if (!checked) {
+        await authToggle.click();
+      }
+    }
+
+    if (options.username !== undefined) {
+      await this.prometheusUsernameInput().fill(options.username);
+    }
+    if (options.password !== undefined) {
+      await this.prometheusPasswordInput().fill(options.password);
+    }
   }
 
   async clickPrimaryAction(action: 'save' | 'test' | 'reset') {
@@ -165,6 +222,19 @@ export class InstanceManagementPage {
   async expectLatestToast(variant: 'success' | 'error', timeout = uiTimeouts.toast) {
     const selector = variant === 'success' ? feedbackSelectors.successToast : feedbackSelectors.errorToast;
     await expect(this.page.locator(selector).last()).toBeVisible({ timeout });
+  }
+
+  async expectLatestToastContains(variant: 'success' | 'error', text: string, timeout = uiTimeouts.toast) {
+    const selector = variant === 'success' ? feedbackSelectors.successToast : feedbackSelectors.errorToast;
+    await expect(this.page.locator(selector).last()).toContainText(text, { timeout });
+  }
+
+  async expectTooltipContains(text: string) {
+    await expect(this.page.getByText(text, { exact: false }).last()).toBeVisible({ timeout: uiTimeouts.action });
+  }
+
+  tooltipLinkByText(text: string) {
+    return this.page.locator('.el-popper a').filter({ hasText: text }).last();
   }
 
   async createStandaloneConnection(options: { name: string; host?: string; port?: string; username?: string; password?: string }) {
