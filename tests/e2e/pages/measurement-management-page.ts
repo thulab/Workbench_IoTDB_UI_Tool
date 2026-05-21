@@ -46,6 +46,26 @@ export class MeasurementManagementPage {
     return this.page.locator(measurementManagementSelectors.databaseModal).first();
   }
 
+  databaseModalNameInput() {
+    return this.databaseModal().locator(measurementManagementSelectors.databaseModalName).first();
+  }
+
+  databaseModalCancelButton() {
+    return this.databaseModal().locator(measurementManagementSelectors.databaseModalCancel).first();
+  }
+
+  databaseModalConfirmButton() {
+    return this.databaseModal().locator(measurementManagementSelectors.databaseModalConfirm).first();
+  }
+
+  databaseModalCloseButton() {
+    return this.databaseModal().locator('.el-dialog__headerbtn').first();
+  }
+
+  databaseModalValidationErrors() {
+    return this.databaseModal().locator('.el-form-item__error');
+  }
+
   measurementModal() {
     return this.page.locator(measurementManagementSelectors.measurementModal).first();
   }
@@ -333,6 +353,7 @@ export class MeasurementManagementPage {
 
   async openNodeContextMenu(path: string) {
     const node = this.nodeByPath(path);
+    await this.dismissContextMenuIfVisible();
     await this.ensureNodeVisible(path);
     await expect(node).toBeVisible({ timeout: uiTimeouts.pageReady });
     await node.click({ button: 'right' });
@@ -346,17 +367,38 @@ export class MeasurementManagementPage {
     await expect(newMeasurementAction).toBeVisible({ timeout: uiTimeouts.action });
   }
 
-  async createDatabase(databaseName: string, options?: { expectVisible?: boolean }) {
+  async openCreateDatabaseModal(parentPath = 'root') {
+    await this.openNodeContextMenu(parentPath);
     await this.contextMenuAction('新建数据库', measurementManagementSelectors.contextMenuNewDatabase).click();
     await expect(this.databaseModal()).toBeVisible({ timeout: uiTimeouts.action });
-    await this.page.locator(measurementManagementSelectors.databaseModalName).fill(databaseName);
-    await this.page.locator(measurementManagementSelectors.databaseModalConfirm).click();
-    await this.expectLatestToast('success');
-    await expect(this.databaseModal()).toBeHidden({ timeout: uiTimeouts.toast });
+  }
+
+  async createDatabase(databaseName: string, options?: { expectVisible?: boolean }) {
+    await this.openCreateDatabaseModal('root');
+    await this.databaseModalNameInput().fill(databaseName);
+    await this.submitDatabaseModal();
     if (options?.expectVisible !== false) {
       await this.ensureNodeVisible(`root.${databaseName}`);
       await expect(this.nodeByPath(`root.${databaseName}`)).toBeVisible({ timeout: uiTimeouts.pageReady });
     }
+  }
+
+  async submitDatabaseModal(options?: { expectSuccess?: boolean }) {
+    await this.databaseModalConfirmButton().click();
+
+    if (options?.expectSuccess === false) {
+      return;
+    }
+
+    await this.expectLatestToast('success');
+    await expect(this.databaseModal()).toBeHidden({ timeout: uiTimeouts.toast });
+  }
+
+  async dismissDatabaseModal(action: 'cancel' | 'close' = 'cancel') {
+    const button = action === 'close' ? this.databaseModalCloseButton() : this.databaseModalCancelButton();
+    await expect(button).toBeVisible({ timeout: uiTimeouts.action });
+    await button.click();
+    await expect(this.databaseModal()).toBeHidden({ timeout: uiTimeouts.action });
   }
 
   async createMeasurement(
@@ -387,7 +429,7 @@ export class MeasurementManagementPage {
 
   async openMeasurementModal(parentPath: string) {
     await this.openNodeContextMenu(parentPath);
-    await this.contextMenuAction('鏂板缓娴嬬偣', measurementManagementSelectors.contextMenuNewMeasurement).click();
+    await this.contextMenuAction('新建测点', measurementManagementSelectors.contextMenuNewMeasurement).click();
     await expect(this.measurementModal()).toBeVisible({ timeout: uiTimeouts.action });
   }
 
@@ -507,6 +549,19 @@ export class MeasurementManagementPage {
       }
     }
 
+    await this.confirmVisibleMessageBoxIfPresent();
+    await expect(modal).toBeHidden({ timeout: uiTimeouts.toast });
+  }
+
+  async dismissMeasurementModal(action: 'cancel' | 'close' = 'cancel') {
+    const modal = this.measurementModal();
+    if (!(await modal.isVisible().catch(() => false))) {
+      return;
+    }
+
+    const button = action === 'close' ? this.measurementModalCloseButton() : this.measurementModalCancelButton();
+    await expect(button).toBeVisible({ timeout: uiTimeouts.action });
+    await button.click();
     await this.confirmVisibleMessageBoxIfPresent();
     await expect(modal).toBeHidden({ timeout: uiTimeouts.toast });
   }
@@ -806,11 +861,11 @@ export class MeasurementManagementPage {
     const createdNames: string[] = [];
 
     for (const databaseName of databaseNames) {
-      await this.openNodeContextMenu('root');
-      await this.createDatabase(databaseName, { expectVisible: false });
+      await this.createDatabaseByApi(databaseName);
       createdNames.push(databaseName);
+      await this.refreshMeasurementTree();
 
-      if (await this.treeRootMoreButton().count()) {
+      if (await this.treeRootMoreButton().isVisible().catch(() => false)) {
         break;
       }
     }
@@ -1905,6 +1960,19 @@ export class MeasurementManagementPage {
     return false;
   }
 
+  private async dismissContextMenuIfVisible() {
+    const menu = this.contextMenu();
+    if (!(await menu.isVisible().catch(() => false))) {
+      return;
+    }
+
+    await this.page.keyboard.press('Escape').catch(() => undefined);
+    if (await menu.isVisible().catch(() => false)) {
+      await this.page.mouse.click(8, 8).catch(() => undefined);
+    }
+    await expect(menu).toBeHidden({ timeout: uiTimeouts.action }).catch(() => undefined);
+  }
+
   async createDatabaseByApi(databaseName: string) {
     const result = await this.page.evaluate(async (name) => {
       const groupName = `root.${name}`;
@@ -2048,6 +2116,10 @@ export class MeasurementManagementPage {
   async measurementModalFieldValue(index: number, field: 'name' | 'alias' | 'description' | 'tags') {
     await this.ensureMeasurementModalRowExpanded(index);
     return this.inputLikeRowField(index, field).inputValue();
+  }
+
+  measurementModalFieldInput(index: number, field: 'name' | 'alias' | 'description' | 'tags') {
+    return this.inputLikeRowField(index, field);
   }
 
   private measurementModalRowHeader(index: number) {

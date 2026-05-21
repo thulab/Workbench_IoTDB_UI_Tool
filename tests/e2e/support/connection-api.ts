@@ -20,6 +20,10 @@ export type ConnectionSummary = {
   model?: string;
 };
 
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function readJsonResponse(response: Awaited<ReturnType<APIRequestContext['get']>>, requestPath: string) {
   const rawText = await response.text();
   if (!rawText) {
@@ -106,72 +110,101 @@ export async function ensureStandaloneConnectionExists(
     prometheusPassword?: string;
   },
 ) {
-  const connections = await getConnectionListByApi(request);
   const normalizedPrometheusUrl = normalizePrometheusUrl(connection.prometheusUrl);
-  const existingConnection = connections.find((item) => item?.name === connection.name);
-  if (existingConnection) {
-    const detail = await getConnectionDetailByApi(request, existingConnection.id);
-    if (!detail) {
-      return;
-    }
+  for (let attempt = 1; attempt <= 5; attempt += 1) {
+    const connections = await getConnectionListByApi(request);
+    const existingConnection = connections.find((item) => item?.name === connection.name);
+    if (existingConnection) {
+      const detail = await getConnectionDetailByApi(request, existingConnection.id);
+      if (!detail) {
+        await delay(300);
+        continue;
+      }
 
-    const currentHostAndPort = detail.masterCluster?.hostAndPortVOS?.[0];
-    const shouldUpdate =
-      detail.username !== connection.username ||
-      (detail.model || 'tree') !== (connection.model || 'tree') ||
-      currentHostAndPort?.host !== connection.host ||
-      Number(currentHostAndPort?.port) !== Number(connection.port) ||
-      (detail.masterCluster?.prometheusUrl || '') !== normalizedPrometheusUrl ||
-      (detail.masterCluster?.prometheusUsername || '') !== (connection.prometheusUsername || '') ||
-      (detail.masterCluster?.prometheusPassword || '') !== (connection.prometheusPassword || '');
+      const currentHostAndPort = detail.masterCluster?.hostAndPortVOS?.[0];
+      const shouldUpdate =
+        detail.username !== connection.username ||
+        (detail.model || 'tree') !== (connection.model || 'tree') ||
+        currentHostAndPort?.host !== connection.host ||
+        Number(currentHostAndPort?.port) !== Number(connection.port) ||
+        (detail.masterCluster?.prometheusUrl || '') !== normalizedPrometheusUrl ||
+        (detail.masterCluster?.prometheusUsername || '') !== (connection.prometheusUsername || '') ||
+        (detail.masterCluster?.prometheusPassword || '') !== (connection.prometheusPassword || '');
 
-    if (!shouldUpdate) {
-      return;
-    }
+      if (!shouldUpdate) {
+        return;
+      }
 
-    await request.post('/api/connection/saveOrUpdateConnection', {
-      data: {
-        ...detail,
-        id: detail.id,
-        type: detail.type ?? 0,
-        name: connection.name,
-        username: connection.username,
-        password: connection.password || '',
-        model: connection.model || 'tree',
-        masterCluster: {
-          ...(detail.masterCluster || {}),
-          hostAndPortVOS: [{ host: connection.host, port: connection.port }],
-          prometheusUrl: normalizedPrometheusUrl,
-          prometheusUsername: connection.prometheusUsername || '',
-          prometheusPassword: connection.prometheusPassword || '',
+      await request.post('/api/connection/saveOrUpdateConnection', {
+        data: {
+          ...detail,
+          id: detail.id,
+          type: detail.type ?? 0,
+          name: connection.name,
+          username: connection.username,
+          password: connection.password || '',
+          model: connection.model || 'tree',
+          masterCluster: {
+            ...(detail.masterCluster || {}),
+            hostAndPortVOS: [{ host: connection.host, port: connection.port }],
+            prometheusUrl: normalizedPrometheusUrl,
+            prometheusUsername: connection.prometheusUsername || '',
+            prometheusPassword: connection.prometheusPassword || '',
+          },
+          slaveCluster: detail.slaveCluster ?? null,
+          useSsl: detail.useSsl || false,
+          trustStorePassword: detail.trustStorePassword || '',
         },
-        slaveCluster: detail.slaveCluster ?? null,
-        useSsl: detail.useSsl || false,
-        trustStorePassword: detail.trustStorePassword || '',
-      },
-    });
-    return;
+      });
+    } else {
+      await request.post('/api/connection/saveOrUpdateConnection', {
+        data: {
+          id: '',
+          type: 0,
+          name: connection.name,
+          username: connection.username,
+          password: connection.password || '',
+          model: connection.model || 'tree',
+          masterCluster: {
+            hostAndPortVOS: [{ host: connection.host, port: connection.port }],
+            prometheusUrl: normalizedPrometheusUrl,
+            prometheusUsername: connection.prometheusUsername || '',
+            prometheusPassword: connection.prometheusPassword || '',
+          },
+          slaveCluster: null,
+          useSsl: false,
+          trustStorePassword: '',
+        },
+      });
+    }
+
+    await delay(500);
+    const confirmedConnections = await getConnectionListByApi(request);
+    const confirmedConnection = confirmedConnections.find((item) => item?.name === connection.name);
+    if (!confirmedConnection) {
+      continue;
+    }
+
+    const confirmedDetail = await getConnectionDetailByApi(request, confirmedConnection.id);
+    const confirmedHostAndPort = confirmedDetail?.masterCluster?.hostAndPortVOS?.[0];
+    const isConfirmed =
+      !!confirmedDetail &&
+      confirmedDetail.username === connection.username &&
+      (confirmedDetail.model || 'tree') === (connection.model || 'tree') &&
+      confirmedHostAndPort?.host === connection.host &&
+      Number(confirmedHostAndPort?.port) === Number(connection.port) &&
+      (confirmedDetail.masterCluster?.prometheusUrl || '') === normalizedPrometheusUrl &&
+      (confirmedDetail.masterCluster?.prometheusUsername || '') === (connection.prometheusUsername || '') &&
+      (confirmedDetail.masterCluster?.prometheusPassword || '') === (connection.prometheusPassword || '');
+
+    if (isConfirmed) {
+      return;
+    }
+
+    await delay(500);
   }
 
-  await request.post('/api/connection/saveOrUpdateConnection', {
-    data: {
-      id: '',
-      type: 0,
-      name: connection.name,
-      username: connection.username,
-      password: connection.password || '',
-      model: connection.model || 'tree',
-      masterCluster: {
-        hostAndPortVOS: [{ host: connection.host, port: connection.port }],
-        prometheusUrl: normalizedPrometheusUrl,
-        prometheusUsername: connection.prometheusUsername || '',
-        prometheusPassword: connection.prometheusPassword || '',
-      },
-      slaveCluster: null,
-      useSsl: false,
-      trustStorePassword: '',
-    },
-  });
+  throw new Error(`Failed to ensure connection "${connection.name}" is visible and up to date in Workbench.`);
 }
 
 export async function cleanupConnectionsByNames(request: APIRequestContext, names: string[]) {

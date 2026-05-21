@@ -1,0 +1,13 @@
+viewName(视图名称),viewDescription(视图描述),resultMeasurement(结果测点),expression(表达式)
+import_view_1,导入的视图1,root.view.import.s1,root.test_view_seed.d1.s1+root.test_view_seed.d1.s2
+import_view_2,导入的视图2,root.view.import.s2,root.test_view_seed.d1.s1+root.test_view_seed.d1.s2
+import_view_3,导入的视图3,root.view.import.s3,root.test_view_seed.d1.s1+root.test_view_seed.d1.s2
+import_view_4,导入的视图4,root.view.import.s4,root.test_view_seed.d1.s1+root.test_view_seed.d1.s2
+import_view_5,导入的视图5,root.view.import.s5,100 + root.test_view_seed.d1.s1
+import_view_6,导入的视图6,root.view.import.s6,100 + root.test_view_seed.d1.s1
+import_view_7,导入的视图7,root.view.import.s7,root.test_view_seed.d1.s2 - 1.1
+import_view_8,导入的视图8,root.view.import.s8,root.test_view_seed.d1.s2 - 1
+import_view_9,导入的视图9,root.view.import.s9,100 + root.test_view_seed.d1.s1
+import_view_10,导入的视图10,root.view.import.s10,100 + root.test_view_seed.d1.s1
+import_view_11,导入的视图11,root.view.import.s11,root.test_view_seed.d1.s2 - 1.1
+import_view_12,导入的视图12,root.view.import.s12,root.test_view_seed.d1.s2 - 1

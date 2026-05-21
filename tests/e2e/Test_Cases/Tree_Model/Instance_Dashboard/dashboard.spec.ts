@@ -1,8 +1,8 @@
-import { expect, test, type Locator, type Page } from '@playwright/test';
-import { loginThroughUi, mockWorkbenchApi, seedClientState } from '../../support/workbench-test-support';
-import { LoginPage } from '../../pages/login-page';
-import { uiTimeouts } from '../../support/e2e-selectors';
-import { cleanupConnectionsByNames, ensureStandaloneConnectionExists, localhostConnection } from '../../support/connection-api';
+﻿import { expect, test, type Locator, type Page } from '@playwright/test';
+import { loginThroughUi, mockWorkbenchApi, seedClientState } from '../../../support/workbench-test-support';
+import { LoginPage } from '../../../pages/login-page';
+import { uiTimeouts } from '../../../support/e2e-selectors';
+import { cleanupConnectionsByNames, ensureStandaloneConnectionExists, localhostConnection } from '../../../support/connection-api';
 
 const realBackendRun = process.env.PLAYWRIGHT_REAL_BACKEND === 'true';
 const dashboardSelectors = {
@@ -391,3 +391,4 @@ test.describe('首页', () => {
     });
   }
 });
+

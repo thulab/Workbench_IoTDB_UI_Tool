@@ -3,25 +3,27 @@ import { spawn } from 'node:child_process';
 
 const repoRoot = process.cwd();
 const reportScriptPath = path.join(repoRoot, 'tests', 'e2e', 'scripts', 'run-playwright-report.mjs');
+const cleanupScriptPath = path.join(repoRoot, 'tests', 'e2e', 'scripts', 'run-real-cleanup.mjs');
 const tscScriptPath = path.join(repoRoot, 'node_modules', 'typescript', 'bin', 'tsc');
-const orderedModules = ['login', 'instance', 'dashboard', 'measurement', 'query'];
-const specialCommands = ['typecheck'];
-const realFullModules = [...orderedModules];
+const orderedModules = ['login', 'instance', 'dashboard', 'measurement', 'search', 'sql', 'calculate'];
+const specialCommands = ['typecheck', 'search-cleanup', 'measurement-cleanup', 'calculate-cleanup', 'cleanup-all'];
+const fullModules = ['login', 'instance', 'dashboard', 'measurement', 'search', 'sql', 'calculate'];
 const presetModuleMap = {
-  full: realFullModules,
-  'full-real': realFullModules,
-  'full-dev': [...orderedModules],
+  full: fullModules,
+  'full-real': fullModules,
+  'full-dev': [...fullModules],
 };
 const moduleSpecMap = {
-  login: ['tests/e2e/Test_Cases/Instance_Login/login.spec.ts'],
-  instance: ['tests/e2e/Test_Cases/Instance_Management/instance-management.spec.ts'],
-  dashboard: ['tests/e2e/Test_Cases/Instance_Dashboard/dashboard.spec.ts'],
-  measurement: ['tests/e2e/Test_Cases/Measurement_Management/measurement-management.spec.ts'],
-  query: [
-    'tests/e2e/Test_Cases/Search/data-search.spec.ts',
-    'tests/e2e/Test_Cases/SQL_Search/sql-search.spec.ts',
-    'tests/e2e/Test_Cases/Search/statistic-search.spec.ts',
+  login: ['tests/e2e/Test_Cases/Tree_Model/Instance_Login/login.spec.ts'],
+  instance: ['tests/e2e/Test_Cases/Tree_Model/Instance_Management/instance-management.spec.ts'],
+  dashboard: ['tests/e2e/Test_Cases/Tree_Model/Instance_Dashboard/dashboard.spec.ts'],
+  measurement: ['tests/e2e/Test_Cases/Tree_Model/Measurement_Management/measurement-management.spec.ts'],
+  search: [
+    'tests/e2e/Test_Cases/Tree_Model/Search/data-search.spec.ts',
+    'tests/e2e/Test_Cases/Tree_Model/Search/statistic-search.spec.ts',
   ],
+  sql: ['tests/e2e/Test_Cases/Tree_Model/SQL_Search/sql-search.spec.ts'],
+  calculate: ['tests/e2e/Test_Cases/Tree_Model/Calculate_Detail/calculate.spec.ts'],
 };
 const runtimeTargets = new Set(['direct', 'real', '9190', 'dev', '8098']);
 
@@ -35,7 +37,13 @@ Modules:
   instance
   dashboard
   measurement
-  query
+  search
+  sql
+  calculate
+  search-cleanup
+  measurement-cleanup
+  calculate-cleanup
+  cleanup-all
   typecheck
   full
   full-real
@@ -46,15 +54,22 @@ Examples:
   start.bat login direct
   start.bat login headed
   start.bat measurement direct
+  start.bat search direct
+  start.bat sql direct
+  start.bat calculate direct
   start.bat measurement dev
   start.bat measurement headed
-  start.bat login instance dashboard
-  start.bat login instance dashboard measurement direct headed
-  start.bat login,instance,dashboard,measurement direct headed
+  start.bat login instance dashboard calculate
+  start.bat login instance dashboard measurement calculate direct headed
+  start.bat login,instance,dashboard,measurement,calculate direct headed
   start.bat full
   start.bat full headed
   start.bat full-real headed
   start.bat full-dev headed
+  start.bat search-cleanup
+  start.bat measurement-cleanup
+  start.bat calculate-cleanup
+  start.bat cleanup-all
   start.bat typecheck
   start.bat typecheck --dry-run
 
@@ -63,9 +78,10 @@ Notes:
   dev     = open local frontend on 127.0.0.1:8098 and proxy API to 127.0.0.1:9190
   report  = generate report without headed browser mode
   headed  = open browser and generate report
+  search-cleanup / measurement-cleanup / calculate-cleanup / cleanup-all = cleanup-only commands for real 127.0.0.1:9190 data
   typecheck = run TypeScript check for Playwright and tests/e2e via tsconfig.e2e.json
-  full/full-real = run all modules in direct mode on 127.0.0.1:9190
-  full-dev = run all modules in dev mode on 127.0.0.1:8098
+  full/full-real = run all modules including SQL and Calculate in direct mode on 127.0.0.1:9190
+  full-dev = run all modules including SQL and Calculate in dev mode on 127.0.0.1:8098
   --dry-run = print resolved command without executing`);
 }
 
@@ -268,6 +284,22 @@ function buildTypecheckCommandArgs() {
   return [tscScriptPath, '-p', 'tsconfig.e2e.json', '--noEmit'];
 }
 
+function buildCleanupCommandArgs(command) {
+  if (command === 'search-cleanup') {
+    return [cleanupScriptPath, 'search'];
+  }
+
+  if (command === 'measurement-cleanup') {
+    return [cleanupScriptPath, 'measurement'];
+  }
+
+  if (command === 'calculate-cleanup') {
+    return [cleanupScriptPath, 'calculate'];
+  }
+
+  return [cleanupScriptPath, 'all'];
+}
+
 async function runCommand(commandArgs, runtimeEnv) {
   return await new Promise((resolve) => {
     const child = spawn(process.execPath, commandArgs, {
@@ -295,6 +327,29 @@ try {
 
     console.log();
     console.log('[E2E] command=typecheck');
+
+    if (parsed.dryRun) {
+      console.log('[E2E] dry-run=true');
+      console.log(`[E2E] command=node ${commandArgs.join(' ')}`);
+      process.exit(0);
+    }
+
+    console.log();
+    const exitCode = await runCommand(commandArgs, process.env);
+    process.exit(exitCode);
+  }
+
+  if (
+    parsed.command === 'search-cleanup'
+    || parsed.command === 'measurement-cleanup'
+    || parsed.command === 'calculate-cleanup'
+    || parsed.command === 'cleanup-all'
+  ) {
+    const commandArgs = buildCleanupCommandArgs(parsed.command);
+
+    console.log();
+    console.log(`[E2E] command=${parsed.command}`);
+    console.log(`[E2E] baseURL=http://127.0.0.1:9190`);
 
     if (parsed.dryRun) {
       console.log('[E2E] dry-run=true');

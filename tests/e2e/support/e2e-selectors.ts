@@ -73,6 +73,7 @@ export const measurementManagementSelectors = {
   contextMenuDelete: '[data-testid="measurement-context-menu-delete"]',
   databaseModal: '[data-testid="measurement-database-modal"], #new-database-modal-database',
   databaseModalName: '[data-testid="measurement-database-modal-name"], #new-database-modal-groupName',
+  databaseModalCancel: '[data-testid="measurement-database-modal-cancel"], #new-database-modal-cancel',
   databaseModalConfirm: '[data-testid="measurement-database-modal-confirm"], #new-database-modal-confirm',
   measurementModal: '[data-testid="measurement-modal"], #measurement-modal-measurement',
   measurementModalConfirm: '[data-testid="measurement-modal-confirm"], #measurement-modal-confirm',

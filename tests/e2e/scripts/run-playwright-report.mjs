@@ -290,17 +290,18 @@ function buildMarkdownReport({
     for (const [file, fileResults] of grouped.entries()) {
       sections.push(`### ${path.basename(file)}`);
       sections.push('');
-      fileResults.forEach((item, index) => {
-        sections.push(`${index + 1}. ${item.title}`);
-        sections.push(`   结果: ${normalizeStatus(item.status)}`);
-        sections.push(`   所属套件: ${item.suiteTitle || '-'}`);
-        sections.push(`   浏览器项目: ${item.projectName || '-'}`);
-        sections.push(`   耗时: ${item.duration}`);
+      fileResults.forEach((item) => {
+        sections.push(`#### ${item.title}`);
+        sections.push('');
+        sections.push(`- 结果: ${normalizeStatus(item.status)}`);
+        sections.push(`- 所属套件: ${item.suiteTitle || '-'}`);
+        sections.push(`- 浏览器项目: ${item.projectName || '-'}`);
+        sections.push(`- 耗时: ${item.duration}`);
         if (item.errors.length) {
-          sections.push(`   失败信息: ${item.errors[0].split('\n')[0]}`);
+          sections.push(`- 失败信息: ${item.errors[0].split('\n')[0]}`);
         }
+        sections.push('');
       });
-      sections.push('');
     }
   }
 

@@ -1,8 +1,8 @@
-import { expect, test } from '@playwright/test';
-import { mockWorkbenchApi, seedClientState } from '../../support/workbench-test-support';
-import { InstanceManagementPage } from '../../pages/instance-management-page';
-import { LoginPage } from '../../pages/login-page';
-import { cleanupConnectionsByNames, cleanupConnectionsByPrefixes, ensureStandaloneConnectionExists, getConnectionListByApi, localhostConnection } from '../../support/connection-api';
+﻿import { expect, test } from '@playwright/test';
+import { mockWorkbenchApi, seedClientState } from '../../../support/workbench-test-support';
+import { InstanceManagementPage } from '../../../pages/instance-management-page';
+import { LoginPage } from '../../../pages/login-page';
+import { cleanupConnectionsByNames, cleanupConnectionsByPrefixes, ensureStandaloneConnectionExists, getConnectionListByApi, localhostConnection } from '../../../support/connection-api';
 
 const realBackendRun = process.env.PLAYWRIGHT_REAL_BACKEND === 'true';
 const tempInstancePrefix = 'TimechoDB-tmp-';
@@ -635,3 +635,4 @@ test.describe('实例管理', () => {
     });
   }
 });
+

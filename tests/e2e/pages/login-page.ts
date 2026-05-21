@@ -82,18 +82,36 @@ export class LoginPage {
     await expect(this.submitButton()).toBeVisible();
   }
 
-  async selectConnectionByName(name: string) {
-    await this.connectionSelect().click({ force: true });
-    const dropdown = this.page
+  private connectionDropdown() {
+    return this.page
       .locator('.el-select-dropdown')
       .filter({
         has: this.page.locator('.el-select-dropdown__item'),
       })
       .last();
-    await expect(dropdown).toBeVisible({ timeout: uiTimeouts.action });
-    const option = dropdown.locator('.el-select-dropdown__item').filter({ hasText: name }).first();
-    await expect(option).toBeVisible({ timeout: uiTimeouts.action });
-    await option.click();
+  }
+
+  async selectConnectionByName(name: string) {
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      await this.connectionSelect().click({ force: true });
+      const dropdown = this.connectionDropdown();
+      await expect(dropdown).toBeVisible({ timeout: uiTimeouts.action });
+
+      const option = dropdown.locator('.el-select-dropdown__item').filter({ hasText: name }).first();
+      const isVisible = await option.isVisible({ timeout: uiTimeouts.action }).catch(() => false);
+      if (isVisible) {
+        await option.click();
+        return;
+      }
+
+      await this.page.keyboard.press('Escape').catch(() => undefined);
+      if (attempt < 3) {
+        await this.page.reload({ waitUntil: 'domcontentloaded' });
+        await this.expectVisible();
+      }
+    }
+
+    throw new Error(`Connection option "${name}" was not visible in login dropdown after retries.`);
   }
 
   async login(options: { connectionName?: string; username?: string; password?: string }) {

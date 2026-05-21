@@ -1,22 +1,29 @@
 # IoTDB Workbench UI Automation
 
-`IoTDB_Workbench_UI_Auto` 是 IoTDB Workbench Web 端前端工程，同时已经集成一套基于 Playwright 的 UI 自动化能力。当前自动化以真实 Workbench + 真实 IoTDB 为主，默认使用简体中文界面执行。
+`IoTDB_Workbench_UI_Auto` 是基于 IoTDB Workbench 前端工程搭建的 UI 自动化项目，当前以 Playwright 为核心，面向真实 Workbench + 真实 IoTDB 环境执行回归。
+
+当前约定：
+
+- 默认使用中文界面执行。
+- 默认真实环境地址为 `http://127.0.0.1:9190`。
+- 当前树模型自动化已覆盖登录、实例管理、首页、测点管理、查询模块、SQL操作模块、视图页面模块。
+- `full` / `full-real` / `full-dev` 当前都包含 SQL 模块和视图页面模块。
 
 ## 1. 技术栈
 
 - 前端框架：Vue 3 + Vite + Element Plus
+- UI 自动化框架：Playwright
+- 语言与工程化：TypeScript + ESLint + Stylelint
 - 单元测试：Vitest
-- UI 自动化：Playwright
-- 语言与工程：TypeScript + ESLint + Stylelint
 
 ## 2. 前置条件
 
-执行任何 UI 自动化之前，先准备以下环境：
+执行 UI 自动化前，请先准备以下环境：
 
 - Node.js：`^20.19.0` 或 `>=22.12.0`
-- npm：建议使用与 Node.js 配套版本
+- npm
 - Playwright Chromium 浏览器依赖
-- 已启动的企业版 IoTDB 数据库
+- 已启动的 IoTDB 数据库
 - 已启动的 Workbench 服务
 
 建议安装命令：
@@ -26,110 +33,188 @@ npm install
 npx playwright install chromium
 ```
 
-Windows 下建议始终使用 `npm.cmd`，避免 PowerShell 执行策略拦截 `npm.ps1`。
+Windows 下建议统一使用 `npm.cmd`，避免 PowerShell 执行策略拦截 `npm.ps1`。
 
 ## 3. 默认真实环境配置
 
-当前真实环境默认按以下地址执行：
+当前项目默认使用以下真实环境：
 
 - Workbench 直连地址：`http://127.0.0.1:9190`
 - 本地前端调试地址：`http://127.0.0.1:8098`
 - IoTDB：`127.0.0.1:6667`
-- 默认实例名：`localhost`
-- 默认用户：`root`
-- Prometheus：`127.0.0.1:9090`
+- 默认实例名称：`localhost`
+- 默认用户名：`root`
+- 默认 Prometheus：`127.0.0.1:9090`
 
 相关配置文件：
 
-- Workbench / Playwright 地址配置：`playwright.config.ts`
+- Playwright 地址配置：`playwright.config.ts`
 - 实例连接默认配置：`tests/e2e/support/connection-api.ts`
+- 真实环境数据清理脚本：`tests/e2e/scripts/run-real-cleanup.mjs`
 
 ## 4. 运行模式
 
-### 4.1 `direct` 模式
+### 4.1 `direct`
 
-`direct` 模式直接访问已经启动好的 Workbench，不再由 Playwright 自动拉起本地前端。
+`direct` 模式直接访问已启动好的 Workbench，不由 Playwright 拉起本地前端。
 
 - 访问地址：`http://127.0.0.1:9190`
-- 自动设置：
+- 自动注入：
   - `PLAYWRIGHT_REAL_BACKEND=true`
   - `PLAYWRIGHT_BASE_URL=http://127.0.0.1:9190`
+  - `PLAYWRIGHT_REAL_BASE_URL=http://127.0.0.1:9190`
   - `PLAYWRIGHT_PORT=9190`
   - `PLAYWRIGHT_SKIP_WEBSERVER=true`
 - 适用场景：
   - 真实环境回归
   - 中文界面验证
-  - 登录 / 实例管理 / Dashboard / 查询页
-  - 测点管理当前也已支持 `9190` 直连执行
+  - 登录、实例管理、Dashboard、测点管理、查询模块、SQL操作模块、视图页面模块回归
 
-### 4.2 `dev` 模式
+### 4.2 `dev`
 
-`dev` 模式会启动本地前端页面，再把接口代理到真实 Workbench 后端。
+`dev` 模式会启动本地前端页面，再将接口代理到真实 Workbench 后端。
 
 - 前端地址：`http://127.0.0.1:8098`
 - API 代理：`http://127.0.0.1:9190`
-- 自动设置：
+- 自动注入：
   - `PLAYWRIGHT_REAL_BACKEND=true`
   - `PLAYWRIGHT_BASE_URL=http://127.0.0.1:8098`
+  - `PLAYWRIGHT_REAL_BASE_URL=http://127.0.0.1:9190`
   - `PLAYWRIGHT_PORT=8098`
   - `PLAYWRIGHT_SERVER_MODE=dev`
   - `PLAYWRIGHT_FORCE_WEBSERVER=true`
   - `CONFIG_API_PROXY=http://127.0.0.1:9190`
 - 适用场景：
-  - 前端 DOM 适配
-  - 本地开发调试
-  - 页面结构变化后的快速修复
+  - 本地联调
+  - DOM 结构适配
+  - 页面变更后的快速修复
 
-## 5. E2E 用例目录
+## 5. 用例目录
 
 ```text
 tests/e2e/
 ├─ Test_Cases/
-│  ├─ Instance_Login/
-│  │  └─ login.spec.ts
-│  ├─ Instance_Management/
-│  │  └─ instance-management.spec.ts
-│  ├─ Instance_Dashboard/
-│  │  └─ dashboard.spec.ts
-│  ├─ Measurement_Management/
-│  │  └─ measurement-management.spec.ts
-│  ├─ Search/
-│  │  ├─ data-search.spec.ts
-│  │  └─ statistic-search.spec.ts
-│  └─ SQL_Search/
-│     └─ sql-search.spec.ts
+│  ├─ Tree_Model/
+│  │  ├─ Instance_Login/
+│  │  │  └─ login.spec.ts
+│  │  ├─ Instance_Management/
+│  │  │  └─ instance-management.spec.ts
+│  │  ├─ Instance_Dashboard/
+│  │  │  └─ dashboard.spec.ts
+│  │  ├─ Measurement_Management/
+│  │  │  └─ measurement-management.spec.ts
+│  │  ├─ Search/
+│  │  │  ├─ data-search.spec.ts
+│  │  │  ├─ statistic-search.spec.ts
+│  │  │  └─ test-data/
+│  │  ├─ Calculate_Detail/
+│  │  │  └─ calculate.spec.ts
+│  │  └─ SQL_Search/
+│  │     └─ sql-search.spec.ts
+│  └─ Table_Model/
+│     ├─ Instance_Login/
+│     │  └─ .gitkeep
+│     ├─ Instance_Management/
+│     │  └─ .gitkeep
+│     ├─ Instance_Dashboard/
+│     │  └─ .gitkeep
+│     ├─ Measurement_Management/
+│     │  └─ .gitkeep
+│     ├─ Search/
+│     │  └─ .gitkeep
+│     ├─ Calculate_Detail/
+│     │  └─ .gitkeep
+│     └─ SQL_Search/
+│        └─ .gitkeep
 ├─ pages/
 ├─ support/
-│  ├─ e2e-selectors.ts
-│  ├─ workbench-test-support.ts
-│  ├─ connection-api.ts
-│  └─ real-query-data.ts
-├─ test-data/
-│  └─ data-import.csv
 ├─ scripts/
 ├─ reports/
 ├─ PAGE_CHANGE_CHECKLIST.md
-└─ XMind_Test_Case_Tree.md
+├─ XMind_Test_Case_Tree.md
+└─ MEASUREMENT_MANAGEMENT_STATUS.md
 ```
 
 说明：
 
-- `Test_Cases/` 目录统一承载所有模块测试用例目录与 spec 文件
-- 各模块原有目录名已保留，并统一收口到 `Test_Cases/` 下
-- 脚本中的 `query` 模块属于组合入口，会同时执行 `Test_Cases/Search/data-search.spec.ts`、`Test_Cases/SQL_Search/sql-search.spec.ts`、`Test_Cases/Search/statistic-search.spec.ts`
-- 上述 3 个查询真实用例均已纳入 `9190 direct` 模式回归
-- `support/workbench-test-support.ts` 承载 Playwright 测试支撑逻辑，例如 `mockWorkbenchApi`、`seedClientState`、`gotoLogin`
-- `test-data/` 用于放置 CSV 等静态样例文件，避免与测试支撑代码混放
-- `tsconfig.e2e.json` 为 Playwright / `tests/e2e` 专用 TypeScript 类型配置，已包含 `node`、`@playwright/test`、`DOM`
+- `Test_Cases/` 统一承载所有模块测试用例。
+- `Tree_Model/` 是当前树模型真实环境自动化主目录。
+- `Table_Model/` 已创建与树模型一致的模块骨架目录，当前仅保留 `.gitkeep` 占位文件。
+- `Search/` 当前包含 2 个查询用例文件：`data-search.spec.ts`、`statistic-search.spec.ts`。
+- `Search/test-data/` 存放查询模块导入、导出、真实环境验证所需测试数据文件。
+- `SQL_Search/` 为独立 SQL操作模块用例目录，当前执行入口已支持单独运行。
+- `Calculate_Detail/` 为视图页面模块用例目录，当前已接入真实环境统一执行入口。
 
-## 6. `sbin` 启动脚本
+## 6. 当前模块说明
 
-统一启动脚本位置：
+### 6.1 Tree_Model
+
+当前已落地模块：
+
+- `Instance_Login`
+- `Instance_Management`
+- `Instance_Dashboard`
+- `Measurement_Management`
+- `Search`
+- `Calculate_Detail`
+- `SQL_Search`
+
+补充说明：
+
+- `Search` 模块 = `data-search.spec.ts + statistic-search.spec.ts`
+  - 仅包含“数据查询”和“统计查询”
+- `SQL_Search` 模块 = `sql-search.spec.ts`
+  - 独立对应“SQL操作模块”
+- `Calculate_Detail` 模块 = `calculate.spec.ts`
+  - 对应“视图页面 / 新建视图 / 表达式交互 / 批量导入 / 导出 / 刷新 / 编辑 / 删除 / 分页”模块
+  - 当前真实环境已覆盖 `50` 条用例，包含：页面基础展示、筛选查询、结果测点跳转、表达式详情、新建视图、编辑视图、单条删除、批量删除、分页、导出 CSV/XLSX、刷新最新值、查看数据跳转、批量导入成功与异常场景
+  - 当前异常导入已覆盖：非法后缀、非法表头、部分成功 + 错误详情下载、非法表达式
+
+### 6.2 Table_Model
+
+当前状态：
+
+- 已建立与树模型同名的模块目录：
+  - `Instance_Login`
+  - `Instance_Management`
+  - `Instance_Dashboard`
+  - `Measurement_Management`
+  - `Search`
+  - `Calculate_Detail`
+  - `SQL_Search`
+- 目前仅保留目录骨架与 `.gitkeep` 占位文件。
+- 暂未接入当前默认执行入口，后续按表模型页面逐步补充并启用。
+
+## 7. 真实环境数据清理约定
+
+为避免真实 IoTDB 环境残留自动化测试数据，当前约定以下临时前缀：
+
+| 模块 | 临时数据前缀 | 主要清理位置 |
+| --- | --- | --- |
+| 查询模块 | `root.test_query_` | `tests/e2e/support/real-query-data.ts` |
+| 查询导入模块 | `root.test_csv_`、`root.test_xlsx_` | `tests/e2e/support/real-query-data.ts` |
+| 测点管理模块 | `root.db_auto_` | `measurement-management.spec.ts` |
+| 测点管理专项库 | `root.test` | `measurement-management.spec.ts` |
+| 视图页面模块 | `root.test_view_seed`、`root.test_view_seed.view_auto_`、`root.view.import.` | `calculate.spec.ts` / `tests/e2e/scripts/run-real-cleanup.mjs` |
+
+清理入口：
+
+- `npm.cmd run test:e2e:search:real:cleanup`
+- `npm.cmd run test:e2e:measurement:real:cleanup`
+- `npm.cmd run test:e2e:calculate:real:cleanup`
+- `.\sbin\start.bat search-cleanup`
+- `.\sbin\start.bat measurement-cleanup`
+- `.\sbin\start.bat calculate-cleanup`
+- `.\sbin\start.bat cleanup-all`
+
+## 8. 启动脚本
+
+统一脚本位置：
 
 - Windows：`sbin/start.bat`
 - Linux / macOS / Git Bash：`sbin/start.sh`
 
-### 6.1 语法
+### 8.1 语法
 
 Windows：
 
@@ -143,80 +228,102 @@ Shell：
 ./sbin/start.sh <module...|module1,module2,...> [direct|dev] [report|headed] [--dry-run]
 ```
 
-### 6.2 支持模块
+### 8.2 支持模块
 
 - `login`
 - `instance`
 - `dashboard`
 - `measurement`
-- `query`
+- `search`
+- `sql`
+- `calculate`
+- `search-cleanup`
+- `measurement-cleanup`
+- `calculate-cleanup`
+- `cleanup-all`
 - `typecheck`
 - `full`
 - `full-real`
 - `full-dev`
 
-模块与 `Test_Cases` 目录映射：
+### 8.3 模块映射
 
-| 模块名 | 对应目录 / 文件 |
+| 模块 | 对应 spec |
 | --- | --- |
-| `login` | `tests/e2e/Test_Cases/Instance_Login/login.spec.ts` |
-| `instance` | `tests/e2e/Test_Cases/Instance_Management/instance-management.spec.ts` |
-| `dashboard` | `tests/e2e/Test_Cases/Instance_Dashboard/dashboard.spec.ts` |
-| `measurement` | `tests/e2e/Test_Cases/Measurement_Management/measurement-management.spec.ts` |
-| `query` | `tests/e2e/Test_Cases/Search/data-search.spec.ts` + `tests/e2e/Test_Cases/SQL_Search/sql-search.spec.ts` + `tests/e2e/Test_Cases/Search/statistic-search.spec.ts` |
+| `login` | `tests/e2e/Test_Cases/Tree_Model/Instance_Login/login.spec.ts` |
+| `instance` | `tests/e2e/Test_Cases/Tree_Model/Instance_Management/instance-management.spec.ts` |
+| `dashboard` | `tests/e2e/Test_Cases/Tree_Model/Instance_Dashboard/dashboard.spec.ts` |
+| `measurement` | `tests/e2e/Test_Cases/Tree_Model/Measurement_Management/measurement-management.spec.ts` |
+| `search` | `tests/e2e/Test_Cases/Tree_Model/Search/data-search.spec.ts` + `tests/e2e/Test_Cases/Tree_Model/Search/statistic-search.spec.ts` |
+| `sql` | `tests/e2e/Test_Cases/Tree_Model/SQL_Search/sql-search.spec.ts` |
+| `calculate` | `tests/e2e/Test_Cases/Tree_Model/Calculate_Detail/calculate.spec.ts` |
 
-### 6.3 组合规则
+### 8.4 执行规则
 
-- 未指定运行模式时，默认是 `direct`
-- 未指定展示模式时，默认是 `report`
+- 不写运行模式时，默认 `direct`
+- 不写展示模式时，默认 `report`
 - `direct` 表示直连 `127.0.0.1:9190`
 - `dev` 表示启动本地前端 `127.0.0.1:8098`
-- `report` 表示执行后生成报告，不打开浏览器
-- `headed` 表示打开浏览器执行，并在结束后生成报告
-- `--dry-run` 只打印最终命令，不真正执行
+- `report` 表示执行并输出报告，不打开浏览器
+- `headed` 表示打开浏览器执行，并输出报告
+- `--dry-run` 只打印解析后的执行命令
 - 支持空格分隔多个模块
-- 支持英文逗号分隔多个模块
-- `full` 和 `full-real` 固定为全量 `direct`
-- `full-dev` 固定为全量 `dev`
-- `typecheck` 为特殊命令，不与其他模块混用，也不依赖 `direct|dev`、`report|headed`
+- 支持逗号分隔多个模块
+- `full` 和 `full-real` 固定走 `direct`
+- `full-dev` 固定走 `dev`
+- 当前 `full` / `full-real` / `full-dev` 都包含 `sql` 和 `calculate`
+- `typecheck` 不能与其他模块混用
+- `search-cleanup` / `measurement-cleanup` / `calculate-cleanup` / `cleanup-all` 仅做真实环境数据清理
 
-### 6.4 常用命令
+### 8.5 常见执行命令
 
-| 命令 | 说明 |
-| --- | --- |
-| `.\sbin\start.bat login` | 直连 `9190`，执行登录模块并生成报告 |
-| `.\sbin\start.bat instance headed` | 直连 `9190`，打开浏览器执行实例管理 |
-| `.\sbin\start.bat dashboard direct headed` | 显式指定 `direct`，打开浏览器执行首页 |
-| `.\sbin\start.bat measurement direct headed` | 直连 `9190`，打开浏览器执行测点管理 |
-| `.\sbin\start.bat query direct report` | 直连 `9190`，执行查询页并生成报告 |
-| `.\sbin\start.bat login,instance,dashboard direct headed` | 直连 `9190`，串行执行多个模块 |
-| `.\sbin\start.bat measurement dev headed` | 使用本地前端模式执行测点管理 |
-| `.\sbin\start.bat full` | 全量直连回归，默认生成报告 |
-| `.\sbin\start.bat full headed` | 全量直连回归，打开浏览器执行 |
-| `.\sbin\start.bat full-dev headed` | 全量本地前端模式执行 |
-| `.\sbin\start.bat query direct --dry-run` | 仅打印解析后的命令 |
-| `.\sbin\start.bat typecheck` | 执行 E2E TypeScript 类型检查 |
+```powershell
+.\sbin\start.bat login
+.\sbin\start.bat instance headed
+.\sbin\start.bat dashboard direct headed
+.\sbin\start.bat measurement direct headed
+.\sbin\start.bat search direct report
+.\sbin\start.bat sql direct report
+.\sbin\start.bat sql direct headed
+.\sbin\start.bat calculate direct report
+.\sbin\start.bat calculate direct headed
+.\sbin\start.bat login,instance,dashboard,calculate direct headed
+.\sbin\start.bat full
+.\sbin\start.bat full headed
+.\sbin\start.bat full-real headed
+.\sbin\start.bat full-dev headed
+.\sbin\start.bat search-cleanup
+.\sbin\start.bat measurement-cleanup
+.\sbin\start.bat calculate-cleanup
+.\sbin\start.bat cleanup-all
+.\sbin\start.bat typecheck
+```
 
-命令与实际用例目录对应关系：
+## 9. package.json 固定脚本
 
-- `.\sbin\start.bat login`
-  - 实际执行 `tests/e2e/Test_Cases/Instance_Login/login.spec.ts`
-- `.\sbin\start.bat instance`
-  - 实际执行 `tests/e2e/Test_Cases/Instance_Management/instance-management.spec.ts`
-- `.\sbin\start.bat dashboard`
-  - 实际执行 `tests/e2e/Test_Cases/Instance_Dashboard/dashboard.spec.ts`
-- `.\sbin\start.bat measurement`
-  - 实际执行 `tests/e2e/Test_Cases/Measurement_Management/measurement-management.spec.ts`
-- `.\sbin\start.bat query`
-  - 实际串行执行 `tests/e2e/Test_Cases/Search/data-search.spec.ts`
-  - 实际串行执行 `tests/e2e/Test_Cases/SQL_Search/sql-search.spec.ts`
-  - 实际串行执行 `tests/e2e/Test_Cases/Search/statistic-search.spec.ts`
-- `.\sbin\start.bat full`
-  - 实际覆盖 `Test_Cases` 下全部 7 个真实环境 spec
+### 9.1 单模块真实环境直跑
 
-## 7. package.json 固定脚本
+```powershell
+npm.cmd run test:e2e:login:real
+npm.cmd run test:e2e:login:real:headed
 
-### 7.1 单模块真实环境报告入口
+npm.cmd run test:e2e:instance:real
+npm.cmd run test:e2e:instance:real:headed
+
+npm.cmd run test:e2e:dashboard:real
+npm.cmd run test:e2e:dashboard:real:headed
+
+npm.cmd run test:e2e:measurement:real
+npm.cmd run test:e2e:measurement:real:headed
+
+npm.cmd run test:e2e:calculate:real
+npm.cmd run test:e2e:calculate:real:headed
+
+npm.cmd run test:e2e:sql:real
+npm.cmd run test:e2e:sql:real:headed
+```
+
+### 9.2 单模块真实环境报告入口
 
 ```powershell
 npm.cmd run test:e2e:login:real:report
@@ -231,51 +338,22 @@ npm.cmd run test:e2e:dashboard:real:headed:report
 npm.cmd run test:e2e:measurement:real:report
 npm.cmd run test:e2e:measurement:real:headed:report
 
-npm.cmd run test:e2e:query:real:report
-npm.cmd run test:e2e:query:real:headed:report
+npm.cmd run test:e2e:calculate:real:report
+npm.cmd run test:e2e:calculate:real:headed:report
+
+npm.cmd run test:e2e:search:real:report
+npm.cmd run test:e2e:search:real:headed:report
+
+npm.cmd run test:e2e:sql:real:report
+npm.cmd run test:e2e:sql:real:headed:report
 ```
 
-说明：
-
-- `test:e2e:query:*` 不是单文件入口，而是查询模块组合入口
-- 该入口会同时覆盖：
-  - `tests/e2e/Test_Cases/Search/data-search.spec.ts`
-  - `tests/e2e/Test_Cases/SQL_Search/sql-search.spec.ts`
-  - `tests/e2e/Test_Cases/Search/statistic-search.spec.ts`
-
-### 7.2 单模块真实环境直接执行
-
-```powershell
-npm.cmd run test:e2e:login:real
-npm.cmd run test:e2e:login:real:headed
-
-npm.cmd run test:e2e:instance:real
-npm.cmd run test:e2e:instance:real:headed
-
-npm.cmd run test:e2e:dashboard:real
-npm.cmd run test:e2e:dashboard:real:headed
-
-npm.cmd run test:e2e:measurement:real
-npm.cmd run test:e2e:measurement:real:headed
-```
-
-### 7.3 E2E 类型检查
-
-```powershell
-npm.cmd run test:e2e:typecheck
-```
-
-说明：
-
-- 用于校验 `tests/e2e/**/*.ts`、`playwright.config.ts` 的 TypeScript 类型
-- 底层使用 `tsconfig.e2e.json`
-- 当 `process`、`window`、`document` 等全局类型在 E2E 脚本中标红时，优先执行此命令排查
-
-### 7.4 全量入口
+### 9.3 全量入口
 
 ```powershell
 npm.cmd run test:e2e:full-real
 npm.cmd run test:e2e:full-real:headed
+
 npm.cmd run test:e2e:full-dev
 npm.cmd run test:e2e:full-dev:headed
 
@@ -285,70 +363,91 @@ npm.cmd run test:e2e:real:headed:report
 
 说明：
 
-- `test:e2e:full-real`：全量 `9190` 直连回归
-- `test:e2e:full-dev`：全量 `8098` 本地前端回归
-- `test:e2e:real:report`：全量真实环境 Markdown + HTML 报告
+- `test:e2e:real:report` 和 `test:e2e:real:headed:report` 当前覆盖 `login + instance + dashboard + measurement + search + sql + calculate`
 
-## 8. 9190 直连模式注意事项
+### 9.4 清理与类型检查
 
-### 8.1 执行前必须确认
+```powershell
+npm.cmd run test:e2e:measurement:real:cleanup
+npm.cmd run test:e2e:search:real:cleanup
+npm.cmd run test:e2e:calculate:real:cleanup
+npm.cmd run test:e2e:typecheck
+```
 
-- Workbench 已经真正启动并监听 `127.0.0.1:9190`
-- IoTDB 已经启动，且 `localhost` 实例可连接
-- 登录页语言为简体中文
-- 本次执行不依赖 Mock 拦截
+## 10. 报告输出
 
-Windows 下可用以下命令确认 `9190` 是否在监听：
+报告由 `tests/e2e/scripts/run-playwright-report.mjs` 统一生成，命名规则如下：
+
+- Markdown 报告：`tests/e2e/reports/Workbench-report_年-月-日_时-分-秒.md`
+- 最新 Markdown 报告：`tests/e2e/reports/Workbench-report_latest.md`
+- HTML 报告：`playwright-report/index.html`
+- JSON 报告：`tests/e2e/reports/.playwright-report.json`
+- 失败截图、视频、trace：`test-results/`
+
+报告内容默认包含：
+
+- 执行环境：`Workbench + IoTDB`
+- Workbench 地址：`http://127.0.0.1:9190`
+- 执行命令
+- 总体通过 / 失败统计
+- 分文件、分用例结果明细
+- 失败截图与相关产物
+
+## 11. 9190 直连模式注意事项
+
+执行前请确认：
+
+- Workbench 已启动并监听 `127.0.0.1:9190`
+- IoTDB 已启动
+- `localhost` 实例可正常登录
+- 本次执行不依赖 Mock
+
+Windows 可用以下命令确认 `9190` 是否监听：
 
 ```powershell
 netstat -ano | findstr 9190
 ```
 
-### 8.2 直连模式特性
+说明：
 
-- `direct` 模式不会自动启动 Workbench 服务
+- `direct` 模式不会帮你启动 Workbench
 - 如果 `127.0.0.1:9190` 未启动，用例会直接失败
-- 当前测点管理已适配真实 DOM，可直接跑在 `9190`
-- 查询页真实场景依赖测试前自动准备连接和种子数据
+- 查询页真实场景会自动准备连接和查询种子数据
+- SQL 用例已按真实 Workbench DOM 做兼容定位
+- 视图页面用例已按真实 Workbench DOM 做兼容定位与自动清理
 
-### 8.3 建议执行顺序
-
-当页面有较大变化时，建议优先按以下顺序检查：
+建议排查顺序：
 
 1. `login`
 2. `instance`
 3. `dashboard`
-4. `query`
-5. `measurement`
+4. `search`
+5. `sql`
+6. `calculate`
+7. `measurement`
 
-## 9. 报告输出位置
+## 12. 页面变更后的维护入口
 
-- Markdown 报告目录：`tests/e2e/reports/`
-- 最新 Markdown 报告：`tests/e2e/reports/Workbench-report_latest.md`
-- HTML 报告：`playwright-report/index.html`
-- JSON 报告：`tests/e2e/reports/.playwright-report.json`
-- 失败截图 / 视频 / trace：`test-results/`
+页面结构变化后，优先查看：
 
-## 10. 页面变化后的维护入口
-
-页面结构变化后，优先查看以下文件：
-
-- 变更清单：`tests/e2e/PAGE_CHANGE_CHECKLIST.md`
-- 稳定选择器：`tests/e2e/support/e2e-selectors.ts`
-- 登录页 Page Object：`tests/e2e/pages/login-page.ts`
-- 实例管理 Page Object：`tests/e2e/pages/instance-management-page.ts`
-- 测点管理 Page Object：`tests/e2e/pages/measurement-management-page.ts`
-- E2E 类型配置：`tsconfig.e2e.json`
+- `tests/e2e/PAGE_CHANGE_CHECKLIST.md`
+- `tests/e2e/CALCULATE_DETAIL_STATUS.md`
+- `tests/e2e/support/e2e-selectors.ts`
+- `tests/e2e/pages/login-page.ts`
+- `tests/e2e/pages/instance-management-page.ts`
+- `tests/e2e/pages/measurement-management-page.ts`
+- `tests/e2e/support/workbench-test-support.ts`
+- `tsconfig.e2e.json`
 
 建议维护顺序：
 
-1. 先补充或修正 `data-testid` / 稳定定位
-2. 再修 Page Object
-3. 最后修 `spec.ts` 断言
+1. 先补稳定定位，例如 `data-testid`
+2. 再改 Page Object
+3. 最后再改 spec 断言
 
-## 11. 常见问题
+## 13. 常见问题
 
-### 11.1 PowerShell 执行 `npm` 报脚本策略错误
+### 13.1 PowerShell 下执行 `npm` 报脚本策略错误
 
 请使用：
 
@@ -362,29 +461,29 @@ npm.cmd run test:e2e:login:real:headed:report
 npm run test:e2e:login:real:headed:report
 ```
 
-### 11.2 真实环境用例全部失败
+### 13.2 真实环境用例全部失败
 
 优先检查：
 
 - `127.0.0.1:9190` 是否可访问
 - IoTDB 是否已启动
-- `tests/e2e/support/connection-api.ts` 中的实例配置是否与当前环境一致
+- `tests/e2e/support/connection-api.ts` 中的连接配置是否与当前环境一致
 
-### 11.3 页面元素变化导致定位失效
+### 13.3 页面元素变化导致定位失败
 
 优先检查：
 
 - `tests/e2e/support/e2e-selectors.ts`
-- 对应页面的 `page object`
+- 对应 `page object`
 - `tests/e2e/PAGE_CHANGE_CHECKLIST.md`
 
-### 11.4 `process` 在 E2E 脚本中标红
+### 13.4 `process` 在 E2E 脚本中标红
 
-原因：
+当前项目已通过 `tsconfig.e2e.json` 注入：
 
-- `tests/e2e/**/*.ts` 需要 Node 类型声明
-- 当前项目已通过 `tsconfig.e2e.json` 单独为 E2E 脚本注入 `node` 与 `@playwright/test` 类型
-- 一般不需要重复安装 `@types/node`
+- `node`
+- `@playwright/test`
+- `DOM`
 
 排查方式：
 
@@ -392,7 +491,7 @@ npm run test:e2e:login:real:headed:report
 .\node_modules\.bin\tsc.cmd -p tsconfig.e2e.json --noEmit
 ```
 
-或直接使用固定脚本：
+或：
 
 ```powershell
 npm.cmd run test:e2e:typecheck
@@ -400,12 +499,12 @@ npm.cmd run test:e2e:typecheck
 
 如果编辑器仍然标红：
 
-- 重新加载 VS Code TypeScript Server
+- 重载 TypeScript Server
 - 重新打开工程目录
-- 确认当前文件位于 `tests/e2e/` 下，并由 `tsconfig.e2e.json` 覆盖
+- 确认当前文件位于 `tests/e2e/` 覆盖范围内
 
-## 12. 编码约定
+## 14. 编码约定
 
 - 测试标题统一使用 UTF-8 简体中文
-- Markdown 报告统一使用 UTF-8
-- Windows 环境推荐使用 `npm.cmd`
+- Markdown 文档统一使用 UTF-8
+- Windows 环境建议统一使用 `npm.cmd`

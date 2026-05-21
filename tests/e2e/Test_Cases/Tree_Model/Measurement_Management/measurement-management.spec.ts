@@ -1,12 +1,12 @@
-import { expect, test, type Page } from '@playwright/test';
+﻿import { expect, test, type Page } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import { rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { getOpenedUrls, seedClientState } from '../../support/workbench-test-support';
-import { LoginPage } from '../../pages/login-page';
-import { MeasurementManagementPage } from '../../pages/measurement-management-page';
-import { ensureStandaloneConnectionExists, localhostConnection } from '../../support/connection-api';
+import { getOpenedUrls, seedClientState } from '../../../support/workbench-test-support';
+import { LoginPage } from '../../../pages/login-page';
+import { MeasurementManagementPage } from '../../../pages/measurement-management-page';
+import { ensureStandaloneConnectionExists, localhostConnection } from '../../../support/connection-api';
 
 const realBackendRun = process.env.PLAYWRIGHT_REAL_BACKEND === 'true';
 
@@ -41,12 +41,17 @@ async function deleteDatabasesForPagination(
   measurementPage: MeasurementManagementPage,
   databaseNames: string[],
 ) {
-  await measurementPage.cleanupKnownRootDatabases(databaseNames);
+  for (const databaseName of databaseNames) {
+    await measurementPage.deleteDatabaseByApi(databaseName).catch(() => undefined);
+  }
 }
 
 async function cleanupMeasurementArtifacts(measurementPage: MeasurementManagementPage) {
   await measurementPage.cleanupDatabasesByPrefixApi('root.db_auto_');
 }
+
+const rootTestDatabaseName = 'test';
+const rootTestDatabasePath = `root.${rootTestDatabaseName}`;
 
 const measurementDescriptionTipText = '仅支持输入字母大小写、数字、下划线、UNICODE 中文字符，特殊字符以及实数需要用反引号进行引用';
 const measurementTagTipText = '标签输入格式为“key=value”，若输入多个标签请使用“;”进行切割';
@@ -58,6 +63,14 @@ function buildFixedLengthText(prefix: string, targetLength: number) {
     return base;
   }
   return `${base}${'x'.repeat(targetLength - base.length)}`;
+}
+
+function buildValidTagText(targetLength: number) {
+  const prefix = 'k=';
+  if (targetLength <= prefix.length) {
+    return prefix.slice(0, targetLength);
+  }
+  return `${prefix}${'v'.repeat(targetLength - prefix.length)}`;
 }
 
 function createMeasurementImportCsvFile(
@@ -209,6 +222,53 @@ async function loginAndPrepareTempDatabase(page: Page, databaseName = `db_auto_$
   };
 }
 
+async function loginAndPrepareMeasurementList(page: Page) {
+  const loginPage = new LoginPage(page);
+  const measurementPage = new MeasurementManagementPage(page);
+
+  await loginPage.goto();
+  await loginPage.login({
+    connectionName: localhostConnection.name,
+    password: localhostConnection.password,
+  });
+  await loginPage.expectDashboardLanding(localhostConnection.name, `${localhostConnection.host}:${localhostConnection.port}`);
+
+  await page.evaluate(() => {
+    window.localStorage.removeItem('measurementCols');
+  });
+  await measurementPage.gotoMeasurementList();
+  await cleanupMeasurementArtifacts(measurementPage);
+  await measurementPage.refreshMeasurementTree();
+
+  return {
+    loginPage,
+    measurementPage,
+  };
+}
+
+async function prepareRootTestDatabaseByUi(page: Page) {
+  const { measurementPage } = await loginAndPrepareMeasurementList(page);
+
+  await measurementPage.deleteDatabaseByApi(rootTestDatabaseName).catch(() => undefined);
+  await measurementPage.refreshMeasurementTree();
+  await measurementPage.openCreateDatabaseModal('root');
+  await measurementPage.databaseModalNameInput().fill(rootTestDatabaseName);
+  await measurementPage.submitDatabaseModal();
+  await measurementPage.ensureNodeVisible(rootTestDatabasePath);
+  await expect(measurementPage.nodeByPath(rootTestDatabasePath)).toBeVisible();
+
+  return {
+    measurementPage,
+    databaseName: rootTestDatabaseName,
+    databasePath: rootTestDatabasePath,
+  };
+}
+
+async function cleanupRootTestDatabase(measurementPage: MeasurementManagementPage) {
+  await measurementPage.dismissMeasurementModalIfVisible().catch(() => undefined);
+  await measurementPage.deleteDatabaseByApi(rootTestDatabaseName).catch(() => undefined);
+}
+
 async function cleanupTempDatabase(
   page: Page,
   measurementPage: MeasurementManagementPage,
@@ -225,6 +285,36 @@ async function cleanupTempDatabase(
   }
 }
 
+async function cleanupMeasurementArtifactsForPage(page: Page) {
+  if (page.isClosed()) {
+    return;
+  }
+
+  const loginPage = new LoginPage(page);
+  const measurementPage = new MeasurementManagementPage(page);
+
+  try {
+    await page.goto('/view/measurement-management/list', { waitUntil: 'domcontentloaded' }).catch(() => undefined);
+
+    const loginVisible = await loginPage.pageRoot().isVisible().catch(() => false);
+    if (loginVisible) {
+      await loginPage.login({
+        connectionName: localhostConnection.name,
+        password: localhostConnection.password,
+      });
+      await loginPage.expectDashboardLanding(localhostConnection.name, `${localhostConnection.host}:${localhostConnection.port}`);
+    }
+
+    await measurementPage.gotoMeasurementList().catch(() => undefined);
+    await measurementPage.dismissMeasurementModalIfVisible().catch(() => undefined);
+    await measurementPage.dismissDatabaseModal('close').catch(() => undefined);
+    await cleanupMeasurementArtifacts(measurementPage).catch(() => undefined);
+    await cleanupRootTestDatabase(measurementPage).catch(() => undefined);
+  } catch {
+    // Ignore teardown failures so assertion results remain primary.
+  }
+}
+
 test.describe('测点管理', () => {
   // 测点管理当前仅在真实 Workbench + IoTDB 环境下执行，不走 Mock。
   test.skip(!realBackendRun, '需启动 Workbench + IoTDB 环境下执行');
@@ -236,8 +326,12 @@ test.describe('测点管理', () => {
     await ensureStandaloneConnectionExists(request, localhostConnection);
   });
 
+  test.afterEach(async ({ page }) => {
+    await cleanupMeasurementArtifactsForPage(page);
+  });
+
   // 第一段覆盖菜单展开、测点列表基础操作、导入导出、筛选、删除、行内编辑等核心列表能力。
-  test('1. 登录 localhost 后展开测点管理菜单，展示测点列表和数据模型模块', async ({ page }) => {
+  test('1. 登录 localhost 后展开【测点管理】菜单，分别展示【测点列表】和【数据模型】模块', async ({ page }) => {
     const loginPage = new LoginPage(page);
     const measurementPage = new MeasurementManagementPage(page);
 
@@ -253,12 +347,9 @@ test.describe('测点管理', () => {
     await expect(page.getByText('数据模型', { exact: true }).first()).toBeVisible();
   });
 
-  test('2. 切换到测点管理界面后，右键 root 可新建数据库和新建测点', async ({ page }) => {
+  test('2. 切换到【测点列表】界面后，右键 root 可新建数据库和新建测点', async ({ page }) => {
     const loginPage = new LoginPage(page);
     const measurementPage = new MeasurementManagementPage(page);
-    const names = buildMeasurementNames();
-    const databasePath = `root.${names.databaseName}`;
-    const measurementPath = `${databasePath}.${names.measurementName}`;
 
     await loginPage.goto();
     await loginPage.login({
@@ -266,33 +357,14 @@ test.describe('测点管理', () => {
       password: localhostConnection.password,
     });
 
+    // 该用例只校验 root 主节点右键菜单的两个核心入口可见。
     await measurementPage.gotoMeasurementList();
     await cleanupMeasurementArtifacts(measurementPage);
     await measurementPage.openNodeContextMenu('root');
     await measurementPage.expectRootContextMenuActions();
-
-    try {
-      await measurementPage.createDatabase(names.databaseName);
-      await measurementPage.createMeasurement(databasePath, {
-        name: names.measurementName,
-        alias: names.alias,
-        description: names.description,
-        tags: names.tags,
-        dataType: 'BOOLEAN',
-      });
-      await measurementPage.expectMeasurementVisible(measurementPath);
-    } finally {
-      if (page.isClosed()) {
-        return;
-      }
-      const databaseNode = measurementPage.nodeByPath(databasePath);
-      if (await databaseNode.count()) {
-        await measurementPage.deleteNode(databasePath).catch(() => undefined);
-      }
-    }
   });
 
-  test('3. 数据库列表选中 root 后，右侧展示 root 信息与 root 列表及默认工具栏', async ({ page }) => {
+  test('3. 数据库列表选中主节点 root 后，右侧展示 root 信息与 root 列表及默认工具栏', async ({ page }) => {
     const loginPage = new LoginPage(page);
     const measurementPage = new MeasurementManagementPage(page);
 
@@ -2452,24 +2524,11 @@ test.describe('测点管理', () => {
   });
 
   test('75. 数据模型页面刷新后可展示已新建的数据库，并展开查看新增测点', async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    const measurementPage = new MeasurementManagementPage(page);
     const names = buildMeasurementNames();
-    const databasePath = `root.${names.databaseName}`;
+    const { measurementPage, databasePath } = await loginAndPrepareTempDatabase(page, names.databaseName);
     const measurementPath = `${databasePath}.${names.measurementName}`;
 
-    await loginPage.goto();
-    await loginPage.login({
-      connectionName: localhostConnection.name,
-      password: localhostConnection.password,
-    });
-
-    await measurementPage.gotoMeasurementList();
-    await cleanupMeasurementArtifacts(measurementPage);
-
     try {
-      await measurementPage.openNodeContextMenu('root');
-      await measurementPage.createDatabase(names.databaseName);
       await measurementPage.createMeasurement(databasePath, {
         name: names.measurementName,
         alias: names.alias,
@@ -2490,35 +2549,15 @@ test.describe('测点管理', () => {
       const subtreePaths = await measurementPage.fetchDataModelSubtreePaths(databasePath, 4);
       expect(subtreePaths.some((path) => path === measurementPath || path.endsWith(`.${names.measurementName}`))).toBe(true);
     } finally {
-      if (page.isClosed()) {
-        return;
-      }
-      await measurementPage.gotoMeasurementList().catch(() => undefined);
-      const databaseNode = measurementPage.nodeByPath(databasePath);
-      if (await databaseNode.count()) {
-        await measurementPage.deleteNode(databasePath).catch(() => undefined);
-      }
+      await cleanupTempDatabase(page, measurementPage, databasePath);
     }
   });
 
   test('76. 数据模型图谱中数据库节点可展开并收起子树区域', async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    const measurementPage = new MeasurementManagementPage(page);
     const names = buildMeasurementNames();
-    const databasePath = `root.${names.databaseName}`;
-
-    await loginPage.goto();
-    await loginPage.login({
-      connectionName: localhostConnection.name,
-      password: localhostConnection.password,
-    });
-
-    await measurementPage.gotoMeasurementList();
-    await cleanupMeasurementArtifacts(measurementPage);
+    const { measurementPage, databasePath } = await loginAndPrepareTempDatabase(page, names.databaseName);
 
     try {
-      await measurementPage.openNodeContextMenu('root');
-      await measurementPage.createDatabase(names.databaseName);
       await measurementPage.createMeasurement(databasePath, {
         name: names.measurementName,
         alias: names.alias,
@@ -2547,14 +2586,7 @@ test.describe('测点管理', () => {
       const collapsedHash = hashBuffer(await measurementPage.screenshotDataModelChart());
       expect(collapsedHash).not.toBe(expandedHash);
     } finally {
-      if (page.isClosed()) {
-        return;
-      }
-      await measurementPage.gotoMeasurementList().catch(() => undefined);
-      const databaseNode = measurementPage.nodeByPath(databasePath);
-      if (await databaseNode.count()) {
-        await measurementPage.deleteNode(databasePath).catch(() => undefined);
-      }
+      await cleanupTempDatabase(page, measurementPage, databasePath);
     }
   });
   test('77. 数据模型图谱分页节点支持下一页和上一页切换', async ({ page }) => {
@@ -3270,4 +3302,229 @@ test.describe('测点管理', () => {
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
   });
+
+  // 这一组覆盖“新建数据库”弹窗的基础表单校验与关闭行为。
+  test('102. 新建数据库时名称为空会提示请输入数据库名称', async ({ page }) => {
+    // 不填写数据库名称直接提交，校验前端必填红字提示。
+    const { measurementPage } = await loginAndPrepareMeasurementList(page);
+
+    try {
+      await measurementPage.openCreateDatabaseModal('root');
+      await measurementPage.submitDatabaseModal({ expectSuccess: false });
+
+      await expect(measurementPage.databaseModalValidationErrors().filter({ hasText: '请输入数据库名称' }).first()).toBeVisible();
+      await expect(measurementPage.databaseModal()).toBeVisible();
+    } finally {
+      await measurementPage.dismissDatabaseModal('cancel').catch(() => undefined);
+    }
+  });
+
+  test('103. 新建数据库名称最多支持输入 59 个字符并可创建成功', async ({ page }) => {
+    // 输入超长名称后应被截断为 59 位，并允许按截断后的值成功创建。
+    const suffix = Date.now();
+    const databaseName = buildFixedLengthText(`db_auto_name_limit_${suffix}_`, 59);
+    const overlongDatabaseName = `${databaseName}_overflow`;
+    const { measurementPage } = await loginAndPrepareMeasurementList(page);
+
+    try {
+      await measurementPage.openCreateDatabaseModal('root');
+      await expect(measurementPage.databaseModalNameInput()).toHaveAttribute('maxlength', '59');
+      await measurementPage.databaseModalNameInput().fill(overlongDatabaseName);
+      await expect(measurementPage.databaseModalNameInput()).toHaveValue(databaseName);
+
+      await measurementPage.submitDatabaseModal();
+      await measurementPage.ensureNodeVisible(`root.${databaseName}`);
+      await expect(measurementPage.nodeByPath(`root.${databaseName}`)).toBeVisible();
+    } finally {
+      await measurementPage.deleteDatabaseByApi(databaseName).catch(() => undefined);
+    }
+  });
+
+  test('104. 新建数据库输入名称后点击取消或关闭按钮时弹窗关闭且数据库不会创建', async ({ page }) => {
+    // 分别验证点击取消按钮和右上角关闭按钮时，数据库都不会被实际创建。
+    const suffix = Date.now();
+    const cancelDatabaseName = `db_auto_cancel_${suffix}`;
+    const closeDatabaseName = `db_auto_close_${suffix}`;
+    const { measurementPage } = await loginAndPrepareMeasurementList(page);
+
+    try {
+      await measurementPage.openCreateDatabaseModal('root');
+      await measurementPage.databaseModalNameInput().fill(cancelDatabaseName);
+      await measurementPage.dismissDatabaseModal('cancel');
+      await measurementPage.refreshMeasurementTree();
+      await expect(measurementPage.nodeByPath(`root.${cancelDatabaseName}`)).toHaveCount(0);
+
+      await measurementPage.openCreateDatabaseModal('root');
+      await measurementPage.databaseModalNameInput().fill(closeDatabaseName);
+      await measurementPage.dismissDatabaseModal('close');
+      await measurementPage.refreshMeasurementTree();
+      await expect(measurementPage.nodeByPath(`root.${closeDatabaseName}`)).toHaveCount(0);
+    } finally {
+      await measurementPage.deleteDatabaseByApi(cancelDatabaseName).catch(() => undefined);
+      await measurementPage.deleteDatabaseByApi(closeDatabaseName).catch(() => undefined);
+    }
+  });
+
+  test('105. 通过 UI 新建数据库 root.test 后，右键该数据库选择【新建测点】可打开弹窗', async ({ page }) => {
+    // 先通过 root 节点右键创建 root.test，再从 root.test 右键进入“新建测点”。
+    const { measurementPage, databasePath } = await prepareRootTestDatabaseByUi(page);
+
+    try {
+      await measurementPage.openMeasurementModal(databasePath);
+      await expect(measurementPage.measurementModal()).toBeVisible();
+    } finally {
+      await cleanupRootTestDatabase(measurementPage);
+    }
+  });
+
+  test('106. root.test 的新建测点弹窗中，测点名称为空时提交提示请输入内容后操作', async ({ page }) => {
+    // 不填写测点名称直接提交，校验输入框底部红字提示。
+    const { measurementPage, databasePath } = await prepareRootTestDatabaseByUi(page);
+
+    try {
+      await measurementPage.openMeasurementModal(databasePath);
+      await measurementPage.submitMeasurementModal({ expectSuccess: false });
+
+      await expect(measurementPage.measurementModalValidationErrors().filter({ hasText: '请输入内容后操作' }).first()).toBeVisible();
+      await expect(measurementPage.measurementModal()).toBeVisible();
+    } finally {
+      await cleanupRootTestDatabase(measurementPage);
+    }
+  });
+
+  test('107. root.test 的新建测点弹窗中，测点别名最多支持输入 100 个字符', async ({ page }) => {
+    // 输入超长别名后，前端应截断为 100 个字符，并可按截断值成功创建。
+    const suffix = Date.now();
+    const measurementName = `root_test_alias_${suffix}`;
+    const expectedAlias = buildFixedLengthText(`alias_limit_${suffix}_`, 100);
+    const aliasOverLimit = `${expectedAlias}_overflow`;
+    const { measurementPage, databasePath } = await prepareRootTestDatabaseByUi(page);
+
+    try {
+      await measurementPage.openMeasurementModal(databasePath);
+      await measurementPage.fillMeasurementRow(0, {
+        name: measurementName,
+        alias: aliasOverLimit,
+      });
+
+      await expect(measurementPage.measurementModalFieldInput(0, 'alias')).toHaveAttribute('maxlength', '100');
+      await measurementPage.expectMeasurementModalFieldValue(0, 'alias', expectedAlias);
+      await measurementPage.submitMeasurementModal();
+
+      await measurementPage.openMeasurementNode(databasePath);
+      await measurementPage.ensureTableColumns(['alias']);
+      await measurementPage.expectDatabaseTableRowContains(measurementName, expectedAlias);
+    } finally {
+      await cleanupRootTestDatabase(measurementPage);
+    }
+  });
+
+  test('108. root.test 的新建测点弹窗中，测点描述最多支持输入 100 个字符', async ({ page }) => {
+    // 输入超长测点描述后，前端应截断为 100 个字符，并可按截断值成功创建。
+    const suffix = Date.now();
+    const measurementName = `root_test_description_${suffix}`;
+    const expectedDescription = buildFixedLengthText(`description_limit_${suffix}_`, 100);
+    const descriptionOverLimit = `${expectedDescription}_overflow`;
+    const { measurementPage, databasePath } = await prepareRootTestDatabaseByUi(page);
+
+    try {
+      await measurementPage.openMeasurementModal(databasePath);
+      await measurementPage.fillMeasurementRow(0, {
+        name: measurementName,
+        description: descriptionOverLimit,
+      });
+
+      await expect(measurementPage.measurementModalFieldInput(0, 'description')).toHaveAttribute('maxlength', '100');
+      await measurementPage.expectMeasurementModalFieldValue(0, 'description', expectedDescription);
+      await measurementPage.submitMeasurementModal();
+
+      await measurementPage.openMeasurementNode(databasePath);
+      await measurementPage.ensureTableColumns(['description']);
+      await measurementPage.expectDatabaseTableRowContains(measurementName, expectedDescription);
+    } finally {
+      await cleanupRootTestDatabase(measurementPage);
+    }
+  });
+
+  test('109. root.test 的新建测点弹窗中，标签最多支持输入 100 个字符', async ({ page }) => {
+    // 输入超长且合法的标签文本后，前端应截断为 100 个字符，并按截断值保存。
+    const suffix = Date.now();
+    const measurementName = `root_test_tags_${suffix}`;
+    const expectedTags = buildValidTagText(100);
+    const tagsOverLimit = `${expectedTags}overflow`;
+    const { measurementPage, databasePath } = await prepareRootTestDatabaseByUi(page);
+
+    try {
+      await measurementPage.openMeasurementModal(databasePath);
+      await measurementPage.fillMeasurementRow(0, {
+        name: measurementName,
+        tags: tagsOverLimit,
+      });
+
+      await expect(measurementPage.measurementModalFieldInput(0, 'tags')).toHaveAttribute('maxlength', '100');
+      await measurementPage.expectMeasurementModalFieldValue(0, 'tags', expectedTags);
+      await measurementPage.submitMeasurementModal();
+
+      await measurementPage.openMeasurementNode(databasePath);
+      await measurementPage.ensureTableColumns(['tags']);
+      await measurementPage.openTagDetailByMeasurementName(measurementName);
+      await measurementPage.expectTagDetailValue(expectedTags);
+      await measurementPage.closeTagDetailModal();
+    } finally {
+      await cleanupRootTestDatabase(measurementPage);
+    }
+  });
+
+  test('110. root.test 的新建测点弹窗中，hover 测点描述问号可展示说明提示', async ({ page }) => {
+    // 基于 root.test 场景校验测点描述问号的 tooltip 文案。
+    const { measurementPage, databasePath } = await prepareRootTestDatabaseByUi(page);
+
+    try {
+      await measurementPage.openMeasurementModal(databasePath);
+      await measurementPage.descriptionTooltipIcon().hover({ force: true });
+      await expect(page.getByText(measurementDescriptionTipText, { exact: true })).toBeVisible();
+    } finally {
+      await cleanupRootTestDatabase(measurementPage);
+    }
+  });
+
+  test('111. root.test 的新建测点弹窗中，hover 标签问号可展示说明提示', async ({ page }) => {
+    // 基于 root.test 场景校验标签问号的 tooltip 文案。
+    const { measurementPage, databasePath } = await prepareRootTestDatabaseByUi(page);
+
+    try {
+      await measurementPage.openMeasurementModal(databasePath);
+      await measurementPage.tagTooltipIcon().hover({ force: true });
+      await expect(page.getByText(measurementTagTipText, { exact: true })).toBeVisible();
+    } finally {
+      await cleanupRootTestDatabase(measurementPage);
+    }
+  });
+
+  test('112. root.test 的新建测点弹窗点击取消按钮或右上角 X 后关闭弹窗且不会创建测点', async ({ page }) => {
+    // 分别验证取消按钮和右上角 X 关闭时，弹窗关闭且测点不会被创建。
+    const suffix = Date.now();
+    const cancelMeasurementName = `cancel_only_${suffix}`;
+    const closeMeasurementName = `close_only_${suffix}`;
+    const { measurementPage, databasePath } = await prepareRootTestDatabaseByUi(page);
+
+    try {
+      await measurementPage.openMeasurementModal(databasePath);
+      await measurementPage.fillMeasurementRow(0, {
+        name: cancelMeasurementName,
+      });
+      await measurementPage.dismissMeasurementModal('cancel');
+      await expect(measurementPage.nodeByPath(`${databasePath}.${cancelMeasurementName}`)).toHaveCount(0);
+
+      await measurementPage.openMeasurementModal(databasePath);
+      await measurementPage.fillMeasurementRow(0, {
+        name: closeMeasurementName,
+      });
+      await measurementPage.dismissMeasurementModal('close');
+      await expect(measurementPage.nodeByPath(`${databasePath}.${closeMeasurementName}`)).toHaveCount(0);
+    } finally {
+      await cleanupRootTestDatabase(measurementPage);
+    }
+  });
 });
+
