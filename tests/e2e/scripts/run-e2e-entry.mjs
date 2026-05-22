@@ -5,25 +5,98 @@ const repoRoot = process.cwd();
 const reportScriptPath = path.join(repoRoot, 'tests', 'e2e', 'scripts', 'run-playwright-report.mjs');
 const cleanupScriptPath = path.join(repoRoot, 'tests', 'e2e', 'scripts', 'run-real-cleanup.mjs');
 const tscScriptPath = path.join(repoRoot, 'node_modules', 'typescript', 'bin', 'tsc');
-const orderedModules = ['login', 'instance', 'dashboard', 'measurement', 'search', 'sql', 'calculate'];
+
+const moduleDefinitions = [
+  {
+    key: 'instance',
+    displayName: '实例管理',
+    aliases: ['instance', 'instance-management'],
+    specs: ['tests/e2e/Test_Cases/Tree_Model/Instance_Management/instance-management.spec.ts'],
+  },
+  {
+    key: 'login',
+    displayName: '登录',
+    aliases: ['login'],
+    specs: ['tests/e2e/Test_Cases/Tree_Model/Instance_Login/login.spec.ts'],
+  },
+  {
+    key: 'dashboard',
+    displayName: '首页',
+    aliases: ['dashboard', 'home'],
+    specs: ['tests/e2e/Test_Cases/Tree_Model/Instance_Dashboard/dashboard.spec.ts'],
+  },
+  {
+    key: 'measurement',
+    displayName: '测点管理',
+    aliases: ['measurement', 'measurement-management'],
+    specs: ['tests/e2e/Test_Cases/Tree_Model/Measurement_Management/measurement-management.spec.ts'],
+  },
+  {
+    key: 'search',
+    displayName: '查询',
+    aliases: ['search', 'query'],
+    specs: ['tests/e2e/Test_Cases/Tree_Model/Search/data-search.spec.ts', 'tests/e2e/Test_Cases/Tree_Model/Search/statistic-search.spec.ts'],
+  },
+  {
+    key: 'sql',
+    displayName: 'SQL操作',
+    aliases: ['sql', 'sql-operation'],
+    specs: ['tests/e2e/Test_Cases/Tree_Model/SQL_Search/sql-search.spec.ts'],
+  },
+  {
+    key: 'ai-analysis',
+    displayName: 'AI分析',
+    aliases: ['ai-analysis', 'ai'],
+    specs: [],
+  },
+  {
+    key: 'visualization',
+    displayName: '可视化',
+    aliases: ['visualization', 'visual'],
+    specs: [],
+  },
+  {
+    key: 'view',
+    displayName: '视图',
+    aliases: ['view', 'calculate'],
+    specs: ['tests/e2e/Test_Cases/Tree_Model/Calculate_Detail/calculate.spec.ts'],
+  },
+  {
+    key: 'data-sync',
+    displayName: '数据同步',
+    aliases: ['data-sync', 'sync'],
+    specs: [],
+  },
+  {
+    key: 'auth',
+    displayName: '权限管理',
+    aliases: ['auth', 'permission', 'permission-management'],
+    specs: ['tests/e2e/Test_Cases/Tree_Model/System/Auth/User/user.spec.ts', 'tests/e2e/Test_Cases/Tree_Model/System/Auth/Role/role.spec.ts'],
+  },
+  {
+    key: 'audit',
+    displayName: '审计日志',
+    aliases: ['audit', 'audit-log'],
+    specs: ['tests/e2e/Test_Cases/Tree_Model/System/Audit/audit.spec.ts'],
+  },
+  {
+    key: 'db-config',
+    displayName: '数据库配置',
+    aliases: ['db-config', 'database-config', 'config'],
+    specs: ['tests/e2e/Test_Cases/Tree_Model/System/Config/config.spec.ts'],
+  },
+];
+
+const moduleDefinitionMap = new Map(moduleDefinitions.map((definition) => [definition.key, definition]));
+const moduleAliasMap = new Map(moduleDefinitions.flatMap((definition) => definition.aliases.map((alias) => [alias, definition.key])));
+const allModuleKeys = moduleDefinitions.map((definition) => definition.key);
+const orderedModules = moduleDefinitions.filter((definition) => definition.specs.length).map((definition) => definition.key);
 const specialCommands = ['typecheck', 'search-cleanup', 'measurement-cleanup', 'calculate-cleanup', 'cleanup-all'];
-const fullModules = ['login', 'instance', 'dashboard', 'measurement', 'search', 'sql', 'calculate'];
+const fullModules = ['instance', 'login', 'dashboard', 'measurement', 'search', 'sql', 'view', 'auth', 'audit', 'db-config'];
 const presetModuleMap = {
   full: fullModules,
   'full-real': fullModules,
   'full-dev': [...fullModules],
-};
-const moduleSpecMap = {
-  login: ['tests/e2e/Test_Cases/Tree_Model/Instance_Login/login.spec.ts'],
-  instance: ['tests/e2e/Test_Cases/Tree_Model/Instance_Management/instance-management.spec.ts'],
-  dashboard: ['tests/e2e/Test_Cases/Tree_Model/Instance_Dashboard/dashboard.spec.ts'],
-  measurement: ['tests/e2e/Test_Cases/Tree_Model/Measurement_Management/measurement-management.spec.ts'],
-  search: [
-    'tests/e2e/Test_Cases/Tree_Model/Search/data-search.spec.ts',
-    'tests/e2e/Test_Cases/Tree_Model/Search/statistic-search.spec.ts',
-  ],
-  sql: ['tests/e2e/Test_Cases/Tree_Model/SQL_Search/sql-search.spec.ts'],
-  calculate: ['tests/e2e/Test_Cases/Tree_Model/Calculate_Detail/calculate.spec.ts'],
 };
 const runtimeTargets = new Set(['direct', 'real', '9190', 'dev', '8098']);
 
@@ -33,13 +106,19 @@ function printUsage() {
   ./start.sh <module...|module1,module2,...> [direct|dev] [report|headed] [--dry-run]
 
 Modules:
+  instance | instance-management
   login
-  instance
-  dashboard
-  measurement
-  search
-  sql
-  calculate
+  dashboard | home
+  measurement | measurement-management
+  search | query
+  sql | sql-operation
+  view | calculate
+  auth | permission | permission-management
+  ai-analysis | ai
+  visualization | visual
+  data-sync | sync
+  audit | audit-log
+  db-config | database-config | config
   search-cleanup
   measurement-cleanup
   calculate-cleanup
@@ -51,17 +130,18 @@ Modules:
 
 Examples:
   start.bat login
-  start.bat login direct
-  start.bat login headed
-  start.bat measurement direct
-  start.bat search direct
-  start.bat sql direct
-  start.bat calculate direct
+  start.bat instance-management direct
+  start.bat home headed
+  start.bat measurement-management direct
+  start.bat query direct
+  start.bat sql-operation direct
+  start.bat view direct
+  start.bat auth direct
   start.bat measurement dev
   start.bat measurement headed
-  start.bat login instance dashboard calculate
-  start.bat login instance dashboard measurement calculate direct headed
-  start.bat login,instance,dashboard,measurement,calculate direct headed
+  start.bat login instance home view
+  start.bat login instance home measurement query view auth direct headed
+  start.bat login,instance,home,measurement,query,view,auth direct headed
   start.bat full
   start.bat full headed
   start.bat full-real headed
@@ -78,10 +158,12 @@ Notes:
   dev     = open local frontend on 127.0.0.1:8098 and proxy API to 127.0.0.1:9190
   report  = generate report without headed browser mode
   headed  = open browser and generate report
+  auth = run user + role management specs under permission management
+  ai-analysis / visualization / data-sync = reserved business-module aliases, no spec implemented yet
   search-cleanup / measurement-cleanup / calculate-cleanup / cleanup-all = cleanup-only commands for real 127.0.0.1:9190 data
   typecheck = run TypeScript check for Playwright and tests/e2e via tsconfig.e2e.json
-  full/full-real = run all modules including SQL and Calculate in direct mode on 127.0.0.1:9190
-  full-dev = run all modules including SQL and Calculate in dev mode on 127.0.0.1:8098
+  full/full-real = run all currently covered modules in direct mode on 127.0.0.1:9190
+  full-dev = run all currently covered modules in dev mode on 127.0.0.1:8098
   --dry-run = print resolved command without executing`);
 }
 
@@ -158,14 +240,16 @@ function parseArgs(argv) {
     };
   }
 
+  const resolvedRawModules = rawModules.map((moduleName) => moduleAliasMap.get(moduleName) ?? moduleName);
+
   const uniqueModules = [];
-  for (const moduleName of rawModules) {
+  for (const moduleName of resolvedRawModules) {
     if (!uniqueModules.includes(moduleName)) {
       uniqueModules.push(moduleName);
     }
   }
 
-  const allowedModules = new Set([...orderedModules, ...specialCommands, ...Object.keys(presetModuleMap)]);
+  const allowedModules = new Set([...allModuleKeys, ...specialCommands, ...Object.keys(presetModuleMap)]);
   const invalidModules = uniqueModules.filter((moduleName) => !allowedModules.has(moduleName));
   if (invalidModules.length) {
     throw new Error(`Unsupported module(s): ${invalidModules.join(', ')}`);
@@ -177,12 +261,7 @@ function parseArgs(argv) {
   }
 
   const modules = selectedPreset ? [...presetModuleMap[selectedPreset]] : uniqueModules;
-  const resolvedRuntimeTarget =
-    runtimeTarget === 'real' || runtimeTarget === '9190'
-      ? 'direct'
-      : runtimeTarget === '8098'
-        ? 'dev'
-        : runtimeTarget;
+  const resolvedRuntimeTarget = runtimeTarget === 'real' || runtimeTarget === '9190' ? 'direct' : runtimeTarget === '8098' ? 'dev' : runtimeTarget;
 
   if (selectedPreset === 'full-dev' && resolvedRuntimeTarget === 'direct') {
     throw new Error('The "full-dev" preset cannot run in direct mode. Use "full" or "full-real" instead.');
@@ -206,7 +285,16 @@ function parseArgs(argv) {
 function buildSpecList(modules) {
   const specs = [];
   for (const moduleName of modules) {
-    for (const spec of moduleSpecMap[moduleName]) {
+    const definition = moduleDefinitionMap.get(moduleName);
+    if (!definition) {
+      throw new Error(`Unsupported module "${moduleName}".`);
+    }
+
+    if (!definition.specs.length) {
+      throw new Error(`The "${definition.displayName}" module is recognized, but no automation spec has been implemented yet.`);
+    }
+
+    for (const spec of definition.specs) {
       if (!specs.includes(spec)) {
         specs.push(spec);
       }
@@ -339,12 +427,7 @@ try {
     process.exit(exitCode);
   }
 
-  if (
-    parsed.command === 'search-cleanup'
-    || parsed.command === 'measurement-cleanup'
-    || parsed.command === 'calculate-cleanup'
-    || parsed.command === 'cleanup-all'
-  ) {
+  if (parsed.command === 'search-cleanup' || parsed.command === 'measurement-cleanup' || parsed.command === 'calculate-cleanup' || parsed.command === 'cleanup-all') {
     const commandArgs = buildCleanupCommandArgs(parsed.command);
 
     console.log();
@@ -370,9 +453,11 @@ try {
     reportKey,
     mode: parsed.mode,
   });
+  const requestedDisplayModules = parsed.requestedModules.map((moduleName) => moduleDefinitionMap.get(moduleName)?.displayName ?? moduleName).join(',');
 
   console.log();
   console.log(`[E2E] modules=${parsed.requestedModules.join(',')}`);
+  console.log(`[E2E] modulesDisplay=${requestedDisplayModules}`);
   console.log(`[E2E] mode=${parsed.mode}`);
   console.log(`[E2E] target=${runtime.runtimeTarget}`);
   console.log(`[E2E] baseURL=${runtime.baseURL}`);

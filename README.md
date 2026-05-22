@@ -6,8 +6,10 @@
 
 - 默认使用中文界面执行。
 - 默认真实环境地址为 `http://127.0.0.1:9190`。
-- 当前树模型自动化已覆盖登录、实例管理、首页、测点管理、查询模块、SQL操作模块、视图页面模块。
-- `full` / `full-real` / `full-dev` 当前都包含 SQL 模块和视图页面模块。
+- 当前自动化文档口径统一按 `13` 个一级业务模块管理。
+- 当前树模型自动化已覆盖：实例管理、登录、首页、测点管理、查询、SQL操作、视图、权限管理、审计日志、数据库配置。
+- 当前未覆盖：AI分析、可视化、数据同步。
+- `full` / `full-real` / `full-dev` 当前覆盖：实例管理、登录、首页、测点管理、查询、SQL操作、视图、权限管理、审计日志、数据库配置。
 
 ## 1. 技术栈
 
@@ -68,7 +70,7 @@ Windows 下建议统一使用 `npm.cmd`，避免 PowerShell 执行策略拦截 `
 - 适用场景：
   - 真实环境回归
   - 中文界面验证
-  - 登录、实例管理、Dashboard、测点管理、查询模块、SQL操作模块、视图页面模块回归
+  - 登录、实例管理、首页、测点管理、查询、SQL操作、视图、权限管理、审计日志、数据库配置模块回归
 
 ### 4.2 `dev`
 
@@ -109,8 +111,17 @@ tests/e2e/
 │  │  │  └─ test-data/
 │  │  ├─ Calculate_Detail/
 │  │  │  └─ calculate.spec.ts
-│  │  └─ SQL_Search/
-│  │     └─ sql-search.spec.ts
+│  │  ├─ SQL_Search/
+│  │  │  └─ sql-search.spec.ts
+│  │  └─ System/
+│  │     ├─ Audit/
+│  │     ├─ Auth/
+│  │     │  ├─ Role/
+│  │     │  │  └─ role.spec.ts
+│  │     │  └─ User/
+│  │     │     └─ user.spec.ts
+│  │     └─ Config/
+│  │        └─ config.spec.ts
 │  └─ Table_Model/
 │     ├─ Instance_Login/
 │     │  └─ .gitkeep
@@ -122,14 +133,17 @@ tests/e2e/
 │     │  └─ .gitkeep
 │     ├─ Search/
 │     │  └─ .gitkeep
-│     ├─ Calculate_Detail/
+│     ├─ SQL_Search/
 │     │  └─ .gitkeep
-│     └─ SQL_Search/
-│        └─ .gitkeep
+│     └─ System/
+│        ├─ Audit/
+│        ├─ Auth/
+│        └─ Config/
 ├─ pages/
 ├─ support/
 ├─ scripts/
 ├─ reports/
+├─ AUTOMATION_COVERAGE_MATRIX.md
 ├─ PAGE_CHANGE_CHECKLIST.md
 ├─ XMind_Test_Case_Tree.md
 └─ MEASUREMENT_MANAGEMENT_STATUS.md
@@ -139,63 +153,83 @@ tests/e2e/
 
 - `Test_Cases/` 统一承载所有模块测试用例。
 - `Tree_Model/` 是当前树模型真实环境自动化主目录。
-- `Table_Model/` 已创建与树模型一致的模块骨架目录，当前仅保留 `.gitkeep` 占位文件。
-- `Search/` 当前包含 2 个查询用例文件：`data-search.spec.ts`、`statistic-search.spec.ts`。
+- `Table_Model/` 已创建首批骨架目录，当前仅保留 `.gitkeep` 占位文件。
+- `Search/` 当前包含 2 个查询用例文件：`data-search.spec.ts`、`statistic-search.spec.ts`，统一归属一级模块“查询”。
 - `Search/test-data/` 存放查询模块导入、导出、真实环境验证所需测试数据文件。
-- `SQL_Search/` 为独立 SQL操作模块用例目录，当前执行入口已支持单独运行。
-- `Calculate_Detail/` 为视图页面模块用例目录，当前已接入真实环境统一执行入口。
+- `SQL_Search/` 为一级模块“SQL操作”用例目录。
+- `Calculate_Detail/` 为一级模块“视图”用例目录。
+- `System/Auth/` 为一级模块“权限管理”下的用户管理、角色管理目录。
+- `System/Audit/` 为一级模块“审计日志”首批真实环境用例目录。
+- `System/Config/` 当前已落地数据库配置首批真实环境用例。
+- `AUTOMATION_COVERAGE_MATRIX.md` 统一记录当前 13 个一级业务模块的覆盖状态。
 
 ## 6. 当前模块说明
 
-### 6.1 Tree_Model
+当前统一按以下 `13` 个一级业务模块管理：
 
-当前已落地模块：
+1. 实例管理
+2. 登录
+3. 首页
+4. 测点管理
+5. 查询
+6. SQL操作
+7. AI分析
+8. 可视化
+9. 视图
+10. 数据同步
+11. 权限管理
+12. 审计日志
+13. 数据库配置
 
-- `Instance_Login`
-- `Instance_Management`
-- `Instance_Dashboard`
-- `Measurement_Management`
-- `Search`
-- `Calculate_Detail`
-- `SQL_Search`
+### 6.1 当前已覆盖
 
-补充说明：
+- 1. 实例管理
+- 2. 登录
+- 3. 首页
+- 4. 测点管理
+- 5. 查询
+- 6. SQL操作
+- 9. 视图
+- 11. 权限管理
+- 12. 审计日志
+- 13. 数据库配置
 
-- `Search` 模块 = `data-search.spec.ts + statistic-search.spec.ts`
-  - 仅包含“数据查询”和“统计查询”
-- `SQL_Search` 模块 = `sql-search.spec.ts`
-  - 独立对应“SQL操作模块”
-- `Calculate_Detail` 模块 = `calculate.spec.ts`
-  - 对应“视图页面 / 新建视图 / 表达式交互 / 批量导入 / 导出 / 刷新 / 编辑 / 删除 / 分页”模块
-  - 当前真实环境已覆盖 `50` 条用例，包含：页面基础展示、筛选查询、结果测点跳转、表达式详情、新建视图、编辑视图、单条删除、批量删除、分页、导出 CSV/XLSX、刷新最新值、查看数据跳转、批量导入成功与异常场景
-  - 当前异常导入已覆盖：非法后缀、非法表头、部分成功 + 错误详情下载、非法表达式
+### 6.2 当前部分覆盖
 
-### 6.2 Table_Model
+- 11. 权限管理
+  - 当前仅覆盖：用户管理、角色管理的页面展示与新建主流程
+  - 当前未覆盖：编辑、删除、授权、搜索筛选等深层能力
+- 12. 审计日志
+  - 当前已覆盖：页面基础展示、列表列头展示、空结果提示
+  - 当前未覆盖：分页、详情弹窗、查询重置组合、导出能力
+- 13. 数据库配置
+  - 当前已覆盖：页面展示、官网文档跳转、ConfigNode/DataNode 切换、刷新、重置、节点生效、全部生效
+  - 当前未覆盖：更多配置参数组合、异常提示、权限边界与多节点差异校验
 
-当前状态：
+### 6.3 当前未覆盖
 
-- 已建立与树模型同名的模块目录：
-  - `Instance_Login`
-  - `Instance_Management`
-  - `Instance_Dashboard`
-  - `Measurement_Management`
-  - `Search`
-  - `Calculate_Detail`
-  - `SQL_Search`
-- 目前仅保留目录骨架与 `.gitkeep` 占位文件。
-- 暂未接入当前默认执行入口，后续按表模型页面逐步补充并启用。
+- 7. AI分析
+- 8. 可视化
+- 10. 数据同步
+
+### 6.4 Tree_Model 与 Table_Model 状态
+
+- `Tree_Model/` 是当前真实环境自动化主目录，已承载当前全部 `313` 条可执行用例。
+- `Table_Model/` 当前仅建立首批骨架目录，尚未落地 spec 和执行入口。
+- 当前覆盖详情、用例数和缺口统一见：
+  - `tests/e2e/AUTOMATION_COVERAGE_MATRIX.md`
 
 ## 7. 真实环境数据清理约定
 
 为避免真实 IoTDB 环境残留自动化测试数据，当前约定以下临时前缀：
 
-| 模块 | 临时数据前缀 | 主要清理位置 |
-| --- | --- | --- |
-| 查询模块 | `root.test_query_` | `tests/e2e/support/real-query-data.ts` |
-| 查询导入模块 | `root.test_csv_`、`root.test_xlsx_` | `tests/e2e/support/real-query-data.ts` |
-| 测点管理模块 | `root.db_auto_` | `measurement-management.spec.ts` |
-| 测点管理专项库 | `root.test` | `measurement-management.spec.ts` |
-| 视图页面模块 | `root.test_view_seed`、`root.test_view_seed.view_auto_`、`root.view.import.` | `calculate.spec.ts` / `tests/e2e/scripts/run-real-cleanup.mjs` |
+| 模块           | 临时数据前缀                                                                 | 主要清理位置                                                   |
+| -------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| 查询模块       | `root.test_query_`                                                           | `tests/e2e/support/real-query-data.ts`                         |
+| 查询导入模块   | `root.test_csv_`、`root.test_xlsx_`                                          | `tests/e2e/support/real-query-data.ts`                         |
+| 测点管理模块   | `root.db_auto_`                                                              | `measurement-management.spec.ts`                               |
+| 测点管理专项库 | `root.test`                                                                  | `measurement-management.spec.ts`                               |
+| 视图页面模块   | `root.test_view_seed`、`root.test_view_seed.view_auto_`、`root.view.import.` | `calculate.spec.ts` / `tests/e2e/scripts/run-real-cleanup.mjs` |
 
 清理入口：
 
@@ -232,11 +266,31 @@ Shell：
 
 - `login`
 - `instance`
+- `instance-management`
 - `dashboard`
+- `home`
 - `measurement`
+- `measurement-management`
 - `search`
+- `query`
 - `sql`
+- `sql-operation`
 - `calculate`
+- `view`
+- `auth`
+- `permission`
+- `permission-management`
+- `ai-analysis`
+- `ai`
+- `visualization`
+- `visual`
+- `data-sync`
+- `sync`
+- `audit`
+- `audit-log`
+- `db-config`
+- `database-config`
+- `config`
 - `search-cleanup`
 - `measurement-cleanup`
 - `calculate-cleanup`
@@ -248,15 +302,26 @@ Shell：
 
 ### 8.3 模块映射
 
-| 模块 | 对应 spec |
-| --- | --- |
-| `login` | `tests/e2e/Test_Cases/Tree_Model/Instance_Login/login.spec.ts` |
-| `instance` | `tests/e2e/Test_Cases/Tree_Model/Instance_Management/instance-management.spec.ts` |
-| `dashboard` | `tests/e2e/Test_Cases/Tree_Model/Instance_Dashboard/dashboard.spec.ts` |
-| `measurement` | `tests/e2e/Test_Cases/Tree_Model/Measurement_Management/measurement-management.spec.ts` |
-| `search` | `tests/e2e/Test_Cases/Tree_Model/Search/data-search.spec.ts` + `tests/e2e/Test_Cases/Tree_Model/Search/statistic-search.spec.ts` |
-| `sql` | `tests/e2e/Test_Cases/Tree_Model/SQL_Search/sql-search.spec.ts` |
-| `calculate` | `tests/e2e/Test_Cases/Tree_Model/Calculate_Detail/calculate.spec.ts` |
+| 模块                                            | 对应 spec                                                                                                                         |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `login`                                         | `tests/e2e/Test_Cases/Tree_Model/Instance_Login/login.spec.ts`                                                                    |
+| `instance` / `instance-management`              | `tests/e2e/Test_Cases/Tree_Model/Instance_Management/instance-management.spec.ts`                                                 |
+| `dashboard` / `home`                            | `tests/e2e/Test_Cases/Tree_Model/Instance_Dashboard/dashboard.spec.ts`                                                            |
+| `measurement` / `measurement-management`        | `tests/e2e/Test_Cases/Tree_Model/Measurement_Management/measurement-management.spec.ts`                                           |
+| `search` / `query`                              | `tests/e2e/Test_Cases/Tree_Model/Search/data-search.spec.ts` + `tests/e2e/Test_Cases/Tree_Model/Search/statistic-search.spec.ts`  |
+| `sql` / `sql-operation`                         | `tests/e2e/Test_Cases/Tree_Model/SQL_Search/sql-search.spec.ts`                                                                   |
+| `calculate` / `view`                            | `tests/e2e/Test_Cases/Tree_Model/Calculate_Detail/calculate.spec.ts`                                                              |
+| `auth` / `permission` / `permission-management` | `tests/e2e/Test_Cases/Tree_Model/System/Auth/User/user.spec.ts` + `tests/e2e/Test_Cases/Tree_Model/System/Auth/Role/role.spec.ts` |
+| `audit` / `audit-log`                           | `tests/e2e/Test_Cases/Tree_Model/System/Audit/audit.spec.ts`                                                                      |
+| `db-config` / `database-config` / `config`      | `tests/e2e/Test_Cases/Tree_Model/System/Config/config.spec.ts`                                                                    |
+
+预留别名说明：
+
+- `ai-analysis` / `ai`
+- `visualization` / `visual`
+- `data-sync` / `sync`
+
+以上模块别名当前已被入口脚本识别，但对应 spec 尚未落地，执行时会提示“模块已识别但尚未实现自动化”。
 
 ### 8.4 执行规则
 
@@ -271,7 +336,7 @@ Shell：
 - 支持逗号分隔多个模块
 - `full` 和 `full-real` 固定走 `direct`
 - `full-dev` 固定走 `dev`
-- 当前 `full` / `full-real` / `full-dev` 都包含 `sql` 和 `calculate`
+- 当前 `full` / `full-real` / `full-dev` 都包含 `instance + login + dashboard + measurement + search + sql + calculate + auth + audit + db-config`
 - `typecheck` 不能与其他模块混用
 - `search-cleanup` / `measurement-cleanup` / `calculate-cleanup` / `cleanup-all` 仅做真实环境数据清理
 
@@ -280,14 +345,23 @@ Shell：
 ```powershell
 .\sbin\start.bat login
 .\sbin\start.bat instance headed
+.\sbin\start.bat instance-management direct report
 .\sbin\start.bat dashboard direct headed
+.\sbin\start.bat home direct headed
 .\sbin\start.bat measurement direct headed
+.\sbin\start.bat measurement-management direct headed
 .\sbin\start.bat search direct report
+.\sbin\start.bat query direct report
 .\sbin\start.bat sql direct report
+.\sbin\start.bat sql-operation direct report
 .\sbin\start.bat sql direct headed
 .\sbin\start.bat calculate direct report
+.\sbin\start.bat view direct report
 .\sbin\start.bat calculate direct headed
-.\sbin\start.bat login,instance,dashboard,calculate direct headed
+.\sbin\start.bat auth direct report
+.\sbin\start.bat audit direct report
+.\sbin\start.bat db-config direct headed
+.\sbin\start.bat login,instance,home,view,auth,audit,db-config direct headed
 .\sbin\start.bat full
 .\sbin\start.bat full headed
 .\sbin\start.bat full-real headed
@@ -316,11 +390,23 @@ npm.cmd run test:e2e:dashboard:real:headed
 npm.cmd run test:e2e:measurement:real
 npm.cmd run test:e2e:measurement:real:headed
 
+npm.cmd run test:e2e:search:real
+npm.cmd run test:e2e:search:real:headed
+
 npm.cmd run test:e2e:calculate:real
 npm.cmd run test:e2e:calculate:real:headed
 
 npm.cmd run test:e2e:sql:real
 npm.cmd run test:e2e:sql:real:headed
+
+npm.cmd run test:e2e:auth:real
+npm.cmd run test:e2e:auth:real:headed
+
+npm.cmd run test:e2e:audit:real
+npm.cmd run test:e2e:audit:real:headed
+
+npm.cmd run test:e2e:db-config:real
+npm.cmd run test:e2e:db-config:real:headed
 ```
 
 ### 9.2 单模块真实环境报告入口
@@ -346,6 +432,15 @@ npm.cmd run test:e2e:search:real:headed:report
 
 npm.cmd run test:e2e:sql:real:report
 npm.cmd run test:e2e:sql:real:headed:report
+
+npm.cmd run test:e2e:auth:real:report
+npm.cmd run test:e2e:auth:real:headed:report
+
+npm.cmd run test:e2e:audit:real:report
+npm.cmd run test:e2e:audit:real:headed:report
+
+npm.cmd run test:e2e:db-config:real:report
+npm.cmd run test:e2e:db-config:real:headed:report
 ```
 
 ### 9.3 全量入口
@@ -363,7 +458,8 @@ npm.cmd run test:e2e:real:headed:report
 
 说明：
 
-- `test:e2e:real:report` 和 `test:e2e:real:headed:report` 当前覆盖 `login + instance + dashboard + measurement + search + sql + calculate`
+- `test:e2e:real:report` 和 `test:e2e:real:headed:report` 当前覆盖 `instance + login + dashboard + measurement + search + sql + calculate + auth + audit + db-config`
+- 上述入口对应的一级业务模块为：`实例管理 + 登录 + 首页 + 测点管理 + 查询 + SQL操作 + 视图 + 权限管理 + 审计日志 + 数据库配置`
 
 ### 9.4 清理与类型检查
 
@@ -415,6 +511,7 @@ netstat -ano | findstr 9190
 - 查询页真实场景会自动准备连接和查询种子数据
 - SQL 用例已按真实 Workbench DOM 做兼容定位
 - 视图页面用例已按真实 Workbench DOM 做兼容定位与自动清理
+- 当前覆盖矩阵和模块缺口统一维护在 `tests/e2e/AUTOMATION_COVERAGE_MATRIX.md`
 
 建议排查顺序：
 
