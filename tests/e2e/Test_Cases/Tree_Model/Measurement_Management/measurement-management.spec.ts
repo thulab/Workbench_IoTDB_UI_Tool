@@ -10,6 +10,21 @@ import { ensureStandaloneConnectionExists, localhostConnection } from '../../../
 
 const realBackendRun = process.env.PLAYWRIGHT_REAL_BACKEND === 'true';
 
+function safeRemoveFile(filePath: string) {
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    try {
+      rmSync(filePath, { force: true });
+      return;
+    } catch (error) {
+      const code = typeof error === 'object' && error && 'code' in error ? String((error as { code?: unknown }).code || '') : '';
+      if (code !== 'EPERM' && code !== 'EBUSY') {
+        return;
+      }
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 150);
+    }
+  }
+}
+
 function hashBuffer(buffer: Buffer) {
   return createHash('md5').update(buffer).digest('hex');
 }
@@ -30,17 +45,11 @@ function buildPaginationDatabaseNames(count = 9) {
   return Array.from({ length: count }, (_, index) => `db_auto_${suffix}_${index + 1}`);
 }
 
-async function createDatabasesForPagination(
-  measurementPage: MeasurementManagementPage,
-  databaseNames: string[],
-) {
+async function createDatabasesForPagination(measurementPage: MeasurementManagementPage, databaseNames: string[]) {
   return measurementPage.createRootDatabasesUntilPagination(databaseNames);
 }
 
-async function deleteDatabasesForPagination(
-  measurementPage: MeasurementManagementPage,
-  databaseNames: string[],
-) {
+async function deleteDatabasesForPagination(measurementPage: MeasurementManagementPage, databaseNames: string[]) {
   for (const databaseName of databaseNames) {
     await measurementPage.deleteDatabaseByApi(databaseName).catch(() => undefined);
   }
@@ -55,7 +64,8 @@ const rootTestDatabasePath = `root.${rootTestDatabaseName}`;
 
 const measurementDescriptionTipText = '仅支持输入字母大小写、数字、下划线、UNICODE 中文字符，特殊字符以及实数需要用反引号进行引用';
 const measurementTagTipText = '标签输入格式为“key=value”，若输入多个标签请使用“;”进行切割';
-const measurementImportTemplateHeader = 'device(设备名称),measurement(测点名称),alias(别名),description(测点描述),label(标签key=value),dataType(数据类型),isAligned(是否为对齐序列，对齐序列:true 非对齐:false),encoding(编码方式),compressor(压缩方式)';
+const measurementImportTemplateHeader =
+  'device(设备名称),measurement(测点名称),alias(别名),description(测点描述),label(标签key=value),dataType(数据类型),isAligned(是否为对齐序列，对齐序列:true 非对齐:false),encoding(编码方式),compressor(压缩方式)';
 
 function buildFixedLengthText(prefix: string, targetLength: number) {
   const base = prefix.slice(0, targetLength);
@@ -149,7 +159,7 @@ async function importMeasurementsIntoDatabase(
     await measurementPage.importMeasurementsFromFile(importFilePath);
     await measurementPage.openMeasurementNode(databasePath);
   } finally {
-    rmSync(importFilePath, { force: true });
+    safeRemoveFile(importFilePath);
   }
 }
 
@@ -269,11 +279,7 @@ async function cleanupRootTestDatabase(measurementPage: MeasurementManagementPag
   await measurementPage.deleteDatabaseByApi(rootTestDatabaseName).catch(() => undefined);
 }
 
-async function cleanupTempDatabase(
-  page: Page,
-  measurementPage: MeasurementManagementPage,
-  databasePath: string,
-) {
+async function cleanupTempDatabase(page: Page, measurementPage: MeasurementManagementPage, databasePath: string) {
   if (page.isClosed()) {
     return;
   }
@@ -296,7 +302,10 @@ async function cleanupMeasurementArtifactsForPage(page: Page) {
   try {
     await page.goto('/view/measurement-management/list', { waitUntil: 'domcontentloaded' }).catch(() => undefined);
 
-    const loginVisible = await loginPage.pageRoot().isVisible().catch(() => false);
+    const loginVisible = await loginPage
+      .pageRoot()
+      .isVisible()
+      .catch(() => false);
     if (loginVisible) {
       await loginPage.login({
         connectionName: localhostConnection.name,
@@ -476,7 +485,7 @@ test.describe('测点管理', () => {
       await measurementPage.expectDatabaseTableRowCountByMeasurementName(firstName, 1);
       await measurementPage.expectDatabaseTableRowCountByMeasurementName(secondName, 1);
     } finally {
-      rmSync(importFilePath, { force: true });
+      safeRemoveFile(importFilePath);
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
   });
@@ -500,7 +509,7 @@ test.describe('测点管理', () => {
       await measurementPage.importMeasurementsFromFile(importFilePath);
       await measurementPage.expectDatabaseTableRowCountByMeasurementName(measurementName, 1);
     } finally {
-      rmSync(importFilePath, { force: true });
+      safeRemoveFile(importFilePath);
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
   });
@@ -715,9 +724,7 @@ test.describe('测点管理', () => {
       await measurementPage.refreshDatabaseDetail();
       await measurementPage.expectDatabaseTableRowCountByMeasurementName(firstMeasurement, 1);
       await measurementPage.expectDatabaseTableRowCountByMeasurementName(secondMeasurement, 0);
-      await expect
-        .poll(async () => measurementPage.getVisibleDatabaseTableHeaders())
-        .toEqual(expect.arrayContaining(['测点名称', '别名', '测点描述']));
+      await expect.poll(async () => measurementPage.getVisibleDatabaseTableHeaders()).toEqual(expect.arrayContaining(['测点名称', '别名', '测点描述']));
       await measurementPage.expectDatabaseTableRowContains(firstMeasurement, alias);
       await measurementPage.expectDatabaseTableRowContains(firstMeasurement, description);
     } finally {
@@ -782,12 +789,8 @@ test.describe('测点管理', () => {
 
       await measurementPage.openColumnFilter();
       await measurementPage.columnFilterResetAndConfirmVisible();
-      await expect
-        .poll(async () => measurementPage.getVisibleDatabaseTableHeaders())
-        .toContain('测点名称');
-      await expect
-        .poll(async () => measurementPage.getVisibleDatabaseTableHeaders())
-        .not.toContain('最新值时间');
+      await expect.poll(async () => measurementPage.getVisibleDatabaseTableHeaders()).toContain('测点名称');
+      await expect.poll(async () => measurementPage.getVisibleDatabaseTableHeaders()).not.toContain('最新值时间');
     } finally {
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
@@ -1005,10 +1008,7 @@ test.describe('测点管理', () => {
     const { measurementPage, databasePath } = await loginAndPrepareTempDatabase(page, `db_auto_batch_cancel_${suffix}`);
 
     try {
-      await importMeasurementsIntoDatabase(measurementPage, databasePath, `measurement-batch-cancel-${suffix}.csv`, [
-        { measurement: firstName },
-        { measurement: secondName },
-      ]);
+      await importMeasurementsIntoDatabase(measurementPage, databasePath, `measurement-batch-cancel-${suffix}.csv`, [{ measurement: firstName }, { measurement: secondName }]);
 
       await measurementPage.selectMeasurementRowsByNames([firstName, secondName]);
       await measurementPage.expectBatchDeleteEnabled();
@@ -1040,9 +1040,7 @@ test.describe('测点管理', () => {
       ]);
 
       await measurementPage.setVisibleTableColumns(['timeseries', 'alias', 'description']);
-      await expect
-        .poll(async () => measurementPage.getVisibleDatabaseTableHeaders())
-        .toEqual(expect.arrayContaining(['测点名称', '别名', '测点描述']));
+      await expect.poll(async () => measurementPage.getVisibleDatabaseTableHeaders()).toEqual(expect.arrayContaining(['测点名称', '别名', '测点描述']));
       await expect
         .poll(async () => {
           const headers = await measurementPage.getVisibleDatabaseTableHeaders();
@@ -1068,10 +1066,7 @@ test.describe('测点管理', () => {
     const measurementName = `bad_header_${suffix}`;
     const importFilePath = createTempCsvFile(
       `measurement-bad-header-${suffix}.csv`,
-      [
-        'device,measurement_name,alias',
-        `root.db_auto_bad_header_${suffix},${measurementName},alias_${suffix}`,
-      ].join('\n'),
+      ['device,measurement_name,alias', `root.db_auto_bad_header_${suffix},${measurementName},alias_${suffix}`].join('\n'),
     );
     const { measurementPage, databasePath } = await loginAndPrepareTempDatabase(page, `db_auto_bad_header_${suffix}`);
 
@@ -1082,7 +1077,7 @@ test.describe('测点管理', () => {
       await measurementPage.finishImportModal();
       await measurementPage.expectDatabaseTableRowCountByMeasurementName(measurementName, 0);
     } finally {
-      rmSync(importFilePath, { force: true });
+      safeRemoveFile(importFilePath);
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
   });
@@ -1122,7 +1117,7 @@ test.describe('测点管理', () => {
       await measurementPage.expectDatabaseTableRowCountByMeasurementName(duplicateMeasurement, 1);
       await measurementPage.expectDatabaseTableRowCountByMeasurementName(validMeasurement, 1);
     } finally {
-      rmSync(importFilePath, { force: true });
+      safeRemoveFile(importFilePath);
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
   });
@@ -1159,7 +1154,7 @@ test.describe('测点管理', () => {
       await measurementPage.expectDatabaseTableRowCountByMeasurementName(duplicateMeasurement, 1);
       await measurementPage.expectDatabaseTableRowCountByMeasurementName(validMeasurement, 1);
     } finally {
-      rmSync(importFilePath, { force: true });
+      safeRemoveFile(importFilePath);
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
   });
@@ -1192,7 +1187,7 @@ test.describe('测点管理', () => {
       await measurementPage.expectDatabaseTableRowCountByMeasurementName(duplicateMeasurement, 1);
       await measurementPage.expectDatabaseTableRowCountByMeasurementName(validMeasurement, 1);
     } finally {
-      rmSync(importFilePath, { force: true });
+      safeRemoveFile(importFilePath);
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
   });
@@ -1210,7 +1205,7 @@ test.describe('测点管理', () => {
       await measurementPage.expectDatabaseTableRowCountByMeasurementName(`empty_${suffix}`, 0);
       await expect(measurementPage.databaseDetailTable()).toContainText('暂无数据');
     } finally {
-      rmSync(importFilePath, { force: true });
+      safeRemoveFile(importFilePath);
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
   });
@@ -1256,7 +1251,7 @@ test.describe('测点管理', () => {
       await measurementPage.expectDatabaseTableRowContains(measurementName, description);
     } finally {
       if (xlsxFilePath) {
-        rmSync(xlsxFilePath, { force: true });
+        safeRemoveFile(xlsxFilePath);
       }
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
@@ -1274,7 +1269,7 @@ test.describe('测点管理', () => {
       await measurementPage.finishImportModal();
       await expect(measurementPage.databaseDetailTable()).toContainText('暂无数据');
     } finally {
-      rmSync(fakeXlsxPath, { force: true });
+      safeRemoveFile(fakeXlsxPath);
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
   });
@@ -1343,10 +1338,7 @@ test.describe('测点管理', () => {
     const measurementName = `invalid_suffix_${suffix}`;
     const importFilePath = createTempCsvFile(
       `measurement-invalid-suffix-${suffix}.txt`,
-      [
-        measurementImportTemplateHeader,
-        `root.db_auto_invalid_suffix_${suffix},${measurementName},,,,BOOLEAN,false,PLAIN,SNAPPY`,
-      ].join('\n'),
+      [measurementImportTemplateHeader, `root.db_auto_invalid_suffix_${suffix},${measurementName},,,,BOOLEAN,false,PLAIN,SNAPPY`].join('\n'),
     );
     const { measurementPage, databasePath } = await loginAndPrepareTempDatabase(page, `db_auto_invalid_suffix_${suffix}`);
 
@@ -1360,7 +1352,7 @@ test.describe('测点管理', () => {
       await measurementPage.closeImportModalByHeader();
       await measurementPage.expectDatabaseTableRowCountByMeasurementName(measurementName, 0);
     } finally {
-      rmSync(importFilePath, { force: true });
+      safeRemoveFile(importFilePath);
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
   });
@@ -1372,10 +1364,7 @@ test.describe('测点管理', () => {
     const { measurementPage, databasePath } = await loginAndPrepareTempDatabase(page, `db_auto_export_filter_${suffix}`);
 
     try {
-      await importMeasurementsIntoDatabase(measurementPage, databasePath, `measurement-export-filter-${suffix}.csv`, [
-        { measurement: firstMeasurement },
-        { measurement: secondMeasurement },
-      ]);
+      await importMeasurementsIntoDatabase(measurementPage, databasePath, `measurement-export-filter-${suffix}.csv`, [{ measurement: firstMeasurement }, { measurement: secondMeasurement }]);
 
       await measurementPage.searchMeasurements(firstMeasurement, 'name');
       await measurementPage.exportMeasurements('csv');
@@ -1454,8 +1443,8 @@ test.describe('测点管理', () => {
       await measurementPage.expectDatabaseTableRowCountByMeasurementName(firstMeasurement, 0);
       await measurementPage.expectDatabaseTableRowCountByMeasurementName(secondMeasurement, 1);
     } finally {
-      rmSync(firstFilePath, { force: true });
-      rmSync(secondFilePath, { force: true });
+      safeRemoveFile(firstFilePath);
+      safeRemoveFile(secondFilePath);
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
   });
@@ -1493,9 +1482,7 @@ test.describe('测点管理', () => {
       await measurementPage.gotoMeasurementList();
       await measurementPage.openMeasurementNode(databasePath);
 
-      await expect
-        .poll(async () => measurementPage.getVisibleDatabaseTableHeaders())
-        .toEqual(expect.arrayContaining(['测点名称', '别名', '测点描述']));
+      await expect.poll(async () => measurementPage.getVisibleDatabaseTableHeaders()).toEqual(expect.arrayContaining(['测点名称', '别名', '测点描述']));
       await expect
         .poll(async () => {
           const headers = await measurementPage.getVisibleDatabaseTableHeaders();
@@ -1528,9 +1515,7 @@ test.describe('测点管理', () => {
       await measurementPage.expectVisible();
       await measurementPage.openMeasurementNode(databasePath);
 
-      await expect
-        .poll(async () => measurementPage.getVisibleDatabaseTableHeaders())
-        .toEqual(expect.arrayContaining(['测点名称', '别名', '测点描述']));
+      await expect.poll(async () => measurementPage.getVisibleDatabaseTableHeaders()).toEqual(expect.arrayContaining(['测点名称', '别名', '测点描述']));
       await expect
         .poll(async () => {
           const headers = await measurementPage.getVisibleDatabaseTableHeaders();
@@ -1560,9 +1545,7 @@ test.describe('测点管理', () => {
       await measurementPage.expectVisible();
       await measurementPage.openMeasurementNode(databasePath);
 
-      await expect
-        .poll(async () => measurementPage.getVisibleDatabaseTableHeaders())
-        .toEqual(expect.arrayContaining(['测点名称', '最新值', '最新值时间']));
+      await expect.poll(async () => measurementPage.getVisibleDatabaseTableHeaders()).toEqual(expect.arrayContaining(['测点名称', '最新值', '最新值时间']));
     } finally {
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
@@ -2017,9 +2000,7 @@ test.describe('测点管理', () => {
 
       await measurementPage.setVisibleTableColumns(['timeseries', 'tags']);
       await measurementPage.openTagDetailByMeasurementName(measurementName);
-      await expect
-        .poll(async () => (await page.locator('#tag-modal-detail').first().textContent())?.trim() || '')
-        .toBe('');
+      await expect.poll(async () => (await page.locator('#tag-modal-detail').first().textContent())?.trim() || '').toBe('');
       await measurementPage.closeTagDetailModal();
     } finally {
       await cleanupTempDatabase(page, measurementPage, databasePath);
@@ -2139,7 +2120,7 @@ test.describe('测点管理', () => {
       await measurementPage.openMeasurementNode(databasePath);
       await measurementPage.expectDatabaseTableRowCountByMeasurementName(measurementName, 0);
     } finally {
-      rmSync(importFilePath, { force: true });
+      safeRemoveFile(importFilePath);
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
   });
@@ -2164,32 +2145,23 @@ test.describe('测点管理', () => {
     const { measurementPage, databasePath } = await loginAndPrepareTempDatabase(page, `db_auto_batch_filter_case_${suffix}`);
 
     try {
-      await importMeasurementsIntoDatabase(
-        measurementPage,
-        databasePath,
-        `measurement-filtered-batch-delete-${suffix}.csv`,
-        [
-          {
-            measurement: deletedMeasurement,
-            dataType: 'INT32',
-          },
-          {
-            measurement: retainedMeasurement,
-            dataType: 'INT32',
-          },
-        ],
-      );
+      await importMeasurementsIntoDatabase(measurementPage, databasePath, `measurement-filtered-batch-delete-${suffix}.csv`, [
+        {
+          measurement: deletedMeasurement,
+          dataType: 'INT32',
+        },
+        {
+          measurement: retainedMeasurement,
+          dataType: 'INT32',
+        },
+      ]);
 
       await measurementPage.searchMeasurements(deletedMeasurement, 'name');
-      await expect
-        .poll(async () => measurementPage.getVisibleMeasurementNames())
-        .toEqual([deletedMeasurement]);
+      await expect.poll(async () => measurementPage.getVisibleMeasurementNames()).toEqual([deletedMeasurement]);
       await measurementPage.selectFirstMeasurementRow();
       await measurementPage.expectBatchDeleteEnabled();
       await measurementPage.batchDeleteSelectedMeasurements();
-      await expect
-        .poll(async () => measurementPage.getVisibleMeasurementNames())
-        .toEqual([]);
+      await expect.poll(async () => measurementPage.getVisibleMeasurementNames()).toEqual([]);
       await measurementPage.expectBatchDeleteDisabled();
 
       await measurementPage.clearMeasurementSearch('name');
@@ -2218,15 +2190,11 @@ test.describe('测点管理', () => {
       ]);
 
       await measurementPage.setVisibleTableColumns(['timeseries', 'alias', 'description', 'encoding', 'compression']);
-      await expect
-        .poll(async () => measurementPage.getVisibleDatabaseTableHeaders())
-        .toEqual(expect.arrayContaining(['测点名称', '别名', '测点描述', '编码方式', '压缩方式']));
+      await expect.poll(async () => measurementPage.getVisibleDatabaseTableHeaders()).toEqual(expect.arrayContaining(['测点名称', '别名', '测点描述', '编码方式', '压缩方式']));
 
       await measurementPage.openColumnFilter();
       await measurementPage.columnFilterResetAndConfirmVisible();
-      await expect
-        .poll(async () => measurementPage.getVisibleDatabaseTableHeaders())
-        .toEqual(expect.arrayContaining(['测点名称']));
+      await expect.poll(async () => measurementPage.getVisibleDatabaseTableHeaders()).toEqual(expect.arrayContaining(['测点名称']));
 
       await expect
         .poll(async () => {
@@ -2271,22 +2239,7 @@ test.describe('测点管理', () => {
       await measurementPage.columnFilterSelectAllAndConfirmVisible();
       await expect
         .poll(async () => measurementPage.getVisibleDatabaseTableHeaders())
-        .toEqual(
-          expect.arrayContaining([
-            '设备名称',
-            '测点名称',
-            '别名',
-            '测点描述',
-            '标签',
-            '数据类型',
-            '测点类型',
-            '时间对齐',
-            '编码方式',
-            '压缩方式',
-            '最新值',
-            '最新值时间',
-          ]),
-        );
+        .toEqual(expect.arrayContaining(['设备名称', '测点名称', '别名', '测点描述', '标签', '数据类型', '测点类型', '时间对齐', '编码方式', '压缩方式', '最新值', '最新值时间']));
     } finally {
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
@@ -2313,14 +2266,10 @@ test.describe('测点管理', () => {
       ]);
 
       await measurementPage.searchMeasurements(`not_found_desc_${suffix}`, 'description');
-      await expect
-        .poll(async () => measurementPage.getVisibleMeasurementNames())
-        .toEqual([]);
+      await expect.poll(async () => measurementPage.getVisibleMeasurementNames()).toEqual([]);
 
       await measurementPage.clearMeasurementSearch('description');
-      await expect
-        .poll(async () => measurementPage.getVisibleMeasurementNames())
-        .toEqual(expect.arrayContaining([firstMeasurement, secondMeasurement]));
+      await expect.poll(async () => measurementPage.getVisibleMeasurementNames()).toEqual(expect.arrayContaining([firstMeasurement, secondMeasurement]));
     } finally {
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
@@ -2379,22 +2328,7 @@ test.describe('测点管理', () => {
 
       await expect
         .poll(async () => measurementPage.getVisibleDatabaseTableHeaders())
-        .toEqual(
-          expect.arrayContaining([
-            '设备名称',
-            '测点名称',
-            '别名',
-            '测点描述',
-            '标签',
-            '数据类型',
-            '测点类型',
-            '时间对齐',
-            '编码方式',
-            '压缩方式',
-            '最新值',
-            '最新值时间',
-          ]),
-        );
+        .toEqual(expect.arrayContaining(['设备名称', '测点名称', '别名', '测点描述', '标签', '数据类型', '测点类型', '时间对齐', '编码方式', '压缩方式', '最新值', '最新值时间']));
     } finally {
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
@@ -2420,9 +2354,7 @@ test.describe('测点管理', () => {
       await measurementPage.expectVisible();
       await measurementPage.openMeasurementNode(databasePath);
 
-      await expect
-        .poll(async () => measurementPage.getVisibleDatabaseTableHeaders())
-        .toEqual(expect.arrayContaining(['测点名称']));
+      await expect.poll(async () => measurementPage.getVisibleDatabaseTableHeaders()).toEqual(expect.arrayContaining(['测点名称']));
       await expect
         .poll(async () => {
           const headers = await measurementPage.getVisibleDatabaseTableHeaders();
@@ -2454,14 +2386,10 @@ test.describe('测点管理', () => {
       ]);
 
       await measurementPage.searchMeasurements(`not_found_refresh_${suffix}`, 'name');
-      await expect
-        .poll(async () => measurementPage.getVisibleMeasurementNames())
-        .toEqual([]);
+      await expect.poll(async () => measurementPage.getVisibleMeasurementNames()).toEqual([]);
 
       await measurementPage.refreshDatabaseDetail();
-      await expect
-        .poll(async () => measurementPage.getVisibleMeasurementNames())
-        .toEqual([]);
+      await expect.poll(async () => measurementPage.getVisibleMeasurementNames()).toEqual([]);
     } finally {
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
@@ -2491,7 +2419,7 @@ test.describe('测点管理', () => {
       await measurementPage.closeImportModalByHeader();
       await measurementPage.expectDatabaseTableRowCountByMeasurementName(measurementName, 0);
     } finally {
-      rmSync(importFilePath, { force: true });
+      safeRemoveFile(importFilePath);
       await cleanupTempDatabase(page, measurementPage, databasePath);
     }
   });
@@ -2616,9 +2544,7 @@ test.describe('测点管理', () => {
       expect(firstPage.hasNext).toBe(true);
 
       const firstPagePaths = firstPage.list.map((item) => item.nodePath);
-      expect(
-        createdDatabaseNames.some((databaseName) => firstPagePaths.includes(`root.${databaseName}`)),
-      ).toBe(true);
+      expect(createdDatabaseNames.some((databaseName) => firstPagePaths.includes(`root.${databaseName}`))).toBe(true);
 
       const firstPageVisibleCount = firstPage.list.length + Number(firstPage.hasNext) + Number(firstPage.hasPre);
       const firstPageHash = hashBuffer(await measurementPage.screenshotDataModelChart());
@@ -2630,9 +2556,7 @@ test.describe('测点管理', () => {
 
       const secondPagePaths = secondPage.list.map((item) => item.nodePath);
       expect(secondPagePaths).not.toEqual(firstPagePaths);
-      expect(
-        [...firstPagePaths, ...secondPagePaths].some((path) => path.startsWith('root.db_auto_')),
-      ).toBe(true);
+      expect([...firstPagePaths, ...secondPagePaths].some((path) => path.startsWith('root.db_auto_'))).toBe(true);
 
       const secondPageHash = hashBuffer(await measurementPage.screenshotDataModelChart());
       expect(secondPageHash).not.toBe(firstPageHash);
@@ -3223,9 +3147,9 @@ test.describe('测点管理', () => {
       });
       await measurementPage.copyMeasurementRow(0);
 
-      await expect(
-        page.locator('[data-testid="measurement-modal-row-1-name"] input, #measurement-modal-collapse-1-timeseries, #measurement-modal-collapse-1-timeseries input').first(),
-      ).toHaveValue(copiedMeasurementName);
+      await expect(page.locator('[data-testid="measurement-modal-row-1-name"] input, #measurement-modal-collapse-1-timeseries, #measurement-modal-collapse-1-timeseries input').first()).toHaveValue(
+        copiedMeasurementName,
+      );
       await measurementPage.submitMeasurementModal();
 
       await measurementPage.expectMeasurementVisible(`${databasePath}.${measurementName}`);
@@ -3527,4 +3451,3 @@ test.describe('测点管理', () => {
     }
   });
 });
-

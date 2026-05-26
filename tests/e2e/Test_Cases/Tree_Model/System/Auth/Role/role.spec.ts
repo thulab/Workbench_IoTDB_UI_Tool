@@ -141,19 +141,15 @@ async function cleanupCreatedRoles(page: Page) {
   }
 
   try {
-    await page.evaluate(async (names) => {
-      await Promise.all(
-        names.map(async (name) => {
-          try {
-            await fetch(`/api/relational/privileges/deleteRole?roleName=${encodeURIComponent(name)}`, {
-              method: 'DELETE',
-            });
-          } catch {
-            // ignore cleanup failures
-          }
-        }),
-      );
-    }, roleNames);
+    for (const roleName of roleNames) {
+      await page
+        .context()
+        .request.delete('/api/relational/privileges/deleteRole', {
+          params: { roleName },
+          timeout: 15_000,
+        })
+        .catch(() => undefined);
+    }
   } catch {
     // ignore cleanup failures
   } finally {

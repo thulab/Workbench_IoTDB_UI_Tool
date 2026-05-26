@@ -139,9 +139,7 @@ export class MeasurementManagementPage {
   }
 
   databaseSearchTypeDisplay() {
-    return this.databaseSearchType()
-      .locator('.el-select__selected-item, .el-select__selection-item, .el-select__placeholder, input')
-      .first();
+    return this.databaseSearchType().locator('.el-select__selected-item, .el-select__selection-item, .el-select__placeholder, input').first();
   }
 
   databaseSearchTypeNameOption() {
@@ -153,19 +151,25 @@ export class MeasurementManagementPage {
   }
 
   databaseImportButton() {
-    return this.page.locator(measurementManagementSelectors.databaseImportButton).first()
+    return this.page
+      .locator(measurementManagementSelectors.databaseImportButton)
+      .first()
       .or(this.page.getByRole('button', { name: '导入' }).first())
       .first();
   }
 
   databaseExportDropdown() {
-    return this.page.locator(measurementManagementSelectors.databaseExportDropdown).first()
+    return this.page
+      .locator(measurementManagementSelectors.databaseExportDropdown)
+      .first()
       .or(this.page.getByRole('button', { name: '导出' }).first())
       .first();
   }
 
   databaseExportButton() {
-    return this.page.locator(measurementManagementSelectors.databaseExportButton).first()
+    return this.page
+      .locator(measurementManagementSelectors.databaseExportButton)
+      .first()
       .or(this.page.getByRole('button', { name: '导出' }).first())
       .first();
   }
@@ -259,9 +263,7 @@ export class MeasurementManagementPage {
   }
 
   measurementModalRow(index: number) {
-    return this.measurementModal()
-      .locator(`[data-testid="measurement-modal-row-${index}"], .el-collapse-item`)
-      .nth(index);
+    return this.measurementModal().locator(`[data-testid="measurement-modal-row-${index}"], .el-collapse-item`).nth(index);
   }
 
   measurementModalCopyButton(index: number) {
@@ -573,7 +575,9 @@ export class MeasurementManagementPage {
       await cancelButton.click({ force: true, timeout: 1000 }).catch(() => undefined);
     }
     await this.confirmVisibleMessageBoxIfPresent();
-    await expect(modal).toBeHidden({ timeout: uiTimeouts.toast }).catch(() => undefined);
+    await expect(modal)
+      .toBeHidden({ timeout: uiTimeouts.toast })
+      .catch(() => undefined);
   }
 
   async openMeasurementNode(path: string) {
@@ -581,13 +585,17 @@ export class MeasurementManagementPage {
     if (parentSegments.length > 2) {
       const parentPath = parentSegments.slice(0, -1).join('.');
       await this.ensureNodeVisible(parentPath);
-      if (await this.nodeByPath(parentPath).count()) {
-        await this.nodeByPath(parentPath).click();
+      const parentNode = this.nodeByPath(parentPath);
+      if (await parentNode.count()) {
+        await parentNode.click();
+        await this.page.waitForTimeout(300);
       }
+      await this.ensureNodeVisible(path);
       await expect(this.nodeByPath(path)).toBeVisible({ timeout: uiTimeouts.pageReady });
       await this.nodeByPath(path).click();
       return;
     }
+    await this.ensureNodeVisible(path);
     await expect(this.nodeByPath(path)).toBeVisible({ timeout: uiTimeouts.pageReady });
     await this.nodeByPath(path).click();
     if (parentSegments.length <= 2) {
@@ -648,16 +656,21 @@ export class MeasurementManagementPage {
   }
 
   async expectDatabaseTableRowCountByMeasurementName(measurementName: string, expectedCount: number) {
-    const rows = this.databaseDetailTable().locator('tr').filter({
-      has: this.page.getByText(measurementName, { exact: true }),
-    });
+    const rows = this.databaseDetailTable()
+      .locator('tr')
+      .filter({
+        has: this.page.getByText(measurementName, { exact: true }),
+      });
     await expect(rows).toHaveCount(expectedCount, { timeout: uiTimeouts.pageReady });
   }
 
   async openTagDetailByMeasurementName(measurementName: string) {
     const row = this.databaseDetailTable().locator('tr').filter({ hasText: measurementName }).first();
     await expect(row).toBeVisible({ timeout: uiTimeouts.pageReady });
-    await row.getByRole('button', { name: /详情|Detail/ }).first().click();
+    await row
+      .getByRole('button', { name: /详情|Detail/ })
+      .first()
+      .click();
     await expect(this.tagDetailModal()).toBeVisible({ timeout: uiTimeouts.action });
   }
 
@@ -751,7 +764,9 @@ export class MeasurementManagementPage {
 
   async chooseMeasurementTrendMenu(type: 'running' | 'history') {
     const optionText = type === 'running' ? /实时趋势|Running Trend/ : /历史趋势|History Trend/;
-    const option = this.page.getByRole('menuitem', { name: optionText }).first()
+    const option = this.page
+      .getByRole('menuitem', { name: optionText })
+      .first()
       .or(this.page.locator('.el-dropdown-menu__item').filter({ hasText: optionText }).first())
       .first();
     await expect(option).toBeVisible({ timeout: uiTimeouts.action });
@@ -792,19 +807,11 @@ export class MeasurementManagementPage {
   }
 
   descriptionTooltipIcon() {
-    return this.measurementModal()
-      .getByText('测点描述', { exact: false })
-      .locator('xpath=..')
-      .locator('img, svg')
-      .first();
+    return this.measurementModal().getByText('测点描述', { exact: false }).locator('xpath=..').locator('img, svg').first();
   }
 
   tagTooltipIcon() {
-    return this.measurementModal()
-      .getByText('标签', { exact: false })
-      .locator('xpath=..')
-      .locator('img, svg')
-      .first();
+    return this.measurementModal().getByText('标签', { exact: false }).locator('xpath=..').locator('img, svg').first();
   }
 
   async deleteNode(path: string) {
@@ -865,7 +872,11 @@ export class MeasurementManagementPage {
       createdNames.push(databaseName);
       await this.refreshMeasurementTree();
 
-      if (await this.treeRootMoreButton().isVisible().catch(() => false)) {
+      if (
+        await this.treeRootMoreButton()
+          .isVisible()
+          .catch(() => false)
+      ) {
         break;
       }
     }
@@ -888,13 +899,13 @@ export class MeasurementManagementPage {
         }
       }
 
-      if (!progress && await this.treeRootAllButton().count()) {
+      if (!progress && (await this.treeRootAllButton().count())) {
         await this.treeRootAllButton().click();
         await this.page.waitForTimeout(800);
         progress = true;
       }
 
-      if (!progress && await this.treeRootMoreButton().count()) {
+      if (!progress && (await this.treeRootMoreButton().count())) {
         await this.treeRootMoreButton().click();
         await this.page.waitForTimeout(500);
       }
@@ -904,19 +915,46 @@ export class MeasurementManagementPage {
   }
 
   async ensureNodeVisible(path: string) {
-    if (await this.nodeByPath(path).count()) {
-      return;
+    const parentSegments = path.split('.');
+    if (parentSegments.length > 2) {
+      const parentPath = parentSegments.slice(0, -1).join('.');
+      await this.ensureNodeVisible(parentPath);
+      const parentNode = this.nodeByPath(parentPath);
+      if (await parentNode.count()) {
+        await parentNode.click().catch(() => undefined);
+        await this.page.waitForTimeout(300);
+      }
     }
 
-    await this.refreshMeasurementTree();
+    for (let attempt = 0; attempt < 6; attempt += 1) {
+      if (await this.nodeByPath(path).count()) {
+        return;
+      }
 
-    if (await this.nodeByPath(path).count()) {
-      return;
-    }
+      if (attempt === 0) {
+        await this.refreshMeasurementTree();
+      } else if (await this.treeRootAllButton().count()) {
+        await this.treeRootAllButton()
+          .click()
+          .catch(() => undefined);
+        await this.page.waitForTimeout(800);
+      } else if (await this.treeRootMoreButton().count()) {
+        await this.treeRootMoreButton()
+          .click()
+          .catch(() => undefined);
+        await this.page.waitForTimeout(500);
+      } else {
+        await this.page.waitForTimeout(300);
+      }
 
-    if (await this.treeRootAllButton().count()) {
-      await this.treeRootAllButton().click();
-      await this.page.waitForTimeout(800);
+      if (parentSegments.length > 2) {
+        const parentPath = parentSegments.slice(0, -1).join('.');
+        const parentNode = this.nodeByPath(parentPath);
+        if (await parentNode.count()) {
+          await parentNode.click().catch(() => undefined);
+          await this.page.waitForTimeout(300);
+        }
+      }
     }
   }
 
@@ -939,10 +977,18 @@ export class MeasurementManagementPage {
   }
 
   async expectDatabasePanelTitles(currentDatabase: string) {
-    await expect(this.databaseInfoTitles().filter({ hasText: `${currentDatabase} 信息` }).first()).toBeVisible({
+    await expect(
+      this.databaseInfoTitles()
+        .filter({ hasText: `${currentDatabase} 信息` })
+        .first(),
+    ).toBeVisible({
       timeout: uiTimeouts.pageReady,
     });
-    await expect(this.databaseInfoTitles().filter({ hasText: `${currentDatabase} 列表` }).first()).toBeVisible({
+    await expect(
+      this.databaseInfoTitles()
+        .filter({ hasText: `${currentDatabase} 列表` })
+        .first(),
+    ).toBeVisible({
       timeout: uiTimeouts.pageReady,
     });
   }
@@ -977,12 +1023,7 @@ export class MeasurementManagementPage {
   }
 
   async selectSearchType(type: 'name' | 'description') {
-    await this.databaseSearchType()
-      .locator('.el-select__wrapper, .el-input__wrapper')
-      .first()
-      .or(this.databaseSearchType())
-      .first()
-      .click({ force: true });
+    await this.databaseSearchType().locator('.el-select__wrapper, .el-input__wrapper').first().or(this.databaseSearchType()).first().click({ force: true });
     const option = type === 'name' ? this.databaseSearchTypeNameOption() : this.databaseSearchTypeDescriptionOption();
     await expect(option).toBeVisible({ timeout: uiTimeouts.action });
     await option.click({ force: true });
@@ -1166,10 +1207,10 @@ export class MeasurementManagementPage {
 
   async exportMeasurements(format: 'csv' | 'xlsx') {
     await this.databaseExportDropdown().click();
-    const optionSelector = format === 'csv'
-      ? measurementManagementSelectors.databaseExportCsv
-      : measurementManagementSelectors.databaseExportXlsx;
-    const option = this.page.locator(`.el-popper:visible ${optionSelector}`).first()
+    const optionSelector = format === 'csv' ? measurementManagementSelectors.databaseExportCsv : measurementManagementSelectors.databaseExportXlsx;
+    const option = this.page
+      .locator(`.el-popper:visible ${optionSelector}`)
+      .first()
       .or(this.page.locator(`.el-dropdown-menu:visible ${optionSelector}`).first())
       .first();
     await expect(option).toBeVisible({ timeout: uiTimeouts.action });
@@ -1243,19 +1284,25 @@ export class MeasurementManagementPage {
 
   async waitForDataModelNode(path: string, timeout = uiTimeouts.pageReady) {
     await expect
-      .poll(async () => {
-        const paths = await this.getDataModelNodePaths();
-        return paths.includes(path);
-      }, { timeout })
+      .poll(
+        async () => {
+          const paths = await this.getDataModelNodePaths();
+          return paths.includes(path);
+        },
+        { timeout },
+      )
       .toBe(true);
   }
 
   async waitForDataModelNodeContaining(fragment: string, timeout = uiTimeouts.pageReady) {
     await expect
-      .poll(async () => {
-        const paths = await this.getDataModelNodePaths();
-        return paths.some((path) => path.includes(fragment));
-      }, { timeout })
+      .poll(
+        async () => {
+          const paths = await this.getDataModelNodePaths();
+          return paths.some((path) => path.includes(fragment));
+        },
+        { timeout },
+      )
       .toBe(true);
   }
 
@@ -1274,16 +1321,19 @@ export class MeasurementManagementPage {
 
   async waitForDataModelIdle(timeout = uiTimeouts.pageReady) {
     await expect
-      .poll(async () => {
-        return this.page.evaluate(() => {
-          const testWindow = window as typeof window & {
-            __measurementModelTest__?: {
-              isLoading: () => boolean;
+      .poll(
+        async () => {
+          return this.page.evaluate(() => {
+            const testWindow = window as typeof window & {
+              __measurementModelTest__?: {
+                isLoading: () => boolean;
+              };
             };
-          };
-          return testWindow.__measurementModelTest__?.isLoading() ?? false;
-        });
-      }, { timeout })
+            return testWindow.__measurementModelTest__?.isLoading() ?? false;
+          });
+        },
+        { timeout },
+      )
       .toBe(false);
   }
 
@@ -1307,28 +1357,31 @@ export class MeasurementManagementPage {
   }
 
   async fetchDataModelChildrenPage(nodePath: string, pageNum: number, pageSize = 10) {
-    return this.page.evaluate(async ({ path, currentPage, size }) => {
-      const response = await fetch('/api/model/getNextNodes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          pageNum: currentPage,
-          pageSize: size,
-          nodePath: path,
-        }),
-      });
-      const payload = await response.json();
-      return {
-        list: Array.isArray(payload?.data?.list) ? payload.data.list : [],
-        hasNext: Boolean(payload?.data?.hasNext),
-        hasPre: Boolean(payload?.data?.hasPre),
-        pageNum: Number(payload?.data?.pageNum || currentPage),
-        pageSize: Number(payload?.data?.pageSize || size),
-      };
-    }, { path: nodePath, currentPage: pageNum, size: pageSize }) as Promise<{
+    return this.page.evaluate(
+      async ({ path, currentPage, size }) => {
+        const response = await fetch('/api/model/getNextNodes', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            pageNum: currentPage,
+            pageSize: size,
+            nodePath: path,
+          }),
+        });
+        const payload = await response.json();
+        return {
+          list: Array.isArray(payload?.data?.list) ? payload.data.list : [],
+          hasNext: Boolean(payload?.data?.hasNext),
+          hasPre: Boolean(payload?.data?.hasPre),
+          pageNum: Number(payload?.data?.pageNum || currentPage),
+          pageSize: Number(payload?.data?.pageSize || size),
+        };
+      },
+      { path: nodePath, currentPage: pageNum, size: pageSize },
+    ) as Promise<{
       list: Array<{ node: string; nodePath: string; nodeType: string }>;
       hasNext: boolean;
       hasPre: boolean;
@@ -1374,46 +1427,46 @@ export class MeasurementManagementPage {
   async clickDataModelLevelOnePagination(direction: 'next' | 'pre', total: number) {
     const baseline = await this.screenshotDataModelChart();
     const triggeredByGraphic = await this.page.evaluate((targetDirection) => {
-      const chartSelectors = [
-        '[data-testid="measurement-model-chart"]',
-        '[data-testid="measurement-model-chart-wrapper"]',
-        '.chart-container-box',
-      ];
+      const chartSelectors = ['[data-testid="measurement-model-chart"]', '[data-testid="measurement-model-chart-wrapper"]', '.chart-container-box'];
       const targetNodeType = targetDirection === 'next' ? 'next' : 'pre';
-      const echartsGlobal = (window as typeof window & {
-        echarts?: {
-          getInstanceByDom: (dom: Element) => {
-            getZr: () => {
-              storage: {
-                getDisplayList: () => Array<{
-                  style?: { text?: string };
-                  parent?: unknown;
-                  __ecData?: {
-                    dataIndex?: number;
-                    eventData?: {
-                      data?: {
-                        nodeType?: string;
+      const echartsGlobal = (
+        window as typeof window & {
+          echarts?: {
+            getInstanceByDom: (dom: Element) =>
+              | {
+                  getZr: () => {
+                    storage: {
+                      getDisplayList: () => Array<{
+                        style?: { text?: string };
+                        parent?: unknown;
+                        __ecData?: {
+                          dataIndex?: number;
+                          eventData?: {
+                            data?: {
+                              nodeType?: string;
+                            };
+                          };
+                        };
+                        trigger?: (eventName: string, event: Record<string, unknown>) => void;
+                      }>;
+                    };
+                  };
+                  getModel: () => {
+                    getSeriesByIndex: (index: number) => {
+                      getData: () => {
+                        getItemModel: (dataIndex: number) => {
+                          option: {
+                            nodeType?: string;
+                          };
+                        };
                       };
                     };
                   };
-                  trigger?: (eventName: string, event: Record<string, unknown>) => void;
-                }>;
-              };
-            };
-            getModel: () => {
-              getSeriesByIndex: (index: number) => {
-                getData: () => {
-                  getItemModel: (dataIndex: number) => {
-                    option: {
-                      nodeType?: string;
-                    };
-                  };
-                };
-              };
-            };
-          } | undefined;
-        };
-      }).echarts;
+                }
+              | undefined;
+          };
+        }
+      ).echarts;
 
       if (!echartsGlobal?.getInstanceByDom) {
         return false;
@@ -1488,10 +1541,7 @@ export class MeasurementManagementPage {
         return undefined;
       };
 
-      const findTriggerable = (item: {
-        parent?: unknown;
-        trigger?: (eventName: string, event: Record<string, unknown>) => void;
-      }) => {
+      const findTriggerable = (item: { parent?: unknown; trigger?: (eventName: string, event: Record<string, unknown>) => void }) => {
         let current = item as unknown as {
           parent?: unknown;
           trigger?: (eventName: string, event: Record<string, unknown>) => void;
@@ -1523,53 +1573,55 @@ export class MeasurementManagementPage {
     }, direction);
 
     if (triggeredByGraphic) {
-      if (await this.waitForDataModelChartChange(baseline, {
-        attempts: 4,
-        intervalMs: 700,
-      })) {
+      if (
+        await this.waitForDataModelChartChange(baseline, {
+          attempts: 4,
+          intervalMs: 700,
+        })
+      ) {
         return;
       }
     }
 
     const chartCanvas = this.modelChartWrapper().locator('canvas').first();
     const paginationPoint = await this.page.evaluate((targetDirection) => {
-      const chartSelectors = [
-        '[data-testid="measurement-model-chart"]',
-        '[data-testid="measurement-model-chart-wrapper"]',
-        '.chart-container-box',
-      ];
+      const chartSelectors = ['[data-testid="measurement-model-chart"]', '[data-testid="measurement-model-chart-wrapper"]', '.chart-container-box'];
       const chartTexts = targetDirection === 'next' ? ['下一页', 'Next Page'] : ['上一页', 'Previous Page'];
-      const echartsGlobal = (window as typeof window & {
-        echarts?: {
-          getInstanceByDom: (dom: Element) => {
-            getZr: () => {
-              storage: {
-                getDisplayList: () => Array<{
-                  style?: { text?: string };
-                  transform?: number[];
-                  getBoundingRect: () => {
-                    x: number;
-                    y: number;
-                    width: number;
-                    height: number;
-                    clone?: () => {
-                      x: number;
-                      y: number;
-                      width: number;
-                      height: number;
-                      applyTransform?: (transform: number[]) => void;
+      const echartsGlobal = (
+        window as typeof window & {
+          echarts?: {
+            getInstanceByDom: (dom: Element) =>
+              | {
+                  getZr: () => {
+                    storage: {
+                      getDisplayList: () => Array<{
+                        style?: { text?: string };
+                        transform?: number[];
+                        getBoundingRect: () => {
+                          x: number;
+                          y: number;
+                          width: number;
+                          height: number;
+                          clone?: () => {
+                            x: number;
+                            y: number;
+                            width: number;
+                            height: number;
+                            applyTransform?: (transform: number[]) => void;
+                          };
+                          applyTransform?: (transform: number[]) => void;
+                        };
+                      }>;
                     };
-                    applyTransform?: (transform: number[]) => void;
+                    painter: {
+                      getViewportRoot: () => Element;
+                    };
                   };
-                }>;
-              };
-              painter: {
-                getViewportRoot: () => Element;
-              };
-            };
-          } | undefined;
-        };
-      }).echarts;
+                }
+              | undefined;
+          };
+        }
+      ).echarts;
 
       if (!echartsGlobal?.getInstanceByDom) {
         return null;
@@ -1665,9 +1717,7 @@ export class MeasurementManagementPage {
     }
 
     const primaryCenterY = direction === 'next' ? (total - 0.5) / total : 0.5 / total;
-    const primaryYOffsets = direction === 'next'
-      ? [-0.05, -0.035, -0.02, -0.005]
-      : [0.05, 0.035, 0.02, 0.005];
+    const primaryYOffsets = direction === 'next' ? [-0.05, -0.035, -0.02, -0.005] : [0.05, 0.035, 0.02, 0.005];
     const primaryYFractions = primaryYOffsets.map((offset) => this.clampChartFraction(primaryCenterY + offset));
     const primaryXFractions = [0.18, 0.2, 0.22, 0.24];
 
@@ -1676,9 +1726,7 @@ export class MeasurementManagementPage {
     }
 
     const fallbackXFractions = [0.16, 0.18, 0.2, 0.22, 0.24, 0.26, 0.28];
-    const fallbackYFractions = direction === 'next'
-      ? [0.9, 0.92, 0.935, 0.95, 0.965, 0.98]
-      : [0.02, 0.035, 0.05, 0.065, 0.08, 0.095, 0.11, 0.125];
+    const fallbackYFractions = direction === 'next' ? [0.9, 0.92, 0.935, 0.95, 0.965, 0.98] : [0.02, 0.035, 0.05, 0.065, 0.08, 0.095, 0.11, 0.125];
 
     if (await this.tryClickDataModelPaginationFractions(chartCanvas, baseline, fallbackXFractions, fallbackYFractions)) {
       return;
@@ -1689,67 +1737,67 @@ export class MeasurementManagementPage {
 
   async inspectDataModelPagination(direction: 'next' | 'pre') {
     return this.page.evaluate((targetDirection) => {
-      const chartSelectors = [
-        '[data-testid="measurement-model-chart"]',
-        '[data-testid="measurement-model-chart-wrapper"]',
-        '.chart-container-box',
-      ];
+      const chartSelectors = ['[data-testid="measurement-model-chart"]', '[data-testid="measurement-model-chart-wrapper"]', '.chart-container-box'];
       const targetNodeType = targetDirection === 'next' ? 'next' : 'pre';
       const chartTexts = targetDirection === 'next' ? ['下一页', 'Next Page'] : ['上一页', 'Previous Page'];
-      const echartsGlobal = (window as typeof window & {
-        echarts?: {
-          getInstanceByDom: (dom: Element) => {
-            getZr: () => {
-              storage: {
-                getDisplayList: () => Array<{
-                  type?: string;
-                  style?: { text?: string };
-                  silent?: boolean;
-                  invisible?: boolean;
-                  parent?: unknown;
-                  __ecData?: {
-                    dataIndex?: number;
-                    eventData?: {
-                      data?: {
-                        nodeType?: string;
-                        node?: string;
-                        nodePath?: string;
+      const echartsGlobal = (
+        window as typeof window & {
+          echarts?: {
+            getInstanceByDom: (dom: Element) =>
+              | {
+                  getZr: () => {
+                    storage: {
+                      getDisplayList: () => Array<{
+                        type?: string;
+                        style?: { text?: string };
+                        silent?: boolean;
+                        invisible?: boolean;
+                        parent?: unknown;
+                        __ecData?: {
+                          dataIndex?: number;
+                          eventData?: {
+                            data?: {
+                              nodeType?: string;
+                              node?: string;
+                              nodePath?: string;
+                            };
+                          };
+                        };
+                        getBoundingRect?: () => {
+                          x: number;
+                          y: number;
+                          width: number;
+                          height: number;
+                          clone?: () => {
+                            x: number;
+                            y: number;
+                            width: number;
+                            height: number;
+                            applyTransform?: (transform: number[]) => void;
+                          };
+                          applyTransform?: (transform: number[]) => void;
+                        };
+                        transform?: number[];
+                        trigger?: unknown;
+                      }>;
+                    };
+                  };
+                  getModel: () => {
+                    getSeriesByIndex: (index: number) => {
+                      getData: () => {
+                        getItemModel: (dataIndex: number) => {
+                          option: {
+                            nodeType?: string;
+                          };
+                        };
                       };
                     };
                   };
-                  getBoundingRect?: () => {
-                    x: number;
-                    y: number;
-                    width: number;
-                    height: number;
-                    clone?: () => {
-                      x: number;
-                      y: number;
-                      width: number;
-                      height: number;
-                      applyTransform?: (transform: number[]) => void;
-                    };
-                    applyTransform?: (transform: number[]) => void;
-                  };
-                  transform?: number[];
-                  trigger?: unknown;
-                }>;
-              };
-            };
-            getModel: () => {
-              getSeriesByIndex: (index: number) => {
-                getData: () => {
-                  getItemModel: (dataIndex: number) => {
-                    option: {
-                      nodeType?: string;
-                    };
-                  };
-                };
-              };
-            };
-          } | undefined;
-        };
-      }).echarts;
+                }
+              | undefined;
+          };
+        }
+      ).echarts;
 
       if (!echartsGlobal?.getInstanceByDom) {
         return { hasEcharts: false, items: [] };
@@ -1911,12 +1959,7 @@ export class MeasurementManagementPage {
     return Math.max(0.02, Math.min(0.98, value));
   }
 
-  private async tryClickDataModelPaginationFractions(
-    chartCanvas: Locator,
-    baseline: Buffer,
-    xFractions: number[],
-    yFractions: number[],
-  ) {
+  private async tryClickDataModelPaginationFractions(chartCanvas: Locator, baseline: Buffer, xFractions: number[], yFractions: number[]) {
     const box = await chartCanvas.boundingBox();
     if (!box) {
       throw new Error('Data model chart canvas not found');
@@ -1970,7 +2013,9 @@ export class MeasurementManagementPage {
     if (await menu.isVisible().catch(() => false)) {
       await this.page.mouse.click(8, 8).catch(() => undefined);
     }
-    await expect(menu).toBeHidden({ timeout: uiTimeouts.action }).catch(() => undefined);
+    await expect(menu)
+      .toBeHidden({ timeout: uiTimeouts.action })
+      .catch(() => undefined);
   }
 
   async createDatabaseByApi(databaseName: string) {
@@ -2036,29 +2081,30 @@ export class MeasurementManagementPage {
   }
 
   async listDatabasePathsByApi(pageNum = 1, pageSize = 200) {
-    return this.page.evaluate(async ({ currentPage, size }) => {
-      const response = await fetch(`/api/schema/getDatabases?pageNum=${currentPage}&pageSize=${size}`, {
-        method: 'GET',
-        credentials: 'include',
-      });
-      const rawText = await response.text();
-      let payload: DatabasePathsApiPayload = {};
-      if (rawText) {
-        try {
-          payload = JSON.parse(rawText) as DatabasePathsApiPayload;
-        } catch {
-          payload = {};
+    return this.page.evaluate(
+      async ({ currentPage, size }) => {
+        const response = await fetch(`/api/schema/getDatabases?pageNum=${currentPage}&pageSize=${size}`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+        const rawText = await response.text();
+        let payload: DatabasePathsApiPayload = {};
+        if (rawText) {
+          try {
+            payload = JSON.parse(rawText) as DatabasePathsApiPayload;
+          } catch {
+            payload = {};
+          }
         }
-      }
-      return Array.isArray(payload?.data?.pathNames) ? payload.data.pathNames : [];
-    }, { currentPage: pageNum, size: pageSize }) as Promise<string[]>;
+        return Array.isArray(payload?.data?.pathNames) ? payload.data.pathNames : [];
+      },
+      { currentPage: pageNum, size: pageSize },
+    ) as Promise<string[]>;
   }
 
   async cleanupDatabasesByPrefixApi(prefix: string) {
     const databasePaths = await this.listDatabasePathsByApi();
-    const matchedNames = databasePaths
-      .filter((path) => path.startsWith(prefix))
-      .map((path) => path.replace(/^root\./, ''));
+    const matchedNames = databasePaths.filter((path) => path.startsWith(prefix)).map((path) => path.replace(/^root\./, ''));
 
     for (const databaseName of matchedNames) {
       await this.deleteDatabaseByApi(databaseName).catch(() => undefined);
@@ -2141,50 +2187,58 @@ export class MeasurementManagementPage {
   private rowField(index: number, field: 'name' | 'alias' | 'description' | 'tags'): Locator {
     const row = this.measurementModalRow(index);
     if (field === 'name') {
-      return row.locator(
-        [
-          `[data-testid="measurement-modal-row-${index}-name"] input`,
-          `[data-testid="measurement-modal-row-${index}-name"] textarea`,
-          `#measurement-modal-collapse-${index}-timeseries input`,
-          `input[placeholder*="测点名称"]`,
-          `textarea[placeholder*="测点名称"]`,
-        ].join(', '),
-      ).first();
+      return row
+        .locator(
+          [
+            `[data-testid="measurement-modal-row-${index}-name"] input`,
+            `[data-testid="measurement-modal-row-${index}-name"] textarea`,
+            `#measurement-modal-collapse-${index}-timeseries input`,
+            `input[placeholder*="测点名称"]`,
+            `textarea[placeholder*="测点名称"]`,
+          ].join(', '),
+        )
+        .first();
     }
     if (field === 'alias') {
-      return row.locator(
-        [
-          `[data-testid="measurement-modal-row-${index}-alias"] input`,
-          `[data-testid="measurement-modal-row-${index}-alias"] textarea`,
-          `#measurement-modal-collapse-${index}-alias input`,
-          `#measurement-modal-collapse-${index}-alias textarea`,
-          `input[placeholder*="测点别名"]`,
-          `textarea[placeholder*="测点别名"]`,
-        ].join(', '),
-      ).first();
+      return row
+        .locator(
+          [
+            `[data-testid="measurement-modal-row-${index}-alias"] input`,
+            `[data-testid="measurement-modal-row-${index}-alias"] textarea`,
+            `#measurement-modal-collapse-${index}-alias input`,
+            `#measurement-modal-collapse-${index}-alias textarea`,
+            `input[placeholder*="测点别名"]`,
+            `textarea[placeholder*="测点别名"]`,
+          ].join(', '),
+        )
+        .first();
     }
     if (field === 'description') {
-      return row.locator(
-        [
-          `[data-testid="measurement-modal-row-${index}-description"] input`,
-          `[data-testid="measurement-modal-row-${index}-description"] textarea`,
-          `#measurement-modal-collapse-${index}-description input`,
-          `#measurement-modal-collapse-${index}-description textarea`,
-          `input[placeholder*="测点描述"]`,
-          `textarea[placeholder*="测点描述"]`,
-        ].join(', '),
-      ).first();
+      return row
+        .locator(
+          [
+            `[data-testid="measurement-modal-row-${index}-description"] input`,
+            `[data-testid="measurement-modal-row-${index}-description"] textarea`,
+            `#measurement-modal-collapse-${index}-description input`,
+            `#measurement-modal-collapse-${index}-description textarea`,
+            `input[placeholder*="测点描述"]`,
+            `textarea[placeholder*="测点描述"]`,
+          ].join(', '),
+        )
+        .first();
     }
-    return row.locator(
-      [
-        `[data-testid="measurement-modal-row-${index}-tags"] input`,
-        `[data-testid="measurement-modal-row-${index}-tags"] textarea`,
-        `#measurement-modal-collapse-${index}-tags input`,
-        `#measurement-modal-collapse-${index}-tags textarea`,
-        `input[placeholder*="标签"]`,
-        `textarea[placeholder*="标签"]`,
-      ].join(', '),
-    ).first();
+    return row
+      .locator(
+        [
+          `[data-testid="measurement-modal-row-${index}-tags"] input`,
+          `[data-testid="measurement-modal-row-${index}-tags"] textarea`,
+          `#measurement-modal-collapse-${index}-tags input`,
+          `#measurement-modal-collapse-${index}-tags textarea`,
+          `input[placeholder*="标签"]`,
+          `textarea[placeholder*="标签"]`,
+        ].join(', '),
+      )
+      .first();
   }
 
   private inputLikeRowField(index: number, field: 'name' | 'alias' | 'description' | 'tags') {
@@ -2198,17 +2252,17 @@ export class MeasurementManagementPage {
       return;
     }
 
-    const visibleTextOption = this.page.locator('.el-select-dropdown:visible [role="option"]').filter({
-      hasText: optionText,
-    }).first();
+    const visibleTextOption = this.page
+      .locator('.el-select-dropdown:visible [role="option"]')
+      .filter({
+        hasText: optionText,
+      })
+      .first();
     await expect(visibleTextOption).toBeVisible({ timeout: uiTimeouts.action });
     await visibleTextOption.click({ force: true });
   }
 
-  private async selectRowDataType(
-    index: number,
-    dataType: 'BOOLEAN' | 'INT32' | 'INT64' | 'FLOAT' | 'DOUBLE' | 'TEXT',
-  ) {
+  private async selectRowDataType(index: number, dataType: 'BOOLEAN' | 'INT32' | 'INT64' | 'FLOAT' | 'DOUBLE' | 'TEXT') {
     await this.ensureMeasurementModalRowExpanded(index);
     const selector = this.measurementModalRow(index).getByRole('combobox').nth(0);
     await expect(selector).toBeVisible({ timeout: uiTimeouts.action });
@@ -2267,7 +2321,8 @@ export class MeasurementManagementPage {
       compressor?: string;
     }>,
   ) {
-    const header = 'device(璁惧鍚嶇О),measurement(娴嬬偣鍚嶇О),alias(鍒悕),description(娴嬬偣鎻忚堪),label(鏍囩key=value),dataType(鏁版嵁绫诲瀷),isAligned(鏄惁涓哄榻愬簭鍒楋紝瀵归綈搴忓垪:true 闈炲榻?false),encoding(缂栫爜鏂瑰紡),compressor(鍘嬬缉鏂瑰紡)';
+    const header =
+      'device(璁惧鍚嶇О),measurement(娴嬬偣鍚嶇О),alias(鍒悕),description(娴嬬偣鎻忚堪),label(鏍囩key=value),dataType(鏁版嵁绫诲瀷),isAligned(鏄惁涓哄榻愬簭鍒楋紝瀵归綈搴忓垪:true 闈炲榻?false),encoding(缂栫爜鏂瑰紡),compressor(鍘嬬缉鏂瑰紡)';
     const body = [
       header,
       ...rows.map((row) =>

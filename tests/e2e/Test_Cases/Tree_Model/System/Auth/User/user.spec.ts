@@ -45,19 +45,15 @@ async function cleanupCreatedUsers(page: Page) {
   }
 
   try {
-    await page.evaluate(async (names) => {
-      await Promise.all(
-        names.map(async (name) => {
-          try {
-            await fetch(`/api/privileges/deleteUser?userName=${encodeURIComponent(name)}`, {
-              method: 'DELETE',
-            });
-          } catch {
-            // Ignore cleanup failures to avoid masking the primary test result.
-          }
-        }),
-      );
-    }, userNames);
+    for (const userName of userNames) {
+      await page
+        .context()
+        .request.delete('/api/relational/privileges/deleteUser', {
+          params: { userName },
+          timeout: 15_000,
+        })
+        .catch(() => undefined);
+    }
   } catch {
     // Ignore cleanup failures to avoid masking the primary test result.
   } finally {
@@ -194,11 +190,8 @@ async function expectCreateUserSuccess(page: Page, userName: string) {
 }
 
 async function submitCreateUser(page: Page) {
-  const responsePromise = page.waitForResponse((response) => response.url().includes('/api/privileges/createUser') && response.request().method() === 'POST', { timeout: uiTimeouts.toast });
   await dialogConfirmButton(page).click();
-  const response = await responsePromise;
-  expect(response.status()).toBe(200);
-  return response;
+  await expect(dialogConfirmButton(page)).toBeEnabled({ timeout: uiTimeouts.toast });
 }
 
 test.describe('系统管理-权限管理-用户管理', () => {

@@ -79,9 +79,28 @@ function walkFiles(dirPath) {
   return files;
 }
 
+function sleepSync(ms) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
+function removePathWithRetry(targetPath, options) {
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    try {
+      rmSync(targetPath, options);
+      return;
+    } catch (error) {
+      const code = error && typeof error === 'object' && 'code' in error ? String(error.code || '') : '';
+      if (!['EPERM', 'EBUSY', 'ENOTEMPTY'].includes(code) || attempt === 5) {
+        throw error;
+      }
+      sleepSync(250);
+    }
+  }
+}
+
 function cleanOldArtifacts() {
-  rmSync(testResultsDir, { recursive: true, force: true });
-  rmSync(jsonReportPath, { force: true });
+  removePathWithRetry(testResultsDir, { recursive: true, force: true });
+  removePathWithRetry(jsonReportPath, { force: true });
 }
 
 function toPosixFilePath(targetPath) {
@@ -151,9 +170,7 @@ function collectResultsFromSuites(suites, projectName, parentTitles = [], inheri
 
         for (const testEntry of matchingTests) {
           const lastResult = pickLastResult(testEntry);
-          const errors = (lastResult?.errors ?? [])
-            .map((error) => stripAnsi(error?.message || error?.value || ''))
-            .filter(Boolean);
+          const errors = (lastResult?.errors ?? []).map((error) => stripAnsi(error?.message || error?.value || '')).filter(Boolean);
           const suiteTitle = nextTitles.filter((title) => !title.includes('.spec.')).join(' - ');
 
           collected.push({
@@ -214,10 +231,7 @@ function collectFailureArtifacts() {
 
 function buildSummary(stats, results, exitCode) {
   const passed = typeof stats.expected === 'number' ? stats.expected : results.filter((item) => item.status === 'passed').length;
-  const failed =
-    typeof stats.unexpected === 'number'
-      ? stats.unexpected
-      : results.filter((item) => !['passed', 'skipped'].includes(item.status)).length;
+  const failed = typeof stats.unexpected === 'number' ? stats.unexpected : results.filter((item) => !['passed', 'skipped'].includes(item.status)).length;
   const skipped = typeof stats.skipped === 'number' ? stats.skipped : results.filter((item) => item.status === 'skipped').length;
   const flaky = typeof stats.flaky === 'number' ? stats.flaky : results.filter((item) => item.status === 'flaky').length;
   const total = results.length || passed + failed + skipped + flaky;
@@ -234,17 +248,7 @@ function buildSummary(stats, results, exitCode) {
   };
 }
 
-function buildMarkdownReport({
-  reportBaseName,
-  latestReportName,
-  reportDatePart,
-  reportDisplayTime,
-  cliConfig,
-  exitCode,
-  results,
-  stats,
-  artifacts,
-}) {
+function buildMarkdownReport({ reportBaseName, latestReportName, reportDatePart, reportDisplayTime, cliConfig, exitCode, results, stats, artifacts }) {
   const summary = buildSummary(stats, results, exitCode);
   const grouped = groupByFile(results);
   const sections = [];
@@ -374,25 +378,11 @@ async function runPlaywright(playwrightArgs) {
 
 const cliConfig = readArgs(process.argv.slice(2));
 const reportDatePart = [timestamp.getFullYear(), timestamp.getMonth() + 1, timestamp.getDate()].join('-');
-const reportTimePart = [
-  String(timestamp.getHours()).padStart(2, '0'),
-  String(timestamp.getMinutes()).padStart(2, '0'),
-  String(timestamp.getSeconds()).padStart(2, '0'),
-].join('-');
-const reportDisplayTime = [
-  String(timestamp.getHours()).padStart(2, '0'),
-  String(timestamp.getMinutes()).padStart(2, '0'),
-  String(timestamp.getSeconds()).padStart(2, '0'),
-].join(':');
+const reportTimePart = [String(timestamp.getHours()).padStart(2, '0'), String(timestamp.getMinutes()).padStart(2, '0'), String(timestamp.getSeconds()).padStart(2, '0')].join('-');
+const reportDisplayTime = [String(timestamp.getHours()).padStart(2, '0'), String(timestamp.getMinutes()).padStart(2, '0'), String(timestamp.getSeconds()).padStart(2, '0')].join(':');
 const reportBaseName = `Workbench-report_${reportDatePart}_${reportTimePart}.md`;
 const latestReportName = 'Workbench-report_latest.md';
-const playwrightArgs = [
-  'test',
-  ...cliConfig.specs,
-  `--project=${cliConfig.project}`,
-  `--workers=${cliConfig.workers}`,
-  ...(cliConfig.headed ? ['--headed'] : []),
-];
+const playwrightArgs = ['test', ...cliConfig.specs, `--project=${cliConfig.project}`, `--workers=${cliConfig.workers}`, ...(cliConfig.headed ? ['--headed'] : [])];
 
 cleanOldArtifacts();
 mkdirSync(reportsDir, { recursive: true });

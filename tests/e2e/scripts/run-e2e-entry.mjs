@@ -65,7 +65,7 @@ const moduleDefinitions = [
     key: 'data-sync',
     displayName: '数据同步',
     aliases: ['data-sync', 'sync'],
-    specs: [],
+    specs: ['tests/e2e/Test_Cases/Tree_Model/Data_Sync/data-sync.spec.ts'],
   },
   {
     key: 'auth',
@@ -92,7 +92,7 @@ const moduleAliasMap = new Map(moduleDefinitions.flatMap((definition) => definit
 const allModuleKeys = moduleDefinitions.map((definition) => definition.key);
 const orderedModules = moduleDefinitions.filter((definition) => definition.specs.length).map((definition) => definition.key);
 const specialCommands = ['typecheck', 'search-cleanup', 'measurement-cleanup', 'calculate-cleanup', 'cleanup-all'];
-const fullModules = ['instance', 'login', 'dashboard', 'measurement', 'search', 'sql', 'view', 'auth', 'audit', 'db-config'];
+const fullModules = ['instance', 'login', 'dashboard', 'measurement', 'search', 'sql', 'view', 'data-sync', 'auth', 'audit', 'db-config'];
 const presetModuleMap = {
   full: fullModules,
   'full-real': fullModules,
@@ -159,7 +159,7 @@ Notes:
   report  = generate report without headed browser mode
   headed  = open browser and generate report
   auth = run user + role management specs under permission management
-  ai-analysis / visualization / data-sync = reserved business-module aliases, no spec implemented yet
+  ai-analysis / visualization = reserved business-module aliases, no spec implemented yet
   search-cleanup / measurement-cleanup / calculate-cleanup / cleanup-all = cleanup-only commands for real 127.0.0.1:9190 data
   typecheck = run TypeScript check for Playwright and tests/e2e via tsconfig.e2e.json
   full/full-real = run all currently covered modules in direct mode on 127.0.0.1:9190
