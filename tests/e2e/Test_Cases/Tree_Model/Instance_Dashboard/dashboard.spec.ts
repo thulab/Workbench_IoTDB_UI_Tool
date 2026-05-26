@@ -88,13 +88,31 @@ async function getMonitorState(page: Page): Promise<'configured' | 'unconfigured
   await expect
     .poll(
       async () => {
-        if (await page.locator(dashboardSelectors.monitorNodeSelect).first().isVisible().catch(() => false)) {
+        if (
+          await page
+            .locator(dashboardSelectors.monitorNodeSelect)
+            .first()
+            .isVisible()
+            .catch(() => false)
+        ) {
           return 'configured';
         }
-        if (await page.getByText(dashboardTexts.monitorUnconfigured, { exact: true }).first().isVisible().catch(() => false)) {
+        if (
+          await page
+            .getByText(dashboardTexts.monitorUnconfigured, { exact: true })
+            .first()
+            .isVisible()
+            .catch(() => false)
+        ) {
           return 'unconfigured';
         }
-        if (await page.getByText(dashboardTexts.monitorConfigError, { exact: true }).first().isVisible().catch(() => false)) {
+        if (
+          await page
+            .getByText(dashboardTexts.monitorConfigError, { exact: true })
+            .first()
+            .isVisible()
+            .catch(() => false)
+        ) {
           return 'config-error';
         }
         return 'pending';
@@ -103,10 +121,22 @@ async function getMonitorState(page: Page): Promise<'configured' | 'unconfigured
     )
     .not.toBe('pending');
 
-  if (await page.locator(dashboardSelectors.monitorNodeSelect).first().isVisible().catch(() => false)) {
+  if (
+    await page
+      .locator(dashboardSelectors.monitorNodeSelect)
+      .first()
+      .isVisible()
+      .catch(() => false)
+  ) {
     return 'configured';
   }
-  if (await page.getByText(dashboardTexts.monitorUnconfigured, { exact: true }).first().isVisible().catch(() => false)) {
+  if (
+    await page
+      .getByText(dashboardTexts.monitorUnconfigured, { exact: true })
+      .first()
+      .isVisible()
+      .catch(() => false)
+  ) {
     return 'unconfigured';
   }
   return 'config-error';
@@ -134,7 +164,12 @@ async function openMonitorNodeDropdown(page: Page) {
         async () => {
           const count = await dropdowns.count();
           for (let index = 0; index < count; index += 1) {
-            if (await dropdowns.nth(index).isVisible().catch(() => false)) {
+            if (
+              await dropdowns
+                .nth(index)
+                .isVisible()
+                .catch(() => false)
+            ) {
               return index;
             }
           }
@@ -204,9 +239,7 @@ async function selectMonitorNodeByType(page: Page, nodeType: 'ConfigNode' | 'Dat
 }
 
 async function expectLocatorTextNotEmpty(locator: Locator) {
-  await expect
-    .poll(async () => (await locator.innerText()).trim(), { timeout: uiTimeouts.pageReady })
-    .not.toBe('');
+  await expect.poll(async () => (await locator.innerText()).trim(), { timeout: uiTimeouts.pageReady }).not.toBe('');
 }
 
 async function expectActivationDetailRow(
@@ -281,7 +314,7 @@ test.describe('首页', () => {
   }
 
   if (realBackendRun) {
-    // 真实环境分支直连 127.0.0.1:9190，校验首页核心展示与监控切换。
+    // 真实环境分支直连统一配置中的 Workbench 地址，校验首页核心展示与监控切换。
     test('1. 通过连接实例 localhost 登录并进入首页', async ({ page }) => {
       await loginToDashboard(page);
     });
@@ -314,9 +347,7 @@ test.describe('首页', () => {
       await expect(activeModal.getByText(dashboardTexts.activeDetail, { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
       await expect(activeModal.getByText(activationDetailTexts.used, { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
       await expect(activeModal.getByText(activationDetailTexts.allocated, { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
-      await expect
-        .poll(async () => activeModal.locator('.el-table__row').count(), { timeout: uiTimeouts.pageReady })
-        .toBeGreaterThanOrEqual(6);
+      await expect.poll(async () => activeModal.locator('.el-table__row').count(), { timeout: uiTimeouts.pageReady }).toBeGreaterThanOrEqual(6);
 
       await expectActivationDetailRow(activeModal, activationDetailTexts.activationExpirationTime, {
         usedValue: 'hyphen',
@@ -391,4 +422,3 @@ test.describe('首页', () => {
     });
   }
 });
-

@@ -5,7 +5,7 @@
 - 所属全局回归：`Tree_Model`
 - 模块文件：`tests/e2e/Test_Cases/Tree_Model/Calculate_Detail/calculate.spec.ts`
 - 执行环境：真实 Workbench + 真实 IoTDB
-- Workbench 地址：`http://127.0.0.1:9190`
+- Workbench 地址：以 `tests/e2e/config/runtime-environment.json` 中的 `workbench.realBaseUrl` 为准
 - 执行模式：`--headed`
 - 执行日期：`2026-05-21`
 - 当前结果：`50 / 50` 全部通过
@@ -20,7 +20,7 @@ npm.cmd run test:e2e:calculate:real:headed
 
 - 已完成树模型【视图页面】模块真实环境 UI 自动化建设
 - 当前模块累计落地 `50` 条用例，覆盖页面展示、查询筛选、新建、编辑、删除、分页、导出、刷新、查看数据跳转、批量导入成功与异常场景
-- 当前在 `Workbench + IoTDB` 真实环境 `127.0.0.1:9190` 下回归结果为 `50 / 50` 全通过
+- 当前在统一环境配置指定的 `Workbench + IoTDB` 真实环境下回归结果为 `50 / 50` 全通过
 - 已同步完成代码、XMind 测试树、README 模块说明、状态文档四处收口
 
 ## 2. 当前自动化覆盖清单

@@ -1,16 +1,5 @@
 import type { APIRequestContext } from '@playwright/test';
-
-export const localhostConnection = {
-  name: 'localhost',
-  host: '127.0.0.1',
-  port: 6667,
-  username: 'root',
-  password: 'TimechoDB@2021',
-  model: 'tree',
-  prometheusUrl: '127.0.0.1:9090',
-  prometheusUsername: '',
-  prometheusPassword: '',
-} as const;
+export { localhostConnection } from './runtime-config';
 
 export type ConnectionSummary = {
   id: number | string;

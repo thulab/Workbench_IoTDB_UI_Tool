@@ -71,7 +71,7 @@
   - 导入导出触发方式
 - 是否改变了真实环境前置依赖：
   - `localhost` 实例
-  - `http://127.0.0.1:9190` 直连模式
+  - 统一环境配置中的 `workbench.realBaseUrl` 直连模式
   - 查询 / 测点 / 视图依赖的种子数据
 
 ## 3. 按模块维护入口
@@ -431,13 +431,13 @@ npm.cmd run test:e2e:calculate:real
 角色管理：
 
 ```powershell
-$env:PLAYWRIGHT_REAL_BACKEND='true'; $env:PLAYWRIGHT_BASE_URL='http://127.0.0.1:9190'; $env:PLAYWRIGHT_REAL_BASE_URL='http://127.0.0.1:9190'; $env:PLAYWRIGHT_PORT='9190'; $env:PLAYWRIGHT_SKIP_WEBSERVER='true'; node node_modules/playwright/cli.js test tests/e2e/Test_Cases/Tree_Model/System/Auth/Role/role.spec.ts --project=chromium
+.\sbin\start.bat auth direct report
 ```
 
 用户管理：
 
 ```powershell
-$env:PLAYWRIGHT_REAL_BACKEND='true'; $env:PLAYWRIGHT_BASE_URL='http://127.0.0.1:9190'; $env:PLAYWRIGHT_REAL_BASE_URL='http://127.0.0.1:9190'; $env:PLAYWRIGHT_PORT='9190'; $env:PLAYWRIGHT_SKIP_WEBSERVER='true'; node node_modules/playwright/cli.js test tests/e2e/Test_Cases/Tree_Model/System/Auth/User/user.spec.ts --project=chromium
+.\sbin\start.bat auth direct report
 ```
 
 ### 7.9 全量回归

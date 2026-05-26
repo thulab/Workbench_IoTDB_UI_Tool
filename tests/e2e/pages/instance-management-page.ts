@@ -1,5 +1,6 @@
 import { expect, type Page } from '@playwright/test';
 import { feedbackSelectors, instanceManagementSelectors, uiTimeouts } from '../support/e2e-selectors';
+import { localhostConnection } from '../support/runtime-config';
 
 export class InstanceManagementPage {
   constructor(private readonly page: Page) {}
@@ -121,7 +122,10 @@ export class InstanceManagementPage {
   }
 
   tooltipPopper() {
-    return this.page.locator('.el-popper').filter({ has: this.page.locator('.el-tooltip__popper, .el-popper__arrow') }).last();
+    return this.page
+      .locator('.el-popper')
+      .filter({ has: this.page.locator('.el-tooltip__popper, .el-popper__arrow') })
+      .last();
   }
 
   itemById(id: number | string | 'new') {
@@ -152,7 +156,9 @@ export class InstanceManagementPage {
     await discardChanges.waitFor({ state: 'visible', timeout: 1_500 }).catch(() => undefined);
     if (await discardChanges.isVisible().catch(() => false)) {
       await discardChanges.click({ force: true }).catch(() => undefined);
-      await this.confirmDialog().waitFor({ state: 'hidden', timeout: 5_000 }).catch(() => undefined);
+      await this.confirmDialog()
+        .waitFor({ state: 'hidden', timeout: 5_000 })
+        .catch(() => undefined);
     }
 
     await expect(this.modal()).toBeHidden();
@@ -174,7 +180,10 @@ export class InstanceManagementPage {
 
   async fillPrometheusCredentials(username: string, password: string) {
     const authToggle = this.prometheusAuthToggle();
-    const checked = await authToggle.locator('input').isChecked().catch(() => false);
+    const checked = await authToggle
+      .locator('input')
+      .isChecked()
+      .catch(() => false);
     if (!checked) {
       await authToggle.click();
     }
@@ -189,7 +198,10 @@ export class InstanceManagementPage {
 
     if (options.username !== undefined || options.password !== undefined) {
       const authToggle = this.prometheusAuthToggle();
-      const checked = await authToggle.locator('input').isChecked().catch(() => false);
+      const checked = await authToggle
+        .locator('input')
+        .isChecked()
+        .catch(() => false);
       if (!checked) {
         await authToggle.click();
       }
@@ -241,10 +253,10 @@ export class InstanceManagementPage {
     await this.addConnection();
     await this.fillStandaloneConnection({
       name: options.name,
-      host: options.host || '127.0.0.1',
-      port: options.port || '6667',
-      username: options.username || 'root',
-      password: options.password || 'TimechoDB@2021',
+      host: options.host || localhostConnection.host,
+      port: options.port || String(localhostConnection.port),
+      username: options.username || localhostConnection.username,
+      password: options.password || localhostConnection.password,
     });
     await this.clickPrimaryAction('test');
     await this.expectLatestToast('success');

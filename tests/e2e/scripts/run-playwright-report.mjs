@@ -1,6 +1,7 @@
 import { mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
+import { getRealWorkbenchBaseUrl } from './runtime-config.mjs';
 
 const repoRoot = process.cwd();
 const reportsDir = path.join(repoRoot, 'tests', 'e2e', 'reports');
@@ -8,6 +9,7 @@ const htmlReportPath = path.join(repoRoot, 'playwright-report', 'index.html');
 const testResultsDir = path.join(repoRoot, 'test-results');
 const jsonReportPath = path.join(reportsDir, '.playwright-report.json');
 const timestamp = new Date();
+const realWorkbenchBaseUrl = getRealWorkbenchBaseUrl();
 
 function readArgs(argv) {
   const config = {
@@ -260,7 +262,7 @@ function buildMarkdownReport({ reportBaseName, latestReportName, reportDatePart,
   sections.push(`- 报告名称: \`${reportBaseName}\``);
   sections.push(`- 执行时间: ${reportDatePart} ${reportDisplayTime}`);
   sections.push('- 执行环境: Workbench + IoTDB');
-  sections.push('- Workbench 地址: `http://127.0.0.1:9190`');
+  sections.push(`- Workbench 地址: \`${realWorkbenchBaseUrl}\``);
   sections.push(`- 报告类型: \`${cliConfig.reportKey}\``);
   sections.push(`- 是否 Headed: \`${cliConfig.headed ? '是' : '否'}\``);
   sections.push(`- 浏览器项目: \`${cliConfig.project}\``);

@@ -1,5 +1,6 @@
 import { expect, type Page, type Route } from '@playwright/test';
 import { uiTimeouts } from './e2e-selectors';
+import { enterpriseDbConfig } from './runtime-config';
 
 type MockMode = 'login' | 'authenticated';
 
@@ -36,13 +37,6 @@ type MockConnectionDetail = ReturnType<typeof buildConnection>;
 
 const appVersion = '2.3.1';
 const pageReadyTimeout = process.env.PLAYWRIGHT_REAL_BACKEND === 'true' ? 60_000 : 30_000;
-const enterpriseDbConfig = {
-  host: '127.0.0.1',
-  port: 6667,
-  username: 'root',
-  password: 'TimechoDB@2021',
-};
-
 function success<T>(data: T, message = 'success') {
   return {
     success: true,
@@ -207,10 +201,7 @@ function buildSqlQueryResult(sql = 'select * from root.sg.d1') {
   };
 }
 
-function buildSqlQueryResultFromOverride(
-  sql: string,
-  override?: NonNullable<MockOptions['sqlQueryOverrides']>[string],
-) {
+function buildSqlQueryResultFromOverride(sql: string, override?: NonNullable<MockOptions['sqlQueryOverrides']>[string]) {
   if (!override) {
     return buildSqlQueryResult(sql);
   }
@@ -237,31 +228,32 @@ function buildSqlQueryResultFromOverride(
 
 export async function seedClientState(page: Page, options: { lang?: 'cn' | 'en'; appVersion?: string | null } = {}) {
   const lang = options.lang || 'en';
-  const initialAppVersion = Object.prototype.hasOwnProperty.call(options, 'appVersion')
-    ? options.appVersion
-    : (process.env.PLAYWRIGHT_REAL_BACKEND === 'true' ? null : appVersion);
+  const initialAppVersion = Object.prototype.hasOwnProperty.call(options, 'appVersion') ? options.appVersion : process.env.PLAYWRIGHT_REAL_BACKEND === 'true' ? null : appVersion;
 
-  await page.addInitScript(([version, initialLang]) => {
-    if (version) {
-      window.localStorage.setItem('appVersion', version);
-    }
-    window.localStorage.setItem('lang', initialLang);
+  await page.addInitScript(
+    ([version, initialLang]) => {
+      if (version) {
+        window.localStorage.setItem('appVersion', version);
+      }
+      window.localStorage.setItem('lang', initialLang);
 
-    const trackedWindow = window as typeof window & {
-      __openedUrls?: string[];
-      __dataSearchRequests?: Array<Record<string, unknown>>;
-      __sqlStopRequests?: number[];
-      __sqlQueryRequests?: Array<Record<string, unknown>>;
-    };
-    trackedWindow.__openedUrls = [];
-    trackedWindow.__dataSearchRequests = [];
-    trackedWindow.__sqlStopRequests = [];
-    trackedWindow.__sqlQueryRequests = [];
-    trackedWindow.open = ((url?: string | URL) => {
-      trackedWindow.__openedUrls?.push(url ? String(url) : '');
-      return null;
-    }) as typeof window.open;
-  }, [initialAppVersion, lang] as const);
+      const trackedWindow = window as typeof window & {
+        __openedUrls?: string[];
+        __dataSearchRequests?: Array<Record<string, unknown>>;
+        __sqlStopRequests?: number[];
+        __sqlQueryRequests?: Array<Record<string, unknown>>;
+      };
+      trackedWindow.__openedUrls = [];
+      trackedWindow.__dataSearchRequests = [];
+      trackedWindow.__sqlStopRequests = [];
+      trackedWindow.__sqlQueryRequests = [];
+      trackedWindow.open = ((url?: string | URL) => {
+        trackedWindow.__openedUrls?.push(url ? String(url) : '');
+        return null;
+      }) as typeof window.open;
+    },
+    [initialAppVersion, lang] as const,
+  );
 }
 
 export async function seedSessionStorage(page: Page, key: string, value: unknown) {
@@ -646,18 +638,19 @@ function loginSubmitButton(page: Page) {
 }
 
 function loginModelRadio(page: Page, model: 'tree' | 'table') {
-  const selector = model === 'tree'
-    ? '[data-testid="login-model-tree"], #connection-modal-type-0'
-    : '[data-testid="login-model-table"], #connection-modal-type-1';
+  const selector = model === 'tree' ? '[data-testid="login-model-tree"], #connection-modal-type-0' : '[data-testid="login-model-table"], #connection-modal-type-1';
   return page.locator(selector).first();
 }
 
 export async function selectLoginConnection(page: Page, connectionName?: string) {
   await loginConnectionSelect(page).click({ force: true });
 
-  const dropdown = page.locator('.el-select-dropdown').filter({
-    has: page.locator('.el-select-dropdown__item'),
-  }).last();
+  const dropdown = page
+    .locator('.el-select-dropdown')
+    .filter({
+      has: page.locator('.el-select-dropdown__item'),
+    })
+    .last();
   await expect(dropdown).toBeVisible({ timeout: 10_000 });
 
   if (connectionName) {
@@ -718,10 +711,7 @@ export async function fillSqlEditor(page: Page, sql: string) {
         state: {
           doc: { length: number };
         };
-        dispatch(payload: {
-          changes: { from: number; to: number; insert: string };
-          selection: { anchor: number };
-        }): void;
+        dispatch(payload: { changes: { from: number; to: number; insert: string }; selection: { anchor: number } }): void;
         focus(): void;
       };
     };
@@ -877,11 +867,14 @@ export async function selectTimeseries(page: Page, prefix: string, measurement =
 
   const inputTagName = await select.evaluate((element) => element.tagName.toLowerCase()).catch(() => '');
   const nestedInput = select.locator('input').last();
-  const input = inputTagName === 'input' ? select : ((await nestedInput.count()) > 0 ? nestedInput : page.locator(`#${prefix}`).last());
+  const input = inputTagName === 'input' ? select : (await nestedInput.count()) > 0 ? nestedInput : page.locator(`#${prefix}`).last();
   await expect(input).toBeVisible({ timeout: uiTimeouts.action });
   await input.fill(measurement);
 
-  const optionTestId = `${prefix}-option-${measurement.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase()}`;
+  const optionTestId = `${prefix}-option-${measurement
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase()}`;
   const optionByTestId = page.getByTestId(optionTestId);
   const optionByText = page.locator('.el-select-dropdown__item, .el-tree-node').filter({ hasText: measurement }).first();
   if (await optionByTestId.count()) {
@@ -900,7 +893,7 @@ export async function openTimeseriesOptions(page: Page, prefix: string, query = 
 
   const inputTagName = await select.evaluate((element) => element.tagName.toLowerCase()).catch(() => '');
   const nestedInput = select.locator('input').last();
-  const input = inputTagName === 'input' ? select : ((await nestedInput.count()) > 0 ? nestedInput : page.locator(`#${prefix}`).last());
+  const input = inputTagName === 'input' ? select : (await nestedInput.count()) > 0 ? nestedInput : page.locator(`#${prefix}`).last();
   await expect(input).toBeVisible({ timeout: uiTimeouts.action });
   await input.fill(query);
 

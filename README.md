@@ -5,7 +5,8 @@
 当前约定：
 
 - 默认使用中文界面执行。
-- 默认真实环境地址为 `http://127.0.0.1:9190`。
+- 默认真实环境参数以 `tests/e2e/config/runtime-environment.json` 为准。
+- 真实环境地址、IoTDB 地址、Prometheus 地址已统一收口到一个配置文件中维护。
 - 当前自动化文档口径统一按 `13` 个一级业务模块管理。
 - 当前树模型自动化已覆盖：实例管理、登录、首页、测点管理、查询、SQL操作、视图、权限管理、审计日志、数据库配置。
 - 当前未覆盖：AI分析、可视化、数据同步。
@@ -41,17 +42,106 @@ Windows 下建议统一使用 `npm.cmd`，避免 PowerShell 执行策略拦截 `
 
 当前项目默认使用以下真实环境：
 
-- Workbench 直连地址：`http://127.0.0.1:9190`
-- 本地前端调试地址：`http://127.0.0.1:8098`
-- IoTDB：`127.0.0.1:6667`
-- 默认实例名称：`localhost`
-- 默认用户名：`root`
-- 默认 Prometheus：`127.0.0.1:9090`
+- Workbench 直连地址：读取 `workbench.realBaseUrl`
+- 本地前端调试地址：读取 `workbench.devBaseUrl`
+- IoTDB：读取 `iotdb.host` + `iotdb.port`
+- 默认实例名称：读取 `iotdb.instanceName`
+- 默认用户名：读取 `iotdb.username`
+- 默认 Prometheus：读取 `prometheus.url`
 
-相关配置文件：
+### 3.1 统一环境配置文件
 
-- Playwright 地址配置：`playwright.config.ts`
-- 实例连接默认配置：`tests/e2e/support/connection-api.ts`
+真实环境相关配置已经统一收口到：
+
+- `tests/e2e/config/runtime-environment.json`
+
+当前文件结构如下：
+
+```json
+{
+  "workbench": {
+    "realBaseUrl": "http://127.0.0.1:9190",
+    "devBaseUrl": "http://127.0.0.1:8098",
+    "devProxyApiUrl": "http://127.0.0.1:9190"
+  },
+  "iotdb": {
+    "instanceName": "localhost",
+    "host": "127.0.0.1",
+    "port": 6667,
+    "username": "root",
+    "password": "TimechoDB@2021",
+    "model": "tree"
+  },
+  "prometheus": {
+    "url": "127.0.0.1:9090",
+    "username": "",
+    "password": ""
+  }
+}
+```
+
+修改规则：
+
+- 切换 Workbench 地址：修改 `workbench.realBaseUrl`
+- 切换本地前端调试地址：修改 `workbench.devBaseUrl`
+- 切换本地前端代理目标：修改 `workbench.devProxyApiUrl`
+- 切换 IoTDB 实例地址：修改 `iotdb.host` 和 `iotdb.port`
+- 切换默认登录实例名：修改 `iotdb.instanceName`
+- 切换数据库账号密码：修改 `iotdb.username` 和 `iotdb.password`
+- 切换 Prometheus 地址：修改 `prometheus.url`
+
+生效范围：
+
+- Playwright 运行基地址
+- `sbin/start.bat` / `sbin/start.sh` 启动脚本
+- `tests/e2e/scripts/run-e2e-entry.mjs`
+- `tests/e2e/scripts/run-real-cleanup.mjs`
+- `tests/e2e/scripts/run-playwright-report.mjs`
+- `tests/e2e/support/connection-api.ts`
+- 真实环境实例管理相关默认值与断言
+
+### 3.2 Linux 服务器场景
+
+如果 Workbench、IoTDB、Prometheus 都部署在 Linux 服务器上，不需要再分散改多个脚本，只需要修改 `tests/e2e/config/runtime-environment.json`。
+
+示例：
+
+```json
+{
+  "workbench": {
+    "realBaseUrl": "http://192.168.1.100:9190",
+    "devBaseUrl": "http://127.0.0.1:8098",
+    "devProxyApiUrl": "http://192.168.1.100:9190"
+  },
+  "iotdb": {
+    "instanceName": "localhost",
+    "host": "192.168.1.100",
+    "port": 6667,
+    "username": "root",
+    "password": "你的密码",
+    "model": "tree"
+  },
+  "prometheus": {
+    "url": "192.168.1.100:9090",
+    "username": "",
+    "password": ""
+  }
+}
+```
+
+修改完成后，直接按原命令执行即可，例如：
+
+```powershell
+.\sbin\start.bat login direct headed
+.\sbin\start.bat instance direct report
+.\sbin\start.bat full headed
+```
+
+相关配置入口：
+
+- Playwright 地址配置读取：`playwright.config.ts`
+- TS 侧统一读取器：`tests/e2e/support/runtime-config.ts`
+- Node 脚本侧统一读取器：`tests/e2e/scripts/runtime-config.mjs`
 - 真实环境数据清理脚本：`tests/e2e/scripts/run-real-cleanup.mjs`
 
 ## 4. 运行模式
@@ -60,12 +150,12 @@ Windows 下建议统一使用 `npm.cmd`，避免 PowerShell 执行策略拦截 `
 
 `direct` 模式直接访问已启动好的 Workbench，不由 Playwright 拉起本地前端。
 
-- 访问地址：`http://127.0.0.1:9190`
+- 访问地址：默认读取 `tests/e2e/config/runtime-environment.json` 中的 `workbench.realBaseUrl`
 - 自动注入：
   - `PLAYWRIGHT_REAL_BACKEND=true`
-  - `PLAYWRIGHT_BASE_URL=http://127.0.0.1:9190`
-  - `PLAYWRIGHT_REAL_BASE_URL=http://127.0.0.1:9190`
-  - `PLAYWRIGHT_PORT=9190`
+  - `PLAYWRIGHT_BASE_URL=<workbench.realBaseUrl>`
+  - `PLAYWRIGHT_REAL_BASE_URL=<workbench.realBaseUrl>`
+  - `PLAYWRIGHT_PORT=<从 workbench.realBaseUrl 自动解析>`
   - `PLAYWRIGHT_SKIP_WEBSERVER=true`
 - 适用场景：
   - 真实环境回归
@@ -76,20 +166,25 @@ Windows 下建议统一使用 `npm.cmd`，避免 PowerShell 执行策略拦截 `
 
 `dev` 模式会启动本地前端页面，再将接口代理到真实 Workbench 后端。
 
-- 前端地址：`http://127.0.0.1:8098`
-- API 代理：`http://127.0.0.1:9190`
+- 前端地址：默认读取 `tests/e2e/config/runtime-environment.json` 中的 `workbench.devBaseUrl`
+- API 代理：默认读取 `tests/e2e/config/runtime-environment.json` 中的 `workbench.devProxyApiUrl`
 - 自动注入：
   - `PLAYWRIGHT_REAL_BACKEND=true`
-  - `PLAYWRIGHT_BASE_URL=http://127.0.0.1:8098`
-  - `PLAYWRIGHT_REAL_BASE_URL=http://127.0.0.1:9190`
-  - `PLAYWRIGHT_PORT=8098`
+  - `PLAYWRIGHT_BASE_URL=<workbench.devBaseUrl>`
+  - `PLAYWRIGHT_REAL_BASE_URL=<workbench.realBaseUrl>`
+  - `PLAYWRIGHT_PORT=<从 workbench.devBaseUrl 自动解析>`
   - `PLAYWRIGHT_SERVER_MODE=dev`
   - `PLAYWRIGHT_FORCE_WEBSERVER=true`
-  - `CONFIG_API_PROXY=http://127.0.0.1:9190`
+  - `CONFIG_API_PROXY=<workbench.devProxyApiUrl>`
 - 适用场景：
   - 本地联调
   - DOM 结构适配
   - 页面变更后的快速修复
+
+说明：
+
+- 上述地址是当前 `tests/e2e/config/runtime-environment.json` 中的默认值
+- 如果你已经改成 Linux 服务器地址，这里的 `direct` / `dev` 会自动跟随统一配置生效
 
 ## 5. 用例目录
 
@@ -327,8 +422,8 @@ Shell：
 
 - 不写运行模式时，默认 `direct`
 - 不写展示模式时，默认 `report`
-- `direct` 表示直连 `127.0.0.1:9190`
-- `dev` 表示启动本地前端 `127.0.0.1:8098`
+- `direct` 表示直连统一配置中的 `workbench.realBaseUrl`
+- `dev` 表示启动统一配置中的 `workbench.devBaseUrl`
 - `report` 表示执行并输出报告，不打开浏览器
 - `headed` 表示打开浏览器执行，并输出报告
 - `--dry-run` 只打印解析后的执行命令
@@ -483,31 +578,31 @@ npm.cmd run test:e2e:typecheck
 报告内容默认包含：
 
 - 执行环境：`Workbench + IoTDB`
-- Workbench 地址：`http://127.0.0.1:9190`
+- Workbench 地址：读取当前运行时生效的 `workbench.realBaseUrl`
 - 执行命令
 - 总体通过 / 失败统计
 - 分文件、分用例结果明细
 - 失败截图与相关产物
 
-## 11. 9190 直连模式注意事项
+## 11. direct 真实环境模式注意事项
 
 执行前请确认：
 
-- Workbench 已启动并监听 `127.0.0.1:9190`
+- Workbench 已启动并监听 `tests/e2e/config/runtime-environment.json` 中配置的 `workbench.realBaseUrl`
 - IoTDB 已启动
-- `localhost` 实例可正常登录
+- 统一配置中的默认实例可正常登录
 - 本次执行不依赖 Mock
 
-Windows 可用以下命令确认 `9190` 是否监听：
+Windows 可用以下命令确认目标端口是否监听：
 
 ```powershell
-netstat -ano | findstr 9190
+netstat -ano | findstr <Workbench端口>
 ```
 
 说明：
 
 - `direct` 模式不会帮你启动 Workbench
-- 如果 `127.0.0.1:9190` 未启动，用例会直接失败
+- 如果统一配置中的 `workbench.realBaseUrl` 未启动，用例会直接失败
 - 查询页真实场景会自动准备连接和查询种子数据
 - SQL 用例已按真实 Workbench DOM 做兼容定位
 - 视图页面用例已按真实 Workbench DOM 做兼容定位与自动清理
@@ -562,7 +657,7 @@ npm run test:e2e:login:real:headed:report
 
 优先检查：
 
-- `127.0.0.1:9190` 是否可访问
+- `tests/e2e/config/runtime-environment.json` 中的 `workbench.realBaseUrl` 是否可访问
 - IoTDB 是否已启动
 - `tests/e2e/support/connection-api.ts` 中的连接配置是否与当前环境一致
 

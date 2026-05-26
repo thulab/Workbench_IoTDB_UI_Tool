@@ -1,13 +1,13 @@
 import { defineConfig, devices } from '@playwright/test';
+import { getDevWorkbenchBaseUrl, getPlaywrightPort, getRealWorkbenchBaseUrl } from './tests/e2e/support/runtime-config';
 
-const port = Number(process.env.PLAYWRIGHT_PORT || 8080);
 const realBackendRun = process.env.PLAYWRIGHT_REAL_BACKEND === 'true';
+const port = getPlaywrightPort(realBackendRun);
 const forceWebServer = process.env.PLAYWRIGHT_FORCE_WEBSERVER === 'true';
-const realWorkbenchBaseURL = process.env.PLAYWRIGHT_REAL_BASE_URL || 'http://127.0.0.1:9190';
-const baseURL = process.env.PLAYWRIGHT_BASE_URL || (realBackendRun ? realWorkbenchBaseURL : `http://127.0.0.1:${port}`);
-const useWebServer = process.env.PLAYWRIGHT_SKIP_WEBSERVER
-  ? process.env.PLAYWRIGHT_SKIP_WEBSERVER !== 'true'
-  : forceWebServer || !realBackendRun;
+const realWorkbenchBaseURL = getRealWorkbenchBaseUrl();
+const devWorkbenchBaseURL = getDevWorkbenchBaseUrl();
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || (realBackendRun ? realWorkbenchBaseURL : devWorkbenchBaseURL);
+const useWebServer = process.env.PLAYWRIGHT_SKIP_WEBSERVER ? process.env.PLAYWRIGHT_SKIP_WEBSERVER !== 'true' : forceWebServer || !realBackendRun;
 const serverMode = process.env.PLAYWRIGHT_SERVER_MODE || 'preview';
 
 function getWebServerCommand() {

@@ -1,18 +1,11 @@
 import { chromium, request } from '@playwright/test';
+import { getLocalhostConnection, getRealWorkbenchBaseUrl } from './runtime-config.mjs';
 
-const defaultBaseUrl = 'http://127.0.0.1:9190';
-const baseUrl = process.env.PLAYWRIGHT_REAL_BASE_URL || process.env.PLAYWRIGHT_BASE_URL || defaultBaseUrl;
-
+const baseUrl = getRealWorkbenchBaseUrl();
+const configuredLocalhostConnection = getLocalhostConnection();
 const localhostConnection = {
-  name: 'localhost',
-  host: '127.0.0.1',
-  port: 6667,
-  username: 'root',
-  password: 'TimechoDB@2021',
-  model: 'tree',
-  prometheusUrl: 'http://127.0.0.1:9090/api/v1/query',
-  prometheusUsername: '',
-  prometheusPassword: '',
+  ...configuredLocalhostConnection,
+  prometheusUrl: /^https?:\/\//i.test(configuredLocalhostConnection.prometheusUrl) ? configuredLocalhostConnection.prometheusUrl : `http://${configuredLocalhostConnection.prometheusUrl}/api/v1/query`,
 };
 
 const cleanupPrefixMap = {
@@ -155,36 +148,35 @@ async function loginToWorkbench(page) {
 }
 
 async function runSqlsInWorkbenchSession(page, sqls) {
-  return await page.evaluate(async ({ statements }) => {
-    const response = await fetch('/api/query/querySql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sqls: statements,
-        timestamp: Date.now(),
-      }),
-    });
+  return await page.evaluate(
+    async ({ statements }) => {
+      const response = await fetch('/api/query/querySql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sqls: statements,
+          timestamp: Date.now(),
+        }),
+      });
 
-    return await response.json();
-  }, { statements: sqls });
+      return await response.json();
+    },
+    { statements: sqls },
+  );
 }
 
 function readDatabaseNames(queryPayload) {
   const rows = queryPayload?.data?.flatMap((item) => item?.valueList || []) || [];
-  return rows
-    .map((row) => row.find((value) => typeof value === 'string'))
-    .filter((value) => typeof value === 'string' && value.length > 0);
+  return rows.map((row) => row.find((value) => typeof value === 'string')).filter((value) => typeof value === 'string' && value.length > 0);
 }
 
 function buildCleanupTargets(modules, databaseNames) {
   const prefixes = modules.flatMap((moduleName) => cleanupPrefixMap[moduleName] || []);
   const exactNames = modules.flatMap((moduleName) => cleanupExactMap[moduleName] || []);
 
-  return databaseNames.filter((databaseName) =>
-    exactNames.includes(databaseName) || prefixes.some((prefix) => databaseName.startsWith(prefix)),
-  );
+  return databaseNames.filter((databaseName) => exactNames.includes(databaseName) || prefixes.some((prefix) => databaseName.startsWith(prefix)));
 }
 
 async function cleanupRealDatabases(page, modules) {
@@ -208,46 +200,50 @@ async function cleanupRealViews(page, modules) {
     return [];
   }
 
-  const measurements = await page.evaluate(async ({ prefixes }) => {
-    const response = await fetch('/api/calculate/getCalculateList', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        pageNum: 1,
-        pageSize: 500,
-        name: '',
-        measurement: '',
-        desc: '',
-      }),
-    });
+  const measurements = await page.evaluate(
+    async ({ prefixes }) => {
+      const response = await fetch('/api/calculate/getCalculateList', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pageNum: 1,
+          pageSize: 500,
+          name: '',
+          measurement: '',
+          desc: '',
+        }),
+      });
 
-    if (!response.ok) {
-      return [];
-    }
+      if (!response.ok) {
+        return [];
+      }
 
-    const payload = await response.json();
-    const list = Array.isArray(payload?.data?.list) ? payload.data.list : [];
-    return list
-      .map((item) => item?.measurement || '')
-      .filter((measurement) => prefixes.some((prefix) => measurement.startsWith(prefix)));
-  }, { prefixes: measurementPrefixes });
+      const payload = await response.json();
+      const list = Array.isArray(payload?.data?.list) ? payload.data.list : [];
+      return list.map((item) => item?.measurement || '').filter((measurement) => prefixes.some((prefix) => measurement.startsWith(prefix)));
+    },
+    { prefixes: measurementPrefixes },
+  );
 
   if (!measurements.length) {
     console.log('[cleanup] no matching views found');
     return [];
   }
 
-  await page.evaluate(async ({ measurementList }) => {
-    await fetch('/api/calculate/deleteCalculate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ measurements: measurementList }),
-    });
-  }, { measurementList: measurements });
+  await page.evaluate(
+    async ({ measurementList }) => {
+      await fetch('/api/calculate/deleteCalculate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ measurements: measurementList }),
+      });
+    },
+    { measurementList: measurements },
+  );
 
   return measurements;
 }

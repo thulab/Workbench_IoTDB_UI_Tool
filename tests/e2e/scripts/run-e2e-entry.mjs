@@ -1,10 +1,16 @@
 import path from 'node:path';
 import { spawn } from 'node:child_process';
+import { getDevProxyApiUrl, getDevWorkbenchBaseUrl, getPlaywrightPort, getRealWorkbenchBaseUrl } from './runtime-config.mjs';
 
 const repoRoot = process.cwd();
 const reportScriptPath = path.join(repoRoot, 'tests', 'e2e', 'scripts', 'run-playwright-report.mjs');
 const cleanupScriptPath = path.join(repoRoot, 'tests', 'e2e', 'scripts', 'run-real-cleanup.mjs');
 const tscScriptPath = path.join(repoRoot, 'node_modules', 'typescript', 'bin', 'tsc');
+const realWorkbenchBaseUrl = getRealWorkbenchBaseUrl();
+const devWorkbenchBaseUrl = getDevWorkbenchBaseUrl();
+const devProxyApiUrl = getDevProxyApiUrl();
+const directPort = String(getPlaywrightPort(true));
+const devPort = String(getPlaywrightPort(false));
 
 const moduleDefinitions = [
   {
@@ -154,16 +160,16 @@ Examples:
   start.bat typecheck --dry-run
 
 Notes:
-  direct  = connect directly to Workbench on 127.0.0.1:9190
-  dev     = open local frontend on 127.0.0.1:8098 and proxy API to 127.0.0.1:9190
+  direct  = connect directly to Workbench on ${realWorkbenchBaseUrl}
+  dev     = open local frontend on ${devWorkbenchBaseUrl} and proxy API to ${devProxyApiUrl}
   report  = generate report without headed browser mode
   headed  = open browser and generate report
   auth = run user + role management specs under permission management
   ai-analysis / visualization = reserved business-module aliases, no spec implemented yet
-  search-cleanup / measurement-cleanup / calculate-cleanup / cleanup-all = cleanup-only commands for real 127.0.0.1:9190 data
+  search-cleanup / measurement-cleanup / calculate-cleanup / cleanup-all = cleanup-only commands for real ${realWorkbenchBaseUrl} data
   typecheck = run TypeScript check for Playwright and tests/e2e via tsconfig.e2e.json
-  full/full-real = run all currently covered modules in direct mode on 127.0.0.1:9190
-  full-dev = run all currently covered modules in dev mode on 127.0.0.1:8098
+  full/full-real = run all currently covered modules in direct mode on ${realWorkbenchBaseUrl}
+  full-dev = run all currently covered modules in dev mode on ${devWorkbenchBaseUrl}
   --dry-run = print resolved command without executing`);
 }
 
@@ -334,10 +340,10 @@ function buildRuntimeConfig(runtimeTarget) {
 
   if (runtimeTarget === 'dev') {
     env.PLAYWRIGHT_REAL_BACKEND = 'true';
-    env.CONFIG_API_PROXY = 'http://127.0.0.1:9190';
-    env.PLAYWRIGHT_REAL_BASE_URL = 'http://127.0.0.1:9190';
-    env.PLAYWRIGHT_BASE_URL = 'http://127.0.0.1:8098';
-    env.PLAYWRIGHT_PORT = '8098';
+    env.CONFIG_API_PROXY = devProxyApiUrl;
+    env.PLAYWRIGHT_REAL_BASE_URL = realWorkbenchBaseUrl;
+    env.PLAYWRIGHT_BASE_URL = devWorkbenchBaseUrl;
+    env.PLAYWRIGHT_PORT = devPort;
     env.PLAYWRIGHT_SERVER_MODE = 'dev';
     env.PLAYWRIGHT_FORCE_WEBSERVER = 'true';
     delete env.PLAYWRIGHT_SKIP_WEBSERVER;
@@ -351,9 +357,9 @@ function buildRuntimeConfig(runtimeTarget) {
   }
 
   env.PLAYWRIGHT_REAL_BACKEND = 'true';
-  env.PLAYWRIGHT_REAL_BASE_URL = 'http://127.0.0.1:9190';
-  env.PLAYWRIGHT_BASE_URL = 'http://127.0.0.1:9190';
-  env.PLAYWRIGHT_PORT = '9190';
+  env.PLAYWRIGHT_REAL_BASE_URL = realWorkbenchBaseUrl;
+  env.PLAYWRIGHT_BASE_URL = realWorkbenchBaseUrl;
+  env.PLAYWRIGHT_PORT = directPort;
   env.PLAYWRIGHT_SKIP_WEBSERVER = 'true';
   delete env.PLAYWRIGHT_FORCE_WEBSERVER;
   delete env.PLAYWRIGHT_SERVER_MODE;
@@ -432,7 +438,7 @@ try {
 
     console.log();
     console.log(`[E2E] command=${parsed.command}`);
-    console.log(`[E2E] baseURL=http://127.0.0.1:9190`);
+    console.log(`[E2E] baseURL=${realWorkbenchBaseUrl}`);
 
     if (parsed.dryRun) {
       console.log('[E2E] dry-run=true');

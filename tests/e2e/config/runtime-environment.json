@@ -1,0 +1,20 @@
+{
+  "workbench": {
+    "realBaseUrl": "http://127.0.0.1:9190",
+    "devBaseUrl": "http://127.0.0.1:8098",
+    "devProxyApiUrl": "http://127.0.0.1:9190"
+  },
+  "iotdb": {
+    "instanceName": "localhost",
+    "host": "127.0.0.1",
+    "port": 6667,
+    "username": "root",
+    "password": "TimechoDB@2021",
+    "model": "tree"
+  },
+  "prometheus": {
+    "url": "127.0.0.1:9090",
+    "username": "",
+    "password": ""
+  }
+}

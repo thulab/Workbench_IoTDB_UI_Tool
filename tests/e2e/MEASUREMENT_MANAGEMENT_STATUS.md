@@ -7,7 +7,7 @@
 - Tree_Model 全量报告：`tests/e2e/reports/Workbench-report_2026-5-15_15-58-10.md`
 - 模块文件：`tests/e2e/Test_Cases/Tree_Model/Measurement_Management/measurement-management.spec.ts`
 - 执行环境：真实 Workbench + 真实 IoTDB
-- Workbench 地址：`http://127.0.0.1:9190`
+- Workbench 地址：以 `tests/e2e/config/runtime-environment.json` 中的 `workbench.realBaseUrl` 为准
 - 执行模式：`--headed`
 - 执行日期：`2026-05-15`
 - 当前结果：`112 / 112` 全部通过

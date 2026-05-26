@@ -79,7 +79,7 @@ test.describe('登录页验证', () => {
   }
 
   if (realBackendRun) {
-    // 真实环境分支直连 127.0.0.1:9190，校验实际 Workbench 登录行为。
+    // 真实环境分支直连统一配置中的 Workbench 地址，校验实际 Workbench 登录行为。
     test('1. 进入登录页并加载 localhost 实例', async ({ page }) => {
       const loginPage = new LoginPage(page);
       await loginPage.goto();
@@ -167,4 +167,3 @@ test.describe('登录页验证', () => {
     });
   }
 });
-

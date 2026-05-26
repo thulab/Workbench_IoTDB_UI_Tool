@@ -263,7 +263,7 @@ test.describe('实例管理', () => {
   }
 
   if (realBackendRun) {
-    // 真实环境分支直连 127.0.0.1:9190，覆盖实例新建、编辑、删除和连接测试。
+    // 真实环境分支直连统一配置中的 Workbench 地址，覆盖实例新建、编辑、删除和连接测试。
     test('1. 实例管理页，完成单机实例新建流程', async ({ page }) => {
       const loginPage = new LoginPage(page);
       const instancePage = new InstanceManagementPage(page);
@@ -327,9 +327,9 @@ test.describe('实例管理', () => {
       await instancePage.addConnection();
       await instancePage.fillStandaloneConnection({
         name: registerCleanupName(buildTempInstanceName('wrong-pwd')),
-        host: '127.0.0.1',
-        port: '6667',
-        username: 'root',
+        host: localhostConnection.host,
+        port: String(localhostConnection.port),
+        username: localhostConnection.username,
         password: 'Pass@12345678',
       });
       await instancePage.clickPrimaryAction('test');
@@ -365,10 +365,10 @@ test.describe('实例管理', () => {
       await instancePage.addConnection();
       await instancePage.fillStandaloneConnection({
         name: draftName,
-        host: '127.0.0.1',
-        port: '6667',
-        username: 'root',
-        password: 'TimechoDB@2021',
+        host: localhostConnection.host,
+        port: String(localhostConnection.port),
+        username: localhostConnection.username,
+        password: localhostConnection.password,
       });
 
       await instancePage.itemByName(baseName).click();
@@ -408,12 +408,15 @@ test.describe('实例管理', () => {
       await instancePage.clickPrimaryAction('save');
       await instancePage.expectLatestToast('success');
       await expect
-        .poll(async () => {
-          const connections = await getConnectionListByApi(request);
-          return connections.find((item) => item?.name === updatedName)?.name || '';
-        }, {
-          timeout: 15_000,
-        })
+        .poll(
+          async () => {
+            const connections = await getConnectionListByApi(request);
+            return connections.find((item) => item?.name === updatedName)?.name || '';
+          },
+          {
+            timeout: 15_000,
+          },
+        )
         .toBe(updatedName);
 
       await instancePage.refreshList();
@@ -466,9 +469,9 @@ test.describe('实例管理', () => {
       await instancePage.addConnection();
       await instancePage.fillStandaloneConnection({
         name: '',
-        host: '127.0.0.1',
-        port: '6667',
-        username: 'root',
+        host: localhostConnection.host,
+        port: String(localhostConnection.port),
+        username: localhostConnection.username,
       });
       await instancePage.clickPrimaryAction('save');
 
@@ -488,7 +491,7 @@ test.describe('实例管理', () => {
         name: buildTempInstanceName('empty-host-port'),
         host: '',
         port: '',
-        username: 'root',
+        username: localhostConnection.username,
       });
       await instancePage.clickPrimaryAction('save');
 
@@ -507,8 +510,8 @@ test.describe('实例管理', () => {
       await instancePage.addConnection();
       await instancePage.fillStandaloneConnection({
         name: buildTempInstanceName('empty-username'),
-        host: '127.0.0.1',
-        port: '6667',
+        host: localhostConnection.host,
+        port: String(localhostConnection.port),
         username: '',
       });
       await instancePage.clickPrimaryAction('save');
@@ -570,8 +573,8 @@ test.describe('实例管理', () => {
       await instancePage.addConnection();
       await instancePage.fillStandaloneConnection({
         name: buildTempInstanceName('test-iotdb-fail'),
-        host: '127.0.0.1',
-        port: '6667',
+        host: localhostConnection.host,
+        port: String(localhostConnection.port),
         username: 'root-error',
         password: 'Pass@1',
       });
@@ -592,8 +595,8 @@ test.describe('实例管理', () => {
       await instancePage.addConnection();
       await instancePage.fillStandaloneConnection({
         name: buildTempInstanceName('test-all-fail'),
-        host: '127.0.0.1',
-        port: '6667',
+        host: localhostConnection.host,
+        port: String(localhostConnection.port),
         username: 'root-error',
         password: 'Pass@12345678',
       });
@@ -635,4 +638,3 @@ test.describe('实例管理', () => {
     });
   }
 });
-
