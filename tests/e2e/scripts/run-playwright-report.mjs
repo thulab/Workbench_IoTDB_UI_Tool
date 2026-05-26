@@ -390,6 +390,12 @@ cleanOldArtifacts();
 mkdirSync(reportsDir, { recursive: true });
 
 const result = await runPlaywright(playwrightArgs);
+if (!statExists(jsonReportPath)) {
+  const stderrSummary = stripAnsi(result.stderr || '').trim();
+  const stdoutSummary = stripAnsi(result.stdout || '').trim();
+  const diagnosticText = stderrSummary || stdoutSummary || 'No Playwright stdout/stderr captured.';
+  throw new Error(`Playwright JSON report was not generated: ${jsonReportPath}\n\nLikely root cause:\n${diagnosticText}`);
+}
 const { results, stats } = loadPlaywrightJsonResults(cliConfig.project);
 const artifacts = result.code === 0 ? [] : collectFailureArtifacts();
 const reportContent = buildMarkdownReport({

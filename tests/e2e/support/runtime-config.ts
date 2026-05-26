@@ -1,4 +1,6 @@
-import runtimeEnvironment from '../config/runtime-environment.json';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 type RuntimeEnvironment = {
   workbench: {
@@ -21,7 +23,10 @@ type RuntimeEnvironment = {
   };
 };
 
-const runtimeConfig = runtimeEnvironment as RuntimeEnvironment;
+const currentFilePath = fileURLToPath(import.meta.url);
+const currentDirPath = path.dirname(currentFilePath);
+const runtimeConfigPath = path.join(currentDirPath, '..', 'config', 'runtime-environment.json');
+const runtimeConfig = JSON.parse(readFileSync(runtimeConfigPath, 'utf8')) as RuntimeEnvironment;
 
 function parseUrlPort(url: string, fallbackPort: number) {
   try {
