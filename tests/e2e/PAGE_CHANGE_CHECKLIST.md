@@ -2,15 +2,15 @@
 
 ## 1. 适用范围
 
-本清单按当前统一的 `13` 个一级业务模块维护：
+本文档按当前统一的 `13` 个一级业务模块维护：
 
 1. 实例管理
 2. 登录
 3. 首页
 4. 测点管理
 5. 查询
-6. SQL操作
-7. AI分析
+6. SQL 操作
+7. AI 分析
 8. 可视化
 9. 视图
 10. 数据同步
@@ -18,7 +18,7 @@
 12. 审计日志
 13. 数据库配置
 
-当前已落地真实环境自动化的 spec：
+当前已落地的真实环境自动化 spec：
 
 - `tests/e2e/Test_Cases/Tree_Model/Instance_Management/instance-management.spec.ts`
 - `tests/e2e/Test_Cases/Tree_Model/Instance_Login/login.spec.ts`
@@ -29,6 +29,7 @@
 - `tests/e2e/Test_Cases/Tree_Model/SQL_Search/sql-search.spec.ts`
 - `tests/e2e/Test_Cases/Tree_Model/Trend/tree-running-trend.spec.ts`
 - `tests/e2e/Test_Cases/Tree_Model/Trend/tree-history-trend.spec.ts`
+- `tests/e2e/Test_Cases/Tree_Model/Trend/spectrum.spec.ts`
 - `tests/e2e/Test_Cases/Tree_Model/Calculate_Detail/calculate.spec.ts`
 - `tests/e2e/Test_Cases/Tree_Model/Data_Sync/data-sync.spec.ts`
 - `tests/e2e/Test_Cases/Tree_Model/System/Auth/User/user.spec.ts`
@@ -47,6 +48,7 @@
 - `tests/e2e/support/connection-api.ts`
 - `tests/e2e/scripts/run-e2e-entry.mjs`
 - `tests/e2e/scripts/run-real-cleanup.mjs`
+- `tests/e2e/scripts/runtime-config.mjs`
 
 ## 2. 页面改动前先确认
 
@@ -56,17 +58,17 @@
   - 首页
   - 测点管理
   - 查询
-  - SQL操作
-  - AI分析
+  - SQL 操作
+  - AI 分析
   - 可视化
   - 视图
   - 数据同步
   - 权限管理
   - 审计日志
   - 数据库配置
-- 是否新增、删除、重命名了关键 `id` / `data-testid`
-- 是否调整了菜单结构、面包屑、路由地址或查询参数
-- 是否调整了交互时序：
+- 是否新增、删除、重命名了关键 `id`、`data-testid`、按钮文案、表单标签。
+- 是否调整了菜单结构、面包屑、路由地址、查询参数或多页签行为。
+- 是否调整了核心交互时序：
   - 弹层打开 / 关闭
   - 表单回填
   - 保存后刷新
@@ -74,8 +76,10 @@
   - 导入导出触发方式
 - 是否改变了真实环境前置依赖：
   - `localhost` 实例
-  - 统一环境配置中的 `workbench.realBaseUrl` 直连模式
-  - 查询 / 测点 / 视图依赖的种子数据
+  - 统一环境配置中的 `workbench.realBaseUrl`
+  - 9190 直连模式与默认登录模式
+  - 查询 / 趋势 / 视图 / SQL / 分析依赖的种子数据
+  - UDF 或插件前置安装状态
 
 ## 3. 按模块维护入口
 
@@ -111,8 +115,8 @@
   - 节点切换下拉
   - ConfigNode / DataNode 指标卡片
 - 当前说明：
-  - 首页较多依赖中文文案和卡片结构断言
-  - 如页面改版，优先补稳定 `data-testid`
+  - 首页较多依赖中文文案和卡片结构断言。
+  - 如页面改版，优先补稳定 `data-testid`。
 - 优先维护：
   - `tests/e2e/Test_Cases/Tree_Model/Instance_Dashboard/dashboard.spec.ts`
 
@@ -141,15 +145,15 @@
   - 查询 / 重置 / 刷新 / 导入 / 导出
   - 结果表格与分页区
 - 当前说明：
-  - 查询模块复用 `workbench-test-support.ts` 中跳转与 `window.open` 捕获逻辑
-  - 若导入导出方式变化，需同步调整 URL 捕获断言
+  - 查询模块复用 `workbench-test-support.ts` 中跳转、导出和选择器兼容逻辑。
+  - 若导入导出方式变更，需要同步调整 URL 捕获和下载断言。
 - 优先维护：
   - `tests/e2e/support/workbench-test-support.ts`
   - `tests/e2e/support/real-query-data.ts`
   - `tests/e2e/Test_Cases/Tree_Model/Search/data-search.spec.ts`
   - `tests/e2e/Test_Cases/Tree_Model/Search/statistic-search.spec.ts`
 
-### 3.6 SQL操作
+### 3.6 SQL 操作
 
 - 重点检查：
   - SQL 编辑器容器
@@ -158,13 +162,13 @@
   - 快捷操作区：测点 / 函数 / 常用
   - 结果区：刷新 / 导出 / tooltip
 - 当前说明：
-  - SQL 模块对编辑器 DOM 敏感
-  - 如果编辑器框架升级，优先改 `workbench-test-support.ts` 里的编辑器兼容输入层
+  - SQL 模块对编辑器 DOM 很敏感。
+  - 如果编辑器框架升级，优先更新 `workbench-test-support.ts` 中的编辑器输入层。
 - 优先维护：
   - `tests/e2e/support/workbench-test-support.ts`
   - `tests/e2e/Test_Cases/Tree_Model/SQL_Search/sql-search.spec.ts`
 
-### 3.7 AI分析
+### 3.7 AI 分析
 
 - 当前状态：
   - 未覆盖
@@ -177,8 +181,7 @@
 ### 3.8 可视化
 
 - 当前状态：
-  - 已完成实时趋势、历史趋势首批真实环境覆盖
-  - 分析页仍待补充
+  - 已完成实时趋势、历史趋势、分析页首批真实环境覆盖
 - 重点检查：
   - 可视化主菜单与子菜单结构
   - 实时趋势页左侧测点列表
@@ -187,13 +190,19 @@
   - 保存常用弹窗
   - 常用趋势下拉框
   - 趋势删除按钮与导出按钮
+  - 分析方式下拉与其 tooltip
+  - 分析页 SQL 输入弹窗 / 编辑器
+  - 分析图谱容器
+  - 时间范围和测点选择区域
 - 当前说明：
-  - 实时趋势当前已覆盖菜单进入、基础布局、测点入图、播放暂停、保存常用、趋势删除、导出图片
-  - 历史趋势当前已覆盖页面基础布局、时间范围调整、测点入图、保存常用、趋势删除
-  - 该模块对图表容器、按钮图标和弹窗文案较敏感，页面改版后需优先核对稳定选择器与可点击区域
+  - 实时趋势当前已覆盖菜单进入、基础布局、测点入图、播放暂停、保存常用、趋势删除、导出图片。
+  - 历史趋势当前已覆盖基础布局、时间范围调整、测点入图、保存常用、趋势删除。
+  - 分析页当前已覆盖方法下拉、FFT、ENVELOPE、DWT、LOWPASS、HIGHPASS、自定义分析，以及图谱渲染主链路。
+  - 该模块对图表容器、Element Plus 可见下拉层、按钮图标、SQL 弹窗和编辑器 DOM 较敏感，页面改版后要优先校对这些定位点。
 - 优先维护：
   - `tests/e2e/Test_Cases/Tree_Model/Trend/tree-running-trend.spec.ts`
   - `tests/e2e/Test_Cases/Tree_Model/Trend/tree-history-trend.spec.ts`
+  - `tests/e2e/Test_Cases/Tree_Model/Trend/spectrum.spec.ts`
 
 ### 3.9 视图
 
@@ -206,8 +215,8 @@
   - 导出下拉
   - 批量删除 / 刷新
 - 当前说明：
-  - 视图当前已覆盖新建、编辑、删除、导入、导出、刷新、分页、查看数据跳转
-  - 如果列表、导入弹窗、导出结构变化，优先统一调整 helper，不要把定位散落到各条用例中
+  - 视图当前已覆盖新建、编辑、删除、导入、导出、刷新、分页、查看数据跳转。
+  - 如果列表、导入弹窗、导出结构变更，优先统一调整 helper，不要把定位散落到每条用例里。
 - 优先维护：
   - `tests/e2e/Test_Cases/Tree_Model/Calculate_Detail/calculate.spec.ts`
 
@@ -223,8 +232,8 @@
   - 详情 / 停止 / 删除
   - 时间范围、发送插件、发送模式相关控件
 - 当前说明：
-  - 当前已覆盖列表展示、新建任务、校验提示、查询重置、状态监控、批量操作、启停删除、空态
-  - 如页面改版，优先统一收口弹窗表单选择器与任务操作列按钮定位
+  - 当前已覆盖列表展示、新建任务、校验提示、查询重置、状态监控、批量操作、启停删除、空态。
+  - 如页面改版，优先统一收口弹窗表单选择器与任务操作列按钮定位。
 - 优先维护：
   - `tests/e2e/Test_Cases/Tree_Model/Data_Sync/data-sync.spec.ts`
 
@@ -237,8 +246,8 @@
   - 权限详情区
   - 用户详情区
 - 当前说明：
-  - 当前已覆盖用户管理、角色管理的页面展示与新建
-  - 编辑、删除、授权场景后续还要继续补
+  - 当前已覆盖用户管理、角色管理的页面展示与新建。
+  - 编辑、删除、授权场景后续仍需继续补。
 - 优先维护：
   - `tests/e2e/Test_Cases/Tree_Model/System/Auth/User/user.spec.ts`
   - `tests/e2e/Test_Cases/Tree_Model/System/Auth/Role/role.spec.ts`
@@ -247,7 +256,7 @@
 
 - 当前状态：
   - 首批已覆盖
-- 页面改版时建议先补：
+- 页面改版时建议先看：
   - 筛选区标签和输入控件
   - 查询 / 重置主链路
   - 列表列头
@@ -332,217 +341,31 @@
 - `#calculate-modal-desc`
 - `#calculate-modal-measurement`
 - `#calculate-modal-confirm`
-- `#calculate-modal-cancel`
-- `#calculate-modal-import`
-- `#calculate-import-steps`
-- `#calculate-import-upload`
-- `#calculate-import-next`
-- `#calculate-import-close`
-- `calculate-table-*-data`
-- `calculate-table-*-edit`
-- `calculate-table-*-del`
 
-### 4.6 数据库配置
+### 4.6 可视化分析页
 
-- `#iotdb-config-doc`
-- `#iotdb-config-select-node`
-- `#iotdb-config-refresh`
-- `#iotdb-config-reset`
-- `#iotdb-config-save`
-- `#iotdb-config-all-save`
-- `.editor-box .monaco-container`
-- `.preview-box .monaco-container`
-- `.iotdb-config-continue-confirm`
+- `analysis-method-select`
+- `analysis-apply`
+- `analysis-reset`
+- `analysis-save`
+- `analysis-cursor`
+- `analysis-common`
+- 真实页面中的可见 Element Plus 下拉层
+- SQL 输入弹窗中的编辑器容器
+- 分析图谱容器 / 图表 canvas
 
-说明：
+## 5. 变更后最低验证要求
 
-- 其他模块当前更多依赖中文文案、表格结构和 Page Object 封装。
-- 如果某个模块未来新增稳定 `data-testid`，优先补到 `tests/e2e/support/e2e-selectors.ts`。
-
-## 5. 测试层维护顺序
-
-### 5.1 通用顺序
-
-1. 先看是否可以补稳定 `data-testid`
-2. 先改 `tests/e2e/support/e2e-selectors.ts`
-3. 再改 `Page Object` 或公共 support helper
-4. 最后再改具体 `spec.ts` 断言
-
-不要在 `spec` 里分散修改同一类选择器。
-
-### 5.2 当前建议优先入口
-
-- 登录 / 实例管理：先看 `login-page.ts`、`instance-management-page.ts`
-- 测点管理：先看 `measurement-management-page.ts`
-- 查询 / SQL操作：先看 `workbench-test-support.ts`、`real-query-data.ts`
-- 视图：先看 `calculate.spec.ts` 内部 helper
-- 权限管理：先看对应 `user.spec.ts`、`role.spec.ts`
-
-## 6. 测试数据维护规则
-
-- `localhost` 作为登录页真实场景的基线实例
-- 每条真实登录用例开始前自动补齐 `localhost`
-- 登录页真实用例结束后需要统一清理 `localhost`
-- 实例管理真实场景使用 `TimechoDB-tmp-` 前缀的临时实例
-- 临时实例必须在 `afterEach / afterAll` 中统一清理
-
-- 查询模块真实场景使用：
-  - `root.test_query_`
-  - `root.test_csv_`
-  - `root.test_xlsx_`
-- 测点管理真实场景使用：
-  - `root.db_auto_`
-  - `root.test`
-- 视图真实场景使用：
-  - `root.test_view_seed`
-  - `root.test_view_seed.view_auto_`
-  - `root.view.import.`
-
-- 查询、测点管理、视图真实用例都必须具备模块级兜底清理，不能只依赖单条用例里的 `finally`
-- 新增真实环境用例时，如果会创建数据库、实例、视图、导入库或其他持久化对象，必须先定义统一前缀，再同步接入 `afterEach / afterAll` 或支撑层清理逻辑
-- 如果执行中断后界面仍能看到上述前缀数据，优先重跑对应模块 cleanup，不建议先手工删除
-
-## 7. 改动后的最小回归集
-
-### 7.1 登录
-
-```powershell
-npm.cmd run test:e2e:login:real
-```
-
-### 7.2 实例管理
-
-```powershell
-npm.cmd run test:e2e:instance:real
-```
-
-### 7.3 首页
-
-```powershell
-npm.cmd run test:e2e:dashboard:real
-```
-
-### 7.4 测点管理
-
-```powershell
-npm.cmd run test:e2e:measurement:real
-```
-
-### 7.5 查询
-
-```powershell
-npm.cmd run test:e2e:search:real:report
-```
-
-### 7.6 SQL操作
-
-```powershell
-npm.cmd run test:e2e:sql:real
-```
-
-### 7.7 视图
-
-```powershell
-npm.cmd run test:e2e:calculate:real
-```
-
-### 7.8 权限管理
-
-角色管理：
-
-```powershell
-.\sbin\start.bat auth direct report
-```
-
-用户管理：
-
-```powershell
-.\sbin\start.bat auth direct report
-```
-
-### 7.9 全量回归
-
-```powershell
-npm.cmd run test:e2e:real:headed:report
-```
-
-如果本次改动影响菜单、路由、登录态、实例连接或公共 support 层，建议直接跑全量。
-
-### 7.10 数据库配置
-
-```powershell
-npm.cmd run test:e2e:db-config:real
-```
-
-或：
-
-```powershell
-.\sbin\start.bat db-config direct headed
-```
-
-### 7.11 审计日志
-
-```powershell
-npm.cmd run test:e2e:audit:real
-```
-
-或：
-
-```powershell
-.\sbin\start.bat audit direct headed
-```
-
-## 8. 典型故障排查
-
-### 8.1 点击不到元素
-
-- 优先检查 `e2e-selectors.ts` 或模块 helper 是否失效
-- 检查元素是否被新的包裹层覆盖
-- 检查是否需要 `force: true`
-- 检查是否变成 hover 后才展示
-
-### 8.2 保存后断言偶发失败
-
-- 优先改为轮询列表项数量、URL 参数或接口结果
-- 不要只依赖瞬时提示文案
-
-### 8.3 编辑表单值被覆盖
-
-- 先等待详情回填完成
-- 再执行 `fill`
-- 编辑器场景优先走现有 helper，不要直接硬写键盘输入
-
-### 8.4 删除后列表未及时刷新
-
-- 使用轮询判断条目数量是否为 `0`
-- 或刷新列表后再断言
-- 模糊查询场景避免使用会命中其他记录的关键字
-
-### 8.5 导出断言失败
-
-- 先确认前端仍是 `window.open(...)` 触发
-- 再确认导出 URL 是否变化
-- 如果接口改名，记得同步修改 `openedUrls` 捕获逻辑
-
-### 8.6 导入弹窗用例失败
-
-- 先确认模板表头是否变化
-- 再确认真实环境依赖的源测点是否存在
-- 部分成功场景要同时核对：
-  - 结果文案
-  - 错误详情链接
-  - 成功数据是否实际落库
-
-### 8.7 分页相关断言失败
-
-- 先确认默认 `pageSize` 是否变化
-- 再确认是否新增筛选条件导致结果数减少
-- Element Plus 分页结构变化时，优先统一调整 helper
-
-## 9. 提交前检查
-
-- 所有新增页面元素是否补了稳定 `data-testid`
-- Page Object 或 support helper 是否已复用
-- 真实环境是否跑通最小回归集
-- 测试数据是否已经清理
-- `README.md`、`AUTOMATION_COVERAGE_MATRIX.md`、`XMind_Test_Case_Tree.md` 是否已同步
+- 如果改动影响单个模块，至少执行对应 spec 的 `--headed` 真实环境回归。
+- 如果改动影响公共 helper、路由、顶部布局、登录态、统一选择器，至少执行：
+  - 登录
+  - 首页
+  - 测点管理
+  - 查询
+  - SQL 操作
+  - 可视化
+- 如果改动影响图表容器、下拉层或编辑器，必须追加执行：
+  - `Trend/tree-running-trend.spec.ts`
+  - `Trend/tree-history-trend.spec.ts`
+  - `Trend/spectrum.spec.ts`
+  - `SQL_Search/sql-search.spec.ts`

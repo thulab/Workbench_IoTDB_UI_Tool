@@ -59,7 +59,11 @@ const moduleDefinitions = [
     key: 'trend',
     displayName: '可视化',
     aliases: ['trend', 'visualization', 'visual'],
-    specs: ['tests/e2e/Test_Cases/Tree_Model/Trend/tree-running-trend.spec.ts', 'tests/e2e/Test_Cases/Tree_Model/Trend/tree-history-trend.spec.ts'],
+    specs: [
+      'tests/e2e/Test_Cases/Tree_Model/Trend/tree-running-trend.spec.ts',
+      'tests/e2e/Test_Cases/Tree_Model/Trend/tree-history-trend.spec.ts',
+      'tests/e2e/Test_Cases/Tree_Model/Trend/spectrum.spec.ts',
+    ],
   },
   {
     key: 'view',
