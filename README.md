@@ -246,7 +246,6 @@ tests/e2e/
 ├─ AUTOMATION_COVERAGE_MATRIX.md
 ├─ PAGE_CHANGE_CHECKLIST.md
 ├─ XMind_Test_Case_Tree.md
-└─ MEASUREMENT_MANAGEMENT_STATUS.md
 ```
 
 说明：
@@ -651,7 +650,6 @@ netstat -ano | findstr <Workbench端口>
 页面结构变化后，优先查看：
 
 - `tests/e2e/PAGE_CHANGE_CHECKLIST.md`
-- `tests/e2e/CALCULATE_DETAIL_STATUS.md`
 - `tests/e2e/support/e2e-selectors.ts`
 - `tests/e2e/pages/login-page.ts`
 - `tests/e2e/pages/instance-management-page.ts`
