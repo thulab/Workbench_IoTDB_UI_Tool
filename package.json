@@ -74,6 +74,10 @@
     "test:e2e:sql:real:headed": "set PLAYWRIGHT_REAL_BACKEND=true&& playwright test tests/e2e/Test_Cases/Tree_Model/SQL_Search/sql-search.spec.ts --project=chromium --headed --workers=1",
     "test:e2e:sql:real:report": "node tests/e2e/scripts/run-playwright-report.mjs --report-key sql-real-report --spec tests/e2e/Test_Cases/Tree_Model/SQL_Search/sql-search.spec.ts --project chromium --workers 1",
     "test:e2e:sql:real:headed:report": "node tests/e2e/scripts/run-playwright-report.mjs --report-key sql-real-headed-report --spec tests/e2e/Test_Cases/Tree_Model/SQL_Search/sql-search.spec.ts --project chromium --workers 1 --headed",
+    "test:e2e:trend:real": "node tests/e2e/scripts/run-e2e-entry.mjs trend direct",
+    "test:e2e:trend:real:headed": "node tests/e2e/scripts/run-e2e-entry.mjs trend direct headed",
+    "test:e2e:trend:real:report": "node tests/e2e/scripts/run-playwright-report.mjs --report-key trend-real-report --spec tests/e2e/Test_Cases/Tree_Model/Trend/tree-running-trend.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Trend/tree-history-trend.spec.ts --project chromium --workers 1",
+    "test:e2e:trend:real:headed:report": "node tests/e2e/scripts/run-playwright-report.mjs --report-key trend-real-headed-report --spec tests/e2e/Test_Cases/Tree_Model/Trend/tree-running-trend.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Trend/tree-history-trend.spec.ts --project chromium --workers 1 --headed",
     "test:e2e:data-sync:real": "node tests/e2e/scripts/run-e2e-entry.mjs data-sync direct",
     "test:e2e:data-sync:real:headed": "node tests/e2e/scripts/run-e2e-entry.mjs data-sync direct headed",
     "test:e2e:data-sync:real:report": "node tests/e2e/scripts/run-playwright-report.mjs --report-key data-sync-real-report --spec tests/e2e/Test_Cases/Tree_Model/Data_Sync/data-sync.spec.ts --project chromium --workers 1",
@@ -94,8 +98,8 @@
     "test:e2e:full-real:headed": "node tests/e2e/scripts/run-e2e-entry.mjs full-real headed",
     "test:e2e:full-dev": "node tests/e2e/scripts/run-e2e-entry.mjs full-dev",
     "test:e2e:full-dev:headed": "node tests/e2e/scripts/run-e2e-entry.mjs full-dev headed",
-    "test:e2e:real:report": "node tests/e2e/scripts/run-playwright-report.mjs --report-key real-full-report --spec tests/e2e/Test_Cases/Tree_Model/Instance_Management/instance-management.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Instance_Login/login.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Instance_Dashboard/dashboard.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Measurement_Management/measurement-management.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Search/data-search.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Search/statistic-search.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/SQL_Search/sql-search.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Calculate_Detail/calculate.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Data_Sync/data-sync.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/System/Auth/User/user.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/System/Auth/Role/role.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/System/Audit/audit.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/System/Config/config.spec.ts --project chromium --workers 1",
-    "test:e2e:real:headed:report": "node tests/e2e/scripts/run-playwright-report.mjs --report-key real-full-report --spec tests/e2e/Test_Cases/Tree_Model/Instance_Management/instance-management.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Instance_Login/login.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Instance_Dashboard/dashboard.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Measurement_Management/measurement-management.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Search/data-search.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Search/statistic-search.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/SQL_Search/sql-search.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Calculate_Detail/calculate.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Data_Sync/data-sync.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/System/Auth/User/user.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/System/Auth/Role/role.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/System/Audit/audit.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/System/Config/config.spec.ts --project chromium --workers 1 --headed",
+    "test:e2e:real:report": "node tests/e2e/scripts/run-playwright-report.mjs --report-key real-full-report --spec tests/e2e/Test_Cases/Tree_Model/Instance_Management/instance-management.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Instance_Login/login.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Instance_Dashboard/dashboard.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Measurement_Management/measurement-management.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Search/data-search.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Search/statistic-search.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/SQL_Search/sql-search.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Trend/tree-running-trend.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Trend/tree-history-trend.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Calculate_Detail/calculate.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Data_Sync/data-sync.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/System/Auth/User/user.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/System/Auth/Role/role.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/System/Audit/audit.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/System/Config/config.spec.ts --project chromium --workers 1",
+    "test:e2e:real:headed:report": "node tests/e2e/scripts/run-playwright-report.mjs --report-key real-full-report --spec tests/e2e/Test_Cases/Tree_Model/Instance_Management/instance-management.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Instance_Login/login.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Instance_Dashboard/dashboard.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Measurement_Management/measurement-management.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Search/data-search.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Search/statistic-search.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/SQL_Search/sql-search.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Trend/tree-running-trend.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Trend/tree-history-trend.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Calculate_Detail/calculate.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/Data_Sync/data-sync.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/System/Auth/User/user.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/System/Auth/Role/role.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/System/Audit/audit.spec.ts --spec tests/e2e/Test_Cases/Tree_Model/System/Config/config.spec.ts --project chromium --workers 1 --headed",
     "prepare": "husky"
   },
   "dependencies": {
@@ -134,9 +138,9 @@
     "yaml": "^2.8.2"
   },
   "devDependencies": {
-    "@playwright/test": "^1.55.0",
     "@eslint/eslintrc": "^3.3.3",
     "@iconify-json/ep": "^1.2.3",
+    "@playwright/test": "^1.55.0",
     "@prettier/plugin-oxc": "^0.1.3",
     "@rushstack/eslint-patch": "^1.15.0",
     "@tsconfig/node22": "^22.0.5",
@@ -160,6 +164,7 @@
     "husky": "^9.1.7",
     "jiti": "^2.6.1",
     "jsdom": "^27.4.0",
+    "jszip": "^3.10.1",
     "lint-staged": "^16.2.7",
     "npm-run-all2": "^8.0.4",
     "oxlint": "~1.38.0",

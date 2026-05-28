@@ -3,13 +3,8 @@ import { readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import {
-  getOpenedUrls,
-  gotoDataSearch,
-  openTimeseriesOptions,
-  seedClientState,
-  selectTimeseries,
-} from '../../../support/workbench-test-support';
+import JSZip from 'jszip';
+import { getOpenedUrls, gotoDataSearch, openTimeseriesOptions, seedClientState, selectTimeseries } from '../../../support/workbench-test-support';
 import {
   cleanupRealQueryConnection,
   cleanupRealQuerySeedData,
@@ -58,16 +53,7 @@ const aggregationCases = [
 ] as const;
 
 function searchTestDataPath(fileName: string) {
-  return path.join(
-    process.cwd(),
-    'tests',
-    'e2e',
-    'Test_Cases',
-    'Tree_Model',
-    'Search',
-    'test-data',
-    fileName,
-  );
+  return path.join(process.cwd(), 'tests', 'e2e', 'Test_Cases', 'Tree_Model', 'Search', 'test-data', fileName);
 }
 
 function pageRoot(page: Page) {
@@ -115,23 +101,38 @@ function detailHeader(page: Page) {
 }
 
 function refreshButton(page: Page) {
-  return page.locator('[data-testid="data-search-refresh"], #data-search-refresh').first().or(page.getByRole('button', { name: '刷新' }).first());
+  return page
+    .locator('[data-testid="data-search-refresh"], #data-search-refresh')
+    .first()
+    .or(page.getByRole('button', { name: '刷新' }).first());
 }
 
 function importButton(page: Page) {
-  return page.locator('[data-testid="data-search-import"], #data-search-import').first().or(page.getByRole('button', { name: '导入' }).first());
+  return page
+    .locator('[data-testid="data-search-import"], #data-search-import')
+    .first()
+    .or(page.getByRole('button', { name: '导入' }).first());
 }
 
 function downloadButton(page: Page) {
-  return page.locator('[data-testid="data-search-download"], #data-search-download').first().or(page.getByRole('button', { name: /导出/ }).first());
+  return page
+    .locator('[data-testid="data-search-download"], #data-search-download')
+    .first()
+    .or(page.getByRole('button', { name: /导出/ }).first());
 }
 
 function downloadCsvOption(page: Page) {
-  return page.locator('[data-testid="data-search-download-csv"], #data-search-download-csv').first().or(page.locator('.el-dropdown-menu__item').filter({ hasText: '以 .csv 格式导出' }).first());
+  return page
+    .locator('[data-testid="data-search-download-csv"], #data-search-download-csv')
+    .first()
+    .or(page.locator('.el-dropdown-menu__item').filter({ hasText: '以 .csv 格式导出' }).first());
 }
 
 function downloadXlsxOption(page: Page) {
-  return page.locator('[data-testid="data-search-download-xlsx"], #data-search-download-xlsx').first().or(page.locator('.el-dropdown-menu__item').filter({ hasText: '以 .xlsx 格式导出' }).first());
+  return page
+    .locator('[data-testid="data-search-download-xlsx"], #data-search-download-xlsx')
+    .first()
+    .or(page.locator('.el-dropdown-menu__item').filter({ hasText: '以 .xlsx 格式导出' }).first());
 }
 
 function importDialog(page: Page) {
@@ -147,7 +148,8 @@ function importNextButton(page: Page) {
 }
 
 function importCloseButton(page: Page) {
-  return page.locator('[data-testid="data-search-import-close"], #data-search-import-close')
+  return page
+    .locator('[data-testid="data-search-import-close"], #data-search-import-close')
     .or(importDialog(page).getByRole('button', { name: '完成' }))
     .first();
 }
@@ -157,16 +159,12 @@ function importUploadText(page: Page) {
 }
 
 function importSuccessPanel(page: Page) {
-  return importDialog(page).locator(
-    '[data-testid="data-search-import-step-success"], .success-box, .upload-result-box',
-  ).first();
+  return importDialog(page).locator('[data-testid="data-search-import-step-success"], .success-box, .upload-result-box').first();
 }
 
 function importFormatOption(page: Page, format: 'tsfile' | 'csv' | 'xlsx') {
   const label = format === 'tsfile' ? 'TsFile' : format.toUpperCase();
-  return importDialog(page).locator(
-    `[data-testid="data-search-import-format-${format}"], .el-radio:has-text("${label}")`,
-  ).first();
+  return importDialog(page).locator(`[data-testid="data-search-import-format-${format}"], .el-radio:has-text("${label}")`).first();
 }
 
 function resultTable(page: Page) {
@@ -186,8 +184,7 @@ function selectedMeasurementsButton(page: Page) {
 }
 
 function pathModeSelect(page: Page) {
-  return page.getByTestId('data-search-path-mode-select')
-    .or(page.locator('[data-testid="data-search-path-mode-wrapper"] .el-select, .select-container .el-select').first());
+  return page.getByTestId('data-search-path-mode-select').or(page.locator('[data-testid="data-search-path-mode-wrapper"] .el-select, .select-container .el-select').first());
 }
 
 function firstDataValueCell(page: Page) {
@@ -214,17 +211,11 @@ async function openSearchSubmenu(page: Page) {
   const dataMenuItemById = page.getByTestId(searchMenuSelectors.dataMenuItem);
   const statisticMenuItemById = page.getByTestId(searchMenuSelectors.statisticMenuItem);
 
-  const submenuTitle = (await submenuTitleById.count())
-    ? submenuTitleById.first()
-    : menuRoot.getByText('数据查询', { exact: true }).first();
+  const submenuTitle = (await submenuTitleById.count()) ? submenuTitleById.first() : menuRoot.getByText('数据查询', { exact: true }).first();
 
-  const dataMenuItem = (await dataMenuItemById.count())
-    ? dataMenuItemById.first()
-    : menuRoot.getByText('数据查询', { exact: true }).last();
+  const dataMenuItem = (await dataMenuItemById.count()) ? dataMenuItemById.first() : menuRoot.getByText('数据查询', { exact: true }).last();
 
-  const statisticMenuItem = (await statisticMenuItemById.count())
-    ? statisticMenuItemById.first()
-    : menuRoot.getByText('统计查询', { exact: true }).first();
+  const statisticMenuItem = (await statisticMenuItemById.count()) ? statisticMenuItemById.first() : menuRoot.getByText('统计查询', { exact: true }).first();
 
   await expect(submenuTitle).toBeVisible({ timeout: uiTimeouts.pageReady });
   if (!(await dataMenuItem.isVisible().catch(() => false))) {
@@ -277,7 +268,10 @@ async function openDescriptionMode(page: Page) {
 
 async function openDescriptionModeCompat(page: Page) {
   await pathModeSelect(page).click();
-  const option = page.locator('.el-select-dropdown__item').filter({ hasText: /测点描述/ }).last();
+  const option = page
+    .locator('.el-select-dropdown__item')
+    .filter({ hasText: /测点描述/ })
+    .last();
   await expect(option).toBeVisible({ timeout: uiTimeouts.action });
   await option.click();
 }
@@ -299,7 +293,10 @@ async function importFileByFormat(page: Page, format: 'tsfile' | 'csv' | 'xlsx',
 }
 
 function buildRealImportToken() {
-  return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`.replace(/[^a-z0-9]/gi, '').slice(-8).padStart(8, '0');
+  return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`
+    .replace(/[^a-z0-9]/gi, '')
+    .slice(-8)
+    .padStart(8, '0');
 }
 
 function replaceBufferAscii(buffer: Buffer, source: string, target: string) {
@@ -339,14 +336,8 @@ function createIsolatedTsFileArtifacts() {
   const targetTsFilePath = path.join(tmpdir(), `testdata-1-0-0-${token}.tsfile`);
   const targetResourcePath = `${targetTsFilePath}.resource`;
 
-  writeFileSync(
-    targetTsFilePath,
-    replaceBufferAscii(readFileSync(sourceTsFilePath), sourceDevicePath, targetDevicePath),
-  );
-  writeFileSync(
-    targetResourcePath,
-    replaceBufferAscii(readFileSync(sourceResourcePath), sourceDevicePath, targetDevicePath),
-  );
+  writeFileSync(targetTsFilePath, replaceBufferAscii(readFileSync(sourceTsFilePath), sourceDevicePath, targetDevicePath));
+  writeFileSync(targetResourcePath, replaceBufferAscii(readFileSync(sourceResourcePath), sourceDevicePath, targetDevicePath));
 
   return {
     filePath: targetTsFilePath,
@@ -360,8 +351,7 @@ function createIsolatedCsvImportFile() {
   const targetDatabase = `root.test_csv_${token}`;
   const targetDevice = `${targetDatabase}.etth`;
   const targetFilePath = path.join(tmpdir(), `ETTh1-tree-${token}.csv`);
-  const csvContent = readFileSync(searchTestDataPath(importFiles.csv), 'utf8')
-    .replaceAll('root.db.etth', targetDevice);
+  const csvContent = readFileSync(searchTestDataPath(importFiles.csv), 'utf8').replaceAll('root.db.etth', targetDevice);
 
   writeFileSync(targetFilePath, csvContent, 'utf8');
 
@@ -372,45 +362,27 @@ function createIsolatedCsvImportFile() {
   };
 }
 
-function escapePowerShellLiteral(input: string) {
-  return input.replace(/'/g, "''");
-}
-
-function createIsolatedXlsxImportFile() {
+async function createIsolatedXlsxImportFile() {
   const token = buildRealImportToken();
   const targetDatabase = `root.test_xlsx_${token}`;
   const targetFilePath = path.join(tmpdir(), `import_data_01-${token}.xlsx`);
-  const targetZipPath = path.join(tmpdir(), `import_data_01-${token}.zip`);
-  const workDir = path.join(tmpdir(), `import_data_01-${token}`);
   const sourceFilePath = searchTestDataPath(importFiles.xlsx);
+  const zip = await JSZip.loadAsync(readFileSync(sourceFilePath));
+  const sharedStringsPath = 'xl/sharedStrings.xml';
+  const sharedStringsFile = zip.file(sharedStringsPath);
 
-  const psScript = `
-$ErrorActionPreference = 'Stop'
-$source = '${escapePowerShellLiteral(sourceFilePath)}'
-$target = '${escapePowerShellLiteral(targetFilePath)}'
-$targetZip = '${escapePowerShellLiteral(targetZipPath)}'
-$work = '${escapePowerShellLiteral(workDir)}'
-if (Test-Path -LiteralPath $target) { Remove-Item -LiteralPath $target -Force }
-if (Test-Path -LiteralPath $targetZip) { Remove-Item -LiteralPath $targetZip -Force }
-if (Test-Path -LiteralPath $work) { Remove-Item -LiteralPath $work -Recurse -Force }
-Copy-Item -LiteralPath $source -Destination $targetZip -Force
-Expand-Archive -LiteralPath $targetZip -DestinationPath $work -Force
-$sharedStrings = Join-Path $work 'xl\\sharedStrings.xml'
-$content = Get-Content -LiteralPath $sharedStrings -Raw -Encoding UTF8
-$content = $content.Replace('root.sg.', '${escapePowerShellLiteral(`${targetDatabase}.`)}')
-Set-Content -LiteralPath $sharedStrings -Value $content -Encoding UTF8
-Compress-Archive -Path (Join-Path $work '*') -DestinationPath $targetZip -Force
-Move-Item -LiteralPath $targetZip -Destination $target -Force
-Remove-Item -LiteralPath $work -Recurse -Force
-`;
+  if (!sharedStringsFile) {
+    throw new Error(`Missing ${sharedStringsPath} in ${sourceFilePath}`);
+  }
 
-  execFileSync('powershell.exe', ['-NoProfile', '-Command', psScript], {
-    stdio: 'pipe',
-  });
+  const sharedStringsContent = await sharedStringsFile.async('string');
+  zip.file(sharedStringsPath, sharedStringsContent.replaceAll('root.sg.', `${targetDatabase}.`));
+  const generatedBuffer = await zip.generateAsync({ type: 'nodebuffer' });
+  writeFileSync(targetFilePath, generatedBuffer);
 
   return {
     filePath: targetFilePath,
-    cleanupPaths: [targetFilePath, targetZipPath],
+    cleanupPaths: [targetFilePath],
     database: targetDatabase,
   };
 }
@@ -423,7 +395,9 @@ async function selectTimeseriesByQuery(page: Page, prefix: string, query: string
   const select = page.locator(`[data-testid="${prefix}-select"], #${prefix}`).first();
   await select.click({ force: true });
 
-  const input = select.locator('input:visible').last()
+  const input = select
+    .locator('input:visible')
+    .last()
     .or(page.locator('.el-select__input:visible, .el-select-v2__input:visible').last())
     .or(page.locator('input[placeholder*="描述"]:visible, input[placeholder*="测点"]:visible').last());
   await expect(input).toBeVisible({ timeout: uiTimeouts.action });
@@ -437,16 +411,16 @@ async function selectTimeseriesByQuery(page: Page, prefix: string, query: string
     await input.fill(query);
   }
 
-  const optionSelector = `${prefix}-option-${optionText.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase()}`;
+  const optionSelector = `${prefix}-option-${optionText
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase()}`;
   const optionByTestId = page.locator(`[data-testid="${optionSelector}"]:visible`).first();
   const optionByText = page
     .locator('.el-select-dropdown:visible .el-select-dropdown__item, .el-popper:visible .el-select-dropdown__item, .el-tree-node:visible')
     .filter({ hasText: optionText })
     .first();
-  const hiddenOptionByText = page
-    .locator('.el-select-dropdown__item, .el-tree-node')
-    .filter({ hasText: optionText })
-    .first();
+  const hiddenOptionByText = page.locator('.el-select-dropdown__item, .el-tree-node').filter({ hasText: optionText }).first();
 
   if (await optionByTestId.count()) {
     await expect(optionByTestId.first()).toBeVisible({ timeout: 10_000 });
@@ -470,38 +444,41 @@ async function selectTimeseriesByQuery(page: Page, prefix: string, query: string
 }
 
 async function updateMeasurementDescription(page: Page, measurement: string, description: string) {
-  const result = await page.evaluate(async ({ measurementPath, descriptionText }) => {
-    const response = await fetch('/api/schema/alterDescription', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({
-        measurement: measurementPath,
-        description: descriptionText,
-      }),
-    });
+  const result = await page.evaluate(
+    async ({ measurementPath, descriptionText }) => {
+      const response = await fetch('/api/schema/alterDescription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          measurement: measurementPath,
+          description: descriptionText,
+        }),
+      });
 
-    const rawText = await response.text();
-    let payload: Record<string, unknown> = {};
-    if (rawText) {
-      try {
-        payload = JSON.parse(rawText) as Record<string, unknown>;
-      } catch {
-        payload = {};
+      const rawText = await response.text();
+      let payload: Record<string, unknown> = {};
+      if (rawText) {
+        try {
+          payload = JSON.parse(rawText) as Record<string, unknown>;
+        } catch {
+          payload = {};
+        }
       }
-    }
 
-    return {
-      ok: response.ok,
-      code: Number(payload?.code ?? (response.ok ? 0 : -1)),
-      message: String(payload?.message ?? ''),
-    };
-  }, {
-    measurementPath: measurement,
-    descriptionText: description,
-  });
+      return {
+        ok: response.ok,
+        code: Number(payload?.code ?? (response.ok ? 0 : -1)),
+        message: String(payload?.message ?? ''),
+      };
+    },
+    {
+      measurementPath: measurement,
+      descriptionText: description,
+    },
+  );
 
   expect(result.ok).toBe(true);
   expect(result.code).toBe(0);
@@ -597,32 +574,37 @@ function resultsPagination(page: Page) {
 }
 
 async function waitForMeasurementDescriptionIndex(page: Page, keyword: string, expectedMeasurement: string) {
-  await expect.poll(
-    async () =>
-      await page.evaluate(async ({ query }) => {
-        const response = await fetch('/api/schema/getMeasurementsByDesc', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
+  await expect
+    .poll(
+      async () =>
+        await page.evaluate(
+          async ({ query }) => {
+            const response = await fetch('/api/schema/getMeasurementsByDesc', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              credentials: 'include',
+              body: JSON.stringify({
+                keyword: query,
+                size: 100,
+              }),
+            });
+            const payload = (await response.json()) as {
+              data?: {
+                measurements?: Array<{ timeseries?: string }>;
+              };
+            };
+            return (payload.data?.measurements || []).map((item) => item.timeseries || '');
           },
-          credentials: 'include',
-          body: JSON.stringify({
-            keyword: query,
-            size: 100,
-          }),
-        });
-        const payload = (await response.json()) as {
-          data?: {
-            measurements?: Array<{ timeseries?: string }>;
-          };
-        };
-        return (payload.data?.measurements || []).map((item) => item.timeseries || '');
-      }, { query: keyword }),
-    {
-      timeout: 20_000,
-      intervals: [1_000],
-    },
-  ).toContain(expectedMeasurement);
+          { query: keyword },
+        ),
+      {
+        timeout: 20_000,
+        intervals: [1_000],
+      },
+    )
+    .toContain(expectedMeasurement);
 }
 
 async function chooseSamplingUnit(page: Page, unit: (typeof unitCases)[number]['unit']) {
@@ -730,7 +712,6 @@ async function mockRealDataSearchResponse(
   });
 }
 
-
 test.describe('数据查询', () => {
   test.beforeEach(async ({ page, request }) => {
     await seedClientState(page, { lang: 'cn' });
@@ -780,12 +761,12 @@ test.describe('数据查询', () => {
         await page.goto('/view/search/data-search', { waitUntil: 'domcontentloaded' });
         await expectDataSearchPageReady(page);
 
-      await selectTimeseries(page, 'data-search-path', realQuerySeed.measurement1);
-      await page.keyboard.press('Escape').catch(() => undefined);
-      await searchButton(page).click();
+        await selectTimeseries(page, 'data-search-path', realQuerySeed.measurement1);
+        await page.keyboard.press('Escape').catch(() => undefined);
+        await searchButton(page).click();
 
-      await expect(resultTable(page).getByText(realQuerySeed.measurement1, { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
-      await expect(page.getByText(String(realQuerySeed.point11.s1), { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
+        await expect(resultTable(page).getByText(realQuerySeed.measurement1, { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
+        await expect(page.getByText(String(realQuerySeed.point11.s1), { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
       });
     });
 
@@ -809,10 +790,12 @@ test.describe('数据查询', () => {
         await downloadButton(page).click();
         await downloadCsvOption(page).click();
 
-        await expect.poll(async () => {
-          const urls = await getOpenedUrls(page);
-          return urls.at(-1) || '';
-        }).toContain('/api/file/exportCSVData?exportId=');
+        await expect
+          .poll(async () => {
+            const urls = await getOpenedUrls(page);
+            return urls.at(-1) || '';
+          })
+          .toContain('/api/file/exportCSVData?exportId=');
       });
     });
 
@@ -824,10 +807,12 @@ test.describe('数据查询', () => {
         await downloadButton(page).click();
         await downloadXlsxOption(page).click();
 
-        await expect.poll(async () => {
-          const urls = await getOpenedUrls(page);
-          return urls.at(-1) || '';
-        }).toContain('/api/file/exportExcelData?exportId=');
+        await expect
+          .poll(async () => {
+            const urls = await getOpenedUrls(page);
+            return urls.at(-1) || '';
+          })
+          .toContain('/api/file/exportExcelData?exportId=');
       });
     });
 
@@ -955,9 +940,7 @@ test.describe('数据查询', () => {
         const selectedItem2 = page
           .getByTestId('data-search-path-selected-item-root-test-db-d1-s2')
           .or(page.locator('.select-modal .select-item').filter({ hasText: realQuerySeed.measurement2 }).first());
-        const deleteItem1 = page
-          .getByTestId('data-search-path-selected-delete-root-test-db-d1-s1')
-          .or(selectedItem1.locator('.select-item-delete-box').first());
+        const deleteItem1 = page.getByTestId('data-search-path-selected-delete-root-test-db-d1-s1').or(selectedItem1.locator('.select-item-delete-box').first());
 
         await expect(selectedItem1).toBeVisible({ timeout: uiTimeouts.action });
         await expect(selectedItem2).toBeVisible({ timeout: uiTimeouts.action });
@@ -986,14 +969,18 @@ test.describe('数据查询', () => {
         await expect(lastTimeBeforeSort).not.toBe('');
 
         await resultTable(page).getByRole('columnheader', { name: /Time/ }).click();
-        await expect.poll(async () => ((await timeCells.first().textContent()) || '').trim(), {
-          timeout: uiTimeouts.pageReady,
-        }).not.toBe(firstTimeBeforeSort);
+        await expect
+          .poll(async () => ((await timeCells.first().textContent()) || '').trim(), {
+            timeout: uiTimeouts.pageReady,
+          })
+          .not.toBe(firstTimeBeforeSort);
 
         await resultTable(page).getByRole('columnheader', { name: /Time/ }).click();
-        await expect.poll(async () => ((await timeCells.first().textContent()) || '').trim(), {
-          timeout: uiTimeouts.pageReady,
-        }).toBe(firstTimeBeforeSort);
+        await expect
+          .poll(async () => ((await timeCells.first().textContent()) || '').trim(), {
+            timeout: uiTimeouts.pageReady,
+          })
+          .toBe(firstTimeBeforeSort);
       });
     });
 
@@ -1076,7 +1063,7 @@ test.describe('数据查询', () => {
       await loginForDataSearch(page);
       await openDataSearchFromMenu(page);
 
-      const artifact = createIsolatedXlsxImportFile();
+      const artifact = await createIsolatedXlsxImportFile();
       try {
         await importFileByFormat(page, 'xlsx', artifact.filePath);
       } finally {
@@ -1136,9 +1123,11 @@ test.describe('数据查询', () => {
         await resultsPagination(page).locator('.number').filter({ hasText: '2' }).first().click();
         await expect(resultsPagination(page).locator('.number.is-active').filter({ hasText: '2' })).toBeVisible({ timeout: uiTimeouts.pageReady });
         await expect(tableRows(page)).toHaveCount(1, { timeout: uiTimeouts.pageReady });
-        await expect.poll(async () => ((await tableRows(page).first().locator('td').first().textContent()) || '').trim(), {
-          timeout: uiTimeouts.pageReady,
-        }).not.toBe(firstPageFirstTime);
+        await expect
+          .poll(async () => ((await tableRows(page).first().locator('td').first().textContent()) || '').trim(), {
+            timeout: uiTimeouts.pageReady,
+          })
+          .not.toBe(firstPageFirstTime);
       } finally {
         await cleanupRealImportDatabase(page, seed.database);
       }
@@ -1168,4 +1157,3 @@ test.describe('数据查询', () => {
     });
   }
 });
-

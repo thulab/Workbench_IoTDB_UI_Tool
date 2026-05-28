@@ -8,9 +8,9 @@
 - 默认真实环境参数以 `tests/e2e/config/runtime-environment.json` 为准。
 - 真实环境地址、IoTDB 地址、Prometheus 地址已统一收口到一个配置文件中维护。
 - 当前自动化文档口径统一按 `13` 个一级业务模块管理。
-- 当前树模型自动化已覆盖：实例管理、登录、首页、测点管理、查询、SQL操作、视图、权限管理、审计日志、数据库配置。
-- 当前未覆盖：AI分析、可视化、数据同步。
-- `full` / `full-real` / `full-dev` 当前覆盖：实例管理、登录、首页、测点管理、查询、SQL操作、视图、权限管理、审计日志、数据库配置。
+- 当前树模型自动化已覆盖：实例管理、登录、首页、测点管理、查询、SQL操作、实时趋势、历史趋势、视图、数据同步、权限管理、审计日志、数据库配置。
+- 当前未覆盖：AI分析；可视化中的分析页待补充。
+- `full` / `full-real` / `full-dev` 当前覆盖：实例管理、登录、首页、测点管理、查询、SQL操作、实时趋势、历史趋势、视图、数据同步、权限管理、审计日志、数据库配置。
 
 ## 1. 技术栈
 
@@ -204,10 +204,15 @@ tests/e2e/
 │  │  │  ├─ data-search.spec.ts
 │  │  │  ├─ statistic-search.spec.ts
 │  │  │  └─ test-data/
+│  │  ├─ Trend/
+│  │  │  └─ tree-running-trend.spec.ts
+│  │  │  └─ tree-history-trend.spec.ts
 │  │  ├─ Calculate_Detail/
 │  │  │  └─ calculate.spec.ts
 │  │  ├─ SQL_Search/
 │  │  │  └─ sql-search.spec.ts
+│  │  ├─ Data_Sync/
+│  │  │  └─ data-sync.spec.ts
 │  │  └─ System/
 │  │     ├─ Audit/
 │  │     ├─ Auth/
@@ -252,7 +257,9 @@ tests/e2e/
 - `Search/` 当前包含 2 个查询用例文件：`data-search.spec.ts`、`statistic-search.spec.ts`，统一归属一级模块“查询”。
 - `Search/test-data/` 存放查询模块导入、导出、真实环境验证所需测试数据文件。
 - `SQL_Search/` 为一级模块“SQL操作”用例目录。
+- `Trend/` 为一级模块“可视化”下的实时趋势、历史趋势用例目录。
 - `Calculate_Detail/` 为一级模块“视图”用例目录。
+- `Data_Sync/` 为一级模块“数据同步”首批真实环境用例目录。
 - `System/Auth/` 为一级模块“权限管理”下的用户管理、角色管理目录。
 - `System/Audit/` 为一级模块“审计日志”首批真实环境用例目录。
 - `System/Config/` 当前已落地数据库配置首批真实环境用例。
@@ -284,13 +291,19 @@ tests/e2e/
 - 4. 测点管理
 - 5. 查询
 - 6. SQL操作
+- 8. 可视化
 - 9. 视图
+- 10. 数据同步
 - 11. 权限管理
 - 12. 审计日志
 - 13. 数据库配置
 
 ### 6.2 当前部分覆盖
 
+- 8. 可视化
+  - 当前已覆盖：实时趋势页面基础展示、测点入图、播放暂停、保存常用、删除趋势、导出图片
+  - 当前已覆盖：历史趋势页面基础展示、时间范围调整、测点入图、保存常用、删除趋势
+  - 当前未覆盖：分析页，以及更多复杂图表交互
 - 11. 权限管理
   - 当前仅覆盖：用户管理、角色管理的页面展示与新建主流程
   - 当前未覆盖：编辑、删除、授权、搜索筛选等深层能力
@@ -304,12 +317,10 @@ tests/e2e/
 ### 6.3 当前未覆盖
 
 - 7. AI分析
-- 8. 可视化
-- 10. 数据同步
 
 ### 6.4 Tree_Model 与 Table_Model 状态
 
-- `Tree_Model/` 是当前真实环境自动化主目录，已承载当前全部 `313` 条可执行用例。
+- `Tree_Model/` 是当前真实环境自动化主目录，已承载当前全部 `388` 条可执行用例。
 - `Table_Model/` 当前仅建立首批骨架目录，尚未落地 spec 和执行入口。
 - 当前覆盖详情、用例数和缺口统一见：
   - `tests/e2e/AUTOMATION_COVERAGE_MATRIX.md`
@@ -377,6 +388,7 @@ Shell：
 - `permission-management`
 - `ai-analysis`
 - `ai`
+- `trend`
 - `visualization`
 - `visual`
 - `data-sync`
@@ -397,26 +409,26 @@ Shell：
 
 ### 8.3 模块映射
 
-| 模块                                            | 对应 spec                                                                                                                         |
-| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `login`                                         | `tests/e2e/Test_Cases/Tree_Model/Instance_Login/login.spec.ts`                                                                    |
-| `instance` / `instance-management`              | `tests/e2e/Test_Cases/Tree_Model/Instance_Management/instance-management.spec.ts`                                                 |
-| `dashboard` / `home`                            | `tests/e2e/Test_Cases/Tree_Model/Instance_Dashboard/dashboard.spec.ts`                                                            |
-| `measurement` / `measurement-management`        | `tests/e2e/Test_Cases/Tree_Model/Measurement_Management/measurement-management.spec.ts`                                           |
-| `search` / `query`                              | `tests/e2e/Test_Cases/Tree_Model/Search/data-search.spec.ts` + `tests/e2e/Test_Cases/Tree_Model/Search/statistic-search.spec.ts`  |
-| `sql` / `sql-operation`                         | `tests/e2e/Test_Cases/Tree_Model/SQL_Search/sql-search.spec.ts`                                                                   |
-| `calculate` / `view`                            | `tests/e2e/Test_Cases/Tree_Model/Calculate_Detail/calculate.spec.ts`                                                              |
-| `auth` / `permission` / `permission-management` | `tests/e2e/Test_Cases/Tree_Model/System/Auth/User/user.spec.ts` + `tests/e2e/Test_Cases/Tree_Model/System/Auth/Role/role.spec.ts` |
-| `audit` / `audit-log`                           | `tests/e2e/Test_Cases/Tree_Model/System/Audit/audit.spec.ts`                                                                      |
-| `db-config` / `database-config` / `config`      | `tests/e2e/Test_Cases/Tree_Model/System/Config/config.spec.ts`                                                                    |
+| 模块                                            | 对应 spec                                                                                                                               |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `login`                                         | `tests/e2e/Test_Cases/Tree_Model/Instance_Login/login.spec.ts`                                                                          |
+| `instance` / `instance-management`              | `tests/e2e/Test_Cases/Tree_Model/Instance_Management/instance-management.spec.ts`                                                       |
+| `dashboard` / `home`                            | `tests/e2e/Test_Cases/Tree_Model/Instance_Dashboard/dashboard.spec.ts`                                                                  |
+| `measurement` / `measurement-management`        | `tests/e2e/Test_Cases/Tree_Model/Measurement_Management/measurement-management.spec.ts`                                                 |
+| `search` / `query`                              | `tests/e2e/Test_Cases/Tree_Model/Search/data-search.spec.ts` + `tests/e2e/Test_Cases/Tree_Model/Search/statistic-search.spec.ts`        |
+| `sql` / `sql-operation`                         | `tests/e2e/Test_Cases/Tree_Model/SQL_Search/sql-search.spec.ts`                                                                         |
+| `trend` / `visualization` / `visual`            | `tests/e2e/Test_Cases/Tree_Model/Trend/tree-running-trend.spec.ts` + `tests/e2e/Test_Cases/Tree_Model/Trend/tree-history-trend.spec.ts` |
+| `calculate` / `view`                            | `tests/e2e/Test_Cases/Tree_Model/Calculate_Detail/calculate.spec.ts`                                                                    |
+| `data-sync` / `sync`                            | `tests/e2e/Test_Cases/Tree_Model/Data_Sync/data-sync.spec.ts`                                                                           |
+| `auth` / `permission` / `permission-management` | `tests/e2e/Test_Cases/Tree_Model/System/Auth/User/user.spec.ts` + `tests/e2e/Test_Cases/Tree_Model/System/Auth/Role/role.spec.ts`       |
+| `audit` / `audit-log`                           | `tests/e2e/Test_Cases/Tree_Model/System/Audit/audit.spec.ts`                                                                            |
+| `db-config` / `database-config` / `config`      | `tests/e2e/Test_Cases/Tree_Model/System/Config/config.spec.ts`                                                                          |
 
 预留别名说明：
 
 - `ai-analysis` / `ai`
-- `visualization` / `visual`
-- `data-sync` / `sync`
 
-以上模块别名当前已被入口脚本识别，但对应 spec 尚未落地，执行时会提示“模块已识别但尚未实现自动化”。
+以上预留别名当前已被入口脚本识别，但对应 spec 尚未落地，执行时会提示“模块已识别但尚未实现自动化”。
 
 ### 8.4 执行规则
 
@@ -431,7 +443,7 @@ Shell：
 - 支持逗号分隔多个模块
 - `full` 和 `full-real` 固定走 `direct`
 - `full-dev` 固定走 `dev`
-- 当前 `full` / `full-real` / `full-dev` 都包含 `instance + login + dashboard + measurement + search + sql + calculate + auth + audit + db-config`
+- 当前 `full` / `full-real` / `full-dev` 都包含 `instance + login + dashboard + measurement + search + sql + trend + calculate + data-sync + auth + audit + db-config`
 - `typecheck` 不能与其他模块混用
 - `search-cleanup` / `measurement-cleanup` / `calculate-cleanup` / `cleanup-all` 仅做真实环境数据清理
 
@@ -450,13 +462,17 @@ Shell：
 .\sbin\start.bat sql direct report
 .\sbin\start.bat sql-operation direct report
 .\sbin\start.bat sql direct headed
+.\sbin\start.bat trend direct report
+.\sbin\start.bat trend direct headed
 .\sbin\start.bat calculate direct report
 .\sbin\start.bat view direct report
 .\sbin\start.bat calculate direct headed
+.\sbin\start.bat data-sync direct report
+.\sbin\start.bat data-sync direct headed
 .\sbin\start.bat auth direct report
 .\sbin\start.bat audit direct report
 .\sbin\start.bat db-config direct headed
-.\sbin\start.bat login,instance,home,view,auth,audit,db-config direct headed
+.\sbin\start.bat login,instance,home,trend,view,data-sync,auth,audit,db-config direct headed
 .\sbin\start.bat full
 .\sbin\start.bat full headed
 .\sbin\start.bat full-real headed
@@ -494,6 +510,12 @@ npm.cmd run test:e2e:calculate:real:headed
 npm.cmd run test:e2e:sql:real
 npm.cmd run test:e2e:sql:real:headed
 
+npm.cmd run test:e2e:trend:real
+npm.cmd run test:e2e:trend:real:headed
+
+npm.cmd run test:e2e:data-sync:real
+npm.cmd run test:e2e:data-sync:real:headed
+
 npm.cmd run test:e2e:auth:real
 npm.cmd run test:e2e:auth:real:headed
 
@@ -528,6 +550,12 @@ npm.cmd run test:e2e:search:real:headed:report
 npm.cmd run test:e2e:sql:real:report
 npm.cmd run test:e2e:sql:real:headed:report
 
+npm.cmd run test:e2e:trend:real:report
+npm.cmd run test:e2e:trend:real:headed:report
+
+npm.cmd run test:e2e:data-sync:real:report
+npm.cmd run test:e2e:data-sync:real:headed:report
+
 npm.cmd run test:e2e:auth:real:report
 npm.cmd run test:e2e:auth:real:headed:report
 
@@ -553,8 +581,8 @@ npm.cmd run test:e2e:real:headed:report
 
 说明：
 
-- `test:e2e:real:report` 和 `test:e2e:real:headed:report` 当前覆盖 `instance + login + dashboard + measurement + search + sql + calculate + auth + audit + db-config`
-- 上述入口对应的一级业务模块为：`实例管理 + 登录 + 首页 + 测点管理 + 查询 + SQL操作 + 视图 + 权限管理 + 审计日志 + 数据库配置`
+- `test:e2e:real:report` 和 `test:e2e:real:headed:report` 当前覆盖 `instance + login + dashboard + measurement + search + sql + trend + calculate + data-sync + auth + audit + db-config`
+- 上述入口对应的一级业务模块为：`实例管理 + 登录 + 首页 + 测点管理 + 查询 + SQL操作 + 可视化 + 视图 + 数据同步 + 权限管理 + 审计日志 + 数据库配置`
 
 ### 9.4 清理与类型检查
 
@@ -694,6 +722,48 @@ npm.cmd run test:e2e:typecheck
 - 重载 TypeScript Server
 - 重新打开工程目录
 - 确认当前文件位于 `tests/e2e/` 覆盖范围内
+
+### 13.5 在其他目录运行时报 `ENOENT: no such file or directory`
+
+常见现象：
+
+- 导入类用例提示找不到 `import_view_01.csv`
+- 视图、查询等模块在其他机器或其他目录下运行时报测试数据文件不存在
+
+当前处理方式：
+
+- 测试数据文件路径统一按项目根目录动态解析
+- 不再依赖固定绝对路径，例如 `D:\Workbench_AI\...`
+
+排查方式：
+
+- 确认当前命令是在项目根目录执行
+- 确认测试数据文件仍存在于对应目录：
+  - `tests/e2e/Test_Cases/Tree_Model/Calculate_Detail/test-data/`
+  - `tests/e2e/Test_Cases/Tree_Model/Search/test-data/`
+- 如仓库被整体移动到新目录，无需改 spec 内文件路径
+
+### 13.6 其他环境执行时报 `spawnSync powershell.exe ENOENT`
+
+常见现象：
+
+- XLSX 导入相关用例在 Linux、Git Bash、精简 Windows 环境中报：
+  - `spawnSync powershell.exe ENOENT`
+
+当前处理方式：
+
+- 查询模块的 XLSX 测试文件预处理已改为纯 Node 实现
+- 不再依赖 `powershell.exe`
+
+说明：
+
+- 当前版本已支持在无 `powershell.exe` 的环境中执行这类 XLSX 导入用例
+- 如果仍出现同类错误，请先确认使用的是最新代码，并执行：
+
+```powershell
+npm.cmd install
+npm.cmd run test:e2e:typecheck
+```
 
 ## 14. 编码约定
 

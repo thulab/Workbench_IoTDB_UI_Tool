@@ -27,7 +27,10 @@
 - `tests/e2e/Test_Cases/Tree_Model/Search/data-search.spec.ts`
 - `tests/e2e/Test_Cases/Tree_Model/Search/statistic-search.spec.ts`
 - `tests/e2e/Test_Cases/Tree_Model/SQL_Search/sql-search.spec.ts`
+- `tests/e2e/Test_Cases/Tree_Model/Trend/tree-running-trend.spec.ts`
+- `tests/e2e/Test_Cases/Tree_Model/Trend/tree-history-trend.spec.ts`
 - `tests/e2e/Test_Cases/Tree_Model/Calculate_Detail/calculate.spec.ts`
+- `tests/e2e/Test_Cases/Tree_Model/Data_Sync/data-sync.spec.ts`
 - `tests/e2e/Test_Cases/Tree_Model/System/Auth/User/user.spec.ts`
 - `tests/e2e/Test_Cases/Tree_Model/System/Auth/Role/role.spec.ts`
 - `tests/e2e/Test_Cases/Tree_Model/System/Audit/audit.spec.ts`
@@ -174,12 +177,23 @@
 ### 3.8 可视化
 
 - 当前状态：
-  - 未覆盖
-- 页面改版时建议先补：
-  - 实时趋势
-  - 历史趋势
-  - 分析页
-  - 图表时间范围、图例、刷新、导出
+  - 已完成实时趋势、历史趋势首批真实环境覆盖
+  - 分析页仍待补充
+- 重点检查：
+  - 可视化主菜单与子菜单结构
+  - 实时趋势页左侧测点列表
+  - 历史趋势页时间范围控件
+  - 趋势图容器、播放 / 暂停按钮
+  - 保存常用弹窗
+  - 常用趋势下拉框
+  - 趋势删除按钮与导出按钮
+- 当前说明：
+  - 实时趋势当前已覆盖菜单进入、基础布局、测点入图、播放暂停、保存常用、趋势删除、导出图片
+  - 历史趋势当前已覆盖页面基础布局、时间范围调整、测点入图、保存常用、趋势删除
+  - 该模块对图表容器、按钮图标和弹窗文案较敏感，页面改版后需优先核对稳定选择器与可点击区域
+- 优先维护：
+  - `tests/e2e/Test_Cases/Tree_Model/Trend/tree-running-trend.spec.ts`
+  - `tests/e2e/Test_Cases/Tree_Model/Trend/tree-history-trend.spec.ts`
 
 ### 3.9 视图
 
@@ -200,13 +214,19 @@
 ### 3.10 数据同步
 
 - 当前状态：
-  - 未覆盖
-- 页面改版时建议先补：
-  - 同步任务列表
-  - 新建同步任务
-  - 状态刷新
-  - 启停 / 删除
-  - 日志 / 详情
+  - 已完成首批真实环境覆盖
+- 重点检查：
+  - 任务列表
+  - 新建任务弹窗
+  - 批量操作
+  - 状态监控
+  - 详情 / 停止 / 删除
+  - 时间范围、发送插件、发送模式相关控件
+- 当前说明：
+  - 当前已覆盖列表展示、新建任务、校验提示、查询重置、状态监控、批量操作、启停删除、空态
+  - 如页面改版，优先统一收口弹窗表单选择器与任务操作列按钮定位
+- 优先维护：
+  - `tests/e2e/Test_Cases/Tree_Model/Data_Sync/data-sync.spec.ts`
 
 ### 3.11 权限管理
 

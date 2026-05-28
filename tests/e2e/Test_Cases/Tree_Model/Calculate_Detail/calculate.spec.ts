@@ -16,20 +16,9 @@ const viewPageDocumentUrlPrefix = 'https://www.timecho.com/docs/zh/UserGuide/lat
 const exportTipText = 'excel 格式最大支持下载量为 2G，csv 无限制，推荐使用 csv 格式导出';
 const importViewTemplateFileName = 'view_template.csv';
 const importViewUploadTip = '仅支持上传 csv 和 xlsx 文件，将文件拖到此处，或 点击上传';
-const importViewFilePath = 'D:\\Workbench_AI\\iotdb-workbench\\IoTDB_Workbench_UI_Auto\\tests\\e2e\\Test_Cases\\Tree_Model\\Calculate_Detail\\test-data\\import_view_01.csv';
 const importedViewMeasurementPrefix = 'root.view.import.';
 
-const functionCategories = [
-  '数学函数',
-  '比较函数',
-  '字符串处理函数',
-  '数据类型转换函数',
-  '常序列生成函数',
-  '选择函数',
-  '区间查询函数',
-  '趋势计算函数',
-  '采样函数',
-] as const;
+const functionCategories = ['数学函数', '比较函数', '字符串处理函数', '数据类型转换函数', '常序列生成函数', '选择函数', '区间查询函数', '趋势计算函数', '采样函数'] as const;
 
 const calculateSeed = {
   database: 'root.test_view_seed',
@@ -70,6 +59,12 @@ function createTempCsvFile(fileName: string, content: string) {
   return fullPath;
 }
 
+function calculateTestDataPath(fileName: string) {
+  return path.join(process.cwd(), 'tests', 'e2e', 'Test_Cases', 'Tree_Model', 'Calculate_Detail', 'test-data', fileName);
+}
+
+const importViewFilePath = calculateTestDataPath('import_view_01.csv');
+
 function pageSearchInput(page: Page) {
   return page.locator('#calculate-search-name').first();
 }
@@ -87,15 +82,24 @@ function pageSearchTypeSelect(page: Page) {
 }
 
 function pageSearchTypeNameOption(page: Page) {
-  return page.locator('#calculate-search-type-name').last().or(page.locator('.el-select-dropdown__item').filter({ hasText: '视图名称' }).last());
+  return page
+    .locator('#calculate-search-type-name')
+    .last()
+    .or(page.locator('.el-select-dropdown__item').filter({ hasText: '视图名称' }).last());
 }
 
 function pageSearchTypeMeasurementOption(page: Page) {
-  return page.locator('#calculate-search-type-measurement').last().or(page.locator('.el-select-dropdown__item').filter({ hasText: '结果测点' }).last());
+  return page
+    .locator('#calculate-search-type-measurement')
+    .last()
+    .or(page.locator('.el-select-dropdown__item').filter({ hasText: '结果测点' }).last());
 }
 
 function pageSearchTypeDescOption(page: Page) {
-  return page.locator('#calculate-search-type-desc').last().or(page.locator('.el-select-dropdown__item').filter({ hasText: '视图描述' }).last());
+  return page
+    .locator('#calculate-search-type-desc')
+    .last()
+    .or(page.locator('.el-select-dropdown__item').filter({ hasText: '视图描述' }).last());
 }
 
 function pageAddButton(page: Page) {
@@ -127,13 +131,17 @@ function pageExportTipTrigger(page: Page) {
 }
 
 function pageExportCsvOption(page: Page) {
-  return page.locator('#calculate-download-csv').last()
+  return page
+    .locator('#calculate-download-csv')
+    .last()
     .or(page.locator('.el-dropdown-menu__item').filter({ hasText: '以 .csv 格式导出' }).last())
     .first();
 }
 
 function pageExportXlsxOption(page: Page) {
-  return page.locator('#calculate-download-xlsx').last()
+  return page
+    .locator('#calculate-download-xlsx')
+    .last()
     .or(page.locator('.el-dropdown-menu__item').filter({ hasText: '以 .xlsx 格式导出' }).last())
     .first();
 }
@@ -213,7 +221,10 @@ function deleteConfirmButton(page: Page) {
 }
 
 function deleteCancelButton(page: Page) {
-  return deleteConfirmDialog(page).locator('.el-button').filter({ hasNot: deleteConfirmDialog(page).locator('.el-button--primary') }).first();
+  return deleteConfirmDialog(page)
+    .locator('.el-button')
+    .filter({ hasNot: deleteConfirmDialog(page).locator('.el-button--primary') })
+    .first();
 }
 
 function deleteCloseButton(page: Page) {
@@ -225,7 +236,10 @@ function pagePagination(page: Page) {
 }
 
 function paginationPageItem(page: Page, pageNo: number) {
-  return pagePagination(page).locator('.el-pager li').filter({ hasText: String(pageNo) }).first();
+  return pagePagination(page)
+    .locator('.el-pager li')
+    .filter({ hasText: String(pageNo) })
+    .first();
 }
 
 function activePaginationItem(page: Page) {
@@ -317,7 +331,10 @@ function dialogMeasurementFilterInput(page: Page) {
 }
 
 function dialogMeasurementTable(page: Page) {
-  return createViewDialog(page).locator('.el-table').filter({ has: page.locator('.el-table__body') }).first();
+  return createViewDialog(page)
+    .locator('.el-table')
+    .filter({ has: page.locator('.el-table__body') })
+    .first();
 }
 
 function dialogTabs(page: Page) {
@@ -353,9 +370,8 @@ async function ensureCalculateSeedData(page: Page) {
     `insert into ${calculateSeed.device}(timestamp,s1,s2) values (1713801720000,43.8,42.2)`,
   ];
   const response = await runSqlsInWorkbenchSession(page, sqls);
-  const failed = (typeof response.success === 'boolean' && response.success === false)
-    || (typeof response.code === 'number' && response.code !== 0)
-    || response.data?.some((item) => item.status === false);
+  const failed =
+    (typeof response.success === 'boolean' && response.success === false) || (typeof response.code === 'number' && response.code !== 0) || response.data?.some((item) => item.status === false);
   if (failed) {
     throw new Error(`Failed to initialize calculate seed data: ${response.message || response.data?.find((item) => item.status === false)?.errMsg || 'unknown error'}`);
   }
@@ -374,49 +390,50 @@ async function cleanupImportedViews(page: Page) {
 }
 
 async function cleanupViewsByMeasurementPrefixes(page: Page, measurementPrefixes: string[]) {
-  await page.evaluate(async ({ prefixes }) => {
-    const listResponse = await fetch('/api/calculate/getCalculateList', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        pageNum: 1,
-        pageSize: 200,
-        name: '',
-        measurement: '',
-        desc: '',
-      }),
-    });
+  await page.evaluate(
+    async ({ prefixes }) => {
+      const listResponse = await fetch('/api/calculate/getCalculateList', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pageNum: 1,
+          pageSize: 200,
+          name: '',
+          measurement: '',
+          desc: '',
+        }),
+      });
 
-    if (!listResponse.ok) {
-      return;
-    }
+      if (!listResponse.ok) {
+        return;
+      }
 
-    const listPayload = await listResponse.json() as {
-      data?: {
-        list?: Array<{
-          measurement?: string;
-        }>;
+      const listPayload = (await listResponse.json()) as {
+        data?: {
+          list?: Array<{
+            measurement?: string;
+          }>;
+        };
       };
-    };
 
-    const measurements = (listPayload.data?.list || [])
-      .map((item) => item.measurement || '')
-      .filter((measurement) => prefixes.some((prefix: string) => measurement.startsWith(prefix)));
+      const measurements = (listPayload.data?.list || []).map((item) => item.measurement || '').filter((measurement) => prefixes.some((prefix: string) => measurement.startsWith(prefix)));
 
-    if (!measurements.length) {
-      return;
-    }
+      if (!measurements.length) {
+        return;
+      }
 
-    await fetch('/api/calculate/deleteCalculate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ measurements }),
-    });
-  }, { prefixes: measurementPrefixes });
+      await fetch('/api/calculate/deleteCalculate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ measurements }),
+      });
+    },
+    { prefixes: measurementPrefixes },
+  );
 }
 
 async function openCreateViewDialog(page: Page) {
@@ -439,11 +456,7 @@ async function searchViewByName(page: Page, name: string) {
 
 async function selectSearchType(page: Page, type: 'name' | 'measurement' | 'desc') {
   await pageSearchTypeSelect(page).click({ force: true });
-  const option = type === 'name'
-    ? pageSearchTypeNameOption(page)
-    : type === 'measurement'
-      ? pageSearchTypeMeasurementOption(page)
-      : pageSearchTypeDescOption(page);
+  const option = type === 'name' ? pageSearchTypeNameOption(page) : type === 'measurement' ? pageSearchTypeMeasurementOption(page) : pageSearchTypeDescOption(page);
   await expect(option).toBeVisible({ timeout: 10_000 });
   await option.click();
 }
@@ -466,26 +479,28 @@ async function createViewByDialog(page: Page, draft: { name: string; description
 }
 
 async function createViewByApi(page: Page, draft: { name: string; description?: string; measurement: string; expression: string }) {
-  const response = await page.evaluate(async ({ payload }) => {
-    const res = await fetch('/api/calculate/addCalculate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
-    return res.json();
-  }, {
-    payload: {
-      name: draft.name,
-      desc: draft.description || '',
-      measurement: `root.${draft.measurement}`,
-      expression: draft.expression,
+  const response = await page.evaluate(
+    async ({ payload }) => {
+      const res = await fetch('/api/calculate/addCalculate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+      return res.json();
     },
-  });
+    {
+      payload: {
+        name: draft.name,
+        desc: draft.description || '',
+        measurement: `root.${draft.measurement}`,
+        expression: draft.expression,
+      },
+    },
+  );
 
-  const failed = (typeof response?.success === 'boolean' && response.success === false)
-    || (typeof response?.code === 'number' && response.code !== 0);
+  const failed = (typeof response?.success === 'boolean' && response.success === false) || (typeof response?.code === 'number' && response.code !== 0);
   if (failed) {
     throw new Error(`Failed to create view by api: ${response?.message || 'unknown error'}`);
   }
@@ -493,7 +508,11 @@ async function createViewByApi(page: Page, draft: { name: string; description?: 
 
 async function openExportDropdown(page: Page) {
   await pageExportButton(page).hover();
-  if (!(await pageExportCsvOption(page).isVisible().catch(() => false))) {
+  if (
+    !(await pageExportCsvOption(page)
+      .isVisible()
+      .catch(() => false))
+  ) {
     await pageExportButton(page).click({ force: true });
   }
   await expect(pageExportCsvOption(page)).toBeVisible({ timeout: 10_000 });
@@ -795,7 +814,11 @@ test.describe('视图页面', () => {
     await expect.poll(() => page.url()).toContain(`measurement=${encodeURIComponent(`root.${draft.measurement}`)}`);
     await measurementPage.expectVisible();
     await expect(
-      measurementPage.databaseDetailTable().locator('tr').filter({ hasText: draft.measurement.split('.').pop() || draft.measurement }).first(),
+      measurementPage
+        .databaseDetailTable()
+        .locator('tr')
+        .filter({ hasText: draft.measurement.split('.').pop() || draft.measurement })
+        .first(),
     ).toBeVisible({ timeout: 15_000 });
   });
 
@@ -967,9 +990,7 @@ test.describe('视图页面', () => {
     const beforeValue = (await rowLatestValueCell(row).innerText()).trim();
     const beforeTime = (await rowLatestTimeCell(row).innerText()).trim();
 
-    await runSqlsInWorkbenchSession(page, [
-      `insert into ${calculateSeed.device}(timestamp,s1,s2) values (1713801780000,100,10)`,
-    ]);
+    await runSqlsInWorkbenchSession(page, [`insert into ${calculateSeed.device}(timestamp,s1,s2) values (1713801780000,100,10)`]);
     await pageRefreshButton(page).click();
 
     await expect.poll(async () => (await rowLatestValueCell(row).innerText()).trim(), { timeout: 30_000 }).toMatch(/110(\.0+)?/);
@@ -1134,10 +1155,9 @@ test.describe('视图页面', () => {
     const viewName = `非法表头_${suffix}`;
     const invalidHeaderFilePath = createTempCsvFile(
       `calculate-invalid-header-${suffix}.csv`,
-      [
-        'badName,badDescription,badMeasurement,badExpression',
-        `${viewName},非法表头描述,root.view.import.invalid_header_${suffix},${calculateSeed.measurement1}+${calculateSeed.measurement2}`,
-      ].join('\n'),
+      ['badName,badDescription,badMeasurement,badExpression', `${viewName},非法表头描述,root.view.import.invalid_header_${suffix},${calculateSeed.measurement1}+${calculateSeed.measurement2}`].join(
+        '\n',
+      ),
     );
 
     try {

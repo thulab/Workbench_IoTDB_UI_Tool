@@ -128,3 +128,16 @@ export const feedbackSelectors = {
   successToast: '.el-message--success',
   errorToast: '.el-message--error',
 } as const;
+
+export const trendSelectors = {
+  menuSubmenu: '[data-testid="layout-submenu-trend"], .el-sub-menu:has([id="/view/trend/tree-running-trend"])',
+  menuSubmenuTitle: '[data-testid="layout-submenu-title-trend"], .el-sub-menu:has([id="/view/trend/tree-running-trend"]) > .el-sub-menu__title',
+  menuRunningTrend: '[data-testid="layout-menu-item-trend-tree-running-trend"], [id="/view/trend/tree-running-trend"]',
+  menuHistoryTrend: '[data-testid="layout-menu-item-trend-tree-history-trend"], [id="/view/trend/tree-history-trend"]',
+  menuAnalysis: '[data-testid="layout-menu-item-trend-spectrum"], [id="/view/trend/spectrum"]',
+  page: '[data-testid="layout-menu-item-trend-tree-running-trend"], .measurement-tree-wrapper',
+  measurementTreeWrapper: '.measurement-tree-wrapper',
+  measurementTreeSearchInput: '#measurement-tree-input',
+  measurementTreeRootNode: '#tree-node-content-root',
+  markerTable: '.marker-table',
+} as const;

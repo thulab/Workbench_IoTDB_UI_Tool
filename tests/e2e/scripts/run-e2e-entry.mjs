@@ -56,10 +56,10 @@ const moduleDefinitions = [
     specs: [],
   },
   {
-    key: 'visualization',
+    key: 'trend',
     displayName: '可视化',
-    aliases: ['visualization', 'visual'],
-    specs: [],
+    aliases: ['trend', 'visualization', 'visual'],
+    specs: ['tests/e2e/Test_Cases/Tree_Model/Trend/tree-running-trend.spec.ts', 'tests/e2e/Test_Cases/Tree_Model/Trend/tree-history-trend.spec.ts'],
   },
   {
     key: 'view',
@@ -98,7 +98,7 @@ const moduleAliasMap = new Map(moduleDefinitions.flatMap((definition) => definit
 const allModuleKeys = moduleDefinitions.map((definition) => definition.key);
 const orderedModules = moduleDefinitions.filter((definition) => definition.specs.length).map((definition) => definition.key);
 const specialCommands = ['typecheck', 'search-cleanup', 'measurement-cleanup', 'calculate-cleanup', 'cleanup-all'];
-const fullModules = ['instance', 'login', 'dashboard', 'measurement', 'search', 'sql', 'view', 'data-sync', 'auth', 'audit', 'db-config'];
+const fullModules = ['instance', 'login', 'dashboard', 'measurement', 'search', 'sql', 'trend', 'view', 'data-sync', 'auth', 'audit', 'db-config'];
 const presetModuleMap = {
   full: fullModules,
   'full-real': fullModules,
@@ -121,7 +121,7 @@ Modules:
   view | calculate
   auth | permission | permission-management
   ai-analysis | ai
-  visualization | visual
+  trend | visualization | visual
   data-sync | sync
   audit | audit-log
   db-config | database-config | config
@@ -141,13 +141,14 @@ Examples:
   start.bat measurement-management direct
   start.bat query direct
   start.bat sql-operation direct
+  start.bat trend direct
   start.bat view direct
   start.bat auth direct
   start.bat measurement dev
   start.bat measurement headed
   start.bat login instance home view
-  start.bat login instance home measurement query view auth direct headed
-  start.bat login,instance,home,measurement,query,view,auth direct headed
+  start.bat login instance home measurement query trend view auth direct headed
+  start.bat login,instance,home,measurement,query,trend,view,auth direct headed
   start.bat full
   start.bat full headed
   start.bat full-real headed
@@ -165,7 +166,7 @@ Notes:
   report  = generate report without headed browser mode
   headed  = open browser and generate report
   auth = run user + role management specs under permission management
-  ai-analysis / visualization = reserved business-module aliases, no spec implemented yet
+  ai-analysis = reserved business-module alias, no spec implemented yet
   search-cleanup / measurement-cleanup / calculate-cleanup / cleanup-all = cleanup-only commands for real ${realWorkbenchBaseUrl} data
   typecheck = run TypeScript check for Playwright and tests/e2e via tsconfig.e2e.json
   full/full-real = run all currently covered modules in direct mode on ${realWorkbenchBaseUrl}
