@@ -15,3 +15,12 @@ node_modules/*
 public/
 .editorconfig
 .gitattributes
+sbin/*.bat
+sbin/*.sh
+tests/e2e/reports/
+playwright-report/
+test-results/
+tests/e2e/Test_Cases/**/test-data/*.csv
+tests/e2e/Test_Cases/**/test-data/*.xlsx
+tests/e2e/Test_Cases/**/test-data/*.xls
+tests/e2e/Test_Cases/**/test-data/*.tsfile
