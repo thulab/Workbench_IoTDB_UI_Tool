@@ -7,13 +7,13 @@
     "node": "^20.19.0 || >=22.12.0"
   },
   "lint-staged": {
-    "*": [
+    "*.{js,jsx,ts,tsx,vue,css,scss,less,html,json,md,yml,yaml}": [
       "prettier --write"
     ],
-    "src/**/*.{js,jsx,vue,ts,tsx}": [
+    "src/**/*.{js,jsx,ts,tsx,vue}": [
       "eslint --fix"
     ],
-    "src/**/*.{css,scss,less,vue,html}": [
+    "src/**/*.{css,scss,less,html}": [
       "stylelint --fix"
     ]
   },
