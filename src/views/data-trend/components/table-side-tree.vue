@@ -233,13 +233,14 @@ function filterTreeData(data: TableTreeNodeData[], keyword: string): TableTreeNo
   data.forEach((node) => {
     const nodeCopy = cloneDeep(node);
     const isMatch = node.nodeName.toLowerCase().includes(keyword);
+    if (isMatch) {
+      result.push(nodeCopy);
+      return;
+    }
     if (node.children && node.children.length > 0) {
       const filteredChildren = filterTreeData(node.children, keyword);
       if (filteredChildren.length > 0) {
         nodeCopy.children = filteredChildren;
-        result.push(nodeCopy);
-      } else if (isMatch) {
-        nodeCopy.children = [];
         result.push(nodeCopy);
       }
     } else if (isMatch) {
@@ -357,6 +358,8 @@ function handleDeleteMeasurements(nodeInfo: TableTreeNodeData) {
 
 const setDefaultTreeExpandKeys = async () => {
   await getDatabases();
+  await nextTick();
+  initSelectedMeasurementsData();
 };
 
 function initSelectedMeasurementsData() {
@@ -426,8 +429,7 @@ function initSelectedMeasurementsData() {
 }
 
 onMounted(() => {
-  setDefaultTreeExpandKeys();
-  initSelectedMeasurementsData();
+  void setDefaultTreeExpandKeys();
 });
 
 function handleSearch() {
@@ -438,8 +440,17 @@ function handleSearch() {
 }
 
 function handleRefresh() {
+  void setDefaultTreeExpandKeys();
   emit('updateDetail');
 }
+
+watch(
+  () => treeData.value,
+  () => {
+    initSelectedMeasurementsData();
+  },
+  { deep: true },
+);
 
 function handleNodeExpand(payload: Record<string, unknown>) {
   const data = payload as unknown as TableTreeNodeData;

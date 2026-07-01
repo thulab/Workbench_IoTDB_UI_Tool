@@ -109,6 +109,10 @@ function toPosixFilePath(targetPath) {
   return targetPath.replace(/\\/g, '/');
 }
 
+function toMarkdownLink(label, targetPath) {
+  return `[${label}](${toPosixFilePath(targetPath)})`;
+}
+
 function stripAnsi(text) {
   return text.replace(/\u001B\[[0-9;]*m/g, '');
 }
@@ -259,14 +263,14 @@ function buildMarkdownReport({ reportBaseName, latestReportName, reportDatePart,
   sections.push('');
   sections.push('## 执行信息');
   sections.push('');
-  sections.push(`- 报告名称: \`${reportBaseName}\``);
+  sections.push(`- 报告名称: ${reportBaseName}`);
   sections.push(`- 执行时间: ${reportDatePart} ${reportDisplayTime}`);
   sections.push('- 执行环境: Workbench + IoTDB');
-  sections.push(`- Workbench 地址: \`${realWorkbenchBaseUrl}\``);
-  sections.push(`- 报告类型: \`${cliConfig.reportKey}\``);
-  sections.push(`- 是否 Headed: \`${cliConfig.headed ? '是' : '否'}\``);
-  sections.push(`- 浏览器项目: \`${cliConfig.project}\``);
-  sections.push('- 编码策略: `UTF-8 Markdown + Playwright JSON 结果`');
+  sections.push(`- Workbench 地址: ${realWorkbenchBaseUrl}`);
+  sections.push(`- 报告类型: ${cliConfig.reportKey}`);
+  sections.push(`- 是否 Headed: ${cliConfig.headed ? '是' : '否'}`);
+  sections.push(`- 浏览器项目: ${cliConfig.project}`);
+  sections.push('- 编码策略: UTF-8 Markdown + Playwright JSON 结果');
   sections.push('- 执行命令:');
   sections.push('');
   sections.push('```powershell');
@@ -278,13 +282,13 @@ function buildMarkdownReport({ reportBaseName, latestReportName, reportDatePart,
 
   sections.push('## 总体结果');
   sections.push('');
-  sections.push(`- 总用例数: \`${summary.total}\``);
-  sections.push(`- 通过数: \`${summary.passed}\``);
-  sections.push(`- 失败数: \`${summary.failed}\``);
-  sections.push(`- 跳过数: \`${summary.skipped}\``);
-  sections.push(`- Flaky 数: \`${summary.flaky}\``);
-  sections.push(`- 总耗时: \`${summary.duration}\``);
-  sections.push(`- 结论: \`${summary.conclusion}\``);
+  sections.push(`- 总用例数: ${summary.total}`);
+  sections.push(`- 通过数: ${summary.passed}`);
+  sections.push(`- 失败数: ${summary.failed}`);
+  sections.push(`- 跳过数: ${summary.skipped}`);
+  sections.push(`- Flaky 数: ${summary.flaky}`);
+  sections.push(`- 总耗时: ${summary.duration}`);
+  sections.push(`- 结论: ${summary.conclusion}`);
   sections.push('');
 
   sections.push('## 用例结果明细');
@@ -320,7 +324,7 @@ function buildMarkdownReport({ reportBaseName, latestReportName, reportDatePart,
     sections.push('');
     artifacts.forEach((artifactPath, index) => {
       const normalizedPath = toPosixFilePath(artifactPath);
-      sections.push(`${index + 1}. \`${artifactPath}\``);
+      sections.push(`${index + 1}. ${toMarkdownLink(path.basename(artifactPath), artifactPath)}`);
       if (/\.png$/i.test(normalizedPath)) {
         sections.push(`   ![failed-screenshot-${index + 1}](${normalizedPath})`);
       }
@@ -330,11 +334,11 @@ function buildMarkdownReport({ reportBaseName, latestReportName, reportDatePart,
 
   sections.push('## 报告文件');
   sections.push('');
-  sections.push(`- Markdown 报告: \`tests/e2e/reports/${reportBaseName}\``);
-  sections.push(`- Markdown 最新版: \`tests/e2e/reports/${latestReportName}\``);
-  sections.push('- Playwright HTML 报告: `playwright-report/index.html`');
-  sections.push('- Playwright JSON 报告: `tests/e2e/reports/.playwright-report.json`');
-  sections.push('- 失败产物目录: `test-results/`');
+  sections.push(`- Markdown 报告: ${toMarkdownLink(reportBaseName, `tests/e2e/reports/${reportBaseName}`)}`);
+  sections.push(`- Markdown 最新版: ${toMarkdownLink(latestReportName, `tests/e2e/reports/${latestReportName}`)}`);
+  sections.push(`- Playwright HTML 报告: ${toMarkdownLink('index.html', 'playwright-report/index.html')}`);
+  sections.push(`- Playwright JSON 报告: ${toMarkdownLink('.playwright-report.json', 'tests/e2e/reports/.playwright-report.json')}`);
+  sections.push(`- 失败产物目录: ${toMarkdownLink('test-results', 'test-results/')}`);
   sections.push('');
 
   return sections.join('\n');

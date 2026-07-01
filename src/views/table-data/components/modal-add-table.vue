@@ -121,6 +121,7 @@ const dialogVisible = ref(false);
 const formRef = ref<FormInstance>();
 const { requestFn: saveTable } = useRequest(IoTDBApi.saveTable);
 const { requestFn: saveColumns } = useRequest(IoTDBApi.saveColumns);
+const { data: tableListData, requestFn: getTableList } = useRequest(IoTDBApi.getTableList);
 const addType = ref('addTable'); // addTable or addColumn
 const activeName = ref('measurement_0');
 const { setFirstLoad, setActiveList } = useDbStore();
@@ -165,12 +166,26 @@ const formDataBody = ref<Database>({
   tables: [],
 });
 const currentNode = ref<TableTreeNodeData>();
+const existingTableNames = ref<string[]>([]);
 const tableNames = computed(() => {
+  if (existingTableNames.value.length) {
+    return existingTableNames.value;
+  }
   if (currentNode?.value && currentNode.value.children?.length) {
     return currentNode.value.children.map((item) => item.nodeName);
   }
   return [];
 });
+
+async function loadExistingTableNames(databaseName?: string) {
+  if (!databaseName) {
+    existingTableNames.value = [];
+    return;
+  }
+
+  await getTableList(databaseName);
+  existingTableNames.value = (tableListData.value?.value || []).map((item) => item.tableName);
+}
 
 const validateTableName: FormItemRule['validator'] = (rule, value, callback) => {
   if (
@@ -181,6 +196,7 @@ const validateTableName: FormItemRule['validator'] = (rule, value, callback) => 
     )
   ) {
     callback(new Error(t('dataManage.tableNameExist')));
+    return;
   }
 
   // 情况1：简单名称（字母开头，可包含下划线和数字）
@@ -372,6 +388,10 @@ const handleConfirm = async () => {
     }
   }
 
+  if (addType.value === 'addTable') {
+    await loadExistingTableNames(currentNode.value?.nodeName);
+  }
+
   let validate = false;
   await formRef.value?.validate((valid) => {
     validate = valid;
@@ -423,10 +443,14 @@ function resetFormData() {
 defineExpose({
   open: (currentVal: TableTreeNodeData, typeVal: string = 'addTable') => {
     resetFormData();
+    existingTableNames.value = [];
     currentNode.value = currentVal;
     addType.value = typeVal;
     if (currentVal) {
       formData.ttl = currentVal.ttl || '';
+    }
+    if (addType.value === 'addTable') {
+      void loadExistingTableNames(currentVal?.nodeName);
     }
     if (addType.value !== 'addTable') {
       formData.tableName = currentVal.nodeName;

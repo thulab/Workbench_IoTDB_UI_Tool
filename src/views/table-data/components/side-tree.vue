@@ -264,6 +264,7 @@ function showAddTableDialog(nodeInfo: TableTreeNodeData, addType: string) {
 
 const setDefaultTreeExpandKeys = async () => {
   await getDatabases();
+  await nextTick();
   if (treeData.value && treeData.value.length) {
     let activeNode = treeData.value[0]!;
     if (activeKeyList.value.length) {
@@ -292,9 +293,12 @@ function filterTreeData(): TableTreeNodeData[] {
 
   const filterNode = (node: TableTreeNodeData): TableTreeNodeData | null => {
     const nodeCopy = cloneDeep(node);
-    nodeCopy.children = [];
-
     const isCurrentMatch = node.nodeName.toLowerCase().includes(searchTextLower);
+    if (isCurrentMatch) {
+      return nodeCopy;
+    }
+
+    nodeCopy.children = [];
 
     if (node.children) {
       node.children.forEach((child) => {
@@ -320,7 +324,7 @@ function filterTreeData(): TableTreeNodeData[] {
 }
 
 onMounted(() => {
-  setDefaultTreeExpandKeys();
+  void setDefaultTreeExpandKeys();
 });
 
 function handleSearch() {
@@ -330,7 +334,9 @@ function handleSearch() {
   }, 1000);
 }
 
-function handleRefresh() {
+async function handleRefresh() {
+  setFirstLoad(true);
+  await setDefaultTreeExpandKeys();
   emit('updateDetail');
 }
 

@@ -336,7 +336,7 @@ test.describe('测点管理', () => {
   });
 
   test.afterEach(async ({ page }) => {
-    await cleanupMeasurementArtifactsForPage(page);
+    await cleanupMeasurementArtifactsForPage(page).catch(() => undefined);
   });
 
   // 第一段覆盖菜单展开、测点列表基础操作、导入导出、筛选、删除、行内编辑等核心列表能力。

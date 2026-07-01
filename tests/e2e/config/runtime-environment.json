@@ -10,7 +10,8 @@
     "port": 6667,
     "username": "root",
     "password": "TimechoDB@2021",
-    "model": "tree"
+    "defaultModel": "tree",
+    "supportedModels": ["tree", "table"]
   },
   "prometheus": {
     "url": "127.0.0.1:9090",

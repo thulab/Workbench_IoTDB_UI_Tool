@@ -38,6 +38,7 @@ export const instanceManagementSelectors = {
   prometheusPassword: '[data-testid="connection-masterCluster-prometheusUrl-prometheus-password"]',
   standaloneType: '[data-testid="connection-type-standalone"], #connection-modal-type-0',
   defaultTreeModel: '[data-testid="connection-default-model-tree"], #connection-default-model-tree',
+  defaultTableModel: '[data-testid="connection-default-model-table"], #connection-default-model-table',
   saveButton: '[data-testid="connection-save"], #connection-modal-save',
   testButton: '[data-testid="connection-test"], #connection-modal-test',
   resetButton: '[data-testid="connection-reset"], #connection-modal-reset',

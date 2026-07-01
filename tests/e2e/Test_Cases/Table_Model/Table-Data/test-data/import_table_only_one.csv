@@ -1,0 +1,8 @@
+﻿tableName(表名),TTL(数据保留时间),tableComment(表备注),columnName(列名),columnComment(列备注),dataType(数据类型),cateGory(列类型)
+table_a,86400000,表一,device_id,设备列,string,tag
+table_a,86400000,表一,attr,属性列,string,attribute
+table_a,86400000,表一,s1,测点列,int32,field
+table_a,86400000,表一,s2,测点列,int64,field
+table_a,86400000,表一,s3,测点列,float,field
+table_a,86400000,表一,s4,测点列,double,field
+table_a,86400000,表一,s5,测点列,boolean,field

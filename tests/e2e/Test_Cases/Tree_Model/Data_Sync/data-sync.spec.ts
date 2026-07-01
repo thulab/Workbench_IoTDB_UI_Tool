@@ -1,4 +1,4 @@
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test, type APIRequestContext, type Locator, type Page } from '@playwright/test';
 import net from 'node:net';
 import { ensureRealQueryConnection, loginToRealWorkbench } from '../../../support/real-query-data';
 import { seedClientState } from '../../../support/workbench-test-support';
@@ -393,28 +393,22 @@ function generatedTaskNames(baseName: string, options?: { history?: boolean; rea
   return names;
 }
 
-async function cleanupTasks(page: Page, taskNames: string[]) {
-  if (!taskNames.length || page.isClosed()) {
+async function cleanupTasks(apiContext: APIRequestContext, taskNames: string[]) {
+  if (!taskNames.length) {
     return;
   }
 
-  await page
-    .context()
-    .request.post('/api/synchron/deleteDataSynchronByNames', {
+  await apiContext
+    .post('/api/synchron/deleteDataSynchronByNames', {
       data: { taskNames },
       timeout: 20_000,
     })
     .catch(() => undefined);
 }
 
-async function cleanupTasksByKeyword(page: Page, keyword: string) {
-  if (page.isClosed()) {
-    return;
-  }
-
-  const names = await page
-    .context()
-    .request.get('/api/synchron/getDataSynchronList', {
+async function cleanupTasksByKeyword(apiContext: APIRequestContext, keyword: string) {
+  const names = await apiContext
+    .get('/api/synchron/getDataSynchronList', {
       params: { taskName: keyword },
       timeout: 20_000,
     })
@@ -429,13 +423,13 @@ async function cleanupTasksByKeyword(page: Page, keyword: string) {
     .catch(() => []);
 
   if (names.length) {
-    await cleanupTasks(page, names);
+    await cleanupTasks(apiContext, names);
   }
 }
 
-async function cleanupAutoTasks(page: Page) {
+async function cleanupAutoTasks(apiContext: APIRequestContext) {
   for (const keyword of dataSyncCleanupKeywords) {
-    await cleanupTasksByKeyword(page, keyword);
+    await cleanupTasksByKeyword(apiContext, keyword);
   }
 }
 
@@ -793,13 +787,16 @@ test.describe('数据同步', () => {
     await loginToRealWorkbench(page);
     await gotoDataSyncPage(page);
     clearRegisteredTasks();
-    await cleanupAutoTasks(page);
+    await cleanupAutoTasks(request);
   });
 
-  test.afterEach(async ({ page }) => {
-    await cleanupTasks(page, [...createdTaskNames]);
-    await cleanupAutoTasks(page);
-    clearRegisteredTasks();
+  test.afterEach(async ({ request }) => {
+    try {
+      await cleanupTasks(request, [...createdTaskNames]).catch(() => undefined);
+      await cleanupAutoTasks(request).catch(() => undefined);
+    } finally {
+      clearRegisteredTasks();
+    }
   });
 
   test('1. 进入数据同步页后展示任务名称、重置、查询、任务列表、新建任务、批量操作、状态监控和刷新按钮', async ({ page }) => {

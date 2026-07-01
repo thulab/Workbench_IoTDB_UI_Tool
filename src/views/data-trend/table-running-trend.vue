@@ -493,6 +493,32 @@ function deleteMeasurement(payload: { groupId: string; measurementPath: string }
   }
 }
 
+function getVisibleSelectedMeasurements() {
+  return measurementList.value.filter((member) => visibleMeasurementCountMap.value.has(member.id)).map((member) => member.details as SelectedMeasurement);
+}
+
+function sendCurrentMeasurementsToWebSocket() {
+  const visibleMeasurements = getVisibleSelectedMeasurements();
+  if (!socketInstance.value || socketInstance.value.readyState !== 1) {
+    return;
+  }
+  socketInstance.value.send(
+    JSON.stringify({
+      operate: 'SET_CONNECT',
+      connectionId: connectionId.value,
+      user: userName.value,
+      type: connectionType.value,
+    }),
+  );
+  if (visibleMeasurements.length > 0) {
+    window.setTimeout(() => {
+      if (socketInstance.value && socketInstance.value.readyState === 1) {
+        socketInstance.value.send(buildParams('add', visibleMeasurements));
+      }
+    }, 300);
+  }
+}
+
 const buildParams = (operate: string, measurements: SelectedMeasurement[]) => {
   return JSON.stringify({
     operate,
@@ -586,18 +612,14 @@ function handleData(data: any) {
 
 function handlePlay(val: boolean) {
   if (val) {
-    if (!socketInstance.value || socketInstance.value.readyState > 1) {
-      initWebsocket(() => {
-        const paths = realTimeData.value.map((data) => data.path);
-        const allCurrentPaths = resolvedGroups.value.flatMap((group) => group.members).map((member) => member.details as SelectedMeasurement);
-        socketInstance.value?.send(
-          buildParams(
-            'add',
-            allCurrentPaths.filter((item) => paths.includes(formatSelectedMeasurement(item))),
-          ),
-        );
-      });
+    runningTrendStore.setIsPlaying(true);
+    realTimeData.value = [];
+    if (socketInstance.value) {
+      socketInstance.value.close();
     }
+    initWebsocket(() => {
+      sendCurrentMeasurementsToWebSocket();
+    });
     realTimeData.value.forEach((data) => {
       if (data.timestamps.length > 0) {
         data.values.push('');
@@ -606,8 +628,8 @@ function handlePlay(val: boolean) {
     });
   } else {
     runningTrendStore.setVisibleTimeRange({ start: runningTrendStore.min, end: dayjs().valueOf() });
+    runningTrendStore.setIsPlaying(false);
   }
-  runningTrendStore.setIsPlaying(val);
 }
 
 function init() {

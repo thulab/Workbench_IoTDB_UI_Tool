@@ -579,9 +579,12 @@ test.describe('视图页面', () => {
     if (page.isClosed()) {
       return;
     }
-    await cleanupImportedViews(page).catch(() => undefined);
-    await cleanupCreatedViews(page).catch(() => undefined);
-    await cleanupCalculateSeedData(page).catch(() => undefined);
+    try {
+      await cleanupImportedViews(page).catch(() => undefined);
+      await cleanupCreatedViews(page).catch(() => undefined);
+    } finally {
+      await cleanupCalculateSeedData(page).catch(() => undefined);
+    }
   });
 
   // 1. 验证视图页基础模块展示。

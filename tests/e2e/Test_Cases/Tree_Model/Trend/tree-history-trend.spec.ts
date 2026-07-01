@@ -9,12 +9,15 @@ import { seedClientState } from '../../../support/workbench-test-support';
 
 const realBackendRun = process.env.PLAYWRIGHT_REAL_BACKEND === 'true';
 
-const trendTexts = {
+const pageTexts = {
   historyTrend: '历史趋势',
   timeRange: '时间范围',
   measurementName: '测点名称',
   saveCommon: '保存常用',
   emptyName: '请填写名称后确定',
+  confirm: '确定',
+  noData: '暂无数据',
+  trendTemplateNamePattern: /趋势\d+/,
 } as const;
 
 const historyTrendDatabasePrefix = 'history_trend_auto_';
@@ -382,7 +385,7 @@ async function confirmResetAllTrends(page: Page) {
   await trendResetButton(page).click();
   const confirmDialog = historyTrendConfirmDialog(page);
   await expect(confirmDialog).toBeVisible({ timeout: uiTimeouts.pageReady });
-  await confirmDialog.getByRole('button', { name: '确定' }).click();
+  await confirmDialog.getByRole('button', { name: pageTexts.confirm }).click();
   await expect(confirmDialog).toBeHidden({ timeout: uiTimeouts.pageReady });
 }
 
@@ -396,14 +399,14 @@ async function readHistoryTrendStorage(page: Page) {
   });
 }
 
-test.describe('历史趋势', () => {
+test.describe('树模型-历史趋势', () => {
   test.describe.configure({ timeout: realBackendRun ? 180_000 : 60_000 });
 
   test.beforeEach(async ({ page, request }) => {
     await seedClientState(page, { lang: 'cn' });
 
     if (!realBackendRun) {
-      test.skip(true, '历史趋势当前仅覆盖真实 Workbench 场景。');
+      test.skip(true, '树模型历史趋势当前仅覆盖真实 Workbench 场景');
       return;
     }
 
@@ -415,8 +418,11 @@ test.describe('历史趋势', () => {
       return;
     }
 
-    await cleanupHistoryTrendArtifactsForPage(page).catch(() => undefined);
-    await cleanupConnectionsByNames(request, [localhostConnection.name]);
+    try {
+      await cleanupHistoryTrendArtifactsForPage(page).catch(() => undefined);
+    } finally {
+      await cleanupConnectionsByNames(request, [localhostConnection.name]).catch(() => undefined);
+    }
   });
 
   test.afterAll(async ({ request }) => {
@@ -424,31 +430,29 @@ test.describe('历史趋势', () => {
       return;
     }
 
-    await cleanupConnectionsByNames(request, [localhostConnection.name]);
+    await cleanupConnectionsByNames(request, [localhostConnection.name]).catch(() => undefined);
   });
 
-  // 校验历史趋势页基础布局，左侧存在测点树，右侧存在时间范围与历史趋势状态表格。
   test('1. 进入历史趋势页后左侧展示测点列表，右侧展示历史趋势状态', async ({ page }) => {
     await loginToWorkbench(page);
     await gotoHistoryTrend(page);
 
-    await expect(page.locator(trendSelectors.menuHistoryTrend).first()).toContainText(trendTexts.historyTrend);
+    await expect(page.locator(trendSelectors.menuHistoryTrend).first()).toContainText(pageTexts.historyTrend);
     await expect(page.locator(trendSelectors.measurementTreeSearchInput).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
     await expect(page.locator(trendSelectors.measurementTreeRootNode).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
-    await expect(page.getByText(trendTexts.timeRange, { exact: false }).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(page.getByText(pageTexts.timeRange, { exact: false }).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
     await expect(page.locator('.date-picker').first()).toBeVisible({ timeout: uiTimeouts.pageReady });
 
     const markerTable = page.locator(trendSelectors.markerTable).first();
     await expect(markerTable).toBeVisible({ timeout: uiTimeouts.pageReady });
-    await expect(markerTable.getByText(trendTexts.measurementName, { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(markerTable.getByText(pageTexts.measurementName, { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
     await expect(markerTable.getByText('T1', { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
     await expect(markerTable.getByText('T2', { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
     await expect(markerTable.getByText('V1', { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
     await expect(markerTable.getByText('V2', { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
   });
 
-  // 创建 4 种数值型测点并写入历史数据后，可在历史趋势页将测点加入趋势图。
-  test('2. 创建 INT32、INT64、DOUBLE、FLOAT 测点并插入历史数据后可加入历史趋势', async ({ page }) => {
+  test('2. 创建四种数值型测点并写入历史数据后可加入历史趋势', async ({ page }) => {
     const { measurements } = await prepareHistoryTrendScenario(page);
 
     await addMeasurementsToTrend(
@@ -463,7 +467,6 @@ test.describe('历史趋势', () => {
     await expect(markerTable.getByText(measurements[0]!.path, { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
   });
 
-  // 在历史趋势页调整时间范围后，页面按新的时间窗口刷新历史趋势查询状态。
   test('3. 在历史趋势页可根据时间范围查找对应的历史趋势', async ({ page }) => {
     const { measurements, timestamps } = await prepareHistoryTrendScenario(page);
     const rangeStart = normalizeToSecond(timestamps[1] - 15 * 60 * 1000);
@@ -482,8 +485,7 @@ test.describe('历史趋势', () => {
     await expect(markerTable.getByText(measurements[0]!.path, { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
   });
 
-  // 历史趋势页已添加多个趋势后，支持通过顶部删除图标一键清空所有趋势。
-  test('4. 在历史趋势页添加多个趋势后可点击删除图标删除所有趋势', async ({ page }) => {
+  test('4. 添加多个趋势后可点击删除图标清空所有趋势', async ({ page }) => {
     const { measurements } = await prepareHistoryTrendScenario(page);
 
     await addMeasurementsToTrend(
@@ -495,11 +497,10 @@ test.describe('历史趋势', () => {
     await confirmResetAllTrends(page);
 
     await expect(trendGroups(page)).toHaveCount(0, { timeout: uiTimeouts.pageReady });
-    await expect(page.locator(trendSelectors.markerTable).first()).toContainText('暂无数据', { timeout: uiTimeouts.pageReady });
+    await expect(page.locator(trendSelectors.markerTable).first()).toContainText(pageTexts.noData, { timeout: uiTimeouts.pageReady });
   });
 
-  // 历史趋势页已添加多个趋势后，支持通过指定趋势卡片左上角的删除按钮删除单个趋势。
-  test('5. 在历史趋势页添加多个趋势后可删除指定趋势', async ({ page }) => {
+  test('5. 添加多个趋势后可删除指定趋势', async ({ page }) => {
     const { measurements } = await prepareHistoryTrendScenario(page);
     const measurementPaths = measurements.slice(0, 3).map((item) => item.path);
 
@@ -514,36 +515,32 @@ test.describe('历史趋势', () => {
     await expect(page.locator('.graph-border').filter({ hasText: measurementPaths[1]! })).toHaveCount(0, { timeout: uiTimeouts.pageReady });
   });
 
-  // 历史趋势页添加趋势后点击保存按钮，弹出“保存常用”窗口。
-  test('6. 在历史趋势页添加趋势后点击保存按钮弹出保存常用弹窗', async ({ page }) => {
+  test('6. 添加趋势后点击保存弹出保存常用弹窗', async ({ page }) => {
     const { measurements } = await prepareHistoryTrendScenario(page);
 
     await openSaveTemplateDialog(page, [measurements[0]!.path]);
-    await expect(trendTemplateDialog(page)).toContainText(trendTexts.saveCommon);
+    await expect(trendTemplateDialog(page)).toContainText(pageTexts.saveCommon);
   });
 
-  // 历史趋势保存常用弹窗中名称为空时提交，提示“请填写名称后确定”。
-  test('7. 历史趋势保存常用弹窗名称为空时提示请填写名称后确定', async ({ page }) => {
+  test('7. 保存常用弹窗名称为空时提示请填写名称后确定', async ({ page }) => {
     const { measurements } = await prepareHistoryTrendScenario(page);
 
     await openSaveTemplateDialog(page, [measurements[0]!.path]);
     await trendTemplateNameInput(page).fill('');
     await trendTemplateConfirmButton(page).click();
-    await expect(trendTemplateValidationError(page)).toContainText(trendTexts.emptyName, { timeout: uiTimeouts.pageReady });
+    await expect(trendTemplateValidationError(page)).toContainText(pageTexts.emptyName, { timeout: uiTimeouts.pageReady });
   });
 
-  // 历史趋势保存常用弹窗名称支持最多输入 25 个字符并保存成功。
-  test('8. 历史趋势保存常用弹窗名称最多输入 25 个字符可新建趋势模板', async ({ page }) => {
+  test('8. 保存常用弹窗名称最多输入 25 个字符可新建趋势模板', async ({ page }) => {
     const { measurements } = await prepareHistoryTrendScenario(page);
     const templateName = buildFixedLengthText(`history_tpl_${Date.now()}`, 25);
 
     await openSaveTemplateDialog(page, [measurements[0]!.path]);
-    await expect(trendTemplateNameInput(page)).toHaveValue(/趋势\d+/);
+    await expect(trendTemplateNameInput(page)).toHaveValue(pageTexts.trendTemplateNamePattern);
     await saveTrendTemplate(page, templateName);
   });
 
-  // 历史趋势保存常用弹窗支持通过右上角 X 和取消按钮关闭。
-  test('9. 历史趋势保存常用弹窗支持通过右上角 X 或取消按钮关闭', async ({ page }) => {
+  test('9. 保存常用弹窗支持通过右上角关闭或取消按钮关闭', async ({ page }) => {
     const { measurements } = await prepareHistoryTrendScenario(page);
 
     await openSaveTemplateDialog(page, [measurements[0]!.path]);

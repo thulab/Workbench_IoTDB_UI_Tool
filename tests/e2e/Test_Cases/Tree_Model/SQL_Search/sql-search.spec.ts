@@ -383,14 +383,17 @@ if (realBackendRun) {
     });
 
     test.afterEach(async ({ page, request }) => {
-      await cleanupSqlTemplateByName(page, '查询集群信息').catch(() => undefined);
-      await cleanupRealQuerySeedData(page);
-      await cleanupRealTemporaryQueryDatabases(page).catch(() => undefined);
-      await cleanupRealQueryConnection(request);
+      try {
+        await cleanupSqlTemplateByName(page, '查询集群信息').catch(() => undefined);
+        await cleanupRealQuerySeedData(page).catch(() => undefined);
+        await cleanupRealTemporaryQueryDatabases(page).catch(() => undefined);
+      } finally {
+        await cleanupRealQueryConnection(request).catch(() => undefined);
+      }
     });
 
     test.afterAll(async ({ request }) => {
-      await cleanupRealQueryConnection(request);
+      await cleanupRealQueryConnection(request).catch(() => undefined);
     });
 
     test('1. 进入【SQL操作】页面后, 展示 SQL 输入区域、执行结果和快捷操作模块', async ({ page }) => {

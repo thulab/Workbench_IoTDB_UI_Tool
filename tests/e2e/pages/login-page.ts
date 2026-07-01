@@ -42,6 +42,10 @@ export class LoginPage {
     return this.page.locator(loginSelectors.treeModel).first();
   }
 
+  tableModel() {
+    return this.page.locator(loginSelectors.tableModel).first();
+  }
+
   validationErrors() {
     return this.page.locator(loginSelectors.validationError);
   }
@@ -114,7 +118,7 @@ export class LoginPage {
     throw new Error(`Connection option "${name}" was not visible in login dropdown after retries.`);
   }
 
-  async login(options: { connectionName?: string; username?: string; password?: string }) {
+  async login(options: { connectionName?: string; username?: string; password?: string; model?: 'tree' | 'table' }) {
     if (options.connectionName !== undefined) {
       await this.selectConnectionByName(options.connectionName);
     }
@@ -124,7 +128,49 @@ export class LoginPage {
     if (options.password !== undefined) {
       await this.passwordInput().fill(options.password);
     }
+    if (options.model !== undefined) {
+      await this.selectModel(options.model);
+    }
     await this.submitButton().click();
+  }
+
+  async selectModel(model: 'tree' | 'table') {
+    const target = model === 'tree' ? this.treeModel() : this.tableModel();
+    await target.click();
+  }
+
+  async submitAndExpectDashboardLanding(connectionName: string, endpoint: string, options: { maxAttempts?: number } = {}) {
+    const maxAttempts = options.maxAttempts ?? 2;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+      await this.submitButton().click();
+
+      const landed = await this.page
+        .waitForURL(/\/view\/dashboard/, {
+          timeout: Math.min(uiTimeouts.pageReady, 15_000),
+        })
+        .then(() => true)
+        .catch(() => false);
+
+      if (landed) {
+        await this.expectDashboardLanding(connectionName, endpoint);
+        return;
+      }
+
+      const latestErrorVisible = await this.latestErrorToast()
+        .isVisible({ timeout: 1_000 })
+        .catch(() => false);
+      const validationErrorCount = await this.validationErrors().count().catch(() => 0);
+      const loginStillVisible = await this.pageRoot().isVisible().catch(() => false);
+
+      if (attempt >= maxAttempts || latestErrorVisible || validationErrorCount > 0 || !loginStillVisible) {
+        break;
+      }
+
+      await this.page.waitForTimeout(1_000);
+    }
+
+    await this.expectDashboardLanding(connectionName, endpoint);
   }
 
   async openInstanceManagement() {

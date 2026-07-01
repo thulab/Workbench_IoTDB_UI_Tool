@@ -37,6 +37,7 @@ function clearRegisteredCleanupNames() {
 test.describe('实例管理', () => {
   test.beforeEach(async ({ page }) => {
     // 实例管理统一使用中文界面，便于真实环境与本地调试共用断言。
+    clearRegisteredCleanupNames();
     await seedClientState(page, { lang: 'cn' });
     if (!realBackendRun) {
       // Mock 模式下由前端拦截接口，不依赖真实 Workbench。
@@ -58,9 +59,12 @@ test.describe('实例管理', () => {
       return;
     }
 
-    await cleanupConnectionsByNames(request, [...createdConnectionNames]);
-    await cleanupConnectionsByPrefixes(request, tempInstancePrefixes);
-    clearRegisteredCleanupNames();
+    try {
+      await cleanupConnectionsByNames(request, [...createdConnectionNames]).catch(() => undefined);
+      await cleanupConnectionsByPrefixes(request, tempInstancePrefixes).catch(() => undefined);
+    } finally {
+      clearRegisteredCleanupNames();
+    }
   });
 
   test.afterAll(async ({ request }) => {
@@ -68,9 +72,12 @@ test.describe('实例管理', () => {
       return;
     }
 
-    await cleanupConnectionsByNames(request, [...createdConnectionNames]);
-    await cleanupConnectionsByPrefixes(request, tempInstancePrefixes);
-    clearRegisteredCleanupNames();
+    try {
+      await cleanupConnectionsByNames(request, [...createdConnectionNames]).catch(() => undefined);
+      await cleanupConnectionsByPrefixes(request, tempInstancePrefixes).catch(() => undefined);
+    } finally {
+      clearRegisteredCleanupNames();
+    }
   });
 
   if (!realBackendRun) {

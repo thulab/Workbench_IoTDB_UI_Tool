@@ -474,8 +474,11 @@ test.describe('分析页', () => {
       return;
     }
 
-    await cleanupSpectrumDatabases(page).catch(() => undefined);
-    await cleanupConnectionsByNames(request, [localhostConnection.name]);
+    try {
+      await cleanupSpectrumDatabases(page).catch(() => undefined);
+    } finally {
+      await cleanupConnectionsByNames(request, [localhostConnection.name]).catch(() => undefined);
+    }
   });
 
   test.afterAll(async ({ request }) => {
@@ -483,7 +486,7 @@ test.describe('分析页', () => {
       return;
     }
 
-    await cleanupConnectionsByNames(request, [localhostConnection.name]);
+    await cleanupConnectionsByNames(request, [localhostConnection.name]).catch(() => undefined);
   });
 
   // 校验分析页基础框架，包含分析方式、重置/应用/保存、光标/常用页签；切换到自定义分析后展示真实页面中的“SQL输入”入口。

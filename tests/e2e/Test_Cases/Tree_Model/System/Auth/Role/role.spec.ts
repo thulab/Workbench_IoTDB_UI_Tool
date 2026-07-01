@@ -1,12 +1,16 @@
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test, type APIRequestContext, type Locator, type Page } from '@playwright/test';
 import { ensureRealQueryConnection, loginToRealWorkbench } from '../../../../../support/real-query-data';
+import { cleanupRelationalRolesByNames, cleanupRelationalRolesByPrefixes } from '../../../../../support/relational-artifact-cleanup';
 import { seedClientState } from '../../../../../support/workbench-test-support';
 import { uiTimeouts } from '../../../../../support/e2e-selectors';
 
 const realBackendRun = process.env.PLAYWRIGHT_REAL_BACKEND === 'true';
 const requiredFieldMessage = '请输入内容后操作';
 const roleCreateSuccessMessage = '创建成功';
+const treeAuthRoleCleanupPrefixes = ['trr', 'q4'];
 const createdRoleNames = new Set<string>();
+const treeRoleNamePrefix = 'trr';
+const treeRoleFourCharPrefix = 'q4';
 
 function buildFixedLengthText(prefix: string, targetLength: number) {
   const normalizedPrefix = prefix.replace(/[^A-Za-z0-9]/g, '');
@@ -17,12 +21,12 @@ function buildFixedLengthText(prefix: string, targetLength: number) {
 }
 
 function buildUniqueRoleName(label: string, targetLength = 20) {
-  const raw = `${label}${Date.now()}`;
+  const raw = `${treeRoleNamePrefix}${label}${Date.now()}`;
   return buildFixedLengthText(raw, targetLength);
 }
 
 function buildFourCharRoleName() {
-  return `r${String(Date.now() % 1000).padStart(3, '0')}`;
+  return `${treeRoleFourCharPrefix}${String(Date.now() % 100).padStart(2, '0')}`;
 }
 
 function registerCreatedRole(roleName: string) {
@@ -134,22 +138,14 @@ async function expectCreateRoleSuccess(page: Page, roleName: string) {
   }
 }
 
-async function cleanupCreatedRoles(page: Page) {
+async function cleanupCreatedRoles(apiContext: APIRequestContext) {
   const roleNames = [...createdRoleNames];
   if (!roleNames.length) {
     return;
   }
 
   try {
-    for (const roleName of roleNames) {
-      await page
-        .context()
-        .request.delete('/api/relational/privileges/deleteRole', {
-          params: { roleName },
-          timeout: 15_000,
-        })
-        .catch(() => undefined);
-    }
+    await cleanupRelationalRolesByNames(apiContext, roleNames);
   } catch {
     // ignore cleanup failures
   } finally {
@@ -163,14 +159,19 @@ test.describe('系统管理-权限管理-角色管理', () => {
 
   test.beforeEach(async ({ page, request }) => {
     await seedClientState(page, { lang: 'cn' });
+    await cleanupRelationalRolesByPrefixes(request, treeAuthRoleCleanupPrefixes).catch(() => undefined);
     await ensureRealQueryConnection(request);
     await loginToRealWorkbench(page);
     await gotoRoleManagement(page);
     clearRegisteredRoles();
   });
 
-  test.afterEach(async ({ page }) => {
-    await cleanupCreatedRoles(page);
+  test.afterEach(async ({ request }) => {
+    try {
+      await cleanupCreatedRoles(request);
+    } finally {
+      await cleanupRelationalRolesByPrefixes(request, treeAuthRoleCleanupPrefixes).catch(() => undefined);
+    }
   });
 
   test('1. 权限管理菜单中分别展示用户管理和角色管理', async ({ page }) => {

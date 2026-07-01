@@ -8,7 +8,7 @@ import { seedClientState } from '../../../support/workbench-test-support';
 
 const realBackendRun = process.env.PLAYWRIGHT_REAL_BACKEND === 'true';
 
-const trendTexts = {
+const pageTexts = {
   visualization: '可视化',
   runningTrend: '实时趋势',
   historyTrend: '历史趋势',
@@ -17,7 +17,10 @@ const trendTexts = {
   tip2: 'Tip 2',
   tip3: 'Tip 3',
   tip4: 'Tip 4',
+  tip5: 'Tip 5',
   measurementName: '测点名称',
+  saveCommon: '保存常用',
+  emptyName: '请填写名称后确定',
 } as const;
 
 const trendDatabasePrefix = 'trend_auto_';
@@ -446,14 +449,14 @@ async function openTrendTemplateDropdown(page: Page) {
   return dropdown;
 }
 
-test.describe('实时趋势', () => {
+test.describe('树模型-实时趋势', () => {
   test.describe.configure({ timeout: realBackendRun ? 180_000 : 60_000 });
 
   test.beforeEach(async ({ page, request }) => {
     await seedClientState(page, { lang: 'cn' });
 
     if (!realBackendRun) {
-      test.skip(true, '实时趋势当前仅覆盖真实 Workbench 场景。');
+      test.skip(true, '树模型实时趋势当前仅覆盖真实 Workbench 场景');
       return;
     }
 
@@ -465,8 +468,11 @@ test.describe('实时趋势', () => {
       return;
     }
 
-    await cleanupTrendArtifactsForPage(page).catch(() => undefined);
-    await cleanupConnectionsByNames(request, [localhostConnection.name]);
+    try {
+      await cleanupTrendArtifactsForPage(page).catch(() => undefined);
+    } finally {
+      await cleanupConnectionsByNames(request, [localhostConnection.name]).catch(() => undefined);
+    }
   });
 
   test.afterAll(async ({ request }) => {
@@ -474,45 +480,42 @@ test.describe('实时趋势', () => {
       return;
     }
 
-    await cleanupConnectionsByNames(request, [localhostConnection.name]);
+    await cleanupConnectionsByNames(request, [localhostConnection.name]).catch(() => undefined);
   });
 
-  // 校验可视化主菜单的树模型子菜单结构，确保实时趋势、历史趋势、分析入口都可见。
   test('1. 展开可视化主菜单后展示实时趋势、历史趋势、分析子菜单', async ({ page }) => {
     await loginToWorkbench(page);
 
-    await expect(page.locator(trendSelectors.menuSubmenuTitle).first()).toContainText(trendTexts.visualization);
+    await expect(page.locator(trendSelectors.menuSubmenuTitle).first()).toContainText(pageTexts.visualization);
     await expandVisualizationMenu(page);
 
-    await expect(page.locator(trendSelectors.menuRunningTrend).first()).toContainText(trendTexts.runningTrend);
-    await expect(page.locator(trendSelectors.menuHistoryTrend).first()).toContainText(trendTexts.historyTrend);
-    await expect(page.locator(trendSelectors.menuAnalysis).first()).toContainText(trendTexts.analysis);
+    await expect(page.locator(trendSelectors.menuRunningTrend).first()).toContainText(pageTexts.runningTrend);
+    await expect(page.locator(trendSelectors.menuHistoryTrend).first()).toContainText(pageTexts.historyTrend);
+    await expect(page.locator(trendSelectors.menuAnalysis).first()).toContainText(pageTexts.analysis);
   });
 
-  // 校验实时趋势页基础布局，左侧有测点树导航，右侧有趋势提示区与趋势状态表格区。
-  test('2. 进入实时趋势页后左侧展示测点列表信息，右侧展示趋势状态区域', async ({ page }) => {
+  test('2. 进入实时趋势页后左侧展示测点列表，右侧展示趋势状态区域', async ({ page }) => {
     await loginToWorkbench(page);
     await gotoRunningTrend(page);
 
     await expect(page.locator(trendSelectors.measurementTreeSearchInput).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
     await expect(page.locator(trendSelectors.measurementTreeRootNode).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
 
-    await expect(page.getByText(trendTexts.tip1, { exact: true }).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
-    await expect(page.getByText(trendTexts.tip2, { exact: true }).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
-    await expect(page.getByText(trendTexts.tip3, { exact: true }).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
-    await expect(page.getByText(trendTexts.tip4, { exact: true }).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(page.getByText(pageTexts.tip1, { exact: true }).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(page.getByText(pageTexts.tip2, { exact: true }).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(page.getByText(pageTexts.tip3, { exact: true }).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(page.getByText(pageTexts.tip4, { exact: true }).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
 
     const markerTable = page.locator(trendSelectors.markerTable).first();
     await expect(markerTable).toBeVisible({ timeout: uiTimeouts.pageReady });
-    await expect(markerTable.getByText(trendTexts.measurementName, { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(markerTable.getByText(pageTexts.measurementName, { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
     await expect(markerTable.getByText('T1', { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
     await expect(markerTable.getByText('T2', { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
     await expect(markerTable.getByText('V1', { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
     await expect(markerTable.getByText('V2', { exact: true })).toBeVisible({ timeout: uiTimeouts.pageReady });
   });
 
-  // 创建 4 种数值型测点，实时写入数据，并在实时趋势页通过左侧树节点双击加入趋势图。
-  test('3. 创建 INT32、INT64、FLOAT、DOUBLE 测点后可加入实时趋势图并查看实时数据', async ({ page }) => {
+  test('3. 创建四种数值型测点后可加入实时趋势图并查看实时数据', async ({ page }) => {
     const { databasePath, measurements } = await prepareRunningTrendScenario(page);
 
     await addMeasurementsToTrend(
@@ -531,8 +534,7 @@ test.describe('实时趋势', () => {
     }
   });
 
-  // 在实时趋势页加入测点后，支持暂停与恢复播放。
-  test('4. 实时趋势页加入测点后支持播放与暂停切换', async ({ page }) => {
+  test('4. 加入测点后支持播放与暂停切换', async ({ page }) => {
     const { databasePath, measurements } = await prepareRunningTrendScenario(page);
 
     await addMeasurementsToTrend(
@@ -557,8 +559,7 @@ test.describe('实时趋势', () => {
     expect(resumedIconHtml).toBe(initialIconHtml);
   });
 
-  // 在实时趋势页加入测点后，支持保存趋势模板并在模板下拉中看到新模板。
-  test('5. 实时趋势页支持模板保存操作', async ({ page }) => {
+  test('5. 支持保存实时趋势模板并在模板列表中查看', async ({ page }) => {
     const { measurements } = await prepareRunningTrendScenario(page);
     const templateName = `${trendTemplatePrefix}${Date.now()}`;
 
@@ -589,8 +590,7 @@ test.describe('实时趋势', () => {
     await expect.poll(async () => listTrendTemplateNames(page)).toContain(templateName);
   });
 
-  // 在实时趋势页增加测点趋势后，支持通过趋势卡片左上角删除按钮移除当前趋势。
-  test('6. 实时趋势页增加测点趋势后可删除当前趋势', async ({ page }) => {
+  test('6. 增加测点趋势后可删除当前趋势', async ({ page }) => {
     const { measurements } = await prepareRunningTrendScenario(page);
 
     await addMeasurementsToTrend(page, [measurements[0]!.path]);
@@ -600,11 +600,10 @@ test.describe('实时趋势', () => {
     await trendGroupDeleteButton(firstGroup).click();
 
     await expect(trendGroups(page)).toHaveCount(0, { timeout: uiTimeouts.pageReady });
-    await expect(page.getByText(trendTexts.tip1, { exact: true }).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(page.getByText(pageTexts.tip1, { exact: true }).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
   });
 
-  // 在实时趋势页同一趋势中增加多个测点后，支持通过每个测点后的 X 按钮逐条删除测点趋势。
-  test('7. 实时趋势页增加多个测点趋势后可删除指定测点趋势', async ({ page }) => {
+  test('7. 增加多个测点趋势后可删除指定测点趋势', async ({ page }) => {
     const { measurements } = await prepareRunningTrendScenario(page);
     const [firstMeasurement, ...restMeasurements] = measurements;
 
@@ -632,8 +631,7 @@ test.describe('实时趋势', () => {
     await expect(trendGroups(page)).toHaveCount(0, { timeout: uiTimeouts.pageReady });
   });
 
-  // 在实时趋势页已有趋势图时，支持通过导出按钮导出趋势图片。
-  test('8. 实时趋势页支持导出趋势图片', async ({ page }) => {
+  test('8. 已有趋势图时支持导出趋势图片', async ({ page }) => {
     const { databasePath, measurements } = await prepareRunningTrendScenario(page);
 
     await addMeasurementsToTrend(page, [measurements[0]!.path]);
@@ -656,16 +654,14 @@ test.describe('实时趋势', () => {
       );
   });
 
-  // 在实时趋势页选中测点后，点击保存按钮，弹出“保存常用”窗口。
-  test('9. 实时趋势页选择测点后点击保存按钮弹出保存常用窗口', async ({ page }) => {
+  test('9. 选择测点后点击保存按钮弹出保存常用窗口', async ({ page }) => {
     const { measurements } = await prepareRunningTrendScenario(page);
 
     await openSaveTemplateDialog(page, [measurements[0]!.path]);
-    await expect(trendTemplateDialog(page)).toContainText('保存常用');
+    await expect(trendTemplateDialog(page)).toContainText(pageTexts.saveCommon);
   });
 
-  // 保存常用弹窗支持通过右上角 X 或取消按钮关闭。
-  test('10. 保存常用弹窗支持通过右上角 X 或取消按钮关闭', async ({ page }) => {
+  test('10. 保存常用弹窗支持通过右上角关闭或取消按钮关闭', async ({ page }) => {
     const { measurements } = await prepareRunningTrendScenario(page);
 
     await openSaveTemplateDialog(page, [measurements[0]!.path]);
@@ -677,18 +673,16 @@ test.describe('实时趋势', () => {
     await expect(trendTemplateDialog(page)).toBeHidden({ timeout: uiTimeouts.pageReady });
   });
 
-  // 保存常用弹窗中名称为空时提交，提示“请填写名称后确定”。
   test('11. 保存常用弹窗名称为空时提交提示请填写名称后确定', async ({ page }) => {
     const { measurements } = await prepareRunningTrendScenario(page);
 
     await openSaveTemplateDialog(page, [measurements[0]!.path]);
     await trendTemplateNameInput(page).fill('');
     await trendTemplateConfirmButton(page).click();
-    await expect(trendTemplateValidationError(page)).toContainText('请填写名称后确定', { timeout: uiTimeouts.pageReady });
+    await expect(trendTemplateValidationError(page)).toContainText(pageTexts.emptyName, { timeout: uiTimeouts.pageReady });
   });
 
-  // 保存常用弹窗名称支持最多 25 个字符，提交后增加常用成功。
-  test('12. 保存常用弹窗名称最多输入 25 个字符后提交可增加常用成功', async ({ page }) => {
+  test('12. 保存常用弹窗名称最多输入 25 个字符后可增加常用成功', async ({ page }) => {
     const { measurements } = await prepareRunningTrendScenario(page);
     const templateName = buildFixedLengthText(`trend_tpl_max_${Date.now()}`, 25);
 
@@ -698,8 +692,7 @@ test.describe('实时趋势', () => {
     await saveTrendTemplate(page, templateName);
   });
 
-  // 保存常用提交后，在常用趋势下拉框中可看到并选中已创建的模板。
-  test('13. 保存常用提交后在常用趋势下拉框中可看到并选中已创建模板', async ({ page }) => {
+  test('13. 保存常用提交后可在常用趋势下拉框中查看并选中已创建模板', async ({ page }) => {
     const { measurements } = await prepareRunningTrendScenario(page);
     const templateName = `${trendTemplatePrefix}${Date.now()}`;
 

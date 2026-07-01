@@ -301,9 +301,12 @@ test.describe('统计查询', () => {
       return;
     }
 
-    await cleanupRealTemporaryQueryDatabases(page);
-    await cleanupRealQuerySeedData(page);
-    await cleanupRealQueryConnection(request);
+    try {
+      await cleanupRealTemporaryQueryDatabases(page).catch(() => undefined);
+      await cleanupRealQuerySeedData(page).catch(() => undefined);
+    } finally {
+      await cleanupRealQueryConnection(request).catch(() => undefined);
+    }
   });
 
   test.afterAll(async ({ request }) => {
@@ -311,7 +314,7 @@ test.describe('统计查询', () => {
       return;
     }
 
-    await cleanupRealQueryConnection(request);
+    await cleanupRealQueryConnection(request).catch(() => undefined);
   });
 
   if (realBackendRun) {

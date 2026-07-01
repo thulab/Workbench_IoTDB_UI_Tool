@@ -333,7 +333,6 @@ function getListData() {
             }
             return value;
           },
-          // formatHeader: formatTimeseries,
         });
       });
       columns.value = list;

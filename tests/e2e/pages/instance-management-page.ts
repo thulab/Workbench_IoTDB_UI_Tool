@@ -14,7 +14,7 @@ export class InstanceManagementPage {
   }
 
   list() {
-    return this.page.locator(instanceManagementSelectors.list).first();
+    return this.modal().locator('.connection-list-wrapper, [data-testid="connection-list"], .connection-list-box').first();
   }
 
   listSearchInput() {
@@ -62,7 +62,7 @@ export class InstanceManagementPage {
   }
 
   connectionInfoLabel() {
-    return this.form().locator('.ip-port-box .form-label').filter({ hasText: '实例信息' }).first();
+    return this.form().locator('.ip-port-box .form-label').first();
   }
 
   connectionInfoTooltipIcon() {
@@ -74,7 +74,12 @@ export class InstanceManagementPage {
   }
 
   prometheusSection() {
-    return this.form().locator('.el-form-item').filter({ hasText: 'Prometheus 信息' }).first();
+    return this.form()
+      .locator('.el-form-item')
+      .filter({
+        has: this.form().locator(instanceManagementSelectors.prometheusUrl),
+      })
+      .first();
   }
 
   prometheusTooltipIcon() {
@@ -82,27 +87,36 @@ export class InstanceManagementPage {
   }
 
   prometheusAuthToggle() {
-    return this.prometheusSection().locator('.el-switch').first();
+    return this.form().locator(instanceManagementSelectors.prometheusAuth).first();
   }
 
   prometheusUsernameInput() {
-    return this.form().getByPlaceholder('请输入Prometheus用户名').first();
+    return this.form().locator(instanceManagementSelectors.prometheusUsername).first();
   }
 
   prometheusPasswordInput() {
-    return this.form().getByPlaceholder('请输入Prometheus密码').first();
+    return this.form().locator(instanceManagementSelectors.prometheusPassword).first();
   }
 
   standaloneType() {
     return this.page.locator(instanceManagementSelectors.standaloneType).first();
   }
 
-  defaultTreeModel() {
-    return this.page.locator(instanceManagementSelectors.defaultTreeModel).first();
+  defaultModelSection() {
+    return this.form()
+      .locator('.el-form-item')
+      .filter({
+        has: this.form().locator('.el-radio').filter({ hasText: '\u8868\u6A21\u578B' }),
+      })
+      .first();
   }
 
-  defaultModelSection() {
-    return this.form().locator('.el-form-item').filter({ hasText: '默认模型' }).first();
+  defaultTreeModel() {
+    return this.form().locator('.el-radio').filter({ hasText: '\u6811\u6A21\u578B' }).first();
+  }
+
+  defaultTableModel() {
+    return this.form().locator('.el-radio').filter({ hasText: '\u8868\u6A21\u578B' }).first();
   }
 
   defaultModelTooltipIcon() {
@@ -133,7 +147,7 @@ export class InstanceManagementPage {
   }
 
   itemByName(name: string) {
-    return this.list().locator(instanceManagementSelectors.connectionItemBox).filter({ hasText: name }).first();
+    return this.modal().locator(instanceManagementSelectors.connectionItemBox).filter({ hasText: name }).first();
   }
 
   async expectVisible() {
@@ -159,6 +173,10 @@ export class InstanceManagementPage {
       await this.confirmDialog()
         .waitFor({ state: 'hidden', timeout: 5_000 })
         .catch(() => undefined);
+    }
+
+    if (await this.modal().isVisible().catch(() => false)) {
+      await this.page.locator(instanceManagementSelectors.modalCloseButton).click({ force: true }).catch(() => undefined);
     }
 
     await expect(this.modal()).toBeHidden();
@@ -215,6 +233,11 @@ export class InstanceManagementPage {
     }
   }
 
+  async selectDefaultModel(model: 'tree' | 'table') {
+    const target = model === 'tree' ? this.defaultTreeModel() : this.defaultTableModel();
+    await target.click();
+  }
+
   async clickPrimaryAction(action: 'save' | 'test' | 'reset') {
     switch (action) {
       case 'save':
@@ -268,6 +291,15 @@ export class InstanceManagementPage {
   async search(keyword: string) {
     await this.listSearchInput().fill(keyword);
     await this.listSearchInput().press('Enter');
+
+    const discardChanges = this.page.locator(instanceManagementSelectors.unsavedCancelButton);
+    await discardChanges.waitFor({ state: 'visible', timeout: 1_500 }).catch(() => undefined);
+    if (await discardChanges.isVisible().catch(() => false)) {
+      await discardChanges.click({ force: true }).catch(() => undefined);
+      await this.confirmDialog()
+        .waitFor({ state: 'hidden', timeout: 5_000 })
+        .catch(() => undefined);
+    }
   }
 
   async deleteConnectionByName(name: string) {

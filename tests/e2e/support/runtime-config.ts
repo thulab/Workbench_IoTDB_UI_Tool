@@ -14,7 +14,9 @@ type RuntimeEnvironment = {
     port: number;
     username: string;
     password: string;
-    model: 'tree' | 'table';
+    model?: 'tree' | 'table';
+    defaultModel?: 'tree' | 'table';
+    supportedModels?: Array<'tree' | 'table'>;
   };
   prometheus: {
     url: string;
@@ -27,6 +29,30 @@ const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirPath = path.dirname(currentFilePath);
 const runtimeConfigPath = path.join(currentDirPath, '..', 'config', 'runtime-environment.json');
 const runtimeConfig = JSON.parse(readFileSync(runtimeConfigPath, 'utf8')) as RuntimeEnvironment;
+
+function normalizeModel(model?: string): 'tree' | 'table' {
+  return model === 'table' ? 'table' : 'tree';
+}
+
+function getDefaultIoTDBModel() {
+  return normalizeModel(runtimeConfig.iotdb.defaultModel || runtimeConfig.iotdb.model);
+}
+
+function getSupportedIoTDBModels() {
+  const configuredModels = Array.isArray(runtimeConfig.iotdb.supportedModels) ? runtimeConfig.iotdb.supportedModels : [];
+  const normalizedModels = [...new Set(configuredModels.map((item) => normalizeModel(item)))];
+  const defaultModel = getDefaultIoTDBModel();
+
+  if (!normalizedModels.includes(defaultModel)) {
+    normalizedModels.unshift(defaultModel);
+  }
+
+  if (!normalizedModels.includes('tree')) {
+    normalizedModels.unshift('tree');
+  }
+
+  return [...new Set(normalizedModels)];
+}
 
 function parseUrlPort(url: string, fallbackPort: number) {
   try {
@@ -41,7 +67,15 @@ function parseUrlPort(url: string, fallbackPort: number) {
 }
 
 export function getRuntimeEnvironment() {
-  return runtimeConfig;
+  return {
+    ...runtimeConfig,
+    iotdb: {
+      ...runtimeConfig.iotdb,
+      model: getDefaultIoTDBModel(),
+      defaultModel: getDefaultIoTDBModel(),
+      supportedModels: getSupportedIoTDBModels(),
+    },
+  };
 }
 
 export function getRealWorkbenchBaseUrl() {
@@ -74,7 +108,7 @@ export const localhostConnection = {
   port: runtimeConfig.iotdb.port,
   username: runtimeConfig.iotdb.username,
   password: runtimeConfig.iotdb.password,
-  model: runtimeConfig.iotdb.model,
+  model: getDefaultIoTDBModel(),
   prometheusUrl: runtimeConfig.prometheus.url,
   prometheusUsername: runtimeConfig.prometheus.username,
   prometheusPassword: runtimeConfig.prometheus.password,

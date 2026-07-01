@@ -1,12 +1,15 @@
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test, type APIRequestContext, type Locator, type Page } from '@playwright/test';
 import { ensureRealQueryConnection, loginToRealWorkbench } from '../../../../../support/real-query-data';
+import { cleanupRelationalUsersByNames, cleanupRelationalUsersByPrefixes } from '../../../../../support/relational-artifact-cleanup';
 import { seedClientState } from '../../../../../support/workbench-test-support';
 import { uiTimeouts } from '../../../../../support/e2e-selectors';
 
 const realBackendRun = process.env.PLAYWRIGHT_REAL_BACKEND === 'true';
 const requiredFieldMessage = '请输入内容后操作';
 const userCreateSuccessMessage = '新建用户成功';
+const treeAuthUserCleanupPrefixes = ['tru'];
 const createdUserNames = new Set<string>();
+const treeUserNamePrefix = 'tru';
 
 function buildFixedLengthText(prefix: string, targetLength: number) {
   const normalizedPrefix = prefix.replace(/[^A-Za-z0-9]/g, '');
@@ -17,7 +20,7 @@ function buildFixedLengthText(prefix: string, targetLength: number) {
 }
 
 function buildUniqueUserName(label: string, targetLength = 20) {
-  const raw = `${label}${Date.now()}`;
+  const raw = `${treeUserNamePrefix}${label}${Date.now()}`;
   return buildFixedLengthText(raw, targetLength);
 }
 
@@ -38,22 +41,14 @@ function clearRegisteredUsers() {
   createdUserNames.clear();
 }
 
-async function cleanupCreatedUsers(page: Page) {
+async function cleanupCreatedUsers(apiContext: APIRequestContext) {
   const userNames = [...createdUserNames];
   if (!userNames.length) {
     return;
   }
 
   try {
-    for (const userName of userNames) {
-      await page
-        .context()
-        .request.delete('/api/relational/privileges/deleteUser', {
-          params: { userName },
-          timeout: 15_000,
-        })
-        .catch(() => undefined);
-    }
+    await cleanupRelationalUsersByNames(apiContext, userNames);
   } catch {
     // Ignore cleanup failures to avoid masking the primary test result.
   } finally {
@@ -201,14 +196,20 @@ test.describe('系统管理-权限管理-用户管理', () => {
   test.beforeEach(async ({ page, request }) => {
     // 统一使用中文界面，并直连真实 Workbench + IoTDB 环境。
     await seedClientState(page, { lang: 'cn' });
+    await seedClientState(page, { lang: 'cn' });
+    await cleanupRelationalUsersByPrefixes(request, treeAuthUserCleanupPrefixes).catch(() => undefined);
     await ensureRealQueryConnection(request);
     await loginToRealWorkbench(page);
     await gotoUserManagement(page);
     clearRegisteredUsers();
   });
 
-  test.afterEach(async ({ page }) => {
-    await cleanupCreatedUsers(page);
+  test.afterEach(async ({ request }) => {
+    try {
+      await cleanupCreatedUsers(request);
+    } finally {
+      await cleanupRelationalUsersByPrefixes(request, treeAuthUserCleanupPrefixes).catch(() => undefined);
+    }
   });
 
   test('1. 展开系统管理后展示权限管理、审计日志和数据库配置', async ({ page }) => {

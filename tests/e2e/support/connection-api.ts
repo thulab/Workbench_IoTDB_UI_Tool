@@ -1,5 +1,13 @@
 import type { APIRequestContext } from '@playwright/test';
+import { getRuntimeEnvironment } from './runtime-config';
 export { localhostConnection } from './runtime-config';
+
+const realBackendRun = process.env.PLAYWRIGHT_REAL_BACKEND === 'true';
+const realApiBaseUrl = process.env.PLAYWRIGHT_REAL_API_BASE_URL || getRuntimeEnvironment().workbench.realBaseUrl;
+
+function resolveApiRequestPath(path: string) {
+  return realBackendRun ? `${realApiBaseUrl}${path}` : path;
+}
 
 export type ConnectionSummary = {
   id: number | string;
@@ -69,20 +77,20 @@ type ConnectionDetail = {
 
 export async function getConnectionListByApi(request: APIRequestContext): Promise<ConnectionSummary[]> {
   const requestPath = '/api/connection/getConnectionList';
-  const response = await request.get(requestPath);
+  const response = await request.get(resolveApiRequestPath(requestPath));
   const payload = await readJsonResponse(response, requestPath);
   return Array.isArray(payload.data) ? payload.data : [];
 }
 
 export async function getConnectionDetailByApi(request: APIRequestContext, id: number | string): Promise<ConnectionDetail | null> {
   const requestPath = `/api/connection/getConnectionById?id=${id}`;
-  const response = await request.get(requestPath);
+  const response = await request.get(resolveApiRequestPath(requestPath));
   const payload = await readJsonResponse(response, requestPath);
   return payload?.data || null;
 }
 
 export async function deleteConnectionById(request: APIRequestContext, id: number | string) {
-  await request.get(`/api/connection/deleteConnectionById?id=${id}`);
+  await request.get(resolveApiRequestPath(`/api/connection/deleteConnectionById?id=${id}`));
 }
 
 export async function ensureStandaloneConnectionExists(
@@ -124,7 +132,7 @@ export async function ensureStandaloneConnectionExists(
         return;
       }
 
-      await request.post('/api/connection/saveOrUpdateConnection', {
+      await request.post(resolveApiRequestPath('/api/connection/saveOrUpdateConnection'), {
         data: {
           ...detail,
           id: detail.id,
@@ -146,7 +154,7 @@ export async function ensureStandaloneConnectionExists(
         },
       });
     } else {
-      await request.post('/api/connection/saveOrUpdateConnection', {
+      await request.post(resolveApiRequestPath('/api/connection/saveOrUpdateConnection'), {
         data: {
           id: '',
           type: 0,

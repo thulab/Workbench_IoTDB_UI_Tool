@@ -1,0 +1,16 @@
+﻿tableName(表名),TTL(数据保留时间),tableComment(表备注),columnName(列名),columnComment(列备注),dataType(数据类型),cateGory(列类型)
+table_1,86400000,表一,device_id,设备列,string,tag
+table_1,86400000,表一,attr,属性列,string,attribute
+table_1,86400000,表一,s1,测点列,int32,field
+table_2,86400000,表二,device_id,设备列,string,tag
+table_2,86400000,表二,attr,属性列,string,attribute
+table_2,86400000,表二,s1,测点列,int32,field
+table_3,86400000,表三,device_id,设备列,string,tag
+table_3,86400000,表三,attr,属性列,string,attribute
+table_3,86400000,表三,s1,测点列,int32,field
+table_4,86400000,表四,device_id,设备列,string,tag
+table_4,86400000,表四,attr,属性列,string,attribute
+table_4,86400000,表四,s1,测点列,int32,field
+table_5,86400000,表五,device_id,设备列,string,tag
+table_5,86400000,表五,attr,属性列,string,attribute
+table_5,86400000,表五,s1,测点列,int32,field

@@ -26,7 +26,7 @@ test.describe('登录页验证', () => {
     }
 
     // 每条真实用例结束后回收 localhost，避免污染后续执行。
-    await cleanupConnectionsByNames(request, [localhostConnection.name]);
+    await cleanupConnectionsByNames(request, [localhostConnection.name]).catch(() => undefined);
   });
 
   test.afterAll(async ({ request }) => {
@@ -35,7 +35,7 @@ test.describe('登录页验证', () => {
     }
 
     // 兜底清理异常中断时残留的实例数据。
-    await cleanupConnectionsByNames(request, [localhostConnection.name]);
+    await cleanupConnectionsByNames(request, [localhostConnection.name]).catch(() => undefined);
   });
 
   if (!realBackendRun) {
@@ -133,14 +133,12 @@ test.describe('登录页验证', () => {
       const instancePage = new InstanceManagementPage(page);
 
       await loginPage.goto();
-      await loginPage.login({
-        connectionName: localhostConnection.name,
-        username: localhostConnection.username,
-        password: localhostConnection.password,
-      });
+      await loginPage.selectConnectionByName(localhostConnection.name);
+      await loginPage.userInput().fill(localhostConnection.username);
+      await loginPage.passwordInput().fill(localhostConnection.password);
 
       // 成功进入首页后，再回到登录页验证实例删除链路。
-      await loginPage.expectDashboardLanding(localhostConnection.name, `${localhostConnection.host}:${localhostConnection.port}`);
+      await loginPage.submitAndExpectDashboardLanding(localhostConnection.name, `${localhostConnection.host}:${localhostConnection.port}`);
       await loginPage.logoutToLoginPage();
 
       await loginPage.openInstanceManagement();

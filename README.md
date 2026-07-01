@@ -1,5 +1,7 @@
 # IoTDB Workbench UI Automation
 
+Execution preset supplement: `tests/e2e/EXECUTION_PRESETS.md`
+
 `IoTDB_Workbench_UI_Auto` 是基于 IoTDB Workbench 前端工程搭建的 UI 自动化项目，当前以 Playwright 为核心，面向真实 Workbench + 真实 IoTDB 环境执行回归。
 
 当前约定：
@@ -70,7 +72,8 @@ Windows 下建议统一使用 `npm.cmd`，避免 PowerShell 执行策略拦截 `
     "port": 6667,
     "username": "root",
     "password": "TimechoDB@2021",
-    "model": "tree"
+    "defaultModel": "tree",
+    "supportedModels": ["tree", "table"]
   },
   "prometheus": {
     "url": "127.0.0.1:9090",
@@ -88,7 +91,15 @@ Windows 下建议统一使用 `npm.cmd`，避免 PowerShell 执行策略拦截 `
 - 切换 IoTDB 实例地址：修改 `iotdb.host` 和 `iotdb.port`
 - 切换默认登录实例名：修改 `iotdb.instanceName`
 - 切换数据库账号密码：修改 `iotdb.username` 和 `iotdb.password`
+- 切换默认连接模型：修改 `iotdb.defaultModel`
+- 声明当前环境支持的模型：修改 `iotdb.supportedModels`
 - 切换 Prometheus 地址：修改 `prometheus.url`
+
+说明：
+
+- `iotdb.defaultModel` 控制默认连接/登录时使用的模型
+- `iotdb.supportedModels` 用于声明当前环境支持哪些模型，当前可配置为 `["tree", "table"]`
+- 运行时仍会兼容输出 `iotdb.model`，用于兼容旧脚本；配置文件中不再建议直接维护该字段
 
 生效范围：
 
@@ -119,7 +130,8 @@ Windows 下建议统一使用 `npm.cmd`，避免 PowerShell 执行策略拦截 `
     "port": 6667,
     "username": "root",
     "password": "你的密码",
-    "model": "tree"
+    "defaultModel": "tree",
+    "supportedModels": ["tree", "table"]
   },
   "prometheus": {
     "url": "192.168.1.100:9090",
@@ -244,15 +256,19 @@ tests/e2e/
 ├─ scripts/
 ├─ reports/
 ├─ AUTOMATION_COVERAGE_MATRIX.md
+├─ AUTOMATION_COVERAGE_MATRIX_TREE_MODEL.md
+├─ AUTOMATION_COVERAGE_MATRIX_TABLE_MODEL.md
 ├─ PAGE_CHANGE_CHECKLIST.md
 ├─ XMind_Test_Case_Tree.md
+├─ XMind_Test_Case_Tree_Model.md
+├─ XMind_Test_Case_Table_Model.md
 ```
 
 说明：
 
 - `Test_Cases/` 统一承载所有模块测试用例。
 - `Tree_Model/` 是当前树模型真实环境自动化主目录。
-- `Table_Model/` 已创建首批骨架目录，当前仅保留 `.gitkeep` 占位文件。
+- `Table_Model/` 当前已接入首批真实 UI 自动化用例，已落地 `实例管理`、`登录`、`首页`、`表数据`、`SQL操作` 相关 spec。
 - `Search/` 当前包含 2 个查询用例文件：`data-search.spec.ts`、`statistic-search.spec.ts`，统一归属一级模块“查询”。
 - `Search/test-data/` 存放查询模块导入、导出、真实环境验证所需测试数据文件。
 - `SQL_Search/` 为一级模块“SQL操作”用例目录。
@@ -262,7 +278,7 @@ tests/e2e/
 - `System/Auth/` 为一级模块“权限管理”下的用户管理、角色管理目录。
 - `System/Audit/` 为一级模块“审计日志”首批真实环境用例目录。
 - `System/Config/` 当前已落地数据库配置首批真实环境用例。
-- `AUTOMATION_COVERAGE_MATRIX.md` 统一记录当前 13 个一级业务模块的覆盖状态。
+- `AUTOMATION_COVERAGE_MATRIX.md` 为覆盖矩阵总入口；树模型与表模型覆盖状态分别维护在独立子文档中。
 
 ## 6. 当前模块说明
 
@@ -300,9 +316,18 @@ tests/e2e/
 ### 6.2 当前部分覆盖
 
 - 8. 可视化
-  - 当前已覆盖：实时趋势页面基础展示、测点入图、播放暂停、保存常用、删除趋势、导出图片
+  - 当前已覆盖：实时趋势页面基础展示、测点入图、写入实时数据后趋势运行图更新、播放暂停、保存常用、删除趋势、导出图片、左侧测点重置确认/取消、趋势区重置取消、模板保存后重置恢复
   - 当前已覆盖：历史趋势页面基础展示、时间范围调整、测点入图、保存常用、删除趋势
   - 当前未覆盖：分析页，以及更多复杂图表交互
+
+#### 趋势页按钮口径说明
+
+- 左侧测点重置图标按钮：
+  位于趋势页左侧测点树顶部，紧邻测点搜索框。
+  该按钮作用范围是“已选测点列表”，确认后会清空左侧已加入的测点节点，并联动清空依赖这些测点生成的趋势图。
+- 趋势区重置图标按钮：
+  位于右侧趋势操作区，和播放/保存常用按钮同一行。
+  该按钮作用范围是“当前趋势图区域”，确认后清空当前趋势组，但不负责清空左侧已选测点列表。
 - 11. 权限管理
   - 当前仅覆盖：用户管理、角色管理的页面展示与新建主流程
   - 当前未覆盖：编辑、删除、授权、搜索筛选等深层能力
@@ -319,10 +344,22 @@ tests/e2e/
 
 ### 6.4 Tree_Model 与 Table_Model 状态
 
-- `Tree_Model/` 是当前真实环境自动化主目录，已承载当前全部 `388` 条可执行用例。
-- `Table_Model/` 当前仅建立首批骨架目录，尚未落地 spec 和执行入口。
-- 当前覆盖详情、用例数和缺口统一见：
-  - `tests/e2e/AUTOMATION_COVERAGE_MATRIX.md`
+- `Tree_Model/` 是当前真实环境自动化主目录，当前承载 `397` 条可执行用例。
+- `Table_Model/` 当前已落地统一执行入口，现阶段可执行模块为：`table-instance`、`table-login`、`table-dashboard`、`table-data`、`table-sql`、`table-trend`、`table-auth`。
+- 当前覆盖详情、用例数和缺口见：
+  - 总入口：`tests/e2e/AUTOMATION_COVERAGE_MATRIX.md`
+  - 树模型：`tests/e2e/AUTOMATION_COVERAGE_MATRIX_TREE_MODEL.md`
+  - 表模型：`tests/e2e/AUTOMATION_COVERAGE_MATRIX_TABLE_MODEL.md`
+
+### 6.5 Combined Preset
+- `all-models-full` / `all-models-full-real`: run `tree-full` + current `table-full` together in direct mode.
+- `all-models-full-dev`: run `tree-full` + current `table-full` together in dev mode.
+- Current `table-full` coverage: `table-instance` + `table-login` + `table-dashboard` + `table-data` + `table-sql` + `table-trend` + `table-auth`.
+- Recommended commands:
+  - `.\sbin\start.bat all-models-full direct`
+  - `.\sbin\start.bat all-models-full direct headed`
+  - `npm.cmd run test:e2e:all-models-full:real`
+  - `npm.cmd run test:e2e:all-models-full:real:headed`
 
 ## 7. 真实环境数据清理约定
 
@@ -358,13 +395,13 @@ tests/e2e/
 Windows：
 
 ```powershell
-.\sbin\start.bat <module...|module1,module2,...> [direct|dev] [report|headed] [--dry-run]
+.\sbin\start.bat <module...|module1,module2,...> [direct|dev] [report|headed] [--plain] [--dry-run]
 ```
 
 Shell：
 
 ```bash
-./sbin/start.sh <module...|module1,module2,...> [direct|dev] [report|headed] [--dry-run]
+./sbin/start.sh <module...|module1,module2,...> [direct|dev] [report|headed] [--plain] [--dry-run]
 ```
 
 ### 8.2 支持模块
@@ -411,15 +448,22 @@ Shell：
 | 模块                                            | 对应 spec                                                                                                                               |
 | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | `login`                                         | `tests/e2e/Test_Cases/Tree_Model/Instance_Login/login.spec.ts`                                                                          |
+| `table-login`                                   | `tests/e2e/Test_Cases/Table_Model/Instance_Login/login.spec.ts`                                                                         |
 | `instance` / `instance-management`              | `tests/e2e/Test_Cases/Tree_Model/Instance_Management/instance-management.spec.ts`                                                       |
+| `table-instance` / `table-instance-management`  | `tests/e2e/Test_Cases/Table_Model/Instance_Management/instance-management.spec.ts`                                                      |
 | `dashboard` / `home`                            | `tests/e2e/Test_Cases/Tree_Model/Instance_Dashboard/dashboard.spec.ts`                                                                  |
+| `table-dashboard`                               | `tests/e2e/Test_Cases/Table_Model/Instance_Dashboard/dashboard.spec.ts`                                                                 |
 | `measurement` / `measurement-management`        | `tests/e2e/Test_Cases/Tree_Model/Measurement_Management/measurement-management.spec.ts`                                                 |
+| `table-data` / `table-data-management`          | `tests/e2e/Test_Cases/Table_Model/Table-Data/table-data.spec.ts`                                                                        |
 | `search` / `query`                              | `tests/e2e/Test_Cases/Tree_Model/Search/data-search.spec.ts` + `tests/e2e/Test_Cases/Tree_Model/Search/statistic-search.spec.ts`        |
 | `sql` / `sql-operation`                         | `tests/e2e/Test_Cases/Tree_Model/SQL_Search/sql-search.spec.ts`                                                                         |
+| `table-sql` / `table-sql-operation`             | `tests/e2e/Test_Cases/Table_Model/SQL_Search/sql-search.spec.ts`                                                                        |
 | `trend` / `visualization` / `visual`            | `tests/e2e/Test_Cases/Tree_Model/Trend/tree-running-trend.spec.ts` + `tests/e2e/Test_Cases/Tree_Model/Trend/tree-history-trend.spec.ts` |
+| `table-trend` / `table-visualization` / `table-visual` | `tests/e2e/Test_Cases/Table_Model/Trend/table-running-trend.spec.ts` + `tests/e2e/Test_Cases/Table_Model/Trend/table-history-trend.spec.ts` |
 | `calculate` / `view`                            | `tests/e2e/Test_Cases/Tree_Model/Calculate_Detail/calculate.spec.ts`                                                                    |
 | `data-sync` / `sync`                            | `tests/e2e/Test_Cases/Tree_Model/Data_Sync/data-sync.spec.ts`                                                                           |
 | `auth` / `permission` / `permission-management` | `tests/e2e/Test_Cases/Tree_Model/System/Auth/User/user.spec.ts` + `tests/e2e/Test_Cases/Tree_Model/System/Auth/Role/role.spec.ts`       |
+| `table-auth` / `table-permission` / `table-permission-management` | `tests/e2e/Test_Cases/Table_Model/System/Auth/User/table-user.spec.ts` + `tests/e2e/Test_Cases/Table_Model/System/Auth/Role/table-role.spec.ts` |
 | `audit` / `audit-log`                           | `tests/e2e/Test_Cases/Tree_Model/System/Audit/audit.spec.ts`                                                                            |
 | `db-config` / `database-config` / `config`      | `tests/e2e/Test_Cases/Tree_Model/System/Config/config.spec.ts`                                                                          |
 
@@ -437,6 +481,7 @@ Shell：
 - `dev` 表示启动统一配置中的 `workbench.devBaseUrl`
 - `report` 表示执行并输出报告，不打开浏览器
 - `headed` 表示打开浏览器执行，并输出报告
+- `--plain` 表示直跑 Playwright，不走 Markdown/JSON 报告封装
 - `--dry-run` 只打印解析后的执行命令
 - 支持空格分隔多个模块
 - 支持逗号分隔多个模块
@@ -452,23 +497,30 @@ Shell：
 .\sbin\start.bat login
 .\sbin\start.bat instance headed
 .\sbin\start.bat instance-management direct report
+.\\sbin\\start.bat table-login direct headed
+.\\sbin\\start.bat table-instance direct headed
 .\sbin\start.bat dashboard direct headed
 .\sbin\start.bat home direct headed
+.\\sbin\\start.bat table-dashboard direct headed
 .\sbin\start.bat measurement direct headed
 .\sbin\start.bat measurement-management direct headed
+.\\sbin\\start.bat table-data direct headed
 .\sbin\start.bat search direct report
 .\sbin\start.bat query direct report
 .\sbin\start.bat sql direct report
 .\sbin\start.bat sql-operation direct report
 .\sbin\start.bat sql direct headed
+.\\sbin\\start.bat table-sql direct headed
 .\sbin\start.bat trend direct report
 .\sbin\start.bat trend direct headed
+.\\sbin\\start.bat table-trend direct headed
 .\sbin\start.bat calculate direct report
 .\sbin\start.bat view direct report
 .\sbin\start.bat calculate direct headed
 .\sbin\start.bat data-sync direct report
 .\sbin\start.bat data-sync direct headed
 .\sbin\start.bat auth direct report
+.\\sbin\\start.bat table-auth direct headed
 .\sbin\start.bat audit direct report
 .\sbin\start.bat db-config direct headed
 .\sbin\start.bat login,instance,home,trend,view,data-sync,auth,audit,db-config direct headed
@@ -476,6 +528,10 @@ Shell：
 .\sbin\start.bat full headed
 .\sbin\start.bat full-real headed
 .\sbin\start.bat full-dev headed
+.\\sbin\\start.bat tree-full direct headed
+.\\sbin\\start.bat table-full direct headed
+.\\sbin\\start.bat all-models-full direct
+.\\sbin\\start.bat all-models-full direct headed
 .\sbin\start.bat search-cleanup
 .\sbin\start.bat measurement-cleanup
 .\sbin\start.bat calculate-cleanup
@@ -487,18 +543,30 @@ Shell：
 
 ### 9.1 单模块真实环境直跑
 
+说明：
+- 本节 `:real` / `:real:headed` 脚本已统一收口到 `tests/e2e/scripts/run-e2e-entry.mjs --plain`
+- 这类命令只负责直跑 Playwright，不额外生成 Markdown 报告
+
 ```powershell
 npm.cmd run test:e2e:login:real
 npm.cmd run test:e2e:login:real:headed
+npm.cmd run test:e2e:table-login:real
+npm.cmd run test:e2e:table-login:real:headed
 
 npm.cmd run test:e2e:instance:real
 npm.cmd run test:e2e:instance:real:headed
+npm.cmd run test:e2e:table-instance:real
+npm.cmd run test:e2e:table-instance:real:headed
 
 npm.cmd run test:e2e:dashboard:real
 npm.cmd run test:e2e:dashboard:real:headed
+npm.cmd run test:e2e:table-dashboard:real
+npm.cmd run test:e2e:table-dashboard:real:headed
 
 npm.cmd run test:e2e:measurement:real
 npm.cmd run test:e2e:measurement:real:headed
+npm.cmd run test:e2e:table-data:real
+npm.cmd run test:e2e:table-data:real:headed
 
 npm.cmd run test:e2e:search:real
 npm.cmd run test:e2e:search:real:headed
@@ -508,6 +576,11 @@ npm.cmd run test:e2e:calculate:real:headed
 
 npm.cmd run test:e2e:sql:real
 npm.cmd run test:e2e:sql:real:headed
+npm.cmd run test:e2e:table-sql:real
+npm.cmd run test:e2e:table-sql:real:headed
+
+npm.cmd run test:e2e:table-trend:real
+npm.cmd run test:e2e:table-trend:real:headed
 
 npm.cmd run test:e2e:trend:real
 npm.cmd run test:e2e:trend:real:headed
@@ -517,6 +590,8 @@ npm.cmd run test:e2e:data-sync:real:headed
 
 npm.cmd run test:e2e:auth:real
 npm.cmd run test:e2e:auth:real:headed
+npm.cmd run test:e2e:table-auth:real
+npm.cmd run test:e2e:table-auth:real:headed
 
 npm.cmd run test:e2e:audit:real
 npm.cmd run test:e2e:audit:real:headed
@@ -527,18 +602,29 @@ npm.cmd run test:e2e:db-config:real:headed
 
 ### 9.2 单模块真实环境报告入口
 
+说明：
+- 本节 `:report` / `:headed:report` 脚本会通过 `tests/e2e/scripts/run-playwright-report.mjs` 生成 Markdown、HTML、JSON 报告
+
 ```powershell
 npm.cmd run test:e2e:login:real:report
 npm.cmd run test:e2e:login:real:headed:report
+npm.cmd run test:e2e:table-login:real:report
+npm.cmd run test:e2e:table-login:real:headed:report
 
 npm.cmd run test:e2e:instance:real:report
 npm.cmd run test:e2e:instance:real:headed:report
+npm.cmd run test:e2e:table-instance:real:report
+npm.cmd run test:e2e:table-instance:real:headed:report
 
 npm.cmd run test:e2e:dashboard:real:report
 npm.cmd run test:e2e:dashboard:real:headed:report
+npm.cmd run test:e2e:table-dashboard:real:report
+npm.cmd run test:e2e:table-dashboard:real:headed:report
 
 npm.cmd run test:e2e:measurement:real:report
 npm.cmd run test:e2e:measurement:real:headed:report
+npm.cmd run test:e2e:table-data:real:report
+npm.cmd run test:e2e:table-data:real:headed:report
 
 npm.cmd run test:e2e:calculate:real:report
 npm.cmd run test:e2e:calculate:real:headed:report
@@ -548,6 +634,11 @@ npm.cmd run test:e2e:search:real:headed:report
 
 npm.cmd run test:e2e:sql:real:report
 npm.cmd run test:e2e:sql:real:headed:report
+npm.cmd run test:e2e:table-sql:real:report
+npm.cmd run test:e2e:table-sql:real:headed:report
+
+npm.cmd run test:e2e:table-trend:real:report
+npm.cmd run test:e2e:table-trend:real:headed:report
 
 npm.cmd run test:e2e:trend:real:report
 npm.cmd run test:e2e:trend:real:headed:report
@@ -557,6 +648,8 @@ npm.cmd run test:e2e:data-sync:real:headed:report
 
 npm.cmd run test:e2e:auth:real:report
 npm.cmd run test:e2e:auth:real:headed:report
+npm.cmd run test:e2e:table-auth:real:report
+npm.cmd run test:e2e:table-auth:real:headed:report
 
 npm.cmd run test:e2e:audit:real:report
 npm.cmd run test:e2e:audit:real:headed:report
@@ -574,8 +667,23 @@ npm.cmd run test:e2e:full-real:headed
 npm.cmd run test:e2e:full-dev
 npm.cmd run test:e2e:full-dev:headed
 
+npm.cmd run test:e2e:tree-full:real
+npm.cmd run test:e2e:tree-full:real:headed
+
+npm.cmd run test:e2e:table-full:real
+npm.cmd run test:e2e:table-full:real:headed
+
+npm.cmd run test:e2e:all-models-full:real
+npm.cmd run test:e2e:all-models-full:real:headed
+npm.cmd run test:e2e:all-models-full:dev
+npm.cmd run test:e2e:all-models-full:dev:headed
+
 npm.cmd run test:e2e:real:report
 npm.cmd run test:e2e:real:headed:report
+npm.cmd run test:e2e:table-full:real:report
+npm.cmd run test:e2e:table-full:real:headed:report
+npm.cmd run test:e2e:all-models-full:real:report
+npm.cmd run test:e2e:all-models-full:real:headed:report
 ```
 
 说明：
@@ -633,7 +741,10 @@ netstat -ano | findstr <Workbench端口>
 - 查询页真实场景会自动准备连接和查询种子数据
 - SQL 用例已按真实 Workbench DOM 做兼容定位
 - 视图页面用例已按真实 Workbench DOM 做兼容定位与自动清理
-- 当前覆盖矩阵和模块缺口统一维护在 `tests/e2e/AUTOMATION_COVERAGE_MATRIX.md`
+- 当前覆盖矩阵和模块缺口维护方式如下：
+  - 总入口：`tests/e2e/AUTOMATION_COVERAGE_MATRIX.md`
+  - 树模型：`tests/e2e/AUTOMATION_COVERAGE_MATRIX_TREE_MODEL.md`
+  - 表模型：`tests/e2e/AUTOMATION_COVERAGE_MATRIX_TABLE_MODEL.md`
 
 建议排查顺序：
 

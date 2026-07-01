@@ -7,6 +7,30 @@ const currentDirPath = path.dirname(currentFilePath);
 const runtimeConfigPath = path.join(currentDirPath, '..', 'config', 'runtime-environment.json');
 const runtimeEnvironment = JSON.parse(readFileSync(runtimeConfigPath, 'utf8'));
 
+function normalizeModel(model) {
+  return model === 'table' ? 'table' : 'tree';
+}
+
+function getDefaultIoTDBModel() {
+  return normalizeModel(runtimeEnvironment.iotdb.defaultModel || runtimeEnvironment.iotdb.model);
+}
+
+function getSupportedIoTDBModels() {
+  const configuredModels = Array.isArray(runtimeEnvironment.iotdb.supportedModels) ? runtimeEnvironment.iotdb.supportedModels : [];
+  const normalizedModels = [...new Set(configuredModels.map(normalizeModel))];
+  const defaultModel = getDefaultIoTDBModel();
+
+  if (!normalizedModels.includes(defaultModel)) {
+    normalizedModels.unshift(defaultModel);
+  }
+
+  if (!normalizedModels.includes('tree')) {
+    normalizedModels.unshift('tree');
+  }
+
+  return [...new Set(normalizedModels)];
+}
+
 function parseUrlPort(url, fallbackPort) {
   try {
     const parsed = new URL(url);
@@ -20,7 +44,15 @@ function parseUrlPort(url, fallbackPort) {
 }
 
 export function getRuntimeEnvironment() {
-  return runtimeEnvironment;
+  return {
+    ...runtimeEnvironment,
+    iotdb: {
+      ...runtimeEnvironment.iotdb,
+      model: getDefaultIoTDBModel(),
+      defaultModel: getDefaultIoTDBModel(),
+      supportedModels: getSupportedIoTDBModels(),
+    },
+  };
 }
 
 export function getRealWorkbenchBaseUrl(env = process.env) {
@@ -54,7 +86,7 @@ export function getLocalhostConnection() {
     port: runtimeEnvironment.iotdb.port,
     username: runtimeEnvironment.iotdb.username,
     password: runtimeEnvironment.iotdb.password,
-    model: runtimeEnvironment.iotdb.model,
+    model: getDefaultIoTDBModel(),
     prometheusUrl: runtimeEnvironment.prometheus.url,
     prometheusUsername: runtimeEnvironment.prometheus.username,
     prometheusPassword: runtimeEnvironment.prometheus.password,

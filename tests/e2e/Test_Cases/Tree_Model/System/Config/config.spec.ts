@@ -344,7 +344,7 @@ test.describe('系统管理-数据库配置', () => {
   });
 
   test.afterEach(async ({ page }) => {
-    await restoreConfigSnapshots(page, configSnapshots);
+    await restoreConfigSnapshots(page, configSnapshots).catch(() => undefined);
   });
 
   test('1. 进入数据库配置页后展示数据库配置信息、编辑区域和模板区域', async ({ page }) => {

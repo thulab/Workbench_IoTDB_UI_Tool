@@ -288,7 +288,7 @@ test.describe('首页', () => {
       return;
     }
 
-    await cleanupConnectionsByNames(request, [localhostConnection.name]);
+    await cleanupConnectionsByNames(request, [localhostConnection.name]).catch(() => undefined);
   });
 
   test.afterAll(async ({ request }) => {
@@ -296,7 +296,7 @@ test.describe('首页', () => {
       return;
     }
 
-    await cleanupConnectionsByNames(request, [localhostConnection.name]);
+    await cleanupConnectionsByNames(request, [localhostConnection.name]).catch(() => undefined);
   });
 
   if (!realBackendRun) {
