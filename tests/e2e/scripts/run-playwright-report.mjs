@@ -18,6 +18,7 @@ function readArgs(argv) {
     headed: false,
     workers: '1',
     project: 'chromium',
+    renderOnly: false,
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -42,12 +43,15 @@ function readArgs(argv) {
         config.project = argv[index + 1];
         index += 1;
         break;
+      case '--render-only':
+        config.renderOnly = true;
+        break;
       default:
         break;
     }
   }
 
-  if (!config.specs.length) {
+  if (!config.renderOnly && !config.specs.length) {
     throw new Error('At least one --spec must be provided.');
   }
 
@@ -254,9 +258,80 @@ function buildSummary(stats, results, exitCode) {
   };
 }
 
+function detectModelByFile(filePath) {
+  const normalizedFilePath = String(filePath || '').replace(/\\/g, '/');
+  if (normalizedFilePath.includes('/Test_Cases/Tree_Model/') || normalizedFilePath.includes('Test_Cases/Tree_Model/')) {
+    return 'tree';
+  }
+
+  if (normalizedFilePath.includes('/Test_Cases/Table_Model/') || normalizedFilePath.includes('Test_Cases/Table_Model/')) {
+    return 'table';
+  }
+
+  return 'other';
+}
+
+function buildSummaryFromResults(results) {
+  const passed = results.filter((item) => item.status === 'passed').length;
+  const skipped = results.filter((item) => item.status === 'skipped').length;
+  const flaky = results.filter((item) => item.status === 'flaky').length;
+  const failed = results.filter((item) => !['passed', 'skipped', 'flaky'].includes(item.status)).length;
+
+  return {
+    total: results.length,
+    passed,
+    failed,
+    skipped,
+    flaky,
+  };
+}
+
+function groupResultsByModel(results) {
+  return {
+    tree: results.filter((item) => detectModelByFile(item.file) === 'tree'),
+    table: results.filter((item) => detectModelByFile(item.file) === 'table'),
+    other: results.filter((item) => detectModelByFile(item.file) === 'other'),
+  };
+}
+
+function detectModuleByFile(filePath) {
+  const normalizedFilePath = String(filePath || '').replace(/\\/g, '/');
+  const treeMatch = normalizedFilePath.match(/Test_Cases\/Tree_Model\/([^/]+)/);
+  if (treeMatch?.[1]) {
+    return treeMatch[1];
+  }
+
+  const tableMatch = normalizedFilePath.match(/Test_Cases\/Table_Model\/([^/]+)/);
+  if (tableMatch?.[1]) {
+    return tableMatch[1];
+  }
+
+  return 'Unknown';
+}
+
+function groupResultsByModule(results) {
+  const grouped = new Map();
+
+  for (const result of results) {
+    const moduleKey = detectModuleByFile(result.file);
+    if (!grouped.has(moduleKey)) {
+      grouped.set(moduleKey, []);
+    }
+    grouped.get(moduleKey).push(result);
+  }
+
+  return [...grouped.entries()].sort((left, right) => left[0].localeCompare(right[0]));
+}
+
+function collectTitlesByStatus(results, statuses) {
+  return results
+    .filter((item) => statuses.includes(item.status))
+    .map((item) => `${item.title} [${path.basename(item.file || '(unknown-file)')}]`);
+}
+
 function buildMarkdownReport({ reportBaseName, latestReportName, reportDatePart, reportDisplayTime, cliConfig, exitCode, results, stats, artifacts }) {
   const summary = buildSummary(stats, results, exitCode);
-  const grouped = groupByFile(results);
+  const groupedByModel = groupResultsByModel(results);
   const sections = [];
 
   sections.push('# Workbench 测试报告');
@@ -274,9 +349,14 @@ function buildMarkdownReport({ reportBaseName, latestReportName, reportDatePart,
   sections.push('- 执行命令:');
   sections.push('');
   sections.push('```powershell');
-  sections.push(
-    `$env:PLAYWRIGHT_REAL_BACKEND='true'; node node_modules/playwright/cli.js test ${cliConfig.specs.join(' ')} --project=${cliConfig.project} --workers=${cliConfig.workers}${cliConfig.headed ? ' --headed' : ''}`,
-  );
+  if (cliConfig.renderOnly) {
+    sections.push(`# render-only`);
+    sections.push(`node tests/e2e/scripts/run-playwright-report.mjs --render-only --project=${cliConfig.project}`);
+  } else {
+    sections.push(
+      `$env:PLAYWRIGHT_REAL_BACKEND='true'; node node_modules/playwright/cli.js test ${cliConfig.specs.join(' ')} --project=${cliConfig.project} --workers=${cliConfig.workers}${cliConfig.headed ? ' --headed' : ''}`,
+    );
+  }
   sections.push('```');
   sections.push('');
 
@@ -291,27 +371,84 @@ function buildMarkdownReport({ reportBaseName, latestReportName, reportDatePart,
   sections.push(`- 结论: ${summary.conclusion}`);
   sections.push('');
 
+  sections.push('## 分模型结果');
+  sections.push('');
+  for (const [modelKey, modelTitle] of [
+    ['tree', '树模型'],
+    ['table', '表模型'],
+    ['other', '未归类'],
+  ]) {
+    const modelResults = groupedByModel[modelKey];
+    if (!modelResults.length) {
+      continue;
+    }
+
+    const modelSummary = buildSummaryFromResults(modelResults);
+    sections.push(`### ${modelTitle}`);
+    sections.push('');
+    sections.push(`- 总用例数: ${modelSummary.total}`);
+    sections.push(`- 通过数: ${modelSummary.passed}`);
+    sections.push(`- 失败数: ${modelSummary.failed}`);
+    sections.push(`- 跳过数: ${modelSummary.skipped}`);
+    sections.push(`- Flaky 数: ${modelSummary.flaky}`);
+    sections.push('- 模块统计:');
+    for (const [moduleName, moduleResults] of groupResultsByModule(modelResults)) {
+      const moduleSummary = buildSummaryFromResults(moduleResults);
+      sections.push(`  - ${moduleName}: 总 ${moduleSummary.total} / 通过 ${moduleSummary.passed} / 失败 ${moduleSummary.failed} / 跳过 ${moduleSummary.skipped} / Flaky ${moduleSummary.flaky}`);
+      const failedTitles = collectTitlesByStatus(moduleResults, ['failed', 'timedOut', 'interrupted']);
+      const skippedTitles = collectTitlesByStatus(moduleResults, ['skipped']);
+      const flakyTitles = collectTitlesByStatus(moduleResults, ['flaky']);
+
+      if (failedTitles.length) {
+        sections.push(`    - 失败用例: ${failedTitles.join('；')}`);
+      }
+
+      if (skippedTitles.length) {
+        sections.push(`    - 跳过用例: ${skippedTitles.join('；')}`);
+      }
+
+      if (flakyTitles.length) {
+        sections.push(`    - Flaky 用例: ${flakyTitles.join('；')}`);
+      }
+    }
+    sections.push('');
+  }
+
   sections.push('## 用例结果明细');
   sections.push('');
   if (!results.length) {
     sections.push('- 本次未解析到任何用例结果，请检查 Playwright JSON 报告是否正常生成。');
     sections.push('');
   } else {
-    for (const [file, fileResults] of grouped.entries()) {
-      sections.push(`### ${path.basename(file)}`);
+    for (const [modelKey, modelTitle] of [
+      ['tree', '树模型'],
+      ['table', '表模型'],
+      ['other', '未归类'],
+    ]) {
+      const modelResults = groupedByModel[modelKey];
+      if (!modelResults.length) {
+        continue;
+      }
+
+      const grouped = groupByFile(modelResults);
+      sections.push(`### ${modelTitle}`);
       sections.push('');
-      fileResults.forEach((item) => {
-        sections.push(`#### ${item.title}`);
+      for (const [file, fileResults] of grouped.entries()) {
+        sections.push(`#### ${path.basename(file)}`);
         sections.push('');
-        sections.push(`- 结果: ${normalizeStatus(item.status)}`);
-        sections.push(`- 所属套件: ${item.suiteTitle || '-'}`);
-        sections.push(`- 浏览器项目: ${item.projectName || '-'}`);
-        sections.push(`- 耗时: ${item.duration}`);
-        if (item.errors.length) {
-          sections.push(`- 失败信息: ${item.errors[0].split('\n')[0]}`);
-        }
-        sections.push('');
-      });
+        fileResults.forEach((item) => {
+          sections.push(`##### ${item.title}`);
+          sections.push('');
+          sections.push(`- 结果: ${normalizeStatus(item.status)}`);
+          sections.push(`- 所属套件: ${item.suiteTitle || '-'}`);
+          sections.push(`- 浏览器项目: ${item.projectName || '-'}`);
+          sections.push(`- 耗时: ${item.duration}`);
+          if (item.errors.length) {
+            sections.push(`- 失败信息: ${item.errors[0].split('\n')[0]}`);
+          }
+          sections.push('');
+        });
+      }
     }
   }
 
@@ -390,17 +527,30 @@ const reportBaseName = `Workbench-report_${reportDatePart}_${reportTimePart}.md`
 const latestReportName = 'Workbench-report_latest.md';
 const playwrightArgs = ['test', ...cliConfig.specs, `--project=${cliConfig.project}`, `--workers=${cliConfig.workers}`, ...(cliConfig.headed ? ['--headed'] : [])];
 
-cleanOldArtifacts();
 mkdirSync(reportsDir, { recursive: true });
+let result = {
+  code: 0,
+  stdout: '',
+  stderr: '',
+};
 
-const result = await runPlaywright(playwrightArgs);
-if (!statExists(jsonReportPath)) {
-  const stderrSummary = stripAnsi(result.stderr || '').trim();
-  const stdoutSummary = stripAnsi(result.stdout || '').trim();
-  const diagnosticText = stderrSummary || stdoutSummary || 'No Playwright stdout/stderr captured.';
-  throw new Error(`Playwright JSON report was not generated: ${jsonReportPath}\n\nLikely root cause:\n${diagnosticText}`);
+if (!cliConfig.renderOnly) {
+  cleanOldArtifacts();
+  result = await runPlaywright(playwrightArgs);
+  if (!statExists(jsonReportPath)) {
+    const stderrSummary = stripAnsi(result.stderr || '').trim();
+    const stdoutSummary = stripAnsi(result.stdout || '').trim();
+    const diagnosticText = stderrSummary || stdoutSummary || 'No Playwright stdout/stderr captured.';
+    throw new Error(`Playwright JSON report was not generated: ${jsonReportPath}\n\nLikely root cause:\n${diagnosticText}`);
+  }
+} else if (!statExists(jsonReportPath)) {
+  throw new Error(`Cannot render report only because JSON report does not exist: ${jsonReportPath}`);
 }
+
 const { results, stats } = loadPlaywrightJsonResults(cliConfig.project);
+if (cliConfig.renderOnly) {
+  result.code = typeof stats.unexpected === 'number' && stats.unexpected > 0 ? 1 : 0;
+}
 const artifacts = result.code === 0 ? [] : collectFailureArtifacts();
 const reportContent = buildMarkdownReport({
   reportBaseName,

@@ -89,6 +89,7 @@ async function loginToWorkbench(page: Page) {
   await loginPage.login({
     connectionName: localhostConnection.name,
     password: localhostConnection.password,
+    model: 'tree',
   });
 
   await expect(page.locator('html')).toHaveAttribute('lang', /zh-cn/i);

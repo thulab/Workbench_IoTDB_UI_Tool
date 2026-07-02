@@ -83,6 +83,7 @@ async function loginToWorkbench(page: Page) {
     connectionName: localhostConnection.name,
     username: localhostConnection.username,
     password: localhostConnection.password,
+    model: 'tree',
   });
 
   await expect(page.locator('html')).toHaveAttribute('lang', /zh-cn/i);
@@ -402,14 +403,17 @@ async function cleanupSpectrumDatabases(page: Page) {
 
 async function ensureSpectrumSeedData(page: Page) {
   const seed = buildSpectrumSeed();
-  const createSqls = [
-    `create database ${seed.databasePath}`,
-    `create timeseries ${seed.measurementPath} with datatype=INT32, encoding=PLAIN, compression=SNAPPY`,
-    ...seed.values.map((value, index) => `insert into ${seed.devicePath}(timestamp,${seed.measurementPath.split('.').at(-1)}) values (${seed.startTime + index * 1000},${value})`),
-  ];
+  const createDatabaseResponse = await runSqlsInWorkbenchSession(page, [`create database ${seed.databasePath}`]);
+  assertSqlResponseSucceeded(createDatabaseResponse, 'create spectrum database');
 
-  const createResponse = await runSqlsInWorkbenchSession(page, createSqls);
-  assertSqlResponseSucceeded(createResponse, 'initialize spectrum seed data');
+  const createTimeseriesResponse = await runSqlsInWorkbenchSession(page, [`create timeseries ${seed.measurementPath} with datatype=INT32, encoding=PLAIN, compression=SNAPPY`]);
+  assertSqlResponseSucceeded(createTimeseriesResponse, 'create spectrum timeseries');
+
+  const insertSeedResponse = await runSqlsInWorkbenchSession(
+    page,
+    seed.values.map((value, index) => `insert into ${seed.devicePath}(timestamp,${seed.measurementPath.split('.').at(-1)}) values (${seed.startTime + index * 1000},${value})`),
+  );
+  assertSqlResponseSucceeded(insertSeedResponse, 'initialize spectrum seed data');
 
   const verifyResponse = await runSqlsInWorkbenchSession(page, [`select * from ${seed.devicePath} limit ${seed.values.length}`]);
   assertSqlResponseSucceeded(verifyResponse, 'verify spectrum seed data');
@@ -456,7 +460,7 @@ async function applyAndExpectChart(page: Page, options: { expectCursorEnabled?: 
 }
 
 test.describe('分析页', () => {
-  test.describe.configure({ timeout: realBackendRun ? 180_000 : 60_000 });
+  test.describe.configure({ mode: 'serial', timeout: realBackendRun ? 180_000 : 60_000 });
 
   test.beforeEach(async ({ page, request }) => {
     await seedClientState(page, { lang: 'cn' });
@@ -640,6 +644,6 @@ test.describe('分析页', () => {
 
     await saveCustomSql(page, `select ${seed.measurementPath.split('.').at(-1)} from ${seed.devicePath} where time >= ${seed.startTime} and time <= ${seed.endTime}`);
 
-    await applyAndExpectChart(page);
+    await applyAndExpectChart(page, { expectCursorEnabled: false });
   });
 });

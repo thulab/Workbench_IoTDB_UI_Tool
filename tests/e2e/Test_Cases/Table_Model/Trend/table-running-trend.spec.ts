@@ -83,9 +83,7 @@ async function getTableNamesByApi(apiContext: APIRequestContext, databaseName: s
     return [];
   }
 
-  return tables
-    .map((item) => item?.tableVO?.tableName ?? item?.tableName)
-    .filter((name): name is string => typeof name === 'string' && name.length > 0);
+  return tables.map((item) => item?.tableVO?.tableName ?? item?.tableName).filter((name): name is string => typeof name === 'string' && name.length > 0);
 }
 
 async function waitForTrendTableReady(apiContext: APIRequestContext, databaseName: string, tableName: string) {
@@ -160,11 +158,7 @@ async function insertTrendTableRowsByApi(apiContext: APIRequestContext, seed: Tr
   }
 }
 
-async function insertRealtimeTrendTableRowByApi(
-  apiContext: APIRequestContext,
-  seed: TrendTableSeed,
-  values: { temperature: string; pressure: string } = { temperature: '44.6', pressure: '11.6' },
-) {
+async function insertRealtimeTrendTableRowByApi(apiContext: APIRequestContext, seed: TrendTableSeed, values: { temperature: string; pressure: string } = { temperature: '44.6', pressure: '11.6' }) {
   const response = await apiContext.post(resolveApiRequestPath('/api/relational/data/saveDataInfo'), {
     data: {
       database: seed.databaseName,
@@ -203,7 +197,10 @@ async function loginToTableWorkbench(page: Page) {
       model: 'table',
     });
 
-    const landed = await page.waitForURL(dashboardUrlPattern, { timeout: 15_000 }).then(() => true).catch(() => false);
+    const landed = await page
+      .waitForURL(dashboardUrlPattern, { timeout: 15_000 })
+      .then(() => true)
+      .catch(() => false);
     if (landed) {
       break;
     }
@@ -253,7 +250,10 @@ function selectedMeasurementResetButton(page: Page) {
 }
 
 function measurementChooseDialog(page: Page) {
-  return page.locator('.el-dialog').filter({ has: page.locator('.device-table') }).last();
+  return page
+    .locator('.el-dialog')
+    .filter({ has: page.locator('.device-table') })
+    .last();
 }
 
 function measurementChooseConfirmButton(page: Page) {
@@ -313,7 +313,10 @@ function trendGroupMeasurementDeleteButton(group: ReturnType<typeof trendGroups>
 }
 
 function saveTemplateDialog(page: Page) {
-  return page.locator('.el-dialog').filter({ has: page.locator('#trend-template-modal-name, input[maxlength="25"]').first() }).last();
+  return page
+    .locator('.el-dialog')
+    .filter({ has: page.locator('#trend-template-modal-name, input[maxlength="25"]').first() })
+    .last();
 }
 
 function saveTemplateNameInput(page: Page) {
@@ -479,7 +482,13 @@ async function expandDatabaseRow(page: Page, databaseName: string) {
     await page.waitForTimeout(800);
   }
 
-  if (!(await databaseRow.locator('.el-tree-node__children').first().isVisible().catch(() => false))) {
+  if (
+    !(await databaseRow
+      .locator('.el-tree-node__children')
+      .first()
+      .isVisible()
+      .catch(() => false))
+  ) {
     await databaseRow.click({ force: true }).catch(() => undefined);
     await page.waitForTimeout(800);
   }
@@ -534,7 +543,10 @@ async function selectTableMeasurementsIntoSideTree(page: Page, seed: TrendTableS
   await measurementDeviceFirstRowCheckbox(page).click();
 
   await measurementMultiSelect(page).click();
-  const dropdown = page.locator('.el-select-dropdown').filter({ has: page.locator('.el-select-dropdown__item') }).last();
+  const dropdown = page
+    .locator('.el-select-dropdown')
+    .filter({ has: page.locator('.el-select-dropdown__item') })
+    .last();
   await expect(dropdown).toBeVisible({ timeout: uiTimeouts.pageReady });
   await dropdown.locator('.el-select-dropdown__item').filter({ hasText: 'temperature' }).first().click();
   await dropdown.locator('.el-select-dropdown__item').filter({ hasText: 'pressure' }).first().click();
@@ -624,7 +636,7 @@ async function seedRunningTrendState(page: Page, seed: TrendTableSeed, groupedMe
 
 test.describe('表模型-实时趋势', () => {
   test.skip(!realBackendRun, '表模型实时趋势仅在真实后端环境执行');
-  test.describe.configure({ timeout: 180_000 });
+  test.describe.configure({ mode: 'serial', timeout: 180_000 });
 
   test.beforeEach(async ({ page, request }) => {
     await seedClientState(page, { lang: 'cn' });
