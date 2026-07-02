@@ -183,22 +183,14 @@ const moduleDefinitionMap = new Map(moduleDefinitions.map((definition) => [defin
 const moduleAliasMap = new Map(moduleDefinitions.flatMap((definition) => definition.aliases.map((alias) => [alias, definition.key])));
 const allModuleKeys = moduleDefinitions.map((definition) => definition.key);
 const specialCommands = ['typecheck', 'search-cleanup', 'measurement-cleanup', 'calculate-cleanup', 'cleanup-all'];
+const deprecatedPresetAliases = new Set(['full', 'full-real', 'full-dev', 'tree-full-real', 'tree-full-dev', 'table-full-real', 'table-full-dev', 'all-models-full-real', 'all-models-full-dev']);
 const treeFullModules = ['tree-instance', 'tree-login', 'tree-dashboard', 'tree-measurement', 'tree-search', 'tree-sql', 'tree-trend', 'tree-view', 'tree-data-sync', 'tree-auth', 'tree-audit', 'tree-db-config'];
 const tableFullModules = ['table-instance', 'table-login', 'table-dashboard', 'table-measurement', 'table-sql', 'table-trend', 'table-auth'];
 const allModelsFullModules = [...treeFullModules, ...tableFullModules];
 const presetModuleMap = {
-  full: treeFullModules,
-  'full-real': treeFullModules,
-  'full-dev': [...treeFullModules],
   'tree-full': treeFullModules,
-  'tree-full-real': treeFullModules,
-  'tree-full-dev': [...treeFullModules],
   'table-full': tableFullModules,
-  'table-full-real': tableFullModules,
-  'table-full-dev': [...tableFullModules],
   'all-models-full': allModelsFullModules,
-  'all-models-full-real': allModelsFullModules,
-  'all-models-full-dev': [...allModelsFullModules],
 };
 const runtimeTargets = new Set(['direct', 'real', '9190', 'dev', '8098']);
 
@@ -208,36 +200,35 @@ function printUsage() {
   ./start.sh <module...|module1,module2,...> [direct|dev] [report|headed] [--plain] [--dry-run]
 
 Modules:
-  tree-instance | instance
+  tree-instance
   table-instance
-  tree-login | login
+  tree-login
   table-login
-  tree-dashboard | dashboard | home
+  tree-dashboard
   table-dashboard
-  tree-measurement | measurement
+  tree-measurement
   table-measurement
-  tree-search | search | query
+  tree-search
   table-search
-  tree-sql | sql
+  tree-sql
   table-sql
-  tree-view | view | calculate
+  tree-view
   table-view
-  tree-auth | auth | permission
+  tree-auth
   table-auth
-  tree-ai-analysis | ai-analysis | ai
+  tree-ai-analysis
   table-ai-analysis
-  tree-trend | trend | visualization | visual
+  tree-trend
   table-trend
-  tree-data-sync | data-sync | sync
+  tree-data-sync
   table-data-sync
-  tree-audit | audit | audit-log
+  tree-audit
   table-audit
-  tree-db-config | db-config | database-config | config
+  tree-db-config
   table-db-config
-  tree-full | tree-full-real | tree-full-dev
-  table-full | table-full-real | table-full-dev
-  all-models-full | all-models-full-real | all-models-full-dev
-  full | full-real | full-dev
+  tree-full
+  table-full
+  all-models-full
   search-cleanup
   measurement-cleanup
   calculate-cleanup
@@ -253,14 +244,14 @@ Modules:
     ./start.sh table-instance direct
     start.bat tree-login,tree-instance,tree-dashboard direct headed
     start.bat tree-full direct
-    start.bat tree-full-dev headed
+    start.bat tree-full dev headed
     start.bat table-full direct
     start.bat all-models-full direct
     ./start.sh all-models-full direct
     start.bat all-models-full direct report
     ./start.sh all-models-full direct report
-    start.bat all-models-full-dev headed
-    ./start.sh all-models-full-dev headed
+    start.bat all-models-full dev headed
+    ./start.sh all-models-full dev headed
     start.bat search-cleanup
     start.bat typecheck
   
@@ -270,15 +261,18 @@ Notes:
   report  = generate report without headed browser mode
   headed  = open browser and generate report
   --plain = run Playwright directly without the markdown/json report wrapper
-  legacy module names like "instance" and "login" still map to tree-* modules
+  use explicit tree-* or table-* module names; legacy aliases like "instance" and "login" are no longer supported
   table-* modules without specs are recognized but will fail fast with "no automation spec implemented yet"
-  full/full-real/full-dev remain aliases for tree-full presets
-  all-models-full* presets run tree-full + table-full together
+  tree-full / table-full / all-models-full can be combined with direct or dev runtime targets
   --dry-run = print resolved command without executing`);
 }
 
 function normalizeModuleToken(token) {
   return token.trim().toLowerCase();
+}
+
+function isLegacyAlias(moduleName) {
+  return !moduleName.startsWith('tree-') && !moduleName.startsWith('table-') && moduleName !== 'all-models-full';
 }
 
 function parseArgs(argv) {
@@ -342,6 +336,17 @@ function parseArgs(argv) {
     throw new Error('At least one valid module must be provided.');
   }
 
+  const deprecatedPreset = rawModules.find((moduleName) => deprecatedPresetAliases.has(moduleName));
+  if (deprecatedPreset) {
+    if (deprecatedPreset.startsWith('all-models-full')) {
+      throw new Error(`The "${deprecatedPreset}" preset has been removed. Use "all-models-full" with an explicit runtime target, for example: all-models-full direct or all-models-full dev.`);
+    }
+    if (deprecatedPreset.startsWith('table-full')) {
+      throw new Error(`The "${deprecatedPreset}" preset has been removed. Use "table-full" with an explicit runtime target, for example: table-full direct or table-full dev.`);
+    }
+    throw new Error(`The "${deprecatedPreset}" preset has been removed. Use "tree-full" with an explicit runtime target, for example: tree-full direct or tree-full dev.`);
+  }
+
   const selectedSpecialCommand = rawModules.find((moduleName) => specialCommands.includes(moduleName));
   if (selectedSpecialCommand) {
     if (rawModules.length > 1) {
@@ -356,7 +361,17 @@ function parseArgs(argv) {
     };
   }
 
-  const resolvedRawModules = rawModules.map((moduleName) => moduleAliasMap.get(moduleName) ?? moduleName);
+  const legacyAliasResolutions = [];
+  const resolvedRawModules = rawModules.map((moduleName) => {
+    const resolvedModuleName = moduleAliasMap.get(moduleName) ?? moduleName;
+    if (resolvedModuleName !== moduleName && isLegacyAlias(moduleName)) {
+      legacyAliasResolutions.push({
+        input: moduleName,
+        resolved: resolvedModuleName,
+      });
+    }
+    return resolvedModuleName;
+  });
   const uniqueModules = [];
   for (const moduleName of resolvedRawModules) {
     if (!uniqueModules.includes(moduleName)) {
@@ -370,6 +385,11 @@ function parseArgs(argv) {
     throw new Error(`Unsupported module(s): ${invalidModules.join(', ')}`);
   }
 
+  if (legacyAliasResolutions.length) {
+    const details = legacyAliasResolutions.map((item) => `${item.input} -> ${item.resolved}`).join(', ');
+    throw new Error(`Legacy module aliases are no longer supported: ${details}. Use explicit tree-* or table-* module names.`);
+  }
+
   const selectedPreset = uniqueModules.find((moduleName) => Object.prototype.hasOwnProperty.call(presetModuleMap, moduleName));
   if (selectedPreset && uniqueModules.length > 1) {
     throw new Error(`The "${selectedPreset}" preset cannot be combined with other modules.`);
@@ -378,23 +398,16 @@ function parseArgs(argv) {
   const modules = selectedPreset ? [...presetModuleMap[selectedPreset]] : uniqueModules;
   const resolvedRuntimeTarget = runtimeTarget === 'real' || runtimeTarget === '9190' ? 'direct' : runtimeTarget === '8098' ? 'dev' : runtimeTarget;
 
-  if ((selectedPreset === 'full-dev' || selectedPreset === 'tree-full-dev' || selectedPreset === 'table-full-dev' || selectedPreset === 'all-models-full-dev') && resolvedRuntimeTarget === 'direct') {
-    throw new Error(`The "${selectedPreset}" preset cannot run in direct mode.`);
-  }
-
-  if ((selectedPreset === 'full' || selectedPreset === 'full-real' || selectedPreset === 'tree-full' || selectedPreset === 'tree-full-real' || selectedPreset === 'table-full' || selectedPreset === 'table-full-real' || selectedPreset === 'all-models-full' || selectedPreset === 'all-models-full-real') && resolvedRuntimeTarget === 'dev') {
-    throw new Error(`The "${selectedPreset}" preset is fixed to direct mode.`);
-  }
-
   return {
     help: false,
     dryRun,
     plain,
     mode,
+    legacyAliasResolutions,
     requestedModules: uniqueModules,
     modules,
     selectedPreset,
-    runtimeTarget: resolvedRuntimeTarget || (selectedPreset?.endsWith('-dev') ? 'dev' : 'direct'),
+    runtimeTarget: resolvedRuntimeTarget || 'direct',
   };
 }
 
@@ -419,21 +432,15 @@ function buildSpecList(modules) {
   return specs;
 }
 
-function buildReportKey(modules, mode, selectedPreset) {
+function buildReportKey(modules, mode, selectedPreset, runtimeTarget) {
   let baseKey = `${modules.join('-')}-real-report`;
 
-  if (selectedPreset === 'full' || selectedPreset === 'full-real' || selectedPreset === 'tree-full' || selectedPreset === 'tree-full-real') {
-    baseKey = 'tree-full-report';
-  } else if (selectedPreset === 'table-full' || selectedPreset === 'table-full-real') {
-    baseKey = 'table-full-report';
-  } else if (selectedPreset === 'all-models-full' || selectedPreset === 'all-models-full-real') {
-    baseKey = 'all-models-full-report';
-  } else if (selectedPreset === 'full-dev' || selectedPreset === 'tree-full-dev') {
-    baseKey = 'tree-full-dev-report';
-  } else if (selectedPreset === 'table-full-dev') {
-    baseKey = 'table-full-dev-report';
-  } else if (selectedPreset === 'all-models-full-dev') {
-    baseKey = 'all-models-full-dev-report';
+  if (selectedPreset === 'tree-full') {
+    baseKey = runtimeTarget === 'dev' ? 'tree-full-dev-report' : 'tree-full-report';
+  } else if (selectedPreset === 'table-full') {
+    baseKey = runtimeTarget === 'dev' ? 'table-full-dev-report' : 'table-full-report';
+  } else if (selectedPreset === 'all-models-full') {
+    baseKey = runtimeTarget === 'dev' ? 'all-models-full-dev-report' : 'all-models-full-report';
   }
 
   return mode === 'headed' ? baseKey.replace('-report', '-headed-report') : baseKey;
@@ -581,7 +588,7 @@ try {
   }
 
   const specs = buildSpecList(parsed.modules);
-  const reportKey = buildReportKey(parsed.modules, parsed.mode, parsed.selectedPreset);
+  const reportKey = buildReportKey(parsed.modules, parsed.mode, parsed.selectedPreset, parsed.runtimeTarget);
   const runtime = buildRuntimeConfig(parsed.runtimeTarget);
   const commandArgs = parsed.plain
     ? buildPlainCommandArgs({
