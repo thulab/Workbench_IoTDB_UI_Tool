@@ -496,6 +496,24 @@ async function setTasksStateViaApi(page: Page, taskNames: string[], state: 'runn
   expect(response.status()).toBe(200);
 }
 
+async function getTaskStateByName(page: Page, taskName: string) {
+  const response = await page.context().request.get('/api/synchron/getDataSynchronList', {
+    params: {
+      taskName,
+    },
+    timeout: 20_000,
+  });
+  expect(response.status()).toBe(200);
+  const payload = await response.json();
+  const list = Array.isArray(payload?.data) ? payload.data : [];
+  const matched = list.find((item: { name?: string }) => String(item?.name || '') === taskName) as { state?: string } | undefined;
+  return String(matched?.state || '');
+}
+
+async function waitForTaskState(page: Page, taskName: string, state: 'running' | 'stopped') {
+  await expect.poll(async () => await getTaskStateByName(page, taskName), { timeout: uiTimeouts.pageReady }).toBe(state);
+}
+
 async function fetchFirstMonitorNodeId(page: Page) {
   const response = await page.context().request.post('/api/home/getSystemInfo', {
     data: {
@@ -510,6 +528,15 @@ async function fetchFirstMonitorNodeId(page: Page) {
 }
 
 async function gotoDataSyncPage(page: Page) {
+  await page.goto('/view/data-sync/detail', { waitUntil: 'domcontentloaded' });
+  const reachedByDirectRoute = await pageWrapper(page)
+    .isVisible({ timeout: 5_000 })
+    .catch(() => false);
+  if (reachedByDirectRoute) {
+    await expect(taskListTitle(page)).toBeVisible({ timeout: uiTimeouts.pageReady });
+    return;
+  }
+
   await dataSyncMenu(page).click();
   await expect(page).toHaveURL(/\/view\/data-sync\/detail/, { timeout: uiTimeouts.pageReady });
   await expect(pageWrapper(page)).toBeVisible({ timeout: uiTimeouts.pageReady });
@@ -1185,6 +1212,10 @@ test.describe('数据同步', () => {
     expect(response.status()).toBe(200);
     await expect(latestSuccessToast(page)).toContainText(taskRunSuccessMessage, { timeout: uiTimeouts.toast });
     for (const taskName of taskNames) {
+      await waitForTaskState(page, taskName, 'running');
+    }
+    await searchTasks(page, keyword);
+    for (const taskName of taskNames) {
       await expect(tableRowByTaskName(page, taskName)).toContainText('running', { timeout: uiTimeouts.pageReady });
     }
   });
@@ -1249,6 +1280,8 @@ test.describe('数据同步', () => {
     const response = await responsePromise;
     expect(response.status()).toBe(200);
     await expect(latestSuccessToast(page)).toContainText(taskRunSuccessMessage, { timeout: uiTimeouts.toast });
+    await waitForTaskState(page, taskName, 'running');
+    await searchTasks(page, keyword);
     await expect(tableRowByTaskName(page, taskName)).toContainText('running', { timeout: uiTimeouts.pageReady });
   });
 

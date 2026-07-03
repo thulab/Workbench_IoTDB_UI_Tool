@@ -170,12 +170,7 @@ async function getTableDatabasesByApi(apiContext: APIRequestContext): Promise<Ta
   }
 
   const payload = await readJsonPayload(response);
-  const databases =
-    payload?.data?.value?.databases ??
-    payload?.data?.databases ??
-    payload?.value?.databases ??
-    payload?.databases ??
-    [];
+  const databases = payload?.data?.value?.databases ?? payload?.data?.databases ?? payload?.value?.databases ?? payload?.databases ?? [];
 
   return Array.isArray(databases) ? (databases as TableDatabaseRecord[]) : [];
 }
@@ -225,29 +220,20 @@ async function createTableDatabaseByApi(apiContext: APIRequestContext, databaseN
 async function loginToTableData(page: Page, request: APIRequestContext) {
   const loginPage = new LoginPage(page);
   const tableDataPage = new TableDataPage(page);
-  const dashboardUrlPattern = /\/view\/dashboard/;
 
   await ensureStandaloneConnectionExists(request, {
     ...localhostConnection,
     model: 'table',
   });
 
-  for (let attempt = 1; attempt <= 2; attempt += 1) {
-    await loginPage.goto();
-    await loginPage.login({
-      connectionName: localhostConnection.name,
-      username: localhostConnection.username,
-      password: localhostConnection.password,
-      model: 'table',
-    });
-
-    const landed = await page.waitForURL(dashboardUrlPattern, { timeout: 15_000 }).then(() => true).catch(() => false);
-    if (landed) {
-      break;
-    }
-  }
-
-  await loginPage.expectDashboardLanding(localhostConnection.name, `${localhostConnection.host}:${localhostConnection.port}`);
+  await loginPage.goto();
+  await loginPage.selectConnectionByName(localhostConnection.name);
+  await loginPage.userInput().fill(localhostConnection.username);
+  await loginPage.passwordInput().fill(localhostConnection.password);
+  await loginPage.selectModel('table');
+  await loginPage.submitAndExpectDashboardLanding(localhostConnection.name, `${localhostConnection.host}:${localhostConnection.port}`, {
+    maxAttempts: 3,
+  });
   await tableDataPage.gotoViaMenu();
 
   return tableDataPage;
@@ -267,7 +253,10 @@ async function createDatabaseAndExpectSuccess(page: Page, tableDataPage: TableDa
 
 async function applyTreeSearch(tableDataPage: TableDataPage, keyword: string) {
   await tableDataPage.searchInput().fill(keyword);
-  await tableDataPage.searchInput().press('Enter').catch(() => undefined);
+  await tableDataPage
+    .searchInput()
+    .press('Enter')
+    .catch(() => undefined);
   await expect(tableDataPage.refreshButton()).toBeEnabled({ timeout: 3_000 });
 }
 
@@ -339,14 +328,7 @@ async function createTableAndExpectSuccess(page: Page, tableDataPage: TableDataP
   await expect(tableDataPage.addTableDialog()).toBeHidden();
 }
 
-async function createVisibleTableForNodeTests(
-  page: Page,
-  request: APIRequestContext,
-  prefix?: string,
-  tableNamePrefix = 'table_node_',
-  ttl = '86400000',
-  columnName = 'device_id',
-) {
+async function createVisibleTableForNodeTests(page: Page, request: APIRequestContext, prefix?: string, tableNamePrefix = 'table_node_', ttl = '86400000', columnName = 'device_id') {
   const { tableDataPage, databaseName } = await openAddTableDialogForDatabase(page, request, prefix);
   const tableName = `${tableNamePrefix}${Date.now()}`;
 
@@ -363,13 +345,7 @@ async function createVisibleTableForNodeTests(
   return { tableDataPage, databaseName, tableName, ttl, columnName };
 }
 
-async function createVisibleDataTableForDataTests(
-  page: Page,
-  request: APIRequestContext,
-  prefix?: string,
-  tableNamePrefix = 'table_data_',
-  ttl = '86400000',
-) {
+async function createVisibleDataTableForDataTests(page: Page, request: APIRequestContext, prefix?: string, tableNamePrefix = 'table_data_', ttl = '86400000') {
   const { tableDataPage, databaseName } = await openAddTableDialogForDatabase(page, request, prefix);
   const tableName = `${tableNamePrefix}${Date.now()}`;
 
@@ -392,12 +368,7 @@ async function createVisibleDataTableForDataTests(
   return { tableDataPage, databaseName, tableName, ttl, tagColumnName: 'device_id', fieldColumnName: 's1' };
 }
 
-async function insertTableRowByApi(
-  apiContext: APIRequestContext,
-  databaseName: string,
-  tableName: string,
-  row: { time: string; deviceId: string },
-) {
+async function insertTableRowByApi(apiContext: APIRequestContext, databaseName: string, tableName: string, row: { time: string; deviceId: string }) {
   return apiContext.post(resolveApiRequestPath('/api/relational/data/saveDataInfo'), {
     data: {
       database: databaseName,
@@ -408,13 +379,7 @@ async function insertTableRowByApi(
   });
 }
 
-async function insertTableValuesByApi(
-  apiContext: APIRequestContext,
-  databaseName: string,
-  tableName: string,
-  metaDataList: string[],
-  valueList: string[],
-) {
+async function insertTableValuesByApi(apiContext: APIRequestContext, databaseName: string, tableName: string, metaDataList: string[], valueList: string[]) {
   return apiContext.post(resolveApiRequestPath('/api/relational/data/saveDataInfo'), {
     data: {
       database: databaseName,
@@ -454,12 +419,7 @@ async function saveColumnsByApi(
   });
 }
 
-async function openDataDetailWithSeedRow(
-  page: Page,
-  request: APIRequestContext,
-  prefix: string,
-  tablePrefix: string,
-) {
+async function openDataDetailWithSeedRow(page: Page, request: APIRequestContext, prefix: string, tablePrefix: string) {
   const { tableDataPage, databaseName, tableName } = await createVisibleTableForNodeTests(page, request, prefix, tablePrefix);
   const deviceId = `device_${Date.now()}`;
   const time = `${Date.now()}`;
@@ -507,11 +467,7 @@ async function openDataDetailWithTwoColumns(page: Page, request: APIRequestConte
   await expect(page.locator('.el-message--success').last()).toContainText('保存成功');
   await expect(tableDataPage.addTableDialog()).toBeHidden();
 
-  const insertResponse = await insertTableValuesByApi(page.context().request, databaseName, tableName, ['time', 'device_id', 'temperature'], [
-    time,
-    `'${deviceId}'`,
-    `'${temperature}'`,
-  ]);
+  const insertResponse = await insertTableValuesByApi(page.context().request, databaseName, tableName, ['time', 'device_id', 'temperature'], [time, `'${deviceId}'`, `'${temperature}'`]);
   expect(insertResponse.ok()).toBeTruthy();
 
   await applyTreeSearch(tableDataPage, tableName);
@@ -533,10 +489,7 @@ async function openDataDetailWithTwoRowsAtTimes(page: Page, request: APIRequestC
   const laterTime = baseTime - 2 * 60 * 1000;
   const earlierDeviceId = `device_early_${Date.now()}`;
   const laterDeviceId = `device_late_${Date.now()}`;
-  const seedFilePath = createTempTextFile(
-    `table-data-range-seed-${Date.now()}.csv`,
-    `time,device_id\n${earlierTime},${earlierDeviceId}\n${laterTime},${laterDeviceId}\n`,
-  );
+  const seedFilePath = createTempTextFile(`table-data-range-seed-${Date.now()}.csv`, `time,device_id\n${earlierTime},${earlierDeviceId}\n${laterTime},${laterDeviceId}\n`);
 
   await tableDataPage.treeNodeByExactName(tableName).click();
   await tableDataPage.treeNodeMoreButtonByExactName(tableName).click();
@@ -563,12 +516,7 @@ async function openDataDetailWithTwoRowsAtTimes(page: Page, request: APIRequestC
   return { tableDataPage, databaseName, tableName, earlierTime, laterTime, earlierDeviceId, laterDeviceId };
 }
 
-async function openDataRowDeleteConfirmDialog(
-  page: Page,
-  request: APIRequestContext,
-  prefix: string,
-  tablePrefix: string,
-) {
+async function openDataRowDeleteConfirmDialog(page: Page, request: APIRequestContext, prefix: string, tablePrefix: string) {
   const detailInfo = await openDataDetailWithSeedRow(page, request, prefix, tablePrefix);
 
   await detailInfo.tableDataPage.dataRowDeleteButtonByText(detailInfo.deviceId).click();
@@ -577,12 +525,7 @@ async function openDataRowDeleteConfirmDialog(
   return detailInfo;
 }
 
-async function openEditableInsertRow(
-  page: Page,
-  request: APIRequestContext,
-  prefix: string,
-  tablePrefix: string,
-) {
+async function openEditableInsertRow(page: Page, request: APIRequestContext, prefix: string, tablePrefix: string) {
   const detailInfo = await openDataDetailWithSeedRow(page, request, prefix, tablePrefix);
 
   await detailInfo.tableDataPage.dataDetailInsertButton().click();
@@ -642,14 +585,7 @@ async function openAddColumnDialogFromTableStructureDetail(
   return tableInfo;
 }
 
-async function openTableStructureDetail(
-  page: Page,
-  request: APIRequestContext,
-  prefix?: string,
-  tableNamePrefix = 'table_schema_',
-  ttl = '86400000',
-  columnName = 'device_id',
-) {
+async function openTableStructureDetail(page: Page, request: APIRequestContext, prefix?: string, tableNamePrefix = 'table_schema_', ttl = '86400000', columnName = 'device_id') {
   const tableInfo = await createVisibleTableForNodeTests(page, request, prefix, tableNamePrefix, ttl, columnName);
 
   await tableInfo.tableDataPage.treeNodeMoreButtonByExactName(tableInfo.tableName).click();
@@ -659,14 +595,7 @@ async function openTableStructureDetail(
   return tableInfo;
 }
 
-async function openExactTableStructureDetail(
-  page: Page,
-  request: APIRequestContext,
-  prefix?: string,
-  tableName = 'table_a',
-  ttl = '86400000',
-  columnName = 'device_id',
-) {
+async function openExactTableStructureDetail(page: Page, request: APIRequestContext, prefix?: string, tableName = 'table_a', ttl = '86400000', columnName = 'device_id') {
   const { tableDataPage, databaseName } = await openAddTableDialogForDatabase(page, request, prefix);
 
   await tableDataPage.addTableNameInput().fill(tableName);
@@ -699,14 +628,7 @@ async function openAddTableDialogFromDatabaseStructureDetail(page: Page, request
   return databaseInfo;
 }
 
-async function openDatabaseStructureDetailWithTable(
-  page: Page,
-  request: APIRequestContext,
-  prefix?: string,
-  tableNamePrefix = 'table_db_schema_',
-  ttl = '86400000',
-  columnName = 'device_id',
-) {
+async function openDatabaseStructureDetailWithTable(page: Page, request: APIRequestContext, prefix?: string, tableNamePrefix = 'table_db_schema_', ttl = '86400000', columnName = 'device_id') {
   const tableInfo = await createVisibleTableForNodeTests(page, request, prefix, tableNamePrefix, ttl, columnName);
 
   await tableInfo.tableDataPage.treeNodeMoreButtonByExactName(tableInfo.databaseName).click();
@@ -948,9 +870,7 @@ test.describe('数据管理', () => {
     const createResponse = await createTableDatabaseByApi(page.context().request, databaseName);
     expect(createResponse.ok()).toBeTruthy();
 
-    const refreshResponsePromise = page.waitForResponse(
-      (response) => response.url().includes('/api/relational/schema/getDatabases') && response.request().method() === 'GET',
-    );
+    const refreshResponsePromise = page.waitForResponse((response) => response.url().includes('/api/relational/schema/getDatabases') && response.request().method() === 'GET');
     await tableDataPage.refreshButton().click();
     await refreshResponsePromise;
 
@@ -1190,7 +1110,10 @@ test.describe('数据管理', () => {
     await expect(tableDataPage.addTableColumnDataTypeSelect(0).locator('[role="combobox"]').first()).toBeDisabled();
   });
 
-  test('30. 在数据管理-新增表弹窗内, 输入表名table_0, 添加列, 输入列名: sensor_1, 列类别选择FIELD(测点列), 数据类型下拉列表展示: BOOLEAN, INT32, INT64, FLOAT, DOUBLE, TEXT, STRING, BLOB, TIMESTAMP, DATE, OBJECT', async ({ page, request }) => {
+  test('30. 在数据管理-新增表弹窗内, 输入表名table_0, 添加列, 输入列名: sensor_1, 列类别选择FIELD(测点列), 数据类型下拉列表展示: BOOLEAN, INT32, INT64, FLOAT, DOUBLE, TEXT, STRING, BLOB, TIMESTAMP, DATE, OBJECT', async ({
+    page,
+    request,
+  }) => {
     const { tableDataPage } = await openAddTableDialogForDatabase(page, request);
 
     await tableDataPage.addTableNameInput().fill('table_0');
@@ -1280,12 +1203,7 @@ test.describe('数据管理', () => {
     const createdTable = createdDatabase?.tables?.find((item) => item.tableVO?.tableName === 'table_all_types');
     const createdColumns = (createdTable?.columnVOS ?? []).map((item) => `${item.columnName}:${item.datatype}`);
 
-    expect(createdColumns).toEqual(
-      expect.arrayContaining([
-        'time:TIMESTAMP',
-        ...customColumnTypes.map((dataType) => `field_${dataType.toLowerCase()}:${dataType}`),
-      ]),
-    );
+    expect(createdColumns).toEqual(expect.arrayContaining(['time:TIMESTAMP', ...customColumnTypes.map((dataType) => `field_${dataType.toLowerCase()}:${dataType}`)]));
   });
 
   test('36. 在数据管理-新增表弹窗内, hover表名右上角的小问号, 展示表名规则 tooltip', async ({ page, request }) => {
@@ -1561,10 +1479,13 @@ test.describe('数据管理', () => {
     await tableDataPage.addTableConfirmButton().click();
 
     await expect
-      .poll(async () => {
-        const columns = await getTableColumnsByApi(page.context().request, databaseName, tableName);
-        return expectedColumnNames.every((columnName) => columns.some((item) => item.columnName === columnName && item.category === 'FIELD' && item.datatype === 'BOOLEAN'));
-      }, { timeout: 20_000 })
+      .poll(
+        async () => {
+          const columns = await getTableColumnsByApi(page.context().request, databaseName, tableName);
+          return expectedColumnNames.every((columnName) => columns.some((item) => item.columnName === columnName && item.category === 'FIELD' && item.datatype === 'BOOLEAN'));
+        },
+        { timeout: 20_000 },
+      )
       .toBeTruthy();
   });
 
@@ -1672,12 +1593,7 @@ test.describe('数据管理', () => {
   });
 
   test('58. 在数据管理页，数据库列表顶部输入框，输入已存在的表名称，进行模糊搜索', async ({ page, request }) => {
-    const { tableDataPage, databaseName, tableName } = await createVisibleTableForNodeTests(
-      page,
-      request,
-      'db_fuzzy_search_table_',
-      'table_fuzzy_search_',
-    );
+    const { tableDataPage, databaseName, tableName } = await createVisibleTableForNodeTests(page, request, 'db_fuzzy_search_table_', 'table_fuzzy_search_');
     const keyword = buildFuzzySearchKeyword(tableName);
 
     expect(keyword).not.toBe(tableName);
@@ -1733,12 +1649,7 @@ test.describe('数据管理', () => {
   });
 
   test('62. 在数据管理页，数据库列表顶部输入框，搜索命中表名称后，点击表节点，右侧联动展示该表详情', async ({ page, request }) => {
-    const { tableDataPage, tableName } = await createVisibleTableForNodeTests(
-      page,
-      request,
-      'db_search_detail_link_',
-      'table_search_detail_',
-    );
+    const { tableDataPage, tableName } = await createVisibleTableForNodeTests(page, request, 'db_search_detail_link_', 'table_search_detail_');
     const keyword = buildFuzzySearchKeyword(tableName);
 
     await tableDataPage.searchInput().fill(keyword);
@@ -2030,12 +1941,7 @@ test.describe('数据管理', () => {
   });
 
   test('79. 在数据管理-数据库结构详情页，点击导出按钮并选择“以 . csv格式导出”后导出成功', async ({ page, request }) => {
-    const { tableDataPage, tableName, columnName } = await openDatabaseStructureDetailWithTable(
-      page,
-      request,
-      'db_database_export_csv_success_',
-      'table_database_export_csv_success_',
-    );
+    const { tableDataPage, tableName, columnName } = await openDatabaseStructureDetailWithTable(page, request, 'db_database_export_csv_success_', 'table_database_export_csv_success_');
 
     await tableDataPage.databaseDetailExportButton().click();
     await expect(tableDataPage.exportDropdownMenu()).toBeVisible();
@@ -2049,12 +1955,7 @@ test.describe('数据管理', () => {
   });
 
   test('80. 在数据管理-数据库结构详情页，点击导出按钮并选择“以 . xlsx格式导出”后导出成功', async ({ page, request }) => {
-    const { tableDataPage } = await openDatabaseStructureDetailWithTable(
-      page,
-      request,
-      'db_database_export_xlsx_success_',
-      'table_database_export_xlsx_success_',
-    );
+    const { tableDataPage } = await openDatabaseStructureDetailWithTable(page, request, 'db_database_export_xlsx_success_', 'table_database_export_xlsx_success_');
 
     await tableDataPage.databaseDetailExportButton().click();
     await expect(tableDataPage.exportDropdownMenu()).toBeVisible();
@@ -2099,14 +2000,7 @@ test.describe('数据管理', () => {
   });
 
   test('83. 在数据管理-表结构详情页，展示表的数据保留时间，列数量和列名列表信息', async ({ page, request }) => {
-    const { tableDataPage, tableName, ttl, columnName } = await openTableStructureDetail(
-      page,
-      request,
-      'db_table_detail_info_',
-      'table_detail_info_',
-      '86400000',
-      'field_detail_info',
-    );
+    const { tableDataPage, tableName, ttl, columnName } = await openTableStructureDetail(page, request, 'db_table_detail_info_', 'table_detail_info_', '86400000', 'field_detail_info');
 
     await expect(tableDataPage.detailTitle()).toContainText(tableName);
     await expect(tableDataPage.detailTitle()).toContainText('结构');
@@ -2117,14 +2011,7 @@ test.describe('数据管理', () => {
   });
 
   test('84. 在数据管理-表结构详情页，可对数据保留时间修改 TTL 数值', async ({ page, request }) => {
-    const { tableDataPage } = await openTableStructureDetail(
-      page,
-      request,
-      'db_table_detail_ttl_update_',
-      'table_detail_ttl_update_',
-      '86400000',
-      'field_detail_ttl',
-    );
+    const { tableDataPage } = await openTableStructureDetail(page, request, 'db_table_detail_ttl_update_', 'table_detail_ttl_update_', '86400000', 'field_detail_ttl');
     const updatedTtl = '7200000';
 
     await expect(tableDataPage.databaseInfoItemByLabel('数据保留时间')).toContainText('86400000 ms');
@@ -2140,24 +2027,13 @@ test.describe('数据管理', () => {
   });
 
   test('85. 在数据管理-表结构详情页，点击【新增】按钮，弹窗新增列', async ({ page, request }) => {
-    const { tableDataPage } = await openAddColumnDialogFromTableStructureDetail(
-      page,
-      request,
-      'db_table_detail_add_column_dialog_',
-      'table_detail_add_column_dialog_',
-    );
+    const { tableDataPage } = await openAddColumnDialogFromTableStructureDetail(page, request, 'db_table_detail_add_column_dialog_', 'table_detail_add_column_dialog_');
 
     await expect(tableDataPage.addTableDialogTitle()).toContainText(addColumnDialogTitleText);
   });
 
   test('86. 在数据管理-表结构详情页中的新增列弹窗中，表名和数据保留时间默认显示具体信息且不支持修改编辑', async ({ page, request }) => {
-    const { tableDataPage, tableName, ttl } = await openAddColumnDialogFromTableStructureDetail(
-      page,
-      request,
-      'db_table_detail_add_column_default_',
-      'table_detail_add_column_default_',
-      '86400000',
-    );
+    const { tableDataPage, tableName, ttl } = await openAddColumnDialogFromTableStructureDetail(page, request, 'db_table_detail_add_column_default_', 'table_detail_add_column_default_', '86400000');
 
     await expect(tableDataPage.addTableDialogTitle()).toContainText(addColumnDialogTitleText);
     await expect(tableDataPage.addTableNameInput()).toHaveValue(tableName);
@@ -2167,12 +2043,7 @@ test.describe('数据管理', () => {
   });
 
   test('87. 在数据管理-表结构详情页中的新增列弹窗中，添加列并输入列相关信息后确定，新增列成功', async ({ page, request }) => {
-    const { tableDataPage, databaseName, tableName } = await openAddColumnDialogFromTableStructureDetail(
-      page,
-      request,
-      'db_table_detail_add_column_submit_',
-      'table_detail_add_column_submit_',
-    );
+    const { tableDataPage, databaseName, tableName } = await openAddColumnDialogFromTableStructureDetail(page, request, 'db_table_detail_add_column_submit_', 'table_detail_add_column_submit_');
     const addedColumnName = `field_add_${Date.now()}`;
 
     await addFieldColumnWithDataType(tableDataPage, 0, addedColumnName, 'INT32');
@@ -2189,12 +2060,7 @@ test.describe('数据管理', () => {
   });
 
   test('88. 在数据管理-表结构详情页，点击【导入】按钮，弹窗批量导入列结构弹窗', async ({ page, request }) => {
-    const { tableDataPage } = await openTableStructureDetail(
-      page,
-      request,
-      'db_table_detail_import_dialog_',
-      'table_detail_import_dialog_',
-    );
+    const { tableDataPage } = await openTableStructureDetail(page, request, 'db_table_detail_import_dialog_', 'table_detail_import_dialog_');
 
     await tableDataPage.dataDetailImportButton().click();
 
@@ -2203,12 +2069,7 @@ test.describe('数据管理', () => {
   });
 
   test('89. 在数据管理-表结构详情页中的批量导入列结构弹窗中, 模板table_template.csv支持下载', async ({ page, request }) => {
-    const { tableDataPage } = await openTableStructureDetail(
-      page,
-      request,
-      'db_table_detail_import_template_',
-      'table_detail_import_template_',
-    );
+    const { tableDataPage } = await openTableStructureDetail(page, request, 'db_table_detail_import_template_', 'table_detail_import_template_');
 
     await tableDataPage.dataDetailImportButton().click();
     await expect(tableDataPage.importDialog()).toBeVisible();
@@ -2240,10 +2101,13 @@ test.describe('数据管理', () => {
     await expect(tableDataPage.importDialog()).toBeHidden();
 
     await expect
-      .poll(async () => {
-        const columns = await getTableColumnsByApi(page.context().request, databaseName, 'table_a');
-        return ['attr', 's1', 's5'].every((columnName) => columns.some((item) => item.columnName === columnName));
-      }, { timeout: 20_000 })
+      .poll(
+        async () => {
+          const columns = await getTableColumnsByApi(page.context().request, databaseName, 'table_a');
+          return ['attr', 's1', 's5'].every((columnName) => columns.some((item) => item.columnName === columnName));
+        },
+        { timeout: 20_000 },
+      )
       .toBeTruthy();
   });
 
@@ -2263,10 +2127,13 @@ test.describe('数据管理', () => {
     await expect(tableDataPage.importDialog()).toBeHidden();
 
     await expect
-      .poll(async () => {
-        const columns = await getTableColumnsByApi(page.context().request, databaseName, 't1');
-        return ['attr', 's1', 's7'].every((columnName) => columns.some((item) => item.columnName === columnName));
-      }, { timeout: 20_000 })
+      .poll(
+        async () => {
+          const columns = await getTableColumnsByApi(page.context().request, databaseName, 't1');
+          return ['attr', 's1', 's7'].every((columnName) => columns.some((item) => item.columnName === columnName));
+        },
+        { timeout: 20_000 },
+      )
       .toBeTruthy();
   });
 
@@ -2328,38 +2195,30 @@ test.describe('数据管理', () => {
 
     await expect(page.locator('.el-message--success').last()).toContainText(deleteSuccessMessage);
     await expect
-      .poll(async () => {
-        const columns = await getTableColumnsByApi(page.context().request, databaseName, 'table_a');
-        return ['attr', 's1'].every((columnName) => !columns.some((item) => item.columnName === columnName));
-      }, { timeout: 20_000 })
+      .poll(
+        async () => {
+          const columns = await getTableColumnsByApi(page.context().request, databaseName, 'table_a');
+          return ['attr', 's1'].every((columnName) => !columns.some((item) => item.columnName === columnName));
+        },
+        { timeout: 20_000 },
+      )
       .toBeTruthy();
   });
 
   test('96. 在数据管理-表结构详情页，通过刷新按钮可刷新列名列表', async ({ page, request }) => {
     const { tableDataPage, databaseName } = await openExactTableStructureDetail(page, request, 'db_table_refresh_columns_', 'table_a');
     const refreshColumnName = `refresh_col_${Date.now()}`;
-    const saveResponse = await saveColumnsByApi(page.context().request, databaseName, 'table_a', [
-      { columnName: refreshColumnName, category: 'FIELD', datatype: 'INT32', comment: '刷新列' },
-    ]);
+    const saveResponse = await saveColumnsByApi(page.context().request, databaseName, 'table_a', [{ columnName: refreshColumnName, category: 'FIELD', datatype: 'INT32', comment: '刷新列' }]);
 
     expect(saveResponse.ok()).toBe(true);
     await expect(tableDataPage.tableRowByText(refreshColumnName)).toHaveCount(0);
 
     await tableDataPage.databaseDetailRefreshButton().click();
-    await expect
-      .poll(async () => await tableDataPage.tableRowByText(refreshColumnName).count(), { timeout: 20_000 })
-      .toBeGreaterThan(0);
+    await expect.poll(async () => await tableDataPage.tableRowByText(refreshColumnName).count(), { timeout: 20_000 }).toBeGreaterThan(0);
   });
 
   test('97. 在数据管理-表结构详情页，点击列备注编辑按钮后修改列备注并提交成功', async ({ page, request }) => {
-    const { tableDataPage, tableName, columnName } = await openTableStructureDetail(
-      page,
-      request,
-      'db_edit_column_comment_',
-      'table_edit_column_comment_',
-      '86400000',
-      'field_comment_target',
-    );
+    const { tableDataPage, tableName, columnName } = await openTableStructureDetail(page, request, 'db_edit_column_comment_', 'table_edit_column_comment_', '86400000', 'field_comment_target');
     const updatedComment = `column_comment_${Date.now()}`;
     await expect(tableDataPage.detailTitle()).toContainText(tableName);
     await expect(tableDataPage.tableRowByText(columnName)).toBeVisible();
@@ -2385,16 +2244,9 @@ test.describe('数据管理', () => {
   });
 
   test('99. 在数据管理-表结构详情页, 选择指定的非time列名, 点击操作栏中的删除按钮, 弹出二次确认删除弹窗提示', async ({ page, request }) => {
-    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(
-      page,
-      request,
-      'db_table_delete_single_confirm_',
-      'table_delete_single_confirm_',
-    );
+    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(page, request, 'db_table_delete_single_confirm_', 'table_delete_single_confirm_');
     const targetColumnName = `field_delete_${Date.now()}`;
-    const saveResponse = await saveColumnsByApi(page.context().request, databaseName, tableName, [
-      { columnName: targetColumnName, category: 'FIELD', datatype: 'INT32', comment: '删除列' },
-    ]);
+    const saveResponse = await saveColumnsByApi(page.context().request, databaseName, tableName, [{ columnName: targetColumnName, category: 'FIELD', datatype: 'INT32', comment: '删除列' }]);
 
     expect(saveResponse.ok()).toBe(true);
     await tableDataPage.databaseDetailRefreshButton().click();
@@ -2406,16 +2258,9 @@ test.describe('数据管理', () => {
   });
 
   test('100. 在数据管理-表结构详情页中的二次确认删除弹窗内，点击取消按钮，弹窗关闭，列名不删除', async ({ page, request }) => {
-    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(
-      page,
-      request,
-      'db_table_delete_single_cancel_',
-      'table_delete_single_cancel_',
-    );
+    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(page, request, 'db_table_delete_single_cancel_', 'table_delete_single_cancel_');
     const targetColumnName = `field_delete_${Date.now()}`;
-    const saveResponse = await saveColumnsByApi(page.context().request, databaseName, tableName, [
-      { columnName: targetColumnName, category: 'FIELD', datatype: 'INT32', comment: '删除列' },
-    ]);
+    const saveResponse = await saveColumnsByApi(page.context().request, databaseName, tableName, [{ columnName: targetColumnName, category: 'FIELD', datatype: 'INT32', comment: '删除列' }]);
 
     expect(saveResponse.ok()).toBe(true);
     await tableDataPage.databaseDetailRefreshButton().click();
@@ -2430,16 +2275,9 @@ test.describe('数据管理', () => {
   });
 
   test('101. 在数据管理-表结构详情页中的二次确认删除弹窗内，点击确定按钮，弹窗关闭，列名删除', async ({ page, request }) => {
-    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(
-      page,
-      request,
-      'db_table_delete_single_submit_',
-      'table_delete_single_submit_',
-    );
+    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(page, request, 'db_table_delete_single_submit_', 'table_delete_single_submit_');
     const targetColumnName = `field_delete_${Date.now()}`;
-    const saveResponse = await saveColumnsByApi(page.context().request, databaseName, tableName, [
-      { columnName: targetColumnName, category: 'FIELD', datatype: 'INT32', comment: '删除列' },
-    ]);
+    const saveResponse = await saveColumnsByApi(page.context().request, databaseName, tableName, [{ columnName: targetColumnName, category: 'FIELD', datatype: 'INT32', comment: '删除列' }]);
 
     expect(saveResponse.ok()).toBe(true);
     await tableDataPage.databaseDetailRefreshButton().click();
@@ -2452,24 +2290,20 @@ test.describe('数据管理', () => {
     await expect(tableDataPage.confirmDialog()).toBeHidden();
     await expect(page.locator('.el-message--success').last()).toContainText(deleteSuccessMessage);
     await expect
-      .poll(async () => {
-        const columns = await getTableColumnsByApi(page.context().request, databaseName, tableName);
-        return !columns.some((item) => item.columnName === targetColumnName);
-      }, { timeout: 20_000 })
+      .poll(
+        async () => {
+          const columns = await getTableColumnsByApi(page.context().request, databaseName, tableName);
+          return !columns.some((item) => item.columnName === targetColumnName);
+        },
+        { timeout: 20_000 },
+      )
       .toBeTruthy();
   });
 
   test('102. 在数据管理-表结构详情页, 列名为device_id，操作列的删除按钮禁用, hover提示TAG列暂不支持删除', async ({ page, request }) => {
-    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(
-      page,
-      request,
-      'db_table_tag_delete_disabled_',
-      'table_tag_delete_disabled_',
-    );
+    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(page, request, 'db_table_tag_delete_disabled_', 'table_tag_delete_disabled_');
     const tagColumnName = `tag_delete_${Date.now()}`;
-    const saveResponse = await saveColumnsByApi(page.context().request, databaseName, tableName, [
-      { columnName: tagColumnName, category: 'TAG', datatype: 'STRING', comment: '标签列' },
-    ]);
+    const saveResponse = await saveColumnsByApi(page.context().request, databaseName, tableName, [{ columnName: tagColumnName, category: 'TAG', datatype: 'STRING', comment: '标签列' }]);
     const deleteTooltip = page.locator('.el-popper:visible').filter({ hasText: 'TAG列暂不支持删除' }).first();
 
     expect(saveResponse.ok()).toBe(true);
@@ -2480,16 +2314,9 @@ test.describe('数据管理', () => {
   });
 
   test('103. 在数据管理-表结构详情页中的二次确认删除弹窗内，点击右上角的 X 按钮，弹窗关闭，列名不删除', async ({ page, request }) => {
-    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(
-      page,
-      request,
-      'db_table_delete_single_close_',
-      'table_delete_single_close_',
-    );
+    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(page, request, 'db_table_delete_single_close_', 'table_delete_single_close_');
     const targetColumnName = `field_delete_${Date.now()}`;
-    const saveResponse = await saveColumnsByApi(page.context().request, databaseName, tableName, [
-      { columnName: targetColumnName, category: 'FIELD', datatype: 'INT32', comment: '删除列' },
-    ]);
+    const saveResponse = await saveColumnsByApi(page.context().request, databaseName, tableName, [{ columnName: targetColumnName, category: 'FIELD', datatype: 'INT32', comment: '删除列' }]);
 
     expect(saveResponse.ok()).toBe(true);
     await tableDataPage.databaseDetailRefreshButton().click();
@@ -2504,12 +2331,7 @@ test.describe('数据管理', () => {
   });
 
   test('104. 在数据管理-表结构详情页，批量勾选列名后点击批量删除并在确认弹窗中点击取消，列名不删除', async ({ page, request }) => {
-    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(
-      page,
-      request,
-      'db_table_batch_delete_cancel_',
-      'table_batch_delete_cancel_',
-    );
+    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(page, request, 'db_table_batch_delete_cancel_', 'table_batch_delete_cancel_');
     const firstColumnName = `field_delete_a_${Date.now()}`;
     const secondColumnName = `field_delete_b_${Date.now()}`;
     const saveResponse = await saveColumnsByApi(page.context().request, databaseName, tableName, [
@@ -2536,12 +2358,7 @@ test.describe('数据管理', () => {
   });
 
   test('105. 在数据管理-表结构详情页，批量勾选列名后点击批量删除并在确认弹窗中点击确定，列名删除', async ({ page, request }) => {
-    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(
-      page,
-      request,
-      'db_table_batch_delete_submit_',
-      'table_batch_delete_submit_',
-    );
+    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(page, request, 'db_table_batch_delete_submit_', 'table_batch_delete_submit_');
     const firstColumnName = `field_delete_a_${Date.now()}`;
     const secondColumnName = `field_delete_b_${Date.now()}`;
     const saveResponse = await saveColumnsByApi(page.context().request, databaseName, tableName, [
@@ -2564,20 +2381,18 @@ test.describe('数据管理', () => {
 
     await expect(page.locator('.el-message--success').last()).toContainText(deleteSuccessMessage);
     await expect
-      .poll(async () => {
-        const columns = await getTableColumnsByApi(page.context().request, databaseName, tableName);
-        return [firstColumnName, secondColumnName].every((columnName) => !columns.some((item) => item.columnName === columnName));
-      }, { timeout: 20_000 })
+      .poll(
+        async () => {
+          const columns = await getTableColumnsByApi(page.context().request, databaseName, tableName);
+          return [firstColumnName, secondColumnName].every((columnName) => !columns.some((item) => item.columnName === columnName));
+        },
+        { timeout: 20_000 },
+      )
       .toBeTruthy();
   });
 
   test('106. 在数据管理-表结构详情页，搜索类型选择列名并输入关键字后，可筛选展示命中列名', async ({ page, request }) => {
-    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(
-      page,
-      request,
-      'db_table_search_name_',
-      'table_search_name_',
-    );
+    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(page, request, 'db_table_search_name_', 'table_search_name_');
     const targetColumnName = `filter_name_${Date.now()}`;
     const otherColumnName = `other_name_${Date.now()}`;
     const saveResponse = await saveColumnsByApi(page.context().request, databaseName, tableName, [
@@ -2600,12 +2415,7 @@ test.describe('数据管理', () => {
   });
 
   test('107. 在数据管理-表结构详情页，搜索类型选择备注并输入关键字后，可筛选展示命中列名', async ({ page, request }) => {
-    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(
-      page,
-      request,
-      'db_table_search_comment_',
-      'table_search_comment_',
-    );
+    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(page, request, 'db_table_search_comment_', 'table_search_comment_');
     const targetColumnName = `comment_field_${Date.now()}`;
     const targetComment = `remark_${Date.now()}`;
     const otherColumnName = `other_comment_${Date.now()}`;
@@ -2627,12 +2437,7 @@ test.describe('数据管理', () => {
   });
 
   test('108. 在数据管理-表结构详情页，搜索类型选择数据类型并输入关键字后，可筛选展示命中列名', async ({ page, request }) => {
-    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(
-      page,
-      request,
-      'db_table_search_datatype_',
-      'table_search_datatype_',
-    );
+    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(page, request, 'db_table_search_datatype_', 'table_search_datatype_');
     const targetColumnName = `datatype_field_${Date.now()}`;
     const otherColumnName = `datatype_other_${Date.now()}`;
     const saveResponse = await saveColumnsByApi(page.context().request, databaseName, tableName, [
@@ -2653,12 +2458,7 @@ test.describe('数据管理', () => {
   });
 
   test('109. 在数据管理-表结构详情页，搜索类型选择列类别并输入关键字后，可筛选展示命中列名', async ({ page, request }) => {
-    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(
-      page,
-      request,
-      'db_table_search_category_',
-      'table_search_category_',
-    );
+    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(page, request, 'db_table_search_category_', 'table_search_category_');
     const targetColumnName = `category_attr_${Date.now()}`;
     const otherColumnName = `category_field_${Date.now()}`;
     const saveResponse = await saveColumnsByApi(page.context().request, databaseName, tableName, [
@@ -2731,22 +2531,14 @@ test.describe('数据管理', () => {
     await expect(dataDetailInfo.tableDataPage.tooltipPopper()).toContainText(exportTipText);
   });
   test('113. 在数据管理-数据信息页，点击导入按钮后打开批量导入数据弹窗并展示模板与上传区', async ({ page, request }) => {
-    const { tableDataPage, databaseName, tableName } = await openDataDetailWithSeedRow(
-      page,
-      request,
-      'db_data_import_open_',
-      'table_data_import_open_',
-    );
+    const { tableDataPage, databaseName, tableName } = await openDataDetailWithSeedRow(page, request, 'db_data_import_open_', 'table_data_import_open_');
 
     await tableDataPage.dataDetailImportButton().click();
 
     await expect(tableDataPage.importDialog()).toBeVisible();
     await expect(tableDataPage.importDialogSteps()).toBeVisible();
     await expect(tableDataPage.importDialogTemplateLink()).toBeVisible();
-    await expect(tableDataPage.importDialogTemplateLink()).toHaveAttribute(
-      'href',
-      new RegExp(`exportDataTemplateTable\\?database=${databaseName}&tableName=${tableName}`),
-    );
+    await expect(tableDataPage.importDialogTemplateLink()).toHaveAttribute('href', new RegExp(`exportDataTemplateTable\\?database=${databaseName}&tableName=${tableName}`));
     await expect(tableDataPage.importDialogUpload()).toBeVisible();
     await expect(tableDataPage.importDialogNextButton()).toBeDisabled();
   });
@@ -2762,12 +2554,7 @@ test.describe('数据管理', () => {
   });
 
   test('115. 在数据管理-数据信息页，批量删除弹窗点击取消后不删除已选数据', async ({ page, request }) => {
-    const { tableDataPage, deviceId } = await openDataDetailWithSeedRow(
-      page,
-      request,
-      'db_data_batch_delete_cancel_',
-      'table_data_batch_delete_cancel_',
-    );
+    const { tableDataPage, deviceId } = await openDataDetailWithSeedRow(page, request, 'db_data_batch_delete_cancel_', 'table_data_batch_delete_cancel_');
 
     await tableDataPage.firstDataSelectionCheckbox().click();
     await expect(tableDataPage.dataDetailBatchDeleteButton()).toBeEnabled();
@@ -2781,12 +2568,7 @@ test.describe('数据管理', () => {
   });
 
   test('116. 在数据管理-数据信息页，批量删除弹窗点击确定后删除已选数据', async ({ page, request }) => {
-    const { tableDataPage, deviceId } = await openDataDetailWithSeedRow(
-      page,
-      request,
-      'db_data_batch_delete_submit_',
-      'table_data_batch_delete_submit_',
-    );
+    const { tableDataPage, deviceId } = await openDataDetailWithSeedRow(page, request, 'db_data_batch_delete_submit_', 'table_data_batch_delete_submit_');
 
     await tableDataPage.firstDataSelectionCheckbox().click();
     await expect(tableDataPage.dataDetailBatchDeleteButton()).toBeEnabled();
@@ -2819,12 +2601,7 @@ test.describe('数据管理', () => {
   });
 
   test('118. 在数据管理-数据信息页，批量导入数据弹窗内上传目录 Table-Data/test-data/ETTh1-tab.csv 文件后，导入成功', async ({ page, request }) => {
-    const { tableDataPage: sourceTableDataPage, deviceId } = await openDataDetailWithSeedRow(
-      page,
-      request,
-      'db_data_import_etth1_source_',
-      'table_data_import_etth1_source_',
-    );
+    const { tableDataPage: sourceTableDataPage, deviceId } = await openDataDetailWithSeedRow(page, request, 'db_data_import_etth1_source_', 'table_data_import_etth1_source_');
     const importFilePath = path.resolve(process.cwd(), 'tests/e2e/Test_Cases/Table_Model/Table-Data/test-data/ETTh1-tab.csv');
     await sourceTableDataPage.databaseDetailExportButton().click();
     await expect(sourceTableDataPage.exportDropdownMenu()).toBeVisible();
@@ -2834,12 +2611,7 @@ test.describe('数据管理', () => {
     const exportedCsvText = (await fetchTextByOpenedUrl(page, csvUrl)).replace(/^\uFEFF/, '');
     writeFileSync(importFilePath, exportedCsvText, 'utf8');
 
-    const { tableDataPage: targetTableDataPage, tableName: targetTableName } = await createVisibleTableForNodeTests(
-      page,
-      request,
-      'db_data_import_etth1_target_',
-      'table_data_import_etth1_target_',
-    );
+    const { tableDataPage: targetTableDataPage, tableName: targetTableName } = await createVisibleTableForNodeTests(page, request, 'db_data_import_etth1_target_', 'table_data_import_etth1_target_');
 
     await targetTableDataPage.treeNodeByExactName(targetTableName).click();
     await targetTableDataPage.treeNodeMoreButtonByExactName(targetTableName).click();
@@ -2863,12 +2635,7 @@ test.describe('数据管理', () => {
   });
 
   test('119. 在数据管理-数据信息页，单行删除弹窗点击取消后不删除当前数据', async ({ page, request }) => {
-    const { tableDataPage, deviceId } = await openDataRowDeleteConfirmDialog(
-      page,
-      request,
-      'db_data_row_delete_cancel_',
-      'table_data_row_delete_cancel_',
-    );
+    const { tableDataPage, deviceId } = await openDataRowDeleteConfirmDialog(page, request, 'db_data_row_delete_cancel_', 'table_data_row_delete_cancel_');
 
     await tableDataPage.confirmDialogCancelButton().click();
     await expect(tableDataPage.confirmDialog()).toBeHidden();
@@ -2876,12 +2643,7 @@ test.describe('数据管理', () => {
   });
 
   test('120. 在数据管理-数据信息页，单行删除弹窗点击确定后删除当前数据', async ({ page, request }) => {
-    const { tableDataPage, deviceId } = await openDataRowDeleteConfirmDialog(
-      page,
-      request,
-      'db_data_row_delete_submit_',
-      'table_data_row_delete_submit_',
-    );
+    const { tableDataPage, deviceId } = await openDataRowDeleteConfirmDialog(page, request, 'db_data_row_delete_submit_', 'table_data_row_delete_submit_');
 
     await tableDataPage.confirmDialogConfirmButton().click();
     await expect(tableDataPage.confirmDialog()).toBeHidden();
@@ -2952,12 +2714,7 @@ test.describe('数据管理', () => {
   });
 
   test('127. 在数据管理-数据信息页，设置查询时间范围后仅展示命中时间段的数据', async ({ page, request }) => {
-    const { tableDataPage, laterTime, earlierDeviceId, laterDeviceId } = await openDataDetailWithTwoRowsAtTimes(
-      page,
-      request,
-      'db_data_time_range_',
-      'table_data_time_range_',
-    );
+    const { tableDataPage, laterTime, earlierDeviceId, laterDeviceId } = await openDataDetailWithTwoRowsAtTimes(page, request, 'db_data_time_range_', 'table_data_time_range_');
     const startText = formatDateTimeForPicker(laterTime - 60 * 1000);
     const endText = formatDateTimeForPicker(laterTime + 60 * 1000);
     const inputs = tableDataPage.dataSearchDateRangeInputs();
@@ -2975,12 +2732,7 @@ test.describe('数据管理', () => {
   });
 
   test('128. 在数据管理-数据信息页，时间范围查询后点击重置恢复全部数据', async ({ page, request }) => {
-    const { tableDataPage, laterTime, earlierDeviceId, laterDeviceId } = await openDataDetailWithTwoRowsAtTimes(
-      page,
-      request,
-      'db_data_time_reset_',
-      'table_data_time_reset_',
-    );
+    const { tableDataPage, laterTime, earlierDeviceId, laterDeviceId } = await openDataDetailWithTwoRowsAtTimes(page, request, 'db_data_time_reset_', 'table_data_time_reset_');
     const startText = formatDateTimeForPicker(laterTime - 60 * 1000);
     const endText = formatDateTimeForPicker(laterTime + 60 * 1000);
     const inputs = tableDataPage.dataSearchDateRangeInputs();
@@ -3048,10 +2800,7 @@ test.describe('数据管理', () => {
   test('132. 在数据管理-数据信息页，批量导入数据弹窗上传合法 csv 后可导入成功并刷新展示新增数据', async ({ page, request }) => {
     const { tableDataPage } = await openDataDetailWithSeedRow(page, request, 'db_data_import_success_', 'table_data_import_success_');
     const importedDeviceId = `device_import_success_${Date.now()}`;
-    const filePath = createTempTextFile(
-      `table-data-import-success-${Date.now()}.csv`,
-      `time,device_id\n${Date.now() + 1000},${importedDeviceId}`,
-    );
+    const filePath = createTempTextFile(`table-data-import-success-${Date.now()}.csv`, `time,device_id\n${Date.now() + 1000},${importedDeviceId}`);
 
     try {
       await tableDataPage.dataDetailImportButton().click();
@@ -3074,10 +2823,7 @@ test.describe('数据管理', () => {
   test('133. 在数据管理-数据信息页，批量导入数据弹窗导入非法表头 csv 后进入结果步骤且不新增数据', async ({ page, request }) => {
     const { tableDataPage } = await openDataDetailWithSeedRow(page, request, 'db_data_import_bad_header_', 'table_data_import_bad_header_');
     const missingDeviceId = `device_import_bad_${Date.now()}`;
-    const filePath = createTempTextFile(
-      `table-data-import-bad-header-${Date.now()}.csv`,
-      `timestamp,device\n${Date.now() + 1000},${missingDeviceId}`,
-    );
+    const filePath = createTempTextFile(`table-data-import-bad-header-${Date.now()}.csv`, `timestamp,device\n${Date.now() + 1000},${missingDeviceId}`);
 
     try {
       await tableDataPage.dataDetailImportButton().click();
@@ -3098,18 +2844,10 @@ test.describe('数据管理', () => {
   });
 
   test('134. 在数据管理-数据信息页，批量导入数据弹窗导入混合合法与非法行后不新增任一新数据', async ({ page, request }) => {
-    const { tableDataPage } = await openDataDetailWithSeedRow(
-      page,
-      request,
-      'db_data_import_mixed_',
-      'table_data_import_mixed_',
-    );
+    const { tableDataPage } = await openDataDetailWithSeedRow(page, request, 'db_data_import_mixed_', 'table_data_import_mixed_');
     const importedDeviceId = `device_import_mixed_valid_${Date.now()}`;
     const invalidDeviceId = `device_import_mixed_invalid_${Date.now()}`;
-    const filePath = createTempTextFile(
-      `table-data-import-mixed-${Date.now()}.csv`,
-      `time,device_id\n${Date.now() + 1000},${importedDeviceId}\ninvalid_time,${invalidDeviceId}`,
-    );
+    const filePath = createTempTextFile(`table-data-import-mixed-${Date.now()}.csv`, `time,device_id\n${Date.now() + 1000},${importedDeviceId}\ninvalid_time,${invalidDeviceId}`);
 
     try {
       await tableDataPage.dataDetailImportButton().click();
@@ -3181,12 +2919,7 @@ test.describe('数据管理', () => {
     }
   });
   test('137. 在数据管理-数据信息页，导出的 XLSX 文件可重新导入到新表并恢复数据', async ({ page, request }) => {
-    const { tableDataPage: sourceTableDataPage, deviceId } = await openDataDetailWithSeedRow(
-      page,
-      request,
-      'db_data_import_xlsx_source_',
-      'table_data_import_xlsx_source_',
-    );
+    const { tableDataPage: sourceTableDataPage, deviceId } = await openDataDetailWithSeedRow(page, request, 'db_data_import_xlsx_source_', 'table_data_import_xlsx_source_');
     let xlsxFilePath = '';
 
     try {
@@ -3198,12 +2931,7 @@ test.describe('数据管理', () => {
       const xlsxBuffer = await fetchBufferByOpenedUrl(page, xlsxUrl);
       xlsxFilePath = createTempBinaryFile(`table-data-roundtrip-${Date.now()}.xlsx`, xlsxBuffer);
 
-      const { tableDataPage: targetTableDataPage, tableName: targetTableName } = await createVisibleTableForNodeTests(
-        page,
-        request,
-        'db_data_import_xlsx_target_',
-        'table_data_import_xlsx_target_',
-      );
+      const { tableDataPage: targetTableDataPage, tableName: targetTableName } = await createVisibleTableForNodeTests(page, request, 'db_data_import_xlsx_target_', 'table_data_import_xlsx_target_');
 
       await targetTableDataPage.treeNodeByExactName(targetTableName).click();
       await targetTableDataPage.treeNodeMoreButtonByExactName(targetTableName).click();
@@ -3232,12 +2960,7 @@ test.describe('数据管理', () => {
   });
 
   test('138. 在数据管理-数据信息页，导入非法 XLSX 文件后不会新增数据', async ({ page, request }) => {
-    const { tableDataPage, deviceId } = await openDataDetailWithSeedRow(
-      page,
-      request,
-      'db_data_import_invalid_xlsx_',
-      'table_data_import_invalid_xlsx_',
-    );
+    const { tableDataPage, deviceId } = await openDataDetailWithSeedRow(page, request, 'db_data_import_invalid_xlsx_', 'table_data_import_invalid_xlsx_');
     const fakeXlsxPath = createTempBinaryFile(`table-data-invalid-${Date.now()}.xlsx`, Buffer.from('not-a-real-xlsx-file', 'utf8'));
 
     try {
@@ -3324,12 +3047,7 @@ test.describe('数据管理', () => {
       const csvText = (await fetchTextByOpenedUrl(page, csvUrl)).replace(/^\uFEFF/, '');
       csvFilePath = createTempTextFile(`table-structure-roundtrip-${Date.now()}.csv`, csvText);
 
-      const { tableDataPage: targetTableDataPage, databaseName: targetDatabaseName } = await openTableStructureDetail(
-        page,
-        request,
-        'db_table_import_csv_target_',
-        'table_import_csv_target_',
-      );
+      const { tableDataPage: targetTableDataPage, databaseName: targetDatabaseName } = await openTableStructureDetail(page, request, 'db_table_import_csv_target_', 'table_import_csv_target_');
 
       await targetTableDataPage.dataDetailImportButton().click();
       await expect(targetTableDataPage.importDialog()).toBeVisible();
@@ -3370,12 +3088,7 @@ test.describe('数据管理', () => {
       const xlsxBuffer = await fetchBufferByOpenedUrl(page, xlsxUrl);
       xlsxFilePath = createTempBinaryFile(`table-structure-roundtrip-${Date.now()}.xlsx`, xlsxBuffer);
 
-      const { tableDataPage: targetTableDataPage, databaseName: targetDatabaseName } = await openTableStructureDetail(
-        page,
-        request,
-        'db_table_import_xlsx_target_',
-        'table_import_xlsx_target_',
-      );
+      const { tableDataPage: targetTableDataPage, databaseName: targetDatabaseName } = await openTableStructureDetail(page, request, 'db_table_import_xlsx_target_', 'table_import_xlsx_target_');
 
       await targetTableDataPage.dataDetailImportButton().click();
       await expect(targetTableDataPage.importDialog()).toBeVisible();
@@ -3400,12 +3113,7 @@ test.describe('数据管理', () => {
   });
 
   test('144. 在数据管理-表结构详情页，导入非法 XLSX 文件后不会新增任何新表结构', async ({ page, request }) => {
-    const { tableDataPage, databaseName, tableName } = await openTableStructureDetail(
-      page,
-      request,
-      'db_table_import_invalid_xlsx_',
-      'table_import_invalid_xlsx_',
-    );
+    const { tableDataPage, databaseName, tableName } = await openTableStructureDetail(page, request, 'db_table_import_invalid_xlsx_', 'table_import_invalid_xlsx_');
     const fakeXlsxPath = createTempBinaryFile(`table-structure-invalid-${Date.now()}.xlsx`, Buffer.from('not-a-real-xlsx-file', 'utf8'));
 
     try {
@@ -3428,12 +3136,7 @@ test.describe('数据管理', () => {
   });
 
   test('145. 在数据管理-数据库结构详情页，选择 CSV 导出后可获取包含当前表与字段信息的导出内容', async ({ page, request }) => {
-    const { tableDataPage, tableName, columnName } = await openDatabaseStructureDetailWithTable(
-      page,
-      request,
-      'db_database_export_csv_',
-      'table_database_export_csv_',
-    );
+    const { tableDataPage, tableName, columnName } = await openDatabaseStructureDetailWithTable(page, request, 'db_database_export_csv_', 'table_database_export_csv_');
 
     await tableDataPage.databaseDetailExportButton().click();
     await expect(tableDataPage.exportDropdownMenu()).toBeVisible();
@@ -3482,12 +3185,7 @@ test.describe('数据管理', () => {
     await expect(tableDataPage.fieldErrorFor(tableDataPage.addTableColumnNameInput(0))).toHaveText(requiredFieldMessage);
   });
   test('148. 在数据管理-表结构详情页，按列名关键字筛选后清空搜索框，列名列表恢复完整展示', async ({ page, request }) => {
-    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(
-      page,
-      request,
-      'db_table_search_clear_',
-      'table_search_clear_',
-    );
+    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(page, request, 'db_table_search_clear_', 'table_search_clear_');
     const targetColumnName = `restore_name_${Date.now()}`;
     const otherColumnName = `restore_other_${Date.now()}`;
     const saveResponse = await saveColumnsByApi(page.context().request, databaseName, tableName, [
@@ -3539,12 +3237,7 @@ test.describe('数据管理', () => {
   });
 
   test('150. 在数据管理-表结构详情页，批量删除列名成功后取消勾选并将批量删除按钮恢复为禁用状态', async ({ page, request }) => {
-    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(
-      page,
-      request,
-      'db_table_batch_delete_reset_',
-      'table_batch_delete_reset_',
-    );
+    const { tableDataPage, databaseName, tableName } = await openExactTableStructureDetail(page, request, 'db_table_batch_delete_reset_', 'table_batch_delete_reset_');
     const firstColumnName = `field_reset_a_${Date.now()}`;
     const secondColumnName = `field_reset_b_${Date.now()}`;
     const saveResponse = await saveColumnsByApi(page.context().request, databaseName, tableName, [
@@ -3567,10 +3260,13 @@ test.describe('数据管理', () => {
 
     await expect(page.locator('.el-message--success').last()).toContainText(deleteSuccessMessage);
     await expect
-      .poll(async () => {
-        const columns = await getTableColumnsByApi(page.context().request, databaseName, tableName);
-        return [firstColumnName, secondColumnName].every((columnName) => !columns.some((item) => item.columnName === columnName));
-      }, { timeout: 20_000 })
+      .poll(
+        async () => {
+          const columns = await getTableColumnsByApi(page.context().request, databaseName, tableName);
+          return [firstColumnName, secondColumnName].every((columnName) => !columns.some((item) => item.columnName === columnName));
+        },
+        { timeout: 20_000 },
+      )
       .toBeTruthy();
     await expect(tableDataPage.batchDeleteButton()).toBeDisabled();
   });

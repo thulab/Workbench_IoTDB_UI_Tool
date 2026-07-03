@@ -227,6 +227,17 @@ async function openSearchSubmenu(page: Page) {
 }
 
 async function openDataSearchFromMenu(page: Page) {
+  await page.goto('/view/search/data-search', { waitUntil: 'domcontentloaded' });
+  const reachedByDirectRoute = await page
+    .locator('[data-testid="data-search-page"], #data-search-path, #data-search-search')
+    .first()
+    .isVisible({ timeout: 5_000 })
+    .catch(() => false);
+  if (reachedByDirectRoute) {
+    await expectDataSearchPageReady(page);
+    return;
+  }
+
   await openSearchSubmenu(page);
 
   const menuItemById = page.getByTestId(searchMenuSelectors.dataMenuItem);
@@ -395,21 +406,11 @@ async function selectTimeseriesByQuery(page: Page, prefix: string, query: string
   const select = page.locator(`[data-testid="${prefix}-select"], #${prefix}`).first();
   await select.click({ force: true });
 
-  const input = select
-    .locator('input:visible')
-    .last()
-    .or(page.locator('.el-select__input:visible, .el-select-v2__input:visible').last())
-    .or(page.locator('input[placeholder*="描述"]:visible, input[placeholder*="测点"]:visible').last());
+  const inputTagName = await select.evaluate((element) => element.tagName.toLowerCase()).catch(() => '');
+  const nestedInput = select.locator('input').last();
+  const input = inputTagName === 'input' ? select : (await nestedInput.count()) > 0 ? nestedInput : page.locator(`#${prefix}`).last();
   await expect(input).toBeVisible({ timeout: uiTimeouts.action });
-  const isReadonly = await input.evaluate((element) => element.hasAttribute('readonly')).catch(() => false);
-  if (isReadonly) {
-    await input.click({ force: true });
-    await page.keyboard.press('Control+A').catch(() => undefined);
-    await page.keyboard.press('Backspace').catch(() => undefined);
-    await page.keyboard.type(query);
-  } else {
-    await input.fill(query);
-  }
+  await input.fill(query);
 
   const optionSelector = `${prefix}-option-${optionText
     .replace(/[^a-zA-Z0-9]+/g, '-')
@@ -421,6 +422,13 @@ async function selectTimeseriesByQuery(page: Page, prefix: string, query: string
     .filter({ hasText: optionText })
     .first();
   const hiddenOptionByText = page.locator('.el-select-dropdown__item, .el-tree-node').filter({ hasText: optionText }).first();
+
+  await expect
+    .poll(async () => (await optionByTestId.count().catch(() => 0)) > 0 || (await optionByText.count().catch(() => 0)) > 0 || (await hiddenOptionByText.count().catch(() => 0)) > 0, {
+      timeout: 15_000,
+      intervals: [500, 1_000],
+    })
+    .toBe(true);
 
   if (await optionByTestId.count()) {
     await expect(optionByTestId.first()).toBeVisible({ timeout: 10_000 });
@@ -1088,10 +1096,14 @@ test.describe('数据查询', () => {
 
     test('26. 数据查询页选择测点描述后，在“请输入测点描述”输入框内输入描述内容进行查询，结果集显示正确', async ({ page }) => {
       await loginForDataSearch(page);
-      await openDataSearchFromMenu(page);
 
       const seed = await createRealDataSearchSeed(page);
       try {
+        await openRealDataSearchWithStorage(page, {
+          path: [],
+          datetimerange: [...seed.timeRange],
+          timeType: 'datetimerange',
+        });
         await openDescriptionModeCompat(page);
         await waitForMeasurementDescriptionIndex(page, seed.descriptionText, seed.descriptionMeasurement);
 

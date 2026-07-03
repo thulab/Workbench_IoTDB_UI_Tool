@@ -209,11 +209,11 @@ async function loginAndPrepareTempDatabase(page: Page, databaseName = `db_auto_$
   const databasePath = `root.${databaseName}`;
 
   await loginPage.goto();
-  await loginPage.login({
-    connectionName: localhostConnection.name,
-    password: localhostConnection.password,
+  await loginPage.selectConnectionByName(localhostConnection.name);
+  await loginPage.passwordInput().fill(localhostConnection.password);
+  await loginPage.submitAndExpectDashboardLanding(localhostConnection.name, `${localhostConnection.host}:${localhostConnection.port}`, {
+    maxAttempts: 3,
   });
-  await loginPage.expectDashboardLanding(localhostConnection.name, `${localhostConnection.host}:${localhostConnection.port}`);
 
   await page.evaluate(() => {
     window.localStorage.removeItem('measurementCols');
@@ -237,11 +237,11 @@ async function loginAndPrepareMeasurementList(page: Page) {
   const measurementPage = new MeasurementManagementPage(page);
 
   await loginPage.goto();
-  await loginPage.login({
-    connectionName: localhostConnection.name,
-    password: localhostConnection.password,
+  await loginPage.selectConnectionByName(localhostConnection.name);
+  await loginPage.passwordInput().fill(localhostConnection.password);
+  await loginPage.submitAndExpectDashboardLanding(localhostConnection.name, `${localhostConnection.host}:${localhostConnection.port}`, {
+    maxAttempts: 3,
   });
-  await loginPage.expectDashboardLanding(localhostConnection.name, `${localhostConnection.host}:${localhostConnection.port}`);
 
   await page.evaluate(() => {
     window.localStorage.removeItem('measurementCols');

@@ -65,11 +65,7 @@ export class TableDataPage {
   }
 
   addDatabaseNameTooltipIcon() {
-    return this.addDatabaseDialog()
-      .locator('.el-form-item')
-      .filter({ has: this.addDatabaseNameInput() })
-      .locator('svg')
-      .first();
+    return this.addDatabaseDialog().locator('.el-form-item').filter({ has: this.addDatabaseNameInput() }).locator('svg').first();
   }
 
   addDatabaseTtlInput() {
@@ -272,7 +268,9 @@ export class TableDataPage {
   }
 
   dataDetailInsertButton() {
-    return this.detailPanel().getByRole('button', { name: /数据插入/ }).first();
+    return this.detailPanel()
+      .getByRole('button', { name: /数据插入/ })
+      .first();
   }
 
   dataDetailImportButton() {
@@ -308,7 +306,9 @@ export class TableDataPage {
   }
 
   editableDataRow() {
-    return this.dataRows().filter({ has: this.page.locator('input') }).last();
+    return this.dataRows()
+      .filter({ has: this.page.locator('input') })
+      .last();
   }
 
   editableDataRowInputs() {
@@ -427,20 +427,11 @@ export class TableDataPage {
   }
 
   treeNodeMoreButtonByName(name: string) {
-    return this.sidePanel()
-      .locator('.node-text')
-      .filter({ hasText: name })
-      .first()
-      .locator('xpath=ancestor::*[contains(@class,"el-tree-node__content")][1]')
-      .locator('.lang-icon')
-      .first();
+    return this.sidePanel().locator('.node-text').filter({ hasText: name }).first().locator('xpath=ancestor::*[contains(@class,"el-tree-node__content")][1]').locator('.lang-icon').first();
   }
 
   treeNodeMoreButtonByExactName(name: string) {
-    return this.treeNodeByExactName(name)
-      .locator('xpath=ancestor::*[contains(@class,"el-tree-node__content")][1]')
-      .locator('.lang-icon')
-      .first();
+    return this.treeNodeByExactName(name).locator('xpath=ancestor::*[contains(@class,"el-tree-node__content")][1]').locator('.lang-icon').first();
   }
 
   treeNodeExpandButtonByName(name: string) {
@@ -454,10 +445,7 @@ export class TableDataPage {
   }
 
   treeNodeExpandButtonByExactName(name: string) {
-    return this.treeNodeByExactName(name)
-      .locator('xpath=ancestor::*[contains(@class,"el-tree-node__content")][1]')
-      .locator('.el-tree-node__expand-icon')
-      .first();
+    return this.treeNodeByExactName(name).locator('xpath=ancestor::*[contains(@class,"el-tree-node__content")][1]').locator('.el-tree-node__expand-icon').first();
   }
 
   dropdownMenu() {
@@ -504,13 +492,30 @@ export class TableDataPage {
   }
 
   async gotoViaMenu() {
-    await this.menuItem().click();
-    const navigated = await this.page.waitForURL(/\/view\/table-data\/detail/, { timeout: 10_000 }).then(() => true).catch(() => false);
-    if (!navigated) {
-      await this.page.goto('/view/table-data/detail', { waitUntil: 'domcontentloaded' });
-      await expect(this.page).toHaveURL(/\/view\/table-data\/detail/, { timeout: uiTimeouts.pageReady });
+    let lastError: unknown;
+
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      try {
+        await this.menuItem().click();
+        const navigated = await this.page
+          .waitForURL(/\/view\/table-data\/detail/, { timeout: 10_000 })
+          .then(() => true)
+          .catch(() => false);
+        if (!navigated) {
+          await this.page.goto('/view/table-data/detail', { waitUntil: 'domcontentloaded' });
+        }
+        await expect(this.page).toHaveURL(/\/view\/table-data\/detail/, { timeout: uiTimeouts.pageReady });
+        await this.expectVisible();
+        return;
+      } catch (error) {
+        lastError = error;
+        if (attempt < 3) {
+          await this.page.waitForTimeout(1_500);
+        }
+      }
     }
-    await this.expectVisible();
+
+    throw lastError;
   }
 
   async expectVisible() {

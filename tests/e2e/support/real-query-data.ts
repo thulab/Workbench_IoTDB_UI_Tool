@@ -92,11 +92,7 @@ type QuerySqlEnvelope = {
   }>;
 };
 
-const realTemporaryDatabasePrefixes = [
-  'root.test_query_',
-  'root.test_csv_',
-  'root.test_xlsx_',
-] as const;
+const realTemporaryDatabasePrefixes = ['root.test_query_', 'root.test_csv_', 'root.test_xlsx_'] as const;
 
 export async function ensureRealQueryConnection(request: APIRequestContext) {
   await ensureStandaloneConnectionExists(request, localhostConnection);
@@ -109,31 +105,44 @@ export async function cleanupRealQueryConnection(request: APIRequestContext) {
 export async function loginToRealWorkbench(page: Page) {
   const loginPage = new LoginPage(page);
   await loginPage.goto();
-  await loginPage.login({
-    connectionName: localhostConnection.name,
-    username: localhostConnection.username,
-    password: localhostConnection.password,
+  await loginPage.selectConnectionByName(localhostConnection.name);
+  await loginPage.userInput().fill(localhostConnection.username);
+  await loginPage.passwordInput().fill(localhostConnection.password);
+  await loginPage.submitAndExpectDashboardLanding(localhostConnection.name, `${localhostConnection.host}:${localhostConnection.port}`, {
+    maxAttempts: 3,
   });
 
   await expect(page.locator('html')).toHaveAttribute('lang', /zh-cn/i);
-  await loginPage.expectDashboardLanding(localhostConnection.name, `${localhostConnection.host}:${localhostConnection.port}`);
+}
+
+function parseQuerySqlEnvelope(rawText: string) {
+  if (!rawText) {
+    return {} as QuerySqlEnvelope;
+  }
+
+  try {
+    return JSON.parse(rawText) as QuerySqlEnvelope;
+  } catch {
+    return {} as QuerySqlEnvelope;
+  }
 }
 
 export async function runSqlsInWorkbenchSession(page: Page, sqls: string[]) {
-  return await page.evaluate(async ({ statements }) => {
-    const response = await fetch('/api/query/querySql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sqls: statements,
-        timestamp: Date.now(),
-      }),
-    });
+  const response = await page.context().request.post('/api/query/querySql', {
+    data: {
+      sqls,
+      timestamp: Date.now(),
+    },
+    timeout: 30_000,
+  });
 
-    return await response.json();
-  }, { statements: sqls }) as QuerySqlEnvelope;
+  const rawText = await response.text();
+  const payload = parseQuerySqlEnvelope(rawText);
+  if (!response.ok()) {
+    throw new Error(`Failed to execute SQLs in Workbench session: HTTP ${response.status()} ${payload.message || rawText || 'unknown error'}`);
+  }
+
+  return payload;
 }
 
 function readQueryValueListRows(payload: QuerySqlEnvelope) {
@@ -142,8 +151,7 @@ function readQueryValueListRows(payload: QuerySqlEnvelope) {
 
 async function listRealDatabasesInWorkbenchSession(page: Page) {
   const response = await runSqlsInWorkbenchSession(page, ['show databases']);
-  const failed = (typeof response.success === 'boolean' && response.success === false)
-    || (typeof response.code === 'number' && response.code !== 0);
+  const failed = (typeof response.success === 'boolean' && response.success === false) || (typeof response.code === 'number' && response.code !== 0);
   if (failed) {
     throw new Error(`Failed to list databases: ${response.message || 'unknown error'}`);
   }
@@ -162,9 +170,7 @@ export async function cleanupRealTemporaryQueryDatabases(page: Page) {
     databases = await listRealDatabasesInWorkbenchSession(page);
   }
 
-  const targetDatabases = databases.filter((database) =>
-    realTemporaryDatabasePrefixes.some((prefix) => database.startsWith(prefix)),
-  );
+  const targetDatabases = databases.filter((database) => realTemporaryDatabasePrefixes.some((prefix) => database.startsWith(prefix)));
   if (!targetDatabases.length) {
     return;
   }
@@ -188,30 +194,20 @@ export async function cleanupRealQuerySeedData(page: Page) {
 export async function ensureRealQuerySeedData(page: Page) {
   await cleanupRealQuerySeedData(page);
 
-  const insertSqls = realQuerySeed.points.map((point) =>
-    `insert into ${realQuerySeed.device}(timestamp,s1,s2) values (${point.timestamp},${point.s1},${point.s2})`,
-  );
-  const setupSqls = [
-    `create database ${realQuerySeed.database}`,
-    ...insertSqls,
-  ];
+  const insertSqls = realQuerySeed.points.map((point) => `insert into ${realQuerySeed.device}(timestamp,s1,s2) values (${point.timestamp},${point.s1},${point.s2})`);
+  const setupSqls = [`create database ${realQuerySeed.database}`, ...insertSqls];
 
   const setupResponse = await runSqlsInWorkbenchSession(page, setupSqls);
-  const setupFailed = (typeof setupResponse.success === 'boolean' && setupResponse.success === false)
-    || (typeof setupResponse.code === 'number' && setupResponse.code !== 0);
+  const setupFailed = (typeof setupResponse.success === 'boolean' && setupResponse.success === false) || (typeof setupResponse.code === 'number' && setupResponse.code !== 0);
   if (setupFailed) {
     throw new Error(`Failed to initialize query seed data: ${setupResponse.message || 'unknown error'}`);
   }
 
-  const verifyResponse = await runSqlsInWorkbenchSession(page, [
-    `select s1,s2 from ${realQuerySeed.device} limit ${realQuerySeed.points.length}`,
-  ]);
+  const verifyResponse = await runSqlsInWorkbenchSession(page, [`select s1,s2 from ${realQuerySeed.device} limit ${realQuerySeed.points.length}`]);
 
   const result = verifyResponse.data?.[0];
-  const verifyFailed = (typeof verifyResponse.success === 'boolean' && verifyResponse.success === false)
-    || (typeof verifyResponse.code === 'number' && verifyResponse.code !== 0)
-    || result?.status === false
-    || !result;
+  const verifyFailed =
+    (typeof verifyResponse.success === 'boolean' && verifyResponse.success === false) || (typeof verifyResponse.code === 'number' && verifyResponse.code !== 0) || result?.status === false || !result;
   if (verifyFailed) {
     throw new Error(`Failed to verify query seed data: ${result?.errMsg || verifyResponse.message || 'unknown error'}`);
   }

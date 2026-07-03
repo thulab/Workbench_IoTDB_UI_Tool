@@ -355,7 +355,7 @@ test.describe('实例管理', () => {
       await instancePage.expectVisible();
       await instancePage.createStandaloneConnection({ name: instanceName });
       await instancePage.refreshList();
-      await expect(instancePage.list()).toContainText(instanceName);
+      await expect(instancePage.itemByName(instanceName)).toBeVisible({ timeout: 15_000 });
       await instancePage.close();
     });
 
@@ -427,7 +427,7 @@ test.describe('实例管理', () => {
         .toBe(updatedName);
 
       await instancePage.refreshList();
-      await expect(instancePage.list()).toContainText(updatedName);
+      await expect(instancePage.itemByName(updatedName)).toBeVisible({ timeout: 15_000 });
       await instancePage.itemByName(updatedName).click();
       await expect(instancePage.connectionNameInput()).toHaveValue(updatedName);
       await expect(instancePage.hostInput()).toHaveValue('127.0.0.2');

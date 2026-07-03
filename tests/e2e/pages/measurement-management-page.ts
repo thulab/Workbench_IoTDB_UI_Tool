@@ -2019,87 +2019,79 @@ export class MeasurementManagementPage {
   }
 
   async createDatabaseByApi(databaseName: string) {
-    const result = await this.page.evaluate(async (name) => {
-      const groupName = `root.${name}`;
-      const response = await fetch('/api/schema/saveDatabase', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          groupName,
-          database: groupName,
-          ttlUnit: 'day',
-        }),
-      });
-      const rawText = await response.text();
-      let payload: Record<string, unknown> = {};
-      if (rawText) {
-        try {
-          payload = JSON.parse(rawText) as Record<string, unknown>;
-        } catch {
-          payload = {};
-        }
+    const groupName = `root.${databaseName}`;
+    const response = await this.page.context().request.post('/api/schema/saveDatabase', {
+      data: {
+        groupName,
+        database: groupName,
+        ttlUnit: 'day',
+      },
+      timeout: 30_000,
+    });
+    const rawText = await response.text();
+    let payload: Record<string, unknown> = {};
+    if (rawText) {
+      try {
+        payload = JSON.parse(rawText) as Record<string, unknown>;
+      } catch {
+        payload = {};
       }
-      return {
-        ok: response.ok,
-        code: Number(payload?.code ?? (response.ok ? 0 : -1)),
-        message: String(payload?.message ?? ''),
-      };
-    }, databaseName);
+    }
+    const result = {
+      ok: response.ok(),
+      code: Number(payload?.code ?? (response.ok() ? 0 : -1)),
+      message: String(payload?.message ?? ''),
+    };
 
     expect(result.ok).toBe(true);
     expect(result.code).toBe(0);
   }
 
   async deleteDatabaseByApi(databaseName: string) {
-    const result = await this.page.evaluate(async (name) => {
-      const groupName = `root.${name}`;
-      const response = await fetch(`/api/schema/deleteDatabase?groupName=${encodeURIComponent(groupName)}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
-      const rawText = await response.text();
-      let payload: Record<string, unknown> = {};
-      if (rawText) {
-        try {
-          payload = JSON.parse(rawText) as Record<string, unknown>;
-        } catch {
-          payload = {};
-        }
+    const groupName = `root.${databaseName}`;
+    const response = await this.page.context().request.delete('/api/schema/deleteDatabase', {
+      params: {
+        groupName,
+      },
+      timeout: 30_000,
+    });
+    const rawText = await response.text();
+    let payload: Record<string, unknown> = {};
+    if (rawText) {
+      try {
+        payload = JSON.parse(rawText) as Record<string, unknown>;
+      } catch {
+        payload = {};
       }
-      return {
-        ok: response.ok,
-        code: Number(payload?.code ?? (response.ok ? 0 : -1)),
-        message: String(payload?.message ?? ''),
-      };
-    }, databaseName);
+    }
+    const result = {
+      ok: response.ok(),
+      code: Number(payload?.code ?? (response.ok() ? 0 : -1)),
+      message: String(payload?.message ?? ''),
+    };
 
     expect(result.ok).toBe(true);
     expect(result.code).toBe(0);
   }
 
   async listDatabasePathsByApi(pageNum = 1, pageSize = 200) {
-    return this.page.evaluate(
-      async ({ currentPage, size }) => {
-        const response = await fetch(`/api/schema/getDatabases?pageNum=${currentPage}&pageSize=${size}`, {
-          method: 'GET',
-          credentials: 'include',
-        });
-        const rawText = await response.text();
-        let payload: DatabasePathsApiPayload = {};
-        if (rawText) {
-          try {
-            payload = JSON.parse(rawText) as DatabasePathsApiPayload;
-          } catch {
-            payload = {};
-          }
-        }
-        return Array.isArray(payload?.data?.pathNames) ? payload.data.pathNames : [];
+    const response = await this.page.context().request.get('/api/schema/getDatabases', {
+      params: {
+        pageNum,
+        pageSize,
       },
-      { currentPage: pageNum, size: pageSize },
-    ) as Promise<string[]>;
+      timeout: 30_000,
+    });
+    const rawText = await response.text();
+    let payload: DatabasePathsApiPayload = {};
+    if (rawText) {
+      try {
+        payload = JSON.parse(rawText) as DatabasePathsApiPayload;
+      } catch {
+        payload = {};
+      }
+    }
+    return Array.isArray(payload?.data?.pathNames) ? payload.data.pathNames : [];
   }
 
   async cleanupDatabasesByPrefixApi(prefix: string) {

@@ -363,17 +363,37 @@ async function ensureCalculateSeedData(page: Page) {
   await cleanupCreatedViews(page).catch(() => undefined);
   await cleanupCalculateSeedData(page).catch(() => undefined);
 
-  const sqls = [
+  const createDatabaseResponse = await runSqlsInWorkbenchSession(page, [`create database ${calculateSeed.database}`]);
+  const createDatabaseFailed =
+    (typeof createDatabaseResponse.success === 'boolean' && createDatabaseResponse.success === false) ||
+    (typeof createDatabaseResponse.code === 'number' && createDatabaseResponse.code !== 0) ||
+    createDatabaseResponse.data?.some((item) => item.status === false);
+  if (createDatabaseFailed) {
+    throw new Error(`Failed to create calculate seed database: ${createDatabaseResponse.message || createDatabaseResponse.data?.find((item) => item.status === false)?.errMsg || 'unknown error'}`);
+  }
+
+  const insertSqls = [
     `create database ${calculateSeed.database}`,
     `insert into ${calculateSeed.device}(timestamp,s1,s2) values (1713801600000,42.5,40.1)`,
     `insert into ${calculateSeed.device}(timestamp,s1,s2) values (1713801660000,43.1,41.6)`,
     `insert into ${calculateSeed.device}(timestamp,s1,s2) values (1713801720000,43.8,42.2)`,
   ];
-  const response = await runSqlsInWorkbenchSession(page, sqls);
+  insertSqls.shift();
+
+  const response = await runSqlsInWorkbenchSession(page, insertSqls);
   const failed =
     (typeof response.success === 'boolean' && response.success === false) || (typeof response.code === 'number' && response.code !== 0) || response.data?.some((item) => item.status === false);
   if (failed) {
     throw new Error(`Failed to initialize calculate seed data: ${response.message || response.data?.find((item) => item.status === false)?.errMsg || 'unknown error'}`);
+  }
+
+  const verifyResponse = await runSqlsInWorkbenchSession(page, [`select s1,s2 from ${calculateSeed.device} limit 3`]);
+  const verifyFailed =
+    (typeof verifyResponse.success === 'boolean' && verifyResponse.success === false) ||
+    (typeof verifyResponse.code === 'number' && verifyResponse.code !== 0) ||
+    verifyResponse.data?.some((item) => item.status === false);
+  if (verifyFailed) {
+    throw new Error(`Failed to verify calculate seed data: ${verifyResponse.message || verifyResponse.data?.find((item) => item.status === false)?.errMsg || 'unknown error'}`);
   }
 }
 
@@ -390,50 +410,39 @@ async function cleanupImportedViews(page: Page) {
 }
 
 async function cleanupViewsByMeasurementPrefixes(page: Page, measurementPrefixes: string[]) {
-  await page.evaluate(
-    async ({ prefixes }) => {
-      const listResponse = await fetch('/api/calculate/getCalculateList', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          pageNum: 1,
-          pageSize: 200,
-          name: '',
-          measurement: '',
-          desc: '',
-        }),
-      });
-
-      if (!listResponse.ok) {
-        return;
-      }
-
-      const listPayload = (await listResponse.json()) as {
-        data?: {
-          list?: Array<{
-            measurement?: string;
-          }>;
-        };
-      };
-
-      const measurements = (listPayload.data?.list || []).map((item) => item.measurement || '').filter((measurement) => prefixes.some((prefix: string) => measurement.startsWith(prefix)));
-
-      if (!measurements.length) {
-        return;
-      }
-
-      await fetch('/api/calculate/deleteCalculate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ measurements }),
-      });
+  const listResponse = await page.context().request.post('/api/calculate/getCalculateList', {
+    data: {
+      pageNum: 1,
+      pageSize: 200,
+      name: '',
+      measurement: '',
+      desc: '',
     },
-    { prefixes: measurementPrefixes },
-  );
+    timeout: 20_000,
+  });
+
+  if (!listResponse.ok()) {
+    return;
+  }
+
+  const listPayload = (await listResponse.json()) as {
+    data?: {
+      list?: Array<{
+        measurement?: string;
+      }>;
+    };
+  };
+
+  const measurements = (listPayload.data?.list || []).map((item) => item.measurement || '').filter((measurement) => measurementPrefixes.some((prefix) => measurement.startsWith(prefix)));
+
+  if (!measurements.length) {
+    return;
+  }
+
+  await page.context().request.post('/api/calculate/deleteCalculate', {
+    data: { measurements },
+    timeout: 20_000,
+  });
 }
 
 async function openCreateViewDialog(page: Page) {
@@ -479,26 +488,20 @@ async function createViewByDialog(page: Page, draft: { name: string; description
 }
 
 async function createViewByApi(page: Page, draft: { name: string; description?: string; measurement: string; expression: string }) {
-  const response = await page.evaluate(
-    async ({ payload }) => {
-      const res = await fetch('/api/calculate/addCalculate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-      return res.json();
+  const request = await page.context().request.post('/api/calculate/addCalculate', {
+    data: {
+      name: draft.name,
+      desc: draft.description || '',
+      measurement: `root.${draft.measurement}`,
+      expression: draft.expression,
     },
-    {
-      payload: {
-        name: draft.name,
-        desc: draft.description || '',
-        measurement: `root.${draft.measurement}`,
-        expression: draft.expression,
-      },
-    },
-  );
+    timeout: 20_000,
+  });
+  const response = (await request.json()) as {
+    success?: boolean;
+    code?: number;
+    message?: string;
+  };
 
   const failed = (typeof response?.success === 'boolean' && response.success === false) || (typeof response?.code === 'number' && response.code !== 0);
   if (failed) {

@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import { feedbackSelectors, instanceManagementSelectors, uiTimeouts } from '../support/e2e-selectors';
 import { localhostConnection } from '../support/runtime-config';
 
@@ -66,7 +66,7 @@ export class InstanceManagementPage {
   }
 
   connectionInfoTooltipIcon() {
-    return this.connectionInfoLabel().locator('svg').first();
+    return this.connectionInfoLabel().locator('i-custom-question, i-custom-question-new, svg, i').first();
   }
 
   prometheusUrlInput() {
@@ -74,28 +74,23 @@ export class InstanceManagementPage {
   }
 
   prometheusSection() {
-    return this.form()
-      .locator('.el-form-item')
-      .filter({
-        has: this.form().locator(instanceManagementSelectors.prometheusUrl),
-      })
-      .first();
+    return this.prometheusUrlInput().locator('xpath=ancestor::*[contains(@class,"el-form-item")][1]').first();
   }
 
   prometheusTooltipIcon() {
-    return this.prometheusSection().locator('svg').first();
+    return this.prometheusSection().locator('i-custom-question, i-custom-question-new, svg, i').first();
   }
 
   prometheusAuthToggle() {
-    return this.form().locator(instanceManagementSelectors.prometheusAuth).first();
+    return this.prometheusSection().locator(instanceManagementSelectors.prometheusAuth).or(this.prometheusSection().locator('.el-switch').first()).first();
   }
 
   prometheusUsernameInput() {
-    return this.form().locator(instanceManagementSelectors.prometheusUsername).first();
+    return this.form().locator('input[placeholder="请输入Prometheus用户名"], input[placeholder="prometheus username"]').first();
   }
 
   prometheusPasswordInput() {
-    return this.form().locator(instanceManagementSelectors.prometheusPassword).first();
+    return this.form().locator('input[placeholder="请输入Prometheus密码"], input[placeholder="prometheus password"]').first();
   }
 
   standaloneType() {
@@ -103,12 +98,7 @@ export class InstanceManagementPage {
   }
 
   defaultModelSection() {
-    return this.form()
-      .locator('.el-form-item')
-      .filter({
-        has: this.form().locator('.el-radio').filter({ hasText: '\u8868\u6A21\u578B' }),
-      })
-      .first();
+    return this.defaultTreeModel().locator('xpath=ancestor::*[contains(@class,"el-form-item")][1]').first();
   }
 
   defaultTreeModel() {
@@ -120,7 +110,7 @@ export class InstanceManagementPage {
   }
 
   defaultModelTooltipIcon() {
-    return this.defaultModelSection().locator('svg').first();
+    return this.defaultModelSection().locator('i-custom-question, i-custom-question-new, svg, i').first();
   }
 
   validationErrors() {
@@ -175,11 +165,38 @@ export class InstanceManagementPage {
         .catch(() => undefined);
     }
 
-    if (await this.modal().isVisible().catch(() => false)) {
-      await this.page.locator(instanceManagementSelectors.modalCloseButton).click({ force: true }).catch(() => undefined);
+    if (
+      await this.modal()
+        .isVisible()
+        .catch(() => false)
+    ) {
+      await this.page
+        .locator(instanceManagementSelectors.modalCloseButton)
+        .click({ force: true })
+        .catch(() => undefined);
     }
 
     await expect(this.modal()).toBeHidden();
+  }
+
+  private async fillInputWithRetry(input: Locator, value: string) {
+    const editableInput = input.locator('input:not([type="hidden"]), textarea').first();
+    const target = ((await editableInput.count().catch(() => 0)) > 0 ? editableInput : input).first();
+
+    await target.click({ force: true });
+    await target.press('Control+A').catch(() => undefined);
+    await target.fill(value);
+    await expect.poll(async () => await target.inputValue().catch(() => '')).toBe(value);
+  }
+
+  private async isSwitchChecked(toggle: Locator) {
+    const switchInput = toggle.locator('.el-switch__input').first();
+    const checkedFromInput = await switchInput.getAttribute('aria-checked').catch(() => null);
+    if (checkedFromInput !== null) {
+      return checkedFromInput === 'true';
+    }
+
+    return (await toggle.getAttribute('aria-checked').catch(() => 'false')) === 'true';
   }
 
   fieldErrorForInput(input: ReturnType<InstanceManagementPage['connectionNameInput']>) {
@@ -187,49 +204,53 @@ export class InstanceManagementPage {
   }
 
   async fillStandaloneConnection(options: { name: string; host: string; port: string; username?: string; password?: string }) {
-    await this.connectionNameInput().fill(options.name);
-    await this.hostInput().fill(options.host);
-    await this.portInput().fill(options.port);
-    await this.usernameInput().fill(options.username ?? 'root');
+    await this.fillInputWithRetry(this.connectionNameInput(), options.name);
+    await this.fillInputWithRetry(this.hostInput(), options.host);
+    await this.fillInputWithRetry(this.portInput(), options.port);
+    await this.fillInputWithRetry(this.usernameInput(), options.username ?? 'root');
     if (options.password !== undefined) {
-      await this.passwordInput().fill(options.password);
+      await this.fillInputWithRetry(this.passwordInput(), options.password);
     }
   }
 
   async fillPrometheusCredentials(username: string, password: string) {
     const authToggle = this.prometheusAuthToggle();
-    const checked = await authToggle
-      .locator('input')
-      .isChecked()
-      .catch(() => false);
+    await expect(authToggle).toBeVisible({ timeout: uiTimeouts.action });
+    const checked = await this.isSwitchChecked(authToggle);
     if (!checked) {
-      await authToggle.click();
+      await authToggle.click({ force: true });
     }
-    await this.prometheusUsernameInput().fill(username);
-    await this.prometheusPasswordInput().fill(password);
+    await expect(this.prometheusUsernameInput()).toBeVisible({ timeout: uiTimeouts.action });
+    await expect(this.prometheusPasswordInput()).toBeVisible({ timeout: uiTimeouts.action });
+    await this.fillInputWithRetry(this.prometheusUsernameInput(), username);
+    await this.fillInputWithRetry(this.prometheusPasswordInput(), password);
   }
 
   async fillPrometheusConfig(options: { url?: string; username?: string; password?: string }) {
     if (options.url !== undefined) {
-      await this.prometheusUrlInput().fill(options.url);
+      await this.fillInputWithRetry(this.prometheusUrlInput(), options.url);
     }
 
     if (options.username !== undefined || options.password !== undefined) {
       const authToggle = this.prometheusAuthToggle();
-      const checked = await authToggle
-        .locator('input')
-        .isChecked()
-        .catch(() => false);
+      await expect(authToggle).toBeVisible({ timeout: uiTimeouts.action });
+      const checked = await this.isSwitchChecked(authToggle);
       if (!checked) {
-        await authToggle.click();
+        await authToggle.click({ force: true });
+      }
+      if (options.username !== undefined) {
+        await expect(this.prometheusUsernameInput()).toBeVisible({ timeout: uiTimeouts.action });
+      }
+      if (options.password !== undefined) {
+        await expect(this.prometheusPasswordInput()).toBeVisible({ timeout: uiTimeouts.action });
       }
     }
 
     if (options.username !== undefined) {
-      await this.prometheusUsernameInput().fill(options.username);
+      await this.fillInputWithRetry(this.prometheusUsernameInput(), options.username);
     }
     if (options.password !== undefined) {
-      await this.prometheusPasswordInput().fill(options.password);
+      await this.fillInputWithRetry(this.prometheusPasswordInput(), options.password);
     }
   }
 
@@ -285,7 +306,6 @@ export class InstanceManagementPage {
     await this.expectLatestToast('success');
     await this.clickPrimaryAction('save');
     await this.expectLatestToast('success');
-    await expect(this.list()).toContainText(options.name);
   }
 
   async search(keyword: string) {
