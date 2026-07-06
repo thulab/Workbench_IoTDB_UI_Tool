@@ -5,6 +5,10 @@ import { localhostConnection } from '../support/runtime-config';
 export class InstanceManagementPage {
   constructor(private readonly page: Page) {}
 
+  private formItemAncestor(locator: Locator) {
+    return locator.locator('xpath=ancestor::*[contains(concat(" ", normalize-space(@class), " "), " el-form-item ")][1]').first();
+  }
+
   modal() {
     return this.page.locator(instanceManagementSelectors.modal).first();
   }
@@ -66,7 +70,7 @@ export class InstanceManagementPage {
   }
 
   connectionInfoTooltipIcon() {
-    return this.connectionInfoLabel().locator('i-custom-question, i-custom-question-new, svg, i').first();
+    return this.connectionInfoLabel().locator('.el-tooltip__trigger, [class*="tooltip"]').first().or(this.connectionInfoLabel().locator('svg').first());
   }
 
   prometheusUrlInput() {
@@ -74,11 +78,14 @@ export class InstanceManagementPage {
   }
 
   prometheusSection() {
-    return this.prometheusUrlInput().locator('xpath=ancestor::*[contains(@class,"el-form-item")][1]').first();
+    return this.formItemAncestor(this.prometheusUrlInput());
   }
 
   prometheusTooltipIcon() {
-    return this.prometheusSection().locator('i-custom-question, i-custom-question-new, svg, i').first();
+    return this.prometheusSection()
+      .locator('.el-form-item__label .el-tooltip__trigger, .el-form-item__label [class*="tooltip"]')
+      .first()
+      .or(this.prometheusSection().locator('.el-form-item__label svg').first());
   }
 
   prometheusAuthToggle() {
@@ -98,7 +105,7 @@ export class InstanceManagementPage {
   }
 
   defaultModelSection() {
-    return this.defaultTreeModel().locator('xpath=ancestor::*[contains(@class,"el-form-item")][1]').first();
+    return this.formItemAncestor(this.defaultTreeModel());
   }
 
   defaultTreeModel() {
@@ -110,7 +117,10 @@ export class InstanceManagementPage {
   }
 
   defaultModelTooltipIcon() {
-    return this.defaultModelSection().locator('i-custom-question, i-custom-question-new, svg, i').first();
+    return this.defaultModelSection()
+      .locator('.el-form-item__label .el-tooltip__trigger, .el-form-item__label [class*="tooltip"]')
+      .first()
+      .or(this.defaultModelSection().locator('.el-form-item__label svg').first());
   }
 
   validationErrors() {
@@ -122,7 +132,7 @@ export class InstanceManagementPage {
   }
 
   confirmDialog() {
-    return this.page.locator(instanceManagementSelectors.confirmDialog);
+    return this.page.locator('.el-message-box:visible, .el-overlay-message-box:visible .el-message-box').last();
   }
 
   tooltipPopper() {
@@ -286,7 +296,9 @@ export class InstanceManagementPage {
   }
 
   async expectTooltipContains(text: string) {
-    await expect(this.page.getByText(text, { exact: false }).last()).toBeVisible({ timeout: uiTimeouts.action });
+    const tooltip = this.page.locator('.el-popper[role="tooltip"]:visible, .el-tooltip__popper:visible, .el-popper.is-light:visible').filter({ hasText: text }).last();
+    await expect(tooltip).toBeVisible({ timeout: uiTimeouts.action });
+    await expect(tooltip).toContainText(text, { timeout: uiTimeouts.action });
   }
 
   tooltipLinkByText(text: string) {

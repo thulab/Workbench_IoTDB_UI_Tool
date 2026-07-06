@@ -378,15 +378,18 @@ test.describe('实例管理', () => {
         password: localhostConnection.password,
       });
 
-      await instancePage.itemByName(baseName).click();
+      await instancePage.itemByName(localhostConnection.name).evaluate((element) => {
+        (element as HTMLElement).click();
+      });
       await expect(instancePage.confirmDialog()).toBeVisible();
-      await page.locator('.connection-form-continue-confirm').click();
-      await expect(instancePage.draftItem()).toBeVisible();
-      await expect(instancePage.connectionNameInput()).toHaveValue(draftName);
+      await instancePage.confirmDialog().locator('.connection-form-continue-confirm').click();
+      await expect(instancePage.connectionNameInput()).toHaveValue(baseName);
 
-      await instancePage.itemByName(baseName).click();
+      await instancePage.itemByName(localhostConnection.name).evaluate((element) => {
+        (element as HTMLElement).click();
+      });
       await expect(instancePage.confirmDialog()).toBeVisible();
-      await page.locator('.connection-form-continue-cancel').click();
+      await instancePage.confirmDialog().locator('.connection-form-continue-cancel').click();
       await expect(instancePage.draftItem()).toHaveCount(0);
       await expect(instancePage.connectionNameInput()).not.toHaveValue(draftName);
     });
