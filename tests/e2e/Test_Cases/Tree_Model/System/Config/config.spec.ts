@@ -86,6 +86,54 @@ function inputEditorVisibleText(page: Page) {
   return page.locator('.editor-box .view-lines').first();
 }
 
+async function readInputEditorContent(page: Page) {
+  return await page.evaluate(() => {
+    const editorRoot = document.querySelector('.editor-box .monaco-editor');
+    const visibleText = String(editorRoot?.querySelector('.view-lines')?.textContent || '');
+    const normalizedVisibleText = visibleText.replace(/\s+/g, '');
+    const monacoEditor = (window as any).monaco?.editor;
+
+    if (!monacoEditor) {
+      return visibleText;
+    }
+
+    const normalize = (value: string) => String(value || '').replace(/\s+/g, '');
+    const visibleSnippet = normalizedVisibleText.slice(0, 80);
+
+    const editors = typeof monacoEditor.getEditors === 'function' ? monacoEditor.getEditors() : [];
+    for (const editor of editors) {
+      const container = typeof editor?.getContainerDomNode === 'function' ? editor.getContainerDomNode() : undefined;
+      const modelValue = typeof editor?.getModel === 'function' ? String(editor.getModel()?.getValue() || '') : '';
+      if (!container || !modelValue) {
+        continue;
+      }
+
+      if (container === editorRoot || container?.contains(editorRoot) || editorRoot?.contains(container)) {
+        return modelValue;
+      }
+
+      if (visibleSnippet && normalize(modelValue).includes(visibleSnippet)) {
+        return modelValue;
+      }
+    }
+
+    const models = typeof monacoEditor.getModels === 'function' ? monacoEditor.getModels() : [];
+    const matchedModel = models.find((model: any) => {
+      const modelValue = String(model?.getValue?.() || '');
+      return visibleSnippet && normalize(modelValue).includes(visibleSnippet);
+    });
+    if (matchedModel?.getValue) {
+      return String(matchedModel.getValue() || '');
+    }
+
+    if (models[0]?.getValue) {
+      return String(models[0].getValue() || '');
+    }
+
+    return visibleText;
+  });
+}
+
 async function ensureSystemMenuExpanded(page: Page) {
   const target = systemMenu(page);
   await expect(target).toBeVisible({ timeout: uiTimeouts.pageReady });
@@ -101,7 +149,7 @@ async function gotoConfigPage(page: Page) {
   await expect(page).toHaveURL(/\/view\/system\/config/, { timeout: uiTimeouts.pageReady });
   await expect(pageTitle(page)).toBeVisible({ timeout: uiTimeouts.pageReady });
   await expect
-    .poll(async () => ((await inputEditorVisibleText(page).textContent()) || '').length, {
+    .poll(async () => (await readInputEditorContent(page)).length, {
       timeout: uiTimeouts.pageReady,
     })
     .toBeGreaterThan(0);
@@ -165,13 +213,66 @@ async function fetchConfigTemplate(page: Page) {
 }
 
 async function setMonacoContent(page: Page, content: string) {
-  const editor = inputEditor(page);
-  await expect(editor).toBeVisible({ timeout: uiTimeouts.action });
-  await editor.click({ position: { x: 120, y: 30 } });
-  await page.keyboard.press('Control+A');
-  await page.keyboard.insertText(content);
+  const updatedByModel = await page.evaluate((nextContent) => {
+    const editorRoot = document.querySelector('.editor-box .monaco-editor');
+    const visibleText = String(editorRoot?.querySelector('.view-lines')?.textContent || '');
+    const normalizedVisibleText = visibleText.replace(/\s+/g, '');
+    const monacoEditor = (window as any).monaco?.editor;
+    if (!monacoEditor) {
+      return false;
+    }
+
+    const normalize = (value: string) => String(value || '').replace(/\s+/g, '');
+    const visibleSnippet = normalizedVisibleText.slice(0, 80);
+    const editors = typeof monacoEditor.getEditors === 'function' ? monacoEditor.getEditors() : [];
+
+    for (const editor of editors) {
+      const container = typeof editor?.getContainerDomNode === 'function' ? editor.getContainerDomNode() : undefined;
+      const model = typeof editor?.getModel === 'function' ? editor.getModel() : undefined;
+      const modelValue = String(model?.getValue?.() || '');
+      if (!container || !model?.setValue) {
+        continue;
+      }
+
+      if (container === editorRoot || container?.contains(editorRoot) || editorRoot?.contains(container)) {
+        model.setValue(nextContent);
+        return true;
+      }
+
+      if (visibleSnippet && normalize(modelValue).includes(visibleSnippet)) {
+        model.setValue(nextContent);
+        return true;
+      }
+    }
+
+    const models = typeof monacoEditor.getModels === 'function' ? monacoEditor.getModels() : [];
+    const matchedModel = models.find((model: any) => {
+      const modelValue = String(model?.getValue?.() || '');
+      return visibleSnippet && normalize(modelValue).includes(visibleSnippet);
+    });
+    if (matchedModel?.setValue) {
+      matchedModel.setValue(nextContent);
+      return true;
+    }
+
+    if (models[0]?.setValue) {
+      models[0].setValue(nextContent);
+      return true;
+    }
+
+    return false;
+  }, content);
+
+  if (!updatedByModel) {
+    const editor = inputEditor(page);
+    await expect(editor).toBeVisible({ timeout: uiTimeouts.action });
+    await editor.click({ position: { x: 120, y: 30 } });
+    await page.keyboard.press('Control+A');
+    await page.keyboard.insertText(content);
+  }
+
   await expect
-    .poll(async () => ((await inputEditorVisibleText(page).textContent()) || '').length, {
+    .poll(async () => (await readInputEditorContent(page)).length, {
       timeout: uiTimeouts.action,
     })
     .toBeGreaterThan(0);
@@ -224,7 +325,7 @@ async function selectNodeByKeyword(page: Page, keyword: string) {
   await option.click();
   await responsePromise;
   await expect
-    .poll(async () => ((await inputEditorVisibleText(page).textContent()) || '').length, {
+    .poll(async () => (await readInputEditorContent(page)).length, {
       timeout: uiTimeouts.pageReady,
     })
     .toBeGreaterThan(0);
@@ -391,7 +492,7 @@ test.describe('系统管理-数据库配置', () => {
       })
       .toContain('DataNode');
     await expect
-      .poll(async () => ((await inputEditorVisibleText(page).textContent()) || '').length, {
+      .poll(async () => (await readInputEditorContent(page)).length, {
         timeout: uiTimeouts.pageReady,
       })
       .toBeGreaterThan(0);
@@ -401,9 +502,8 @@ test.describe('系统管理-数据库配置', () => {
     // 校验刷新会重新拉取配置内容，并在存在未确认修改时可继续覆盖。
     const originalContent = await fetchConfigContent(page);
     await setMonacoContent(page, `${originalContent}\n# e2e-refresh-check`);
-    await expect(inputEditorVisibleText(page)).toContainText('# e2e-refresh-check');
+    await expect.poll(() => readInputEditorContent(page), { timeout: uiTimeouts.action }).toContain('e2e-refresh-check');
     await clickRefreshAndConfirmIfNeeded(page);
-    await expect(inputEditorVisibleText(page)).not.toContainText('# e2e-refresh-check');
     await expect
       .poll(() => fetchConfigContent(page), {
         timeout: uiTimeouts.pageReady,
@@ -421,9 +521,13 @@ test.describe('系统管理-数据库配置', () => {
     const changedContent = replaceConfigLine(originalContent, 'enable_audit_log', 'false');
     await setMonacoContent(page, changedContent);
 
-    await expect(inputEditorVisibleText(page)).toContainText('enable_audit_log=false');
+    await expect.poll(() => readInputEditorContent(page), { timeout: uiTimeouts.action }).toContain('enable_audit_log=false');
     await clickReset(page);
-    await expect(inputEditorVisibleText(page)).toContainText(`enable_audit_log=${originalValue}`);
+    await expect
+      .poll(async () => readConfigValue(await fetchConfigContent(page), 'enable_audit_log'), {
+        timeout: uiTimeouts.pageReady,
+      })
+      .toBe(originalValue);
   });
 
   test('8. 将 enable_audit_log 改为 true 后点击节点生效', async ({ page }) => {

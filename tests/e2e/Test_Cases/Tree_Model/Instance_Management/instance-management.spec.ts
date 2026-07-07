@@ -378,14 +378,14 @@ test.describe('实例管理', () => {
         password: localhostConnection.password,
       });
 
-      await instancePage.itemByName(localhostConnection.name).evaluate((element) => {
+      await instancePage.itemByName(baseName).evaluate((element) => {
         (element as HTMLElement).click();
       });
       await expect(instancePage.confirmDialog()).toBeVisible();
       await instancePage.confirmDialog().locator('.connection-form-continue-confirm').click();
       await expect(instancePage.connectionNameInput()).toHaveValue(baseName);
 
-      await instancePage.itemByName(localhostConnection.name).evaluate((element) => {
+      await instancePage.itemByName(baseName).evaluate((element) => {
         (element as HTMLElement).click();
       });
       await expect(instancePage.confirmDialog()).toBeVisible();

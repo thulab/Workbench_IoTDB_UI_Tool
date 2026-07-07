@@ -23,6 +23,9 @@ const taskDeleteSuccessMessage = '删除成功';
 const taskStopSuccessMessage = '停止成功';
 const taskRunSuccessMessage = '启动成功';
 const createdTaskNames = new Set<string>();
+const defaultSyncTargetHost = '127.0.0.1';
+const defaultSyncTargetPort = 6668;
+const thriftReceiverSkipMessage = `当前真实环境未开启独立 Thrift Receiver（${defaultSyncTargetHost}:${defaultSyncTargetPort}），无法验证数据同步任务成功创建。`;
 const dataSyncCleanupKeywords = [
   '_auto_',
   'new_task_1',
@@ -36,6 +39,20 @@ const dataSyncCleanupKeywords = [
   'path_auto_',
   'reforward_',
 ] as const;
+
+type SynchronApiResponse = {
+  code?: number;
+  success?: boolean;
+  message?: string;
+  data?: unknown;
+};
+
+type SynchronHttpResponse = {
+  status(): number;
+  text(): Promise<string>;
+};
+
+let thriftReceiverReachableCache: boolean | undefined;
 
 function dataSyncMenu(page: Page) {
   return page.getByRole('menuitem', { name: '数据同步' }).first();
@@ -366,6 +383,44 @@ async function isTcpPortReachable(host: string, port: number, timeout = 1500) {
   });
 }
 
+async function isDefaultThriftReceiverReachable() {
+  if (thriftReceiverReachableCache !== undefined) {
+    return thriftReceiverReachableCache;
+  }
+
+  thriftReceiverReachableCache = await isTcpPortReachable(defaultSyncTargetHost, defaultSyncTargetPort);
+  return thriftReceiverReachableCache;
+}
+
+async function ensureThriftReceiverAvailable() {
+  test.skip(!(await isDefaultThriftReceiverReachable()), thriftReceiverSkipMessage);
+}
+
+async function parseSynchronApiResponse(response: SynchronHttpResponse) {
+  const rawText = await response.text();
+  if (!rawText) {
+    return {} as SynchronApiResponse;
+  }
+
+  try {
+    return JSON.parse(rawText) as SynchronApiResponse;
+  } catch {
+    return {
+      message: rawText,
+    } satisfies SynchronApiResponse;
+  }
+}
+
+async function expectSynchronApiSuccess(response: SynchronHttpResponse, operation: string) {
+  expect(response.status()).toBe(200);
+  const payload = await parseSynchronApiResponse(response);
+  const failed = payload.success === false || (typeof payload.code === 'number' && payload.code !== 0);
+  if (failed) {
+    throw new Error(`${operation} failed: ${payload.message || 'unknown error'}`);
+  }
+  return payload;
+}
+
 function registerCreatedTask(taskName: string) {
   createdTaskNames.add(taskName);
   return taskName;
@@ -447,7 +502,18 @@ async function createSyncTaskViaApi(
     triggerMode?: 'stream' | 'batch';
   },
 ) {
-  const { baseName, path = 'root.sg.**', host = '127.0.0.1', port = '6668', waitTime = 5, batchSize = 1024, history = true, realtime = true, triggerMode = 'stream' } = options;
+  await ensureThriftReceiverAvailable();
+  const {
+    baseName,
+    path = 'root.sg.**',
+    host = defaultSyncTargetHost,
+    port = String(defaultSyncTargetPort),
+    waitTime = 5,
+    batchSize = 1024,
+    history = true,
+    realtime = true,
+    triggerMode = 'stream',
+  } = options;
 
   const response = await page.context().request.post('/api/synchron/saveSynchronTask', {
     data: {
@@ -478,7 +544,7 @@ async function createSyncTaskViaApi(
     timeout: 30_000,
   });
 
-  expect(response.status()).toBe(200);
+  await expectSynchronApiSuccess(response, 'Create synchron task');
   return registerCreatedTasks(generatedTaskNames(baseName, { history, realtime }));
 }
 
@@ -637,12 +703,16 @@ async function createTaskViaUi(
     syncMeasurement = 'all',
     path = 'sg.**',
     reforward = true,
-    host = '127.0.0.1',
-    port = '6668',
+    host = defaultSyncTargetHost,
+    port = String(defaultSyncTargetPort),
     waitTime = '5',
     batchSize = '1024',
     targetOverTime = '1000',
   } = options;
+
+  if (connectorPlugin === 'iotdb-thrift-connector') {
+    await ensureThriftReceiverAvailable();
+  }
 
   await openCreateDialog(page);
   await taskNameInput(page).fill(baseName);
@@ -744,7 +814,7 @@ async function submitCreateTask(page: Page) {
   const responsePromise = page.waitForResponse((response) => response.url().includes('/api/synchron/saveSynchronTask') && response.request().method() === 'POST', { timeout: uiTimeouts.toast });
   await confirmButton(page).click();
   const response = await responsePromise;
-  expect(response.status()).toBe(200);
+  await expectSynchronApiSuccess(response, 'Create synchron task');
 }
 
 async function openBatchDropdown(page: Page) {
@@ -1003,6 +1073,7 @@ test.describe('数据同步', () => {
 
   test('19. 新建任务弹窗填写 new_task_1 及前缀路径、目标端信息后点击确定可成功新建任务', async ({ page }) => {
     // 校验数据同步任务创建主链路可在真实环境下成功完成，并在列表中可见。
+    await ensureThriftReceiverAvailable();
     const taskName = registerCreatedTask('new_task_1');
     const historyTaskName = registerCreatedTask('new_task_1_history');
     const realtimeTaskName = registerCreatedTask('new_task_1_realtime');
@@ -1016,8 +1087,8 @@ test.describe('数据同步', () => {
     await taskNameInput(page).fill(taskName);
     await setNativeRadioState(syncMeasurementPathRadio(page), true);
     await pathInput(page).fill('sg.**');
-    await targetHostInput(page).fill('127.0.0.1');
-    await targetPortInput(page).fill('6668');
+    await targetHostInput(page).fill(defaultSyncTargetHost);
+    await targetPortInput(page).fill(String(defaultSyncTargetPort));
     await waitTimeInput(page).fill('5');
     await batchSizeInput(page).fill('1024');
 
