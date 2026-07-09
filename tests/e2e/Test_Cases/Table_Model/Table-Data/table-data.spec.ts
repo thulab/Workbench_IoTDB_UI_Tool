@@ -217,6 +217,28 @@ async function createTableDatabaseByApi(apiContext: APIRequestContext, databaseN
   return response;
 }
 
+async function submitAddTableAndWaitForSuccess(page: Page, tableDataPage: TableDataPage) {
+  const responsePromise = page.waitForResponse((response) => response.url().includes('/api/relational/schema/saveTable') && response.request().method() === 'POST', { timeout: 30_000 });
+
+  await tableDataPage.addTableConfirmButton().click();
+  const response = await responsePromise;
+  expect(response.ok()).toBeTruthy();
+
+  const payload = await response.json().catch(() => null);
+  const responseCode = payload?.code;
+  if (typeof responseCode === 'number') {
+    expect([0, 200].includes(responseCode)).toBeTruthy();
+  }
+
+  await expect(tableDataPage.addTableDialog()).toBeHidden({ timeout: 30_000 });
+
+  const successToast = page.locator('.el-message--success').last();
+  const hasSuccessToast = await successToast.isVisible({ timeout: 3_000 }).catch(() => false);
+  if (hasSuccessToast) {
+    await expect(successToast).toContainText('保存成功');
+  }
+}
+
 async function loginToTableData(page: Page, request: APIRequestContext) {
   const loginPage = new LoginPage(page);
   const tableDataPage = new TableDataPage(page);
@@ -323,9 +345,7 @@ async function addFieldColumnWithDataType(tableDataPage: TableDataPage, index: n
 async function createTableAndExpectSuccess(page: Page, tableDataPage: TableDataPage, tableName: string, columnName = 'device_id') {
   await tableDataPage.addTableNameInput().fill(tableName);
   await addSingleFieldColumn(tableDataPage, columnName);
-  await tableDataPage.addTableConfirmButton().click();
-  await expect(page.locator('.el-message--success').last()).toContainText('保存成功');
-  await expect(tableDataPage.addTableDialog()).toBeHidden();
+  await submitAddTableAndWaitForSuccess(page, tableDataPage);
 }
 
 async function createVisibleTableForNodeTests(page: Page, request: APIRequestContext, prefix?: string, tableNamePrefix = 'table_node_', ttl = '86400000', columnName = 'device_id') {
@@ -335,9 +355,7 @@ async function createVisibleTableForNodeTests(page: Page, request: APIRequestCon
   await tableDataPage.addTableNameInput().fill(tableName);
   await tableDataPage.addTableTtlInput().fill(ttl);
   await addSingleFieldColumn(tableDataPage, columnName);
-  await tableDataPage.addTableConfirmButton().click();
-  await expect(page.locator('.el-message--success').last()).toContainText('保存成功');
-  await expect(tableDataPage.addTableDialog()).toBeHidden();
+  await submitAddTableAndWaitForSuccess(page, tableDataPage);
 
   await tableDataPage.searchInput().fill(tableName);
   await expect(tableDataPage.treeNodeByName(tableName)).toBeVisible();
@@ -358,9 +376,7 @@ async function createVisibleDataTableForDataTests(page: Page, request: APIReques
   await selectAddTableColumnCategory(tableDataPage, 0, tagCategoryText);
 
   await addFieldColumnWithDataType(tableDataPage, 1, 's1', 'INT32');
-  await tableDataPage.addTableConfirmButton().click();
-  await expect(page.locator('.el-message--success').last()).toContainText('保存成功');
-  await expect(tableDataPage.addTableDialog()).toBeHidden();
+  await submitAddTableAndWaitForSuccess(page, tableDataPage);
 
   await applyTreeSearch(tableDataPage, tableName);
   await expect(tableDataPage.treeNodeByName(tableName)).toBeVisible();
@@ -463,9 +479,7 @@ async function openDataDetailWithTwoColumns(page: Page, request: APIRequestConte
   await selectAddTableColumnCategory(tableDataPage, 0, tagCategoryText);
   await tableDataPage.addTableAddColumnButton().click();
   await tableDataPage.addTableColumnNameInput(1).fill('temperature');
-  await tableDataPage.addTableConfirmButton().click();
-  await expect(page.locator('.el-message--success').last()).toContainText('保存成功');
-  await expect(tableDataPage.addTableDialog()).toBeHidden();
+  await submitAddTableAndWaitForSuccess(page, tableDataPage);
 
   const insertResponse = await insertTableValuesByApi(page.context().request, databaseName, tableName, ['time', 'device_id', 'temperature'], [time, `'${deviceId}'`, `'${temperature}'`]);
   expect(insertResponse.ok()).toBeTruthy();
@@ -601,9 +615,7 @@ async function openExactTableStructureDetail(page: Page, request: APIRequestCont
   await tableDataPage.addTableNameInput().fill(tableName);
   await tableDataPage.addTableTtlInput().fill(ttl);
   await addSingleFieldColumn(tableDataPage, columnName);
-  await tableDataPage.addTableConfirmButton().click();
-  await expect(page.locator('.el-message--success').last()).toContainText('保存成功');
-  await expect(tableDataPage.addTableDialog()).toBeHidden();
+  await submitAddTableAndWaitForSuccess(page, tableDataPage);
   await expect(tableDataPage.detailTitle()).toContainText(tableName);
 
   return { tableDataPage, databaseName, tableName, ttl, columnName };
@@ -1188,9 +1200,7 @@ test.describe('数据管理', () => {
       await addFieldColumnWithDataType(tableDataPage, index, `field_${dataType.toLowerCase()}`, dataType);
     }
 
-    await tableDataPage.addTableConfirmButton().click();
-    await expect(page.locator('.el-message--success').last()).toContainText('保存成功');
-    await expect(tableDataPage.addTableDialog()).toBeHidden();
+    await submitAddTableAndWaitForSuccess(page, tableDataPage);
 
     await expect(tableDataPage.detailTitle()).toContainText('table_all_types');
     await expect(tableDataPage.detailPanel()).toContainText(columnCountText);
@@ -1820,10 +1830,7 @@ test.describe('数据管理', () => {
     await tableDataPage.addTableNameInput().fill(tableName);
     await tableDataPage.addTableTtlInput().fill('86400000');
     await addSingleFieldColumn(tableDataPage, columnName);
-    await tableDataPage.addTableConfirmButton().click();
-
-    await expect(page.locator('.el-message--success').last()).toContainText('保存成功');
-    await expect(tableDataPage.addTableDialog()).toBeHidden();
+    await submitAddTableAndWaitForSuccess(page, tableDataPage);
     await expect(tableDataPage.detailTitle()).toContainText(tableName);
     await expect(tableDataPage.tableRowByText(columnName)).toBeVisible();
   });

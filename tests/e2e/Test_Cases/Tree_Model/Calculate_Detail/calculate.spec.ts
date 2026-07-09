@@ -365,11 +365,9 @@ async function ensureCalculateSeedData(page: Page) {
 
   const createDatabaseResponse = await runSqlsInWorkbenchSession(page, [`create database ${calculateSeed.database}`]);
   const createDatabaseFailed =
-    (typeof createDatabaseResponse.success === 'boolean' && createDatabaseResponse.success === false) ||
-    (typeof createDatabaseResponse.code === 'number' && createDatabaseResponse.code !== 0) ||
-    createDatabaseResponse.data?.some((item) => item.status === false);
+    (typeof createDatabaseResponse.success === 'boolean' && createDatabaseResponse.success === false) || (typeof createDatabaseResponse.code === 'number' && createDatabaseResponse.code !== 0);
   if (createDatabaseFailed) {
-    throw new Error(`Failed to create calculate seed database: ${createDatabaseResponse.message || createDatabaseResponse.data?.find((item) => item.status === false)?.errMsg || 'unknown error'}`);
+    throw new Error(`Failed to create calculate seed database: ${createDatabaseResponse.message || 'unknown error'}`);
   }
 
   const insertSqls = [
@@ -381,19 +379,25 @@ async function ensureCalculateSeedData(page: Page) {
   insertSqls.shift();
 
   const response = await runSqlsInWorkbenchSession(page, insertSqls);
-  const failed =
-    (typeof response.success === 'boolean' && response.success === false) || (typeof response.code === 'number' && response.code !== 0) || response.data?.some((item) => item.status === false);
+  const failed = (typeof response.success === 'boolean' && response.success === false) || (typeof response.code === 'number' && response.code !== 0);
   if (failed) {
-    throw new Error(`Failed to initialize calculate seed data: ${response.message || response.data?.find((item) => item.status === false)?.errMsg || 'unknown error'}`);
+    throw new Error(`Failed to initialize calculate seed data: ${response.message || 'unknown error'}`);
   }
 
   const verifyResponse = await runSqlsInWorkbenchSession(page, [`select s1,s2 from ${calculateSeed.device} limit 3`]);
+  const verifyResult = verifyResponse.data?.[0];
   const verifyFailed =
     (typeof verifyResponse.success === 'boolean' && verifyResponse.success === false) ||
     (typeof verifyResponse.code === 'number' && verifyResponse.code !== 0) ||
-    verifyResponse.data?.some((item) => item.status === false);
+    verifyResult?.status === false ||
+    !verifyResult;
   if (verifyFailed) {
-    throw new Error(`Failed to verify calculate seed data: ${verifyResponse.message || verifyResponse.data?.find((item) => item.status === false)?.errMsg || 'unknown error'}`);
+    throw new Error(`Failed to verify calculate seed data: ${verifyResult?.errMsg || verifyResponse.message || 'unknown error'}`);
+  }
+
+  const flatText = JSON.stringify(verifyResult.valueList || []);
+  if (!flatText.includes('42.5') || !flatText.includes('42.2')) {
+    throw new Error(`Calculate seed data verification did not include expected values: ${flatText}`);
   }
 }
 
@@ -483,8 +487,31 @@ async function createViewByDialog(page: Page, draft: { name: string; description
   }
   await dialogMeasurementInput(page).fill(draft.measurement);
   await fillSqlEditor(page, draft.expression);
+  await submitViewDialogAndWaitForSuccess(page, 'add');
+}
+
+async function submitViewDialogAndWaitForSuccess(page: Page, mode: 'add' | 'edit') {
+  const apiPath = mode === 'add' ? '/api/calculate/addCalculate' : '/api/calculate/updateCalculate';
+  const successMessagePattern = mode === 'add' ? /创建成功|新建成功/ : /修改成功|编辑成功/;
+  const responsePromise = page.waitForResponse((response) => response.url().includes(apiPath) && response.request().method() === 'POST', { timeout: 30_000 });
+
   await dialogConfirmButton(page).click();
-  await expect(createViewDialog(page)).toBeHidden({ timeout: 15_000 });
+  const response = await responsePromise;
+  expect(response.ok()).toBeTruthy();
+
+  const payload = await response.json().catch(() => null);
+  const failed = (typeof payload?.success === 'boolean' && payload.success === false) || (typeof payload?.code === 'number' && payload.code !== 0);
+  if (failed) {
+    throw new Error(`View ${mode} failed: ${payload?.message || 'unknown error'}`);
+  }
+
+  await expect(createViewDialog(page)).toBeHidden({ timeout: 30_000 });
+
+  const successToast = page.locator('.el-message--success').last();
+  const hasSuccessToast = await successToast.isVisible({ timeout: 3_000 }).catch(() => false);
+  if (hasSuccessToast) {
+    await expect(successToast).toContainText(successMessagePattern);
+  }
 }
 
 async function createViewByApi(page: Page, draft: { name: string; description?: string; measurement: string; expression: string }) {
@@ -1041,8 +1068,7 @@ test.describe('视图页面', () => {
     await dialogNameInput(page).fill(updatedName);
     await dialogDescInput(page).fill(updatedDescription);
     await fillSqlEditor(page, updatedExpression);
-    await dialogConfirmButton(page).click();
-    await expect(createViewDialog(page)).toBeHidden({ timeout: 15_000 });
+    await submitViewDialogAndWaitForSuccess(page, 'edit');
 
     await queryViewList(page, updatedName);
     const row = rowByText(page, updatedName);
