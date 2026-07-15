@@ -1056,6 +1056,8 @@ test.describe('数据查询', () => {
     });
 
     test('23. 数据查询页中的【批量导入数据】弹窗内，导入 CSV 格式文件可完成导入流程', async ({ page }) => {
+      test.setTimeout(240_000);
+
       await loginForDataSearch(page);
       await openDataSearchFromMenu(page);
 

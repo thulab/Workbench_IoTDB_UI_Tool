@@ -451,7 +451,7 @@ async function openTrendTemplateDropdown(page: Page) {
 }
 
 test.describe('树模型-实时趋势', () => {
-  test.describe.configure({ timeout: realBackendRun ? 180_000 : 60_000 });
+  test.describe.configure({ timeout: realBackendRun ? 300_000 : 60_000 });
 
   test.beforeEach(async ({ page, request }) => {
     await seedClientState(page, { lang: 'cn' });

@@ -128,7 +128,7 @@ export async function ensureStandaloneConnectionExists(
         (detail.masterCluster?.prometheusUsername || '') !== (connection.prometheusUsername || '') ||
         (detail.masterCluster?.prometheusPassword || '') !== (connection.prometheusPassword || '');
 
-      if (!shouldUpdate) {
+      if (!shouldUpdate && !connection.password) {
         return;
       }
 
