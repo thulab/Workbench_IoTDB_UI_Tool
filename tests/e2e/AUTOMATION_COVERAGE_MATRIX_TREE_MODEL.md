@@ -1,289 +1,75 @@
-# UI 自动化覆盖矩阵（树模型）
+﻿# UI 自动化覆盖矩阵（树模型）
 
 ## 1. 当前整体状态
 
-- 项目目录：`tests/e2e/Test_Cases/Tree_Model`
+- 用例目录：`tests/e2e/Test_Cases/Tree_Model`
 - 执行模式：真实 Workbench + 真实 IoTDB + 简体中文界面
-- 当前实际可执行用例总数：`397`
-- 当前 spec 文件数：`16`
-- 当前回归结果：最近一次已确认 `Trend/spectrum.spec.ts` 真实环境 `12 passed`
-- 当前覆盖主体：`Tree_Model`
+- 当前 spec 文件数：16
+- 当前测试用例总数：399
+- 树模型按 13 个一级业务模块管理，当前已覆盖 12 个业务模块。
+- `tree-full` 当前覆盖入口：`tree-instance`、`tree-login`、`tree-dashboard`、`tree-measurement`、`tree-search`、`tree-sql`、`tree-trend`、`tree-view`、`tree-data-sync`、`tree-auth`、`tree-audit`、`tree-db-config`
 
 ## 2. 按业务模块划分的覆盖状态
 
-| 一级模块       | 二级模块                     | 当前状态 | 已覆盖用例数 | 当前说明                                                                                 | 优先级 |
-| -------------- | ---------------------------- | -------- | -----------: | ---------------------------------------------------------------------------------------- | ------ |
-| 1. 实例管理    | -                            | 已覆盖   |           26 | 已覆盖单机实例新建、编辑、删除、刷新、未保存确认、Prometheus 配置、校验提示、模型说明    | P1     |
-| 2. 登录        | -                            | 已覆盖   |            8 | 已覆盖 localhost 准备、登录成功、空实例、空用户名、空密码、密码错误、退出登录清理        | P1     |
-| 3. 首页        | -                            | 已覆盖   |            8 | 已覆盖系统信息、激活详情、全部节点、ConfigNode、DataNode 监控指标                        | P1     |
-| 4. 测点管理    | 测点列表 \| 数据模型         | 已覆盖   |          112 | 已覆盖列表主流程、导入导出、分页、过滤列、批量删除、新建数据库、新建测点、数据模型图谱   | P1     |
-| 5. 查询        | 数据查询 \| 统计查询         | 已覆盖   |           51 | 数据查询 29 条，统计查询 22 条，已覆盖查询、导入导出、分页、空态、错误态                 | P1     |
-| 6. SQL 操作    | -                            | 已覆盖   |           24 | 已覆盖 SQL 输入、多页签、执行、取消、保存常用、快捷操作、导出、刷新                      | P1     |
-| 7. AI 分析     | AI 可视化 \| 模型管理        | 未覆盖   |            0 | 当前无目录、无 spec、无骨架                                                              | P0     |
-| 8. 可视化      | 实时趋势 \| 历史趋势 \| 分析 | 部分覆盖 |           34 | 已覆盖实时趋势、历史趋势、分析页首批真实链路；剩余缺口主要在更复杂图表交互与高级异常场景 | P1     |
-| 9. 视图        | -                            | 已覆盖   |           50 | 已覆盖视图列表、新建、编辑、删除、导入导出、表达式、分页、查看数据跳转                   | P1     |
-| 10. 数据同步   | -                            | 已覆盖   |           52 | 已覆盖任务列表、新建任务、查询重置、状态监控、批量操作、时间范围、发送插件与删除流程     | P1     |
-| 11. 权限管理   | 用户管理 \| 角色管理         | 部分覆盖 |           22 | 已覆盖用户管理 13 条、角色管理 9 条，当前以页面展示和新建为主                            | P1     |
-| 12. 审计日志   | -                            | 部分覆盖 |            3 | 已覆盖页面展示、列表列头、空结果提示                                                     | P1     |
-| 13. 数据库配置 | -                            | 部分覆盖 |           10 | 已覆盖页面展示、文档跳转、节点切换、刷新、重置、节点生效、全部生效                       | P1     |
+| 一级模块       | 二级范围                       | 当前状态 | 用例数 | 对应入口           | 说明                                                                                                                  |
+| -------------- | ------------------------------ | -------- | -----: | ------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| 1. 实例管理    | -                              | 已覆盖   |     26 | `tree-instance`    | 覆盖实例新建、编辑、删除、刷新、未保存确认、Prometheus 配置、连接校验、模型说明等。                                   |
+| 2. 登录        | -                              | 已覆盖   |      8 | `tree-login`       | 覆盖实例加载、登录成功、空实例、空用户名、空密码、密码错误、退出登录等主流程。                                        |
+| 3. 首页        | -                              | 已覆盖   |      8 | `tree-dashboard`   | 覆盖系统信息、激活详情、节点信息、ConfigNode、DataNode、监控指标等展示。                                              |
+| 4. 测点管理    | 测点列表 / 数据模型            | 已覆盖   |    112 | `tree-measurement` | 覆盖测点列表、数据模型、新建数据库、新建测点、导入导出、分页、筛选、批量删除、标签/别名/描述编辑等。                  |
+| 5. 查询        | 数据查询 / 统计查询            | 已覆盖   |     51 | `tree-search`      | 覆盖数据查询、统计查询、测点筛选、时间范围、采样策略、分页、导入导出、空态和错误态等。                                |
+| 6. SQL操作     | -                              | 已覆盖   |     24 | `tree-sql`         | 覆盖 SQL 输入、多页签、执行、取消、保存常用、快捷操作、结果刷新和导出等。                                             |
+| 7. AI分析      | AI可视化 / 模型管理            | 未覆盖   |      0 | `tree-ai-analysis` | 启动脚本已识别该入口，但当前未实现自动化 spec，且不包含在 `tree-full` 中。                                            |
+| 8. 可视化      | 实时趋势 / 历史趋势 / 频谱分析 | 已覆盖   |     34 | `tree-trend`       | 覆盖实时趋势、历史趋势、频谱分析、测点入图、播放暂停、保存常用、导出、重置、分析方式与 SQL 分析等。                   |
+| 9. 视图        | -                              | 已覆盖   |     50 | `tree-view`        | 覆盖视图列表、新建、编辑、删除、表达式、导入导出、批量删除、分页、查看数据跳转等。                                    |
+| 10. 数据同步   | -                              | 已覆盖   |     52 | `tree-data-sync`   | 覆盖任务列表、新建任务、查询重置、状态监控、批量操作、时间范围、发送插件、详情、停止和删除等。                        |
+| 11. 权限管理   | 用户管理 / 角色管理            | 已覆盖   |     22 | `tree-auth`        | 覆盖用户管理和角色管理主流程。三权分立权限验证暂未覆盖，原因是当前 Workbench 尚未适配。                               |
+| 12. 审计日志   | -                              | 部分覆盖 |      3 | `tree-audit`       | 当前仅保留基础入口和页面级覆盖。TimechoDB V2.0.8.1 审计日志位置已调整，Workbench 尚未适配新位置，详细用例待后续补充。 |
+| 13. 数据库配置 | -                              | 已覆盖   |      9 | `tree-db-config`   | 覆盖页面展示、文档跳转、节点切换、刷新、重置、节点生效、全部生效等主流程。                                            |
 
-## 3. 当前已覆盖模块明细
+## 3. 当前用例文件与用例数
 
-### 3.1 实例管理
+| 一级模块   | spec 文件                                                          |  用例数 |
+| ---------- | ------------------------------------------------------------------ | ------: |
+| 实例管理   | `Tree_Model/Instance_Management/instance-management.spec.ts`       |      26 |
+| 登录       | `Tree_Model/Instance_Login/login.spec.ts`                          |       8 |
+| 首页       | `Tree_Model/Instance_Dashboard/dashboard.spec.ts`                  |       8 |
+| 测点管理   | `Tree_Model/Measurement_Management/measurement-management.spec.ts` |     112 |
+| 查询       | `Tree_Model/Search/data-search.spec.ts`                            |      29 |
+| 查询       | `Tree_Model/Search/statistic-search.spec.ts`                       |      22 |
+| SQL操作    | `Tree_Model/SQL_Search/sql-search.spec.ts`                         |      24 |
+| 可视化     | `Tree_Model/Trend/tree-running-trend.spec.ts`                      |      13 |
+| 可视化     | `Tree_Model/Trend/tree-history-trend.spec.ts`                      |       9 |
+| 可视化     | `Tree_Model/Trend/spectrum.spec.ts`                                |      12 |
+| 视图       | `Tree_Model/Calculate_Detail/calculate.spec.ts`                    |      50 |
+| 数据同步   | `Tree_Model/Data_Sync/data-sync.spec.ts`                           |      52 |
+| 权限管理   | `Tree_Model/System/Auth/User/user.spec.ts`                         |      13 |
+| 权限管理   | `Tree_Model/System/Auth/Role/role.spec.ts`                         |       9 |
+| 审计日志   | `Tree_Model/System/Audit/audit.spec.ts`                            |       3 |
+| 数据库配置 | `Tree_Model/System/Config/config.spec.ts`                          |       9 |
+| **合计**   | **16 个 spec 文件**                                                | **399** |
 
-- 对应用例文件：
-  - `Tree_Model/Instance_Management/instance-management.spec.ts`
-- 已覆盖内容：
-  - 单机实例创建
-  - 实例编辑
-  - 实例删除
-  - 刷新列表
-  - 未保存切换确认
-  - 必填校验
-  - 名称长度校验
-  - Prometheus 信息展示
-  - 连接失败提示
-  - 默认模型说明与官网跳转
+## 4. 当前未覆盖与后续补充
 
-### 3.2 登录
+| 模块                 | 当前状态   | 后续动作                                                                                                |
+| -------------------- | ---------- | ------------------------------------------------------------------------------------------------------- |
+| AI分析               | 未覆盖     | 待 Workbench 树模型 AI可视化、模型管理页面具备可测入口后补充自动化 spec。                               |
+| 权限管理（三权分立） | 部分未覆盖 | 经与研发确认，当前 Workbench 尚未适配三权分立权限验证能力，后续待适配后补充。                           |
+| 审计日志详情         | 部分未覆盖 | TimechoDB V2.0.8.1 审计日志存放位置已调整，Workbench 尚未适配新审计日志位置，后续待适配后补充详细用例。 |
 
-- 对应用例文件：
-  - `Tree_Model/Instance_Login/login.spec.ts`
-- 已覆盖内容：
-  - 登录页实例加载
-  - 空实例校验
-  - 空用户名校验
-  - 空密码校验
-  - 用户名密码不匹配提示
-  - 登录成功后退出并清理实例
+## 5. 执行入口说明
 
-### 3.3 首页
+- 树模型全量：`.\sbin\start.bat tree-full direct report`
+- 树模型登录冒烟：`.\sbin\start.bat tree-login direct headed`
+- 树模型测点管理：`.\sbin\start.bat tree-measurement direct report`
+- 树模型查询：`.\sbin\start.bat tree-search direct report`
+- 树模型可视化：`.\sbin\start.bat tree-trend direct report`
+- 树模型权限管理：`.\sbin\start.bat tree-auth direct report`
 
-- 对应用例文件：
-  - `Tree_Model/Instance_Dashboard/dashboard.spec.ts`
-- 已覆盖内容：
-  - 首页系统信息模块
-  - 激活详情弹窗
-  - 默认全部节点监控信息
-  - ConfigNode 指标
-  - DataNode 指标
+Linux / macOS 使用 `./sbin/start.sh` 替换 `.\sbin\start.bat`。
 
-### 3.4 测点管理
+## 6. 统计口径
 
-- 对应用例文件：
-  - `Tree_Model/Measurement_Management/measurement-management.spec.ts`
-- 已覆盖内容：
-  - 测点列表
-  - 数据模型
-  - root 节点右键能力
-  - 新建数据库
-  - 新建测点
-  - 测点导入导出
-  - 批量删除
-  - 筛选和分页
-  - 标签、别名、描述编辑
-  - 数据模型节点展开收起与分页
-  - 大量异常校验场景
-
-### 3.5 查询
-
-- 对应用例文件：
-  - `Tree_Model/Search/data-search.spec.ts`
-  - `Tree_Model/Search/statistic-search.spec.ts`
-- 已覆盖内容：
-  - 数据查询
-  - 统计查询
-  - 测点名称 / 测点描述查询
-  - 时间点 / 时间段
-  - 采样周期 / 采样策略
-  - 查询结果分页
-  - CSV / XLSX 导出
-  - TsFile / CSV / XLSX 导入
-  - 空态 / 错误态
-  - 会话恢复
-
-### 3.6 SQL 操作
-
-- 对应用例文件：
-  - `Tree_Model/SQL_Search/sql-search.spec.ts`
-- 已覆盖内容：
-  - SQL 输入区
-  - 执行全部 / 执行选中
-  - 取消执行
-  - 新增页签
-  - 重置 / 清空
-  - 保存常用
-  - 快捷操作
-  - 运行结果导出
-  - 运行结果刷新
-
-### 3.7 可视化
-
-- 对应用例文件：
-  - `Tree_Model/Trend/tree-running-trend.spec.ts`
-  - `Tree_Model/Trend/tree-history-trend.spec.ts`
-  - `Tree_Model/Trend/spectrum.spec.ts`
-- 已覆盖内容：
-  - 可视化菜单展开
-  - 实时趋势页面基础展示
-  - 历史趋势页面基础展示
-  - 分析页基础布局与空态
-  - `INT32` / `INT64` / `FLOAT` / `DOUBLE` 测点入图
-  - 播放 / 暂停
-  - 历史时间范围调整
-  - 保存常用
-  - 趋势删除
-  - 趋势图片导出
-  - 分析方式下拉与 tooltip
-  - FFT / ENVELOPE / DWT / LOWPASS / HIGHPASS / 自定义分析
-  - SQL 输入弹窗与分析图谱渲染
-
-### 3.8 视图
-
-- 对应用例文件：
-  - `Tree_Model/Calculate_Detail/calculate.spec.ts`
-- 已覆盖内容：
-  - 视图页展示
-  - 新建视图
-  - 编辑视图
-  - 删除视图
-  - 表达式弹窗
-  - 导入导出
-  - 批量删除
-  - 分页
-  - 查看数据跳转
-  - 公式类异常文件导入校验
-
-### 3.9 数据同步
-
-- 对应用例文件：
-  - `Tree_Model/Data_Sync/data-sync.spec.ts`
-- 已覆盖内容：
-  - 数据同步页基础展示
-  - 新建任务弹窗与必填校验
-  - 任务名称长度校验
-  - Tooltip 文案展示
-  - 实时 / 历史 / 二次转发 / 发送模式组合
-  - 时间范围选择
-  - 发送插件选择
-  - 查询、重置、刷新、分页
-  - 状态监控
-  - 详情、停止、删除、批量操作
-  - 空状态展示
-
-### 3.10 权限管理
-
-- 对应用例文件：
-  - `Tree_Model/System/Auth/User/user.spec.ts`
-  - `Tree_Model/System/Auth/Role/role.spec.ts`
-- 已覆盖内容：
-  - 用户管理页面展示
-  - 角色管理页面展示
-  - 新建用户
-  - 新建角色
-  - 用户名 / 角色名长度校验
-  - 密码长度校验
-  - 必填校验
-
-### 3.11 审计日志
-
-- 对应用例文件：
-  - `Tree_Model/System/Audit/audit.spec.ts`
-- 已覆盖内容：
-  - 审计日志查询区基础展示
-  - 日志列表列头与主表格展示
-  - 无结果空态展示
-
-### 3.12 数据库配置
-
-- 对应用例文件：
-  - `Tree_Model/System/Config/config.spec.ts`
-- 已覆盖内容：
-  - 数据库配置页基础展示
-  - 官网配置参数手册跳转
-  - ConfigNode 默认展示
-  - ConfigNode / DataNode 下拉切换
-  - 刷新节点配置
-  - `enable_audit_log` 重置校验
-  - `enable_audit_log` 节点生效
-  - `trusted_uri_pattern` 全部生效
-
-## 4. 当前未覆盖模块
-
-### 4.1 完全未覆盖
-
-| 一级模块   | 当前状态 | 说明                                |
-| ---------- | -------- | ----------------------------------- |
-| 7. AI 分析 | 未开始   | AI 可视化、模型管理均未建目录或用例 |
-
-### 4.2 部分覆盖
-
-| 一级模块       | 当前缺口                                                                                               |
-| -------------- | ------------------------------------------------------------------------------------------------------ |
-| 8. 可视化      | 已覆盖实时趋势、历史趋势、分析页首批真实链路，后续仍需补更复杂图表交互、更多高级分析参数组合和异常分支 |
-| 11. 权限管理   | 仅覆盖用户管理和角色管理的页面展示与新建，未覆盖编辑、删除、授权、搜索筛选                             |
-| 12. 审计日志   | 仅覆盖页面展示、列表列头与空态，未覆盖分页、详情弹窗、查询重置组合和导出                               |
-| 13. 数据库配置 | 仅覆盖首批页面展示和参数生效主链路，未覆盖更多参数组合、异常提示、权限边界和多节点差异                 |
-| 3. 首页        | 未覆盖监控空态、Prometheus 未配置态、异常态、更多字段精确断言                                          |
-| 1. 实例管理    | 未覆盖更多连接类型、集群模式、更多异常接口场景                                                         |
-| 4. 测点管理    | 未覆盖更多服务端异常、更多权限差异、更多跨库跨设备组合                                                 |
-| 5. 查询        | 未覆盖更多超大结果集、复杂组合条件、更多排序列和失败分支                                               |
-| 6. SQL 操作    | 未覆盖更多 SQL 异常语句、大结果集、更多常用管理和多页签复杂联动                                        |
-| 9. 视图        | 未覆盖更多复杂公式场景、更多精确结果断言、权限差异                                                     |
-
-## 5. 当前用例文件与模块映射
-
-| 一级模块       | spec 文件                                                          | 用例数 |
-| -------------- | ------------------------------------------------------------------ | -----: |
-| 1. 实例管理    | `Tree_Model/Instance_Management/instance-management.spec.ts`       |     26 |
-| 2. 登录        | `Tree_Model/Instance_Login/login.spec.ts`                          |      8 |
-| 3. 首页        | `Tree_Model/Instance_Dashboard/dashboard.spec.ts`                  |      8 |
-| 4. 测点管理    | `Tree_Model/Measurement_Management/measurement-management.spec.ts` |    112 |
-| 5. 查询        | `Tree_Model/Search/data-search.spec.ts`                            |     29 |
-| 5. 查询        | `Tree_Model/Search/statistic-search.spec.ts`                       |     22 |
-| 6. SQL 操作    | `Tree_Model/SQL_Search/sql-search.spec.ts`                         |     24 |
-| 8. 可视化      | `Tree_Model/Trend/tree-running-trend.spec.ts`                      |     13 |
-| 8. 可视化      | `Tree_Model/Trend/tree-history-trend.spec.ts`                      |      9 |
-| 8. 可视化      | `Tree_Model/Trend/spectrum.spec.ts`                                |     12 |
-| 9. 视图        | `Tree_Model/Calculate_Detail/calculate.spec.ts`                    |     50 |
-| 10. 数据同步   | `Tree_Model/Data_Sync/data-sync.spec.ts`                           |     52 |
-| 11. 权限管理   | `Tree_Model/System/Auth/User/user.spec.ts`                         |     13 |
-| 11. 权限管理   | `Tree_Model/System/Auth/Role/role.spec.ts`                         |      9 |
-| 12. 审计日志   | `Tree_Model/System/Audit/audit.spec.ts`                            |      3 |
-| 13. 数据库配置 | `Tree_Model/System/Config/config.spec.ts`                          |     10 |
-
-## 6. 下一阶段建议顺序
-
-### 第一优先级
-
-- 7. AI 分析
-
-### 第二优先级
-
-- 8. 可视化：继续补复杂图表交互、更多分析参数组合、异常分支
-- 12. 审计日志：补齐分页、详情查看、查询重置组合与导出
-- 13. 数据库配置：补齐更多参数组合、异常提示与权限边界
-- 11. 权限管理：补齐编辑、删除、授权
-- 1. 实例管理：补齐更多连接类型
-- 3. 首页：补齐监控空态与异常态
-
-### 第三优先级
-
-- 4. 测点管理：继续补复杂异常与权限边界
-- 5. 查询：继续补复杂组合与大结果集
-- 6. SQL 操作：继续补异常 SQL 与高级页签联动
-- 9. 视图：继续补复杂表达式与精确结果校验
-
-## 7. 当前汇报口径
-
-- 当前已按 13 个一级业务模块进行拆分管理。
-- 当前已完成核心主链路覆盖的模块有：`实例管理`、`登录`、`首页`、`测点管理`、`查询`、`SQL 操作`、`视图`、`数据同步`。
-- `可视化` 已完成实时趋势、历史趋势、分析页首批真实环境覆盖，但仍属于部分覆盖。
-- `权限管理`、`审计日志`、`数据库配置` 已完成首批覆盖，但仍属于部分覆盖状态。
-- `AI 分析` 是当前唯一尚未开始的一类一级模块。
-- 当前真实环境累计已落地 `395` 条可执行用例，后续需要再跑一次完整全量回归统一确认最新总绿结果。
-## Execution Presets Supplement
-- `tree-full`: current Tree_Model full regression preset.
-- `table-full`: current Table_Model connected preset, includes `table-instance`, `table-login`, `table-dashboard`, `table-data`, `table-sql`.
-- `all-models-full`: combined preset for `tree-full` + `table-full` in direct mode.
-- `all-models-full-dev`: combined preset for `tree-full` + `table-full` in dev mode.
+- 用例数按当前树模型 spec 文件中的 `test(...)` 条目统计。
+- `test.skip(...)` 环境守卫不计入用例数。
+- 运行报告结果以 `tests/e2e/reports/Workbench-report_latest.md` 为准。
