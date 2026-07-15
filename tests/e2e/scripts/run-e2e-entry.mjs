@@ -69,12 +69,6 @@ const moduleDefinitions = [
     specs: ['tests/e2e/Test_Cases/Tree_Model/Search/data-search.spec.ts', 'tests/e2e/Test_Cases/Tree_Model/Search/statistic-search.spec.ts'],
   },
   {
-    key: 'table-search',
-    displayName: 'table-search',
-    aliases: ['table-search'],
-    specs: [],
-  },
-  {
     key: 'tree-sql',
     displayName: 'tree-sql',
     aliases: ['tree-sql', 'sql', 'sql-operation'],
@@ -124,22 +118,10 @@ const moduleDefinitions = [
     specs: ['tests/e2e/Test_Cases/Tree_Model/Calculate_Detail/calculate.spec.ts'],
   },
   {
-    key: 'table-view',
-    displayName: 'table-view',
-    aliases: ['table-view', 'table-calculate'],
-    specs: [],
-  },
-  {
     key: 'tree-data-sync',
     displayName: 'tree-data-sync',
     aliases: ['tree-data-sync', 'data-sync', 'sync'],
     specs: ['tests/e2e/Test_Cases/Tree_Model/Data_Sync/data-sync.spec.ts'],
-  },
-  {
-    key: 'table-data-sync',
-    displayName: 'table-data-sync',
-    aliases: ['table-data-sync', 'table-sync'],
-    specs: [],
   },
   {
     key: 'tree-auth',
@@ -160,22 +142,10 @@ const moduleDefinitions = [
     specs: ['tests/e2e/Test_Cases/Tree_Model/System/Audit/audit.spec.ts'],
   },
   {
-    key: 'table-audit',
-    displayName: 'table-audit',
-    aliases: ['table-audit', 'table-audit-log'],
-    specs: [],
-  },
-  {
     key: 'tree-db-config',
     displayName: 'tree-db-config',
     aliases: ['tree-db-config', 'db-config', 'database-config', 'config'],
     specs: ['tests/e2e/Test_Cases/Tree_Model/System/Config/config.spec.ts'],
-  },
-  {
-    key: 'table-db-config',
-    displayName: 'table-db-config',
-    aliases: ['table-db-config', 'table-database-config', 'table-config'],
-    specs: [],
   },
 ];
 
@@ -209,11 +179,9 @@ Modules:
   tree-measurement
   table-measurement
   tree-search
-  table-search
   tree-sql
   table-sql
   tree-view
-  table-view
   tree-auth
   table-auth
   tree-ai-analysis
@@ -221,11 +189,8 @@ Modules:
   tree-trend
   table-trend
   tree-data-sync
-  table-data-sync
   tree-audit
-  table-audit
   tree-db-config
-  table-db-config
   tree-full
   table-full
   all-models-full
@@ -262,7 +227,7 @@ Notes:
   headed  = open browser and generate report
   --plain = run Playwright directly without the markdown/json report wrapper
   use explicit tree-* or table-* module names; legacy aliases like "instance" and "login" are no longer supported
-  table-* modules without specs are recognized but will fail fast with "no automation spec implemented yet"
+  modules without specs are recognized but will fail fast with "no automation spec implemented yet"
   tree-full / table-full / all-models-full can be combined with direct or dev runtime targets
   --dry-run = print resolved command without executing`);
 }
