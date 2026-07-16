@@ -1,5 +1,7 @@
 ﻿# IoTDB Workbench UI Automation
 
+GitHub 仓库地址：[https://github.com/thulab/Workbench_IoTDB_UI_Tool](https://github.com/thulab/Workbench_IoTDB_UI_Tool)
+
 更多执行预设与模块入口说明见：[EXECUTION_PRESETS.md](tests/e2e/EXECUTION_PRESETS.md)
 
 IoTDB_Workbench_UI_Auto 是基于 IoTDB Workbench 前端工程搭建的 UI 自动化项目，当前以 Playwright 为核心，面向真实 Workbench + 真实 IoTDB 环境执行回归。
