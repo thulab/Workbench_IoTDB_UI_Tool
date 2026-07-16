@@ -4,6 +4,8 @@ GitHub 仓库地址：[https://github.com/thulab/Workbench_IoTDB_UI_Tool](https:
 
 更多执行预设与模块入口说明见：[EXECUTION_PRESETS.md](tests/e2e/EXECUTION_PRESETS.md)
 
+新增、修改、删除用例说明见：[TEST_CASE_GUIDE.md](tests/e2e/TEST_CASE_GUIDE.md)
+
 IoTDB_Workbench_UI_Auto 是基于 IoTDB Workbench 前端工程搭建的 UI 自动化项目，当前以 Playwright 为核心，面向真实 Workbench + 真实 IoTDB 环境执行回归。
 
 当前约定：
@@ -378,6 +380,7 @@ tests/e2e/
 ├─ AUTOMATION_COVERAGE_MATRIX.md
 ├─ AUTOMATION_COVERAGE_MATRIX_TREE_MODEL.md
 ├─ AUTOMATION_COVERAGE_MATRIX_TABLE_MODEL.md
+├─ TEST_CASE_GUIDE.md
 ├─ PAGE_CHANGE_CHECKLIST.md
 ├─ XMind_Test_Case_Tree.md
 ├─ XMind_Test_Case_Tree_Model.md
@@ -696,6 +699,7 @@ netstat -ano | findstr <Workbench端口>
 这一节仅面向维护自动化脚本的开发/测试人员。页面结构变化后，优先查看：
 
 - tests/e2e/PAGE_CHANGE_CHECKLIST.md
+- tests/e2e/TEST_CASE_GUIDE.md
 - tests/e2e/support/e2e-selectors.ts
 - tests/e2e/support/workbench-test-support.ts
 
