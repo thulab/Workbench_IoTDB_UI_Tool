@@ -6,6 +6,7 @@ import { pipeline } from 'node:stream/promises';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import JSZip from 'jszip';
+import YAML from 'yaml';
 
 const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirPath = path.dirname(currentFilePath);
@@ -28,6 +29,16 @@ const defaults = {
   iotdbUsername: 'root',
   iotdbPassword: 'root',
   prometheusUrl: '127.0.0.1:9090',
+  prometheusConfigNodeTargets: ['127.0.0.1:9091'],
+  prometheusDataNodeTargets: ['127.0.0.1:9092'],
+  iotdbSystemProperties: {
+    cn_metric_reporter_list: 'PROMETHEUS',
+    dn_metric_reporter_list: 'PROMETHEUS',
+    trusted_uri_pattern: '.*',
+    enable_audit_log: 'true',
+    pipe_air_gap_receiver_enabled: 'true',
+    pipe_air_gap_receiver_port: '9780',
+  },
 };
 
 function parseArgs(argv) {
@@ -77,6 +88,9 @@ Environment overrides:
   SETUP_IOTDB_USERNAME
   SETUP_IOTDB_PASSWORD
   SETUP_PROMETHEUS_URL_VALUE
+  SETUP_PROMETHEUS_CONFIGNODE_TARGETS
+  SETUP_PROMETHEUS_DATANODE_TARGETS
+  SETUP_IOTDB_PIPE_AIR_GAP_RECEIVER_PORT
 `);
 }
 
@@ -97,7 +111,22 @@ function getConfig() {
     iotdbUsername: process.env.SETUP_IOTDB_USERNAME || current.iotdb?.username || defaults.iotdbUsername,
     iotdbPassword: process.env.SETUP_IOTDB_PASSWORD || current.iotdb?.password || defaults.iotdbPassword,
     prometheusRuntimeUrl: process.env.SETUP_PROMETHEUS_URL_VALUE || current.prometheus?.url || defaults.prometheusUrl,
+    prometheusConfigNodeTargets: parseTargets(process.env.SETUP_PROMETHEUS_CONFIGNODE_TARGETS, defaults.prometheusConfigNodeTargets),
+    prometheusDataNodeTargets: parseTargets(process.env.SETUP_PROMETHEUS_DATANODE_TARGETS, defaults.prometheusDataNodeTargets),
+    iotdbSystemProperties: {
+      ...defaults.iotdbSystemProperties,
+      pipe_air_gap_receiver_port: process.env.SETUP_IOTDB_PIPE_AIR_GAP_RECEIVER_PORT || defaults.iotdbSystemProperties.pipe_air_gap_receiver_port,
+    },
   };
+}
+
+function parseTargets(value, fallback) {
+  if (!value) return fallback;
+  const targets = value
+    .split(',')
+    .map((target) => target.trim())
+    .filter(Boolean);
+  return targets.length > 0 ? targets : fallback;
 }
 
 async function downloadFile(url, targetPath, forceDownload) {
@@ -236,26 +265,107 @@ function startDetached(name, command, args, cwd) {
   console.log(`[setup] started ${name}: pid=${child.pid}, logs=${outPath}`);
 }
 
-function startIoTDB(iotdbDir) {
+function updatePropertiesFile(filePath, values) {
+  const existing = existsSync(filePath) ? readFileSync(filePath, 'utf8') : '';
+  const lines = existing ? existing.split(/\r?\n/) : [];
+  const usedKeys = new Set();
+  const nextLines = lines.map((line) => {
+    const match = line.match(/^(\s*#?\s*)([A-Za-z0-9_.-]+)(\s*=)(.*)$/);
+    if (!match) return line;
+
+    const key = match[2];
+    if (!Object.prototype.hasOwnProperty.call(values, key)) return line;
+
+    usedKeys.add(key);
+    return `${key}=${values[key]}`;
+  });
+
+  for (const [key, value] of Object.entries(values)) {
+    if (!usedKeys.has(key)) nextLines.push(`${key}=${value}`);
+  }
+
+  writeFileSync(filePath, `${nextLines.join('\n').replace(/\n+$/, '')}\n`, 'utf8');
+}
+
+function updateIoTDBSystemConfig(iotdbRoot, config) {
+  const configFile = findFirst(iotdbRoot, ['iotdb-system.properties']);
+  if (!configFile) {
+    console.warn(`[setup] IoTDB system config not found under ${iotdbRoot}. Update conf/iotdb-system.properties manually.`);
+    return false;
+  }
+
+  updatePropertiesFile(configFile, config.iotdbSystemProperties);
+  console.log(`[setup] updated IoTDB system config: ${configFile}`);
+  return true;
+}
+
+function startIoTDB(iotdbDir, config) {
   const root = serviceRoot(iotdbDir);
   const script = findFirst(root, isWindows ? ['start-standalone.bat'] : ['start-standalone.sh']);
   if (!script) {
     console.warn(`[setup] IoTDB start script not found under ${root}. Start IoTDB manually.`);
     return false;
   }
+  updateIoTDBSystemConfig(root, config);
   const { command, args } = processCommandForScript(script);
   startDetached('iotdb', command, args, root);
   return true;
 }
 
-function startPrometheus(prometheusDir) {
+function updatePrometheusConfig(prometheusRoot, executable, config) {
+  const existingConfig = findFirst(prometheusRoot, ['prometheus.yml']);
+  const configPath = existingConfig || path.join(path.dirname(executable), 'prometheus.yml');
+  const current = existsSync(configPath)
+    ? YAML.parse(readFileSync(configPath, 'utf8')) || {}
+    : {
+        global: {
+          scrape_interval: '15s',
+          evaluation_interval: '15s',
+        },
+      };
+
+  const existingScrapeConfigs = Array.isArray(current.scrape_configs) ? current.scrape_configs : [];
+  const nextScrapeConfigs = existingScrapeConfigs.filter((job) => !['confignode', 'datanode'].includes(job?.job_name));
+
+  nextScrapeConfigs.push(
+    {
+      job_name: 'confignode',
+      static_configs: [
+        {
+          targets: config.prometheusConfigNodeTargets,
+        },
+      ],
+      honor_labels: true,
+    },
+    {
+      job_name: 'datanode',
+      static_configs: [
+        {
+          targets: config.prometheusDataNodeTargets,
+        },
+      ],
+      honor_labels: true,
+    },
+  );
+
+  const next = {
+    ...current,
+    scrape_configs: nextScrapeConfigs,
+  };
+  writeFileSync(configPath, YAML.stringify(next), 'utf8');
+  console.log(`[setup] updated Prometheus config: ${configPath}`);
+  return configPath;
+}
+
+function startPrometheus(prometheusDir, config) {
   const root = serviceRoot(prometheusDir);
   const executable = findFirst(root, isWindows ? ['prometheus.exe'] : ['prometheus']);
   if (!executable) {
     console.warn(`[setup] Prometheus executable not found under ${root}. Start Prometheus manually.`);
     return false;
   }
-  startDetached('prometheus', executable, ['--web.listen-address=127.0.0.1:9090'], path.dirname(executable));
+  const configPath = updatePrometheusConfig(root, executable, config);
+  startDetached('prometheus', executable, [`--config.file=${configPath}`, '--web.listen-address=127.0.0.1:9090'], path.dirname(executable));
   return true;
 }
 
@@ -406,8 +516,8 @@ async function main() {
   }
 
   if (!options.noStart) {
-    startIoTDB(iotdbDir);
-    if (!options.skipPrometheus) startPrometheus(prometheusDir);
+    startIoTDB(iotdbDir, config);
+    if (!options.skipPrometheus) startPrometheus(prometheusDir, config);
     startWorkbench(workbenchDir);
     await new Promise((resolve) => setTimeout(resolve, 5_000));
     await healthCheck(config, options.skipPrometheus);

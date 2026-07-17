@@ -123,6 +123,8 @@ Linux / macOS：
 - 下载 Workbench、IoTDB、Prometheus 到 `.e2e-runtime/downloads/`。
 - 解压服务到 `.e2e-runtime/services/`。
 - 更新 `tests/e2e/config/runtime-environment.json`。
+- 启动 IoTDB 前更新 `conf/iotdb-system.properties`，写入监控、审计日志和 Pipe air gap 配置。
+- 启动 Prometheus 前更新 `prometheus.yml`，写入 `confignode` 和 `datanode` 监控 job。
 - 尝试启动 IoTDB、Prometheus、Workbench。
 - 服务日志输出到 `.e2e-runtime/logs/`。
 - 启动后执行基础连通性检查。
@@ -148,6 +150,34 @@ Linux / macOS：
 - `SETUP_IOTDB_USERNAME`
 - `SETUP_IOTDB_PASSWORD`
 - `SETUP_PROMETHEUS_URL_VALUE`
+- `SETUP_PROMETHEUS_CONFIGNODE_TARGETS`，默认 `127.0.0.1:9091`
+- `SETUP_PROMETHEUS_DATANODE_TARGETS`，默认 `127.0.0.1:9092`
+- `SETUP_IOTDB_PIPE_AIR_GAP_RECEIVER_PORT`，默认 `9780`
+
+IoTDB 默认写入配置：
+
+```properties
+cn_metric_reporter_list=PROMETHEUS
+dn_metric_reporter_list=PROMETHEUS
+trusted_uri_pattern=.*
+enable_audit_log=true
+pipe_air_gap_receiver_enabled=true
+pipe_air_gap_receiver_port=9780
+```
+
+Prometheus 默认写入配置：
+
+```yaml
+- job_name: 'confignode'
+  static_configs:
+    - targets: ['127.0.0.1:9091']
+  honor_labels: true
+
+- job_name: 'datanode'
+  static_configs:
+    - targets: ['127.0.0.1:9092']
+  honor_labels: true
+```
 
 注意：
 
