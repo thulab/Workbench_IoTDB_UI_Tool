@@ -4,6 +4,8 @@ GitHub 仓库地址：[https://github.com/thulab/Workbench_IoTDB_UI_Tool](https:
 
 更多执行预设与模块入口说明见：[EXECUTION_PRESETS.md](tests/e2e/EXECUTION_PRESETS.md)
 
+日常执行与维护 SOP 见：[SOP.md](tests/e2e/SOP.md)
+
 新增、修改、删除用例说明见：[TEST_CASE_GUIDE.md](tests/e2e/TEST_CASE_GUIDE.md)
 
 IoTDB_Workbench_UI_Auto 是基于 IoTDB Workbench 前端工程搭建的 UI 自动化项目，当前以 Playwright 为核心，面向真实 Workbench + 真实 IoTDB 环境执行回归。
@@ -49,7 +51,25 @@ Linux 环境如果提示缺少浏览器系统依赖，继续执行：
 npx playwright install-deps chromium
 ```
 
-### 第二步：确认真实环境配置
+### 第二步：准备真实环境
+
+如果本机还没有 Workbench、IoTDB、Prometheus，可先执行一键部署脚本。
+
+Windows：
+
+```powershell
+.\sbin\setup-e2e-env.bat
+```
+
+Linux / macOS：
+
+```bash
+./sbin/setup-e2e-env.sh
+```
+
+脚本会下载并解压服务、更新 `tests/e2e/config/runtime-environment.json`，并尝试启动服务。详细说明见 [SOP.md](tests/e2e/SOP.md)。
+
+### 第三步：确认真实环境配置
 
 用例默认连接已经启动好的 Workbench 和 IoTDB。先确认配置文件：
 
@@ -62,7 +82,7 @@ npx playwright install-deps chromium
 - `iotdb.username` 和 `iotdb.password`：数据库账号密码
 - `iotdb.supportedModels`：当前环境支持的模型，默认 `["tree", "table"]`
 
-### 第三步：先跑登录冒烟用例
+### 第四步：先跑登录冒烟用例
 
 建议先跑登录用例，确认环境、账号、浏览器和脚本入口都可用。
 
@@ -80,7 +100,7 @@ Linux / macOS / Git Bash：
 ./sbin/start.sh table-login direct headed
 ```
 
-### 第四步：按模块运行
+### 第五步：按模块运行
 
 登录通过后，再按模块执行。常用入口如下：
 
@@ -100,7 +120,7 @@ Linux / macOS / Git Bash：
 - `headed` 表示打开浏览器执行，适合调试和肉眼确认页面行为。
 - 表模型数据管理启动脚本推荐入口是 `table-measurement`；`table-data` 是兼容别名和 npm 固定脚本名。
 
-### 第五步：全量运行
+### 第六步：全量运行
 
 确认单模块稳定后，再执行全量回归。全量耗时较长，建议优先分模型执行。
 
@@ -121,7 +141,7 @@ Linux / macOS / Git Bash：
 .\sbin\start.bat all-models-full direct report
 ```
 
-### 第六步：查看报告
+### 第七步：查看报告
 
 执行带报告入口后，查看：
 
@@ -380,6 +400,7 @@ tests/e2e/
 ├─ AUTOMATION_COVERAGE_MATRIX.md
 ├─ AUTOMATION_COVERAGE_MATRIX_TREE_MODEL.md
 ├─ AUTOMATION_COVERAGE_MATRIX_TABLE_MODEL.md
+├─ SOP.md
 ├─ TEST_CASE_GUIDE.md
 ├─ PAGE_CHANGE_CHECKLIST.md
 ├─ XMind_Test_Case_Tree.md

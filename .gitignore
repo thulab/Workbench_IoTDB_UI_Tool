@@ -16,6 +16,7 @@ playwright-report
 test-results
 .playwright
 tests/e2e/reports/
+.e2e-runtime/
 *.local
 
 /cypress/videos/
