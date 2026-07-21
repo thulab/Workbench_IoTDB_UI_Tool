@@ -577,7 +577,7 @@ const handleConfirm = () => {
         const params = {
           name: formData.value.name,
           whole: formData.value.whole,
-          path: formData.value.whole ? 'root' : `root.${formData.value.path}`,
+          path: formData.value.whole ? 'root.**' : `root.${formData.value.path}`,
           reforward: formData.value.reforward,
           isSynchronHistory: formData.value.isSynchronHistory,
           startTime: formData.value.isSynchronHistory ? formatDate(formData.value.datetimerange[0], 'YYYY-MM-DD HH:mm:ss.SSSZ') : '',

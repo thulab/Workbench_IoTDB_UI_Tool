@@ -686,6 +686,7 @@ async function createTaskViaUi(
     triggerMode?: 'stream' | 'batch';
     syncMeasurement?: 'all' | 'path';
     path?: string;
+    expectDefaultGlobal?: boolean;
     reforward?: boolean;
     host?: string;
     port?: string;
@@ -700,8 +701,9 @@ async function createTaskViaUi(
     history = true,
     realtime = true,
     triggerMode = 'stream',
-    syncMeasurement = 'all',
-    path = 'sg.**',
+    syncMeasurement = 'path',
+    path = 'db.d1.**',
+    expectDefaultGlobal = false,
     reforward = true,
     host = defaultSyncTargetHost,
     port = String(defaultSyncTargetPort),
@@ -716,6 +718,10 @@ async function createTaskViaUi(
 
   await openCreateDialog(page);
   await taskNameInput(page).fill(baseName);
+
+  if (expectDefaultGlobal) {
+    await expect(syncMeasurementAllRadio(page)).toBeChecked();
+  }
 
   if (syncMeasurement === 'path') {
     await setNativeRadioState(syncMeasurementPathRadio(page), true);
@@ -1499,11 +1505,13 @@ test.describe('数据同步', () => {
     });
   });
 
-  test('49. 新建任务同步测点选择全局后可成功创建任务', async ({ page }) => {
-    // 校验同步测点选择全局时任务可成功创建。
+  test('49. 新建任务同步测点默认全局且切换前缀路径后可成功创建任务', async ({ page }) => {
+    // 校验同步测点默认选择全局，切换到前缀路径后任务可成功创建。
     await createTaskViaUi(page, {
       baseName: `whole_auto_${Date.now()}`,
-      syncMeasurement: 'all',
+      syncMeasurement: 'path',
+      path: 'db.d1.**',
+      expectDefaultGlobal: true,
     });
   });
 
