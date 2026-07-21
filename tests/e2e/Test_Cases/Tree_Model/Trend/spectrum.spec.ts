@@ -79,15 +79,15 @@ function buildSpectrumSeed(): SpectrumSeed {
 async function loginToWorkbench(page: Page) {
   const loginPage = new LoginPage(page);
   await loginPage.goto();
-  await loginPage.login({
-    connectionName: localhostConnection.name,
-    username: localhostConnection.username,
-    password: localhostConnection.password,
-    model: 'tree',
+  await loginPage.selectConnectionByName(localhostConnection.name);
+  await loginPage.userInput().fill(localhostConnection.username);
+  await loginPage.passwordInput().fill(localhostConnection.password);
+  await loginPage.selectModel('tree');
+  await loginPage.submitAndExpectDashboardLanding(localhostConnection.name, `${localhostConnection.host}:${localhostConnection.port}`, {
+    maxAttempts: 3,
   });
 
   await expect(page.locator('html')).toHaveAttribute('lang', /zh-cn/i);
-  await loginPage.expectDashboardLanding(localhostConnection.name, `${localhostConnection.host}:${localhostConnection.port}`);
 }
 
 async function expandVisualizationMenu(page: Page) {
