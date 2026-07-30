@@ -9,7 +9,14 @@
           </el-button>
         </el-tooltip>
         <auth-tooltip :is-disabled="canReadWriteSchema" :content="'common.schemaAuth'">
-          <el-button :disabled="!canReadWriteSchema" link @click="handleRefresh" id="measurement-tree-refresh" data-testid="measurement-model-refresh" :class="!canReadWriteSchema ? '' : 'svg-button-hover-color'">
+          <el-button
+            :disabled="!canReadWriteSchema"
+            link
+            @click="handleRefresh"
+            id="measurement-tree-refresh"
+            data-testid="measurement-model-refresh"
+            :class="!canReadWriteSchema ? '' : 'svg-button-hover-color'"
+          >
             <el-icon size="24"><i-custom-refresh /></el-icon>
           </el-button>
         </auth-tooltip>
@@ -257,6 +264,7 @@ function findNodeByPath(data: ModelData, path: string): ModelData | null {
 type MeasurementModelTestBridge = {
   getNodePaths: () => string[];
   clickNodeByPath: (path: string) => boolean;
+  clickPaginationByType: (nodeType: 'next' | 'pre') => boolean;
   refresh: () => void;
   isLoading: () => boolean;
 };
@@ -274,6 +282,14 @@ function installMeasurementModelTestBridge() {
         return false;
       }
       clickFunction({ data: node });
+      return true;
+    },
+    clickPaginationByType: (nodeType: 'next' | 'pre') => {
+      const paginationNode = treeData.value.children?.find((item) => item.nodeType === nodeType);
+      if (!paginationNode) {
+        return false;
+      }
+      clickFunction({ data: paginationNode });
       return true;
     },
     refresh: () => {

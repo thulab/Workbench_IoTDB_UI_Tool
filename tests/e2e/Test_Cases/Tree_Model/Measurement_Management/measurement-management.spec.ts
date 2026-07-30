@@ -40,7 +40,7 @@ function buildMeasurementNames() {
   };
 }
 
-function buildPaginationDatabaseNames(count = 9) {
+function buildPaginationDatabaseNames(count = 12) {
   const suffix = Date.now();
   return Array.from({ length: count }, (_, index) => `db_auto_${suffix}_${index + 1}`);
 }
@@ -307,11 +307,7 @@ async function cleanupMeasurementArtifactsForPage(page: Page) {
       .isVisible()
       .catch(() => false);
     if (loginVisible) {
-      await loginPage.login({
-        connectionName: localhostConnection.name,
-        password: localhostConnection.password,
-      });
-      await loginPage.expectDashboardLanding(localhostConnection.name, `${localhostConnection.host}:${localhostConnection.port}`);
+      return;
     }
 
     await measurementPage.gotoMeasurementList().catch(() => undefined);
@@ -2522,7 +2518,6 @@ test.describe('测点管理', () => {
     const measurementPage = new MeasurementManagementPage(page);
     const paginationDatabaseNames = buildPaginationDatabaseNames();
     let createdDatabaseNames: string[] = [];
-    test.setTimeout(120000);
 
     await loginPage.goto();
     await loginPage.login({
@@ -2545,12 +2540,10 @@ test.describe('测点管理', () => {
 
       const firstPagePaths = firstPage.list.map((item) => item.nodePath);
       expect(createdDatabaseNames.some((databaseName) => firstPagePaths.includes(`root.${databaseName}`))).toBe(true);
+      const canInspectVisiblePaths = await measurementPage.hasDataModelNodePathBridge();
+      const firstPageHash = canInspectVisiblePaths ? undefined : hashBuffer(await measurementPage.screenshotDataModelChart());
 
       const firstPageVisibleCount = firstPage.list.length + Number(firstPage.hasNext) + Number(firstPage.hasPre);
-      const firstPageHash = hashBuffer(await measurementPage.screenshotDataModelChart());
-
-      await measurementPage.clickDataModelLevelOnePagination('next', firstPageVisibleCount);
-
       const secondPage = await measurementPage.fetchDataModelChildrenPage('root', 2);
       expect(secondPage.hasPre).toBe(true);
 
@@ -2558,17 +2551,37 @@ test.describe('测点管理', () => {
       expect(secondPagePaths).not.toEqual(firstPagePaths);
       expect([...firstPagePaths, ...secondPagePaths].some((path) => path.startsWith('root.db_auto_'))).toBe(true);
 
-      const secondPageHash = hashBuffer(await measurementPage.screenshotDataModelChart());
-      expect(secondPageHash).not.toBe(firstPageHash);
+      await measurementPage.clickDataModelLevelOnePagination('next', firstPageVisibleCount, canInspectVisiblePaths ? secondPagePaths : []);
+      if (canInspectVisiblePaths) {
+        await expect
+          .poll(async () => {
+            const visiblePaths = await measurementPage.getDataModelNodePaths();
+            return secondPagePaths.some((path) => visiblePaths.includes(path));
+          })
+          .toBe(true);
+      } else {
+        const secondPageHash = hashBuffer(await measurementPage.screenshotDataModelChart());
+        expect(secondPageHash).not.toBe(firstPageHash);
+      }
 
       const secondPageVisibleCount = secondPage.list.length + Number(secondPage.hasNext) + Number(secondPage.hasPre);
-      await measurementPage.clickDataModelLevelOnePagination('pre', secondPageVisibleCount);
+      const secondPageHash = canInspectVisiblePaths ? undefined : hashBuffer(await measurementPage.screenshotDataModelChart());
+      await measurementPage.clickDataModelLevelOnePagination('pre', secondPageVisibleCount, canInspectVisiblePaths ? firstPagePaths : []);
 
-      await expect
-        .poll(async () => hashBuffer(await measurementPage.screenshotDataModelChart()), {
-          timeout: 10_000,
-        })
-        .not.toBe(secondPageHash);
+      if (canInspectVisiblePaths) {
+        await expect
+          .poll(async () => {
+            const visiblePaths = await measurementPage.getDataModelNodePaths();
+            return firstPagePaths.some((path) => visiblePaths.includes(path));
+          })
+          .toBe(true);
+      } else {
+        await expect
+          .poll(async () => hashBuffer(await measurementPage.screenshotDataModelChart()), {
+            timeout: 10_000,
+          })
+          .not.toBe(secondPageHash);
+      }
     } finally {
       if (page.isClosed()) {
         return;

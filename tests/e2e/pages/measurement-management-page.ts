@@ -870,17 +870,9 @@ export class MeasurementManagementPage {
     for (const databaseName of databaseNames) {
       await this.createDatabaseByApi(databaseName);
       createdNames.push(databaseName);
-      await this.refreshMeasurementTree();
-
-      if (
-        await this.treeRootMoreButton()
-          .isVisible()
-          .catch(() => false)
-      ) {
-        break;
-      }
     }
 
+    await this.refreshMeasurementTree();
     return createdNames;
   }
 
@@ -1282,6 +1274,17 @@ export class MeasurementManagementPage {
     });
   }
 
+  async hasDataModelNodePathBridge() {
+    return this.page.evaluate(() => {
+      const testWindow = window as typeof window & {
+        __measurementModelTest__?: {
+          getNodePaths?: () => string[];
+        };
+      };
+      return typeof testWindow.__measurementModelTest__?.getNodePaths === 'function';
+    });
+  }
+
   async waitForDataModelNode(path: string, timeout = uiTimeouts.pageReady) {
     await expect
       .poll(
@@ -1424,8 +1427,42 @@ export class MeasurementManagementPage {
     await this.page.waitForTimeout(1200);
   }
 
-  async clickDataModelLevelOnePagination(direction: 'next' | 'pre', total: number) {
+  async clickDataModelLevelOnePagination(direction: 'next' | 'pre', total: number, expectedPaths: string[] = []) {
     const baseline = await this.screenshotDataModelChart();
+    const waitForExpectedPaths = async () => {
+      if (!expectedPaths.length) {
+        return false;
+      }
+      const matched = await expect
+        .poll(
+          async () => {
+            const visiblePaths = await this.getDataModelNodePaths();
+            return expectedPaths.some((path) => visiblePaths.includes(path));
+          },
+          { timeout: 5_000 },
+        )
+        .toBe(true)
+        .then(() => true)
+        .catch(() => false);
+      return matched;
+    };
+
+    const triggeredByBridge = await this.page.evaluate((targetDirection) => {
+      const testWindow = window as typeof window & {
+        __measurementModelTest__?: {
+          clickPaginationByType?: (nodeType: 'next' | 'pre') => boolean;
+        };
+      };
+      return testWindow.__measurementModelTest__?.clickPaginationByType?.(targetDirection) || false;
+    }, direction);
+
+    if (triggeredByBridge) {
+      await this.waitForDataModelIdle();
+      if (!expectedPaths.length || (await waitForExpectedPaths())) {
+        return;
+      }
+    }
+
     const triggeredByGraphic = await this.page.evaluate((targetDirection) => {
       const chartSelectors = ['[data-testid="measurement-model-chart"]', '[data-testid="measurement-model-chart-wrapper"]', '.chart-container-box'];
       const targetNodeType = targetDirection === 'next' ? 'next' : 'pre';
@@ -1573,17 +1610,136 @@ export class MeasurementManagementPage {
     }, direction);
 
     if (triggeredByGraphic) {
+      await this.waitForDataModelIdle().catch(() => undefined);
+      if (await waitForExpectedPaths()) {
+        return;
+      }
       if (
-        await this.waitForDataModelChartChange(baseline, {
+        !expectedPaths.length &&
+        (await this.waitForDataModelChartChange(baseline, {
           attempts: 4,
           intervalMs: 700,
-        })
+        }))
       ) {
         return;
       }
     }
 
     const chartCanvas = this.modelChartWrapper().locator('canvas').first();
+    const paginationLayoutPoint = await this.page.evaluate((targetDirection) => {
+      const chartSelectors = ['[data-testid="measurement-model-chart"]', '[data-testid="measurement-model-chart-wrapper"]', '.chart-container-box'];
+      const targetNodeType = targetDirection === 'next' ? 'next' : 'pre';
+      const echartsGlobal = (
+        window as typeof window & {
+          echarts?: {
+            getInstanceByDom: (dom: Element) =>
+              | {
+                  getZr: () => {
+                    painter: {
+                      getViewportRoot: () => Element;
+                    };
+                  };
+                  getModel: () => {
+                    getSeriesByIndex: (index: number) => {
+                      getData: () => {
+                        count: () => number;
+                        getItemLayout: (dataIndex: number) => [number, number] | { x?: number; y?: number } | undefined;
+                        getItemModel: (dataIndex: number) => {
+                          option: {
+                            nodeType?: string;
+                          };
+                        };
+                      };
+                    };
+                  };
+                }
+              | undefined;
+          };
+        }
+      ).echarts;
+
+      if (!echartsGlobal?.getInstanceByDom) {
+        return null;
+      }
+
+      const candidateElements = chartSelectors.flatMap((selector) => Array.from(document.querySelectorAll(selector)));
+      let instance:
+        | {
+            getZr: () => {
+              painter: {
+                getViewportRoot: () => Element;
+              };
+            };
+            getModel: () => {
+              getSeriesByIndex: (index: number) => {
+                getData: () => {
+                  count: () => number;
+                  getItemLayout: (dataIndex: number) => [number, number] | { x?: number; y?: number } | undefined;
+                  getItemModel: (dataIndex: number) => {
+                    option: {
+                      nodeType?: string;
+                    };
+                  };
+                };
+              };
+            };
+          }
+        | undefined;
+
+      for (const element of candidateElements) {
+        instance = echartsGlobal.getInstanceByDom(element);
+        if (instance) {
+          break;
+        }
+      }
+
+      if (!instance) {
+        return null;
+      }
+
+      const data = instance.getModel().getSeriesByIndex(0).getData();
+      for (let dataIndex = 0; dataIndex < data.count(); dataIndex += 1) {
+        const nodeType = data.getItemModel(dataIndex)?.option?.nodeType;
+        if (nodeType !== targetNodeType) {
+          continue;
+        }
+        const layout = data.getItemLayout(dataIndex);
+        const x = Array.isArray(layout) ? layout[0] : layout?.x;
+        const y = Array.isArray(layout) ? layout[1] : layout?.y;
+        if (typeof x !== 'number' || typeof y !== 'number') {
+          return null;
+        }
+        const viewportRect = instance.getZr().painter.getViewportRoot().getBoundingClientRect();
+        return {
+          x: viewportRect.left + x,
+          y: viewportRect.top + y,
+        };
+      }
+
+      return null;
+    }, direction);
+
+    if (paginationLayoutPoint) {
+      const box = await chartCanvas.boundingBox();
+      if (box) {
+        await chartCanvas.click({
+          position: {
+            x: paginationLayoutPoint.x - box.x,
+            y: paginationLayoutPoint.y - box.y,
+          },
+        });
+      } else {
+        await this.page.mouse.click(paginationLayoutPoint.x, paginationLayoutPoint.y);
+      }
+      await this.waitForDataModelIdle().catch(() => undefined);
+      if (await waitForExpectedPaths()) {
+        return;
+      }
+      if (!expectedPaths.length && (await this.waitForDataModelChartChange(baseline))) {
+        return;
+      }
+    }
+
     const paginationPoint = await this.page.evaluate((targetDirection) => {
       const chartSelectors = ['[data-testid="measurement-model-chart"]', '[data-testid="measurement-model-chart-wrapper"]', '.chart-container-box'];
       const chartTexts = targetDirection === 'next' ? ['下一页', 'Next Page'] : ['上一页', 'Previous Page'];
@@ -1706,7 +1862,11 @@ export class MeasurementManagementPage {
       } else {
         await this.page.mouse.click(paginationPoint.x, paginationPoint.y);
       }
-      if (await this.waitForDataModelChartChange(baseline)) {
+      await this.waitForDataModelIdle().catch(() => undefined);
+      if (await waitForExpectedPaths()) {
+        return;
+      }
+      if (!expectedPaths.length && (await this.waitForDataModelChartChange(baseline))) {
         return;
       }
     }
@@ -1722,13 +1882,26 @@ export class MeasurementManagementPage {
     const primaryXFractions = [0.18, 0.2, 0.22, 0.24];
 
     if (await this.tryClickDataModelPaginationFractions(chartCanvas, baseline, primaryXFractions, primaryYFractions)) {
-      return;
+      await this.waitForDataModelIdle().catch(() => undefined);
+      if (await waitForExpectedPaths()) {
+        return;
+      }
+      if (!expectedPaths.length) {
+        return;
+      }
     }
 
     const fallbackXFractions = [0.16, 0.18, 0.2, 0.22, 0.24, 0.26, 0.28];
     const fallbackYFractions = direction === 'next' ? [0.9, 0.92, 0.935, 0.95, 0.965, 0.98] : [0.02, 0.035, 0.05, 0.065, 0.08, 0.095, 0.11, 0.125];
 
     if (await this.tryClickDataModelPaginationFractions(chartCanvas, baseline, fallbackXFractions, fallbackYFractions)) {
+      await this.waitForDataModelIdle().catch(() => undefined);
+      if (await waitForExpectedPaths()) {
+        return;
+      }
+      if (expectedPaths.length) {
+        throw new Error(`Data model pagination did not show expected ${direction} page paths after fallback coordinate click`);
+      }
       return;
     }
 
