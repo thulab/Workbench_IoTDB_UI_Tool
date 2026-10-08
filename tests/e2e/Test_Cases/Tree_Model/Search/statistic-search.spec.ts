@@ -285,6 +285,13 @@ async function createRealStatisticSearchSeed(page: Page, measurementCount = 1) {
   };
 }
 
+async function restoreStatisticSearchFromSessionViaMenu(page: Page, searchData: { path: string[]; datetimerange: string[] }) {
+  await page.evaluate((value) => {
+    window.sessionStorage.setItem('statisticSearchStorage', JSON.stringify(value));
+  }, searchData);
+  await openStatisticSearchFromMenu(page);
+}
+
 test.describe('统计查询', () => {
   test.beforeEach(async ({ page, request }) => {
     await seedClientState(page, { lang: realBackendRun ? 'cn' : 'en' });
@@ -487,11 +494,10 @@ test.describe('统计查询', () => {
       await loginToRealWorkbench(page);
       const seed = await createRealStatisticSearchSeed(page, 11);
 
-      await seedSessionStorage(page, 'statisticSearchStorage', {
+      await restoreStatisticSearchFromSessionViaMenu(page, {
         path: seed.measurements,
         datetimerange: [...seed.timeRange],
       });
-      await gotoStatisticSearch(page);
 
       await expect(pagination(page)).toBeVisible({ timeout: 30_000 });
       await expect(resultTable(page).getByText(seed.measurements[0], { exact: true })).toBeVisible({ timeout: 30_000 });
@@ -505,11 +511,10 @@ test.describe('统计查询', () => {
       await loginToRealWorkbench(page);
       const seed = await createRealStatisticSearchSeed(page, 1);
 
-      await seedSessionStorage(page, 'statisticSearchStorage', {
+      await restoreStatisticSearchFromSessionViaMenu(page, {
         path: seed.measurements,
         datetimerange: [...seed.timeRange],
       });
-      await gotoStatisticSearch(page);
 
       await expect(statisticSearchForm(page)).toBeVisible();
       await expect(resultTable(page)).toBeVisible();
@@ -585,11 +590,10 @@ test.describe('统计查询', () => {
       await loginToRealWorkbench(page);
       const seed = await createRealStatisticSearchSeed(page, 11);
 
-      await seedSessionStorage(page, 'statisticSearchStorage', {
+      await restoreStatisticSearchFromSessionViaMenu(page, {
         path: seed.measurements,
         datetimerange: [...seed.timeRange],
       });
-      await gotoStatisticSearch(page);
 
       await expect(pagination(page)).toBeVisible({ timeout: 30_000 });
       await expect(resultTable(page).getByText(seed.measurements[0], { exact: true })).toBeVisible({ timeout: 30_000 });
@@ -604,11 +608,10 @@ test.describe('统计查询', () => {
       await loginToRealWorkbench(page);
       const seed = await createRealStatisticSearchSeed(page, 1);
 
-      await seedSessionStorage(page, 'statisticSearchStorage', {
+      await restoreStatisticSearchFromSessionViaMenu(page, {
         path: seed.measurements,
         datetimerange: [...seed.timeRange],
       });
-      await gotoStatisticSearch(page);
 
       await expect(downloadDropdown(page)).toBeVisible();
       await openExportDropdown(page);
@@ -624,11 +627,10 @@ test.describe('统计查询', () => {
       await loginToRealWorkbench(page);
       const seed = await createRealStatisticSearchSeed(page, 1);
 
-      await seedSessionStorage(page, 'statisticSearchStorage', {
+      await restoreStatisticSearchFromSessionViaMenu(page, {
         path: seed.measurements,
         datetimerange: [...seed.timeRange],
       });
-      await gotoStatisticSearch(page);
 
       await openExportDropdown(page);
       await downloadXlsxOption(page).click();
@@ -658,11 +660,10 @@ test.describe('统计查询', () => {
       await loginToRealWorkbench(page);
       const seed = await createRealStatisticSearchSeed(page, 1);
 
-      await seedSessionStorage(page, 'statisticSearchStorage', {
+      await restoreStatisticSearchFromSessionViaMenu(page, {
         path: seed.measurements,
         datetimerange: [...seed.timeRange],
       });
-      await gotoStatisticSearch(page);
 
       await expect(resultTable(page).getByText(seed.measurements[0], { exact: true })).toBeVisible({ timeout: 30_000 });
       await expect(resultTable(page)).toContainText(seed.expectedFirstValue);
