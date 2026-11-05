@@ -90,7 +90,12 @@ export async function getConnectionDetailByApi(request: APIRequestContext, id: n
 }
 
 export async function deleteConnectionById(request: APIRequestContext, id: number | string) {
-  await request.get(resolveApiRequestPath(`/api/connection/deleteConnectionById?id=${id}`));
+  const requestPath = `/api/connection/deleteConnectionById?id=${id}`;
+  // 后端新分支将删除接口改为 POST；对仍只支持 GET 的旧分支回退一次。
+  const response = await request.post(resolveApiRequestPath(requestPath));
+  if (response.status() === 405) {
+    await request.get(resolveApiRequestPath(requestPath));
+  }
 }
 
 export async function ensureStandaloneConnectionExists(

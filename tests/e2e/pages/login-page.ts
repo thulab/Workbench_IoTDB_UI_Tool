@@ -3,7 +3,8 @@ import { gotoLogin } from '../support/workbench-test-support';
 import { loginSelectors, shellSelectors, uiTimeouts } from '../support/e2e-selectors';
 
 const dashboardLandingTexts = {
-  home: '首页',
+  // 新版 AI 助手界面把左侧首个菜单由「首页」改为「运行总览」，两种文案都要兼容。
+  home: /^(?:首页|运行总览)$/,
   systemInfo: '系统信息',
 } as const;
 
@@ -190,7 +191,7 @@ export class LoginPage {
     await expect(this.page).toHaveURL(/\/view\/dashboard/, { timeout: uiTimeouts.pageReady });
     await expect(this.page.getByText(connectionName, { exact: true }).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
     await expect(this.page.getByText(endpoint, { exact: true }).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
-    await expect(this.page.getByText(dashboardLandingTexts.home, { exact: true }).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
+    await expect(this.page.getByText(dashboardLandingTexts.home).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
     await expect(this.page.getByText(dashboardLandingTexts.systemInfo, { exact: true }).first()).toBeVisible({ timeout: uiTimeouts.pageReady });
   }
 
