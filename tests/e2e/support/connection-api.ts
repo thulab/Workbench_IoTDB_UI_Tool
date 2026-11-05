@@ -91,8 +91,10 @@ export async function getConnectionDetailByApi(request: APIRequestContext, id: n
 
 export async function deleteConnectionById(request: APIRequestContext, id: number | string) {
   const requestPath = `/api/connection/deleteConnectionById?id=${id}`;
-  // 后端新分支将删除接口改为 POST；对仍只支持 GET 的旧分支回退一次。
-  const response = await request.post(resolveApiRequestPath(requestPath));
+  // 后端新分支将删除接口改为 POST，并要求 CSRF 头；对仍只支持 GET 的旧分支回退一次。
+  const response = await request.post(resolveApiRequestPath(requestPath), {
+    headers: { 'X-Workbench-CSRF': '1' },
+  });
   if (response.status() === 405) {
     await request.get(resolveApiRequestPath(requestPath));
   }
