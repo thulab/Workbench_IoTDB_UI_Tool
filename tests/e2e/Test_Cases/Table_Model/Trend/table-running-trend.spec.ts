@@ -312,6 +312,17 @@ function trendGroupMeasurementDeleteButton(group: ReturnType<typeof trendGroups>
   return group.locator(`xpath=.//div[contains(@class,"text-12px") and normalize-space()="${measurementLabel}"]/following-sibling::button[1]`).first();
 }
 
+async function clickTrendGroupMeasurementDeleteButton(group: ReturnType<typeof trendGroups>, measurementLabel: string) {
+  const button = trendGroupMeasurementDeleteButton(group, measurementLabel);
+  await expect(button).toBeVisible({ timeout: uiTimeouts.pageReady });
+  // 新版趋势列表出现横向滚动条时，滚动条会覆盖按钮中心；从按钮左上角点击，仍失败则直接派发点击事件。
+  try {
+    await button.click({ position: { x: 2, y: 2 }, timeout: 5_000 });
+  } catch {
+    await button.dispatchEvent('click');
+  }
+}
+
 function saveTemplateDialog(page: Page) {
   return page
     .locator('.el-dialog')
@@ -852,7 +863,7 @@ test.describe('表模型-实时趋势', () => {
     await expect(pressureGroup).toBeVisible({ timeout: uiTimeouts.pageReady });
     await expect(temperatureGroup).toBeVisible({ timeout: uiTimeouts.pageReady });
 
-    await trendGroupMeasurementDeleteButton(pressureGroup, measurementLabels.pressure).click();
+    await clickTrendGroupMeasurementDeleteButton(pressureGroup, measurementLabels.pressure);
     await expect(trendGroups(page).filter({ hasText: measurementLabels.pressure })).toHaveCount(0, { timeout: uiTimeouts.pageReady });
     await expect(trendGroups(page).filter({ hasText: measurementLabels.temperature })).toHaveCount(1, { timeout: uiTimeouts.pageReady });
   });

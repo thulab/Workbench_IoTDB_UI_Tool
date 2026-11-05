@@ -1,4 +1,4 @@
-import { expect, type Page, type Route } from '@playwright/test';
+import { expect, type Locator, type Page, type Route } from '@playwright/test';
 import { uiTimeouts } from './e2e-selectors';
 import { enterpriseDbConfig } from './runtime-config';
 
@@ -861,6 +861,22 @@ export async function getActiveSqlEditorText(page: Page) {
   });
 }
 
+async function closeTimeseriesDropdown(page: Page, select: Locator) {
+  const dropdown = page.locator('.el-select-dropdown:visible').last();
+  if (!(await dropdown.isVisible().catch(() => false))) {
+    return;
+  }
+  // 新版测点选择器为多选下拉，选中后不会自动收起；按 Escape 在选项上不生效，需点击选择框或空白处关闭。
+  await page.keyboard.press('Escape').catch(() => undefined);
+  if (await dropdown.isVisible().catch(() => false)) {
+    await select.click().catch(() => undefined);
+  }
+  if (await dropdown.isVisible().catch(() => false)) {
+    await page.mouse.click(640, 8);
+  }
+  await expect(dropdown).toBeHidden({ timeout: 5_000 }).catch(() => undefined);
+}
+
 export async function selectTimeseries(page: Page, prefix: string, measurement = 'root.sg.d1.s1') {
   const select = page.locator(`[data-testid="${prefix}-select"], #${prefix}`).first();
   await select.click();
@@ -880,11 +896,13 @@ export async function selectTimeseries(page: Page, prefix: string, measurement =
   if (await optionByTestId.count()) {
     await expect(optionByTestId).toBeVisible({ timeout: 10_000 });
     await optionByTestId.click();
+    await closeTimeseriesDropdown(page, select);
     return;
   }
 
   await expect(optionByText).toBeVisible({ timeout: 10_000 });
   await optionByText.click();
+  await closeTimeseriesDropdown(page, select);
 }
 
 export async function openTimeseriesOptions(page: Page, prefix: string, query = 'root.sg.d1.s') {

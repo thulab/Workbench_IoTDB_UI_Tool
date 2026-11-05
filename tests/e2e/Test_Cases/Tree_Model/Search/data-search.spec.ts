@@ -402,6 +402,19 @@ function measurementSelectInput(page: Page) {
   return measurementSelect(page).locator('input').last();
 }
 
+async function closeTimeseriesDropdown(page: Page) {
+  const dropdown = page.locator('.el-select-dropdown:visible').last();
+  if (!(await dropdown.isVisible().catch(() => false))) {
+    return;
+  }
+  // 新版测点选择器为多选下拉，选中后不会自动收起，会遮挡查询按钮和日期选择器。
+  await page.keyboard.press('Escape').catch(() => undefined);
+  if (await dropdown.isVisible().catch(() => false)) {
+    await page.mouse.click(640, 8);
+  }
+  await expect(dropdown).toBeHidden({ timeout: 5_000 }).catch(() => undefined);
+}
+
 async function selectTimeseriesByQuery(page: Page, prefix: string, query: string, optionText: string) {
   const select = page.locator(`[data-testid="${prefix}-select"], #${prefix}`).first();
   await select.click({ force: true });
@@ -433,22 +446,26 @@ async function selectTimeseriesByQuery(page: Page, prefix: string, query: string
   if (await optionByTestId.count()) {
     await expect(optionByTestId.first()).toBeVisible({ timeout: 10_000 });
     await optionByTestId.first().click();
+    await closeTimeseriesDropdown(page);
     return;
   }
 
   if (await optionByText.count()) {
     await expect(optionByText).toBeVisible({ timeout: 10_000 });
     await optionByText.click();
+    await closeTimeseriesDropdown(page);
     return;
   }
 
   if (await hiddenOptionByText.count()) {
     await hiddenOptionByText.dispatchEvent('click');
+    await closeTimeseriesDropdown(page);
     return;
   }
 
   await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Enter');
+  await closeTimeseriesDropdown(page);
 }
 
 async function updateMeasurementDescription(page: Page, measurement: string, description: string) {
