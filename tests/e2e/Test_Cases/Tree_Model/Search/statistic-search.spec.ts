@@ -169,6 +169,19 @@ async function hoverAndExpectTooltip(trigger: ReturnType<Page['locator']>, page:
     .toContain(normalizeTooltipText(text));
 }
 
+async function closeTimeseriesDropdown(page: Page) {
+  const dropdown = page.locator('.el-select-dropdown:visible').last();
+  if (!(await dropdown.isVisible().catch(() => false))) {
+    return;
+  }
+  // 新版测点选择器为多选下拉，反选后不会自动收起，会遮挡查询按钮和日期选择器。
+  await page.keyboard.press('Escape').catch(() => undefined);
+  if (await dropdown.isVisible().catch(() => false)) {
+    await page.mouse.click(640, 8);
+  }
+  await expect(dropdown).toBeHidden({ timeout: 5_000 }).catch(() => undefined);
+}
+
 async function chooseTodayDateRange(page: Page) {
   await dateRangePicker(page).click({ force: true });
   const shortcut = page.locator('.el-picker-panel:visible .el-picker-panel__shortcut').filter({ hasText: '今天' }).first()
@@ -576,7 +589,7 @@ test.describe('统计查询', () => {
         .getByTestId('statistic-search-path-invert-selection')
         .or(page.getByRole('button', { name: '反选' }).first())
         .click();
-      await page.keyboard.press('Escape');
+      await closeTimeseriesDropdown(page);
 
       await expect(selectedMeasurementsButton(page)).toBeEnabled({ timeout: 10_000 });
 
